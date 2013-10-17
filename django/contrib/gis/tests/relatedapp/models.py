@@ -5,7 +5,9 @@ from django.utils.encoding import python_2_unicode_compatible
 class Location(models.Model):
     point = models.PointField()
     objects = models.GeoManager()
-    def __str__(self): return self.point.wkt
+
+    def __str__(self):
+        return self.point.wkt
 
 @python_2_unicode_compatible
 class City(models.Model):
@@ -13,7 +15,9 @@ class City(models.Model):
     state = models.CharField(max_length=2)
     location = models.ForeignKey(Location)
     objects = models.GeoManager()
-    def __str__(self): return self.name
+
+    def __str__(self):
+        return self.name
 
 class AugmentedLocation(Location):
     extra_text = models.TextField(blank=True)
@@ -34,7 +38,9 @@ class Parcel(models.Model):
     border1 = models.PolygonField()
     border2 = models.PolygonField(srid=2276)
     objects = models.GeoManager()
-    def __str__(self): return self.name
+
+    def __str__(self):
+        return self.name
 
 # These use the GeoManager but do not have any geographic fields.
 class Author(models.Model):

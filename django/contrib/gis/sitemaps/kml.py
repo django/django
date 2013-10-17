@@ -46,7 +46,8 @@ class KMLSitemap(Sitemap):
         is placed on each URL element.
         """
         urls = Sitemap.get_urls(self, page=page, site=site)
-        for url in urls: url['geo_format'] = self.geo_format
+        for url in urls:
+            url['geo_format'] = self.geo_format
         return urls
 
     def items(self):

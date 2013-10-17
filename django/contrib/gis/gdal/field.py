@@ -132,9 +132,14 @@ class OFTReal(Field):
         return self.as_double()
 
 # String & Binary fields, just subclasses
-class OFTString(Field): pass
-class OFTWideString(Field): pass
-class OFTBinary(Field): pass
+class OFTString(Field):
+    pass
+
+class OFTWideString(Field):
+    pass
+
+class OFTBinary(Field):
+    pass
 
 # OFTDate, OFTTime, OFTDateTime fields.
 class OFTDate(Field):
@@ -172,10 +177,17 @@ class OFTTime(Field):
             return None
 
 # List fields are also just subclasses
-class OFTIntegerList(Field): pass
-class OFTRealList(Field): pass
-class OFTStringList(Field): pass
-class OFTWideStringList(Field): pass
+class OFTIntegerList(Field):
+    pass
+
+class OFTRealList(Field):
+    pass
+
+class OFTStringList(Field):
+    pass
+
+class OFTWideStringList(Field):
+    pass
 
 # Class mapping dictionary for OFT Types and reverse mapping.
 OGRFieldTypes = {

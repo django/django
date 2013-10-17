@@ -7,7 +7,9 @@ class SouthTexasCity(models.Model):
     name = models.CharField(max_length=30)
     point = models.PointField(srid=32140)
     objects = models.GeoManager()
-    def __str__(self): return self.name
+
+    def __str__(self):
+        return self.name
 
 @python_2_unicode_compatible
 class SouthTexasCityFt(models.Model):
@@ -15,7 +17,9 @@ class SouthTexasCityFt(models.Model):
     name = models.CharField(max_length=30)
     point = models.PointField(srid=2278)
     objects = models.GeoManager()
-    def __str__(self): return self.name
+
+    def __str__(self):
+        return self.name
 
 @python_2_unicode_compatible
 class AustraliaCity(models.Model):
@@ -23,7 +27,9 @@ class AustraliaCity(models.Model):
     name = models.CharField(max_length=30)
     point = models.PointField()
     objects = models.GeoManager()
-    def __str__(self): return self.name
+
+    def __str__(self):
+        return self.name
 
 @python_2_unicode_compatible
 class CensusZipcode(models.Model):
@@ -31,7 +37,9 @@ class CensusZipcode(models.Model):
     name = models.CharField(max_length=5)
     poly = models.PolygonField(srid=4269)
     objects = models.GeoManager()
-    def __str__(self): return self.name
+
+    def __str__(self):
+        return self.name
 
 @python_2_unicode_compatible
 class SouthTexasZipcode(models.Model):
@@ -39,7 +47,9 @@ class SouthTexasZipcode(models.Model):
     name = models.CharField(max_length=5)
     poly = models.PolygonField(srid=32140, null=True)
     objects = models.GeoManager()
-    def __str__(self): return self.name
+
+    def __str__(self):
+        return self.name
 
 @python_2_unicode_compatible
 class Interstate(models.Model):
@@ -47,7 +57,9 @@ class Interstate(models.Model):
     name = models.CharField(max_length=10)
     path = models.LineStringField()
     objects = models.GeoManager()
-    def __str__(self): return self.name
+
+    def __str__(self):
+        return self.name
 
 @python_2_unicode_compatible
 class SouthTexasInterstate(models.Model):
@@ -55,4 +67,6 @@ class SouthTexasInterstate(models.Model):
     name = models.CharField(max_length=10)
     path = models.LineStringField(srid=32140)
     objects = models.GeoManager()
-    def __str__(self): return self.name
+
+    def __str__(self):
+        return self.name

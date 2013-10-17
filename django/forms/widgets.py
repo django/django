@@ -273,7 +273,8 @@ class PasswordInput(TextInput):
         self.render_value = render_value
 
     def render(self, name, value, attrs=None):
-        if not self.render_value: value=None
+        if not self.render_value:
+            value=None
         return super(PasswordInput, self).render(name, value, attrs)
 
 class HiddenInput(Input):
@@ -291,7 +292,8 @@ class MultipleHiddenInput(HiddenInput):
         self.choices = choices
 
     def render(self, name, value, attrs=None, choices=()):
-        if value is None: value = []
+        if value is None:
+            value = []
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
         id_ = final_attrs.get('id', None)
         inputs = []
@@ -394,7 +396,8 @@ class Textarea(Widget):
         super(Textarea, self).__init__(default_attrs)
 
     def render(self, name, value, attrs=None):
-        if value is None: value = ''
+        if value is None:
+            value = ''
         final_attrs = self.build_attrs(attrs, name=name)
         return format_html('<textarea{0}>\r\n{1}</textarea>',
                            flatatt(final_attrs),
@@ -469,7 +472,8 @@ class Select(Widget):
         self.choices = list(choices)
 
     def render(self, name, value, attrs=None, choices=()):
-        if value is None: value = ''
+        if value is None:
+            value = ''
         final_attrs = self.build_attrs(attrs, name=name)
         output = [format_html('<select{0}>', flatatt(final_attrs))]
         options = self.render_options(choices, [value])
@@ -539,7 +543,8 @@ class SelectMultiple(Select):
     allow_multiple_selected = True
 
     def render(self, name, value, attrs=None, choices=()):
-        if value is None: value = []
+        if value is None:
+            value = []
         final_attrs = self.build_attrs(attrs, name=name)
         output = [format_html('<select multiple="multiple"{0}>', flatatt(final_attrs))]
         options = self.render_options(choices, value)

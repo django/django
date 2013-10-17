@@ -36,7 +36,8 @@ else:
 if lib_names:
     for lib_name in lib_names:
         lib_path = find_library(lib_name)
-        if not lib_path is None: break
+        if not lib_path is None:
+            break
 
 if lib_path is None:
     raise OGRException('Could not find the GDAL library (tried "%s"). '
@@ -83,7 +84,8 @@ version_regex = re.compile(r'^(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<subminor>\d+)
 def gdal_version_info():
     ver = gdal_version().decode()
     m = version_regex.match(ver)
-    if not m: raise OGRException('Could not parse GDAL version string "%s"' % ver)
+    if not m:
+        raise OGRException('Could not parse GDAL version string "%s"' % ver)
     return dict((key, m.group(key)) for key in ('major', 'minor', 'subminor'))
 
 _verinfo = gdal_version_info()

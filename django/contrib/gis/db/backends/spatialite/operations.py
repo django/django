@@ -275,12 +275,14 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
             version = None
             try:
                 tmp = self._get_spatialite_func("X(GeomFromText('POINT(1 1)'))")
-                if tmp == 1.0: version = '2.3.0'
+                if tmp == 1.0:
+                    version = '2.3.0'
             except DatabaseError:
                 pass
             # If no version string defined, then just re-raise the original
             # exception.
-            if version is None: raise
+            if version is None:
+                raise
 
         m = self.version_regex.match(version)
         if m:
@@ -301,7 +303,8 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         if not self.check_aggregate_support(agg):
             raise NotImplementedError('%s spatial aggregate is not implmented for this backend.' % agg_name)
         agg_name = agg_name.lower()
-        if agg_name == 'union': agg_name += 'agg'
+        if agg_name == 'union':
+            agg_name += 'agg'
         sql_template = self.select % '%(function)s(%(field)s)'
         sql_function = getattr(self, agg_name)
         return sql_template, sql_function

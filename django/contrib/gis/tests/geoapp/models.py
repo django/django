@@ -10,14 +10,18 @@ class Country(models.Model):
     name = models.CharField(max_length=30)
     mpoly = models.MultiPolygonField() # SRID, by default, is 4326
     objects = models.GeoManager()
-    def __str__(self): return self.name
+
+    def __str__(self):
+        return self.name
 
 @python_2_unicode_compatible
 class City(models.Model):
     name = models.CharField(max_length=30)
     point = models.PointField()
     objects = models.GeoManager()
-    def __str__(self): return self.name
+
+    def __str__(self):
+        return self.name
 
 # This is an inherited model from City
 class PennsylvaniaCity(City):
@@ -30,14 +34,18 @@ class State(models.Model):
     name = models.CharField(max_length=30)
     poly = models.PolygonField(null=null_flag) # Allowing NULL geometries here.
     objects = models.GeoManager()
-    def __str__(self): return self.name
+
+    def __str__(self):
+        return self.name
 
 @python_2_unicode_compatible
 class Track(models.Model):
     name = models.CharField(max_length=30)
     line = models.LineStringField()
     objects = models.GeoManager()
-    def __str__(self): return self.name
+
+    def __str__(self):
+        return self.name
 
 class Truth(models.Model):
     val = models.BooleanField(default=False)
@@ -49,7 +57,9 @@ if not spatialite:
         name = models.CharField(max_length=20)
         geom = models.GeometryField()
         objects = models.GeoManager()
-        def __str__(self): return self.name
+
+        def __str__(self):
+            return self.name
 
     class MinusOneSRID(models.Model):
         geom = models.PointField(srid=-1) # Minus one SRID.

@@ -21,11 +21,20 @@ from django.utils.encoding import force_text
 
 
 # LayerMapping exceptions.
-class LayerMapError(Exception): pass
-class InvalidString(LayerMapError): pass
-class InvalidDecimal(LayerMapError): pass
-class InvalidInteger(LayerMapError): pass
-class MissingForeignKey(LayerMapError): pass
+class LayerMapError(Exception):
+    pass
+
+class InvalidString(LayerMapError):
+    pass
+
+class InvalidDecimal(LayerMapError):
+    pass
+
+class InvalidInteger(LayerMapError):
+    pass
+
+class MissingForeignKey(LayerMapError):
+    pass
 
 class LayerMapping(object):
     "A class that maps OGR Layers to GeoDjango Models."
@@ -263,10 +272,12 @@ class LayerMapping(object):
         if isinstance(unique, (list, tuple)):
             # List of fields to determine uniqueness with
             for attr in unique:
-                if not attr in self.mapping: raise ValueError
+                if not attr in self.mapping:
+                    raise ValueError
         elif isinstance(unique, six.string_types):
             # Only a single field passed in.
-            if unique not in self.mapping: raise ValueError
+            if unique not in self.mapping:
+                raise ValueError
         else:
             raise TypeError('Unique keyword argument must be set with a tuple, list, or string.')
 
@@ -413,7 +424,8 @@ class LayerMapping(object):
         # Transforming the geometry with our Coordinate Transformation object,
         # but only if the class variable `transform` is set w/a CoordTransform
         # object.
-        if self.transform: g.transform(self.transform)
+        if self.transform:
+            g.transform(self.transform)
 
         # Returning the WKT of the geometry.
         return g.wkt
@@ -512,7 +524,8 @@ class LayerMapping(object):
                     kwargs = self.feature_kwargs(feat)
                 except LayerMapError as msg:
                     # Something borked the validation
-                    if strict: raise
+                    if strict:
+                        raise
                     elif not silent:
                         stream.write('Ignoring Feature ID %s because: %s\n' % (feat.fid, msg))
                 else:
@@ -534,7 +547,8 @@ class LayerMapping(object):
                             # just-updated geometry WKT.
                             geom = getattr(m, self.geom_field).ogr
                             new = OGRGeometry(kwargs[self.geom_field])
-                            for g in new: geom.add(g)
+                            for g in new:
+                                geom.add(g)
                             setattr(m, self.geom_field, geom.wkt)
                         except ObjectDoesNotExist:
                             # No unique model exists yet, create.
@@ -546,7 +560,8 @@ class LayerMapping(object):
                         # Attempting to save.
                         m.save(using=self.using)
                         num_saved += 1
-                        if verbose: stream.write('%s: %s\n' % ('Updated' if is_update else 'Saved', m))
+                        if verbose:
+                            stream.write('%s: %s\n' % ('Updated' if is_update else 'Saved', m))
                     except Exception as msg:
                         if strict:
                             # Bailing out if the `strict` keyword is set.
@@ -580,8 +595,10 @@ class LayerMapping(object):
             for i, end in enumerate(indices):
                 # Constructing the slice to use for this step; the last slice is
                 # special (e.g, [100:] instead of [90:100]).
-                if i+1 == n_i: step_slice = slice(beg, None)
-                else: step_slice = slice(beg, end)
+                if i+1 == n_i:
+                    step_slice = slice(beg, None)
+                else:
+                    step_slice = slice(beg, end)
 
                 try:
                     num_feat, num_saved = _save(step_slice, num_feat, num_saved)

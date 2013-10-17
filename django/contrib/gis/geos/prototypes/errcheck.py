@@ -33,7 +33,8 @@ def last_arg_byref(args):
 def check_dbl(result, func, cargs):
     "Checks the status code and returns the double value passed in by reference."
     # Checking the status code
-    if result != 1: return None
+    if result != 1:
+        return None
     # Double passed in by reference, return its value.
     return last_arg_byref(cargs)
 
@@ -53,8 +54,10 @@ def check_minus_one(result, func, cargs):
 def check_predicate(result, func, cargs):
     "Error checking for unary/binary predicate functions."
     val = ord(result) # getting the ordinal from the character
-    if val == 1: return True
-    elif val == 0: return False
+    if val == 1:
+        return True
+    elif val == 0:
+        return False
     else:
         raise GEOSException('Error encountered on GEOS C predicate function "%s".' % func.__name__)
 
@@ -80,7 +83,8 @@ def check_string(result, func, cargs):
 
     This frees the memory allocated by GEOS at the result pointer.
     """
-    if not result: raise GEOSException('Error encountered checking string return value in GEOS C function "%s".' % func.__name__)
+    if not result:
+        raise GEOSException('Error encountered checking string return value in GEOS C function "%s".' % func.__name__)
     # Getting the string value at the pointer address.
     s = string_at(result)
     # Freeing the memory allocated within GEOS

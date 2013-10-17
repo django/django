@@ -27,7 +27,8 @@ geoip_encodings = {
     1: 'utf8',
 }
 
-class GeoIPTag(Structure): pass
+class GeoIPTag(Structure):
+    pass
 
 RECTYPE = POINTER(GeoIPRecord)
 DBTYPE = POINTER(GeoIPTag)

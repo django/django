@@ -156,14 +156,20 @@ class GeoQuerySet(QuerySet):
         # PostGIS we're using. SpatiaLite only uses the first group of options.
         if backend.spatial_version >= (1, 4, 0):
             options = 0
-            if crs and bbox: options = 3
-            elif bbox: options = 1
-            elif crs: options = 2
+            if crs and bbox:
+                options = 3
+            elif bbox:
+                options = 1
+            elif crs:
+                options = 2
         else:
             options = 0
-            if crs and bbox: options = 3
-            elif crs: options = 1
-            elif bbox: options = 2
+            if crs and bbox:
+                options = 3
+            elif crs:
+                options = 1
+            elif bbox:
+                options = 2
         s = {'desc' : 'GeoJSON',
              'procedure_args' : {'precision' : precision, 'options' : options},
              'procedure_fmt' : '%(geo_col)s,%(precision)s,%(options)s',
@@ -441,7 +447,8 @@ class GeoQuerySet(QuerySet):
         # Does the spatial backend support this?
         connection = connections[self.db]
         func = getattr(connection.ops, att, False)
-        if desc is None: desc = att
+        if desc is None:
+            desc = att
         if not func:
             raise NotImplementedError('%s stored procedure not available on '
                                       'the %s backend.' %
@@ -489,7 +496,8 @@ class GeoQuerySet(QuerySet):
         # Adding any keyword parameters for the Aggregate object. Oracle backends
         # in particular need an additional `tolerance` parameter.
         agg_kwargs = {}
-        if connections[self.db].ops.oracle: agg_kwargs['tolerance'] = tolerance
+        if connections[self.db].ops.oracle:
+            agg_kwargs['tolerance'] = tolerance
 
         # Calling the QuerySet.aggregate, and returning only the value of the aggregate.
         return self.aggregate(geoagg=aggregate(agg_col, **agg_kwargs))['geoagg']
@@ -533,12 +541,14 @@ class GeoQuerySet(QuerySet):
         if settings.get('setup', True):
             default_args, geo_field = self._spatial_setup(att, desc=settings['desc'], field_name=field_name,
                                                           geo_field_type=settings.get('geo_field_type', None))
-            for k, v in six.iteritems(default_args): settings['procedure_args'].setdefault(k, v)
+            for k, v in six.iteritems(default_args):
+                settings['procedure_args'].setdefault(k, v)
         else:
             geo_field = settings['geo_field']
 
         # The attribute to attach to the model.
-        if not isinstance(model_att, six.string_types): model_att = att
+        if not isinstance(model_att, six.string_types):
+            model_att = att
 
         # Special handling for any argument that is a geometry.
         for name in settings['geom_args']:

@@ -201,8 +201,10 @@ class SpatialRefSysMixin(object):
             return self.srs.ellipsoid
         else:
             m = self.spheroid_regex.match(self.wkt)
-            if m: return (float(m.group('major')), float(m.group('flattening')))
-            else: return None
+            if m:
+                return (float(m.group('major')), float(m.group('flattening')))
+            else:
+                return None
 
     @property
     def name(self):

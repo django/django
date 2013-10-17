@@ -15,8 +15,10 @@ def double_output(func, argtypes, errcheck=False, strarg=False):
     "Generates a ctypes function that returns a double value."
     func.argtypes = argtypes
     func.restype = c_double
-    if errcheck: func.errcheck = check_arg_errcode
-    if strarg: func.errcheck = check_str_arg
+    if errcheck:
+        func.errcheck = check_arg_errcode
+    if strarg:
+        func.errcheck = check_str_arg
     return func
 
 def geom_output(func, argtypes, offset=None):
@@ -106,7 +108,8 @@ def void_output(func, argtypes, errcheck=True):
     For functions that don't only return an error code that needs to
     be examined.
     """
-    if argtypes: func.argtypes = argtypes
+    if argtypes:
+        func.argtypes = argtypes
     if errcheck:
         # `errcheck` keyword may be set to False for routines that
         # return void, rather than a status code.

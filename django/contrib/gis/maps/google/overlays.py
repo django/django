@@ -102,8 +102,10 @@ class GPolygon(GOverlayBase):
           fill_opacity:
             The opacity of the polygon fill.  Defaults to 0.4.
         """
-        if isinstance(poly, six.string_types): poly = fromstr(poly)
-        if isinstance(poly, (tuple, list)): poly = Polygon(poly)
+        if isinstance(poly, six.string_types):
+            poly = fromstr(poly)
+        if isinstance(poly, (tuple, list)):
+            poly = Polygon(poly)
         if not isinstance(poly, Polygon):
             raise TypeError('GPolygon may only initialize on GEOS Polygons.')
 
@@ -152,8 +154,10 @@ class GPolyline(GOverlayBase):
             The opacity of the polyline, between 0 and 1.  Defaults to 1.
         """
         # If a GEOS geometry isn't passed in, try to contsruct one.
-        if isinstance(geom, six.string_types): geom = fromstr(geom)
-        if isinstance(geom, (tuple, list)): geom = Polygon(geom)
+        if isinstance(geom, six.string_types):
+            geom = fromstr(geom)
+        if isinstance(geom, (tuple, list)):
+            geom = Polygon(geom)
         # Generating the lat/lng coordinate pairs.
         if isinstance(geom, (LineString, LinearRing)):
             self.latlngs = self.latlng_from_coords(geom.coords)
@@ -282,8 +286,10 @@ class GMarker(GOverlayBase):
            Draggable option for GMarker, disabled by default.
         """
         # If a GEOS geometry isn't passed in, try to construct one.
-        if isinstance(geom, six.string_types): geom = fromstr(geom)
-        if isinstance(geom, (tuple, list)): geom = Point(geom)
+        if isinstance(geom, six.string_types):
+            geom = fromstr(geom)
+        if isinstance(geom, (tuple, list)):
+            geom = Point(geom)
         if isinstance(geom, Point):
             self.latlng = self.latlng_from_coords(geom.coords)
         else:
@@ -301,9 +307,12 @@ class GMarker(GOverlayBase):
 
     def options(self):
         result = []
-        if self.title: result.append('title: "%s"' % self.title)
-        if self.icon: result.append('icon: %s' % self.icon.varname)
-        if self.draggable: result.append('draggable: true')
+        if self.title:
+            result.append('title: "%s"' % self.title)
+        if self.icon:
+            result.append('icon: %s' % self.icon.varname)
+        if self.draggable:
+            result.append('draggable: true')
         return '{%s}' % ','.join(result)
 
     @property

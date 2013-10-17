@@ -113,7 +113,8 @@ class GeoQuery(sql.Query):
         if field_name is None:
             # Incrementing until the first geographic field is found.
             for fld in self.model._meta.fields:
-                if isinstance(fld, GeometryField): return fld
+                if isinstance(fld, GeometryField):
+                    return fld
             return False
         else:
             # Otherwise, check by the given field name -- which may be
