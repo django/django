@@ -120,7 +120,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # It's possible to have the unique and PK constraints in separate indexes.
             if row[2] == 'PRIMARY':
                 indexes[row[4]]['primary_key'] = True
-            if not bool(row[1]):
+            if not row[1]:
                 indexes[row[4]]['unique'] = True
         return indexes
 

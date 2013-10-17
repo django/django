@@ -111,7 +111,7 @@ def check_pointer(result, func, cargs):
     "Makes sure the result pointer is valid."
     if isinstance(result, six.integer_types):
         result = c_void_p(result)
-    if bool(result):
+    if result:
         return result
     else:
         raise OGRException('Invalid pointer returned from "%s"' % func.__name__)

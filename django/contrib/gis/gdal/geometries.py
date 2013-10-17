@@ -122,7 +122,7 @@ class OGRGeometry(GDALBase):
         self.ptr = g
 
         # Assigning the SpatialReference object to the geometry, if valid.
-        if bool(srs):
+        if srs:
             self.srs = srs
 
         # Setting the class depending upon the OGR Geometry Type

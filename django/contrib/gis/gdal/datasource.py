@@ -86,7 +86,7 @@ class DataSource(GDALBase):
         else:
             raise OGRException('Invalid data source input type: %s' % type(ds_input))
 
-        if bool(ds):
+        if ds:
             self.ptr = ds
             self.driver = Driver(ds_driver)
         else:

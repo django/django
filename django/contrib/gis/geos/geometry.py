@@ -89,7 +89,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
             # Invalid geometry type.
             raise TypeError('Improper geometry input type: %s' % str(type(geo_input)))
 
-        if bool(g):
+        if g:
             # Setting the pointer object with a valid pointer.
             self.ptr = g
         else:

@@ -50,7 +50,7 @@ GeoIPRecord_delete.restype = None
 
 # For retrieving records by name or address.
 def check_record(result, func, cargs):
-    if bool(result):
+    if result:
         # Checking the pointer to the C structure, if valid pull out elements
         # into a dicionary.
         rec = result.contents

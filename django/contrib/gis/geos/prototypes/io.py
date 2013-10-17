@@ -224,7 +224,7 @@ class WKBWriter(IOBase):
         return bool(ord(wkb_writer_get_include_srid(self.ptr)))
 
     def _set_include_srid(self, include):
-        if bool(include):
+        if include:
             flag = b'\x01'
         else:
             flag = b'\x00'
