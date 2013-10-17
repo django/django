@@ -5,7 +5,7 @@ import os
 from importlib import import_module
 from django.utils import six
 from django.db import models
-from django.db.models.loading import cache
+from django.db.models.loading import cache, get_app_path
 from django.db.migrations.loader import MigrationLoader
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
@@ -68,7 +68,7 @@ class MigrationWriter(object):
             oneup = ".".join(migrations_module_name.split(".")[:-1])
             app_oneup = ".".join(app_module.__name__.split(".")[:-1])
             if oneup == app_oneup:
-                basedir = os.path.join(os.path.dirname(app_module.__file__), migrations_module_name.split(".")[-1])
+                basedir = os.path.join(get_app_path(self.migration.app_label), migrations_module_name.split(".")[-1])
             else:
                 raise ImportError("Cannot open migrations module %s for app %s" % (migrations_module_name, self.migration.app_label))
         return os.path.join(basedir, self.filename)
