@@ -1325,6 +1325,27 @@ related. This works exactly the same as it does for :class:`ForeignKey`,
 including all the options regarding :ref:`recursive <recursive-relationships>`
 and :ref:`lazy <lazy-relationships>` relationships.
 
+If you do not specify the the :attr:`~ForeignKey.related_name` argument for
+the ``OneToOneField``, Django will use the lower-case name of the current model
+as default value.
+
+With the following example::
+
+    from django.db import models
+    from django.contrib.auth.models import User
+
+    class MySpecialUser(models.Model):
+        user = models.OneToOneField(User)
+        supervisor = models.OneToOneField(User, related_name='supervisor_of')
+
+your resulting ``User`` model will have the following attributes::
+
+    >>> user = User.objects.get(pk=1)
+    >>> hasattr(user, 'myspecialuser')
+    True
+    >>> hasattr(user, 'supervisor_of')
+    True
+
 .. _onetoone-arguments:
 
 Additionally, ``OneToOneField`` accepts all of the extra arguments
@@ -1337,3 +1358,6 @@ accepted by :class:`ForeignKey`, plus one extra argument:
     link back to the parent class, rather than the extra
     ``OneToOneField`` which would normally be implicitly created by
     subclassing.
+
+See :doc:`One-to-one relationships </topics/db/examples/one_to_one>` for usage
+examples of ``OneToOneField``.
