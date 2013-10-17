@@ -12,16 +12,15 @@ from django.contrib.formtools.wizard.views import CookieWizardView
 from django.utils._os import upath
 from django.contrib.formtools.tests.models import Poet, Poem
 
+
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = '__all__'
 
-
-# Creating table formtools_testmodel
-# OperationalError: no such table: tests_poet
 UserFormSet = forms.models.modelformset_factory(User, form=UserForm, extra=2)
 PoemFormSet = forms.models.inlineformset_factory(Poet, Poem, fields="__all__")
+
 
 class WizardTests(object):
     urls = 'django.contrib.formtools.tests.wizard.wizardtests.urls'
@@ -408,6 +407,7 @@ class WizardFormKwargsOverrideTests(TestCase):
         self.assertEqual(['staff@example.com'],
             list(formset.queryset.values_list('email', flat=True)))
             
+
 class WizardInlineFormSetTests(TestCase):
     def setUp(self):
         self.rf = RequestFactory()
@@ -427,4 +427,3 @@ class WizardInlineFormSetTests(TestCase):
         response = view(self.rf.get('/'))
         formset = response.context_data['wizard']['form']
         self.assertEqual(formset.instance, self.poet)
-
