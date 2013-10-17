@@ -59,6 +59,7 @@ def rotate_token(request):
     for security purposes.
     """
     request.META["CSRF_COOKIE"] = _get_new_csrf_key()
+    request.META["CSRF_COOKIE_USED"] = True
 
 
 def _sanitize_token(token):
