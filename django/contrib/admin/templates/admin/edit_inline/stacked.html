@@ -1,6 +1,14 @@
 {% load i18n admin_static %}
 <div class="inline-group" id="{{ inline_admin_formset.formset.prefix }}-group">
-  <h2>{{ inline_admin_formset.opts.verbose_name_plural|title }}</h2>
+  <h2>
+    {% with formset_opts=inline_admin_formset.opts max_num=inline_admin_formset.formset.max_num %}
+      {% if not max_num or max_num > 1 %}
+        {{ formset_opts.verbose_name_plural|title }}
+      {% else %}
+        {{ formset_opts.verbose_name|title }}
+      {% endif %}
+    {% endwith %}
+  </h2>
 {{ inline_admin_formset.formset.management_form }}
 {{ inline_admin_formset.formset.non_form_errors }}
 
