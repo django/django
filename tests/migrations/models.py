@@ -18,3 +18,18 @@ class UnicodeModel(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Unserializable(object):
+    """
+    An object that migration doesn't know how to serialize.
+    """
+    pass
+
+
+class UnserializableModel(models.Model):
+    title = models.CharField(max_length=20, default=Unserializable())
+
+    class Meta:
+        # Disable auto loading of this model as we load it on our own
+        app_cache = BaseAppCache()
