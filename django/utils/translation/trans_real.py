@@ -426,7 +426,9 @@ def get_language_from_request(request, check_path=False):
             return lang_code
 
     if hasattr(request, 'session'):
-        lang_code = request.session.get('django_language', None)
+        # for backwards compatibility (1.7) django_language is also checked
+        lang_code = request.session.get('_language',
+                                        request.session.get('django_language'))
         if lang_code in supported and lang_code is not None and check_for_language(lang_code):
             return lang_code
 

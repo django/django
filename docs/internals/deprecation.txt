@@ -410,6 +410,9 @@ these changes.
 * The ``Model._meta.get_(add|change|delete)_permission`` methods will
   be removed.
 
+* The session key ``django_language`` will no longer be read for backwards
+  compatibility.
+
 1.9
 ---
 

@@ -34,7 +34,7 @@ class I18NTests(TestCase):
             post_data = dict(language=lang_code, next='/views/')
             response = self.client.post('/views/i18n/setlang/', data=post_data)
             self.assertRedirects(response, 'http://testserver/views/')
-            self.assertEqual(self.client.session['django_language'], lang_code)
+            self.assertEqual(self.client.session['_language'], lang_code)
 
     def test_setlang_unsafe_next(self):
         """
@@ -45,7 +45,7 @@ class I18NTests(TestCase):
         post_data = dict(language=lang_code, next='//unsafe/redirection/')
         response = self.client.post('/views/i18n/setlang/', data=post_data)
         self.assertEqual(response.url, 'http://testserver/')
-        self.assertEqual(self.client.session['django_language'], lang_code)
+        self.assertEqual(self.client.session['_language'], lang_code)
 
     def test_setlang_reversal(self):
         self.assertEqual(reverse('set_language'), '/views/i18n/setlang/')

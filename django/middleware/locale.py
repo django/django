@@ -56,8 +56,14 @@ class LocaleMiddleware(object):
                 return self.response_redirect_class(language_url)
 
         # Store language back into session if it is not present
-        if hasattr(request, 'session'):
-            request.session.setdefault('django_language', language)
+        if hasattr(request, 'session') and '_language' not in request.session:
+            # Backwards compatibility check on django_language (remove in 1.8);
+            # revert to: `request.session.setdefault('_language', language)`.
+            if 'django_language' in request.session:
+                request.session['_language'] = request.session['django_language']
+                del request.session['django_language']
+            else:
+                request.session['_language'] = language
 
         if not (self.is_language_prefix_patterns_used()
                 and language_from_path):
