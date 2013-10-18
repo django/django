@@ -24,5 +24,5 @@ class Command(BaseCommand):
             # isn't installed. There's a possibility OSError would be raised
             # for some other reason, in which case this error message would be
             # inaccurate. Still, this message catches the common case.
-            raise CommandError('You appear not to have the %r program installed or on your path.' % \
+            raise CommandError('You appear not to have the %r program installed or on your path.' %
                 connection.client.executable_name)

@@ -54,7 +54,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
         # Check that we got a field of the right type
         self.assertTrue(
             isinstance(widget, widgetclass),
-            "Wrong widget for %s.%s: expected %s, got %s" % \
+            "Wrong widget for %s.%s: expected %s, got %s" %
                 (model.__class__.__name__, fieldname, widgetclass, type(widget))
         )
 
