@@ -22,7 +22,6 @@ rather than the HTML rendered to the end-user.
 """
 from __future__ import unicode_literals
 
-from django.conf import settings
 from django.core import mail
 from django.test import Client, TestCase, RequestFactory
 from django.test.utils import override_settings
@@ -430,7 +429,6 @@ class ClientTest(TestCase):
         except KeyError:
             pass
 
-        from django.contrib.sessions.models import Session
         self.client.post('/test_client/session_view/')
 
         # Check that the session was modified

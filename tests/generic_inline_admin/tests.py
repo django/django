@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 import warnings
 
-from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.contenttypes.generic import (

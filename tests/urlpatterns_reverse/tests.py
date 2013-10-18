@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 
 import unittest
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.core.urlresolvers import (reverse, reverse_lazy, resolve, get_callable,

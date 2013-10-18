@@ -44,7 +44,7 @@ except ImportError:
 # This import does nothing, but it's necessary to avoid some race conditions
 # in the threading module. See http://code.djangoproject.com/ticket/2330 .
 try:
-    import threading
+    import threading  # NOQA
 except ImportError:
     pass
 

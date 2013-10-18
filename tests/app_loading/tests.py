@@ -3,10 +3,8 @@ from __future__ import unicode_literals
 import copy
 import os
 import sys
-import time
 from unittest import TestCase
 
-from django.conf import Settings
 from django.db.models.loading import cache, load_app, get_model, get_models, AppCache
 from django.test.utils import override_settings
 from django.utils._os import upath

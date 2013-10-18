@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 import copy
 
-from django.conf import settings
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
@@ -17,7 +16,7 @@ from .models import (MyPerson, Person, StatusPerson, LowerStatusPerson,
     MyPersonProxy, Abstract, OtherPerson, User, UserProxy, UserProxyProxy,
     Country, State, StateProxy, TrackerUser, BaseUser, Bug, ProxyTrackerUser,
     Improvement, ProxyProxyBug, ProxyBug, ProxyImprovement, Issue)
-from .admin import admin as force_admin_model_registration
+from .admin import admin as force_admin_model_registration  # NOQA
 
 
 class ProxyModelTests(TestCase):

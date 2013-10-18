@@ -3,7 +3,6 @@ import warnings
 
 from django.test import SimpleTestCase, RequestFactory
 from django.utils import six
-from django.utils.datastructures import MergeDict
 from django.utils.deprecation import RenameMethodsBase
 
 

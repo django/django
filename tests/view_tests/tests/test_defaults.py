@@ -1,11 +1,10 @@
 from __future__ import unicode_literals
 
-from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.test.utils import (setup_test_template_loader,
     restore_template_loaders, override_settings)
 
-from ..models import Author, Article, UrlArticle
+from ..models import UrlArticle
 
 
 class DefaultsTests(TestCase):

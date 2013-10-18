@@ -8,7 +8,7 @@ import sys
 
 from django.conf import settings
 from django.core import exceptions
-from django.db import connections, router, transaction, DatabaseError, IntegrityError
+from django.db import connections, router, transaction, IntegrityError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import AutoField, Empty
 from django.db.models.query_utils import (Q, select_related_descend,

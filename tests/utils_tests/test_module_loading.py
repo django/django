@@ -44,7 +44,7 @@ class DefaultLoader(unittest.TestCase):
         self.assertRaises(ImportError, import_module, 'utils_tests.test_module.django')
 
         # Don't be confused by caching of import misses
-        import types  # causes attempted import of utils_tests.types
+        import types  # NOQA: causes attempted import of utils_tests.types
         self.assertFalse(module_has_submodule(sys.modules['utils_tests'], 'types'))
 
         # A module which doesn't have a __path__ (so no submodules)

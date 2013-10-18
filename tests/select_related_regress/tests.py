@@ -5,7 +5,7 @@ from django.utils import six
 
 from .models import (Building, Child, Device, Port, Item, Country, Connection,
     ClientStatus, State, Client, SpecialClient, TUser, Person, Student,
-    Organizer, Class, Enrollment, Hen, Chick, Base, A, B, C)
+    Organizer, Class, Enrollment, Hen, Chick, A, B, C)
 
 
 class SelectRelatedRegressTests(TestCase):

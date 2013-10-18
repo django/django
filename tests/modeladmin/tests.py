@@ -4,7 +4,6 @@ from datetime import date
 import unittest
 
 from django import forms
-from django.conf import settings
 from django.contrib.admin.options import (ModelAdmin, TabularInline,
      HORIZONTAL, VERTICAL)
 from django.contrib.admin.sites import AdminSite

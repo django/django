@@ -101,7 +101,7 @@ def runfastcgi(argset=[], **kwargs):
         return fastcgi_help()
 
     try:
-        import flup
+        import flup  # NOQA
     except ImportError as e:
         sys.stderr.write("ERROR: %s\n" % e)
         sys.stderr.write("  Unable to load the flup package.  In order to run django\n")

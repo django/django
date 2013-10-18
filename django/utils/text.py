@@ -15,7 +15,7 @@ from django.utils.safestring import mark_safe
 if six.PY2:
     # Import force_unicode even though this module doesn't use it, because some
     # people rely on it being here.
-    from django.utils.encoding import force_unicode
+    from django.utils.encoding import force_unicode  # NOQA
 
 # Capitalizes the first letter of a string.
 capfirst = lambda x: x and force_text(x)[0].upper() + force_text(x)[1:]

@@ -1,8 +1,7 @@
 from django.contrib import admin
 from django.core.paginator import Paginator
 
-from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
-    Quartet, Membership, ChordsMusician, ChordsBand, Invitation, Swallow)
+from .models import Event, Child, Parent, Swallow
 
 
 site = admin.AdminSite(name="admin")

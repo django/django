@@ -3419,7 +3419,6 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         main form and with stacked and tabular inlines.
         Refs #13068, #9264, #9983, #9784.
         """
-        from selenium.common.exceptions import TimeoutException
         self.admin_login(username='super', password='secret', login_url='/test_admin/admin/')
         self.selenium.get('%s%s' % (self.live_server_url,
             '/test_admin/admin/admin_views/mainprepopulated/add/'))

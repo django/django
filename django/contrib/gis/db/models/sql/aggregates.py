@@ -1,4 +1,4 @@
-from django.db.models.sql.aggregates import *
+from django.db.models.sql.aggregates import Aggregate
 from django.contrib.gis.db.models.fields import GeometryField
 
 

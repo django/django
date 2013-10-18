@@ -1,16 +1,12 @@
 import sys
-import os
 from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
-from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
 from django.db import connections, DEFAULT_DB_ALIAS, migrations
-from django.db.migrations.loader import MigrationLoader, AmbiguityError
-from django.db.migrations.autodetector import MigrationAutodetector, InteractiveMigrationQuestioner
+from django.db.migrations.loader import AmbiguityError
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.writer import MigrationWriter
-from django.db.models.loading import cache
 from django.db.migrations.optimizer import MigrationOptimizer
 
 

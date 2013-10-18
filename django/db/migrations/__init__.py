@@ -1,2 +1,2 @@
-from .migration import Migration
-from .operations import *
+from .migration import Migration  # NOQA
+from .operations import *  # NOQA

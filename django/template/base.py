@@ -6,7 +6,7 @@ from importlib import import_module
 from inspect import getargspec, getcallargs
 
 from django.conf import settings
-from django.template.context import (BaseContext, Context, RequestContext,
+from django.template.context import (BaseContext, Context, RequestContext,  # NOQA: imported for backwards compatability
     ContextPopException)
 from django.utils.itercompat import is_iterable
 from django.utils.text import (smart_split, unescape_string_literal,

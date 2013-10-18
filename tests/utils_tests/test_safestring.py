@@ -4,7 +4,6 @@ from django.template import Template, Context
 from django.test import TestCase
 from django.utils.encoding import force_text, force_bytes
 from django.utils.functional import lazy, Promise
-from django.utils.html import escape
 from django.utils.safestring import mark_safe, mark_for_escaping
 from django.utils import six
 from django.utils import translation

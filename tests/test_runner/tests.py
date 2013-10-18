@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 
 from importlib import import_module
 from optparse import make_option
-import sys
 import unittest
 
 from django.core.exceptions import ImproperlyConfigured

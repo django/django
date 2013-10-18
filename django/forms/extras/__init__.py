@@ -1,1 +1,3 @@
-from django.forms.extras.widgets import *
+from django.forms.extras.widgets import SelectDateWidget
+
+__all__ = ['SelectDateWidget']

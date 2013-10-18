@@ -5,7 +5,7 @@ import gzip
 from io import BytesIO
 import random
 import re
-from unittest import expectedFailure, skipIf
+from unittest import skipIf
 import warnings
 
 from django.conf import settings

@@ -6,9 +6,8 @@ from io import BytesIO
 from itertools import chain
 import time
 from unittest import skipIf
-import warnings
 
-from django.db import connection, connections, DEFAULT_DB_ALIAS
+from django.db import connection, connections
 from django.core import signals
 from django.core.exceptions import SuspiciousOperation
 from django.core.handlers.wsgi import WSGIRequest, LimitedStream
