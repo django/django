@@ -271,7 +271,7 @@ class Deserializer(base.Deserializer):
         model_identifier = node.getAttribute(attr)
         if not model_identifier:
             raise base.DeserializationError(
-                "<%s> node is missing the required '%s' attribute" \
+                "<%s> node is missing the required '%s' attribute"
                     % (node.nodeName, attr))
         try:
             Model = models.get_model(*model_identifier.split("."))
@@ -279,7 +279,7 @@ class Deserializer(base.Deserializer):
             Model = None
         if Model is None:
             raise base.DeserializationError(
-                "<%s> node has invalid model identifier: '%s'" % \
+                "<%s> node has invalid model identifier: '%s'" %
                     (node.nodeName, model_identifier))
         return Model
 

@@ -168,7 +168,7 @@ class ChangeListTests(TestCase):
         m.list_display = ['id', 'name', 'parent']
         m.list_display_links = ['id']
         m.list_editable = ['name']
-        self.assertRaises(IncorrectLookupParameters, lambda: \
+        self.assertRaises(IncorrectLookupParameters, lambda:
             ChangeList(request, Child, m.list_display, m.list_display_links,
                     m.list_filter, m.date_hierarchy, m.search_fields,
                     m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m))

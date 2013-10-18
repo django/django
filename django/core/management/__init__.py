@@ -262,7 +262,7 @@ class ManagementUtility(object):
         try:
             app_name = commands[subcommand]
         except KeyError:
-            sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" % \
+            sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" %
                 (subcommand, self.prog_name))
             sys.exit(1)
         if isinstance(app_name, BaseCommand):

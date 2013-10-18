@@ -63,7 +63,7 @@ class Command(BaseCommand):
                 field_output.append("UNIQUE")
             if f.db_index:
                 unique = "UNIQUE " if f.unique else ""
-                index_output.append("CREATE %sINDEX %s ON %s (%s);" % \
+                index_output.append("CREATE %sINDEX %s ON %s (%s);" %
                     (unique, qn('%s_%s' % (tablename, f.name)), qn(tablename),
                     qn(f.name)))
             table_output.append(" ".join(field_output))

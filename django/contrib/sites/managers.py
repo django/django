@@ -14,7 +14,7 @@ class CurrentSiteManager(models.Manager):
 
         # If a custom name is provided, make sure the field exists on the model
         if self.__field_name is not None and self.__field_name not in field_names:
-            raise ValueError("%s couldn't find a field named %s in %s." % \
+            raise ValueError("%s couldn't find a field named %s in %s." %
                 (self.__class__.__name__, self.__field_name, self.model._meta.object_name))
 
         # Otherwise, see if there is a field called either 'site' or 'sites'
@@ -31,7 +31,7 @@ class CurrentSiteManager(models.Manager):
             if not isinstance(field, (models.ForeignKey, models.ManyToManyField)):
                 raise TypeError("%s must be a ForeignKey or ManyToManyField." %self.__field_name)
         except FieldDoesNotExist:
-            raise ValueError("%s couldn't find a field named %s in %s." % \
+            raise ValueError("%s couldn't find a field named %s in %s." %
                     (self.__class__.__name__, self.__field_name, self.model._meta.object_name))
         self.__is_validated = True
 
