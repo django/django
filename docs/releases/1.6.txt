@@ -368,9 +368,8 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher has been
   increased by 20%. This backwards compatible change will not affect
   existing passwords or users who have subclassed
-  `django.contrib.auth.hashers.PBKDF2PasswordHasher`` to change the
+  ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` to change the
   default value.
-
 
 Backwards incompatible changes in 1.6
 =====================================
