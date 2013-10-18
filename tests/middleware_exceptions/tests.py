@@ -375,7 +375,7 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self._add_middleware(pre_middleware)
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [
                 "The view middleware_exceptions.views.null_view didn't return an HttpResponse object.",
-            ],
+        ],
             ValueError())
 
         # Check that the right middleware methods have been invoked
@@ -392,7 +392,7 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self._add_middleware(pre_middleware)
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [
                 "The view middleware_exceptions.views.null_view didn't return an HttpResponse object."
-            ],
+        ],
             ValueError())
 
         # Check that the right middleware methods have been invoked
@@ -687,7 +687,7 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [
                 "The view middleware_exceptions.views.null_view didn't return an HttpResponse object.",
                 'Test Response Exception'
-            ])
+        ])
 
         # Check that the right middleware methods have been invoked
         self.assert_middleware_usage(pre_middleware,  True, True, False, False, False)
@@ -703,7 +703,7 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self._add_middleware(pre_middleware)
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [
                 "The view middleware_exceptions.views.null_view didn't return an HttpResponse object."
-            ],
+        ],
             ValueError())
 
         # Check that the right middleware methods have been invoked

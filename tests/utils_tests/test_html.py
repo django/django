@@ -49,7 +49,7 @@ class TestUtilsHtml(TestCase):
                              fourth=html.mark_safe("<i>safe again</i>")
                              ),
             "&lt; Dangerous &gt; <b>safe</b> &lt; dangerous again <i>safe again</i>"
-            )
+        )
 
     def test_linebreaks(self):
         f = html.linebreaks

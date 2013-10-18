@@ -431,7 +431,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                 values=[p.name for p in Promo.objects.all()],
                 test=lambda obj, value:
                     obj.chap.book.promo_set.filter(name=value).exists()),
-            }
+        }
         for filter_path, params in filters.items():
             for value in params['values']:
                 query_string = urlencode({filter_path: value})
@@ -1256,7 +1256,7 @@ class AdminViewPermissionsTest(TestCase):
                 'index': 0,
                 'action': ['delete_selected'],
                 '_selected_action': ['1'],
-            })
+        })
         self.assertTemplateUsed(response, 'custom_admin/delete_selected_confirmation.html')
         response = self.client.get('/test_admin/admin/admin_views/customarticle/%d/history/' % article_pk)
         self.assertTemplateUsed(response, 'custom_admin/object_history.html')
@@ -1474,7 +1474,7 @@ class AdminViewDeletedObjectsTest(TestCase):
             """<li>Super villain: <a href="/test_admin/admin/admin_views/supervillain/3/">Bob</a>""",
             """<li>Secret hideout: floating castle""",
             """<li>Super secret hideout: super floating castle!"""
-            ]
+        ]
         response = self.client.get('/test_admin/admin/admin_views/villain/%s/delete/' % quote(3))
         for should in should_contain:
             self.assertContains(response, should, 1)

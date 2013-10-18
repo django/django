@@ -34,7 +34,7 @@ class WSGITest(TestCase):
             PATH_INFO="/",
             CONTENT_TYPE="text/html; charset=utf-8",
             REQUEST_METHOD="GET"
-            )
+        )
 
         response_data = {}
 

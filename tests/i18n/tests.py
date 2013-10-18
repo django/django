@@ -787,7 +787,7 @@ class FormattingTests(TransRealMixin, TestCase):
                 'date_added': datetime.datetime(2009, 12, 31, 6, 0, 0),
                 'cents_paid': decimal.Decimal('59.47'),
                 'products_delivered': 12000,
-                })
+            })
             context = Context({'form': form})
             self.assertTrue(form.is_valid())
 

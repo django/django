@@ -203,7 +203,7 @@ class InlineFormsetTests(TestCase):
         self.assertQuerysetEqual(
             dalnet.host_set.order_by("hostname"),
             ["<Host: matrix.de.eu.dal.net>", "<Host: tranquility.hub.dal.net>"]
-            )
+        )
 
     def test_initial_data(self):
         user = User.objects.create(username="bibi", serial=1)

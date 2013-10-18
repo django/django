@@ -24,7 +24,7 @@ class GeometryField(forms.Field):
         'invalid_geom_type' : _('Invalid geometry type.'),
         'transform_error' : _('An error occurred when transforming the geometry '
                               'to the SRID of the geometry form field.'),
-        }
+    }
 
     def __init__(self, **kwargs):
         # Pop out attributes from the database field, or use sensible

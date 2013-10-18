@@ -637,7 +637,7 @@ class Ticket19607Tests(TestCase):
         for id, name1, name2 in [
             (1, 'einfach', 'simple'),
             (2, 'schwierig', 'difficult'),
-            ]:
+        ]:
             LessonEntry.objects.create(id=id, name1=name1, name2=name2)
 
         for id, lesson_entry_id, name in [
@@ -645,7 +645,7 @@ class Ticket19607Tests(TestCase):
             (2, 1, 'simple'),
             (3, 2, 'schwierig'),
             (4, 2, 'difficult'),
-            ]:
+        ]:
             WordEntry.objects.create(id=id, lesson_entry_id=lesson_entry_id, name=name)
 
     def test_bug(self):

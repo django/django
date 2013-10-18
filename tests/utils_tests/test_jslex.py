@@ -103,7 +103,7 @@ class JsTokensTest(TestCase):
           "id value", "punct .", "id replace", "punct (", r"regex /\\/g", "punct ,", r'string "\\\\"', "punct )",
           "punct .", "id replace", "punct (", r'regex /"/g', "punct ,", r'string "\\\""', "punct )", "punct +",
           r'string "\")"', "punct ;"]),
-        ]
+    ]
 
 def make_function(input, toks):
     def test_func(self):

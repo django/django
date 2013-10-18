@@ -32,7 +32,7 @@ class FlatpageTemplateTagTests(TestCase):
                 "{% for page in flatpages %}"
                 "{{ page.title }},"
                 "{% endfor %}"
-            ).render(Context())
+        ).render(Context())
         self.assertEqual(out, "A Flatpage,A Nested Flatpage,")
 
     def test_get_flatpages_tag_for_anon_user(self):
@@ -43,9 +43,9 @@ class FlatpageTemplateTagTests(TestCase):
                 "{% for page in flatpages %}"
                 "{{ page.title }},"
                 "{% endfor %}"
-            ).render(Context({
+        ).render(Context({
                 'anonuser': AnonymousUser()
-            }))
+        }))
         self.assertEqual(out, "A Flatpage,A Nested Flatpage,")
 
     @skipIfCustomUser
@@ -58,9 +58,9 @@ class FlatpageTemplateTagTests(TestCase):
                 "{% for page in flatpages %}"
                 "{{ page.title }},"
                 "{% endfor %}"
-            ).render(Context({
+        ).render(Context({
                 'me': me
-            }))
+        }))
         self.assertEqual(out, "A Flatpage,A Nested Flatpage,Sekrit Nested Flatpage,Sekrit Flatpage,")
 
     def test_get_flatpages_with_prefix(self):
@@ -71,7 +71,7 @@ class FlatpageTemplateTagTests(TestCase):
                 "{% for page in location_flatpages %}"
                 "{{ page.title }},"
                 "{% endfor %}"
-            ).render(Context())
+        ).render(Context())
         self.assertEqual(out, "A Nested Flatpage,")
 
     def test_get_flatpages_with_prefix_for_anon_user(self):
@@ -82,9 +82,9 @@ class FlatpageTemplateTagTests(TestCase):
                 "{% for page in location_flatpages %}"
                 "{{ page.title }},"
                 "{% endfor %}"
-            ).render(Context({
+        ).render(Context({
                 'anonuser': AnonymousUser()
-            }))
+        }))
         self.assertEqual(out, "A Nested Flatpage,")
 
     @skipIfCustomUser
@@ -97,9 +97,9 @@ class FlatpageTemplateTagTests(TestCase):
                 "{% for page in location_flatpages %}"
                 "{{ page.title }},"
                 "{% endfor %}"
-            ).render(Context({
+        ).render(Context({
                 'me': me
-            }))
+        }))
         self.assertEqual(out, "A Nested Flatpage,Sekrit Nested Flatpage,")
 
     def test_get_flatpages_with_variable_prefix(self):
@@ -110,9 +110,9 @@ class FlatpageTemplateTagTests(TestCase):
                 "{% for page in location_flatpages %}"
                 "{{ page.title }},"
                 "{% endfor %}"
-            ).render(Context({
+        ).render(Context({
                 'location_prefix': '/location/'
-            }))
+        }))
         self.assertEqual(out, "A Nested Flatpage,")
 
     def test_parsing_errors(self):

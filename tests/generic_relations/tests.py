@@ -105,7 +105,7 @@ class GenericRelationsTests(TestCase):
                 ('salty', Vegetable, bacon.pk),
                 ('shiny', Animal, platypus.pk),
                 ('yellow', Animal, lion.pk)
-            ],
+        ],
             comp_func
         )
         lion.delete()
@@ -115,7 +115,7 @@ class GenericRelationsTests(TestCase):
                 ('fatty', Vegetable, bacon.pk),
                 ('salty', Vegetable, bacon.pk),
                 ('shiny', Animal, platypus.pk)
-            ],
+        ],
             comp_func
         )
 
@@ -129,7 +129,7 @@ class GenericRelationsTests(TestCase):
                 ('fatty', Vegetable, bacon.pk),
                 ('salty', Vegetable, bacon.pk),
                 ('shiny', Animal, platypus.pk)
-            ],
+        ],
             comp_func
         )
         # If you delete a tag, the objects using the tag are unaffected
@@ -142,7 +142,7 @@ class GenericRelationsTests(TestCase):
                 ('fatty', Animal, platypus.pk),
                 ('salty', Vegetable, bacon.pk),
                 ('shiny', Animal, platypus.pk)
-            ],
+        ],
             comp_func
         )
         TaggedItem.objects.filter(tag='fatty').delete()

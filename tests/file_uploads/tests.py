@@ -61,7 +61,7 @@ class FileUploadTests(TestCase):
             'name': 'Ringo',
             'file_field1': file1,
             'file_field2': file2,
-            }
+        }
 
         for key in list(post_data):
             try:
@@ -112,7 +112,7 @@ class FileUploadTests(TestCase):
 
             post_data = {
                 'file_unicode': file1,
-                }
+            }
 
             response = self.client.post('/file_uploads/unicode_name/', post_data)
 

@@ -996,9 +996,9 @@ class FormsFormsetTestCase(TestCase):
                     'choices-2-votes': '2',
                     'choices-3-choice': 'Three',
                     'choices-3-votes': '3',
-                    },
+                },
                 prefix='choices',
-                )
+            )
             # But we still only instantiate 3 forms
             self.assertEqual(len(formset.forms), 3)
             # and the formset isn't valid
@@ -1028,9 +1028,9 @@ class FormsFormsetTestCase(TestCase):
                     'choices-2-votes': '2',
                     'choices-3-choice': 'Three',
                     'choices-3-votes': '3',
-                    },
+                },
                 prefix='choices',
-                )
+            )
             # Four forms are instantiated and no exception is raised
             self.assertEqual(len(formset.forms), 4)
         finally:

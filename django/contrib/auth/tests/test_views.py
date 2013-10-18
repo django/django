@@ -49,7 +49,7 @@ class AuthViewsTestCase(TestCase):
         response = self.client.post('/login/', {
             'username': 'testclient',
             'password': password,
-            })
+        })
         self.assertTrue(SESSION_KEY in self.client.session)
         return response
 
@@ -180,7 +180,7 @@ class PasswordResetTest(AuthViewsTestCase):
             response = self.client.post('/password_reset/',
                     {'email': 'staffmember@example.com'},
                     HTTP_HOST='www.example:dr.frankenstein@evil.tld'
-                )
+            )
             self.assertEqual(response.status_code, 400)
             self.assertEqual(len(mail.outbox), 0)
             self.assertEqual(len(logger_calls), 1)
@@ -193,7 +193,7 @@ class PasswordResetTest(AuthViewsTestCase):
             response = self.client.post('/admin_password_reset/',
                     {'email': 'staffmember@example.com'},
                     HTTP_HOST='www.example:dr.frankenstein@evil.tld'
-                )
+            )
             self.assertEqual(response.status_code, 400)
             self.assertEqual(len(mail.outbox), 0)
             self.assertEqual(len(logger_calls), 1)
@@ -357,7 +357,7 @@ class ChangePasswordTest(AuthViewsTestCase):
         })
         self.assertFormError(response, AuthenticationForm.error_messages['invalid_login'] % {
                 'username': User._meta.get_field('username').verbose_name
-            })
+        })
 
     def logout(self):
         self.client.get('/logout/')

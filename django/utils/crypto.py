@@ -72,7 +72,7 @@ def get_random_string(length=12,
                     random.getstate(),
                     time.time(),
                     settings.SECRET_KEY)).encode('utf-8')
-                ).digest())
+            ).digest())
     return ''.join(random.choice(allowed_chars) for i in range(length))
 
 

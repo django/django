@@ -252,7 +252,7 @@ class Distance(MeasureBase):
         'survey_ft' : 0.304800609601,
         'um' : 0.000001,
         'yd': 0.9144,
-        }
+    }
 
     # Unit aliases for `UNIT` terms encountered in Spatial Reference WKT.
     ALIAS = {
@@ -292,7 +292,7 @@ class Distance(MeasureBase):
         'U.S. Foot' : 'survey_ft',
         'Yard (Indian)' : 'indian_yd',
         'Yard (Sears)' : 'sears_yd'
-        }
+    }
     LALIAS = dict((k.lower(), v) for k, v in ALIAS.items())
 
     def __mul__(self, other):
@@ -305,7 +305,7 @@ class Distance(MeasureBase):
         else:
             raise TypeError('%(distance)s must be multiplied with number or %(distance)s' % {
                 "distance" : pretty_name(self.__class__),
-                })
+            })
 
 
 class Area(MeasureBase):

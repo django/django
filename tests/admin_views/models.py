@@ -171,7 +171,7 @@ class Fabric(models.Model):
         ('Textured', (
                 ('x', 'Horizontal'),
                 ('y', 'Vertical'),
-            )
+        )
         ),
         ('plain', 'Smooth'),
     )

@@ -466,7 +466,7 @@ class ModelFormBaseTest(TestCase):
             """<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>
 <tr><th><label for="id_slug">Slug:</label></th><td><input id="id_slug" type="text" name="slug" maxlength="20" /></td></tr>
 <tr><th><label for="id_checkbox">Checkbox:</label></th><td><input type="checkbox" name="checkbox" id="id_checkbox" /></td></tr>"""
-            )
+        )
 
     def test_orderfields_form(self):
         class OrderFields(forms.ModelForm):
@@ -480,7 +480,7 @@ class ModelFormBaseTest(TestCase):
             str(OrderFields()),
             """<tr><th><label for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>
 <tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>"""
-            )
+        )
 
     def test_orderfields2_form(self):
         class OrderFields2(forms.ModelForm):
@@ -831,13 +831,13 @@ class OldFormForXTests(TestCase):
             """<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>
 <tr><th><label for="id_slug">Slug:</label></th><td><input id="id_slug" type="text" name="slug" maxlength="20" /></td></tr>
 <tr><th><label for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>"""
-            )
+        )
         self.assertHTMLEqual(
             str(f.as_ul()),
             """<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" maxlength="20" /></li>
 <li><label for="id_slug">Slug:</label> <input id="id_slug" type="text" name="slug" maxlength="20" /></li>
 <li><label for="id_url">The URL:</label> <input id="id_url" type="text" name="url" maxlength="40" /></li>"""
-            )
+        )
         self.assertHTMLEqual(
             str(f["name"]),
             """<input id="id_name" type="text" name="name" maxlength="20" />""")
@@ -849,7 +849,7 @@ class OldFormForXTests(TestCase):
             """<li>Name: <input type="text" name="name" maxlength="20" /></li>
 <li>Slug: <input type="text" name="slug" maxlength="20" /></li>
 <li>The URL: <input type="text" name="url" maxlength="40" /></li>"""
-            )
+        )
 
     def test_with_data(self):
         self.assertEqual(Category.objects.count(), 0)
@@ -989,7 +989,7 @@ class OldFormForXTests(TestCase):
                 'pub_date': '1984-02-06',
                 'writer': six.text_type(w_royko.pk),
                 'article': 'Hello.'
-            }, instance=art)
+        }, instance=art)
         self.assertEqual(f.errors, {})
         self.assertEqual(f.is_valid(), True)
         test_art = f.save()
@@ -1002,7 +1002,7 @@ class OldFormForXTests(TestCase):
                 'headline': 'New headline',
                 'slug': 'new-headline',
                 'pub_date': '1988-01-04'
-            }, auto_id=False, instance=art)
+        }, auto_id=False, instance=art)
         self.assertHTMLEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" value="new-headline" maxlength="50" /></li>
 <li>Pub date: <input type="text" name="pub_date" value="1988-01-04" /></li>''')
@@ -1073,7 +1073,7 @@ class OldFormForXTests(TestCase):
                 'writer': six.text_type(w_royko.pk),
                 'article': 'Hello.',
                 'categories': [six.text_type(c1.id), six.text_type(c2.id)]
-            }, instance=new_art)
+        }, instance=new_art)
         new_art = f.save()
         self.assertEqual(new_art.id == art_id_1, True)
         new_art = Article.objects.get(id=art_id_1)
@@ -1619,7 +1619,7 @@ class OldFormForXTests(TestCase):
         f = OptionalImageFileForm(
                 data={'description': 'And a final one'},
                 files={'image': SimpleUploadedFile('test4.png', image_data2)}
-            )
+        )
         self.assertEqual(f.is_valid(), True)
         instance = f.save()
         self.assertEqual(instance.image.name, 'tests/test4.png')

@@ -136,7 +136,7 @@ class JsLexer(Lexer):
         Tok("punct",        literals("{ } ( [ . ; , < > + - * % & | ^ ! ~ ? : ="), next='reg'),
         Tok("string",       r'"([^"\\]|(\\(.|\n)))*?"', next='div'),
         Tok("string",       r"'([^'\\]|(\\(.|\n)))*?'", next='div'),
-        ]
+    ]
 
     both_after = [
         Tok("other",        r"."),
@@ -175,7 +175,7 @@ class JsLexer(Lexer):
                     [a-zA-Z0-9]*            # trailing flags
                 """, next='div'),
             ] + both_after,
-        }
+    }
 
     def __init__(self):
         super(JsLexer, self).__init__(self.states, 'reg')

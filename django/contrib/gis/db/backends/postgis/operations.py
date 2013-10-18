@@ -119,7 +119,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             # The "&&" operator returns true if A's bounding box overlaps
             # B's bounding box.
             'bboverlaps' : PostGISOperator('&&'),
-            }
+        }
 
         self.geometry_functions = {
             'equals' : PostGISFunction(prefix, 'Equals'),
@@ -256,7 +256,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
                     'GeoDjango requires at least PostGIS version 1.3. '
                     'Was the database created from a spatial database '
                     'template?' % self.connection.settings_dict['NAME']
-                    )
+                )
             version = vtup[1:]
         return version
 

@@ -495,7 +495,7 @@ constant_string = r"""
     'strsq': r"'[^'\\]*(?:\\.[^'\\]*)*'",  # single-quoted string
     'i18n_open': re.escape("_("),
     'i18n_close': re.escape(")"),
-    }
+}
 constant_string = constant_string.replace("\n", "")
 
 filter_raw_string = r"""

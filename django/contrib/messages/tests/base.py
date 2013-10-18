@@ -359,7 +359,7 @@ class BaseTests(object):
             constants.WARNING: '',
             constants.ERROR: 'bad',
             29: 'custom',
-        }
+    }
     )
     def test_custom_tags(self):
         storage = self.get_storage()

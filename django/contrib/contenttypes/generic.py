@@ -354,7 +354,7 @@ def create_generic_related_manager(superclass):
                 '%s__pk' % self.content_type_field_name: self.content_type.id,
                 '%s__in' % self.object_id_field_name:
                     set(obj._get_pk_val() for obj in instances)
-                }
+            }
             qs = super(GenericRelatedObjectManager, self).get_queryset().using(db).filter(**query)
             # We (possibly) need to convert object IDs to the type of the
             # instances' PK in order to match up instances:

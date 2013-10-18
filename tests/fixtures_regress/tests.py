@@ -390,7 +390,7 @@ class TestFixtures(TestCase):
             stdout.getvalue(),
             """[{"pk": %d, "model": "fixtures_regress.widget", "fields": {"name": "grommet"}}]"""
             % widget.pk
-            )
+        )
 
     def test_loaddata_works_when_fixture_has_forward_refs(self):
         """
@@ -535,7 +535,7 @@ class NaturalKeyFixtureTests(TestCase):
             'loaddata',
             'forward_ref_lookup.json',
             verbosity=0,
-            )
+        )
 
         stdout = StringIO()
         management.call_command(

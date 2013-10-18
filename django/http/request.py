@@ -526,9 +526,9 @@ def validate_host(host, allowed_hosts):
             pattern == '*' or
             pattern.startswith('.') and (
                 host.endswith(pattern) or host == pattern[1:]
-                ) or
+            ) or
             pattern == host
-            )
+        )
         if match:
             return True
 

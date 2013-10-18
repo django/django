@@ -154,7 +154,7 @@ def send_log(request, exc_info):
     admin_email_handler = [
         h for h in logger.handlers
         if h.__class__.__name__ == "AdminEmailHandler"
-        ][0]
+    ][0]
     orig_filters = admin_email_handler.filters
     admin_email_handler.filters = []
     admin_email_handler.include_html = True

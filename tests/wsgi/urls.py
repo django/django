@@ -7,4 +7,4 @@ def helloworld(request):
 urlpatterns = patterns(
     "",
     url("^$", helloworld)
-    )
+)

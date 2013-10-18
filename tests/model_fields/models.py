@@ -33,12 +33,12 @@ class Whiz(models.Model):
         ('Group 1', (
                 (1, 'First'),
                 (2, 'Second'),
-            )
+        )
         ),
         ('Group 2', (
                 (3, 'Third'),
                 (4, 'Fourth'),
-            )
+        )
         ),
         (0, 'Other'),
     )

@@ -150,7 +150,7 @@ class DummyCacheTests(unittest.TestCase):
             'unicode_ascii': 'Iñtërnâtiônàlizætiøn1',
             'Iñtërnâtiônàlizætiøn': 'Iñtërnâtiônàlizætiøn2',
             'ascii2': {'x' : 1}
-            }
+        }
         for (key, value) in stuff.items():
             self.cache.set(key, value)
             self.assertEqual(self.cache.get(key), None)
@@ -354,7 +354,7 @@ class BaseCacheTests(object):
             'unicode_ascii': 'Iñtërnâtiônàlizætiøn1',
             'Iñtërnâtiônàlizætiøn': 'Iñtërnâtiônàlizætiøn2',
             'ascii2': {'x' : 1}
-            }
+        }
         # Test `set`
         for (key, value) in stuff.items():
             self.cache.set(key, value)

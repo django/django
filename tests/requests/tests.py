@@ -480,7 +480,7 @@ class HostValidationTests(SimpleTestCase):
             'forward.com', 'example.com', 'internal.com', '12.34.56.78',
             '[2001:19f0:feee::dead:beef:cafe]', 'xn--4ca9at.com',
             '.multitenant.com', 'INSENSITIVE.com',
-            ])
+        ])
     def test_http_get_host(self):
         # Check if X_FORWARDED_HOST is provided.
         request = HttpRequest()

@@ -256,7 +256,7 @@ class AggregationTests(TestCase):
         self.assertEqual(
             Book.objects.annotate(c=Count('authors')).values('c').aggregate(Max('c')),
             {'c__max': 3}
-            )
+        )
 
     def test_field_error(self):
         # Bad field requests in aggregates are caught and reported

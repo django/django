@@ -123,7 +123,7 @@ class ParserTests(TestCase):
                 '1|two_arguments',
                 '1|two_arguments:"1"',
                 '1|two_one_opt_arg',
-            ):
+        ):
             with self.assertRaises(TemplateSyntaxError):
                 FilterExpression(expr, p)
         for expr in (
@@ -135,5 +135,5 @@ class ParserTests(TestCase):
                 '1|one_opt_argument:"1"',
                 # Not supplying all
                 '1|two_one_opt_arg:"1"',
-            ):
+        ):
             FilterExpression(expr, p)

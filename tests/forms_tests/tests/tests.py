@@ -128,7 +128,7 @@ class ModelFormCallableModelDefault(TestCase):
                 'choice_int': obj2,
                 'multi_choice': [obj2,obj3],
                 'multi_choice_int': ChoiceOptionModel.objects.exclude(name="default"),
-            }).as_p(), """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice">
+        }).as_p(), """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice">
 <option value="1">ChoiceOption 1</option>
 <option value="2" selected="selected">ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>

@@ -112,7 +112,7 @@ class CachedLoader(unittest.TestCase):
         settings.TEMPLATE_LOADERS = (
             ('django.template.loaders.cached.Loader', (
                     'django.template.loaders.filesystem.Loader',
-                )
+            )
             ),
         )
     def tearDown(self):
