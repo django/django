@@ -369,7 +369,8 @@ Minor features
   increased by 20%. This backwards compatible change will not affect
   existing passwords or users who have subclassed
   ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` to change the
-  default value.
+  default value. Passwords :ref:`will be upgraded <password-upgrades>` to use
+  the new iteration count as necessary.
 
 Backwards incompatible changes in 1.6
 =====================================
