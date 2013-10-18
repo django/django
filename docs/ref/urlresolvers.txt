@@ -4,8 +4,8 @@
 
 .. module:: django.core.urlresolvers
 
-reverse()
----------
+:func:`~reverse`
+----------------
 
 If you need to use something similar to the :ttag:`url` template tag in
 your code, Django provides the following function:
@@ -68,8 +68,10 @@ You can use ``kwargs`` instead of ``args``. For example::
     ``urllib.quote``) to the output of ``reverse()`` may produce undesirable
     results.
 
-reverse_lazy()
---------------
+.. function:: reverse_lazy
+
+:func:`reverse_lazy`
+--------------------
 
 A lazily evaluated version of `reverse()`_.
 
