@@ -479,6 +479,9 @@ these changes.
 * The ``zh-cn`` and ``zh-tw`` language codes will be removed and have been
   replaced by the ``zh-hans`` and ``zh-hant`` language code respectively.
 
+* ``get_cache`` from django.core.cache will be removed.  Instead, use
+  ``create_cache`` or  ``caches``, depending on your need.
+
 2.0
 ---
 

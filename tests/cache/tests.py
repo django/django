@@ -10,13 +10,14 @@ import random
 import re
 import string
 import tempfile
+import threading
 import time
 import unittest
 import warnings
 
 from django.conf import settings
 from django.core import management
-from django.core.cache import get_cache
+from django.core.cache import create_cache, caches
 from django.core.cache.backends.base import (CacheKeyWarning,
     InvalidCacheBackendError)
 from django.db import connection, router, transaction
@@ -56,7 +57,7 @@ class DummyCacheTests(unittest.TestCase):
     backend_name = 'django.core.cache.backends.dummy.DummyCache'
 
     def setUp(self):
-        self.cache = get_cache(self.backend_name)
+        self.cache = create_cache(self.backend_name)
 
     def test_simple(self):
         "Dummy cache backend ignores cache set calls"
@@ -847,11 +848,11 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         # Spaces are used in the table name to ensure quoting/escaping is working
         self._table_name = 'test cache table'
         management.call_command('createcachetable', verbosity=0, interactive=False)
-        self.cache = get_cache(self.backend_name, LOCATION=self._table_name, OPTIONS={'MAX_ENTRIES': 30})
-        self.prefix_cache = get_cache(self.backend_name, LOCATION=self._table_name, KEY_PREFIX='cacheprefix')
-        self.v2_cache = get_cache(self.backend_name, LOCATION=self._table_name, VERSION=2)
-        self.custom_key_cache = get_cache(self.backend_name, LOCATION=self._table_name, KEY_FUNCTION=custom_key_func)
-        self.custom_key_cache2 = get_cache(self.backend_name, LOCATION=self._table_name, KEY_FUNCTION='cache.tests.custom_key_func')
+        self.cache = create_cache(self.backend_name, LOCATION=self._table_name, OPTIONS={'MAX_ENTRIES': 30})
+        self.prefix_cache = create_cache(self.backend_name, LOCATION=self._table_name, KEY_PREFIX='cacheprefix')
+        self.v2_cache = create_cache(self.backend_name, LOCATION=self._table_name, VERSION=2)
+        self.custom_key_cache = create_cache(self.backend_name, LOCATION=self._table_name, KEY_FUNCTION=custom_key_func)
+        self.custom_key_cache2 = create_cache(self.backend_name, LOCATION=self._table_name, KEY_FUNCTION='cache.tests.custom_key_func')
 
     def tearDown(self):
         cursor = connection.cursor()
@@ -862,7 +863,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self.perform_cull_test(50, 29)
 
     def test_zero_cull(self):
-        self.cache = get_cache(self.backend_name, LOCATION=self._table_name, OPTIONS={'MAX_ENTRIES': 30, 'CULL_FREQUENCY': 0})
+        self.cache = create_cache(self.backend_name, LOCATION=self._table_name, OPTIONS={'MAX_ENTRIES': 30, 'CULL_FREQUENCY': 0})
         self.perform_cull_test(50, 18)
 
     def test_second_call_doesnt_crash(self):
@@ -956,11 +957,11 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
     backend_name = 'django.core.cache.backends.locmem.LocMemCache'
 
     def setUp(self):
-        self.cache = get_cache(self.backend_name, OPTIONS={'MAX_ENTRIES': 30})
-        self.prefix_cache = get_cache(self.backend_name, KEY_PREFIX='cacheprefix')
-        self.v2_cache = get_cache(self.backend_name, VERSION=2)
-        self.custom_key_cache = get_cache(self.backend_name, OPTIONS={'MAX_ENTRIES': 30}, KEY_FUNCTION=custom_key_func)
-        self.custom_key_cache2 = get_cache(self.backend_name, OPTIONS={'MAX_ENTRIES': 30}, KEY_FUNCTION='cache.tests.custom_key_func')
+        self.cache = create_cache(self.backend_name, OPTIONS={'MAX_ENTRIES': 30})
+        self.prefix_cache = create_cache(self.backend_name, KEY_PREFIX='cacheprefix')
+        self.v2_cache = create_cache(self.backend_name, VERSION=2)
+        self.custom_key_cache = create_cache(self.backend_name, OPTIONS={'MAX_ENTRIES': 30}, KEY_FUNCTION=custom_key_func)
+        self.custom_key_cache2 = create_cache(self.backend_name, OPTIONS={'MAX_ENTRIES': 30}, KEY_FUNCTION='cache.tests.custom_key_func')
 
         # LocMem requires a hack to make the other caches
         # share a data store with the 'normal' cache.
@@ -983,13 +984,13 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
         self.perform_cull_test(50, 29)
 
     def test_zero_cull(self):
-        self.cache = get_cache(self.backend_name, OPTIONS={'MAX_ENTRIES': 30, 'CULL_FREQUENCY': 0})
+        self.cache = create_cache(self.backend_name, OPTIONS={'MAX_ENTRIES': 30, 'CULL_FREQUENCY': 0})
         self.perform_cull_test(50, 19)
 
     def test_multiple_caches(self):
         "Check that multiple locmem caches are isolated"
-        mirror_cache = get_cache(self.backend_name)
-        other_cache = get_cache(self.backend_name, LOCATION='other')
+        mirror_cache = create_cache(self.backend_name)
+        other_cache = create_cache(self.backend_name, LOCATION='other')
 
         self.cache.set('value1', 42)
         self.assertEqual(mirror_cache.get('value1'), 42)
@@ -1022,11 +1023,11 @@ class MemcachedCacheTests(unittest.TestCase, BaseCacheTests):
             if cache['BACKEND'].startswith('django.core.cache.backends.memcached.'):
                 break
         random_prefix = ''.join(random.choice(string.ascii_letters) for x in range(10))
-        self.cache = get_cache(cache_key)
-        self.prefix_cache = get_cache(cache_key, KEY_PREFIX=random_prefix)
-        self.v2_cache = get_cache(cache_key, VERSION=2)
-        self.custom_key_cache = get_cache(cache_key, KEY_FUNCTION=custom_key_func)
-        self.custom_key_cache2 = get_cache(cache_key, KEY_FUNCTION='cache.tests.custom_key_func')
+        self.cache = caches[cache_key]
+        self.prefix_cache = create_cache(cache_key, KEY_PREFIX=random_prefix)
+        self.v2_cache = create_cache(cache_key, VERSION=2)
+        self.custom_key_cache = create_cache(cache_key, KEY_FUNCTION=custom_key_func)
+        self.custom_key_cache2 = create_cache(cache_key, KEY_FUNCTION='cache.tests.custom_key_func')
 
     def tearDown(self):
         self.cache.clear()
@@ -1055,7 +1056,7 @@ class MemcachedCacheTests(unittest.TestCase, BaseCacheTests):
         # Regression test for #19810
         for cache_key, cache in settings.CACHES.items():
             if cache['BACKEND'] == 'django.core.cache.backends.memcached.MemcachedCache':
-                self.assertEqual(get_cache(cache_key)._cache.pickleProtocol,
+                self.assertEqual(caches[cache_key]._cache.pickleProtocol,
                                  pickle.HIGHEST_PROTOCOL)
 
 
@@ -1067,11 +1068,11 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
 
     def setUp(self):
         self.dirname = tempfile.mkdtemp()
-        self.cache = get_cache(self.backend_name, LOCATION=self.dirname, OPTIONS={'MAX_ENTRIES': 30})
-        self.prefix_cache = get_cache(self.backend_name, LOCATION=self.dirname, KEY_PREFIX='cacheprefix')
-        self.v2_cache = get_cache(self.backend_name, LOCATION=self.dirname, VERSION=2)
-        self.custom_key_cache = get_cache(self.backend_name, LOCATION=self.dirname, KEY_FUNCTION=custom_key_func)
-        self.custom_key_cache2 = get_cache(self.backend_name, LOCATION=self.dirname, KEY_FUNCTION='cache.tests.custom_key_func')
+        self.cache = create_cache(self.backend_name, LOCATION=self.dirname, OPTIONS={'MAX_ENTRIES': 30})
+        self.prefix_cache = create_cache(self.backend_name, LOCATION=self.dirname, KEY_PREFIX='cacheprefix')
+        self.v2_cache = create_cache(self.backend_name, LOCATION=self.dirname, VERSION=2)
+        self.custom_key_cache = create_cache(self.backend_name, LOCATION=self.dirname, KEY_FUNCTION=custom_key_func)
+        self.custom_key_cache2 = create_cache(self.backend_name, LOCATION=self.dirname, KEY_FUNCTION='cache.tests.custom_key_func')
 
     def tearDown(self):
         self.cache.clear()
@@ -1101,7 +1102,7 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
 
     def test_zero_cull(self):
         # Regression test for #15806
-        self.cache = get_cache(self.backend_name, LOCATION=self.dirname, OPTIONS={'MAX_ENTRIES': 30, 'CULL_FREQUENCY': 0})
+        self.cache = create_cache(self.backend_name, LOCATION=self.dirname, OPTIONS={'MAX_ENTRIES': 30, 'CULL_FREQUENCY': 0})
         self.perform_cull_test(50, 19)
 
 
@@ -1113,7 +1114,7 @@ class CustomCacheKeyValidationTests(unittest.TestCase):
 
     """
     def test_custom_key_validation(self):
-        cache = get_cache('cache.liberal_backend.CacheClass')
+        cache = create_cache('cache.liberal_backend.CacheClass')
 
         # this key is both longer than 250 characters, and has spaces
         key = 'some key with spaces' * 15
@@ -1125,18 +1126,23 @@ class CustomCacheKeyValidationTests(unittest.TestCase):
 class GetCacheTests(unittest.TestCase):
 
     def test_simple(self):
-        from django.core.cache import cache
-        self.assertIsInstance(cache, get_cache('default').__class__)
+        from django.core.cache import caches, DEFAULT_CACHE_ALIAS
+        self.assertIsInstance(
+            caches[DEFAULT_CACHE_ALIAS],
+            create_cache('default').__class__
+        )
 
-        cache = get_cache(
-            'django.core.cache.backends.dummy.DummyCache', **{'TIMEOUT': 120})
+        cache = create_cache(
+            'django.core.cache.backends.dummy.DummyCache',
+            **{'TIMEOUT': 120}
+        )
         self.assertEqual(cache.default_timeout, 120)
 
-        self.assertRaises(InvalidCacheBackendError, get_cache, 'does_not_exist')
+        self.assertRaises(InvalidCacheBackendError, create_cache, 'does_not_exist')
 
     def test_close(self):
         from django.core import signals
-        cache = get_cache('cache.closeable_cache.CacheClass')
+        cache = create_cache('cache.closeable_cache.CacheClass')
         self.assertFalse(cache.closed)
         signals.request_finished.send(self.__class__)
         self.assertTrue(cache.closed)
@@ -1157,7 +1163,7 @@ class CacheUtils(TestCase):
 
     def setUp(self):
         self.path = '/cache/test/'
-        self.cache = get_cache('default')
+        self.cache = caches['default']
 
     def tearDown(self):
         self.cache.clear()
@@ -1274,7 +1280,7 @@ class CacheHEADTest(TestCase):
 
     def setUp(self):
         self.path = '/cache/test/'
-        self.cache = get_cache('default')
+        self.cache = caches['default']
 
     def tearDown(self):
         self.cache.clear()
@@ -1338,7 +1344,7 @@ class CacheI18nTest(TestCase):
 
     def setUp(self):
         self.path = '/cache/test/'
-        self.cache = get_cache('default')
+        self.cache = create_cache('default')
 
     def tearDown(self):
         self.cache.clear()
@@ -1624,8 +1630,8 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
     def setUp(self):
         super(CacheMiddlewareTest, self).setUp()
         self.factory = RequestFactory()
-        self.default_cache = get_cache('default')
-        self.other_cache = get_cache('other')
+        self.default_cache = create_cache('default')
+        self.other_cache = create_cache('other')
 
     def tearDown(self):
         self.default_cache.clear()
@@ -1651,7 +1657,7 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
         # First, test with "defaults":
         as_view_decorator = CacheMiddleware(cache_alias=None, key_prefix=None)
 
-        self.assertEqual(as_view_decorator.cache_timeout, 300)  # Timeout value for 'default' cache, i.e. 300
+        self.assertEqual(as_view_decorator.cache_timeout, 30)  # Timeout value for 'default' cache, i.e. 30
         self.assertEqual(as_view_decorator.key_prefix, '')
         self.assertEqual(as_view_decorator.cache_alias, 'default')  # Value of DEFAULT_CACHE_ALIAS from django.core.cache
         self.assertEqual(as_view_decorator.cache_anonymous_only, False)
@@ -1798,7 +1804,7 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
         time.sleep(2)
 
         # ... the default cache will still hit
-        get_cache('default')
+        caches['default']
         response = default_view(request, '11')
         self.assertEqual(response.content, b'Hello World 1')
 
@@ -1844,7 +1850,7 @@ class TestWithTemplateResponse(TestCase):
     """
     def setUp(self):
         self.path = '/cache/test/'
-        self.cache = get_cache('default')
+        self.cache = create_cache('default')
 
     def tearDown(self):
         self.cache.clear()
@@ -1956,3 +1962,29 @@ class TestMakeTemplateFragmentKey(TestCase):
         key = make_template_fragment_key('spam', ['abc:def%'])
         self.assertEqual(key,
             'template.cache.spam.f27688177baec990cdf3fbd9d9c3f469')
+
+class CacheHandlerTest(TestCase):
+    def test_same_instance(self):
+        """
+        Attempting to retrieve the same alias should yield the same instance.
+        """
+        cache1 = caches['default']
+        cache2 = caches['default']
+
+        self.assertTrue(cache1 is cache2)
+
+    def test_per_thread(self):
+        """
+        Requesting the same alias from separate threads should yield separate
+        instances.
+        """
+        c = []
+        def runner():
+            c.append(caches['default'])
+
+        for x in range(2):
+            t = threading.Thread(target=runner)
+            t.start()
+            t.join()
+
+        self.assertFalse(c[0] is c[1])
