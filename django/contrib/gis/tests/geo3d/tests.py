@@ -51,7 +51,7 @@ interstate_data = (
        15.544,  14.975,  15.688,  16.099,  15.197,  17.268,  19.857,
        15.435),
      ),
-    )
+)
 
 # Bounding box polygon for inner-loop of Houston (in projected coordinate
 # system 32140), with elevation values from the National Elevation Dataset

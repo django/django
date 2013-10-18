@@ -82,7 +82,7 @@ class DatabaseErrorWrapper(object):
                 DatabaseError,
                 InterfaceError,
                 Error,
-            ):
+        ):
             db_exc_type = getattr(self.wrapper.Database, dj_exc_type.__name__)
             if issubclass(exc_type, db_exc_type):
                 dj_exc_value = dj_exc_type(*exc_value.args)

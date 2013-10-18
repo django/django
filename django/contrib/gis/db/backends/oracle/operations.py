@@ -114,7 +114,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         'distance_lt' : (SDODistance('<'), dtypes),
         'distance_lte' : (SDODistance('<='), dtypes),
         'dwithin' : (SDODWithin(), dtypes),
-        }
+    }
 
     geometry_functions = {
         'contains' : SDOOperation('SDO_CONTAINS'),
@@ -129,7 +129,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         'relate' : (SDORelate, six.string_types), # Oracle uses a different syntax, e.g., 'mask=inside+touch'
         'touches' : SDOOperation('SDO_TOUCH'),
         'within' : SDOOperation('SDO_INSIDE'),
-        }
+    }
     geometry_functions.update(distance_functions)
 
     gis_terms = set(['isnull'])

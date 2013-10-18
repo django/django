@@ -77,11 +77,11 @@
 TEMPLATE_EXTENSIONS = [
     ".html",
     ".htm",
-    ]
+]
 
 PYTHON_SOURCE_EXTENSIONS = [
     ".py",
-    ]
+]
 
 TEMPLATE_ENCODING = "UTF-8"
 

@@ -25,7 +25,7 @@ class DiscoverRunner(object):
         make_option('-p', '--pattern', action='store', dest='pattern',
             default="test*.py",
             help='The test matching pattern. Defaults to test*.py.'),
-        )
+    )
 
     def __init__(self, pattern=None, top_level=None,
                  verbosity=1, interactive=True, failfast=False,

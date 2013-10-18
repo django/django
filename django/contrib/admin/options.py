@@ -1200,7 +1200,7 @@ class ModelAdmin(BaseModelAdmin):
             'The %(name)s "%(obj)s" was deleted successfully.') % {
                 'name': force_text(opts.verbose_name),
                 'obj': force_text(obj_display)
-            }, messages.SUCCESS)
+        }, messages.SUCCESS)
 
         if self.has_change_permission(request, None):
             post_url = reverse('admin:%s_%s_changelist' %

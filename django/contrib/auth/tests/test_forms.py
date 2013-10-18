@@ -32,7 +32,7 @@ class UserCreationFormTest(TestCase):
             'username': 'testclient',
             'password1': 'test123',
             'password2': 'test123',
-            }
+        }
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["username"].errors,
@@ -43,7 +43,7 @@ class UserCreationFormTest(TestCase):
             'username': 'jsmith!',
             'password1': 'test123',
             'password2': 'test123',
-            }
+        }
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["username"].errors,
@@ -55,7 +55,7 @@ class UserCreationFormTest(TestCase):
             'username': 'jsmith',
             'password1': 'test123',
             'password2': 'test',
-            }
+        }
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["password2"].errors,
@@ -82,7 +82,7 @@ class UserCreationFormTest(TestCase):
             'username': 'jsmith@example.com',
             'password1': 'test123',
             'password2': 'test123',
-            }
+        }
         form = UserCreationForm(data)
         self.assertTrue(form.is_valid())
         u = form.save()
@@ -101,7 +101,7 @@ class AuthenticationFormTest(TestCase):
         data = {
             'username': 'jsmith_does_not_exist',
             'password': 'test123',
-            }
+        }
         form = AuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.non_field_errors(),
@@ -114,7 +114,7 @@ class AuthenticationFormTest(TestCase):
         data = {
             'username': 'inactive',
             'password': 'password',
-            }
+        }
         form = AuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.non_field_errors(),
@@ -126,7 +126,7 @@ class AuthenticationFormTest(TestCase):
             data = {
                 'username': 'inactive',
                 'password': 'password',
-                }
+            }
             form = AuthenticationForm(None, data)
             self.assertFalse(form.is_valid())
             self.assertEqual(form.non_field_errors(),
@@ -137,7 +137,7 @@ class AuthenticationFormTest(TestCase):
         data = {
             'username': 'inactive',
             'password': 'password',
-            }
+        }
 
         class AuthenticationFormWithInactiveUsersOkay(AuthenticationForm):
             def confirm_login_allowed(self, user):
@@ -161,7 +161,7 @@ class AuthenticationFormTest(TestCase):
         data = {
             'username': 'testclient',
             'password': 'password',
-            }
+        }
         form = PickyAuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.non_field_errors(), ["Sorry, nobody's allowed in."])
@@ -171,7 +171,7 @@ class AuthenticationFormTest(TestCase):
         data = {
             'username': 'testclient',
             'password': 'password',
-            }
+        }
         form = AuthenticationForm(None, data)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.non_field_errors(), [])
@@ -215,7 +215,7 @@ class SetPasswordFormTest(TestCase):
         data = {
             'new_password1': 'abc123',
             'new_password2': 'abc',
-            }
+        }
         form = SetPasswordForm(user, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["new_password2"].errors,
@@ -226,7 +226,7 @@ class SetPasswordFormTest(TestCase):
         data = {
             'new_password1': 'abc123',
             'new_password2': 'abc123',
-            }
+        }
         form = SetPasswordForm(user, data)
         self.assertTrue(form.is_valid())
 
@@ -243,7 +243,7 @@ class PasswordChangeFormTest(TestCase):
             'old_password': 'test',
             'new_password1': 'abc123',
             'new_password2': 'abc123',
-            }
+        }
         form = PasswordChangeForm(user, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["old_password"].errors,
@@ -256,7 +256,7 @@ class PasswordChangeFormTest(TestCase):
             'old_password': 'password',
             'new_password1': 'abc123',
             'new_password2': 'abc',
-            }
+        }
         form = PasswordChangeForm(user, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["new_password2"].errors,
@@ -269,7 +269,7 @@ class PasswordChangeFormTest(TestCase):
             'old_password': 'password',
             'new_password1': 'abc123',
             'new_password2': 'abc123',
-            }
+        }
         form = PasswordChangeForm(user, data)
         self.assertTrue(form.is_valid())
 

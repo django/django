@@ -607,7 +607,7 @@ class ModelTest(TestCase):
         dicts = Article.objects.filter(
             pub_date__year=2008).extra(
                 select={'dashed-value': '1'}
-            ).values('headline', 'dashed-value')
+        ).values('headline', 'dashed-value')
         self.assertEqual([sorted(d.items()) for d in dicts],
             [[('dashed-value', 1), ('headline', 'Article 11')], [('dashed-value', 1), ('headline', 'Article 12')]])
 

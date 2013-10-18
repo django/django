@@ -81,7 +81,7 @@ def simple_unlimited_args_kwargs(one, two='hi', *args, **kwargs):
     return "simple_unlimited_args_kwargs - Expected result: %s / %s" % (
         ', '.join(six.text_type(arg) for arg in [one, two] + list(args)),
         ', '.join('%s=%s' % (k, v) for (k, v) in sorted_kwarg)
-        )
+    )
 simple_unlimited_args_kwargs.anything = "Expected simple_unlimited_args_kwargs __dict__"
 
 @register.simple_tag(takes_context=True)
@@ -232,7 +232,7 @@ def inclusion_unlimited_args_kwargs(one, two='hi', *args, **kwargs):
     return {"result": "inclusion_unlimited_args_kwargs - Expected result: %s / %s" % (
         ', '.join(six.text_type(arg) for arg in [one, two] + list(args)),
         ', '.join('%s=%s' % (k, v) for (k, v) in sorted_kwarg)
-        )}
+    )}
 inclusion_unlimited_args_kwargs.anything = "Expected inclusion_unlimited_args_kwargs __dict__"
 
 @register.inclusion_tag('inclusion.html', takes_context=True)
@@ -303,7 +303,7 @@ def assignment_unlimited_args_kwargs(one, two='hi', *args, **kwargs):
     return "assignment_unlimited_args_kwargs - Expected result: %s / %s" % (
         ', '.join(six.text_type(arg) for arg in [one, two] + list(args)),
         ', '.join('%s=%s' % (k, v) for (k, v) in sorted_kwarg)
-        )
+    )
 assignment_unlimited_args_kwargs.anything = "Expected assignment_unlimited_args_kwargs __dict__"
 
 @register.assignment_tag(takes_context=True)

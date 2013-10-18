@@ -66,7 +66,7 @@ class LayerMapping(object):
         models.BigIntegerField : (OFTInteger, OFTReal, OFTString),
         models.SmallIntegerField : (OFTInteger, OFTReal, OFTString),
         models.PositiveSmallIntegerField : (OFTInteger, OFTReal, OFTString),
-        }
+    }
 
     def __init__(self, model, data, mapping, layer=0,
                  source_srs=None, encoding='utf-8',

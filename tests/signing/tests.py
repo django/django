@@ -33,7 +33,7 @@ class TestSigner(TestCase):
             signer.signature('hello'),
                 signing.base64_hmac('extra-salt' + 'signer',
                 'hello', 'predictable-secret').decode()
-            )
+        )
         self.assertNotEqual(
             signing.Signer('predictable-secret', salt='one').signature('hello'),
             signing.Signer('predictable-secret', salt='two').signature('hello'))

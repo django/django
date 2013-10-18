@@ -123,13 +123,13 @@ class ModelTests(TestCase):
         self.assertQuerysetEqual(
                 Party.objects.filter(when__year=1), [
                         datetime.date(1, 3, 3),
-                    ],
+                ],
                 attrgetter("when")
         )
         self.assertQuerysetEqual(
                 Party.objects.filter(when__year='1'), [
                         datetime.date(1, 3, 3),
-                    ],
+                ],
                 attrgetter("when")
         )
 

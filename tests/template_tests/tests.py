@@ -573,7 +573,7 @@ class TemplateTests(TransRealMixin, TestCase):
                     ('', False, normal_string_result),
                     (expected_invalid_str, False, invalid_string_result),
                     ('', True, template_debug_result)
-                ]:
+            ]:
                 settings.TEMPLATE_STRING_IF_INVALID = invalid_str
                 settings.TEMPLATE_DEBUG = template_debug
                 for is_cached in (False, True):

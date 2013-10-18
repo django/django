@@ -103,14 +103,14 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         # These are implemented here as synonyms for Equals
         'same_as' : SpatiaLiteFunction('Equals'),
         'exact' : SpatiaLiteFunction('Equals'),
-        }
+    }
 
     distance_functions = {
         'distance_gt' : (get_dist_ops('>'), dtypes),
         'distance_gte' : (get_dist_ops('>='), dtypes),
         'distance_lt' : (get_dist_ops('<'), dtypes),
         'distance_lte' : (get_dist_ops('<='), dtypes),
-        }
+    }
     geometry_functions.update(distance_functions)
 
     def __init__(self, connection):

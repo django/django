@@ -144,7 +144,7 @@ class Command(BaseCommand):
                                     'object_name': obj.object._meta.object_name,
                                     'pk': obj.object.pk,
                                     'error_msg': force_text(e)
-                                },)
+                            },)
                             raise
 
                 self.loaded_object_count += loaded_objects_in_fixture

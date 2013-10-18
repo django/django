@@ -161,7 +161,7 @@ class AdminEmailHandlerTest(TestCase):
         admin_email_handler = [
             h for h in logger.handlers
             if h.__class__.__name__ == "AdminEmailHandler"
-            ][0]
+        ][0]
         return admin_email_handler
 
     def test_fail_silently(self):
@@ -171,7 +171,7 @@ class AdminEmailHandlerTest(TestCase):
     @override_settings(
             ADMINS=(('whatever admin', 'admin@example.com'),),
             EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-'
-        )
+    )
     def test_accepts_args(self):
         """
         Ensure that user-supplied arguments and the EMAIL_SUBJECT_PREFIX
@@ -202,7 +202,7 @@ class AdminEmailHandlerTest(TestCase):
             ADMINS=(('whatever admin', 'admin@example.com'),),
             EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-',
             INTERNAL_IPS=('127.0.0.1',),
-        )
+    )
     def test_accepts_args_and_request(self):
         """
         Ensure that the subject is also handled if being
@@ -237,7 +237,7 @@ class AdminEmailHandlerTest(TestCase):
             ADMINS=(('admin', 'admin@example.com'),),
             EMAIL_SUBJECT_PREFIX='',
             DEBUG=False,
-        )
+    )
     def test_subject_accepts_newlines(self):
         """
         Ensure that newlines in email reports' subjects are escaped to avoid
@@ -260,7 +260,7 @@ class AdminEmailHandlerTest(TestCase):
             ADMINS=(('admin', 'admin@example.com'),),
             EMAIL_SUBJECT_PREFIX='',
             DEBUG=False,
-        )
+    )
     def test_truncate_subject(self):
         """
         RFC 2822's hard limit is 998 characters per line.
@@ -281,7 +281,7 @@ class AdminEmailHandlerTest(TestCase):
     @override_settings(
             ADMINS=(('admin', 'admin@example.com'),),
             DEBUG=False,
-        )
+    )
     def test_uses_custom_email_backend(self):
         """
         Refs #19325

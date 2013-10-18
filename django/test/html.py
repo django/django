@@ -190,7 +190,7 @@ class Parser(HTMLParser):
             if name == "class"
             else (name, value)
             for name, value in attrs
-            ]
+        ]
         element = Element(tag, attrs)
         self.current.append(element)
         if tag not in self.SELF_CLOSING_TAGS:

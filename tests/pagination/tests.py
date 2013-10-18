@@ -253,7 +253,7 @@ class ModelPaginationTests(TestCase):
                 "<Article: Article 3>",
                 "<Article: Article 4>",
                 "<Article: Article 5>"
-            ],
+        ],
             ordered=False
         )
         self.assertTrue(p.has_next())
@@ -273,7 +273,7 @@ class ModelPaginationTests(TestCase):
                 "<Article: Article 7>",
                 "<Article: Article 8>",
                 "<Article: Article 9>"
-            ],
+        ],
             ordered=False
         )
         self.assertFalse(p.has_next())
@@ -304,7 +304,7 @@ class ModelPaginationTests(TestCase):
         self.assertQuerysetEqual(p[slice(2)], [
                 "<Article: Article 1>",
                 "<Article: Article 2>",
-            ]
+        ]
         )
         # After __getitem__ is called, object_list is a list
         self.assertIsInstance(p.object_list, list)

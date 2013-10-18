@@ -67,7 +67,7 @@ class Command(LabelCommand):
                     'determined, the SRID of the data source is used.'),
         make_option('--mapping', action='store_true', dest='mapping',
                     help='Generate mapping dictionary for use with `LayerMapping`.')
-        )
+    )
 
     requires_model_validation = False
 

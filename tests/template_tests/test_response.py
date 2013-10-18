@@ -152,7 +152,7 @@ class SimpleTemplateResponseTest(TestCase):
         response = SimpleTemplateResponse('first/test.html', {
                 'value': 123,
                 'fn': datetime.now,
-            })
+        })
         self.assertRaises(ContentNotRenderedError,
                           pickle.dumps, response)
 
@@ -180,7 +180,7 @@ class SimpleTemplateResponseTest(TestCase):
         response = SimpleTemplateResponse('first/test.html', {
                 'value': 123,
                 'fn': datetime.now,
-            })
+        })
         self.assertRaises(ContentNotRenderedError,
                           pickle.dumps, response)
 
@@ -193,7 +193,7 @@ class SimpleTemplateResponseTest(TestCase):
         response = SimpleTemplateResponse('first/test.html', {
                 'value': 123,
                 'fn': datetime.now,
-            })
+        })
 
         response.cookies['key'] = 'value'
 
@@ -286,7 +286,7 @@ class TemplateResponseTest(TestCase):
         response = SimpleTemplateResponse('first/test.html', {
                 'value': 123,
                 'fn': datetime.now,
-            })
+        })
         self.assertRaises(ContentNotRenderedError,
                           pickle.dumps, response)
 

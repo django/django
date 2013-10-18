@@ -242,7 +242,7 @@ class BooleanFieldListFilter(FieldListFilter):
                 'selected': self.lookup_val == lookup and not self.lookup_val2,
                 'query_string': cl.get_query_string({
                         self.lookup_kwarg: lookup,
-                    }, [self.lookup_kwarg2]),
+                }, [self.lookup_kwarg2]),
                 'display': title,
             }
         if isinstance(self.field, models.NullBooleanField):
@@ -250,7 +250,7 @@ class BooleanFieldListFilter(FieldListFilter):
                 'selected': self.lookup_val2 == 'True',
                 'query_string': cl.get_query_string({
                         self.lookup_kwarg2: 'True',
-                    }, [self.lookup_kwarg]),
+                }, [self.lookup_kwarg]),
                 'display': _('Unknown'),
             }
 
