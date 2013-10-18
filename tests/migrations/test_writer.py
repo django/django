@@ -73,6 +73,8 @@ class WriterTests(TestCase):
         # Datetime stuff
         self.assertSerializedEqual(datetime.datetime.utcnow())
         self.assertSerializedEqual(datetime.datetime.utcnow)
+        self.assertSerializedEqual(datetime.datetime.today())
+        self.assertSerializedEqual(datetime.datetime.today)
         self.assertSerializedEqual(datetime.date.today())
         self.assertSerializedEqual(datetime.date.today)
         # Django fields

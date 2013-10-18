@@ -148,18 +148,9 @@ class MigrationWriter(object):
             return cls.serialize_deconstructed(path, args, kwargs)
         # Functions
         elif isinstance(value, (types.FunctionType, types.BuiltinFunctionType)):
-            # Special-cases, as these don't have im_class
-            special_cases = [
-                (datetime.datetime.now, "datetime.datetime.now", ["import datetime"]),
-                (datetime.datetime.utcnow, "datetime.datetime.utcnow", ["import datetime"]),
-                (datetime.date.today, "datetime.date.today", ["import datetime"]),
-            ]
-            for func, string, imports in special_cases:
-                if func == value:  # For some reason "utcnow is not utcnow"
-                    return string, set(imports)
-            # Method?
-            if hasattr(value, "im_class"):
-                klass = value.im_class
+            # @classmethod?
+            if getattr(value, "__self__", None) and isinstance(value.__self__, type):
+                klass = value.__self__
                 module = klass.__module__
                 return "%s.%s.%s" % (module, klass.__name__, value.__name__), set(["import %s" % module])
             elif hasattr(value, 'deconstruct'):
