@@ -34,7 +34,7 @@ def set_language(request):
         lang_code = request.POST.get('language', None)
         if lang_code and check_for_language(lang_code):
             if hasattr(request, 'session'):
-                request.session['django_language'] = lang_code
+                request.session['_language'] = lang_code
             else:
                 response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang_code)
     return response

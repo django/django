@@ -1594,8 +1594,13 @@ following this algorithm:
   root URLconf. See :ref:`url-internationalization` for more information
   about the language prefix and how to internationalize URL patterns.
 
-* Failing that, it looks for a ``django_language`` key in the current
-  user's session.
+* Failing that, it looks for a ``_language`` key in the current user's session.
+
+  .. versionchanged:: 1.7
+
+      In previous versions, the key was named ``django_language`` but it was
+      renamed to start with an underscore to denote a Django reserved session
+      key.
 
 * Failing that, it looks for a cookie.
 

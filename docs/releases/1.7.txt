@@ -302,6 +302,13 @@ Internationalization
 * The :attr:`django.middleware.locale.LocaleMiddleware.response_redirect_class`
   attribute allows you to customize the redirects issued by the middleware.
 
+* The :class:`~django.middleware.locale.LocaleMiddleware` now stores the user's
+  selected language with the session key ``_language``. Previously it was
+  stored with the key ``django_language``, but keys reserved for Django should
+  start with an underscore. For backwards compatibility ``django_language`` is
+  still read from in 1.7. Sessions will be migrated to the new ``_language``
+  key as they are written.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
