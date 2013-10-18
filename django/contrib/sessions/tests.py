@@ -15,7 +15,7 @@ from django.contrib.sessions.backends.file import SessionStore as FileSession
 from django.contrib.sessions.backends.signed_cookies import SessionStore as CookieSession
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.middleware import SessionMiddleware
-from django.core.cache import get_cache
+from django.core.cache import caches
 from django.core.cache.backends.base import InvalidCacheBackendError
 from django.core import management
 from django.core.exceptions import ImproperlyConfigured
@@ -140,7 +140,7 @@ class SessionTestsMixin(object):
         self.assertTrue(self.session.modified)
 
     def test_save(self):
-        if (hasattr(self.session, '_cache') and'DummyCache' in
+        if (hasattr(self.session, '_cache') and 'DummyCache' in
             settings.CACHES[settings.SESSION_CACHE_ALIAS]['BACKEND']):
             raise unittest.SkipTest("Session saving tests require a real cache backend")
         self.session.save()
@@ -481,7 +481,7 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
 
     def test_default_cache(self):
         self.session.save()
-        self.assertNotEqual(get_cache('default').get(self.session.cache_key), None)
+        self.assertNotEqual(caches['default'].get(self.session.cache_key), None)
 
     @override_settings(CACHES={
         'default': {
@@ -489,6 +489,7 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
         },
         'sessions': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'session',
         },
     }, SESSION_CACHE_ALIAS='sessions')
     def test_non_default_cache(self):
@@ -496,8 +497,8 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
         self.session = self.backend()
 
         self.session.save()
-        self.assertEqual(get_cache('default').get(self.session.cache_key), None)
-        self.assertNotEqual(get_cache('sessions').get(self.session.cache_key), None)
+        self.assertEqual(caches['default'].get(self.session.cache_key), None)
+        self.assertNotEqual(caches['sessions'].get(self.session.cache_key), None)
 
 
 class SessionMiddlewareTests(unittest.TestCase):

@@ -6,14 +6,15 @@ In a nutshell, a cache is a set of values -- which can be any object that
 may be pickled -- identified by string keys.  For the complete API, see
 the abstract BaseCache class in django.core.cache.backends.base.
 
-Client code should not access a cache backend directly; instead it should
-either use the "cache" variable made available here, or it should use the
-get_cache() function made available here. get_cache() takes a CACHES alias or a
-backend path and config parameters, and returns an instance of a backend cache
-class.
+Client code should use the `cache` variable defined here to access the default
+cache backend and look up non-default cache backends in the `caches` dict-like
+object.
 
 See docs/topics/cache.txt for information on the public API.
 """
+from threading import local
+import warnings
+
 from django.conf import settings
 from django.core import signals
 from django.core.cache.backends.base import (
@@ -35,14 +36,14 @@ if DEFAULT_CACHE_ALIAS not in settings.CACHES:
 
 def get_cache(backend, **kwargs):
     """
-    Function to load a cache backend dynamically. This is flexible by design
+    Function to create a cache backend dynamically. This is flexible by design
     to allow different use cases:
 
     To load a backend that is pre-defined in the settings::
 
         cache = get_cache('default')
 
-    To load a backend with its dotted import path,
+    To create a backend with its dotted import path,
     including arbitrary options::
 
         cache = get_cache('django.core.cache.backends.memcached.MemcachedCache', **{
@@ -50,6 +51,12 @@ def get_cache(backend, **kwargs):
         })
 
     """
+    warnings.warn("'get_cache' is deprecated in favor of 'caches'.",
+                  PendingDeprecationWarning, stacklevel=2)
+    return _create_cache(backend, **kwargs)
+
+
+def _create_cache(backend, **kwargs):
     try:
         # Try to get the CACHES entry for the given backend name first
         try:
@@ -79,4 +86,57 @@ def get_cache(backend, **kwargs):
     signals.request_finished.connect(cache.close)
     return cache
 
-cache = get_cache(DEFAULT_CACHE_ALIAS)
+
+class CacheHandler(object):
+    """
+    A Cache Handler to manage access to Cache instances.
+
+    Ensures only one instance of each alias exists per thread.
+    """
+    def __init__(self):
+        self._caches = local()
+
+    def __getitem__(self, alias):
+        try:
+            return getattr(self._caches, alias)
+        except AttributeError:
+            pass
+
+        if alias not in settings.CACHES:
+            raise InvalidCacheBackendError(
+                "Could not find config for '%s' in settings.CACHES" % alias
+            )
+
+        cache = _create_cache(alias)
+        setattr(self._caches, alias, cache)
+
+        return cache
+
+caches = CacheHandler()
+
+class DefaultCacheProxy(object):
+    """
+    Proxy access to the default Cache object's attributes.
+
+    This allows the legacy `cache` object to be thread-safe using the new
+    ``caches`` API.
+    """
+    def __getattr__(self, name):
+        return getattr(caches[DEFAULT_CACHE_ALIAS], name)
+
+    def __setattr__(self, name, value):
+        return setattr(caches[DEFAULT_CACHE_ALIAS], name, value)
+
+    def __delattr__(self, name):
+        return delattr(caches[DEFAULT_CACHE_ALIAS], name)
+
+    def __contains__(self, key):
+        return key in caches[DEFAULT_CACHE_ALIAS]
+
+    def __eq__(self, other):
+        return caches[DEFAULT_CACHE_ALIAS] == other
+
+    def __ne__(self, other):
+        return caches[DEFAULT_CACHE_ALIAS] != other
+
+cache = DefaultCacheProxy()

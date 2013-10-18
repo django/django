@@ -114,7 +114,7 @@ these changes.
   no longer appears to be actively maintained & does not work on Python 3.
   You are advised to install `Pillow`_, which should be used instead.
 
-.. _`Pillow`: https://pypi.python.org/pypi/Pillow
+  .. _`Pillow`: https://pypi.python.org/pypi/Pillow
 
 * The following private APIs will be removed:
 
@@ -214,6 +214,9 @@ these changes.
   replaced by the ``zh-hans`` and ``zh-hant`` language code respectively.
 
 * The internal ``django.utils.functional.memoize`` will be removed.
+
+* ``django.core.cache.get_cache`` will be removed. Add suitable entries
+  to :setting:`CACHES` and use :data:`django.core.cache.caches` instead.
 
 2.0
 ---
