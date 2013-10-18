@@ -269,6 +269,26 @@ Minor features
   allowing the ``published`` element to be included in the feed (which
   relies on ``pubdate``).
 
+Cache
+^^^^^
+
+* Access to caches configured in ``settings.CACHES`` is now available via
+  ``django.core.cache.caches``.  This will now return a different instance per
+  thread.
+
+* A new function ``django.core.cache.create_cache`` has been added to make it
+  clearer what's happening.  ``django.core.cache.get_cache`` will call this
+  if it's passed anything other than just a cache config alias.
+
+* ``django.core.cache.get_cache`` has been deprecated.  Use
+  ``django.core.cache.caches`` to access caches configurd in
+  ``settings.CACHES``, or ``django.core.cache.create_cache`` to create ad-hoc
+  instances.
+
+* All thread safety in cache backends has been removed, as
+  ``django.core.cache.caches`` now yields differend backend instances per
+   thread.
+
 Email
 ^^^^^
 
@@ -642,6 +662,12 @@ Miscellaneous
 
 Features deprecated in 1.7
 ==========================
+
+``django.core.cache.get_cache``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.core.cache.get_cache`` has been supplanted by
+``django.core.cache.caches`` and ``django.core.cache.create_cache``.
 
 ``django.utils.dictconfig``/``django.utils.importlib``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

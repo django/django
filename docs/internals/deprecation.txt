@@ -215,6 +215,9 @@ these changes.
 
 * The internal ``django.utils.functional.memoize`` will be removed.
 
+* ``get_cache`` from django.core.cache will be removed.  Instead, use
+  ``create_cache`` or  ``caches``, depending on your need.
+
 2.0
 ---
 

@@ -23,7 +23,7 @@ import re
 import time
 
 from django.conf import settings
-from django.core.cache import get_cache
+from django.core.cache import caches
 from django.utils.encoding import iri_to_uri, force_bytes, force_text
 from django.utils.http import http_date
 from django.utils.timezone import get_current_timezone_name
@@ -219,7 +219,7 @@ def get_cache_key(request, key_prefix=None, method='GET', cache=None):
         key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
     cache_key = _generate_cache_header_key(key_prefix, request)
     if cache is None:
-        cache = get_cache(settings.CACHE_MIDDLEWARE_ALIAS)
+        cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
     headerlist = cache.get(cache_key, None)
     if headerlist is not None:
         return _generate_cache_key(request, method, headerlist, key_prefix)
@@ -246,7 +246,7 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
         cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
     cache_key = _generate_cache_header_key(key_prefix, request)
     if cache is None:
-        cache = get_cache(settings.CACHE_MIDDLEWARE_ALIAS)
+        cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
     if response.has_header('Vary'):
         is_accept_language_redundant = settings.USE_I18N or settings.USE_L10N
         # If i18n or l10n are used, the generated cache key will be suffixed

@@ -7,7 +7,7 @@ import posixpath
 import re
 
 from django.conf import settings
-from django.core.cache import (get_cache, InvalidCacheBackendError,
+from django.core.cache import (caches, InvalidCacheBackendError,
                                cache as default_cache)
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
@@ -56,7 +56,7 @@ class CachedFilesMixin(object):
     def __init__(self, *args, **kwargs):
         super(CachedFilesMixin, self).__init__(*args, **kwargs)
         try:
-            self.cache = get_cache('staticfiles')
+            self.cache = caches['staticfiles']
         except InvalidCacheBackendError:
             # Use the default backend
             self.cache = default_cache
