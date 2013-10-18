@@ -1,1 +1,1 @@
-from django import Xtemplate
+from django import Xtemplate  # NOQA

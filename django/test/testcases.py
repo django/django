@@ -12,7 +12,7 @@ import socket
 import sys
 import threading
 import unittest
-from unittest import skipIf         # Imported here for backward compatibility
+from unittest import skipIf         # NOQA: Imported here for backward compatibility
 from unittest.util import safe_repr
 
 from django.conf import settings

@@ -102,7 +102,7 @@ class TextFile(models.Model):
         return self.description
 
 try:
-    from django.utils.image import Image
+    from django.utils.image import Image  # NOQA: detect if Pillow is installed
 
     test_images = True
 

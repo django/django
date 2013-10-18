@@ -1,6 +1,5 @@
 "Database cache backend."
 import base64
-import time
 from datetime import datetime
 
 try:

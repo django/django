@@ -10,6 +10,14 @@ from django.contrib.admin.filters import (ListFilter, SimpleListFilter,
     ChoicesFieldListFilter, DateFieldListFilter, AllValuesFieldListFilter)
 from django.utils.module_loading import autodiscover_modules
 
+__all__ = [
+    "register", "ACTION_CHECKBOX_NAME", "ModelAdmin", "HORIZONTAL", "VERTICAL",
+    "StackedInline", "TabularInline", "AdminSite", "site", "ListFilter",
+    "SimpleListFilter", "FieldListFilter", "BooleanFieldListFilter",
+    "RelatedFieldListFilter", "ChoicesFieldListFilter", "DateFieldListFilter",
+    "AllValuesFieldListFilter", "autodiscover",
+]
+
 
 def autodiscover():
     autodiscover_modules('admin', register_to=site)

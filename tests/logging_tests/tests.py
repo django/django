@@ -1,9 +1,6 @@
 from __future__ import unicode_literals
 
-import copy
 import logging
-import sys
-from unittest import skipUnless
 import warnings
 
 from django.conf import LazySettings

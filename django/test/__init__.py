@@ -8,3 +8,9 @@ from django.test.testcases import (TestCase, TransactionTestCase,
     skipUnlessDBFeature
 )
 from django.test.utils import override_settings
+
+__all__ = [
+    'Client', 'RequestFactory', 'TestCase', 'TransactionTestCase',
+    'SimpleTestCase', 'LiveServerTestCase', 'skipIfDBFeature',
+    'skipUnlessDBFeature', 'override_settings',
+]

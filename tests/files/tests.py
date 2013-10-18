@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from io import BytesIO
 import os
 import gzip
-import shutil
 import tempfile
 import unittest
 import zlib
@@ -15,7 +14,6 @@ from django.core.files.move import file_move_safe
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
 from django.core.files.temp import NamedTemporaryFile
-from django.test import TestCase
 from django.utils._os import upath
 from django.utils import six
 

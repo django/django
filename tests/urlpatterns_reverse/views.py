@@ -17,7 +17,7 @@ def defaults_view(request, arg1, arg2):
     pass
 
 def erroneous_view(request):
-    import non_existent
+    import non_existent  # NOQA
 
 def pass_resolver_match_view(request, *args, **kwargs):
     response = HttpResponse('')

@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.test import TestCase
-from django.utils import six
 
 from .models import (
     First, Third, Parent, Child, Category, Record, Relation, Car, Driver)

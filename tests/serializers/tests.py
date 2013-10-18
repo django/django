@@ -14,7 +14,6 @@ except ImportError:
     HAS_YAML = False
 
 
-from django.conf import settings
 from django.core import management, serializers
 from django.db import transaction, connection
 from django.test import TestCase, TransactionTestCase

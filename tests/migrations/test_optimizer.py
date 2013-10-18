@@ -1,5 +1,4 @@
 # encoding: utf8
-import operator
 from django.test import TestCase
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db import migrations

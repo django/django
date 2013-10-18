@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import datetime
-import os
 import re
 import sys
 from unittest import skipIf
@@ -13,10 +12,8 @@ try:
 except ImportError:
     pytz = None
 
-from django.conf import settings
 from django.core import serializers
 from django.core.urlresolvers import reverse
-from django.db import connection
 from django.db.models import Min, Max
 from django.http import HttpRequest
 from django.template import Context, RequestContext, Template, TemplateSyntaxError

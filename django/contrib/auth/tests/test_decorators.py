@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import models
 from django.contrib.auth.decorators import login_required, permission_required
-# Trigger CustomUser perm creation:
-from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.test_views import AuthViewsTestCase
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core.exceptions import PermissionDenied

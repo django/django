@@ -15,7 +15,7 @@ from django.utils.html import conditional_escape, format_html
 from django.utils.translation import ugettext_lazy
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
-from django.utils import datetime_safe, formats, six
+from django.utils import formats, six
 from django.utils.six.moves.urllib.parse import urljoin
 
 __all__ = (

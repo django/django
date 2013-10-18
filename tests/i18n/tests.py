@@ -16,7 +16,7 @@ from django.test.utils import override_settings, TransRealMixin
 from django.utils import translation
 from django.utils.formats import (get_format, date_format, time_format,
     localize, localize_input, iter_format_modules, get_format_modules,
-    number_format, reset_format_cache, sanitize_separators)
+    reset_format_cache, sanitize_separators)
 from django.utils.numberformat import format as nformat
 from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeBytes, SafeString, SafeText
@@ -25,11 +25,11 @@ from django.utils.six import PY3
 from django.utils.translation import (activate, deactivate,
     get_language,  get_language_from_request, get_language_info,
     to_locale, trans_real,
-    gettext, gettext_lazy,
+    gettext_lazy,
     ugettext, ugettext_lazy,
-    ngettext, ngettext_lazy,
-    ungettext, ungettext_lazy,
-    pgettext, pgettext_lazy,
+    ngettext_lazy,
+    ungettext_lazy,
+    pgettext,
     npgettext, npgettext_lazy,
     check_for_language)
 

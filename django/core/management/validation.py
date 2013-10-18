@@ -122,7 +122,7 @@ def get_validation_errors(outfile, app=None):
                         e.add(opts, invalid_values_msg % f.name)
             if isinstance(f, models.ImageField):
                 try:
-                    from django.utils.image import Image
+                    from django.utils.image import Image  # NOQA
                 except ImportError:
                     e.add(opts, '"%s": To use ImageFields, you need to install Pillow. Get it at https://pypi.python.org/pypi/Pillow.' % f.name)
             if isinstance(f, models.BooleanField) and getattr(f, 'null', False):

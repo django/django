@@ -1,5 +1,4 @@
 from __future__ import unicode_literals
-import warnings
 
 from django.contrib.admin.utils import quote
 from django.core.urlresolvers import reverse

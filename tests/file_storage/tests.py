@@ -15,7 +15,6 @@ try:
 except ImportError:
     import dummy_threading as threading
 
-from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 from django.core.files.base import File, ContentFile

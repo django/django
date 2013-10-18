@@ -26,7 +26,6 @@ from django.db import connection, models
 from django.http import HttpResponse
 from django.test import TestCase
 from django.utils import six
-from django.utils.encoding import force_text
 from django.utils.functional import curry
 
 from .models import (BinaryData, BooleanData, CharData, DateData, DateTimeData, EmailData,

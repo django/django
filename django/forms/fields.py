@@ -30,7 +30,7 @@ from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
 # Provide this import for backwards compatibility.
-from django.core.validators import EMPTY_VALUES
+from django.core.validators import EMPTY_VALUES  # NOQA
 
 
 __all__ = (

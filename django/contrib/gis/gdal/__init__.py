@@ -31,24 +31,34 @@
  to a non-existant file location (e.g., `GDAL_LIBRARY_PATH='/null/path'`;
  setting to None/False/'' will not work as a string must be given).
 """
-from django.contrib.gis.gdal.error import check_err, OGRException, OGRIndexError, SRSException
-from django.contrib.gis.gdal.geomtype import OGRGeomType
+from django.contrib.gis.gdal.error import check_err, OGRException, OGRIndexError, SRSException  # NOQA
+from django.contrib.gis.gdal.geomtype import OGRGeomType  # NOQA
+
+__all__ = [
+    'check_err', 'OGRException', 'OGRIndexError', 'SRSException', 'OGRGeomType',
+    'HAS_GDAL',
+]
 
 # Attempting to import objects that depend on the GDAL library.  The
 # HAS_GDAL flag will be set to True if the library is present on
 # the system.
 try:
-    from django.contrib.gis.gdal.driver import Driver
-    from django.contrib.gis.gdal.datasource import DataSource
-    from django.contrib.gis.gdal.libgdal import gdal_version, gdal_full_version, GDAL_VERSION
-    from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
-    from django.contrib.gis.gdal.geometries import OGRGeometry
+    from django.contrib.gis.gdal.driver import Driver  # NOQA
+    from django.contrib.gis.gdal.datasource import DataSource  # NOQA
+    from django.contrib.gis.gdal.libgdal import gdal_version, gdal_full_version, GDAL_VERSION  # NOQA
+    from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform  # NOQA
+    from django.contrib.gis.gdal.geometries import OGRGeometry  # NOQA
     HAS_GDAL = True
+    __all__ += [
+        'Driver', 'DataSource', 'gdal_version', 'gdal_full_version',
+        'GDAL_VERSION', 'SpatialReference', 'CoordTransform', 'OGRGeometry',
+    ]
 except OGRException:
     HAS_GDAL = False
 
 try:
     from django.contrib.gis.gdal.envelope import Envelope
+    __all__ += ['Envelope']
 except ImportError:
     # No ctypes, but don't raise an exception.
     pass
