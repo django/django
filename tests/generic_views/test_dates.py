@@ -22,7 +22,6 @@ class ArchiveIndexViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
     urls = 'generic_views.urls'
 
-
     def test_archive_view(self):
         res = self.client.get('/dates/books/')
         self.assertEqual(res.status_code, 200)

@@ -236,7 +236,6 @@ class CustomUserModelBackendAuthenticateTest(TestCase):
         self.assertEqual(test_user, authenticated_user)
 
 
-
 class TestObj(object):
     pass
 

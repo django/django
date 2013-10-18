@@ -178,7 +178,6 @@ class ProxyDeleteTest(TestCase):
 
         return test_image
 
-
     def test_delete_proxy(self):
         """
         Deleting the *proxy* instance bubbles through to its non-proxy and
@@ -196,7 +195,6 @@ class ProxyDeleteTest(TestCase):
         # The Image deletion cascaded and *all* references to it are deleted.
         self.assertEqual(len(FooImage.objects.all()), 0)
         self.assertEqual(len(FooFile.objects.all()), 0)
-
 
     def test_delete_proxy_of_proxy(self):
         """
@@ -224,7 +222,6 @@ class ProxyDeleteTest(TestCase):
         self.assertEqual(len(FooFile.objects.all()), 0)
         self.assertEqual(len(FooImage.objects.all()), 0)
 
-
     def test_delete_concrete_parent(self):
         """
         Deleting an instance of a concrete model should also delete objects
@@ -243,7 +240,6 @@ class ProxyDeleteTest(TestCase):
         # to it.
         self.assertEqual(len(FooFile.objects.all()), 0)
         self.assertEqual(len(FooImage.objects.all()), 0)
-
 
     def test_delete_proxy_pair(self):
         """

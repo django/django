@@ -66,7 +66,6 @@ class QueryTestCase(TestCase):
             title="Dive into Python"
         )
 
-
     def test_other_creation(self):
         "Objects created on another database don't leak onto the default database"
         # Create a book on the second database
@@ -200,7 +199,6 @@ class QueryTestCase(TestCase):
         john = Person.objects.using('other').create(name="John Smith")
         self.assertEqual(list(Book.objects.using('other').filter(authors__name='John Smith').values_list('title', flat=True)),
                           [])
-
 
         dive.authors.add(john)
         self.assertEqual(list(Book.objects.using('other').filter(authors__name='Mark Pilgrim').values_list('title', flat=True)),
@@ -1026,7 +1024,6 @@ class RouterTestCase(TestCase):
 
         self.assertFalse(router.allow_migrate('default', User))
         self.assertTrue(router.allow_migrate('default', Book))
-
 
     def test_database_routing(self):
         marty = Person.objects.using('default').create(name="Marty Alchin")
@@ -1905,8 +1902,6 @@ class MigrateTestCase(TestCase):
             router.routers = old_routers
 
         self.assertEqual(cts.count(), 0)
-
-
 
 
 class RouterUsed(Exception):

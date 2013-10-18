@@ -1068,7 +1068,6 @@ class FormsFormsetTestCase(TestCase):
         formset = CheckFormSet(data, prefix='check')
         self.assertTrue(formset.is_valid())
 
-
     def test_formset_total_error_count(self):
         """A valid formset should have 0 total errors."""
         data = [  # formset_data, expected error count
@@ -1163,7 +1162,6 @@ class TestIsBoundBehavior(TestCase):
         self.assertTrue(formset.is_valid())
         self.assertTrue(formset.forms[0].is_valid())
         self.assertEqual([{}], formset.cleaned_data)
-
 
     def test_form_errors_are_caught_by_formset(self):
         data = {

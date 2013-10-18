@@ -59,7 +59,6 @@ class HttpUtilTests(TestCase):
         conditional_content_removal(req, res)
         self.assertEqual(b''.join(res), b'')
 
-
         # Strip content for HEAD requests.
         req.method = 'HEAD'
 

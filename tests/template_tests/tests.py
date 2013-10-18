@@ -283,7 +283,6 @@ class TemplateLoaderTests(TestCase):
             loader.template_source_loaders = old_loaders
             settings.TEMPLATE_DEBUG = old_td
 
-
     def test_extends_include_missing_baseloader(self):
         """
         Tests that the correct template is identified as not existing
@@ -1821,8 +1820,8 @@ class TemplateTests(TransRealMixin, TestCase):
                 'numpy-array-index02': ("{{ var.5 }}", {"var": numpy.array(["first item", "second item"])}, ("", "INVALID")),
             })
 
-
         return tests
+
 
 class TemplateTagLoading(unittest.TestCase):
 

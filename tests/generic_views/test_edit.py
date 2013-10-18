@@ -156,7 +156,6 @@ class CreateViewTests(TestCase):
                              ['name', 'slug'])
         self.assertEqual(len(w), 0)
 
-
     def test_create_view_without_explicit_fields(self):
 
         with warnings.catch_warnings(record=True) as w:

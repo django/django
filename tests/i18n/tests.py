@@ -262,7 +262,6 @@ class TranslationTests(TransRealMixin, TestCase):
             self.assertRaises(TemplateSyntaxError, Template, '{% load i18n %}{% blocktrans context %}{% endblocktrans %}')
             self.assertRaises(TemplateSyntaxError, Template, '{% load i18n %}{% blocktrans count number=2 context %}{{ number }} super result{% plural %}{{ number }} super results{% endblocktrans %}')
 
-
     def test_string_concat(self):
         """
         six.text_type(string_concat(...)) should not raise a TypeError - #4796

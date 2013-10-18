@@ -45,7 +45,6 @@ class SelectRelatedRegressTests(TestCase):
         # twice each, plus connection once). Thus, 6 joins plus the FROM table.
         self.assertEqual(str(connections.query).count(" JOIN "), 6)
 
-
     def test_regression_8106(self):
         """
         Regression test for bug #8106.

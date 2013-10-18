@@ -67,7 +67,6 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
 
         self.assertTrue(app is application)
 
-
     @override_settings(WSGI_APPLICATION=None)
     def test_default(self):
         """
@@ -90,7 +89,6 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
         finally:
             basehttp.get_wsgi_application = _orig_get_wsgi_app
 
-
     @override_settings(WSGI_APPLICATION="wsgi.noexist.app")
     def test_bad_module(self):
         with six.assertRaisesRegex(self,
@@ -98,7 +96,6 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
             r"^WSGI application 'wsgi.noexist.app' could not be loaded; Error importing.*"):
 
             get_internal_wsgi_application()
-
 
     @override_settings(WSGI_APPLICATION="wsgi.wsgi.noexist")
     def test_bad_name(self):

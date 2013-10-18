@@ -92,7 +92,6 @@ class OverrideCleanTests(TestCase):
         self.assertEqual(form.instance.left, 1)
 
 
-
 class PartiallyLocalizedTripleForm(forms.ModelForm):
     class Meta:
         model = Triple

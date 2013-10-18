@@ -128,7 +128,6 @@ class FileStorageTests(TestCase):
         with temp_storage.open('tests/file_obj') as f:
             self.assertEqual(f.read(), b'some content')
 
-
     def test_stringio(self):
         # Test passing StringIO instance as content argument to save
         output = StringIO()

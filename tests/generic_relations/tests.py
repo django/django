@@ -151,7 +151,6 @@ class GenericRelationsTests(TestCase):
             "<Animal: Platypus>"
         ])
 
-
     def test_multiple_gfk(self):
         # Simple tests for multiple GenericForeignKeys
         # only uses one model, since the above tests should be sufficient.

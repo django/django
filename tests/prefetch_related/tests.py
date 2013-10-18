@@ -48,7 +48,6 @@ class PrefetchRelatedTests(TestCase):
         normal_lists = [list(b.authors.all()) for b in Book.objects.all()]
         self.assertEqual(lists, normal_lists)
 
-
     def test_m2m_reverse(self):
         with self.assertNumQueries(2):
             lists = [list(a.books.all()) for a in Author.objects.prefetch_related('books')]

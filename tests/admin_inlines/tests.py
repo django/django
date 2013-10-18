@@ -513,7 +513,6 @@ class TestInlinePermissions(TestCase):
                             'value="%i" name="inner2_set-0-id" />' % self.inner2_id, html=True)
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
 
-
     def test_inline_change_fk_all_perms(self):
         permission = Permission.objects.get(codename='add_inner2', content_type=self.inner_ct)
         self.user.user_permissions.add(permission)

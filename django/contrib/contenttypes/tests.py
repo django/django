@@ -203,7 +203,6 @@ class ContentTypesTests(TestCase):
             DeferredProxyModel: proxy_model_ct,
         })
 
-
     @override_settings(ALLOWED_HOSTS=['example.com'])
     def test_shortcut_view(self):
         """

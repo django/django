@@ -284,7 +284,6 @@ class SessionTestsMixin(object):
             self.assertEqual(len(calls), 1)
             self.assertTrue('corrupted' in calls[0])
 
-
     def test_actual_expiry(self):
         # this doesn't work with JSONSerializer (serializing timedelta)
         with override_settings(SESSION_SERIALIZER='django.contrib.sessions.serializers.PickleSerializer'):

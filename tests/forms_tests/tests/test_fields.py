@@ -69,7 +69,6 @@ class FieldsTests(SimpleTestCase):
                 self.class_a_var = True
                 super(A, self).__init__()
 
-
         class ComplexField(Field, A):
             def __init__(self):
                 super(ComplexField, self).__init__()
@@ -718,7 +717,6 @@ class FieldsTests(SimpleTestCase):
         # with here)
         self.assertTrue(f._has_changed('resume.txt', {'filename': 'resume.txt', 'content': 'My resume'}))
 
-
     # URLField ##################################################################
 
     def test_urlfield_1(self):
@@ -964,7 +962,6 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(None, f.clean('2'))
         self.assertEqual(None, f.clean('3'))
         self.assertEqual(None, f.clean('hello'))
-
 
     def test_nullbooleanfield_2(self):
         # Make sure that the internal value is preserved if using HiddenInput (#7753)
@@ -1217,7 +1214,6 @@ class FieldsTests(SimpleTestCase):
         for exp, got in zip(expected, actual):
             self.assertEqual(exp[1], got[1])
             self.assertTrue(got[0].endswith(exp[0]))
-
 
     # SplitDateTimeField ##########################################################
 

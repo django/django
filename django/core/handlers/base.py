@@ -30,7 +30,6 @@ class BaseHandler(object):
     def __init__(self):
         self._request_middleware = self._view_middleware = self._template_response_middleware = self._response_middleware = self._exception_middleware = None
 
-
     def load_middleware(self):
         """
         Populate middleware lists from settings.MIDDLEWARE_CLASSES.
