@@ -61,20 +61,22 @@ class MigrationWriter(object):
 
     @property
     def path(self):
-        migrations_module_name = MigrationLoader.migrations_module(self.migration.app_label)
-        app_module = cache.get_app(self.migration.app_label)
+        migrations_package_name = MigrationLoader.migrations_module(self.migration.app_label)
         # See if we can import the migrations module directly
         try:
-            migrations_module = import_module(migrations_module_name)
+            migrations_module = import_module(migrations_package_name)
             basedir = os.path.dirname(migrations_module.__file__)
         except ImportError:
+            app = cache.get_app(self.migration.app_label)
+            app_path = cache._get_app_path(app)
+            app_package_name = cache._get_app_package(app)
+            migrations_package_basename = migrations_package_name.split(".")[-1]
+
             # Alright, see if it's a direct submodule of the app
-            oneup = ".".join(migrations_module_name.split(".")[:-1])
-            app_oneup = ".".join(app_module.__name__.split(".")[:-1])
-            if oneup == app_oneup:
-                basedir = os.path.join(os.path.dirname(app_module.__file__), migrations_module_name.split(".")[-1])
+            if '%s.%s' % (app_package_name, migrations_package_basename) == migrations_package_name:
+                basedir = os.path.join(app_path, migrations_package_basename)
             else:
-                raise ImportError("Cannot open migrations module %s for app %s" % (migrations_module_name, self.migration.app_label))
+                raise ImportError("Cannot open migrations module %s for app %s" % (migrations_package_name, self.migration.app_label))
         return os.path.join(basedir, self.filename)
 
     @classmethod
