@@ -486,7 +486,7 @@ Classes
 
 .. class:: SimpleLazyObject
 
-    A ``SimpleLazyObject`` resists instatiation until it's required.
+    A ``SimpleLazyObject`` resists instantiation until it's required.
 
     ``SimpleLazyObject`` can be used as the base for a new class, as in the
     case of ``django.utils.text.Truncator``.
@@ -503,7 +503,7 @@ Classes
 
     ``LazyObject`` is the base class for :class:`~SimpleLazyObject`. Subclass
     ``LazyObject`` for your object if you need to intercept and manage its
-    instatiation manually; otherwise, subclass :class:`~SimpleLazyObject`.
+    instantiation manually; otherwise, subclass :class:`~SimpleLazyObject`.
 
 .. class:: lazy_property(fget=None, fset=None, fdel=None, doc=None)
 
