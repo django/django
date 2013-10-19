@@ -147,7 +147,7 @@ class FileSystemStorage(Storage):
     Standard filesystem storage
     """
 
-    def __init__(self, location=None, base_url=None):
+    def __init__(self, location=None, base_url=None, file_permissions_mode=None):
         if location is None:
             location = settings.MEDIA_ROOT
         self.base_location = location
@@ -155,6 +155,10 @@ class FileSystemStorage(Storage):
         if base_url is None:
             base_url = settings.MEDIA_URL
         self.base_url = base_url
+        self.file_permissions_mode = (
+            file_permissions_mode if file_permissions_mode is not None
+            else settings.FILE_UPLOAD_PERMISSIONS
+        )
 
     def _open(self, name, mode='rb'):
         return File(open(self.path(name), mode))
@@ -232,8 +236,8 @@ class FileSystemStorage(Storage):
                 # OK, the file save worked. Break out of the loop.
                 break
 
-        if settings.FILE_UPLOAD_PERMISSIONS is not None:
-            os.chmod(full_path, settings.FILE_UPLOAD_PERMISSIONS)
+        if self.file_permissions_mode is not None:
+            os.chmod(full_path, self.file_permissions_mode)
 
         return name
 

@@ -226,6 +226,15 @@ Minor features
   :class:`~django.middleware.http.ConditionalGetMiddleware` to handle
   conditional ``GET`` requests for sitemaps which set ``lastmod``.
 
+:mod:`django.contrib.staticfiles`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The :ref:`static files storage classes <staticfiles-storages>` may be
+  subclassed to override the permissions that collected static files receive by
+  setting the
+  :attr:`~django.core.files.storage.FileSystemStorage.file_permissions_mode`
+  parameter. See :djadmin:`collectstatic` for example usage.
+
 :mod:`django.contrib.syndication`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
