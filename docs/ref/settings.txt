@@ -2678,6 +2678,31 @@ setting.
 Static file finders are currently considered a private interface, and this
 interface is thus undocumented.
 
+STATIC_FILE_PERMISSIONS
+-----------------------
+
+.. versionadded:: 1.7
+
+Default: ``None``
+
+The numeric mode (i.e. ``0644``) to set newly-collected static files to. For
+more information about what these modes mean, see the documentation for
+:func:`os.chmod`.
+
+If this isn't given or is ``None``, FILE_UPLOAD_PERMISSIONS will be used
+instead.
+
+.. warning::
+
+    **Always prefix the mode with a 0.**
+
+    If you're not familiar with file modes, please note that the leading
+    ``0`` is very important: it indicates an octal number, which is the
+    way that modes must be specified. If you try to use ``644``, you'll
+    get totally incorrect behavior.
+
+.. setting:: STATIC_FILE_PERMISSIONS
+
 Core Settings Topical Index
 ===========================
 

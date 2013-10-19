@@ -610,6 +610,11 @@ STATICFILES_FINDERS = (
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
+# The numeric mode to set newly-collected static files to. The value should be
+# a mode you'd pass directly to os.chmod; see
+# http://docs.python.org/lib/os-file-dir.html.
+STATIC_FILE_PERMISSIONS = None
+
 ##############
 # MIGRATIONS #
 ##############

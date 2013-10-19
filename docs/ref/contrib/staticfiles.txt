@@ -28,6 +28,7 @@ following settings:
 * :setting:`STATICFILES_DIRS`
 * :setting:`STATICFILES_STORAGE`
 * :setting:`STATICFILES_FINDERS`
+* :setting:`STATIC_FILE_PERMISSIONS`
 
 Management Commands
 ===================
@@ -321,6 +322,16 @@ files:
   :ttag:`get_static_prefix` but uses :setting:`MEDIA_URL`.
 
 .. _staticfiles-development-view:
+
+Permissions
+===========
+
+.. versionadded:: 1.7
+
+When running :djadmin:`collectstatic` management command, the newly-collected
+static files will derive their permissions from
+:setting:`STATIC_FILE_PERMISSIONS`. If it is ``None``, they will get the
+permissions from :setting:`FILE_UPLOAD_PERMISSIONS`.
 
 Static file development view
 ----------------------------

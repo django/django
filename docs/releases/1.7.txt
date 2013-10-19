@@ -217,6 +217,12 @@ Minor features
   respects :setting:`SESSION_CACHE_ALIAS`. In previous versions, it always used
   the `default` cache.
 
+:mod:`django.contrib.staticfiles`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The new :setting:`STATIC_FILE_PERMISSIONS` controls the file system
+  permissions of newly-collected static files during deployment.
+
 :mod:`django.contrib.sitemaps`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
