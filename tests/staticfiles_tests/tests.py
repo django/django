@@ -7,6 +7,7 @@ import posixpath
 import shutil
 import sys
 import tempfile
+import unittest
 
 from django.template import loader, Context
 from django.conf import settings
@@ -21,6 +22,7 @@ from django.utils._os import rmtree_errorhandler, upath
 from django.utils import six
 
 from django.contrib.staticfiles import finders, storage
+from django.contrib.staticfiles.management.commands import collectstatic
 
 TEST_ROOT = os.path.dirname(upath(__file__))
 TEST_SETTINGS = {
@@ -804,3 +806,45 @@ class TestAppStaticStorage(TestCase):
             st.path('bar')
         finally:
             sys.getfilesystemencoding = old_enc_func
+
+
+class CustomStaticFilesStorage(storage.StaticFilesStorage):
+    """
+    Used in TestStaticFilePermissions
+    """
+    def __init__(self, *args, **kwargs):
+        kwargs['file_permissions_mode'] = 0o640
+        super(CustomStaticFilesStorage, self).__init__(*args, **kwargs)
+
+
+@unittest.skipIf(sys.platform.startswith('win'),
+                 "Windows only partially supports chmod.")
+class TestStaticFilePermissions(BaseCollectionTestCase, StaticFilesTestCase):
+
+    command_params = {'interactive': False,
+                      'post_process': True,
+                      'verbosity': '0',
+                      'ignore_patterns': ['*.ignoreme'],
+                      'use_default_ignore_patterns': True,
+                      'clear': False,
+                      'link': False,
+                      'dry_run': False}
+
+    # Don't run collectstatic command in this test class.
+    def run_collectstatic(self, **kwargs):
+        pass
+
+    @override_settings(FILE_UPLOAD_PERMISSIONS=0o655)
+    def test_collect_static_files_default_permissions(self):
+        collectstatic.Command().execute(**self.command_params)
+        test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
+        file_mode = os.stat(test_file)[0] & 0o777
+        self.assertEqual(file_mode, 0o655)
+
+    @override_settings(FILE_UPLOAD_PERMISSIONS=0o655,
+                       STATICFILES_STORAGE='staticfiles_tests.tests.CustomStaticFilesStorage')
+    def test_collect_static_files_subclass_of_static_storage(self):
+        collectstatic.Command().execute(**self.command_params)
+        test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
+        file_mode = os.stat(test_file)[0] & 0o777
+        self.assertEqual(file_mode, 0o640)
