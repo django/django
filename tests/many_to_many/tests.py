@@ -56,7 +56,7 @@ class ManyToManyTests(TestCase):
         with six.assertRaisesRegex(self, TypeError, "'Publication' instance expected, got <Article.*"):
             a6.publications.add(a5)
         # Add a Publication directly via publications.add by using keyword arguments.
-        p4 = a6.publications.create(title='Highlights for Adults')
+        a6.publications.create(title='Highlights for Adults')
         self.assertQuerysetEqual(a6.publications.all(),
             [
                 '<Publication: Highlights for Adults>',
@@ -81,7 +81,7 @@ class ManyToManyTests(TestCase):
                                  ['<Publication: Science News>'])
 
         # Adding via the other end using keywords
-        new_article = self.p2.article_set.create(headline='Carbon-free diet works wonders')
+        self.p2.article_set.create(headline='Carbon-free diet works wonders')
         self.assertQuerysetEqual(
             self.p2.article_set.all(),
             [

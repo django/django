@@ -254,7 +254,7 @@ class SelectForUpdateTests(TransactionTestCase):
         means that it will be either committed or rolled back by Django,
         which will release any locks held by the SELECT FOR UPDATE.
         """
-        people = list(Person.objects.select_for_update())
+        list(Person.objects.select_for_update())
         self.assertTrue(transaction.is_dirty())
 
     @skipUnlessDBFeature('has_select_for_update')

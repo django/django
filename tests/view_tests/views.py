@@ -171,8 +171,8 @@ def non_sensitive_view(request):
     # Do not just use plain strings for the variables' values in the code
     # so that the tests don't return false positives when the function's source
     # is displayed in the exception report.
-    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])
-    sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])
+    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
+    sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])  # NOQA
     try:
         raise Exception
     except Exception:
@@ -186,8 +186,8 @@ def sensitive_view(request):
     # Do not just use plain strings for the variables' values in the code
     # so that the tests don't return false positives when the function's source
     # is displayed in the exception report.
-    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])
-    sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])
+    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
+    sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])  # NOQA
     try:
         raise Exception
     except Exception:
@@ -201,8 +201,8 @@ def paranoid_view(request):
     # Do not just use plain strings for the variables' values in the code
     # so that the tests don't return false positives when the function's source
     # is displayed in the exception report.
-    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])
-    sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])
+    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
+    sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])  # NOQA
     try:
         raise Exception
     except Exception:
@@ -223,7 +223,7 @@ def sensitive_args_function(sauce):
     # Do not just use plain strings for the variables' values in the code
     # so that the tests don't return false positives when the function's source
     # is displayed in the exception report.
-    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])
+    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
     raise Exception
 
 def sensitive_kwargs_function_caller(request):
@@ -239,7 +239,7 @@ def sensitive_kwargs_function(sauce=None):
     # Do not just use plain strings for the variables' values in the code
     # so that the tests don't return false positives when the function's source
     # is displayed in the exception report.
-    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])
+    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
     raise Exception
 
 class UnsafeExceptionReporterFilter(SafeExceptionReporterFilter):
@@ -260,8 +260,8 @@ def custom_exception_reporter_filter_view(request):
     # Do not just use plain strings for the variables' values in the code
     # so that the tests don't return false positives when the function's source
     # is displayed in the exception report.
-    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])
-    sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])
+    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
+    sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])  # NOQA
     request.exception_reporter_filter = UnsafeExceptionReporterFilter()
     try:
         raise Exception
@@ -278,8 +278,8 @@ class Klass(object):
         # Do not just use plain strings for the variables' values in the code
         # so that the tests don't return false positives when the function's
         # source is displayed in the exception report.
-        cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])
-        sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])
+        cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
+        sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])  # NOQA
         try:
             raise Exception
         except Exception:
@@ -294,8 +294,8 @@ def sensitive_method_view(request):
 @sensitive_variables('sauce')
 @sensitive_post_parameters('bacon-key', 'sausage-key')
 def multivalue_dict_key_error(request):
-    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])
-    sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])
+    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
+    sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])  # NOQA
     try:
         request.POST['bar']
     except Exception:

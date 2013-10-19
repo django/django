@@ -160,7 +160,7 @@ class ExtraRegressTests(TestCase):
         columns, we can (and should) ignore those columns. They don't change
         the result and cause incorrect SQL to be produced otherwise.
         """
-        rm = RevisionableModel.objects.create(
+        RevisionableModel.objects.create(
             title='First Revision',
             when=datetime.datetime(2008, 9, 28, 10, 30, 0)
         )

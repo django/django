@@ -370,7 +370,6 @@ class TemplateLoaderTests(TestCase):
         template that does not exist does not raise an exception at parse
         time.
         """
-        ctx = Context()
         tmpl = Template('{% include "this_does_not_exist.html" %}')
         self.assertIsInstance(tmpl, Template)
 
@@ -440,7 +439,7 @@ class TemplateRegressionTests(TestCase):
         # Regression test for #19392
         with six.assertRaisesRegex(self, template.TemplateSyntaxError,
                 "The syntax of 'url' changed in Django 1.5, see the docs."):
-            t = Template('{% url my-view %}')      # not a variable = old syntax
+            Template('{% url my-view %}')      # not a variable = old syntax
 
     @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
     def test_no_wrapped_exception(self):
@@ -458,7 +457,7 @@ class TemplateRegressionTests(TestCase):
     def test_invalid_block_suggestion(self):
         # See #7876
         try:
-            t = Template("{% if 1 %}lala{% endblock %}{% endif %}")
+            Template("{% if 1 %}lala{% endblock %}{% endif %}")
         except TemplateSyntaxError as e:
             self.assertEqual(e.args[0], "Invalid block tag: 'endblock', expected 'elif', 'else' or 'endif'")
 
@@ -1863,7 +1862,7 @@ class TemplateTagLoading(unittest.TestCase):
         egg_name = '%s/tagsegg.egg' % self.egg_dir
         sys.path.append(egg_name)
         settings.INSTALLED_APPS = ('tagsegg',)
-        t = template.Template(ttext)
+        template.Template(ttext)
 
 
 class RequestContextTests(unittest.TestCase):

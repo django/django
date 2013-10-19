@@ -159,7 +159,7 @@ class ImageFieldTests(ImageFieldTestMixin, TestCase):
         self.assertEqual(p.mugshot.closed, True)
 
         # After asking for the size, the file should still be closed.
-        _ = p.mugshot.size
+        p.mugshot.size
         self.assertEqual(p.mugshot.closed, True)
 
     def test_pickle(self):

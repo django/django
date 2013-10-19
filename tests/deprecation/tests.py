@@ -168,7 +168,7 @@ class DeprecatingRequestMergeDictTest(SimpleTestCase):
         with warnings.catch_warnings(record=True) as recorded:
             warnings.simplefilter('always')
             request = RequestFactory().get('/')
-            _ = request.REQUEST
+            request.REQUEST  # evaluate
 
             msgs = [str(warning.message) for warning in recorded]
             self.assertEqual(msgs, [

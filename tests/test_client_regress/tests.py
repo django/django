@@ -810,7 +810,7 @@ class ExceptionTests(TestCase):
         login = self.client.login(username='testclient',password='password')
         self.assertTrue(login, 'Could not log in')
         try:
-            response = self.client.get("/test_client_regress/staff_only/")
+            self.client.get("/test_client_regress/staff_only/")
             self.fail("General users should not be able to visit this page")
         except CustomTestException:
             pass
@@ -840,7 +840,7 @@ class TemplateExceptionTests(TestCase):
     def test_bad_404_template(self):
         "Errors found when rendering 404 error templates are re-raised"
         try:
-            response = self.client.get("/no_such_view/")
+            self.client.get("/no_such_view/")
             self.fail("Should get error about syntax error in template")
         except TemplateSyntaxError:
             pass

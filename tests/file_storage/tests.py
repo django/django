@@ -241,8 +241,8 @@ class FileStorageTests(unittest.TestCase):
         self.assertFalse(self.storage.exists('storage_test_2'))
         self.assertFalse(self.storage.exists('storage_dir_1'))
 
-        f = self.storage.save('storage_test_1', ContentFile('custom content'))
-        f = self.storage.save('storage_test_2', ContentFile('custom content'))
+        self.storage.save('storage_test_1', ContentFile('custom content'))
+        self.storage.save('storage_test_2', ContentFile('custom content'))
         os.mkdir(os.path.join(self.temp_dir, 'storage_dir_1'))
 
         dirs, files = self.storage.listdir('')
@@ -428,7 +428,7 @@ class FileSaveRaceConditionTest(unittest.TestCase):
 
     def test_race_condition(self):
         self.thread.start()
-        name = self.save_file('conflict')
+        self.save_file('conflict')
         self.thread.join()
         self.assertTrue(self.storage.exists('conflict'))
         self.assertTrue(self.storage.exists('conflict_1'))

@@ -94,9 +94,9 @@ class ModelFormCallableModelDefault(TestCase):
 
     def test_callable_initial_value(self):
         "The initial value for a callable default returning a queryset is the pk (refs #13769)"
-        obj1 = ChoiceOptionModel.objects.create(id=1, name='default')
-        obj2 = ChoiceOptionModel.objects.create(id=2, name='option 2')
-        obj3 = ChoiceOptionModel.objects.create(id=3, name='option 3')
+        ChoiceOptionModel.objects.create(id=1, name='default')
+        ChoiceOptionModel.objects.create(id=2, name='option 2')
+        ChoiceOptionModel.objects.create(id=3, name='option 3')
         self.assertHTMLEqual(ChoiceFieldForm().as_p(), """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice">
 <option value="1" selected="selected">ChoiceOption 1</option>
 <option value="2">ChoiceOption 2</option>
@@ -120,7 +120,7 @@ class ModelFormCallableModelDefault(TestCase):
 
     def test_initial_instance_value(self):
         "Initial instances for model fields may also be instances (refs #7287)"
-        obj1 = ChoiceOptionModel.objects.create(id=1, name='default')
+        ChoiceOptionModel.objects.create(id=1, name='default')
         obj2 = ChoiceOptionModel.objects.create(id=2, name='option 2')
         obj3 = ChoiceOptionModel.objects.create(id=3, name='option 3')
         self.assertHTMLEqual(ChoiceFieldForm(initial={

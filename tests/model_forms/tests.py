@@ -259,7 +259,7 @@ class ModelFormBaseTest(TestCase):
                          ['name', 'slug', 'url'])
 
     def test_missing_fields_attribute(self):
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True):
             warnings.simplefilter("always", DeprecationWarning)
 
             class MissingFieldsForm(forms.ModelForm):
@@ -429,11 +429,11 @@ class ModelFormBaseTest(TestCase):
 
         # Can't create new form
         with self.assertRaises(ValueError):
-            f = InvalidModelForm()
+            InvalidModelForm()
 
         # Even if you provide a model instance
         with self.assertRaises(ValueError):
-            f = InvalidModelForm(instance=Category)
+            InvalidModelForm(instance=Category)
 
     def test_subcategory_form(self):
         class SubCategoryForm(BaseCategoryForm):
@@ -668,7 +668,7 @@ class UniqueTest(TestCase):
     def test_abstract_inherited_unique(self):
         title = 'Boss'
         isbn = '12345'
-        dbook = DerivedBook.objects.create(title=title, author=self.writer, isbn=isbn)
+        DerivedBook.objects.create(title=title, author=self.writer, isbn=isbn)
         form = DerivedBookForm({'title': 'Other', 'author': self.writer.pk, 'isbn': isbn})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
@@ -677,7 +677,7 @@ class UniqueTest(TestCase):
     def test_abstract_inherited_unique_together(self):
         title = 'Boss'
         isbn = '12345'
-        dbook = DerivedBook.objects.create(title=title, author=self.writer, isbn=isbn)
+        DerivedBook.objects.create(title=title, author=self.writer, isbn=isbn)
         form = DerivedBookForm({
                     'title': 'Other',
                     'author': self.writer.pk,
@@ -737,7 +737,7 @@ class UniqueTest(TestCase):
         """If the date for unique_for_* constraints is excluded from the
         ModelForm (in this case 'posted' has editable=False, then the
         constraint should be ignored."""
-        p = DateTimePost.objects.create(title="Django 1.0 is released",
+        DateTimePost.objects.create(title="Django 1.0 is released",
             slug="Django 1.0", subtitle="Finally",
             posted=datetime.datetime(2008, 9, 3, 10, 10, 1))
         # 'title' has unique_for_date='posted'
@@ -1697,7 +1697,7 @@ class OldFormForXTests(TestCase):
 
     def test_foreignkeys_which_use_to_field(self):
         apple = Inventory.objects.create(barcode=86, name='Apple')
-        pear = Inventory.objects.create(barcode=22, name='Pear')
+        Inventory.objects.create(barcode=22, name='Pear')
         core = Inventory.objects.create(barcode=87, name='Core', parent=apple)
 
         field = forms.ModelChoiceField(Inventory.objects.all(), to_field_name='barcode')

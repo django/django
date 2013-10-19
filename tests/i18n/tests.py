@@ -1198,16 +1198,16 @@ class LocaleMiddlewareTests(TransRealMixin, TestCase):
 
         # Clear the session data before request
         session.save()
-        response = self.client.get('/en/simple/')
+        self.client.get('/en/simple/')
         self.assertEqual(self.client.session['django_language'], 'en')
 
         # Clear the session data before request
         session.save()
-        response = self.client.get('/fr/simple/')
+        self.client.get('/fr/simple/')
         self.assertEqual(self.client.session['django_language'], 'fr')
 
         # Check that language is not changed in session
-        response = self.client.get('/en/simple/')
+        self.client.get('/en/simple/')
         self.assertEqual(self.client.session['django_language'], 'fr')
 
 

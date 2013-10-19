@@ -144,8 +144,8 @@ def m2m_compare(testcase, pk, klass, data):
     testcase.assertEqual(data, [obj.id for obj in instance.data.order_by('id')])
 
 def im2m_compare(testcase, pk, klass, data):
-    instance = klass.objects.get(id=pk)
-    #actually nothing else to check, the instance just should exist
+    klass.objects.get(id=pk)
+    # actually nothing else to check, the instance just should exist
 
 def im_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
@@ -478,7 +478,7 @@ def naturalKeySerializerTest(format, self):
         instance_count[klass] = klass.objects.count()
 
     # use_natural_keys is deprecated and to be removed in Django 1.9
-    with warnings.catch_warnings(record=True) as w:
+    with warnings.catch_warnings(record=True):
         warnings.simplefilter("always")
         # Serialize the test database
         serialized_data = serializers.serialize(format, objects, indent=2,

@@ -351,7 +351,7 @@ class FTimeDeltaTests(TestCase):
     def test_delta_invalid_op_mult(self):
         raised = False
         try:
-            r = repr(Experiment.objects.filter(end__lt=F('start')*self.deltas[0]))
+            repr(Experiment.objects.filter(end__lt=F('start')*self.deltas[0]))
         except TypeError:
             raised = True
         self.assertTrue(raised, "TypeError not raised on attempt to multiply datetime by timedelta.")
@@ -359,7 +359,7 @@ class FTimeDeltaTests(TestCase):
     def test_delta_invalid_op_div(self):
         raised = False
         try:
-            r = repr(Experiment.objects.filter(end__lt=F('start')/self.deltas[0]))
+            repr(Experiment.objects.filter(end__lt=F('start')/self.deltas[0]))
         except TypeError:
             raised = True
         self.assertTrue(raised, "TypeError not raised on attempt to divide datetime by timedelta.")
@@ -367,7 +367,7 @@ class FTimeDeltaTests(TestCase):
     def test_delta_invalid_op_mod(self):
         raised = False
         try:
-            r = repr(Experiment.objects.filter(end__lt=F('start') % self.deltas[0]))
+            repr(Experiment.objects.filter(end__lt=F('start') % self.deltas[0]))
         except TypeError:
             raised = True
         self.assertTrue(raised, "TypeError not raised on attempt to modulo divide datetime by timedelta.")
@@ -375,7 +375,7 @@ class FTimeDeltaTests(TestCase):
     def test_delta_invalid_op_and(self):
         raised = False
         try:
-            r = repr(Experiment.objects.filter(end__lt=F('start').bitand(self.deltas[0])))
+            repr(Experiment.objects.filter(end__lt=F('start').bitand(self.deltas[0])))
         except TypeError:
             raised = True
         self.assertTrue(raised, "TypeError not raised on attempt to binary and a datetime with a timedelta.")
@@ -383,7 +383,7 @@ class FTimeDeltaTests(TestCase):
     def test_delta_invalid_op_or(self):
         raised = False
         try:
-            r = repr(Experiment.objects.filter(end__lt=F('start').bitor(self.deltas[0])))
+            repr(Experiment.objects.filter(end__lt=F('start').bitor(self.deltas[0])))
         except TypeError:
             raised = True
         self.assertTrue(raised, "TypeError not raised on attempt to binary or a datetime with a timedelta.")

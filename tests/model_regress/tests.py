@@ -217,7 +217,7 @@ class ModelTests(TestCase):
 
 class ModelValidationTest(TestCase):
     def test_pk_validation(self):
-        one = NonAutoPK.objects.create(name="one")
+        NonAutoPK.objects.create(name="one")
         again = NonAutoPK(name="one")
         self.assertRaises(ValidationError, again.validate_unique)
 

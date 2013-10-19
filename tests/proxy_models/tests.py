@@ -105,8 +105,8 @@ class ProxyModelTests(TestCase):
             name='Zathras'
         )
 
-        sp1 = StatusPerson.objects.create(name='Bazza Jr.')
-        sp2 = StatusPerson.objects.create(name='Foo Jr.')
+        StatusPerson.objects.create(name='Bazza Jr.')
+        StatusPerson.objects.create(name='Foo Jr.')
         max_id = Person.objects.aggregate(max_id=models.Max('id'))['max_id']
 
         self.assertRaises(Person.MultipleObjectsReturned,
@@ -232,7 +232,7 @@ class ProxyModelTests(TestCase):
         signals.pre_save.connect(h3, sender=Person)
         signals.post_save.connect(h4, sender=Person)
 
-        dino = MyPerson.objects.create(name="dino")
+        MyPerson.objects.create(name="dino")
         self.assertEqual(output, [
             'MyPerson pre save',
             'MyPerson post save'
@@ -246,7 +246,7 @@ class ProxyModelTests(TestCase):
         signals.pre_save.connect(h5, sender=MyPersonProxy)
         signals.post_save.connect(h6, sender=MyPersonProxy)
 
-        dino = MyPersonProxy.objects.create(name="pebbles")
+        MyPersonProxy.objects.create(name="pebbles")
 
         self.assertEqual(output, [
             'MyPersonProxy pre save',
@@ -303,7 +303,7 @@ class ProxyModelTests(TestCase):
         querysets.
         """
         country = Country.objects.create(name='Australia')
-        state = State.objects.create(name='New South Wales', country=country)
+        State.objects.create(name='New South Wales', country=country)
 
         resp = [s.name for s in State.objects.select_related()]
         self.assertEqual(resp, ['New South Wales'])

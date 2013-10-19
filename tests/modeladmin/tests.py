@@ -405,7 +405,7 @@ class ModelAdminTests(TestCase):
                 ConcertInline
             ]
 
-        concert = Concert.objects.create(main_band=self.band, opening_band=self.band, day=1)
+        Concert.objects.create(main_band=self.band, opening_band=self.band, day=1)
         ma = BandAdmin(Band, self.site)
         inline_instances = ma.get_inline_instances(request)
         fieldsets = list(inline_instances[0].get_fieldsets(request))

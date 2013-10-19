@@ -178,7 +178,6 @@ class GenericInlineAdminParametersTest(TestCase):
         With extra=5 and max_num=2, there should be only 2 forms.
         """
         e = self._create_object(EpisodeMaxNum)
-        inline_form_data = '<input type="hidden" name="generic_inline_admin-media-content_type-object_id-TOTAL_FORMS" value="2" id="id_generic_inline_admin-media-content_type-object_id-TOTAL_FORMS" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-INITIAL_FORMS" value="1" id="id_generic_inline_admin-media-content_type-object_id-INITIAL_FORMS" />'
         response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodemaxnum/%s/' % e.pk)
         formset = response.context['inline_admin_formsets'][0].formset
         self.assertEqual(formset.total_form_count(), 2)
@@ -422,13 +421,13 @@ class GenericInlineModelAdminTest(TestCase):
 
             def get_formsets(self, request, obj=None):
                 # Catch the deprecation warning to force the usage of get_formsets
-                with warnings.catch_warnings(record=True) as w:
+                with warnings.catch_warnings(record=True):
                     warnings.simplefilter("always")
                     return super(EpisodeAdmin, self).get_formsets(request, obj)
 
         ma = EpisodeAdmin(Episode, self.site)
         inlines = ma.get_inline_instances(request)
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True):
             warnings.simplefilter("always")
             for (formset, inline), other_inline in zip(ma.get_formsets_with_inlines(request), inlines):
                 self.assertIsInstance(formset, other_inline.get_formset(request).__class__)

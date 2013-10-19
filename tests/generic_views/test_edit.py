@@ -122,15 +122,15 @@ class CreateViewTests(TestCase):
 
     def test_create_without_redirect(self):
         try:
-            res = self.client.post('/edit/authors/create/naive/',
-                            {'name': 'Randall Munroe', 'slug': 'randall-munroe'})
+            self.client.post('/edit/authors/create/naive/',
+                {'name': 'Randall Munroe', 'slug': 'randall-munroe'})
             self.fail('Should raise exception -- No redirect URL provided, and no get_absolute_url provided')
         except ImproperlyConfigured:
             pass
 
     def test_create_restricted(self):
         res = self.client.post('/edit/authors/create/restricted/',
-                        {'name': 'Randall Munroe', 'slug': 'randall-munroe'})
+            {'name': 'Randall Munroe', 'slug': 'randall-munroe'})
         self.assertEqual(res.status_code, 302)
         self.assertRedirects(res, 'http://testserver/accounts/login/?next=/edit/authors/create/restricted/')
 
@@ -278,16 +278,15 @@ class UpdateViewTests(TestCase):
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (author of xkcd)>'])
 
     def test_update_without_redirect(self):
-        try:
-            a = Author.objects.create(
-                name='Randall Munroe',
-                slug='randall-munroe',
-            )
-            res = self.client.post('/edit/author/%d/update/naive/' % a.pk,
+        a = Author.objects.create(
+            name='Randall Munroe',
+            slug='randall-munroe',
+        )
+        # Should raise exception -- No redirect URL provided, and no
+        # get_absolute_url provided
+        with self.assertRaises(ImproperlyConfigured):
+            self.client.post('/edit/author/%d/update/naive/' % a.pk,
                             {'name': 'Randall Munroe (author of xkcd)', 'slug': 'randall-munroe'})
-            self.fail('Should raise exception -- No redirect URL provided, and no get_absolute_url provided')
-        except ImproperlyConfigured:
-            pass
 
     def test_update_get_object(self):
         a = Author.objects.create(
@@ -365,12 +364,11 @@ class DeleteViewTests(TestCase):
         self.assertQuerysetEqual(Author.objects.all(), [])
 
     def test_delete_without_redirect(self):
-        try:
-            a = Author.objects.create(
-                name='Randall Munroe',
-                slug='randall-munroe',
-            )
-            res = self.client.post('/edit/author/%d/delete/naive/' % a.pk)
-            self.fail('Should raise exception -- No redirect URL provided, and no get_absolute_url provided')
-        except ImproperlyConfigured:
-            pass
+        a = Author.objects.create(
+            name='Randall Munroe',
+            slug='randall-munroe',
+        )
+        # Should raise exception -- No redirect URL provided, and no
+        # get_absolute_url provided
+        with self.assertRaises(ImproperlyConfigured):
+            self.client.post('/edit/author/%d/delete/naive/' % a.pk)

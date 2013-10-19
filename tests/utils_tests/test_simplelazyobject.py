@@ -69,7 +69,7 @@ class TestUtilsSimpleLazyObject(TestCase):
         self.assertEqual(empty, x._wrapped)
 
         # Second, for an evaluated SimpleLazyObject
-        name = x.name  # evaluate
+        x.name  # evaluate
         self.assertIsInstance(x._wrapped, _ComplexObject)
         # __repr__ contains __repr__ of wrapped object
         self.assertEqual("<SimpleLazyObject: %r>" % x._wrapped, repr(x))
@@ -99,7 +99,7 @@ class TestUtilsSimpleLazyObject(TestCase):
         self.assertEqual(s2, complex_object())
 
         # Second, for an evaluated SimpleLazyObject
-        name = s.name  # evaluate
+        s.name  # evaluate
         self.assertIsNot(s._wrapped, empty)
         s3 = copy.deepcopy(s)
         self.assertEqual(s3, complex_object())
@@ -186,15 +186,15 @@ class TestUtilsSimpleLazyObjectDjangoTestCase(DjangoTestCase):
 
         # This would fail with "TypeError: can't pickle instancemethod objects",
         # only on Python 2.X.
-        pickled = pickle.dumps(x)
+        pickle.dumps(x)
 
         # Try the variant protocol levels.
-        pickled = pickle.dumps(x, 0)
-        pickled = pickle.dumps(x, 1)
-        pickled = pickle.dumps(x, 2)
+        pickle.dumps(x, 0)
+        pickle.dumps(x, 1)
+        pickle.dumps(x, 2)
 
         if six.PY2:
             import cPickle
 
             # This would fail with "TypeError: expected string or Unicode object, NoneType found".
-            pickled = cPickle.dumps(x)
+            cPickle.dumps(x)

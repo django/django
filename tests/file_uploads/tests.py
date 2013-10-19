@@ -335,7 +335,7 @@ class FileUploadTests(TestCase):
             """A handler that'll access POST during an exception."""
             def handle_uncaught_exception(self, request, resolver, exc_info):
                 ret = super(POSTAccessingHandler, self).handle_uncaught_exception(request, resolver, exc_info)
-                p = request.POST
+                request.POST  # evaluate
                 return ret
 
         # Maybe this is a little more complicated that it needs to be; but if
@@ -356,7 +356,7 @@ class FileUploadTests(TestCase):
                 'file_field': fp,
             }
             try:
-                response = self.client.post('/file_uploads/upload_errors/', post_data)
+                self.client.post('/file_uploads/upload_errors/', post_data)
             except reference_error.__class__ as err:
                 self.assertFalse(
                     str(err) == str(reference_error),
@@ -444,7 +444,7 @@ class MultiParserTests(unittest.TestCase):
     def test_empty_upload_handlers(self):
         # We're not actually parsing here; just checking if the parser properly
         # instantiates with empty upload handlers.
-        parser = MultiPartParser({
+        MultiPartParser({
             'CONTENT_TYPE':     'multipart/form-data; boundary=_foo',
             'CONTENT_LENGTH':   '1'
         }, StringIO('x'), [], 'utf-8')

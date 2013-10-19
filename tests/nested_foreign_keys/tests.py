@@ -32,8 +32,8 @@ class NestedForeignKeysTests(TestCase):
     # This test failed in #16715 because in some cases INNER JOIN was selected
     # for the second foreign key relation instead of LEFT OUTER JOIN.
     def testInheritance(self):
-        some_event = Event.objects.create()
-        screening = Screening.objects.create(movie=self.movie)
+        Event.objects.create()
+        Screening.objects.create(movie=self.movie)
 
         self.assertEqual(len(Event.objects.all()), 2)
         self.assertEqual(len(Event.objects.select_related('screening')), 2)
@@ -53,9 +53,9 @@ class NestedForeignKeysTests(TestCase):
 
     # These all work because the second foreign key in the chain has null=True.
     def testInheritanceNullFK(self):
-        some_event = Event.objects.create()
-        screening = ScreeningNullFK.objects.create(movie=None)
-        screening_with_movie = ScreeningNullFK.objects.create(movie=self.movie)
+        Event.objects.create()
+        ScreeningNullFK.objects.create(movie=None)
+        ScreeningNullFK.objects.create(movie=self.movie)
 
         self.assertEqual(len(Event.objects.all()), 3)
         self.assertEqual(len(Event.objects.select_related('screeningnullfk')), 3)
@@ -80,9 +80,9 @@ class NestedForeignKeysTests(TestCase):
     # This test failed in #16715 because in some cases INNER JOIN was selected
     # for the second foreign key relation instead of LEFT OUTER JOIN.
     def testExplicitForeignKey(self):
-        package = Package.objects.create()
+        Package.objects.create()
         screening = Screening.objects.create(movie=self.movie)
-        package_with_screening = Package.objects.create(screening=screening)
+        Package.objects.create(screening=screening)
 
         self.assertEqual(len(Package.objects.all()), 2)
         self.assertEqual(len(Package.objects.select_related('screening')), 2)
@@ -100,11 +100,11 @@ class NestedForeignKeysTests(TestCase):
 
     # These all work because the second foreign key in the chain has null=True.
     def testExplicitForeignKeyNullFK(self):
-        package = PackageNullFK.objects.create()
+        PackageNullFK.objects.create()
         screening = ScreeningNullFK.objects.create(movie=None)
         screening_with_movie = ScreeningNullFK.objects.create(movie=self.movie)
-        package_with_screening = PackageNullFK.objects.create(screening=screening)
-        package_with_screening_with_movie = PackageNullFK.objects.create(screening=screening_with_movie)
+        PackageNullFK.objects.create(screening=screening)
+        PackageNullFK.objects.create(screening=screening_with_movie)
 
         self.assertEqual(len(PackageNullFK.objects.all()), 3)
         self.assertEqual(len(PackageNullFK.objects.select_related('screening')), 3)
@@ -129,8 +129,8 @@ class DeeplyNestedForeignKeysTests(TestCase):
         self.movie = Movie.objects.create(title='Monty Python and the Holy Grail', director=self.director)
 
     def testInheritance(self):
-        some_event = Event.objects.create()
-        screening = Screening.objects.create(movie=self.movie)
+        Event.objects.create()
+        Screening.objects.create(movie=self.movie)
 
         self.assertEqual(len(Event.objects.all()), 2)
         self.assertEqual(len(Event.objects.select_related('screening__movie__director')), 2)
@@ -148,9 +148,9 @@ class DeeplyNestedForeignKeysTests(TestCase):
         self.assertEqual(Event.objects.exclude(screening__movie__director=self.director).count(), 1)
 
     def testExplicitForeignKey(self):
-        package = Package.objects.create()
+        Package.objects.create()
         screening = Screening.objects.create(movie=self.movie)
-        package_with_screening = Package.objects.create(screening=screening)
+        Package.objects.create(screening=screening)
 
         self.assertEqual(len(Package.objects.all()), 2)
         self.assertEqual(len(Package.objects.select_related('screening__movie__director')), 2)

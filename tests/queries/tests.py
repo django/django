@@ -713,7 +713,7 @@ class Queries1Tests(BaseQuerysetTest):
 
         # Pickling of DateQuerySets used to fail
         qs = Item.objects.datetimes('created', 'month')
-        _ = pickle.loads(pickle.dumps(qs))
+        pickle.loads(pickle.dumps(qs))
 
     def test_ticket9997(self):
         # If a ValuesList or Values queryset is passed as an inner query, we
@@ -1383,7 +1383,7 @@ class Queries4Tests(BaseQuerysetTest):
         c3 = SpecialCategory.objects.create(name="named category2",
                 special_name="special2")
 
-        ci1 = CategoryItem.objects.create(category=c1)
+        CategoryItem.objects.create(category=c1)
         ci2 = CategoryItem.objects.create(category=c2)
         ci3 = CategoryItem.objects.create(category=c3)
 
@@ -1399,8 +1399,8 @@ class Queries4Tests(BaseQuerysetTest):
                 special_name="special2")
 
         ci1 = CategoryItem.objects.create(category=c1)
-        ci2 = CategoryItem.objects.create(category=c2)
-        ci3 = CategoryItem.objects.create(category=c3)
+        CategoryItem.objects.create(category=c2)
+        CategoryItem.objects.create(category=c3)
 
         qs = CategoryItem.objects.exclude(category__specialcategory__isnull=False)
         self.assertEqual(qs.count(), 1)
@@ -1414,8 +1414,8 @@ class Queries4Tests(BaseQuerysetTest):
                 special_name="special2")
 
         ci1 = CategoryItem.objects.create(category=c1)
-        ci2 = CategoryItem.objects.create(category=c2)
-        ci3 = CategoryItem.objects.create(category=c3)
+        CategoryItem.objects.create(category=c2)
+        CategoryItem.objects.create(category=c3)
 
         qs = CategoryItem.objects.filter(category__specialcategory__isnull=True)
         self.assertEqual(qs.count(), 1)
@@ -1428,7 +1428,7 @@ class Queries4Tests(BaseQuerysetTest):
         c3 = SpecialCategory.objects.create(name="named category2",
                 special_name="special2")
 
-        ci1 = CategoryItem.objects.create(category=c1)
+        CategoryItem.objects.create(category=c1)
         ci2 = CategoryItem.objects.create(category=c2)
         ci3 = CategoryItem.objects.create(category=c3)
 
@@ -1441,10 +1441,10 @@ class Queries4Tests(BaseQuerysetTest):
         c0 = SimpleCategory.objects.create(name="cat0")
         c1 = SimpleCategory.objects.create(name="category1")
 
-        c2 = OneToOneCategory.objects.create(category = c1, new_name="new1")
-        c3 = OneToOneCategory.objects.create(category = c0, new_name="new2")
+        OneToOneCategory.objects.create(category = c1, new_name="new1")
+        OneToOneCategory.objects.create(category = c0, new_name="new2")
 
-        ci1 = CategoryItem.objects.create(category=c)
+        CategoryItem.objects.create(category=c)
         ci2 = CategoryItem.objects.create(category=c0)
         ci3 = CategoryItem.objects.create(category=c1)
 
@@ -1457,12 +1457,12 @@ class Queries4Tests(BaseQuerysetTest):
         c0 = SimpleCategory.objects.create(name="cat0")
         c1 = SimpleCategory.objects.create(name="category1")
 
-        c2 = OneToOneCategory.objects.create(category = c1, new_name="new1")
-        c3 = OneToOneCategory.objects.create(category = c0, new_name="new2")
+        OneToOneCategory.objects.create(category = c1, new_name="new1")
+        OneToOneCategory.objects.create(category = c0, new_name="new2")
 
         ci1 = CategoryItem.objects.create(category=c)
-        ci2 = CategoryItem.objects.create(category=c0)
-        ci3 = CategoryItem.objects.create(category=c1)
+        CategoryItem.objects.create(category=c0)
+        CategoryItem.objects.create(category=c1)
 
         qs = CategoryItem.objects.exclude(category__onetoonecategory__isnull=False)
         self.assertEqual(qs.count(), 1)
@@ -1473,12 +1473,12 @@ class Queries4Tests(BaseQuerysetTest):
         c0 = SimpleCategory.objects.create(name="cat0")
         c1 = SimpleCategory.objects.create(name="category1")
 
-        c2 = OneToOneCategory.objects.create(category = c1, new_name="new1")
-        c3 = OneToOneCategory.objects.create(category = c0, new_name="new2")
+        OneToOneCategory.objects.create(category = c1, new_name="new1")
+        OneToOneCategory.objects.create(category = c0, new_name="new2")
 
         ci1 = CategoryItem.objects.create(category=c)
-        ci2 = CategoryItem.objects.create(category=c0)
-        ci3 = CategoryItem.objects.create(category=c1)
+        CategoryItem.objects.create(category=c0)
+        CategoryItem.objects.create(category=c1)
 
         qs = CategoryItem.objects.filter(category__onetoonecategory__isnull=True)
         self.assertEqual(qs.count(), 1)
@@ -1489,10 +1489,10 @@ class Queries4Tests(BaseQuerysetTest):
         c0 = SimpleCategory.objects.create(name="cat0")
         c1 = SimpleCategory.objects.create(name="category1")
 
-        c2 = OneToOneCategory.objects.create(category = c1, new_name="new1")
-        c3 = OneToOneCategory.objects.create(category = c0, new_name="new2")
+        OneToOneCategory.objects.create(category = c1, new_name="new1")
+        OneToOneCategory.objects.create(category = c0, new_name="new2")
 
-        ci1 = CategoryItem.objects.create(category=c)
+        CategoryItem.objects.create(category=c)
         ci2 = CategoryItem.objects.create(category=c0)
         ci3 = CategoryItem.objects.create(category=c1)
 
@@ -1712,14 +1712,14 @@ class Queries6Tests(TestCase):
     def setUp(self):
         generic = NamedCategory.objects.create(name="Generic")
         t1 = Tag.objects.create(name='t1', category=generic)
-        t2 = Tag.objects.create(name='t2', parent=t1, category=generic)
+        Tag.objects.create(name='t2', parent=t1, category=generic)
         t3 = Tag.objects.create(name='t3', parent=t1)
         t4 = Tag.objects.create(name='t4', parent=t3)
-        t5 = Tag.objects.create(name='t5', parent=t3)
+        Tag.objects.create(name='t5', parent=t3)
         n1 = Note.objects.create(note='n1', misc='foo', id=1)
         ann1 = Annotation.objects.create(name='a1', tag=t1)
         ann1.notes.add(n1)
-        ann2 = Annotation.objects.create(name='a2', tag=t4)
+        Annotation.objects.create(name='a2', tag=t4)
 
     def test_parallel_iterators(self):
         # Test that parallel iterators work.
@@ -1794,7 +1794,7 @@ class Queries6Tests(TestCase):
 
 class RawQueriesTests(TestCase):
     def setUp(self):
-        n1 = Note.objects.create(note='n1', misc='foo', id=1)
+        Note.objects.create(note='n1', misc='foo', id=1)
 
     def test_ticket14729(self):
         # Test representation of raw query with one or few parameters passed as list
@@ -1827,8 +1827,8 @@ class ComparisonTests(TestCase):
 
     def test_ticket8597(self):
         # Regression tests for case-insensitive comparisons
-        _ = Item.objects.create(name="a_b", created=datetime.datetime.now(), creator=self.a2, note=self.n1)
-        _ = Item.objects.create(name="x%y", created=datetime.datetime.now(), creator=self.a2, note=self.n1)
+        Item.objects.create(name="a_b", created=datetime.datetime.now(), creator=self.a2, note=self.n1)
+        Item.objects.create(name="x%y", created=datetime.datetime.now(), creator=self.a2, note=self.n1)
         self.assertQuerysetEqual(
             Item.objects.filter(name__iexact="A_b"),
             ['<Item: a_b>']
@@ -2129,7 +2129,7 @@ class WeirdQuerysetSlicingTests(BaseQuerysetTest):
 class EscapingTests(TestCase):
     def test_ticket_7302(self):
         # Reserved names are appropriately escaped
-        _ = ReservedName.objects.create(name='a', order=42)
+        ReservedName.objects.create(name='a', order=42)
         ReservedName.objects.create(name='b', order=37)
         self.assertQuerysetEqual(
             ReservedName.objects.all().order_by('order'),
@@ -2209,10 +2209,10 @@ class ConditionalTests(BaseQuerysetTest):
     def setUp(self):
         generic = NamedCategory.objects.create(name="Generic")
         t1 = Tag.objects.create(name='t1', category=generic)
-        t2 = Tag.objects.create(name='t2', parent=t1, category=generic)
+        Tag.objects.create(name='t2', parent=t1, category=generic)
         t3 = Tag.objects.create(name='t3', parent=t1)
-        t4 = Tag.objects.create(name='t4', parent=t3)
-        t5 = Tag.objects.create(name='t5', parent=t3)
+        Tag.objects.create(name='t4', parent=t3)
+        Tag.objects.create(name='t5', parent=t3)
 
     def test_infinite_loop(self):
         # If you're not careful, it's possible to introduce infinite loops via
@@ -2474,8 +2474,8 @@ class Exclude15786(TestCase):
     def test_ticket15786(self):
         c1 = SimpleCategory.objects.create(name='c1')
         c2 = SimpleCategory.objects.create(name='c2')
-        o2o1 = OneToOneCategory.objects.create(category=c1)
-        o2o2 = OneToOneCategory.objects.create(category=c2)
+        OneToOneCategory.objects.create(category=c1)
+        OneToOneCategory.objects.create(category=c2)
         rel = CategoryRelationship.objects.create(first=c1, second=c2)
         self.assertEqual(
             CategoryRelationship.objects.exclude(

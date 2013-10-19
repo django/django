@@ -170,7 +170,7 @@ class FileTests(unittest.TestCase):
         # See #14681, stdlib gzip module crashes if mode is set to None
         file = SimpleUploadedFile("mode_test.txt", b"content")
         self.assertFalse(hasattr(file, 'mode'))
-        g = gzip.GzipFile(fileobj=file)
+        gzip.GzipFile(fileobj=file)
 
 
 class FileMoveSafeTests(unittest.TestCase):

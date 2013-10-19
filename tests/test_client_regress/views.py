@@ -35,7 +35,7 @@ def request_data(request, template='base.html', data='sausage'):
     "A simple view that returns the request data in the context"
 
     # request.REQUEST is deprecated, but needs testing until removed.
-    with warnings.catch_warnings(record=True) as w:
+    with warnings.catch_warnings(record=True):
         warnings.simplefilter("always")
         request_foo = request.REQUEST.get('foo')
         request_bar = request.REQUEST.get('bar')

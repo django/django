@@ -419,7 +419,7 @@ class ClientTest(TestCase):
             pass
 
         from django.contrib.sessions.models import Session
-        response = self.client.post('/test_client/session_view/')
+        self.client.post('/test_client/session_view/')
 
         # Check that the session was modified
         self.assertEqual(self.client.session['tobacconist'], 'hovercraft')

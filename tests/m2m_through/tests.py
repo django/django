@@ -24,9 +24,9 @@ class M2mThroughTests(TestCase):
             []
         )
         # To make Jim a member of Group Rock, simply create a Membership object.
-        m1 = Membership.objects.create(person=self.jim, group=self.rock)
+        Membership.objects.create(person=self.jim, group=self.rock)
         # We can do the same for Jane and Rock.
-        m2 = Membership.objects.create(person=self.jane, group=self.rock)
+        Membership.objects.create(person=self.jane, group=self.rock)
         # Let's check to make sure that it worked.  Jane and Jim should be members of Rock.
         self.assertQuerysetEqual(
             self.rock.members.all(), [
@@ -36,9 +36,9 @@ class M2mThroughTests(TestCase):
             attrgetter("name")
         )
         # Now we can add a bunch more Membership objects to test with.
-        m3 = Membership.objects.create(person=self.bob, group=self.roll)
-        m4 = Membership.objects.create(person=self.jim, group=self.roll)
-        m5 = Membership.objects.create(person=self.jane, group=self.roll)
+        Membership.objects.create(person=self.bob, group=self.roll)
+        Membership.objects.create(person=self.jim, group=self.roll)
+        Membership.objects.create(person=self.jane, group=self.roll)
         # We can get Jim's Group membership as with any ForeignKey.
         self.assertQuerysetEqual(
             self.jim.group_set.all(), [
@@ -161,8 +161,8 @@ class M2mThroughTests(TestCase):
             []
         )
 
-        cm1 = CustomMembership.objects.create(person=self.bob, group=self.rock)
-        cm2 = CustomMembership.objects.create(person=self.jim, group=self.rock)
+        CustomMembership.objects.create(person=self.bob, group=self.rock)
+        CustomMembership.objects.create(person=self.jim, group=self.rock)
 
         # If we get the number of people in Rock, it should be both Bob and Jim.
         self.assertQuerysetEqual(
@@ -195,7 +195,7 @@ class M2mThroughTests(TestCase):
         )
 
         chris = PersonSelfRefM2M.objects.create(name="Chris")
-        f = Friendship.objects.create(first=tony, second=chris, date_friended=datetime.now())
+        Friendship.objects.create(first=tony, second=chris, date_friended=datetime.now())
 
         # Tony should now show that Chris is his friend.
         self.assertQuerysetEqual(
@@ -209,7 +209,7 @@ class M2mThroughTests(TestCase):
             chris.friends.all(),
             []
         )
-        f2 = Friendship.objects.create(first=chris, second=tony, date_friended=datetime.now())
+        Friendship.objects.create(first=chris, second=tony, date_friended=datetime.now())
 
         # Having added Chris as a friend, let's make sure that his friend set reflects
         # that addition.
@@ -236,10 +236,10 @@ class M2mThroughTests(TestCase):
         )
 
     def test_query_tests(self):
-        m1 = Membership.objects.create(person=self.jim, group=self.rock)
+        Membership.objects.create(person=self.jim, group=self.rock)
         m2 = Membership.objects.create(person=self.jane, group=self.rock)
         m3 = Membership.objects.create(person=self.bob, group=self.roll)
-        m4 = Membership.objects.create(person=self.jim, group=self.roll)
+        Membership.objects.create(person=self.jim, group=self.roll)
         m5 = Membership.objects.create(person=self.jane, group=self.roll)
 
         m2.invite_reason = "She was just awesome."
@@ -278,8 +278,8 @@ class M2mThroughTests(TestCase):
             attrgetter("name")
         )
 
-        cm1 = CustomMembership.objects.create(person=self.bob, group=self.rock)
-        cm2 = CustomMembership.objects.create(person=self.jim, group=self.rock)
+        CustomMembership.objects.create(person=self.bob, group=self.rock)
+        CustomMembership.objects.create(person=self.jim, group=self.rock)
         # If the m2m field has specified a related_name, using that will work.
         self.assertQuerysetEqual(
             Person.objects.filter(custom__name="Rock"),[

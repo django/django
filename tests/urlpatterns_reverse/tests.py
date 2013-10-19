@@ -228,7 +228,7 @@ class ResolverTests(unittest.TestCase):
         proxy_url = reverse_lazy('named-url1', urlconf=urls)
         resolver = get_resolver(urls)
         try:
-            match = resolver.resolve(proxy_url)
+            resolver.resolve(proxy_url)
         except TypeError:
             self.fail('Failed to coerce lazy object to text')
 
@@ -290,7 +290,7 @@ class ReverseLazyTest(TestCase):
         self.assertRedirects(response, "/redirected_to/", status_code=301)
 
     def test_user_permission_with_lazy_reverse(self):
-        user = User.objects.create_user('alfred', 'alfred@example.com', password='testpw')
+        User.objects.create_user('alfred', 'alfred@example.com', password='testpw')
         response = self.client.get('/login_required_view/')
         self.assertRedirects(response, "/login/?next=/login_required_view/", status_code=302)
         self.client.login(username='alfred', password='testpw')

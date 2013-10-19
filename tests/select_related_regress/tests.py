@@ -61,7 +61,7 @@ class SelectRelatedRegressTests(TestCase):
         s = Student.objects.create(person = usp)
         o = Organizer.objects.create(person = uop)
         c = Class.objects.create(org=o)
-        e = Enrollment.objects.create(std=s, cls=c)
+        Enrollment.objects.create(std=s, cls=c)
 
         e_related = Enrollment.objects.all().select_related()[0]
         self.assertEqual(e_related.std.person.user.name, "std")
@@ -77,7 +77,7 @@ class SelectRelatedRegressTests(TestCase):
         for country before getting status.
         """
 
-        australia = Country.objects.create(name='Australia')
+        Country.objects.create(name='Australia')
         active = ClientStatus.objects.create(name='active')
         client = Client.objects.create(name='client', status=active)
 
@@ -92,8 +92,8 @@ class SelectRelatedRegressTests(TestCase):
     def test_multi_table_inheritance(self):
         """ Exercising select_related() with multi-table model inheritance. """
         c1 = Child.objects.create(name="child1", value=42)
-        i1 = Item.objects.create(name="item1", child=c1)
-        i2 = Item.objects.create(name="item2")
+        Item.objects.create(name="item1", child=c1)
+        Item.objects.create(name="item2")
 
         self.assertQuerysetEqual(
                 Item.objects.select_related("child").order_by("name"),
@@ -111,14 +111,14 @@ class SelectRelatedRegressTests(TestCase):
         active = ClientStatus.objects.create(name='active')
 
         wa = State.objects.create(name="Western Australia", country=australia)
-        c1 = Client.objects.create(name='Brian Burke', state=wa, status=active)
+        Client.objects.create(name='Brian Burke', state=wa, status=active)
         burke = Client.objects.select_related('state').defer('state__name').get(name='Brian Burke')
 
         self.assertEqual(burke.name, 'Brian Burke')
         self.assertEqual(burke.state.name, 'Western Australia')
 
         # Still works if we're dealing with an inherited class
-        sc1 = SpecialClient.objects.create(name='Troy Buswell', state=wa, status=active, value=42)
+        SpecialClient.objects.create(name='Troy Buswell', state=wa, status=active, value=42)
         troy = SpecialClient.objects.select_related('state').defer('state__name').get(name='Troy Buswell')
 
         self.assertEqual(troy.name, 'Troy Buswell')
@@ -168,7 +168,7 @@ class SelectRelatedRegressTests(TestCase):
 
         """
         hen = Hen.objects.create(name='Hen')
-        chick = Chick.objects.create(name='Chick', mother=hen)
+        Chick.objects.create(name='Chick', mother=hen)
 
         self.assertEqual(Chick.objects.all()[0].mother.name, 'Hen')
         self.assertEqual(Chick.objects.select_related()[0].mother.name, 'Hen')

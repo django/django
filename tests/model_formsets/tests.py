@@ -291,9 +291,9 @@ class ModelFormsetTest(TestCase):
         # all existing related objects/inlines for a given object to be
         # displayed, but not allow the creation of new inlines beyond max_num.
 
-        author1 = Author.objects.create(name='Charles Baudelaire')
-        author2 = Author.objects.create(name='Paul Verlaine')
-        author3 = Author.objects.create(name='Walt Whitman')
+        Author.objects.create(name='Charles Baudelaire')
+        Author.objects.create(name='Paul Verlaine')
+        Author.objects.create(name='Walt Whitman')
 
         qs = Author.objects.order_by('name')
 
@@ -394,8 +394,8 @@ class ModelFormsetTest(TestCase):
         Test that a queryset can be overridden in the __init__ method.
         https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#changing-the-queryset
         """
-        author1 = Author.objects.create(name='Charles Baudelaire')
-        author2 = Author.objects.create(name='Paul Verlaine')
+        Author.objects.create(name='Charles Baudelaire')
+        Author.objects.create(name='Paul Verlaine')
 
         class BaseAuthorFormSet(BaseModelFormSet):
             def __init__(self, *args, **kwargs):
@@ -535,7 +535,7 @@ class ModelFormsetTest(TestCase):
         # The save_as_new parameter lets you re-associate the data to a new
         # instance.  This is used in the admin for save_as functionality.
         AuthorBooksFormSet = inlineformset_factory(Author, Book, can_delete=False, extra=2, fields="__all__")
-        author = Author.objects.create(name='Charles Baudelaire')
+        Author.objects.create(name='Charles Baudelaire')
 
         data = {
             'book_set-TOTAL_FORMS': '3', # the number of forms rendered
@@ -1139,7 +1139,7 @@ class ModelFormsetTest(TestCase):
         # has_changed should work with queryset and list of pk's
         # see #18898
         FormSet = modelformset_factory(AuthorMeeting, fields='__all__')
-        author = Author.objects.create(pk=1, name='Charles Baudelaire')
+        Author.objects.create(pk=1, name='Charles Baudelaire')
         data = {
             'form-TOTAL_FORMS': 1,
             'form-INITIAL_FORMS': 0,
@@ -1195,9 +1195,9 @@ class ModelFormsetTest(TestCase):
 
         FormSet = inlineformset_factory(Author, Book, extra=0, fields="__all__")
         author = Author.objects.create(pk=1, name='Charles Baudelaire')
-        book1 = Book.objects.create(pk=1, author=author, title='Les Paradis Artificiels')
-        book2 = Book.objects.create(pk=2, author=author, title='Les Fleurs du Mal')
-        book3 = Book.objects.create(pk=3, author=author, title='Flowers of Evil')
+        Book.objects.create(pk=1, author=author, title='Les Paradis Artificiels')
+        Book.objects.create(pk=2, author=author, title='Les Fleurs du Mal')
+        Book.objects.create(pk=3, author=author, title='Flowers of Evil')
 
         book_ids = author.book_set.order_by('id').values_list('id', flat=True)
         data = {

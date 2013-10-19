@@ -535,7 +535,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         self.assertEqual(f.cleaned_data['field1'], 'some text,JP,2007-04-25 06:24:00')
 
     def test_ipaddress(self):
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True):
             warnings.simplefilter("always")
             f = IPAddressField()
         self.assertFormErrors(['This field is required.'], f.clean, '')
@@ -546,7 +546,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '1.2.3.4.5')
         self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '256.125.1.5')
 
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True):
             warnings.simplefilter("always")
             f = IPAddressField(required=False)
         self.assertEqual(f.clean(''), '')

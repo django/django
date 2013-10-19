@@ -12,7 +12,7 @@ from .models import Book, BookSigning
 
 def _make_books(n, base_date):
     for i in range(n):
-        b = Book.objects.create(
+        Book.objects.create(
             name='Book %d' % i,
             slug='book-%d' % i,
             pages=100+i,
@@ -158,7 +158,7 @@ class YearArchiveViewTests(TestCase):
     def test_year_view_allow_future(self):
         # Create a new book in the future
         year = datetime.date.today().year + 1
-        b = Book.objects.create(name="The New New Testement", pages=600, pubdate=datetime.date(year, 1, 1))
+        Book.objects.create(name="The New New Testement", pages=600, pubdate=datetime.date(year, 1, 1))
         res = self.client.get('/dates/books/%s/' % year)
         self.assertEqual(res.status_code, 404)
 

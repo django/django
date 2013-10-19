@@ -19,7 +19,7 @@ class GenericRelationsTests(TestCase):
         platypus = Animal.objects.create(
             common_name="Platypus", latin_name="Ornithorhynchus anatinus"
         )
-        eggplant = Vegetable.objects.create(name="Eggplant", is_yucky=True)
+        Vegetable.objects.create(name="Eggplant", is_yucky=True)
         bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
         quartz = Mineral.objects.create(name="Quartz", hardness=7)
 
@@ -46,7 +46,7 @@ class GenericRelationsTests(TestCase):
         # Recall that the Mineral class doesn't have an explicit GenericRelation
         # defined. That's OK, because you can create TaggedItems explicitly.
         tag1 = TaggedItem.objects.create(content_object=quartz, tag="shiny")
-        tag2 = TaggedItem.objects.create(content_object=quartz, tag="clearish")
+        TaggedItem.objects.create(content_object=quartz, tag="clearish")
 
         # However, excluding GenericRelations means your lookups have to be a
         # bit more explicit.

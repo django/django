@@ -12,12 +12,11 @@ from .models import (User, UserProfile, UserStat, UserStatResult, StatDetails,
 class ReverseSelectRelatedTestCase(TestCase):
     def setUp(self):
         user = User.objects.create(username="test")
-        userprofile = UserProfile.objects.create(user=user, state="KS",
-                                                 city="Lawrence")
+        UserProfile.objects.create(user=user, state="KS", city="Lawrence")
         results = UserStatResult.objects.create(results='first results')
         userstat = UserStat.objects.create(user=user, posts=150,
                                            results=results)
-        details = StatDetails.objects.create(base_stats=userstat, comments=259)
+        StatDetails.objects.create(base_stats=userstat, comments=259)
 
         user2 = User.objects.create(username="bob")
         results2 = UserStatResult.objects.create(results='moar results')

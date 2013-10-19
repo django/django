@@ -10,13 +10,13 @@ from .models import Article, ArticlePKOrdering
 
 class OrderingTests(TestCase):
     def test_basic(self):
-        a1 = Article.objects.create(
+        Article.objects.create(
             headline="Article 1", pub_date=datetime(2005, 7, 26)
         )
-        a2 = Article.objects.create(
+        Article.objects.create(
             headline="Article 2", pub_date=datetime(2005, 7, 27)
         )
-        a3 = Article.objects.create(
+        Article.objects.create(
             headline="Article 3", pub_date=datetime(2005, 7, 27)
         )
         a4 = Article.objects.create(
@@ -143,16 +143,16 @@ class OrderingTests(TestCase):
         Ensure that 'pk' works as an ordering option in Meta.
         Refs #8291.
         """
-        a1 = ArticlePKOrdering.objects.create(
+        ArticlePKOrdering.objects.create(
             pk=1, headline="Article 1", pub_date=datetime(2005, 7, 26)
         )
-        a2 = ArticlePKOrdering.objects.create(
+        ArticlePKOrdering.objects.create(
             pk=2, headline="Article 2", pub_date=datetime(2005, 7, 27)
         )
-        a3 = ArticlePKOrdering.objects.create(
+        ArticlePKOrdering.objects.create(
             pk=3, headline="Article 3", pub_date=datetime(2005, 7, 27)
         )
-        a4 = ArticlePKOrdering.objects.create(
+        ArticlePKOrdering.objects.create(
             pk=4, headline="Article 4", pub_date=datetime(2005, 7, 28)
         )
 

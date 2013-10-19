@@ -117,7 +117,7 @@ class BaseMiddlewareExceptionTest(TestCase):
 
     def assert_exceptions_handled(self, url, errors, extra_error=None):
         try:
-            response = self.client.get(url)
+            self.client.get(url)
         except TestException:
             # Test client intentionally re-raises any exceptions being raised
             # during request handling. Hence actual testing that exception was

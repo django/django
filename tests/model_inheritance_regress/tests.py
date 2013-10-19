@@ -133,7 +133,7 @@ class ModelInheritanceTest(TestCase):
     def test_issue_7105(self):
         # Regressions tests for #7105: dates() queries should be able to use
         # fields from the parent model as easily as the child.
-        obj = Child.objects.create(
+        Child.objects.create(
             name='child',
             created=datetime.datetime(2008, 6, 26, 17, 0, 0))
         datetimes = list(Child.objects.datetimes('created', 'month'))
@@ -159,7 +159,7 @@ class ModelInheritanceTest(TestCase):
 
         ident = ItalianRestaurant.objects.all()[0].id
         self.assertEqual(Place.objects.get(pk=ident), place1)
-        xx = Restaurant.objects.create(
+        Restaurant.objects.create(
             name='a',
             address='xx',
             serves_hot_dogs=True,

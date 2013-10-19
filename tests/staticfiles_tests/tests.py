@@ -561,7 +561,7 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
         """
         finders._finders.clear()
         err = six.StringIO()
-        with self.assertRaises(Exception) as cm:
+        with self.assertRaises(Exception):
             call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
         self.assertEqual("Post-processing 'faulty.css' failed!\n\n", err.getvalue())
 

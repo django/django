@@ -369,8 +369,7 @@ class FormFieldCallbackTests(TestCase):
                 widgets = {'name': widget}
                 fields = "__all__"
 
-        _ = modelform_factory(Person, form=BaseForm,
-                              formfield_callback=callback)
+        modelform_factory(Person, form=BaseForm, formfield_callback=callback)
         id_field, name_field = Person._meta.fields
 
         self.assertEqual(callback_args,
@@ -567,7 +566,7 @@ class TestTicket19733(TestCase):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always", DeprecationWarning)
             # This should become an error once deprecation cycle is complete.
-            form = modelform_factory(Person)
+            modelform_factory(Person)
         self.assertEqual(w[0].category, DeprecationWarning)
 
     def test_modelform_factory_with_all_fields(self):

@@ -198,7 +198,7 @@ class SerializersTestBase(object):
         mv.save()
 
         with self.assertNumQueries(0):
-            serial_str = serializers.serialize(self.serializer_name, [mv])
+            serializers.serialize(self.serializer_name, [mv])
 
     def test_serialize_with_null_pk(self):
         """

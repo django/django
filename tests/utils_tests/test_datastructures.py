@@ -148,8 +148,6 @@ class MergeDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
         d3 = {'chris3':'cool3', 'camri3':'cute3', 'cotton3':'adorable3',
               'tulip3':'snuggable3'}
 
-        d4 = {'twoofme': 'secondone'}
-
         md = MergeDict(d1, d2, d3)
 
         self.assertEqual(md['chris'], 'cool')

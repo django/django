@@ -187,7 +187,7 @@ class SimpleTemplateResponseTest(TestCase):
         response.render()
         pickled_response = pickle.dumps(response)
         unpickled_response = pickle.loads(pickled_response)
-        repickled_response = pickle.dumps(unpickled_response)
+        pickle.dumps(unpickled_response)
 
     def test_pickling_cookie(self):
         response = SimpleTemplateResponse('first/test.html', {
@@ -293,7 +293,7 @@ class TemplateResponseTest(TestCase):
         response.render()
         pickled_response = pickle.dumps(response)
         unpickled_response = pickle.loads(pickled_response)
-        repickled_response = pickle.dumps(unpickled_response)
+        pickle.dumps(unpickled_response)
 
 
 class CustomURLConfTest(TestCase):
