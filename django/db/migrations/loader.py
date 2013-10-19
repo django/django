@@ -41,8 +41,8 @@ class MigrationLoader(object):
     def migrations_module(cls, app_label):
         if app_label in settings.MIGRATION_MODULES:
             return settings.MIGRATION_MODULES[app_label]
-        app = cache.get_app(app_label)
-        return ".".join(app.__name__.split(".")[:-1] + ["migrations"])
+        else:
+            return '%s.migrations' % cache.get_app_package(app_label)
 
     def load_disk(self):
         """
