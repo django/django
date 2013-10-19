@@ -225,7 +225,7 @@ class Command(NoArgsCommand):
 
         if (locale is None and not process_all) or self.domain is None:
             raise CommandError("Type '%s help %s' for usage information." % (
-                                os.path.basename(sys.argv[0]), sys.argv[1]))
+                os.path.basename(sys.argv[0]), sys.argv[1]))
 
         if self.verbosity > 1:
             self.stdout.write('examining files with the extensions: %s\n'

@@ -136,7 +136,7 @@ class LocalTimezone(ReferenceLocalTimezone):
         except (OverflowError, ValueError) as exc:
             exc_type = type(exc)
             exc_value = exc_type(
-                    "Unsupported value: %r. You should install pytz." % dt)
+                "Unsupported value: %r. You should install pytz." % dt)
             exc_value.__cause__ = exc
             six.reraise(exc_type, exc_value, sys.exc_info()[2])
 

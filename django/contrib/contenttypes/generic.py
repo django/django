@@ -240,12 +240,10 @@ class GenericRelation(ForeignObject):
 
         """
         return self.rel.to._base_manager.db_manager(using).filter(**{
-                "%s__pk" % self.content_type_field_name:
-                    ContentType.objects.db_manager(using).get_for_model(
-                        self.model, for_concrete_model=self.for_concrete_model).pk,
-                "%s__in" % self.object_id_field_name:
-                    [obj.pk for obj in objs]
-                })
+            "%s__pk" % self.content_type_field_name: ContentType.objects.db_manager(using).get_for_model(
+                self.model, for_concrete_model=self.for_concrete_model).pk,
+            "%s__in" % self.object_id_field_name: [obj.pk for obj in objs]
+        })
 
 
 class ReverseGenericRelatedObjectsDescriptor(object):
@@ -352,8 +350,7 @@ def create_generic_related_manager(superclass):
             db = self._db or router.db_for_read(self.model, instance=instances[0])
             query = {
                 '%s__pk' % self.content_type_field_name: self.content_type.id,
-                '%s__in' % self.object_id_field_name:
-                    set(obj._get_pk_val() for obj in instances)
+                '%s__in' % self.object_id_field_name: set(obj._get_pk_val() for obj in instances)
             }
             qs = super(GenericRelatedObjectManager, self).get_queryset().using(db).filter(**query)
             # We (possibly) need to convert object IDs to the type of the

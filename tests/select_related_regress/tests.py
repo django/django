@@ -96,8 +96,8 @@ class SelectRelatedRegressTests(TestCase):
         Item.objects.create(name="item2")
 
         self.assertQuerysetEqual(
-                Item.objects.select_related("child").order_by("name"),
-                ["<Item: item1>", "<Item: item2>"]
+            Item.objects.select_related("child").order_by("name"),
+            ["<Item: item1>", "<Item: item2>"]
         )
 
     def test_regression_12851(self):

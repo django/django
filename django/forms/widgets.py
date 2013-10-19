@@ -62,9 +62,9 @@ class Media(object):
         # We need to sort the keys, and iterate over the sorted list.
         media = sorted(self._css.keys())
         return chain(*[
-                [format_html('<link href="{0}" type="text/css" media="{1}" rel="stylesheet" />', self.absolute_path(path), medium)
-                    for path in self._css[medium]]
-                for medium in media])
+            [format_html('<link href="{0}" type="text/css" media="{1}" rel="stylesheet" />', self.absolute_path(path), medium)
+             for path in self._css[medium]]
+            for medium in media])
 
     def absolute_path(self, path, prefix=None):
         if path.startswith(('http://', 'https://', '/')):

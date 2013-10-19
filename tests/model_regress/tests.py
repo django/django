@@ -121,16 +121,16 @@ class ModelTests(TestCase):
 
         # Regression test for #18969
         self.assertQuerysetEqual(
-                Party.objects.filter(when__year=1), [
-                        datetime.date(1, 3, 3),
-                ],
-                attrgetter("when")
+            Party.objects.filter(when__year=1), [
+                datetime.date(1, 3, 3),
+            ],
+            attrgetter("when")
         )
         self.assertQuerysetEqual(
-                Party.objects.filter(when__year='1'), [
-                        datetime.date(1, 3, 3),
-                ],
-                attrgetter("when")
+            Party.objects.filter(when__year='1'), [
+                datetime.date(1, 3, 3),
+            ],
+            attrgetter("when")
         )
 
     if (3,) <= sys.version_info < (3, 3) and connection.vendor == 'mysql':

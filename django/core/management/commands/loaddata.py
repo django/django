@@ -46,8 +46,8 @@ class Command(BaseCommand):
 
         if not len(fixture_labels):
             raise CommandError(
-                    "No database fixture specified. Please provide the path "
-                    "of at least one fixture in the command line.")
+                "No database fixture specified. Please provide the path "
+                "of at least one fixture in the command line.")
 
         self.verbosity = int(options.get('verbosity'))
 
@@ -140,10 +140,10 @@ class Command(BaseCommand):
                             obj.save(using=self.using)
                         except (DatabaseError, IntegrityError) as e:
                             e.args = ("Could not load %(app_label)s.%(object_name)s(pk=%(pk)s): %(error_msg)s" % {
-                                    'app_label': obj.object._meta.app_label,
-                                    'object_name': obj.object._meta.object_name,
-                                    'pk': obj.object.pk,
-                                    'error_msg': force_text(e)
+                                'app_label': obj.object._meta.app_label,
+                                'object_name': obj.object._meta.object_name,
+                                'pk': obj.object.pk,
+                                'error_msg': force_text(e)
                             },)
                             raise
 
@@ -176,8 +176,8 @@ class Command(BaseCommand):
         # Check kept for backwards-compatibility; it doesn't look very useful.
         if '.' in os.path.basename(fixture_name):
             raise CommandError(
-                    "Problem installing fixture '%s': %s is not a known "
-                    "serialization format." % tuple(fixture_name.rsplit('.')))
+                "Problem installing fixture '%s': %s is not a known "
+                "serialization format." % tuple(fixture_name.rsplit('.')))
 
         if self.verbosity >= 2:
             self.stdout.write("Loading '%s' fixtures..." % fixture_name)
@@ -210,8 +210,8 @@ class Command(BaseCommand):
             # duplicates are only allowed in different directories.
             if len(fixture_files_in_dir) > 1:
                 raise CommandError(
-                        "Multiple fixtures named '%s' in %s. Aborting." %
-                        (fixture_name, humanize(fixture_dir)))
+                    "Multiple fixtures named '%s' in %s. Aborting." %
+                    (fixture_name, humanize(fixture_dir)))
             fixture_files.extend(fixture_files_in_dir)
 
         if fixture_name != 'initial_data' and not fixture_files:

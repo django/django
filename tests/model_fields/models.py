@@ -31,13 +31,13 @@ class Bar(models.Model):
 class Whiz(models.Model):
     CHOICES = (
         ('Group 1', (
-                (1, 'First'),
-                (2, 'Second'),
+            (1, 'First'),
+            (2, 'Second'),
         )
         ),
         ('Group 2', (
-                (3, 'Third'),
-                (4, 'Fourth'),
+            (3, 'Third'),
+            (4, 'Fourth'),
         )
         ),
         (0, 'Other'),
@@ -218,9 +218,9 @@ if Image:
                                  height_field='mugshot_height',
                                  width_field='mugshot_width')
         headshot_height = models.PositiveSmallIntegerField(
-                blank=True, null=True)
+            blank=True, null=True)
         headshot_width = models.PositiveSmallIntegerField(
-                blank=True, null=True)
+            blank=True, null=True)
         headshot = TestImageField(blank=True, null=True,
                                   storage=temp_storage, upload_to='tests',
                                   height_field='headshot_height',

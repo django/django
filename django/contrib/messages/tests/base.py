@@ -354,11 +354,11 @@ class BaseTests(object):
                           'success'])
 
     @override_settings_tags(MESSAGE_TAGS={
-            constants.INFO: 'info',
-            constants.DEBUG: '',
-            constants.WARNING: '',
-            constants.ERROR: 'bad',
-            29: 'custom',
+        constants.INFO: 'info',
+        constants.DEBUG: '',
+        constants.WARNING: '',
+        constants.ERROR: 'bad',
+        29: 'custom',
     }
     )
     def test_custom_tags(self):

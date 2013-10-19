@@ -169,8 +169,8 @@ class AdminEmailHandlerTest(TestCase):
         self.assertTrue(admin_email_handler.connection().fail_silently)
 
     @override_settings(
-            ADMINS=(('whatever admin', 'admin@example.com'),),
-            EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-'
+        ADMINS=(('whatever admin', 'admin@example.com'),),
+        EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-'
     )
     def test_accepts_args(self):
         """
@@ -199,9 +199,9 @@ class AdminEmailHandlerTest(TestCase):
             admin_email_handler.filters = orig_filters
 
     @override_settings(
-            ADMINS=(('whatever admin', 'admin@example.com'),),
-            EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-',
-            INTERNAL_IPS=('127.0.0.1',),
+        ADMINS=(('whatever admin', 'admin@example.com'),),
+        EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-',
+        INTERNAL_IPS=('127.0.0.1',),
     )
     def test_accepts_args_and_request(self):
         """
@@ -234,9 +234,9 @@ class AdminEmailHandlerTest(TestCase):
             admin_email_handler.filters = orig_filters
 
     @override_settings(
-            ADMINS=(('admin', 'admin@example.com'),),
-            EMAIL_SUBJECT_PREFIX='',
-            DEBUG=False,
+        ADMINS=(('admin', 'admin@example.com'),),
+        EMAIL_SUBJECT_PREFIX='',
+        DEBUG=False,
     )
     def test_subject_accepts_newlines(self):
         """
@@ -257,9 +257,9 @@ class AdminEmailHandlerTest(TestCase):
         self.assertEqual(mail.outbox[0].subject, expected_subject)
 
     @override_settings(
-            ADMINS=(('admin', 'admin@example.com'),),
-            EMAIL_SUBJECT_PREFIX='',
-            DEBUG=False,
+        ADMINS=(('admin', 'admin@example.com'),),
+        EMAIL_SUBJECT_PREFIX='',
+        DEBUG=False,
     )
     def test_truncate_subject(self):
         """
@@ -279,8 +279,8 @@ class AdminEmailHandlerTest(TestCase):
         self.assertEqual(mail.outbox[0].subject, expected_subject)
 
     @override_settings(
-            ADMINS=(('admin', 'admin@example.com'),),
-            DEBUG=False,
+        ADMINS=(('admin', 'admin@example.com'),),
+        DEBUG=False,
     )
     def test_uses_custom_email_backend(self):
         """

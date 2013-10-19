@@ -427,7 +427,7 @@ class PermissionDeniedBackendTest(TestCase):
         self.assertEqual(authenticate(username='test', password='test'), None)
 
     @override_settings(AUTHENTICATION_BACKENDS=tuple(
-            settings.AUTHENTICATION_BACKENDS) + (backend, ))
+        settings.AUTHENTICATION_BACKENDS) + (backend, ))
     def test_authenticates(self):
         self.assertEqual(authenticate(username='test', password='test'), self.user1)
 

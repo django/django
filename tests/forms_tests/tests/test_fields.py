@@ -1134,14 +1134,14 @@ class FieldsTests(SimpleTestCase):
         f.choices = [p for p in f.choices if p[0].endswith('.py')]
         f.choices.sort()
         expected = [
-                ('/django/forms/__init__.py', '__init__.py'),
-                ('/django/forms/fields.py', 'fields.py'),
-                ('/django/forms/forms.py', 'forms.py'),
-                ('/django/forms/formsets.py', 'formsets.py'),
-                ('/django/forms/models.py', 'models.py'),
-                ('/django/forms/util.py', 'util.py'),
-                ('/django/forms/utils.py', 'utils.py'),
-                ('/django/forms/widgets.py', 'widgets.py')
+            ('/django/forms/__init__.py', '__init__.py'),
+            ('/django/forms/fields.py', 'fields.py'),
+            ('/django/forms/forms.py', 'forms.py'),
+            ('/django/forms/formsets.py', 'formsets.py'),
+            ('/django/forms/models.py', 'models.py'),
+            ('/django/forms/util.py', 'util.py'),
+            ('/django/forms/utils.py', 'utils.py'),
+            ('/django/forms/widgets.py', 'widgets.py')
         ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
@@ -1155,14 +1155,14 @@ class FieldsTests(SimpleTestCase):
         f = FilePathField(path=path, match='^.*?\.py$')
         f.choices.sort()
         expected = [
-                ('/django/forms/__init__.py', '__init__.py'),
-                ('/django/forms/fields.py', 'fields.py'),
-                ('/django/forms/forms.py', 'forms.py'),
-                ('/django/forms/formsets.py', 'formsets.py'),
-                ('/django/forms/models.py', 'models.py'),
-                ('/django/forms/util.py', 'util.py'),
-                ('/django/forms/utils.py', 'utils.py'),
-                ('/django/forms/widgets.py', 'widgets.py')
+            ('/django/forms/__init__.py', '__init__.py'),
+            ('/django/forms/fields.py', 'fields.py'),
+            ('/django/forms/forms.py', 'forms.py'),
+            ('/django/forms/formsets.py', 'formsets.py'),
+            ('/django/forms/models.py', 'models.py'),
+            ('/django/forms/util.py', 'util.py'),
+            ('/django/forms/utils.py', 'utils.py'),
+            ('/django/forms/widgets.py', 'widgets.py')
         ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
@@ -1174,16 +1174,16 @@ class FieldsTests(SimpleTestCase):
         f = FilePathField(path=path, recursive=True, match='^.*?\.py$')
         f.choices.sort()
         expected = [
-                ('/django/forms/__init__.py', '__init__.py'),
-                ('/django/forms/extras/__init__.py', 'extras/__init__.py'),
-                ('/django/forms/extras/widgets.py', 'extras/widgets.py'),
-                ('/django/forms/fields.py', 'fields.py'),
-                ('/django/forms/forms.py', 'forms.py'),
-                ('/django/forms/formsets.py', 'formsets.py'),
-                ('/django/forms/models.py', 'models.py'),
-                ('/django/forms/util.py', 'util.py'),
-                ('/django/forms/utils.py', 'utils.py'),
-                ('/django/forms/widgets.py', 'widgets.py')
+            ('/django/forms/__init__.py', '__init__.py'),
+            ('/django/forms/extras/__init__.py', 'extras/__init__.py'),
+            ('/django/forms/extras/widgets.py', 'extras/widgets.py'),
+            ('/django/forms/fields.py', 'fields.py'),
+            ('/django/forms/forms.py', 'forms.py'),
+            ('/django/forms/formsets.py', 'formsets.py'),
+            ('/django/forms/models.py', 'models.py'),
+            ('/django/forms/util.py', 'util.py'),
+            ('/django/forms/utils.py', 'utils.py'),
+            ('/django/forms/widgets.py', 'widgets.py')
         ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])

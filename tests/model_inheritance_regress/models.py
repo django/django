@@ -124,7 +124,7 @@ class DerivedM(BaseM):
 
     def __str__(self):
         return "PK = %d, base_name = %s, derived_name = %s" \
-                % (self.customPK, self.base_name, self.derived_name)
+            % (self.customPK, self.base_name, self.derived_name)
 
 class AuditBase(models.Model):
     planned_date = models.DateField()

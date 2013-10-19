@@ -694,7 +694,7 @@ class QuerySet(object):
     def _filter_or_exclude(self, negate, *args, **kwargs):
         if args or kwargs:
             assert self.query.can_filter(), \
-                    "Cannot filter a query once a slice has been taken."
+                "Cannot filter a query once a slice has been taken."
 
         clone = self._clone()
         if negate:

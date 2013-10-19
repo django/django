@@ -279,7 +279,7 @@ def setup_databases(verbosity, interactive, **kwargs):
             connection = connections[alias]
             if test_db_name is None:
                 test_db_name = connection.creation.create_test_db(
-                        verbosity, autoclobber=not interactive)
+                    verbosity, autoclobber=not interactive)
                 destroy = True
             else:
                 connection.settings_dict['NAME'] = test_db_name

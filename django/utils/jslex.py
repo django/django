@@ -143,14 +143,14 @@ class JsLexer(Lexer):
     ]
 
     states = {
-        'div': # slash will mean division
-            both_before + [
-                Tok("punct", literals("/= /"), next='reg'),
-            ] + both_after,
+        # slash will mean division
+        'div': both_before + [
+            Tok("punct", literals("/= /"), next='reg'),
+        ] + both_after,
 
-        'reg':  # slash will mean regex
-            both_before + [
-                Tok("regex",
+        # slash will mean regex
+        'reg': both_before + [
+            Tok("regex",
                 r"""
                     /                       # opening slash
                     # First character is..
@@ -174,7 +174,7 @@ class JsLexer(Lexer):
                     /                       # closing slash
                     [a-zA-Z0-9]*            # trailing flags
                 """, next='div'),
-            ] + both_after,
+        ] + both_after,
     }
 
     def __init__(self):

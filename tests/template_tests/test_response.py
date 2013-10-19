@@ -150,8 +150,8 @@ class SimpleTemplateResponseTest(TestCase):
         # Create a template response. The context is
         # known to be unpickleable (e.g., a function).
         response = SimpleTemplateResponse('first/test.html', {
-                'value': 123,
-                'fn': datetime.now,
+            'value': 123,
+            'fn': datetime.now,
         })
         self.assertRaises(ContentNotRenderedError,
                           pickle.dumps, response)
@@ -178,8 +178,8 @@ class SimpleTemplateResponseTest(TestCase):
 
     def test_repickling(self):
         response = SimpleTemplateResponse('first/test.html', {
-                'value': 123,
-                'fn': datetime.now,
+            'value': 123,
+            'fn': datetime.now,
         })
         self.assertRaises(ContentNotRenderedError,
                           pickle.dumps, response)
@@ -191,8 +191,8 @@ class SimpleTemplateResponseTest(TestCase):
 
     def test_pickling_cookie(self):
         response = SimpleTemplateResponse('first/test.html', {
-                'value': 123,
-                'fn': datetime.now,
+            'value': 123,
+            'fn': datetime.now,
         })
 
         response.cookies['key'] = 'value'
@@ -284,8 +284,8 @@ class TemplateResponseTest(TestCase):
 
     def test_repickling(self):
         response = SimpleTemplateResponse('first/test.html', {
-                'value': 123,
-                'fn': datetime.now,
+            'value': 123,
+            'fn': datetime.now,
         })
         self.assertRaises(ContentNotRenderedError,
                           pickle.dumps, response)

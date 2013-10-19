@@ -59,8 +59,8 @@ def fix_IE_for_attach(request, response):
             pass
         if response.has_header('Cache-Control'):
             cache_control_values = [value.strip() for value in
-                    response['Cache-Control'].split(',')
-                    if value.strip().lower() not in offending_headers]
+                response['Cache-Control'].split(',')
+                if value.strip().lower() not in offending_headers]
 
             if not len(cache_control_values):
                 del response['Cache-Control']
