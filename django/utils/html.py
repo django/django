@@ -97,8 +97,8 @@ def format_html_join(sep, format_string, args_generator):
 
     """
     return mark_safe(conditional_escape(sep).join(
-            format_html(format_string, *tuple(args))
-            for args in args_generator))
+        format_html(format_string, *tuple(args))
+        for args in args_generator))
 
 
 def linebreaks(value, autoescape=False):

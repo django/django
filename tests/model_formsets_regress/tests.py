@@ -369,25 +369,25 @@ class FormfieldShouldDeleteFormTests(TestCase):
     DeleteFormset = modelformset_factory(User, form=CustomDeleteUserForm, formset=BaseCustomDeleteModelFormSet)
 
     data = {
-            'form-TOTAL_FORMS': '4',
-            'form-INITIAL_FORMS': '0',
-            'form-MAX_NUM_FORMS': '4',
-            'form-0-username': 'John',
-            'form-0-serial': '1',
-            'form-1-username': 'Paul',
-            'form-1-serial': '2',
-            'form-2-username': 'George',
-            'form-2-serial': '3',
-            'form-3-username': 'Ringo',
-            'form-3-serial': '5',
-            }
+        'form-TOTAL_FORMS': '4',
+        'form-INITIAL_FORMS': '0',
+        'form-MAX_NUM_FORMS': '4',
+        'form-0-username': 'John',
+        'form-0-serial': '1',
+        'form-1-username': 'Paul',
+        'form-1-serial': '2',
+        'form-2-username': 'George',
+        'form-2-serial': '3',
+        'form-3-username': 'Ringo',
+        'form-3-serial': '5',
+    }
 
     delete_all_ids = {
-            'form-0-DELETE': '1',
-            'form-1-DELETE': '1',
-            'form-2-DELETE': '1',
-            'form-3-DELETE': '1',
-            }
+        'form-0-DELETE': '1',
+        'form-1-DELETE': '1',
+        'form-2-DELETE': '1',
+        'form-3-DELETE': '1',
+    }
 
     def test_init_database(self):
         """ Add test data to database via formset """

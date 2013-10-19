@@ -164,8 +164,7 @@ def result_headers(cl):
             "url_primary": cl.get_query_string({ORDER_VAR: '.'.join(o_list_primary)}),
             "url_remove": cl.get_query_string({ORDER_VAR: '.'.join(o_list_remove)}),
             "url_toggle": cl.get_query_string({ORDER_VAR: '.'.join(o_list_toggle)}),
-            "class_attrib": format_html(' class="{0}"', ' '.join(th_classes))
-                            if th_classes else '',
+            "class_attrib": format_html(' class="{0}"', ' '.join(th_classes)) if th_classes else '',
         }
 
 def _boolean_icon(field_val):
@@ -246,8 +245,7 @@ def items_for_result(cl, result, form):
                 link_or_text = format_html(
                     '<a href="{0}"{1}>{2}</a>',
                     url,
-                    format_html(' onclick="opener.dismissRelatedLookupPopup(window, &#39;{0}&#39;); return false;"', result_id)
-                        if cl.is_popup else '',
+                    format_html(' onclick="opener.dismissRelatedLookupPopup(window, &#39;{0}&#39;); return false;"', result_id) if cl.is_popup else '',
                     result_repr)
 
             yield format_html('<{0}{1}>{2}</{3}>',
@@ -261,7 +259,7 @@ def items_for_result(cl, result, form):
             # can provide fields on a per request basis
             if (form and field_name in form.fields and not (
                     field_name == cl.model._meta.pk.name and
-                        form[cl.model._meta.pk.name].is_hidden)):
+                    form[cl.model._meta.pk.name].is_hidden)):
                 bf = form[field_name]
                 result_repr = mark_safe(force_text(bf.errors) + force_text(bf))
             yield format_html('<td{0}>{1}</td>', row_class, result_repr)

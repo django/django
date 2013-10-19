@@ -605,8 +605,7 @@ class ModelTest(TestCase):
         )
 
         dicts = Article.objects.filter(
-            pub_date__year=2008).extra(
-                select={'dashed-value': '1'}
+            pub_date__year=2008).extra(select={'dashed-value': '1'}
         ).values('headline', 'dashed-value')
         self.assertEqual([sorted(d.items()) for d in dicts],
             [[('dashed-value', 1), ('headline', 'Article 11')], [('dashed-value', 1), ('headline', 'Article 12')]])
@@ -629,8 +628,7 @@ class ModelTest(TestCase):
         )
 
         articles = Article.objects.filter(
-            pub_date__year=2008).extra(
-                select={'dashed-value': '1', 'undashedvalue': '2'})
+            pub_date__year=2008).extra(select={'dashed-value': '1', 'undashedvalue': '2'})
         self.assertEqual(articles[0].undashedvalue, 2)
 
     def test_create_relation_with_ugettext_lazy(self):

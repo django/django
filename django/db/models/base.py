@@ -107,16 +107,20 @@ class ModelBase(type):
 
         new_class.add_to_class('_meta', Options(meta, **kwargs))
         if not abstract:
-            new_class.add_to_class('DoesNotExist', subclass_exception(str('DoesNotExist'),
-                    tuple(x.DoesNotExist
-                          for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
-                    or (ObjectDoesNotExist,),
-                    module, attached_to=new_class))
-            new_class.add_to_class('MultipleObjectsReturned', subclass_exception(str('MultipleObjectsReturned'),
-                    tuple(x.MultipleObjectsReturned
-                          for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
-                    or (MultipleObjectsReturned,),
-                    module, attached_to=new_class))
+            new_class.add_to_class(
+                'DoesNotExist',
+                subclass_exception(
+                    str('DoesNotExist'),
+                    tuple(x.DoesNotExist for x in parents if hasattr(x, '_meta') and not x._meta.abstract) or (ObjectDoesNotExist,),
+                    module,
+                    attached_to=new_class))
+            new_class.add_to_class(
+                'MultipleObjectsReturned',
+                subclass_exception(
+                    str('MultipleObjectsReturned'),
+                    tuple(x.MultipleObjectsReturned for x in parents if hasattr(x, '_meta') and not x._meta.abstract) or (MultipleObjectsReturned,),
+                    module,
+                    attached_to=new_class))
             if base_meta and not base_meta.abstract:
                 # Non-abstract child classes inherit some attributes from their
                 # non-abstract parent (unless an ABC comes before it in the
@@ -565,9 +569,9 @@ class Model(six.with_metaclass(ModelBase)):
                     field_names.add(field.attname)
             deferred_fields = [
                 f.attname for f in self._meta.fields
-                if f.attname not in self.__dict__
-                    and isinstance(self.__class__.__dict__[f.attname],
-                                   DeferredAttribute)]
+                if (f.attname not in self.__dict__ and
+                    isinstance(self.__class__.__dict__[f.attname], DeferredAttribute))
+            ]
 
             loaded_fields = field_names.difference(deferred_fields)
             if loaded_fields:

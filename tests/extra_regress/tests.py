@@ -13,9 +13,9 @@ class ExtraRegressTests(TestCase):
 
     def setUp(self):
         self.u = User.objects.create_user(
-                    username="fred",
-                    password="secret",
-                    email="fred@example.com"
+            username="fred",
+            password="secret",
+            email="fred@example.com"
         )
 
     def test_regression_7314_7372(self):
@@ -41,9 +41,9 @@ class ExtraRegressTests(TestCase):
 
         # Queryset to match most recent revision:
         qs = RevisionableModel.objects.extra(
-                where=["%(table)s.id IN (SELECT MAX(rev.id) FROM %(table)s rev GROUP BY rev.base_id)" % {
-                    'table': RevisionableModel._meta.db_table,
-                }]
+            where=["%(table)s.id IN (SELECT MAX(rev.id) FROM %(table)s rev GROUP BY rev.base_id)" % {
+                'table': RevisionableModel._meta.db_table,
+            }]
         )
 
         self.assertQuerysetEqual(qs,
@@ -74,8 +74,8 @@ class ExtraRegressTests(TestCase):
         # select portions. Applies when portions are updated or otherwise
         # moved around.
         qs = User.objects.extra(
-                    select=OrderedDict((("alpha", "%s"), ("beta", "2"),  ("gamma", "%s"))),
-                    select_params=(1, 3)
+            select=OrderedDict((("alpha", "%s"), ("beta", "2"),  ("gamma", "%s"))),
+            select_params=(1, 3)
         )
         qs = qs.extra(select={"beta": 4})
         qs = qs.extra(select={"alpha": "%s"}, select_params=[5])
@@ -129,11 +129,11 @@ class ExtraRegressTests(TestCase):
         should still be present because of the extra() call.
         """
         self.assertQuerysetEqual(
-                Order.objects.extra(where=["username=%s"],
-                                    params=["fred"],
-                                    tables=["auth_user"]
-                            ).order_by('created_by'),
-                []
+            Order.objects.extra(where=["username=%s"],
+                                params=["fred"],
+                                tables=["auth_user"]
+            ).order_by('created_by'),
+            []
         )
 
     def test_regression_8819(self):
@@ -294,7 +294,7 @@ class ExtraRegressTests(TestCase):
 
         self.assertQuerysetEqual(
             TestObject.objects.filter(
-                    pk__in=TestObject.objects.extra(select={'extra': 1}).values('pk')
+                pk__in=TestObject.objects.extra(select={'extra': 1}).values('pk')
             ),
             ['<TestObject: TestObject: first,second,third>']
         )
@@ -312,8 +312,7 @@ class ExtraRegressTests(TestCase):
         )
 
         self.assertQuerysetEqual(
-            TestObject.objects.filter(pk=obj.pk) |
-                TestObject.objects.extra(where=["id > %s"], params=[obj.pk]),
+            TestObject.objects.filter(pk=obj.pk) | TestObject.objects.extra(where=["id > %s"], params=[obj.pk]),
             ['<TestObject: TestObject: first,second,third>']
         )
 

@@ -177,7 +177,7 @@ class Deserializer(base.Deserializer):
         data = {}
         if node.hasAttribute('pk'):
             data[Model._meta.pk.attname] = Model._meta.pk.to_python(
-                                                    node.getAttribute('pk'))
+                node.getAttribute('pk'))
 
         # Also start building a dict of m2m data (this is saved as
         # {m2m_accessor_attribute : [list_of_related_objects]})
@@ -272,15 +272,15 @@ class Deserializer(base.Deserializer):
         if not model_identifier:
             raise base.DeserializationError(
                 "<%s> node is missing the required '%s' attribute"
-                    % (node.nodeName, attr))
+                % (node.nodeName, attr))
         try:
             Model = models.get_model(*model_identifier.split("."))
         except TypeError:
             Model = None
         if Model is None:
             raise base.DeserializationError(
-                "<%s> node has invalid model identifier: '%s'" %
-                    (node.nodeName, model_identifier))
+                "<%s> node has invalid model identifier: '%s'"
+                % (node.nodeName, model_identifier))
         return Model
 
 

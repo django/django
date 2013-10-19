@@ -133,11 +133,12 @@ class GEOSMutationTest(unittest.TestCase):
 
             # _set_list
             pg._set_list(2, (((1,2),(10,0),(12,9),(-1,15),(1,2)),
-                            ((4,2),(5,2),(5,3),(4,2))))
-            self.assertEqual(pg.coords,
-                    (((1.0,2.0),(10.0,0.0),(12.0,9.0),(-1.0,15.0),(1.0,2.0)),
-                        ((4.0,2.0),(5.0,2.0),(5.0,3.0),(4.0,2.0))),
-                    'Polygon _set_list')
+                             ((4,2),(5,2),(5,3),(4,2))))
+            self.assertEqual(
+                pg.coords,
+                (((1.0,2.0),(10.0,0.0),(12.0,9.0),(-1.0,15.0),(1.0,2.0)),
+                 ((4.0,2.0),(5.0,2.0),(5.0,3.0),(4.0,2.0))),
+                'Polygon _set_list')
 
             lsa = Polygon(*pg.coords)
             for f in geos_function_tests:

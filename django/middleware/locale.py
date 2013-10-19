@@ -38,7 +38,7 @@ class LocaleMiddleware(object):
     def process_response(self, request, response):
         language = translation.get_language()
         language_from_path = translation.get_language_from_path(
-                request.path_info, supported=self._supported_languages
+            request.path_info, supported=self._supported_languages
         )
         if (response.status_code == 404 and not language_from_path
                 and self.is_language_prefix_patterns_used()):

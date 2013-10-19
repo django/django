@@ -111,7 +111,7 @@ class CachedLoader(unittest.TestCase):
         self.old_TEMPLATE_LOADERS = settings.TEMPLATE_LOADERS
         settings.TEMPLATE_LOADERS = (
             ('django.template.loaders.cached.Loader', (
-                    'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.filesystem.Loader',
             )
             ),
         )

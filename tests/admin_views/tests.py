@@ -425,12 +425,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                 test=lambda obj, value: obj.chap.book.name == value),
             'chap__book__promo__id__exact': dict(
                 values=[p.id for p in Promo.objects.all()],
-                test=lambda obj, value:
-                    obj.chap.book.promo_set.filter(id=value).exists()),
+                test=lambda obj, value: obj.chap.book.promo_set.filter(id=value).exists()),
             'chap__book__promo__name': dict(
                 values=[p.name for p in Promo.objects.all()],
-                test=lambda obj, value:
-                    obj.chap.book.promo_set.filter(name=value).exists()),
+                test=lambda obj, value: obj.chap.book.promo_set.filter(name=value).exists()),
         }
         for filter_path, params in filters.items():
             for value in params['values']:
@@ -1253,9 +1251,9 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/customarticle/%d/delete/' % article_pk)
         self.assertTemplateUsed(response, 'custom_admin/delete_confirmation.html')
         response = self.client.post('/test_admin/admin/admin_views/customarticle/', data={
-                'index': 0,
-                'action': ['delete_selected'],
-                '_selected_action': ['1'],
+            'index': 0,
+            'action': ['delete_selected'],
+            '_selected_action': ['1'],
         })
         self.assertTemplateUsed(response, 'custom_admin/delete_selected_confirmation.html')
         response = self.client.get('/test_admin/admin/admin_views/customarticle/%d/history/' % article_pk)

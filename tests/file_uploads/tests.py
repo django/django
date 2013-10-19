@@ -377,8 +377,7 @@ class FileUploadTests(TestCase):
         vars = {'boundary': 'oUrBoUnDaRyStRiNg'}
         post_data = [
             '--%(boundary)s',
-            'Content-Disposition: form-data; name="file_field"; '
-                'filename="MiXeD_cAsE.txt"',
+            'Content-Disposition: form-data; name="file_field"; filename="MiXeD_cAsE.txt"',
             'Content-Type: application/octet-stream',
             '',
             'file contents\n'

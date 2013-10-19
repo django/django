@@ -540,7 +540,7 @@ class Queries1Tests(BaseQuerysetTest):
             ['<Author: a1>']
         )
         self.assertQuerysetEqual(
-                Author.objects.filter(Q(extra__note=self.n1)|Q(item__note=self.n3)).filter(id=self.a1.id),
+            Author.objects.filter(Q(extra__note=self.n1)|Q(item__note=self.n3)).filter(id=self.a1.id),
             ['<Author: a1>']
         )
 

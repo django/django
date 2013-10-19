@@ -177,9 +177,10 @@ class PasswordResetTest(AuthViewsTestCase):
         # HTTP_HOST header isn't poisoned. This is done as a check when get_host()
         # is invoked, but we check here as a practical consequence.
         with patch_logger('django.security.DisallowedHost', 'error') as logger_calls:
-            response = self.client.post('/password_reset/',
-                    {'email': 'staffmember@example.com'},
-                    HTTP_HOST='www.example:dr.frankenstein@evil.tld'
+            response = self.client.post(
+                '/password_reset/',
+                {'email': 'staffmember@example.com'},
+                HTTP_HOST='www.example:dr.frankenstein@evil.tld'
             )
             self.assertEqual(response.status_code, 400)
             self.assertEqual(len(mail.outbox), 0)
@@ -190,9 +191,10 @@ class PasswordResetTest(AuthViewsTestCase):
     def test_poisoned_http_host_admin_site(self):
         "Poisoned HTTP_HOST headers can't be used for reset emails on admin views"
         with patch_logger('django.security.DisallowedHost', 'error') as logger_calls:
-            response = self.client.post('/admin_password_reset/',
-                    {'email': 'staffmember@example.com'},
-                    HTTP_HOST='www.example:dr.frankenstein@evil.tld'
+            response = self.client.post(
+                '/admin_password_reset/',
+                {'email': 'staffmember@example.com'},
+                HTTP_HOST='www.example:dr.frankenstein@evil.tld'
             )
             self.assertEqual(response.status_code, 400)
             self.assertEqual(len(mail.outbox), 0)
@@ -356,7 +358,7 @@ class ChangePasswordTest(AuthViewsTestCase):
             'password': password,
         })
         self.assertFormError(response, AuthenticationForm.error_messages['invalid_login'] % {
-                'username': User._meta.get_field('username').verbose_name
+            'username': User._meta.get_field('username').verbose_name
         })
 
     def logout(self):
@@ -490,8 +492,8 @@ class LoginTest(AuthViewsTestCase):
                 'good_url': urlquote(good_url),
             }
             response = self.client.post(safe_url, {
-                    'username': 'testclient',
-                    'password': password,
+                'username': 'testclient',
+                'password': password,
             })
             self.assertEqual(response.status_code, 302)
             self.assertTrue(good_url in response.url,
