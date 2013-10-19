@@ -234,6 +234,15 @@ Minor features
   allowing the ``published`` element to be included in the feed (which
   relies on ``pubdate``).
 
+:mod:`django.contrib.staticfiles.storage`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The :class:`~django.contrib.staticfiles.storage.StaticFilesStorage` can be
+  subclassed to override the permission from
+  :setting:`FILE_UPLOAD_PERMISSIONS` by setting `file_permissions_mode` class
+  attribute to the desired permission then use this class in
+  :setting:`STATICFILES_STORAGE`.
+
 Email
 ^^^^^
 

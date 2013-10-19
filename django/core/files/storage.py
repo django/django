@@ -171,7 +171,7 @@ class FileSystemStorage(Storage):
             try:
                 if settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS is not None:
                     # os.makedirs applies the global umask, so we reset it,
-                    # for consistency with FILE_UPLOAD_PERMISSIONS behavior.
+                    # for consistency with file_permissions_mode behavior.
                     old_umask = os.umask(0)
                     try:
                         os.makedirs(directory, settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS)
@@ -232,8 +232,14 @@ class FileSystemStorage(Storage):
                 # OK, the file save worked. Break out of the loop.
                 break
 
-        if settings.FILE_UPLOAD_PERMISSIONS is not None:
-            os.chmod(full_path, settings.FILE_UPLOAD_PERMISSIONS)
+        if self.__class__ is not FileSystemStorage and \
+                'file_permissions_mode' in self.__class__.__dict__:
+            mode = self.__class__.__dict__['file_permissions_mode']
+        else:
+            mode = settings.FILE_UPLOAD_PERMISSIONS
+
+        if mode is not None:
+            os.chmod(full_path, mode)
 
         return name
 

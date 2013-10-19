@@ -1153,6 +1153,13 @@ dependent behavior. On most platforms, temporary files will have a mode
 of ``0600``, and files saved from memory will be saved using the
 system's standard umask.
 
+This setting also determines the permission for collected static files by
+:djadmin:`collectstatic` management command. But the permission can be
+overriden by subclassing the
+:class:`~django.contrib.staticfiles.storage.StaticFilesStorage`, setting
+the class attribute `file_permissions_mode` to the different permission, and
+setting :setting:`STATICFILES_STORAGE` to this subclass.
+
 .. warning::
 
     **Always prefix the mode with a 0.**

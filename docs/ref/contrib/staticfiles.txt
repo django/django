@@ -61,6 +61,25 @@ receives all command line options of :djadmin:`collectstatic`. This is used
 by the :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
 by default.
 
+Files will receive permission from :setting:`FILE_UPLOAD_PERMISSIONS`. In case
+you want to differentiate permission for collecting static files from the
+permission for uploading files, you can subclass
+:class:`~django.contrib.staticfiles.storage.StaticFilesStorage` and set
+the class attribute `file_permissions_mode` to the desired permission. For
+example:
+
+    .. code-block:: css+django
+
+        class CustomStaticFilesStorage(storage.StaticFilesStorage):
+            file_permissions_mode = 0o600
+
+Then set :setting:`STATICFILES_STORAGE` to :class:`CustomStaticFilesStorage`.
+
+.. versionadded:: 1.7
+
+    `file_permissions_mode` is new in Django 1.7. Previously the files
+    permission is hardcoded to :setting:`FILE_UPLOAD_PERMISSIONS`.
+
 Some commonly used options are:
 
 .. django-admin-option:: --noinput
