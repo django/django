@@ -423,6 +423,14 @@ Atom1Feed
 .. module:: django.utils.functional
     :synopsis: Functional programming tools.
 
+It is important to note that these tools were by and large created to provide
+some useful utilities for use within the codebase of Django itself. In some
+cases they have been created for one particular use-case only, so even if they
+may be applied more generally, don't assume that they are necessarily the best
+way to meet the needs of your own application. They exist chiefly to serve the
+needs of Django internals. Other Python libraries may exist that provide the
+same functionality more robustly.
+
 Classes
 -------
 
