@@ -436,6 +436,7 @@ class PasswordResetFormTest(TestCase):
         user.save()
         form = PasswordResetForm({'email': email})
         self.assertTrue(form.is_valid())
+        form.save()
         self.assertEqual(len(mail.outbox), 0)
 
     def test_unusable_password(self):
