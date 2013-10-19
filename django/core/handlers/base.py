@@ -153,8 +153,6 @@ class BaseHandler(object):
                     # Just in case another exception is thrown later.
                     response = self.handle_uncaught_exception(request, resolver,
                         sys.exc_info())
-                    self.handle_got_request_exception_signal(
-                        sender=self.__class__, request=request)
 
         except PermissionDenied:
             logger.warning(
@@ -172,8 +170,6 @@ class BaseHandler(object):
                 # Just in case another exception is thrown later.
                 response = self.handle_uncaught_exception(request, resolver,
                     sys.exc_info())
-                self.handle_got_request_exception_signal(sender=self.__class__,
-                    request=request)
 
         except SuspiciousOperation as e:
             # The request logger receives events for any problematic request
@@ -191,8 +187,6 @@ class BaseHandler(object):
                 # Just in case another exception is thrown later.
                 response = self.handle_uncaught_exception(request, resolver,
                     sys.exc_info())
-                self.handle_got_request_exception_signal(sender=self.__class__,
-                    request=request)
 
         except SystemExit:
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701
@@ -204,34 +198,17 @@ class BaseHandler(object):
             # Just in case another exception is thrown later.
             response = self.handle_uncaught_exception(request, resolver,
                 sys.exc_info())
-            self.handle_got_request_exception_signal(sender=self.__class__,
-                request=request)
+
         try:
             # Apply response middleware, regardless of the response
             for middleware_method in self._response_middleware:
                 response = middleware_method(request, response)
             response = self.apply_response_fixes(request, response)
         except: # Any exception should be gathered and handled
-            signals.got_request_exception.send(sender=self.__class__,
-                request=request)
             response = self.handle_uncaught_exception(request, resolver,
                 sys.exc_info())
-        return response
 
-    def handle_got_request_exception_signal(self, sender, request):
-        signal_responses = signals.got_request_exception.send_robust(
-            sender=sender, request=request)
-        for signal_response in signal_responses:
-            if isinstance(signal_response[1], Exception):                
-                logger.error('Request Signal Handler Error: %s', request.path,
-                    #TODO: should we add the exc_info of the original error here?
-                    exc_info='',  
-                    extra={
-                        'status_code': 500,
-                        'request': request,
-                        'error': signal_response[1]
-                    }
-                )        
+        return response
 
     def handle_uncaught_exception(self, request, resolver, exc_info):
         """
@@ -243,9 +220,19 @@ class BaseHandler(object):
         caused by anything, so assuming something like the database is always
         available would be an error.
         """
+
+        # First trigger the got_request_exception Signal to make sure that
+        # all handlers are executed; collect the responses to check for 
+        # errors later on.
+        signal_responses = signals.got_request_exception.send_robust(
+            sender=self.__class__, request=request)
+
+        # After all handlers have been executed, check DEBUG_PROPAGATE_EXCEPTIONS
         if settings.DEBUG_PROPAGATE_EXCEPTIONS:
             raise
 
+        # Log the "inital" error, which was basically the root cause and 
+        # which is the most valuable resource for debugging.
         logger.error('Internal Server Error: %s', request.path,
             exc_info=exc_info,
             extra={
@@ -254,15 +241,46 @@ class BaseHandler(object):
             }
         )
 
+        # Check whether the handlers executed as expected or if the handlers 
+        # itself raised further exceptions
+        for signal_response in signal_responses:
+            if isinstance(signal_response[1], Exception):                
+                logger.error('Got Request Exception Handler Error: %s', request.path,
+                    #TODO: should we add the exc_info of the original error here?
+                    exc_info='',  
+                    extra={
+                        'status_code': 500,
+                        'request': request,
+                        'error': signal_response[1]
+                    }
+                )  
+
+        # After everything is logged, check if we are in DEBUG mode
         if settings.DEBUG:
             return debug.technical_500_response(request, *exc_info)
 
         # If Http500 handler is not installed, re-raise last exception
         if resolver.urlconf_module is None:
             six.reraise(*exc_info)
+
         # Return an HttpResponse that displays a friendly error message.
-        callback, param_dict = resolver.resolve500()
-        return callback(request, **param_dict)
+        try:
+            callback, param_dict = resolver.resolve500()
+            return callback(request, **param_dict)
+        except:
+            # Last Resort: and just in the highly unlikely case that somehting
+            # has gone wrong here, we return a minimal error message to the
+            # user and log the issue.
+
+            logger.error('500 Resolve Error: %s', request.path,
+                exc_info=sys.exc_info(),
+                extra={
+                    'status_code': 500,
+                    'request': request
+                }
+            )
+            return http.HttpResponseServerError('<h1>Server Error (500)</h1>', 
+                content_type='text/html')            
 
     def apply_response_fixes(self, request, response):
         """

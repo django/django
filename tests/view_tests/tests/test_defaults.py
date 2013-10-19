@@ -92,7 +92,7 @@ class DefaultsTests(TestCase):
                         raise
                 self.assertEqual(len(calls), 2)
                 self.assertEqual(calls[0][0], 'Internal Server Error: %s')
-                self.assertTrue(calls[1][0], 'Request Signal Handler Error: %s')
+                self.assertTrue(calls[1][0], 'Got Request Exception Handler Error: %s')
         finally:
             got_request_exception.disconnect(handler)
 
