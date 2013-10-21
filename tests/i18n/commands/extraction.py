@@ -342,6 +342,7 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
     PO_FILE_ES = 'locale/es/LC_MESSAGES/django.po'
 
     def tearDown(self):
+        super(CopyPluralFormsExtractorTests, self).tearDown()
         os.chdir(self.test_dir)
         try:
             self._rmrf('locale/es')
