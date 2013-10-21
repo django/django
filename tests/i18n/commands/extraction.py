@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+import io
 import os
 import re
 import shutil
@@ -65,8 +66,8 @@ class BasicExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        with open(self.PO_FILE, 'r') as fp:
-            po_contents = force_text(fp.read())
+        with io.open(self.PO_FILE, 'r', encoding='utf-8') as fp:
+            po_contents = fp.read()
             self.assertTrue('#. Translators: This comment should be extracted' in po_contents)
             self.assertTrue('This comment should not be extracted' not in po_contents)
             # Comments in templates
@@ -363,8 +364,8 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale='es', extensions=['djtpl'], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE_ES))
-        with open(self.PO_FILE_ES, 'r') as fp:
-            po_contents = force_text(fp.read())
+        with io.open(self.PO_FILE_ES, 'r', encoding='utf-8') as fp:
+            po_contents = fp.read()
             found = re.findall(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', po_contents, re.MULTILINE | re.DOTALL)
             self.assertEqual(1, len(found))
 
