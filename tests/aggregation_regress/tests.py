@@ -1062,7 +1062,7 @@ class AggregationTests(TestCase):
             pk__in=Author.objects.annotate(book_cnt=Count('book')).filter(book_cnt=2)
         ).order_by('name')
         expected_results = [a.name for a in expected_results]
-        qs = Author.objects.annotate(book_cnt=Count('book')).exclude(Q(book_cnt=2)|Q(book_cnt=2)).order_by('name')
+        qs = Author.objects.annotate(book_cnt=Count('book')).exclude(Q(book_cnt=2) | Q(book_cnt=2)).order_by('name')
         self.assertQuerysetEqual(
             qs,
             expected_results,
@@ -1071,7 +1071,7 @@ class AggregationTests(TestCase):
 
     def test_name_filters(self):
         qs = Author.objects.annotate(Count('book')).filter(
-            Q(book__count__exact=2)|Q(name='Adrian Holovaty')
+            Q(book__count__exact=2) | Q(name='Adrian Holovaty')
         ).order_by('name')
         self.assertQuerysetEqual(
             qs,
@@ -1084,7 +1084,7 @@ class AggregationTests(TestCase):
         # Note that Adrian's age is 34 in the fixtures, and he has one book
         # so both conditions match one author.
         qs = Author.objects.annotate(Count('book')).filter(
-            Q(name='Peter Norvig')|Q(age=F('book__count') + 33)
+            Q(name='Peter Norvig') | Q(age=F('book__count') + 33)
         ).order_by('name')
         self.assertQuerysetEqual(
             qs,

@@ -134,7 +134,7 @@ class Queries1Tests(BaseQuerysetTest):
             ['<Item: one>']
         )
         self.assertQuerysetEqual(
-            Item.objects.filter(Q(tags=self.t1)).filter(Q(creator__name='fred')|Q(tags=self.t2)),
+            Item.objects.filter(Q(tags=self.t1)).filter(Q(creator__name='fred') | Q(tags=self.t2)),
             ['<Item: one>']
         )
 
@@ -146,7 +146,7 @@ class Queries1Tests(BaseQuerysetTest):
             []
         )
         self.assertQuerysetEqual(
-            Item.objects.filter(Q(tags=self.t1), Q(creator__name='fred')|Q(tags=self.t2)),
+            Item.objects.filter(Q(tags=self.t1), Q(creator__name='fred') | Q(tags=self.t2)),
             []
         )
 
@@ -203,7 +203,7 @@ class Queries1Tests(BaseQuerysetTest):
         # (which would match everything).
         self.assertQuerysetEqual(Author.objects.filter(Q(id__in=[])), [])
         self.assertQuerysetEqual(
-            Author.objects.filter(Q(id__in=[])|Q(id__in=[])),
+            Author.objects.filter(Q(id__in=[]) | Q(id__in=[])),
             []
         )
 
@@ -337,7 +337,7 @@ class Queries1Tests(BaseQuerysetTest):
         # values (Author -> ExtraInfo, in the following), it should never be
         # promoted to a left outer join. So the following query should only
         # involve one "left outer" join (Author -> Item is 0-to-many).
-        qs = Author.objects.filter(id=self.a1.id).filter(Q(extra__note=self.n1)|Q(item__note=self.n3))
+        qs = Author.objects.filter(id=self.a1.id).filter(Q(extra__note=self.n1) | Q(item__note=self.n3))
         self.assertEqual(
             len([x[2] for x in qs.query.alias_map.values() if x[2] == query.LOUTER and qs.query.alias_refcount[x[1]]]),
             1
@@ -474,7 +474,7 @@ class Queries1Tests(BaseQuerysetTest):
 
     def test_ticket3037(self):
         self.assertQuerysetEqual(
-            Item.objects.filter(Q(creator__name='a3', name='two')|Q(creator__name='a4', name='four')),
+            Item.objects.filter(Q(creator__name='a3', name='two') | Q(creator__name='a4', name='four')),
             ['<Item: four>']
         )
 
@@ -536,11 +536,11 @@ class Queries1Tests(BaseQuerysetTest):
         # Multiple filter statements are joined using "AND" all the time.
 
         self.assertQuerysetEqual(
-            Author.objects.filter(id=self.a1.id).filter(Q(extra__note=self.n1)|Q(item__note=self.n3)),
+            Author.objects.filter(id=self.a1.id).filter(Q(extra__note=self.n1) | Q(item__note=self.n3)),
             ['<Author: a1>']
         )
         self.assertQuerysetEqual(
-            Author.objects.filter(Q(extra__note=self.n1)|Q(item__note=self.n3)).filter(id=self.a1.id),
+            Author.objects.filter(Q(extra__note=self.n1) | Q(item__note=self.n3)).filter(id=self.a1.id),
             ['<Author: a1>']
         )
 
@@ -830,23 +830,23 @@ class Queries1Tests(BaseQuerysetTest):
         # Complex combinations of conjunctions, disjunctions and nullable
         # relations.
         self.assertQuerysetEqual(
-            Author.objects.filter(Q(item__note__extrainfo=self.e2)|Q(report=self.r1, name='xyz')),
+            Author.objects.filter(Q(item__note__extrainfo=self.e2) | Q(report=self.r1, name='xyz')),
             ['<Author: a2>']
         )
         self.assertQuerysetEqual(
-            Author.objects.filter(Q(report=self.r1, name='xyz')|Q(item__note__extrainfo=self.e2)),
+            Author.objects.filter(Q(report=self.r1, name='xyz') | Q(item__note__extrainfo=self.e2)),
             ['<Author: a2>']
         )
         self.assertQuerysetEqual(
-            Annotation.objects.filter(Q(tag__parent=self.t1)|Q(notes__note='n1', name='a1')),
+            Annotation.objects.filter(Q(tag__parent=self.t1) | Q(notes__note='n1', name='a1')),
             ['<Annotation: a1>']
         )
         xx = ExtraInfo.objects.create(info='xx', note=self.n3)
         self.assertQuerysetEqual(
-            Note.objects.filter(Q(extrainfo__author=self.a1)|Q(extrainfo=xx)),
+            Note.objects.filter(Q(extrainfo__author=self.a1) | Q(extrainfo=xx)),
             ['<Note: n1>', '<Note: n3>']
         )
-        q = Note.objects.filter(Q(extrainfo__author=self.a1)|Q(extrainfo=xx)).query
+        q = Note.objects.filter(Q(extrainfo__author=self.a1) | Q(extrainfo=xx)).query
         self.assertEqual(
             len([x[2] for x in q.alias_map.values() if x[2] == q.LOUTER and q.alias_refcount[x[1]]]),
             1
@@ -872,11 +872,11 @@ class Queries1Tests(BaseQuerysetTest):
             Item.objects.exclude(tags__name='t4'),
             [repr(i) for i in Item.objects.filter(~Q(tags__name='t4'))])
         self.assertQuerysetEqual(
-            Item.objects.exclude(Q(tags__name='t4')|Q(tags__name='t3')),
-            [repr(i) for i in Item.objects.filter(~(Q(tags__name='t4')|Q(tags__name='t3')))])
+            Item.objects.exclude(Q(tags__name='t4') | Q(tags__name='t3')),
+            [repr(i) for i in Item.objects.filter(~(Q(tags__name='t4') | Q(tags__name='t3')))])
         self.assertQuerysetEqual(
-            Item.objects.exclude(Q(tags__name='t4')|~Q(tags__name='t3')),
-            [repr(i) for i in Item.objects.filter(~(Q(tags__name='t4')|~Q(tags__name='t3')))])
+            Item.objects.exclude(Q(tags__name='t4') | ~Q(tags__name='t3')),
+            [repr(i) for i in Item.objects.filter(~(Q(tags__name='t4') | ~Q(tags__name='t3')))])
 
     def test_nested_exclude(self):
         self.assertQuerysetEqual(
@@ -1318,7 +1318,7 @@ class Queries4Tests(BaseQuerysetTest):
         Report.objects.create(name='r4', creator=self.a1)
         q1 = Author.objects.filter(report__name='r5')
         q2 = Author.objects.filter(report__name='r4').filter(report__name='r1')
-        combined = q1|q2
+        combined = q1 | q2
         self.assertEqual(str(combined.query).count('JOIN'), 2)
         self.assertEqual(len(combined), 1)
         self.assertEqual(combined[0].name, 'a1')
@@ -1606,11 +1606,11 @@ class Queries5Tests(TestCase):
             ['<Note: n1>', '<Note: n2>']
         )
         self.assertQuerysetEqual(
-            Note.objects.filter(~Q()|~Q()),
+            Note.objects.filter(~Q() | ~Q()),
             ['<Note: n1>', '<Note: n2>']
         )
         self.assertQuerysetEqual(
-            Note.objects.exclude(~Q()&~Q()),
+            Note.objects.exclude(~Q() & ~Q()),
             ['<Note: n1>', '<Note: n2>']
         )
 
@@ -1692,18 +1692,18 @@ class DisjunctiveFilterTests(TestCase):
         LeafA.objects.create(data='first')
         self.assertQuerysetEqual(LeafA.objects.all(), ['<LeafA: first>'])
         self.assertQuerysetEqual(
-            LeafA.objects.filter(Q(data='first')|Q(join__b__data='second')),
+            LeafA.objects.filter(Q(data='first') | Q(join__b__data='second')),
             ['<LeafA: first>']
         )
 
     def test_ticket8283(self):
         # Checking that applying filters after a disjunction works correctly.
         self.assertQuerysetEqual(
-            (ExtraInfo.objects.filter(note=self.n1)|ExtraInfo.objects.filter(info='e2')).filter(note=self.n1),
+            (ExtraInfo.objects.filter(note=self.n1) | ExtraInfo.objects.filter(info='e2')).filter(note=self.n1),
             ['<ExtraInfo: e1>']
         )
         self.assertQuerysetEqual(
-            (ExtraInfo.objects.filter(info='e2')|ExtraInfo.objects.filter(note=self.n1)).filter(note=self.n1),
+            (ExtraInfo.objects.filter(info='e2') | ExtraInfo.objects.filter(note=self.n1)).filter(note=self.n1),
             ['<ExtraInfo: e1>']
         )
 

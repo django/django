@@ -814,11 +814,11 @@ def filesizeformat(bytes):
 
     filesize_number_format = lambda value: formats.number_format(round(value, 1), 1)
 
-    KB = 1<<10
-    MB = 1<<20
-    GB = 1<<30
-    TB = 1<<40
-    PB = 1<<50
+    KB = 1 << 10
+    MB = 1 << 20
+    GB = 1 << 30
+    TB = 1 << 40
+    PB = 1 << 50
 
     if bytes < KB:
         value = ungettext("%(size)d byte", "%(size)d bytes", bytes) % {'size': bytes}

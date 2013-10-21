@@ -41,7 +41,7 @@ class Lexer(object):
                 groupid = "t%d" % tok.id
                 self.toks[groupid] = tok
                 parts.append("(?P<%s>%s)" % (groupid, tok.regex))
-            self.regexes[state] = re.compile("|".join(parts), re.MULTILINE|re.VERBOSE)
+            self.regexes[state] = re.compile("|".join(parts), re.MULTILINE | re.VERBOSE)
 
         self.state = first
 
