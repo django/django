@@ -101,13 +101,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def get_connection_params(self):
         settings_dict = self.settings_dict
-        if not settings_dict['NAME']:
+        # None may be used to connect to the default 'postgres' db
+        if settings_dict['NAME'] == '':
             from django.core.exceptions import ImproperlyConfigured
             raise ImproperlyConfigured(
                 "settings.DATABASES is improperly configured. "
                 "Please supply the NAME value.")
         conn_params = {
-            'database': settings_dict['NAME'],
+            'database': settings_dict['NAME'] or 'postgres',
         }
         conn_params.update(settings_dict['OPTIONS'])
         if 'autocommit' in conn_params:
