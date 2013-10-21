@@ -249,6 +249,15 @@ class ManagementUtility(object):
                 usage.append(style.NOTICE("[%s]" % app))
                 for name in sorted(commands_dict[app]):
                     usage.append("    %s" % name)
+            # Output an extra note if settings are not properly configured
+            try:
+                from django.conf import settings
+                settings.INSTALLED_APPS
+            except ImproperlyConfigured as e:
+                usage.append(style.NOTICE(
+                    "Note that only Django core commands are listed as settings "
+                    "are not properly configured (error: %s)." % e))
+
         return '\n'.join(usage)
 
     def fetch_command(self, subcommand):

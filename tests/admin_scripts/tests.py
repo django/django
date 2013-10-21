@@ -1055,6 +1055,17 @@ class ManageSettingsWithSettingsErrors(AdminScriptTestCase):
         self.assertNoOutput(out)
         self.assertOutput(err, "KeyError: 'blah'")
 
+    def test_help(self):
+        """
+        Test listing available commands output note when only core commands are
+        available.
+        """
+        self.write_settings('settings.py', sdict={'MEDIA_URL': '"/no_ending_slash"'})
+        args = ['help']
+        out, err = self.run_manage(args)
+        self.assertOutput(out, 'only Django core commands are listed')
+        self.assertNoOutput(err)
+
 
 class ManageValidate(AdminScriptTestCase):
     def tearDown(self):
