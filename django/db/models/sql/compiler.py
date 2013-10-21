@@ -575,7 +575,7 @@ class SQLCompiler(object):
                 for order, order_params in ordering_group_by:
                     # Even if we have seen the same SQL string, it might have
                     # different params, so, we add same SQL in "has params" case.
-                    if order not in seen or params:
+                    if order not in seen or order_params:
                         result.append(order)
                         params.extend(order_params)
                         seen.add(order)
