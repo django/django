@@ -350,7 +350,6 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
         except OSError:
             pass
         os.chdir(self._cwd)
-        super(CopyPluralFormsExtractorTests, self).tearDown()
 
     def test_copy_plural_forms(self):
         os.chdir(self.test_dir)
