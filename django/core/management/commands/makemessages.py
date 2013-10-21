@@ -11,7 +11,7 @@ import django
 from django.core.management.base import CommandError, NoArgsCommand
 from django.core.management.utils import (handle_extensions, find_command,
     popen_wrapper)
-from django.utils.encoding import smart_str
+from django.utils.encoding import force_str
 from django.utils.functional import total_ordering
 from django.utils.text import get_text_list
 from django.utils.jslex import prepare_js_for_gettext
@@ -407,7 +407,7 @@ class Command(NoArgsCommand):
                 with io.open(django_po, 'rU', encoding='utf-8') as fp:
                     m = plural_forms_re.search(fp.read())
                 if m:
-                    plural_form_line = smart_str(m.group('value'))
+                    plural_form_line = force_str(m.group('value'))
                     if self.verbosity > 1:
                         self.stdout.write("copying plural forms: %s\n" % plural_form_line)
                     lines = []
