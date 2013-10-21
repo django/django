@@ -65,15 +65,14 @@ Files will receive permission from :setting:`FILE_UPLOAD_PERMISSIONS`. In case
 you want to differentiate permission for collecting static files from the
 permission for uploading files, you can subclass
 :class:`~django.contrib.staticfiles.storage.StaticFilesStorage` and set
-the class attribute `file_permissions_mode` to the desired permission. For
-example:
+the class attribute `file_permissions_mode` to the desired permission.
 
-    .. code-block:: css+django
+For example::
 
-        class CustomStaticFilesStorage(storage.StaticFilesStorage):
-            file_permissions_mode = 0o600
+    class CustomStaticFilesStorage(storage.StaticFilesStorage):
+        file_permissions_mode = 0o600
 
-Then set :setting:`STATICFILES_STORAGE` to :class:`CustomStaticFilesStorage`.
+Then set :setting:`STATICFILES_STORAGE` to `CustomStaticFilesStorage`.
 
 .. versionadded:: 1.7
 

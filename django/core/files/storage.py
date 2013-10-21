@@ -171,7 +171,7 @@ class FileSystemStorage(Storage):
             try:
                 if settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS is not None:
                     # os.makedirs applies the global umask, so we reset it,
-                    # for consistency with file_permissions_mode behavior.
+                    # for consistency with FILE_UPLOAD_PERMISSIONS behavior.
                     old_umask = os.umask(0)
                     try:
                         os.makedirs(directory, settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS)
@@ -233,8 +233,8 @@ class FileSystemStorage(Storage):
                 break
 
         if self.__class__ is not FileSystemStorage and \
-                'file_permissions_mode' in self.__class__.__dict__:
-            mode = self.__class__.__dict__['file_permissions_mode']
+                hasattr(self, 'file_permissions_mode'):
+            mode = self.file_permissions_mode
         else:
             mode = settings.FILE_UPLOAD_PERMISSIONS
 
