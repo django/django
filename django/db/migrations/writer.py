@@ -146,6 +146,9 @@ class MigrationWriter(object):
         elif isinstance(value, models.Field):
             attr_name, path, args, kwargs = value.deconstruct()
             return cls.serialize_deconstructed(path, args, kwargs)
+        # Anything that knows how to deconstruct itself.
+        elif hasattr(value, 'deconstruct'):
+            return cls.serialize_deconstructed(*value.deconstruct())
         # Functions
         elif isinstance(value, (types.FunctionType, types.BuiltinFunctionType)):
             # @classmethod?
@@ -153,8 +156,6 @@ class MigrationWriter(object):
                 klass = value.__self__
                 module = klass.__module__
                 return "%s.%s.%s" % (module, klass.__name__, value.__name__), set(["import %s" % module])
-            elif hasattr(value, 'deconstruct'):
-                return cls.serialize_deconstructed(*value.deconstruct())
             elif value.__name__ == '<lambda>':
                 raise ValueError("Cannot serialize function: lambda")
             elif value.__module__ is None:
