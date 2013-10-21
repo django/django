@@ -6,11 +6,13 @@ import copy
 import datetime
 import os
 
+from django.core.validators import RegexValidator, EmailValidator
 from django.db import models, migrations
 from django.db.migrations.writer import MigrationWriter
 from django.db.models.loading import cache
 from django.test import TestCase, override_settings
 from django.utils import six
+from django.utils.deconstruct import deconstructible
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -77,6 +79,18 @@ class WriterTests(TestCase):
         self.assertSerializedEqual(datetime.datetime.today)
         self.assertSerializedEqual(datetime.date.today())
         self.assertSerializedEqual(datetime.date.today)
+        # Classes
+        validator = RegexValidator(message="hello")
+        string, imports = MigrationWriter.serialize(validator)
+        self.assertEqual(string, "django.core.validators.RegexValidator(message=%s)" % repr("hello"))
+        self.serialize_round_trip(validator)
+        validator = EmailValidator(message="hello")  # Test with a subclass.
+        string, imports = MigrationWriter.serialize(validator)
+        self.assertEqual(string, "django.core.validators.EmailValidator(message=%s)" % repr("hello"))
+        self.serialize_round_trip(validator)
+        validator = deconstructible(path="custom.EmailValidator")(EmailValidator)(message="hello")
+        string, imports = MigrationWriter.serialize(validator)
+        self.assertEqual(string, "custom.EmailValidator(message=%s)" % repr("hello"))
         # Django fields
         self.assertSerializedFieldEqual(models.CharField(max_length=255))
         self.assertSerializedFieldEqual(models.TextField(null=True, blank=True))
