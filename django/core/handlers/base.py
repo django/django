@@ -165,9 +165,9 @@ class BaseHandler(object):
                 response = callback(request, **param_dict)
             except:
                 signals.got_request_exception.send(
-                        sender=self.__class__, request=request)
+                    sender=self.__class__, request=request)
                 response = self.handle_uncaught_exception(request,
-                        resolver, sys.exc_info())
+                    resolver, sys.exc_info())
 
         except SuspiciousOperation as e:
             # The request logger receives events for any problematic request
@@ -181,9 +181,9 @@ class BaseHandler(object):
                 response = callback(request, **param_dict)
             except:
                 signals.got_request_exception.send(
-                        sender=self.__class__, request=request)
+                    sender=self.__class__, request=request)
                 response = self.handle_uncaught_exception(request,
-                        resolver, sys.exc_info())
+                    resolver, sys.exc_info())
 
         except SystemExit:
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701

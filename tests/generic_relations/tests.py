@@ -98,23 +98,23 @@ class GenericRelationsTests(TestCase):
         )
 
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-                ('clearish', Mineral, quartz.pk),
-                ('fatty', Animal, platypus.pk),
-                ('fatty', Vegetable, bacon.pk),
-                ('hairy', Animal, lion.pk),
-                ('salty', Vegetable, bacon.pk),
-                ('shiny', Animal, platypus.pk),
-                ('yellow', Animal, lion.pk)
+            ('clearish', Mineral, quartz.pk),
+            ('fatty', Animal, platypus.pk),
+            ('fatty', Vegetable, bacon.pk),
+            ('hairy', Animal, lion.pk),
+            ('salty', Vegetable, bacon.pk),
+            ('shiny', Animal, platypus.pk),
+            ('yellow', Animal, lion.pk)
         ],
             comp_func
         )
         lion.delete()
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-                ('clearish', Mineral, quartz.pk),
-                ('fatty', Animal, platypus.pk),
-                ('fatty', Vegetable, bacon.pk),
-                ('salty', Vegetable, bacon.pk),
-                ('shiny', Animal, platypus.pk)
+            ('clearish', Mineral, quartz.pk),
+            ('fatty', Animal, platypus.pk),
+            ('fatty', Vegetable, bacon.pk),
+            ('salty', Vegetable, bacon.pk),
+            ('shiny', Animal, platypus.pk)
         ],
             comp_func
         )
@@ -124,11 +124,11 @@ class GenericRelationsTests(TestCase):
         quartz_pk = quartz.pk
         quartz.delete()
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-                ('clearish', Mineral, quartz_pk),
-                ('fatty', Animal, platypus.pk),
-                ('fatty', Vegetable, bacon.pk),
-                ('salty', Vegetable, bacon.pk),
-                ('shiny', Animal, platypus.pk)
+            ('clearish', Mineral, quartz_pk),
+            ('fatty', Animal, platypus.pk),
+            ('fatty', Vegetable, bacon.pk),
+            ('salty', Vegetable, bacon.pk),
+            ('shiny', Animal, platypus.pk)
         ],
             comp_func
         )
@@ -138,10 +138,10 @@ class GenericRelationsTests(TestCase):
         tag.delete()
         self.assertQuerysetEqual(bacon.tags.all(), ["<TaggedItem: salty>"])
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-                ('clearish', Mineral, quartz_pk),
-                ('fatty', Animal, platypus.pk),
-                ('salty', Vegetable, bacon.pk),
-                ('shiny', Animal, platypus.pk)
+            ('clearish', Mineral, quartz_pk),
+            ('fatty', Animal, platypus.pk),
+            ('salty', Vegetable, bacon.pk),
+            ('shiny', Animal, platypus.pk)
         ],
             comp_func
         )

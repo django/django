@@ -28,11 +28,11 @@ class NullQueriesTests(TestCase):
 
         # Excluding the previous result returns everything.
         self.assertQuerysetEqual(
-                Choice.objects.exclude(choice=None).order_by('id'),
-                [
-                    '<Choice: Choice: Because. in poll Q: Why? >',
-                    '<Choice: Choice: Why Not? in poll Q: Why? >'
-                ]
+            Choice.objects.exclude(choice=None).order_by('id'),
+            [
+                '<Choice: Choice: Because. in poll Q: Why? >',
+                '<Choice: Choice: Why Not? in poll Q: Why? >'
+            ]
         )
 
         # Valid query, but fails because foo isn't a keyword

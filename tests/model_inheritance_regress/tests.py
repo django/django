@@ -385,8 +385,8 @@ class ModelInheritanceTest(TestCase):
         # abstract models in the inheritance chain, for consistency with
         # verbose_name.
         self.assertEqual(
-                InternalCertificationAudit._meta.verbose_name_plural,
-                'Audits'
+            InternalCertificationAudit._meta.verbose_name_plural,
+            'Audits'
         )
 
     def test_inherited_nullable_exclude(self):

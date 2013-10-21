@@ -1138,14 +1138,14 @@ class GetCacheTests(unittest.TestCase):
 
 
 @override_settings(
-        CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
-        CACHE_MIDDLEWARE_SECONDS=1,
-        CACHES={
-            'default': {
-                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            },
+    CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
+    CACHE_MIDDLEWARE_SECONDS=1,
+    CACHES={
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         },
-        USE_I18N=False,
+    },
+    USE_I18N=False,
 )
 class CacheUtils(TestCase):
     """TestCase for django.utils.cache functions."""
@@ -1245,25 +1245,25 @@ class CacheUtils(TestCase):
 
 
 @override_settings(
-        CACHES={
-            'default': {
-                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-                'KEY_PREFIX': 'cacheprefix',
-            },
+    CACHES={
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'KEY_PREFIX': 'cacheprefix',
         },
+    },
 )
 class PrefixedCacheUtils(CacheUtils):
     pass
 
 
 @override_settings(
-        CACHE_MIDDLEWARE_SECONDS=60,
-        CACHE_MIDDLEWARE_KEY_PREFIX='test',
-        CACHES={
-            'default': {
-                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            },
+    CACHE_MIDDLEWARE_SECONDS=60,
+    CACHE_MIDDLEWARE_KEY_PREFIX='test',
+    CACHES={
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         },
+    },
 )
 class CacheHEADTest(TestCase):
 
@@ -1318,16 +1318,16 @@ class CacheHEADTest(TestCase):
 
 
 @override_settings(
-        CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
-        CACHES={
-            'default': {
-                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            },
+    CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
+    CACHES={
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         },
-        LANGUAGES=(
-            ('en', 'English'),
-            ('es', 'Spanish'),
-        ),
+    },
+    LANGUAGES=(
+        ('en', 'English'),
+        ('es', 'Spanish'),
+    ),
 )
 class CacheI18nTest(TestCase):
 
@@ -1496,10 +1496,10 @@ class CacheI18nTest(TestCase):
                     "Cache keys should include the time zone name when time zones are active")
 
     @override_settings(
-            CACHE_MIDDLEWARE_KEY_PREFIX="test",
-            CACHE_MIDDLEWARE_SECONDS=60,
-            USE_ETAGS=True,
-            USE_I18N=True,
+        CACHE_MIDDLEWARE_KEY_PREFIX="test",
+        CACHE_MIDDLEWARE_SECONDS=60,
+        USE_ETAGS=True,
+        USE_I18N=True,
     )
     def test_middleware(self):
         def set_cache(request, lang, msg):
@@ -1560,9 +1560,9 @@ class CacheI18nTest(TestCase):
         translation.deactivate()
 
     @override_settings(
-            CACHE_MIDDLEWARE_KEY_PREFIX="test",
-            CACHE_MIDDLEWARE_SECONDS=60,
-            USE_ETAGS=True,
+        CACHE_MIDDLEWARE_KEY_PREFIX="test",
+        CACHE_MIDDLEWARE_SECONDS=60,
+        USE_ETAGS=True,
     )
     def test_middleware_doesnt_cache_streaming_response(self):
         request = self._get_request()
@@ -1581,12 +1581,12 @@ class CacheI18nTest(TestCase):
         self.assertIsNone(get_cache_data)
 
 @override_settings(
-        CACHES={
-            'default': {
-                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-                'KEY_PREFIX': 'cacheprefix'
-            },
+    CACHES={
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'KEY_PREFIX': 'cacheprefix'
         },
+    },
 )
 class PrefixedCacheI18nTest(CacheI18nTest):
     pass
@@ -1597,20 +1597,20 @@ def hello_world_view(request, value):
 
 
 @override_settings(
-        CACHE_MIDDLEWARE_ALIAS='other',
-        CACHE_MIDDLEWARE_KEY_PREFIX='middlewareprefix',
-        CACHE_MIDDLEWARE_SECONDS=30,
-        CACHE_MIDDLEWARE_ANONYMOUS_ONLY=False,
-        CACHES={
-            'default': {
-                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            },
-            'other': {
-                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-                'LOCATION': 'other',
-                'TIMEOUT': '1',
-            },
+    CACHE_MIDDLEWARE_ALIAS='other',
+    CACHE_MIDDLEWARE_KEY_PREFIX='middlewareprefix',
+    CACHE_MIDDLEWARE_SECONDS=30,
+    CACHE_MIDDLEWARE_ANONYMOUS_ONLY=False,
+    CACHES={
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         },
+        'other': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'other',
+            'TIMEOUT': '1',
+        },
+    },
 )
 class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
 
@@ -1816,14 +1816,14 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
         self.assertEqual(response.content, b'Hello World 16')
 
 @override_settings(
-        CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
-        CACHE_MIDDLEWARE_SECONDS=1,
-        CACHES={
-            'default': {
-                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            },
+    CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
+    CACHE_MIDDLEWARE_SECONDS=1,
+    CACHES={
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         },
-        USE_I18N=False,
+    },
+    USE_I18N=False,
 )
 class TestWithTemplateResponse(TestCase):
     """

@@ -374,7 +374,7 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self._add_middleware(middleware)
         self._add_middleware(pre_middleware)
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [
-                "The view middleware_exceptions.views.null_view didn't return an HttpResponse object.",
+            "The view middleware_exceptions.views.null_view didn't return an HttpResponse object.",
         ],
             ValueError())
 
@@ -391,7 +391,7 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self._add_middleware(middleware)
         self._add_middleware(pre_middleware)
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [
-                "The view middleware_exceptions.views.null_view didn't return an HttpResponse object."
+            "The view middleware_exceptions.views.null_view didn't return an HttpResponse object."
         ],
             ValueError())
 
@@ -685,8 +685,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self._add_middleware(bad_middleware)
         self._add_middleware(pre_middleware)
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [
-                "The view middleware_exceptions.views.null_view didn't return an HttpResponse object.",
-                'Test Response Exception'
+            "The view middleware_exceptions.views.null_view didn't return an HttpResponse object.",
+            'Test Response Exception'
         ])
 
         # Check that the right middleware methods have been invoked
@@ -702,7 +702,7 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self._add_middleware(bad_middleware)
         self._add_middleware(pre_middleware)
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [
-                "The view middleware_exceptions.views.null_view didn't return an HttpResponse object."
+            "The view middleware_exceptions.views.null_view didn't return an HttpResponse object."
         ],
             ValueError())
 

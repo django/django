@@ -679,12 +679,12 @@ class UniqueTest(TestCase):
         isbn = '12345'
         DerivedBook.objects.create(title=title, author=self.writer, isbn=isbn)
         form = DerivedBookForm({
-                    'title': 'Other',
-                    'author': self.writer.pk,
-                    'isbn': '9876',
-                    'suffix1': '0',
-                    'suffix2': '0'
-                })
+            'title': 'Other',
+            'author': self.writer.pk,
+            'isbn': '9876',
+            'suffix1': '0',
+            'suffix2': '0'
+        })
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['__all__'],
@@ -953,12 +953,12 @@ class OldFormForXTests(TestCase):
         self.assertHTMLEqual(six.text_type(f), '''<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" /><br /><span class="helptext">Use both first and last names.</span></td></tr>''')
 
         art = Article(
-                    headline='Test article',
-                    slug='test-article',
-                    pub_date=datetime.date(1988, 1, 4),
-                    writer=w,
-                    article='Hello.'
-                )
+            headline='Test article',
+            slug='test-article',
+            pub_date=datetime.date(1988, 1, 4),
+            writer=w,
+            article='Hello.'
+        )
         art.save()
         art_id_1 = art.id
         self.assertEqual(art_id_1 is not None, True)
@@ -984,11 +984,11 @@ class OldFormForXTests(TestCase):
 <option value="3">Live</option>
 </select></li>''' % (w_woodward.pk, w_royko.pk, c1.pk, c2.pk, c3.pk))
         f = TestArticleForm({
-                'headline': 'Test headline',
-                'slug': 'test-headline',
-                'pub_date': '1984-02-06',
-                'writer': six.text_type(w_royko.pk),
-                'article': 'Hello.'
+            'headline': 'Test headline',
+            'slug': 'test-headline',
+            'pub_date': '1984-02-06',
+            'writer': six.text_type(w_royko.pk),
+            'article': 'Hello.'
         }, instance=art)
         self.assertEqual(f.errors, {})
         self.assertEqual(f.is_valid(), True)
@@ -999,9 +999,9 @@ class OldFormForXTests(TestCase):
         # You can create a form over a subset of the available fields
         # by specifying a 'fields' argument to form_for_instance.
         f = PartialArticleFormWithSlug({
-                'headline': 'New headline',
-                'slug': 'new-headline',
-                'pub_date': '1988-01-04'
+            'headline': 'New headline',
+            'slug': 'new-headline',
+            'pub_date': '1988-01-04'
         }, auto_id=False, instance=art)
         self.assertHTMLEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" value="new-headline" maxlength="50" /></li>
@@ -1040,11 +1040,11 @@ class OldFormForXTests(TestCase):
 
         # Initial values can be provided for model forms
         f = TestArticleForm(
-                auto_id=False,
-                initial={
-                    'headline': 'Your headline here',
-                    'categories': [str(c1.id), str(c2.id)]
-                })
+            auto_id=False,
+            initial={
+                'headline': 'Your headline here',
+                'categories': [str(c1.id), str(c2.id)]
+            })
         self.assertHTMLEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" value="Your headline here" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" maxlength="50" /></li>
 <li>Pub date: <input type="text" name="pub_date" /></li>
@@ -1067,12 +1067,12 @@ class OldFormForXTests(TestCase):
 </select></li>''' % (w_woodward.pk, w_royko.pk, c1.pk, c2.pk, c3.pk))
 
         f = TestArticleForm({
-                'headline': 'New headline',
-                'slug': 'new-headline',
-                'pub_date': '1988-01-04',
-                'writer': six.text_type(w_royko.pk),
-                'article': 'Hello.',
-                'categories': [six.text_type(c1.id), six.text_type(c2.id)]
+            'headline': 'New headline',
+            'slug': 'new-headline',
+            'pub_date': '1988-01-04',
+            'writer': six.text_type(w_royko.pk),
+            'article': 'Hello.',
+            'categories': [six.text_type(c1.id), six.text_type(c2.id)]
         }, instance=new_art)
         new_art = f.save()
         self.assertEqual(new_art.id == art_id_1, True)
@@ -1388,8 +1388,8 @@ class OldFormForXTests(TestCase):
         # Upload a file and ensure it all works as expected.
 
         f = TextFileForm(
-                data={'description': 'Assistance'},
-                files={'file': SimpleUploadedFile('test1.txt', b'hello world')})
+            data={'description': 'Assistance'},
+            files={'file': SimpleUploadedFile('test1.txt', b'hello world')})
         self.assertEqual(f.is_valid(), True)
         self.assertEqual(type(f.cleaned_data['file']), SimpleUploadedFile)
         instance = f.save()
@@ -1397,8 +1397,8 @@ class OldFormForXTests(TestCase):
 
         instance.file.delete()
         f = TextFileForm(
-                data={'description': 'Assistance'},
-                files={'file': SimpleUploadedFile('test1.txt', b'hello world')})
+            data={'description': 'Assistance'},
+            files={'file': SimpleUploadedFile('test1.txt', b'hello world')})
         self.assertEqual(f.is_valid(), True)
         self.assertEqual(type(f.cleaned_data['file']), SimpleUploadedFile)
         instance = f.save()
@@ -1406,16 +1406,16 @@ class OldFormForXTests(TestCase):
 
         # Check if the max_length attribute has been inherited from the model.
         f = TextFileForm(
-                data={'description': 'Assistance'},
-                files={'file': SimpleUploadedFile('test-maxlength.txt', b'hello world')})
+            data={'description': 'Assistance'},
+            files={'file': SimpleUploadedFile('test-maxlength.txt', b'hello world')})
         self.assertEqual(f.is_valid(), False)
 
         # Edit an instance that already has the file defined in the model. This will not
         # save the file again, but leave it exactly as it is.
 
         f = TextFileForm(
-                data={'description': 'Assistance'},
-                instance=instance)
+            data={'description': 'Assistance'},
+            instance=instance)
         self.assertEqual(f.is_valid(), True)
         self.assertEqual(f.cleaned_data['file'].name, 'tests/test1.txt')
         instance = f.save()
@@ -1427,8 +1427,8 @@ class OldFormForXTests(TestCase):
         # Override the file by uploading a new one.
 
         f = TextFileForm(
-                data={'description': 'Assistance'},
-                files={'file': SimpleUploadedFile('test2.txt', b'hello world')}, instance=instance)
+            data={'description': 'Assistance'},
+            files={'file': SimpleUploadedFile('test2.txt', b'hello world')}, instance=instance)
         self.assertEqual(f.is_valid(), True)
         instance = f.save()
         self.assertEqual(instance.file.name, 'tests/test2.txt')
@@ -1436,8 +1436,8 @@ class OldFormForXTests(TestCase):
         # Delete the current file since this is not done by Django.
         instance.file.delete()
         f = TextFileForm(
-                data={'description': 'Assistance'},
-                files={'file': SimpleUploadedFile('test2.txt', b'hello world')})
+            data={'description': 'Assistance'},
+            files={'file': SimpleUploadedFile('test2.txt', b'hello world')})
         self.assertEqual(f.is_valid(), True)
         instance = f.save()
         self.assertEqual(instance.file.name, 'tests/test2.txt')
@@ -1455,8 +1455,8 @@ class OldFormForXTests(TestCase):
         self.assertEqual(instance.file.name, '')
 
         f = TextFileForm(
-                data={'description': 'Assistance'},
-                files={'file': SimpleUploadedFile('test3.txt', b'hello world')}, instance=instance)
+            data={'description': 'Assistance'},
+            files={'file': SimpleUploadedFile('test3.txt', b'hello world')}, instance=instance)
         self.assertEqual(f.is_valid(), True)
         instance = f.save()
         self.assertEqual(instance.file.name, 'tests/test3.txt')
@@ -1464,8 +1464,8 @@ class OldFormForXTests(TestCase):
         # Instance can be edited w/out re-uploading the file and existing file should be preserved.
 
         f = TextFileForm(
-                data={'description': 'New Description'},
-                instance=instance)
+            data={'description': 'New Description'},
+            instance=instance)
         f.fields['file'].required = False
         self.assertEqual(f.is_valid(), True)
         instance = f.save()
@@ -1477,8 +1477,8 @@ class OldFormForXTests(TestCase):
         instance.delete()
 
         f = TextFileForm(
-                data={'description': 'Assistance'},
-                files={'file': SimpleUploadedFile('test3.txt', b'hello world')})
+            data={'description': 'Assistance'},
+            files={'file': SimpleUploadedFile('test3.txt', b'hello world')})
         self.assertEqual(f.is_valid(), True)
         instance = f.save()
         self.assertEqual(instance.file.name, 'tests/test3.txt')
@@ -1511,8 +1511,8 @@ class OldFormForXTests(TestCase):
             image_data2 = fp.read()
 
         f = ImageFileForm(
-                data={'description': 'An image'},
-                files={'image': SimpleUploadedFile('test.png', image_data)})
+            data={'description': 'An image'},
+            files={'image': SimpleUploadedFile('test.png', image_data)})
         self.assertEqual(f.is_valid(), True)
         self.assertEqual(type(f.cleaned_data['image']), SimpleUploadedFile)
         instance = f.save()
@@ -1524,8 +1524,8 @@ class OldFormForXTests(TestCase):
         # because the dimension fields are not null=True.
         instance.image.delete(save=False)
         f = ImageFileForm(
-                data={'description': 'An image'},
-                files={'image': SimpleUploadedFile('test.png', image_data)})
+            data={'description': 'An image'},
+            files={'image': SimpleUploadedFile('test.png', image_data)})
         self.assertEqual(f.is_valid(), True)
         self.assertEqual(type(f.cleaned_data['image']), SimpleUploadedFile)
         instance = f.save()
@@ -1550,8 +1550,8 @@ class OldFormForXTests(TestCase):
         # Override the file by uploading a new one.
 
         f = ImageFileForm(
-                data={'description': 'Changed it'},
-                files={'image': SimpleUploadedFile('test2.png', image_data2)}, instance=instance)
+            data={'description': 'Changed it'},
+            files={'image': SimpleUploadedFile('test2.png', image_data2)}, instance=instance)
         self.assertEqual(f.is_valid(), True)
         instance = f.save()
         self.assertEqual(instance.image.name, 'tests/test2.png')
@@ -1564,8 +1564,8 @@ class OldFormForXTests(TestCase):
         instance.delete()
 
         f = ImageFileForm(
-                data={'description': 'Changed it'},
-                files={'image': SimpleUploadedFile('test2.png', image_data2)})
+            data={'description': 'Changed it'},
+            files={'image': SimpleUploadedFile('test2.png', image_data2)})
         self.assertEqual(f.is_valid(), True)
         instance = f.save()
         self.assertEqual(instance.image.name, 'tests/test2.png')
@@ -1593,8 +1593,8 @@ class OldFormForXTests(TestCase):
         self.assertEqual(instance.height, None)
 
         f = OptionalImageFileForm(
-                data={'description': 'And a final one'},
-                files={'image': SimpleUploadedFile('test3.png', image_data)}, instance=instance)
+            data={'description': 'And a final one'},
+            files={'image': SimpleUploadedFile('test3.png', image_data)}, instance=instance)
         self.assertEqual(f.is_valid(), True)
         instance = f.save()
         self.assertEqual(instance.image.name, 'tests/test3.png')
@@ -1603,8 +1603,8 @@ class OldFormForXTests(TestCase):
 
         # Editing the instance without re-uploading the image should not affect the image or its width/height properties
         f = OptionalImageFileForm(
-                data={'description': 'New Description'},
-                instance=instance)
+            data={'description': 'New Description'},
+            instance=instance)
         self.assertEqual(f.is_valid(), True)
         instance = f.save()
         self.assertEqual(instance.description, 'New Description')
@@ -1617,8 +1617,8 @@ class OldFormForXTests(TestCase):
         instance.delete()
 
         f = OptionalImageFileForm(
-                data={'description': 'And a final one'},
-                files={'image': SimpleUploadedFile('test4.png', image_data2)}
+            data={'description': 'And a final one'},
+            files={'image': SimpleUploadedFile('test4.png', image_data2)}
         )
         self.assertEqual(f.is_valid(), True)
         instance = f.save()
@@ -1628,8 +1628,8 @@ class OldFormForXTests(TestCase):
         instance.delete()
         # Test callable upload_to behavior that's dependent on the value of another field in the model
         f = ImageFileForm(
-                data={'description': 'And a final one', 'path': 'foo'},
-                files={'image': SimpleUploadedFile('test4.png', image_data)})
+            data={'description': 'And a final one', 'path': 'foo'},
+            files={'image': SimpleUploadedFile('test4.png', image_data)})
         self.assertEqual(f.is_valid(), True)
         instance = f.save()
         self.assertEqual(instance.image.name, 'foo/test4.png')

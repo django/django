@@ -14,8 +14,8 @@ from django.utils.encoding import force_str, force_text
 from django.utils.functional import allow_lazy
 from django.utils import six
 from django.utils.six.moves.urllib.parse import (
-        quote, quote_plus, unquote, unquote_plus, urlparse,
-        urlencode as original_urlencode)
+    quote, quote_plus, unquote, unquote_plus, urlparse,
+    urlencode as original_urlencode)
 
 ETAG_MATCH = re.compile(r'(?:W/)?"((?:\\.|[^"])*)"')
 

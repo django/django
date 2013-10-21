@@ -184,8 +184,8 @@ class WizardView(TemplateView):
                 if (isinstance(field, forms.FileField) and
                         not hasattr(cls, 'file_storage')):
                     raise NoFileStorageConfigured(
-                            "You need to define 'file_storage' in your "
-                            "wizard view in order to handle file uploads.")
+                        "You need to define 'file_storage' in your "
+                        "wizard view in order to handle file uploads.")
 
         # build the kwargs for the wizardview instances
         kwargs['form_list'] = computed_form_list

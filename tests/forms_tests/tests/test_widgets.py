@@ -1182,9 +1182,9 @@ class ClearableFileInputTests(TestCase):
         widget = ClearableFileInput()
         widget.is_required = False
         self.assertEqual(widget.value_from_datadict(
-                data={'myfile-clear': True},
-                files={},
-                name='myfile'), False)
+            data={'myfile-clear': True},
+            files={},
+            name='myfile'), False)
 
     def test_clear_input_checked_returns_false_only_if_not_required(self):
         """
@@ -1196,6 +1196,6 @@ class ClearableFileInputTests(TestCase):
         widget.is_required = True
         f = SimpleUploadedFile('something.txt', b'content')
         self.assertEqual(widget.value_from_datadict(
-                data={'myfile-clear': True},
-                files={'myfile': f},
-                name='myfile'), f)
+            data={'myfile-clear': True},
+            files={'myfile': f},
+            name='myfile'), f)

@@ -213,9 +213,9 @@ class ManyToOneTests(TestCase):
         self.assertQuerysetEqual(
             Article.objects.filter(reporter__in=[self.r.id,self.r2.id]).distinct(),
             [
-                    "<Article: John's second story>",
-                    "<Article: Paul's story>",
-                    "<Article: This is a test>",
+                "<Article: John's second story>",
+                "<Article: Paul's story>",
+                "<Article: This is a test>",
             ])
         self.assertQuerysetEqual(
             Article.objects.filter(reporter__in=[self.r,self.r2]).distinct(),
@@ -229,8 +229,8 @@ class ManyToOneTests(TestCase):
         # then converted into a query
         self.assertQuerysetEqual(
             Article.objects.filter(
-                        reporter__in=Reporter.objects.filter(first_name='John').values('pk').query
-                    ).distinct(),
+                reporter__in=Reporter.objects.filter(first_name='John').values('pk').query
+            ).distinct(),
             [
                 "<Article: John's second story>",
                 "<Article: This is a test>",

@@ -17,8 +17,8 @@ import warnings
 from functools import wraps
 
 from django.db import (
-        connections, DEFAULT_DB_ALIAS,
-        DatabaseError, ProgrammingError)
+    connections, DEFAULT_DB_ALIAS,
+    DatabaseError, ProgrammingError)
 from django.utils.decorators import available_attrs
 
 

@@ -298,12 +298,12 @@ class RequestsTests(SimpleTestCase):
         # we don't want the data held in memory twice, and we don't want to
         # silence the error by setting body = '' either.
         payload = FakePayload("\r\n".join([
-                '--boundary',
-                'Content-Disposition: form-data; name="name"',
-                '',
-                'value',
-                '--boundary--'
-                '']))
+            '--boundary',
+            'Content-Disposition: form-data; name="name"',
+            '',
+            'value',
+            '--boundary--'
+            '']))
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
                                'CONTENT_LENGTH': len(payload),
@@ -320,12 +320,12 @@ class RequestsTests(SimpleTestCase):
         # being a binary upload, in which case it should still be accessible
         # via body.
         payload_data = b"\r\n".join([
-                b'--boundary',
-                b'Content-ID: id; name="name"',
-                b'',
-                b'value',
-                b'--boundary--'
-                b''])
+            b'--boundary',
+            b'Content-ID: id; name="name"',
+            b'',
+            b'value',
+            b'--boundary--'
+            b''])
         payload = FakePayload(payload_data)
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_TYPE': 'multipart/related; boundary=boundary',
@@ -343,12 +343,12 @@ class RequestsTests(SimpleTestCase):
         # Every request.POST with Content-Length >= 0 is a valid request,
         # this test ensures that we handle Content-Length == 0.
         payload = FakePayload("\r\n".join([
-                '--boundary',
-                'Content-Disposition: form-data; name="name"',
-                '',
-                'value',
-                '--boundary--'
-                '']))
+            '--boundary',
+            'Content-Disposition: form-data; name="name"',
+            '',
+            'value',
+            '--boundary--'
+            '']))
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
                                'CONTENT_LENGTH': 0,
@@ -413,12 +413,12 @@ class RequestsTests(SimpleTestCase):
         the stream is read second. Using multipart/form-data instead of urlencoded.
         """
         payload = FakePayload("\r\n".join([
-                '--boundary',
-                'Content-Disposition: form-data; name="name"',
-                '',
-                'value',
-                '--boundary--'
-                '']))
+            '--boundary',
+            'Content-Disposition: form-data; name="name"',
+            '',
+            'value',
+            '--boundary--'
+            '']))
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
                                'CONTENT_LENGTH': len(payload),

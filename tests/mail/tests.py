@@ -324,8 +324,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
         connection = mail.get_connection('mail.custombackend.EmailBackend')
         send_mass_mail([
-                ('Subject1', 'Content1', 'from1@example.com', ['to1@example.com']),
-                ('Subject2', 'Content2', 'from2@example.com', ['to2@example.com']),
+            ('Subject1', 'Content1', 'from1@example.com', ['to1@example.com']),
+            ('Subject2', 'Content2', 'from2@example.com', ['to2@example.com']),
         ], connection=connection)
         self.assertEqual(mail.outbox, [])
         self.assertEqual(len(connection.test_outbox), 2)
