@@ -67,6 +67,18 @@ Django quotes column and table names behind the scenes.
     the table name via ``db_table``, particularly if you are using the MySQL
     backend. See the :ref:`MySQL notes <mysql-notes>` for more details.
 
+.. admonition:: Table name quoting for Oracle
+
+   In order to to meet the 30-char limitation Oracle has on table names,
+   and match the usual conventions for Oracle databases, Django may shorten
+   table names and turn them all-uppercase. To prevent such transformations,
+   use a quoted name as the value for ``db_table``::
+
+       db_table = '"name_left_in_lowercase"'
+
+   Such quoted names can also be used with Django's other supported database 
+   backends; except for Oracle, however, the quotes have no effect. See the
+   :ref:`Oracle notes <oracle-notes>` for more details.
 
 ``db_tablespace``
 -----------------
