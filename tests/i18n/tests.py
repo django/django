@@ -1190,17 +1190,39 @@ class LocaleMiddlewareTests(TransRealMixin, TestCase):
 
         # Clear the session data before request
         session.save()
-        self.client.get('/en/simple/')
-        self.assertEqual(self.client.session['django_language'], 'en')
+        response = self.client.get('/en/simple/')
+        self.assertEqual(self.client.session['_language'], 'en')
 
         # Clear the session data before request
         session.save()
-        self.client.get('/fr/simple/')
-        self.assertEqual(self.client.session['django_language'], 'fr')
+        response = self.client.get('/fr/simple/')
+        self.assertEqual(self.client.session['_language'], 'fr')
 
         # Check that language is not changed in session
-        self.client.get('/en/simple/')
-        self.assertEqual(self.client.session['django_language'], 'fr')
+        response = self.client.get('/en/simple/')
+        self.assertEqual(self.client.session['_language'], 'fr')
+
+    @override_settings(
+        MIDDLEWARE_CLASSES=(
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.middleware.locale.LocaleMiddleware',
+            'django.middleware.common.CommonMiddleware',
+        ),
+    )
+    def test_backwards_session_language(self):
+        """
+        Check that language is stored in session if missing.
+        """
+        # Create session with old language key name
+        engine = import_module(settings.SESSION_ENGINE)
+        session = engine.SessionStore()
+        session['django_language'] = 'en'
+        session.save()
+        self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
+
+        # request other language; should default to old language key value
+        response = self.client.get('/fr/simple/')
+        self.assertEqual(self.client.session['_language'], 'en')
 
 
 @override_settings(
