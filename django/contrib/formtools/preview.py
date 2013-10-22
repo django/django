@@ -101,7 +101,6 @@ class FormPreview(object):
         "Context for template rendering."
         return {'form': form, 'stage_field': self.unused_name('stage'), 'state': self.state}
 
-
     def parse_params(self, *args, **kwargs):
         """
         Given captured args and kwargs from the URLconf, saves something in

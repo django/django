@@ -403,7 +403,7 @@ class InlineValidator(BaseValidator):
 def check_type(cls, attr, type_):
     if getattr(cls, attr, None) is not None and not isinstance(getattr(cls, attr), type_):
         raise ImproperlyConfigured("'%s.%s' should be a %s."
-                % (cls.__name__, attr, type_.__name__ ))
+                % (cls.__name__, attr, type_.__name__))
 
 def check_isseq(cls, label, obj):
     if not isinstance(obj, (list, tuple)):

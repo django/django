@@ -1,5 +1,7 @@
 from .base import Operation
+from django.utils import six
 from django.db import models, router
+from django.db.models.options import normalize_unique_together
 from django.db.migrations.state import ModelState
 
 
@@ -31,6 +33,23 @@ class CreateModel(Operation):
 
     def describe(self):
         return "Create model %s" % (self.name, )
+
+    def references_model(self, name, app_label=None):
+        strings_to_check = [self.name]
+        # Check we didn't inherit from the model
+        for base in self.bases:
+            if isinstance(base, six.string_types):
+                strings_to_check.append(base.split(".")[-1])
+        # Check we have no FKs/M2Ms with it
+        for fname, field in self.fields:
+            if field.rel:
+                if isinstance(field.rel.to, six.string_types):
+                    strings_to_check.append(field.rel.to.split(".")[-1])
+        # Now go over all the strings and compare them
+        for string in strings_to_check:
+            if string.lower() == name.lower():
+                return True
+        return False
 
     def __eq__(self, other):
         return (
@@ -65,6 +84,9 @@ class DeleteModel(Operation):
         if router.allow_migrate(schema_editor.connection.alias, model):
             schema_editor.create_model(model)
 
+    def references_model(self, name, app_label=None):
+        return name.lower() == self.name.lower()
+
     def describe(self):
         return "Delete model %s" % (self.name, )
 
@@ -96,6 +118,9 @@ class AlterModelTable(Operation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
 
+    def references_model(self, name, app_label=None):
+        return name.lower() == self.name.lower()
+
     def describe(self):
         return "Rename table for %s to %s" % (self.name, self.table)
 
@@ -108,6 +133,7 @@ class AlterUniqueTogether(Operation):
 
     def __init__(self, name, unique_together):
         self.name = name
+        unique_together = normalize_unique_together(unique_together)
         self.unique_together = set(tuple(cons) for cons in unique_together)
 
     def state_forwards(self, app_label, state):
@@ -128,6 +154,9 @@ class AlterUniqueTogether(Operation):
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
+
+    def references_model(self, name, app_label=None):
+        return name.lower() == self.name.lower()
 
     def describe(self):
         return "Alter unique_together for %s (%s constraints)" % (self.name, len(self.unique_together))
@@ -161,6 +190,9 @@ class AlterIndexTogether(Operation):
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
+
+    def references_model(self, name, app_label=None):
+        return name.lower() == self.name.lower()
 
     def describe(self):
         return "Alter index_together for %s (%s constraints)" % (self.name, len(self.index_together))

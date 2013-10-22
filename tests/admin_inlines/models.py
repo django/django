@@ -221,6 +221,17 @@ class Sighting(models.Model):
     et = models.ForeignKey(ExtraTerrestrial)
     place = models.CharField(max_length=100)
 
+
+# Models for #18263
+class SomeParentModel(models.Model):
+    name = models.CharField(max_length=1)
+
+
+class SomeChildModel(models.Model):
+    name = models.CharField(max_length=1)
+    position = models.PositiveIntegerField()
+    parent = models.ForeignKey(SomeParentModel)
+
 # Other models
 
 class ProfileCollection(models.Model):

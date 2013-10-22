@@ -12,7 +12,7 @@ class MutuallyReferentialTests(TestCase):
 
         # Create some children
         c = q.child_set.create(name='Charles')
-        e = q.child_set.create(name='Edward')
+        q.child_set.create(name='Edward')
 
         # Set the best child
         # No assertion require here; if basic assignment and

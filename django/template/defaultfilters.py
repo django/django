@@ -194,10 +194,10 @@ def linenumbers(value, autoescape=None):
     width = six.text_type(len(six.text_type(len(lines))))
     if not autoescape or isinstance(value, SafeData):
         for i, line in enumerate(lines):
-            lines[i] = ("%0" + width  + "d. %s") % (i + 1, line)
+            lines[i] = ("%0" + width + "d. %s") % (i + 1, line)
     else:
         for i, line in enumerate(lines):
-            lines[i] = ("%0" + width  + "d. %s") % (i + 1, escape(line))
+            lines[i] = ("%0" + width + "d. %s") % (i + 1, escape(line))
     return mark_safe('\n'.join(lines))
 
 @register.filter(is_safe=True)
@@ -814,11 +814,11 @@ def filesizeformat(bytes):
 
     filesize_number_format = lambda value: formats.number_format(round(value, 1), 1)
 
-    KB = 1<<10
-    MB = 1<<20
-    GB = 1<<30
-    TB = 1<<40
-    PB = 1<<50
+    KB = 1 << 10
+    MB = 1 << 20
+    GB = 1 << 30
+    TB = 1 << 40
+    PB = 1 << 50
 
     if bytes < KB:
         value = ungettext("%(size)d byte", "%(size)d bytes", bytes) % {'size': bytes}

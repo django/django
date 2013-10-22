@@ -604,7 +604,7 @@ class PromiseTest(test.TestCase):
 
     def test_IPAddressField(self):
         lazy_func = lazy(lambda: '127.0.0.1', six.text_type)
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True):
             warnings.simplefilter("always")
             self.assertIsInstance(
                 IPAddressField().get_prep_value(lazy_func()),

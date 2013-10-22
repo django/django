@@ -101,7 +101,7 @@ class CustomRedirects(TestCase):
         new object.
         Refs 8001, 18310, 19505.
         """
-        post_data = { 'name': 'John Doe', }
+        post_data = {'name': 'John Doe'}
         self.assertEqual(Person.objects.count(), 0)
         response = self.client.post(
             reverse('admin:admin_custom_urls_person_add'), post_data)
@@ -120,7 +120,7 @@ class CustomRedirects(TestCase):
         Person.objects.create(name='John Doe')
         self.assertEqual(Person.objects.count(), 1)
         person = Person.objects.all()[0]
-        post_data = { 'name': 'Jack Doe', }
+        post_data = {'name': 'Jack Doe'}
         response = self.client.post(
             reverse('admin:admin_custom_urls_person_change', args=[person.pk]), post_data)
         self.assertRedirects(
@@ -131,7 +131,7 @@ class CustomRedirects(TestCase):
         Ensures that the ModelAdmin.response_add()'s parameter `post_url_continue`
         controls the redirection after an object has been created.
         """
-        post_data = { 'name': 'SuperFast', '_continue': '1' }
+        post_data = {'name': 'SuperFast', '_continue': '1'}
         self.assertEqual(Car.objects.count(), 0)
         response = self.client.post(
             reverse('admin:admin_custom_urls_car_add'), post_data)

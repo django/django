@@ -83,22 +83,19 @@ class CommentViewTests(CommentTestCase):
 
     def testDebugCommentErrors(self):
         """The debug error template should be shown only if DEBUG is True"""
-        olddebug = settings.DEBUG
-
-        settings.DEBUG = True
         a = Article.objects.get(pk=1)
         data = self.getValidData(a)
         data["security_hash"] = "Nobody expects the Spanish Inquisition!"
-        response = self.client.post("/post/", data)
-        self.assertEqual(response.status_code, 400)
-        self.assertTemplateUsed(response, "comments/400-debug.html")
 
-        settings.DEBUG = False
-        response = self.client.post("/post/", data)
-        self.assertEqual(response.status_code, 400)
-        self.assertTemplateNotUsed(response, "comments/400-debug.html")
+        with self.settings(DEBUG=True):
+            response = self.client.post("/post/", data)
+            self.assertEqual(response.status_code, 400)
+            self.assertTemplateUsed(response, "comments/400-debug.html")
 
-        settings.DEBUG = olddebug
+        with self.settings(DEBUG=False):
+            response = self.client.post("/post/", data)
+            self.assertEqual(response.status_code, 400)
+            self.assertTemplateNotUsed(response, "comments/400-debug.html")
 
     def testCreateValidComment(self):
         address = "1.2.3.4"
@@ -243,21 +240,21 @@ class CommentViewTests(CommentTestCase):
         response = self.client.post("/post/", data)
         location = response["Location"]
         match = post_redirect_re.match(location)
-        self.assertTrue(match != None, "Unexpected redirect location: %s" % location)
+        self.assertTrue(match is not None, "Unexpected redirect location: %s" % location)
 
         data["next"] = "/somewhere/else/"
         data["comment"] = "This is another comment"
         response = self.client.post("/post/", data)
         location = response["Location"]
         match = re.search(r"^http://testserver/somewhere/else/\?c=\d+$", location)
-        self.assertTrue(match != None, "Unexpected redirect location: %s" % location)
+        self.assertTrue(match is not None, "Unexpected redirect location: %s" % location)
 
         data["next"] = "http://badserver/somewhere/else/"
         data["comment"] = "This is another comment with an unsafe next url"
         response = self.client.post("/post/", data)
         location = response["Location"]
         match = post_redirect_re.match(location)
-        self.assertTrue(match != None, "Unsafe redirection to: %s" % location)
+        self.assertTrue(match is not None, "Unsafe redirection to: %s" % location)
 
     def testCommentDoneView(self):
         a = Article.objects.get(pk=1)
@@ -265,7 +262,7 @@ class CommentViewTests(CommentTestCase):
         response = self.client.post("/post/", data)
         location = response["Location"]
         match = post_redirect_re.match(location)
-        self.assertTrue(match != None, "Unexpected redirect location: %s" % location)
+        self.assertTrue(match is not None, "Unexpected redirect location: %s" % location)
         pk = int(match.group('pk'))
         response = self.client.get(location)
         self.assertTemplateUsed(response, "comments/posted.html")
@@ -282,7 +279,7 @@ class CommentViewTests(CommentTestCase):
         response = self.client.post("/post/", data)
         location = response["Location"]
         match = re.search(r"^http://testserver/somewhere/else/\?foo=bar&c=\d+$", location)
-        self.assertTrue(match != None, "Unexpected redirect location: %s" % location)
+        self.assertTrue(match is not None, "Unexpected redirect location: %s" % location)
 
     def testCommentPostRedirectWithInvalidIntegerPK(self):
         """
@@ -311,7 +308,7 @@ class CommentViewTests(CommentTestCase):
         response = self.client.post("/post/", data)
         location = response["Location"]
         match = re.search(r"^http://testserver/somewhere/else/\?foo=bar&c=\d+#baz$", location)
-        self.assertTrue(match != None, "Unexpected redirect location: %s" % location)
+        self.assertTrue(match is not None, "Unexpected redirect location: %s" % location)
 
         # Without a query string
         a = Article.objects.get(pk=1)
@@ -321,4 +318,4 @@ class CommentViewTests(CommentTestCase):
         response = self.client.post("/post/", data)
         location = response["Location"]
         match = re.search(r"^http://testserver/somewhere/else/\?c=\d+#baz$", location)
-        self.assertTrue(match != None, "Unexpected redirect location: %s" % location)
+        self.assertTrue(match is not None, "Unexpected redirect location: %s" % location)

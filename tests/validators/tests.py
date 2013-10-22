@@ -7,7 +7,13 @@ import types
 from unittest import TestCase
 
 from django.core.exceptions import ValidationError
-from django.core.validators import *
+from django.core.validators import (
+    BaseValidator, EmailValidator, MaxLengthValidator, MaxValueValidator,
+    MinLengthValidator, MinValueValidator, RegexValidator, URLValidator,
+    validate_comma_separated_integer_list, validate_email, validate_integer,
+    validate_ipv46_address, validate_ipv4_address, validate_ipv6_address,
+    validate_slug,
+)
 from django.test.utils import str_prefix
 
 
@@ -145,6 +151,9 @@ TEST_DATA = (
     (URLValidator(), 'http://valid-----hyphens.com/', None),
     (URLValidator(), 'http://example.com?something=value', None),
     (URLValidator(), 'http://example.com/index.php?something=value&another=value2', None),
+    (URLValidator(), 'https://example.com/', None),
+    (URLValidator(), 'ftp://example.com/', None),
+    (URLValidator(), 'ftps://example.com/', None),
 
     (URLValidator(), 'foo', ValidationError),
     (URLValidator(), 'http://', ValidationError),

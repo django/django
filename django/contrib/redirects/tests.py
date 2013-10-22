@@ -13,7 +13,7 @@ from .models import Redirect
 @override_settings(
     APPEND_SLASH=False,
     MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) +
-        ['django.contrib.redirects.middleware.RedirectFallbackMiddleware'],
+    ['django.contrib.redirects.middleware.RedirectFallbackMiddleware'],
     SITE_ID=1,
 )
 class RedirectTests(TestCase):
@@ -72,7 +72,7 @@ class OverriddenRedirectFallbackMiddleware(RedirectFallbackMiddleware):
 
 @override_settings(
     MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) +
-        ['django.contrib.redirects.tests.OverriddenRedirectFallbackMiddleware'],
+    ['django.contrib.redirects.tests.OverriddenRedirectFallbackMiddleware'],
     SITE_ID=1,
 )
 class OverriddenRedirectMiddlewareTests(TestCase):

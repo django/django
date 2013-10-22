@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from django.template import Template
 from django.test import TestCase
+from django.test.utils import override_settings
 
 class TestException(Exception):
     pass
@@ -117,7 +118,7 @@ class BaseMiddlewareExceptionTest(TestCase):
 
     def assert_exceptions_handled(self, url, errors, extra_error=None):
         try:
-            response = self.client.get(url)
+            self.client.get(url)
         except TestException:
             # Test client intentionally re-raises any exceptions being raised
             # during request handling. Hence actual testing that exception was
@@ -374,8 +375,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self._add_middleware(middleware)
         self._add_middleware(pre_middleware)
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [
-                "The view middleware_exceptions.views.null_view didn't return an HttpResponse object.",
-            ],
+            "The view middleware_exceptions.views.null_view didn't return an HttpResponse object.",
+        ],
             ValueError())
 
         # Check that the right middleware methods have been invoked
@@ -391,8 +392,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self._add_middleware(middleware)
         self._add_middleware(pre_middleware)
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [
-                "The view middleware_exceptions.views.null_view didn't return an HttpResponse object."
-            ],
+            "The view middleware_exceptions.views.null_view didn't return an HttpResponse object."
+        ],
             ValueError())
 
         # Check that the right middleware methods have been invoked
@@ -685,9 +686,9 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self._add_middleware(bad_middleware)
         self._add_middleware(pre_middleware)
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [
-                "The view middleware_exceptions.views.null_view didn't return an HttpResponse object.",
-                'Test Response Exception'
-            ])
+            "The view middleware_exceptions.views.null_view didn't return an HttpResponse object.",
+            'Test Response Exception'
+        ])
 
         # Check that the right middleware methods have been invoked
         self.assert_middleware_usage(pre_middleware,  True, True, False, False, False)
@@ -702,8 +703,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self._add_middleware(bad_middleware)
         self._add_middleware(pre_middleware)
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [
-                "The view middleware_exceptions.views.null_view didn't return an HttpResponse object."
-            ],
+            "The view middleware_exceptions.views.null_view didn't return an HttpResponse object."
+        ],
             ValueError())
 
         # Check that the right middleware methods have been invoked
@@ -772,15 +773,11 @@ _missing = object()
 class RootUrlconfTests(TestCase):
     urls = 'middleware_exceptions.urls'
 
+    @override_settings(ROOT_URLCONF=None)
     def test_missing_root_urlconf(self):
-        try:
-            original_ROOT_URLCONF = settings.ROOT_URLCONF
-            del settings.ROOT_URLCONF
-        except AttributeError:
-            original_ROOT_URLCONF = _missing
+        # Removing ROOT_URLCONF is safe, as override_settings will restore
+        # the previously defined settings.
+        del settings.ROOT_URLCONF
         self.assertRaises(AttributeError,
             self.client.get, "/middleware_exceptions/view/"
         )
-
-        if original_ROOT_URLCONF is not _missing:
-            settings.ROOT_URLCONF = original_ROOT_URLCONF

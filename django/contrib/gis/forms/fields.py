@@ -24,7 +24,7 @@ class GeometryField(forms.Field):
         'invalid_geom_type' : _('Invalid geometry type.'),
         'transform_error' : _('An error occurred when transforming the geometry '
                               'to the SRID of the geometry form field.'),
-        }
+    }
 
     def __init__(self, **kwargs):
         # Pop out attributes from the database field, or use sensible
@@ -73,7 +73,7 @@ class GeometryField(forms.Field):
             elif self.srid != -1 and self.srid != geom.srid:
                 try:
                     geom.transform(self.srid)
-                except:
+                except GEOSException:
                     raise forms.ValidationError(self.error_messages['transform_error'], code='transform_error')
 
         return geom

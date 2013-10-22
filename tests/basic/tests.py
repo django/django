@@ -33,7 +33,7 @@ class ModelTest(TestCase):
         a.save()
 
         # Now it has an ID.
-        self.assertTrue(a.id != None)
+        self.assertTrue(a.id is not None)
 
         # Models have a pk property that is an alias for the primary key
         # attribute (by default, the 'id' attribute).
@@ -585,7 +585,7 @@ class ModelTest(TestCase):
         f3 = Field()
         self.assertTrue(f2 < f1)
         self.assertTrue(f3 > f1)
-        self.assertFalse(f1 == None)
+        self.assertFalse(f1 is None)
         self.assertFalse(f2 in (None, 1, ''))
 
     def test_extra_method_select_argument_with_dashes_and_values(self):
@@ -605,9 +605,8 @@ class ModelTest(TestCase):
         )
 
         dicts = Article.objects.filter(
-            pub_date__year=2008).extra(
-                select={'dashed-value': '1'}
-            ).values('headline', 'dashed-value')
+            pub_date__year=2008).extra(select={'dashed-value': '1'}
+        ).values('headline', 'dashed-value')
         self.assertEqual([sorted(d.items()) for d in dicts],
             [[('dashed-value', 1), ('headline', 'Article 11')], [('dashed-value', 1), ('headline', 'Article 12')]])
 
@@ -629,8 +628,7 @@ class ModelTest(TestCase):
         )
 
         articles = Article.objects.filter(
-            pub_date__year=2008).extra(
-                select={'dashed-value': '1', 'undashedvalue': '2'})
+            pub_date__year=2008).extra(select={'dashed-value': '1', 'undashedvalue': '2'})
         self.assertEqual(articles[0].undashedvalue, 2)
 
     def test_create_relation_with_ugettext_lazy(self):

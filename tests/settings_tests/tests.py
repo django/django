@@ -73,6 +73,16 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
             self.fail()
 
 
+@override_settings(TEST='override-parent')
+class ParentDecoratedTestCase(TestCase):
+    pass
+
+@override_settings(TEST='override-child')
+class ChildDecoratedTestCase(ParentDecoratedTestCase):
+    def test_override_settings_inheritance(self):
+        self.assertEqual(settings.TEST, 'override-child')
+
+
 class SettingsTests(TestCase):
     def setUp(self):
         self.testvalue = None

@@ -48,7 +48,6 @@ class PrefetchRelatedTests(TestCase):
         normal_lists = [list(b.authors.all()) for b in Book.objects.all()]
         self.assertEqual(lists, normal_lists)
 
-
     def test_m2m_reverse(self):
         with self.assertNumQueries(2):
             lists = [list(a.books.all()) for a in Author.objects.prefetch_related('books')]
@@ -65,8 +64,8 @@ class PrefetchRelatedTests(TestCase):
 
     def test_foreignkey_reverse(self):
         with self.assertNumQueries(2):
-            lists = [list(b.first_time_authors.all())
-                     for b in Book.objects.prefetch_related('first_time_authors')]
+            [list(b.first_time_authors.all())
+             for b in Book.objects.prefetch_related('first_time_authors')]
 
         self.assertQuerysetEqual(self.book2.authors.all(), ["<Author: Charlotte>"])
 
@@ -80,22 +79,20 @@ class PrefetchRelatedTests(TestCase):
 
     def test_survives_clone(self):
         with self.assertNumQueries(2):
-            lists = [list(b.first_time_authors.all())
-                     for b in Book.objects.prefetch_related('first_time_authors').exclude(id=1000)]
+            [list(b.first_time_authors.all())
+             for b in Book.objects.prefetch_related('first_time_authors').exclude(id=1000)]
 
     def test_len(self):
         with self.assertNumQueries(2):
             qs = Book.objects.prefetch_related('first_time_authors')
-            length = len(qs)
-            lists = [list(b.first_time_authors.all())
-                     for b in qs]
+            len(qs)
+            [list(b.first_time_authors.all()) for b in qs]
 
     def test_bool(self):
         with self.assertNumQueries(2):
             qs = Book.objects.prefetch_related('first_time_authors')
-            x = bool(qs)
-            lists = [list(b.first_time_authors.all())
-                     for b in qs]
+            bool(qs)
+            [list(b.first_time_authors.all()) for b in qs]
 
     def test_count(self):
         with self.assertNumQueries(2):
@@ -124,7 +121,7 @@ class PrefetchRelatedTests(TestCase):
         with self.assertNumQueries(5):
             with_prefetch = Author.objects.prefetch_related('books')
             without_prefetch = with_prefetch.prefetch_related(None)
-            lists = [list(a.books.all()) for a in without_prefetch]
+            [list(a.books.all()) for a in without_prefetch]
 
     def test_m2m_then_m2m(self):
         """
@@ -321,9 +318,9 @@ class GenericRelationTests(TestCase):
                          [t.created_by for t in TaggedItem.objects.all()])
 
     def test_generic_relation(self):
-        b = Bookmark.objects.create(url='http://www.djangoproject.com/')
-        t1 = TaggedItem.objects.create(content_object=b, tag='django')
-        t2 = TaggedItem.objects.create(content_object=b, tag='python')
+        bookmark = Bookmark.objects.create(url='http://www.djangoproject.com/')
+        TaggedItem.objects.create(content_object=bookmark, tag='django')
+        TaggedItem.objects.create(content_object=bookmark, tag='python')
 
         with self.assertNumQueries(2):
             tags = [t.tag for b in Bookmark.objects.prefetch_related('tags')
@@ -332,8 +329,8 @@ class GenericRelationTests(TestCase):
 
     def test_charfield_GFK(self):
         b = Bookmark.objects.create(url='http://www.djangoproject.com/')
-        t1 = TaggedItem.objects.create(content_object=b, tag='django')
-        t2 = TaggedItem.objects.create(content_object=b, favorite=b, tag='python')
+        TaggedItem.objects.create(content_object=b, tag='django')
+        TaggedItem.objects.create(content_object=b, favorite=b, tag='python')
 
         with self.assertNumQueries(3):
             bookmark = Bookmark.objects.filter(pk=b.pk).prefetch_related('tags', 'favorite_tags')[0]
@@ -440,9 +437,9 @@ class ForeignKeyToFieldTest(TestCase):
         with self.assertNumQueries(3):
             qs = Author.objects.all().prefetch_related('favorite_authors', 'favors_me')
             favorites = [(
-                 [six.text_type(i_like) for i_like in author.favorite_authors.all()],
-                 [six.text_type(likes_me) for likes_me in author.favors_me.all()]
-                ) for author in qs]
+                [six.text_type(i_like) for i_like in author.favorite_authors.all()],
+                [six.text_type(likes_me) for likes_me in author.favors_me.all()]
+            ) for author in qs]
             self.assertEqual(
                 favorites,
                 [
@@ -498,8 +495,8 @@ class NullableTest(TestCase):
 
     def setUp(self):
         boss = Employee.objects.create(name="Peter")
-        worker1 = Employee.objects.create(name="Joe", boss=boss)
-        worker2 = Employee.objects.create(name="Angela", boss=boss)
+        Employee.objects.create(name="Joe", boss=boss)
+        Employee.objects.create(name="Angela", boss=boss)
 
     def test_traverse_nullable(self):
         # Because we use select_related() for 'boss', it doesn't need to be
@@ -509,8 +506,8 @@ class NullableTest(TestCase):
             co_serfs = [list(e.boss.serfs.all()) if e.boss is not None else []
                         for e in qs]
 
-        qs2 =  Employee.objects.select_related('boss')
-        co_serfs2 =  [list(e.boss.serfs.all()) if e.boss is not None else []
+        qs2 = Employee.objects.select_related('boss')
+        co_serfs2 = [list(e.boss.serfs.all()) if e.boss is not None else []
                         for e in qs2]
 
         self.assertEqual(co_serfs, co_serfs2)
@@ -522,8 +519,8 @@ class NullableTest(TestCase):
             co_serfs = [list(e.boss.serfs.all()) if e.boss is not None else []
                         for e in qs]
 
-        qs2 =  Employee.objects.all()
-        co_serfs2 =  [list(e.boss.serfs.all()) if e.boss is not None else []
+        qs2 = Employee.objects.all()
+        co_serfs2 = [list(e.boss.serfs.all()) if e.boss is not None else []
                         for e in qs2]
 
         self.assertEqual(co_serfs, co_serfs2)
@@ -593,8 +590,8 @@ class MultiDbTests(TestCase):
         book1 = B.create(title="Poems")
         book2 = B.create(title="Sense and Sensibility")
 
-        author1 = A.create(name="Charlotte Bronte", first_book=book1)
-        author2 = A.create(name="Jane Austen", first_book=book2)
+        A.create(name="Charlotte Bronte", first_book=book1)
+        A.create(name="Jane Austen", first_book=book2)
 
         # Forward
         with self.assertNumQueries(2, using='other'):
@@ -614,9 +611,9 @@ class MultiDbTests(TestCase):
         B = BookWithYear.objects.using('other')
         A = AuthorWithAge.objects.using('other')
         book1 = B.create(title="Poems", published_year=2010)
-        book2 = B.create(title="More poems", published_year=2011)
-        author1 = A.create(name='Jane', first_book=book1, age=50)
-        author2 = A.create(name='Tom', first_book=book1, age=49)
+        B.create(title="More poems", published_year=2011)
+        A.create(name='Jane', first_book=book1, age=50)
+        A.create(name='Tom', first_book=book1, age=49)
 
         # parent link
         with self.assertNumQueries(2, using='other'):
@@ -638,7 +635,7 @@ class Ticket19607Tests(TestCase):
         for id, name1, name2 in [
             (1, 'einfach', 'simple'),
             (2, 'schwierig', 'difficult'),
-            ]:
+        ]:
             LessonEntry.objects.create(id=id, name1=name1, name2=name2)
 
         for id, lesson_entry_id, name in [
@@ -646,7 +643,7 @@ class Ticket19607Tests(TestCase):
             (2, 1, 'simple'),
             (3, 2, 'schwierig'),
             (4, 2, 'difficult'),
-            ]:
+        ]:
             WordEntry.objects.create(id=id, lesson_entry_id=lesson_entry_id, name=name)
 
     def test_bug(self):

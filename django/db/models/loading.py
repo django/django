@@ -185,6 +185,12 @@ class BaseAppCache(object):
 
         return [elt[0] for elt in apps]
 
+    def _get_app_package(self, app):
+        return '.'.join(app.__name__.split('.')[:-1])
+
+    def get_app_package(self, app_label):
+        return self._get_app_package(self.get_app(app_label))
+
     def _get_app_path(self, app):
         if hasattr(app, '__path__'):        # models/__init__.py package
             app_path = app.__path__[0]
@@ -380,6 +386,7 @@ cache = AppCache()
 # These methods were always module level, so are kept that way for backwards
 # compatibility.
 get_apps = cache.get_apps
+get_app_package = cache.get_app_package
 get_app_path = cache.get_app_path
 get_app_paths = cache.get_app_paths
 get_app = cache.get_app

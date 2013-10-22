@@ -161,7 +161,7 @@ class AdminEmailHandlerTest(TestCase):
         admin_email_handler = [
             h for h in logger.handlers
             if h.__class__.__name__ == "AdminEmailHandler"
-            ][0]
+        ][0]
         return admin_email_handler
 
     def test_fail_silently(self):
@@ -169,9 +169,9 @@ class AdminEmailHandlerTest(TestCase):
         self.assertTrue(admin_email_handler.connection().fail_silently)
 
     @override_settings(
-            ADMINS=(('whatever admin', 'admin@example.com'),),
-            EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-'
-        )
+        ADMINS=(('whatever admin', 'admin@example.com'),),
+        EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-'
+    )
     def test_accepts_args(self):
         """
         Ensure that user-supplied arguments and the EMAIL_SUBJECT_PREFIX
@@ -199,10 +199,10 @@ class AdminEmailHandlerTest(TestCase):
             admin_email_handler.filters = orig_filters
 
     @override_settings(
-            ADMINS=(('whatever admin', 'admin@example.com'),),
-            EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-',
-            INTERNAL_IPS=('127.0.0.1',),
-        )
+        ADMINS=(('whatever admin', 'admin@example.com'),),
+        EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-',
+        INTERNAL_IPS=('127.0.0.1',),
+    )
     def test_accepts_args_and_request(self):
         """
         Ensure that the subject is also handled if being
@@ -234,10 +234,10 @@ class AdminEmailHandlerTest(TestCase):
             admin_email_handler.filters = orig_filters
 
     @override_settings(
-            ADMINS=(('admin', 'admin@example.com'),),
-            EMAIL_SUBJECT_PREFIX='',
-            DEBUG=False,
-        )
+        ADMINS=(('admin', 'admin@example.com'),),
+        EMAIL_SUBJECT_PREFIX='',
+        DEBUG=False,
+    )
     def test_subject_accepts_newlines(self):
         """
         Ensure that newlines in email reports' subjects are escaped to avoid
@@ -257,10 +257,10 @@ class AdminEmailHandlerTest(TestCase):
         self.assertEqual(mail.outbox[0].subject, expected_subject)
 
     @override_settings(
-            ADMINS=(('admin', 'admin@example.com'),),
-            EMAIL_SUBJECT_PREFIX='',
-            DEBUG=False,
-        )
+        ADMINS=(('admin', 'admin@example.com'),),
+        EMAIL_SUBJECT_PREFIX='',
+        DEBUG=False,
+    )
     def test_truncate_subject(self):
         """
         RFC 2822's hard limit is 998 characters per line.
@@ -279,9 +279,9 @@ class AdminEmailHandlerTest(TestCase):
         self.assertEqual(mail.outbox[0].subject, expected_subject)
 
     @override_settings(
-            ADMINS=(('admin', 'admin@example.com'),),
-            DEBUG=False,
-        )
+        ADMINS=(('admin', 'admin@example.com'),),
+        DEBUG=False,
+    )
     def test_uses_custom_email_backend(self):
         """
         Refs #19325
@@ -362,12 +362,12 @@ class SecurityLoggerTest(TestCase):
 
     def test_suspicious_operation_creates_log_message(self):
         with patch_logger('django.security.SuspiciousOperation', 'error') as calls:
-            response = self.client.get('/suspicious/')
+            self.client.get('/suspicious/')
             self.assertEqual(len(calls), 1)
             self.assertEqual(calls[0], 'dubious')
 
     def test_suspicious_operation_uses_sublogger(self):
         with patch_logger('django.security.DisallowedHost', 'error') as calls:
-            response = self.client.get('/suspicious_spec/')
+            self.client.get('/suspicious_spec/')
             self.assertEqual(len(calls), 1)
             self.assertEqual(calls[0], 'dubious')

@@ -61,14 +61,14 @@ class TzinfoTests(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
         # US/Eastern -- we force its representation to "EST"
         tz = LocalTimezone(dt + datetime.timedelta(days=1))
         self.assertEqual(
-                repr(datetime.datetime.fromtimestamp(ts - 3600, tz)),
-                'datetime.datetime(2010, 11, 7, 0, 0, tzinfo=EST)')
+            repr(datetime.datetime.fromtimestamp(ts - 3600, tz)),
+            'datetime.datetime(2010, 11, 7, 0, 0, tzinfo=EST)')
         self.assertEqual(
-                repr(datetime.datetime.fromtimestamp(ts, tz)),
-                'datetime.datetime(2010, 11, 7, 1, 0, tzinfo=EST)')
+            repr(datetime.datetime.fromtimestamp(ts, tz)),
+            'datetime.datetime(2010, 11, 7, 1, 0, tzinfo=EST)')
         self.assertEqual(
-                repr(datetime.datetime.fromtimestamp(ts + 3600, tz)),
-                'datetime.datetime(2010, 11, 7, 1, 0, tzinfo=EST)')
+            repr(datetime.datetime.fromtimestamp(ts + 3600, tz)),
+            'datetime.datetime(2010, 11, 7, 1, 0, tzinfo=EST)')
 
     def test_copy(self):
         now = datetime.datetime.now()

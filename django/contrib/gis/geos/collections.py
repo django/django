@@ -73,7 +73,8 @@ class GeometryCollection(GEOSGeometry):
         prev_ptr = self.ptr
         srid = self.srid
         self.ptr = self._create_collection(length, items)
-        if srid: self.srid = srid
+        if srid:
+            self.srid = srid
         capi.destroy_geom(prev_ptr)
 
     _set_single = GEOSGeometry._set_single_rebuild

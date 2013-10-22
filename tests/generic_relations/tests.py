@@ -4,11 +4,12 @@ from django import forms
 from django.contrib.contenttypes.generic import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
+from django.utils import six
 
 from .models import (TaggedItem, ValuableTaggedItem, Comparison, Animal,
                      Vegetable, Mineral, Gecko, Rock, ManualPK,
                      ForProxyModelModel, ForConcreteModelModel,
-                     ProxyRelatedModel, ConcreteRelatedModel)
+                     ProxyRelatedModel, ConcreteRelatedModel, AllowsNullGFK)
 
 
 class GenericRelationsTests(TestCase):
@@ -18,7 +19,7 @@ class GenericRelationsTests(TestCase):
         platypus = Animal.objects.create(
             common_name="Platypus", latin_name="Ornithorhynchus anatinus"
         )
-        eggplant = Vegetable.objects.create(name="Eggplant", is_yucky=True)
+        Vegetable.objects.create(name="Eggplant", is_yucky=True)
         bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
         quartz = Mineral.objects.create(name="Quartz", hardness=7)
 
@@ -45,7 +46,7 @@ class GenericRelationsTests(TestCase):
         # Recall that the Mineral class doesn't have an explicit GenericRelation
         # defined. That's OK, because you can create TaggedItems explicitly.
         tag1 = TaggedItem.objects.create(content_object=quartz, tag="shiny")
-        tag2 = TaggedItem.objects.create(content_object=quartz, tag="clearish")
+        TaggedItem.objects.create(content_object=quartz, tag="clearish")
 
         # However, excluding GenericRelations means your lookups have to be a
         # bit more explicit.
@@ -97,24 +98,24 @@ class GenericRelationsTests(TestCase):
         )
 
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-                ('clearish', Mineral, quartz.pk),
-                ('fatty', Animal, platypus.pk),
-                ('fatty', Vegetable, bacon.pk),
-                ('hairy', Animal, lion.pk),
-                ('salty', Vegetable, bacon.pk),
-                ('shiny', Animal, platypus.pk),
-                ('yellow', Animal, lion.pk)
-            ],
+            ('clearish', Mineral, quartz.pk),
+            ('fatty', Animal, platypus.pk),
+            ('fatty', Vegetable, bacon.pk),
+            ('hairy', Animal, lion.pk),
+            ('salty', Vegetable, bacon.pk),
+            ('shiny', Animal, platypus.pk),
+            ('yellow', Animal, lion.pk)
+        ],
             comp_func
         )
         lion.delete()
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-                ('clearish', Mineral, quartz.pk),
-                ('fatty', Animal, platypus.pk),
-                ('fatty', Vegetable, bacon.pk),
-                ('salty', Vegetable, bacon.pk),
-                ('shiny', Animal, platypus.pk)
-            ],
+            ('clearish', Mineral, quartz.pk),
+            ('fatty', Animal, platypus.pk),
+            ('fatty', Vegetable, bacon.pk),
+            ('salty', Vegetable, bacon.pk),
+            ('shiny', Animal, platypus.pk)
+        ],
             comp_func
         )
 
@@ -123,12 +124,12 @@ class GenericRelationsTests(TestCase):
         quartz_pk = quartz.pk
         quartz.delete()
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-                ('clearish', Mineral, quartz_pk),
-                ('fatty', Animal, platypus.pk),
-                ('fatty', Vegetable, bacon.pk),
-                ('salty', Vegetable, bacon.pk),
-                ('shiny', Animal, platypus.pk)
-            ],
+            ('clearish', Mineral, quartz_pk),
+            ('fatty', Animal, platypus.pk),
+            ('fatty', Vegetable, bacon.pk),
+            ('salty', Vegetable, bacon.pk),
+            ('shiny', Animal, platypus.pk)
+        ],
             comp_func
         )
         # If you delete a tag, the objects using the tag are unaffected
@@ -137,11 +138,11 @@ class GenericRelationsTests(TestCase):
         tag.delete()
         self.assertQuerysetEqual(bacon.tags.all(), ["<TaggedItem: salty>"])
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-                ('clearish', Mineral, quartz_pk),
-                ('fatty', Animal, platypus.pk),
-                ('salty', Vegetable, bacon.pk),
-                ('shiny', Animal, platypus.pk)
-            ],
+            ('clearish', Mineral, quartz_pk),
+            ('fatty', Animal, platypus.pk),
+            ('salty', Vegetable, bacon.pk),
+            ('shiny', Animal, platypus.pk)
+        ],
             comp_func
         )
         TaggedItem.objects.filter(tag='fatty').delete()
@@ -149,7 +150,6 @@ class GenericRelationsTests(TestCase):
         self.assertQuerysetEqual(Animal.objects.filter(tags__content_type=ctype), [
             "<Animal: Platypus>"
         ])
-
 
     def test_multiple_gfk(self):
         # Simple tests for multiple GenericForeignKeys
@@ -440,3 +440,17 @@ class ProxyRelatedModelTest(TestCase):
         newrel.bases = [base]
         newrel = ConcreteRelatedModel.objects.get(pk=newrel.pk)
         self.assertEqual(base, newrel.bases.get())
+
+
+class TestInitWithNoneArgument(TestCase):
+    def test_none_not_allowed(self):
+        # TaggedItem requires a content_type, initializing with None should
+        # raise a ValueError.
+        with six.assertRaisesRegex(self, ValueError,
+          'Cannot assign None: "TaggedItem.content_type" does not allow null values'):
+            TaggedItem(content_object=None)
+
+    def test_none_allowed(self):
+        # AllowsNullGFK doesn't require a content_type, so None argument should
+        # also be allowed.
+        AllowsNullGFK(content_object=None)

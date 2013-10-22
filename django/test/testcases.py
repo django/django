@@ -157,6 +157,7 @@ class SimpleTestCase(unittest.TestCase):
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
+    _custom_settings = None
 
     def __call__(self, result=None):
         """
@@ -193,6 +194,9 @@ class SimpleTestCase(unittest.TestCase):
         * If the class has a 'urls' attribute, replace ROOT_URLCONF with it.
         * Clearing the mail test outbox.
         """
+        if self._custom_settings:
+            self._overridden = override_settings(**self._custom_settings)
+            self._overridden.enable()
         self.client = self.client_class()
         self._urlconf_setup()
         mail.outbox = []
@@ -210,6 +214,8 @@ class SimpleTestCase(unittest.TestCase):
         * Putting back the original ROOT_URLCONF if it was changed.
         """
         self._urlconf_teardown()
+        if self._custom_settings:
+            self._overridden.disable()
 
     def _urlconf_teardown(self):
         set_urlconf(None)
@@ -276,8 +282,7 @@ class SimpleTestCase(unittest.TestCase):
                     " response code was %d (expected %d)" %
                         (path, redirect_response.status_code, target_status_code))
 
-        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(
-                                                              expected_url)
+        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(expected_url)
         if not (e_scheme or e_netloc):
             expected_url = urlunsplit(('http', host or 'testserver', e_path,
                 e_query, e_fragment))
@@ -735,7 +740,7 @@ class TransactionTestCase(SimpleTestCase):
         conn = connections[db_name]
         if conn.features.supports_sequence_reset:
             sql_list = conn.ops.sequence_reset_by_name_sql(
-                    no_style(), conn.introspection.sequence_list())
+                no_style(), conn.introspection.sequence_list())
             if sql_list:
                 with transaction.commit_on_success_unless_managed(using=db_name):
                     cursor = conn.cursor()
@@ -844,10 +849,10 @@ class TestCase(TransactionTestCase):
                 try:
                     call_command('loaddata', *self.fixtures,
                                  **{
-                                    'verbosity': 0,
-                                    'commit': False,
-                                    'database': db_name,
-                                    'skip_validation': True,
+                                     'verbosity': 0,
+                                     'commit': False,
+                                     'database': db_name,
+                                     'skip_validation': True,
                                  })
                 except Exception:
                     self._fixture_teardown()

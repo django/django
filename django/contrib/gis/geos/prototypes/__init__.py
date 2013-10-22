@@ -24,7 +24,7 @@ from django.contrib.gis.geos.prototypes.misc import *
 from django.contrib.gis.geos.prototypes.predicates import (geos_hasz, geos_isempty,
     geos_isring, geos_issimple, geos_isvalid, geos_contains, geos_crosses,
     geos_disjoint, geos_equals, geos_equalsexact, geos_intersects,
-    geos_intersects, geos_overlaps, geos_relatepattern, geos_touches, geos_within)
+    geos_overlaps, geos_relatepattern, geos_touches, geos_within)
 
 # Topology routines
 from django.contrib.gis.geos.prototypes.topology import *

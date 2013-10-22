@@ -159,22 +159,18 @@ particularly temporary.
 Database caching
 ----------------
 
-To use a database table as your cache backend, first create a cache table in
-your database by running this command::
+Django can store its cached data in your database. This works best if you've
+got a fast, well-indexed database server.
 
-    $ python manage.py createcachetable [cache_table_name]
+To use a database table as your cache backend:
 
-...where ``[cache_table_name]`` is the name of the database table to create.
-(This name can be whatever you want, as long as it's a valid table name that's
-not already being used in your database.) This command creates a single table
-in your database that is in the proper format that Django's database-cache
-system expects.
+    * Set :setting:`BACKEND <CACHES-BACKEND>` to
+      ``django.core.cache.backends.db.DatabaseCache``
+    * Set :setting:`LOCATION <CACHES-LOCATION>` to ``tablename``, the name of
+      the database table. This name can be whatever you want, as long as it's
+      a valid table name that's not already being used in your database.
 
-Once you've created that database table, set your
-:setting:`BACKEND <CACHES-BACKEND>` setting to
-``"django.core.cache.backends.db.DatabaseCache"``, and
-:setting:`LOCATION <CACHES-LOCATION>` to ``tablename`` -- the name of the
-database table. In this example, the cache table's name is ``my_cache_table``::
+In this example, the cache table's name is ``my_cache_table``::
 
     CACHES = {
         'default': {
@@ -183,14 +179,36 @@ database table. In this example, the cache table's name is ``my_cache_table``::
         }
     }
 
+Creating the cache table
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-The database caching backend uses the same database as specified in your
-settings file. You can't use a different database backend for your cache table.
+Before using the database cache, you must create the cache table with this
+command::
 
-Database caching works best if you've got a fast, well-indexed database server.
+    python manage.py createcachetable
 
-Database caching and multiple databases
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This creates a table in your database that is in the proper format that
+Django's database-cache system expects. The name of the table is taken from
+:setting:`LOCATION <CACHES-LOCATION>`.
+
+If you are using multiple database caches, :djadmin:`createcachetable` creates
+one table for each cache.
+
+If you are using multiple databases, :djadmin:`createcachetable` observes the
+``allow_migrate()`` method of your database routers (see below).
+
+Like :djadmin:`migrate`, :djadmin:`createcachetable` won't touch an existing
+table. It will only create missing tables.
+
+.. versionchanged:: 1.7
+
+    Before Django 1.7, :djadmin:`createcachetable` created one table at a time.
+    You had to pass the name of the table you wanted to create, and if you were
+    using multiple databases, you had to use the :djadminopt:`--database`
+    option. For backwards compatibility, this is still possible.
+
+Multiple databases
+~~~~~~~~~~~~~~~~~~
 
 If you use database caching with multiple databases, you'll also need
 to set up routing instructions for your database cache table. For the

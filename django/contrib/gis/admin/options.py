@@ -31,7 +31,7 @@ class GeoModelAdmin(ModelAdmin):
     map_height = 400
     map_srid = 4326
     map_template = 'gis/admin/openlayers.html'
-    openlayers_url = 'http://openlayers.org/api/2.11/OpenLayers.js'
+    openlayers_url = 'http://openlayers.org/api/2.13/OpenLayers.js'
     point_zoom = num_zoom - 6
     wms_url = 'http://vmap0.tiles.osgeo.org/wms/vmap0'
     wms_layer = 'basic'
@@ -70,8 +70,10 @@ class GeoModelAdmin(ModelAdmin):
         """
         is_collection = db_field.geom_type in ('MULTIPOINT', 'MULTILINESTRING', 'MULTIPOLYGON', 'GEOMETRYCOLLECTION')
         if is_collection:
-            if db_field.geom_type == 'GEOMETRYCOLLECTION': collection_type = 'Any'
-            else: collection_type = OGRGeomType(db_field.geom_type.replace('MULTI', ''))
+            if db_field.geom_type == 'GEOMETRYCOLLECTION':
+                collection_type = 'Any'
+            else:
+                collection_type = OGRGeomType(db_field.geom_type.replace('MULTI', ''))
         else:
             collection_type = 'None'
 
@@ -101,7 +103,7 @@ class GeoModelAdmin(ModelAdmin):
                       'num_zoom' : self.num_zoom,
                       'max_zoom' : self.max_zoom,
                       'min_zoom' : self.min_zoom,
-                      'units' : self.units, #likely shoud get from object
+                      'units' : self.units,  # likely should get from object
                       'max_resolution' : self.max_resolution,
                       'max_extent' : self.max_extent,
                       'modifiable' : self.modifiable,

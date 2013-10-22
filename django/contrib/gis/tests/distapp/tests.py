@@ -66,8 +66,10 @@ class DistanceTest(TestCase):
         # Performing distance queries on two projected coordinate systems one
         # with units in meters and the other in units of U.S. survey feet.
         for dist in tx_dists:
-            if isinstance(dist, tuple): dist1, dist2 = dist
-            else: dist1 = dist2 = dist
+            if isinstance(dist, tuple):
+                dist1, dist2 = dist
+            else:
+                dist1 = dist2 = dist
             qs1 = SouthTexasCity.objects.filter(point__dwithin=(self.stx_pnt, dist1))
             qs2 = SouthTexasCityFt.objects.filter(point__dwithin=(self.stx_pnt, dist2))
             for qs in qs1, qs2:
@@ -75,12 +77,16 @@ class DistanceTest(TestCase):
 
         # Now performing the `dwithin` queries on a geodetic coordinate system.
         for dist in au_dists:
-            if isinstance(dist, D) and not oracle: type_error = True
-            else: type_error = False
+            if isinstance(dist, D) and not oracle:
+                type_error = True
+            else:
+                type_error = False
 
             if isinstance(dist, tuple):
-                if oracle: dist = dist[1]
-                else: dist = dist[0]
+                if oracle:
+                    dist = dist[1]
+                else:
+                    dist = dist[0]
 
             # Creating the query set.
             qs = AustraliaCity.objects.order_by('name')
@@ -140,7 +146,7 @@ class DistanceTest(TestCase):
 
         # Testing geodetic distance calculation with a non-point geometry
         # (a LineString of Wollongong and Shellharbour coords).
-        ls = LineString( ( (150.902, -34.4245), (150.87, -34.5789) ) )
+        ls = LineString(((150.902, -34.4245), (150.87, -34.5789)))
         if oracle or connection.ops.geography:
             # Reference query:
             #  SELECT ST_distance_sphere(point, ST_GeomFromText('LINESTRING(150.9020 -34.4245,150.8700 -34.5789)', 4326)) FROM distapp_australiacity ORDER BY name;
@@ -189,7 +195,7 @@ class DistanceTest(TestCase):
             self.assertAlmostEqual(spheroid_distances[i], c.distance.m, tol)
         if postgis:
             # PostGIS uses sphere-only distances by default, testing these as well.
-            qs =  AustraliaCity.objects.exclude(id=hillsdale.id).distance(hillsdale.point)
+            qs = AustraliaCity.objects.exclude(id=hillsdale.id).distance(hillsdale.point)
             for i, c in enumerate(qs):
                 self.assertAlmostEqual(sphere_distances[i], c.distance.m, tol)
 

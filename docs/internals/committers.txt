@@ -521,11 +521,10 @@ Marc Tamlyn
     documentation at DjangoCon EU 2012, and also helped to develop `CCBV`_, an
     additional class based view reference tool.
 
-    Marc currently works at `Incuna Ltd`_, a digital healthcare agency in
+    Marc is currently a full time parent, part time developer, and lives in
     Oxford, UK.
 
     .. _CCBV: http://ccbv.co.uk/
-    .. _Incuna Ltd: http://incuna.com/
 
 Baptiste Mispelon
     Baptiste discovered Django around the 1.2 version and promptly switched away

@@ -36,8 +36,8 @@ class GeoWhereNode(WhereNode):
     def _prepare_data(self, data):
         if isinstance(data, (list, tuple)):
             obj, lookup_type, value = data
-            if ( isinstance(obj, Constraint) and
-                 isinstance(obj.field, GeometryField) ):
+            if (isinstance(obj, Constraint) and
+                isinstance(obj.field, GeometryField)):
                 data = (GeoConstraint(obj), lookup_type, value)
         return super(GeoWhereNode, self)._prepare_data(data)
 
@@ -46,7 +46,7 @@ class GeoWhereNode(WhereNode):
         if isinstance(lvalue, GeoConstraint):
             data, params = lvalue.process(lookup_type, params_or_value, connection)
             spatial_sql, spatial_params = connection.ops.spatial_lookup_sql(
-                    data, lookup_type, params_or_value, lvalue.field, qn)
+                data, lookup_type, params_or_value, lvalue.field, qn)
             return spatial_sql, spatial_params + params
         else:
             return super(GeoWhereNode, self).make_atom(child, qn, connection)

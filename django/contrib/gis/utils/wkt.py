@@ -10,10 +10,11 @@ def precision_wkt(geom, prec):
     integer or a string).  If the precision is an integer, then the decimal
     places of coordinates WKT will be truncated to that number:
 
+     >>> from django.contrib.gis.geos import Point
      >>> pnt = Point(5, 23)
      >>> pnt.wkt
      'POINT (5.0000000000000000 23.0000000000000000)'
-     >>> precision(geom, 1)
+     >>> precision_wkt(pnt, 1)
      'POINT (5.0 23.0)'
 
     If the precision is a string, it must be valid Python format string

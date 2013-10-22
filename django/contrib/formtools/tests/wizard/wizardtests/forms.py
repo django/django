@@ -63,4 +63,3 @@ class SessionContactWizard(ContactWizard):
 
 class CookieContactWizard(ContactWizard):
     storage_name = 'django.contrib.formtools.wizard.storage.cookie.CookieStorage'
-

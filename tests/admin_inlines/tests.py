@@ -12,7 +12,8 @@ from .admin import InnerInline
 from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
     OutfitItem, Fashionista, Teacher, Parent, Child, Author, Book, Profile,
     ProfileCollection, ParentModelWithCustomPk, ChildModel1, ChildModel2,
-    Sighting, Novel, Chapter, FootNote, BinaryTree)
+    Sighting, Novel, Chapter, FootNote, BinaryTree, SomeParentModel,
+    SomeChildModel)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -126,6 +127,16 @@ class TestInline(TestCase):
         response = self.client.get('/admin/admin_inlines/capofamiglia/add/')
         self.assertContains(response, '<img src="/static/admin/img/icon-unknown.gif" class="help help-tooltip" width="10" height="10" alt="(Help text for ReadOnlyInline)" title="Help text for ReadOnlyInline" />', 1)
 
+    def test_inline_hidden_field_no_column(self):
+        """#18263 -- Make sure hidden fields don't get a column in tabular inlines"""
+        parent = SomeParentModel.objects.create(name='a')
+        SomeChildModel.objects.create(name='b', position='0', parent=parent)
+        SomeChildModel.objects.create(name='c', position='1', parent=parent)
+        response = self.client.get('/admin/admin_inlines/someparentmodel/%s/' % parent.pk)
+        self.assertNotContains(response, '<td class="field-position">')
+        self.assertContains(response, (
+            '<input id="id_somechildmodel_set-1-position" '
+            'name="somechildmodel_set-1-position" type="hidden" value="1" />'))
 
     def test_non_related_name_inline(self):
         """
@@ -159,7 +170,7 @@ class TestInline(TestCase):
         holder = Holder.objects.create(pk=123456789, dummy=42)
         inner = Inner.objects.create(pk=987654321, holder=holder, dummy=42, readonly='')
         response = self.client.get('/admin/admin_inlines/holder/%i/' % holder.id)
-        inner_shortcut = 'r/%s/%s/'%(ContentType.objects.get_for_model(inner).pk, inner.pk)
+        inner_shortcut = 'r/%s/%s/' % (ContentType.objects.get_for_model(inner).pk, inner.pk)
         self.assertContains(response, inner_shortcut)
 
     def test_custom_pk_shortcut(self):
@@ -171,8 +182,8 @@ class TestInline(TestCase):
         child1 = ChildModel1.objects.create(my_own_pk="bar", name="Bar", parent=parent)
         child2 = ChildModel2.objects.create(my_own_pk="baz", name="Baz", parent=parent)
         response = self.client.get('/admin/admin_inlines/parentmodelwithcustompk/foo/')
-        child1_shortcut = 'r/%s/%s/'%(ContentType.objects.get_for_model(child1).pk, child1.pk)
-        child2_shortcut = 'r/%s/%s/'%(ContentType.objects.get_for_model(child2).pk, child2.pk)
+        child1_shortcut = 'r/%s/%s/' % (ContentType.objects.get_for_model(child1).pk, child1.pk)
+        child2_shortcut = 'r/%s/%s/' % (ContentType.objects.get_for_model(child2).pk, child2.pk)
         self.assertContains(response, child1_shortcut)
         self.assertContains(response, child2_shortcut)
 
@@ -501,7 +512,6 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, '<input type="hidden" id="id_inner2_set-0-id" '
                             'value="%i" name="inner2_set-0-id" />' % self.inner2_id, html=True)
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
-
 
     def test_inline_change_fk_all_perms(self):
         permission = Permission.objects.get(codename='add_inner2', content_type=self.inner_ct)

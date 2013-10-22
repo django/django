@@ -166,9 +166,8 @@ class RelatedFieldListFilter(FieldListFilter):
             rel_name = other_model._meta.pk.name
         self.lookup_kwarg = '%s__%s__exact' % (field_path, rel_name)
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
-        self.lookup_val = request.GET.get(self.lookup_kwarg, None)
-        self.lookup_val_isnull = request.GET.get(
-                                      self.lookup_kwarg_isnull, None)
+        self.lookup_val = request.GET.get(self.lookup_kwarg)
+        self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull)
         self.lookup_choices = field.get_choices(include_blank=False)
         super(RelatedFieldListFilter, self).__init__(
             field, request, params, model, model_admin, field_path)
@@ -218,8 +217,8 @@ class RelatedFieldListFilter(FieldListFilter):
             }
 
 FieldListFilter.register(lambda f: (
-        bool(f.rel) if hasattr(f, 'rel') else
-        isinstance(f, models.related.RelatedObject)), RelatedFieldListFilter)
+    bool(f.rel) if hasattr(f, 'rel') else
+    isinstance(f, models.related.RelatedObject)), RelatedFieldListFilter)
 
 
 class BooleanFieldListFilter(FieldListFilter):
@@ -242,16 +241,16 @@ class BooleanFieldListFilter(FieldListFilter):
             yield {
                 'selected': self.lookup_val == lookup and not self.lookup_val2,
                 'query_string': cl.get_query_string({
-                        self.lookup_kwarg: lookup,
-                    }, [self.lookup_kwarg2]),
+                    self.lookup_kwarg: lookup,
+                }, [self.lookup_kwarg2]),
                 'display': title,
             }
         if isinstance(self.field, models.NullBooleanField):
             yield {
                 'selected': self.lookup_val2 == 'True',
                 'query_string': cl.get_query_string({
-                        self.lookup_kwarg2: 'True',
-                    }, [self.lookup_kwarg]),
+                    self.lookup_kwarg2: 'True',
+                }, [self.lookup_kwarg]),
                 'display': _('Unknown'),
             }
 
@@ -279,7 +278,7 @@ class ChoicesFieldListFilter(FieldListFilter):
             yield {
                 'selected': smart_text(lookup) == self.lookup_val,
                 'query_string': cl.get_query_string({
-                                    self.lookup_kwarg: lookup}),
+                    self.lookup_kwarg: lookup}),
                 'display': title,
             }
 
@@ -341,7 +340,7 @@ class DateFieldListFilter(FieldListFilter):
             yield {
                 'selected': self.date_params == param_dict,
                 'query_string': cl.get_query_string(
-                                    param_dict, [self.field_generic]),
+                    param_dict, [self.field_generic]),
                 'display': title,
             }
 

@@ -15,8 +15,10 @@ def double_output(func, argtypes, errcheck=False, strarg=False):
     "Generates a ctypes function that returns a double value."
     func.argtypes = argtypes
     func.restype = c_double
-    if errcheck: func.errcheck = check_arg_errcode
-    if strarg: func.errcheck = check_str_arg
+    if errcheck:
+        func.errcheck = check_arg_errcode
+    if strarg:
+        func.errcheck = check_str_arg
     return func
 
 def geom_output(func, argtypes, offset=None):
@@ -77,7 +79,7 @@ def string_output(func, argtypes, offset=-1, str_result=False, decoding=None):
     """
     Generates a ctypes prototype for the given function with the
     given argument types that returns a string from a GDAL pointer.
-    The `const` flag indicates whether the allocated pointer should 
+    The `const` flag indicates whether the allocated pointer should
     be freed via the GDAL library routine VSIFree -- but only applies
     only when `str_result` is True.
     """
@@ -106,7 +108,8 @@ def void_output(func, argtypes, errcheck=True):
     For functions that don't only return an error code that needs to
     be examined.
     """
-    if argtypes: func.argtypes = argtypes
+    if argtypes:
+        func.argtypes = argtypes
     if errcheck:
         # `errcheck` keyword may be set to False for routines that
         # return void, rather than a status code.
@@ -114,7 +117,7 @@ def void_output(func, argtypes, errcheck=True):
         func.errcheck = check_errcode
     else:
         func.restype = None
-        
+
     return func
 
 def voidptr_output(func, argtypes):

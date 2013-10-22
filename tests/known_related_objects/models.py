@@ -20,4 +20,3 @@ class Pool(models.Model):
 class PoolStyle(models.Model):
     name = models.CharField(max_length=30)
     pool = models.OneToOneField(Pool)
-

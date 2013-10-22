@@ -4,7 +4,12 @@ from __future__ import unicode_literals
 import datetime
 import warnings
 
-from django.forms import *
+from django.forms import (
+    CharField, DateField, EmailField, FileField, Form, GenericIPAddressField,
+    HiddenInput, ImageField, IPAddressField, MultipleChoiceField,
+    MultiValueField, MultiWidget, PasswordInput, SelectMultiple, SlugField,
+    SplitDateTimeField, SplitDateTimeWidget, TextInput, URLField,
+)
 from django.forms.extras import SelectDateWidget
 from django.forms.utils import ErrorList
 from django.test import TestCase
@@ -509,7 +514,6 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         self.assertTrue(f._has_changed('some text,JP,2007-04-25 06:24:00',
             ['some text', ['J','P'], ['2009-04-25','11:44:00']]))
 
-
         class ComplexFieldForm(Form):
             field1 = ComplexField(widget=w)
 
@@ -536,7 +540,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         self.assertEqual(f.cleaned_data['field1'], 'some text,JP,2007-04-25 06:24:00')
 
     def test_ipaddress(self):
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True):
             warnings.simplefilter("always")
             f = IPAddressField()
         self.assertFormErrors(['This field is required.'], f.clean, '')
@@ -547,7 +551,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '1.2.3.4.5')
         self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '256.125.1.5')
 
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True):
             warnings.simplefilter("always")
             f = IPAddressField(required=False)
         self.assertEqual(f.clean(''), '')
@@ -727,7 +731,8 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
                 return self.as_divs()
 
             def as_divs(self):
-                if not self: return ''
+                if not self:
+                    return ''
                 return '<div class="errorlist">%s</div>' % ''.join('<div class="error">%s</div>' % force_text(e) for e in self)
 
         class CommentForm(Form):

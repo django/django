@@ -20,7 +20,8 @@ class OpenLayersWidget(Textarea):
     """
     def render(self, name, value, attrs=None):
         # Update the template parameters with any attributes passed in.
-        if attrs: self.params.update(attrs)
+        if attrs:
+            self.params.update(attrs)
 
         # Defaulting the WKT value to a blank string -- this
         # will be tested in the JavaScript and the appropriate
@@ -35,7 +36,7 @@ class OpenLayersWidget(Textarea):
             except (GEOSException, ValueError) as err:
                 logger.error(
                     "Error creating geometry from value '%s' (%s)" % (
-                    value, err)
+                        value, err)
                 )
                 value = None
 
@@ -67,7 +68,7 @@ class OpenLayersWidget(Textarea):
                 except OGRException as err:
                     logger.error(
                         "Error transforming geometry from srid '%s' to srid '%s' (%s)" % (
-                        value.srid, srid, err)
+                            value.srid, srid, err)
                     )
                     wkt = ''
             else:

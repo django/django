@@ -43,4 +43,3 @@ class Article(models.Model):
 
     class Meta:
         ordering = ('headline',)
-

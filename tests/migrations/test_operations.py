@@ -267,6 +267,10 @@ class OperationTests(MigrationTestBase):
         cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (1, 1, 1)")
         cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (2, 1, 1)")
         cursor.execute("DELETE FROM test_alunto_pony")
+        # Test flat unique_together
+        operation = migrations.AlterUniqueTogether("Pony", ("pink", "weight"))
+        operation.state_forwards("test_alunto", new_state)
+        self.assertEqual(len(new_state.models["test_alunto", "pony"].options.get("unique_together", set())), 1)
 
     def test_alter_index_together(self):
         """

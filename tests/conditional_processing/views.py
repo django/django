@@ -23,4 +23,3 @@ etag_view1 = condition(etag_func=lambda r: ETAG)(etag_view1)
 def etag_view2(request):
     return HttpResponse(FULL_RESPONSE)
 etag_view2 = etag(lambda r: ETAG)(etag_view2)
-

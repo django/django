@@ -62,9 +62,9 @@ class Media(object):
         # We need to sort the keys, and iterate over the sorted list.
         media = sorted(self._css.keys())
         return chain(*[
-                [format_html(u'<link href="{0}" type="text/css" media="{1}" rel="stylesheet" />', self.absolute_path(path), medium)
-                    for path in self._css[medium]]
-                for medium in media])
+            [format_html(u'<link href="{0}" type="text/css" media="{1}" rel="stylesheet" />', self.absolute_path(path), medium)
+             for path in self._css[medium]]
+            for medium in media])
 
     def absolute_path(self, path, prefix=None):
         if path.startswith(('http://', 'https://', '/')):
@@ -117,7 +117,7 @@ def media_property(cls):
         if definition:
             extend = getattr(definition, 'extend', True)
             if extend:
-                if extend == True:
+                if extend is True:
                     m = base
                 else:
                     m = Media()
@@ -131,12 +131,16 @@ def media_property(cls):
     return property(_media)
 
 class MediaDefiningClass(type):
-    "Metaclass for classes that can have media definitions"
-    def __new__(cls, name, bases, attrs):
-        new_class = super(MediaDefiningClass, cls).__new__(cls, name, bases,
-                                                           attrs)
+    """
+    Metaclass for classes that can have media definitions.
+    """
+    def __new__(mcs, name, bases, attrs):
+        new_class = (super(MediaDefiningClass, mcs)
+            .__new__(mcs, name, bases, attrs))
+
         if 'media' not in attrs:
             new_class.media = media_property(new_class)
+
         return new_class
 
 @python_2_unicode_compatible
@@ -269,7 +273,8 @@ class PasswordInput(TextInput):
         self.render_value = render_value
 
     def render(self, name, value, attrs=None):
-        if not self.render_value: value=None
+        if not self.render_value:
+            value=None
         return super(PasswordInput, self).render(name, value, attrs)
 
 class HiddenInput(Input):
@@ -287,7 +292,8 @@ class MultipleHiddenInput(HiddenInput):
         self.choices = choices
 
     def render(self, name, value, attrs=None, choices=()):
-        if value is None: value = []
+        if value is None:
+            value = []
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
         id_ = final_attrs.get('id', None)
         inputs = []
@@ -390,67 +396,35 @@ class Textarea(Widget):
         super(Textarea, self).__init__(default_attrs)
 
     def render(self, name, value, attrs=None):
-        if value is None: value = ''
+        if value is None:
+            value = ''
         final_attrs = self.build_attrs(attrs, name=name)
         return format_html(u'<textarea{0}>\r\n{1}</textarea>',
                            flatatt(final_attrs),
                            force_text(value))
 
 
-class DateInput(TextInput):
+class DateTimeBaseInput(TextInput):
+    format_key = ''
     def __init__(self, attrs=None, format=None):
-        super(DateInput, self).__init__(attrs)
-        if format:
-            self.format = format
-            self.manual_format = True
-        else:
-            self.format = formats.get_format('DATE_INPUT_FORMATS')[0]
-            self.manual_format = False
+        super(DateTimeBaseInput, self).__init__(attrs)
+        self.format = format if format else None
 
     def _format_value(self, value):
-        if self.is_localized and not self.manual_format:
-            return formats.localize_input(value)
-        elif hasattr(value, 'strftime'):
-            value = datetime_safe.new_date(value)
-            return value.strftime(self.format)
-        return value
+        return formats.localize_input(value,
+            self.format or formats.get_format(self.format_key)[0])
 
 
-class DateTimeInput(TextInput):
-    def __init__(self, attrs=None, format=None):
-        super(DateTimeInput, self).__init__(attrs)
-        if format:
-            self.format = format
-            self.manual_format = True
-        else:
-            self.format = formats.get_format('DATETIME_INPUT_FORMATS')[0]
-            self.manual_format = False
-
-    def _format_value(self, value):
-        if self.is_localized and not self.manual_format:
-            return formats.localize_input(value)
-        elif hasattr(value, 'strftime'):
-            value = datetime_safe.new_datetime(value)
-            return value.strftime(self.format)
-        return value
+class DateInput(DateTimeBaseInput):
+    format_key = 'DATE_INPUT_FORMATS'
 
 
-class TimeInput(TextInput):
-    def __init__(self, attrs=None, format=None):
-        super(TimeInput, self).__init__(attrs)
-        if format:
-            self.format = format
-            self.manual_format = True
-        else:
-            self.format = formats.get_format('TIME_INPUT_FORMATS')[0]
-            self.manual_format = False
+class DateTimeInput(DateTimeBaseInput):
+    format_key = 'DATETIME_INPUT_FORMATS'
 
-    def _format_value(self, value):
-        if self.is_localized and not self.manual_format:
-            return formats.localize_input(value)
-        elif hasattr(value, 'strftime'):
-            return value.strftime(self.format)
-        return value
+
+class TimeInput(DateTimeBaseInput):
+    format_key = 'TIME_INPUT_FORMATS'
 
 
 # Defined at module level so that CheckboxInput is picklable (#17976)
@@ -498,7 +472,8 @@ class Select(Widget):
         self.choices = list(choices)
 
     def render(self, name, value, attrs=None, choices=()):
-        if value is None: value = ''
+        if value is None:
+            value = ''
         final_attrs = self.build_attrs(attrs, name=name)
         output = [format_html(u'<select{0}>', flatatt(final_attrs))]
         options = self.render_options(choices, [value])
@@ -508,7 +483,7 @@ class Select(Widget):
         return mark_safe('\n'.join(output))
 
     def render_option(self, selected_choices, option_value, option_label):
-        if option_value == None:
+        if option_value is None:
             option_value = ''
         option_value = force_text(option_value)
         if option_value in selected_choices:
@@ -568,7 +543,8 @@ class SelectMultiple(Select):
     allow_multiple_selected = True
 
     def render(self, name, value, attrs=None, choices=()):
-        if value is None: value = []
+        if value is None:
+            value = []
         final_attrs = self.build_attrs(attrs, name=name)
         output = [format_html(u'<select multiple="multiple"{0}>', flatatt(final_attrs))]
         options = self.render_options(choices, value)

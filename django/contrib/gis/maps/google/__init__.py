@@ -30,20 +30,20 @@
       {{ google.style }} => "<style>{{ google.vml_css }}</style>"
 
   Explanation:
-   - The `xhtml` property provides the correct XML namespace needed for 
+   - The `xhtml` property provides the correct XML namespace needed for
      Google Maps to operate in IE using XHTML.  Google Maps on IE uses
-     VML to draw polylines.  Returns, by default: 
+     VML to draw polylines.  Returns, by default:
      <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">
-       
+
    - The `style` property provides the correct style tag for the CSS
      properties required by Google Maps on IE:
      <style type="text/css">v\:* {behavior:url(#default#VML);}</style>
 
-   - The `scripts` property provides the necessary <script> tags for 
+   - The `scripts` property provides the necessary <script> tags for
      including the Google Maps javascript, as well as including the
      generated javascript.
 
-   - The `body` property provides the correct attributes for the 
+   - The `body` property provides the correct attributes for the
      body tag to load the generated javascript.  By default, returns:
      <body onload="gmap_load()" onunload="GUnload()">
 

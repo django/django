@@ -22,7 +22,6 @@ from .models import Article, Count, Event, Location, EventGuide
 class NestedObjectsTests(TestCase):
     """
     Tests for ``NestedObject`` utility collection.
-
     """
     def setUp(self):
         self.n = NestedObjects(using=DEFAULT_DB_ALIAS)
@@ -295,7 +294,7 @@ class UtilTests(SimpleTestCase):
         # safestring should not be escaped
         class MyForm(forms.Form):
             text = forms.CharField(label=mark_safe('<i>text</i>'))
-            cb   = forms.BooleanField(label=mark_safe('<i>cb</i>'))
+            cb = forms.BooleanField(label=mark_safe('<i>cb</i>'))
 
         form = MyForm()
         self.assertHTMLEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
@@ -306,7 +305,7 @@ class UtilTests(SimpleTestCase):
         # normal strings needs to be escaped
         class MyForm(forms.Form):
             text = forms.CharField(label='&text')
-            cb   = forms.BooleanField(label='&cb')
+            cb = forms.BooleanField(label='&cb')
 
         form = MyForm()
         self.assertHTMLEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),

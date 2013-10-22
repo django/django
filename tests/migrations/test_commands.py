@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import copy
 import os
 import shutil
 
@@ -11,7 +12,7 @@ from django.utils import six
 from django.utils._os import upath
 from django.utils.encoding import force_text
 
-from .models import UnicodeModel
+from .models import UnicodeModel, UnserializableModel
 from .test_base import MigrationTestBase
 
 
@@ -90,12 +91,26 @@ class MakeMigrationsTests(MigrationTestBase):
     Tests running the makemigrations command.
     """
 
+    # Because the `import_module` performed in `MigrationLoader` will cache
+    # the migrations package, we can't reuse the same migration package
+    # between tests. This is only a problem for testing, since `makemigrations`
+    # is normally called in its own process.
+    creation_counter = 0
+
     def setUp(self):
+        MakeMigrationsTests.creation_counter += 1
         self._cwd = os.getcwd()
         self.test_dir = os.path.abspath(os.path.dirname(upath(__file__)))
-        self.migration_dir = os.path.join(self.test_dir, 'migrations')
+        self.migration_dir = os.path.join(self.test_dir, 'migrations_%d' % self.creation_counter)
+        self.migration_pkg = "migrations.migrations_%d" % self.creation_counter
+        self._old_app_models = copy.deepcopy(cache.app_models)
+        self._old_app_store = copy.deepcopy(cache.app_store)
 
     def tearDown(self):
+        cache.app_models = self._old_app_models
+        cache.app_store = self._old_app_store
+        cache._get_models_cache = {}
+
         os.chdir(self.test_dir)
         try:
             self._rmrf(self.migration_dir)
@@ -111,7 +126,8 @@ class MakeMigrationsTests(MigrationTestBase):
     def test_files_content(self):
         self.assertTableNotExists("migrations_unicodemodel")
         cache.register_models('migrations', UnicodeModel)
-        call_command("makemigrations", "migrations", verbosity=0)
+        with override_settings(MIGRATION_MODULES={"migrations": self.migration_pkg}):
+            call_command("makemigrations", "migrations", verbosity=0)
 
         init_file = os.path.join(self.migration_dir, "__init__.py")
 
@@ -142,3 +158,14 @@ class MakeMigrationsTests(MigrationTestBase):
                 self.assertTrue('\\xfa\\xf1\\xed\\xa9\\xf3\\xf0\\xe9 \\xb5\\xf3\\xf0\\xe9\\xf8\\xdf' in content)  # Meta.verbose_name_plural
                 self.assertTrue('\\xda\\xd1\\xcd\\xa2\\xd3\\xd0\\xc9' in content)  # title.verbose_name
                 self.assertTrue('\\u201c\\xd0j\\xe1\\xf1g\\xf3\\u201d' in content)  # title.default
+
+    def test_failing_migration(self):
+        #21280 - If a migration fails to serialize, it shouldn't generate an empty file.
+        cache.register_models('migrations', UnserializableModel)
+
+        with six.assertRaisesRegex(self, ValueError, r'Cannot serialize'):
+            with override_settings(MIGRATION_MODULES={"migrations": self.migration_pkg}):
+                    call_command("makemigrations", "migrations", verbosity=0)
+
+        initial_file = os.path.join(self.migration_dir, "0001_initial.py")
+        self.assertFalse(os.path.exists(initial_file))

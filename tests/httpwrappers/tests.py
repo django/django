@@ -254,6 +254,7 @@ class HttpResponseTests(unittest.TestCase):
         r['key'] = 'test'.encode('ascii')
         self.assertEqual(r['key'], str('test'))
         self.assertIsInstance(r['key'], str)
+        self.assertIn(b'test', r.serialize_headers())
 
         # Latin-1 unicode or bytes values are also converted to native strings.
         r['key'] = 'café'
@@ -262,11 +263,13 @@ class HttpResponseTests(unittest.TestCase):
         r['key'] = 'café'.encode('latin-1')
         self.assertEqual(r['key'], smart_str('café', 'latin-1'))
         self.assertIsInstance(r['key'], str)
+        self.assertIn('café'.encode('latin-1'), r.serialize_headers())
 
         # Other unicode values are MIME-encoded (there's no way to pass them as bytes).
         r['key'] = '†'
         self.assertEqual(r['key'], str('=?utf-8?b?4oCg?='))
         self.assertIsInstance(r['key'], str)
+        self.assertIn(b'=?utf-8?b?4oCg?=', r.serialize_headers())
 
         # The response also converts unicode or bytes keys to strings, but requires
         # them to contain ASCII

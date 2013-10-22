@@ -13,7 +13,7 @@ class KMLSitemap(Sitemap):
         # If no locations specified, then we try to build for
         # every model in installed applications.
         self.locations = self._build_kml_sources(locations)
-        
+
     def _build_kml_sources(self, sources):
         """
         Goes through the given sources and returns a 3-tuple of
@@ -33,7 +33,7 @@ class KMLSitemap(Sitemap):
                                             source._meta.model_name,
                                             field.name))
             elif isinstance(source, (list, tuple)):
-                if len(source) != 3: 
+                if len(source) != 3:
                     raise ValueError('Must specify a 3-tuple of (app_label, module_name, field_name).')
                 kml_sources.append(source)
             else:
@@ -46,7 +46,8 @@ class KMLSitemap(Sitemap):
         is placed on each URL element.
         """
         urls = Sitemap.get_urls(self, page=page, site=site)
-        for url in urls: url['geo_format'] = self.geo_format
+        for url in urls:
+            url['geo_format'] = self.geo_format
         return urls
 
     def items(self):
@@ -54,7 +55,7 @@ class KMLSitemap(Sitemap):
 
     def location(self, obj):
         return urlresolvers.reverse('django.contrib.gis.sitemaps.views.%s' % self.geo_format,
-                                    kwargs={'label' : obj[0], 
+                                    kwargs={'label' : obj[0],
                                             'model' : obj[1],
                                             'field_name': obj[2],
                                             }

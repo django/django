@@ -1229,6 +1229,10 @@ This flush/load procedure is repeated for each test in the test case, so you
 can be certain that the outcome of a test will not be affected by another test,
 or by the order of test execution.
 
+By default, fixtures are only loaded into the ``default`` database. If you are
+using multiple databases and set :attr:`multi_db=True
+<TransactionTestCase.multi_db>`, fixtures will be loaded into all databases.
+
 URLconf configuration
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -1293,6 +1297,11 @@ For example::
 
 This test case will flush *all* the test databases before running
 ``testIndexPageView``.
+
+The ``multi_db`` flag also affects into which databases the
+attr:`TransactionTestCase.fixtures` are loaded. By default (when
+``multi_db=False``), fixtures are only loaded into the ``default`` database.
+If ``multi_db=True``, fixtures are loaded into all databases.
 
 .. _overriding-settings:
 

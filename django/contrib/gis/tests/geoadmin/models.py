@@ -7,6 +7,8 @@ class City(models.Model):
     name = models.CharField(max_length=30)
     point = models.PointField()
     objects = models.GeoManager()
-    def __str__(self): return self.name
+
+    def __str__(self):
+        return self.name
 
 admin.site.register(City, admin.OSMGeoAdmin)

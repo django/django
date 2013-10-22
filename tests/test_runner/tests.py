@@ -355,7 +355,7 @@ class DeprecationDisplayTest(AdminScriptTestCase):
     def setUp(self):
         settings = {
             'DATABASES': '{"default": {"ENGINE":"django.db.backends.sqlite3", "NAME":":memory:"}}'
-            }
+        }
         self.write_settings('settings.py', sdict=settings)
 
     def tearDown(self):

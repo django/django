@@ -186,6 +186,12 @@ Minor features
   ``html_email_template_name`` parameter used to send a multipart HTML email
   for password resets.
 
+:mod:`django.contrib.gis`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The default OpenLayers library version included in widgets has been updated
+  from 2.11 to 2.13.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -246,6 +252,10 @@ File Uploads
   the file system permissions of directories created during file upload, like
   :setting:`FILE_UPLOAD_PERMISSIONS` does for the files themselves.
 
+* The :attr:`FileField.upload_to <django.db.models.FileField.upload_to>`
+  attribute is now optional. If it is omitted or given ``None`` or an empty
+  string, a subdirectory won't be used for storing the uploaded files.
+
 Forms
 ^^^^^
 
@@ -278,17 +288,42 @@ Forms
   :func:`~django.forms.formsets.formset_factory` to allow validating
   a minimum number of submitted forms.
 
+* The metaclasses used by ``Form`` and ``ModelForm`` have been reworked to
+  support more inheritance scenarios. The previous limitation that prevented
+  inheriting from both ``Form`` and ``ModelForm`` simultaneously have been
+  removed as long as ``ModelForm`` appears first in the MRO.
+
+* It's now possible to opt-out from a ``Form`` field declared in a parent class
+  by shadowing it with a non-``Field`` value.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
 * The :attr:`django.middleware.locale.LocaleMiddleware.response_redirect_class`
   attribute allows you to customize the redirects issued by the middleware.
 
+* The :class:`~django.middleware.locale.LocaleMiddleware` now stores the user's
+  selected language with the session key ``_language``. Previously it was
+  stored with the key ``django_language``, but keys reserved for Django should
+  start with an underscore. For backwards compatibility ``django_language`` is
+  still read from in 1.7. Sessions will be migrated to the new ``_language``
+  key as they are written.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
 * The :djadminopt:`--no-color` option for ``django-admin.py`` allows you to
   disable the colorization of management command output.
+
+* The new :djadminopt:`--natural-foreign` and :djadminopt:`--natural-primary`
+  options for :djadmin:`dumpdata`, and the new ``use_natural_foreign_keys`` and
+  ``use_natural_primary_keys`` arguments for ``serializers.serialize()``, allow
+  the use of natural primary keys when serializing.
+
+* It is no longer necessary to provide the cache table name or the
+  :djadminopt:`--database` option for the :djadmin:`createcachetable` command.
+  Django takes this information from your settings file. If you have configured
+  multiple caches or multiple databases, all cache tables are created.
 
 Models
 ^^^^^^
@@ -310,6 +345,9 @@ Models
   :class:`~django.db.models.OneToOneField` by setting its
   :attr:`~django.db.models.ForeignKey.related_name` to
   `'+'` or ending it with `'+'`.
+
+* :class:`F expressions <django.db.models.F>` support the power operator
+  (``**``).
 
 Signals
 ^^^^^^^
@@ -357,6 +395,12 @@ Templates
   and ``'Z'`` and is able to digest :ref:`time-zone-aware
   <naive_vs_aware_datetimes>` ``datetime`` instances performing the expected
   rendering.
+
+Requests
+^^^^^^^^
+
+* The new :attr:`HttpRequest.scheme <django.http.HttpRequest.scheme>` attribute
+  specifies the scheme of the request (``http`` or ``https`` normally).
 
 Tests
 ^^^^^
@@ -493,6 +537,18 @@ Miscellaneous
   still worked, even though it was not documented or officially supported. If
   you're still using it, please update to the current :setting:`CACHES` syntax.
 
+* The default ordering of ``Form`` fields in case of inheritance has changed to
+  follow normal Python MRO. Fields are now discovered by iterating through the
+  MRO in reverse with the topmost class coming last. This only affects you if
+  you relied on the default field ordering while having fields defined on both
+  the current class *and* on a parent ``Form``.
+
+* :meth:`~django.db.models.query.QuerySet.select_related` now chains in the
+  same way as other similar calls like ``prefetch_related``. That is,
+  ``select_related('foo', 'bar')`` is equivalent to
+  ``select_related('foo').select_related('bar')``. Previously the latter would
+  have been equivalent to ``select_related('bar')``.
+
 Features deprecated in 1.7
 ==========================
 
@@ -584,3 +640,27 @@ The :class:`django.db.models.IPAddressField` and
 The ``BaseMemcachedCache._get_memcache_timeout()`` method has been renamed to
 ``get_backend_timeout()``. Despite being a private API, it will go through the
 normal deprecation.
+
+Natural key serialization options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``--natural`` and ``-n`` options for :djadmin:`dumpdata` have been
+deprecated. Use :djadminopt:`--natural-foreign` instead.
+
+Similarly, the ``use_natural_keys`` argument for ``serializers.serialize()``
+has been deprecated. Use ``use_natural_foreign_keys`` instead.
+
+Merging of ``POST`` and ``GET`` arguments into ``WSGIRequest.REQUEST``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It was already strongly suggested that you use ``GET`` and ``POST`` instead of
+``REQUEST``, because the former are more explicit. The property ``REQUEST`` is
+deprecated and will be removed in Django 1.9.
+
+``django.utils.datastructures.MergeDict`` class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``MergeDict`` exists primarily to support merging ``POST`` and ``GET``
+arguments into a ``REQUEST`` property on ``WSGIRequest``. To merge
+dictionaries, use ``dict.update()`` instead. The class ``MergeDict`` is
+deprecated and will be removed in Django 1.9.

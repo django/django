@@ -52,4 +52,3 @@ try:
 except ImportError:
     # No ctypes, but don't raise an exception.
     pass
-

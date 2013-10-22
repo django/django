@@ -394,9 +394,9 @@ class LookupTests(TestCase):
                                  ['<Article: Article with \ backslash>'])
 
     def test_exclude(self):
-        a8 = Article.objects.create(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20))
-        a9 = Article.objects.create(headline='Article% with percent sign', pub_date=datetime(2005, 11, 21))
-        a10 = Article.objects.create(headline='Article with \\ backslash', pub_date=datetime(2005, 11, 22))
+        Article.objects.create(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20))
+        Article.objects.create(headline='Article% with percent sign', pub_date=datetime(2005, 11, 21))
+        Article.objects.create(headline='Article with \\ backslash', pub_date=datetime(2005, 11, 22))
 
         # exclude() is the opposite of filter() when doing lookups:
         self.assertQuerysetEqual(

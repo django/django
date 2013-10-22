@@ -248,12 +248,12 @@ class ModelPaginationTests(TestCase):
         p = paginator.page(1)
         self.assertEqual("<Page 1 of 2>", six.text_type(p))
         self.assertQuerysetEqual(p.object_list, [
-                "<Article: Article 1>",
-                "<Article: Article 2>",
-                "<Article: Article 3>",
-                "<Article: Article 4>",
-                "<Article: Article 5>"
-            ],
+            "<Article: Article 1>",
+            "<Article: Article 2>",
+            "<Article: Article 3>",
+            "<Article: Article 4>",
+            "<Article: Article 5>"
+        ],
             ordered=False
         )
         self.assertTrue(p.has_next())
@@ -269,11 +269,11 @@ class ModelPaginationTests(TestCase):
         p = paginator.page(2)
         self.assertEqual("<Page 2 of 2>", six.text_type(p))
         self.assertQuerysetEqual(p.object_list, [
-                "<Article: Article 6>",
-                "<Article: Article 7>",
-                "<Article: Article 8>",
-                "<Article: Article 9>"
-            ],
+            "<Article: Article 6>",
+            "<Article: Article 7>",
+            "<Article: Article 8>",
+            "<Article: Article 9>"
+        ],
             ordered=False
         )
         self.assertFalse(p.has_next())
@@ -302,9 +302,9 @@ class ModelPaginationTests(TestCase):
         # Make sure slicing the Page object with numbers and slice objects work.
         self.assertEqual(p[0], Article.objects.get(headline='Article 1'))
         self.assertQuerysetEqual(p[slice(2)], [
-                "<Article: Article 1>",
-                "<Article: Article 2>",
-            ]
+            "<Article: Article 1>",
+            "<Article: Article 2>",
+        ]
         )
         # After __getitem__ is called, object_list is a list
         self.assertIsInstance(p.object_list, list)

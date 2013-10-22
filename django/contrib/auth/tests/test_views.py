@@ -21,6 +21,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
                 SetPasswordForm)
+from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.auth.views import login as login_view
 
@@ -48,7 +49,7 @@ class AuthViewsTestCase(TestCase):
         response = self.client.post('/login/', {
             'username': 'testclient',
             'password': password,
-            })
+        })
         self.assertTrue(SESSION_KEY in self.client.session)
         return response
 
@@ -176,10 +177,11 @@ class PasswordResetTest(AuthViewsTestCase):
         # HTTP_HOST header isn't poisoned. This is done as a check when get_host()
         # is invoked, but we check here as a practical consequence.
         with patch_logger('django.security.DisallowedHost', 'error') as logger_calls:
-            response = self.client.post('/password_reset/',
-                    {'email': 'staffmember@example.com'},
-                    HTTP_HOST='www.example:dr.frankenstein@evil.tld'
-                )
+            response = self.client.post(
+                '/password_reset/',
+                {'email': 'staffmember@example.com'},
+                HTTP_HOST='www.example:dr.frankenstein@evil.tld'
+            )
             self.assertEqual(response.status_code, 400)
             self.assertEqual(len(mail.outbox), 0)
             self.assertEqual(len(logger_calls), 1)
@@ -189,14 +191,14 @@ class PasswordResetTest(AuthViewsTestCase):
     def test_poisoned_http_host_admin_site(self):
         "Poisoned HTTP_HOST headers can't be used for reset emails on admin views"
         with patch_logger('django.security.DisallowedHost', 'error') as logger_calls:
-            response = self.client.post('/admin_password_reset/',
-                    {'email': 'staffmember@example.com'},
-                    HTTP_HOST='www.example:dr.frankenstein@evil.tld'
-                )
+            response = self.client.post(
+                '/admin_password_reset/',
+                {'email': 'staffmember@example.com'},
+                HTTP_HOST='www.example:dr.frankenstein@evil.tld'
+            )
             self.assertEqual(response.status_code, 400)
             self.assertEqual(len(mail.outbox), 0)
             self.assertEqual(len(logger_calls), 1)
-
 
     def _test_confirm_start(self):
         # Start by creating the email
@@ -356,8 +358,8 @@ class ChangePasswordTest(AuthViewsTestCase):
             'password': password,
         })
         self.assertFormError(response, AuthenticationForm.error_messages['invalid_login'] % {
-                'username': User._meta.get_field('username').verbose_name
-            })
+            'username': User._meta.get_field('username').verbose_name
+        })
 
     def logout(self):
         self.client.get('/logout/')
@@ -490,8 +492,8 @@ class LoginTest(AuthViewsTestCase):
                 'good_url': urlquote(good_url),
             }
             response = self.client.post(safe_url, {
-                    'username': 'testclient',
-                    'password': password,
+                'username': 'testclient',
+                'password': password,
             })
             self.assertEqual(response.status_code, 302)
             self.assertTrue(good_url in response.url,
@@ -525,14 +527,12 @@ class LoginTest(AuthViewsTestCase):
         req.COOKIES[settings.CSRF_COOKIE_NAME] = token1
         req.method = "POST"
         req.POST = {'username': 'testclient', 'password': password, 'csrfmiddlewaretoken': token1}
-        req.REQUEST = req.POST
 
         # Use POST request to log in
         SessionMiddleware().process_request(req)
         CsrfViewMiddleware().process_view(req, login_view, (), {})
         req.META["SERVER_NAME"] = "testserver"  # Required to have redirect work in login view
         req.META["SERVER_PORT"] = 80
-        req.META["CSRF_COOKIE_USED"] = True
         resp = login_view(req)
         resp2 = CsrfViewMiddleware().process_response(req, resp)
         csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, None)

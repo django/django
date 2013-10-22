@@ -22,11 +22,13 @@ class GeoIPRecord(Structure):
                 ('continent_code', c_char_p),
                 ]
 geoip_char_fields = [name for name, ctype in GeoIPRecord._fields_ if ctype is c_char_p]
-geoip_encodings = { 0: 'iso-8859-1',
-                    1: 'utf8',
-                    }
+geoip_encodings = {
+    0: 'iso-8859-1',
+    1: 'utf8',
+}
 
-class GeoIPTag(Structure): pass
+class GeoIPTag(Structure):
+    pass
 
 RECTYPE = POINTER(GeoIPRecord)
 DBTYPE = POINTER(GeoIPTag)
@@ -48,7 +50,7 @@ GeoIPRecord_delete.restype = None
 
 # For retrieving records by name or address.
 def check_record(result, func, cargs):
-    if bool(result):
+    if result:
         # Checking the pointer to the C structure, if valid pull out elements
         # into a dicionary.
         rec = result.contents

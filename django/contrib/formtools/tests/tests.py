@@ -12,7 +12,9 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils._os import upath
 
-from django.contrib.formtools.tests.forms import *
+from django.contrib.formtools.tests.forms import (
+    HashTestBlankForm, HashTestForm, TestForm,
+)
 
 success_string = "Done was called!"
 success_string_encoded = success_string.encode()
@@ -138,7 +140,6 @@ class PreviewTests(TestCase):
         self.test_data.update({'hash': hash})
         response = self.client.post('/preview/', self.test_data)
         self.assertEqual(response.content, success_string_encoded)
-
 
     def test_form_submit_bad_hash(self):
         """

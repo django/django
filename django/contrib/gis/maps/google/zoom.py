@@ -34,7 +34,7 @@ class GoogleZoom(object):
         # zoom levels.
         self._degpp = [] # Degrees per pixel
         self._radpp = [] # Radians per pixel
-        self._npix  = [] # 1/2 the number of pixels for a tile at the given zoom level
+        self._npix = [] # 1/2 the number of pixels for a tile at the given zoom level
 
         # Incrementing through the zoom levels and populating the parameter arrays.
         z = tilesize # The number of pixels per zoom level.
@@ -95,7 +95,7 @@ class GoogleZoom(object):
         lon = (px[0] - npix) / self._degpp[zoom]
 
         # Calculating the latitude value.
-        lat = RTOD * ( 2 * atan(exp((px[1] - npix)/ (-1.0 * self._radpp[zoom]))) - 0.5 * pi)
+        lat = RTOD * (2 * atan(exp((px[1] - npix)/ (-1.0 * self._radpp[zoom]))) - 0.5 * pi)
 
         # Returning the longitude, latitude coordinate pair.
         return (lon, lat)
@@ -158,5 +158,5 @@ class GoogleZoom(object):
         ur = Point(extent[2:])
         # Calculating the width and height.
         height = ll.distance(ul)
-        width  = ul.distance(ur)
+        width = ul.distance(ur)
         return width, height

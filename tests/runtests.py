@@ -168,7 +168,7 @@ def setup(verbosity, test_labels):
             match = lambda label: (
                 module_label == label or  # exact match
                 module_label.startswith(label + '.')  # ancestor match
-                )
+            )
 
             module_found_in_labels = any(match(l) for l in test_labels_set)
 

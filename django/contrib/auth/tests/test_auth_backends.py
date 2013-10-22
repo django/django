@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
-from django.contrib.auth.tests.test_custom_user import ExtensionUser, CustomPermissionsUser, CustomUser
+from django.contrib.auth.tests.custom_user import ExtensionUser, CustomPermissionsUser, CustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.contrib.auth import authenticate, get_user
@@ -236,7 +236,6 @@ class CustomUserModelBackendAuthenticateTest(TestCase):
         self.assertEqual(test_user, authenticated_user)
 
 
-
 class TestObj(object):
     pass
 
@@ -428,7 +427,7 @@ class PermissionDeniedBackendTest(TestCase):
         self.assertEqual(authenticate(username='test', password='test'), None)
 
     @override_settings(AUTHENTICATION_BACKENDS=tuple(
-            settings.AUTHENTICATION_BACKENDS) + (backend, ))
+        settings.AUTHENTICATION_BACKENDS) + (backend, ))
     def test_authenticates(self):
         self.assertEqual(authenticate(username='test', password='test'), self.user1)
 

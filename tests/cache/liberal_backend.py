@@ -7,4 +7,3 @@ class LiberalKeyValidationMixin(object):
 
 class CacheClass(LiberalKeyValidationMixin, LocMemCache):
     pass
-

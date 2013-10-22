@@ -11,4 +11,3 @@ class Command(BaseCommand):
         else:
             sitemap_url = None
         ping_google(sitemap_url=sitemap_url)
-

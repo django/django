@@ -26,7 +26,7 @@ ROLES = (
     "term",
     "tfilter",
     "ttag",
-    
+
     # special
     "skip"
 )
@@ -40,39 +40,39 @@ ALWAYS_SKIP = [
 def fixliterals(fname):
     with open(fname) as fp:
         data = fp.read()
-    
+
     last = 0
     new = []
     storage = shelve.open("/tmp/literals_to_xref.shelve")
     lastvalues = storage.get("lastvalues", {})
-    
+
     for m in refre.finditer(data):
-        
+
         new.append(data[last:m.start()])
         last = m.end()
-        
+
         line_start = data.rfind("\n", 0, m.start())
         line_end = data.find("\n", m.end())
         prev_start = data.rfind("\n", 0, line_start)
         next_end = data.find("\n", line_end + 1)
-        
+
         # Skip always-skip stuff
         if m.group(1) in ALWAYS_SKIP:
             new.append(m.group(0))
             continue
-            
+
         # skip when the next line is a title
         next_line = data[m.end():next_end].strip()
         if next_line[0] in "!-/:-@[-`{-~" and all(c == next_line[0] for c in next_line):
             new.append(m.group(0))
             continue
-        
+
         sys.stdout.write("\n"+"-"*80+"\n")
         sys.stdout.write(data[prev_start+1:m.start()])
         sys.stdout.write(colorize(m.group(0), fg="red"))
         sys.stdout.write(data[m.end():next_end])
         sys.stdout.write("\n\n")
-        
+
         replace_type = None
         while replace_type is None:
             replace_type = raw_input(
@@ -80,34 +80,34 @@ def fixliterals(fname):
             ).strip().lower()
             if replace_type and replace_type not in ROLES:
                 replace_type = None
-        
+
         if replace_type == "":
             new.append(m.group(0))
             continue
-            
+
         if replace_type == "skip":
             new.append(m.group(0))
             ALWAYS_SKIP.append(m.group(1))
             continue
-        
+
         default = lastvalues.get(m.group(1), m.group(1))
         if default.endswith("()") and replace_type in ("class", "func", "meth"):
-            default = default[:-2]        
+            default = default[:-2]
         replace_value = raw_input(
             colorize("Text <target> [", fg="yellow") + default + colorize("]: ", fg="yellow")
         ).strip()
-        if not replace_value: 
+        if not replace_value:
             replace_value = default
         new.append(":%s:`%s`" % (replace_type, replace_value))
         lastvalues[m.group(1)] = replace_value
-    
+
     new.append(data[last:])
     with open(fname, "w") as fp:
         fp.write("".join(new))
-    
+
     storage["lastvalues"] = lastvalues
     storage.close()
-    
+
 #
 # The following is taken from django.utils.termcolors and is copied here to
 # avoid the dependency.

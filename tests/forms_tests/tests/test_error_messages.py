@@ -4,7 +4,13 @@ from __future__ import unicode_literals
 import warnings
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import *
+from django.forms import (
+    BooleanField, CharField, ChoiceField, DateField, DateTimeField,
+    DecimalField, EmailField, FileField, FloatField, Form,
+    GenericIPAddressField, IntegerField, IPAddressField, ModelChoiceField,
+    ModelMultipleChoiceField, MultipleChoiceField, RegexField,
+    SplitDateTimeField, TimeField, URLField, utils, ValidationError,
+)
 from django.test import TestCase
 from django.utils.safestring import mark_safe
 from django.utils.encoding import python_2_unicode_compatible
@@ -194,7 +200,7 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'required': 'REQUIRED',
             'invalid': 'INVALID IP ADDRESS',
         }
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True):
             warnings.simplefilter("always")
             f = IPAddressField(error_messages=e)
         self.assertFormErrors(['REQUIRED'], f.clean, '')
@@ -224,7 +230,8 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
                 return self.as_divs()
 
             def as_divs(self):
-                if not self: return ''
+                if not self:
+                    return ''
                 return mark_safe('<div class="error">%s</div>' % ''.join('<p>%s</p>' % e for e in self))
 
         # This form should print errors the default way.
@@ -242,9 +249,9 @@ class ModelChoiceFieldErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
     def test_modelchoicefield(self):
         # Create choices for the model choice field tests below.
         from forms_tests.models import ChoiceModel
-        c1 = ChoiceModel.objects.create(pk=1, name='a')
-        c2 = ChoiceModel.objects.create(pk=2, name='b')
-        c3 = ChoiceModel.objects.create(pk=3, name='c')
+        ChoiceModel.objects.create(pk=1, name='a')
+        ChoiceModel.objects.create(pk=2, name='b')
+        ChoiceModel.objects.create(pk=3, name='c')
 
         # ModelChoiceField
         e = {

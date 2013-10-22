@@ -11,14 +11,21 @@ from django.utils import six
 from django.utils.encoding import force_bytes
 
 ### The WKB/WKT Reader/Writer structures and pointers ###
-class WKTReader_st(Structure): pass
-class WKTWriter_st(Structure): pass
-class WKBReader_st(Structure): pass
-class WKBWriter_st(Structure): pass
+class WKTReader_st(Structure):
+    pass
 
-WKT_READ_PTR  = POINTER(WKTReader_st)
+class WKTWriter_st(Structure):
+    pass
+
+class WKBReader_st(Structure):
+    pass
+
+class WKBWriter_st(Structure):
+    pass
+
+WKT_READ_PTR = POINTER(WKTReader_st)
 WKT_WRITE_PTR = POINTER(WKTWriter_st)
-WKB_READ_PTR  = POINTER(WKBReader_st)
+WKB_READ_PTR = POINTER(WKBReader_st)
 WKB_WRITE_PTR = POINTER(WKBReader_st)
 
 ### WKTReader routines ###
@@ -107,8 +114,8 @@ def wkb_writer_set(func, argtype=c_int):
 
 wkb_writer_get_byteorder = wkb_writer_get(GEOSFunc('GEOSWKBWriter_getByteOrder'))
 wkb_writer_set_byteorder = wkb_writer_set(GEOSFunc('GEOSWKBWriter_setByteOrder'))
-wkb_writer_get_outdim    = wkb_writer_get(GEOSFunc('GEOSWKBWriter_getOutputDimension'))
-wkb_writer_set_outdim    = wkb_writer_set(GEOSFunc('GEOSWKBWriter_setOutputDimension'))
+wkb_writer_get_outdim = wkb_writer_get(GEOSFunc('GEOSWKBWriter_getOutputDimension'))
+wkb_writer_set_outdim = wkb_writer_set(GEOSFunc('GEOSWKBWriter_setOutputDimension'))
 wkb_writer_get_include_srid = wkb_writer_get(GEOSFunc('GEOSWKBWriter_getIncludeSRID'), restype=c_char)
 wkb_writer_set_include_srid = wkb_writer_set(GEOSFunc('GEOSWKBWriter_setIncludeSRID'), argtype=c_char)
 
@@ -121,7 +128,8 @@ class IOBase(GEOSBase):
 
     def __del__(self):
         # Cleaning up with the appropriate destructor.
-        if self._ptr: self._destructor(self._ptr)
+        if self._ptr:
+            self._destructor(self._ptr)
 
 ### Base WKB/WKT Reading and Writing objects ###
 
@@ -194,7 +202,8 @@ class WKBWriter(IOBase):
         return wkb_writer_get_byteorder(self.ptr)
 
     def _set_byteorder(self, order):
-        if not order in (0, 1): raise ValueError('Byte order parameter must be 0 (Big Endian) or 1 (Little Endian).')
+        if not order in (0, 1):
+            raise ValueError('Byte order parameter must be 0 (Big Endian) or 1 (Little Endian).')
         wkb_writer_set_byteorder(self.ptr, order)
 
     byteorder = property(_get_byteorder, _set_byteorder)
@@ -204,7 +213,8 @@ class WKBWriter(IOBase):
         return wkb_writer_get_outdim(self.ptr)
 
     def _set_outdim(self, new_dim):
-        if not new_dim in (2, 3): raise ValueError('WKB output dimension must be 2 or 3')
+        if not new_dim in (2, 3):
+            raise ValueError('WKB output dimension must be 2 or 3')
         wkb_writer_set_outdim(self.ptr, new_dim)
 
     outdim = property(_get_outdim, _set_outdim)
@@ -214,8 +224,10 @@ class WKBWriter(IOBase):
         return bool(ord(wkb_writer_get_include_srid(self.ptr)))
 
     def _set_include_srid(self, include):
-        if bool(include): flag = b'\x01'
-        else: flag = b'\x00'
+        if include:
+            flag = b'\x01'
+        else:
+            flag = b'\x00'
         wkb_writer_set_include_srid(self.ptr, flag)
 
     srid = property(_get_include_srid, _set_include_srid)

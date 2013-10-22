@@ -77,11 +77,11 @@
 TEMPLATE_EXTENSIONS = [
     ".html",
     ".htm",
-    ]
+]
 
 PYTHON_SOURCE_EXTENSIONS = [
     ".py",
-    ]
+]
 
 TEMPLATE_ENCODING = "UTF-8"
 
@@ -144,7 +144,7 @@ def get_template_dirs():
     from django.conf import settings
     dirs = set()
     if ('django.template.loaders.filesystem.load_template_source' in settings.TEMPLATE_LOADERS
-        or  'django.template.loaders.filesystem.Loader' in settings.TEMPLATE_LOADERS):
+        or 'django.template.loaders.filesystem.Loader' in settings.TEMPLATE_LOADERS):
         dirs.update(map(unicode, settings.TEMPLATE_DIRS))
 
     if ('django.template.loaders.app_directories.load_template_source' in settings.TEMPLATE_LOADERS

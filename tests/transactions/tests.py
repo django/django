@@ -203,7 +203,7 @@ class AtomicTests(TransactionTestCase):
             with self.assertRaises(DatabaseError):
                 with transaction.atomic(savepoint=False):
                     connection.cursor().execute(
-                            "SELECT no_such_col FROM transactions_reporter")
+                        "SELECT no_such_col FROM transactions_reporter")
             # prevent atomic from rolling back since we're recovering manually
             self.assertTrue(transaction.get_rollback())
             transaction.set_rollback(False)
@@ -489,7 +489,6 @@ class TransactionTests(IgnoreDeprecationWarningsMixin, TransactionTestCase):
         gen_reporter()
         r = Reporter.objects.get()
         self.assertEqual(r.first_name, "Robert")
-
 
     @skipUnlessDBFeature('supports_transactions')
     def test_manually_managed(self):

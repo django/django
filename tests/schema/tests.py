@@ -655,7 +655,7 @@ class SchemaTests(TransactionTestCase):
         class SomeError(Exception):
             pass
         try:
-            with connection.schema_editor() as editor:
+            with connection.schema_editor():
                 raise SomeError
         except SomeError:
             self.assertFalse(connection.in_atomic_block)

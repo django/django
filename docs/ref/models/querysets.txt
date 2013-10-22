@@ -688,13 +688,12 @@ manager or a ``QuerySet`` and do further filtering on the result. After calling
 select_related
 ~~~~~~~~~~~~~~
 
-.. method:: select_related()
+.. method:: select_related(*fields)
 
-Returns a ``QuerySet`` that will automatically "follow" foreign-key
-relationships, selecting that additional related-object data when it executes
-its query. This is a performance booster which results in (sometimes much)
-larger queries but means later use of foreign-key relationships won't require
-database queries.
+Returns a ``QuerySet`` that will "follow" foreign-key relationships, selecting
+additional related-object data when it executes its query. This is a
+performance booster which results in a single more complex query but means
+later use of foreign-key relationships won't require database queries.
 
 The following examples illustrate the difference between plain lookups and
 ``select_related()`` lookups. Here's standard lookup::
@@ -708,13 +707,13 @@ The following examples illustrate the difference between plain lookups and
 And here's ``select_related`` lookup::
 
     # Hits the database.
-    e = Entry.objects.select_related().get(id=5)
+    e = Entry.objects.select_related('blog').get(id=5)
 
     # Doesn't hit the database, because e.blog has been prepopulated
     # in the previous query.
     b = e.blog
 
-``select_related()`` follows foreign keys as far as possible. If you have the
+You can follow foreign keys in a similar way to querying them. If you have the
 following models::
 
     from django.db import models
@@ -731,10 +730,11 @@ following models::
         # ...
         author = models.ForeignKey(Person)
 
-...then a call to ``Book.objects.select_related().get(id=4)`` will cache the
-related ``Person`` *and* the related ``City``::
+...then a call to ``Book.objects.select_related('person',
+'person__city').get(id=4)`` will cache the related ``Person`` *and* the related
+``City``::
 
-    b = Book.objects.select_related().get(id=4)
+    b = Book.objects.select_related('person__city').get(id=4)
     p = b.author         # Doesn't hit the database.
     c = p.hometown       # Doesn't hit the database.
 
@@ -742,45 +742,9 @@ related ``Person`` *and* the related ``City``::
     p = b.author         # Hits the database.
     c = p.hometown       # Hits the database.
 
-Note that, by default, ``select_related()`` does not follow foreign keys that
-have ``null=True``.
-
-Usually, using ``select_related()`` can vastly improve performance because your
-app can avoid many database calls. However, there are times you are only
-interested in specific related models, or have deeply nested sets of
-relationships, and in these cases ``select_related()`` can be optimized by
-explicitly passing the related field names you are interested in. Only
-the specified relations will be followed.
-
-You can even do this for models that are more than one relation away by
-separating the field names with double underscores, just as for filters. For
-example, if you have this model::
-
-    class Room(models.Model):
-        # ...
-        building = models.ForeignKey(...)
-
-    class Group(models.Model):
-        # ...
-        teacher = models.ForeignKey(...)
-        room = models.ForeignKey(Room)
-        subject = models.ForeignKey(...)
-
-...and you only needed to work with the ``room`` and ``subject`` attributes,
-you could write this::
-
-    g = Group.objects.select_related('room', 'subject')
-
-This is also valid::
-
-    g = Group.objects.select_related('room__building', 'subject')
-
-...and would also pull in the ``building`` relation.
-
 You can refer to any :class:`~django.db.models.ForeignKey` or
 :class:`~django.db.models.OneToOneField` relation in the list of fields
-passed to ``select_related()``. This includes foreign keys that have
-``null=True`` (which are omitted in a no-parameter ``select_related()`` call).
+passed to ``select_related()``.
 
 You can also refer to the reverse direction of a
 :class:`~django.db.models.OneToOneField` in the list of fields passed to
@@ -789,12 +753,26 @@ You can also refer to the reverse direction of a
 is defined. Instead of specifying the field name, use the :attr:`related_name
 <django.db.models.ForeignKey.related_name>` for the field on the related object.
 
+There may be some situations where you wish to call ``select_related()`` with a
+lot of related objects, or where you don't know all of the relations. In these
+cases it is possible to call ``select_related()`` with no arguments. This will
+follow all non-null foreign keys it can find - nullable foreign keys must be
+specified. This is not recommended in most cases as it is likely to make the
+underlying query more complex, and return more data, than is actually needed.
+
 .. versionadded:: 1.6
 
 If you need to clear the list of related fields added by past calls of
 ``select_related`` on a ``QuerySet``, you can pass ``None`` as a parameter::
 
    >>> without_relations = queryset.select_related(None)
+
+.. versionchanged:: 1.7
+
+Chaining ``select_related`` calls now works in a similar way to other methods -
+that is that ``select_related('foo', 'bar')`` is equivalent to
+``select_related('foo').select_related('bar')``. Previously the latter would
+have been equivalent to ``select_related('bar')``.
 
 prefetch_related
 ~~~~~~~~~~~~~~~~

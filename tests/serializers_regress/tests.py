@@ -11,6 +11,7 @@ from __future__ import unicode_literals
 import datetime
 import decimal
 from unittest import expectedFailure, skipUnless
+import warnings
 
 try:
     import yaml
@@ -120,13 +121,13 @@ def data_compare(testcase, pk, klass, data):
     if klass == BinaryData and data is not None:
         testcase.assertEqual(bytes(data), bytes(instance.data),
              "Objects with PK=%d not equal; expected '%s' (%s), got '%s' (%s)" % (
-                pk, repr(bytes(data)), type(data), repr(bytes(instance.data)),
-                type(instance.data))
+                 pk, repr(bytes(data)), type(data), repr(bytes(instance.data)),
+                 type(instance.data))
         )
     else:
         testcase.assertEqual(data, instance.data,
              "Objects with PK=%d not equal; expected '%s' (%s), got '%s' (%s)" % (
-                pk, data, type(data), instance, type(instance.data))
+                 pk, data, type(data), instance, type(instance.data))
         )
 
 def generic_compare(testcase, pk, klass, data):
@@ -143,8 +144,8 @@ def m2m_compare(testcase, pk, klass, data):
     testcase.assertEqual(data, [obj.id for obj in instance.data.order_by('id')])
 
 def im2m_compare(testcase, pk, klass, data):
-    instance = klass.objects.get(id=pk)
-    #actually nothing else to check, the instance just should exist
+    klass.objects.get(id=pk)
+    # actually nothing else to check, the instance just should exist
 
 def im_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
@@ -204,7 +205,7 @@ test_data = [
     (data_obj, 41, EmailData, None),
     (data_obj, 42, EmailData, ""),
     (data_obj, 50, FileData, 'file:///foo/bar/whiz.txt'),
-#     (data_obj, 51, FileData, None),
+    # (data_obj, 51, FileData, None),
     (data_obj, 52, FileData, ""),
     (data_obj, 60, FilePathData, "/foo/bar/whiz.txt"),
     (data_obj, 61, FilePathData, None),
@@ -307,10 +308,10 @@ The end."""),
     (pk_obj, 601, BooleanPKData, True),
     (pk_obj, 602, BooleanPKData, False),
     (pk_obj, 610, CharPKData, "Test Char PKData"),
-#     (pk_obj, 620, DatePKData, datetime.date(2006,6,16)),
-#     (pk_obj, 630, DateTimePKData, datetime.datetime(2006,6,16,10,42,37)),
+    # (pk_obj, 620, DatePKData, datetime.date(2006,6,16)),
+    # (pk_obj, 630, DateTimePKData, datetime.datetime(2006,6,16,10,42,37)),
     (pk_obj, 640, EmailPKData, "hovercraft@example.com"),
-#     (pk_obj, 650, FilePKData, 'file:///foo/bar/whiz.txt'),
+    # (pk_obj, 650, FilePKData, 'file:///foo/bar/whiz.txt'),
     (pk_obj, 660, FilePathPKData, "/foo/bar/whiz.txt"),
     (pk_obj, 670, DecimalPKData, decimal.Decimal('12.345')),
     (pk_obj, 671, DecimalPKData, decimal.Decimal('-12.345')),
@@ -321,7 +322,7 @@ The end."""),
     (pk_obj, 680, IntegerPKData, 123456789),
     (pk_obj, 681, IntegerPKData, -123456789),
     (pk_obj, 682, IntegerPKData, 0),
-#     (XX, ImagePKData
+    # (XX, ImagePKData
     (pk_obj, 690, IPAddressPKData, "127.0.0.1"),
     (pk_obj, 695, GenericIPAddressPKData, "fe80:1424:2223:6cff:fe8a:2e8a:2151:abcd"),
     # (pk_obj, 700, NullBooleanPKData, True),
@@ -332,12 +333,12 @@ The end."""),
     (pk_obj, 750, SmallPKData, 12),
     (pk_obj, 751, SmallPKData, -12),
     (pk_obj, 752, SmallPKData, 0),
-#     (pk_obj, 760, TextPKData, """This is a long piece of text.
-# It contains line breaks.
-# Several of them.
-# The end."""),
-#    (pk_obj, 770, TimePKData, datetime.time(10,42,37)),
-#     (pk_obj, 790, XMLPKData, "<foo></foo>"),
+    # (pk_obj, 760, TextPKData, """This is a long piece of text.
+    # It contains line breaks.
+    # Several of them.
+    # The end."""),
+    # (pk_obj, 770, TimePKData, datetime.time(10,42,37)),
+    # (pk_obj, 790, XMLPKData, "<foo></foo>"),
 
     (data_obj, 800, AutoNowDateTimeData, datetime.datetime(2006,6,16,10,42,37)),
     (data_obj, 810, ModifyingSaveData, 42),
@@ -476,9 +477,12 @@ def naturalKeySerializerTest(format, self):
     for klass in instance_count:
         instance_count[klass] = klass.objects.count()
 
-    # Serialize the test database
-    serialized_data = serializers.serialize(format, objects, indent=2,
-        use_natural_keys=True)
+    # use_natural_keys is deprecated and to be removed in Django 1.9
+    with warnings.catch_warnings(record=True):
+        warnings.simplefilter("always")
+        # Serialize the test database
+        serialized_data = serializers.serialize(format, objects, indent=2,
+            use_natural_keys=True)
 
     for obj in serializers.deserialize(format, serialized_data):
         obj.save()
@@ -523,13 +527,41 @@ def streamTest(format, self):
         else:
             self.assertEqual(string_data, stream.content.decode('utf-8'))
 
-for format in [
-            f for f in serializers.get_serializer_formats()
-            if not isinstance(serializers.get_serializer(f), serializers.BadSerializer)
-        ]:
+
+def naturalKeyTest(format, self):
+    book1 = {'data': '978-1590597255', 'title': 'The Definitive Guide to '
+             'Django: Web Development Done Right'}
+    book2 = {'data':'978-1590599969', 'title': 'Practical Django Projects'}
+
+    # Create the books.
+    adrian = NaturalKeyAnchor.objects.create(**book1)
+    james = NaturalKeyAnchor.objects.create(**book2)
+
+    # Serialize the books.
+    string_data = serializers.serialize(format, NaturalKeyAnchor.objects.all(),
+                                        indent=2, use_natural_foreign_keys=True,
+                                        use_natural_primary_keys=True)
+
+    # Delete one book (to prove that the natural key generation will only
+    # restore the primary keys of books found in the database via the
+    # get_natural_key manager method).
+    james.delete()
+
+    # Deserialize and test.
+    books = list(serializers.deserialize(format, string_data))
+    self.assertEqual(len(books), 2)
+    self.assertEqual(books[0].object.title, book1['title'])
+    self.assertEqual(books[0].object.pk, adrian.pk)
+    self.assertEqual(books[1].object.title, book2['title'])
+    self.assertEqual(books[1].object.pk, None)
+
+
+for format in [f for f in serializers.get_serializer_formats()
+               if not isinstance(serializers.get_serializer(f), serializers.BadSerializer)]:
     setattr(SerializerTests, 'test_' + format + '_serializer', curry(serializerTest, format))
     setattr(SerializerTests, 'test_' + format + '_natural_key_serializer', curry(naturalKeySerializerTest, format))
     setattr(SerializerTests, 'test_' + format + '_serializer_fields', curry(fieldsTest, format))
+    setattr(SerializerTests, 'test_' + format + '_serializer_natural_keys', curry(naturalKeyTest, format))
     if format != 'python':
         setattr(SerializerTests, 'test_' + format + '_serializer_stream', curry(streamTest, format))
 

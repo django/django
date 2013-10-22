@@ -38,7 +38,7 @@ def bookmarklets(request):
     admin_root = urlresolvers.reverse('admin:index')
     return render_to_response('admin_doc/bookmarklets.html', {
         'root_path': admin_root,
-        'admin_url': "%s://%s%s" % ('https' if request.is_secure() else 'http', request.get_host(), admin_root),
+        'admin_url': "%s://%s%s" % (request.scheme, request.get_host(), admin_root),
     }, context_instance=RequestContext(request))
 
 @staff_member_required
@@ -204,7 +204,13 @@ def model_detail(request, app_label, model_name):
         if isinstance(field, models.ForeignKey):
             data_type = field.rel.to.__name__
             app_label = field.rel.to._meta.app_label
-            verbose = utils.parse_rst((_("the related `%(app_label)s.%(data_type)s` object")  % {'app_label': app_label, 'data_type': data_type}), 'model', _('model:') + data_type)
+            verbose = utils.parse_rst(
+                (_("the related `%(app_label)s.%(data_type)s` object") % {
+                    'app_label': app_label, 'data_type': data_type,
+                }),
+                'model',
+                _('model:') + data_type,
+            )
         else:
             data_type = get_readable_field_data_type(field)
             verbose = field.verbose_name

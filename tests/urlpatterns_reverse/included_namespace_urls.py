@@ -21,4 +21,3 @@ urlpatterns = patterns('urlpatterns_reverse.views',
     (r'^ns-included3/', include('urlpatterns_reverse.included_urls', namespace='inc-ns3')),
     (r'^ns-included4/', include('urlpatterns_reverse.namespace_urls', namespace='inc-ns4')),
 )
-

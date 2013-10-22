@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 
 from datetime import date, datetime, time, timedelta
 
-from django.test.utils import str_prefix
+from django.test.utils import str_prefix, TZ_SUPPORT
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils import timezone
@@ -50,15 +50,16 @@ def get_filter_tests():
         'filter-timesince06' : ('{{ a|timesince:b }}', {'a':now_tz - timedelta(hours=8), 'b':now_tz}, '8\xa0hours'),
 
         # Regression for #7443
-        'filter-timesince07': ('{{ earlier|timesince }}', { 'earlier': now - timedelta(days=7) }, '1\xa0week'),
-        'filter-timesince08': ('{{ earlier|timesince:now }}', { 'now': now, 'earlier': now - timedelta(days=7) }, '1\xa0week'),
-        'filter-timesince09': ('{{ later|timesince }}', { 'later': now + timedelta(days=7) }, '0\xa0minutes'),
-        'filter-timesince10': ('{{ later|timesince:now }}', { 'now': now, 'later': now + timedelta(days=7) }, '0\xa0minutes'),
+        'filter-timesince07': ('{{ earlier|timesince }}', {'earlier': now - timedelta(days=7)}, '1\xa0week'),
+        'filter-timesince08': ('{{ earlier|timesince:now }}', {'now': now, 'earlier': now - timedelta(days=7)}, '1\xa0week'),
+        'filter-timesince09': ('{{ later|timesince }}', {'later': now + timedelta(days=7)}, '0\xa0minutes'),
+        'filter-timesince10': ('{{ later|timesince:now }}', {'now': now, 'later': now + timedelta(days=7)}, '0\xa0minutes'),
 
         # Ensures that differing timezones are calculated correctly
+        # Tests trying to compare a timezone-aware 'now' to now aren't supported on no-tz-support systems (e.g Windows).
         'filter-timesince11' : ('{{ a|timesince }}', {'a': now}, '0\xa0minutes'),
-        'filter-timesince12' : ('{{ a|timesince }}', {'a': now_tz}, '0\xa0minutes'),
-        'filter-timesince13' : ('{{ a|timesince }}', {'a': now_tz_i}, '0\xa0minutes'),
+        'filter-timesince12' : ('{{ a|timesince }}', {'a': now_tz}, '0\xa0minutes') if TZ_SUPPORT else ('', {}, ''),
+        'filter-timesince13' : ('{{ a|timesince }}', {'a': now_tz_i}, '0\xa0minutes') if TZ_SUPPORT else ('', {}, ''),
         'filter-timesince14' : ('{{ a|timesince:b }}', {'a': now_tz, 'b': now_tz_i}, '0\xa0minutes'),
         'filter-timesince15' : ('{{ a|timesince:b }}', {'a': now, 'b': now_tz_i}, ''),
         'filter-timesince16' : ('{{ a|timesince:b }}', {'a': now_tz_i, 'b': now}, ''),
@@ -77,18 +78,20 @@ def get_filter_tests():
         'filter-timeuntil05' : ('{{ a|timeuntil:b }}', {'a':now - timedelta(days=2), 'b':now - timedelta(days=2, minutes=1)}, '1\xa0minute'),
 
         # Regression for #7443
-        'filter-timeuntil06': ('{{ earlier|timeuntil }}', { 'earlier': now - timedelta(days=7) }, '0\xa0minutes'),
-        'filter-timeuntil07': ('{{ earlier|timeuntil:now }}', { 'now': now, 'earlier': now - timedelta(days=7) }, '0\xa0minutes'),
-        'filter-timeuntil08': ('{{ later|timeuntil }}', { 'later': now + timedelta(days=7, hours=1) }, '1\xa0week'),
-        'filter-timeuntil09': ('{{ later|timeuntil:now }}', { 'now': now, 'later': now + timedelta(days=7) }, '1\xa0week'),
+        'filter-timeuntil06': ('{{ earlier|timeuntil }}', {'earlier': now - timedelta(days=7)}, '0\xa0minutes'),
+        'filter-timeuntil07': ('{{ earlier|timeuntil:now }}', {'now': now, 'earlier': now - timedelta(days=7)}, '0\xa0minutes'),
+        'filter-timeuntil08': ('{{ later|timeuntil }}', {'later': now + timedelta(days=7, hours=1)}, '1\xa0week'),
+        'filter-timeuntil09': ('{{ later|timeuntil:now }}', {'now': now, 'later': now + timedelta(days=7)}, '1\xa0week'),
 
         # Ensures that differing timezones are calculated correctly
-        'filter-timeuntil10' : ('{{ a|timeuntil }}', {'a': now_tz_i}, '0\xa0minutes'),
-        'filter-timeuntil11' : ('{{ a|timeuntil:b }}', {'a': now_tz_i, 'b': now_tz}, '0\xa0minutes'),
+        # Tests trying to compare a timezone-aware 'now' to now aren't supported on no-tz-support systems (e.g Windows).
+        'filter-timeuntil10' : ('{{ a|timeuntil }}', {'a': now_tz}, '0\xa0minutes') if TZ_SUPPORT else ('', {}, ''),
+        'filter-timeuntil11' : ('{{ a|timeuntil }}', {'a': now_tz_i}, '0\xa0minutes') if TZ_SUPPORT else ('', {}, ''),
+        'filter-timeuntil12' : ('{{ a|timeuntil:b }}', {'a': now_tz_i, 'b': now_tz}, '0\xa0minutes'),
 
         # Regression for #9065 (two date objects).
-        'filter-timeuntil12' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today}, '0\xa0minutes'),
-        'filter-timeuntil13' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today - timedelta(hours=24)}, '1\xa0day'),
+        'filter-timeuntil13' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today}, '0\xa0minutes'),
+        'filter-timeuntil14' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today - timedelta(hours=24)}, '1\xa0day'),
 
         'filter-addslash01': ("{% autoescape off %}{{ a|addslashes }} {{ b|addslashes }}{% endautoescape %}", {"a": "<a>'", "b": mark_safe("<a>'")}, r"<a>\' <a>\'"),
         'filter-addslash02': ("{{ a|addslashes }} {{ b|addslashes }}", {"a": "<a>'", "b": mark_safe("<a>'")}, r"&lt;a&gt;\&#39; <a>\'"),
@@ -264,8 +267,8 @@ def get_filter_tests():
         'filter-default_if_none01': ('{{ a|default:"x<" }}', {"a": None}, "x<"),
         'filter-default_if_none02': ('{% autoescape off %}{{ a|default:"x<" }}{% endautoescape %}', {"a": None}, "x<"),
 
-        'filter-phone2numeric01': ('{{ a|phone2numeric }} {{ b|phone2numeric }}', {"a": "<1-800-call-me>", "b": mark_safe("<1-800-call-me>") }, "&lt;1-800-2255-63&gt; <1-800-2255-63>"),
-        'filter-phone2numeric02': ('{% autoescape off %}{{ a|phone2numeric }} {{ b|phone2numeric }}{% endautoescape %}', {"a": "<1-800-call-me>", "b": mark_safe("<1-800-call-me>") }, "<1-800-2255-63> <1-800-2255-63>"),
+        'filter-phone2numeric01': ('{{ a|phone2numeric }} {{ b|phone2numeric }}', {"a": "<1-800-call-me>", "b": mark_safe("<1-800-call-me>")}, "&lt;1-800-2255-63&gt; <1-800-2255-63>"),
+        'filter-phone2numeric02': ('{% autoescape off %}{{ a|phone2numeric }} {{ b|phone2numeric }}{% endautoescape %}', {"a": "<1-800-call-me>", "b": mark_safe("<1-800-call-me>")}, "<1-800-2255-63> <1-800-2255-63>"),
         'filter-phone2numeric03': ('{{ a|phone2numeric }}', {"a": "How razorback-jumping frogs can level six piqued gymnasts!"}, "469 729672225-5867464 37647 226 53835 749 747833 49662787!"),
 
         # Ensure iriencode keeps safe strings:
@@ -344,7 +347,7 @@ def get_filter_tests():
         # Test that joining with unsafe joiners don't result in unsafe strings (#11377)
         'join05': (r'{{ a|join:var }}', {'a': ['alpha', 'beta & me'], 'var': ' & '}, 'alpha &amp; beta &amp; me'),
         'join06': (r'{{ a|join:var }}', {'a': ['alpha', 'beta & me'], 'var': mark_safe(' & ')}, 'alpha & beta &amp; me'),
-        'join07': (r'{{ a|join:var|lower }}', {'a': ['Alpha', 'Beta & me'], 'var': ' & ' }, 'alpha &amp; beta &amp; me'),
+        'join07': (r'{{ a|join:var|lower }}', {'a': ['Alpha', 'Beta & me'], 'var': ' & '}, 'alpha &amp; beta &amp; me'),
         'join08': (r'{{ a|join:var|lower }}', {'a': ['Alpha', 'Beta & me'], 'var': mark_safe(' & ')}, 'alpha & beta &amp; me'),
 
         'date01': (r'{{ d|date:"m" }}', {'d': datetime(2008, 1, 1)}, '01'),
@@ -368,12 +371,12 @@ def get_filter_tests():
         'time05': (r'{{ d|time:"P:e:O:T:Z" }}', {'d': today}, ''),
         'time06': (r'{{ obj|time:"P:e:O:T:Z" }}', {'obj': 'non-datetime-value'}, ''),
 
-         # Tests for #11687 and #16676
-         'add01': (r'{{ i|add:"5" }}', {'i': 2000}, '2005'),
-         'add02': (r'{{ i|add:"napis" }}', {'i': 2000}, ''),
-         'add03': (r'{{ i|add:16 }}', {'i': 'not_an_int'}, ''),
-         'add04': (r'{{ i|add:"16" }}', {'i': 'not_an_int'}, 'not_an_int16'),
-         'add05': (r'{{ l1|add:l2 }}', {'l1': [1, 2], 'l2': [3, 4]}, '[1, 2, 3, 4]'),
-         'add06': (r'{{ t1|add:t2 }}', {'t1': (3, 4), 't2': (1, 2)}, '(3, 4, 1, 2)'),
-         'add07': (r'{{ d|add:t }}', {'d': date(2000, 1, 1), 't': timedelta(10)}, 'Jan. 11, 2000'),
+        # Tests for #11687 and #16676
+        'add01': (r'{{ i|add:"5" }}', {'i': 2000}, '2005'),
+        'add02': (r'{{ i|add:"napis" }}', {'i': 2000}, ''),
+        'add03': (r'{{ i|add:16 }}', {'i': 'not_an_int'}, ''),
+        'add04': (r'{{ i|add:"16" }}', {'i': 'not_an_int'}, 'not_an_int16'),
+        'add05': (r'{{ l1|add:l2 }}', {'l1': [1, 2], 'l2': [3, 4]}, '[1, 2, 3, 4]'),
+        'add06': (r'{{ t1|add:t2 }}', {'t1': (3, 4), 't2': (1, 2)}, '(3, 4, 1, 2)'),
+        'add07': (r'{{ d|add:t }}', {'d': date(2000, 1, 1), 't': timedelta(10)}, 'Jan. 11, 2000'),
     }

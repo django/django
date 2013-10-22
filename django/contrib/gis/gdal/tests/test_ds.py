@@ -93,7 +93,8 @@ class DataSourceTest(unittest.TestCase):
 
                 # Now checking the field names.
                 flds = layer.fields
-                for f in flds: self.assertEqual(True, f in source.fields)
+                for f in flds:
+                    self.assertEqual(True, f in source.fields)
 
                 # Negative FIDs are not allowed.
                 self.assertRaises(OGRIndexError, layer.__getitem__, -1)

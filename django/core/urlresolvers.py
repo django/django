@@ -156,7 +156,6 @@ class LocaleRegexProvider(object):
         self._regex = regex
         self._regex_dict = {}
 
-
     @property
     def regex(self):
         """

@@ -20,8 +20,8 @@ class GoogleMap(object):
 
     # String constants
     onunload = mark_safe('onunload="GUnload()"') # Cleans up after Google Maps
-    vml_css  = mark_safe('v\:* {behavior:url(#default#VML);}') # CSS for IE VML
-    xmlns    = mark_safe('xmlns:v="urn:schemas-microsoft-com:vml"') # XML Namespace (for IE VML).
+    vml_css = mark_safe('v\:* {behavior:url(#default#VML);}') # CSS for IE VML
+    xmlns = mark_safe('xmlns:v="urn:schemas-microsoft-com:vml"') # XML Namespace (for IE VML).
 
     def __init__(self, key=None, api_url=None, version=None,
                  center=None, zoom=None, dom_id='map',
@@ -81,15 +81,17 @@ class GoogleMap(object):
         # level and a center coordinate are provided with polygons/polylines,
         # no automatic determination will occur.
         self.calc_zoom = False
-        if self.polygons or self.polylines  or self.markers:
+        if self.polygons or self.polylines or self.markers:
             if center is None or zoom is None:
                 self.calc_zoom = True
 
         # Defaults for the zoom level and center coordinates if the zoom
         # is not automatically calculated.
-        if zoom is None: zoom = 4
+        if zoom is None:
+            zoom = 4
         self.zoom = zoom
-        if center is None: center = (0, 0)
+        if center is None:
+            center = (0, 0)
         self.center = center
 
     def render(self):
@@ -229,5 +231,6 @@ class GoogleMapSet(GoogleMap):
     def icons(self):
         "Returns a sequence of all icons in each map of the set."
         icons = set()
-        for map in self.maps: icons |= map.icons
+        for map in self.maps:
+            icons |= map.icons
         return icons

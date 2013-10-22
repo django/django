@@ -51,8 +51,8 @@ def pretty_name(obj):
 @total_ordering
 class MeasureBase(object):
     STANDARD_UNIT = None
-    ALIAS  = {}
-    UNITS  = {}
+    ALIAS = {}
+    UNITS = {}
     LALIAS = {}
 
     def __init__(self, default_unit=None, **kwargs):
@@ -179,7 +179,8 @@ class MeasureBase(object):
         val = 0.0
         default_unit = self.STANDARD_UNIT
         for unit, value in six.iteritems(kwargs):
-            if not isinstance(value, float): value = float(value)
+            if not isinstance(value, float):
+                value = float(value)
             if unit in self.UNITS:
                 val += self.UNITS[unit] * value
                 default_unit = unit
@@ -251,7 +252,7 @@ class Distance(MeasureBase):
         'survey_ft' : 0.304800609601,
         'um' : 0.000001,
         'yd': 0.9144,
-        }
+    }
 
     # Unit aliases for `UNIT` terms encountered in Spatial Reference WKT.
     ALIAS = {
@@ -291,7 +292,7 @@ class Distance(MeasureBase):
         'U.S. Foot' : 'survey_ft',
         'Yard (Indian)' : 'indian_yd',
         'Yard (Sears)' : 'sears_yd'
-        }
+    }
     LALIAS = dict((k.lower(), v) for k, v in ALIAS.items())
 
     def __mul__(self, other):
@@ -304,7 +305,7 @@ class Distance(MeasureBase):
         else:
             raise TypeError('%(distance)s must be multiplied with number or %(distance)s' % {
                 "distance" : pretty_name(self.__class__),
-                })
+            })
 
 
 class Area(MeasureBase):

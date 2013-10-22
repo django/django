@@ -72,5 +72,3 @@ class Contact(models.Model):
 #
 class EpisodePermanent(Episode):
     pass
-
-

@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include
 
-from . import  widgetadmin
+from . import widgetadmin
 
 
 urlpatterns = patterns('',

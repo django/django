@@ -36,7 +36,7 @@ class DebugParser(Parser):
         self.command_stack = []
 
     def enter_command(self, command, token):
-        self.command_stack.append( (command, token.source) )
+        self.command_stack.append((command, token.source))
 
     def exit_command(self):
         self.command_stack.pop()

@@ -58,15 +58,17 @@ class GeoFeedMixin(object):
                         raise ValueError('Only should be 2 or 4 numeric elements.')
                 # If a GeoRSS box was given via tuple.
                 if not box_coords is None:
-                    if w3c_geo: raise ValueError('Cannot use simple GeoRSS box in W3C Geo feeds.')
+                    if w3c_geo:
+                        raise ValueError('Cannot use simple GeoRSS box in W3C Geo feeds.')
                     handler.addQuickElement('georss:box', self.georss_coords(box_coords))
             else:
                 # Getting the lower-case geometry type.
                 gtype = str(geom.geom_type).lower()
                 if gtype == 'point':
-                    self.add_georss_point(handler, geom.coords, w3c_geo=w3c_geo) 
+                    self.add_georss_point(handler, geom.coords, w3c_geo=w3c_geo)
                 else:
-                    if w3c_geo: raise ValueError('W3C Geo only supports Point geometries.')
+                    if w3c_geo:
+                        raise ValueError('W3C Geo only supports Point geometries.')
                     # For formatting consistent w/the GeoRSS simple standard:
                     # http://georss.org/1.0#simple
                     if gtype in ('linestring', 'linearring'):

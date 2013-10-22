@@ -119,7 +119,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             # The "&&" operator returns true if A's bounding box overlaps
             # B's bounding box.
             'bboverlaps' : PostGISOperator('&&'),
-            }
+        }
 
         self.geometry_functions = {
             'equals' : PostGISFunction(prefix, 'Equals'),
@@ -256,7 +256,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
                     'GeoDjango requires at least PostGIS version 1.3. '
                     'Was the database created from a spatial database '
                     'template?' % self.connection.settings_dict['NAME']
-                    )
+                )
             version = vtup[1:]
         return version
 
@@ -453,8 +453,10 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         Helper routine that returns a boolean indicating whether the number of
         parameters is correct for the lookup type.
         """
-        def exactly_two(np): return np == 2
-        def two_to_three(np): return np >= 2 and np <=3
+        def exactly_two(np):
+            return np == 2
+        def two_to_three(np):
+            return np >= 2 and np <=3
         if (lookup_type in self.distance_functions and
             lookup_type != 'dwithin'):
             return two_to_three(num_param)

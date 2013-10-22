@@ -61,7 +61,7 @@ class FileUploadTests(TestCase):
             'name': 'Ringo',
             'file_field1': file1,
             'file_field2': file2,
-            }
+        }
 
         for key in list(post_data):
             try:
@@ -112,7 +112,7 @@ class FileUploadTests(TestCase):
 
             post_data = {
                 'file_unicode': file1,
-                }
+            }
 
             response = self.client.post('/file_uploads/unicode_name/', post_data)
 
@@ -335,7 +335,7 @@ class FileUploadTests(TestCase):
             """A handler that'll access POST during an exception."""
             def handle_uncaught_exception(self, request, resolver, exc_info):
                 ret = super(POSTAccessingHandler, self).handle_uncaught_exception(request, resolver, exc_info)
-                p = request.POST
+                request.POST  # evaluate
                 return ret
 
         # Maybe this is a little more complicated that it needs to be; but if
@@ -356,7 +356,7 @@ class FileUploadTests(TestCase):
                 'file_field': fp,
             }
             try:
-                response = self.client.post('/file_uploads/upload_errors/', post_data)
+                self.client.post('/file_uploads/upload_errors/', post_data)
             except reference_error.__class__ as err:
                 self.assertFalse(
                     str(err) == str(reference_error),
@@ -377,8 +377,7 @@ class FileUploadTests(TestCase):
         vars = {'boundary': 'oUrBoUnDaRyStRiNg'}
         post_data = [
             '--%(boundary)s',
-            'Content-Disposition: form-data; name="file_field"; '
-                'filename="MiXeD_cAsE.txt"',
+            'Content-Disposition: form-data; name="file_field"; filename="MiXeD_cAsE.txt"',
             'Content-Type: application/octet-stream',
             '',
             'file contents\n'
@@ -444,7 +443,7 @@ class MultiParserTests(unittest.TestCase):
     def test_empty_upload_handlers(self):
         # We're not actually parsing here; just checking if the parser properly
         # instantiates with empty upload handlers.
-        parser = MultiPartParser({
+        MultiPartParser({
             'CONTENT_TYPE':     'multipart/form-data; boundary=_foo',
             'CONTENT_LENGTH':   '1'
         }, StringIO('x'), [], 'utf-8')

@@ -6,7 +6,7 @@ your kitchen with the scissors, batteries, duct tape, and other junk.
 
 .. toctree::
    :maxdepth: 2
-   
+
    api-stability
    design-philosophies
    distributions

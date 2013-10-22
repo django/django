@@ -356,13 +356,7 @@ class BaseDatabaseCreation(object):
             interactive=False,
             database=self.connection.alias)
 
-        from django.core.cache import get_cache
-        from django.core.cache.backends.db import BaseDatabaseCache
-        for cache_alias in settings.CACHES:
-            cache = get_cache(cache_alias)
-            if isinstance(cache, BaseDatabaseCache):
-                call_command('createcachetable', cache._table,
-                             database=self.connection.alias)
+        call_command('createcachetable', database=self.connection.alias)
 
         # Get a cursor (even though we don't need one yet). This has
         # the side effect of initializing the test database.
@@ -445,9 +439,9 @@ class BaseDatabaseCreation(object):
         settings_dict['NAME'] = old_database_name
         backend = load_backend(settings_dict['ENGINE'])
         new_connection = backend.DatabaseWrapper(
-                             settings_dict,
-                             alias='__destroy_test_db__',
-                             allow_thread_sharing=False)
+            settings_dict,
+            alias='__destroy_test_db__',
+            allow_thread_sharing=False)
         new_connection.creation._destroy_test_db(test_database_name, verbosity)
 
     def _destroy_test_db(self, test_database_name, verbosity):

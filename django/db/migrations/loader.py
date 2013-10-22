@@ -41,8 +41,8 @@ class MigrationLoader(object):
     def migrations_module(cls, app_label):
         if app_label in settings.MIGRATION_MODULES:
             return settings.MIGRATION_MODULES[app_label]
-        app = cache.get_app(app_label)
-        return ".".join(app.__name__.split(".")[:-1] + ["migrations"])
+        else:
+            return '%s.migrations' % cache.get_app_package(app_label)
 
     def load_disk(self):
         """
@@ -81,20 +81,29 @@ class MigrationLoader(object):
                     if import_name[0] not in "_.~":
                         migration_names.add(import_name)
             # Load them
+            south_style_migrations = False
             for migration_name in migration_names:
                 try:
                     migration_module = import_module("%s.%s" % (module_name, migration_name))
                 except ImportError as e:
                     # Ignore South import errors, as we're triggering them
                     if "south" in str(e).lower():
-                        continue
+                        south_style_migrations = True
+                        break
                     raise
                 if not hasattr(migration_module, "Migration"):
                     raise BadMigrationError("Migration %s in app %s has no Migration class" % (migration_name, app_label))
                 # Ignore South-style migrations
                 if hasattr(migration_module.Migration, "forwards"):
-                    continue
+                    south_style_migrations = True
+                    break
                 self.disk_migrations[app_label, migration_name] = migration_module.Migration(migration_name, app_label)
+            if south_style_migrations:
+                self.unmigrated_apps.add(app_label)
+
+    def get_migration(self, app_label, name_prefix):
+        "Gets the migration exactly named, or raises KeyError"
+        return self.graph.nodes[app_label, name_prefix]
 
     def get_migration_by_prefix(self, app_label, name_prefix):
         "Returns the migration(s) which match the given app label and name _prefix_"
@@ -155,6 +164,8 @@ class MigrationLoader(object):
             # and remove, repointing dependencies if needs be.
             for replaced in migration.replaces:
                 if replaced in normal:
+                    # We don't care if the replaced migration doesn't exist;
+                    # the usage pattern here is to delete things after a while.
                     del normal[replaced]
                 for child_key in reverse_dependencies.get(replaced, set()):
                     normal[child_key].dependencies.remove(replaced)

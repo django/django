@@ -2,12 +2,17 @@
 
 from __future__ import unicode_literals
 
+import copy
 import datetime
+import os
 
-from django.utils import six
-from django.test import TestCase
-from django.db.migrations.writer import MigrationWriter
+from django.core.validators import RegexValidator, EmailValidator
 from django.db import models, migrations
+from django.db.migrations.writer import MigrationWriter
+from django.db.models.loading import cache
+from django.test import TestCase, override_settings
+from django.utils import six
+from django.utils.deconstruct import deconstructible
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -70,8 +75,22 @@ class WriterTests(TestCase):
         # Datetime stuff
         self.assertSerializedEqual(datetime.datetime.utcnow())
         self.assertSerializedEqual(datetime.datetime.utcnow)
+        self.assertSerializedEqual(datetime.datetime.today())
+        self.assertSerializedEqual(datetime.datetime.today)
         self.assertSerializedEqual(datetime.date.today())
         self.assertSerializedEqual(datetime.date.today)
+        # Classes
+        validator = RegexValidator(message="hello")
+        string, imports = MigrationWriter.serialize(validator)
+        self.assertEqual(string, "django.core.validators.RegexValidator(message=%s)" % repr("hello"))
+        self.serialize_round_trip(validator)
+        validator = EmailValidator(message="hello")  # Test with a subclass.
+        string, imports = MigrationWriter.serialize(validator)
+        self.assertEqual(string, "django.core.validators.EmailValidator(message=%s)" % repr("hello"))
+        self.serialize_round_trip(validator)
+        validator = deconstructible(path="custom.EmailValidator")(EmailValidator)(message="hello")
+        string, imports = MigrationWriter.serialize(validator)
+        self.assertEqual(string, "custom.EmailValidator(message=%s)" % repr("hello"))
         # Django fields
         self.assertSerializedFieldEqual(models.CharField(max_length=255))
         self.assertSerializedFieldEqual(models.TextField(null=True, blank=True))
@@ -95,3 +114,24 @@ class WriterTests(TestCase):
         # Just make sure it runs for now, and that things look alright.
         result = self.safe_exec(output)
         self.assertIn("Migration", result)
+
+    def test_migration_path(self):
+        _old_app_store = copy.deepcopy(cache.app_store)
+
+        test_apps = [
+            'migrations.migrations_test_apps.normal',
+            'migrations.migrations_test_apps.with_package_model',
+        ]
+
+        base_dir = os.path.dirname(os.path.dirname(__file__))
+
+        try:
+            with override_settings(INSTALLED_APPS=test_apps):
+                for app in test_apps:
+                    cache.load_app(app)
+                    migration = migrations.Migration('0001_initial', app.split('.')[-1])
+                    expected_path = os.path.join(base_dir, *(app.split('.') + ['migrations', '0001_initial.py']))
+                    writer = MigrationWriter(migration)
+                    self.assertEqual(writer.path, expected_path)
+        finally:
+            cache.app_store = _old_app_store

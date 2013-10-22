@@ -30,7 +30,6 @@ class BaseHandler(object):
     def __init__(self):
         self._request_middleware = self._view_middleware = self._template_response_middleware = self._response_middleware = self._exception_middleware = None
 
-
     def load_middleware(self):
         """
         Populate middleware lists from settings.MIDDLEWARE_CLASSES.
@@ -166,9 +165,9 @@ class BaseHandler(object):
                 response = callback(request, **param_dict)
             except:
                 signals.got_request_exception.send(
-                        sender=self.__class__, request=request)
+                    sender=self.__class__, request=request)
                 response = self.handle_uncaught_exception(request,
-                        resolver, sys.exc_info())
+                    resolver, sys.exc_info())
 
         except SuspiciousOperation as e:
             # The request logger receives events for any problematic request
@@ -182,9 +181,9 @@ class BaseHandler(object):
                 response = callback(request, **param_dict)
             except:
                 signals.got_request_exception.send(
-                        sender=self.__class__, request=request)
+                    sender=self.__class__, request=request)
                 response = self.handle_uncaught_exception(request,
-                        resolver, sys.exc_info())
+                    resolver, sys.exc_info())
 
         except SystemExit:
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701

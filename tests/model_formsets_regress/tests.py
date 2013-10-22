@@ -161,8 +161,8 @@ class InlineFormsetTests(TestCase):
 
         # Instantiate the Form and FormSet to prove
         # you can create a formset with an instance of None
-        form = Form(instance=None)
-        formset = FormSet(instance=None)
+        Form(instance=None)
+        FormSet(instance=None)
 
     def test_empty_fields_on_modelformset(self):
         "No fields passed to modelformset_factory should result in no fields on returned forms except for the id. See #14119."
@@ -203,7 +203,7 @@ class InlineFormsetTests(TestCase):
         self.assertQuerysetEqual(
             dalnet.host_set.order_by("hostname"),
             ["<Host: matrix.de.eu.dal.net>", "<Host: tranquility.hub.dal.net>"]
-            )
+        )
 
     def test_initial_data(self):
         user = User.objects.create(username="bibi", serial=1)
@@ -369,25 +369,25 @@ class FormfieldShouldDeleteFormTests(TestCase):
     DeleteFormset = modelformset_factory(User, form=CustomDeleteUserForm, formset=BaseCustomDeleteModelFormSet)
 
     data = {
-            'form-TOTAL_FORMS': '4',
-            'form-INITIAL_FORMS': '0',
-            'form-MAX_NUM_FORMS': '4',
-            'form-0-username': 'John',
-            'form-0-serial': '1',
-            'form-1-username': 'Paul',
-            'form-1-serial': '2',
-            'form-2-username': 'George',
-            'form-2-serial': '3',
-            'form-3-username': 'Ringo',
-            'form-3-serial': '5',
-            }
+        'form-TOTAL_FORMS': '4',
+        'form-INITIAL_FORMS': '0',
+        'form-MAX_NUM_FORMS': '4',
+        'form-0-username': 'John',
+        'form-0-serial': '1',
+        'form-1-username': 'Paul',
+        'form-1-serial': '2',
+        'form-2-username': 'George',
+        'form-2-serial': '3',
+        'form-3-username': 'Ringo',
+        'form-3-serial': '5',
+    }
 
     delete_all_ids = {
-            'form-0-DELETE': '1',
-            'form-1-DELETE': '1',
-            'form-2-DELETE': '1',
-            'form-3-DELETE': '1',
-            }
+        'form-0-DELETE': '1',
+        'form-1-DELETE': '1',
+        'form-2-DELETE': '1',
+        'form-3-DELETE': '1',
+    }
 
     def test_init_database(self):
         """ Add test data to database via formset """

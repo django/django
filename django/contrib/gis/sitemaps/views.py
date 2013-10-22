@@ -8,6 +8,7 @@ from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.contrib.gis.db.models.fields import GeometryField
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models import get_model
+from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
 from django.utils.translation import ugettext as _
 
@@ -20,7 +21,7 @@ def index(request, sitemaps):
     """
     current_site = get_current_site(request)
     sites = []
-    protocol = 'https' if request.is_secure() else 'http'
+    protocol = request.scheme
     for section, site in sitemaps.items():
         if callable(site):
             pages = site().paginator.num_pages
@@ -77,10 +78,10 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
 
     if field_name:
         try:
-            info = klass._meta.get_field_by_name(field_name)
-            if not isinstance(info[0], GeometryField):
-                raise Exception
-        except:
+            field, _, _, _ = klass._meta.get_field_by_name(field_name)
+            if not isinstance(field, GeometryField):
+                raise FieldDoesNotExist
+        except FieldDoesNotExist:
             raise Http404('Invalid geometry field.')
 
     connection = connections[using]

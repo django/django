@@ -54,8 +54,12 @@ class AdminFormfieldForDBFieldTests(TestCase):
         # Check that we got a field of the right type
         self.assertTrue(
             isinstance(widget, widgetclass),
-            "Wrong widget for %s.%s: expected %s, got %s" % \
-                (model.__class__.__name__, fieldname, widgetclass, type(widget))
+            "Wrong widget for %s.%s: expected %s, got %s" % (
+                model.__class__.__name__,
+                fieldname,
+                widgetclass,
+                type(widget),
+            )
         )
 
         # Return the formfield so that other tests can continue
@@ -367,7 +371,9 @@ class AdminFileWidgetTest(DjangoTestCase):
         w = widgets.AdminFileWidget()
         self.assertHTMLEqual(
             w.render('test', album.cover_art),
-            '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/hybrid_theory.jpg">albums\hybrid_theory.jpg</a> <span class="clearable-file-input"><input type="checkbox" name="test-clear" id="test-clear_id" /> <label for="test-clear_id">Clear</label></span><br />Change: <input type="file" name="test" /></p>' % { 'STORAGE_URL': default_storage.url('') },
+            '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/hybrid_theory.jpg">albums\hybrid_theory.jpg</a> <span class="clearable-file-input"><input type="checkbox" name="test-clear" id="test-clear_id" /> <label for="test-clear_id">Clear</label></span><br />Change: <input type="file" name="test" /></p>' % {
+                'STORAGE_URL': default_storage.url('')
+            },
         )
 
         self.assertHTMLEqual(
@@ -857,7 +863,6 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         self.admin_login(username='super', password='secret', login_url='/')
         self.selenium.get(
             '%s%s' % (self.live_server_url, '/admin_widgets/school/%s/' % self.school.id))
-
 
         for field_name in ['students', 'alumni']:
             from_box = '#id_%s_from' % field_name

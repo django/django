@@ -112,6 +112,10 @@ As well as addition, Django supports subtraction, multiplication, division,
 and modulo arithmetic with ``F()`` objects, using Python constants,
 variables, and even other ``F()`` objects.
 
+.. versionadded:: 1.7
+
+    The power operator ``**`` is also supported.
+
 ``Q()`` objects
 ===============
 

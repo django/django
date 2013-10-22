@@ -5,7 +5,17 @@ import datetime
 import decimal
 import unittest
 
-from django.template.defaultfilters import *
+from django.template.defaultfilters import (
+    add, addslashes, capfirst, center, cut, date, default, default_if_none,
+    dictsort, dictsortreversed, divisibleby, escape, escapejs_filter,
+    filesizeformat, first, fix_ampersands_filter, floatformat, force_escape,
+    get_digit, iriencode, join, length, length_is, linebreaksbr,
+    linebreaks_filter, linenumbers, ljust, lower, make_list,
+    phone2numeric_filter, pluralize, removetags, rjust, slice_filter, slugify,
+    stringformat, striptags, time, timesince_filter, timeuntil_filter, title,
+    truncatewords, truncatewords_html, unordered_list, upper, urlencode,
+    urlize, urlizetrunc, wordcount, wordwrap, yesno,
+)
 from django.test import TestCase
 from django.utils import six
 from django.utils import translation
@@ -82,7 +92,6 @@ class DefaultFiltersTests(TestCase):
         finally:
             decimal_ctx.prec = old_prec
 
-
     def test_floatformat_py2_fail(self):
         self.assertEqual(floatformat(1.00000000000000015, 16), '1.0000000000000002')
 
@@ -91,7 +100,6 @@ class DefaultFiltersTests(TestCase):
     # such as unicode or Decimal.
     if six.PY2:
         test_floatformat_py2_fail = unittest.expectedFailure(test_floatformat_py2_fail)
-
 
     def test_addslashes(self):
         self.assertEqual(addslashes('"double quotes" and \'single quotes\''),
@@ -124,7 +132,7 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(linenumbers('line 1\nline 2'),
                           '1. line 1\n2. line 2')
         self.assertEqual(linenumbers('\n'.join(['x'] * 10)),
-                          '01. x\n02. x\n03. x\n04. x\n05. x\n06. x\n07. '\
+                          '01. x\n02. x\n03. x\n04. x\n05. x\n06. x\n07. '
                           'x\n08. x\n09. x\n10. x')
 
     def test_lower(self):
@@ -138,7 +146,7 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(make_list(1234), ['1', '2', '3', '4'])
 
     def test_slugify(self):
-        self.assertEqual(slugify(' Jack & Jill like numbers 1,2,3 and 4 and'\
+        self.assertEqual(slugify(' Jack & Jill like numbers 1,2,3 and 4 and'
             ' silly characters ?%.$!/'),
             'jack-jill-like-numbers-123-and-4-and-silly-characters')
 
@@ -170,7 +178,7 @@ class DefaultFiltersTests(TestCase):
     def test_truncatewords_html(self):
         self.assertEqual(truncatewords_html(
             '<p>one <a href="#">two - three <br>four</a> five</p>', 0), '')
-        self.assertEqual(truncatewords_html('<p>one <a href="#">two - '\
+        self.assertEqual(truncatewords_html('<p>one <a href="#">two - '
             'three <br>four</a> five</p>', 2),
             '<p>one <a href="#">two ...</a></p>')
         self.assertEqual(truncatewords_html(
@@ -184,6 +192,9 @@ class DefaultFiltersTests(TestCase):
             '<p>one <a href="#">two - three <br>four</a> five</p>')
         self.assertEqual(truncatewords_html(
             '\xc5ngstr\xf6m was here', 1), '\xc5ngstr\xf6m ...')
+        self.assertEqual(truncatewords_html('<i>Buenos d&iacute;as! '
+            '&#x00bf;C&oacute;mo est&aacute;?</i>', 3),
+            '<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo ...</i>')
 
     def test_upper(self):
         self.assertEqual(upper('Mixed case input'), 'MIXED CASE INPUT')
@@ -202,17 +213,17 @@ class DefaultFiltersTests(TestCase):
                           'fran%C3%A7ois%20%26%20jill')
 
     def test_urlizetrunc(self):
-        self.assertEqual(urlizetrunc('http://short.com/', 20), '<a href='\
+        self.assertEqual(urlizetrunc('http://short.com/', 20), '<a href='
             '"http://short.com/" rel="nofollow">http://short.com/</a>')
 
-        self.assertEqual(urlizetrunc('http://www.google.co.uk/search?hl=en'\
-            '&q=some+long+url&btnG=Search&meta=', 20), '<a href="http://'\
-            'www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&'\
+        self.assertEqual(urlizetrunc('http://www.google.co.uk/search?hl=en'
+            '&q=some+long+url&btnG=Search&meta=', 20), '<a href="http://'
+            'www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&'
             'meta=" rel="nofollow">http://www.google...</a>')
 
-        self.assertEqual(urlizetrunc('http://www.google.co.uk/search?hl=en'\
-            '&q=some+long+url&btnG=Search&meta=', 20), '<a href="http://'\
-            'www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search'\
+        self.assertEqual(urlizetrunc('http://www.google.co.uk/search?hl=en'
+            '&q=some+long+url&btnG=Search&meta=', 20), '<a href="http://'
+            'www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search'
             '&meta=" rel="nofollow">http://www.google...</a>')
 
         # Check truncating of URIs which are the exact length
@@ -220,15 +231,15 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(len(uri), 31)
 
         self.assertEqual(urlizetrunc(uri, 31),
-            '<a href="http://31characteruri.com/test/" rel="nofollow">'\
+            '<a href="http://31characteruri.com/test/" rel="nofollow">'
             'http://31characteruri.com/test/</a>')
 
         self.assertEqual(urlizetrunc(uri, 30),
-            '<a href="http://31characteruri.com/test/" rel="nofollow">'\
+            '<a href="http://31characteruri.com/test/" rel="nofollow">'
             'http://31characteruri.com/t...</a>')
 
         self.assertEqual(urlizetrunc(uri, 2),
-            '<a href="http://31characteruri.com/test/"'\
+            '<a href="http://31characteruri.com/test/"'
             ' rel="nofollow">...</a>')
 
     def test_urlize(self):
@@ -312,9 +323,9 @@ class DefaultFiltersTests(TestCase):
 
         # Check urlize handles brackets properly (#19070)
         self.assertEqual(urlize('[see www.example.com]'),
-            '[see <a href="http://www.example.com" rel="nofollow">www.example.com</a>]' )
+            '[see <a href="http://www.example.com" rel="nofollow">www.example.com</a>]')
         self.assertEqual(urlize('see test[at[example.com'),
-            'see <a href="http://test[at[example.com" rel="nofollow">test[at[example.com</a>' )
+            'see <a href="http://test[at[example.com" rel="nofollow">test[at[example.com</a>')
         self.assertEqual(urlize('[http://168.192.0.1](http://168.192.0.1)'),
             '[<a href="http://168.192.0.1](http://168.192.0.1)" rel="nofollow">http://168.192.0.1](http://168.192.0.1)</a>')
 
@@ -338,7 +349,7 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(urlize('before \'hi@example.com afterwards'),
                          'before \'<a href="mailto:hi@example.com">hi@example.com</a> afterwards')
 
-        # Check urlize copes with commas following URLs in quotes - see #20364 
+        # Check urlize copes with commas following URLs in quotes - see #20364
         self.assertEqual(urlize('Email us at "hi@example.com", or phone us at +xx.yy'),
             'Email us at "<a href="mailto:hi@example.com">hi@example.com</a>", or phone us at +xx.yy')
 
@@ -347,18 +358,18 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(wordcount('oneword'), 1)
         self.assertEqual(wordcount('lots of words'), 3)
 
-        self.assertEqual(wordwrap('this is a long paragraph of text that '\
+        self.assertEqual(wordwrap('this is a long paragraph of text that '
             'really needs to be wrapped I\'m afraid', 14),
-            "this is a long\nparagraph of\ntext that\nreally needs\nto be "\
+            "this is a long\nparagraph of\ntext that\nreally needs\nto be "
             "wrapped\nI'm afraid")
 
-        self.assertEqual(wordwrap('this is a short paragraph of text.\n  '\
+        self.assertEqual(wordwrap('this is a short paragraph of text.\n  '
             'But this line should be indented', 14),
-            'this is a\nshort\nparagraph of\ntext.\n  But this\nline '\
+            'this is a\nshort\nparagraph of\ntext.\n  But this\nline '
             'should be\nindented')
 
-        self.assertEqual(wordwrap('this is a short paragraph of text.\n  '\
-            'But this line should be indented',15), 'this is a short\n'\
+        self.assertEqual(wordwrap('this is a short paragraph of text.\n  '
+            'But this line should be indented',15), 'this is a short\n'
             'paragraph of\ntext.\n  But this line\nshould be\nindented')
 
     def test_rjust(self):
@@ -385,7 +396,7 @@ class DefaultFiltersTests(TestCase):
         self.assertIsInstance(escaped, SafeData)
         self.assertEqual(
             force_escape('<some html & special characters > here ĐÅ€£'),
-            '&lt;some html &amp; special characters &gt; here'\
+            '&lt;some html &amp; special characters &gt; here'
             ' \u0110\xc5\u20ac\xa3')
 
     def test_linebreaks(self):
@@ -406,10 +417,10 @@ class DefaultFiltersTests(TestCase):
                           'line 1<br />line 2')
 
     def test_removetags(self):
-        self.assertEqual(removetags('some <b>html</b> with <script>alert'\
+        self.assertEqual(removetags('some <b>html</b> with <script>alert'
             '("You smell")</script> disallowed <img /> tags', 'script img'),
             'some <b>html</b> with alert("You smell") disallowed  tags')
-        self.assertEqual(striptags('some <b>html</b> with <script>alert'\
+        self.assertEqual(striptags('some <b>html</b> with <script>alert'
             '("You smell")</script> disallowed <img /> tags'),
             'some html with alert("You smell") disallowed  tags')
 
@@ -480,20 +491,20 @@ class DefaultFiltersTests(TestCase):
 
         self.assertEqual(
             unordered_list(['item 1', ['item 1.1', 'item1.2'], 'item 2']),
-            '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t\t<li>item1.2'\
+            '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t\t<li>item1.2'
             '</li>\n\t</ul>\n\t</li>\n\t<li>item 2</li>')
 
         self.assertEqual(
             unordered_list(['item 1', ['item 1.1', ['item 1.1.1',
                                                       ['item 1.1.1.1']]]]),
-            '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1\n\t\t<ul>\n\t\t\t<li>'\
-            'item 1.1.1\n\t\t\t<ul>\n\t\t\t\t<li>item 1.1.1.1</li>\n\t\t\t'\
+            '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1\n\t\t<ul>\n\t\t\t<li>'
+            'item 1.1.1\n\t\t\t<ul>\n\t\t\t\t<li>item 1.1.1.1</li>\n\t\t\t'
             '</ul>\n\t\t\t</li>\n\t\t</ul>\n\t\t</li>\n\t</ul>\n\t</li>')
 
         self.assertEqual(unordered_list(
             ['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]),
-            '\t<li>States\n\t<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>'\
-            'Lawrence</li>\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>'\
+            '\t<li>States\n\t<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>'
+            'Lawrence</li>\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>'
             '\n\t\t<li>Illinois</li>\n\t</ul>\n\t</li>')
 
         @python_2_unicode_compatible
@@ -515,13 +526,13 @@ class DefaultFiltersTests(TestCase):
             '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t</ul>\n\t</li>')
 
         self.assertEqual(unordered_list(['item 1', [['item 1.1', []],
-            ['item 1.2', []]]]), '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1'\
+            ['item 1.2', []]]]), '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1'
             '</li>\n\t\t<li>item 1.2</li>\n\t</ul>\n\t</li>')
 
         self.assertEqual(unordered_list(['States', [['Kansas', [['Lawrence',
-            []], ['Topeka', []]]], ['Illinois', []]]]), '\t<li>States\n\t'\
-            '<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>Lawrence</li>'\
-            '\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>\n\t\t<li>'\
+            []], ['Topeka', []]]], ['Illinois', []]]]), '\t<li>States\n\t'
+            '<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>Lawrence</li>'
+            '\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>\n\t\t<li>'
             'Illinois</li>\n\t</ul>\n\t</li>')
 
     def test_add(self):

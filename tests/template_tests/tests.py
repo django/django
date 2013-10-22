@@ -201,10 +201,10 @@ class TemplateLoaderTests(TestCase):
             test_template_sources('/DIR1/index.HTML', template_dirs,
                                   ['/DIR1/index.HTML'])
 
+    # Turn TEMPLATE_DEBUG on, so that the origin file name will be kept with
+    # the compiled templates.
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_loader_debug_origin(self):
-        # Turn TEMPLATE_DEBUG on, so that the origin file name will be kept with
-        # the compiled templates.
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, True
         old_loaders = loader.template_source_loaders
 
         try:
@@ -237,7 +237,6 @@ class TemplateLoaderTests(TestCase):
                 'Cached template loaded through cached loader has incorrect name for debug page: %s' % template_name)
         finally:
             loader.template_source_loaders = old_loaders
-            settings.TEMPLATE_DEBUG = old_td
 
     def test_loader_origin(self):
         with self.settings(TEMPLATE_DEBUG=True):
@@ -253,15 +252,14 @@ class TemplateLoaderTests(TestCase):
         template = loader.get_template('login.html')
         self.assertEqual(template.origin, None)
 
+    # TEMPLATE_DEBUG must be true, otherwise the exception raised
+    # during {% include %} processing will be suppressed.
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_include_missing_template(self):
         """
         Tests that the correct template is identified as not existing
         when {% include %} specifies a template that does not exist.
         """
-
-        # TEMPLATE_DEBUG must be true, otherwise the exception raised
-        # during {% include %} processing will be suppressed.
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, True
         old_loaders = loader.template_source_loaders
 
         try:
@@ -276,14 +274,14 @@ class TemplateLoaderTests(TestCase):
                 tmpl = loader.select_template([load_name])
                 r = tmpl.render(template.Context({}))
             except template.TemplateDoesNotExist as e:
-                settings.TEMPLATE_DEBUG = old_td
                 self.assertEqual(e.args[0], 'missing.html')
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
         finally:
             loader.template_source_loaders = old_loaders
-            settings.TEMPLATE_DEBUG = old_td
 
-
+    # TEMPLATE_DEBUG must be true, otherwise the exception raised
+    # during {% include %} processing will be suppressed.
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_extends_include_missing_baseloader(self):
         """
         Tests that the correct template is identified as not existing
@@ -291,10 +289,6 @@ class TemplateLoaderTests(TestCase):
         that template has an {% include %} of something that does not
         exist. See #12787.
         """
-
-        # TEMPLATE_DEBUG must be true, otherwise the exception raised
-        # during {% include %} processing will be suppressed.
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, True
         old_loaders = loader.template_source_loaders
 
         try:
@@ -309,20 +303,18 @@ class TemplateLoaderTests(TestCase):
             try:
                 r = tmpl.render(template.Context({}))
             except template.TemplateDoesNotExist as e:
-                settings.TEMPLATE_DEBUG = old_td
                 self.assertEqual(e.args[0], 'missing.html')
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
         finally:
             loader.template_source_loaders = old_loaders
-            settings.TEMPLATE_DEBUG = old_td
 
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_extends_include_missing_cachedloader(self):
         """
         Same as test_extends_include_missing_baseloader, only tests
         behavior of the cached loader instead of BaseLoader.
         """
 
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, True
         old_loaders = loader.template_source_loaders
 
         try:
@@ -349,7 +341,6 @@ class TemplateLoaderTests(TestCase):
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
         finally:
             loader.template_source_loaders = old_loaders
-            settings.TEMPLATE_DEBUG = old_td
 
     def test_include_template_argument(self):
         """
@@ -371,7 +362,6 @@ class TemplateLoaderTests(TestCase):
         template that does not exist does not raise an exception at parse
         time.
         """
-        ctx = Context()
         tmpl = Template('{% include "this_does_not_exist.html" %}')
         self.assertIsInstance(tmpl, Template)
 
@@ -441,7 +431,7 @@ class TemplateRegressionTests(TestCase):
         # Regression test for #19392
         with six.assertRaisesRegex(self, template.TemplateSyntaxError,
                 "The syntax of 'url' changed in Django 1.5, see the docs."):
-            t = Template('{% url my-view %}')      # not a variable = old syntax
+            Template('{% url my-view %}')      # not a variable = old syntax
 
     @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
     def test_no_wrapped_exception(self):
@@ -459,7 +449,7 @@ class TemplateRegressionTests(TestCase):
     def test_invalid_block_suggestion(self):
         # See #7876
         try:
-            t = Template("{% if 1 %}lala{% endblock %}{% endif %}")
+            Template("{% if 1 %}lala{% endblock %}{% endif %}")
         except TemplateSyntaxError as e:
             self.assertEqual(e.args[0], "Invalid block tag: 'endblock', expected 'elif', 'else' or 'endif'")
 
@@ -574,7 +564,7 @@ class TemplateTests(TransRealMixin, TestCase):
                     ('', False, normal_string_result),
                     (expected_invalid_str, False, invalid_string_result),
                     ('', True, template_debug_result)
-                ]:
+            ]:
                 settings.TEMPLATE_STRING_IF_INVALID = invalid_str
                 settings.TEMPLATE_DEBUG = template_debug
                 for is_cached in (False, True):
@@ -1102,19 +1092,19 @@ class TemplateTests(TransRealMixin, TestCase):
             'ifchanged08': ('{% for data in datalist %}{% for c,d in data %}{% if c %}{% ifchanged %}{{ d }}{% endifchanged %}{% endif %}{% endfor %}{% endfor %}', {'datalist': [[(1, 'a'), (1, 'a'), (0, 'b'), (1, 'c')], [(0, 'a'), (1, 'c'), (1, 'd'), (1, 'd'), (0, 'e')]]}, 'accd'),
 
             # Test one parameter given to ifchanged.
-            'ifchanged-param01': ('{% for n in num %}{% ifchanged n %}..{% endifchanged %}{{ n }}{% endfor %}', { 'num': (1,2,3) }, '..1..2..3'),
-            'ifchanged-param02': ('{% for n in num %}{% for x in numx %}{% ifchanged n %}..{% endifchanged %}{{ x }}{% endfor %}{% endfor %}', { 'num': (1,2,3), 'numx': (5,6,7) }, '..567..567..567'),
+            'ifchanged-param01': ('{% for n in num %}{% ifchanged n %}..{% endifchanged %}{{ n }}{% endfor %}', {'num': (1,2,3)}, '..1..2..3'),
+            'ifchanged-param02': ('{% for n in num %}{% for x in numx %}{% ifchanged n %}..{% endifchanged %}{{ x }}{% endfor %}{% endfor %}', {'num': (1,2,3), 'numx': (5,6,7)}, '..567..567..567'),
 
             # Test multiple parameters to ifchanged.
-            'ifchanged-param03': ('{% for n in num %}{{ n }}{% for x in numx %}{% ifchanged x n %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', { 'num': (1,1,2), 'numx': (5,6,6) }, '156156256'),
+            'ifchanged-param03': ('{% for n in num %}{{ n }}{% for x in numx %}{% ifchanged x n %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': (1,1,2), 'numx': (5,6,6)}, '156156256'),
 
             # Test a date+hour like construct, where the hour of the last day
             # is the same but the date had changed, so print the hour anyway.
-            'ifchanged-param04': ('{% for d in days %}{% ifchanged %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},] }, '112323'),
+            'ifchanged-param04': ('{% for d in days %}{% ifchanged %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},]}, '112323'),
 
             # Logically the same as above, just written with explicit
             # ifchanged for the day.
-            'ifchanged-param05': ('{% for d in days %}{% ifchanged d.day %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d.day h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},] }, '112323'),
+            'ifchanged-param05': ('{% for d in days %}{% ifchanged d.day %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d.day h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},]}, '112323'),
 
             # Test the else clause of ifchanged.
             'ifchanged-else01': ('{% for id in ids %}{{ id }}{% ifchanged id %}-first{% else %}-other{% endifchanged %},{% endfor %}', {'ids': [1,1,2,2,2,3]}, '1-first,1-other,2-first,2-other,2-other,3-first,'),
@@ -1512,11 +1502,11 @@ class TemplateTests(TransRealMixin, TestCase):
                           '{{ item.foo }}'
                           '{% endfor %},'
                           '{% endfor %}',
-                          {'data': [ {'foo':'c', 'bar':1},
+                          {'data': [{'foo':'c', 'bar':1},
                                      {'foo':'d', 'bar':1},
                                      {'foo':'a', 'bar':2},
                                      {'foo':'b', 'bar':2},
-                                     {'foo':'x', 'bar':3}  ]},
+                                     {'foo':'x', 'bar':3}]},
                           '1:cd,2:ab,3:x,'),
 
             # Test for silent failure when target variable isn't found
@@ -1640,8 +1630,8 @@ class TemplateTests(TransRealMixin, TestCase):
             'widthratio16': ('{% widthratio a b 100 as variable %}-{{ variable }}-', {'a':50,'b':100}, '-50-'),
             'widthratio17': ('{% widthratio a b 100 as variable %}-{{ variable }}-', {'a':100,'b':100}, '-100-'),
 
-            'widthratio18': ('{% widthratio a b 100 as %}', { }, template.TemplateSyntaxError),
-            'widthratio19': ('{% widthratio a b 100 not_as variable %}', { }, template.TemplateSyntaxError),
+            'widthratio18': ('{% widthratio a b 100 as %}', {}, template.TemplateSyntaxError),
+            'widthratio19': ('{% widthratio a b 100 not_as variable %}', {}, template.TemplateSyntaxError),
 
             ### WITH TAG ########################################################
             'with01': ('{% with key=dict.key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, '50'),
@@ -1778,11 +1768,11 @@ class TemplateTests(TransRealMixin, TestCase):
             'autoescape-filtertag01': ("{{ first }}{% filter safe %}{{ first }} x<y{% endfilter %}", {"first": "<a>"}, template.TemplateSyntaxError),
 
             # ifqeual compares unescaped vales.
-            'autoescape-ifequal01': ('{% ifequal var "this & that" %}yes{% endifequal %}', { "var": "this & that" }, "yes"),
+            'autoescape-ifequal01': ('{% ifequal var "this & that" %}yes{% endifequal %}', {"var": "this & that"}, "yes"),
 
             # Arguments to filters are 'safe' and manipulate their input unescaped.
-            'autoescape-filters01': ('{{ var|cut:"&" }}', { "var": "this & that" }, "this  that" ),
-            'autoescape-filters02': ('{{ var|join:" & \" }}', { "var": ("Tom", "Dick", "Harry") }, "Tom & Dick & Harry"),
+            'autoescape-filters01': ('{{ var|cut:"&" }}', {"var": "this & that"}, "this  that"),
+            'autoescape-filters02': ('{{ var|join:" & \" }}', {"var": ("Tom", "Dick", "Harry")}, "Tom & Dick & Harry"),
 
             # Literal strings are safe.
             'autoescape-literals01': ('{{ "this & that" }}',{}, "this & that"),
@@ -1791,7 +1781,7 @@ class TemplateTests(TransRealMixin, TestCase):
             'autoescape-stringiterations01': ('{% for l in var %}{{ l }},{% endfor %}', {'var': 'K&R'}, "K,&amp;,R,"),
 
             # Escape requirement survives lookup.
-            'autoescape-lookup01': ('{{ var.key }}', { "var": {"key": "this & that" }}, "this &amp; that"),
+            'autoescape-lookup01': ('{{ var.key }}', {"var": {"key": "this & that"}}, "this &amp; that"),
 
             # Static template tags
             'static-prefixtag01': ('{% load static %}{% get_static_prefix %}', {}, settings.STATIC_URL),
@@ -1821,20 +1811,18 @@ class TemplateTests(TransRealMixin, TestCase):
                 'numpy-array-index02': ("{{ var.5 }}", {"var": numpy.array(["first item", "second item"])}, ("", "INVALID")),
             })
 
-
         return tests
 
-class TemplateTagLoading(unittest.TestCase):
+
+class TemplateTagLoading(TestCase):
 
     def setUp(self):
         self.old_path = sys.path[:]
-        self.old_apps = settings.INSTALLED_APPS
         self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
         self.old_tag_modules = template_base.templatetags_modules
         template_base.templatetags_modules = []
 
     def tearDown(self):
-        settings.INSTALLED_APPS = self.old_apps
         sys.path = self.old_path
         template_base.templatetags_modules = self.old_tag_modules
 
@@ -1847,11 +1835,11 @@ class TemplateTagLoading(unittest.TestCase):
             self.assertTrue('ImportError' in e.args[0])
             self.assertTrue('Xtemplate' in e.args[0])
 
+    @override_settings(INSTALLED_APPS=('tagsegg',))
     def test_load_error_egg(self):
         ttext = "{% load broken_egg %}"
         egg_name = '%s/tagsegg.egg' % self.egg_dir
         sys.path.append(egg_name)
-        settings.INSTALLED_APPS = ('tagsegg',)
         self.assertRaises(template.TemplateSyntaxError, template.Template, ttext)
         try:
             template.Template(ttext)
@@ -1859,12 +1847,12 @@ class TemplateTagLoading(unittest.TestCase):
             self.assertTrue('ImportError' in e.args[0])
             self.assertTrue('Xtemplate' in e.args[0])
 
+    @override_settings(INSTALLED_APPS=('tagsegg',))
     def test_load_working_egg(self):
         ttext = "{% load working_egg %}"
         egg_name = '%s/tagsegg.egg' % self.egg_dir
         sys.path.append(egg_name)
-        settings.INSTALLED_APPS = ('tagsegg',)
-        t = template.Template(ttext)
+        template.Template(ttext)
 
 
 class RequestContextTests(unittest.TestCase):

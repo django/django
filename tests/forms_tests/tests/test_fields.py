@@ -33,7 +33,14 @@ import os
 from decimal import Decimal
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import *
+from django.forms import (
+    BooleanField, CharField, ChoiceField, ComboField, DateField, DateTimeField,
+    DecimalField, EmailField, Field, FileField, FilePathField, FloatField,
+    Form, forms, HiddenInput, IntegerField, MultipleChoiceField,
+    NullBooleanField, NumberInput, PasswordInput, RadioSelect, RegexField,
+    SplitDateTimeField, TextInput, TimeField, TypedChoiceField,
+    TypedMultipleChoiceField, URLField, ValidationError, Widget,
+)
 from django.test import SimpleTestCase
 from django.utils import formats
 from django.utils import six
@@ -68,7 +75,6 @@ class FieldsTests(SimpleTestCase):
             def __init__(self):
                 self.class_a_var = True
                 super(A, self).__init__()
-
 
         class ComplexField(Field, A):
             def __init__(self):
@@ -718,7 +724,6 @@ class FieldsTests(SimpleTestCase):
         # with here)
         self.assertTrue(f._has_changed('resume.txt', {'filename': 'resume.txt', 'content': 'My resume'}))
 
-
     # URLField ##################################################################
 
     def test_urlfield_1(self):
@@ -965,7 +970,6 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(None, f.clean('3'))
         self.assertEqual(None, f.clean('hello'))
 
-
     def test_nullbooleanfield_2(self):
         # Make sure that the internal value is preserved if using HiddenInput (#7753)
         class HiddenNullBooleanForm(Form):
@@ -978,7 +982,7 @@ class FieldsTests(SimpleTestCase):
         class HiddenNullBooleanForm(Form):
             hidden_nullbool1 = NullBooleanField(widget=HiddenInput, initial=True)
             hidden_nullbool2 = NullBooleanField(widget=HiddenInput, initial=False)
-        f = HiddenNullBooleanForm({ 'hidden_nullbool1': 'True', 'hidden_nullbool2': 'False' })
+        f = HiddenNullBooleanForm({'hidden_nullbool1': 'True', 'hidden_nullbool2': 'False'})
         self.assertEqual(None, f.full_clean())
         self.assertEqual(True, f.cleaned_data['hidden_nullbool1'])
         self.assertEqual(False, f.cleaned_data['hidden_nullbool2'])
@@ -991,7 +995,7 @@ class FieldsTests(SimpleTestCase):
             nullbool0 = NullBooleanField(widget=RadioSelect(choices=NULLBOOL_CHOICES))
             nullbool1 = NullBooleanField(widget=RadioSelect(choices=NULLBOOL_CHOICES))
             nullbool2 = NullBooleanField(widget=RadioSelect(choices=NULLBOOL_CHOICES))
-        f = MySQLNullBooleanForm({ 'nullbool0': '1', 'nullbool1': '0', 'nullbool2': '' })
+        f = MySQLNullBooleanForm({'nullbool0': '1', 'nullbool1': '0', 'nullbool2': ''})
         self.assertEqual(None, f.full_clean())
         self.assertEqual(True, f.cleaned_data['nullbool0'])
         self.assertEqual(False, f.cleaned_data['nullbool1'])
@@ -1137,15 +1141,15 @@ class FieldsTests(SimpleTestCase):
         f.choices = [p for p in f.choices if p[0].endswith('.py')]
         f.choices.sort()
         expected = [
-                ('/django/forms/__init__.py', '__init__.py'),
-                ('/django/forms/fields.py', 'fields.py'),
-                ('/django/forms/forms.py', 'forms.py'),
-                ('/django/forms/formsets.py', 'formsets.py'),
-                ('/django/forms/models.py', 'models.py'),
-                ('/django/forms/util.py', 'util.py'),
-                ('/django/forms/utils.py', 'utils.py'),
-                ('/django/forms/widgets.py', 'widgets.py')
-            ]
+            ('/django/forms/__init__.py', '__init__.py'),
+            ('/django/forms/fields.py', 'fields.py'),
+            ('/django/forms/forms.py', 'forms.py'),
+            ('/django/forms/formsets.py', 'formsets.py'),
+            ('/django/forms/models.py', 'models.py'),
+            ('/django/forms/util.py', 'util.py'),
+            ('/django/forms/utils.py', 'utils.py'),
+            ('/django/forms/widgets.py', 'widgets.py')
+        ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
             self.assertTrue(got[0].endswith(exp[0]))
@@ -1158,15 +1162,15 @@ class FieldsTests(SimpleTestCase):
         f = FilePathField(path=path, match='^.*?\.py$')
         f.choices.sort()
         expected = [
-                ('/django/forms/__init__.py', '__init__.py'),
-                ('/django/forms/fields.py', 'fields.py'),
-                ('/django/forms/forms.py', 'forms.py'),
-                ('/django/forms/formsets.py', 'formsets.py'),
-                ('/django/forms/models.py', 'models.py'),
-                ('/django/forms/util.py', 'util.py'),
-                ('/django/forms/utils.py', 'utils.py'),
-                ('/django/forms/widgets.py', 'widgets.py')
-            ]
+            ('/django/forms/__init__.py', '__init__.py'),
+            ('/django/forms/fields.py', 'fields.py'),
+            ('/django/forms/forms.py', 'forms.py'),
+            ('/django/forms/formsets.py', 'formsets.py'),
+            ('/django/forms/models.py', 'models.py'),
+            ('/django/forms/util.py', 'util.py'),
+            ('/django/forms/utils.py', 'utils.py'),
+            ('/django/forms/widgets.py', 'widgets.py')
+        ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
             self.assertTrue(got[0].endswith(exp[0]))
@@ -1177,17 +1181,17 @@ class FieldsTests(SimpleTestCase):
         f = FilePathField(path=path, recursive=True, match='^.*?\.py$')
         f.choices.sort()
         expected = [
-                ('/django/forms/__init__.py', '__init__.py'),
-                ('/django/forms/extras/__init__.py', 'extras/__init__.py'),
-                ('/django/forms/extras/widgets.py', 'extras/widgets.py'),
-                ('/django/forms/fields.py', 'fields.py'),
-                ('/django/forms/forms.py', 'forms.py'),
-                ('/django/forms/formsets.py', 'formsets.py'),
-                ('/django/forms/models.py', 'models.py'),
-                ('/django/forms/util.py', 'util.py'),
-                ('/django/forms/utils.py', 'utils.py'),
-                ('/django/forms/widgets.py', 'widgets.py')
-            ]
+            ('/django/forms/__init__.py', '__init__.py'),
+            ('/django/forms/extras/__init__.py', 'extras/__init__.py'),
+            ('/django/forms/extras/widgets.py', 'extras/widgets.py'),
+            ('/django/forms/fields.py', 'fields.py'),
+            ('/django/forms/forms.py', 'forms.py'),
+            ('/django/forms/formsets.py', 'formsets.py'),
+            ('/django/forms/models.py', 'models.py'),
+            ('/django/forms/util.py', 'util.py'),
+            ('/django/forms/utils.py', 'utils.py'),
+            ('/django/forms/widgets.py', 'widgets.py')
+        ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
             self.assertTrue(got[0].endswith(exp[0]))
@@ -1217,7 +1221,6 @@ class FieldsTests(SimpleTestCase):
         for exp, got in zip(expected, actual):
             self.assertEqual(exp[1], got[1])
             self.assertTrue(got[0].endswith(exp[0]))
-
 
     # SplitDateTimeField ##########################################################
 

@@ -495,7 +495,7 @@ constant_string = r"""
     'strsq': r"'[^'\\]*(?:\\.[^'\\]*)*'",  # single-quoted string
     'i18n_open': re.escape("_("),
     'i18n_close': re.escape(")"),
-    }
+}
 constant_string = constant_string.replace("\n", "")
 
 filter_raw_string = r"""
@@ -515,7 +515,7 @@ filter_raw_string = r"""
     'var_chars': "\w\.",
     'filter_sep': re.escape(FILTER_SEPARATOR),
     'arg_sep': re.escape(FILTER_ARGUMENT_SEPARATOR),
-  }
+}
 
 filter_re = re.compile(filter_raw_string, re.UNICODE | re.VERBOSE)
 

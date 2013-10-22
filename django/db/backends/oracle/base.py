@@ -482,6 +482,8 @@ WHEN (new.%(col_name)s IS NULL)
             return 'BITAND(%s)' % ','.join(sub_expressions)
         elif connector == '|':
             raise NotImplementedError("Bit-wise or is not supported in Oracle.")
+        elif connector == '^':
+            return 'POWER(%s)' % ','.join(sub_expressions)
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
 
     def _get_sequence_name(self, table):
@@ -620,7 +622,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         try:
             self.connection.stmtcachesize = 20
-        except:
+        except AttributeError:
             # Django docs specify cx_Oracle version 4.3.1 or higher, but
             # stmtcachesize is available only in 4.3.2 and up.
             pass

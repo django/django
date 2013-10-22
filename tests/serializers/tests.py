@@ -18,7 +18,7 @@ from django.conf import settings
 from django.core import management, serializers
 from django.db import transaction, connection
 from django.test import TestCase, TransactionTestCase
-from django.test.utils import Approximate
+from django.test.utils import Approximate, override_settings
 from django.utils import six
 from django.utils.six import StringIO
 
@@ -26,22 +26,18 @@ from .models import (Category, Author, Article, AuthorProfile, Actor, Movie,
     Score, Player, Team)
 
 
-class SerializerRegistrationTests(unittest.TestCase):
+@override_settings(
+    SERIALIZATION_MODULES = {
+        "json2" : "django.core.serializers.json",
+    }
+)
+class SerializerRegistrationTests(TestCase):
     def setUp(self):
-        self.old_SERIALIZATION_MODULES = getattr(settings, 'SERIALIZATION_MODULES', None)
         self.old_serializers = serializers._serializers
-
         serializers._serializers = {}
-        settings.SERIALIZATION_MODULES = {
-            "json2" : "django.core.serializers.json",
-        }
 
     def tearDown(self):
         serializers._serializers = self.old_serializers
-        if self.old_SERIALIZATION_MODULES:
-            settings.SERIALIZATION_MODULES = self.old_SERIALIZATION_MODULES
-        else:
-            delattr(settings, 'SERIALIZATION_MODULES')
 
     def test_register(self):
         "Registering a new serializer populates the full registry. Refs #14823"
@@ -198,7 +194,7 @@ class SerializersTestBase(object):
         mv.save()
 
         with self.assertNumQueries(0):
-            serial_str = serializers.serialize(self.serializer_name, [mv])
+            serializers.serialize(self.serializer_name, [mv])
 
     def test_serialize_with_null_pk(self):
         """
@@ -246,9 +242,9 @@ class SerializersTestBase(object):
         # Regression for #12524 -- dates before 1000AD get prefixed
         # 0's on the year
         a = Article.objects.create(
-        author = self.jane,
-        headline = "Nobody remembers the early years",
-        pub_date = datetime(1, 2, 3, 4, 5, 6))
+            author = self.jane,
+            headline = "Nobody remembers the early years",
+            pub_date = datetime(1, 2, 3, 4, 5, 6))
 
         serial_str = serializers.serialize(self.serializer_name, [a])
         date_values = self._get_field_values(serial_str, "pub_date")

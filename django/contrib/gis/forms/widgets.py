@@ -43,7 +43,7 @@ class BaseGeometryWidget(Widget):
         except (GEOSException, ValueError) as err:
             logger.error(
                 "Error creating geometry from value '%s' (%s)" % (
-                value, err)
+                    value, err)
             )
         return None
 
@@ -63,7 +63,7 @@ class BaseGeometryWidget(Widget):
                 except gdal.OGRException as err:
                     logger.error(
                         "Error transforming geometry from srid '%s' to srid '%s' (%s)" % (
-                        value.srid, self.map_srid, err)
+                            value.srid, self.map_srid, err)
                     )
 
         context = self.build_attrs(attrs,
@@ -81,7 +81,7 @@ class OpenLayersWidget(BaseGeometryWidget):
     template_name = 'gis/openlayers.html'
     class Media:
         js = (
-            'http://openlayers.org/api/2.11/OpenLayers.js',
+            'http://openlayers.org/api/2.13/OpenLayers.js',
             'gis/js/OLMapWidget.js',
         )
 
@@ -96,7 +96,7 @@ class OSMWidget(BaseGeometryWidget):
 
     class Media:
         js = (
-            'http://openlayers.org/api/2.11/OpenLayers.js',
+            'http://openlayers.org/api/2.13/OpenLayers.js',
             'http://www.openstreetmap.org/openlayers/OpenStreetMap.js',
             'gis/js/OLMapWidget.js',
         )

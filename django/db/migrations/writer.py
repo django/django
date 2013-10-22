@@ -26,6 +26,7 @@ class MigrationWriter(object):
         """
         items = {
             "dependencies": repr(self.migration.dependencies),
+            "replaces_str": "",
         }
         imports = set()
         # Deconstruct operations
@@ -49,6 +50,9 @@ class MigrationWriter(object):
             items["imports"] = ""
         else:
             items["imports"] = "\n".join(imports) + "\n"
+        # If there's a replaces, make a string for it
+        if self.migration.replaces:
+            items['replaces_str'] = "\n    replaces = %s\n" % repr(self.migration.replaces)
         return (MIGRATION_TEMPLATE % items).encode("utf8")
 
     @property
@@ -57,20 +61,22 @@ class MigrationWriter(object):
 
     @property
     def path(self):
-        migrations_module_name = MigrationLoader.migrations_module(self.migration.app_label)
-        app_module = cache.get_app(self.migration.app_label)
+        migrations_package_name = MigrationLoader.migrations_module(self.migration.app_label)
         # See if we can import the migrations module directly
         try:
-            migrations_module = import_module(migrations_module_name)
+            migrations_module = import_module(migrations_package_name)
             basedir = os.path.dirname(migrations_module.__file__)
         except ImportError:
+            app = cache.get_app(self.migration.app_label)
+            app_path = cache._get_app_path(app)
+            app_package_name = cache._get_app_package(app)
+            migrations_package_basename = migrations_package_name.split(".")[-1]
+
             # Alright, see if it's a direct submodule of the app
-            oneup = ".".join(migrations_module_name.split(".")[:-1])
-            app_oneup = ".".join(app_module.__name__.split(".")[:-1])
-            if oneup == app_oneup:
-                basedir = os.path.join(os.path.dirname(app_module.__file__), migrations_module_name.split(".")[-1])
+            if '%s.%s' % (app_package_name, migrations_package_basename) == migrations_package_name:
+                basedir = os.path.join(app_path, migrations_package_basename)
             else:
-                raise ImportError("Cannot open migrations module %s for app %s" % (migrations_module_name, self.migration.app_label))
+                raise ImportError("Cannot open migrations module %s for app %s" % (migrations_package_name, self.migration.app_label))
         return os.path.join(basedir, self.filename)
 
     @classmethod
@@ -140,24 +146,16 @@ class MigrationWriter(object):
         elif isinstance(value, models.Field):
             attr_name, path, args, kwargs = value.deconstruct()
             return cls.serialize_deconstructed(path, args, kwargs)
+        # Anything that knows how to deconstruct itself.
+        elif hasattr(value, 'deconstruct'):
+            return cls.serialize_deconstructed(*value.deconstruct())
         # Functions
         elif isinstance(value, (types.FunctionType, types.BuiltinFunctionType)):
-            # Special-cases, as these don't have im_class
-            special_cases = [
-                (datetime.datetime.now, "datetime.datetime.now", ["import datetime"]),
-                (datetime.datetime.utcnow, "datetime.datetime.utcnow", ["import datetime"]),
-                (datetime.date.today, "datetime.date.today", ["import datetime"]),
-            ]
-            for func, string, imports in special_cases:
-                if func == value:  # For some reason "utcnow is not utcnow"
-                    return string, set(imports)
-            # Method?
-            if hasattr(value, "im_class"):
-                klass = value.im_class
+            # @classmethod?
+            if getattr(value, "__self__", None) and isinstance(value.__self__, type):
+                klass = value.__self__
                 module = klass.__module__
                 return "%s.%s.%s" % (module, klass.__name__, value.__name__), set(["import %s" % module])
-            elif hasattr(value, 'deconstruct'):
-                return cls.serialize_deconstructed(*value.deconstruct())
             elif value.__name__ == '<lambda>':
                 raise ValueError("Cannot serialize function: lambda")
             elif value.__module__ is None:
@@ -186,7 +184,7 @@ from django.db import models, migrations
 %(imports)s
 
 class Migration(migrations.Migration):
-
+    %(replaces_str)s
     dependencies = %(dependencies)s
 
     operations = %(operations)s

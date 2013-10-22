@@ -84,6 +84,9 @@ class Fieldline(object):
             self.fields = [field]
         else:
             self.fields = field
+        self.has_visible_field = not all(field in self.form.fields and
+                                         self.form.fields[field].widget.is_hidden
+                                         for field in self.fields)
         self.model_admin = model_admin
         if readonly_fields is None:
             readonly_fields = ()

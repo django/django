@@ -36,4 +36,3 @@ class URLHandling(TestCase):
         """
         response = self.client.get('/permanent_nonascii_redirect/')
         self.assertRedirects(response, self.redirect_target, status_code=301)
-

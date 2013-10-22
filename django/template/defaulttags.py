@@ -315,7 +315,7 @@ class RegroupNode(Node):
 
     def render(self, context):
         obj_list = self.target.resolve(context, True)
-        if obj_list == None:
+        if obj_list is None:
             # target variable wasn't found in context; fail silently.
             context[self.var_name] = []
             return ''

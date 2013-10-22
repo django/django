@@ -1,3 +1,5 @@
+import warnings
+
 from collections import OrderedDict
 from optparse import make_option
 
@@ -20,6 +22,10 @@ class Command(BaseCommand):
             help='An appname or appname.ModelName to exclude (use multiple --exclude to exclude multiple apps/models).'),
         make_option('-n', '--natural', action='store_true', dest='use_natural_keys', default=False,
             help='Use natural keys if they are available.'),
+        make_option('--natural-foreign', action='store_true', dest='use_natural_foreign_keys', default=False,
+            help='Use natural foreign keys if they are available.'),
+        make_option('--natural-primary', action='store_true', dest='use_natural_primary_keys', default=False,
+            help='Use natural primary keys if they are available.'),
         make_option('-a', '--all', action='store_true', dest='use_base_manager', default=False,
             help="Use Django's base manager to dump all models stored in the database, including those that would otherwise be filtered or modified by a custom manager."),
         make_option('--pks', dest='primary_keys', help="Only dump objects with "
@@ -40,6 +46,11 @@ class Command(BaseCommand):
         excludes = options.get('exclude')
         show_traceback = options.get('traceback')
         use_natural_keys = options.get('use_natural_keys')
+        if use_natural_keys:
+            warnings.warn("``--natural`` is deprecated; use ``--natural-foreign`` instead.",
+                PendingDeprecationWarning)
+        use_natural_foreign_keys = options.get('use_natural_foreign_keys') or use_natural_keys
+        use_natural_primary_keys = options.get('use_natural_primary_keys')
         use_base_manager = options.get('use_base_manager')
         pks = options.get('primary_keys')
 
@@ -133,7 +144,9 @@ class Command(BaseCommand):
         try:
             self.stdout.ending = None
             serializers.serialize(format, get_objects(), indent=indent,
-                    use_natural_keys=use_natural_keys, stream=self.stdout)
+                    use_natural_foreign_keys=use_natural_foreign_keys,
+                    use_natural_primary_keys=use_natural_primary_keys,
+                    stream=self.stdout)
         except Exception as e:
             if show_traceback:
                 raise

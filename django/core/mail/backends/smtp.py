@@ -56,7 +56,7 @@ class EmailBackend(BaseEmailBackend):
             if self.username and self.password:
                 self.connection.login(self.username, self.password)
             return True
-        except:
+        except smtplib.SMTPException:
             if not self.fail_silently:
                 raise
 
@@ -72,7 +72,7 @@ class EmailBackend(BaseEmailBackend):
                 # sometimes, or when the connection was already disconnected
                 # by the server.
                 self.connection.close()
-            except:
+            except smtplib.SMTPException:
                 if self.fail_silently:
                     return
                 raise
@@ -113,7 +113,7 @@ class EmailBackend(BaseEmailBackend):
         try:
             self.connection.sendmail(from_email, recipients,
                     force_bytes(message.as_string(), charset))
-        except:
+        except smtplib.SMTPException:
             if not self.fail_silently:
                 raise
             return False

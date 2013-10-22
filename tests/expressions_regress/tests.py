@@ -145,6 +145,13 @@ class ExpressionOperatorTests(TestCase):
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 58)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
+    def test_lefthand_power(self):
+        # LH Powert arithmetic operation on floats and integers
+        Number.objects.filter(pk=self.n.pk).update(integer=F('integer') ** 2,
+                                                float=F('float') ** 1.5)
+        self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 1764)
+        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(61.02, places=2))
+
     def test_right_hand_addition(self):
         # Right hand operators
         Number.objects.filter(pk=self.n.pk).update(integer=15 + F('integer'),
@@ -184,6 +191,13 @@ class ExpressionOperatorTests(TestCase):
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 27)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
+
+    def test_righthand_power(self):
+        # RH Powert arithmetic operation on floats and integers
+        Number.objects.filter(pk=self.n.pk).update(integer=2 ** F('integer'),
+                                                float=1.5 ** F('float'))
+        self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 4398046511104)
+        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(536.308, places=3))
 
 
 class FTimeDeltaTests(TestCase):
@@ -351,7 +365,7 @@ class FTimeDeltaTests(TestCase):
     def test_delta_invalid_op_mult(self):
         raised = False
         try:
-            r = repr(Experiment.objects.filter(end__lt=F('start')*self.deltas[0]))
+            repr(Experiment.objects.filter(end__lt=F('start')*self.deltas[0]))
         except TypeError:
             raised = True
         self.assertTrue(raised, "TypeError not raised on attempt to multiply datetime by timedelta.")
@@ -359,7 +373,7 @@ class FTimeDeltaTests(TestCase):
     def test_delta_invalid_op_div(self):
         raised = False
         try:
-            r = repr(Experiment.objects.filter(end__lt=F('start')/self.deltas[0]))
+            repr(Experiment.objects.filter(end__lt=F('start')/self.deltas[0]))
         except TypeError:
             raised = True
         self.assertTrue(raised, "TypeError not raised on attempt to divide datetime by timedelta.")
@@ -367,7 +381,7 @@ class FTimeDeltaTests(TestCase):
     def test_delta_invalid_op_mod(self):
         raised = False
         try:
-            r = repr(Experiment.objects.filter(end__lt=F('start')%self.deltas[0]))
+            repr(Experiment.objects.filter(end__lt=F('start') % self.deltas[0]))
         except TypeError:
             raised = True
         self.assertTrue(raised, "TypeError not raised on attempt to modulo divide datetime by timedelta.")
@@ -375,7 +389,7 @@ class FTimeDeltaTests(TestCase):
     def test_delta_invalid_op_and(self):
         raised = False
         try:
-            r = repr(Experiment.objects.filter(end__lt=F('start').bitand(self.deltas[0])))
+            repr(Experiment.objects.filter(end__lt=F('start').bitand(self.deltas[0])))
         except TypeError:
             raised = True
         self.assertTrue(raised, "TypeError not raised on attempt to binary and a datetime with a timedelta.")
@@ -383,7 +397,7 @@ class FTimeDeltaTests(TestCase):
     def test_delta_invalid_op_or(self):
         raised = False
         try:
-            r = repr(Experiment.objects.filter(end__lt=F('start').bitor(self.deltas[0])))
+            repr(Experiment.objects.filter(end__lt=F('start').bitor(self.deltas[0])))
         except TypeError:
             raised = True
         self.assertTrue(raised, "TypeError not raised on attempt to binary or a datetime with a timedelta.")

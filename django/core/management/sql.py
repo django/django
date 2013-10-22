@@ -7,8 +7,7 @@ import warnings
 
 from django.conf import settings
 from django.core.management.base import CommandError
-from django.db import models
-from django.db.models import get_models
+from django.db import models, router
 
 
 def sql_create(app, style, connection):
@@ -31,7 +30,7 @@ def sql_create(app, style, connection):
     known_models = set(model for model in connection.introspection.installed_models(tables) if model not in app_models)
     pending_references = {}
 
-    for model in app_models:
+    for model in router.get_migratable_models(app, connection.alias, include_auto_created=True):
         output, references = connection.creation.sql_create_model(model, style, known_models)
         final_output.extend(output)
         for refto, refs in references.items():
@@ -63,7 +62,7 @@ def sql_delete(app, style, connection):
     # This should work even if a connection isn't available
     try:
         cursor = connection.cursor()
-    except:
+    except Exception:
         cursor = None
 
     # Figure out which tables already exist
@@ -78,7 +77,7 @@ def sql_delete(app, style, connection):
     to_delete = set()
 
     references_to_delete = {}
-    app_models = models.get_models(app, include_auto_created=True)
+    app_models = router.get_migratable_models(app, connection.alias, include_auto_created=True)
     for model in app_models:
         if cursor and connection.introspection.table_name_converter(model._meta.db_table) in table_names:
             # The table exists, so it needs to be dropped
@@ -122,7 +121,7 @@ def sql_custom(app, style, connection):
     "Returns a list of the custom table modifying SQL statements for the given app."
     output = []
 
-    app_models = get_models(app)
+    app_models = router.get_migratable_models(app, connection.alias)
 
     for model in app_models:
         output.extend(custom_sql_for_model(model, style, connection))
@@ -133,7 +132,7 @@ def sql_custom(app, style, connection):
 def sql_indexes(app, style, connection):
     "Returns a list of the CREATE INDEX SQL statements for all models in the given app."
     output = []
-    for model in models.get_models(app, include_auto_created=True):
+    for model in router.get_migratable_models(app, connection.alias, include_auto_created=True):
         output.extend(connection.creation.sql_indexes_for_model(model, style))
     return output
 
@@ -141,7 +140,7 @@ def sql_indexes(app, style, connection):
 def sql_destroy_indexes(app, style, connection):
     "Returns a list of the DROP INDEX SQL statements for all models in the given app."
     output = []
-    for model in models.get_models(app, include_auto_created=True):
+    for model in router.get_migratable_models(app, connection.alias, include_auto_created=True):
         output.extend(connection.creation.sql_destroy_indexes_for_model(model, style))
     return output
 

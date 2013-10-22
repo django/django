@@ -9,6 +9,6 @@ from django.contrib.gis.db.models.manager import GeoManager
 
 # The geographic-enabled fields.
 from django.contrib.gis.db.models.fields import (
-     GeometryField, PointField, LineStringField, PolygonField,
-     MultiPointField, MultiLineStringField, MultiPolygonField,
-     GeometryCollectionField)
+    GeometryField, PointField, LineStringField, PolygonField,
+    MultiPointField, MultiLineStringField, MultiPolygonField,
+    GeometryCollectionField)

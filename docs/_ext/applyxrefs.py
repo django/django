@@ -6,8 +6,8 @@ import os
 testing = False
 
 DONT_TOUCH = (
-        './index.txt',
-        )
+    './index.txt',
+)
 
 def target_name(fn):
     if fn.endswith('.txt'):

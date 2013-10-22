@@ -16,11 +16,14 @@ class UserListA(ListMixin):
         self._list = self._mytype(i_list)
         super(UserListA, self).__init__(*args, **kwargs)
 
-    def __len__(self):  return len(self._list)
+    def __len__(self):
+        return len(self._list)
 
-    def __str__(self):  return str(self._list)
+    def __str__(self):
+        return str(self._list)
 
-    def __repr__(self): return repr(self._list)
+    def __repr__(self):
+        return repr(self._list)
 
     def _set_list(self, length, items):
         # this would work:
@@ -56,7 +59,8 @@ class ListMixinTest(unittest.TestCase):
     listType = UserListA
 
     def lists_of_len(self, length=None):
-        if length is None: length = self.limit
+        if length is None:
+            length = self.limit
         pl = list(range(length))
         return pl, self.listType(pl)
 
@@ -87,7 +91,8 @@ class ListMixinTest(unittest.TestCase):
 
     def test02_setslice(self):
         'Slice assignment'
-        def setfcn(x,i,j,k,L): x[i:j:k] = range(L)
+        def setfcn(x,i,j,k,L):
+            x[i:j:k] = range(L)
         pl, ul = self.lists_of_len()
         for slen in range(self.limit + 1):
             ssl = nextRange(slen)
@@ -113,7 +118,7 @@ class ListMixinTest(unittest.TestCase):
                     self.assertEqual(pl, ul[:], 'set slice [%d:%d]' % (i, j))
 
                     for k in self.step_range():
-                        ssl = nextRange( len(ul[i:j:k]) )
+                        ssl = nextRange(len(ul[i:j:k]))
                         ul[i:j:k] = ssl
                         pl[i:j:k] = ssl
                         self.assertEqual(pl, ul[:], 'set slice [%d:%d:%d]' % (i, j, k))
@@ -124,12 +129,12 @@ class ListMixinTest(unittest.TestCase):
                             self.assertRaises(ValueError, setfcn, ul, i, j, k, sliceLen - 1)
 
                 for k in self.step_range():
-                    ssl = nextRange( len(ul[i::k]) )
+                    ssl = nextRange(len(ul[i::k]))
                     ul[i::k] = ssl
                     pl[i::k] = ssl
                     self.assertEqual(pl, ul[:], 'set slice [%d::%d]' % (i, k))
 
-                    ssl = nextRange( len(ul[:i:k]) )
+                    ssl = nextRange(len(ul[:i:k]))
                     ul[:i:k] = ssl
                     pl[:i:k] = ssl
                     self.assertEqual(pl, ul[:], 'set slice [:%d:%d]' % (i, k))
@@ -139,7 +144,6 @@ class ListMixinTest(unittest.TestCase):
                 ul[::k] = ssl
                 pl[::k] = ssl
                 self.assertEqual(pl, ul[:], 'set slice [::%d]' % (k))
-
 
     def test03_delslice(self):
         'Delete slice'
@@ -205,9 +209,12 @@ class ListMixinTest(unittest.TestCase):
 
     def test05_out_of_range_exceptions(self):
         'Out of range exceptions'
-        def setfcn(x, i): x[i] = 20
-        def getfcn(x, i): return x[i]
-        def delfcn(x, i): del x[i]
+        def setfcn(x, i):
+            x[i] = 20
+        def getfcn(x, i):
+            return x[i]
+        def delfcn(x, i):
+            del x[i]
         pl, ul = self.lists_of_len()
         for i in (-1 - self.limit, self.limit):
             self.assertRaises(IndexError, setfcn, ul, i) # 'set index %d' % i)
@@ -245,7 +252,8 @@ class ListMixinTest(unittest.TestCase):
         self.assertEqual(pl[:], ul[:], 'after pop')
 
         pl, ul = self.lists_of_len()
-        def popfcn(x, i): x.pop(i)
+        def popfcn(x, i):
+            x.pop(i)
         self.assertRaises(IndexError, popfcn, ul, self.limit)
         self.assertRaises(IndexError, popfcn, ul, -1 - self.limit)
 
@@ -262,8 +270,10 @@ class ListMixinTest(unittest.TestCase):
             ul.remove(val)
             self.assertEqual(pl[:], ul[:], 'after remove val %d' % val)
 
-        def indexfcn(x, v): return x.index(v)
-        def removefcn(x, v): return x.remove(v)
+        def indexfcn(x, v):
+            return x.index(v)
+        def removefcn(x, v):
+            return x.remove(v)
         self.assertRaises(ValueError, indexfcn, ul, 40)
         self.assertRaises(ValueError, removefcn, ul, 40)
 
@@ -273,7 +283,8 @@ class ListMixinTest(unittest.TestCase):
         ul._allowed = six.integer_types
         ul[1] = 50
         ul[:2] = [60, 70, 80]
-        def setfcn(x, i, v): x[i] = v
+        def setfcn(x, i, v):
+            x[i] = v
         self.assertRaises(TypeError, setfcn, ul, 2, 'hello')
         self.assertRaises(TypeError, setfcn, ul, slice(0,3,2), ('hello','goodbye'))
 
@@ -281,8 +292,10 @@ class ListMixinTest(unittest.TestCase):
         'Length limits'
         pl, ul = self.lists_of_len()
         ul._minlength = 1
-        def delfcn(x,i): del x[:i]
-        def setfcn(x,i): x[:i] = []
+        def delfcn(x,i):
+            del x[:i]
+        def setfcn(x,i):
+            x[:i] = []
         for i in range(self.limit - ul._minlength + 1, self.limit + 1):
             self.assertRaises(ValueError, delfcn, ul, i)
             self.assertRaises(ValueError, setfcn, ul, i)
@@ -296,7 +309,8 @@ class ListMixinTest(unittest.TestCase):
     def test09_iterable_check(self):
         'Error on assigning non-iterable to slice'
         pl, ul = self.lists_of_len(self.limit + 1)
-        def setfcn(x, i, v): x[i] = v
+        def setfcn(x, i, v):
+            x[i] = v
         self.assertRaises(TypeError, setfcn, ul, slice(0,3,2), 2)
 
     def test10_checkindex(self):

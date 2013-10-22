@@ -4,7 +4,7 @@ Django FAQ
 
 .. toctree::
    :maxdepth: 2
-   
+
    general
    install
    usage

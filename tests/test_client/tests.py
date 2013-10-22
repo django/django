@@ -419,7 +419,7 @@ class ClientTest(TestCase):
             pass
 
         from django.contrib.sessions.models import Session
-        response = self.client.post('/test_client/session_view/')
+        self.client.post('/test_client/session_view/')
 
         # Check that the session was modified
         self.assertEqual(self.client.session['tobacconist'], 'hovercraft')
@@ -467,17 +467,11 @@ class ClientTest(TestCase):
         self.assertEqual(mail.outbox[1].to[0], 'second@example.com')
         self.assertEqual(mail.outbox[1].to[1], 'third@example.com')
 
+
+@override_settings(
+    MIDDLEWARE_CLASSES = ('django.middleware.csrf.CsrfViewMiddleware',)
+)
 class CSRFEnabledClientTests(TestCase):
-    def setUp(self):
-        # Enable the CSRF middleware for this test
-        self.old_MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES
-        csrf_middleware_class = 'django.middleware.csrf.CsrfViewMiddleware'
-        if csrf_middleware_class not in settings.MIDDLEWARE_CLASSES:
-            settings.MIDDLEWARE_CLASSES += (csrf_middleware_class,)
-
-    def tearDown(self):
-        settings.MIDDLEWARE_CLASSES = self.old_MIDDLEWARE_CLASSES
-
     def test_csrf_enabled_client(self):
         "A client can be instantiated with CSRF checks enabled"
         csrf_client = Client(enforce_csrf_checks=True)

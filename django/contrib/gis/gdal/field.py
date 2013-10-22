@@ -132,9 +132,14 @@ class OFTReal(Field):
         return self.as_double()
 
 # String & Binary fields, just subclasses
-class OFTString(Field): pass
-class OFTWideString(Field): pass
-class OFTBinary(Field): pass
+class OFTString(Field):
+    pass
+
+class OFTWideString(Field):
+    pass
+
+class OFTBinary(Field):
+    pass
 
 # OFTDate, OFTTime, OFTDateTime fields.
 class OFTDate(Field):
@@ -172,23 +177,31 @@ class OFTTime(Field):
             return None
 
 # List fields are also just subclasses
-class OFTIntegerList(Field): pass
-class OFTRealList(Field): pass
-class OFTStringList(Field): pass
-class OFTWideStringList(Field): pass
+class OFTIntegerList(Field):
+    pass
+
+class OFTRealList(Field):
+    pass
+
+class OFTStringList(Field):
+    pass
+
+class OFTWideStringList(Field):
+    pass
 
 # Class mapping dictionary for OFT Types and reverse mapping.
-OGRFieldTypes = { 0 : OFTInteger,
-                  1 : OFTIntegerList,
-                  2 : OFTReal,
-                  3 : OFTRealList,
-                  4 : OFTString,
-                  5 : OFTStringList,
-                  6 : OFTWideString,
-                  7 : OFTWideStringList,
-                  8 : OFTBinary,
-                  9 : OFTDate,
-                 10 : OFTTime,
-                 11 : OFTDateTime,
-                  }
+OGRFieldTypes = {
+    0: OFTInteger,
+    1: OFTIntegerList,
+    2: OFTReal,
+    3: OFTRealList,
+    4: OFTString,
+    5: OFTStringList,
+    6: OFTWideString,
+    7: OFTWideStringList,
+    8: OFTBinary,
+    9: OFTDate,
+    10: OFTTime,
+    11: OFTDateTime,
+}
 ROGRFieldTypes = dict((cls, num) for num, cls in OGRFieldTypes.items())

@@ -32,7 +32,6 @@ class DistanceTest(unittest.TestCase):
             self.assertEqual(d.m, 1.0)
             self.assertEqual(d.mm, 1000.0)
 
-
     def testInitInvalid(self):
         "Testing initialisation from invalid units"
         self.assertRaises(AttributeError, D, banana=100)

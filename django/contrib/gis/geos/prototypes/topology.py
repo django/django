@@ -3,7 +3,7 @@
  topological operations on geometries.
 """
 __all__ = ['geos_boundary', 'geos_buffer', 'geos_centroid', 'geos_convexhull',
-           'geos_difference', 'geos_envelope', 'geos_intersection', 
+           'geos_difference', 'geos_envelope', 'geos_intersection',
            'geos_linemerge', 'geos_pointonsurface', 'geos_preservesimplify',
            'geos_simplify', 'geos_symdifference', 'geos_union', 'geos_relate']
 
@@ -16,7 +16,8 @@ from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 def topology(func, *args, **kwargs):
     "For GEOS unary topology functions."
     argtypes = [GEOM_PTR]
-    if args: argtypes += args
+    if args:
+        argtypes += args
     func.argtypes = argtypes
     func.restype = kwargs.get('restype', GEOM_PTR)
     func.errcheck = kwargs.get('errcheck', check_geom)

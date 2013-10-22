@@ -7,12 +7,18 @@ import datetime
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
-from django.forms import *
+from django.forms import (
+    BooleanField, CheckboxInput, CheckboxSelectMultiple, ChoiceField,
+    ClearableFileInput, DateInput, DateTimeField, DateTimeInput, FileInput,
+    Form, HiddenInput, MultipleHiddenInput, MultiWidget, NullBooleanSelect,
+    PasswordInput, RadioSelect, Select, SelectMultiple, SplitDateTimeWidget,
+    Textarea, TextInput, TimeInput,
+)
 from django.forms.widgets import RadioFieldRenderer
 from django.utils import formats
 from django.utils.safestring import mark_safe
 from django.utils import six
-from django.utils.translation import activate, deactivate
+from django.utils.translation import activate, deactivate, override
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import python_2_unicode_compatible, force_text
@@ -997,26 +1003,30 @@ class FormsI18NWidgetsTestCase(TestCase):
     def test_datetimeinput(self):
         w = DateTimeInput()
         d = datetime.datetime(2007, 9, 17, 12, 51, 34, 482548)
-        w.is_localized = True
         self.assertHTMLEqual(w.render('date', d), '<input type="text" name="date" value="17.09.2007 12:51:34" />')
 
     def test_dateinput(self):
         w = DateInput()
         d = datetime.date(2007, 9, 17)
-        w.is_localized = True
         self.assertHTMLEqual(w.render('date', d), '<input type="text" name="date" value="17.09.2007" />')
 
     def test_timeinput(self):
         w = TimeInput()
         t = datetime.time(12, 51, 34, 482548)
-        w.is_localized = True
         self.assertHTMLEqual(w.render('time', t), '<input type="text" name="time" value="12:51:34" />')
+
+    def test_datetime_locale_aware(self):
+        w = DateTimeInput()
+        d = datetime.datetime(2007, 9, 17, 12, 51, 34, 482548)
+        with self.settings(USE_L10N=False):
+            self.assertHTMLEqual(w.render('date', d), '<input type="text" name="date" value="2007-09-17 12:51:34" />')
+        with override('es'):
+            self.assertHTMLEqual(w.render('date', d), '<input type="text" name="date" value="17/09/2007 12:51:34" />')
 
     def test_splithiddendatetime(self):
         from django.forms.widgets import SplitHiddenDateTimeWidget
 
         w = SplitHiddenDateTimeWidget()
-        w.is_localized = True
         self.assertHTMLEqual(w.render('date', datetime.datetime(2007, 9, 17, 12, 51)), '<input type="hidden" name="date_0" value="17.09.2007" /><input type="hidden" name="date_1" value="12:51:00" />')
 
     def test_nullbooleanselect(self):
@@ -1178,9 +1188,9 @@ class ClearableFileInputTests(TestCase):
         widget = ClearableFileInput()
         widget.is_required = False
         self.assertEqual(widget.value_from_datadict(
-                data={'myfile-clear': True},
-                files={},
-                name='myfile'), False)
+            data={'myfile-clear': True},
+            files={},
+            name='myfile'), False)
 
     def test_clear_input_checked_returns_false_only_if_not_required(self):
         """
@@ -1192,6 +1202,6 @@ class ClearableFileInputTests(TestCase):
         widget.is_required = True
         f = SimpleUploadedFile('something.txt', b'content')
         self.assertEqual(widget.value_from_datadict(
-                data={'myfile-clear': True},
-                files={'myfile': f},
-                name='myfile'), f)
+            data={'myfile-clear': True},
+            files={'myfile': f},
+            name='myfile'), f)

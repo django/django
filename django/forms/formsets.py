@@ -147,7 +147,7 @@ class BaseFormSet(object):
             'auto_id': self.auto_id,
             'prefix': self.add_prefix(i),
             'error_class': self.error_class,
-            }
+        }
         if self.is_bound:
             defaults['data'] = self.data
             defaults['files'] = self.files

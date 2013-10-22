@@ -12,7 +12,8 @@ from django.db import connection, connections, DEFAULT_DB_ALIAS
 from django.core import signals
 from django.core.exceptions import SuspiciousOperation
 from django.core.handlers.wsgi import WSGIRequest, LimitedStream
-from django.http import HttpRequest, HttpResponse, parse_cookie, build_request_repr, UnreadablePostError
+from django.http import (HttpRequest, HttpResponse, parse_cookie,
+    build_request_repr, UnreadablePostError, RawPostDataException)
 from django.test import SimpleTestCase, TransactionTestCase
 from django.test.client import FakePayload
 from django.test.utils import override_settings, str_prefix
@@ -263,7 +264,7 @@ class RequestsTests(SimpleTestCase):
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': payload})
         self.assertEqual(request.read(2), b'na')
-        self.assertRaises(Exception, lambda: request.body)
+        self.assertRaises(RawPostDataException, lambda: request.body)
         self.assertEqual(request.POST, {})
 
     def test_non_ascii_POST(self):
@@ -297,18 +298,18 @@ class RequestsTests(SimpleTestCase):
         # we don't want the data held in memory twice, and we don't want to
         # silence the error by setting body = '' either.
         payload = FakePayload("\r\n".join([
-                '--boundary',
-                'Content-Disposition: form-data; name="name"',
-                '',
-                'value',
-                '--boundary--'
-                '']))
+            '--boundary',
+            'Content-Disposition: form-data; name="name"',
+            '',
+            'value',
+            '--boundary--'
+            '']))
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': payload})
         self.assertEqual(request.POST, {'name': ['value']})
-        self.assertRaises(Exception, lambda: request.body)
+        self.assertRaises(RawPostDataException, lambda: request.body)
 
     def test_body_after_POST_multipart_related(self):
         """
@@ -319,12 +320,12 @@ class RequestsTests(SimpleTestCase):
         # being a binary upload, in which case it should still be accessible
         # via body.
         payload_data = b"\r\n".join([
-                b'--boundary',
-                b'Content-ID: id; name="name"',
-                b'',
-                b'value',
-                b'--boundary--'
-                b''])
+            b'--boundary',
+            b'Content-ID: id; name="name"',
+            b'',
+            b'value',
+            b'--boundary--'
+            b''])
         payload = FakePayload(payload_data)
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_TYPE': 'multipart/related; boundary=boundary',
@@ -342,12 +343,12 @@ class RequestsTests(SimpleTestCase):
         # Every request.POST with Content-Length >= 0 is a valid request,
         # this test ensures that we handle Content-Length == 0.
         payload = FakePayload("\r\n".join([
-                '--boundary',
-                'Content-Disposition: form-data; name="name"',
-                '',
-                'value',
-                '--boundary--'
-                '']))
+            '--boundary',
+            'Content-Disposition: form-data; name="name"',
+            '',
+            'value',
+            '--boundary--'
+            '']))
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
                                'CONTENT_LENGTH': 0,
@@ -389,7 +390,7 @@ class RequestsTests(SimpleTestCase):
                                'CONTENT_TYPE': 'application/x-www-form-urlencoded',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': payload})
-        raw_data = request.body
+        request.body  # evaluate
         self.assertEqual(request.POST, {'name': ['value']})
 
     def test_POST_after_body_read_and_stream_read(self):
@@ -402,7 +403,7 @@ class RequestsTests(SimpleTestCase):
                                'CONTENT_TYPE': 'application/x-www-form-urlencoded',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': payload})
-        raw_data = request.body
+        request.body  # evaluate
         self.assertEqual(request.read(1), b'n')
         self.assertEqual(request.POST, {'name': ['value']})
 
@@ -412,17 +413,17 @@ class RequestsTests(SimpleTestCase):
         the stream is read second. Using multipart/form-data instead of urlencoded.
         """
         payload = FakePayload("\r\n".join([
-                '--boundary',
-                'Content-Disposition: form-data; name="name"',
-                '',
-                'value',
-                '--boundary--'
-                '']))
+            '--boundary',
+            'Content-Disposition: form-data; name="name"',
+            '',
+            'value',
+            '--boundary--'
+            '']))
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': payload})
-        raw_data = request.body
+        request.body  # evaluate
         # Consume enough data to mess up the parsing:
         self.assertEqual(request.read(13), b'--boundary\r\nC')
         self.assertEqual(request.POST, {'name': ['value']})
@@ -479,7 +480,7 @@ class HostValidationTests(SimpleTestCase):
             'forward.com', 'example.com', 'internal.com', '12.34.56.78',
             '[2001:19f0:feee::dead:beef:cafe]', 'xn--4ca9at.com',
             '.multitenant.com', 'INSENSITIVE.com',
-            ])
+        ])
     def test_http_get_host(self):
         # Check if X_FORWARDED_HOST is provided.
         request = HttpRequest()
@@ -609,7 +610,6 @@ class HostValidationTests(SimpleTestCase):
                     'HTTP_HOST': host,
                 }
                 request.get_host()
-
 
     @override_settings(DEBUG=True, ALLOWED_HOSTS=[])
     def test_host_validation_disabled_in_debug_mode(self):

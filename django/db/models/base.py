@@ -107,16 +107,20 @@ class ModelBase(type):
 
         new_class.add_to_class('_meta', Options(meta, **kwargs))
         if not abstract:
-            new_class.add_to_class('DoesNotExist', subclass_exception(str('DoesNotExist'),
-                    tuple(x.DoesNotExist
-                          for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
-                    or (ObjectDoesNotExist,),
-                    module, attached_to=new_class))
-            new_class.add_to_class('MultipleObjectsReturned', subclass_exception(str('MultipleObjectsReturned'),
-                    tuple(x.MultipleObjectsReturned
-                          for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
-                    or (MultipleObjectsReturned,),
-                    module, attached_to=new_class))
+            new_class.add_to_class(
+                'DoesNotExist',
+                subclass_exception(
+                    str('DoesNotExist'),
+                    tuple(x.DoesNotExist for x in parents if hasattr(x, '_meta') and not x._meta.abstract) or (ObjectDoesNotExist,),
+                    module,
+                    attached_to=new_class))
+            new_class.add_to_class(
+                'MultipleObjectsReturned',
+                subclass_exception(
+                    str('MultipleObjectsReturned'),
+                    tuple(x.MultipleObjectsReturned for x in parents if hasattr(x, '_meta') and not x._meta.abstract) or (MultipleObjectsReturned,),
+                    module,
+                    attached_to=new_class))
             if base_meta and not base_meta.abstract:
                 # Non-abstract child classes inherit some attributes from their
                 # non-abstract parent (unless an ABC comes before it in the
@@ -164,7 +168,7 @@ class ModelBase(type):
         # Basic setup for proxy models.
         if is_proxy:
             base = None
-            for parent in [cls for cls in parents if hasattr(cls, '_meta')]:
+            for parent in [kls for kls in parents if hasattr(kls, '_meta')]:
                 if parent._meta.abstract:
                     if parent._meta.fields:
                         raise TypeError("Abstract base class containing model fields not permitted for proxy model '%s'." % name)
@@ -276,7 +280,7 @@ class ModelBase(type):
     def copy_managers(cls, base_managers):
         # This is in-place sorting of an Options attribute, but that's fine.
         base_managers.sort()
-        for _, mgr_name, manager in base_managers:
+        for _, mgr_name, manager in base_managers: # NOQA (redefinition of _)
             val = getattr(cls, mgr_name, None)
             if not val or val is manager:
                 new_manager = manager._copy_to_model(cls)
@@ -450,11 +454,6 @@ class Model(six.with_metaclass(ModelBase)):
 
     def __str__(self):
         if six.PY2 and hasattr(self, '__unicode__'):
-            if type(self).__unicode__ == Model.__str__:
-                klass_name = type(self).__name__
-                raise RuntimeError("%s.__unicode__ is aliased to __str__. Did"
-                                   " you apply @python_2_unicode_compatible"
-                                   " without defining __str__?" % klass_name)
             return force_text(self).encode('utf-8')
         return '%s object' % self.__class__.__name__
 
@@ -570,9 +569,9 @@ class Model(six.with_metaclass(ModelBase)):
                     field_names.add(field.attname)
             deferred_fields = [
                 f.attname for f in self._meta.fields
-                if f.attname not in self.__dict__
-                   and isinstance(self.__class__.__dict__[f.attname],
-                                  DeferredAttribute)]
+                if (f.attname not in self.__dict__ and
+                    isinstance(self.__class__.__dict__[f.attname], DeferredAttribute))
+            ]
 
             loaded_fields = field_names.difference(deferred_fields)
             if loaded_fields:

@@ -103,14 +103,14 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         # These are implemented here as synonyms for Equals
         'same_as' : SpatiaLiteFunction('Equals'),
         'exact' : SpatiaLiteFunction('Equals'),
-        }
+    }
 
     distance_functions = {
         'distance_gt' : (get_dist_ops('>'), dtypes),
         'distance_gte' : (get_dist_ops('>='), dtypes),
         'distance_lt' : (get_dist_ops('<'), dtypes),
         'distance_lte' : (get_dist_ops('<='), dtypes),
-        }
+    }
     geometry_functions.update(distance_functions)
 
     def __init__(self, connection):
@@ -238,15 +238,12 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         """
         Helper routine for calling SpatiaLite functions and returning
         their result.
+        Any error occuring in this method should be handled by the caller.
         """
         cursor = self.connection._cursor()
         try:
-            try:
-                cursor.execute('SELECT %s' % func)
-                row = cursor.fetchone()
-            except:
-                # Responsibility of caller to perform error handling.
-                raise
+            cursor.execute('SELECT %s' % func)
+            row = cursor.fetchone()
         finally:
             cursor.close()
         return row[0]
@@ -278,12 +275,14 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
             version = None
             try:
                 tmp = self._get_spatialite_func("X(GeomFromText('POINT(1 1)'))")
-                if tmp == 1.0: version = '2.3.0'
+                if tmp == 1.0:
+                    version = '2.3.0'
             except DatabaseError:
                 pass
             # If no version string defined, then just re-raise the original
             # exception.
-            if version is None: raise
+            if version is None:
+                raise
 
         m = self.version_regex.match(version)
         if m:
@@ -304,7 +303,8 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         if not self.check_aggregate_support(agg):
             raise NotImplementedError('%s spatial aggregate is not implmented for this backend.' % agg_name)
         agg_name = agg_name.lower()
-        if agg_name == 'union': agg_name += 'agg'
+        if agg_name == 'union':
+            agg_name += 'agg'
         sql_template = self.select % '%(function)s(%(field)s)'
         sql_function = getattr(self, agg_name)
         return sql_template, sql_function

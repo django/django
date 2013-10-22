@@ -59,7 +59,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # generation.
         cursor.execute("""
             SELECT name FROM sqlite_master
-            WHERE type='table' AND NOT name='sqlite_sequence'
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
             ORDER BY name""")
         return [row[0] for row in cursor.fetchall()]
 

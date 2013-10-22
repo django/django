@@ -13,7 +13,7 @@ from django.test.utils import Approximate
 from django.utils import six
 
 from .models import (Author, Book, Publisher, Clues, Entries, HardbackBook,
-        ItemTag, WithManualPK)
+        ItemTag, WithManualPK, Alfa, Bravo, Charlie)
 
 
 class AggregationTests(TestCase):
@@ -256,7 +256,7 @@ class AggregationTests(TestCase):
         self.assertEqual(
             Book.objects.annotate(c=Count('authors')).values('c').aggregate(Max('c')),
             {'c__max': 3}
-            )
+        )
 
     def test_field_error(self):
         # Bad field requests in aggregates are caught and reported
@@ -1017,20 +1017,20 @@ class AggregationTests(TestCase):
 
         tests aggregations with generic reverse relations
         """
-        b = Book.objects.get(name='Practical Django Projects')
-        ItemTag.objects.create(object_id=b.id, tag='intermediate',
-                content_type=ContentType.objects.get_for_model(b))
-        ItemTag.objects.create(object_id=b.id, tag='django',
-                content_type=ContentType.objects.get_for_model(b))
+        django_book = Book.objects.get(name='Practical Django Projects')
+        ItemTag.objects.create(object_id=django_book.id, tag='intermediate',
+                content_type=ContentType.objects.get_for_model(django_book))
+        ItemTag.objects.create(object_id=django_book.id, tag='django',
+                content_type=ContentType.objects.get_for_model(django_book))
         # Assign a tag to model with same PK as the book above. If the JOIN
         # used in aggregation doesn't have content type as part of the
         # condition the annotation will also count the 'hi mom' tag for b.
-        wmpk = WithManualPK.objects.create(id=b.pk)
+        wmpk = WithManualPK.objects.create(id=django_book.pk)
         ItemTag.objects.create(object_id=wmpk.id, tag='hi mom',
                 content_type=ContentType.objects.get_for_model(wmpk))
-        b = Book.objects.get(name__startswith='Paradigms of Artificial Intelligence')
-        ItemTag.objects.create(object_id=b.id, tag='intermediate',
-                content_type=ContentType.objects.get_for_model(b))
+        ai_book = Book.objects.get(name__startswith='Paradigms of Artificial Intelligence')
+        ItemTag.objects.create(object_id=ai_book.id, tag='intermediate',
+                content_type=ContentType.objects.get_for_model(ai_book))
 
         self.assertEqual(Book.objects.aggregate(Count('tags')), {'tags__count': 3})
         results = Book.objects.annotate(Count('tags')).order_by('-tags__count', 'name')
@@ -1062,7 +1062,7 @@ class AggregationTests(TestCase):
             pk__in=Author.objects.annotate(book_cnt=Count('book')).filter(book_cnt=2)
         ).order_by('name')
         expected_results = [a.name for a in expected_results]
-        qs = Author.objects.annotate(book_cnt=Count('book')).exclude(Q(book_cnt=2)|Q(book_cnt=2)).order_by('name')
+        qs = Author.objects.annotate(book_cnt=Count('book')).exclude(Q(book_cnt=2) | Q(book_cnt=2)).order_by('name')
         self.assertQuerysetEqual(
             qs,
             expected_results,
@@ -1071,7 +1071,7 @@ class AggregationTests(TestCase):
 
     def test_name_filters(self):
         qs = Author.objects.annotate(Count('book')).filter(
-            Q(book__count__exact=2)|Q(name='Adrian Holovaty')
+            Q(book__count__exact=2) | Q(name='Adrian Holovaty')
         ).order_by('name')
         self.assertQuerysetEqual(
             qs,
@@ -1084,7 +1084,7 @@ class AggregationTests(TestCase):
         # Note that Adrian's age is 34 in the fixtures, and he has one book
         # so both conditions match one author.
         qs = Author.objects.annotate(Count('book')).filter(
-            Q(name='Peter Norvig')|Q(age=F('book__count') + 33)
+            Q(name='Peter Norvig') | Q(age=F('book__count') + 33)
         ).order_by('name')
         self.assertQuerysetEqual(
             qs,
@@ -1135,3 +1135,37 @@ class AggregationTests(TestCase):
             'select__sum': 10,
             'select__avg': Approximate(1.666, places=2),
         })
+
+
+class JoinPromotionTests(TestCase):
+    def test_ticket_21150(self):
+        b = Bravo.objects.create()
+        c = Charlie.objects.create(bravo=b)
+        qs = Charlie.objects.select_related('alfa').annotate(Count('bravo__charlie'))
+        self.assertQuerysetEqual(
+            qs, [c], lambda x: x)
+        self.assertIs(qs[0].alfa, None)
+        a = Alfa.objects.create()
+        c.alfa = a
+        c.save()
+        # Force re-evaluation
+        qs = qs.all()
+        self.assertQuerysetEqual(
+            qs, [c], lambda x: x)
+        self.assertEqual(qs[0].alfa, a)
+
+    def test_existing_join_not_promoted(self):
+        # No promotion for existing joins
+        qs = Charlie.objects.filter(alfa__name__isnull=False).annotate(Count('alfa__name'))
+        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        # Also, the existing join is unpromoted when doing filtering for already
+        # promoted join.
+        qs = Charlie.objects.annotate(Count('alfa__name')).filter(alfa__name__isnull=False)
+        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        # But, as the join is nullable first use by annotate will be LOUTER
+        qs = Charlie.objects.annotate(Count('alfa__name'))
+        self.assertTrue(' LEFT OUTER JOIN ' in str(qs.query))
+
+    def test_non_nullable_fk_not_promoted(self):
+        qs = Book.objects.annotate(Count('contact__name'))
+        self.assertTrue(' INNER JOIN ' in str(qs.query))

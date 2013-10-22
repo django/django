@@ -1,6 +1,7 @@
 """
 Module for abstract serializer/unserializer base classes.
 """
+import warnings
 
 from django.db import models
 from django.utils import six
@@ -35,6 +36,11 @@ class Serializer(object):
         self.stream = options.pop("stream", six.StringIO())
         self.selected_fields = options.pop("fields", None)
         self.use_natural_keys = options.pop("use_natural_keys", False)
+        if self.use_natural_keys:
+            warnings.warn("``use_natural_keys`` is deprecated; use ``use_natural_foreign_keys`` instead.",
+                PendingDeprecationWarning)
+        self.use_natural_foreign_keys = options.pop('use_natural_foreign_keys', False) or self.use_natural_keys
+        self.use_natural_primary_keys = options.pop('use_natural_primary_keys', False)
 
         self.start_serialization()
         self.first = True
@@ -169,3 +175,20 @@ class DeserializedObject(object):
         # prevent a second (possibly accidental) call to save() from saving
         # the m2m data twice.
         self.m2m_data = None
+
+def build_instance(Model, data, db):
+    """
+    Build a model instance.
+
+    If the model instance doesn't have a primary key and the model supports
+    natural keys, try to retrieve it from the database.
+    """
+    obj = Model(**data)
+    if (obj.pk is None and hasattr(Model, 'natural_key') and
+            hasattr(Model._default_manager, 'get_by_natural_key')):
+        natural_key = obj.natural_key()
+        try:
+            obj.pk = Model._default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
+        except Model.DoesNotExist:
+            pass
+    return obj

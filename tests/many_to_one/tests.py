@@ -2,6 +2,7 @@ from copy import deepcopy
 import datetime
 
 from django.core.exceptions import MultipleObjectsReturned, FieldError
+from django.db import transaction
 from django.test import TestCase
 from django.utils import six
 from django.utils.translation import ugettext_lazy
@@ -68,8 +69,10 @@ class ManyToOneTests(TestCase):
         self.assertQuerysetEqual(self.r2.article_set.all(), ["<Article: Paul's story>"])
 
         # Adding an object of the wrong type raises TypeError.
-        with six.assertRaisesRegex(self, TypeError, "'Article' instance expected, got <Reporter.*"):
-            self.r.article_set.add(self.r2)
+        with transaction.atomic():
+            with six.assertRaisesRegex(self, TypeError,
+                                       "'Article' instance expected, got <Reporter.*"):
+                self.r.article_set.add(self.r2)
         self.assertQuerysetEqual(self.r.article_set.all(),
             [
                 "<Article: John's second story>",
@@ -115,10 +118,10 @@ class ManyToOneTests(TestCase):
         self.assertFalse(hasattr(self.r2.article_set, 'clear'))
 
     def test_selects(self):
-        new_article = self.r.article_set.create(headline="John's second story",
-                                                pub_date=datetime.date(2005, 7, 29))
-        new_article2 = self.r2.article_set.create(headline="Paul's story",
-                                                  pub_date=datetime.date(2006, 1, 17))
+        self.r.article_set.create(headline="John's second story",
+                                  pub_date=datetime.date(2005, 7, 29))
+        self.r2.article_set.create(headline="Paul's story",
+                                   pub_date=datetime.date(2006, 1, 17))
         # Reporter objects have access to their related Article objects.
         self.assertQuerysetEqual(self.r.article_set.all(), [
             "<Article: John's second story>",
@@ -210,9 +213,9 @@ class ManyToOneTests(TestCase):
         self.assertQuerysetEqual(
             Article.objects.filter(reporter__in=[self.r.id,self.r2.id]).distinct(),
             [
-                    "<Article: John's second story>",
-                    "<Article: Paul's story>",
-                    "<Article: This is a test>",
+                "<Article: John's second story>",
+                "<Article: Paul's story>",
+                "<Article: This is a test>",
             ])
         self.assertQuerysetEqual(
             Article.objects.filter(reporter__in=[self.r,self.r2]).distinct(),
@@ -226,8 +229,8 @@ class ManyToOneTests(TestCase):
         # then converted into a query
         self.assertQuerysetEqual(
             Article.objects.filter(
-                        reporter__in=Reporter.objects.filter(first_name='John').values('pk').query
-                    ).distinct(),
+                reporter__in=Reporter.objects.filter(first_name='John').values('pk').query
+            ).distinct(),
             [
                 "<Article: John's second story>",
                 "<Article: This is a test>",
@@ -236,8 +239,8 @@ class ManyToOneTests(TestCase):
     def test_reverse_selects(self):
         a3 = Article.objects.create(id=None, headline="Third article",
                                     pub_date=datetime.date(2005, 7, 27), reporter_id=self.r.id)
-        a4 = Article.objects.create(id=None, headline="Fourth article",
-                                    pub_date=datetime.date(2005, 7, 27), reporter_id=str(self.r.id))
+        Article.objects.create(id=None, headline="Fourth article",
+                               pub_date=datetime.date(2005, 7, 27), reporter_id=str(self.r.id))
         # Reporters can be queried
         self.assertQuerysetEqual(Reporter.objects.filter(id__exact=self.r.id),
                                  ["<Reporter: John Smith>"])
@@ -333,14 +336,14 @@ class ManyToOneTests(TestCase):
             ])
 
     def test_delete(self):
-        new_article = self.r.article_set.create(headline="John's second story",
+        self.r.article_set.create(headline="John's second story",
                                                 pub_date=datetime.date(2005, 7, 29))
-        new_article2 = self.r2.article_set.create(headline="Paul's story",
-                                                  pub_date=datetime.date(2006, 1, 17))
-        a3 = Article.objects.create(id=None, headline="Third article",
-                                    pub_date=datetime.date(2005, 7, 27), reporter_id=self.r.id)
-        a4 = Article.objects.create(id=None, headline="Fourth article",
-                                    pub_date=datetime.date(2005, 7, 27), reporter_id=str(self.r.id))
+        self.r2.article_set.create(headline="Paul's story",
+                                   pub_date=datetime.date(2006, 1, 17))
+        Article.objects.create(id=None, headline="Third article",
+                               pub_date=datetime.date(2005, 7, 27), reporter_id=self.r.id)
+        Article.objects.create(id=None, headline="Fourth article",
+                               pub_date=datetime.date(2005, 7, 27), reporter_id=str(self.r.id))
         # If you delete a reporter, his articles will be deleted.
         self.assertQuerysetEqual(Article.objects.all(),
             [

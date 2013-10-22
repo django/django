@@ -810,7 +810,7 @@ class ExceptionTests(TestCase):
         login = self.client.login(username='testclient',password='password')
         self.assertTrue(login, 'Could not log in')
         try:
-            response = self.client.get("/test_client_regress/staff_only/")
+            self.client.get("/test_client_regress/staff_only/")
             self.fail("General users should not be able to visit this page")
         except CustomTestException:
             pass
@@ -840,7 +840,7 @@ class TemplateExceptionTests(TestCase):
     def test_bad_404_template(self):
         "Errors found when rendering 404 error templates are re-raised"
         try:
-            response = self.client.get("/no_such_view/")
+            self.client.get("/no_such_view/")
             self.fail("Should get error about syntax error in template")
         except TemplateSyntaxError:
             pass
@@ -1217,10 +1217,10 @@ class UploadedFileEncodingTest(TestCase):
         self.assertEqual(b'Content-Type: text/plain',
                          encode_file('IGNORE', 'IGNORE', DummyFile("file.txt"))[2])
         self.assertIn(encode_file('IGNORE', 'IGNORE', DummyFile("file.zip"))[2], (
-                        b'Content-Type: application/x-compress',
-                        b'Content-Type: application/x-zip',
-                        b'Content-Type: application/x-zip-compressed',
-                        b'Content-Type: application/zip',))
+            b'Content-Type: application/x-compress',
+            b'Content-Type: application/x-zip',
+            b'Content-Type: application/x-zip-compressed',
+            b'Content-Type: application/zip',))
         self.assertEqual(b'Content-Type: application/octet-stream',
                          encode_file('IGNORE', 'IGNORE', DummyFile("file.unknown"))[2])
 

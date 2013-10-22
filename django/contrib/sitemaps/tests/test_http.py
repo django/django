@@ -42,7 +42,6 @@ class HTTPSitemapTests(SitemapTestsBase):
 """ % self.base_url
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
-
     def test_simple_sitemap_section(self):
         "A simple sitemap section can be rendered"
         response = self.client.get('/simple/sitemap-simple.xml')

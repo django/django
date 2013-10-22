@@ -32,7 +32,7 @@ class PostGISIntrospection(DatabaseIntrospection):
         try:
             cursor.execute(oid_sql, ('geometry',))
             GEOM_TYPE = cursor.fetchone()[0]
-            postgis_types = { GEOM_TYPE : 'GeometryField' }
+            postgis_types = {GEOM_TYPE : 'GeometryField'}
             if self.connection.ops.geography:
                 cursor.execute(oid_sql, ('geography',))
                 GEOG_TYPE = cursor.fetchone()[0]
@@ -72,7 +72,8 @@ class PostGISIntrospection(DatabaseIntrospection):
                                'WHERE "f_table_name"=%s AND "f_geometry_column"=%s',
                                (table_name, geo_col))
                 row = cursor.fetchone()
-                if not row: raise GeoIntrospectionError
+                if not row:
+                    raise GeoIntrospectionError
             except GeoIntrospectionError:
                 if self.connection.ops.geography:
                     cursor.execute('SELECT "coord_dimension", "srid", "type" '

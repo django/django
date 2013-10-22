@@ -1,6 +1,6 @@
 """
 The GeoDjango GEOS module.  Please consult the GeoDjango documentation
-for more details: 
+for more details:
   http://geodjango.org/docs/geos.html
 """
 try:
