@@ -567,7 +567,7 @@ class BoundField(object):
         # Translators: If found as last label character, these punctuation
         # characters will prevent the default label_suffix to be appended to the label
         if label_suffix and contents and contents[-1] not in _(':?.!'):
-            contents = format_html('{0}{1}', contents, label_suffix)
+            contents = format_html(u'{0}{1}', contents, label_suffix)
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:
@@ -575,7 +575,7 @@ class BoundField(object):
             if id_for_label:
                 attrs = dict(attrs or {}, **{'for': id_for_label})
             attrs = flatatt(attrs) if attrs else ''
-            contents = format_html('<label{0}>{1}</label>', attrs, contents)
+            contents = format_html(u'<label{0}>{1}</label>', attrs, contents)
         else:
             contents = conditional_escape(contents)
         return mark_safe(contents)

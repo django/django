@@ -55,14 +55,14 @@ class Media(object):
         return mark_safe('\n'.join(chain(*[getattr(self, 'render_' + name)() for name in MEDIA_TYPES])))
 
     def render_js(self):
-        return [format_html('<script type="text/javascript" src="{0}"></script>', self.absolute_path(path)) for path in self._js]
+        return [format_html(u'<script type="text/javascript" src="{0}"></script>', self.absolute_path(path)) for path in self._js]
 
     def render_css(self):
         # To keep rendering order consistent, we can't just iterate over items().
         # We need to sort the keys, and iterate over the sorted list.
         media = sorted(self._css.keys())
         return chain(*[
-            [format_html('<link href="{0}" type="text/css" media="{1}" rel="stylesheet" />', self.absolute_path(path), medium)
+            [format_html(u'<link href="{0}" type="text/css" media="{1}" rel="stylesheet" />', self.absolute_path(path), medium)
              for path in self._css[medium]]
             for medium in media])
 
@@ -241,7 +241,7 @@ class Input(Widget):
         if value != '':
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_text(self._format_value(value))
-        return format_html('<input{0} />', flatatt(final_attrs))
+        return format_html(u'<input{0} />', flatatt(final_attrs))
 
 
 class TextInput(Input):
@@ -303,7 +303,7 @@ class MultipleHiddenInput(HiddenInput):
                 # An ID attribute was given. Add a numeric index as a suffix
                 # so that the inputs don't all have the same ID attribute.
                 input_attrs['id'] = '%s_%s' % (id_, i)
-            inputs.append(format_html('<input{0} />', flatatt(input_attrs)))
+            inputs.append(format_html(u'<input{0} />', flatatt(input_attrs)))
         return mark_safe('\n'.join(inputs))
 
     def value_from_datadict(self, data, files, name):
@@ -399,7 +399,7 @@ class Textarea(Widget):
         if value is None:
             value = ''
         final_attrs = self.build_attrs(attrs, name=name)
-        return format_html('<textarea{0}>\r\n{1}</textarea>',
+        return format_html(u'<textarea{0}>\r\n{1}</textarea>',
                            flatatt(final_attrs),
                            force_text(value))
 
@@ -446,7 +446,7 @@ class CheckboxInput(Widget):
         if not (value is True or value is False or value is None or value == ''):
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_text(value)
-        return format_html('<input{0} />', flatatt(final_attrs))
+        return format_html(u'<input{0} />', flatatt(final_attrs))
 
     def value_from_datadict(self, data, files, name):
         if name not in data:
@@ -475,7 +475,7 @@ class Select(Widget):
         if value is None:
             value = ''
         final_attrs = self.build_attrs(attrs, name=name)
-        output = [format_html('<select{0}>', flatatt(final_attrs))]
+        output = [format_html(u'<select{0}>', flatatt(final_attrs))]
         options = self.render_options(choices, [value])
         if options:
             output.append(options)
@@ -493,7 +493,7 @@ class Select(Widget):
                 selected_choices.remove(option_value)
         else:
             selected_html = ''
-        return format_html('<option value="{0}"{1}>{2}</option>',
+        return format_html(u'<option value="{0}"{1}>{2}</option>',
                            option_value,
                            selected_html,
                            force_text(option_label))
@@ -504,7 +504,7 @@ class Select(Widget):
         output = []
         for option_value, option_label in chain(self.choices, choices):
             if isinstance(option_label, (list, tuple)):
-                output.append(format_html('<optgroup label="{0}">', force_text(option_value)))
+                output.append(format_html(u'<optgroup label="{0}">', force_text(option_value)))
                 for option in option_label:
                     output.append(self.render_option(selected_choices, *option))
                 output.append('</optgroup>')
@@ -546,7 +546,7 @@ class SelectMultiple(Select):
         if value is None:
             value = []
         final_attrs = self.build_attrs(attrs, name=name)
-        output = [format_html('<select multiple="multiple"{0}>', flatatt(final_attrs))]
+        output = [format_html(u'<select multiple="multiple"{0}>', flatatt(final_attrs))]
         options = self.render_options(choices, value)
         if options:
             output.append(options)
@@ -582,10 +582,10 @@ class ChoiceInput(SubWidget):
 
     def render(self, name=None, value=None, attrs=None, choices=()):
         if self.id_for_label:
-            label_for = format_html(' for="{0}"', self.id_for_label)
+            label_for = format_html(u' for="{0}"', self.id_for_label)
         else:
             label_for = ''
-        return format_html('<label{0}>{1} {2}</label>', label_for, self.tag(), self.choice_label)
+        return format_html(u'<label{0}>{1} {2}</label>', label_for, self.tag(), self.choice_label)
 
     def is_checked(self):
         return self.value == self.choice_value
@@ -594,7 +594,7 @@ class ChoiceInput(SubWidget):
         final_attrs = dict(self.attrs, type=self.input_type, name=self.name, value=self.choice_value)
         if self.is_checked():
             final_attrs['checked'] = 'checked'
-        return format_html('<input{0} />', flatatt(final_attrs))
+        return format_html(u'<input{0} />', flatatt(final_attrs))
 
     @property
     def id_for_label(self):
@@ -655,7 +655,7 @@ class ChoiceFieldRenderer(object):
         item in the list will get an id of `$id_$i`).
         """
         id_ = self.attrs.get('id', None)
-        start_tag = format_html('<ul id="{0}">', id_) if id_ else '<ul>'
+        start_tag = format_html(u'<ul id="{0}">', id_) if id_ else '<ul>'
         output = [start_tag]
         for i, choice in enumerate(self.choices):
             choice_value, choice_label = choice
@@ -668,12 +668,12 @@ class ChoiceFieldRenderer(object):
                                                       attrs=attrs_plus,
                                                       choices=choice_label)
                 sub_ul_renderer.choice_input_class = self.choice_input_class
-                output.append(format_html('<li>{0}{1}</li>', choice_value,
+                output.append(format_html(u'<li>{0}{1}</li>', choice_value,
                                           sub_ul_renderer.render()))
             else:
                 w = self.choice_input_class(self.name, self.value,
                                             self.attrs.copy(), choice, i)
-                output.append(format_html('<li>{0}</li>', force_text(w)))
+                output.append(format_html(u'<li>{0}</li>', force_text(w)))
         output.append('</ul>')
         return mark_safe('\n'.join(output))
 

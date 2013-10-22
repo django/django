@@ -155,7 +155,7 @@ class AdminReadonlyField(object):
         if not self.is_first:
             attrs["class"] = "inline"
         label = self.field['label']
-        return format_html('<label{0}>{1}:</label>',
+        return format_html(u'<label{0}>{1}:</label>',
                            flatatt(attrs),
                            capfirst(force_text(label)))
 

@@ -49,9 +49,9 @@ class CsrfTokenNode(Node):
         csrf_token = context.get('csrf_token', None)
         if csrf_token:
             if csrf_token == 'NOTPROVIDED':
-                return format_html("")
+                return format_html(u"")
             else:
-                return format_html("<input type='hidden' name='csrfmiddlewaretoken' value='{0}' />", csrf_token)
+                return format_html(u"<input type='hidden' name='csrfmiddlewaretoken' value='{0}' />", csrf_token)
         else:
             # It's very probable that the token is missing because of
             # misconfiguration, so we raise a warning

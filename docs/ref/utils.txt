@@ -541,7 +541,7 @@ escaping HTML.
     Similar to ``escape()``, except that it doesn't operate on pre-escaped strings,
     so it will not double escape.
 
-.. function:: format_html(format_string, *args, **kwargs)
+.. function:: format_html(uformat_string, *args, **kwargs)
 
     This is similar to `str.format`_, except that it is appropriate for
     building up HTML fragments. All args and kwargs are passed through
@@ -565,7 +565,7 @@ escaping HTML.
 
     .. code-block:: python
 
-        format_html(u"{0} <b>{1}</b> {2}",
+        format_html(uu"{0} <b>{1}</b> {2}",
                     mark_safe(some_html), some_text, some_other_text)
 
     This has the advantage that you don't need to apply :func:`escape` to each
