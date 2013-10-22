@@ -424,12 +424,10 @@ Atom1Feed
     :synopsis: Functional programming tools.
 
 It is important to note that these tools were by and large created to provide
-some useful utilities for use within the codebase of Django itself. In some
-cases they have been created for one particular use-case only, so even if they
-may be applied more generally, don't assume that they are necessarily the best
-way to meet the needs of your own application. They exist chiefly to serve the
-needs of Django internals. Other Python libraries may exist that provide the
-same functionality more robustly.
+some useful utilities for use within the codebase of Django itself. They exist
+chiefly because they serve the needs of Django internals and are not all
+necessarily the best way to meet the needs of your own application. Other
+Python libraries may exist that provide the same functionality more robustly.
 
 Classes
 -------
@@ -492,6 +490,13 @@ Classes
     database by some other process in the brief interval between subsequent
     invocations of a method on the same instance.
 
+.. class:: LazyObject
+
+    ``LazyObject`` is the base class for lazy objects, including
+    :class:`~SimpleLazyObject` below. Subclass ``LazyObject`` for your object
+    if you need to intercept and manage its instantiation manually; otherwise,
+    subclass :class:`~SimpleLazyObject`.
+
 .. class:: SimpleLazyObject
 
     A ``SimpleLazyObject`` resists instantiation until it's required.
@@ -499,19 +504,13 @@ Classes
     ``SimpleLazyObject`` can be used as the base for a new class, as in the
     case of ``django.utils.text.Truncator``.
 
-    It can also be used to create a SimpleLazyObject::
+    It can also be used to create any object lazily::
 
-        slo = SimpleLazyObject(lambda: some_function(*args))
+        lazy_object = SimpleLazyObject(lambda: some_function(*args))
 
     ``SimpleLazyObject`` is for compound objects of arbitrary type. For Python
     built-ins, or objects whose type is known, use
     :func:`~lazy`.
-
-.. class:: LazyObject
-
-    ``LazyObject`` is the base class for :class:`~SimpleLazyObject`. Subclass
-    ``LazyObject`` for your object if you need to intercept and manage its
-    instantiation manually; otherwise, subclass :class:`~SimpleLazyObject`.
 
 .. class:: lazy_property(fget=None, fset=None, fdel=None, doc=None)
 
@@ -541,10 +540,33 @@ Functions
 
     Wraps a function ``func``, so that its output is saved in the dictionary
     ``cache``. ``memoize`` uses the function's first ``num_args`` arguments as
-    a key for the cache. Any arguments that are to be used in this way must
-    therefore be usable as dictionary keys.
+    a key for the cache.
 
     An example::
+
+        # an expensive function we want to cache
+        def solve(crises=(), when="today")
+            ...
+            return solutions
+
+        # create a cache dictionary
+        solution_cache = {}
+
+        # wrap solve(), using both arguments as the cache key
+        solve = memoize(solve, solution_cache, 2)
+
+    The first time the wapped ``solve()`` function is called with particular
+    values of the ``crises`` and ``when`` arguments, it will execute normally
+    and save the output in the ``solution_cache`` dictionary. On subsequent
+    occasions, it will hit the cache instead. If it's called with new values of
+    either ``crises`` or ``when``, it will execute and save the output in the
+    cache with a new key.
+
+    Any arguments that are to be used in this way must therefore be usable as
+    dictionary keys. If one of the arguments were itself a dictionary (and
+    therefore not possible as a dictionary key) it would need to be excluded.
+    In this example, the function takes the dictionary ``agencies`` as an
+    argument::
 
         # an expensive function we want to cache
         def solve(crises=(), when="today", agencies={})
@@ -554,18 +576,16 @@ Functions
         # create a cache dictionary
         solution_cache = {}
 
-        # wrap solve(); use first 2 arguments as the cache key
+        # wrap solve(), using only first 2 arguments as the cache key
         solve = memoize(solve, solution_cache, 2)
 
-    The wrapped ``solve()`` will execute normally the first time it's called,
-    and store the result in ``solution_cache``. Subsequent calls with the same
-    values of the ``crises`` and ``when`` arguments will return the cached
-    value.
+    Any arguments that don't affect the output of the function can also be
+    excluded.
 
 .. function:: lazy(func, *resultclasses)
 
     ``lazy()`` returns a lazy version of any callable, that resists evaluation
-    until required. This is used by for example
+    until required . This is used by for example
     :func:`django.core.urlresolvers.reverse_lazy`, a `lazily evaluated
     <understanding_laziness>`_ version of
     :func:`django.core.urlresolvers.reverse`.
