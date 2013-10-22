@@ -17,12 +17,11 @@ from django.template.defaultfilters import (
     urlize, urlizetrunc, wordcount, wordwrap, yesno,
 )
 from django.test import TestCase
+from django.test.utils import TransRealMixin
 from django.utils import six
 from django.utils import translation
 from django.utils.safestring import SafeData
 from django.utils.encoding import python_2_unicode_compatible
-
-from i18n import TransRealMixin
 
 
 class DefaultFiltersTests(TestCase):

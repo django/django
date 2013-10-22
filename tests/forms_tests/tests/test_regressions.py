@@ -12,7 +12,7 @@ from django.test import TestCase
 from django.utils.translation import ugettext_lazy, override
 
 from forms_tests.models import Cheese
-from i18n import TransRealMixin
+from django.test.utils import TransRealMixin
 
 
 class FormsRegressionsTestCase(TransRealMixin, TestCase):
