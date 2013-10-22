@@ -22,7 +22,7 @@ from django.template import (base as template_base, loader, Context,
 from django.template.loaders import app_directories, filesystem, cached
 from django.test import RequestFactory, TestCase
 from django.test.utils import (setup_test_template_loader,
-    restore_template_loaders, override_settings)
+    restore_template_loaders, override_settings, TransRealMixin)
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
 from django.utils._os import upath
@@ -30,8 +30,6 @@ from django.utils.translation import activate, deactivate
 from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.six.moves.urllib.parse import urljoin
-
-from i18n import TransRealMixin
 
 # NumPy installed?
 try:
