@@ -9,21 +9,6 @@ import sys
 import tempfile
 import warnings
 
-
-def upath(path):
-    """
-    Separate version of django.utils._os.upath. The django.utils version isn't
-    usable here, as upath is needed for RUNTESTS_DIR which is needed before
-    django can be imported.
-    """
-    if sys.version_info[0] != 3 and not isinstance(path, bytes):
-        fs_encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
-        return path.decode(fs_encoding)
-    return path
-
-RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
-sys.path.insert(0, os.path.dirname(RUNTESTS_DIR))  # 'tests/../'
-
 from django import contrib
 from django.utils._os import upath
 from django.utils import six
@@ -33,6 +18,7 @@ CONTRIB_MODULE_PATH = 'django.contrib'
 TEST_TEMPLATE_DIR = 'templates'
 
 CONTRIB_DIR = os.path.dirname(upath(contrib.__file__))
+RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
 
 TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
@@ -99,9 +85,12 @@ def get_installed():
 
 
 def setup(verbosity, test_labels):
+    import django
     from django.conf import settings
     from django.db.models.loading import get_apps, load_app
     from django.test import TransactionTestCase, TestCase
+
+    print("Testing against Django installed in '%s'" % os.path.dirname(django.__file__))
 
     # Force declaring available_apps in TransactionTestCase for faster tests.
     def no_available_apps(self):
