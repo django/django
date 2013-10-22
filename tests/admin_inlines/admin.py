@@ -1,7 +1,15 @@
 from django.contrib import admin
 from django import forms
 
-from .models import *
+from .models import (
+    Author, BinaryTree, CapoFamiglia, Chapter, ChildModel1, ChildModel2,
+    Consigliere, EditablePKBook, ExtraTerrestrial, Fashionista, Holder,
+    Holder2, Holder3, Holder4, Inner, Inner2, Inner3, Inner4Stacked,
+    Inner4Tabular, NonAutoPKBook, Novel, ParentModelWithCustomPk, Poll,
+    Profile, ProfileCollection, Question, ReadOnlyInline, ShoppingWeakness,
+    Sighting, SomeChildModel, SomeParentModel, SottoCapo, Title,
+    TitleCollection,
+)
 
 site = admin.AdminSite(name="admin")
 

@@ -7,7 +7,13 @@ import datetime
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
-from django.forms import *
+from django.forms import (
+    BooleanField, CheckboxInput, CheckboxSelectMultiple, ChoiceField,
+    ClearableFileInput, DateInput, DateTimeField, DateTimeInput, FileInput,
+    Form, HiddenInput, MultipleHiddenInput, MultiWidget, NullBooleanSelect,
+    PasswordInput, RadioSelect, Select, SelectMultiple, SplitDateTimeWidget,
+    Textarea, TextInput, TimeInput,
+)
 from django.forms.widgets import RadioFieldRenderer
 from django.utils import formats
 from django.utils.safestring import mark_safe

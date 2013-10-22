@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 import unittest
 
-from django.contrib.webdesign.lorem_ipsum import *
+from django.contrib.webdesign.lorem_ipsum import paragraphs, words
 from django.template import loader, Context
 
 

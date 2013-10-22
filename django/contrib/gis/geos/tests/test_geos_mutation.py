@@ -8,7 +8,7 @@ from unittest import skipUnless
 from .. import HAS_GEOS
 
 if HAS_GEOS:
-    from .. import *
+    from .. import fromstr, LinearRing, LineString, MultiPoint, Point, Polygon
     from ..error import GEOSIndexError
 
 

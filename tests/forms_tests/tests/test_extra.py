@@ -4,7 +4,12 @@ from __future__ import unicode_literals
 import datetime
 import warnings
 
-from django.forms import *
+from django.forms import (
+    CharField, DateField, EmailField, FileField, Form, GenericIPAddressField,
+    HiddenInput, ImageField, IPAddressField, MultipleChoiceField,
+    MultiValueField, MultiWidget, PasswordInput, SelectMultiple, SlugField,
+    SplitDateTimeField, SplitDateTimeWidget, TextInput, URLField,
+)
 from django.forms.extras import SelectDateWidget
 from django.forms.utils import ErrorList
 from django.test import TestCase

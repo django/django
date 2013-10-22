@@ -33,7 +33,14 @@ import os
 from decimal import Decimal
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import *
+from django.forms import (
+    BooleanField, CharField, ChoiceField, ComboField, DateField, DateTimeField,
+    DecimalField, EmailField, Field, FileField, FilePathField, FloatField,
+    Form, forms, HiddenInput, IntegerField, MultipleChoiceField,
+    NullBooleanField, NumberInput, PasswordInput, RadioSelect, RegexField,
+    SplitDateTimeField, TextInput, TimeField, TypedChoiceField,
+    TypedMultipleChoiceField, URLField, ValidationError, Widget,
+)
 from django.test import SimpleTestCase
 from django.utils import formats
 from django.utils import six

@@ -5,7 +5,17 @@ import datetime
 import decimal
 import unittest
 
-from django.template.defaultfilters import *
+from django.template.defaultfilters import (
+    add, addslashes, capfirst, center, cut, date, default, default_if_none,
+    dictsort, dictsortreversed, divisibleby, escape, escapejs_filter,
+    filesizeformat, first, fix_ampersands_filter, floatformat, force_escape,
+    get_digit, iriencode, join, length, length_is, linebreaksbr,
+    linebreaks_filter, linenumbers, ljust, lower, make_list,
+    phone2numeric_filter, pluralize, removetags, rjust, slice_filter, slugify,
+    stringformat, striptags, time, timesince_filter, timeuntil_filter, title,
+    truncatewords, truncatewords_html, unordered_list, upper, urlencode,
+    urlize, urlizetrunc, wordcount, wordwrap, yesno,
+)
 from django.test import TestCase
 from django.utils import six
 from django.utils import translation

@@ -7,7 +7,13 @@ import warnings
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import RegexValidator
-from django.forms import *
+from django.forms import (
+    BooleanField, CharField, CheckboxSelectMultiple, ChoiceField, DateField,
+    EmailField, FileField, FloatField, Form, forms, HiddenInput, IntegerField,
+    MultipleChoiceField, MultipleHiddenInput, MultiValueField,
+    NullBooleanField, PasswordInput, RadioSelect, Select, SplitDateTimeField,
+    Textarea, TextInput, ValidationError, widgets,
+)
 from django.http import QueryDict
 from django.template import Template, Context
 from django.test import TestCase

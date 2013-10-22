@@ -7,7 +7,13 @@ import types
 from unittest import TestCase
 
 from django.core.exceptions import ValidationError
-from django.core.validators import *
+from django.core.validators import (
+    BaseValidator, EmailValidator, MaxLengthValidator, MaxValueValidator,
+    MinLengthValidator, MinValueValidator, RegexValidator, URLValidator,
+    validate_comma_separated_integer_list, validate_email, validate_integer,
+    validate_ipv46_address, validate_ipv4_address, validate_ipv6_address,
+    validate_slug,
+)
 from django.test.utils import str_prefix
 
 

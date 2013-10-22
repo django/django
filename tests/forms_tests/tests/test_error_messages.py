@@ -4,7 +4,13 @@ from __future__ import unicode_literals
 import warnings
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import *
+from django.forms import (
+    BooleanField, CharField, ChoiceField, DateField, DateTimeField,
+    DecimalField, EmailField, FileField, FloatField, Form,
+    GenericIPAddressField, IntegerField, IPAddressField, ModelChoiceField,
+    ModelMultipleChoiceField, MultipleChoiceField, RegexField,
+    SplitDateTimeField, TimeField, URLField, utils, ValidationError,
+)
 from django.test import TestCase
 from django.utils.safestring import mark_safe
 from django.utils.encoding import python_2_unicode_compatible

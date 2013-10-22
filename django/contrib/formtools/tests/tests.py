@@ -12,7 +12,9 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils._os import upath
 
-from django.contrib.formtools.tests.forms import *
+from django.contrib.formtools.tests.forms import (
+    HashTestBlankForm, HashTestForm, TestForm,
+)
 
 success_string = "Done was called!"
 success_string_encoded = success_string.encode()
