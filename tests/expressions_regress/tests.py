@@ -145,6 +145,13 @@ class ExpressionOperatorTests(TestCase):
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 58)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
+    def test_lefthand_power(self):
+        # LH Powert arithmetic operation on floats and integers
+        Number.objects.filter(pk=self.n.pk).update(integer=F('integer') ** 2,
+                                                float=F('float') ** 1.5)
+        self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 1764)
+        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(61.02, places=2))
+
     def test_right_hand_addition(self):
         # Right hand operators
         Number.objects.filter(pk=self.n.pk).update(integer=15 + F('integer'),
@@ -184,6 +191,13 @@ class ExpressionOperatorTests(TestCase):
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 27)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
+
+    def test_righthand_power(self):
+        # RH Powert arithmetic operation on floats and integers
+        Number.objects.filter(pk=self.n.pk).update(integer=2 ** F('integer'),
+                                                float=1.5 ** F('float'))
+        self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 4398046511104)
+        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(536.308, places=3))
 
 
 class FTimeDeltaTests(TestCase):
