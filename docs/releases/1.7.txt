@@ -397,6 +397,9 @@ Templates
   arguments will be looked up using
   :func:`~django.template.loader.get_template` as always.
 
+* The :ttag:`include` will raise a ``IncludedTemplateDoesNotExist`` error if the
+  included template doesn't exist.
+
 * It is now possible to :ttag:`include` templates recursively.
 
 * Template objects now have an origin attribute set when

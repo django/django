@@ -80,6 +80,10 @@ class TemplateDoesNotExist(Exception):
     pass
 
 
+class IncludedTemplateDoesNotExist(TemplateDoesNotExist):
+    pass
+
+
 class TemplateEncodingError(Exception):
     pass
 

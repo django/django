@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from django.conf import settings
 from django.template.base import TemplateSyntaxError, Library, Node, TextNode,\
-    token_kwargs, Variable
+    token_kwargs, Variable, TemplateDoesNotExist, IncludedTemplateDoesNotExist
 from django.template.loader import get_template
 from django.utils.safestring import mark_safe
 from django.utils import six
@@ -139,7 +139,10 @@ class IncludeNode(Node):
             # Does this quack like a Template?
             if not callable(getattr(template, 'render', None)):
                 # If not, we'll try get_template
-                template = get_template(template)
+                try:
+                    template = get_template(template)
+                except TemplateDoesNotExist as exp:
+                    raise IncludedTemplateDoesNotExist(*exp.args)
             values = {
                 name: var.resolve(context)
                 for name, var in six.iteritems(self.extra_context)
