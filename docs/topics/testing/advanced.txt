@@ -46,7 +46,7 @@ The following is a simple unit test using the request factory::
             # Every test needs access to the request factory.
             self.factory = RequestFactory()
             self.user = User.objects.create_user(
-                first_name='jacob', email='jacob@…', password='top_secret')
+                username='jacob', email='jacob@…', password='top_secret')
 
         def test_details(self):
             # Create an instance of a GET request.
