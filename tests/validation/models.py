@@ -50,7 +50,7 @@ class UniqueForDateModel(models.Model):
     name = models.CharField(max_length=100)
 
 class CustomMessagesModel(models.Model):
-    other  = models.IntegerField(blank=True, null=True)
+    other = models.IntegerField(blank=True, null=True)
     number = models.IntegerField(db_column='number_val',
         error_messages={'null': 'NULL', 'not42': 'AAARGH', 'not_equal': '%s != me'},
         validators=[validate_answer_to_universe]

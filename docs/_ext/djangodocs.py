@@ -22,35 +22,35 @@ simple_option_desc_re = re.compile(
 def setup(app):
     app.add_crossref_type(
         directivename = "setting",
-        rolename      = "setting",
+        rolename = "setting",
         indextemplate = "pair: %s; setting",
     )
     app.add_crossref_type(
         directivename = "templatetag",
-        rolename      = "ttag",
+        rolename = "ttag",
         indextemplate = "pair: %s; template tag"
     )
     app.add_crossref_type(
         directivename = "templatefilter",
-        rolename      = "tfilter",
+        rolename = "tfilter",
         indextemplate = "pair: %s; template filter"
     )
     app.add_crossref_type(
         directivename = "fieldlookup",
-        rolename      = "lookup",
+        rolename = "lookup",
         indextemplate = "pair: %s; field lookup type",
     )
     app.add_description_unit(
         directivename = "django-admin",
-        rolename      = "djadmin",
+        rolename = "djadmin",
         indextemplate = "pair: %s; django-admin command",
-        parse_node    = parse_django_admin_node,
+        parse_node = parse_django_admin_node,
     )
     app.add_description_unit(
         directivename = "django-admin-option",
-        rolename      = "djadminopt",
+        rolename = "djadminopt",
         indextemplate = "pair: %s; django-admin command-line option",
-        parse_node    = parse_django_adminopt_node,
+        parse_node = parse_django_adminopt_node,
     )
     app.add_config_value('django_next_version', '0.0', True)
     app.add_directive('versionadded', VersionDirective)

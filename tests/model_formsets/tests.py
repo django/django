@@ -466,7 +466,7 @@ class ModelFormsetTest(TestCase):
         formset = AuthorBooksFormSet(instance=author)
         self.assertEqual(len(formset.forms), 3)
         self.assertHTMLEqual(formset.forms[0].as_p(),
-            '<p><label for="id_book_set-0-title">Title:</label> <input id="id_book_set-0-title" type="text" name="book_set-0-title" maxlength="100" /><input type="hidden" name="book_set-0-author" value="%d" id="id_book_set-0-author" /><input type="hidden" name="book_set-0-id" id="id_book_set-0-id" /></p>'  % author.id)
+            '<p><label for="id_book_set-0-title">Title:</label> <input id="id_book_set-0-title" type="text" name="book_set-0-title" maxlength="100" /><input type="hidden" name="book_set-0-author" value="%d" id="id_book_set-0-author" /><input type="hidden" name="book_set-0-id" id="id_book_set-0-id" /></p>' % author.id)
         self.assertHTMLEqual(formset.forms[1].as_p(),
             '<p><label for="id_book_set-1-title">Title:</label> <input id="id_book_set-1-title" type="text" name="book_set-1-title" maxlength="100" /><input type="hidden" name="book_set-1-author" value="%d" id="id_book_set-1-author" /><input type="hidden" name="book_set-1-id" id="id_book_set-1-id" /></p>' % author.id)
         self.assertHTMLEqual(formset.forms[2].as_p(),

@@ -1437,7 +1437,7 @@ class Queries4Tests(BaseQuerysetTest):
         self.assertQuerysetEqual(qs, [ci2.pk, ci3.pk], lambda x: x.pk, False)
 
     def test_ticket15316_one2one_filter_false(self):
-        c  = SimpleCategory.objects.create(name="cat")
+        c = SimpleCategory.objects.create(name="cat")
         c0 = SimpleCategory.objects.create(name="cat0")
         c1 = SimpleCategory.objects.create(name="category1")
 
@@ -1453,7 +1453,7 @@ class Queries4Tests(BaseQuerysetTest):
         self.assertQuerysetEqual(qs, [ci2.pk, ci3.pk], lambda x: x.pk, False)
 
     def test_ticket15316_one2one_exclude_false(self):
-        c  = SimpleCategory.objects.create(name="cat")
+        c = SimpleCategory.objects.create(name="cat")
         c0 = SimpleCategory.objects.create(name="cat0")
         c1 = SimpleCategory.objects.create(name="category1")
 
@@ -1469,7 +1469,7 @@ class Queries4Tests(BaseQuerysetTest):
         self.assertQuerysetEqual(qs, [ci1.pk], lambda x: x.pk)
 
     def test_ticket15316_one2one_filter_true(self):
-        c  = SimpleCategory.objects.create(name="cat")
+        c = SimpleCategory.objects.create(name="cat")
         c0 = SimpleCategory.objects.create(name="cat0")
         c1 = SimpleCategory.objects.create(name="category1")
 
@@ -1485,7 +1485,7 @@ class Queries4Tests(BaseQuerysetTest):
         self.assertQuerysetEqual(qs, [ci1.pk], lambda x: x.pk)
 
     def test_ticket15316_one2one_exclude_true(self):
-        c  = SimpleCategory.objects.create(name="cat")
+        c = SimpleCategory.objects.create(name="cat")
         c0 = SimpleCategory.objects.create(name="cat0")
         c1 = SimpleCategory.objects.create(name="category1")
 

@@ -23,9 +23,9 @@ class WKBReader_st(Structure):
 class WKBWriter_st(Structure):
     pass
 
-WKT_READ_PTR  = POINTER(WKTReader_st)
+WKT_READ_PTR = POINTER(WKTReader_st)
 WKT_WRITE_PTR = POINTER(WKTWriter_st)
-WKB_READ_PTR  = POINTER(WKBReader_st)
+WKB_READ_PTR = POINTER(WKBReader_st)
 WKB_WRITE_PTR = POINTER(WKBReader_st)
 
 ### WKTReader routines ###
@@ -114,8 +114,8 @@ def wkb_writer_set(func, argtype=c_int):
 
 wkb_writer_get_byteorder = wkb_writer_get(GEOSFunc('GEOSWKBWriter_getByteOrder'))
 wkb_writer_set_byteorder = wkb_writer_set(GEOSFunc('GEOSWKBWriter_setByteOrder'))
-wkb_writer_get_outdim    = wkb_writer_get(GEOSFunc('GEOSWKBWriter_getOutputDimension'))
-wkb_writer_set_outdim    = wkb_writer_set(GEOSFunc('GEOSWKBWriter_setOutputDimension'))
+wkb_writer_get_outdim = wkb_writer_get(GEOSFunc('GEOSWKBWriter_getOutputDimension'))
+wkb_writer_set_outdim = wkb_writer_set(GEOSFunc('GEOSWKBWriter_setOutputDimension'))
 wkb_writer_get_include_srid = wkb_writer_get(GEOSFunc('GEOSWKBWriter_getIncludeSRID'), restype=c_char)
 wkb_writer_set_include_srid = wkb_writer_set(GEOSFunc('GEOSWKBWriter_setIncludeSRID'), argtype=c_char)
 

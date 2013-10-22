@@ -490,19 +490,19 @@ class ImmutableList(tuple):
             raise AttributeError(self.warning)
 
     # All list mutation functions complain.
-    __delitem__  = complain
+    __delitem__ = complain
     __delslice__ = complain
-    __iadd__     = complain
-    __imul__     = complain
-    __setitem__  = complain
+    __iadd__ = complain
+    __imul__ = complain
+    __setitem__ = complain
     __setslice__ = complain
-    append       = complain
-    extend       = complain
-    insert       = complain
-    pop          = complain
-    remove       = complain
-    sort         = complain
-    reverse      = complain
+    append = complain
+    extend = complain
+    insert = complain
+    pop = complain
+    remove= complain
+    sort = complain
+    reverse = complain
 
 class DictWrapper(dict):
     """

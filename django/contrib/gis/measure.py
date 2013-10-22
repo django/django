@@ -51,8 +51,8 @@ def pretty_name(obj):
 @total_ordering
 class MeasureBase(object):
     STANDARD_UNIT = None
-    ALIAS  = {}
-    UNITS  = {}
+    ALIAS = {}
+    UNITS = {}
     LALIAS = {}
 
     def __init__(self, default_unit=None, **kwargs):

@@ -41,11 +41,11 @@ class GeoIP(object):
     #
     # GEOIP_MMAP_CACHE - load database into mmap shared memory ( not available
     #       on Windows).
-    GEOIP_STANDARD     = 0
+    GEOIP_STANDARD = 0
     GEOIP_MEMORY_CACHE = 1
-    GEOIP_CHECK_CACHE  = 2
-    GEOIP_INDEX_CACHE  = 4
-    GEOIP_MMAP_CACHE   = 8
+    GEOIP_CHECK_CACHE = 2
+    GEOIP_INDEX_CACHE = 4
+    GEOIP_MMAP_CACHE = 8
     cache_options = dict((opt, None) for opt in (0, 1, 2, 4, 8))
 
     # Paths to the city & country binary databases.

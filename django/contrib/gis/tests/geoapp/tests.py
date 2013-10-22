@@ -118,7 +118,7 @@ class GeoModelTest(TestCase):
             # San Antonio in 'Texas 4205, Southern Zone (1983, meters)' (SRID 41157)
             # Used the following Oracle SQL to get this value:
             #  SELECT SDO_UTIL.TO_WKTGEOMETRY(SDO_CS.TRANSFORM(SDO_GEOMETRY('POINT (-98.493183 29.424170)', 4326), 41157)) FROM DUAL;
-            nad_wkt  = 'POINT (300662.034646583 5416427.45974934)'
+            nad_wkt = 'POINT (300662.034646583 5416427.45974934)'
             nad_srid = 41157
         else:
             # San Antonio in 'NAD83(HARN) / Texas Centric Lambert Conformal' (SRID 3084)

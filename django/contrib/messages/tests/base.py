@@ -57,9 +57,9 @@ class BaseTests(object):
 
     def setUp(self):
         self.settings_override = override_settings_tags(
-            TEMPLATE_DIRS   = (),
+            TEMPLATE_DIRS = (),
             TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS,
-            MESSAGE_TAGS    = '',
+            MESSAGE_TAGS = '',
             MESSAGE_STORAGE = '%s.%s' % (self.storage_class.__module__,
                                          self.storage_class.__name__),
             SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer',

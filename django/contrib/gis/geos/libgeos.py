@@ -100,7 +100,7 @@ class GEOSContextHandle_t(Structure):
 GEOM_PTR = POINTER(GEOSGeom_t)
 PREPGEOM_PTR = POINTER(GEOSPrepGeom_t)
 CS_PTR = POINTER(GEOSCoordSeq_t)
-CONTEXT_PTR  = POINTER(GEOSContextHandle_t)
+CONTEXT_PTR = POINTER(GEOSContextHandle_t)
 
 # Used specifically by the GEOSGeom_createPolygon and GEOSGeom_createCollection
 #  GEOS routines

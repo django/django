@@ -147,8 +147,8 @@ class Comment(models.Model):
     comment = models.TextField()
 
     # Content-object field
-    content_type   = models.ForeignKey(ContentType)
-    object_pk      = models.TextField()
+    content_type = models.ForeignKey(ContentType)
+    object_pk = models.TextField()
     content_object = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
 
 

@@ -34,7 +34,7 @@ class GoogleZoom(object):
         # zoom levels.
         self._degpp = [] # Degrees per pixel
         self._radpp = [] # Radians per pixel
-        self._npix  = [] # 1/2 the number of pixels for a tile at the given zoom level
+        self._npix = [] # 1/2 the number of pixels for a tile at the given zoom level
 
         # Incrementing through the zoom levels and populating the parameter arrays.
         z = tilesize # The number of pixels per zoom level.
@@ -158,5 +158,5 @@ class GoogleZoom(object):
         ur = Point(extent[2:])
         # Calculating the width and height.
         height = ll.distance(ul)
-        width  = ul.distance(ur)
+        width = ul.distance(ur)
         return width, height

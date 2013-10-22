@@ -275,7 +275,6 @@ class TestUtilsHashPass(unittest.TestCase):
         finally:
             hasher.iterations = old_iterations
 
-
     def test_load_library_no_algorithm(self):
         with self.assertRaises(ValueError) as e:
             BasePasswordHasher()._load_library()

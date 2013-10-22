@@ -204,7 +204,13 @@ def model_detail(request, app_label, model_name):
         if isinstance(field, models.ForeignKey):
             data_type = field.rel.to.__name__
             app_label = field.rel.to._meta.app_label
-            verbose = utils.parse_rst((_("the related `%(app_label)s.%(data_type)s` object")  % {'app_label': app_label, 'data_type': data_type}), 'model', _('model:') + data_type)
+            verbose = utils.parse_rst(
+                (_("the related `%(app_label)s.%(data_type)s` object") % {
+                    'app_label': app_label, 'data_type': data_type,
+                }),
+                'model',
+                _('model:') + data_type,
+            )
         else:
             data_type = get_readable_field_data_type(field)
             verbose = field.verbose_name

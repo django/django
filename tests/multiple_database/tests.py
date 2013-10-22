@@ -1864,7 +1864,7 @@ class SyncOnlyDefaultDatabaseRouter(object):
 
 class MigrateTestCase(TestCase):
 
-    available_apps  = [
+    available_apps = [
         'multiple_database',
         'django.contrib.auth',
         'django.contrib.contenttypes'

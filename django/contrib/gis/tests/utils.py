@@ -30,9 +30,9 @@ def no_spatialite(func):
 
 # Shortcut booleans to omit only portions of tests.
 _default_db = settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'].rsplit('.')[-1]
-oracle  = _default_db == 'oracle'
+oracle = _default_db == 'oracle'
 postgis = _default_db == 'postgis'
-mysql   = _default_db == 'mysql'
+mysql = _default_db == 'mysql'
 spatialite = _default_db == 'spatialite'
 
 HAS_SPATIALREFSYS = True

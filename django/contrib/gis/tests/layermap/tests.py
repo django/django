@@ -31,8 +31,8 @@ inter_shp = os.path.join(shp_path, 'interstates', 'interstates.shp')
 invalid_shp = os.path.join(shp_path, 'invalid', 'emptypoints.shp')
 
 # Dictionaries to hold what's expected in the county shapefile.
-NAMES  = ['Bexar', 'Galveston', 'Harris', 'Honolulu', 'Pueblo']
-NUMS   = [1, 2, 1, 19, 1] # Number of polygons for each.
+NAMES = ['Bexar', 'Galveston', 'Harris', 'Honolulu', 'Pueblo']
+NUMS = [1, 2, 1, 19, 1] # Number of polygons for each.
 STATES = ['Texas', 'Texas', 'Texas', 'Hawaii', 'Colorado']
 
 

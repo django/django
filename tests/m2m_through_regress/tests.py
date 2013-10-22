@@ -98,7 +98,7 @@ class M2MThroughTestCase(TestCase):
 
     def test_join_trimming(self):
         "Check that we don't involve too many copies of the intermediate table when doing a join. Refs #8046, #8254"
-        bob  = Person.objects.create(name="Bob")
+        bob = Person.objects.create(name="Bob")
         jim = Person.objects.create(name="Jim")
 
         rock = Group.objects.create(name="Rock")

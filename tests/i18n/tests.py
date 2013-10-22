@@ -1190,16 +1190,16 @@ class LocaleMiddlewareTests(TransRealMixin, TestCase):
 
         # Clear the session data before request
         session.save()
-        response = self.client.get('/en/simple/')
+        self.client.get('/en/simple/')
         self.assertEqual(self.client.session['_language'], 'en')
 
         # Clear the session data before request
         session.save()
-        response = self.client.get('/fr/simple/')
+        self.client.get('/fr/simple/')
         self.assertEqual(self.client.session['_language'], 'fr')
 
         # Check that language is not changed in session
-        response = self.client.get('/en/simple/')
+        self.client.get('/en/simple/')
         self.assertEqual(self.client.session['_language'], 'fr')
 
     @override_settings(
@@ -1221,7 +1221,7 @@ class LocaleMiddlewareTests(TransRealMixin, TestCase):
         self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
 
         # request other language; should default to old language key value
-        response = self.client.get('/fr/simple/')
+        self.client.get('/fr/simple/')
         self.assertEqual(self.client.session['_language'], 'en')
 
 
