@@ -186,7 +186,7 @@ def smart_urlquote(url):
 
     return force_text(url)
 
-def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
+def urlize(text, link_text=None, trim_url_limit=None, nofollow=False, autoescape=False):
     """
     Converts any URLs in text into clickable links.
 
@@ -194,6 +194,8 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     the original seven gTLDs (.com, .edu, .gov, .int, .mil, .net, and .org).
     Links can have trailing punctuation (periods, commas, close-parens) and
     leading punctuation (opening parens) and it'll still do the right thing.
+
+    If link_text is not None, the link text will be set to the specified value.
 
     If trim_url_limit is not None, the URLs in link text longer than this limit
     will truncated to trim_url_limit-3 characters and appended with an elipsis.
@@ -245,11 +247,11 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
 
             # Make link.
             if url:
-                trimmed = trim_url(middle)
+                tag_text = link_text or trim_url(middle)
                 if autoescape and not safe_input:
                     lead, trail = escape(lead), escape(trail)
-                    url, trimmed = escape(url), escape(trimmed)
-                middle = '<a href="%s"%s>%s</a>' % (url, nofollow_attr, trimmed)
+                    url, tag_text = escape(url), escape(tag_text)
+                middle = '<a href="%s"%s>%s</a>' % (url, nofollow_attr, tag_text)
                 words[i] = mark_safe('%s%s%s' % (lead, middle, trail))
             else:
                 if safe_input:

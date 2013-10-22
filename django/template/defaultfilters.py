@@ -321,9 +321,10 @@ def urlencode(value, safe=None):
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
-def urlize(value, autoescape=None):
+def urlize(value, link_text=None, autoescape=None):
     """Converts URLs in plain text into clickable links."""
-    return mark_safe(urlize_impl(value, nofollow=True, autoescape=autoescape))
+    return mark_safe(urlize_impl(value, link_text=link_text, nofollow=True,
+                            autoescape=autoescape))
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter

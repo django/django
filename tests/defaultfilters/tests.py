@@ -255,6 +255,16 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(urlize('info@djangoproject.org'),
             '<a href="mailto:info@djangoproject.org">info@djangoproject.org</a>')
 
+        # Check custom link text
+        self.assertEqual(urlize('http://google.com', 'Google'),
+                '<a href="http://google.com" rel="nofollow">Google</a>')
+        self.assertEqual(urlize('www.google.com', 'Another Google'),
+            '<a href="http://www.google.com" rel="nofollow">Another Google</a>')
+
+        # Check that custom link text is excaped automatically
+        self.assertEqual(urlize('http://google.com', '<blink>Google</blink>', autoescape=True),
+                '<a href="http://google.com" rel="nofollow">&lt;blink&gt;Google&lt;/blink&gt;</a>')
+
         # Check urlize with https addresses
         self.assertEqual(urlize('https://google.com'),
             '<a href="https://google.com" rel="nofollow">https://google.com</a>')
