@@ -406,6 +406,7 @@ class Textarea(Widget):
 
 class DateTimeBaseInput(TextInput):
     format_key = ''
+
     def __init__(self, attrs=None, format=None):
         super(DateTimeBaseInput, self).__init__(attrs)
         self.format = format if format else None

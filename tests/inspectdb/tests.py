@@ -38,6 +38,7 @@ class InspectDBTestCase(TestCase):
                      table_name_filter=lambda tn:tn.startswith('inspectdb_columntypes'),
                      stdout=out)
         output = out.getvalue()
+
         def assertFieldType(name, definition):
             out_def = re.search(r'^\s*%s = (models.*)$' % name, output, re.MULTILINE).groups()[0]
             self.assertEqual(definition, out_def)

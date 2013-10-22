@@ -65,6 +65,7 @@ class OnDeleteTests(TestCase):
         # Testing DO_NOTHING is a bit harder: It would raise IntegrityError for a normal model,
         # so we connect to pre_delete and set the fk to a known value.
         replacement_r = R.objects.create()
+
         def check_do_nothing(sender, **kwargs):
             obj = kwargs['instance']
             obj.donothing_set.update(donothing=replacement_r)
@@ -178,6 +179,7 @@ class DeletionTests(TestCase):
     def test_instance_update(self):
         deleted = []
         related_setnull_sets = []
+
         def pre_delete(sender, **kwargs):
             obj = kwargs['instance']
             deleted.append(obj)
@@ -264,6 +266,7 @@ class DeletionTests(TestCase):
 
         # Attach a signal to make sure we will not do fast_deletes.
         calls = []
+
         def noop(*args, **kwargs):
             calls.append('')
         models.signals.post_delete.connect(noop, sender=User)
@@ -281,6 +284,7 @@ class DeletionTests(TestCase):
         )
         # Attach a signal to make sure we will not do fast_deletes.
         calls = []
+
         def noop(*args, **kwargs):
             calls.append('')
         models.signals.post_delete.connect(noop, sender=User)

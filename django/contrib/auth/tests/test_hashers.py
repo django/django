@@ -222,6 +222,7 @@ class TestUtilsHashPass(unittest.TestCase):
         for algo in ('sha1', 'md5'):
             encoded = make_password('lètmein', hasher=algo)
             state = {'upgraded': False}
+
             def setter(password):
                 state['upgraded'] = True
             self.assertTrue(check_password('lètmein', encoded, setter))
@@ -230,6 +231,7 @@ class TestUtilsHashPass(unittest.TestCase):
     def test_no_upgrade(self):
         encoded = make_password('lètmein')
         state = {'upgraded': False}
+
         def setter():
             state['upgraded'] = True
         self.assertFalse(check_password('WRONG', encoded, setter))
@@ -240,6 +242,7 @@ class TestUtilsHashPass(unittest.TestCase):
         for algo in ('sha1', 'md5'):
             encoded = make_password('lètmein', hasher=algo)
             state = {'upgraded': False}
+
             def setter():
                 state['upgraded'] = True
             self.assertFalse(check_password('WRONG', encoded, setter))
@@ -259,6 +262,7 @@ class TestUtilsHashPass(unittest.TestCase):
             self.assertEqual(iterations, '1')
 
             state = {'upgraded': False}
+
             def setter(password):
                 state['upgraded'] = True
 

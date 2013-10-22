@@ -213,6 +213,7 @@ class Enclosure(object):
 
 class RssFeed(SyndicationFeed):
     mime_type = 'application/rss+xml; charset=utf-8'
+
     def write(self, outfile, encoding):
         handler = SimplerXMLGenerator(outfile, encoding)
         handler.startDocument()
@@ -255,6 +256,7 @@ class RssFeed(SyndicationFeed):
 
 class RssUserland091Feed(RssFeed):
     _version = "0.91"
+
     def add_item_elements(self, handler, item):
         handler.addQuickElement("title", item['title'])
         handler.addQuickElement("link", item['link'])
@@ -264,6 +266,7 @@ class RssUserland091Feed(RssFeed):
 class Rss201rev2Feed(RssFeed):
     # Spec: http://blogs.law.harvard.edu/tech/rss
     _version = "2.0"
+
     def add_item_elements(self, handler, item):
         handler.addQuickElement("title", item['title'])
         handler.addQuickElement("link", item['link'])

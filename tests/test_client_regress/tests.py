@@ -547,6 +547,7 @@ class AssertFormErrorTests(TestCase):
 
 class AssertFormsetErrorTests(TestCase):
     msg_prefixes = [("", {}), ("abc: ", {"msg_prefix": "abc"})]
+
     def setUp(self):
         """Makes response object for testing field and non-field errors"""
         # For testing field and non-field errors
@@ -1201,6 +1202,7 @@ class UnicodePayloadTests(TestCase):
 class DummyFile(object):
     def __init__(self, filename):
         self.name = filename
+
     def read(self):
         return b'TEST_FILE_CONTENT'
 

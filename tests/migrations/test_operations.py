@@ -347,6 +347,7 @@ class OperationTests(MigrationTestBase):
         with self.assertRaises(NotImplementedError):
             operation.database_backwards("test_runpython", None, new_state, project_state)
         # Now test we can do it with a callable
+
         def inner_method(models, schema_editor):
             Pony = models.get_model("test_runpython", "Pony")
             Pony.objects.create(pink=1, weight=3.55)

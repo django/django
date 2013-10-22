@@ -35,6 +35,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
             Person.objects.create(name="Person %s" % i)
 
         self._validator_run = False
+
         def my_validator(value):
             self._validator_run = True
 

@@ -1075,9 +1075,11 @@ class ModelFormsetTest(TestCase):
 
         class MembershipForm(forms.ModelForm):
             date_joined = forms.SplitDateTimeField(initial=now)
+
             class Meta:
                 model = Membership
                 fields = "__all__"
+
             def __init__(self, **kwargs):
                 super(MembershipForm, self).__init__(**kwargs)
                 self.fields['date_joined'].widget = forms.SplitDateTimeWidget()

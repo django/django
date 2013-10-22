@@ -719,6 +719,7 @@ class DatabaseConnectionHandlingTests(TransactionTestCase):
 
         connection.enter_transaction_management()
         connection.set_dirty()
+
         # Test that the rollback doesn't succeed (for example network failure
         # could cause this).
         def fail_horribly():

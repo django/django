@@ -1342,6 +1342,7 @@ class CommandTypes(AdminScriptTestCase):
         Also test proper traceback display.
         """
         command = BaseCommand()
+
         def raise_command_error(*args, **kwargs):
             raise CommandError("Custom error")
 

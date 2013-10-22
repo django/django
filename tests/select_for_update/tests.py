@@ -220,6 +220,7 @@ class SelectForUpdateTests(TransactionTestCase):
         raises the correct exception
         """
         self.start_blocking_transaction()
+
         def raw(status):
             try:
                 list(

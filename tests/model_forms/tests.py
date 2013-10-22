@@ -26,6 +26,7 @@ from .models import (Article, ArticleStatus, BetterWriter, BigInt, Book,
 
 if test_images:
     from .models import ImageFile, OptionalImageFile
+
     class ImageFileForm(forms.ModelForm):
         class Meta:
             model = ImageFile
@@ -208,6 +209,7 @@ class ModelFormWithMedia(forms.ModelForm):
         css = {
             'all': ('/some/form/css',)
         }
+
     class Meta:
         model = TextFile
         fields = '__all__'
@@ -1722,6 +1724,7 @@ class OldFormForXTests(TestCase):
 
         class CategoryForm(forms.ModelForm):
             description = forms.CharField()
+
             class Meta:
                 model = Category
                 fields = ['description', 'url']

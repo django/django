@@ -40,6 +40,7 @@ class SpatiaLiteDistance(SpatiaLiteFunction):
 class SpatiaLiteRelate(SpatiaLiteFunctionParam):
     "For SpatiaLite Relate(<geom>, <pattern>) calls."
     pattern_regex = re.compile(r'^[012TF\*]{9}$')
+
     def __init__(self, pattern):
         if not self.pattern_regex.match(pattern):
             raise ValueError('Invalid intersection matrix pattern "%s".' % pattern)

@@ -51,6 +51,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
         # This one only accepts pointers to floats
         c_float_p = ctypes.POINTER(ctypes.c_float)
+
         class FakeGeom2(GEOSBase):
             ptr_type = c_float_p
 

@@ -329,6 +329,7 @@ class BrokenLinkEmailsMiddlewareTest(TestCase):
         class SubclassedMiddleware(BrokenLinkEmailsMiddleware):
             ignored_user_agent_patterns = (re.compile(r'Spider.*'),
                                            re.compile(r'Robot.*'))
+
             def is_ignorable_request(self, request, uri, domain, referer):
                 '''Check user-agent in addition to normal checks.'''
                 if super(SubclassedMiddleware, self).is_ignorable_request(request, uri, domain, referer):
@@ -347,6 +348,7 @@ class BrokenLinkEmailsMiddlewareTest(TestCase):
 
 class ConditionalGetMiddlewareTest(TestCase):
     urls = 'middleware.cond_get_urls'
+
     def setUp(self):
         self.req = HttpRequest()
         self.req.META = {

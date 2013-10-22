@@ -20,6 +20,7 @@ class StateTests(TestCase):
             name = models.CharField(max_length=255)
             bio = models.TextField()
             age = models.IntegerField(blank=True, null=True)
+
             class Meta:
                 app_label = "migrations"
                 app_cache = new_app_cache
@@ -35,6 +36,7 @@ class StateTests(TestCase):
         class Book(models.Model):
             title = models.CharField(max_length=1000)
             author = models.ForeignKey(Author)
+
             class Meta:
                 app_label = "migrations"
                 app_cache = new_app_cache

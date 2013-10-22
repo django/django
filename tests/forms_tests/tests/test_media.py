@@ -429,6 +429,7 @@ class FormsMediaTestCase(TestCase):
         class FormWithMedia(Form):
             field1 = CharField(max_length=20, widget=MyWidget1())
             field2 = CharField(max_length=20, widget=MyWidget2())
+
             class Media:
                 js = ('/some/form/javascript',)
                 css = {
@@ -880,6 +881,7 @@ class StaticFormsMediaTestCase(TestCase):
         class FormWithMedia(Form):
             field1 = CharField(max_length=20, widget=MyWidget1())
             field2 = CharField(max_length=20, widget=MyWidget2())
+
             class Media:
                 js = ('/some/form/javascript',)
                 css = {

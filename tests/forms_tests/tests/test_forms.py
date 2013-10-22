@@ -824,6 +824,7 @@ class FormsTestCase(TestCase):
         """ Test that we are able to modify a form field validators list without polluting
             other forms """
         from django.core.validators import MaxValueValidator
+
         class MyForm(Form):
             myfield = CharField(max_length=25)
 
@@ -1899,6 +1900,7 @@ class FormsTestCase(TestCase):
         """
         class CustomJSONField(CharField):
             empty_values = [None, '']
+
             def to_python(self, value):
                 # Fake json.loads
                 if value == '{}':

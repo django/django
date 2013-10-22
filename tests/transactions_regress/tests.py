@@ -374,6 +374,7 @@ class SavepointTest(IgnoreDeprecationWarningsMixin, TransactionTestCase):
         if (connection.vendor == 'mysql' and
             connection.features._mysql_storage_engine == 'MyISAM'):
             raise SkipTest("MyISAM MySQL storage engine doesn't support savepoints")
+
         @commit_manually
         def work():
             mod = Mod.objects.create(fld=1)

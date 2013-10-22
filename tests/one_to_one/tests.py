@@ -85,6 +85,7 @@ class OneToOneTests(TestCase):
         w = self.r.waiter_set.create(name='Joe')
         w.save()
         self.assertEqual(repr(w), '<Waiter: Joe the waiter at Demon Dogs the restaurant>')
+
         # Query the waiters
         def assert_filter_waiters(**params):
             self.assertQuerysetEqual(Waiter.objects.filter(**params), [

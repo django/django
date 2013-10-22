@@ -241,6 +241,7 @@ class BaseFormSet(object):
             # None should be sorted below anything else. Allowing None as
             # a comparison value makes it so we can leave ordering fields
             # blank.
+
             def compare_ordering_key(k):
                 if k[1] is None:
                     return (1, 0) # +infinity, larger than any number

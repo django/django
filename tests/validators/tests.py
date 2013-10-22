@@ -184,6 +184,7 @@ TEST_DATA = (
 def create_simple_test_method(validator, expected, value, num):
     if expected is not None and issubclass(expected, Exception):
         test_mask = 'test_%s_raises_error_%d'
+
         def test_func(self):
             # assertRaises not used, so as to be able to produce an error message
             # containing the tested value
@@ -196,6 +197,7 @@ def create_simple_test_method(validator, expected, value, num):
                     expected.__name__, value))
     else:
         test_mask = 'test_%s_%d'
+
         def test_func(self):
             try:
                 self.assertEqual(expected, validator(value))

@@ -134,6 +134,7 @@ class SimpleTemplateResponseTest(TestCase):
 
         def post1(obj):
             post.append('post1')
+
         def post2(obj):
             post.append('post2')
 

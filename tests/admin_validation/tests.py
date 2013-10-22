@@ -127,6 +127,7 @@ class ValidationTestCase(TestCase):
             model = TwoAlbumFKAndAnE
             exclude = ("e",)
             fk_name = "album1"
+
         class MyAdmin(admin.ModelAdmin):
             inlines = [TwoAlbumFKAndAnEInline]
         MyAdmin.validate(Album)
@@ -134,6 +135,7 @@ class ValidationTestCase(TestCase):
     def test_inline_self_validation(self):
         class TwoAlbumFKAndAnEInline(admin.TabularInline):
             model = TwoAlbumFKAndAnE
+
         class MyAdmin(admin.ModelAdmin):
             inlines = [TwoAlbumFKAndAnEInline]
 
@@ -291,6 +293,7 @@ class ValidationTestCase(TestCase):
         """
         class SongForm(forms.ModelForm):
             extra_data = forms.CharField()
+
             class Meta:
                 model = Song
                 fields = '__all__'

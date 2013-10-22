@@ -79,6 +79,7 @@ class BaseGeometryWidget(Widget):
 
 class OpenLayersWidget(BaseGeometryWidget):
     template_name = 'gis/openlayers.html'
+
     class Media:
         js = (
             'http://openlayers.org/api/2.13/OpenLayers.js',

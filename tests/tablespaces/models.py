@@ -18,6 +18,7 @@ class ArticleRef(models.Model):
 
 class Scientist(models.Model):
     name = models.CharField(max_length=50)
+
     class Meta:
         db_table = 'tablespaces_scientistref'
         db_tablespace = 'tbl_tbsp'
@@ -28,6 +29,7 @@ class Article(models.Model):
     code = models.CharField(max_length=50, unique=True, db_tablespace='idx_tbsp')
     authors = models.ManyToManyField(Scientist, related_name='articles_written_set')
     reviewers = models.ManyToManyField(Scientist, related_name='articles_reviewed_set', db_tablespace='idx_tbsp')
+
     class Meta:
         db_table = 'tablespaces_articleref'
         db_tablespace = 'tbl_tbsp'
