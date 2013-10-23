@@ -456,7 +456,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         def exactly_two(np):
             return np == 2
         def two_to_three(np):
-            return np >= 2 and np <=3
+            return np >= 2 and np <= 3
         if (lookup_type in self.distance_functions and
             lookup_type != 'dwithin'):
             return two_to_three(num_param)

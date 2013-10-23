@@ -69,4 +69,4 @@ class SaferefTests(unittest.TestCase):
 
     def _closure(self, ref):
         """Dumb utility mechanism to increment deletion counter"""
-        self.closureCount +=1
+        self.closureCount += 1

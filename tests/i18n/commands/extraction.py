@@ -17,11 +17,11 @@ from django.utils.six import StringIO
 from django.utils.translation import TranslatorCommentWarning
 
 
-LOCALE='de'
+LOCALE = 'de'
 
 class ExtractorTests(SimpleTestCase):
 
-    PO_FILE='locale/%s/LC_MESSAGES/django.po' % LOCALE
+    PO_FILE = 'locale/%s/LC_MESSAGES/django.po' % LOCALE
 
     def setUp(self):
         self._cwd = os.getcwd()
@@ -255,7 +255,7 @@ class BasicExtractorTests(ExtractorTests):
 
 class JavascriptExtractorTests(ExtractorTests):
 
-    PO_FILE='locale/%s/LC_MESSAGES/djangojs.po' % LOCALE
+    PO_FILE = 'locale/%s/LC_MESSAGES/djangojs.po' % LOCALE
 
     def test_javascript_literals(self):
         os.chdir(self.test_dir)
@@ -426,7 +426,7 @@ class LocationCommentsTests(ExtractorTests):
 
 class KeepPotFileExtractorTests(ExtractorTests):
 
-    POT_FILE='locale/django.pot'
+    POT_FILE = 'locale/django.pot'
 
     def setUp(self):
         super(KeepPotFileExtractorTests, self).setUp()

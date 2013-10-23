@@ -12,7 +12,7 @@ class GoogleMapException(Exception):
 
 # The default Google Maps URL (for the API javascript)
 # TODO: Internationalize for Japan, UK, etc.
-GOOGLE_MAPS_URL='http://maps.google.com/maps?file=api&v=%s&key='
+GOOGLE_MAPS_URL = 'http://maps.google.com/maps?file=api&v=%s&key='
 
 
 class GoogleMap(object):

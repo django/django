@@ -496,9 +496,9 @@ class BackendTestCase(TestCase):
         tbl = connection.introspection.table_name_converter(opts.db_table)
         f1 = connection.ops.quote_name(opts.get_field('root').column)
         f2 = connection.ops.quote_name(opts.get_field('square').column)
-        if paramstyle=='format':
+        if paramstyle == 'format':
             query = 'INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (tbl, f1, f2)
-        elif paramstyle=='pyformat':
+        elif paramstyle == 'pyformat':
             query = 'INSERT INTO %s (%s, %s) VALUES (%%(root)s, %%(square)s)' % (tbl, f1, f2)
         else:
             raise ValueError("unsupported paramstyle in test")

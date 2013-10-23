@@ -80,8 +80,8 @@ class RelatedObjectUnicodeTests(TestCase):
         Regression test for #6045: references to other models can be unicode
         strings, providing they are directly convertible to ASCII.
         """
-        m1=UnicodeReferenceModel.objects.create()
-        m2=UnicodeReferenceModel.objects.create()
+        m1 = UnicodeReferenceModel.objects.create()
+        m2 = UnicodeReferenceModel.objects.create()
         m2.others.add(m1) # used to cause an error (see ticket #6045)
         m2.save()
         list(m2.others.all()) # Force retrieval.

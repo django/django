@@ -138,7 +138,7 @@ class TranslatableFile(object):
         if msgs:
             if is_templatized:
                 # Remove '.py' suffix
-                if os.name =='nt':
+                if os.name == 'nt':
                     # Preserve '.\' prefix on Windows to respect gettext behavior
                     old = '#: ' + work_file
                     new = '#: ' + orig_file

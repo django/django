@@ -791,7 +791,7 @@ class ModelToDictTests(TestCase):
     Tests for forms.models.model_to_dict
     """
     def test_model_to_dict_many_to_many(self):
-        categories=[
+        categories = [
             Category(name='TestName1', slug='TestName1', url='url1'),
             Category(name='TestName2', slug='TestName2', url='url2'),
             Category(name='TestName3', slug='TestName3', url='url3')

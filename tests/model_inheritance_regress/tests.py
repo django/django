@@ -82,7 +82,7 @@ class ModelInheritanceTest(TestCase):
         italian_restaurant.serves_gnocchi = False
         italian_restaurant.save_base(raw=True)
 
-        place2.name='Derelict lot'
+        place2.name = 'Derelict lot'
         place2.save_base(raw=True)
 
         park.capacity = 50

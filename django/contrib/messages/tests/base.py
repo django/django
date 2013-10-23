@@ -214,11 +214,11 @@ class BaseTests(object):
 
     @override_settings(
         INSTALLED_APPS=filter(
-            lambda app:app!='django.contrib.messages', settings.INSTALLED_APPS),
+            lambda app: app != 'django.contrib.messages', settings.INSTALLED_APPS),
         MIDDLEWARE_CLASSES=filter(
-            lambda m:'MessageMiddleware' not in m, settings.MIDDLEWARE_CLASSES),
+            lambda m: 'MessageMiddleware' not in m, settings.MIDDLEWARE_CLASSES),
         TEMPLATE_CONTEXT_PROCESSORS=filter(
-            lambda p:'context_processors.messages' not in p,
+            lambda p: 'context_processors.messages' not in p,
             settings.TEMPLATE_CONTEXT_PROCESSORS),
         MESSAGE_LEVEL=constants.DEBUG
     )
@@ -239,11 +239,11 @@ class BaseTests(object):
 
     @override_settings(
         INSTALLED_APPS=filter(
-            lambda app:app!='django.contrib.messages', settings.INSTALLED_APPS),
+            lambda app: app != 'django.contrib.messages', settings.INSTALLED_APPS),
         MIDDLEWARE_CLASSES=filter(
-            lambda m:'MessageMiddleware' not in m, settings.MIDDLEWARE_CLASSES),
+            lambda m: 'MessageMiddleware' not in m, settings.MIDDLEWARE_CLASSES),
         TEMPLATE_CONTEXT_PROCESSORS=filter(
-            lambda p:'context_processors.messages' not in p,
+            lambda p: 'context_processors.messages' not in p,
             settings.TEMPLATE_CONTEXT_PROCESSORS),
         MESSAGE_LEVEL=constants.DEBUG
     )

@@ -67,5 +67,5 @@ islocal = int_output(lgdal.OSRIsLocal, [c_void_p])
 isprojected = int_output(lgdal.OSRIsProjected, [c_void_p])
 
 # Coordinate transformation
-new_ct= srs_output(std_call('OCTNewCoordinateTransformation'), [c_void_p, c_void_p])
+new_ct = srs_output(std_call('OCTNewCoordinateTransformation'), [c_void_p, c_void_p])
 destroy_ct = void_output(std_call('OCTDestroyCoordinateTransformation'), [c_void_p], errcheck=False)

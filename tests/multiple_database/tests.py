@@ -39,7 +39,7 @@ class QueryTestCase(TestCase):
 
         # Create a book on the default database using a save
         dive = Book()
-        dive.title="Dive into Python"
+        dive.title = "Dive into Python"
         dive.published = datetime.date(2009, 5, 4)
         dive.save()
 
@@ -74,7 +74,7 @@ class QueryTestCase(TestCase):
 
         # Create a book on the default database using a save
         dive = Book()
-        dive.title="Dive into Python"
+        dive.title = "Dive into Python"
         dive.published = datetime.date(2009, 5, 4)
         dive.save(using='other')
 
@@ -1794,7 +1794,7 @@ class RouterAttributeErrorTestCase(TestCase):
     def test_attribute_error_save(self):
         "Check that the AttributeError from AttributeErrorRouter bubbles up"
         dive = Book()
-        dive.title="Dive into Python"
+        dive.title = "Dive into Python"
         dive.published = datetime.date(2009, 5, 4)
         self.assertRaises(AttributeError, dive.save)
 

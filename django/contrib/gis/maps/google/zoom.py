@@ -95,7 +95,7 @@ class GoogleZoom(object):
         lon = (px[0] - npix) / self._degpp[zoom]
 
         # Calculating the latitude value.
-        lat = RTOD * (2 * atan(exp((px[1] - npix)/ (-1.0 * self._radpp[zoom]))) - 0.5 * pi)
+        lat = RTOD * (2 * atan(exp((px[1] - npix) / (-1.0 * self._radpp[zoom]))) - 0.5 * pi)
 
         # Returning the longitude, latitude coordinate pair.
         return (lon, lat)

@@ -340,7 +340,10 @@ class FormsWidgetTestCase(TestCase):
 </select>""")
 
         # Choices can be nested one level in order to create HTML optgroups:
-        w.choices=(('outer1', 'Outer 1'), ('Group "1"', (('inner1', 'Inner 1'), ('inner2', 'Inner 2'))))
+        w.choices = (
+            ('outer1', 'Outer 1'),
+            ('Group "1"', (('inner1', 'Inner 1'), ('inner2', 'Inner 2'))),
+        )
         self.assertHTMLEqual(w.render('nestchoice', None), """<select name="nestchoice">
 <option value="outer1">Outer 1</option>
 <optgroup label="Group &quot;1&quot;">
@@ -706,7 +709,11 @@ beatle J R Ringo False""")
     def test_nested_choices(self):
         # Choices can be nested for radio buttons:
         w = RadioSelect()
-        w.choices=(('unknown', 'Unknown'), ('Audio', (('vinyl', 'Vinyl'), ('cd', 'CD'))), ('Video', (('vhs', 'VHS'), ('dvd', 'DVD'))))
+        w.choices = (
+            ('unknown', 'Unknown'),
+            ('Audio', (('vinyl', 'Vinyl'), ('cd', 'CD'))),
+            ('Video', (('vhs', 'VHS'), ('dvd', 'DVD'))),
+        )
         self.assertHTMLEqual(w.render('nestchoice', 'dvd', attrs={'id':'media'}), """<ul id="media">
 <li><label for="media_0"><input id="media_0" name="nestchoice" type="radio" value="unknown" /> Unknown</label></li>
 <li>Audio<ul id="media_1">
@@ -721,7 +728,11 @@ beatle J R Ringo False""")
 
         # Choices can be nested for checkboxes:
         w = CheckboxSelectMultiple()
-        w.choices=(('unknown', 'Unknown'), ('Audio', (('vinyl', 'Vinyl'), ('cd', 'CD'))), ('Video', (('vhs', 'VHS'), ('dvd', 'DVD'))))
+        w.choices = (
+            ('unknown', 'Unknown'),
+            ('Audio', (('vinyl', 'Vinyl'), ('cd', 'CD'))),
+            ('Video', (('vhs', 'VHS'), ('dvd', 'DVD'))),
+        )
         self.assertHTMLEqual(w.render('nestchoice', ('vinyl', 'dvd'), attrs={'id':'media'}), """<ul id="media">
 <li><label for="media_0"><input id="media_0" name="nestchoice" type="checkbox" value="unknown" /> Unknown</label></li>
 <li>Audio<ul id="media_1">

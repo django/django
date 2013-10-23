@@ -52,7 +52,7 @@ class GEvent(object):
 
     def __str__(self):
         "Returns the parameter part of a GEvent."
-        return mark_safe('"%s", %s' %(self.event, self.action))
+        return mark_safe('"%s", %s' % (self.event, self.action))
 
 @python_2_unicode_compatible
 class GOverlayBase(object):
@@ -303,7 +303,7 @@ class GMarker(GOverlayBase):
         super(GMarker, self).__init__()
 
     def latlng_from_coords(self, coords):
-        return 'new GLatLng(%s,%s)' %(coords[1], coords[0])
+        return 'new GLatLng(%s,%s)' % (coords[1], coords[0])
 
     def options(self):
         result = []

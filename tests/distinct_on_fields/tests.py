@@ -57,8 +57,8 @@ class DistinctOnTests(TestCase):
             # Does combining querysets work?
             (
                 (Celebrity.objects.filter(fan__in=[self.fan1, self.fan2]).
-                    distinct('name').order_by('name')
-                |Celebrity.objects.filter(fan__in=[self.fan3]).
+                    distinct('name').order_by('name') |
+                 Celebrity.objects.filter(fan__in=[self.fan3]).
                     distinct('name').order_by('name')),
                 ['<Celebrity: c1>', '<Celebrity: c2>'],
             ),

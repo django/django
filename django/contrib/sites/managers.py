@@ -29,7 +29,7 @@ class CurrentSiteManager(models.Manager):
         try:
             field = self.model._meta.get_field(self.__field_name)
             if not isinstance(field, (models.ForeignKey, models.ManyToManyField)):
-                raise TypeError("%s must be a ForeignKey or ManyToManyField." %self.__field_name)
+                raise TypeError("%s must be a ForeignKey or ManyToManyField." % self.__field_name)
         except FieldDoesNotExist:
             raise ValueError("%s couldn't find a field named %s in %s." %
                     (self.__class__.__name__, self.__field_name, self.model._meta.object_name))

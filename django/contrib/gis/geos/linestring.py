@@ -58,7 +58,7 @@ class LineString(GEOSGeometry):
 
         # Creating a coordinate sequence object because it is easier to
         # set the points using GEOSCoordSeq.__setitem__().
-        cs = GEOSCoordSeq(capi.create_cs(ncoords, ndim), z=bool(ndim==3))
+        cs = GEOSCoordSeq(capi.create_cs(ncoords, ndim), z=bool(ndim == 3))
 
         for i in xrange(ncoords):
             if numpy_coords:

@@ -579,7 +579,7 @@ class Queries1Tests(BaseQuerysetTest):
             ['datetime.datetime(2007, 12, 19, 0, 0)', 'datetime.datetime(2007, 12, 20, 0, 0)']
         )
 
-        name="one"
+        name = "one"
         self.assertQuerysetEqual(
             Item.objects.datetimes('created', 'day').extra(where=['name=%s'], params=[name]),
             ['datetime.datetime(2007, 12, 19, 0, 0)']
@@ -2670,8 +2670,8 @@ class NullJoinPromotionOrTest(TestCase):
         # b__c__name generates join to c, which the ORM tried to promote but
         # failed as that join isn't nullable.
         q_obj = (
-            Q(d__name='foo')|
-            Q(b__name='foo')|
+            Q(d__name='foo') |
+            Q(b__name='foo') |
             Q(b__c__name='foo')
         )
         qset = ModelA.objects.filter(q_obj)

@@ -107,7 +107,7 @@ class InlineWeakness(admin.TabularInline):
 
 class QuestionInline(admin.TabularInline):
     model = Question
-    readonly_fields=['call_me']
+    readonly_fields = ['call_me']
 
     def call_me(self, obj):
         return 'Callable in QuestionInline'
@@ -122,7 +122,7 @@ class PollAdmin(admin.ModelAdmin):
 
 class ChapterInline(admin.TabularInline):
     model = Chapter
-    readonly_fields=['call_me']
+    readonly_fields = ['call_me']
 
     def call_me(self, obj):
         return 'Callable in ChapterInline'

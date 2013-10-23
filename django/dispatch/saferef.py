@@ -83,7 +83,7 @@ class BoundMethodWeakref(object):
         of already-referenced methods.
         """
         key = cls.calculateKey(target)
-        current =cls._allInstances.get(key)
+        current = cls._allInstances.get(key)
         if current is not None:
             current.deletionMethods.append(onDelete)
             return current

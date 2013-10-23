@@ -166,7 +166,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
     def test_m2m_widgets(self):
         """m2m fields help text as it applies to admin app (#9321)."""
         class AdvisorAdmin(admin.ModelAdmin):
-            filter_vertical=['companies']
+            filter_vertical = ['companies']
 
         self.assertFormfield(models.Advisor, 'companies', widgets.FilteredSelectMultiple,
                              filter_vertical=['companies'])

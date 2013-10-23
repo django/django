@@ -14,7 +14,7 @@ prepared_destroy.restype = None
 
 # Prepared geometry binary predicate support.
 def prepared_predicate(func):
-    func.argtypes= [PREPGEOM_PTR, GEOM_PTR]
+    func.argtypes = [PREPGEOM_PTR, GEOM_PTR]
     func.restype = c_char
     func.errcheck = check_predicate
     return func

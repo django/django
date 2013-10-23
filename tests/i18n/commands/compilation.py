@@ -37,8 +37,8 @@ class PoFileTests(MessageCompilationTests):
 class PoFileContentsTests(MessageCompilationTests):
     # Ticket #11240
 
-    LOCALE='fr'
-    MO_FILE='locale/%s/LC_MESSAGES/django.mo' % LOCALE
+    LOCALE = 'fr'
+    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
 
     def setUp(self):
         super(PoFileContentsTests, self).setUp()
@@ -53,8 +53,8 @@ class PercentRenderingTests(MessageCompilationTests):
     # Ticket #11240 -- Testing rendering doesn't belong here but we are trying
     # to keep tests for all the stack together
 
-    LOCALE='it'
-    MO_FILE='locale/%s/LC_MESSAGES/django.mo' % LOCALE
+    LOCALE = 'it'
+    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
 
     def setUp(self):
         super(PercentRenderingTests, self).setUp()
@@ -101,8 +101,8 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
 
 class CompilationErrorHandling(MessageCompilationTests):
 
-    LOCALE='ja'
-    MO_FILE='locale/%s/LC_MESSAGES/django.mo' % LOCALE
+    LOCALE = 'ja'
+    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
 
     def setUp(self):
         super(CompilationErrorHandling, self).setUp()

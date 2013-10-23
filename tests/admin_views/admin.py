@@ -47,7 +47,7 @@ class ArticleInline(admin.TabularInline):
     prepopulated_fields = {
         'title' : ('content',)
     }
-    fieldsets=(
+    fieldsets = (
         ('Some fields', {
             'classes': ('collapse',),
             'fields': ('title', 'content')
@@ -74,7 +74,7 @@ class ChapterXtra1Admin(admin.ModelAdmin):
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('content', 'date', callable_year, 'model_year', 'modeladmin_year')
     list_filter = ('date', 'section')
-    fieldsets=(
+    fieldsets = (
         ('Some fields', {
             'classes': ('collapse',),
             'fields': ('title', 'content')
@@ -465,7 +465,7 @@ class WorkHourAdmin(admin.ModelAdmin):
 
 
 class FoodDeliveryAdmin(admin.ModelAdmin):
-    list_display=('reference', 'driver', 'restaurant')
+    list_display = ('reference', 'driver', 'restaurant')
     list_editable = ('driver', 'restaurant')
 
 

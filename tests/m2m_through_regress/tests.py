@@ -68,7 +68,7 @@ class M2MThroughTestCase(TestCase):
 
         p = Person.objects.create(name="Bob")
         g = Group.objects.create(name="Roll")
-        m =Membership.objects.create(person=p, group=g)
+        m = Membership.objects.create(person=p, group=g)
 
         pks = {"p_pk": p.pk, "g_pk": g.pk, "m_pk": m.pk}
 

@@ -500,7 +500,7 @@ class ImmutableList(tuple):
     extend = complain
     insert = complain
     pop = complain
-    remove= complain
+    remove = complain
     sort = complain
     reverse = complain
 

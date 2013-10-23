@@ -1527,8 +1527,8 @@ class CacheI18nTest(TestCase):
         self.assertEqual(get_cache_data, None)
 
         # i18n tests
-        en_message ="Hello world!"
-        es_message ="Hola mundo!"
+        en_message = "Hello world!"
+        es_message = "Hola mundo!"
 
         request = self._get_request_cache()
         set_cache(request, 'en', en_message)

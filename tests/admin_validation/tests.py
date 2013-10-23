@@ -193,7 +193,7 @@ class ValidationTestCase(TestCase):
     def test_nonexistant_field_on_inline(self):
         class CityInline(admin.TabularInline):
             model = City
-            readonly_fields=['i_dont_exist'] # Missing attribute
+            readonly_fields = ['i_dont_exist']  # Missing attribute
 
         self.assertRaisesMessage(ImproperlyConfigured,
             str_prefix("CityInline.readonly_fields[0], %(_)s'i_dont_exist' is not a callable "
