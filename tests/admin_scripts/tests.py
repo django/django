@@ -1385,7 +1385,7 @@ class CommandTypes(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.auth.models'")
-        self.assertOutput(out, os.sep.join(['django', 'contrib', 'auth', 'models.py']))
+        self.assertOutput(out, "module 'django.contrib.auth.models' from")
         self.assertOutput(out, str_prefix("'>, options=[('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
 
     def test_app_command_no_apps(self):
@@ -1400,10 +1400,10 @@ class CommandTypes(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.auth.models'")
-        self.assertOutput(out, os.sep.join(['django', 'contrib', 'auth', 'models.py']))
+        self.assertOutput(out, "module 'django.contrib.auth.models' from")
         self.assertOutput(out, str_prefix("'>, options=[('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
         self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.contenttypes.models'")
-        self.assertOutput(out, os.sep.join(['django', 'contrib', 'contenttypes', 'models.py']))
+        self.assertOutput(out, "module 'django.contrib.contenttypes.models' from")
         self.assertOutput(out, str_prefix("'>, options=[('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
 
     def test_app_command_invalid_appname(self):
