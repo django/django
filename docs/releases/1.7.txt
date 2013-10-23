@@ -379,7 +379,7 @@ Templates
   :setting:`TEMPLATE_DEBUG` is ``True``. This allows template origins to be
   inspected and logged outside of the ``django.template`` infrastructure.
 
-* ``TypeError`` exceptions are not longer silenced when raised during the
+* ``TypeError`` exceptions are no longer silenced when raised during the
   rendering of a template.
 
 * The following functions now accept a ``dirs`` parameter which is a list or
