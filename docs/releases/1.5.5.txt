@@ -2,7 +2,7 @@
 Django 1.5.5 release notes
 ==========================
 
-*October 22, 2013*
+*October 23, 2013*
 
 Django 1.5.5 fixes a couple security-related bugs and several other bugs in the
 1.5 series.
