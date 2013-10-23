@@ -56,6 +56,7 @@ TEST_DATA = (
     # Quoted-string format (CR not allowed)
     (validate_email, '"\\\011"@here.com', None),
     (validate_email, '"\\\012"@here.com', ValidationError),
+    (validate_email, 'trailingdot@shouldfail.com.', ValidationError),
 
     (validate_slug, 'slug-ok', None),
     (validate_slug, 'longer-slug-still-ok', None),
