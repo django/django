@@ -11,7 +11,6 @@ class MigrationExecutor(object):
     def __init__(self, connection, progress_callback=None):
         self.connection = connection
         self.loader = MigrationLoader(self.connection)
-        self.loader.load_disk()
         self.recorder = MigrationRecorder(self.connection)
         self.progress_callback = progress_callback
 
@@ -20,7 +19,7 @@ class MigrationExecutor(object):
         Given a set of targets, returns a list of (Migration instance, backwards?).
         """
         plan = []
-        applied = self.recorder.applied_migrations()
+        applied = set(self.loader.applied_migrations)
         for target in targets:
             # If the target is (appname, None), that means unmigrate everything
             if target[1] is None:
@@ -87,7 +86,13 @@ class MigrationExecutor(object):
             with self.connection.schema_editor() as schema_editor:
                 project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
                 migration.apply(project_state, schema_editor)
-        self.recorder.record_applied(migration.app_label, migration.name)
+        # For replacement migrations, record individual statuses
+        if migration.replaces:
+            for app_label, name in migration.replaces:
+                self.recorder.record_applied(app_label, name)
+        else:
+            self.recorder.record_applied(migration.app_label, migration.name)
+        # Report prgress
         if self.progress_callback:
             self.progress_callback("apply_success", migration)
 
@@ -101,6 +106,12 @@ class MigrationExecutor(object):
             with self.connection.schema_editor() as schema_editor:
                 project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
                 migration.unapply(project_state, schema_editor)
-        self.recorder.record_unapplied(migration.app_label, migration.name)
+        # For replacement migrations, record individual statuses
+        if migration.replaces:
+            for app_label, name in migration.replaces:
+                self.recorder.record_unapplied(app_label, name)
+        else:
+            self.recorder.record_unapplied(migration.app_label, migration.name)
+        # Report progress
         if self.progress_callback:
             self.progress_callback("unapply_success", migration)
