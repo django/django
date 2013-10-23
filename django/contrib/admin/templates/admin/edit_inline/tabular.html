@@ -74,7 +74,7 @@
   $("#{{ inline_admin_formset.formset.prefix }}-group .tabular.inline-related tbody tr").tabularFormset({
     prefix: "{{ inline_admin_formset.formset.prefix }}",
     adminStaticPrefix: '{% static "admin/" %}',
-    addText: "{% blocktrans with inline_admin_formset.opts.verbose_name|title as verbose_name %}Add another {{ verbose_name }}{% endblocktrans %}",
+    addText: "{% blocktrans with inline_admin_formset.opts.verbose_name|capfirst as verbose_name %}Add another {{ verbose_name }}{% endblocktrans %}",
     deleteText: "{% trans 'Remove' %}"
   });
 })(django.jQuery);
