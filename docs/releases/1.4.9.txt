@@ -2,7 +2,7 @@
 Django 1.4.9 release notes
 ==========================
 
-*October 22, 2013*
+*October 23, 2013*
 
 Django 1.4.9 fixes a security-related bug in the 1.4 series and one other
 data corruption bug.
