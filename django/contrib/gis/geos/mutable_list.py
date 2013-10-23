@@ -291,6 +291,7 @@ class ListMixin(object):
         # we're not changing the length of the sequence
         newLen = len(self)
         newVals = dict(zip(indexList, valueList))
+
         def newItems():
             for i in xrange(newLen):
                 if i in newVals:
@@ -317,6 +318,7 @@ class ListMixin(object):
         origLen = len(self)
         stop = max(start, stop)
         newLen = origLen - stop + start + len(valueList)
+
         def newItems():
             for i in xrange(origLen + 1):
                 if i == start:

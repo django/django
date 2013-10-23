@@ -148,6 +148,7 @@ def get_ogr_db_string():
 
     # Build the params of the OGR database connection string
     params = [db_str % {'db_name': db['NAME']}]
+
     def add(key, template):
         value = db.get(key, None)
         # Don't add the parameter if it is not in django's settings

@@ -355,6 +355,7 @@ class FileStorageTests(unittest.TestCase):
         Test behaviour when file.chunks() is raising an error
         """
         f1 = ContentFile('chunks fails')
+
         def failing_chunks():
             raise IOError
         f1.chunks = failing_chunks
@@ -532,10 +533,13 @@ class DimensionClosingBug(unittest.TestCase):
 
         class FileWrapper(object):
             _closed = []
+
             def __init__(self, f):
                 self.f = f
+
             def __getattr__(self, name):
                 return getattr(self.f, name)
+
             def close(self):
                 self._closed.append(True)
                 self.f.close()

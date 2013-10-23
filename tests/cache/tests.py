@@ -1479,6 +1479,7 @@ class CacheI18nTest(TestCase):
         # Regression test for #17476
         class CustomTzName(timezone.UTC):
             name = ''
+
             def tzname(self, dt):
                 return self.name
 

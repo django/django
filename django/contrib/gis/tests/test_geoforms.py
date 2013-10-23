@@ -263,6 +263,7 @@ class CustomGeometryWidgetTest(SimpleTestCase):
         class CustomGeometryWidget(forms.BaseGeometryWidget):
             template_name = 'gis/openlayers.html'
             deserialize_called = 0
+
             def serialize(self, value):
                 return value.json if value else ''
 

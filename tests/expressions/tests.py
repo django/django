@@ -205,6 +205,7 @@ class ExpressionsTests(TestCase):
         test_gmbh.point_of_contact = None
         test_gmbh.save()
         self.assertTrue(test_gmbh.point_of_contact is None)
+
         def test():
             test_gmbh.point_of_contact = F("ceo")
         self.assertRaises(ValueError, test)

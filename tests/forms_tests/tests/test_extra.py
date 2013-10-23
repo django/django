@@ -663,11 +663,13 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
             if six.PY3:
                 def __str__(self):
                     return 'ŠĐĆŽćžšđ'
+
                 def __bytes__(self):
                     return b'Foo'
             else:
                 def __str__(self):
                     return b'Foo'
+
                 def __unicode__(self):
                     return '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
 

@@ -18,6 +18,7 @@ class GeometryColumns(models.Model):
     column_name = models.CharField(max_length=1024)
     srid = models.IntegerField(primary_key=True)
     # TODO: Add support for `diminfo` column (type MDSYS.SDO_DIM_ARRAY).
+
     class Meta:
         db_table = 'USER_SDO_GEOM_METADATA'
         managed = False

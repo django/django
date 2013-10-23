@@ -30,6 +30,7 @@ def method_decorator(decorator):
         # In case 'decorator' adds attributes to the function it decorates, we
         # want to copy those. We don't have access to bound_func in this scope,
         # but we can cheat by using it on a dummy function.
+
         @decorator
         def dummy(*args, **kwargs):
             pass
@@ -84,6 +85,7 @@ def available_attrs(fn):
 def make_middleware_decorator(middleware_class):
     def _make_decorator(*m_args, **m_kwargs):
         middleware = middleware_class(*m_args, **m_kwargs)
+
         def _decorator(view_func):
             @wraps(view_func, assigned=available_attrs(view_func))
             def _wrapped_view(request, *args, **kwargs):

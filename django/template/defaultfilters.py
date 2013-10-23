@@ -591,6 +591,7 @@ def unordered_list(value, autoescape=None):
         escaper = conditional_escape
     else:
         escaper = lambda x: x
+
     def convert_old_style_list(list_):
         """
         Converts old style lists to the new easier to understand format.
@@ -621,6 +622,7 @@ def unordered_list(value, autoescape=None):
         if old_style_list:
             second_item = new_second_item
         return [first_item, second_item], old_style_list
+
     def _helper(list_, tabs=1):
         indent = '\t' * tabs
         output = []

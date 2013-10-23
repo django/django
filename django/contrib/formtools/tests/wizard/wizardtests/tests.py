@@ -418,8 +418,10 @@ class WizardInlineFormSetTests(TestCase):
     def test_set_instance(self):
         # Regression test for #21259
         poet = self.poet
+
         class InlineFormSetWizard(CookieWizardView):
             instance = None
+
             def get_form_instance(self, step):
                 if self.instance is None:
                     self.instance = poet

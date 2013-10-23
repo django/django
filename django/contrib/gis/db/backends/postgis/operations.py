@@ -44,6 +44,7 @@ class PostGISSpheroidDistance(PostGISFunction):
     "For PostGIS spherical distance operations (using the spheroid)."
     dist_func = 'distance_spheroid'
     sql_template = '%(function)s(%(geo_col)s, %(geometry)s, %%s) %(operator)s %%s'
+
     def __init__(self, prefix, operator):
         # An extra parameter in `end_subst` is needed for the spheroid string.
         super(PostGISSpheroidDistance, self).__init__(prefix, self.dist_func,
@@ -137,6 +138,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
 
         # Valid distance types and substitutions
         dtypes = (Decimal, Distance, float) + six.integer_types
+
         def get_dist_ops(operator):
             "Returns operations for both regular and spherical distances."
             return {'cartesian' : PostGISDistance(prefix, operator),
@@ -455,6 +457,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         """
         def exactly_two(np):
             return np == 2
+
         def two_to_three(np):
             return np >= 2 and np <= 3
         if (lookup_type in self.distance_functions and

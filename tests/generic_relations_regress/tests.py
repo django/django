@@ -95,6 +95,7 @@ class GenericRelationTests(TestCase):
         Link.objects.create(content_object=c)
 
         places = list(Place.objects.order_by('links__id'))
+
         def count_places(place):
             return len([p for p in places if p.id == place.id])
 

@@ -1029,8 +1029,10 @@ class ValidationTests(unittest.TestCase):
         class AwesomeFilter(SimpleListFilter):
             def get_title(self):
                 return 'awesomeness'
+
             def get_choices(self, request):
                 return (('bit', 'A bit awesome'), ('very', 'Very awesome'), )
+
             def get_queryset(self, cl, qs):
                 return qs
 

@@ -258,6 +258,7 @@ class ModifyingSaveData(models.Model):
 # Regression for #7202, #7350
 class AbstractBaseModel(models.Model):
     parent_data = models.IntegerField()
+
     class Meta:
         abstract = True
 

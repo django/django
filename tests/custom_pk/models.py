@@ -19,6 +19,7 @@ class Employee(models.Model):
     employee_code = models.IntegerField(primary_key=True, db_column = 'code')
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
+
     class Meta:
         ordering = ('last_name', 'first_name')
 
@@ -29,6 +30,7 @@ class Employee(models.Model):
 class Business(models.Model):
     name = models.CharField(max_length=20, primary_key=True)
     employees = models.ManyToManyField(Employee)
+
     class Meta:
         verbose_name_plural = 'businesses'
 

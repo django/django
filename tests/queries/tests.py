@@ -676,6 +676,7 @@ class Queries1Tests(BaseQuerysetTest):
             Item.objects.filter(created__in=[self.time1, self.time2]),
             ['<Item: one>', '<Item: two>']
         )
+
     def test_ticket7235(self):
         # An EmptyQuerySet should not raise exceptions if it is filtered.
         Eaten.objects.create(meal='m')
@@ -757,6 +758,7 @@ class Queries1Tests(BaseQuerysetTest):
         def f():
             return iter([])
         n_obj = Note.objects.all()[0]
+
         def g():
             for i in [n_obj.pk]:
                 yield i
@@ -1238,6 +1240,7 @@ class Queries2Tests(TestCase):
         # Count should work with a partially read result set.
         count = Number.objects.count()
         qs = Number.objects.all()
+
         def run():
             for obj in qs:
                 return qs.count() == count

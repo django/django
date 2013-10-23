@@ -991,6 +991,7 @@ class FieldsTests(SimpleTestCase):
         # Make sure we're compatible with MySQL, which uses 0 and 1 for its boolean
         # values. (#9609)
         NULLBOOL_CHOICES = (('1', 'Yes'), ('0', 'No'), ('', 'Unknown'))
+
         class MySQLNullBooleanForm(Form):
             nullbool0 = NullBooleanField(widget=RadioSelect(choices=NULLBOOL_CHOICES))
             nullbool1 = NullBooleanField(widget=RadioSelect(choices=NULLBOOL_CHOICES))

@@ -444,6 +444,7 @@ def iterlists(d, **kw):
 if PY3:
     def b(s):
         return s.encode("latin-1")
+
     def u(s):
         return s
     unichr = chr
@@ -462,14 +463,18 @@ if PY3:
 else:
     def b(s):
         return s
+
     def u(s):
         return unicode(s, "unicode_escape")
     unichr = unichr
     int2byte = chr
+
     def byte2int(bs):
         return ord(bs[0])
+
     def indexbytes(buf, i):
         return ord(buf[i])
+
     def iterbytes(buf):
         return (ord(byte) for byte in buf)
     import StringIO
@@ -512,6 +517,7 @@ else:
         fp = kwargs.pop("file", sys.stdout)
         if fp is None:
             return
+
         def write(data):
             if not isinstance(data, basestring):
                 data = str(data)

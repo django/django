@@ -73,6 +73,7 @@ class DefaultFiltersTests(TestCase):
         class FloatWrapper(object):
             def __init__(self, value):
                 self.value = value
+
             def __float__(self):
                 return self.value
 
@@ -510,6 +511,7 @@ class DefaultFiltersTests(TestCase):
         class ULItem(object):
             def __init__(self, title):
                 self.title = title
+
             def __str__(self):
                 return 'ulitem-%s' % str(self.title)
 

@@ -273,6 +273,7 @@ class FormsWidgetTestCase(TestCase):
 
         # The 'choices' argument can be any iterable:
         from itertools import chain
+
         def get_choices():
             for i in range(5):
                 yield (i, i)
@@ -284,6 +285,7 @@ class FormsWidgetTestCase(TestCase):
 <option value="4">4</option>
 </select>""")
         things = ({'id': 1, 'name': 'And Boom'}, {'id': 2, 'name': 'One More Thing!'})
+
         class SomeForm(Form):
             somechoice = ChoiceField(choices=chain((('', '-'*9),), [(thing['id'], thing['name']) for thing in things]))
         f = SomeForm()
@@ -903,6 +905,7 @@ beatle J R Ringo False""")
                 if value:
                     return value.split('__')
                 return ['', '']
+
             def format_output(self, rendered_widgets):
                 return '<br />'.join(rendered_widgets)
 
@@ -1066,6 +1069,7 @@ class SelectAndTextWidget(MultiWidget):
         When choices are set for this widget, we want to pass those along to the Select widget
         """
         self.widgets[0].choices = choices
+
     def _get_choices(self):
         """
         The choices for this widget are the Select widget's choices

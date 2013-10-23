@@ -149,6 +149,7 @@ class TemplateLoaderTests(TestCase):
     def test_loaders_security(self):
         ad_loader = app_directories.Loader()
         fs_loader = filesystem.Loader()
+
         def test_template_sources(path, template_dirs, expected_sources):
             if isinstance(expected_sources, list):
                 # Fix expected sources so they are abspathed

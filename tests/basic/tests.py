@@ -673,6 +673,7 @@ class ModelTest(TestCase):
     def test_emptyqs_customqs(self):
         # A hacky test for custom QuerySet subclass - refs #17271
         Article.objects.create(headline='foo', pub_date=datetime.now())
+
         class CustomQuerySet(QuerySet):
             def do_something(self):
                 return 'did something'
@@ -734,6 +735,7 @@ class ConcurrentSaveTests(TransactionTestCase):
         """
         a = Article.objects.create(headline='foo', pub_date=datetime.now())
         exceptions = []
+
         def deleter():
             try:
                 # Do not delete a directly - doing so alters its state.
