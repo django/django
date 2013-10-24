@@ -31,7 +31,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
     RelatedPrepopulated, UndeletableObject, UnchangeableObject, UserMessenger, Simple, Choice,
     ShortMessage, Telegram, FilteredManager, EmptyModelHidden,
-    EmptyModelVisible, EmptyModelMixin)
+    EmptyModelVisible, EmptyModelMixin, State, City, Restaurant, Worker)
 
 
 def callable_year(dt_value):
@@ -74,6 +74,7 @@ class ChapterXtra1Admin(admin.ModelAdmin):
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('content', 'date', callable_year, 'model_year', 'modeladmin_year')
     list_filter = ('date', 'section')
+    view_on_site = False
     fieldsets = (
         ('Some fields', {
             'classes': ('collapse',),
@@ -735,6 +736,35 @@ class EmptyModelMixinAdmin(admin.ModelAdmin):
     form = FormWithVisibleAndHiddenField
     fieldsets = EmptyModelVisibleAdmin.fieldsets
 
+class CityInlineAdmin(admin.TabularInline):
+    model = City
+    view_on_site = False
+
+class StateAdmin(admin.ModelAdmin):
+    inlines = [CityInlineAdmin]
+
+class RestaurantInlineAdmin(admin.TabularInline):
+    model = Restaurant
+    view_on_site = True
+
+class CityAdmin(admin.ModelAdmin):
+    inlines = [RestaurantInlineAdmin]
+    view_on_site = True
+
+class WorkerAdmin(admin.ModelAdmin):
+    def view_on_site(self, obj):
+        return '/worker/%s/%s/' % (obj.surname, obj.name)
+
+class WorkerInlineAdmin(admin.TabularInline):
+    model = Worker
+
+    def view_on_site(self, obj):
+        return '/worker_inline/%s/%s/' % (obj.surname, obj.name)
+
+class RestaurantAdmin(admin.ModelAdmin):
+    inlines = [WorkerInlineAdmin]
+    view_on_site = False
+
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
@@ -785,6 +815,10 @@ site.register(MainPrepopulated, MainPrepopulatedAdmin)
 site.register(UnorderedObject, UnorderedObjectAdmin)
 site.register(UndeletableObject, UndeletableObjectAdmin)
 site.register(UnchangeableObject, UnchangeableObjectAdmin)
+site.register(State, StateAdmin)
+site.register(City, CityAdmin)
+site.register(Restaurant, RestaurantAdmin)
+site.register(Worker, WorkerAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:

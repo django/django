@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+    <object pk="1" model="admin_views.state">
+        <field type="CharField" name="name">New York</field>
+    </object>
+    <object pk="2" model="admin_views.state">
+        <field type="CharField" name="name">Illinois</field>
+    </object>
+    <object pk="3" model="admin_views.state">
+        <field type="CharField" name="name">California</field>
+    </object>
+    <object pk="1" model="admin_views.city">
+        <field to="admin_views.state" name="state" rel="ManyToOneRel">1</field>
+        <field type="CharField" name="name">New York</field>
+    </object>
+    <object pk="2" model="admin_views.city">
+        <field to="admin_views.state" name="state" rel="ManyToOneRel">2</field>
+        <field type="CharField" name="name">Chicago</field>
+    </object>
+    <object pk="3" model="admin_views.city">
+        <field to="admin_views.state" name="state" rel="ManyToOneRel">3</field>
+        <field type="CharField" name="name">San Francisco</field>
+    </object>
+    <object pk="1" model="admin_views.restaurant">
+        <field to="admin_views.city" name="city" rel="ManyToOneRel">1</field>
+        <field type="CharField" name="name">Italian Pizza</field>
+    </object>
+    <object pk="2" model="admin_views.restaurant">
+        <field to="admin_views.city" name="city" rel="ManyToOneRel">1</field>
+        <field type="CharField" name="name">Boulevard</field>
+    </object>
+    <object pk="3" model="admin_views.restaurant">
+        <field to="admin_views.city" name="city" rel="ManyToOneRel">2</field>
+        <field type="CharField" name="name">Chinese Dinner</field>
+    </object>
+    <object pk="4" model="admin_views.restaurant">
+        <field to="admin_views.city" name="city" rel="ManyToOneRel">2</field>
+        <field type="CharField" name="name">Angels</field>
+    </object>
+    <object pk="5" model="admin_views.restaurant">
+        <field to="admin_views.city" name="city" rel="ManyToOneRel">2</field>
+        <field type="CharField" name="name">Take Away</field>
+    </object>
+    <object pk="6" model="admin_views.restaurant">
+        <field to="admin_views.city" name="city" rel="ManyToOneRel">3</field>
+        <field type="CharField" name="name">The Unknown Restaurant</field>
+    </object>
+    <object pk="1" model="admin_views.worker">
+        <field to="admin_views.restaurant" name="work_at" rel="ManyToOneRel">1</field>
+        <field type="CharField" name="name">Mario</field>
+        <field type="CharField" name="surname">Rossi</field>
+    </object>
+    <object pk="2" model="admin_views.worker">
+        <field to="admin_views.restaurant" name="work_at" rel="ManyToOneRel">1</field>
+        <field type="CharField" name="name">Antonio</field>
+        <field type="CharField" name="surname">Bianchi</field>
+    </object>
+    <object pk="3" model="admin_views.worker">
+        <field to="admin_views.restaurant" name="work_at" rel="ManyToOneRel">1</field>
+        <field type="CharField" name="name">John</field>
+        <field type="CharField" name="surname">Doe</field>
+    </object>
+</django-objects>

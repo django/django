@@ -202,9 +202,10 @@ class InlineAdminFormSet(object):
 
     def __iter__(self):
         for form, original in zip(self.formset.initial_forms, self.formset.get_queryset()):
+            view_on_site_url = self.opts.get_view_on_site_url(original)
             yield InlineAdminForm(self.formset, form, self.fieldsets,
                 self.prepopulated_fields, original, self.readonly_fields,
-                model_admin=self.opts)
+                model_admin=self.opts, view_on_site_url=view_on_site_url)
         for form in self.formset.extra_forms:
             yield InlineAdminForm(self.formset, form, self.fieldsets,
                 self.prepopulated_fields, None, self.readonly_fields,
@@ -242,13 +243,14 @@ class InlineAdminForm(AdminForm):
     A wrapper around an inline form for use in the admin system.
     """
     def __init__(self, formset, form, fieldsets, prepopulated_fields, original,
-      readonly_fields=None, model_admin=None):
+      readonly_fields=None, model_admin=None, view_on_site_url=None):
         self.formset = formset
         self.model_admin = model_admin
         self.original = original
         if original is not None:
             self.original_content_type_id = ContentType.objects.get_for_model(original).pk
-        self.show_url = original and hasattr(original, 'get_absolute_url')
+        self.show_url = original and view_on_site_url is not None
+        self.absolute_url = view_on_site_url
         super(InlineAdminForm, self).__init__(form, fieldsets, prepopulated_fields,
             readonly_fields, model_admin)
 
