@@ -520,6 +520,8 @@ def validate_host(host, allowed_hosts):
     Return ``True`` for a valid host, ``False`` otherwise.
 
     """
+    host = host[:-1] if host.endswith('.') else host
+
     for pattern in allowed_hosts:
         pattern = pattern.lower()
         match = (

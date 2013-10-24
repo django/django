@@ -529,6 +529,8 @@ class HostValidationTests(SimpleTestCase):
             'anything.multitenant.com',
             'multitenant.com',
             'insensitive.com',
+            'example.com.',
+            'example.com.:80',
         ]
 
         for host in legit_hosts:
@@ -539,7 +541,7 @@ class HostValidationTests(SimpleTestCase):
             request.get_host()
 
         # Poisoned host headers are rejected as suspicious
-        for host in chain(self.poisoned_hosts, ['other.com']):
+        for host in chain(self.poisoned_hosts, ['other.com', 'example.com..']):
             with self.assertRaises(SuspiciousOperation):
                 request = HttpRequest()
                 request.META = {
