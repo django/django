@@ -98,6 +98,7 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
     formfield_overrides = {}
     readonly_fields = ()
     ordering = None
+    view_on_site = True
 
     # validation
     validator_class = validation.BaseValidator
@@ -242,6 +243,19 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
             kwargs['queryset'] = queryset
 
         return db_field.formfield(**kwargs)
+
+    def get_view_on_site_url(self, obj=None):
+        if obj is None or not self.view_on_site:
+            return None
+
+        if callable(self.view_on_site):
+            return self.view_on_site(obj)
+        elif self.view_on_site:
+            # use the ContentType lookup if view_on_site is True
+            return reverse('admin:view_on_site', kwargs={
+                'content_type_id': ContentType.objects.get_for_model(obj).pk,
+                'object_id': obj.pk
+            })
 
     @property
     def declared_fieldsets(self):
@@ -971,6 +985,7 @@ class ModelAdmin(BaseModelAdmin):
         app_label = opts.app_label
         preserved_filters = self.get_preserved_filters(request)
         form_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, form_url)
+        view_on_site_url = self.get_view_on_site_url(obj)
         context.update({
             'add': add,
             'change': change,
@@ -978,7 +993,8 @@ class ModelAdmin(BaseModelAdmin):
             'has_change_permission': self.has_change_permission(request, obj),
             'has_delete_permission': self.has_delete_permission(request, obj),
             'has_file_field': True,  # FIXME - this should check if form or formsets have a FileField,
-            'has_absolute_url': hasattr(self.model, 'get_absolute_url'),
+            'has_absolute_url': view_on_site_url is not None,
+            'absolute_url': view_on_site_url,
             'form_url': form_url,
             'opts': opts,
             'content_type_id': ContentType.objects.get_for_model(self.model).id,

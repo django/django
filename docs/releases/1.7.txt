@@ -168,6 +168,10 @@ Minor features
   <django.contrib.admin.ModelAdmin.list_display_links>` ``= None`` to disable
   links on the change list page grid.
 
+* You may now specify :attr:`ModelAdmin.view_on_site
+  <django.contrib.admin.ModelAdmin.view_on_site>` to control whether or not to
+  display the "View on site" link.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
