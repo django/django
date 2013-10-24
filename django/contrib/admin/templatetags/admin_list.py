@@ -26,7 +26,7 @@ register = Library()
 DOT = '.'
 
 @register.simple_tag
-def paginator_number(cl,i):
+def paginator_number(cl, i):
     """
     Generates an individual page index link in a paginated list.
     """

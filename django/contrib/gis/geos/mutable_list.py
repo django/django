@@ -223,7 +223,7 @@ class ListMixin(object):
     def sort(self, cmp=None, key=None, reverse=False):
         "Standard list sort method"
         if key:
-            temp = [(key(v),v) for v in self]
+            temp = [(key(v), v) for v in self]
             temp.sort(key=lambda x: x[0], reverse=reverse)
             self[:] = [v[1] for v in temp]
         else:

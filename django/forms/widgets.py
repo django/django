@@ -660,7 +660,7 @@ class ChoiceFieldRenderer(object):
         output = [start_tag]
         for i, choice in enumerate(self.choices):
             choice_value, choice_label = choice
-            if isinstance(choice_label, (tuple,list)):
+            if isinstance(choice_label, (tuple, list)):
                 attrs_plus = self.attrs.copy()
                 if id_:
                     attrs_plus['id'] += '_{0}'.format(i)

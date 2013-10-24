@@ -45,7 +45,7 @@ class FlatpageCSRFTests(TestCase):
         response = self.client.get('/flatpage_root/sekrit/')
         self.assertRedirects(response, '/accounts/login/?next=/flatpage_root/sekrit/')
         User.objects.create_user('testuser', 'test@example.com', 's3krit')
-        self.client.login(username='testuser',password='s3krit')
+        self.client.login(username='testuser', password='s3krit')
         response = self.client.get('/flatpage_root/sekrit/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<p>Isn't it sekrit!</p>")

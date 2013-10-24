@@ -70,7 +70,7 @@ class BoundMethodWeakref(object):
 
     _allInstances = weakref.WeakValueDictionary()
 
-    def __new__(cls, target, onDelete=None, *arguments,**named):
+    def __new__(cls, target, onDelete=None, *arguments, **named):
         """Create new instance or return current instance
 
         Basically this method of construction allows us to

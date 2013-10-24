@@ -723,7 +723,7 @@ class EmptyModelVisibleAdmin(admin.ModelAdmin):
     form = FormWithoutHiddenField
     fieldsets = (
         (None, {
-            'fields':(('first', 'second'),),
+            'fields': (('first', 'second'),),
         }),
     )
 

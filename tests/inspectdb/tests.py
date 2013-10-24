@@ -35,7 +35,7 @@ class InspectDBTestCase(TestCase):
         """Test introspection of various Django field types"""
         out = StringIO()
         call_command('inspectdb',
-                     table_name_filter=lambda tn:tn.startswith('inspectdb_columntypes'),
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'),
                      stdout=out)
         output = out.getvalue()
 

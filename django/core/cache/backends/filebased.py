@@ -141,7 +141,7 @@ class FileBasedCache(BaseCache):
 
     def _get_num_entries(self):
         count = 0
-        for _,_,files in os.walk(self._dir):
+        for _, _, files in os.walk(self._dir):
             count += len(files)
         return count
     _num_entries = property(_get_num_entries)

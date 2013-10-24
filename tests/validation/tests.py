@@ -129,9 +129,9 @@ class GenericIPAddressFieldTests(ValidationTestCase):
 
     def test_invalid_v4_ip_raises_error(self):
         giptm = GenericIPAddressTestModel(v4_ip="294.4.2.1")
-        self.assertFailsValidation(giptm.full_clean, ['v4_ip',])
+        self.assertFailsValidation(giptm.full_clean, ['v4_ip'])
         giptm = GenericIPAddressTestModel(v4_ip="2001::2")
-        self.assertFailsValidation(giptm.full_clean, ['v4_ip',])
+        self.assertFailsValidation(giptm.full_clean, ['v4_ip'])
 
     def test_correct_v6_ip_passes(self):
         giptm = GenericIPAddressTestModel(v6_ip="2001::2")
@@ -139,16 +139,16 @@ class GenericIPAddressFieldTests(ValidationTestCase):
 
     def test_invalid_v6_ip_raises_error(self):
         giptm = GenericIPAddressTestModel(v6_ip="1.2.3.4")
-        self.assertFailsValidation(giptm.full_clean, ['v6_ip',])
+        self.assertFailsValidation(giptm.full_clean, ['v6_ip'])
         giptm = GenericIPAddressTestModel(v6_ip="1:2")
-        self.assertFailsValidation(giptm.full_clean, ['v6_ip',])
+        self.assertFailsValidation(giptm.full_clean, ['v6_ip'])
 
     def test_v6_uniqueness_detection(self):
         # These two addresses are the same with different syntax
         giptm = GenericIPAddressTestModel(generic_ip="2001::1:0:0:0:0:2")
         giptm.save()
         giptm = GenericIPAddressTestModel(generic_ip="2001:0:1:2")
-        self.assertFailsValidation(giptm.full_clean, ['generic_ip',])
+        self.assertFailsValidation(giptm.full_clean, ['generic_ip'])
 
     def test_v4_unpack_uniqueness_detection(self):
         # These two are different, because we are not doing IPv4 unpacking

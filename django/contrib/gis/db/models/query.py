@@ -286,7 +286,7 @@ class GeoQuerySet(QuerySet):
         Reverses the coordinate order of the geometry, and attaches as a
         `reverse` attribute on each element of this GeoQuerySet.
         """
-        s = {'select_field' : GeomField(),}
+        s = {'select_field': GeomField()}
         kwargs.setdefault('model_att', 'reverse_geom')
         if connections[self.db].ops.oracle:
             s['geo_field_type'] = LineStringField
@@ -733,7 +733,7 @@ class GeoQuerySet(QuerySet):
         DRY routine for setting up a GeoQuerySet method that attaches a
         Geometry attribute (e.g., `centroid`, `point_on_surface`).
         """
-        s = {'select_field' : GeomField(),}
+        s = {'select_field': GeomField()}
         if connections[self.db].ops.oracle:
             s['procedure_fmt'] = '%(geo_col)s,%(tolerance)s'
             s['procedure_args'] = {'tolerance' : tolerance}

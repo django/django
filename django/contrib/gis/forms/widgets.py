@@ -68,7 +68,7 @@ class BaseGeometryWidget(Widget):
 
         context = self.build_attrs(attrs,
             name=name,
-            module='geodjango_%s' % name.replace('-','_'),  # JS-safe
+            module='geodjango_%s' % name.replace('-', '_'),  # JS-safe
             serialized=self.serialize(value),
             geom_type=gdal.OGRGeomType(self.attrs['geom_type']),
             STATIC_URL=settings.STATIC_URL,

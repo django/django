@@ -340,7 +340,7 @@ class BaseAggregateTestCase(TestCase):
             price=Decimal("1000"),
             publisher=p,
             contact_id=1,
-            pubdate=datetime.date(2008,12,1)
+            pubdate=datetime.date(2008, 12, 1)
         )
         Book.objects.create(
             name='ExpensiveBook2',
@@ -350,7 +350,7 @@ class BaseAggregateTestCase(TestCase):
             price=Decimal("1000"),
             publisher=p,
             contact_id=1,
-            pubdate=datetime.date(2008,12,2)
+            pubdate=datetime.date(2008, 12, 2)
         )
         Book.objects.create(
             name='ExpensiveBook3',
@@ -360,7 +360,7 @@ class BaseAggregateTestCase(TestCase):
             price=Decimal("35"),
             publisher=p,
             contact_id=1,
-            pubdate=datetime.date(2008,12,3)
+            pubdate=datetime.date(2008, 12, 3)
         )
 
         publishers = Publisher.objects.annotate(num_books=Count("book__id")).filter(num_books__gt=1).order_by("pk")

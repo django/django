@@ -53,7 +53,7 @@ class OpenLayersWidget(Textarea):
         self.params['name'] = name
         # note: we must switch out dashes for underscores since js
         # functions are created using the module variable
-        js_safe_name = self.params['name'].replace('-','_')
+        js_safe_name = self.params['name'].replace('-', '_')
         self.params['module'] = 'geodjango_%s' % js_safe_name
 
         if value:

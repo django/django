@@ -320,7 +320,7 @@ class ListMixinTest(unittest.TestCase):
 
         def setfcn(x, i, v):
             x[i] = v
-        self.assertRaises(TypeError, setfcn, ul, slice(0,3,2), 2)
+        self.assertRaises(TypeError, setfcn, ul, slice(0, 3, 2), 2)
 
     def test10_checkindex(self):
         'Index check'
@@ -374,7 +374,7 @@ class ListMixinTest(unittest.TestCase):
         self.assertEqual(pl[:], ul[:], 'in-place add')
         self.assertEqual(objid, id(ul), 'in-place add id')
 
-        for n in (-1,0,1,3):
+        for n in (-1, 0, 1, 3):
             pl, ul = self.lists_of_len()
             self.assertEqual(list(pl * n), list(ul * n), 'mul by %d' % n)
             self.assertEqual(type(ul), type(ul * n), 'type of mul by %d result' % n)

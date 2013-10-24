@@ -103,42 +103,42 @@ class MeasureBase(object):
             return self.__class__(default_unit=self._default_unit,
                 **{self.STANDARD_UNIT: (self.standard + other.standard)})
         else:
-            raise TypeError('%(class)s must be added with %(class)s' % {"class":pretty_name(self)})
+            raise TypeError('%(class)s must be added with %(class)s' % {"class": pretty_name(self)})
 
     def __iadd__(self, other):
         if isinstance(other, self.__class__):
             self.standard += other.standard
             return self
         else:
-            raise TypeError('%(class)s must be added with %(class)s' % {"class":pretty_name(self)})
+            raise TypeError('%(class)s must be added with %(class)s' % {"class": pretty_name(self)})
 
     def __sub__(self, other):
         if isinstance(other, self.__class__):
             return self.__class__(default_unit=self._default_unit,
                 **{self.STANDARD_UNIT: (self.standard - other.standard)})
         else:
-            raise TypeError('%(class)s must be subtracted from %(class)s' % {"class":pretty_name(self)})
+            raise TypeError('%(class)s must be subtracted from %(class)s' % {"class": pretty_name(self)})
 
     def __isub__(self, other):
         if isinstance(other, self.__class__):
             self.standard -= other.standard
             return self
         else:
-            raise TypeError('%(class)s must be subtracted from %(class)s' % {"class":pretty_name(self)})
+            raise TypeError('%(class)s must be subtracted from %(class)s' % {"class": pretty_name(self)})
 
     def __mul__(self, other):
         if isinstance(other, NUMERIC_TYPES):
             return self.__class__(default_unit=self._default_unit,
                 **{self.STANDARD_UNIT: (self.standard * other)})
         else:
-            raise TypeError('%(class)s must be multiplied with number' % {"class":pretty_name(self)})
+            raise TypeError('%(class)s must be multiplied with number' % {"class": pretty_name(self)})
 
     def __imul__(self, other):
         if isinstance(other, NUMERIC_TYPES):
             self.standard *= float(other)
             return self
         else:
-            raise TypeError('%(class)s must be multiplied with number' % {"class":pretty_name(self)})
+            raise TypeError('%(class)s must be multiplied with number' % {"class": pretty_name(self)})
 
     def __rmul__(self, other):
         return self * other
@@ -150,7 +150,7 @@ class MeasureBase(object):
             return self.__class__(default_unit=self._default_unit,
                 **{self.STANDARD_UNIT: (self.standard / other)})
         else:
-            raise TypeError('%(class)s must be divided with number or %(class)s' % {"class":pretty_name(self)})
+            raise TypeError('%(class)s must be divided with number or %(class)s' % {"class": pretty_name(self)})
 
     def __div__(self, other):   # Python 2 compatibility
         return type(self).__truediv__(self, other)
@@ -160,7 +160,7 @@ class MeasureBase(object):
             self.standard /= float(other)
             return self
         else:
-            raise TypeError('%(class)s must be divided with number' % {"class":pretty_name(self)})
+            raise TypeError('%(class)s must be divided with number' % {"class": pretty_name(self)})
 
     def __idiv__(self, other):  # Python 2 compatibility
         return type(self).__itruediv__(self, other)
@@ -304,7 +304,7 @@ class Distance(MeasureBase):
                 **{self.STANDARD_UNIT: (self.standard * other)})
         else:
             raise TypeError('%(distance)s must be multiplied with number or %(distance)s' % {
-                "distance" : pretty_name(self.__class__),
+                "distance": pretty_name(self.__class__),
             })
 
 
@@ -320,7 +320,7 @@ class Area(MeasureBase):
             return self.__class__(default_unit=self._default_unit,
                 **{self.STANDARD_UNIT: (self.standard / other)})
         else:
-            raise TypeError('%(class)s must be divided by a number' % {"class":pretty_name(self)})
+            raise TypeError('%(class)s must be divided by a number' % {"class": pretty_name(self)})
 
     def __div__(self, other):  # Python 2 compatibility
         return type(self).__truediv__(self, other)
