@@ -1159,6 +1159,10 @@ dependent behavior. On most platforms, temporary files will have a mode
 of ``0600``, and files saved from memory will be saved using the
 system's standard umask.
 
+This setting also determines the default permissions for collected static files
+when using the :djadmin:`collectstatic` management command. See
+:djadmin:`collectstatic` for details on overridding it.
+
 .. warning::
 
     **Always prefix the mode with a 0.**
