@@ -79,17 +79,21 @@ responsible to provide your own validation of the ``Host`` header (perhaps in a
 middleware; if so this middleware must be listed first in
 :setting:`MIDDLEWARE_CLASSES`).
 
-.. note::
+.. versionchanged:: 1.7
 
-    If you want to also allow the `fully qualified domain name (FQDN)`_, which
-    some browsers can send in the Host header, you must explicitly add another
-    ALLOWED_HOSTS entry that includes a trailing period. This entry can also be
-    a subdomain wildcard::
+    In previous versions of Django, if you wanted to also allow the
+    `fully qualified domain name (FQDN)`_, which some browsers can send in the
+    ``Host`` header, you had to explicitly add another ``ALLOWED_HOSTS`` entry
+    that included a trailing period. This entry could also be a subdomain
+    wildcard::
 
         ALLOWED_HOSTS = [
             '.example.com', # Allow domain and subdomains
             '.example.com.', # Also allow FQDN and subdomains
         ]
+
+    In Django 1.7, the trailing dot is stripped when performing host validation,
+    thus an entry with a trailing dot isn't required.
 
 .. _`fully qualified domain name (FQDN)`: http://en.wikipedia.org/wiki/Fully_qualified_domain_name
 
