@@ -232,8 +232,14 @@ class FileSystemStorage(Storage):
                 # OK, the file save worked. Break out of the loop.
                 break
 
-        if settings.FILE_UPLOAD_PERMISSIONS is not None:
-            os.chmod(full_path, settings.FILE_UPLOAD_PERMISSIONS)
+        if self.__class__ is not FileSystemStorage and \
+                hasattr(self, 'file_permissions_mode'):
+            mode = self.file_permissions_mode
+        else:
+            mode = settings.FILE_UPLOAD_PERMISSIONS
+
+        if mode is not None:
+            os.chmod(full_path, mode)
 
         return name
 
