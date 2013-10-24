@@ -12,7 +12,7 @@ Readdressed denial-of-service via password hashers
 
 Django 1.4.8 imposes a 4096-byte limit on passwords in order to mitigate a
 denial-of-service attack through submission of bogus but extremely large
-passwords. In Django 1.5.5, we've reverted this change and instead improved
+passwords. In Django 1.4.9, we've reverted this change and instead improved
 the speed of our PBKDF2 algorithm by not rehashing the key on every iteration.
 
 Bugfixes
