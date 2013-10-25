@@ -1,7 +1,12 @@
 import os
 import sys
 
-from distutils.core import setup
+try:
+    from setuptools import setup
+    using_setuptools = True
+except ImportError:
+    from distutils.core import setup
+    using_setuptools = False
 from distutils.sysconfig import get_python_lib
 
 # Warn if we are installing over top of an existing installation. This can
@@ -80,7 +85,7 @@ for dirpath, dirnames, filenames in os.walk(django_dir):
 version = __import__('django').get_version()
 
 
-setup(
+setup_opts = dict(
     name='Django',
     version=version,
     url='http://www.djangoproject.com/',
@@ -91,7 +96,6 @@ setup(
     license='BSD',
     packages=packages,
     package_data=package_data,
-    scripts=['django/bin/django-admin.py'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
@@ -112,6 +116,15 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
 )
+
+if using_setuptools:
+    setup_opts['entry_points'] = {'console_scripts': [
+        'django-admin.py = django.core.management.execute_from_command_line',
+    ]}
+else:
+    setup_opts['scripts'] = ['django/bin/django-admin.py']
+
+setup(**setup_opts)
 
 if overlay_warning:
     sys.stderr.write("""
