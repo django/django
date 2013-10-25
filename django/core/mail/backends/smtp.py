@@ -56,6 +56,8 @@ class EmailBackend(BaseEmailBackend):
                 self.connection.ehlo()
                 self.connection.starttls()
                 self.connection.ehlo()
+            if self.username and self.password:
+                self.connection.login(self.username, self.password)
         except smtplib.SMTPException:
             if not self.fail_silently:
                 raise

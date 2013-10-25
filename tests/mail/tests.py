@@ -880,6 +880,16 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
         self.assertEqual(backend.username, '')
         self.assertEqual(backend.password, '')
 
+    def test_auth_attempted(self):
+        """
+        Test that opening the backend with non empty username/password tries
+        to authenticate against the SMTP server.
+        """
+        backend = smtp.EmailBackend(
+            username='not empty username', password='not empty password')
+        self.assertRaisesMessage(SMTPException,
+            'SMTP AUTH extension not supported by server.', backend.open)
+
     def test_server_stopped(self):
         """
         Test that closing the backend while the SMTP server is stopped doesn't
