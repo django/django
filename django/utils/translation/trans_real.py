@@ -142,7 +142,7 @@ def translation(language):
         # doesn't affect en-gb), even though they will both use the core "en"
         # translation. So we have to subvert Python's internal gettext caching.
         base_lang = lambda x: x.split('-', 1)[0]
-        if base_lang(lang) in [base_lang(trans) for trans in list(_translations)]:
+        if res and base_lang(lang) in [base_lang(trans) for trans in list(_translations)]:
             res._info = res._info.copy()
             res._catalog = res._catalog.copy()
 
