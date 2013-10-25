@@ -189,6 +189,11 @@ Forms
   will also update ``UploadedFile.content_type`` with the image's content type
   as determined by Pillow.
 
+* The widget :class:`~django.forms.ClearableFileInput` allows
+  more customization of templates and data rendered. Attribute
+  ``url_markup_template`` was removed in favor of attribute
+  ``template_with_initial``.
+
 Generic Views
 ^^^^^^^^^^^^^
 
