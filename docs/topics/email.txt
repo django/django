@@ -437,7 +437,7 @@ SMTP backend
 
         EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-    Here is an attribute which doesn't have a corresponding settting like the
+    Here is an attribute which doesn't have a corresponding setting like the
     others described above:
 
     .. attribute:: timeout
