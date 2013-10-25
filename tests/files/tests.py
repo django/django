@@ -172,6 +172,16 @@ class FileTests(unittest.TestCase):
         self.assertFalse(hasattr(file, 'mode'))
         gzip.GzipFile(fileobj=file)
 
+    def test_file_iteration(self):
+        orig_file = tempfile.TemporaryFile()
+        orig_file.write(b"some content")
+        base_file = File(orig_file)
+        with base_file as f:
+            for line in f:
+                self.assertEqual(line, "some content")
+        self.assertTrue(f.closed)
+        self.assertTrue(orig_file.closed)
+
 
 class FileMoveSafeTests(unittest.TestCase):
     def test_file_move_overwrite(self):
