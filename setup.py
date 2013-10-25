@@ -1,7 +1,7 @@
 import os
 import sys
 
-from distutils.core import setup
+from setuptools import setup
 from distutils.sysconfig import get_python_lib
 
 # Warn if we are installing over top of an existing installation. This can
@@ -91,7 +91,10 @@ setup(
     license='BSD',
     packages=packages,
     package_data=package_data,
-    scripts=['django/bin/django-admin.py'],
+    entry_points={'console_scripts': [
+        'django-admin = django.core.management:execute_from_command_line',
+    ]},
+    zip_safe=False,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
@@ -112,6 +115,7 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
 )
+
 
 if overlay_warning:
     sys.stderr.write("""
