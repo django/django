@@ -654,7 +654,7 @@ class ValidationTests(unittest.TestCase):
 
         class ValidationTestModelAdmin(ModelAdmin):
             fieldsets = (("General", {"fields": ("name",)}),)
-            fields = ["name",]
+            fields = ["name"]
 
         six.assertRaisesRegex(self,
             ImproperlyConfigured,

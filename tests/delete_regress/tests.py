@@ -303,7 +303,7 @@ class Ticket19102Tests(TestCase):
             Login.objects.order_by('description').filter(
                 orgunit__name__isnull=False
             ).extra(
-                select={'extraf':'1'}
+                select={'extraf': '1'}
             ).filter(
                 pk=self.l1.pk
             ).delete()

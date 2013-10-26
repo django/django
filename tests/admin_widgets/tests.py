@@ -101,7 +101,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
 
     def testRadioFieldsForeignKey(self):
         ff = self.assertFormfield(models.Event, 'main_band', widgets.AdminRadioSelect,
-                                  radio_fields={'main_band':admin.VERTICAL})
+                                  radio_fields={'main_band': admin.VERTICAL})
         self.assertEqual(ff.empty_label, None)
 
     def testManyToMany(self):
@@ -126,7 +126,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
         """
         class BandAdmin(admin.ModelAdmin):
             formfield_overrides = {
-                CharField: {'widget': forms.TextInput(attrs={'size':'10'})}
+                CharField: {'widget': forms.TextInput(attrs={'size': '10'})}
             }
         ma = BandAdmin(models.Band, admin.site)
         f1 = ma.formfield_for_dbfield(models.Band._meta.get_field('name'), request=None)
@@ -158,7 +158,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
 
     def testChoicesWithRadioFields(self):
         self.assertFormfield(models.Member, 'gender', widgets.AdminRadioSelect,
-                             radio_fields={'gender':admin.VERTICAL})
+                             radio_fields={'gender': admin.VERTICAL})
 
     def testInheritance(self):
         self.assertFormfield(models.Album, 'backside_art', widgets.AdminFileWidget)

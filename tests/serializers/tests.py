@@ -144,7 +144,7 @@ class SerializersTestBase(object):
         serialized field list - it replaces the pk identifier.
         """
         profile = AuthorProfile(author=self.joe,
-                                date_of_birth=datetime(1970,1,1))
+                                date_of_birth=datetime(1970, 1, 1))
         profile.save()
         serial_str = serializers.serialize(self.serializer_name,
                                            AuthorProfile.objects.all())
@@ -155,7 +155,7 @@ class SerializersTestBase(object):
 
     def test_serialize_field_subset(self):
         """Tests that output can be restricted to a subset of fields"""
-        valid_fields = ('headline','pub_date')
+        valid_fields = ('headline', 'pub_date')
         invalid_fields = ("author", "categories")
         serial_str = serializers.serialize(self.serializer_name,
                                     Article.objects.all(),

@@ -115,7 +115,7 @@ class ArticleForm(forms.ModelForm):
 class PartialArticleForm(forms.ModelForm):
     class Meta:
         model = Article
-        fields = ('headline','pub_date')
+        fields = ('headline', 'pub_date')
 
 
 class RoykoForm(forms.ModelForm):

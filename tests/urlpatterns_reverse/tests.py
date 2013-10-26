@@ -37,8 +37,8 @@ resolve_test_data = (
     ('/unnamed/view_class/42/37/', 'urlpatterns_reverse.views.ViewClass', None, '', views.view_class_instance, tuple(), {'arg1': '42', 'arg2': '37'}),
 
     # If you have no kwargs, you get an args list.
-    ('/no_kwargs/42/37/', 'no-kwargs', None, '', views.empty_view, ('42','37'), {}),
-    ('/included/no_kwargs/42/37/', 'inc-no-kwargs', None, '', views.empty_view, ('42','37'), {}),
+    ('/no_kwargs/42/37/', 'no-kwargs', None, '', views.empty_view, ('42', '37'), {}),
+    ('/included/no_kwargs/42/37/', 'inc-no-kwargs', None, '', views.empty_view, ('42', '37'), {}),
 
     # Namespaces
     ('/test1/inner/42/37/', 'urlobject-view', 'testapp', 'test-ns1', 'empty_view', tuple(), {'arg1': '42', 'arg2': '37'}),
@@ -55,7 +55,7 @@ resolve_test_data = (
 
     # Namespaces capturing variables
     ('/inc70/', 'inner-nothing', None, 'inc-ns5', views.empty_view, tuple(), {'outer': '70'}),
-    ('/inc78/extra/foobar/', 'inner-extra', None, 'inc-ns5', views.empty_view, tuple(), {'outer':'78', 'extra':'foobar'}),
+    ('/inc78/extra/foobar/', 'inner-extra', None, 'inc-ns5', views.empty_view, tuple(), {'outer': '78', 'extra': 'foobar'}),
 )
 
 test_data = (
@@ -137,9 +137,9 @@ test_data = (
     # the method. This is potentially ambiguous, as you have to pick the
     # correct view for the arguments provided.
     ('kwargs_view', '/arg_view/', [], {}),
-    ('kwargs_view', '/arg_view/10/', [], {'arg1':10}),
+    ('kwargs_view', '/arg_view/10/', [], {'arg1': 10}),
     ('urlpatterns_reverse.views.absolute_kwargs_view', '/absolute_arg_view/', [], {}),
-    ('urlpatterns_reverse.views.absolute_kwargs_view', '/absolute_arg_view/10/', [], {'arg1':10}),
+    ('urlpatterns_reverse.views.absolute_kwargs_view', '/absolute_arg_view/10/', [], {'arg1': 10}),
     ('non_path_include', '/includes/non_path_include/', [], {}),
 
     # Tests for #13154
@@ -343,14 +343,14 @@ class NamespaceTests(TestCase):
     def test_ambiguous_object(self):
         "Names deployed via dynamic URL objects that require namespaces can't be resolved"
         self.assertRaises(NoReverseMatch, reverse, 'urlobject-view')
-        self.assertRaises(NoReverseMatch, reverse, 'urlobject-view', args=[37,42])
-        self.assertRaises(NoReverseMatch, reverse, 'urlobject-view', kwargs={'arg1':42, 'arg2':37})
+        self.assertRaises(NoReverseMatch, reverse, 'urlobject-view', args=[37, 42])
+        self.assertRaises(NoReverseMatch, reverse, 'urlobject-view', kwargs={'arg1': 42, 'arg2': 37})
 
     def test_ambiguous_urlpattern(self):
         "Names deployed via dynamic URL objects that require namespaces can't be resolved"
         self.assertRaises(NoReverseMatch, reverse, 'inner-nothing')
-        self.assertRaises(NoReverseMatch, reverse, 'inner-nothing', args=[37,42])
-        self.assertRaises(NoReverseMatch, reverse, 'inner-nothing', kwargs={'arg1':42, 'arg2':37})
+        self.assertRaises(NoReverseMatch, reverse, 'inner-nothing', args=[37, 42])
+        self.assertRaises(NoReverseMatch, reverse, 'inner-nothing', kwargs={'arg1': 42, 'arg2': 37})
 
     def test_non_existent_namespace(self):
         "Non-existent namespaces raise errors"
@@ -360,99 +360,99 @@ class NamespaceTests(TestCase):
     def test_normal_name(self):
         "Normal lookups work as expected"
         self.assertEqual('/normal/', reverse('normal-view'))
-        self.assertEqual('/normal/37/42/', reverse('normal-view', args=[37,42]))
-        self.assertEqual('/normal/42/37/', reverse('normal-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/normal/37/42/', reverse('normal-view', args=[37, 42]))
+        self.assertEqual('/normal/42/37/', reverse('normal-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/+%5C$*/', reverse('special-view'))
 
     def test_simple_included_name(self):
         "Normal lookups work on names included from other patterns"
         self.assertEqual('/included/normal/', reverse('inc-normal-view'))
-        self.assertEqual('/included/normal/37/42/', reverse('inc-normal-view', args=[37,42]))
-        self.assertEqual('/included/normal/42/37/', reverse('inc-normal-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/included/normal/37/42/', reverse('inc-normal-view', args=[37, 42]))
+        self.assertEqual('/included/normal/42/37/', reverse('inc-normal-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/included/+%5C$*/', reverse('inc-special-view'))
 
     def test_namespace_object(self):
         "Dynamic URL objects can be found using a namespace"
         self.assertEqual('/test1/inner/', reverse('test-ns1:urlobject-view'))
-        self.assertEqual('/test1/inner/37/42/', reverse('test-ns1:urlobject-view', args=[37,42]))
-        self.assertEqual('/test1/inner/42/37/', reverse('test-ns1:urlobject-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/test1/inner/37/42/', reverse('test-ns1:urlobject-view', args=[37, 42]))
+        self.assertEqual('/test1/inner/42/37/', reverse('test-ns1:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/test1/inner/+%5C$*/', reverse('test-ns1:urlobject-special-view'))
 
     def test_embedded_namespace_object(self):
         "Namespaces can be installed anywhere in the URL pattern tree"
         self.assertEqual('/included/test3/inner/', reverse('test-ns3:urlobject-view'))
-        self.assertEqual('/included/test3/inner/37/42/', reverse('test-ns3:urlobject-view', args=[37,42]))
-        self.assertEqual('/included/test3/inner/42/37/', reverse('test-ns3:urlobject-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/included/test3/inner/37/42/', reverse('test-ns3:urlobject-view', args=[37, 42]))
+        self.assertEqual('/included/test3/inner/42/37/', reverse('test-ns3:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/included/test3/inner/+%5C$*/', reverse('test-ns3:urlobject-special-view'))
 
     def test_namespace_pattern(self):
         "Namespaces can be applied to include()'d urlpatterns"
         self.assertEqual('/ns-included1/normal/', reverse('inc-ns1:inc-normal-view'))
-        self.assertEqual('/ns-included1/normal/37/42/', reverse('inc-ns1:inc-normal-view', args=[37,42]))
-        self.assertEqual('/ns-included1/normal/42/37/', reverse('inc-ns1:inc-normal-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/ns-included1/normal/37/42/', reverse('inc-ns1:inc-normal-view', args=[37, 42]))
+        self.assertEqual('/ns-included1/normal/42/37/', reverse('inc-ns1:inc-normal-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/ns-included1/+%5C$*/', reverse('inc-ns1:inc-special-view'))
 
     def test_namespace_pattern_with_variable_prefix(self):
         "When using a include with namespaces when there is a regex variable in front of it"
-        self.assertEqual('/ns-outer/42/normal/', reverse('inc-outer:inc-normal-view', kwargs={'outer':42}))
+        self.assertEqual('/ns-outer/42/normal/', reverse('inc-outer:inc-normal-view', kwargs={'outer': 42}))
         self.assertEqual('/ns-outer/42/normal/', reverse('inc-outer:inc-normal-view', args=[42]))
-        self.assertEqual('/ns-outer/42/normal/37/4/', reverse('inc-outer:inc-normal-view', kwargs={'outer':42, 'arg1': 37, 'arg2': 4}))
+        self.assertEqual('/ns-outer/42/normal/37/4/', reverse('inc-outer:inc-normal-view', kwargs={'outer': 42, 'arg1': 37, 'arg2': 4}))
         self.assertEqual('/ns-outer/42/normal/37/4/', reverse('inc-outer:inc-normal-view', args=[42, 37, 4]))
-        self.assertEqual('/ns-outer/42/+%5C$*/', reverse('inc-outer:inc-special-view',  kwargs={'outer':42}))
+        self.assertEqual('/ns-outer/42/+%5C$*/', reverse('inc-outer:inc-special-view',  kwargs={'outer': 42}))
         self.assertEqual('/ns-outer/42/+%5C$*/', reverse('inc-outer:inc-special-view',  args=[42]))
 
     def test_multiple_namespace_pattern(self):
         "Namespaces can be embedded"
         self.assertEqual('/ns-included1/test3/inner/', reverse('inc-ns1:test-ns3:urlobject-view'))
-        self.assertEqual('/ns-included1/test3/inner/37/42/', reverse('inc-ns1:test-ns3:urlobject-view', args=[37,42]))
-        self.assertEqual('/ns-included1/test3/inner/42/37/', reverse('inc-ns1:test-ns3:urlobject-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/ns-included1/test3/inner/37/42/', reverse('inc-ns1:test-ns3:urlobject-view', args=[37, 42]))
+        self.assertEqual('/ns-included1/test3/inner/42/37/', reverse('inc-ns1:test-ns3:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/ns-included1/test3/inner/+%5C$*/', reverse('inc-ns1:test-ns3:urlobject-special-view'))
 
     def test_nested_namespace_pattern(self):
         "Namespaces can be nested"
         self.assertEqual('/ns-included1/ns-included4/ns-included1/test3/inner/', reverse('inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-view'))
-        self.assertEqual('/ns-included1/ns-included4/ns-included1/test3/inner/37/42/', reverse('inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-view', args=[37,42]))
-        self.assertEqual('/ns-included1/ns-included4/ns-included1/test3/inner/42/37/', reverse('inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/ns-included1/ns-included4/ns-included1/test3/inner/37/42/', reverse('inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-view', args=[37, 42]))
+        self.assertEqual('/ns-included1/ns-included4/ns-included1/test3/inner/42/37/', reverse('inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/ns-included1/ns-included4/ns-included1/test3/inner/+%5C$*/', reverse('inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-special-view'))
 
     def test_app_lookup_object(self):
         "A default application namespace can be used for lookup"
         self.assertEqual('/default/inner/', reverse('testapp:urlobject-view'))
-        self.assertEqual('/default/inner/37/42/', reverse('testapp:urlobject-view', args=[37,42]))
-        self.assertEqual('/default/inner/42/37/', reverse('testapp:urlobject-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/default/inner/37/42/', reverse('testapp:urlobject-view', args=[37, 42]))
+        self.assertEqual('/default/inner/42/37/', reverse('testapp:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/default/inner/+%5C$*/', reverse('testapp:urlobject-special-view'))
 
     def test_app_lookup_object_with_default(self):
         "A default application namespace is sensitive to the 'current' app can be used for lookup"
         self.assertEqual('/included/test3/inner/', reverse('testapp:urlobject-view', current_app='test-ns3'))
-        self.assertEqual('/included/test3/inner/37/42/', reverse('testapp:urlobject-view', args=[37,42], current_app='test-ns3'))
-        self.assertEqual('/included/test3/inner/42/37/', reverse('testapp:urlobject-view', kwargs={'arg1':42, 'arg2':37}, current_app='test-ns3'))
+        self.assertEqual('/included/test3/inner/37/42/', reverse('testapp:urlobject-view', args=[37, 42], current_app='test-ns3'))
+        self.assertEqual('/included/test3/inner/42/37/', reverse('testapp:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}, current_app='test-ns3'))
         self.assertEqual('/included/test3/inner/+%5C$*/', reverse('testapp:urlobject-special-view', current_app='test-ns3'))
 
     def test_app_lookup_object_without_default(self):
         "An application namespace without a default is sensitive to the 'current' app can be used for lookup"
         self.assertEqual('/other2/inner/', reverse('nodefault:urlobject-view'))
-        self.assertEqual('/other2/inner/37/42/', reverse('nodefault:urlobject-view', args=[37,42]))
-        self.assertEqual('/other2/inner/42/37/', reverse('nodefault:urlobject-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/other2/inner/37/42/', reverse('nodefault:urlobject-view', args=[37, 42]))
+        self.assertEqual('/other2/inner/42/37/', reverse('nodefault:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/other2/inner/+%5C$*/', reverse('nodefault:urlobject-special-view'))
 
         self.assertEqual('/other1/inner/', reverse('nodefault:urlobject-view', current_app='other-ns1'))
-        self.assertEqual('/other1/inner/37/42/', reverse('nodefault:urlobject-view', args=[37,42], current_app='other-ns1'))
-        self.assertEqual('/other1/inner/42/37/', reverse('nodefault:urlobject-view', kwargs={'arg1':42, 'arg2':37}, current_app='other-ns1'))
+        self.assertEqual('/other1/inner/37/42/', reverse('nodefault:urlobject-view', args=[37, 42], current_app='other-ns1'))
+        self.assertEqual('/other1/inner/42/37/', reverse('nodefault:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}, current_app='other-ns1'))
         self.assertEqual('/other1/inner/+%5C$*/', reverse('nodefault:urlobject-special-view', current_app='other-ns1'))
 
     def test_special_chars_namespace(self):
         self.assertEqual('/+%5C$*/included/normal/', reverse('special:inc-normal-view'))
-        self.assertEqual('/+%5C$*/included/normal/37/42/', reverse('special:inc-normal-view', args=[37,42]))
-        self.assertEqual('/+%5C$*/included/normal/42/37/', reverse('special:inc-normal-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/+%5C$*/included/normal/37/42/', reverse('special:inc-normal-view', args=[37, 42]))
+        self.assertEqual('/+%5C$*/included/normal/42/37/', reverse('special:inc-normal-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/+%5C$*/included/+%5C$*/', reverse('special:inc-special-view'))
 
     def test_namespaces_with_variables(self):
         "Namespace prefixes can capture variables: see #15900"
         self.assertEqual('/inc70/', reverse('inc-ns5:inner-nothing', kwargs={'outer': '70'}))
-        self.assertEqual('/inc78/extra/foobar/', reverse('inc-ns5:inner-extra', kwargs={'outer':'78', 'extra':'foobar'}))
+        self.assertEqual('/inc78/extra/foobar/', reverse('inc-ns5:inner-extra', kwargs={'outer': '78', 'extra': 'foobar'}))
         self.assertEqual('/inc70/', reverse('inc-ns5:inner-nothing', args=['70']))
-        self.assertEqual('/inc78/extra/foobar/', reverse('inc-ns5:inner-extra', args=['78','foobar']))
+        self.assertEqual('/inc78/extra/foobar/', reverse('inc-ns5:inner-extra', args=['78', 'foobar']))
 
 
 @override_settings(ROOT_URLCONF = urlconf_outer.__name__)

@@ -196,7 +196,7 @@ class AggregationTests(TestCase):
             "name": 'The Definitive Guide to Django: Web Development Done Right',
         })
 
-        obj = Book.objects.annotate(mean_auth_age=Avg('authors__age')).extra(select={'price_per_page' : 'price / pages'}).values('name','mean_auth_age').get(pk=1)
+        obj = Book.objects.annotate(mean_auth_age=Avg('authors__age')).extra(select={'price_per_page' : 'price / pages'}).values('name', 'mean_auth_age').get(pk=1)
         self.assertEqual(obj, {
             'mean_auth_age': 34.5,
             'name': 'The Definitive Guide to Django: Web Development Done Right',
@@ -346,7 +346,7 @@ class AggregationTests(TestCase):
     def test_aggregate_fexpr(self):
         # Aggregates can be used with F() expressions
         # ... where the F() is pushed into the HAVING clause
-        qs = Publisher.objects.annotate(num_books=Count('book')).filter(num_books__lt=F('num_awards')/2).order_by('name').values('name','num_books','num_awards')
+        qs = Publisher.objects.annotate(num_books=Count('book')).filter(num_books__lt=F('num_awards')/2).order_by('name').values('name', 'num_books', 'num_awards')
         self.assertQuerysetEqual(
             qs, [
                 {'num_books': 1, 'name': 'Morgan Kaufmann', 'num_awards': 9},
@@ -355,7 +355,7 @@ class AggregationTests(TestCase):
             lambda p: p,
         )
 
-        qs = Publisher.objects.annotate(num_books=Count('book')).exclude(num_books__lt=F('num_awards')/2).order_by('name').values('name','num_books','num_awards')
+        qs = Publisher.objects.annotate(num_books=Count('book')).exclude(num_books__lt=F('num_awards')/2).order_by('name').values('name', 'num_books', 'num_awards')
         self.assertQuerysetEqual(
             qs, [
                 {'num_books': 2, 'name': 'Apress', 'num_awards': 3},
@@ -366,7 +366,7 @@ class AggregationTests(TestCase):
         )
 
         # ... and where the F() references an aggregate
-        qs = Publisher.objects.annotate(num_books=Count('book')).filter(num_awards__gt=2*F('num_books')).order_by('name').values('name','num_books','num_awards')
+        qs = Publisher.objects.annotate(num_books=Count('book')).filter(num_awards__gt=2*F('num_books')).order_by('name').values('name', 'num_books', 'num_awards')
         self.assertQuerysetEqual(
             qs, [
                 {'num_books': 1, 'name': 'Morgan Kaufmann', 'num_awards': 9},
@@ -375,7 +375,7 @@ class AggregationTests(TestCase):
             lambda p: p,
         )
 
-        qs = Publisher.objects.annotate(num_books=Count('book')).exclude(num_books__lt=F('num_awards')/2).order_by('name').values('name','num_books','num_awards')
+        qs = Publisher.objects.annotate(num_books=Count('book')).exclude(num_books__lt=F('num_awards')/2).order_by('name').values('name', 'num_books', 'num_awards')
         self.assertQuerysetEqual(
             qs, [
                 {'num_books': 2, 'name': 'Apress', 'num_awards': 3},
@@ -456,7 +456,7 @@ class AggregationTests(TestCase):
 
         # Regression for #10132 - If the values() clause only mentioned extra
         # (select=) columns, those columns are used for grouping
-        qs = Book.objects.extra(select={'pub':'publisher_id'}).values('pub').annotate(Count('id')).order_by('pub')
+        qs = Book.objects.extra(select={'pub': 'publisher_id'}).values('pub').annotate(Count('id')).order_by('pub')
         self.assertQuerysetEqual(
             qs, [
                 {'pub': 1, 'id__count': 2},
@@ -467,7 +467,7 @@ class AggregationTests(TestCase):
             lambda b: b
         )
 
-        qs = Book.objects.extra(select={'pub':'publisher_id', 'foo':'pages'}).values('pub').annotate(Count('id')).order_by('pub')
+        qs = Book.objects.extra(select={'pub': 'publisher_id', 'foo': 'pages'}).values('pub').annotate(Count('id')).order_by('pub')
         self.assertQuerysetEqual(
             qs, [
                 {'pub': 1, 'id__count': 2},

@@ -27,9 +27,9 @@ class SelectRelatedRegressTests(TestCase):
         dev1 = Device.objects.create(name="router", building=b)
         dev2 = Device.objects.create(name="switch", building=b)
         dev3 = Device.objects.create(name="server", building=b)
-        port1 = Port.objects.create(port_number='4',device=dev1)
-        port2 = Port.objects.create(port_number='7',device=dev2)
-        port3 = Port.objects.create(port_number='1',device=dev3)
+        port1 = Port.objects.create(port_number='4', device=dev1)
+        port2 = Port.objects.create(port_number='7', device=dev2)
+        port3 = Port.objects.create(port_number='1', device=dev3)
         c1 = Connection.objects.create(start=port1, end=port2)
         c2 = Connection.objects.create(start=port2, end=port3)
 

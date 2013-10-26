@@ -63,7 +63,7 @@ class DistinctOnTests(TestCase):
                 ['<Celebrity: c1>', '<Celebrity: c2>'],
             ),
             (
-                StaffTag.objects.distinct('staff','tag'),
+                StaffTag.objects.distinct('staff', 'tag'),
                 ['<StaffTag: t1 -> p1>'],
             ),
             (

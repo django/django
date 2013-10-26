@@ -38,7 +38,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 
     # The forms library comes with some extra, higher-level Field and Widget
     def test_selectdate(self):
-        w = SelectDateWidget(years=('2007','2008','2009','2010','2011','2012','2013','2014','2015','2016'))
+        w = SelectDateWidget(years=('2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016'))
 
         # Rendering the default state.
         self.assertHTMLEqual(w.render('mydate', ''), """<select name="mydate_month" id="id_mydate_month">
@@ -293,7 +293,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 </select>""")
 
         # Using a SelectDateWidget in a form.
-        w = SelectDateWidget(years=('2007','2008','2009','2010','2011','2012','2013','2014','2015','2016'), required=False)
+        w = SelectDateWidget(years=('2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016'), required=False)
         self.assertHTMLEqual(w.render('mydate', ''), """<select name="mydate_month" id="id_mydate_month">
 <option value="0">---</option>
 <option value="1">January</option>
@@ -419,7 +419,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 <option value="2016">2016</option>
 </select>""")
 
-        a = GetDate({'mydate_month':'4', 'mydate_day':'1', 'mydate_year':'2008'})
+        a = GetDate({'mydate_month': '4', 'mydate_day': '1', 'mydate_year': '2008'})
         self.assertTrue(a.is_valid())
         self.assertEqual(a.cleaned_data['mydate'], datetime.date(2008, 4, 1))
 
@@ -429,17 +429,17 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 
         self.assertHTMLEqual(a['mydate'].as_hidden(), '<input type="hidden" name="mydate" value="2008-4-1" id="id_mydate" />')
 
-        b = GetDate({'mydate':'2008-4-1'})
+        b = GetDate({'mydate': '2008-4-1'})
         self.assertTrue(b.is_valid())
         self.assertEqual(b.cleaned_data['mydate'], datetime.date(2008, 4, 1))
 
         # Invalid dates shouldn't be allowed
-        c = GetDate({'mydate_month':'2', 'mydate_day':'31', 'mydate_year':'2010'})
+        c = GetDate({'mydate_month': '2', 'mydate_day': '31', 'mydate_year': '2010'})
         self.assertFalse(c.is_valid())
         self.assertEqual(c.errors, {'mydate': ['Enter a valid date.']})
 
         # label tag is correctly associated with month dropdown
-        d = GetDate({'mydate_month':'1', 'mydate_day':'1', 'mydate_year':'2010'})
+        d = GetDate({'mydate_month': '1', 'mydate_day': '1', 'mydate_year': '2010'})
         self.assertTrue('<label for="id_mydate_month">' in d.as_p())
 
     def test_multiwidget(self):
@@ -488,31 +488,31 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 
             def compress(self, data_list):
                 if data_list:
-                    return '%s,%s,%s' % (data_list[0],''.join(data_list[1]),data_list[2])
+                    return '%s,%s,%s' % (data_list[0], ''.join(data_list[1]), data_list[2])
                 return None
 
         f = ComplexField(widget=w)
-        self.assertEqual(f.clean(['some text', ['J','P'], ['2007-04-25','6:24:00']]), 'some text,JP,2007-04-25 06:24:00')
-        self.assertFormErrors(['Select a valid choice. X is not one of the available choices.'], f.clean, ['some text',['X'], ['2007-04-25','6:24:00']])
+        self.assertEqual(f.clean(['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]), 'some text,JP,2007-04-25 06:24:00')
+        self.assertFormErrors(['Select a valid choice. X is not one of the available choices.'], f.clean, ['some text', ['X'], ['2007-04-25', '6:24:00']])
 
         # If insufficient data is provided, None is substituted
-        self.assertFormErrors(['This field is required.'], f.clean, ['some text',['JP']])
+        self.assertFormErrors(['This field is required.'], f.clean, ['some text', ['JP']])
 
         # test with no initial data
-        self.assertTrue(f._has_changed(None, ['some text', ['J','P'], ['2007-04-25','6:24:00']]))
+        self.assertTrue(f._has_changed(None, ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
 
         # test when the data is the same as initial
         self.assertFalse(f._has_changed('some text,JP,2007-04-25 06:24:00',
-            ['some text', ['J','P'], ['2007-04-25','6:24:00']]))
+            ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
 
         # test when the first widget's data has changed
         self.assertTrue(f._has_changed('some text,JP,2007-04-25 06:24:00',
-            ['other text', ['J','P'], ['2007-04-25','6:24:00']]))
+            ['other text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
 
         # test when the last widget's data has changed. this ensures that it is not
         # short circuiting while testing the widgets.
         self.assertTrue(f._has_changed('some text,JP,2007-04-25 06:24:00',
-            ['some text', ['J','P'], ['2009-04-25','11:44:00']]))
+            ['some text', ['J', 'P'], ['2009-04-25', '11:44:00']]))
 
         class ComplexFieldForm(Form):
             field1 = ComplexField(widget=w)
@@ -527,7 +527,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 </select>
 <input type="text" name="field1_2_0" id="id_field1_2_0" /><input type="text" name="field1_2_1" id="id_field1_2_1" /></td></tr>""")
 
-        f = ComplexFieldForm({'field1_0':'some text','field1_1':['J','P'], 'field1_2_0':'2007-04-25', 'field1_2_1':'06:24:00'})
+        f = ComplexFieldForm({'field1_0': 'some text', 'field1_1': ['J', 'P'], 'field1_2_0': '2007-04-25', 'field1_2_1': '06:24:00'})
         self.assertHTMLEqual(f.as_table(), """<tr><th><label for="id_field1_0">Field1:</label></th><td><input type="text" name="field1_0" value="some text" id="id_field1_0" />
 <select multiple="multiple" name="field1_1" id="id_field1_1">
 <option value="J" selected="selected">John</option>
@@ -785,7 +785,7 @@ class FormsExtraL10NTestCase(TestCase):
         super(FormsExtraL10NTestCase, self).tearDown()
 
     def test_l10n(self):
-        w = SelectDateWidget(years=('2007','2008','2009','2010','2011','2012','2013','2014','2015','2016'), required=False)
+        w = SelectDateWidget(years=('2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016'), required=False)
         self.assertEqual(w.value_from_datadict({'date_year': '2010', 'date_month': '8', 'date_day': '13'}, {}, 'date'), '13-08-2010')
 
         self.assertHTMLEqual(w.render('date', '13-08-2010'), """<select name="date_day" id="id_date_day">
@@ -911,12 +911,12 @@ class FormsExtraL10NTestCase(TestCase):
 
     def test_l10n_invalid_date_in(self):
         # Invalid dates shouldn't be allowed
-        a = GetDate({'mydate_month':'2', 'mydate_day':'31', 'mydate_year':'2010'})
+        a = GetDate({'mydate_month': '2', 'mydate_day': '31', 'mydate_year': '2010'})
         self.assertFalse(a.is_valid())
         # 'Geef een geldige datum op.' = 'Enter a valid date.'
         self.assertEqual(a.errors, {'mydate': ['Geef een geldige datum op.']})
 
     def test_form_label_association(self):
         # label tag is correctly associated with first rendered dropdown
-        a = GetDate({'mydate_month':'1', 'mydate_day':'1', 'mydate_year':'2010'})
+        a = GetDate({'mydate_month': '1', 'mydate_day': '1', 'mydate_year': '2010'})
         self.assertTrue('<label for="id_mydate_day">' in a.as_p())

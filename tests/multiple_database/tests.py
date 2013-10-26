@@ -522,37 +522,37 @@ class QueryTestCase(TestCase):
         self.assertEqual(chris._state.db, 'other')
         self.assertEqual(html5._state.db, 'other')
         # ... but it isn't saved yet
-        self.assertEqual(list(Person.objects.using('other').values_list('name',flat=True)),
+        self.assertEqual(list(Person.objects.using('other').values_list('name', flat=True)),
                           ['Mark Pilgrim'])
-        self.assertEqual(list(Book.objects.using('other').values_list('title',flat=True)),
+        self.assertEqual(list(Book.objects.using('other').values_list('title', flat=True)),
                            ['Dive into Python'])
 
         # When saved (no using required), new objects goes to 'other'
         chris.save()
         html5.save()
-        self.assertEqual(list(Person.objects.using('default').values_list('name',flat=True)),
+        self.assertEqual(list(Person.objects.using('default').values_list('name', flat=True)),
                           ['Marty Alchin'])
-        self.assertEqual(list(Person.objects.using('other').values_list('name',flat=True)),
+        self.assertEqual(list(Person.objects.using('other').values_list('name', flat=True)),
                           ['Chris Mills', 'Mark Pilgrim'])
-        self.assertEqual(list(Book.objects.using('default').values_list('title',flat=True)),
+        self.assertEqual(list(Book.objects.using('default').values_list('title', flat=True)),
                           ['Pro Django'])
-        self.assertEqual(list(Book.objects.using('other').values_list('title',flat=True)),
+        self.assertEqual(list(Book.objects.using('other').values_list('title', flat=True)),
                           ['Dive into HTML5', 'Dive into Python'])
 
         # This also works if you assign the FK in the constructor
         water = Book(title="Dive into Water", published=datetime.date(2001, 1, 1), editor=mark)
         self.assertEqual(water._state.db, 'other')
         # ... but it isn't saved yet
-        self.assertEqual(list(Book.objects.using('default').values_list('title',flat=True)),
+        self.assertEqual(list(Book.objects.using('default').values_list('title', flat=True)),
                           ['Pro Django'])
-        self.assertEqual(list(Book.objects.using('other').values_list('title',flat=True)),
+        self.assertEqual(list(Book.objects.using('other').values_list('title', flat=True)),
                           ['Dive into HTML5', 'Dive into Python'])
 
         # When saved, the new book goes to 'other'
         water.save()
-        self.assertEqual(list(Book.objects.using('default').values_list('title',flat=True)),
+        self.assertEqual(list(Book.objects.using('default').values_list('title', flat=True)),
                           ['Pro Django'])
-        self.assertEqual(list(Book.objects.using('other').values_list('title',flat=True)),
+        self.assertEqual(list(Book.objects.using('other').values_list('title', flat=True)),
                           ['Dive into HTML5', 'Dive into Python', 'Dive into Water'])
 
     def test_foreign_key_deletion(self):
@@ -657,40 +657,40 @@ class QueryTestCase(TestCase):
         self.assertEqual(charlie._state.db, 'other')
 
         # ... but it isn't saved yet
-        self.assertEqual(list(User.objects.using('other').values_list('username',flat=True)),
+        self.assertEqual(list(User.objects.using('other').values_list('username', flat=True)),
                           ['bob'])
-        self.assertEqual(list(UserProfile.objects.using('other').values_list('flavor',flat=True)),
+        self.assertEqual(list(UserProfile.objects.using('other').values_list('flavor', flat=True)),
                            ['crunchy frog'])
 
         # When saved (no using required), new objects goes to 'other'
         charlie.save()
         bob_profile.save()
         new_bob_profile.save()
-        self.assertEqual(list(User.objects.using('default').values_list('username',flat=True)),
+        self.assertEqual(list(User.objects.using('default').values_list('username', flat=True)),
                           ['alice'])
-        self.assertEqual(list(User.objects.using('other').values_list('username',flat=True)),
+        self.assertEqual(list(User.objects.using('other').values_list('username', flat=True)),
                           ['bob', 'charlie'])
-        self.assertEqual(list(UserProfile.objects.using('default').values_list('flavor',flat=True)),
+        self.assertEqual(list(UserProfile.objects.using('default').values_list('flavor', flat=True)),
                            ['chocolate'])
-        self.assertEqual(list(UserProfile.objects.using('other').values_list('flavor',flat=True)),
+        self.assertEqual(list(UserProfile.objects.using('other').values_list('flavor', flat=True)),
                            ['crunchy frog', 'spring surprise'])
 
         # This also works if you assign the O2O relation in the constructor
-        denise = User.objects.db_manager('other').create_user('denise','denise@example.com')
+        denise = User.objects.db_manager('other').create_user('denise', 'denise@example.com')
         denise_profile = UserProfile(flavor="tofu", user=denise)
 
         self.assertEqual(denise_profile._state.db, 'other')
         # ... but it isn't saved yet
-        self.assertEqual(list(UserProfile.objects.using('default').values_list('flavor',flat=True)),
+        self.assertEqual(list(UserProfile.objects.using('default').values_list('flavor', flat=True)),
                            ['chocolate'])
-        self.assertEqual(list(UserProfile.objects.using('other').values_list('flavor',flat=True)),
+        self.assertEqual(list(UserProfile.objects.using('other').values_list('flavor', flat=True)),
                            ['crunchy frog', 'spring surprise'])
 
         # When saved, the new profile goes to 'other'
         denise_profile.save()
-        self.assertEqual(list(UserProfile.objects.using('default').values_list('flavor',flat=True)),
+        self.assertEqual(list(UserProfile.objects.using('default').values_list('flavor', flat=True)),
                            ['chocolate'])
-        self.assertEqual(list(UserProfile.objects.using('other').values_list('flavor',flat=True)),
+        self.assertEqual(list(UserProfile.objects.using('other').values_list('flavor', flat=True)),
                            ['crunchy frog', 'spring surprise', 'tofu'])
 
     def test_generic_key_separation(self):
@@ -805,14 +805,14 @@ class QueryTestCase(TestCase):
         # ... but it isn't saved yet
         self.assertEqual(list(Review.objects.using('default').filter(object_id=pro.pk).values_list('source', flat=True)),
                           ['Python Monthly'])
-        self.assertEqual(list(Review.objects.using('other').filter(object_id=dive.pk).values_list('source',flat=True)),
+        self.assertEqual(list(Review.objects.using('other').filter(object_id=dive.pk).values_list('source', flat=True)),
                           ['Python Weekly'])
 
         # When saved, John goes to 'other'
         review3.save()
         self.assertEqual(list(Review.objects.using('default').filter(object_id=pro.pk).values_list('source', flat=True)),
                           ['Python Monthly'])
-        self.assertEqual(list(Review.objects.using('other').filter(object_id=dive.pk).values_list('source',flat=True)),
+        self.assertEqual(list(Review.objects.using('other').filter(object_id=dive.pk).values_list('source', flat=True)),
                           ['Python Daily', 'Python Weekly'])
 
     def test_generic_key_deletion(self):
@@ -1066,7 +1066,7 @@ class RouterTestCase(TestCase):
         self.assertFalse(created)
 
         book, created = Book.objects.get_or_create(title="Dive Into Python",
-                                                   defaults={'published':datetime.date(2009, 5, 4)})
+                                                   defaults={'published': datetime.date(2009, 5, 4)})
         self.assertTrue(created)
 
         # Check the head count of objects

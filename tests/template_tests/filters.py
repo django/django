@@ -43,11 +43,11 @@ def get_filter_tests():
         'filter-timesince03' : ('{{ a|timesince }}', {'a': datetime.now() - timedelta(hours=1, minutes=25, seconds = 10)}, '1\xa0hour, 25\xa0minutes'),
 
         # Compare to a given parameter
-        'filter-timesince04' : ('{{ a|timesince:b }}', {'a':now - timedelta(days=2), 'b':now - timedelta(days=1)}, '1\xa0day'),
-        'filter-timesince05' : ('{{ a|timesince:b }}', {'a':now - timedelta(days=2, minutes=1), 'b':now - timedelta(days=2)}, '1\xa0minute'),
+        'filter-timesince04' : ('{{ a|timesince:b }}', {'a': now - timedelta(days=2), 'b': now - timedelta(days=1)}, '1\xa0day'),
+        'filter-timesince05' : ('{{ a|timesince:b }}', {'a': now - timedelta(days=2, minutes=1), 'b': now - timedelta(days=2)}, '1\xa0minute'),
 
         # Check that timezone is respected
-        'filter-timesince06' : ('{{ a|timesince:b }}', {'a':now_tz - timedelta(hours=8), 'b':now_tz}, '8\xa0hours'),
+        'filter-timesince06' : ('{{ a|timesince:b }}', {'a': now_tz - timedelta(hours=8), 'b': now_tz}, '8\xa0hours'),
 
         # Regression for #7443
         'filter-timesince07': ('{{ earlier|timesince }}', {'earlier': now - timedelta(days=7)}, '1\xa0week'),
@@ -69,13 +69,13 @@ def get_filter_tests():
         'filter-timesince18' : ('{{ a|timesince:b }}', {'a': today, 'b': today + timedelta(hours=24)}, '1\xa0day'),
 
         # Default compare with datetime.now()
-        'filter-timeuntil01' : ('{{ a|timeuntil }}', {'a':datetime.now() + timedelta(minutes=2, seconds = 10)}, '2\xa0minutes'),
-        'filter-timeuntil02' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(days=1, seconds = 10))}, '1\xa0day'),
-        'filter-timeuntil03' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(hours=8, minutes=10, seconds = 10))}, '8\xa0hours, 10\xa0minutes'),
+        'filter-timeuntil01' : ('{{ a|timeuntil }}', {'a': datetime.now() + timedelta(minutes=2, seconds=10)}, '2\xa0minutes'),
+        'filter-timeuntil02' : ('{{ a|timeuntil }}', {'a': (datetime.now() + timedelta(days=1, seconds=10))}, '1\xa0day'),
+        'filter-timeuntil03' : ('{{ a|timeuntil }}', {'a': (datetime.now() + timedelta(hours=8, minutes=10, seconds = 10))}, '8\xa0hours, 10\xa0minutes'),
 
         # Compare to a given parameter
-        'filter-timeuntil04' : ('{{ a|timeuntil:b }}', {'a':now - timedelta(days=1), 'b':now - timedelta(days=2)}, '1\xa0day'),
-        'filter-timeuntil05' : ('{{ a|timeuntil:b }}', {'a':now - timedelta(days=2), 'b':now - timedelta(days=2, minutes=1)}, '1\xa0minute'),
+        'filter-timeuntil04' : ('{{ a|timeuntil:b }}', {'a': now - timedelta(days=1), 'b': now - timedelta(days=2)}, '1\xa0day'),
+        'filter-timeuntil05' : ('{{ a|timeuntil:b }}', {'a': now - timedelta(days=2), 'b': now - timedelta(days=2, minutes=1)}, '1\xa0minute'),
 
         # Regression for #7443
         'filter-timeuntil06': ('{{ earlier|timeuntil }}', {'earlier': now - timedelta(days=7)}, '0\xa0minutes'),

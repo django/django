@@ -150,12 +150,12 @@ class ToFieldThroughTests(TestCase):
     def test_to_field_clear_reverse(self):
         self.driver.car_set.clear()
         self.assertQuerysetEqual(
-            self.driver.car_set.all(),[])
+            self.driver.car_set.all(), [])
 
     def test_to_field_clear(self):
         self.car.drivers.clear()
         self.assertQuerysetEqual(
-            self.car.drivers.all(),[])
+            self.car.drivers.all(), [])
 
     # Low level tests for _add_items and _remove_items. We test these methods
     # because .add/.remove aren't available for m2m fields with through, but
@@ -214,7 +214,7 @@ class ToFieldThroughTests(TestCase):
         )
         self.car.drivers._remove_items('car', 'driver', self.driver)
         self.assertQuerysetEqual(
-            self.car.drivers.all(),[])
+            self.car.drivers.all(), [])
 
     def test_remove_reverse(self):
         self.assertQuerysetEqual(
@@ -223,7 +223,7 @@ class ToFieldThroughTests(TestCase):
         )
         self.driver.car_set._remove_items('driver', 'car', self.car)
         self.assertQuerysetEqual(
-            self.driver.car_set.all(),[])
+            self.driver.car_set.all(), [])
 
 
 class ThroughLoadDataTestCase(TestCase):

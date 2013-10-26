@@ -52,21 +52,21 @@ class ModelInheritanceTest(TestCase):
         places = list(Place.objects.all())
         self.assertEqual(places, [place1, place2])
 
-        dicts = list(Restaurant.objects.values('name','serves_hot_dogs'))
+        dicts = list(Restaurant.objects.values('name', 'serves_hot_dogs'))
         self.assertEqual(dicts, [{
             'name': "Guido's House of Pasta",
             'serves_hot_dogs': True
         }])
 
         dicts = list(ItalianRestaurant.objects.values(
-            'name','serves_hot_dogs','serves_gnocchi'))
+            'name', 'serves_hot_dogs', 'serves_gnocchi'))
         self.assertEqual(dicts, [{
             'name': "Guido's House of Pasta",
             'serves_gnocchi': True,
             'serves_hot_dogs': True,
         }])
 
-        dicts = list(ParkingLot.objects.values('name','capacity'))
+        dicts = list(ParkingLot.objects.values('name', 'capacity'))
         self.assertEqual(dicts, [{
             'capacity': 100,
             'name': 'Main St',
@@ -94,7 +94,7 @@ class ModelInheritanceTest(TestCase):
         self.assertEqual(places[0].name, 'Derelict lot')
         self.assertEqual(places[1].name, "Guido's All New House of Pasta")
 
-        dicts = list(Restaurant.objects.values('name','serves_hot_dogs'))
+        dicts = list(Restaurant.objects.values('name', 'serves_hot_dogs'))
         self.assertEqual(dicts, [{
             'name': "Guido's All New House of Pasta",
             'serves_hot_dogs': False,
@@ -108,7 +108,7 @@ class ModelInheritanceTest(TestCase):
             'serves_hot_dogs': False,
         }])
 
-        dicts = list(ParkingLot.objects.values('name','capacity'))
+        dicts = list(ParkingLot.objects.values('name', 'capacity'))
         self.assertEqual(dicts, [{
             'capacity': 50,
             'name': 'Derelict lot',
@@ -123,7 +123,7 @@ class ModelInheritanceTest(TestCase):
         # Note that the name has not changed
         # - name is an attribute of Place, not ItalianRestaurant
         dicts = list(ItalianRestaurant.objects.values(
-            'name','serves_hot_dogs','serves_gnocchi'))
+            'name', 'serves_hot_dogs', 'serves_gnocchi'))
         self.assertEqual(dicts, [{
             'name': "Guido's All New House of Pasta",
             'serves_gnocchi': False,

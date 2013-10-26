@@ -905,7 +905,7 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. John is not one of the available choices.'", f.clean, 'John')
 
     def test_choicefield_4(self):
-        f = ChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3','A'),('4','B'))), ('5','Other')])
+        f = ChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3', 'A'), ('4', 'B'))), ('5', 'Other')])
         self.assertEqual('1', f.clean(1))
         self.assertEqual('1', f.clean('1'))
         self.assertEqual('3', f.clean(3))
@@ -1043,7 +1043,7 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. 3 is not one of the available choices.'", f.clean, ['3'])
 
     def test_multiplechoicefield_3(self):
-        f = MultipleChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3','A'),('4','B'))), ('5','Other')])
+        f = MultipleChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3', 'A'), ('4', 'B'))), ('5', 'Other')])
         self.assertEqual(['1'], f.clean([1]))
         self.assertEqual(['1'], f.clean(['1']))
         self.assertEqual(['1', '5'], f.clean([1, 5]))
@@ -1051,7 +1051,7 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(['1', '5'], f.clean(['1', 5]))
         self.assertEqual(['1', '5'], f.clean(['1', '5']))
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. 6 is not one of the available choices.'", f.clean, ['6'])
-        self.assertRaisesMessage(ValidationError, "'Select a valid choice. 6 is not one of the available choices.'", f.clean, ['1','6'])
+        self.assertRaisesMessage(ValidationError, "'Select a valid choice. 6 is not one of the available choices.'", f.clean, ['1', '6'])
 
     def test_multiplechoicefield_changed(self):
         f = MultipleChoiceField(choices=[('1', 'One'), ('2', 'Two'), ('3', 'Three')])
@@ -1084,8 +1084,8 @@ class FieldsTests(SimpleTestCase):
 
     def test_typedmultiplechoicefield_4(self):
         f = TypedMultipleChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int)
-        self.assertEqual([1, -1], f.clean(['1','-1']))
-        self.assertRaisesMessage(ValidationError, "'Select a valid choice. 2 is not one of the available choices.'", f.clean, ['1','2'])
+        self.assertEqual([1, -1], f.clean(['1', '-1']))
+        self.assertRaisesMessage(ValidationError, "'Select a valid choice. 2 is not one of the available choices.'", f.clean, ['1', '2'])
 
     def test_typedmultiplechoicefield_5(self):
         # Even more weirdness: if you have a valid choice but your coercion function

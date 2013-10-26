@@ -24,7 +24,7 @@ class TestUtilsHtml(TestCase):
     def test_escape(self):
         f = html.escape
         items = (
-            ('&','&amp;'),
+            ('&', '&amp;'),
             ('<', '&lt;'),
             ('>', '&gt;'),
             ('"', '&quot;'),

@@ -178,9 +178,9 @@ class ManyToManyCallableInitialTests(TestCase):
             return db_field.formfield(**kwargs)
 
         # Set up some Publications to use as data
-        book1 = Publication.objects.create(title="First Book", date_published=date(2007,1,1))
-        book2 = Publication.objects.create(title="Second Book", date_published=date(2008,1,1))
-        book3 = Publication.objects.create(title="Third Book", date_published=date(2009,1,1))
+        book1 = Publication.objects.create(title="First Book", date_published=date(2007, 1, 1))
+        book2 = Publication.objects.create(title="Second Book", date_published=date(2008, 1, 1))
+        book3 = Publication.objects.create(title="Third Book", date_published=date(2009, 1, 1))
 
         # Create a ModelForm, instantiate it, and check that the output is as expected
         ModelForm = modelform_factory(Article, fields="__all__",
@@ -252,7 +252,7 @@ class OneToOneFieldTests(TestCase):
         publication = Publication.objects.create(title="Pravda",
             date_published=date(1991, 8, 22))
         author = Author.objects.create(publication=publication, full_name='John Doe')
-        form = AuthorForm({'publication':'', 'full_name':'John Doe'}, instance=author)
+        form = AuthorForm({'publication': '', 'full_name': 'John Doe'}, instance=author)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['publication'], None)
         author = form.save()
@@ -270,7 +270,7 @@ class OneToOneFieldTests(TestCase):
         publication = Publication.objects.create(title="Pravda",
             date_published=date(1991, 8, 22))
         author = Author1.objects.create(publication=publication, full_name='John Doe')
-        form = AuthorForm({'publication':'', 'full_name':'John Doe'}, instance=author)
+        form = AuthorForm({'publication': '', 'full_name': 'John Doe'}, instance=author)
         self.assertTrue(not form.is_valid())
 
 
@@ -350,7 +350,7 @@ class FormFieldCallbackTests(TestCase):
         self.assertNotEqual(Form.base_fields['name'].widget.__class__, forms.Textarea)
 
         # With a widget should not set the widget to textarea
-        Form = modelform_factory(Person, fields="__all__", widgets={'name':widget})
+        Form = modelform_factory(Person, fields="__all__", widgets={'name': widget})
         self.assertEqual(Form.base_fields['name'].widget.__class__, forms.Textarea)
 
     def test_custom_callback(self):

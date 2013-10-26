@@ -67,7 +67,7 @@ class Supplier(models.Model):
     restaurant = models.ForeignKey(Restaurant)
 
 class Wholesaler(Supplier):
-    retailer = models.ForeignKey(Supplier,related_name='wholesale_supplier')
+    retailer = models.ForeignKey(Supplier, related_name='wholesale_supplier')
 
 class Parent(models.Model):
     created = models.DateTimeField(default=datetime.datetime.now)

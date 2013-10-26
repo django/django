@@ -369,7 +369,7 @@ class DefaultFiltersTests(TestCase):
             'should be\nindented')
 
         self.assertEqual(wordwrap('this is a short paragraph of text.\n  '
-            'But this line should be indented',15), 'this is a short\n'
+            'But this line should be indented', 15), 'this is a short\n'
             'paragraph of\ntext.\n  But this line\nshould be\nindented')
 
     def test_rjust(self):
@@ -460,16 +460,16 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(dictsortreversed(1, 'age'), '')
 
     def test_first(self):
-        self.assertEqual(first([0,1,2]), 0)
+        self.assertEqual(first([0, 1, 2]), 0)
         self.assertEqual(first(''), '')
         self.assertEqual(first('test'), 't')
 
     def test_join(self):
-        self.assertEqual(join([0,1,2], 'glue'), '0glue1glue2')
+        self.assertEqual(join([0, 1, 2], 'glue'), '0glue1glue2')
 
     def test_length(self):
         self.assertEqual(length('1234'), 4)
-        self.assertEqual(length([1,2,3,4]), 4)
+        self.assertEqual(length([1, 2, 3, 4]), 4)
         self.assertEqual(length_is([], 0), True)
         self.assertEqual(length_is([], 1), False)
         self.assertEqual(length_is('a', 1), True)
@@ -517,7 +517,7 @@ class DefaultFiltersTests(TestCase):
 
         a = ULItem('a')
         b = ULItem('b')
-        self.assertEqual(unordered_list([a,b]),
+        self.assertEqual(unordered_list([a, b]),
                           '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>')
 
         # Old format for unordered lists should still work
@@ -623,7 +623,7 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(filesizeformat(1024*1024*1024*1024*1024), '1.0\xa0PB')
         self.assertEqual(filesizeformat(1024*1024*1024*1024*1024*2000),
                           '2000.0\xa0PB')
-        self.assertEqual(filesizeformat(complex(1,-1)), '0\xa0bytes')
+        self.assertEqual(filesizeformat(complex(1, -1)), '0\xa0bytes')
         self.assertEqual(filesizeformat(""), '0\xa0bytes')
         self.assertEqual(filesizeformat("\N{GREEK SMALL LETTER ALPHA}"),
                           '0\xa0bytes')
@@ -634,14 +634,14 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(pluralize(2), 's')
         self.assertEqual(pluralize([1]), '')
         self.assertEqual(pluralize([]), 's')
-        self.assertEqual(pluralize([1,2,3]), 's')
-        self.assertEqual(pluralize(1,'es'), '')
-        self.assertEqual(pluralize(0,'es'), 'es')
-        self.assertEqual(pluralize(2,'es'), 'es')
-        self.assertEqual(pluralize(1,'y,ies'), 'y')
-        self.assertEqual(pluralize(0,'y,ies'), 'ies')
-        self.assertEqual(pluralize(2,'y,ies'), 'ies')
-        self.assertEqual(pluralize(0,'y,ies,error'), '')
+        self.assertEqual(pluralize([1, 2, 3]), 's')
+        self.assertEqual(pluralize(1, 'es'), '')
+        self.assertEqual(pluralize(0, 'es'), 'es')
+        self.assertEqual(pluralize(2, 'es'), 'es')
+        self.assertEqual(pluralize(1, 'y,ies'), 'y')
+        self.assertEqual(pluralize(0, 'y,ies'), 'ies')
+        self.assertEqual(pluralize(2, 'y,ies'), 'ies')
+        self.assertEqual(pluralize(0, 'y,ies,error'), '')
 
     def test_phone2numeric(self):
         self.assertEqual(phone2numeric_filter('0800 flowers'), '0800 3569377')
@@ -691,7 +691,7 @@ class DefaultFiltersI18NTests(TransRealMixin, TestCase):
                               '1,0\xa0PB')
             self.assertEqual(filesizeformat(1024*1024*1024*1024*1024*2000),
                               '2000,0\xa0PB')
-            self.assertEqual(filesizeformat(complex(1,-1)), '0\xa0Bytes')
+            self.assertEqual(filesizeformat(complex(1, -1)), '0\xa0Bytes')
             self.assertEqual(filesizeformat(""), '0\xa0Bytes')
             self.assertEqual(filesizeformat("\N{GREEK SMALL LETTER ALPHA}"),
                               '0\xa0Bytes')

@@ -119,9 +119,9 @@ class GenericIPAddressFieldTests(ValidationTestCase):
 
     def test_invalid_generic_ip_raises_error(self):
         giptm = GenericIPAddressTestModel(generic_ip="294.4.2.1")
-        self.assertFailsValidation(giptm.full_clean, ['generic_ip',])
+        self.assertFailsValidation(giptm.full_clean, ['generic_ip'])
         giptm = GenericIPAddressTestModel(generic_ip="1:2")
-        self.assertFailsValidation(giptm.full_clean, ['generic_ip',])
+        self.assertFailsValidation(giptm.full_clean, ['generic_ip'])
 
     def test_correct_v4_ip_passes(self):
         giptm = GenericIPAddressTestModel(v4_ip="1.2.3.4")
@@ -161,7 +161,7 @@ class GenericIPAddressFieldTests(ValidationTestCase):
         giptm = GenericIPAddrUnpackUniqueTest(generic_v4unpack_ip="::ffff:18.52.18.52")
         giptm.save()
         giptm = GenericIPAddrUnpackUniqueTest(generic_v4unpack_ip="18.52.18.52")
-        self.assertFailsValidation(giptm.full_clean, ['generic_v4unpack_ip',])
+        self.assertFailsValidation(giptm.full_clean, ['generic_v4unpack_ip'])
 
     def test_empty_generic_ip_passes(self):
         giptm = GenericIPAddressTestModel(generic_ip="")

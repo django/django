@@ -113,7 +113,7 @@ class SpecializedAuthorCreate(generic.CreateView):
     context_object_name = 'thingy'
 
     def get_success_url(self):
-        return reverse('author_detail', args=[self.object.id,])
+        return reverse('author_detail', args=[self.object.id])
 
 
 class AuthorCreateRestricted(AuthorCreate):
@@ -151,7 +151,7 @@ class SpecializedAuthorUpdate(generic.UpdateView):
     context_object_name = 'thingy'
 
     def get_success_url(self):
-        return reverse('author_detail', args=[self.object.id,])
+        return reverse('author_detail', args=[self.object.id])
 
 
 class NaiveAuthorDelete(generic.DeleteView):
@@ -205,7 +205,7 @@ class AuthorGetQuerySetFormView(generic.edit.ModelFormMixin):
 
 class BookDetailGetObjectCustomQueryset(BookDetail):
     def get_object(self, queryset=None):
-        return super(BookDetailGetObjectCustomQueryset,self).get_object(
+        return super(BookDetailGetObjectCustomQueryset, self).get_object(
             queryset=Book.objects.filter(pk=2))
 
 

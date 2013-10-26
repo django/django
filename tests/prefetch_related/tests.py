@@ -443,9 +443,9 @@ class ForeignKeyToFieldTest(TestCase):
             self.assertEqual(
                 favorites,
                 [
-                    ([six.text_type(self.author2)],[six.text_type(self.author3)]),
-                    ([six.text_type(self.author3)],[six.text_type(self.author1)]),
-                    ([six.text_type(self.author1)],[six.text_type(self.author2)])
+                    ([six.text_type(self.author2)], [six.text_type(self.author3)]),
+                    ([six.text_type(self.author3)], [six.text_type(self.author1)]),
+                    ([six.text_type(self.author1)], [six.text_type(self.author2)])
                 ]
             )
 

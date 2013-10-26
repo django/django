@@ -51,7 +51,7 @@ class ExtractorTests(SimpleTestCase):
             q = "'"
         needle = 'msgid %s' % msgid
         msgid = re.escape(msgid)
-        return self.assertTrue(re.search('^msgid %s' % msgid, s, re.MULTILINE), 'Could not find %(q)s%(n)s%(q)s in generated PO file' % {'n':needle, 'q':q})
+        return self.assertTrue(re.search('^msgid %s' % msgid, s, re.MULTILINE), 'Could not find %(q)s%(n)s%(q)s in generated PO file' % {'n': needle, 'q': q})
 
     def assertNotMsgId(self, msgid, s, use_quotes=True):
         if use_quotes:
@@ -474,7 +474,7 @@ class MultipleLocaleExtractionTests(ExtractorTests):
 
     def test_multiple_locales(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=['pt','de'], verbosity=0)
+        management.call_command('makemessages', locale=['pt', 'de'], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE_PT))
         self.assertTrue(os.path.exists(self.PO_FILE_DE))
 

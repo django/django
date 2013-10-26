@@ -682,55 +682,55 @@ class BaseCacheTests(object):
     def test_cache_versioning_get_set_many(self):
         # set, using default version = 1
         self.cache.set_many({'ford1': 37, 'arthur1': 42})
-        self.assertEqual(self.cache.get_many(['ford1','arthur1']),
+        self.assertEqual(self.cache.get_many(['ford1', 'arthur1']),
                          {'ford1': 37, 'arthur1': 42})
-        self.assertEqual(self.cache.get_many(['ford1','arthur1'], version=1),
+        self.assertEqual(self.cache.get_many(['ford1', 'arthur1'], version=1),
                          {'ford1': 37, 'arthur1': 42})
-        self.assertEqual(self.cache.get_many(['ford1','arthur1'], version=2), {})
+        self.assertEqual(self.cache.get_many(['ford1', 'arthur1'], version=2), {})
 
-        self.assertEqual(self.v2_cache.get_many(['ford1','arthur1']), {})
-        self.assertEqual(self.v2_cache.get_many(['ford1','arthur1'], version=1),
+        self.assertEqual(self.v2_cache.get_many(['ford1', 'arthur1']), {})
+        self.assertEqual(self.v2_cache.get_many(['ford1', 'arthur1'], version=1),
                          {'ford1': 37, 'arthur1': 42})
-        self.assertEqual(self.v2_cache.get_many(['ford1','arthur1'], version=2), {})
+        self.assertEqual(self.v2_cache.get_many(['ford1', 'arthur1'], version=2), {})
 
         # set, default version = 1, but manually override version = 2
         self.cache.set_many({'ford2': 37, 'arthur2': 42}, version=2)
-        self.assertEqual(self.cache.get_many(['ford2','arthur2']), {})
-        self.assertEqual(self.cache.get_many(['ford2','arthur2'], version=1), {})
-        self.assertEqual(self.cache.get_many(['ford2','arthur2'], version=2),
+        self.assertEqual(self.cache.get_many(['ford2', 'arthur2']), {})
+        self.assertEqual(self.cache.get_many(['ford2', 'arthur2'], version=1), {})
+        self.assertEqual(self.cache.get_many(['ford2', 'arthur2'], version=2),
                          {'ford2': 37, 'arthur2': 42})
 
-        self.assertEqual(self.v2_cache.get_many(['ford2','arthur2']),
+        self.assertEqual(self.v2_cache.get_many(['ford2', 'arthur2']),
                          {'ford2': 37, 'arthur2': 42})
-        self.assertEqual(self.v2_cache.get_many(['ford2','arthur2'], version=1), {})
-        self.assertEqual(self.v2_cache.get_many(['ford2','arthur2'], version=2),
+        self.assertEqual(self.v2_cache.get_many(['ford2', 'arthur2'], version=1), {})
+        self.assertEqual(self.v2_cache.get_many(['ford2', 'arthur2'], version=2),
                          {'ford2': 37, 'arthur2': 42})
 
         # v2 set, using default version = 2
         self.v2_cache.set_many({'ford3': 37, 'arthur3': 42})
-        self.assertEqual(self.cache.get_many(['ford3','arthur3']), {})
-        self.assertEqual(self.cache.get_many(['ford3','arthur3'], version=1), {})
-        self.assertEqual(self.cache.get_many(['ford3','arthur3'], version=2),
+        self.assertEqual(self.cache.get_many(['ford3', 'arthur3']), {})
+        self.assertEqual(self.cache.get_many(['ford3', 'arthur3'], version=1), {})
+        self.assertEqual(self.cache.get_many(['ford3', 'arthur3'], version=2),
                          {'ford3': 37, 'arthur3': 42})
 
-        self.assertEqual(self.v2_cache.get_many(['ford3','arthur3']),
+        self.assertEqual(self.v2_cache.get_many(['ford3', 'arthur3']),
                          {'ford3': 37, 'arthur3': 42})
-        self.assertEqual(self.v2_cache.get_many(['ford3','arthur3'], version=1), {})
-        self.assertEqual(self.v2_cache.get_many(['ford3','arthur3'], version=2),
+        self.assertEqual(self.v2_cache.get_many(['ford3', 'arthur3'], version=1), {})
+        self.assertEqual(self.v2_cache.get_many(['ford3', 'arthur3'], version=2),
                          {'ford3': 37, 'arthur3': 42})
 
         # v2 set, default version = 2, but manually override version = 1
         self.v2_cache.set_many({'ford4': 37, 'arthur4': 42}, version=1)
-        self.assertEqual(self.cache.get_many(['ford4','arthur4']),
+        self.assertEqual(self.cache.get_many(['ford4', 'arthur4']),
                          {'ford4': 37, 'arthur4': 42})
-        self.assertEqual(self.cache.get_many(['ford4','arthur4'], version=1),
+        self.assertEqual(self.cache.get_many(['ford4', 'arthur4'], version=1),
                          {'ford4': 37, 'arthur4': 42})
-        self.assertEqual(self.cache.get_many(['ford4','arthur4'], version=2), {})
+        self.assertEqual(self.cache.get_many(['ford4', 'arthur4'], version=2), {})
 
-        self.assertEqual(self.v2_cache.get_many(['ford4','arthur4']), {})
-        self.assertEqual(self.v2_cache.get_many(['ford4','arthur4'], version=1),
+        self.assertEqual(self.v2_cache.get_many(['ford4', 'arthur4']), {})
+        self.assertEqual(self.v2_cache.get_many(['ford4', 'arthur4'], version=1),
                          {'ford4': 37, 'arthur4': 42})
-        self.assertEqual(self.v2_cache.get_many(['ford4','arthur4'], version=2), {})
+        self.assertEqual(self.v2_cache.get_many(['ford4', 'arthur4'], version=2), {})
 
     def test_incr_version(self):
         self.cache.set('answer', 42, version=2)

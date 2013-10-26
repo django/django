@@ -102,7 +102,7 @@ def pk_create(pk, klass, data):
     return [instance]
 
 def inherited_create(pk, klass, data):
-    instance = klass(id=pk,**data)
+    instance = klass(id=pk, **data)
     # This isn't a raw save because:
     #  1) we're testing inheritance, not field behavior, so none
     #     of the field values need to be protected.
@@ -110,7 +110,7 @@ def inherited_create(pk, klass, data):
     #     automatically is easier than manually creating both.
     models.Model.save(instance)
     created = [instance]
-    for klass,field in instance._meta.parents.items():
+    for klass, field in instance._meta.parents.items():
         created.append(klass.objects.get(id=pk))
     return created
 
@@ -166,8 +166,8 @@ def pk_compare(testcase, pk, klass, data):
 
 def inherited_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
-    for key,value in data.items():
-        testcase.assertEqual(value, getattr(instance,key))
+    for key, value in data.items():
+        testcase.assertEqual(value, getattr(instance, key))
 
 # Define some data types. Each data type is
 # actually a pair of functions; one to create
@@ -197,9 +197,9 @@ test_data = [
     # (We use something that will fit into a latin1 database encoding here,
     # because that is still the default used on many system setups.)
     (data_obj, 16, CharData, '\xa5'),
-    (data_obj, 20, DateData, datetime.date(2006,6,16)),
+    (data_obj, 20, DateData, datetime.date(2006, 6, 16)),
     (data_obj, 21, DateData, None),
-    (data_obj, 30, DateTimeData, datetime.datetime(2006,6,16,10,42,37)),
+    (data_obj, 30, DateTimeData, datetime.datetime(2006, 6, 16, 10, 42, 37)),
     (data_obj, 31, DateTimeData, None),
     (data_obj, 40, EmailData, "hovercraft@example.com"),
     (data_obj, 41, EmailData, None),
@@ -247,7 +247,7 @@ Several of them.
 The end."""),
     (data_obj, 161, TextData, ""),
     (data_obj, 162, TextData, None),
-    (data_obj, 170, TimeData, datetime.time(10,42,37)),
+    (data_obj, 170, TimeData, datetime.time(10, 42, 37)),
     (data_obj, 171, TimeData, None),
 
     (generic_obj, 200, GenericData, ['Generic Object 1', 'tag1', 'tag2']),
@@ -262,9 +262,9 @@ The end."""),
     (fk_obj, 402, FKData, None), # Empty reference
 
     (m2m_obj, 410, M2MData, []), # Empty set
-    (m2m_obj, 411, M2MData, [300,301]), # Post reference
-    (m2m_obj, 412, M2MData, [500,501]), # Pre reference
-    (m2m_obj, 413, M2MData, [300,301,500,501]), # Pre and Post reference
+    (m2m_obj, 411, M2MData, [300, 301]), # Post reference
+    (m2m_obj, 412, M2MData, [500, 501]), # Pre reference
+    (m2m_obj, 413, M2MData, [300, 301, 500, 501]), # Pre and Post reference
 
     (o2o_obj, None, O2OData, 300), # Post reference
     (o2o_obj, None, O2OData, 500), # Pre reference
@@ -308,8 +308,8 @@ The end."""),
     (pk_obj, 601, BooleanPKData, True),
     (pk_obj, 602, BooleanPKData, False),
     (pk_obj, 610, CharPKData, "Test Char PKData"),
-    # (pk_obj, 620, DatePKData, datetime.date(2006,6,16)),
-    # (pk_obj, 630, DateTimePKData, datetime.datetime(2006,6,16,10,42,37)),
+    # (pk_obj, 620, DatePKData, datetime.date(2006, 6, 16)),
+    # (pk_obj, 630, DateTimePKData, datetime.datetime(2006, 6, 16, 10, 42, 37)),
     (pk_obj, 640, EmailPKData, "hovercraft@example.com"),
     # (pk_obj, 650, FilePKData, 'file:///foo/bar/whiz.txt'),
     (pk_obj, 660, FilePathPKData, "/foo/bar/whiz.txt"),
@@ -337,15 +337,15 @@ The end."""),
     # It contains line breaks.
     # Several of them.
     # The end."""),
-    # (pk_obj, 770, TimePKData, datetime.time(10,42,37)),
+    # (pk_obj, 770, TimePKData, datetime.time(10, 42, 37)),
     # (pk_obj, 790, XMLPKData, "<foo></foo>"),
 
-    (data_obj, 800, AutoNowDateTimeData, datetime.datetime(2006,6,16,10,42,37)),
+    (data_obj, 800, AutoNowDateTimeData, datetime.datetime(2006, 6, 16, 10, 42, 37)),
     (data_obj, 810, ModifyingSaveData, 42),
 
-    (inherited_obj, 900, InheritAbstractModel, {'child_data':37,'parent_data':42}),
-    (inherited_obj, 910, ExplicitInheritBaseModel, {'child_data':37,'parent_data':42}),
-    (inherited_obj, 920, InheritBaseModel, {'child_data':37,'parent_data':42}),
+    (inherited_obj, 900, InheritAbstractModel, {'child_data': 37, 'parent_data': 42}),
+    (inherited_obj, 910, ExplicitInheritBaseModel, {'child_data': 37, 'parent_data': 42}),
+    (inherited_obj, 920, InheritBaseModel, {'child_data': 37, 'parent_data': 42}),
 
     (data_obj, 1000, BigIntegerData, 9223372036854775807),
     (data_obj, 1001, BigIntegerData, -9223372036854775808),
@@ -502,7 +502,7 @@ def fieldsTest(format, self):
     obj.save_base(raw=True)
 
     # Serialize then deserialize the test database
-    serialized_data = serializers.serialize(format, [obj], indent=2, fields=('field1','field3'))
+    serialized_data = serializers.serialize(format, [obj], indent=2, fields=('field1', 'field3'))
     result = next(serializers.deserialize(format, serialized_data))
 
     # Check that the deserialized object contains data in only the serialized fields.
@@ -511,7 +511,7 @@ def fieldsTest(format, self):
     self.assertEqual(result.object.field3, 'third')
 
 def streamTest(format, self):
-    obj = ComplexModel(field1='first',field2='second',field3='third')
+    obj = ComplexModel(field1='first', field2='second', field3='third')
     obj.save_base(raw=True)
 
     # Serialize the test database to a stream
@@ -531,7 +531,7 @@ def streamTest(format, self):
 def naturalKeyTest(format, self):
     book1 = {'data': '978-1590597255', 'title': 'The Definitive Guide to '
              'Django: Web Development Done Right'}
-    book2 = {'data':'978-1590599969', 'title': 'Practical Django Projects'}
+    book2 = {'data': '978-1590599969', 'title': 'Practical Django Projects'}
 
     # Create the books.
     adrian = NaturalKeyAnchor.objects.create(**book1)

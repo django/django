@@ -7,8 +7,8 @@ from .models import PersonWithDefaultMaxLengths, PersonWithCustomMaxLengths
 
 class MaxLengthArgumentsTests(unittest.TestCase):
 
-    def verify_max_length(self, model,field,length):
-        self.assertEqual(model._meta.get_field(field).max_length,length)
+    def verify_max_length(self, model, field, length):
+        self.assertEqual(model._meta.get_field(field).max_length, length)
 
     def test_default_max_lengths(self):
         self.verify_max_length(PersonWithDefaultMaxLengths, 'email', 75)

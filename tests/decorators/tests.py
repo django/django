@@ -50,7 +50,7 @@ full_decorator = compose(
 
     # django.contrib.auth.decorators
     # Apply user_passes_test twice to check #9474
-    user_passes_test(lambda u:True),
+    user_passes_test(lambda u: True),
     login_required,
     permission_required('change_world'),
 

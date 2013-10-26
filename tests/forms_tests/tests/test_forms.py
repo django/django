@@ -1124,7 +1124,7 @@ class FormsTestCase(TestCase):
         class UserRegistration(Form):
             username = CharField(max_length=10)
             password = CharField(widget=PasswordInput)
-            options = MultipleChoiceField(choices=[('f','foo'),('b','bar'),('w','whiz')])
+            options = MultipleChoiceField(choices=[('f', 'foo'), ('b', 'bar'), ('w', 'whiz')])
 
         # We need to define functions that get called later.)
         def initial_django():
@@ -1134,10 +1134,10 @@ class FormsTestCase(TestCase):
             return 'stephane'
 
         def initial_options():
-            return ['f','b']
+            return ['f', 'b']
 
         def initial_other_options():
-            return ['b','w']
+            return ['b', 'w']
 
         # Here, we're not submitting any data, so the initial value will be displayed.)
         p = UserRegistration(initial={'username': initial_django, 'options': initial_options}, auto_id=False)
@@ -1166,7 +1166,7 @@ class FormsTestCase(TestCase):
 <option value="b">bar</option>
 <option value="w">whiz</option>
 </select></li>""")
-        p = UserRegistration({'username': 'foo', 'options':['f','b']}, initial={'username': initial_django}, auto_id=False)
+        p = UserRegistration({'username': 'foo', 'options': ['f', 'b']}, initial={'username': initial_django}, auto_id=False)
         self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="foo" maxlength="10" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
 <li>Options: <select multiple="multiple" name="options">
@@ -1187,7 +1187,7 @@ class FormsTestCase(TestCase):
         class UserRegistration(Form):
             username = CharField(max_length=10, initial=initial_django)
             password = CharField(widget=PasswordInput)
-            options = MultipleChoiceField(choices=[('f','foo'),('b','bar'),('w','whiz')], initial=initial_other_options)
+            options = MultipleChoiceField(choices=[('f', 'foo'), ('b', 'bar'), ('w', 'whiz')], initial=initial_other_options)
 
         p = UserRegistration(auto_id=False)
         self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
@@ -1813,7 +1813,7 @@ class FormsTestCase(TestCase):
         class ChoicesField(MultiValueField):
             def __init__(self, fields=(), *args, **kwargs):
                 fields = (ChoiceField(label='Rank',
-                           choices=((1,1),(2,2))),
+                           choices=((1, 1), (2, 2))),
                           CharField(label='Name', max_length=10))
                 super(ChoicesField, self).__init__(fields=fields, *args, **kwargs)
 

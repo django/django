@@ -405,7 +405,7 @@ class FormfieldShouldDeleteFormTests(TestCase):
         data['form-INITIAL_FORMS'] = 4
         data.update(dict(
             ('form-%d-id' % i, user.pk)
-            for i,user in enumerate(User.objects.all())
+            for i, user in enumerate(User.objects.all())
         ))
         formset = self.NormalFormset(data, queryset=User.objects.all())
         self.assertTrue(formset.is_valid())
@@ -422,7 +422,7 @@ class FormfieldShouldDeleteFormTests(TestCase):
         data['form-INITIAL_FORMS'] = 4
         data.update(dict(
             ('form-%d-id' % i, user.pk)
-            for i,user in enumerate(User.objects.all())
+            for i, user in enumerate(User.objects.all())
         ))
         data.update(self.delete_all_ids)
         formset = self.NormalFormset(data, queryset=User.objects.all())
@@ -441,7 +441,7 @@ class FormfieldShouldDeleteFormTests(TestCase):
         data['form-INITIAL_FORMS'] = 4
         data.update(dict(
             ('form-%d-id' % i, user.pk)
-            for i,user in enumerate(User.objects.all())
+            for i, user in enumerate(User.objects.all())
         ))
         data.update(self.delete_all_ids)
         formset = self.DeleteFormset(data, queryset=User.objects.all())

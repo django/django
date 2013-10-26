@@ -128,7 +128,7 @@ class UpdateOnlyFieldsTests(TestCase):
         a1 = Account.objects.create(num=1)
         a2 = Account.objects.create(num=2)
 
-        e1.accounts = [a1,a2]
+        e1.accounts = [a1, a2]
 
         with self.assertRaises(ValueError):
             e1.save(update_fields=['accounts'])

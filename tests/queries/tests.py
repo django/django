@@ -1915,16 +1915,16 @@ class SubqueryTests(TestCase):
         "Subselects honor any manual ordering"
         try:
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:2])
-            self.assertEqual(set(query.values_list('id', flat=True)), set([3,4]))
+            self.assertEqual(set(query.values_list('id', flat=True)), set([3, 4]))
 
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[:2])
-            self.assertEqual(set(query.values_list('id', flat=True)), set([3,4]))
+            self.assertEqual(set(query.values_list('id', flat=True)), set([3, 4]))
 
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:2])
             self.assertEqual(set(query.values_list('id', flat=True)), set([3]))
 
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[2:])
-            self.assertEqual(set(query.values_list('id', flat=True)), set([1,2]))
+            self.assertEqual(set(query.values_list('id', flat=True)), set([1, 2]))
         except DatabaseError as e:
             # Oracle and MySQL both have problems with sliced subselects.
             # This prevents us from even evaluating this test case at all.
@@ -1937,7 +1937,7 @@ class SubqueryTests(TestCase):
         """
         try:
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:2])[0:2]
-            self.assertEqual(set([x.id for x in query]), set([3,4]))
+            self.assertEqual(set([x.id for x in query]), set([3, 4]))
 
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:3])[1:3]
             self.assertEqual(set([x.id for x in query]), set([3]))
@@ -1954,10 +1954,10 @@ class SubqueryTests(TestCase):
         "Delete queries can safely contain sliced subqueries"
         try:
             DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:1]).delete()
-            self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1,2,3]))
+            self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1, 2, 3]))
 
             DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:2]).delete()
-            self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1,3]))
+            self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1, 3]))
 
             DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:]).delete()
             self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([3]))
@@ -2139,7 +2139,7 @@ class EscapingTests(TestCase):
             ['<ReservedName: b>', '<ReservedName: a>']
         )
         self.assertQuerysetEqual(
-            ReservedName.objects.extra(select={'stuff':'name'}, order_by=('order','stuff')),
+            ReservedName.objects.extra(select={'stuff': 'name'}, order_by=('order', 'stuff')),
             ['<ReservedName: b>', '<ReservedName: a>']
         )
 

@@ -12,7 +12,7 @@ class MyFileField(models.FileField):
 class Member(models.Model):
     name = models.CharField(max_length=100)
     birthdate = models.DateTimeField(blank=True, null=True)
-    gender = models.CharField(max_length=1, blank=True, choices=[('M','Male'), ('F', 'Female')])
+    gender = models.CharField(max_length=1, blank=True, choices=[('M', 'Male'), ('F', 'Female')])
     email = models.EmailField(blank=True)
 
     def __str__(self):

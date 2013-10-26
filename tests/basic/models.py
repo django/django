@@ -14,7 +14,7 @@ class Article(models.Model):
     pub_date = models.DateTimeField()
 
     class Meta:
-        ordering = ('pub_date','headline')
+        ordering = ('pub_date', 'headline')
 
     def __str__(self):
         return self.headline

@@ -568,7 +568,7 @@ class TemplateTests(TransRealMixin, TestCase):
         # Warm the URL reversing cache. This ensures we don't pay the cost
         # warming the cache during one of the tests.
         urlresolvers.reverse('template_tests.views.client_action',
-                             kwargs={'id':0,'action':"update"})
+                             kwargs={'id': 0, 'action': "update"})
 
         for name, vals in tests:
             if isinstance(vals[2], tuple):
@@ -665,13 +665,13 @@ class TemplateTests(TransRealMixin, TestCase):
 
             # Variables should be replaced with their value in the current
             # context
-            'basic-syntax02': ("{{ headline }}", {'headline':'Success'}, "Success"),
+            'basic-syntax02': ("{{ headline }}", {'headline': 'Success'}, "Success"),
 
             # More than one replacement variable is allowed in a template
             'basic-syntax03': ("{{ first }} --- {{ second }}", {"first" : 1, "second" : 2}, "1 --- 2"),
 
             # Fail silently when a variable is not found in the current context
-            'basic-syntax04': ("as{{ missing }}df", {}, ("asdf","asINVALIDdf")),
+            'basic-syntax04': ("as{{ missing }}df", {}, ("asdf", "asINVALIDdf")),
 
             # A variable may not contain more than one word
             'basic-syntax06': ("{{ multi word variable }}", {}, template.TemplateSyntaxError),
@@ -687,7 +687,7 @@ class TemplateTests(TransRealMixin, TestCase):
             'basic-syntax10': ("{{ var.otherclass.method }}", {"var": SomeClass()}, "OtherClass.method"),
 
             # Fail silently when a variable's attribute isn't found
-            'basic-syntax11': ("{{ var.blech }}", {"var": SomeClass()}, ("","INVALID")),
+            'basic-syntax11': ("{{ var.blech }}", {"var": SomeClass()}, ("", "INVALID")),
 
             # Raise TemplateSyntaxError when trying to access a variable beginning with an underscore
             'basic-syntax12': ("{{ var.__dict__ }}", {"var": SomeClass()}, template.TemplateSyntaxError),
@@ -700,13 +700,13 @@ class TemplateTests(TransRealMixin, TestCase):
             'basic-syntax17': ("{{ moo? }}", {}, template.TemplateSyntaxError),
 
             # Attribute syntax allows a template to call a dictionary key's value
-            'basic-syntax18': ("{{ foo.bar }}", {"foo" : {"bar" : "baz"}}, "baz"),
+            'basic-syntax18': ("{{ foo.bar }}", {"foo": {"bar": "baz"}}, "baz"),
 
             # Fail silently when a variable's dictionary key isn't found
-            'basic-syntax19': ("{{ foo.spam }}", {"foo" : {"bar" : "baz"}}, ("","INVALID")),
+            'basic-syntax19': ("{{ foo.spam }}", {"foo": {"bar": "baz"}}, ("", "INVALID")),
 
             # Fail silently when accessing a non-simple method
-            'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, ("","INVALID")),
+            'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, ("", "INVALID")),
 
             # Don't silence a TypeError if it was raised inside a callable
             'basic-syntax20b': ("{{ var.method5 }}", {"var": SomeClass()}, TypeError),
@@ -893,18 +893,18 @@ class TemplateTests(TransRealMixin, TestCase):
             'cycle11': ("{% cycle 'a' 'b' 'c' as abc %}{% cycle abc %}{% cycle abc %}", {}, 'abc'),
             'cycle12': ("{% cycle 'a' 'b' 'c' as abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}", {}, 'abca'),
             'cycle13': ("{% for i in test %}{% cycle 'a' 'b' %}{{ i }},{% endfor %}", {'test': range(5)}, 'a0,b1,a2,b3,a4,'),
-            'cycle14': ("{% cycle one two as foo %}{% cycle foo %}", {'one': '1','two': '2'}, '12'),
+            'cycle14': ("{% cycle one two as foo %}{% cycle foo %}", {'one': '1', 'two': '2'}, '12'),
             'cycle15': ("{% for i in test %}{% cycle aye bee %}{{ i }},{% endfor %}", {'test': range(5), 'aye': 'a', 'bee': 'b'}, 'a0,b1,a2,b3,a4,'),
-            'cycle16': ("{% cycle one|lower two as foo %}{% cycle foo %}", {'one': 'A','two': '2'}, 'a2'),
+            'cycle16': ("{% cycle one|lower two as foo %}{% cycle foo %}", {'one': 'A', 'two': '2'}, 'a2'),
             'cycle17': ("{% cycle 'a' 'b' 'c' as abc silent %}{% cycle abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}", {}, ""),
             'cycle18': ("{% cycle 'a' 'b' 'c' as foo invalid_flag %}", {}, template.TemplateSyntaxError),
             'cycle19': ("{% cycle 'a' 'b' as silent %}{% cycle silent %}", {}, "ab"),
             'cycle20': ("{% cycle one two as foo %} &amp; {% cycle foo %}", {'one' : 'A & B', 'two' : 'C & D'}, "A & B &amp; C & D"),
             'cycle21': ("{% filter force_escape %}{% cycle one two as foo %} & {% cycle foo %}{% endfilter %}", {'one' : 'A & B', 'two' : 'C & D'}, "A &amp; B &amp; C &amp; D"),
-            'cycle22': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ x }}{% endfor %}", {'values': [1,2,3,4]}, "1234"),
-            'cycle23': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ abc }}{{ x }}{% endfor %}", {'values': [1,2,3,4]}, "a1b2c3a4"),
+            'cycle22': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ x }}{% endfor %}", {'values': [1, 2, 3, 4]}, "1234"),
+            'cycle23': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ abc }}{{ x }}{% endfor %}", {'values': [1, 2, 3, 4]}, "a1b2c3a4"),
             'included-cycle': ('{{ abc }}', {'abc': 'xxx'}, 'xxx'),
-            'cycle24': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{% include 'included-cycle' %}{% endfor %}", {'values': [1,2,3,4]}, "abca"),
+            'cycle24': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{% include 'included-cycle' %}{% endfor %}", {'values': [1, 2, 3, 4]}, "abca"),
             'cycle25': ('{% cycle a as abc %}', {'a': '<'}, '<'),
 
             'cycle26': ('{% load cycle from future %}{% cycle a b as ab %}{% cycle ab %}', {'a': '<', 'b': '>'}, '&lt;&gt;'),
@@ -936,14 +936,14 @@ class TemplateTests(TransRealMixin, TestCase):
             'filter06bis': ('{% filter upper|escape %}fail{% endfilter %}', {}, template.TemplateSyntaxError),
 
             ### FIRSTOF TAG ###########################################################
-            'firstof01': ('{% firstof a b c %}', {'a':0,'b':0,'c':0}, ''),
-            'firstof02': ('{% firstof a b c %}', {'a':1,'b':0,'c':0}, '1'),
-            'firstof03': ('{% firstof a b c %}', {'a':0,'b':2,'c':0}, '2'),
-            'firstof04': ('{% firstof a b c %}', {'a':0,'b':0,'c':3}, '3'),
-            'firstof05': ('{% firstof a b c %}', {'a':1,'b':2,'c':3}, '1'),
-            'firstof06': ('{% firstof a b c %}', {'b':0,'c':3}, '3'),
-            'firstof07': ('{% firstof a b "c" %}', {'a':0}, 'c'),
-            'firstof08': ('{% firstof a b "c and d" %}', {'a':0,'b':0}, 'c and d'),
+            'firstof01': ('{% firstof a b c %}', {'a': 0, 'b': 0, 'c': 0}, ''),
+            'firstof02': ('{% firstof a b c %}', {'a': 1, 'b': 0, 'c': 0}, '1'),
+            'firstof03': ('{% firstof a b c %}', {'a': 0, 'b': 2, 'c': 0}, '2'),
+            'firstof04': ('{% firstof a b c %}', {'a': 0, 'b': 0, 'c': 3}, '3'),
+            'firstof05': ('{% firstof a b c %}', {'a': 1, 'b': 2, 'c': 3}, '1'),
+            'firstof06': ('{% firstof a b c %}', {'b': 0, 'c': 3}, '3'),
+            'firstof07': ('{% firstof a b "c" %}', {'a': 0}, 'c'),
+            'firstof08': ('{% firstof a b "c and d" %}', {'a': 0, 'b': 0}, 'c and d'),
             'firstof09': ('{% firstof %}', {}, template.TemplateSyntaxError),
             'firstof10': ('{% firstof a %}', {'a': '<'}, '<'),
 
@@ -1020,10 +1020,10 @@ class TemplateTests(TransRealMixin, TestCase):
             'if-tag-lte-02': ("{% if 2 <= 1 %}yes{% else %}no{% endif %}", {}, "no"),
 
             # Contains
-            'if-tag-in-01': ("{% if 1 in x %}yes{% else %}no{% endif %}", {'x':[1]}, "yes"),
-            'if-tag-in-02': ("{% if 2 in x %}yes{% else %}no{% endif %}", {'x':[1]}, "no"),
-            'if-tag-not-in-01': ("{% if 1 not in x %}yes{% else %}no{% endif %}", {'x':[1]}, "no"),
-            'if-tag-not-in-02': ("{% if 2 not in x %}yes{% else %}no{% endif %}", {'x':[1]}, "yes"),
+            'if-tag-in-01': ("{% if 1 in x %}yes{% else %}no{% endif %}", {'x': [1]}, "yes"),
+            'if-tag-in-02': ("{% if 2 in x %}yes{% else %}no{% endif %}", {'x': [1]}, "no"),
+            'if-tag-not-in-01': ("{% if 1 not in x %}yes{% else %}no{% endif %}", {'x': [1]}, "no"),
+            'if-tag-not-in-02': ("{% if 2 not in x %}yes{% else %}no{% endif %}", {'x': [1]}, "yes"),
 
             # AND
             'if-tag-and01': ("{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': True}, 'yes'),
@@ -1109,17 +1109,17 @@ class TemplateTests(TransRealMixin, TestCase):
             'if-tag-shortcircuit02': ('{% if x.is_false and x.is_bad %}yes{% else %}no{% endif %}', {'x': TestObj()}, "no"),
 
             # Non-existent args
-            'if-tag-badarg01':("{% if x|default_if_none:y %}yes{% endif %}", {}, ''),
-            'if-tag-badarg02':("{% if x|default_if_none:y %}yes{% endif %}", {'y': 0}, ''),
-            'if-tag-badarg03':("{% if x|default_if_none:y %}yes{% endif %}", {'y': 1}, 'yes'),
-            'if-tag-badarg04':("{% if x|default_if_none:y %}yes{% else %}no{% endif %}", {}, 'no'),
+            'if-tag-badarg01': ("{% if x|default_if_none:y %}yes{% endif %}", {}, ''),
+            'if-tag-badarg02': ("{% if x|default_if_none:y %}yes{% endif %}", {'y': 0}, ''),
+            'if-tag-badarg03': ("{% if x|default_if_none:y %}yes{% endif %}", {'y': 1}, 'yes'),
+            'if-tag-badarg04': ("{% if x|default_if_none:y %}yes{% else %}no{% endif %}", {}, 'no'),
 
             # Additional, more precise parsing tests are in SmartIfTests
 
             ### IFCHANGED TAG #########################################################
-            'ifchanged01': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': (1,2,3)}, '123'),
-            'ifchanged02': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': (1,1,3)}, '13'),
-            'ifchanged03': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': (1,1,1)}, '1'),
+            'ifchanged01': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': (1, 2, 3)}, '123'),
+            'ifchanged02': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': (1, 1, 3)}, '13'),
+            'ifchanged03': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': (1, 1, 1)}, '1'),
             'ifchanged04': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': (1, 2, 3), 'numx': (2, 2, 2)}, '122232'),
             'ifchanged05': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': (1, 1, 1), 'numx': (1, 2, 3)}, '1123123123'),
             'ifchanged06': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': (1, 1, 1), 'numx': (2, 2, 2)}, '1222'),
@@ -1127,30 +1127,30 @@ class TemplateTests(TransRealMixin, TestCase):
             'ifchanged08': ('{% for data in datalist %}{% for c,d in data %}{% if c %}{% ifchanged %}{{ d }}{% endifchanged %}{% endif %}{% endfor %}{% endfor %}', {'datalist': [[(1, 'a'), (1, 'a'), (0, 'b'), (1, 'c')], [(0, 'a'), (1, 'c'), (1, 'd'), (1, 'd'), (0, 'e')]]}, 'accd'),
 
             # Test one parameter given to ifchanged.
-            'ifchanged-param01': ('{% for n in num %}{% ifchanged n %}..{% endifchanged %}{{ n }}{% endfor %}', {'num': (1,2,3)}, '..1..2..3'),
-            'ifchanged-param02': ('{% for n in num %}{% for x in numx %}{% ifchanged n %}..{% endifchanged %}{{ x }}{% endfor %}{% endfor %}', {'num': (1,2,3), 'numx': (5,6,7)}, '..567..567..567'),
+            'ifchanged-param01': ('{% for n in num %}{% ifchanged n %}..{% endifchanged %}{{ n }}{% endfor %}', {'num': (1, 2, 3)}, '..1..2..3'),
+            'ifchanged-param02': ('{% for n in num %}{% for x in numx %}{% ifchanged n %}..{% endifchanged %}{{ x }}{% endfor %}{% endfor %}', {'num': (1, 2, 3), 'numx': (5, 6, 7)}, '..567..567..567'),
 
             # Test multiple parameters to ifchanged.
-            'ifchanged-param03': ('{% for n in num %}{{ n }}{% for x in numx %}{% ifchanged x n %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': (1,1,2), 'numx': (5,6,6)}, '156156256'),
+            'ifchanged-param03': ('{% for n in num %}{{ n }}{% for x in numx %}{% ifchanged x n %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': (1, 1, 2), 'numx': (5, 6, 6)}, '156156256'),
 
             # Test a date+hour like construct, where the hour of the last day
             # is the same but the date had changed, so print the hour anyway.
-            'ifchanged-param04': ('{% for d in days %}{% ifchanged %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},]}, '112323'),
+            'ifchanged-param04': ('{% for d in days %}{% ifchanged %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days': [{'day': 1, 'hours': [1, 2, 3]}, {'day': 2, 'hours': [3]}]}, '112323'),
 
             # Logically the same as above, just written with explicit
             # ifchanged for the day.
-            'ifchanged-param05': ('{% for d in days %}{% ifchanged d.day %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d.day h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},]}, '112323'),
+            'ifchanged-param05': ('{% for d in days %}{% ifchanged d.day %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d.day h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days': [{'day': 1, 'hours': [1, 2, 3]}, {'day': 2, 'hours': [3]}]}, '112323'),
 
             # Test the else clause of ifchanged.
-            'ifchanged-else01': ('{% for id in ids %}{{ id }}{% ifchanged id %}-first{% else %}-other{% endifchanged %},{% endfor %}', {'ids': [1,1,2,2,2,3]}, '1-first,1-other,2-first,2-other,2-other,3-first,'),
+            'ifchanged-else01': ('{% for id in ids %}{{ id }}{% ifchanged id %}-first{% else %}-other{% endifchanged %},{% endfor %}', {'ids': [1, 1, 2, 2, 2, 3]}, '1-first,1-other,2-first,2-other,2-other,3-first,'),
 
-            'ifchanged-else02': ('{% for id in ids %}{{ id }}-{% ifchanged id %}{% cycle red,blue %}{% else %}grey{% endifchanged %},{% endfor %}', {'ids': [1,1,2,2,2,3]}, '1-red,1-grey,2-blue,2-grey,2-grey,3-red,'),
-            'ifchanged-else03': ('{% for id in ids %}{{ id }}{% ifchanged id %}-{% cycle red,blue %}{% else %}{% endifchanged %},{% endfor %}', {'ids': [1,1,2,2,2,3]}, '1-red,1,2-blue,2,2,3-red,'),
+            'ifchanged-else02': ('{% for id in ids %}{{ id }}-{% ifchanged id %}{% cycle red,blue %}{% else %}grey{% endifchanged %},{% endfor %}', {'ids': [1, 1, 2, 2, 2, 3]}, '1-red,1-grey,2-blue,2-grey,2-grey,3-red,'),
+            'ifchanged-else03': ('{% for id in ids %}{{ id }}{% ifchanged id %}-{% cycle red,blue %}{% else %}{% endifchanged %},{% endfor %}', {'ids': [1, 1, 2, 2, 2, 3]}, '1-red,1,2-blue,2,2,3-red,'),
 
-            'ifchanged-else04': ('{% for id in ids %}{% ifchanged %}***{{ id }}*{% else %}...{% endifchanged %}{{ forloop.counter }}{% endfor %}', {'ids': [1,1,2,2,2,3,4]}, '***1*1...2***2*3...4...5***3*6***4*7'),
+            'ifchanged-else04': ('{% for id in ids %}{% ifchanged %}***{{ id }}*{% else %}...{% endifchanged %}{{ forloop.counter }}{% endfor %}', {'ids': [1, 1, 2, 2, 2, 3, 4]}, '***1*1...2***2*3...4...5***3*6***4*7'),
 
             # Test whitespace in filter arguments
-            'ifchanged-filter-ws': ('{% load custom %}{% for n in num %}{% ifchanged n|noop:"x y" %}..{% endifchanged %}{{ n }}{% endfor %}', {'num': (1,2,3)}, '..1..2..3'),
+            'ifchanged-filter-ws': ('{% load custom %}{% for n in num %}{% ifchanged n|noop:"x y" %}..{% endifchanged %}{{ n }}{% endfor %}', {'num': (1, 2, 3)}, '..1..2..3'),
 
             ### IFEQUAL TAG ###########################################################
             'ifequal01': ("{% ifequal a b %}yes{% endifequal %}", {"a": 1, "b": 2}, ""),
@@ -1501,8 +1501,8 @@ class TemplateTests(TransRealMixin, TestCase):
 
             ### HANDLING OF TEMPLATE_STRING_IF_INVALID ###################################
 
-            'invalidstr01': ('{{ var|default:"Foo" }}', {}, ('Foo','INVALID')),
-            'invalidstr02': ('{{ var|default_if_none:"Foo" }}', {}, ('','INVALID')),
+            'invalidstr01': ('{{ var|default:"Foo" }}', {}, ('Foo', 'INVALID')),
+            'invalidstr02': ('{{ var|default_if_none:"Foo" }}', {}, ('', 'INVALID')),
             'invalidstr03': ('{% for v in var %}({{ v }}){% endfor %}', {}, ''),
             'invalidstr04': ('{% if var %}Yes{% else %}No{% endif %}', {}, 'No'),
             'invalidstr04_2': ('{% if var|default:"Foo" %}Yes{% else %}No{% endif %}', {}, 'Yes'),
@@ -1537,11 +1537,11 @@ class TemplateTests(TransRealMixin, TestCase):
                           '{{ item.foo }}'
                           '{% endfor %},'
                           '{% endfor %}',
-                          {'data': [{'foo':'c', 'bar':1},
-                                     {'foo':'d', 'bar':1},
-                                     {'foo':'a', 'bar':2},
-                                     {'foo':'b', 'bar':2},
-                                     {'foo':'x', 'bar':3}]},
+                          {'data': [{'foo': 'c', 'bar': 1},
+                                     {'foo': 'd', 'bar': 1},
+                                     {'foo': 'a', 'bar': 2},
+                                     {'foo': 'b', 'bar': 2},
+                                     {'foo': 'x', 'bar': 3}]},
                           '1:cd,2:ab,3:x,'),
 
             # Test for silent failure when target variable isn't found
@@ -1629,41 +1629,41 @@ class TemplateTests(TransRealMixin, TestCase):
             'simpletag-renamed03': ('{% load custom %}{% minustwo_overridden_name 7 %}', {}, template.TemplateSyntaxError),
 
             ### WIDTHRATIO TAG ########################################################
-            'widthratio01': ('{% widthratio a b 0 %}', {'a':50,'b':100}, '0'),
-            'widthratio02': ('{% widthratio a b 100 %}', {'a':0,'b':0}, '0'),
-            'widthratio03': ('{% widthratio a b 100 %}', {'a':0,'b':100}, '0'),
-            'widthratio04': ('{% widthratio a b 100 %}', {'a':50,'b':100}, '50'),
-            'widthratio05': ('{% widthratio a b 100 %}', {'a':100,'b':100}, '100'),
+            'widthratio01': ('{% widthratio a b 0 %}', {'a': 50, 'b': 100}, '0'),
+            'widthratio02': ('{% widthratio a b 100 %}', {'a': 0, 'b': 0}, '0'),
+            'widthratio03': ('{% widthratio a b 100 %}', {'a': 0, 'b': 100}, '0'),
+            'widthratio04': ('{% widthratio a b 100 %}', {'a': 50, 'b': 100}, '50'),
+            'widthratio05': ('{% widthratio a b 100 %}', {'a': 100, 'b': 100}, '100'),
 
             # 62.5 should round to 63 on Python 2 and 62 on Python 3
             # See http://docs.python.org/py3k/whatsnew/3.0.html
-            'widthratio06': ('{% widthratio a b 100 %}', {'a':50,'b':80}, '62' if six.PY3 else '63'),
+            'widthratio06': ('{% widthratio a b 100 %}', {'a': 50, 'b': 80}, '62' if six.PY3 else '63'),
 
             # 71.4 should round to 71
-            'widthratio07': ('{% widthratio a b 100 %}', {'a':50,'b':70}, '71'),
+            'widthratio07': ('{% widthratio a b 100 %}', {'a': 50, 'b': 70}, '71'),
 
             # Raise exception if we don't have 3 args, last one an integer
             'widthratio08': ('{% widthratio %}', {}, template.TemplateSyntaxError),
-            'widthratio09': ('{% widthratio a b %}', {'a':50,'b':100}, template.TemplateSyntaxError),
-            'widthratio10': ('{% widthratio a b 100.0 %}', {'a':50,'b':100}, '50'),
+            'widthratio09': ('{% widthratio a b %}', {'a': 50, 'b': 100}, template.TemplateSyntaxError),
+            'widthratio10': ('{% widthratio a b 100.0 %}', {'a': 50, 'b': 100}, '50'),
 
             # #10043: widthratio should allow max_width to be a variable
-            'widthratio11': ('{% widthratio a b c %}', {'a':50,'b':100, 'c': 100}, '50'),
+            'widthratio11': ('{% widthratio a b c %}', {'a': 50, 'b': 100, 'c': 100}, '50'),
 
             # #18739: widthratio should handle None args consistently with non-numerics
-            'widthratio12a': ('{% widthratio a b c %}', {'a':'a','b':100,'c':100}, ''),
-            'widthratio12b': ('{% widthratio a b c %}', {'a':None,'b':100,'c':100}, ''),
-            'widthratio13a': ('{% widthratio a b c %}', {'a':0,'b':'b','c':100}, ''),
-            'widthratio13b': ('{% widthratio a b c %}', {'a':0,'b':None,'c':100}, ''),
-            'widthratio14a': ('{% widthratio a b c %}', {'a':0,'b':100,'c':'c'}, template.TemplateSyntaxError),
-            'widthratio14b': ('{% widthratio a b c %}', {'a':0,'b':100,'c':None}, template.TemplateSyntaxError),
+            'widthratio12a': ('{% widthratio a b c %}', {'a': 'a', 'b': 100, 'c': 100}, ''),
+            'widthratio12b': ('{% widthratio a b c %}', {'a': None, 'b': 100, 'c': 100}, ''),
+            'widthratio13a': ('{% widthratio a b c %}', {'a': 0, 'b': 'b', 'c': 100}, ''),
+            'widthratio13b': ('{% widthratio a b c %}', {'a': 0, 'b': None, 'c': 100}, ''),
+            'widthratio14a': ('{% widthratio a b c %}', {'a': 0, 'b': 100, 'c': 'c'}, template.TemplateSyntaxError),
+            'widthratio14b': ('{% widthratio a b c %}', {'a': 0, 'b': 100, 'c': None}, template.TemplateSyntaxError),
 
             # Test whitespace in filter argument
-            'widthratio15': ('{% load custom %}{% widthratio a|noop:"x y" b 0 %}', {'a':50,'b':100}, '0'),
+            'widthratio15': ('{% load custom %}{% widthratio a|noop:"x y" b 0 %}', {'a': 50, 'b': 100}, '0'),
 
             # Widthratio with variable assignment
-            'widthratio16': ('{% widthratio a b 100 as variable %}-{{ variable }}-', {'a':50,'b':100}, '-50-'),
-            'widthratio17': ('{% widthratio a b 100 as variable %}-{{ variable }}-', {'a':100,'b':100}, '-100-'),
+            'widthratio16': ('{% widthratio a b 100 as variable %}-{{ variable }}-', {'a': 50, 'b': 100}, '-50-'),
+            'widthratio17': ('{% widthratio a b 100 as variable %}-{{ variable }}-', {'a': 100, 'b': 100}, '-100-'),
 
             'widthratio18': ('{% widthratio a b 100 as %}', {}, template.TemplateSyntaxError),
             'widthratio19': ('{% widthratio a b 100 not_as variable %}', {}, template.TemplateSyntaxError),
@@ -1712,8 +1712,8 @@ class TemplateTests(TransRealMixin, TestCase):
             'url10': ('{% url "template_tests.views.client_action" id=client.id action="two words" %}', {'client': {'id': 1}}, '/url_tag/client/1/two%20words/'),
             'url11': ('{% url "template_tests.views.client_action" id=client.id action="==" %}', {'client': {'id': 1}}, '/url_tag/client/1/%3D%3D/'),
             'url12': ('{% url "template_tests.views.client_action" id=client.id action="," %}', {'client': {'id': 1}}, '/url_tag/client/1/%2C/'),
-            'url13': ('{% url "template_tests.views.client_action" id=client.id action=arg|join:"-" %}', {'client': {'id': 1}, 'arg':['a','b']}, '/url_tag/client/1/a-b/'),
-            'url14': ('{% url "template_tests.views.client_action" client.id arg|join:"-" %}', {'client': {'id': 1}, 'arg':['a','b']}, '/url_tag/client/1/a-b/'),
+            'url13': ('{% url "template_tests.views.client_action" id=client.id action=arg|join:"-" %}', {'client': {'id': 1}, 'arg': ['a', 'b']}, '/url_tag/client/1/a-b/'),
+            'url14': ('{% url "template_tests.views.client_action" client.id arg|join:"-" %}', {'client': {'id': 1}, 'arg': ['a', 'b']}, '/url_tag/client/1/a-b/'),
             'url15': ('{% url "template_tests.views.client_action" 12 "test" %}', {}, '/url_tag/client/12/test/'),
             'url18': ('{% url "template_tests.views.client" "1,2" %}', {}, '/url_tag/client/1%2C2/'),
 
@@ -1809,7 +1809,7 @@ class TemplateTests(TransRealMixin, TestCase):
             'autoescape-filters02': ('{{ var|join:" & \" }}', {"var": ("Tom", "Dick", "Harry")}, "Tom & Dick & Harry"),
 
             # Literal strings are safe.
-            'autoescape-literals01': ('{{ "this & that" }}',{}, "this & that"),
+            'autoescape-literals01': ('{{ "this & that" }}', {}, "this & that"),
 
             # Iterating over strings outputs safe characters.
             'autoescape-stringiterations01': ('{% for l in var %}{{ l }},{% endfor %}', {'var': 'K&R'}, "K,&amp;,R,"),
