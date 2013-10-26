@@ -78,7 +78,7 @@ def urlencode(query, doseq=0):
         query = query.items()
     return original_urlencode(
         [(force_str(k),
-         [force_str(i) for i in v] if isinstance(v, (list,tuple)) else force_str(v))
+         [force_str(i) for i in v] if isinstance(v, (list, tuple)) else force_str(v))
             for k, v in query],
         doseq)
 

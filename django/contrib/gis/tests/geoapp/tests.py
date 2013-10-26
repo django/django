@@ -24,7 +24,7 @@ if HAS_GEOS and not spatialite:
 
 
 def postgis_bug_version():
-    spatial_version = getattr(connection.ops, "spatial_version", (0,0,0))
+    spatial_version = getattr(connection.ops, "spatial_version", (0, 0, 0))
     return spatial_version and (2, 0, 0) <= spatial_version <= (2, 0, 1)
 
 

@@ -258,7 +258,7 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
 
 
 def _to_tuple(s):
-    t = s.split('=',1)
+    t = s.split('=', 1)
     if len(t) == 2:
         return t[0].lower(), t[1]
     return t[0].lower(), True

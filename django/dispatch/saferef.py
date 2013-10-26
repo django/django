@@ -90,7 +90,7 @@ class BoundMethodWeakref(object):
         else:
             base = super(BoundMethodWeakref, cls).__new__(cls)
             cls._allInstances[key] = base
-            base.__init__(target, onDelete, *arguments,**named)
+            base.__init__(target, onDelete, *arguments, **named)
             return base
 
     def __init__(self, target, onDelete=None):
@@ -139,7 +139,7 @@ class BoundMethodWeakref(object):
         Currently this is a two-tuple of the id()'s of the
         target object and the target function respectively.
         """
-        return (id(target.__self__),id(target.__func__))
+        return (id(target.__self__), id(target.__func__))
     calculateKey = classmethod(calculateKey)
 
     def __str__(self):

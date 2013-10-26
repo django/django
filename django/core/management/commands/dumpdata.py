@@ -18,7 +18,7 @@ class Command(BaseCommand):
         make_option('--database', action='store', dest='database',
             default=DEFAULT_DB_ALIAS, help='Nominates a specific database to dump '
                 'fixtures from. Defaults to the "default" database.'),
-        make_option('-e', '--exclude', dest='exclude',action='append', default=[],
+        make_option('-e', '--exclude', dest='exclude', action='append', default=[],
             help='An appname or appname.ModelName to exclude (use multiple --exclude to exclude multiple apps/models).'),
         make_option('-n', '--natural', action='store_true', dest='use_natural_keys', default=False,
             help='Use natural keys if they are available.'),

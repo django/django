@@ -26,7 +26,7 @@ class InspectDbTests(TestCase):
         """
         out = StringIO()
         call_command('inspectdb',
-                 table_name_filter=lambda tn:tn.startswith('inspectapp_'),
+                 table_name_filter=lambda tn: tn.startswith('inspectapp_'),
                  stdout=out)
         output = out.getvalue()
         self.assertIn('geom = models.PolygonField()', output)

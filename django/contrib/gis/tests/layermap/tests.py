@@ -255,7 +255,7 @@ class LayerMapTest(TestCase):
         # Testing the `step` keyword -- should get the same counties
         # regardless of we use a step that divides equally, that is odd,
         # or that is larger than the dataset.
-        for st in (4,7,1000):
+        for st in (4, 7, 1000):
             clear_counties()
             lm.save(step=st, strict=True)
             self.county_helper(county_feat=False)

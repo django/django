@@ -40,7 +40,7 @@ def cleanse_setting(key, value):
             cleansed = CLEANSED_SUBSTITUTE
         else:
             if isinstance(value, dict):
-                cleansed = dict((k, cleanse_setting(k, v)) for k,v in value.items())
+                cleansed = dict((k, cleanse_setting(k, v)) for k, v in value.items())
             else:
                 cleansed = value
     except TypeError:

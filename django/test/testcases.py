@@ -375,7 +375,7 @@ class SimpleTestCase(unittest.TestCase):
 
         # Search all contexts for the error.
         found_form = False
-        for i,context in enumerate(contexts):
+        for i, context in enumerate(contexts):
             if form not in context:
                 continue
             found_form = True
@@ -600,7 +600,7 @@ class SimpleTestCase(unittest.TestCase):
             self.assertEqual(optional.clean(e), empty_value)
         # test that max_length and min_length are always accepted
         if issubclass(fieldclass, CharField):
-            field_kwargs.update({'min_length':2, 'max_length':20})
+            field_kwargs.update({'min_length': 2, 'max_length': 20})
             self.assertTrue(isinstance(fieldclass(*field_args, **field_kwargs),
                                        fieldclass))
 

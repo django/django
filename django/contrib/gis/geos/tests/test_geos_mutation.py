@@ -109,7 +109,7 @@ class GEOSMutationTest(unittest.TestCase):
 
             # _set_single
             ls._set_single(0, (-50, 25))
-            self.assertEqual(ls.coords, ((-50.0, 25.0),(4.0, 1.0),(6.0, -1.0)), 'LineString _set_single')
+            self.assertEqual(ls.coords, ((-50.0, 25.0), (4.0, 1.0), (6.0, -1.0)), 'LineString _set_single')
 
             # _set_list
             ls._set_list(2, ((-50.0, 25.0), (6.0, -1.0)))
@@ -121,23 +121,23 @@ class GEOSMutationTest(unittest.TestCase):
 
     def test05_Polygon(self):
         'Testing Polygon mutations'
-        for pg in (Polygon(((1,0),(4,1),(6,-1),(8,10),(1,0)),
-                            ((5,4),(6,4),(6,3),(5,4))),
+        for pg in (Polygon(((1, 0), (4, 1), (6, -1), (8, 10), (1, 0)),
+                            ((5, 4), (6, 4), (6, 3), (5, 4))),
                     fromstr('POLYGON ((1 0,4 1,6 -1,8 10,1 0),(5 4,6 4,6 3,5 4))')):
             self.assertEqual(pg._get_single_external(0),
-                            LinearRing((1,0),(4,1),(6,-1),(8,10),(1,0)),
+                            LinearRing((1, 0), (4, 1), (6, -1), (8, 10), (1, 0)),
                             'Polygon _get_single_external(0)')
             self.assertEqual(pg._get_single_external(1),
-                            LinearRing((5,4),(6,4),(6,3),(5,4)),
+                            LinearRing((5, 4), (6, 4), (6, 3), (5, 4)),
                             'Polygon _get_single_external(1)')
 
             # _set_list
-            pg._set_list(2, (((1,2),(10,0),(12,9),(-1,15),(1,2)),
-                             ((4,2),(5,2),(5,3),(4,2))))
+            pg._set_list(2, (((1, 2), (10, 0), (12, 9), (-1, 15), (1, 2)),
+                             ((4, 2), (5, 2), (5, 3), (4, 2))))
             self.assertEqual(
                 pg.coords,
-                (((1.0,2.0),(10.0,0.0),(12.0,9.0),(-1.0,15.0),(1.0,2.0)),
-                 ((4.0,2.0),(5.0,2.0),(5.0,3.0),(4.0,2.0))),
+                (((1.0, 2.0), (10.0, 0.0), (12.0, 9.0), (-1.0, 15.0), (1.0, 2.0)),
+                 ((4.0, 2.0), (5.0, 2.0), (5.0, 3.0), (4.0, 2.0))),
                 'Polygon _set_list')
 
             lsa = Polygon(*pg.coords)
@@ -146,13 +146,13 @@ class GEOSMutationTest(unittest.TestCase):
 
     def test06_Collection(self):
         'Testing Collection mutations'
-        for mp in (MultiPoint(*map(Point,((3,4),(-1,2),(5,-4),(2,8)))),
+        for mp in (MultiPoint(*map(Point, ((3, 4), (-1, 2), (5, -4), (2, 8)))),
                     fromstr('MULTIPOINT (3 4,-1 2,5 -4,2 8)')):
-            self.assertEqual(mp._get_single_external(2), Point(5,-4), 'Collection _get_single_external')
+            self.assertEqual(mp._get_single_external(2), Point(5, -4), 'Collection _get_single_external')
 
-            mp._set_list(3, map(Point,((5,5),(3,-2),(8,1))))
-            self.assertEqual(mp.coords, ((5.0,5.0),(3.0,-2.0),(8.0,1.0)), 'Collection _set_list')
+            mp._set_list(3, map(Point, ((5, 5), (3, -2), (8, 1))))
+            self.assertEqual(mp.coords, ((5.0, 5.0), (3.0, -2.0), (8.0, 1.0)), 'Collection _set_list')
 
-            lsa = MultiPoint(*map(Point,((5,5),(3,-2),(8,1))))
+            lsa = MultiPoint(*map(Point, ((5, 5), (3, -2), (8, 1))))
             for f in geos_function_tests:
                 self.assertEqual(f(lsa), f(mp), 'MultiPoint ' + f.__name__)

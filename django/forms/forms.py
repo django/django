@@ -235,7 +235,7 @@ class BaseForm(object):
                     # not be able to conscript the last row for our purposes,
                     # so insert a new, empty row.
                     last_row = (normal_row % {'errors': '', 'label': '',
-                                              'field': '', 'help_text':'',
+                                              'field': '', 'help_text': '',
                                               'html_class_attr': html_class_attr})
                     output.append(last_row)
                 output[-1] = last_row[:-len(row_ender)] + str_hidden + row_ender

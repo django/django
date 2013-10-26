@@ -62,7 +62,7 @@ class LineString(GEOSGeometry):
 
         for i in xrange(ncoords):
             if numpy_coords:
-                cs[i] = coords[i,:]
+                cs[i] = coords[i, :]
             elif isinstance(coords[i], Point):
                 cs[i] = coords[i].tuple
             else:

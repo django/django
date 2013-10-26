@@ -34,7 +34,7 @@ def color_style():
             # Use that palette as the basis for populating
             # the palette as defined in the environment.
             for role in termcolors.PALETTES[termcolors.NOCOLOR_PALETTE]:
-                format = color_settings.get(role,{})
+                format = color_settings.get(role, {})
                 setattr(style, role, termcolors.make_style(**format))
             # For backwards compatibility,
             # set style for ERROR_OUTPUT == ERROR

@@ -28,7 +28,7 @@ __all__ = (
     'SplitDateTimeWidget', 'SplitHiddenDateTimeWidget',
 )
 
-MEDIA_TYPES = ('css','js')
+MEDIA_TYPES = ('css', 'js')
 
 @python_2_unicode_compatible
 class Media(object):

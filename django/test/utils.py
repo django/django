@@ -285,8 +285,8 @@ def compare_xml(want, got):
                 return node
 
     want, got = strip_quotes(want, got)
-    want = want.replace('\\n','\n')
-    got = got.replace('\\n','\n')
+    want = want.replace('\\n', '\n')
+    got = got.replace('\\n', '\n')
 
     # If the string is not a complete xml document, we may need to add a
     # root element. This allow us to compare fragments, like "<foo/><bar/>"

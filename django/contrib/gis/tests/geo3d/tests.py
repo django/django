@@ -196,7 +196,7 @@ class Geo3DTest(TestCase):
         """
         self._load_city_data()
         # `SELECT ST_Extent3D(point) FROM geo3d_city3d;`
-        ref_extent3d = (-123.305196, -41.315268, 14,174.783117, 48.462611, 1433)
+        ref_extent3d = (-123.305196, -41.315268, 14, 174.783117, 48.462611, 1433)
         extent1 = City3D.objects.aggregate(Extent3D('point'))['point__extent3d']
         extent2 = City3D.objects.extent3d()
 
