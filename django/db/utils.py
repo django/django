@@ -110,7 +110,7 @@ class DatabaseErrorWrapper(object):
 def load_backend(backend_name):
     # Look for a fully qualified database backend name
     try:
-        return import_module('.base', backend_name)
+        return import_module('%s.base' % backend_name)
     except ImportError as e_user:
         # The database backend wasn't found. Display a helpful error message
         # listing all possible (built-in) database backends.

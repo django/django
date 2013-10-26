@@ -54,7 +54,7 @@ def iter_format_modules(lang):
         for location in format_locations:
             for loc in locales:
                 try:
-                    yield import_module('.formats', location % loc)
+                    yield import_module('%s.formats' % (location % loc))
                 except ImportError:
                     pass
 

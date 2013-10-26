@@ -96,7 +96,7 @@ class AppCache(object):
         self.nesting_level += 1
         app_module = import_module(app_name)
         try:
-            models = import_module('.models', app_name)
+            models = import_module('%s.models' % app_name)
         except ImportError:
             self.nesting_level -= 1
             # If the app doesn't have a models module, we can just ignore the
