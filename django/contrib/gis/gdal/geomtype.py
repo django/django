@@ -9,23 +9,23 @@ class OGRGeomType(object):
     wkb25bit = -2147483648
 
     # Dictionary of acceptable OGRwkbGeometryType s and their string names.
-    _types = {0 : 'Unknown',
-              1 : 'Point',
-              2 : 'LineString',
-              3 : 'Polygon',
-              4 : 'MultiPoint',
-              5 : 'MultiLineString',
-              6 : 'MultiPolygon',
-              7 : 'GeometryCollection',
-              100 : 'None',
-              101 : 'LinearRing',
+    _types = {0: 'Unknown',
+              1: 'Point',
+              2: 'LineString',
+              3: 'Polygon',
+              4: 'MultiPoint',
+              5: 'MultiLineString',
+              6: 'MultiPolygon',
+              7: 'GeometryCollection',
+              100: 'None',
+              101: 'LinearRing',
               1 + wkb25bit: 'Point25D',
               2 + wkb25bit: 'LineString25D',
               3 + wkb25bit: 'Polygon25D',
               4 + wkb25bit: 'MultiPoint25D',
-              5 + wkb25bit : 'MultiLineString25D',
-              6 + wkb25bit : 'MultiPolygon25D',
-              7 + wkb25bit : 'GeometryCollection25D',
+              5 + wkb25bit: 'MultiLineString25D',
+              6 + wkb25bit: 'MultiPolygon25D',
+              7 + wkb25bit: 'GeometryCollection25D',
               }
     # Reverse type dictionary, keyed by lower-case of the name.
     _str_types = dict((v.lower(), k) for k, v in _types.items())

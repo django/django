@@ -9,13 +9,13 @@ class GeoFlexibleFieldLookupDict(FlexibleFieldLookupDict):
     """
     base_data_types_reverse = FlexibleFieldLookupDict.base_data_types_reverse.copy()
     base_data_types_reverse.update(
-        {'point' : 'GeometryField',
-         'linestring' : 'GeometryField',
-         'polygon' : 'GeometryField',
-         'multipoint' : 'GeometryField',
-         'multilinestring' : 'GeometryField',
-         'multipolygon' : 'GeometryField',
-         'geometrycollection' : 'GeometryField',
+        {'point': 'GeometryField',
+         'linestring': 'GeometryField',
+         'polygon': 'GeometryField',
+         'multipoint': 'GeometryField',
+         'multilinestring': 'GeometryField',
+         'multipolygon': 'GeometryField',
+         'geometrycollection': 'GeometryField',
          })
 
 class SpatiaLiteIntrospection(DatabaseIntrospection):

@@ -38,16 +38,16 @@ def get_filter_tests():
     # NOTE: \xa0 avoids wrapping between value and unit
     return {
         # Default compare with datetime.now()
-        'filter-timesince01' : ('{{ a|timesince }}', {'a': datetime.now() + timedelta(minutes=-1, seconds = -10)}, '1\xa0minute'),
-        'filter-timesince02' : ('{{ a|timesince }}', {'a': datetime.now() - timedelta(days=1, minutes = 1)}, '1\xa0day'),
-        'filter-timesince03' : ('{{ a|timesince }}', {'a': datetime.now() - timedelta(hours=1, minutes=25, seconds = 10)}, '1\xa0hour, 25\xa0minutes'),
+        'filter-timesince01': ('{{ a|timesince }}', {'a': datetime.now() + timedelta(minutes=-1, seconds = -10)}, '1\xa0minute'),
+        'filter-timesince02': ('{{ a|timesince }}', {'a': datetime.now() - timedelta(days=1, minutes = 1)}, '1\xa0day'),
+        'filter-timesince03': ('{{ a|timesince }}', {'a': datetime.now() - timedelta(hours=1, minutes=25, seconds = 10)}, '1\xa0hour, 25\xa0minutes'),
 
         # Compare to a given parameter
-        'filter-timesince04' : ('{{ a|timesince:b }}', {'a': now - timedelta(days=2), 'b': now - timedelta(days=1)}, '1\xa0day'),
-        'filter-timesince05' : ('{{ a|timesince:b }}', {'a': now - timedelta(days=2, minutes=1), 'b': now - timedelta(days=2)}, '1\xa0minute'),
+        'filter-timesince04': ('{{ a|timesince:b }}', {'a': now - timedelta(days=2), 'b': now - timedelta(days=1)}, '1\xa0day'),
+        'filter-timesince05': ('{{ a|timesince:b }}', {'a': now - timedelta(days=2, minutes=1), 'b': now - timedelta(days=2)}, '1\xa0minute'),
 
         # Check that timezone is respected
-        'filter-timesince06' : ('{{ a|timesince:b }}', {'a': now_tz - timedelta(hours=8), 'b': now_tz}, '8\xa0hours'),
+        'filter-timesince06': ('{{ a|timesince:b }}', {'a': now_tz - timedelta(hours=8), 'b': now_tz}, '8\xa0hours'),
 
         # Regression for #7443
         'filter-timesince07': ('{{ earlier|timesince }}', {'earlier': now - timedelta(days=7)}, '1\xa0week'),
@@ -57,25 +57,25 @@ def get_filter_tests():
 
         # Ensures that differing timezones are calculated correctly
         # Tests trying to compare a timezone-aware 'now' to now aren't supported on no-tz-support systems (e.g Windows).
-        'filter-timesince11' : ('{{ a|timesince }}', {'a': now}, '0\xa0minutes'),
-        'filter-timesince12' : ('{{ a|timesince }}', {'a': now_tz}, '0\xa0minutes') if TZ_SUPPORT else ('', {}, ''),
-        'filter-timesince13' : ('{{ a|timesince }}', {'a': now_tz_i}, '0\xa0minutes') if TZ_SUPPORT else ('', {}, ''),
-        'filter-timesince14' : ('{{ a|timesince:b }}', {'a': now_tz, 'b': now_tz_i}, '0\xa0minutes'),
-        'filter-timesince15' : ('{{ a|timesince:b }}', {'a': now, 'b': now_tz_i}, ''),
-        'filter-timesince16' : ('{{ a|timesince:b }}', {'a': now_tz_i, 'b': now}, ''),
+        'filter-timesince11': ('{{ a|timesince }}', {'a': now}, '0\xa0minutes'),
+        'filter-timesince12': ('{{ a|timesince }}', {'a': now_tz}, '0\xa0minutes') if TZ_SUPPORT else ('', {}, ''),
+        'filter-timesince13': ('{{ a|timesince }}', {'a': now_tz_i}, '0\xa0minutes') if TZ_SUPPORT else ('', {}, ''),
+        'filter-timesince14': ('{{ a|timesince:b }}', {'a': now_tz, 'b': now_tz_i}, '0\xa0minutes'),
+        'filter-timesince15': ('{{ a|timesince:b }}', {'a': now, 'b': now_tz_i}, ''),
+        'filter-timesince16': ('{{ a|timesince:b }}', {'a': now_tz_i, 'b': now}, ''),
 
         # Regression for #9065 (two date objects).
-        'filter-timesince17' : ('{{ a|timesince:b }}', {'a': today, 'b': today}, '0\xa0minutes'),
-        'filter-timesince18' : ('{{ a|timesince:b }}', {'a': today, 'b': today + timedelta(hours=24)}, '1\xa0day'),
+        'filter-timesince17': ('{{ a|timesince:b }}', {'a': today, 'b': today}, '0\xa0minutes'),
+        'filter-timesince18': ('{{ a|timesince:b }}', {'a': today, 'b': today + timedelta(hours=24)}, '1\xa0day'),
 
         # Default compare with datetime.now()
-        'filter-timeuntil01' : ('{{ a|timeuntil }}', {'a': datetime.now() + timedelta(minutes=2, seconds=10)}, '2\xa0minutes'),
-        'filter-timeuntil02' : ('{{ a|timeuntil }}', {'a': (datetime.now() + timedelta(days=1, seconds=10))}, '1\xa0day'),
-        'filter-timeuntil03' : ('{{ a|timeuntil }}', {'a': (datetime.now() + timedelta(hours=8, minutes=10, seconds = 10))}, '8\xa0hours, 10\xa0minutes'),
+        'filter-timeuntil01': ('{{ a|timeuntil }}', {'a': datetime.now() + timedelta(minutes=2, seconds=10)}, '2\xa0minutes'),
+        'filter-timeuntil02': ('{{ a|timeuntil }}', {'a': (datetime.now() + timedelta(days=1, seconds=10))}, '1\xa0day'),
+        'filter-timeuntil03': ('{{ a|timeuntil }}', {'a': (datetime.now() + timedelta(hours=8, minutes=10, seconds = 10))}, '8\xa0hours, 10\xa0minutes'),
 
         # Compare to a given parameter
-        'filter-timeuntil04' : ('{{ a|timeuntil:b }}', {'a': now - timedelta(days=1), 'b': now - timedelta(days=2)}, '1\xa0day'),
-        'filter-timeuntil05' : ('{{ a|timeuntil:b }}', {'a': now - timedelta(days=2), 'b': now - timedelta(days=2, minutes=1)}, '1\xa0minute'),
+        'filter-timeuntil04': ('{{ a|timeuntil:b }}', {'a': now - timedelta(days=1), 'b': now - timedelta(days=2)}, '1\xa0day'),
+        'filter-timeuntil05': ('{{ a|timeuntil:b }}', {'a': now - timedelta(days=2), 'b': now - timedelta(days=2, minutes=1)}, '1\xa0minute'),
 
         # Regression for #7443
         'filter-timeuntil06': ('{{ earlier|timeuntil }}', {'earlier': now - timedelta(days=7)}, '0\xa0minutes'),
@@ -85,13 +85,13 @@ def get_filter_tests():
 
         # Ensures that differing timezones are calculated correctly
         # Tests trying to compare a timezone-aware 'now' to now aren't supported on no-tz-support systems (e.g Windows).
-        'filter-timeuntil10' : ('{{ a|timeuntil }}', {'a': now_tz}, '0\xa0minutes') if TZ_SUPPORT else ('', {}, ''),
-        'filter-timeuntil11' : ('{{ a|timeuntil }}', {'a': now_tz_i}, '0\xa0minutes') if TZ_SUPPORT else ('', {}, ''),
-        'filter-timeuntil12' : ('{{ a|timeuntil:b }}', {'a': now_tz_i, 'b': now_tz}, '0\xa0minutes'),
+        'filter-timeuntil10': ('{{ a|timeuntil }}', {'a': now_tz}, '0\xa0minutes') if TZ_SUPPORT else ('', {}, ''),
+        'filter-timeuntil11': ('{{ a|timeuntil }}', {'a': now_tz_i}, '0\xa0minutes') if TZ_SUPPORT else ('', {}, ''),
+        'filter-timeuntil12': ('{{ a|timeuntil:b }}', {'a': now_tz_i, 'b': now_tz}, '0\xa0minutes'),
 
         # Regression for #9065 (two date objects).
-        'filter-timeuntil13' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today}, '0\xa0minutes'),
-        'filter-timeuntil14' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today - timedelta(hours=24)}, '1\xa0day'),
+        'filter-timeuntil13': ('{{ a|timeuntil:b }}', {'a': today, 'b': today}, '0\xa0minutes'),
+        'filter-timeuntil14': ('{{ a|timeuntil:b }}', {'a': today, 'b': today - timedelta(hours=24)}, '1\xa0day'),
 
         'filter-addslash01': ("{% autoescape off %}{{ a|addslashes }} {{ b|addslashes }}{% endautoescape %}", {"a": "<a>'", "b": mark_safe("<a>'")}, r"<a>\' <a>\'"),
         'filter-addslash02': ("{{ a|addslashes }} {{ b|addslashes }}", {"a": "<a>'", "b": mark_safe("<a>'")}, r"&lt;a&gt;\&#39; <a>\'"),
@@ -135,8 +135,8 @@ def get_filter_tests():
             ".  a&lt;b. .  a<b."),
 
         # Test the title filter
-        'filter-title1' : ('{{ a|title }}', {'a' : 'JOE\'S CRAB SHACK'}, 'Joe&#39;s Crab Shack'),
-        'filter-title2' : ('{{ a|title }}', {'a' : '555 WEST 53RD STREET'}, '555 West 53rd Street'),
+        'filter-title1': ('{{ a|title }}', {'a': 'JOE\'S CRAB SHACK'}, 'Joe&#39;s Crab Shack'),
+        'filter-title2': ('{{ a|title }}', {'a': '555 WEST 53RD STREET'}, '555 West 53rd Street'),
 
         'filter-truncatewords01': ('{% autoescape off %}{{ a|truncatewords:"2" }} {{ b|truncatewords:"2"}}{% endautoescape %}',
             {"a": "alpha & bravo", "b": mark_safe("alpha &amp; bravo")}, "alpha & ... alpha &amp; ..."),

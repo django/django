@@ -45,7 +45,7 @@ callable_year.admin_order_field = 'date'
 class ArticleInline(admin.TabularInline):
     model = Article
     prepopulated_fields = {
-        'title' : ('content',)
+        'title': ('content',)
     }
     fieldsets = (
         ('Some fields', {
@@ -382,7 +382,7 @@ class SubPostInline(admin.TabularInline):
     model = PrePopulatedSubPost
 
     prepopulated_fields = {
-        'subslug' : ('subtitle',)
+        'subslug': ('subtitle',)
     }
 
     def get_readonly_fields(self, request, obj=None):
@@ -399,7 +399,7 @@ class SubPostInline(admin.TabularInline):
 class PrePopulatedPostAdmin(admin.ModelAdmin):
     list_display = ['title', 'slug']
     prepopulated_fields = {
-        'slug' : ('title',)
+        'slug': ('title',)
     }
 
     inlines = [SubPostInline]
@@ -569,7 +569,7 @@ class AlbumAdmin(admin.ModelAdmin):
 
 class PrePopulatedPostLargeSlugAdmin(admin.ModelAdmin):
     prepopulated_fields = {
-        'slug' : ('title',)
+        'slug': ('title',)
     }
 
 

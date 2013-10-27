@@ -398,7 +398,7 @@ def admin_list_filter(cl, spec):
     tpl = get_template(spec.template)
     return tpl.render(Context({
         'title': spec.title,
-        'choices' : list(spec.choices(cl)),
+        'choices': list(spec.choices(cl)),
         'spec': spec,
     }))
 

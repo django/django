@@ -23,7 +23,7 @@ def serve(request, path, document_root=None, show_indexes=False):
 
     To use, put a URL pattern such as::
 
-        (r'^(?P<path>.*)$', 'django.views.static.serve', {'document_root' : '/path/to/my/files/'})
+        (r'^(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/my/files/'})
 
     in your URLconf. You must provide the ``document_root`` param. You may
     also set ``show_indexes`` to ``True`` if you'd like to serve a basic index
@@ -108,8 +108,8 @@ def directory_index(path, fullpath):
                 f += '/'
             files.append(f)
     c = Context({
-        'directory' : path + '/',
-        'file_list' : files,
+        'directory': path + '/',
+        'file_list': files,
     })
     return HttpResponse(t.render(c))
 

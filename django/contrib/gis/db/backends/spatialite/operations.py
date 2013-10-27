@@ -86,31 +86,31 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
     select = 'AsText(%s)'
 
     geometry_functions = {
-        'equals' : SpatiaLiteFunction('Equals'),
-        'disjoint' : SpatiaLiteFunction('Disjoint'),
-        'touches' : SpatiaLiteFunction('Touches'),
-        'crosses' : SpatiaLiteFunction('Crosses'),
-        'within' : SpatiaLiteFunction('Within'),
-        'overlaps' : SpatiaLiteFunction('Overlaps'),
-        'contains' : SpatiaLiteFunction('Contains'),
-        'intersects' : SpatiaLiteFunction('Intersects'),
-        'relate' : (SpatiaLiteRelate, six.string_types),
+        'equals': SpatiaLiteFunction('Equals'),
+        'disjoint': SpatiaLiteFunction('Disjoint'),
+        'touches': SpatiaLiteFunction('Touches'),
+        'crosses': SpatiaLiteFunction('Crosses'),
+        'within': SpatiaLiteFunction('Within'),
+        'overlaps': SpatiaLiteFunction('Overlaps'),
+        'contains': SpatiaLiteFunction('Contains'),
+        'intersects': SpatiaLiteFunction('Intersects'),
+        'relate': (SpatiaLiteRelate, six.string_types),
         # Returns true if B's bounding box completely contains A's bounding box.
-        'contained' : SpatiaLiteFunction('MbrWithin'),
+        'contained': SpatiaLiteFunction('MbrWithin'),
         # Returns true if A's bounding box completely contains B's bounding box.
-        'bbcontains' : SpatiaLiteFunction('MbrContains'),
+        'bbcontains': SpatiaLiteFunction('MbrContains'),
         # Returns true if A's bounding box overlaps B's bounding box.
-        'bboverlaps' : SpatiaLiteFunction('MbrOverlaps'),
+        'bboverlaps': SpatiaLiteFunction('MbrOverlaps'),
         # These are implemented here as synonyms for Equals
-        'same_as' : SpatiaLiteFunction('Equals'),
-        'exact' : SpatiaLiteFunction('Equals'),
+        'same_as': SpatiaLiteFunction('Equals'),
+        'exact': SpatiaLiteFunction('Equals'),
     }
 
     distance_functions = {
-        'distance_gt' : (get_dist_ops('>'), dtypes),
-        'distance_gte' : (get_dist_ops('>='), dtypes),
-        'distance_lt' : (get_dist_ops('<'), dtypes),
-        'distance_lte' : (get_dist_ops('<='), dtypes),
+        'distance_gt': (get_dist_ops('>'), dtypes),
+        'distance_gte': (get_dist_ops('>='), dtypes),
+        'distance_lt': (get_dist_ops('<'), dtypes),
+        'distance_lte': (get_dist_ops('<='), dtypes),
     }
     geometry_functions.update(distance_functions)
 

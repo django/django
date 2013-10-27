@@ -166,7 +166,7 @@ class LayerMapTest(TestCase):
         bad_fk_map1 = copy(co_mapping)
         bad_fk_map1['state'] = 'name'
         bad_fk_map2 = copy(co_mapping)
-        bad_fk_map2['state'] = {'nombre' : 'State'}
+        bad_fk_map2['state'] = {'nombre': 'State'}
         self.assertRaises(TypeError, LayerMapping, County, co_shp, bad_fk_map1, transform=False)
         self.assertRaises(LayerMapError, LayerMapping, County, co_shp, bad_fk_map2, transform=False)
 
@@ -262,11 +262,11 @@ class LayerMapTest(TestCase):
 
     def test_model_inheritance(self):
         "Tests LayerMapping on inherited models.  See #12093."
-        icity_mapping = {'name' : 'Name',
-                         'population' : 'Population',
-                         'density' : 'Density',
-                         'point' : 'POINT',
-                         'dt' : 'Created',
+        icity_mapping = {'name': 'Name',
+                         'population': 'Population',
+                         'density': 'Density',
+                         'point': 'POINT',
+                         'dt': 'Created',
                          }
 
         # Parent model has geometry field.

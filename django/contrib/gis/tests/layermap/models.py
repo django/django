@@ -48,23 +48,23 @@ class Invalid(models.Model):
     point = models.PointField()
 
 # Mapping dictionaries for the models above.
-co_mapping = {'name' : 'Name',
-              'state' : {'name' : 'State'}, # ForeignKey's use another mapping dictionary for the _related_ Model (State in this case).
-              'mpoly' : 'MULTIPOLYGON', # Will convert POLYGON features into MULTIPOLYGONS.
+co_mapping = {'name': 'Name',
+              'state': {'name': 'State'}, # ForeignKey's use another mapping dictionary for the _related_ Model (State in this case).
+              'mpoly': 'MULTIPOLYGON', # Will convert POLYGON features into MULTIPOLYGONS.
               }
 
-cofeat_mapping = {'name' : 'Name',
-                  'poly' : 'POLYGON',
+cofeat_mapping = {'name': 'Name',
+                  'poly': 'POLYGON',
                   }
 
-city_mapping = {'name' : 'Name',
-                'population' : 'Population',
-                'density' : 'Density',
-                'dt' : 'Created',
-                'point' : 'POINT',
+city_mapping = {'name': 'Name',
+                'population': 'Population',
+                'density': 'Density',
+                'dt': 'Created',
+                'point': 'POINT',
                 }
 
-inter_mapping = {'name' : 'Name',
-                 'length' : 'Length',
-                 'path' : 'LINESTRING',
+inter_mapping = {'name': 'Name',
+                 'length': 'Length',
+                 'path': 'LINESTRING',
                  }

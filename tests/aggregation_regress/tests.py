@@ -113,7 +113,7 @@ class AggregationTests(TestCase):
 
         # Aggregate overrides extra selected column
         self.assertEqual(
-            Book.objects.extra(select={'price_per_page' : 'price / pages'}).aggregate(Sum('pages')),
+            Book.objects.extra(select={'price_per_page': 'price / pages'}).aggregate(Sum('pages')),
             {'pages__sum': 3703}
         )
 
@@ -136,7 +136,7 @@ class AggregationTests(TestCase):
         self.assertTrue(obj.manufacture_cost == 11.545 or obj.manufacture_cost == Decimal('11.545'))
 
         # Order of the annotate/extra in the query doesn't matter
-        obj = Book.objects.extra(select={'manufacture_cost' : 'price * .5'}).annotate(mean_auth_age=Avg('authors__age')).get(pk=2)
+        obj = Book.objects.extra(select={'manufacture_cost': 'price * .5'}).annotate(mean_auth_age=Avg('authors__age')).get(pk=2)
         self.assertObjectAttrs(obj,
             contact_id=3,
             id=2,
@@ -153,7 +153,7 @@ class AggregationTests(TestCase):
         self.assertTrue(obj.manufacture_cost == 11.545 or obj.manufacture_cost == Decimal('11.545'))
 
         # Values queries can be combined with annotate and extra
-        obj = Book.objects.annotate(mean_auth_age=Avg('authors__age')).extra(select={'manufacture_cost' : 'price * .5'}).values().get(pk=2)
+        obj = Book.objects.annotate(mean_auth_age=Avg('authors__age')).extra(select={'manufacture_cost': 'price * .5'}).values().get(pk=2)
         manufacture_cost = obj['manufacture_cost']
         self.assertTrue(manufacture_cost == 11.545 or manufacture_cost == Decimal('11.545'))
         del obj['manufacture_cost']
@@ -172,7 +172,7 @@ class AggregationTests(TestCase):
 
         # The order of the (empty) values, annotate and extra clauses doesn't
         # matter
-        obj = Book.objects.values().annotate(mean_auth_age=Avg('authors__age')).extra(select={'manufacture_cost' : 'price * .5'}).get(pk=2)
+        obj = Book.objects.values().annotate(mean_auth_age=Avg('authors__age')).extra(select={'manufacture_cost': 'price * .5'}).get(pk=2)
         manufacture_cost = obj['manufacture_cost']
         self.assertTrue(manufacture_cost == 11.545 or manufacture_cost == Decimal('11.545'))
         del obj['manufacture_cost']
@@ -191,12 +191,12 @@ class AggregationTests(TestCase):
 
         # If the annotation precedes the values clause, it won't be included
         # unless it is explicitly named
-        obj = Book.objects.annotate(mean_auth_age=Avg('authors__age')).extra(select={'price_per_page' : 'price / pages'}).values('name').get(pk=1)
+        obj = Book.objects.annotate(mean_auth_age=Avg('authors__age')).extra(select={'price_per_page': 'price / pages'}).values('name').get(pk=1)
         self.assertEqual(obj, {
             "name": 'The Definitive Guide to Django: Web Development Done Right',
         })
 
-        obj = Book.objects.annotate(mean_auth_age=Avg('authors__age')).extra(select={'price_per_page' : 'price / pages'}).values('name', 'mean_auth_age').get(pk=1)
+        obj = Book.objects.annotate(mean_auth_age=Avg('authors__age')).extra(select={'price_per_page': 'price / pages'}).values('name', 'mean_auth_age').get(pk=1)
         self.assertEqual(obj, {
             'mean_auth_age': 34.5,
             'name': 'The Definitive Guide to Django: Web Development Done Right',
@@ -214,7 +214,7 @@ class AggregationTests(TestCase):
 
         # The annotations are added to values output if values() precedes
         # annotate()
-        obj = Book.objects.values('name').annotate(mean_auth_age=Avg('authors__age')).extra(select={'price_per_page' : 'price / pages'}).get(pk=1)
+        obj = Book.objects.values('name').annotate(mean_auth_age=Avg('authors__age')).extra(select={'price_per_page': 'price / pages'}).get(pk=1)
         self.assertEqual(obj, {
             'mean_auth_age': 34.5,
             'name': 'The Definitive Guide to Django: Web Development Done Right',
@@ -575,7 +575,7 @@ class AggregationTests(TestCase):
 
         # Regression for #10290 - extra selects with parameters can be used for
         # grouping.
-        qs = Book.objects.annotate(mean_auth_age=Avg('authors__age')).extra(select={'sheets' : '(pages + %s) / %s'}, select_params=[1, 2]).order_by('sheets').values('sheets')
+        qs = Book.objects.annotate(mean_auth_age=Avg('authors__age')).extra(select={'sheets': '(pages + %s) / %s'}, select_params=[1, 2]).order_by('sheets').values('sheets')
         self.assertQuerysetEqual(
             qs, [
                 150,

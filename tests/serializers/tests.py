@@ -28,7 +28,7 @@ from .models import (Category, Author, Article, AuthorProfile, Actor, Movie,
 
 @override_settings(
     SERIALIZATION_MODULES = {
-        "json2" : "django.core.serializers.json",
+        "json2": "django.core.serializers.json",
     }
 )
 class SerializerRegistrationTests(TestCase):

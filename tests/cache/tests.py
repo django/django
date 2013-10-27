@@ -119,13 +119,13 @@ class DummyCacheTests(unittest.TestCase):
     def test_data_types(self):
         "All data types are ignored equally by the dummy cache"
         stuff = {
-            'string'    : 'this is a string',
-            'int'       : 42,
-            'list'      : [1, 2, 3, 4],
-            'tuple'     : (1, 2, 3, 4),
-            'dict'      : {'A': 1, 'B' : 2},
-            'function'  : f,
-            'class'     : C,
+            'string': 'this is a string',
+            'int': 42,
+            'list': [1, 2, 3, 4],
+            'tuple': (1, 2, 3, 4),
+            'dict': {'A': 1, 'B': 2},
+            'function': f,
+            'class': C,
         }
         self.cache.set("stuff", stuff)
         self.assertEqual(self.cache.get("stuff"), None)
@@ -149,7 +149,7 @@ class DummyCacheTests(unittest.TestCase):
             'ascii': 'ascii_value',
             'unicode_ascii': 'Iñtërnâtiônàlizætiøn1',
             'Iñtërnâtiônàlizætiøn': 'Iñtërnâtiônàlizætiøn2',
-            'ascii2': {'x' : 1}
+            'ascii2': {'x': 1}
         }
         for (key, value) in stuff.items():
             self.cache.set(key, value)
@@ -231,8 +231,8 @@ class BaseCacheTests(object):
         self.cache.set('b', 'b')
         self.cache.set('c', 'c')
         self.cache.set('d', 'd')
-        self.assertEqual(self.cache.get_many(['a', 'c', 'd']), {'a' : 'a', 'c' : 'c', 'd' : 'd'})
-        self.assertEqual(self.cache.get_many(['a', 'b', 'e']), {'a' : 'a', 'b' : 'b'})
+        self.assertEqual(self.cache.get_many(['a', 'c', 'd']), {'a': 'a', 'c': 'c', 'd': 'd'})
+        self.assertEqual(self.cache.get_many(['a', 'b', 'e']), {'a': 'a', 'b': 'b'})
 
     def test_delete(self):
         # Cache keys can be deleted
@@ -282,13 +282,13 @@ class BaseCacheTests(object):
     def test_data_types(self):
         # Many different data types can be cached
         stuff = {
-            'string'    : 'this is a string',
-            'int'       : 42,
-            'list'      : [1, 2, 3, 4],
-            'tuple'     : (1, 2, 3, 4),
-            'dict'      : {'A': 1, 'B' : 2},
-            'function'  : f,
-            'class'     : C,
+            'string': 'this is a string',
+            'int': 42,
+            'list': [1, 2, 3, 4],
+            'tuple': (1, 2, 3, 4),
+            'dict': {'A': 1, 'B': 2},
+            'function': f,
+            'class': C,
         }
         self.cache.set("stuff", stuff)
         self.assertEqual(self.cache.get("stuff"), stuff)
@@ -353,7 +353,7 @@ class BaseCacheTests(object):
             'ascii': 'ascii_value',
             'unicode_ascii': 'Iñtërnâtiônàlizætiøn1',
             'Iñtërnâtiônàlizætiøn': 'Iñtërnâtiônàlizætiøn2',
-            'ascii2': {'x' : 1}
+            'ascii2': {'x': 1}
         }
         # Test `set`
         for (key, value) in stuff.items():
@@ -1221,16 +1221,16 @@ class CacheUtils(TestCase):
     def test_patch_cache_control(self):
         tests = (
             # Initial Cache-Control, kwargs to patch_cache_control, expected Cache-Control parts
-            (None, {'private' : True}, set(['private'])),
+            (None, {'private': True}, set(['private'])),
 
             # Test whether private/public attributes are mutually exclusive
-            ('private', {'private' : True}, set(['private'])),
-            ('private', {'public' : True}, set(['public'])),
-            ('public', {'public' : True}, set(['public'])),
-            ('public', {'private' : True}, set(['private'])),
-            ('must-revalidate,max-age=60,private', {'public' : True}, set(['must-revalidate', 'max-age=60', 'public'])),
-            ('must-revalidate,max-age=60,public', {'private' : True}, set(['must-revalidate', 'max-age=60', 'private'])),
-            ('must-revalidate,max-age=60', {'public' : True}, set(['must-revalidate', 'max-age=60', 'public'])),
+            ('private', {'private': True}, set(['private'])),
+            ('private', {'public': True}, set(['public'])),
+            ('public', {'public': True}, set(['public'])),
+            ('public', {'private': True}, set(['private'])),
+            ('must-revalidate,max-age=60,private', {'public': True}, set(['must-revalidate', 'max-age=60', 'public'])),
+            ('must-revalidate,max-age=60,public', {'private': True}, set(['must-revalidate', 'max-age=60', 'private'])),
+            ('must-revalidate,max-age=60', {'public': True}, set(['must-revalidate', 'max-age=60', 'public'])),
         )
 
         cc_delim_re = re.compile(r'\s*,\s*')

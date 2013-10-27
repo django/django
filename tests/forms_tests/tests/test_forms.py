@@ -1793,17 +1793,17 @@ class FormsTestCase(TestCase):
         class NameForm(Form):
             name = NameField(validators=[bad_names])
 
-        form = NameForm(data={'name' : ['bad', 'value']})
+        form = NameForm(data={'name': ['bad', 'value']})
         form.full_clean()
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors, {'name': ['bad value not allowed']})
-        form = NameForm(data={'name' : ['should be overly', 'long for the field names']})
+        form = NameForm(data={'name': ['should be overly', 'long for the field names']})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors, {'name': ['Ensure this value has at most 10 characters (it has 16).',
                                                 'Ensure this value has at most 10 characters (it has 24).']})
-        form = NameForm(data={'name' : ['fname', 'lname']})
+        form = NameForm(data={'name': ['fname', 'lname']})
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data, {'name' : 'fname lname'})
+        self.assertEqual(form.cleaned_data, {'name': 'fname lname'})
 
     def test_multivalue_deep_copy(self):
         """
@@ -1912,7 +1912,7 @@ class FormsTestCase(TestCase):
 
         form = JSONForm(data={'json': '{}'})
         form.full_clean()
-        self.assertEqual(form.cleaned_data, {'json' : {}})
+        self.assertEqual(form.cleaned_data, {'json': {}})
 
     def test_boundfield_label_tag(self):
         class SomeForm(Form):

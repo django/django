@@ -15,11 +15,11 @@ class Driver(GDALBase):
     "Wraps an OGR Data Source Driver."
 
     # Case-insensitive aliases for OGR Drivers.
-    _alias = {'esri' : 'ESRI Shapefile',
-              'shp' : 'ESRI Shapefile',
-              'shape' : 'ESRI Shapefile',
-              'tiger' : 'TIGER',
-              'tiger/line' : 'TIGER',
+    _alias = {'esri': 'ESRI Shapefile',
+              'shp': 'ESRI Shapefile',
+              'shape': 'ESRI Shapefile',
+              'tiger': 'TIGER',
+              'tiger/line': 'TIGER',
               }
 
     def __init__(self, dr_input):

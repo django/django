@@ -103,9 +103,9 @@ class Command(LabelCommand):
         if show_mapping:
             # Constructing the keyword arguments for `mapping`, and
             # calling it on the data source.
-            kwargs = {'geom_name' : options['geom_name'],
-                      'layer_key' : options['layer_key'],
-                      'multi_geom' : options['multi_geom'],
+            kwargs = {'geom_name': options['geom_name'],
+                      'layer_key': options['layer_key'],
+                      'multi_geom': options['multi_geom'],
                       }
             mapping_dict = mapping(ds, **kwargs)
             # This extra legwork is so that the dictionary definition comes

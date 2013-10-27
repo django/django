@@ -10,8 +10,8 @@ Usage::
 To add your own serializers, use the SERIALIZATION_MODULES setting::
 
     SERIALIZATION_MODULES = {
-        "csv" : "path.to.csv.serializer",
-        "txt" : "path.to.txt.serializer",
+        "csv": "path.to.csv.serializer",
+        "txt": "path.to.txt.serializer",
     }
 
 """
@@ -24,10 +24,10 @@ from django.core.serializers.base import SerializerDoesNotExist
 
 # Built-in serializers
 BUILTIN_SERIALIZERS = {
-    "xml"    : "django.core.serializers.xml_serializer",
-    "python" : "django.core.serializers.python",
-    "json"   : "django.core.serializers.json",
-    "yaml"   : "django.core.serializers.pyyaml",
+    "xml": "django.core.serializers.xml_serializer",
+    "python": "django.core.serializers.python",
+    "json": "django.core.serializers.json",
+    "yaml": "django.core.serializers.pyyaml",
 }
 
 _serializers = {}

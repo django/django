@@ -229,12 +229,12 @@ def model_detail(request, app_label, model_name):
         fields.append({
             'name': "%s.all" % field.name,
             "data_type": 'List',
-            'verbose': utils.parse_rst(_("all %s") % verbose , 'model', _('model:') + opts.model_name),
+            'verbose': utils.parse_rst(_("all %s") % verbose, 'model', _('model:') + opts.model_name),
         })
         fields.append({
-            'name'      : "%s.count" % field.name,
-            'data_type' : 'Integer',
-            'verbose'   : utils.parse_rst(_("number of %s") % verbose , 'model', _('model:') + opts.model_name),
+            'name': "%s.count" % field.name,
+            'data_type': 'Integer',
+            'verbose': utils.parse_rst(_("number of %s") % verbose, 'model', _('model:') + opts.model_name),
         })
 
     # Gather model methods.
@@ -260,14 +260,14 @@ def model_detail(request, app_label, model_name):
         verbose = _("related `%(app_label)s.%(object_name)s` objects") % {'app_label': rel.opts.app_label, 'object_name': rel.opts.object_name}
         accessor = rel.get_accessor_name()
         fields.append({
-            'name'      : "%s.all" % accessor,
-            'data_type' : 'List',
-            'verbose'   : utils.parse_rst(_("all %s") % verbose , 'model', _('model:') + opts.model_name),
+            'name': "%s.all" % accessor,
+            'data_type': 'List',
+            'verbose': utils.parse_rst(_("all %s") % verbose, 'model', _('model:') + opts.model_name),
         })
         fields.append({
-            'name'      : "%s.count" % accessor,
-            'data_type' : 'Integer',
-            'verbose'   : utils.parse_rst(_("number of %s") % verbose , 'model', _('model:') + opts.model_name),
+            'name': "%s.count" % accessor,
+            'data_type': 'Integer',
+            'verbose': utils.parse_rst(_("number of %s") % verbose, 'model', _('model:') + opts.model_name),
         })
     return render_to_response('admin_doc/model_detail.html', {
         'root_path': urlresolvers.reverse('admin:index'),

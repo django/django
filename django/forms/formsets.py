@@ -423,8 +423,8 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
              'min_num': min_num, 'max_num': max_num,
-             'absolute_max': absolute_max, 'validate_min' : validate_min,
-             'validate_max' : validate_max}
+             'absolute_max': absolute_max, 'validate_min': validate_min,
+             'validate_max': validate_max}
     return type(form.__name__ + str('FormSet'), (formset,), attrs)
 
 def all_valid(formsets):

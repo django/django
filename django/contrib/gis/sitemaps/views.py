@@ -106,7 +106,7 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
         render = render_to_kmz
     else:
         render = render_to_kml
-    return render('gis/kml/placemarks.kml', {'places' : placemarks})
+    return render('gis/kml/placemarks.kml', {'places': placemarks})
 
 def kmz(request, label, model, field_name=None, using=DEFAULT_DB_ALIAS):
     """

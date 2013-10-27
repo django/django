@@ -19,10 +19,10 @@ class GeometryField(forms.Field):
     geom_type = 'GEOMETRY'
 
     default_error_messages = {
-        'required' : _('No geometry value provided.'),
-        'invalid_geom' : _('Invalid geometry value.'),
-        'invalid_geom_type' : _('Invalid geometry type.'),
-        'transform_error' : _('An error occurred when transforming the geometry '
+        'required': _('No geometry value provided.'),
+        'invalid_geom': _('Invalid geometry value.'),
+        'invalid_geom_type': _('Invalid geometry type.'),
+        'transform_error': _('An error occurred when transforming the geometry '
                               'to the SRID of the geometry form field.'),
     }
 

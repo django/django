@@ -1751,7 +1751,7 @@ class OldFormForXTests(TestCase):
         self.assertHTMLEqual(six.text_type(CustomFieldForExclusionForm()),
                          '''<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="10" /></td></tr>''')
 
-    def test_iterable_model_m2m(self) :
+    def test_iterable_model_m2m(self):
         colour = Colour.objects.create(name='Blue')
         form = ColourfulItemForm()
         self.maxDiff = 1024
@@ -1763,7 +1763,7 @@ class OldFormForXTests(TestCase):
         </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>"""
             % {'blue_pk': colour.pk})
 
-    def test_custom_error_messages(self) :
+    def test_custom_error_messages(self):
         data = {'name1': '@#$!!**@#$', 'name2': '@#$!!**@#$'}
         errors = CustomErrorMessageForm(data).errors
         self.assertHTMLEqual(
@@ -1775,7 +1775,7 @@ class OldFormForXTests(TestCase):
             '<ul class="errorlist"><li>Model custom error message.</li></ul>'
         )
 
-    def test_model_clean_error_messages(self) :
+    def test_model_clean_error_messages(self):
         data = {'name1': 'FORBIDDEN_VALUE', 'name2': 'ABC'}
         errors = CustomErrorMessageForm(data).errors
         self.assertHTMLEqual(

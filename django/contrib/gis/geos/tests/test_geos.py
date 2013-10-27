@@ -239,7 +239,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # an invalid type.
         for g in (p, ls):
             self.assertNotEqual(g, None)
-            self.assertNotEqual(g, {'foo' : 'bar'})
+            self.assertNotEqual(g, {'foo': 'bar'})
             self.assertNotEqual(g, False)
 
     def test_points(self):

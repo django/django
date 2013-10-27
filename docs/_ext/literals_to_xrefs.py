@@ -19,7 +19,7 @@ ROLES = (
     'func',
     'lookup',
     'meth',
-    'mod' ,
+    'mod',
     "djadminopt",
     "ref",
     "setting",

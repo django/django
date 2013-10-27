@@ -10,7 +10,7 @@ from django.contrib.gis.geos import GEOSGeometry, GEOSException
 
 # Creating a template context that contains Django settings
 # values needed by admin map templates.
-geo_context = Context({'LANGUAGE_BIDI' : translation.get_language_bidi()})
+geo_context = Context({'LANGUAGE_BIDI': translation.get_language_bidi()})
 logger = logging.getLogger('django.contrib.gis')
 
 
