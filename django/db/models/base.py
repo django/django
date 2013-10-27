@@ -75,6 +75,7 @@ class ModelBase(type):
                     new_class._meta.get_latest_by = base_meta.get_latest_by
 
         is_proxy = new_class._meta.proxy
+        proxy_model_module = is_proxy and module or None
 
         if getattr(new_class, '_default_manager', None):
             if not is_proxy:
@@ -90,7 +91,8 @@ class ModelBase(type):
 
         # Bail out early if we have already created this class.
         m = get_model(new_class._meta.app_label, name,
-                      seed_cache=False, only_installed=False)
+                      seed_cache=False, only_installed=False,
+                      module=proxy_model_module)
         if m is not None:
             return m
 
@@ -203,7 +205,8 @@ class ModelBase(type):
         # should only be one class for each model, so we always return the
         # registered version.
         return get_model(new_class._meta.app_label, name,
-                         seed_cache=False, only_installed=False)
+                         seed_cache=False, only_installed=False,
+                         module=proxy_model_module)
 
     def copy_managers(cls, base_managers):
         # This is in-place sorting of an Options attribute, but that's fine.
