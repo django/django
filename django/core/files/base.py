@@ -94,9 +94,11 @@ class File(FileProxyMixin):
         # Iterate over this file-like object by newlines
         buffer_ = None
         for chunk in self.chunks():
-            chunk_buffer = BytesIO(chunk)
+            chunk_buffer = BytesIO(force_bytes(chunk))
 
             for line in chunk_buffer:
+                line = line.decode() if isinstance(line, bytes) else line
+
                 if buffer_:
                     line = buffer_ + line
                     buffer_ = None
