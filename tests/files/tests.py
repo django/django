@@ -13,7 +13,7 @@ from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.temp import NamedTemporaryFile
 from django.test import TestCase
-from django.utils.six import StringIO
+from django.utils.six import StringIO, PY3, PY2
 
 from .models import Storage, temp_storage, temp_storage_location
 
@@ -172,6 +172,33 @@ class FileTests(unittest.TestCase):
         file = SimpleUploadedFile("mode_test.txt", b"content")
         self.assertFalse(hasattr(file, 'mode'))
         g = gzip.GzipFile(fileobj=file)
+
+    def test_iter(self):
+        text_file = tempfile.NamedTemporaryFile('r+t', delete=False)
+        self.addCleanup(os.unlink, text_file.name)
+        try:
+            if PY3:
+                text_file.write("\xffline1\nline2\r\nline3\r")
+                file_wrapper = File(text_file)
+                self.assertEqual(list(file_wrapper),
+                                 ['\xffline1\n', 'line2\n', 'line3\n'])
+            elif PY2:
+                text_file.write(u"\xffline1\nline2\r\nline3\r".encode('utf-8'))
+                text_file.close()
+                import io
+                with io.open(text_file.name, 'r+t', encoding='utf-8') as tf:
+                    file_wrapper = File(tf)
+                    self.assertEqual(list(file_wrapper),
+                                     [u'\xffline1\n', u'line2\n', u'line3\n'])
+        finally:
+            text_file.close()
+
+        binary_file = tempfile.TemporaryFile('r+b')
+        self.addCleanup(binary_file.close)
+        binary_file.write(b"line1\nline2\r\nline3\r")
+        file_wrapper = File(binary_file)
+        self.assertEqual(list(file_wrapper),
+                         [b'line1\n', b'line2\r\n', b'line3\r'])
 
 
 class FileMoveSafeTests(unittest.TestCase):

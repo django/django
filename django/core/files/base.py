@@ -94,7 +94,10 @@ class File(FileProxyMixin):
         # Iterate over this file-like object by newlines
         buffer_ = None
         for chunk in self.chunks():
-            chunk_buffer = BytesIO(chunk)
+            if isinstance(chunk, six.binary_type):
+                chunk_buffer = BytesIO(chunk)
+            elif isinstance(chunk, six.text_type):
+                chunk_buffer = StringIO(chunk)
 
             for line in chunk_buffer:
                 if buffer_:
@@ -103,7 +106,7 @@ class File(FileProxyMixin):
 
                 # If this is the end of a line, yield
                 # otherwise, wait for the next round
-                if line[-1] in ('\n', '\r'):
+                if line[-1] in ('\n', '\r', 10, 13):
                     yield line
                 else:
                     buffer_ = line
