@@ -1,147 +1,41 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from io import BytesIO
 import os
 import gzip
 import shutil
 import tempfile
 import unittest
+import zlib
 
-from django.core.cache import cache
+from django.core.exceptions import ImproperlyConfigured
 from django.core.files import File
 from django.core.files.move import file_move_safe
 from django.core.files.base import ContentFile
-from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
 from django.core.files.temp import NamedTemporaryFile
 from django.test import TestCase
-from django.utils.six import StringIO
+from django.utils._os import upath
+from django.utils import six
 
-from .models import Storage, temp_storage, temp_storage_location
-
-
-class FileStorageTests(TestCase):
-    def tearDown(self):
-        shutil.rmtree(temp_storage_location)
-
-    def test_files(self):
-        temp_storage.save('tests/default.txt', ContentFile('default content'))
-        # Attempting to access a FileField from the class raises a descriptive
-        # error
-        self.assertRaises(AttributeError, lambda: Storage.normal)
-
-        # An object without a file has limited functionality.
-        obj1 = Storage()
-        self.assertEqual(obj1.normal.name, "")
-        self.assertRaises(ValueError, lambda: obj1.normal.size)
-
-        # Saving a file enables full functionality.
-        obj1.normal.save("django_test.txt", ContentFile("content"))
-        self.assertEqual(obj1.normal.name, "tests/django_test.txt")
-        self.assertEqual(obj1.normal.size, 7)
-        self.assertEqual(obj1.normal.read(), b"content")
-        obj1.normal.close()
-
-        # File objects can be assigned to FileField attributes, but shouldn't
-        # get committed until the model it's attached to is saved.
-        obj1.normal = SimpleUploadedFile("assignment.txt", b"content")
-        dirs, files = temp_storage.listdir("tests")
-        self.assertEqual(dirs, [])
-        self.assertEqual(sorted(files), ["default.txt", "django_test.txt"])
-
-        obj1.save()
-        dirs, files = temp_storage.listdir("tests")
-        self.assertEqual(
-            sorted(files), ["assignment.txt", "default.txt", "django_test.txt"]
-        )
-
-        # Files can be read in a little at a time, if necessary.
-        obj1.normal.open()
-        self.assertEqual(obj1.normal.read(3), b"con")
-        self.assertEqual(obj1.normal.read(), b"tent")
-        self.assertEqual(list(obj1.normal.chunks(chunk_size=2)), [b"co", b"nt", b"en", b"t"])
-        obj1.normal.close()
-
-        # Save another file with the same name.
-        obj2 = Storage()
-        obj2.normal.save("django_test.txt", ContentFile("more content"))
-        self.assertEqual(obj2.normal.name, "tests/django_test_1.txt")
-        self.assertEqual(obj2.normal.size, 12)
-        obj2.normal.close()
-
-        # Push the objects into the cache to make sure they pickle properly
-        cache.set("obj1", obj1)
-        cache.set("obj2", obj2)
-        self.assertEqual(cache.get("obj2").normal.name, "tests/django_test_1.txt")
-
-        # Deleting an object does not delete the file it uses.
-        obj2.delete()
-        obj2.normal.save("django_test.txt", ContentFile("more content"))
-        self.assertEqual(obj2.normal.name, "tests/django_test_2.txt")
-        obj2.normal.close()
-
-        # Multiple files with the same name get _N appended to them.
-        objs = [Storage() for i in range(3)]
-        for o in objs:
-            o.normal.save("multiple_files.txt", ContentFile("Same Content"))
-        self.assertEqual(
-            [o.normal.name for o in objs],
-            ["tests/multiple_files.txt", "tests/multiple_files_1.txt", "tests/multiple_files_2.txt"]
-        )
-        for o in objs:
-            o.delete()
-
-        # Default values allow an object to access a single file.
-        obj3 = Storage.objects.create()
-        self.assertEqual(obj3.default.name, "tests/default.txt")
-        self.assertEqual(obj3.default.read(), b"default content")
-        obj3.default.close()
-
-        # But it shouldn't be deleted, even if there are no more objects using
-        # it.
-        obj3.delete()
-        obj3 = Storage()
-        self.assertEqual(obj3.default.read(), b"default content")
-        obj3.default.close()
-
-        # Verify the fix for #5655, making sure the directory is only
-        # determined once.
-        obj4 = Storage()
-        obj4.random.save("random_file", ContentFile("random content"))
-        self.assertTrue(obj4.random.name.endswith("/random_file"))
-        obj4.random.close()
-
-        # upload_to can be empty, meaning it does not use subdirectory.
-        obj5 = Storage()
-        obj5.empty.save('django_test.txt', ContentFile('more content'))
-        self.assertEqual(obj5.empty.name, "./django_test.txt")
-        self.assertEqual(obj5.empty.read(), b"more content")
-        obj5.empty.close()
-
-    def test_file_object(self):
-        # Create sample file
-        temp_storage.save('tests/example.txt', ContentFile('some content'))
-
-        # Load it as python file object
-        with open(temp_storage.path('tests/example.txt')) as file_obj:
-            # Save it using storage and read its content
-            temp_storage.save('tests/file_obj', file_obj)
-        self.assertTrue(temp_storage.exists('tests/file_obj'))
-        with temp_storage.open('tests/file_obj') as f:
-            self.assertEqual(f.read(), b'some content')
-
-    def test_stringio(self):
-        # Test passing StringIO instance as content argument to save
-        output = StringIO()
-        output.write('content')
-        output.seek(0)
-
-        # Save it and read written file
-        temp_storage.save('tests/stringio', output)
-        self.assertTrue(temp_storage.exists('tests/stringio'))
-        with temp_storage.open('tests/stringio') as f:
-            self.assertEqual(f.read(), b'content')
+try:
+    from django.utils.image import Image
+    from django.core.files import images
+except ImproperlyConfigured:
+    Image = None
 
 
 class FileTests(unittest.TestCase):
+    def test_unicode_uploadedfile_name(self):
+        """
+        Regression test for #8156: files with unicode names I can't quite figure
+        out the encoding situation between doctest and this file, but the actual
+        repr doesn't matter; it just shouldn't return a unicode object.
+        """
+        uf = UploadedFile(name='¿Cómo?', content_type='text')
+        self.assertEqual(type(uf.__repr__()), str)
+
     def test_context_manager(self):
         orig_file = tempfile.TemporaryFile()
         base_file = File(orig_file)
@@ -171,6 +65,124 @@ class FileTests(unittest.TestCase):
         file = SimpleUploadedFile("mode_test.txt", b"content")
         self.assertFalse(hasattr(file, 'mode'))
         gzip.GzipFile(fileobj=file)
+
+
+class NoNameFileTestCase(unittest.TestCase):
+    """
+    Other examples of unnamed files may be tempfile.SpooledTemporaryFile or
+    urllib.urlopen()
+    """
+    def test_noname_file_default_name(self):
+        self.assertEqual(File(BytesIO(b'A file with no name')).name, None)
+
+    def test_noname_file_get_size(self):
+        self.assertEqual(File(BytesIO(b'A file with no name')).size, 19)
+
+
+class ContentFileTestCase(unittest.TestCase):
+    def test_content_file_default_name(self):
+        self.assertEqual(ContentFile(b"content").name, None)
+
+    def test_content_file_custom_name(self):
+        """
+        Test that the constructor of ContentFile accepts 'name' (#16590).
+        """
+        name = "I can have a name too!"
+        self.assertEqual(ContentFile(b"content", name=name).name, name)
+
+    def test_content_file_input_type(self):
+        """
+        Test that ContentFile can accept both bytes and unicode and that the
+        retrieved content is of the same type.
+        """
+        self.assertIsInstance(ContentFile(b"content").read(), bytes)
+        if six.PY3:
+            self.assertIsInstance(ContentFile("español").read(), six.text_type)
+        else:
+            self.assertIsInstance(ContentFile("español").read(), bytes)
+
+
+class DimensionClosingBug(unittest.TestCase):
+    """
+    Test that get_image_dimensions() properly closes files (#8817)
+    """
+    @unittest.skipUnless(Image, "Pillow/PIL not installed")
+    def test_not_closing_of_files(self):
+        """
+        Open files passed into get_image_dimensions() should stay opened.
+        """
+        empty_io = BytesIO()
+        try:
+            images.get_image_dimensions(empty_io)
+        finally:
+            self.assertTrue(not empty_io.closed)
+
+    @unittest.skipUnless(Image, "Pillow/PIL not installed")
+    def test_closing_of_filenames(self):
+        """
+        get_image_dimensions() called with a filename should closed the file.
+        """
+        # We need to inject a modified open() builtin into the images module
+        # that checks if the file was closed properly if the function is
+        # called with a filename instead of an file object.
+        # get_image_dimensions will call our catching_open instead of the
+        # regular builtin one.
+
+        class FileWrapper(object):
+            _closed = []
+
+            def __init__(self, f):
+                self.f = f
+
+            def __getattr__(self, name):
+                return getattr(self.f, name)
+
+            def close(self):
+                self._closed.append(True)
+                self.f.close()
+
+        def catching_open(*args):
+            return FileWrapper(open(*args))
+
+        images.open = catching_open
+        try:
+            images.get_image_dimensions(os.path.join(os.path.dirname(upath(__file__)), "test1.png"))
+        finally:
+            del images.open
+        self.assertTrue(FileWrapper._closed)
+
+
+class InconsistentGetImageDimensionsBug(unittest.TestCase):
+    """
+    Test that get_image_dimensions() works properly after various calls
+    using a file handler (#11158)
+    """
+    @unittest.skipUnless(Image, "Pillow/PIL not installed")
+    def test_multiple_calls(self):
+        """
+        Multiple calls of get_image_dimensions() should return the same size.
+        """
+        img_path = os.path.join(os.path.dirname(upath(__file__)), "test.png")
+        with open(img_path, 'rb') as file:
+            image = images.ImageFile(file)
+            image_pil = Image.open(img_path)
+            size_1 = images.get_image_dimensions(image)
+            size_2 = images.get_image_dimensions(image)
+        self.assertEqual(image_pil.size, size_1)
+        self.assertEqual(size_1, size_2)
+
+    @unittest.skipUnless(Image, "Pillow/PIL not installed")
+    def test_bug_19457(self):
+        """
+        Regression test for #19457
+        get_image_dimensions fails on some pngs, while Image.size is working good on them
+        """
+        img_path = os.path.join(os.path.dirname(upath(__file__)), "magic.png")
+        try:
+            size = images.get_image_dimensions(img_path)
+        except zlib.error:
+            self.fail("Exception raised from get_image_dimensions().")
+        self.assertEqual(size, Image.open(img_path).size)
 
 
 class FileMoveSafeTests(unittest.TestCase):
