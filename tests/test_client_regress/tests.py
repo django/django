@@ -5,6 +5,7 @@ Regression tests for the Test Client, especially the customized assertions.
 from __future__ import unicode_literals
 
 import os
+import itertools
 
 from django.core.urlresolvers import reverse
 from django.template import (TemplateSyntaxError,
@@ -432,6 +433,24 @@ class AssertRedirectsTests(TestCase):
             self.assertRedirects(response, '/test_client/get_view/', msg_prefix='abc')
         except AssertionError as e:
             self.assertIn("abc: Response didn't redirect as expected: Response code was 200 (expected 302)", str(e))
+
+    def test_redirect_scheme(self):
+        "An assertion is raised if the response doesn't have the scheme specified in expected_url"
+
+        # Assure that original request scheme is preserved if no scheme specified in the redirect location
+        response = self.client.get('/test_client/redirect_view/', secure=True)
+        self.assertRedirects(response, 'https://testserver/test_client/get_view/')
+
+        # For all possible True/False combinations of follow and secure
+        for follow, secure in itertools.product([True, False], repeat=2):
+            # always redirects to https
+            response = self.client.get('/test_client/https_redirect_view/', follow=follow, secure=secure)
+            # no scheme to compare too, always succeeds
+            self.assertRedirects(response, '/test_client/secure_view/', status_code=301)
+            # the goal scheme is https
+            self.assertRedirects(response, 'https://testserver/test_client/secure_view/', status_code=301)
+            with self.assertRaises(AssertionError):
+                self.assertRedirects(response, 'http://testserver/test_client/secure_view/', status_code=301)
 
 
 class AssertFormErrorTests(TestCase):

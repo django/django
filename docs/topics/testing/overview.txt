@@ -1576,6 +1576,13 @@ your test suite.
     loaded. Since the test client can't fetch externals URLs, this is
     particularly useful if ``expected_url`` isn't part of your Django app.
 
+    .. versionadded:: 1.7
+
+    Scheme is handled correctly when making comparisons between two URLs. If
+    there isn't any scheme specified in the location where we are redirected to,
+    the original request's scheme is used. If present, the scheme in
+    ``expected_url`` is the one used to make the comparisons to.
+
 .. method:: SimpleTestCase.assertHTMLEqual(html1, html2, msg=None)
 
     Asserts that the strings ``html1`` and ``html2`` are equal. The comparison
