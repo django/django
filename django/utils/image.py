@@ -121,12 +121,15 @@ def _detect_image_library():
             # produce a fully-working PIL & will create a ``_imaging`` module,
             # we'll attempt to import it to verify their kit works.
             try:
-                import _imaging as PIL_imaging
-            except ImportError as err:
-                raise ImproperlyConfigured(
-                    _("The '_imaging' module for the PIL could not be "
-                      "imported: %s") % err
-                )
+                from PIL import _imaging as PIL_imaging
+            except ImportError:
+                try:
+                    import _imaging as PIL_imaging
+                except ImportError as err:
+                    raise ImproperlyConfigured(
+                        _("The '_imaging' module for the PIL could not be "
+                          "imported: %s") % err
+                    )
 
     # Try to import ImageFile as well.
     try:
