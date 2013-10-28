@@ -19,7 +19,7 @@ without actually having to pull them out of the database into Python memory.
 Instead, Django uses the ``F()`` object to generate a SQL expression that
 describes the required operation at the database level.
 
-This is easiest to understand though an example. Normally, one might do
+This is easiest to understand through an example. Normally, one might do
 something like this::
 
     # Tintin filed a news story!
