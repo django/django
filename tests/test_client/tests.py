@@ -93,6 +93,18 @@ class ClientTest(TestCase):
         self.assertEqual(response.templates[0].name, "Book template")
         self.assertEqual(response.content, b"Blink - Malcolm Gladwell")
 
+    def test_insecure(self):
+        "GET a URL through http"
+        response = self.client.get('/test_client/secure_view/', secure=False)
+        self.assertFalse(response.test_was_secure_request)
+        self.assertEqual(response.test_server_port, '80')
+
+    def test_secure(self):
+        "GET a URL through https"
+        response = self.client.get('/test_client/secure_view/', secure=True)
+        self.assertTrue(response.test_was_secure_request)
+        self.assertEqual(response.test_server_port, '443')
+
     def test_redirect(self):
         "GET a URL that redirects elsewhere"
         response = self.client.get('/test_client/redirect_view/')

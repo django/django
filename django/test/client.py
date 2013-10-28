@@ -269,60 +269,68 @@ class RequestFactory(object):
             path = path.encode('utf-8').decode('iso-8859-1')
         return path
 
-    def get(self, path, data={}, **extra):
+    def get(self, path, data={}, secure=False, **extra):
         "Construct a GET request."
 
         r = {
             'QUERY_STRING': urlencode(data, doseq=True),
         }
         r.update(extra)
-        return self.generic('GET', path, **r)
+        return self.generic('GET', path, secure=secure, **r)
 
     def post(self, path, data={}, content_type=MULTIPART_CONTENT,
-             **extra):
+             secure=False, **extra):
         "Construct a POST request."
 
         post_data = self._encode_data(data, content_type)
 
-        return self.generic('POST', path, post_data, content_type, **extra)
+        return self.generic('POST', path, post_data, content_type,
+                            secure=secure, **extra)
 
-    def head(self, path, data={}, **extra):
+    def head(self, path, data={}, secure=False, **extra):
         "Construct a HEAD request."
 
         r = {
             'QUERY_STRING': urlencode(data, doseq=True),
         }
         r.update(extra)
-        return self.generic('HEAD', path, **r)
+        return self.generic('HEAD', path, secure=secure, **r)
 
     def options(self, path, data='', content_type='application/octet-stream',
-                **extra):
+                secure=False, **extra):
         "Construct an OPTIONS request."
-        return self.generic('OPTIONS', path, data, content_type, **extra)
+        return self.generic('OPTIONS', path, data, content_type,
+                            secure=secure, **extra)
 
     def put(self, path, data='', content_type='application/octet-stream',
-            **extra):
+            secure=False, **extra):
         "Construct a PUT request."
-        return self.generic('PUT', path, data, content_type, **extra)
+        return self.generic('PUT', path, data, content_type,
+                            secure=secure, **extra)
 
     def patch(self, path, data='', content_type='application/octet-stream',
-              **extra):
+              secure=False, **extra):
         "Construct a PATCH request."
-        return self.generic('PATCH', path, data, content_type, **extra)
+        return self.generic('PATCH', path, data, content_type,
+                            secure=secure, **extra)
 
     def delete(self, path, data='', content_type='application/octet-stream',
-               **extra):
+               secure=False, **extra):
         "Construct a DELETE request."
-        return self.generic('DELETE', path, data, content_type, **extra)
+        return self.generic('DELETE', path, data, content_type,
+                            secure=secure, **extra)
 
-    def generic(self, method, path,
-                data='', content_type='application/octet-stream', **extra):
+    def generic(self, method, path, data='',
+                content_type='application/octet-stream', secure=False,
+                **extra):
         """Constructs an arbitrary HTTP request."""
         parsed = urlparse(path)
         data = force_bytes(data, settings.DEFAULT_CHARSET)
         r = {
             'PATH_INFO':      self._get_path(parsed),
             'REQUEST_METHOD': str(method),
+            'SERVER_PORT': str('443') if secure else str('80'),
+            'wsgi.url_scheme': str('https') if secure else str('http'),
         }
         if data:
             r.update({
@@ -445,72 +453,82 @@ class Client(RequestFactory):
             signals.template_rendered.disconnect(dispatch_uid=signal_uid)
             got_request_exception.disconnect(dispatch_uid="request-exception")
 
-    def get(self, path, data={}, follow=False, **extra):
+    def get(self, path, data={}, follow=False, secure=False, **extra):
         """
         Requests a response from the server using GET.
         """
-        response = super(Client, self).get(path, data=data, **extra)
+        response = super(Client, self).get(path, data=data, secure=secure,
+                                           **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
 
     def post(self, path, data={}, content_type=MULTIPART_CONTENT,
-             follow=False, **extra):
+             follow=False, secure=False, **extra):
         """
         Requests a response from the server using POST.
         """
-        response = super(Client, self).post(path, data=data, content_type=content_type, **extra)
+        response = super(Client, self).post(path, data=data,
+                                            content_type=content_type,
+                                            secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
 
-    def head(self, path, data={}, follow=False, **extra):
+    def head(self, path, data={}, follow=False, secure=False, **extra):
         """
         Request a response from the server using HEAD.
         """
-        response = super(Client, self).head(path, data=data, **extra)
+        response = super(Client, self).head(path, data=data, secure=secure,
+                                            **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
 
     def options(self, path, data='', content_type='application/octet-stream',
-                follow=False, **extra):
+                follow=False, secure=False, **extra):
         """
         Request a response from the server using OPTIONS.
         """
-        response = super(Client, self).options(path, data=data, content_type=content_type, **extra)
+        response = super(Client, self).options(path, data=data,
+                                               content_type=content_type,
+                                               secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
 
     def put(self, path, data='', content_type='application/octet-stream',
-            follow=False, **extra):
+            follow=False, secure=False, **extra):
         """
         Send a resource to the server using PUT.
         """
-        response = super(Client, self).put(path, data=data, content_type=content_type, **extra)
+        response = super(Client, self).put(path, data=data,
+                                           content_type=content_type,
+                                           secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
 
     def patch(self, path, data='', content_type='application/octet-stream',
-              follow=False, **extra):
+              follow=False, secure=False, **extra):
         """
         Send a resource to the server using PATCH.
         """
-        response = super(Client, self).patch(
-            path, data=data, content_type=content_type, **extra)
+        response = super(Client, self).patch(path, data=data,
+                                             content_type=content_type,
+                                             secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
 
     def delete(self, path, data='', content_type='application/octet-stream',
-               follow=False, **extra):
+               follow=False, secure=False, **extra):
         """
         Send a DELETE request to the server.
         """
-        response = super(Client, self).delete(
-            path, data=data, content_type=content_type, **extra)
+        response = super(Client, self).delete(path, data=data,
+                                              content_type=content_type,
+                                              secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
