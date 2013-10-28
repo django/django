@@ -5,6 +5,7 @@ import gzip
 import shutil
 import tempfile
 import unittest
+import io
 
 from django.core.cache import cache
 from django.core.files import File
@@ -177,28 +178,26 @@ class FileTests(unittest.TestCase):
         text_file = tempfile.NamedTemporaryFile('r+t', delete=False)
         self.addCleanup(os.unlink, text_file.name)
         try:
-            if PY3:
-                text_file.write("\xffline1\nline2\r\nline3\r")
-                file_wrapper = File(text_file)
-                self.assertEqual(list(file_wrapper),
-                                 ['\xffline1\n', 'line2\n', 'line3\n'])
-            elif PY2:
-                text_file.write(u"\xffline1\nline2\r\nline3\r".encode('utf-8'))
+            text_file.write("line1\nline2\nline3\n")
+            if PY2:
                 text_file.close()
-                import io
-                with io.open(text_file.name, 'r+t', encoding='utf-8') as tf:
+                with io.open(text_file.name, 'rt', encoding='utf-8') as tf:
                     file_wrapper = File(tf)
                     self.assertEqual(list(file_wrapper),
-                                     [u'\xffline1\n', u'line2\n', u'line3\n'])
+                                     [u'line1\n', u'line2\n', u'line3\n'])
+            else:
+                file_wrapper = File(text_file)
+                self.assertEqual(list(file_wrapper),
+                                 ['line1\n', 'line2\n', 'line3\n'])
         finally:
             text_file.close()
 
         binary_file = tempfile.TemporaryFile('r+b')
         self.addCleanup(binary_file.close)
-        binary_file.write(b"line1\nline2\r\nline3\r")
+        binary_file.write(b"line1\nline2\nline3\n")
         file_wrapper = File(binary_file)
         self.assertEqual(list(file_wrapper),
-                         [b'line1\n', b'line2\r\n', b'line3\r'])
+                         [b'line1\n', b'line2\n', b'line3\n'])
 
 
 class FileMoveSafeTests(unittest.TestCase):
