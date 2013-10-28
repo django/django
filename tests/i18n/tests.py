@@ -940,6 +940,19 @@ class MiscTests(TransRealMixin, TestCase):
             self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 1})), '%(percent)s% represents 1 object')
             self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 4})), '%(percent)s% represents 4 objects')
 
+    def test_cache_resetting(self):
+        """
+        #14170 after setting LANGUAGE, cache should be cleared and languages
+        previously valid should not be used.
+        """
+        g = get_language_from_request
+        r = self.rf.get('/')
+        r.COOKIES = {}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt-br'}
+        self.assertEqual('pt-br', g(r))
+        with self.settings(LANGUAGES=(('en', 'English'),)):
+            self.assertNotEqual('pt-br', g(r))
+
 
 class ResolutionOrderI18NTests(TransRealMixin, TestCase):
 
