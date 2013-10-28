@@ -18,6 +18,8 @@ Combinations To Account For
     * CPython 2.x may *NOT* have _imaging (broken & needs a error message)
     * CPython 3.x doesn't work
     * PyPy will *NOT* have _imaging (but works?)
+    * On some platforms (Homebrew and RHEL6 reported) _imaging isn't available,
+      the needed import is from PIL import _imaging (refs #21355)
 
 Restated, that looks like:
 
@@ -62,7 +64,8 @@ Approach
 
         * The only option here is that we're on Python 2.x or PyPy, of which
           we only care about if we're on CPython.
-        * If we're on CPython, attempt to ``import _imaging``
+        * If we're on CPython, attempt to ``from PIL import _imaging`` and
+          ``import _imaging``
 
             * ``ImportError`` - Bad install, toss an exception
 
@@ -121,12 +124,15 @@ def _detect_image_library():
             # produce a fully-working PIL & will create a ``_imaging`` module,
             # we'll attempt to import it to verify their kit works.
             try:
-                import _imaging as PIL_imaging
-            except ImportError as err:
-                raise ImproperlyConfigured(
-                    _("The '_imaging' module for the PIL could not be "
-                      "imported: %s") % err
-                )
+                from PIL import _imaging as PIL_imaging
+            except ImportError:
+                try:
+                    import _imaging as PIL_imaging
+                except ImportError as err:
+                    raise ImproperlyConfigured(
+                        _("The '_imaging' module for the PIL could not be "
+                          "imported: %s") % err
+                    )
 
     # Try to import ImageFile as well.
     try:
