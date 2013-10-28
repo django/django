@@ -203,6 +203,9 @@ Minor features
   follow the :setting:`SESSION_COOKIE_SECURE` and
   :setting:`SESSION_COOKIE_HTTPONLY` settings.
 
+* The :ref:`messages context processor <message-displaying>` now adds a
+  dictionary of default levels under the name ``DEFAULT_MESSAGE_LEVELS``.
+
 :mod:`django.contrib.redirects`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
