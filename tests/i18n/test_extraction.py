@@ -5,10 +5,11 @@ import io
 import os
 import re
 import shutil
-from unittest import SkipTest
+from unittest import SkipTest, skipUnless
 import warnings
 
 from django.core import management
+from django.core.management.utils import find_command
 from django.test import SimpleTestCase
 from django.utils.encoding import force_text
 from django.utils._os import upath
@@ -18,14 +19,17 @@ from django.utils.translation import TranslatorCommentWarning
 
 
 LOCALE = 'de'
+has_xgettext = find_command('xgettext')
 
+@skipUnless(has_xgettext, 'xgettext is mandatory for extraction tests')
 class ExtractorTests(SimpleTestCase):
 
     PO_FILE = 'locale/%s/LC_MESSAGES/django.po' % LOCALE
 
     def setUp(self):
         self._cwd = os.getcwd()
-        self.test_dir = os.path.abspath(os.path.dirname(upath(__file__)))
+        self.test_dir = os.path.abspath(
+            os.path.join(os.path.dirname(upath(__file__)), 'commands'))
 
     def _rmrf(self, dname):
         if os.path.commonprefix([self.test_dir, os.path.abspath(dname)]) != self.test_dir:
@@ -302,8 +306,7 @@ class IgnoredExtractorTests(ExtractorTests):
 class SymlinkExtractorTests(ExtractorTests):
 
     def setUp(self):
-        self._cwd = os.getcwd()
-        self.test_dir = os.path.abspath(os.path.dirname(upath(__file__)))
+        super(SymlinkExtractorTests, self).setUp()
         self.symlinked_dir = os.path.join(self.test_dir, 'templates_symlinked')
 
     def tearDown(self):

@@ -1,15 +1,19 @@
 import os
+import unittest
 
 from django.core.management import call_command, CommandError
+from django.core.management.utils import find_command
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils import translation
 from django.utils._os import upath
 from django.utils.six import StringIO
 
-test_dir = os.path.abspath(os.path.dirname(upath(__file__)))
+test_dir = os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), 'commands'))
+has_msgfmt = find_command('msgfmt')
 
 
+@unittest.skipUnless(has_msgfmt, 'msgfmt is mandatory for compilation tests')
 class MessageCompilationTests(SimpleTestCase):
 
     def setUp(self):
