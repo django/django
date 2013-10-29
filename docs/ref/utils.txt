@@ -432,7 +432,9 @@ Atom1Feed
 
     Consider a typical case, where a view might need to call a model's method
     to perform some computation, before placing the model instance into the
-    context, where the template might invoke the method once more::
+    context, where the template might invoke the method once more:
+
+    .. code-block:: python
 
         # the model
         class Person(models.Model):
