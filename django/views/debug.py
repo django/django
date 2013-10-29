@@ -46,6 +46,10 @@ def cleanse_setting(key, value):
     except TypeError:
         # If the key isn't regex-able, just return as-is.
         cleansed = value
+
+    if callable(cleansed):
+        cleansed.do_not_call_in_templates = True
+
     return cleansed
 
 def get_safe_settings():
