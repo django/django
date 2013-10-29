@@ -15,7 +15,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import (request_started, request_finished,
     got_request_exception)
 from django.db import close_old_connections
-from django.http import SimpleCookie, HttpRequest, QueryDict
+from django.http import SimpleCookie, QueryDict
 from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.utils.functional import curry
@@ -83,8 +83,9 @@ def closing_iterator_wrapper(iterable, close):
 class ClientHandler(BaseHandler):
     """
     A HTTP Handler that can be used for testing purposes.
-    Uses the WSGI interface to compose requests, but returns
-    the raw HttpResponse object
+    Uses the WSGI interface to compose requests, but returns the raw
+    HttpResponse object with the originating WSGIRequest attached to its
+    ``request_instance`` attribute.
     """
     def __init__(self, enforce_csrf_checks=True, *args, **kwargs):
         self.enforce_csrf_checks = enforce_csrf_checks
@@ -105,7 +106,13 @@ class ClientHandler(BaseHandler):
         # required for backwards compatibility with external tests against
         # admin views.
         request._dont_enforce_csrf_checks = not self.enforce_csrf_checks
+
+        # Request goes through middleware.
         response = self.get_response(request)
+        # Attach the originating request to the response so that it could be
+        # later retrieved.
+        response.request_instance = request
+
         # We're emulating a WSGI server; we must call the close method
         # on completion.
         if response.streaming:
@@ -546,8 +553,9 @@ class Client(RequestFactory):
                 'django.contrib.sessions' in settings.INSTALLED_APPS):
             engine = import_module(settings.SESSION_ENGINE)
 
-            # Create a fake request to store login details.
-            request = HttpRequest()
+            # Create a fake request that goes through request middleware
+            request = self.request().request_instance
+
             if self.session:
                 request.session = self.session
             else:
@@ -579,7 +587,9 @@ class Client(RequestFactory):
 
         Causes the authenticated user to be logged out.
         """
-        request = HttpRequest()
+        # Create a fake request that goes through request middleware
+        request = self.request().request_instance
+
         engine = import_module(settings.SESSION_ENGINE)
         UserModel = get_user_model()
         if self.session:
