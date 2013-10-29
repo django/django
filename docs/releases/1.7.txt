@@ -431,6 +431,10 @@ Tests
   client can't fetch externals URLs, this allows you to use ``assertRedirects``
   with redirects that aren't part of your Django app.
 
+* You can override the new :meth:`AuthenticationForm.confirm_login_allowed()
+  <django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed>` method
+  to more easily customize the login policy.
+
 Backwards incompatible changes in 1.7
 =====================================
 
