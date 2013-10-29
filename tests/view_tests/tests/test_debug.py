@@ -596,6 +596,50 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
             response = self.client.get('/views/raises500/')
             self.assertNotContains(response, "This should not be displayed", status_code=500)
 
+    def test_dict_setting_with_non_str_key(self):
+        """
+        A dict setting containing a non-string key should not break the
+        debug page (#12744).
+        """
+        with self.settings(DEBUG=True, FOOBAR={42: None}):
+            response = self.client.get('/views/raises500/')
+            self.assertContains(response, 'FOOBAR', status_code=500)
+
+    def test_sensitive_settings(self):
+        """
+        The debug page should not show some sensitive settings
+        (password, secret key, ...).
+        """
+        sensitive_settings = [
+            'SECRET_KEY',
+            'PASSWORD',
+            'API_KEY',
+            'AUTH_TOKEN',
+        ]
+        for setting in sensitive_settings:
+            with self.settings(DEBUG=True, **{setting: "should not be displayed"}):
+                response = self.client.get('/views/raises500/')
+                self.assertNotContains(response, 'should not be displayed', status_code=500)
+
+    def test_settings_with_sensitive_keys(self):
+        """
+        The debug page should filter out some sensitive information found in
+        dict settings.
+        """
+        sensitive_settings = [
+            'SECRET_KEY',
+            'PASSWORD',
+            'API_KEY',
+            'AUTH_TOKEN',
+        ]
+        for setting in sensitive_settings:
+            FOOBAR = {
+                setting: "should not be displayed",
+                'recursive': {setting: "should not be displayed"},
+            }
+            with self.settings(DEBUG=True, FOOBAR=FOOBAR):
+                response = self.client.get('/views/raises500/')
+                self.assertNotContains(response, 'should not be displayed', status_code=500)
 
 class AjaxResponseExceptionReporterFilter(TestCase, ExceptionReportTestMixin):
     """
