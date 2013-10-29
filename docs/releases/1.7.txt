@@ -496,6 +496,11 @@ Tests
   :class:`~django.test.Client`. If ``True``, the request will be made
   through HTTPS.
 
+* Requests made with :meth:`Client.login() <django.test.Client.login>` and
+  :meth:`Client.logout() <django.test.Client.logout>` respect defaults defined
+  in :class:`~django.test.Client` instantiation and are processed through
+  middleware.
+
 Backwards incompatible changes in 1.7
 =====================================
 

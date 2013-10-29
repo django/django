@@ -663,6 +663,13 @@ Use the ``django.test.Client`` class to make requests.
         :meth:`~django.contrib.auth.models.UserManager.create_user` helper
         method to create a new user with a correctly hashed password.
 
+        .. versionadded:: 1.7
+
+            Requests made with :meth:`~django.test.Client.login` go through the
+            request middleware. If you need to control the environment, you can
+            do so at :class:`~django.test.Client` instantiation or with the
+            `Client.defaults` attribute.
+
     .. method:: Client.logout()
 
         If your site uses Django's :doc:`authentication system</topics/auth/index>`,
@@ -672,6 +679,13 @@ Use the ``django.test.Client`` class to make requests.
         After you call this method, the test client will have all the cookies
         and session data cleared to defaults. Subsequent requests will appear
         to come from an :class:`~django.contrib.auth.models.AnonymousUser`.
+
+        .. versionadded:: 1.7
+
+            Requests made with :meth:`~django.test.Client.logout` go through the
+            request middleware. If you need to control the environment, you can
+            do so at :class:`~django.test.Client` instantiation or with the
+            `Client.defaults` attribute.
 
 Testing responses
 ~~~~~~~~~~~~~~~~~
