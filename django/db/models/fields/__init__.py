@@ -102,6 +102,13 @@ class Field(object):
                     'already exists.'),
     }
 
+    # Flag to indicate, whether the field shoud be used in an
+    # INSERT statement.
+    use_on_insert = True
+    # Flag to indicate, whether the field should be used in an
+    # UPDATE statement.
+    use_on_update = True
+
     # Generic field type description, usually overridden by subclasses
     def _description(self):
         return _('Field of type: %(field_type)s') % {

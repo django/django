@@ -14,6 +14,9 @@ from django.db import models
 from django.db.models.fields.files import ImageFieldFile, ImageField
 
 
+from .fields import UpdateOnlyField, SelectOnlyField
+
+
 class Foo(models.Model):
     a = models.CharField(max_length=10)
     d = models.DecimalField(max_digits=5, decimal_places=3)
@@ -227,3 +230,13 @@ if Image:
                                   width_field='headshot_width')
 
 ###############################################################################
+
+
+class UpdateModel(models.Model):
+
+    f = UpdateOnlyField(max_length=20, null=True)
+
+
+class SelectModel(models.Model):
+
+    f = SelectOnlyField(max_length=20, null=True)

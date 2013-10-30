@@ -23,7 +23,7 @@ from django.utils.functional import lazy
 from .models import (
     Foo, Bar, Whiz, BigD, BigS, BigInt, Post, NullBooleanModel,
     BooleanModel, DataModel, Document, RenamedField,
-    VerboseNameField, FksToBooleans)
+    VerboseNameField, FksToBooleans, UpdateModel, SelectModel)
 
 
 class BasicFieldTests(test.TestCase):
@@ -694,3 +694,41 @@ class CustomFieldTests(unittest.TestCase):
             'exact', 'TEST', connection=connection, prepared=False
         )
         self.assertEqual(field.prep_value_count, 1)
+
+
+class UpdateOnlyTests(test.TestCase):
+    """Tests for update-only fields."""
+
+    def test_field_is_ignored_on_insert(self):
+        UpdateModel.objects.create(f='text')
+        self.assertIsNone(UpdateModel.objects.all()[0].f)
+
+    def test_field_is_set_on_update(self):
+        m = UpdateModel.objects.create(f='text')
+        m.save()
+        self.assertEqual(UpdateModel.objects.all()[0].f, 'text')
+
+    def test_field_is_fetched_on_select(self):
+        UpdateModel.objects.create(f='text')
+        m = UpdateModel.objects.all()[0]
+        m.f  # Access f to force its evaluation.
+        self.assertNumQueries(2)
+
+
+class SelectOnlyTests(test.TestCase):
+    """Tests for select-only fields."""
+
+    def test_field_is_ignored_on_insert(self):
+        SelectModel.objects.create(f='text')
+        self.assertIsNone(SelectModel.objects.all()[0].f)
+
+    def test_field_is_ignored_on_update(self):
+        m = SelectModel.objects.create(f='text')
+        m.save()
+        self.assertIsNone(SelectModel.objects.all()[0].f)
+
+    def test_field_is_fetched_on_select(self):
+        SelectModel.objects.create(f='text')
+        m = SelectModel.objects.all()[0]
+        m.f  # Access f to force its evaluation.
+        self.assertNumQueries(2)
