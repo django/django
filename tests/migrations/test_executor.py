@@ -2,9 +2,10 @@ from django.test import TransactionTestCase
 from django.test.utils import override_settings
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
+from .test_base import MigrationTestBase
 
 
-class ExecutorTests(TransactionTestCase):
+class ExecutorTests(MigrationTestBase):
     """
     Tests the migration executor (full end-to-end running).
 
@@ -31,13 +32,13 @@ class ExecutorTests(TransactionTestCase):
             ],
         )
         # Were the tables there before?
-        self.assertNotIn("migrations_author", connection.introspection.get_table_list(connection.cursor()))
-        self.assertNotIn("migrations_book", connection.introspection.get_table_list(connection.cursor()))
+        self.assertTableNotExists("migrations_author")
+        self.assertTableNotExists("migrations_book")
         # Alright, let's try running it
         executor.migrate([("migrations", "0002_second")])
         # Are the tables there now?
-        self.assertIn("migrations_author", connection.introspection.get_table_list(connection.cursor()))
-        self.assertIn("migrations_book", connection.introspection.get_table_list(connection.cursor()))
+        self.assertTableExists("migrations_author")
+        self.assertTableExists("migrations_book")
         # Rebuild the graph to reflect the new DB state
         executor.loader.build_graph()
         # Alright, let's undo what we did
@@ -51,8 +52,8 @@ class ExecutorTests(TransactionTestCase):
         )
         executor.migrate([("migrations", None)])
         # Are the tables gone?
-        self.assertNotIn("migrations_author", connection.introspection.get_table_list(connection.cursor()))
-        self.assertNotIn("migrations_book", connection.introspection.get_table_list(connection.cursor()))
+        self.assertTableNotExists("migrations_author")
+        self.assertTableNotExists("migrations_book")
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_run_with_squashed(self):
@@ -73,13 +74,13 @@ class ExecutorTests(TransactionTestCase):
             ],
         )
         # Were the tables there before?
-        self.assertNotIn("migrations_author", connection.introspection.get_table_list(connection.cursor()))
-        self.assertNotIn("migrations_book", connection.introspection.get_table_list(connection.cursor()))
+        self.assertTableNotExists("migrations_author")
+        self.assertTableNotExists("migrations_book")
         # Alright, let's try running it
         executor.migrate([("migrations", "0001_squashed_0002")])
         # Are the tables there now?
-        self.assertIn("migrations_author", connection.introspection.get_table_list(connection.cursor()))
-        self.assertIn("migrations_book", connection.introspection.get_table_list(connection.cursor()))
+        self.assertTableExists("migrations_author")
+        self.assertTableExists("migrations_book")
         # Rebuild the graph to reflect the new DB state
         executor.loader.build_graph()
         # Alright, let's undo what we did. Should also just use squashed.
@@ -92,8 +93,8 @@ class ExecutorTests(TransactionTestCase):
         )
         executor.migrate([("migrations", None)])
         # Are the tables gone?
-        self.assertNotIn("migrations_author", connection.introspection.get_table_list(connection.cursor()))
-        self.assertNotIn("migrations_book", connection.introspection.get_table_list(connection.cursor()))
+        self.assertTableNotExists("migrations_author")
+        self.assertTableNotExists("migrations_book")
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations", "sessions": "migrations.test_migrations_2"})
     def test_empty_plan(self):
@@ -128,3 +129,41 @@ class ExecutorTests(TransactionTestCase):
         self.assertEqual(plan, [])
         # Erase all the fake records
         executor.recorder.flush()
+
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_soft_apply(self):
+        """
+        Tests detection of initial migrations already having been applied.
+        """
+        state = {"faked": None}
+        def fake_storer(phase, migration, fake):
+            state["faked"] = fake
+        executor = MigrationExecutor(connection, progress_callback=fake_storer)
+        executor.recorder.flush()
+        # Were the tables there before?
+        self.assertTableNotExists("migrations_author")
+        self.assertTableNotExists("migrations_tribble")
+        # Run it normally
+        executor.migrate([("migrations", "0001_initial")])
+        # Are the tables there now?
+        self.assertTableExists("migrations_author")
+        self.assertTableExists("migrations_tribble")
+        # We shouldn't have faked that one
+        self.assertEqual(state["faked"], False)
+        # Rebuild the graph to reflect the new DB state
+        executor.loader.build_graph()
+        # Fake-reverse that
+        executor.migrate([("migrations", None)], fake=True)
+        # Are the tables still there?
+        self.assertTableExists("migrations_author")
+        self.assertTableExists("migrations_tribble")
+        # Make sure that was faked
+        self.assertEqual(state["faked"], True)
+        # Finally, migrate forwards; this should fake-apply our initial migration
+        executor.migrate([("migrations", "0001_initial")])
+        self.assertEqual(state["faked"], True)
+        # And migrate back to clean up the database
+        executor.migrate([("migrations", None)])
+        self.assertTableNotExists("migrations_author")
+        self.assertTableNotExists("migrations_tribble")
