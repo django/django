@@ -98,7 +98,7 @@ js_catalog_template = r"""
   };
 
   django.ngettext = function (singular, plural, count) {
-    value = django.catalog[singular];
+    var value = django.catalog[singular];
     if (typeof(value) == 'undefined') {
       return (count == 1) ? singular : plural;
     } else {
