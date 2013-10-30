@@ -2116,14 +2116,15 @@ date that is in the past relative to the comparison point.
 title
 ^^^^^
 
-Converts a string into titlecase by capitalizing each word in the string.
-This tag makes no effort to keep "trivial words" in lowercase.
+Converts a string into titlecase by making words start with an uppercase
+character and the remaining characters lowercase. This tag makes no effort to
+keep "trivial words" in lowercase.
 
 For example::
 
     {{ value|title }}
 
-If ``value`` is ``"my first post"``, the output will be ``"My First Post"``.
+If ``value`` is ``"my FIRST post"``, the output will be ``"My First Post"``.
 
 .. templatefilter:: truncatechars
 
