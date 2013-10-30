@@ -274,6 +274,11 @@ be notified of a signal in the face of an error.
 and ensures all receivers are notified of the signal. If an error occurs, the
 error instance is returned in the tuple pair for the receiver that raised the error.
 
+.. versionadded:: 1.8
+
+    The tracebacks are present on the ``__traceback__`` attribute
+    of the errors returned when calling ``send_robust()``.
+
 Disconnecting signals
 =====================
 

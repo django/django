@@ -220,7 +220,8 @@ class Signal(object):
 
         If any receiver raises an error (specifically any subclass of
         Exception), the error instance is returned as the result for that
-        receiver.
+        receiver. The traceback is always attached to the error at
+        ``__traceback__``.
         """
         responses = []
         if not self.receivers or self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
@@ -232,6 +233,8 @@ class Signal(object):
             try:
                 response = receiver(signal=self, sender=sender, **named)
             except Exception as err:
+                if not hasattr(err, '__traceback__'):
+                    err.__traceback__ = sys.exc_info()[2]
                 responses.append((receiver, err))
             else:
                 responses.append((receiver, response))
