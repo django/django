@@ -3,6 +3,7 @@ import sys
 import time
 import unittest
 import weakref
+from types import TracebackType
 
 from django.dispatch import Signal, receiver
 
@@ -134,6 +135,8 @@ class DispatcherTests(unittest.TestCase):
         err = result[0][1]
         self.assertIsInstance(err, ValueError)
         self.assertEqual(err.args, ('this',))
+        self.assertTrue(hasattr(err, '__traceback__'))
+        self.assertTrue(isinstance(err.__traceback__, TracebackType))
         a_signal.disconnect(fails)
         self._testIsClean(a_signal)
 

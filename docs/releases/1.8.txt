@@ -153,7 +153,9 @@ Models
 Signals
 ^^^^^^^
 
-* ...
+* Exceptions from the ``(receiver, exception)`` tuples returned by
+  :meth:`Signal.send_robust() <django.dispatch.Signal.send_robust>` now have
+  their traceback attached as a ``__traceback__`` attribute.
 
 Templates
 ^^^^^^^^^
