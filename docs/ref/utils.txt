@@ -764,6 +764,17 @@ appropriate entities.
 
     Can be called multiple times on a single string.
 
+    String marked safe will become unsafe again if modified. For example::
+
+        >>> mystr = '<b>Hello World</b>   '
+        >>> mystr = mark_safe(mystr)
+        >>> type(mystr)
+        <class 'django.utils.safestring.SafeBytes'>
+
+        >>> mystr = mystr.strip()  # removing whitespace
+        >>> type(mystr)
+        <type 'str'>
+
 .. function:: mark_for_escaping(s)
 
     Explicitly mark a string as requiring HTML escaping upon output. Has no
