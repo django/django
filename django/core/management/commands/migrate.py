@@ -127,18 +127,24 @@ class Command(BaseCommand):
         # to do at this point.
         emit_post_migrate_signal(created_models, self.verbosity, self.interactive, connection.alias)
 
-    def migration_progress_callback(self, action, migration):
+    def migration_progress_callback(self, action, migration, fake=False):
         if self.verbosity >= 1:
             if action == "apply_start":
                 self.stdout.write("  Applying %s..." % migration, ending="")
                 self.stdout.flush()
             elif action == "apply_success":
-                self.stdout.write(self.style.MIGRATE_SUCCESS(" OK"))
+                if fake:
+                    self.stdout.write(self.style.MIGRATE_SUCCESS(" FAKED"))
+                else:
+                    self.stdout.write(self.style.MIGRATE_SUCCESS(" OK"))
             elif action == "unapply_start":
                 self.stdout.write("  Unapplying %s..." % migration, ending="")
                 self.stdout.flush()
             elif action == "unapply_success":
-                self.stdout.write(self.style.MIGRATE_SUCCESS(" OK"))
+                if fake:
+                    self.stdout.write(self.style.MIGRATE_SUCCESS(" FAKED"))
+                else:
+                    self.stdout.write(self.style.MIGRATE_SUCCESS(" OK"))
 
     def sync_apps(self, connection, apps):
         "Runs the old syncdb-style operation on a list of apps."

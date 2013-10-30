@@ -1,3 +1,4 @@
+from django.db import migrations
 from .loader import MigrationLoader
 from .recorder import MigrationRecorder
 
@@ -81,27 +82,32 @@ class MigrationExecutor(object):
         Runs a migration forwards.
         """
         if self.progress_callback:
-            self.progress_callback("apply_start", migration)
+            self.progress_callback("apply_start", migration, fake)
         if not fake:
-            with self.connection.schema_editor() as schema_editor:
-                project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
-                migration.apply(project_state, schema_editor)
+            # Test to see if this is an already-applied initial migration
+            if not migration.dependencies and self.detect_soft_applied(migration):
+                fake = True
+            else:
+                # Alright, do it normally
+                with self.connection.schema_editor() as schema_editor:
+                    project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
+                    migration.apply(project_state, schema_editor)
         # For replacement migrations, record individual statuses
         if migration.replaces:
             for app_label, name in migration.replaces:
                 self.recorder.record_applied(app_label, name)
         else:
             self.recorder.record_applied(migration.app_label, migration.name)
-        # Report prgress
+        # Report progress
         if self.progress_callback:
-            self.progress_callback("apply_success", migration)
+            self.progress_callback("apply_success", migration, fake)
 
     def unapply_migration(self, migration, fake=False):
         """
         Runs a migration backwards.
         """
         if self.progress_callback:
-            self.progress_callback("unapply_start", migration)
+            self.progress_callback("unapply_start", migration, fake)
         if not fake:
             with self.connection.schema_editor() as schema_editor:
                 project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
@@ -114,4 +120,19 @@ class MigrationExecutor(object):
             self.recorder.record_unapplied(migration.app_label, migration.name)
         # Report progress
         if self.progress_callback:
-            self.progress_callback("unapply_success", migration)
+            self.progress_callback("unapply_success", migration, fake)
+
+    def detect_soft_applied(self, migration):
+        """
+        Tests whether a migration has been implicity applied - that the
+        tables it would create exist. This is intended only for use
+        on initial migrations (as it only looks for CreateModel).
+        """
+        project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=True)
+        app_cache = project_state.render()
+        for operation in migration.operations:
+            if isinstance(operation, migrations.CreateModel):
+                model = app_cache.get_model(migration.app_label, operation.name)
+                if model._meta.db_table not in self.connection.introspection.get_table_list(self.connection.cursor()):
+                    return False
+        return True
