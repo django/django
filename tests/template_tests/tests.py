@@ -1955,3 +1955,47 @@ class SSITests(TestCase):
         with override_settings(ALLOWED_INCLUDE_ROOTS=(self.ssi_dir,)):
             for path in disallowed_paths:
                 self.assertEqual(self.render_ssi(path), '')
+
+
+class BaseDirsTest(TestCase):
+
+    dirs_tuple = (os.path.join(os.path.dirname(upath(__file__)), 'other_templates'),)
+    dirs_list = list(dirs_tuple)
+    dirs_iter = (dirs_tuple, dirs_list)
+
+    tag_name = None
+
+    def render(self, path, dirs):
+        context = Context({'dirs': dirs})
+        return template.Template('{%% %s "%s" dirs %%}' % (self.tag_name, path)).render(context)
+
+
+class ExtendsDirsTest(BaseDirsTest):
+
+    tag_name = 'extends'
+
+    def test_extends_with_dirs(self):
+        for dirs in self.dirs_iter:
+            self.assertEqual(self.render('test_extends_dirs.html', dirs=dirs), 'spam eggs\n')
+
+    def test_extends_with_var_and_dirs(self):
+        for dirs in self.dirs_iter:
+            context = Context({'file_name': 'test_extends_dirs.html', 'dirs': dirs})
+            output = template.Template('{%% %s file_name dirs %%}' % self.tag_name).render(context)
+            self.assertEqual(output, 'spam eggs\n')
+
+
+class IncludeDirsTest(BaseDirsTest):
+
+    tag_name = 'include'
+
+    def test_include_with_dirs(self):
+        for dirs in self.dirs_iter:
+            self.assertEqual(self.render('test_extends_dirs.html', dirs=dirs), 'spam eggs\n')
+
+    def test_with_another_arguments(self):
+        for dirs in self.dirs_iter:
+            context = Context({'dirs': dirs})
+            tmpl = '{%% %s "name_snippet.html" with person="Jane" greeting="Hello" dirs %%}'
+            output = template.Template(tmpl % self.tag_name).render(context)
+            self.assertEqual(output, 'Hello, Jane!\n')

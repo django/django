@@ -237,6 +237,13 @@ This tag can be used in two ways:
   parent template. If the variable evaluates to a ``Template`` object,
   Django will use that object as the parent template.
 
+* ``{% extends "base.html" dirs %}`` or ``{% extends variable dirs %}`` uses
+  the value of ``dirs`` to override the :setting:`TEMPLATE_DIRS` setting.
+
+.. versionchanged:: 1.7
+
+   The ``dirs`` variable was added.
+
 See :ref:`template-inheritance` for more information.
 
 .. templatetag:: filter
@@ -735,6 +742,15 @@ available to the included template::
     subtemplate and include its contents as if it were part of the parent".
     This means that there is no shared state between included templates --
     each include is a completely independent rendering process.
+
+If you want to override the :setting:`TEMPLATE_DIRS` setting, use the ``dirs``
+variable::
+
+    {% include "base.html" dirs %}
+
+.. versionchanged:: 1.7
+
+   The ``dirs`` variable was added.
 
 See also: :ttag:`{% ssi %}<ssi>`.
 
