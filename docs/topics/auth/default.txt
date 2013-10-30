@@ -577,8 +577,7 @@ patterns.
       log the user in. Defaults to :file:`registration/login.html`.
 
     * ``redirect_field_name``: The name of a ``GET`` field containing the
-      URL to redirect to after login. Overrides ``next`` if the given
-      ``GET`` parameter is passed.
+      URL to redirect to after login. Defaults to ``next``.
 
     * ``authentication_form``: A callable (typically just a form class) to
       use for authentication. Defaults to
@@ -695,8 +694,8 @@ patterns.
       :file:`registration/logged_out.html` if no argument is supplied.
 
     * ``redirect_field_name``: The name of a ``GET`` field containing the
-      URL to redirect to after log out. Overrides ``next_page`` if the given
-      ``GET`` parameter is passed.
+      URL to redirect to after log out. Defaults to ``next``. Overrides the
+      ``next_page`` URL if the given ``GET`` parameter is passed.
 
     * ``current_app``: A hint indicating which application contains the current
       view. See the :ref:`namespaced URL resolution strategy
