@@ -261,15 +261,15 @@ class FileStorageTests(unittest.TestCase):
         """The storage backend should preserve case of filenames."""
         # Create a storage backend associated with the mixed case name
         # directory.
-        temp_storage = self.storage_class(location=self.temp_dir2)
+        other_temp_storage = self.storage_class(location=self.temp_dir2)
         # Ask that storage backend to store a file with a mixed case filename.
         mixed_case = 'CaSe_SeNsItIvE'
-        file = temp_storage.open(mixed_case, 'w')
+        file = other_temp_storage.open(mixed_case, 'w')
         file.write('storage contents')
         file.close()
         self.assertEqual(os.path.join(self.temp_dir2, mixed_case),
-                         temp_storage.path(mixed_case))
-        temp_storage.delete(mixed_case)
+                         other_temp_storage.path(mixed_case))
+        other_temp_storage.delete(mixed_case)
 
     def test_makedirs_race_handling(self):
         """

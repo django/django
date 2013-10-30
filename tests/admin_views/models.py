@@ -717,3 +717,19 @@ class EmptyModelHidden(models.Model):
 
 class EmptyModelMixin(models.Model):
     """ See ticket #11277. """
+
+class State(models.Model):
+    name = models.CharField(max_length=100)
+
+class City(models.Model):
+    state = models.ForeignKey(State)
+    name = models.CharField(max_length=100)
+
+class Restaurant(models.Model):
+    city = models.ForeignKey(City)
+    name = models.CharField(max_length=100)
+
+class Worker(models.Model):
+    work_at = models.ForeignKey(Restaurant)
+    name = models.CharField(max_length=50)
+    surname = models.CharField(max_length=50)
