@@ -546,20 +546,24 @@ class BaseModelFormSet(BaseFormSet):
             self._object_dict = dict((o.pk, o) for o in self.get_queryset())
         return self._object_dict.get(pk)
 
+    def _get_to_python(self, field):
+        """
+        If the field is a related field, fetch the concrete field's (that
+        is, the ultimate pointed-to field's) get_prep_value.
+        """
+        while field.rel is not None:
+            field = field.rel.get_related_field()
+        return field.to_python
+
     def _construct_form(self, i, **kwargs):
         if self.is_bound and i < self.initial_form_count():
-            # Import goes here instead of module-level because importing
-            # django.db has side effects.
-            from django.db import connections
             pk_key = "%s-%s" % (self.add_prefix(i), self.model._meta.pk.name)
             pk = self.data[pk_key]
             pk_field = self.model._meta.pk
-            pk = pk_field.get_db_prep_lookup('exact', pk,
-                connection=connections[self.get_queryset().db])
-            if isinstance(pk, list):
-                pk = pk[0]
+            to_python = self._get_to_python(pk_field)
+            pk = to_python(pk)
             kwargs['instance'] = self._existing_object(pk)
-        if i < self.initial_form_count() and not kwargs.get('instance'):
+        if i < self.initial_form_count() and 'instance' not in kwargs:
             kwargs['instance'] = self.get_queryset()[i]
         if i >= self.initial_form_count() and self.initial_extra:
             # Set initial values for extra forms
@@ -711,21 +715,17 @@ class BaseModelFormSet(BaseFormSet):
         saved_instances = []
         forms_to_delete = self.deleted_forms
         for form in self.initial_forms:
-            pk_name = self._pk_field.name
-            raw_pk_value = form._raw_value(pk_name)
-
-            # clean() for different types of PK fields can sometimes return
-            # the model instance, and sometimes the PK. Handle either.
-            pk_value = form.fields[pk_name].clean(raw_pk_value)
-            pk_value = getattr(pk_value, 'pk', pk_value)
-
-            obj = self._existing_object(pk_value)
+            obj = form.instance
             if form in forms_to_delete:
+                # If the pk is None, it means that the object can't be
+                # deleted again. Possible reason for this is that the
+                # object was already deleted from the DB. Refs #14877.
+                if obj.pk is None:
+                    continue
                 self.deleted_objects.append(obj)
                 if commit:
                     obj.delete()
-                continue
-            if form.has_changed():
+            elif form.has_changed():
                 self.changed_objects.append((obj, form.changed_data))
                 saved_instances.append(self.save_existing(form, obj, commit=commit))
                 if not commit:
