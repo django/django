@@ -273,6 +273,9 @@ these changes.
   formats, such as the previous default ``'../%s/'``, will not be accepted any
   more.
 
+* The generic ``WSGIServerException`` has been removed. The standard library provides
+  ``socket.error`` which should be used instead.
+
 1.7
 ---
 
