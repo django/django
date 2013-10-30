@@ -130,13 +130,13 @@ class ExecutorTests(MigrationTestBase):
         # Erase all the fake records
         executor.recorder.flush()
 
-
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_soft_apply(self):
         """
         Tests detection of initial migrations already having been applied.
         """
         state = {"faked": None}
+
         def fake_storer(phase, migration, fake):
             state["faked"] = fake
         executor = MigrationExecutor(connection, progress_callback=fake_storer)
