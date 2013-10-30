@@ -32,7 +32,7 @@ class GeometryProxy(object):
 
         if isinstance(geom_value, self._klass):
             geom = geom_value
-        elif (geom_value is None) or (geom_value==''):
+        elif (geom_value is None) or (geom_value == ''):
             geom = None
         else:
             # Otherwise, a Geometry object is built using the field's contents,

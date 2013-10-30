@@ -35,4 +35,4 @@ class Author(models.Model):
 
     class Meta:
         db_table = 'my author table'
-        ordering = ('last_name','first_name')
+        ordering = ('last_name', 'first_name')

@@ -11,3 +11,11 @@ DEFAULT_TAGS = {
     WARNING: 'warning',
     ERROR: 'error',
 }
+
+DEFAULT_LEVELS = {
+    'DEBUG': DEBUG,
+    'INFO': INFO,
+    'SUCCESS': SUCCESS,
+    'WARNING': WARNING,
+    'ERROR': ERROR,
+}

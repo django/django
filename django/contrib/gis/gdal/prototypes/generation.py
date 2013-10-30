@@ -36,6 +36,7 @@ def geom_output(func, argtypes, offset=None):
     else:
         # Error code returned, geometry is returned by-reference.
         func.restype = c_int
+
         def geomerrcheck(result, func, cargs):
             return check_geom_offset(result, func, cargs, offset)
         func.errcheck = geomerrcheck

@@ -67,7 +67,7 @@ class Supplier(models.Model):
     restaurant = models.ForeignKey(Restaurant)
 
 class Wholesaler(Supplier):
-    retailer = models.ForeignKey(Supplier,related_name='wholesale_supplier')
+    retailer = models.ForeignKey(Supplier, related_name='wholesale_supplier')
 
 class Parent(models.Model):
     created = models.DateTimeField(default=datetime.datetime.now)
@@ -86,6 +86,7 @@ class SelfRefChild(SelfRefParent):
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
+
     class Meta:
         ordering = ('-pub_date', 'headline')
 

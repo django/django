@@ -31,7 +31,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
     RelatedPrepopulated, UndeletableObject, UnchangeableObject, UserMessenger, Simple, Choice,
     ShortMessage, Telegram, FilteredManager, EmptyModelHidden,
-    EmptyModelVisible, EmptyModelMixin)
+    EmptyModelVisible, EmptyModelMixin, State, City, Restaurant, Worker)
 
 
 def callable_year(dt_value):
@@ -45,9 +45,9 @@ callable_year.admin_order_field = 'date'
 class ArticleInline(admin.TabularInline):
     model = Article
     prepopulated_fields = {
-        'title' : ('content',)
+        'title': ('content',)
     }
-    fieldsets=(
+    fieldsets = (
         ('Some fields', {
             'classes': ('collapse',),
             'fields': ('title', 'content')
@@ -74,7 +74,8 @@ class ChapterXtra1Admin(admin.ModelAdmin):
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('content', 'date', callable_year, 'model_year', 'modeladmin_year')
     list_filter = ('date', 'section')
-    fieldsets=(
+    view_on_site = False
+    fieldsets = (
         ('Some fields', {
             'classes': ('collapse',),
             'fields': ('title', 'content')
@@ -382,7 +383,7 @@ class SubPostInline(admin.TabularInline):
     model = PrePopulatedSubPost
 
     prepopulated_fields = {
-        'subslug' : ('subtitle',)
+        'subslug': ('subtitle',)
     }
 
     def get_readonly_fields(self, request, obj=None):
@@ -399,7 +400,7 @@ class SubPostInline(admin.TabularInline):
 class PrePopulatedPostAdmin(admin.ModelAdmin):
     list_display = ['title', 'slug']
     prepopulated_fields = {
-        'slug' : ('title',)
+        'slug': ('title',)
     }
 
     inlines = [SubPostInline]
@@ -465,7 +466,7 @@ class WorkHourAdmin(admin.ModelAdmin):
 
 
 class FoodDeliveryAdmin(admin.ModelAdmin):
-    list_display=('reference', 'driver', 'restaurant')
+    list_display = ('reference', 'driver', 'restaurant')
     list_editable = ('driver', 'restaurant')
 
 
@@ -569,7 +570,7 @@ class AlbumAdmin(admin.ModelAdmin):
 
 class PrePopulatedPostLargeSlugAdmin(admin.ModelAdmin):
     prepopulated_fields = {
-        'slug' : ('title',)
+        'slug': ('title',)
     }
 
 
@@ -723,7 +724,7 @@ class EmptyModelVisibleAdmin(admin.ModelAdmin):
     form = FormWithoutHiddenField
     fieldsets = (
         (None, {
-            'fields':(('first', 'second'),),
+            'fields': (('first', 'second'),),
         }),
     )
 
@@ -734,6 +735,35 @@ class EmptyModelHiddenAdmin(admin.ModelAdmin):
 class EmptyModelMixinAdmin(admin.ModelAdmin):
     form = FormWithVisibleAndHiddenField
     fieldsets = EmptyModelVisibleAdmin.fieldsets
+
+class CityInlineAdmin(admin.TabularInline):
+    model = City
+    view_on_site = False
+
+class StateAdmin(admin.ModelAdmin):
+    inlines = [CityInlineAdmin]
+
+class RestaurantInlineAdmin(admin.TabularInline):
+    model = Restaurant
+    view_on_site = True
+
+class CityAdmin(admin.ModelAdmin):
+    inlines = [RestaurantInlineAdmin]
+    view_on_site = True
+
+class WorkerAdmin(admin.ModelAdmin):
+    def view_on_site(self, obj):
+        return '/worker/%s/%s/' % (obj.surname, obj.name)
+
+class WorkerInlineAdmin(admin.TabularInline):
+    model = Worker
+
+    def view_on_site(self, obj):
+        return '/worker_inline/%s/%s/' % (obj.surname, obj.name)
+
+class RestaurantAdmin(admin.ModelAdmin):
+    inlines = [WorkerInlineAdmin]
+    view_on_site = False
 
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
@@ -785,6 +815,10 @@ site.register(MainPrepopulated, MainPrepopulatedAdmin)
 site.register(UnorderedObject, UnorderedObjectAdmin)
 site.register(UndeletableObject, UndeletableObjectAdmin)
 site.register(UnchangeableObject, UnchangeableObjectAdmin)
+site.register(State, StateAdmin)
+site.register(City, CityAdmin)
+site.register(Restaurant, RestaurantAdmin)
+site.register(Worker, WorkerAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:

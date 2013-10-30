@@ -15,7 +15,6 @@ from django.forms import (
     Textarea, TextInput, TimeInput,
 )
 from django.forms.widgets import RadioFieldRenderer
-from django.utils import formats
 from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.translation import activate, deactivate, override
@@ -273,6 +272,7 @@ class FormsWidgetTestCase(TestCase):
 
         # The 'choices' argument can be any iterable:
         from itertools import chain
+
         def get_choices():
             for i in range(5):
                 yield (i, i)
@@ -284,6 +284,7 @@ class FormsWidgetTestCase(TestCase):
 <option value="4">4</option>
 </select>""")
         things = ({'id': 1, 'name': 'And Boom'}, {'id': 2, 'name': 'One More Thing!'})
+
         class SomeForm(Form):
             somechoice = ChoiceField(choices=chain((('', '-'*9),), [(thing['id'], thing['name']) for thing in things]))
         f = SomeForm()
@@ -340,7 +341,10 @@ class FormsWidgetTestCase(TestCase):
 </select>""")
 
         # Choices can be nested one level in order to create HTML optgroups:
-        w.choices=(('outer1', 'Outer 1'), ('Group "1"', (('inner1', 'Inner 1'), ('inner2', 'Inner 2'))))
+        w.choices = (
+            ('outer1', 'Outer 1'),
+            ('Group "1"', (('inner1', 'Inner 1'), ('inner2', 'Inner 2'))),
+        )
         self.assertHTMLEqual(w.render('nestchoice', None), """<select name="nestchoice">
 <option value="outer1">Outer 1</option>
 <optgroup label="Group &quot;1&quot;">
@@ -686,7 +690,7 @@ beatle J R Ringo False""")
         self.assertHTMLEqual(six.text_type(w.render('email', 'ŠĐĆŽćžšđ', choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])), '<ul>\n<li><label><input checked="checked" type="radio" name="email" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /> \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></li>\n<li><label><input type="radio" name="email" value="\u0107\u017e\u0161\u0111" /> abc\u0107\u017e\u0161\u0111</label></li>\n</ul>')
 
         # Attributes provided at instantiation are passed to the constituent inputs
-        w = RadioSelect(attrs={'id':'foo'})
+        w = RadioSelect(attrs={'id': 'foo'})
         self.assertHTMLEqual(w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))), """<ul id="foo">
 <li><label for="foo_0"><input checked="checked" type="radio" id="foo_0" value="J" name="beatle" /> John</label></li>
 <li><label for="foo_1"><input type="radio" id="foo_1" value="P" name="beatle" /> Paul</label></li>
@@ -696,7 +700,7 @@ beatle J R Ringo False""")
 
         # Attributes provided at render-time are passed to the constituent inputs
         w = RadioSelect()
-        self.assertHTMLEqual(w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')), attrs={'id':'bar'}), """<ul id="bar">
+        self.assertHTMLEqual(w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')), attrs={'id': 'bar'}), """<ul id="bar">
 <li><label for="bar_0"><input checked="checked" type="radio" id="bar_0" value="J" name="beatle" /> John</label></li>
 <li><label for="bar_1"><input type="radio" id="bar_1" value="P" name="beatle" /> Paul</label></li>
 <li><label for="bar_2"><input type="radio" id="bar_2" value="G" name="beatle" /> George</label></li>
@@ -706,8 +710,12 @@ beatle J R Ringo False""")
     def test_nested_choices(self):
         # Choices can be nested for radio buttons:
         w = RadioSelect()
-        w.choices=(('unknown', 'Unknown'), ('Audio', (('vinyl', 'Vinyl'), ('cd', 'CD'))), ('Video', (('vhs', 'VHS'), ('dvd', 'DVD'))))
-        self.assertHTMLEqual(w.render('nestchoice', 'dvd', attrs={'id':'media'}), """<ul id="media">
+        w.choices = (
+            ('unknown', 'Unknown'),
+            ('Audio', (('vinyl', 'Vinyl'), ('cd', 'CD'))),
+            ('Video', (('vhs', 'VHS'), ('dvd', 'DVD'))),
+        )
+        self.assertHTMLEqual(w.render('nestchoice', 'dvd', attrs={'id': 'media'}), """<ul id="media">
 <li><label for="media_0"><input id="media_0" name="nestchoice" type="radio" value="unknown" /> Unknown</label></li>
 <li>Audio<ul id="media_1">
 <li><label for="media_1_0"><input id="media_1_0" name="nestchoice" type="radio" value="vinyl" /> Vinyl</label></li>
@@ -721,8 +729,12 @@ beatle J R Ringo False""")
 
         # Choices can be nested for checkboxes:
         w = CheckboxSelectMultiple()
-        w.choices=(('unknown', 'Unknown'), ('Audio', (('vinyl', 'Vinyl'), ('cd', 'CD'))), ('Video', (('vhs', 'VHS'), ('dvd', 'DVD'))))
-        self.assertHTMLEqual(w.render('nestchoice', ('vinyl', 'dvd'), attrs={'id':'media'}), """<ul id="media">
+        w.choices = (
+            ('unknown', 'Unknown'),
+            ('Audio', (('vinyl', 'Vinyl'), ('cd', 'CD'))),
+            ('Video', (('vhs', 'VHS'), ('dvd', 'DVD'))),
+        )
+        self.assertHTMLEqual(w.render('nestchoice', ('vinyl', 'dvd'), attrs={'id': 'media'}), """<ul id="media">
 <li><label for="media_0"><input id="media_0" name="nestchoice" type="checkbox" value="unknown" /> Unknown</label></li>
 <li>Audio<ul id="media_1">
 <li><label for="media_1_0"><input checked="checked" id="media_1_0" name="nestchoice" type="checkbox" value="vinyl" /> Vinyl</label></li>
@@ -892,13 +904,14 @@ beatle J R Ringo False""")
                 if value:
                     return value.split('__')
                 return ['', '']
+
             def format_output(self, rendered_widgets):
                 return '<br />'.join(rendered_widgets)
 
         w = MyMultiWidget(widgets=(TextInput(attrs={'class': 'big'}), TextInput(attrs={'class': 'small'})))
         self.assertHTMLEqual(w.render('name', ['john', 'lennon']), '<input type="text" class="big" value="john" name="name_0" /><br /><input type="text" class="small" value="lennon" name="name_1" />')
         self.assertHTMLEqual(w.render('name', 'john__lennon'), '<input type="text" class="big" value="john" name="name_0" /><br /><input type="text" class="small" value="lennon" name="name_1" />')
-        self.assertHTMLEqual(w.render('name', 'john__lennon', attrs={'id':'foo'}), '<input id="foo_0" type="text" class="big" value="john" name="name_0" /><br /><input id="foo_1" type="text" class="small" value="lennon" name="name_1" />')
+        self.assertHTMLEqual(w.render('name', 'john__lennon', attrs={'id': 'foo'}), '<input id="foo_0" type="text" class="big" value="john" name="name_0" /><br /><input id="foo_1" type="text" class="small" value="lennon" name="name_1" />')
         w = MyMultiWidget(widgets=(TextInput(attrs={'class': 'big'}), TextInput(attrs={'class': 'small'})), attrs={'id': 'bar'})
         self.assertHTMLEqual(w.render('name', ['john', 'lennon']), '<input id="bar_0" type="text" class="big" value="john" name="name_0" /><br /><input id="bar_1" type="text" class="small" value="lennon" name="name_1" />')
 
@@ -1055,6 +1068,7 @@ class SelectAndTextWidget(MultiWidget):
         When choices are set for this widget, we want to pass those along to the Select widget
         """
         self.widgets[0].choices = choices
+
     def _get_choices(self):
         """
         The choices for this widget are the Select widget's choices
@@ -1066,12 +1080,12 @@ class SelectAndTextWidget(MultiWidget):
 class WidgetTests(TestCase):
     def test_12048(self):
         # See ticket #12048.
-        w1 = SelectAndTextWidget(choices=[1,2,3])
+        w1 = SelectAndTextWidget(choices=[1, 2, 3])
         w2 = copy.deepcopy(w1)
-        w2.choices = [4,5,6]
+        w2.choices = [4, 5, 6]
         # w2 ought to be independent of w1, since MultiWidget ought
         # to make a copy of its sub-widgets when it is copied.
-        self.assertEqual(w1.choices, [1,2,3])
+        self.assertEqual(w1.choices, [1, 2, 3])
 
     def test_13390(self):
         # See ticket #13390

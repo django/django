@@ -31,7 +31,7 @@ def ogrinfo(data_source, num_features=10):
         print("      extent: %s - %s" % (extent_tup[0:2], extent_tup[2:4]))
         print("Displaying the first %s features ====" % num_features)
 
-        width = max(*map(len,layer.fields))
+        width = max(*map(len, layer.fields))
         fmt = " %%%ss: %%s" % width
         for j, feature in enumerate(layer[:num_features]):
             print("=== Feature %s" % j)

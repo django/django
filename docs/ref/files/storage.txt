@@ -29,12 +29,22 @@ Django provides two convenient ways to access the current storage class:
 The FileSystemStorage Class
 ---------------------------
 
-.. class:: FileSystemStorage
+.. class:: FileSystemStorage([location=None, base_url=None, file_permissions_mode=None])
 
     The :class:`~django.core.files.storage.FileSystemStorage` class implements
     basic file storage on a local filesystem. It inherits from
     :class:`~django.core.files.storage.Storage` and provides implementations
     for all the public methods thereof.
+
+    .. attribute:: file_permissions_mode
+
+        The file system permissions that the file will receive when it is
+        saved. Defaults to :setting:`FILE_UPLOAD_PERMISSIONS`.
+
+        .. versionadded:: 1.7
+
+            The ``file_permissions_mode`` attribute was added. Previously files
+            always received :setting:`FILE_UPLOAD_PERMISSIONS` permissions.
 
     .. note::
 
@@ -80,7 +90,6 @@ The Storage Class
         Returns a filename based on the ``name`` parameter that's free and
         available for new content to be written to on the target storage
         system.
-
 
     .. method:: get_valid_name(name)
 

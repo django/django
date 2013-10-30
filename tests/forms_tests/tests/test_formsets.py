@@ -1106,19 +1106,19 @@ ChoiceFormSet = formset_factory(Choice)
 class FormsetAsFooTests(TestCase):
     def test_as_table(self):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
-        self.assertHTMLEqual(formset.as_table(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
+        self.assertHTMLEqual(formset.as_table(), """<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
 <tr><th>Choice:</th><td><input type="text" name="choices-0-choice" value="Calexico" /></td></tr>
 <tr><th>Votes:</th><td><input type="number" name="choices-0-votes" value="100" /></td></tr>""")
 
     def test_as_p(self):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
-        self.assertHTMLEqual(formset.as_p(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
+        self.assertHTMLEqual(formset.as_p(), """<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
 <p>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></p>
 <p>Votes: <input type="number" name="choices-0-votes" value="100" /></p>""")
 
     def test_as_ul(self):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
-        self.assertHTMLEqual(formset.as_ul(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
+        self.assertHTMLEqual(formset.as_ul(), """<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
 <li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
 <li>Votes: <input type="number" name="choices-0-votes" value="100" /></li>""")
 
@@ -1188,8 +1188,8 @@ class TestEmptyFormSet(TestCase):
     def test_empty_formset_is_valid(self):
         """Test that an empty formset still calls clean()"""
         EmptyFsetWontValidateFormset = formset_factory(FavoriteDrinkForm, extra=0, formset=EmptyFsetWontValidate)
-        formset = EmptyFsetWontValidateFormset(data={'form-INITIAL_FORMS':'0', 'form-TOTAL_FORMS':'0'},prefix="form")
-        formset2 = EmptyFsetWontValidateFormset(data={'form-INITIAL_FORMS':'0', 'form-TOTAL_FORMS':'1', 'form-0-name':'bah'},prefix="form")
+        formset = EmptyFsetWontValidateFormset(data={'form-INITIAL_FORMS': '0', 'form-TOTAL_FORMS': '0'}, prefix="form")
+        formset2 = EmptyFsetWontValidateFormset(data={'form-INITIAL_FORMS': '0', 'form-TOTAL_FORMS': '1', 'form-0-name': 'bah'}, prefix="form")
         self.assertFalse(formset.is_valid())
         self.assertFalse(formset2.is_valid())
 

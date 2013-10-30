@@ -641,7 +641,7 @@ def templatize(src, origin=None):
                     out.write(' _(%s) ' % cmatch.group(1))
                 for p in parts[1:]:
                     if p.find(':_(') >= 0:
-                        out.write(' %s ' % p.split(':',1)[1])
+                        out.write(' %s ' % p.split(':', 1)[1])
                     else:
                         out.write(blankout(p, 'F'))
             elif t.token_type == TOKEN_COMMENT:
@@ -665,7 +665,7 @@ def parse_accept_lang_header(lang_string):
     if pieces[-1]:
         return []
     for i in range(0, len(pieces) - 1, 3):
-        first, lang, priority = pieces[i : i + 3]
+        first, lang, priority = pieces[i:i + 3]
         if first:
             return []
         if priority:

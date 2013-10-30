@@ -80,7 +80,7 @@ class FileUploadTests(TestCase):
             'Content-Disposition: form-data; name="file"; filename="test.txt"',
             'Content-Type: application/octet-stream',
             'Content-Transfer-Encoding: base64',
-            '',]))
+            '']))
         payload.write(b"\r\n" + base64.b64encode(force_bytes(content)) + b"\r\n")
         payload.write('--' + client.BOUNDARY + '--\r\n')
         r = {

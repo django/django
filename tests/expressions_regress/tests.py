@@ -224,7 +224,7 @@ class FTimeDeltaTests(TestCase):
         e0 = Experiment.objects.create(name='e0', assigned=sday, start=stime,
             end=end, completed=end.date())
         self.deltas.append(delta0)
-        self.delays.append(e0.start-
+        self.delays.append(e0.start -
             datetime.datetime.combine(e0.assigned, midnight))
         self.days_long.append(e0.completed-e0.assigned)
 
@@ -239,7 +239,7 @@ class FTimeDeltaTests(TestCase):
             e1 = Experiment.objects.create(name='e1', assigned=sday,
                 start=stime+delay, end=end, completed=end.date())
             self.deltas.append(delta1)
-            self.delays.append(e1.start-
+            self.delays.append(e1.start -
                 datetime.datetime.combine(e1.assigned, midnight))
             self.days_long.append(e1.completed-e1.assigned)
 
@@ -249,7 +249,7 @@ class FTimeDeltaTests(TestCase):
             assigned=sday-datetime.timedelta(3), start=stime, end=end,
             completed=end.date())
         self.deltas.append(delta2)
-        self.delays.append(e2.start-
+        self.delays.append(e2.start -
             datetime.datetime.combine(e2.assigned, midnight))
         self.days_long.append(e2.completed-e2.assigned)
 
@@ -259,7 +259,7 @@ class FTimeDeltaTests(TestCase):
         e3 = Experiment.objects.create(name='e3',
             assigned=sday, start=stime+delay, end=end, completed=end.date())
         self.deltas.append(delta3)
-        self.delays.append(e3.start-
+        self.delays.append(e3.start -
             datetime.datetime.combine(e3.assigned, midnight))
         self.days_long.append(e3.completed-e3.assigned)
 
@@ -269,7 +269,7 @@ class FTimeDeltaTests(TestCase):
             assigned=sday-datetime.timedelta(10), start=stime, end=end,
             completed=end.date())
         self.deltas.append(delta4)
-        self.delays.append(e4.start-
+        self.delays.append(e4.start -
             datetime.datetime.combine(e4.assigned, midnight))
         self.days_long.append(e4.completed-e4.assigned)
         self.expnames = [e.name for e in Experiment.objects.all()]
@@ -341,7 +341,7 @@ class FTimeDeltaTests(TestCase):
             self.assertEqual(test_set, self.expnames[:i])
 
             test_set = [e.name for e in
-                Experiment.objects.filter(start__lte=F('assigned')+delay+
+                Experiment.objects.filter(start__lte=F('assigned') + delay +
                     datetime.timedelta(1))]
             self.assertEqual(test_set, self.expnames[:i+1])
 

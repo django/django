@@ -139,14 +139,14 @@ class SortedDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
 class MergeDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
 
     def test_simple_mergedict(self):
-        d1 = {'chris':'cool', 'camri':'cute', 'cotton':'adorable',
-              'tulip':'snuggable', 'twoofme':'firstone'}
+        d1 = {'chris': 'cool', 'camri': 'cute', 'cotton': 'adorable',
+              'tulip': 'snuggable', 'twoofme': 'firstone'}
 
-        d2 = {'chris2':'cool2', 'camri2':'cute2', 'cotton2':'adorable2',
-              'tulip2':'snuggable2'}
+        d2 = {'chris2': 'cool2', 'camri2': 'cute2', 'cotton2': 'adorable2',
+              'tulip2': 'snuggable2'}
 
-        d3 = {'chris3':'cool3', 'camri3':'cute3', 'cotton3':'adorable3',
-              'tulip3':'snuggable3'}
+        d3 = {'chris3': 'cool3', 'camri3': 'cute3', 'cotton3': 'adorable3',
+              'tulip3': 'snuggable3'}
 
         md = MergeDict(d1, d2, d3)
 
@@ -183,7 +183,7 @@ class MergeDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
                           [('key1', 'value1'), ('key2', 'value3'),
                            ('key4', 'value6')])
 
-        self.assertEqual([(k,mm.getlist(k)) for k in sorted(mm)],
+        self.assertEqual([(k, mm.getlist(k)) for k in sorted(mm)],
                           [('key1', ['value1']),
                            ('key2', ['value2', 'value3']),
                            ('key4', ['value5', 'value6'])])

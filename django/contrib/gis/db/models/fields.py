@@ -203,9 +203,9 @@ class GeometryField(Field):
         return connection.ops.geo_db_type(self)
 
     def formfield(self, **kwargs):
-        defaults = {'form_class' : self.form_class,
-                    'geom_type' : self.geom_type,
-                    'srid' : self.srid,
+        defaults = {'form_class': self.form_class,
+                    'geom_type': self.geom_type,
+                    'srid': self.srid,
                     }
         defaults.update(kwargs)
         if (self.dim > 2 and not 'widget' in kwargs and

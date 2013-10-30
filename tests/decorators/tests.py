@@ -22,6 +22,7 @@ fully_decorated.anything = "Expected __dict__"
 def compose(*functions):
     # compose(f, g)(*args, **kwargs) == f(g(*args, **kwargs))
     functions = list(reversed(functions))
+
     def _inner(*args, **kwargs):
         result = functions[0](*args, **kwargs)
         for f in functions[1:]:
@@ -49,7 +50,7 @@ full_decorator = compose(
 
     # django.contrib.auth.decorators
     # Apply user_passes_test twice to check #9474
-    user_passes_test(lambda u:True),
+    user_passes_test(lambda u: True),
     login_required,
     permission_required('change_world'),
 

@@ -492,7 +492,7 @@ checks to make sure the user has an email in the desired domain::
 The permission_required decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: permission_required([login_url=None, raise_exception=False])
+.. function:: permission_required(perm, [login_url=None, raise_exception=False])
 
     It's a relatively common task to check whether a user has a particular
     permission. For that reason, Django provides a shortcut for that case: the

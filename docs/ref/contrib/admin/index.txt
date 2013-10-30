@@ -1091,6 +1091,37 @@ subclass::
     :meth:`ModelAdmin.get_search_results` to provide additional or alternate
     search behavior.
 
+.. attribute:: ModelAdmin.view_on_site
+
+    .. versionadded:: 1.7
+
+    Set ``view_on_site`` to control whether or not to display the "View on site" link.
+    This link should bring you to a URL where you can display the saved object.
+
+    This value can be either a boolean flag or a callable. If ``True`` (the
+    default), the object's :meth:`~django.db.models.Model.get_absolute_url`
+    method will be used to generate the url.
+
+    If your model has a :meth:`~django.db.models.Model.get_absolute_url` method
+    but you don't want the "View on site" button to appear, you only need to set
+    ``view_on_site`` to ``False``::
+
+        from django.contrib import admin
+
+        class PersonAdmin(admin.ModelAdmin):
+            view_on_site = False
+
+    In case it is a callable, it accepts the model instance as a parameter.
+    For example::
+
+        from django.contrib import admin
+        from django.core.urlresolvers import reverse
+
+        class PersonAdmin(admin.ModelAdmin):
+            def view_on_site(self, obj):
+                return 'http://example.com' + reverse('person-detail',
+                                                      kwargs={'slug': obj.slug})
+
 Custom template options
 ~~~~~~~~~~~~~~~~~~~~~~~
 

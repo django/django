@@ -14,7 +14,7 @@ class GoogleMapException(Exception):
 
 # The default Google Maps URL (for the API javascript)
 # TODO: Internationalize for Japan, UK, etc.
-GOOGLE_MAPS_URL='http://maps.google.com/maps?file=api&v=%s&key='
+GOOGLE_MAPS_URL = 'http://maps.google.com/maps?file=api&v=%s&key='
 
 
 class GoogleMap(object):
@@ -100,16 +100,16 @@ class GoogleMap(object):
         """
         Generates the JavaScript necessary for displaying this Google Map.
         """
-        params = {'calc_zoom' : self.calc_zoom,
-                  'center' : self.center,
-                  'dom_id' : self.dom_id,
-                  'js_module' : self.js_module,
-                  'kml_urls' : self.kml_urls,
-                  'zoom' : self.zoom,
-                  'polygons' : self.polygons,
-                  'polylines' : self.polylines,
+        params = {'calc_zoom': self.calc_zoom,
+                  'center': self.center,
+                  'dom_id': self.dom_id,
+                  'js_module': self.js_module,
+                  'kml_urls': self.kml_urls,
+                  'zoom': self.zoom,
+                  'polygons': self.polygons,
+                  'polylines': self.polylines,
                   'icons': self.icons,
-                  'markers' : self.markers,
+                  'markers': self.markers,
                   }
         params.update(self.extra_context)
         return render_to_string(self.template, params)
@@ -213,10 +213,10 @@ class GoogleMapSet(GoogleMap):
         Generates the JavaScript for the collection of Google Maps in
         this set.
         """
-        params = {'js_module' : self.js_module,
-                  'dom_ids' : self.dom_ids,
-                  'load_map_js' : self.load_map_js(),
-                  'icons' : self.icons,
+        params = {'js_module': self.js_module,
+                  'dom_ids': self.dom_ids,
+                  'load_map_js': self.load_map_js(),
+                  'icons': self.icons,
                   }
         params.update(self.extra_context)
         return render_to_string(self.template, params)

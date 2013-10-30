@@ -142,6 +142,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         Sitemap.get_url() url result.
         """
         test_sitemap = GenericSitemap({'queryset': TestModel.objects.all()})
+
         def is_testmodel(url):
             return isinstance(url['item'], TestModel)
         item_in_url_info = all(map(is_testmodel, test_sitemap.get_urls()))

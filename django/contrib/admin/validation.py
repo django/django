@@ -164,6 +164,11 @@ class BaseValidator(object):
                 for idx, f in enumerate(val):
                     get_field(cls, model, "prepopulated_fields['%s'][%d]" % (field, idx), f)
 
+    def validate_view_on_site_url(self, cls, model):
+        if hasattr(cls, 'view_on_site'):
+            if not callable(cls.view_on_site) and not isinstance(cls.view_on_site, bool):
+                raise ImproperlyConfigured("%s.view_on_site is not a callable or a boolean value." % cls.__name__)
+
     def validate_ordering(self, cls, model):
         " Validate that ordering refers to existing fields or is random. "
         # ordering = None

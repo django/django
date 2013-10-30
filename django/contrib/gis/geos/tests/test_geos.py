@@ -51,6 +51,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
         # This one only accepts pointers to floats
         c_float_p = ctypes.POINTER(ctypes.c_float)
+
         class FakeGeom2(GEOSBase):
             ptr_type = c_float_p
 
@@ -238,7 +239,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # an invalid type.
         for g in (p, ls):
             self.assertNotEqual(g, None)
-            self.assertNotEqual(g, {'foo' : 'bar'})
+            self.assertNotEqual(g, {'foo': 'bar'})
             self.assertNotEqual(g, False)
 
     def test_points(self):
@@ -756,17 +757,17 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         "Testing three-dimensional geometries."
         # Testing a 3D Point
         pnt = Point(2, 3, 8)
-        self.assertEqual((2.,3.,8.), pnt.coords)
-        self.assertRaises(TypeError, pnt.set_coords, (1.,2.))
-        pnt.coords = (1.,2.,3.)
-        self.assertEqual((1.,2.,3.), pnt.coords)
+        self.assertEqual((2., 3., 8.), pnt.coords)
+        self.assertRaises(TypeError, pnt.set_coords, (1., 2.))
+        pnt.coords = (1., 2., 3.)
+        self.assertEqual((1., 2., 3.), pnt.coords)
 
         # Testing a 3D LineString
         ls = LineString((2., 3., 8.), (50., 250., -117.))
-        self.assertEqual(((2.,3.,8.), (50.,250.,-117.)), ls.tuple)
-        self.assertRaises(TypeError, ls.__setitem__, 0, (1.,2.))
-        ls[0] = (1.,2.,3.)
-        self.assertEqual((1.,2.,3.), ls[0])
+        self.assertEqual(((2., 3., 8.), (50., 250., -117.)), ls.tuple)
+        self.assertRaises(TypeError, ls.__setitem__, 0, (1., 2.))
+        ls[0] = (1., 2., 3.)
+        self.assertEqual((1., 2., 3.), ls[0])
 
     def test_distance(self):
         "Testing the distance() function."

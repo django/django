@@ -211,14 +211,14 @@ class ManyToOneTests(TestCase):
                 "<Article: This is a test>",
             ])
         self.assertQuerysetEqual(
-            Article.objects.filter(reporter__in=[self.r.id,self.r2.id]).distinct(),
+            Article.objects.filter(reporter__in=[self.r.id, self.r2.id]).distinct(),
             [
                 "<Article: John's second story>",
                 "<Article: Paul's story>",
                 "<Article: This is a test>",
             ])
         self.assertQuerysetEqual(
-            Article.objects.filter(reporter__in=[self.r,self.r2]).distinct(),
+            Article.objects.filter(reporter__in=[self.r, self.r2]).distinct(),
             [
                 "<Article: John's second story>",
                 "<Article: Paul's story>",
@@ -258,13 +258,13 @@ class ManyToOneTests(TestCase):
         self.assertQuerysetEqual(Reporter.objects.filter(article=self.a),
                                  ["<Reporter: John Smith>"])
         self.assertQuerysetEqual(
-            Reporter.objects.filter(article__in=[self.a.id,a3.id]).distinct(),
+            Reporter.objects.filter(article__in=[self.a.id, a3.id]).distinct(),
             ["<Reporter: John Smith>"])
         self.assertQuerysetEqual(
-            Reporter.objects.filter(article__in=[self.a.id,a3]).distinct(),
+            Reporter.objects.filter(article__in=[self.a.id, a3]).distinct(),
             ["<Reporter: John Smith>"])
         self.assertQuerysetEqual(
-            Reporter.objects.filter(article__in=[self.a,a3]).distinct(),
+            Reporter.objects.filter(article__in=[self.a, a3]).distinct(),
             ["<Reporter: John Smith>"])
         self.assertQuerysetEqual(
             Reporter.objects.filter(article__headline__startswith='T'),
@@ -439,6 +439,6 @@ class ManyToOneTests(TestCase):
                                  Article.objects.values_list,
                                  'reporter__notafield')
         self.assertRaisesMessage(FieldError,
-                                 expected_message % ', '.join(['EXTRA',] + Article._meta.get_all_field_names()),
+                                 expected_message % ', '.join(['EXTRA'] + Article._meta.get_all_field_names()),
                                  Article.objects.extra(select={'EXTRA': 'EXTRA_SELECT'}).values_list,
                                  'notafield')

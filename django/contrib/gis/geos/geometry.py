@@ -707,14 +707,14 @@ from django.contrib.gis.geos.linestring import LineString, LinearRing
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos.polygon import Polygon
 from django.contrib.gis.geos.collections import GeometryCollection, MultiPoint, MultiLineString, MultiPolygon
-GEOS_CLASSES = {0 : Point,
-                1 : LineString,
-                2 : LinearRing,
-                3 : Polygon,
-                4 : MultiPoint,
-                5 : MultiLineString,
-                6 : MultiPolygon,
-                7 : GeometryCollection,
+GEOS_CLASSES = {0: Point,
+                1: LineString,
+                2: LinearRing,
+                3: Polygon,
+                4: MultiPoint,
+                5: MultiLineString,
+                6: MultiPolygon,
+                7: GeometryCollection,
                 }
 
 # If supported, import the PreparedGeometry class.

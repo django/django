@@ -29,7 +29,7 @@ class Event(models.Model):
 
 class Happening(models.Model):
     when = models.DateTimeField(blank=True, default=datetime.datetime.now)
-    name = models.CharField(blank=True, max_length=100, default=lambda:"test")
+    name = models.CharField(blank=True, max_length=100, default=lambda: "test")
     number1 = models.IntegerField(blank=True, default=standalone_number)
     number2 = models.IntegerField(blank=True, default=Numbers.get_static_number)
     number3 = models.IntegerField(blank=True, default=Numbers.get_class_number)

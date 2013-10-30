@@ -40,12 +40,16 @@ def cleanse_setting(key, value):
             cleansed = CLEANSED_SUBSTITUTE
         else:
             if isinstance(value, dict):
-                cleansed = dict((k, cleanse_setting(k, v)) for k,v in value.items())
+                cleansed = dict((k, cleanse_setting(k, v)) for k, v in value.items())
             else:
                 cleansed = value
     except TypeError:
         # If the key isn't regex-able, just return as-is.
         cleansed = value
+
+    if callable(cleansed):
+        cleansed.do_not_call_in_templates = True
+
     return cleansed
 
 def get_safe_settings():
@@ -303,7 +307,7 @@ class ExceptionReporter(object):
             'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
             'server_time': datetime.datetime.now(),
             'django_version_info': get_version(),
-            'sys_path' : sys.path,
+            'sys_path': sys.path,
             'template_info': self.template_info,
             'template_does_not_exist': self.template_does_not_exist,
             'loader_debug_info': self.loader_debug_info,
@@ -592,7 +596,7 @@ TECHNICAL_500_TEMPLATE = """
       for (var i = 0; i < arguments.length; i++) {
         var e = document.getElementById(arguments[i]);
         if (e) {
-          e.style.display = e.style.display == 'none' ? 'block' : 'none';
+          e.style.display = e.style.display == 'none' ? 'block': 'none';
         }
       }
       return false;
@@ -608,7 +612,7 @@ TECHNICAL_500_TEMPLATE = """
     function switchPastebinFriendly(link) {
       s1 = "Switch to copy-and-paste view";
       s2 = "Switch back to interactive view";
-      link.innerHTML = link.innerHTML == s1 ? s2 : s1;
+      link.innerHTML = link.innerHTML == s1 ? s2: s1;
       toggle('browserTraceback', 'pastebinTraceback');
       return false;
     }

@@ -51,7 +51,7 @@ class DispatcherTests(unittest.TestCase):
 
     def testExact(self):
         a_signal.connect(receiver_1_arg, sender=self)
-        expected = [(receiver_1_arg,"test")]
+        expected = [(receiver_1_arg, "test")]
         result = a_signal.send(sender=self, val="test")
         self.assertEqual(result, expected)
         a_signal.disconnect(receiver_1_arg, sender=self)
@@ -59,7 +59,7 @@ class DispatcherTests(unittest.TestCase):
 
     def testIgnoredSender(self):
         a_signal.connect(receiver_1_arg)
-        expected = [(receiver_1_arg,"test")]
+        expected = [(receiver_1_arg, "test")]
         result = a_signal.send(sender=self, val="test")
         self.assertEqual(result, expected)
         a_signal.disconnect(receiver_1_arg)

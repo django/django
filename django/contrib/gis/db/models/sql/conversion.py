@@ -5,6 +5,7 @@ to convert geospatial values from the database.
 
 class BaseField(object):
     empty_strings_allowed = True
+
     def get_internal_type(self):
         "Overloaded method so OracleQuery.convert_values doesn't balk."
         return None

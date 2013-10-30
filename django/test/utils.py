@@ -245,6 +245,7 @@ def compare_xml(want, got):
     Based on http://codespeak.net/svn/lxml/trunk/src/lxml/doctestcompare.py
     """
     _norm_whitespace_re = re.compile(r'[ \t\n][ \t\n]+')
+
     def norm_whitespace(v):
         return _norm_whitespace_re.sub(' ', v)
 
@@ -284,8 +285,8 @@ def compare_xml(want, got):
                 return node
 
     want, got = strip_quotes(want, got)
-    want = want.replace('\\n','\n')
-    got = got.replace('\\n','\n')
+    want = want.replace('\\n', '\n')
+    got = got.replace('\\n', '\n')
 
     # If the string is not a complete xml document, we may need to add a
     # root element. This allow us to compare fragments, like "<foo/><bar/>"
@@ -405,6 +406,7 @@ def patch_logger(logger_name, log_level):
     and provides a simple mock-like list of messages received
     """
     calls = []
+
     def replacement(msg):
         calls.append(msg)
     logger = logging.getLogger(logger_name)

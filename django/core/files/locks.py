@@ -14,7 +14,7 @@ Example Usage::
     ...     f.write('Django')
 """
 
-__all__ = ('LOCK_EX','LOCK_SH','LOCK_NB','lock','unlock')
+__all__ = ('LOCK_EX', 'LOCK_SH', 'LOCK_NB', 'lock', 'unlock')
 
 system_type = None
 

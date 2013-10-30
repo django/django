@@ -341,9 +341,9 @@ def do_translate(parser, token):
             if value[0] == "'":
                 m = re.match("^'([^']+)'(\|.*$)", value)
                 if m:
-                    value = '"%s"%s' % (m.group(1).replace('"','\\"'), m.group(2))
+                    value = '"%s"%s' % (m.group(1).replace('"', '\\"'), m.group(2))
                 elif value[-1] == "'":
-                    value = '"%s"' % value[1:-1].replace('"','\\"')
+                    value = '"%s"' % value[1:-1].replace('"', '\\"')
 
             noop = False
             asvar = None

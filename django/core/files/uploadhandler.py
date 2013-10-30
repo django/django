@@ -11,9 +11,11 @@ from django.core.files.uploadedfile import TemporaryUploadedFile, InMemoryUpload
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.module_loading import import_by_path
 
-__all__ = ['UploadFileException','StopUpload', 'SkipFile', 'FileUploadHandler',
-           'TemporaryFileUploadHandler', 'MemoryFileUploadHandler',
-           'load_handler', 'StopFutureHandlers']
+__all__ = [
+    'UploadFileException', 'StopUpload', 'SkipFile', 'FileUploadHandler',
+    'TemporaryFileUploadHandler', 'MemoryFileUploadHandler', 'load_handler',
+    'StopFutureHandlers'
+]
 
 class UploadFileException(Exception):
     """

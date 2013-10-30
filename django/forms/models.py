@@ -602,6 +602,7 @@ class BaseModelFormSet(BaseFormSet):
         """
         if not commit:
             self.saved_forms = []
+
             def save_m2m():
                 for form in self.saved_forms:
                     form.save_m2m()
@@ -754,6 +755,7 @@ class BaseModelFormSet(BaseFormSet):
         # data back. Generally, pk.editable should be false, but for some
         # reason, auto_created pk fields and AutoField's editable attribute is
         # True, so check for that as well.
+
         def pk_is_not_editable(pk):
             return ((not pk.editable) or (pk.auto_created or isinstance(pk, AutoField))
                 or (pk.rel and pk.rel.parent_link and pk_is_not_editable(pk.rel.to._meta.pk)))
@@ -857,7 +859,7 @@ class BaseInlineFormSet(BaseModelFormSet):
     @classmethod
     def get_default_prefix(cls):
         from django.db.models.fields.related import RelatedObject
-        return RelatedObject(cls.fk.rel.to, cls.model, cls.fk).get_accessor_name().replace('+','')
+        return RelatedObject(cls.fk.rel.to, cls.model, cls.fk).get_accessor_name().replace('+', '')
 
     def save_new(self, form, commit=True):
         # Use commit=False so we can assign the parent key afterwards, then

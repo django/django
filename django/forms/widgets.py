@@ -28,7 +28,7 @@ __all__ = (
     'SplitDateTimeWidget', 'SplitHiddenDateTimeWidget',
 )
 
-MEDIA_TYPES = ('css','js')
+MEDIA_TYPES = ('css', 'js')
 
 @python_2_unicode_compatible
 class Media(object):
@@ -274,7 +274,7 @@ class PasswordInput(TextInput):
 
     def render(self, name, value, attrs=None):
         if not self.render_value:
-            value=None
+            value = None
         return super(PasswordInput, self).render(name, value, attrs)
 
 class HiddenInput(Input):
@@ -406,6 +406,7 @@ class Textarea(Widget):
 
 class DateTimeBaseInput(TextInput):
     format_key = ''
+
     def __init__(self, attrs=None, format=None):
         super(DateTimeBaseInput, self).__init__(attrs)
         self.format = format if format else None
@@ -659,7 +660,7 @@ class ChoiceFieldRenderer(object):
         output = [start_tag]
         for i, choice in enumerate(self.choices):
             choice_value, choice_label = choice
-            if isinstance(choice_label, (tuple,list)):
+            if isinstance(choice_label, (tuple, list)):
                 attrs_plus = self.attrs.copy()
                 if id_:
                     attrs_plus['id'] += '_{0}'.format(i)

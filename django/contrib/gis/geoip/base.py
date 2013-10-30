@@ -195,8 +195,8 @@ class GeoIP(object):
         '24.124.1.80' and 'djangoproject.com' are valid parameters.
         """
         # Returning the country code and name
-        return {'country_code' : self.country_code(query),
-                'country_name' : self.country_name(query),
+        return {'country_code': self.country_code(query),
+                'country_name': self.country_name(query),
                 }
 
     #### Coordinate retrieval routines ####

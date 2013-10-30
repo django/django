@@ -119,13 +119,13 @@ class DummyCacheTests(unittest.TestCase):
     def test_data_types(self):
         "All data types are ignored equally by the dummy cache"
         stuff = {
-            'string'    : 'this is a string',
-            'int'       : 42,
-            'list'      : [1, 2, 3, 4],
-            'tuple'     : (1, 2, 3, 4),
-            'dict'      : {'A': 1, 'B' : 2},
-            'function'  : f,
-            'class'     : C,
+            'string': 'this is a string',
+            'int': 42,
+            'list': [1, 2, 3, 4],
+            'tuple': (1, 2, 3, 4),
+            'dict': {'A': 1, 'B': 2},
+            'function': f,
+            'class': C,
         }
         self.cache.set("stuff", stuff)
         self.assertEqual(self.cache.get("stuff"), None)
@@ -149,7 +149,7 @@ class DummyCacheTests(unittest.TestCase):
             'ascii': 'ascii_value',
             'unicode_ascii': 'Iñtërnâtiônàlizætiøn1',
             'Iñtërnâtiônàlizætiøn': 'Iñtërnâtiônàlizætiøn2',
-            'ascii2': {'x' : 1}
+            'ascii2': {'x': 1}
         }
         for (key, value) in stuff.items():
             self.cache.set(key, value)
@@ -231,8 +231,8 @@ class BaseCacheTests(object):
         self.cache.set('b', 'b')
         self.cache.set('c', 'c')
         self.cache.set('d', 'd')
-        self.assertEqual(self.cache.get_many(['a', 'c', 'd']), {'a' : 'a', 'c' : 'c', 'd' : 'd'})
-        self.assertEqual(self.cache.get_many(['a', 'b', 'e']), {'a' : 'a', 'b' : 'b'})
+        self.assertEqual(self.cache.get_many(['a', 'c', 'd']), {'a': 'a', 'c': 'c', 'd': 'd'})
+        self.assertEqual(self.cache.get_many(['a', 'b', 'e']), {'a': 'a', 'b': 'b'})
 
     def test_delete(self):
         # Cache keys can be deleted
@@ -282,13 +282,13 @@ class BaseCacheTests(object):
     def test_data_types(self):
         # Many different data types can be cached
         stuff = {
-            'string'    : 'this is a string',
-            'int'       : 42,
-            'list'      : [1, 2, 3, 4],
-            'tuple'     : (1, 2, 3, 4),
-            'dict'      : {'A': 1, 'B' : 2},
-            'function'  : f,
-            'class'     : C,
+            'string': 'this is a string',
+            'int': 42,
+            'list': [1, 2, 3, 4],
+            'tuple': (1, 2, 3, 4),
+            'dict': {'A': 1, 'B': 2},
+            'function': f,
+            'class': C,
         }
         self.cache.set("stuff", stuff)
         self.assertEqual(self.cache.get("stuff"), stuff)
@@ -353,7 +353,7 @@ class BaseCacheTests(object):
             'ascii': 'ascii_value',
             'unicode_ascii': 'Iñtërnâtiônàlizætiøn1',
             'Iñtërnâtiônàlizætiøn': 'Iñtërnâtiônàlizætiøn2',
-            'ascii2': {'x' : 1}
+            'ascii2': {'x': 1}
         }
         # Test `set`
         for (key, value) in stuff.items():
@@ -682,55 +682,55 @@ class BaseCacheTests(object):
     def test_cache_versioning_get_set_many(self):
         # set, using default version = 1
         self.cache.set_many({'ford1': 37, 'arthur1': 42})
-        self.assertEqual(self.cache.get_many(['ford1','arthur1']),
+        self.assertEqual(self.cache.get_many(['ford1', 'arthur1']),
                          {'ford1': 37, 'arthur1': 42})
-        self.assertEqual(self.cache.get_many(['ford1','arthur1'], version=1),
+        self.assertEqual(self.cache.get_many(['ford1', 'arthur1'], version=1),
                          {'ford1': 37, 'arthur1': 42})
-        self.assertEqual(self.cache.get_many(['ford1','arthur1'], version=2), {})
+        self.assertEqual(self.cache.get_many(['ford1', 'arthur1'], version=2), {})
 
-        self.assertEqual(self.v2_cache.get_many(['ford1','arthur1']), {})
-        self.assertEqual(self.v2_cache.get_many(['ford1','arthur1'], version=1),
+        self.assertEqual(self.v2_cache.get_many(['ford1', 'arthur1']), {})
+        self.assertEqual(self.v2_cache.get_many(['ford1', 'arthur1'], version=1),
                          {'ford1': 37, 'arthur1': 42})
-        self.assertEqual(self.v2_cache.get_many(['ford1','arthur1'], version=2), {})
+        self.assertEqual(self.v2_cache.get_many(['ford1', 'arthur1'], version=2), {})
 
         # set, default version = 1, but manually override version = 2
         self.cache.set_many({'ford2': 37, 'arthur2': 42}, version=2)
-        self.assertEqual(self.cache.get_many(['ford2','arthur2']), {})
-        self.assertEqual(self.cache.get_many(['ford2','arthur2'], version=1), {})
-        self.assertEqual(self.cache.get_many(['ford2','arthur2'], version=2),
+        self.assertEqual(self.cache.get_many(['ford2', 'arthur2']), {})
+        self.assertEqual(self.cache.get_many(['ford2', 'arthur2'], version=1), {})
+        self.assertEqual(self.cache.get_many(['ford2', 'arthur2'], version=2),
                          {'ford2': 37, 'arthur2': 42})
 
-        self.assertEqual(self.v2_cache.get_many(['ford2','arthur2']),
+        self.assertEqual(self.v2_cache.get_many(['ford2', 'arthur2']),
                          {'ford2': 37, 'arthur2': 42})
-        self.assertEqual(self.v2_cache.get_many(['ford2','arthur2'], version=1), {})
-        self.assertEqual(self.v2_cache.get_many(['ford2','arthur2'], version=2),
+        self.assertEqual(self.v2_cache.get_many(['ford2', 'arthur2'], version=1), {})
+        self.assertEqual(self.v2_cache.get_many(['ford2', 'arthur2'], version=2),
                          {'ford2': 37, 'arthur2': 42})
 
         # v2 set, using default version = 2
         self.v2_cache.set_many({'ford3': 37, 'arthur3': 42})
-        self.assertEqual(self.cache.get_many(['ford3','arthur3']), {})
-        self.assertEqual(self.cache.get_many(['ford3','arthur3'], version=1), {})
-        self.assertEqual(self.cache.get_many(['ford3','arthur3'], version=2),
+        self.assertEqual(self.cache.get_many(['ford3', 'arthur3']), {})
+        self.assertEqual(self.cache.get_many(['ford3', 'arthur3'], version=1), {})
+        self.assertEqual(self.cache.get_many(['ford3', 'arthur3'], version=2),
                          {'ford3': 37, 'arthur3': 42})
 
-        self.assertEqual(self.v2_cache.get_many(['ford3','arthur3']),
+        self.assertEqual(self.v2_cache.get_many(['ford3', 'arthur3']),
                          {'ford3': 37, 'arthur3': 42})
-        self.assertEqual(self.v2_cache.get_many(['ford3','arthur3'], version=1), {})
-        self.assertEqual(self.v2_cache.get_many(['ford3','arthur3'], version=2),
+        self.assertEqual(self.v2_cache.get_many(['ford3', 'arthur3'], version=1), {})
+        self.assertEqual(self.v2_cache.get_many(['ford3', 'arthur3'], version=2),
                          {'ford3': 37, 'arthur3': 42})
 
         # v2 set, default version = 2, but manually override version = 1
         self.v2_cache.set_many({'ford4': 37, 'arthur4': 42}, version=1)
-        self.assertEqual(self.cache.get_many(['ford4','arthur4']),
+        self.assertEqual(self.cache.get_many(['ford4', 'arthur4']),
                          {'ford4': 37, 'arthur4': 42})
-        self.assertEqual(self.cache.get_many(['ford4','arthur4'], version=1),
+        self.assertEqual(self.cache.get_many(['ford4', 'arthur4'], version=1),
                          {'ford4': 37, 'arthur4': 42})
-        self.assertEqual(self.cache.get_many(['ford4','arthur4'], version=2), {})
+        self.assertEqual(self.cache.get_many(['ford4', 'arthur4'], version=2), {})
 
-        self.assertEqual(self.v2_cache.get_many(['ford4','arthur4']), {})
-        self.assertEqual(self.v2_cache.get_many(['ford4','arthur4'], version=1),
+        self.assertEqual(self.v2_cache.get_many(['ford4', 'arthur4']), {})
+        self.assertEqual(self.v2_cache.get_many(['ford4', 'arthur4'], version=1),
                          {'ford4': 37, 'arthur4': 42})
-        self.assertEqual(self.v2_cache.get_many(['ford4','arthur4'], version=2), {})
+        self.assertEqual(self.v2_cache.get_many(['ford4', 'arthur4'], version=2), {})
 
     def test_incr_version(self):
         self.cache.set('answer', 42, version=2)
@@ -1221,16 +1221,16 @@ class CacheUtils(TestCase):
     def test_patch_cache_control(self):
         tests = (
             # Initial Cache-Control, kwargs to patch_cache_control, expected Cache-Control parts
-            (None, {'private' : True}, set(['private'])),
+            (None, {'private': True}, set(['private'])),
 
             # Test whether private/public attributes are mutually exclusive
-            ('private', {'private' : True}, set(['private'])),
-            ('private', {'public' : True}, set(['public'])),
-            ('public', {'public' : True}, set(['public'])),
-            ('public', {'private' : True}, set(['private'])),
-            ('must-revalidate,max-age=60,private', {'public' : True}, set(['must-revalidate', 'max-age=60', 'public'])),
-            ('must-revalidate,max-age=60,public', {'private' : True}, set(['must-revalidate', 'max-age=60', 'private'])),
-            ('must-revalidate,max-age=60', {'public' : True}, set(['must-revalidate', 'max-age=60', 'public'])),
+            ('private', {'private': True}, set(['private'])),
+            ('private', {'public': True}, set(['public'])),
+            ('public', {'public': True}, set(['public'])),
+            ('public', {'private': True}, set(['private'])),
+            ('must-revalidate,max-age=60,private', {'public': True}, set(['must-revalidate', 'max-age=60', 'public'])),
+            ('must-revalidate,max-age=60,public', {'private': True}, set(['must-revalidate', 'max-age=60', 'private'])),
+            ('must-revalidate,max-age=60', {'public': True}, set(['must-revalidate', 'max-age=60', 'public'])),
         )
 
         cc_delim_re = re.compile(r'\s*,\s*')
@@ -1479,6 +1479,7 @@ class CacheI18nTest(TestCase):
         # Regression test for #17476
         class CustomTzName(timezone.UTC):
             name = ''
+
             def tzname(self, dt):
                 return self.name
 
@@ -1527,8 +1528,8 @@ class CacheI18nTest(TestCase):
         self.assertEqual(get_cache_data, None)
 
         # i18n tests
-        en_message ="Hello world!"
-        es_message ="Hola mundo!"
+        en_message = "Hello world!"
+        es_message = "Hola mundo!"
 
         request = self._get_request_cache()
         set_cache(request, 'en', en_message)

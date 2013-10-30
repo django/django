@@ -54,7 +54,7 @@ def _findall(text, substr):
         if j == -1:
             break
         sites.append(j)
-        i=j+1
+        i = j + 1
     return sites
 
 def strftime(dt, fmt):

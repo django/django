@@ -211,6 +211,7 @@ class DerivedBook(Book, BookXtra):
 class ExplicitPK(models.Model):
     key = models.CharField(max_length=20, primary_key=True)
     desc = models.CharField(max_length=20, blank=True, unique=True)
+
     class Meta:
         unique_together = ('key', 'desc')
 

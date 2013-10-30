@@ -26,6 +26,7 @@ from .models import (Article, ArticleStatus, BetterWriter, BigInt, Book,
 
 if test_images:
     from .models import ImageFile, OptionalImageFile
+
     class ImageFileForm(forms.ModelForm):
         class Meta:
             model = ImageFile
@@ -114,7 +115,7 @@ class ArticleForm(forms.ModelForm):
 class PartialArticleForm(forms.ModelForm):
     class Meta:
         model = Article
-        fields = ('headline','pub_date')
+        fields = ('headline', 'pub_date')
 
 
 class RoykoForm(forms.ModelForm):
@@ -208,6 +209,7 @@ class ModelFormWithMedia(forms.ModelForm):
         css = {
             'all': ('/some/form/css',)
         }
+
     class Meta:
         model = TextFile
         fields = '__all__'
@@ -791,7 +793,7 @@ class ModelToDictTests(TestCase):
     Tests for forms.models.model_to_dict
     """
     def test_model_to_dict_many_to_many(self):
-        categories=[
+        categories = [
             Category(name='TestName1', slug='TestName1', url='url1'),
             Category(name='TestName2', slug='TestName2', url='url2'),
             Category(name='TestName3', slug='TestName3', url='url3')
@@ -1722,6 +1724,7 @@ class OldFormForXTests(TestCase):
 
         class CategoryForm(forms.ModelForm):
             description = forms.CharField()
+
             class Meta:
                 model = Category
                 fields = ['description', 'url']
@@ -1748,7 +1751,7 @@ class OldFormForXTests(TestCase):
         self.assertHTMLEqual(six.text_type(CustomFieldForExclusionForm()),
                          '''<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="10" /></td></tr>''')
 
-    def test_iterable_model_m2m(self) :
+    def test_iterable_model_m2m(self):
         colour = Colour.objects.create(name='Blue')
         form = ColourfulItemForm()
         self.maxDiff = 1024
@@ -1760,7 +1763,7 @@ class OldFormForXTests(TestCase):
         </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>"""
             % {'blue_pk': colour.pk})
 
-    def test_custom_error_messages(self) :
+    def test_custom_error_messages(self):
         data = {'name1': '@#$!!**@#$', 'name2': '@#$!!**@#$'}
         errors = CustomErrorMessageForm(data).errors
         self.assertHTMLEqual(
@@ -1772,7 +1775,7 @@ class OldFormForXTests(TestCase):
             '<ul class="errorlist"><li>Model custom error message.</li></ul>'
         )
 
-    def test_model_clean_error_messages(self) :
+    def test_model_clean_error_messages(self):
         data = {'name1': 'FORBIDDEN_VALUE', 'name2': 'ABC'}
         errors = CustomErrorMessageForm(data).errors
         self.assertHTMLEqual(

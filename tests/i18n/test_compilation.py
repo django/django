@@ -1,15 +1,19 @@
 import os
+import unittest
 
 from django.core.management import call_command, CommandError
+from django.core.management.utils import find_command
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils import translation
 from django.utils._os import upath
 from django.utils.six import StringIO
 
-test_dir = os.path.abspath(os.path.dirname(upath(__file__)))
+test_dir = os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), 'commands'))
+has_msgfmt = find_command('msgfmt')
 
 
+@unittest.skipUnless(has_msgfmt, 'msgfmt is mandatory for compilation tests')
 class MessageCompilationTests(SimpleTestCase):
 
     def setUp(self):
@@ -37,8 +41,8 @@ class PoFileTests(MessageCompilationTests):
 class PoFileContentsTests(MessageCompilationTests):
     # Ticket #11240
 
-    LOCALE='fr'
-    MO_FILE='locale/%s/LC_MESSAGES/django.mo' % LOCALE
+    LOCALE = 'fr'
+    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
 
     def setUp(self):
         super(PoFileContentsTests, self).setUp()
@@ -53,8 +57,8 @@ class PercentRenderingTests(MessageCompilationTests):
     # Ticket #11240 -- Testing rendering doesn't belong here but we are trying
     # to keep tests for all the stack together
 
-    LOCALE='it'
-    MO_FILE='locale/%s/LC_MESSAGES/django.mo' % LOCALE
+    LOCALE = 'it'
+    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
 
     def setUp(self):
         super(PercentRenderingTests, self).setUp()
@@ -101,8 +105,8 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
 
 class CompilationErrorHandling(MessageCompilationTests):
 
-    LOCALE='ja'
-    MO_FILE='locale/%s/LC_MESSAGES/django.mo' % LOCALE
+    LOCALE = 'ja'
+    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
 
     def setUp(self):
         super(CompilationErrorHandling, self).setUp()

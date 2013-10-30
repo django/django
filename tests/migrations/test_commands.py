@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import codecs
 import copy
 import os
 import shutil
@@ -143,8 +144,8 @@ class MakeMigrationsTests(MigrationTestBase):
         # Check for existing 0001_initial.py file in migration folder
         self.assertTrue(os.path.exists(initial_file))
 
-        with open(initial_file, 'r') as fp:
-            content = force_text(fp.read())
+        with codecs.open(initial_file, 'r', encoding='utf-8') as fp:
+            content = fp.read()
             self.assertTrue('# encoding: utf8' in content)
             self.assertTrue('migrations.CreateModel' in content)
 

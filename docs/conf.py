@@ -264,7 +264,7 @@ man_pages = [
 
 # List of tuples (startdocname, targetname, title, author, dir_entry,
 # description, category, toctree_only)
-texinfo_documents=[(
+texinfo_documents = [(
     master_doc, "django", "", "", "Django",
     "Documentation of the Django framework", "Web development", False
 )]

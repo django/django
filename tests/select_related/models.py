@@ -15,6 +15,7 @@ from django.utils.encoding import python_2_unicode_compatible
 @python_2_unicode_compatible
 class Domain(models.Model):
     name = models.CharField(max_length=50)
+
     def __str__(self):
         return self.name
 
@@ -22,6 +23,7 @@ class Domain(models.Model):
 class Kingdom(models.Model):
     name = models.CharField(max_length=50)
     domain = models.ForeignKey(Domain)
+
     def __str__(self):
         return self.name
 
@@ -29,6 +31,7 @@ class Kingdom(models.Model):
 class Phylum(models.Model):
     name = models.CharField(max_length=50)
     kingdom = models.ForeignKey(Kingdom)
+
     def __str__(self):
         return self.name
 
@@ -36,6 +39,7 @@ class Phylum(models.Model):
 class Klass(models.Model):
     name = models.CharField(max_length=50)
     phylum = models.ForeignKey(Phylum)
+
     def __str__(self):
         return self.name
 
@@ -43,6 +47,7 @@ class Klass(models.Model):
 class Order(models.Model):
     name = models.CharField(max_length=50)
     klass = models.ForeignKey(Klass)
+
     def __str__(self):
         return self.name
 
@@ -50,6 +55,7 @@ class Order(models.Model):
 class Family(models.Model):
     name = models.CharField(max_length=50)
     order = models.ForeignKey(Order)
+
     def __str__(self):
         return self.name
 
@@ -57,6 +63,7 @@ class Family(models.Model):
 class Genus(models.Model):
     name = models.CharField(max_length=50)
     family = models.ForeignKey(Family)
+
     def __str__(self):
         return self.name
 
@@ -64,6 +71,7 @@ class Genus(models.Model):
 class Species(models.Model):
     name = models.CharField(max_length=50)
     genus = models.ForeignKey(Genus)
+
     def __str__(self):
         return self.name
 
@@ -73,5 +81,6 @@ class HybridSpecies(models.Model):
     name = models.CharField(max_length=50)
     parent_1 = models.ForeignKey(Species, related_name='child_1')
     parent_2 = models.ForeignKey(Species, related_name='child_2')
+
     def __str__(self):
         return self.name

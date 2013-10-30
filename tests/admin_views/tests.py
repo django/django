@@ -9,6 +9,7 @@ import unittest
 from django.conf import settings, global_settings
 from django.core import mail
 from django.core.files import temp as tempfile
+from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, NoReverseMatch
 # Register auth models with the admin.
 from django.contrib.auth import get_permission_codename
@@ -48,8 +49,8 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
     Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage,
-    Telegram, Pizza, Topping, FilteredManager)
-from .admin import site, site2
+    Telegram, Pizza, Topping, FilteredManager, City, Restaurant, Worker)
+from .admin import site, site2, CityAdmin
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \
@@ -3443,7 +3444,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.assertEqual(slug2, 'option-one-here-stacked-inline')
 
         # Add an inline
-        self.selenium.find_elements_by_link_text('Add another Related Prepopulated')[0].click()
+        self.selenium.find_elements_by_link_text('Add another Related prepopulated')[0].click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-pubdate').send_keys('1999-01-25')
         self.get_select_option('#id_relatedprepopulated_set-1-status', 'option two').click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-name').send_keys(' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog text... ')
@@ -3463,7 +3464,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.assertEqual(slug2, 'option-two-and-now-tabular-inline')
 
         # Add an inline
-        self.selenium.find_elements_by_link_text('Add another Related Prepopulated')[1].click()
+        self.selenium.find_elements_by_link_text('Add another Related prepopulated')[1].click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-pubdate').send_keys('1981-08-22')
         self.get_select_option('#id_relatedprepopulated_set-2-1-status', 'option one').click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-name').send_keys('a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters')
@@ -4597,3 +4598,87 @@ class TestLabelVisibility(TestCase):
 
     def assert_fieldline_hidden(self, response):
         self.assertContains(response, '<div class="form-row hidden')
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class AdminViewOnSiteTest(TestCase):
+    urls = "admin_views.urls"
+    fixtures = ['admin-views-users.xml', 'admin-views-restaurants.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_validate(self):
+        "Ensure that the view_on_site value is either a boolean or a callable"
+        CityAdmin.view_on_site = True
+        CityAdmin.validate(City)
+        CityAdmin.view_on_site = False
+        CityAdmin.validate(City)
+        CityAdmin.view_on_site = lambda obj: obj.get_absolute_url()
+        CityAdmin.validate(City)
+        CityAdmin.view_on_site = []
+        with self.assertRaisesMessage(ImproperlyConfigured, 'CityAdmin.view_on_site is not a callable or a boolean value.'):
+            CityAdmin.validate(City)
+
+    def test_false(self):
+        "Ensure that the 'View on site' button is not displayed if view_on_site is False"
+        response = self.client.get('/test_admin/admin/admin_views/restaurant/1/')
+        content_type_pk = ContentType.objects.get_for_model(Restaurant).pk
+        self.assertNotContains(response,
+                               '"/test_admin/admin/r/%s/1/"' % content_type_pk,
+                               )
+
+    def test_true(self):
+        "Ensure that the default behaviour is followed if view_on_site is True"
+        response = self.client.get('/test_admin/admin/admin_views/city/1/')
+        content_type_pk = ContentType.objects.get_for_model(City).pk
+        self.assertContains(response,
+                            '"/test_admin/admin/r/%s/1/"' % content_type_pk,
+                            )
+
+    def test_callable(self):
+        "Ensure that the right link is displayed if view_on_site is a callable"
+        response = self.client.get('/test_admin/admin/admin_views/worker/1/')
+        worker = Worker.objects.get(pk=1)
+        self.assertContains(response,
+                            '"/worker/%s/%s/"' % (worker.surname, worker.name),
+                            )
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class InlineAdminViewOnSiteTest(TestCase):
+    urls = "admin_views.urls"
+    fixtures = ['admin-views-users.xml', 'admin-views-restaurants.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_false(self):
+        "Ensure that the 'View on site' button is not displayed if view_on_site is False"
+        response = self.client.get('/test_admin/admin/admin_views/state/1/')
+        content_type_pk = ContentType.objects.get_for_model(City).pk
+        self.assertNotContains(response,
+                               '/test_admin/admin/r/%s/1/' % content_type_pk,
+                               )
+
+    def test_true(self):
+        "Ensure that the 'View on site' button is displayed if view_on_site is True"
+        response = self.client.get('/test_admin/admin/admin_views/city/1/')
+        content_type_pk = ContentType.objects.get_for_model(Restaurant).pk
+        self.assertContains(response,
+                            '/test_admin/admin/r/%s/1/' % content_type_pk,
+                            )
+
+    def test_callable(self):
+        "Ensure that the right link is displayed if view_on_site is a callable"
+        response = self.client.get('/test_admin/admin/admin_views/restaurant/1/')
+        worker = Worker.objects.get(pk=1)
+        self.assertContains(response,
+                            '"/worker_inline/%s/%s/"' % (worker.surname, worker.name),
+                            )

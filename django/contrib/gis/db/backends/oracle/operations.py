@@ -109,33 +109,33 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     select = 'SDO_UTIL.TO_WKTGEOMETRY(%s)'
 
     distance_functions = {
-        'distance_gt' : (SDODistance('>'), dtypes),
-        'distance_gte' : (SDODistance('>='), dtypes),
-        'distance_lt' : (SDODistance('<'), dtypes),
-        'distance_lte' : (SDODistance('<='), dtypes),
-        'dwithin' : (SDODWithin(), dtypes),
+        'distance_gt': (SDODistance('>'), dtypes),
+        'distance_gte': (SDODistance('>='), dtypes),
+        'distance_lt': (SDODistance('<'), dtypes),
+        'distance_lte': (SDODistance('<='), dtypes),
+        'dwithin': (SDODWithin(), dtypes),
     }
 
     geometry_functions = {
-        'contains' : SDOOperation('SDO_CONTAINS'),
-        'coveredby' : SDOOperation('SDO_COVEREDBY'),
-        'covers' : SDOOperation('SDO_COVERS'),
-        'disjoint' : SDOGeomRelate('DISJOINT'),
-        'intersects' : SDOOperation('SDO_OVERLAPBDYINTERSECT'), # TODO: Is this really the same as ST_Intersects()?
-        'equals' : SDOOperation('SDO_EQUAL'),
-        'exact' : SDOOperation('SDO_EQUAL'),
-        'overlaps' : SDOOperation('SDO_OVERLAPS'),
-        'same_as' : SDOOperation('SDO_EQUAL'),
-        'relate' : (SDORelate, six.string_types), # Oracle uses a different syntax, e.g., 'mask=inside+touch'
-        'touches' : SDOOperation('SDO_TOUCH'),
-        'within' : SDOOperation('SDO_INSIDE'),
+        'contains': SDOOperation('SDO_CONTAINS'),
+        'coveredby': SDOOperation('SDO_COVEREDBY'),
+        'covers': SDOOperation('SDO_COVERS'),
+        'disjoint': SDOGeomRelate('DISJOINT'),
+        'intersects': SDOOperation('SDO_OVERLAPBDYINTERSECT'), # TODO: Is this really the same as ST_Intersects()?
+        'equals': SDOOperation('SDO_EQUAL'),
+        'exact': SDOOperation('SDO_EQUAL'),
+        'overlaps': SDOOperation('SDO_OVERLAPS'),
+        'same_as': SDOOperation('SDO_EQUAL'),
+        'relate': (SDORelate, six.string_types), # Oracle uses a different syntax, e.g., 'mask=inside+touch'
+        'touches': SDOOperation('SDO_TOUCH'),
+        'within': SDOOperation('SDO_INSIDE'),
     }
     geometry_functions.update(distance_functions)
 
     gis_terms = set(['isnull'])
     gis_terms.update(geometry_functions)
 
-    truncate_params = {'relate' : None}
+    truncate_params = {'relate': None}
 
     def convert_extent(self, clob):
         if clob:

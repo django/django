@@ -32,6 +32,7 @@ def wrap(text, width):
     the text. Expects that existing line breaks are posix newlines.
     """
     text = force_text(text)
+
     def _generator():
         it = iter(text.split(' '))
         word = next(it)

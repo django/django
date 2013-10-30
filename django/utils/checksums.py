@@ -2,7 +2,7 @@
 Common checksum routines.
 """
 
-__all__ = ['luhn',]
+__all__ = ['luhn']
 
 from django.utils import six
 

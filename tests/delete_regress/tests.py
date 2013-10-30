@@ -148,6 +148,7 @@ class LargeDeleteTests(TestCase):
         for x in range(300):
             Book.objects.create(pagecount=x+100)
         # attach a signal to make sure we will not fast-delete
+
         def noop(*args, **kwargs):
             pass
         models.signals.post_delete.connect(noop, sender=Book)
@@ -302,7 +303,7 @@ class Ticket19102Tests(TestCase):
             Login.objects.order_by('description').filter(
                 orgunit__name__isnull=False
             ).extra(
-                select={'extraf':'1'}
+                select={'extraf': '1'}
             ).filter(
                 pk=self.l1.pk
             ).delete()

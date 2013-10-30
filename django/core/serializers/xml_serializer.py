@@ -28,7 +28,7 @@ class Serializer(base.Serializer):
         """
         self.xml = SimplerXMLGenerator(self.stream, self.options.get("encoding", settings.DEFAULT_CHARSET))
         self.xml.startDocument()
-        self.xml.startElement("django-objects", {"version" : "1.0"})
+        self.xml.startElement("django-objects", {"version": "1.0"})
 
     def end_serialization(self):
         """
@@ -68,8 +68,8 @@ class Serializer(base.Serializer):
         """
         self.indent(2)
         self.xml.startElement("field", {
-            "name" : field.name,
-            "type" : field.get_internal_type()
+            "name": field.name,
+            "type": field.get_internal_type()
         })
 
         # Get a "string version" of the object's data.
@@ -125,7 +125,7 @@ class Serializer(base.Serializer):
             else:
                 def handle_m2m(value):
                     self.xml.addQuickElement("object", attrs={
-                        'pk' : smart_text(value._get_pk_val())
+                        'pk': smart_text(value._get_pk_val())
                     })
             for relobj in getattr(obj, field.name).iterator():
                 handle_m2m(relobj)
@@ -138,9 +138,9 @@ class Serializer(base.Serializer):
         """
         self.indent(2)
         self.xml.startElement("field", {
-            "name" : field.name,
-            "rel"  : field.rel.__class__.__name__,
-            "to"   : smart_text(field.rel.to._meta),
+            "name": field.name,
+            "rel": field.rel.__class__.__name__,
+            "to": smart_text(field.rel.to._meta),
         })
 
 class Deserializer(base.Deserializer):

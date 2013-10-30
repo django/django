@@ -15,7 +15,7 @@ class Redirect(models.Model):
         verbose_name = _('redirect')
         verbose_name_plural = _('redirects')
         db_table = 'django_redirect'
-        unique_together=(('site', 'old_path'),)
+        unique_together = (('site', 'old_path'),)
         ordering = ('old_path',)
 
     def __str__(self):

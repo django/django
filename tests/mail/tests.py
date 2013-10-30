@@ -880,6 +880,16 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
         self.assertEqual(backend.username, '')
         self.assertEqual(backend.password, '')
 
+    def test_auth_attempted(self):
+        """
+        Test that opening the backend with non empty username/password tries
+        to authenticate against the SMTP server.
+        """
+        backend = smtp.EmailBackend(
+            username='not empty username', password='not empty password')
+        self.assertRaisesMessage(SMTPException,
+            'SMTP AUTH extension not supported by server.', backend.open)
+
     def test_server_stopped(self):
         """
         Test that closing the backend while the SMTP server is stopped doesn't
@@ -933,3 +943,20 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_ssl)
         self.assertRaises(SSLError, backend.open)
+
+    def test_connection_timeout_default(self):
+        """Test that the connection's timeout value is None by default."""
+        connection = mail.get_connection('django.core.mail.backends.smtp.EmailBackend')
+        self.assertEqual(connection.timeout, None)
+
+    def test_connection_timeout_custom(self):
+        """Test that the timeout parameter can be customized."""
+        class MyEmailBackend(smtp.EmailBackend):
+            def __init__(self, *args, **kwargs):
+                kwargs.setdefault('timeout', 42)
+                super(MyEmailBackend, self).__init__(*args, **kwargs)
+
+        myemailbackend = MyEmailBackend()
+        myemailbackend.open()
+        self.assertEqual(myemailbackend.timeout, 42)
+        self.assertEqual(myemailbackend.connection.timeout, 42)

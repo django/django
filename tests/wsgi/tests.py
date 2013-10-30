@@ -76,6 +76,7 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
         """
         # Mock out get_wsgi_application so we know its return value is used
         fake_app = object()
+
         def mock_get_wsgi_app():
             return fake_app
         from django.core.servers import basehttp

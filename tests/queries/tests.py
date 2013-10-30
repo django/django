@@ -579,7 +579,7 @@ class Queries1Tests(BaseQuerysetTest):
             ['datetime.datetime(2007, 12, 19, 0, 0)', 'datetime.datetime(2007, 12, 20, 0, 0)']
         )
 
-        name="one"
+        name = "one"
         self.assertQuerysetEqual(
             Item.objects.datetimes('created', 'day').extra(where=['name=%s'], params=[name]),
             ['datetime.datetime(2007, 12, 19, 0, 0)']
@@ -676,6 +676,7 @@ class Queries1Tests(BaseQuerysetTest):
             Item.objects.filter(created__in=[self.time1, self.time2]),
             ['<Item: one>', '<Item: two>']
         )
+
     def test_ticket7235(self):
         # An EmptyQuerySet should not raise exceptions if it is filtered.
         Eaten.objects.create(meal='m')
@@ -757,6 +758,7 @@ class Queries1Tests(BaseQuerysetTest):
         def f():
             return iter([])
         n_obj = Note.objects.all()[0]
+
         def g():
             for i in [n_obj.pk]:
                 yield i
@@ -1238,6 +1240,7 @@ class Queries2Tests(TestCase):
         # Count should work with a partially read result set.
         count = Number.objects.count()
         qs = Number.objects.all()
+
         def run():
             for obj in qs:
                 return qs.count() == count
@@ -1912,16 +1915,16 @@ class SubqueryTests(TestCase):
         "Subselects honor any manual ordering"
         try:
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:2])
-            self.assertEqual(set(query.values_list('id', flat=True)), set([3,4]))
+            self.assertEqual(set(query.values_list('id', flat=True)), set([3, 4]))
 
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[:2])
-            self.assertEqual(set(query.values_list('id', flat=True)), set([3,4]))
+            self.assertEqual(set(query.values_list('id', flat=True)), set([3, 4]))
 
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:2])
             self.assertEqual(set(query.values_list('id', flat=True)), set([3]))
 
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[2:])
-            self.assertEqual(set(query.values_list('id', flat=True)), set([1,2]))
+            self.assertEqual(set(query.values_list('id', flat=True)), set([1, 2]))
         except DatabaseError as e:
             # Oracle and MySQL both have problems with sliced subselects.
             # This prevents us from even evaluating this test case at all.
@@ -1934,7 +1937,7 @@ class SubqueryTests(TestCase):
         """
         try:
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:2])[0:2]
-            self.assertEqual(set([x.id for x in query]), set([3,4]))
+            self.assertEqual(set([x.id for x in query]), set([3, 4]))
 
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:3])[1:3]
             self.assertEqual(set([x.id for x in query]), set([3]))
@@ -1951,10 +1954,10 @@ class SubqueryTests(TestCase):
         "Delete queries can safely contain sliced subqueries"
         try:
             DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:1]).delete()
-            self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1,2,3]))
+            self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1, 2, 3]))
 
             DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:2]).delete()
-            self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1,3]))
+            self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1, 3]))
 
             DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:]).delete()
             self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([3]))
@@ -2136,7 +2139,7 @@ class EscapingTests(TestCase):
             ['<ReservedName: b>', '<ReservedName: a>']
         )
         self.assertQuerysetEqual(
-            ReservedName.objects.extra(select={'stuff':'name'}, order_by=('order','stuff')),
+            ReservedName.objects.extra(select={'stuff': 'name'}, order_by=('order', 'stuff')),
             ['<ReservedName: b>', '<ReservedName: a>']
         )
 
@@ -2670,8 +2673,8 @@ class NullJoinPromotionOrTest(TestCase):
         # b__c__name generates join to c, which the ORM tried to promote but
         # failed as that join isn't nullable.
         q_obj = (
-            Q(d__name='foo')|
-            Q(b__name='foo')|
+            Q(d__name='foo') |
+            Q(b__name='foo') |
             Q(b__c__name='foo')
         )
         qset = ModelA.objects.filter(q_obj)

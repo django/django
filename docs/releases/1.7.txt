@@ -168,6 +168,10 @@ Minor features
   <django.contrib.admin.ModelAdmin.list_display_links>` ``= None`` to disable
   links on the change list page grid.
 
+* You may now specify :attr:`ModelAdmin.view_on_site
+  <django.contrib.admin.ModelAdmin.view_on_site>` to control whether or not to
+  display the "View on site" link.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -199,6 +203,9 @@ Minor features
   follow the :setting:`SESSION_COOKIE_SECURE` and
   :setting:`SESSION_COOKIE_HTTPONLY` settings.
 
+* The :ref:`messages context processor <message-displaying>` now adds a
+  dictionary of default levels under the name ``DEFAULT_MESSAGE_LEVELS``.
+
 :mod:`django.contrib.redirects`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -226,6 +233,15 @@ Minor features
   :class:`~django.middleware.http.ConditionalGetMiddleware` to handle
   conditional ``GET`` requests for sitemaps which set ``lastmod``.
 
+:mod:`django.contrib.staticfiles`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The :ref:`static files storage classes <staticfiles-storages>` may be
+  subclassed to override the permissions that collected static files receive by
+  setting the
+  :attr:`~django.core.files.storage.FileSystemStorage.file_permissions_mode`
+  parameter. See :djadmin:`collectstatic` for example usage.
+
 :mod:`django.contrib.syndication`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -239,6 +255,8 @@ Email
 
 * :func:`~django.core.mail.send_mail` now accepts an ``html_message``
   parameter for sending a multipart ``text/plain`` and ``text/html`` email.
+* The SMTP :class:`~django.core.mail.backends.smtp.EmailBackend` now accepts a
+  :attr:`~django.core.mail.backends.smtp.EmailBackend.timeout` parameter.
 
 File Uploads
 ^^^^^^^^^^^^
@@ -379,7 +397,7 @@ Templates
   :setting:`TEMPLATE_DEBUG` is ``True``. This allows template origins to be
   inspected and logged outside of the ``django.template`` infrastructure.
 
-* ``TypeError`` exceptions are not longer silenced when raised during the
+* ``TypeError`` exceptions are no longer silenced when raised during the
   rendering of a template.
 
 * The following functions now accept a ``dirs`` parameter which is a list or
@@ -395,6 +413,11 @@ Templates
   and ``'Z'`` and is able to digest :ref:`time-zone-aware
   <naive_vs_aware_datetimes>` ``datetime`` instances performing the expected
   rendering.
+
+* The :ttag:`cache` tag will now try to use the cache called
+  "template_fragments" if it exists and fall back to using the default cache
+  otherwise. It also now accepts an optional ``using`` keyword argument to
+  control which cache it uses.
 
 Requests
 ^^^^^^^^

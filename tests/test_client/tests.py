@@ -147,12 +147,12 @@ class ClientTest(TestCase):
 
     def test_redirect_http(self):
         "GET a URL that redirects to an http URI"
-        response = self.client.get('/test_client/http_redirect_view/',follow=True)
+        response = self.client.get('/test_client/http_redirect_view/', follow=True)
         self.assertFalse(response.test_was_secure_request)
 
     def test_redirect_https(self):
         "GET a URL that redirects to an https URI"
-        response = self.client.get('/test_client/https_redirect_view/',follow=True)
+        response = self.client.get('/test_client/https_redirect_view/', follow=True)
         self.assertTrue(response.test_was_secure_request)
 
     def test_notfound_response(self):
@@ -169,7 +169,7 @@ class ClientTest(TestCase):
             'email': 'foo@example.com',
             'value': 37,
             'single': 'b',
-            'multi': ('b','c','e')
+            'multi': ('b', 'c', 'e')
         }
         response = self.client.post('/test_client/form_view/', post_data)
         self.assertEqual(response.status_code, 200)
@@ -179,7 +179,7 @@ class ClientTest(TestCase):
         "GET a form, providing hints in the GET data"
         hints = {
             'text': 'Hello World',
-            'multi': ('b','c','e')
+            'multi': ('b', 'c', 'e')
         }
         response = self.client.get('/test_client/form_view/', data=hints)
         self.assertEqual(response.status_code, 200)
@@ -209,7 +209,7 @@ class ClientTest(TestCase):
             'email': 'not an email address',
             'value': 37,
             'single': 'b',
-            'multi': ('b','c','e')
+            'multi': ('b', 'c', 'e')
         }
         response = self.client.post('/test_client/form_view/', post_data)
         self.assertEqual(response.status_code, 200)
@@ -224,7 +224,7 @@ class ClientTest(TestCase):
             'email': 'foo@example.com',
             'value': 37,
             'single': 'b',
-            'multi': ('b','c','e')
+            'multi': ('b', 'c', 'e')
         }
         response = self.client.post('/test_client/form_view_with_template/', post_data)
         self.assertContains(response, 'POST data OK')
@@ -255,7 +255,7 @@ class ClientTest(TestCase):
             'email': 'not an email address',
             'value': 37,
             'single': 'b',
-            'multi': ('b','c','e')
+            'multi': ('b', 'c', 'e')
         }
         response = self.client.post('/test_client/form_view_with_template/', post_data)
         self.assertContains(response, 'POST data has errors')

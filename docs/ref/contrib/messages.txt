@@ -196,6 +196,22 @@ Even if you know there is only just one message, you should still iterate over
 the ``messages`` sequence, because otherwise the message storage will not be cleared
 for the next request.
 
+.. versionadded:: 1.7
+
+The context processor also provides a ``DEFAULT_MESSAGE_LEVELS`` variable which
+is a mapping of the message level names to their numeric value::
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+            {{ message }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
 Creating custom message levels
 ------------------------------
 

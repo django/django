@@ -5,10 +5,11 @@ import io
 import os
 import re
 import shutil
-from unittest import SkipTest
+from unittest import SkipTest, skipUnless
 import warnings
 
 from django.core import management
+from django.core.management.utils import find_command
 from django.test import SimpleTestCase
 from django.utils.encoding import force_text
 from django.utils._os import upath
@@ -17,15 +18,18 @@ from django.utils.six import StringIO
 from django.utils.translation import TranslatorCommentWarning
 
 
-LOCALE='de'
+LOCALE = 'de'
+has_xgettext = find_command('xgettext')
 
+@skipUnless(has_xgettext, 'xgettext is mandatory for extraction tests')
 class ExtractorTests(SimpleTestCase):
 
-    PO_FILE='locale/%s/LC_MESSAGES/django.po' % LOCALE
+    PO_FILE = 'locale/%s/LC_MESSAGES/django.po' % LOCALE
 
     def setUp(self):
         self._cwd = os.getcwd()
-        self.test_dir = os.path.abspath(os.path.dirname(upath(__file__)))
+        self.test_dir = os.path.abspath(
+            os.path.join(os.path.dirname(upath(__file__)), 'commands'))
 
     def _rmrf(self, dname):
         if os.path.commonprefix([self.test_dir, os.path.abspath(dname)]) != self.test_dir:
@@ -51,7 +55,7 @@ class ExtractorTests(SimpleTestCase):
             q = "'"
         needle = 'msgid %s' % msgid
         msgid = re.escape(msgid)
-        return self.assertTrue(re.search('^msgid %s' % msgid, s, re.MULTILINE), 'Could not find %(q)s%(n)s%(q)s in generated PO file' % {'n':needle, 'q':q})
+        return self.assertTrue(re.search('^msgid %s' % msgid, s, re.MULTILINE), 'Could not find %(q)s%(n)s%(q)s in generated PO file' % {'n': needle, 'q': q})
 
     def assertNotMsgId(self, msgid, s, use_quotes=True):
         if use_quotes:
@@ -255,7 +259,7 @@ class BasicExtractorTests(ExtractorTests):
 
 class JavascriptExtractorTests(ExtractorTests):
 
-    PO_FILE='locale/%s/LC_MESSAGES/djangojs.po' % LOCALE
+    PO_FILE = 'locale/%s/LC_MESSAGES/djangojs.po' % LOCALE
 
     def test_javascript_literals(self):
         os.chdir(self.test_dir)
@@ -302,8 +306,7 @@ class IgnoredExtractorTests(ExtractorTests):
 class SymlinkExtractorTests(ExtractorTests):
 
     def setUp(self):
-        self._cwd = os.getcwd()
-        self.test_dir = os.path.abspath(os.path.dirname(upath(__file__)))
+        super(SymlinkExtractorTests, self).setUp()
         self.symlinked_dir = os.path.join(self.test_dir, 'templates_symlinked')
 
     def tearDown(self):
@@ -426,7 +429,7 @@ class LocationCommentsTests(ExtractorTests):
 
 class KeepPotFileExtractorTests(ExtractorTests):
 
-    POT_FILE='locale/django.pot'
+    POT_FILE = 'locale/django.pot'
 
     def setUp(self):
         super(KeepPotFileExtractorTests, self).setUp()
@@ -474,7 +477,7 @@ class MultipleLocaleExtractionTests(ExtractorTests):
 
     def test_multiple_locales(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=['pt','de'], verbosity=0)
+        management.call_command('makemessages', locale=['pt', 'de'], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE_PT))
         self.assertTrue(os.path.exists(self.PO_FILE_DE))
 

@@ -17,7 +17,7 @@ class SampleTestCase(TestCase):
         "Test cases can load fixture objects into models defined in packages"
         self.assertEqual(Article.objects.count(), 3)
         self.assertQuerysetEqual(
-            Article.objects.all(),[
+            Article.objects.all(), [
                 "Django conquers world!",
                 "Copyright is fine the way it is",
                 "Poker has no place on ESPN",

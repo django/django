@@ -758,6 +758,22 @@ Naming issues
 Oracle imposes a name length limit of 30 characters. To accommodate this, the
 backend truncates database identifiers to fit, replacing the final four
 characters of the truncated name with a repeatable MD5 hash value.
+Additionally, the backend turns database identifiers to all-uppercase.
+
+To prevent these transformations (this is usually required only when dealing
+with legacy databases or accessing tables which belong to other users), use
+a quoted name as the value for ``db_table``::
+
+    class LegacyModel(models.Model):
+        class Meta:
+       	    db_table = '"name_left_in_lowercase"'
+
+    class ForeignModel(models.Model):
+        class Meta:
+       	    db_table = '"OTHER_USER"."NAME_ONLY_SEEMS_OVER_30"'
+
+Quoted names can also be used with Django's other supported database 
+backends; except for Oracle, however, the quotes have no effect.
 
 When running ``migrate``, an ``ORA-06552`` error may be encountered if
 certain Oracle keywords are used as the name of a model field or the

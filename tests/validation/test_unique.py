@@ -90,7 +90,7 @@ class PerformUniqueChecksTest(TestCase):
         p.full_clean()
 
         # Should work without errors
-        p = Post(title="Django 1.0 is released", posted=datetime.datetime(2008, 9,4))
+        p = Post(title="Django 1.0 is released", posted=datetime.datetime(2008, 9, 4))
         p.full_clean()
 
         p = Post(slug="Django 1.0", posted=datetime.datetime(2008, 1, 1))

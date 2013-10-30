@@ -70,7 +70,7 @@ class BoundMethodWeakref(object):
 
     _allInstances = weakref.WeakValueDictionary()
 
-    def __new__(cls, target, onDelete=None, *arguments,**named):
+    def __new__(cls, target, onDelete=None, *arguments, **named):
         """Create new instance or return current instance
 
         Basically this method of construction allows us to
@@ -83,14 +83,14 @@ class BoundMethodWeakref(object):
         of already-referenced methods.
         """
         key = cls.calculateKey(target)
-        current =cls._allInstances.get(key)
+        current = cls._allInstances.get(key)
         if current is not None:
             current.deletionMethods.append(onDelete)
             return current
         else:
             base = super(BoundMethodWeakref, cls).__new__(cls)
             cls._allInstances[key] = base
-            base.__init__(target, onDelete, *arguments,**named)
+            base.__init__(target, onDelete, *arguments, **named)
             return base
 
     def __init__(self, target, onDelete=None):
@@ -139,7 +139,7 @@ class BoundMethodWeakref(object):
         Currently this is a two-tuple of the id()'s of the
         target object and the target function respectively.
         """
-        return (id(target.__self__),id(target.__func__))
+        return (id(target.__self__), id(target.__func__))
     calculateKey = classmethod(calculateKey)
 
     def __str__(self):

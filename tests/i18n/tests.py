@@ -9,7 +9,6 @@ import pickle
 from threading import local
 
 from django.conf import settings
-from django.core.management.utils import find_command
 from django.template import Template, Context
 from django.template.base import TemplateSyntaxError
 from django.test import TestCase, RequestFactory
@@ -34,16 +33,6 @@ from django.utils.translation import (activate, deactivate,
     npgettext, npgettext_lazy,
     check_for_language)
 
-if find_command('xgettext'):
-    from .commands.extraction import (ExtractorTests, BasicExtractorTests,
-        JavascriptExtractorTests, IgnoredExtractorTests, SymlinkExtractorTests,
-        CopyPluralFormsExtractorTests, NoWrapExtractorTests,
-        LocationCommentsTests, KeepPotFileExtractorTests,
-        MultipleLocaleExtractionTests)
-if find_command('msgfmt'):
-    from .commands.compilation import (PoFileTests, PoFileContentsTests,
-        PercentRenderingTests, MultipleLocaleCompilationTests,
-        CompilationErrorHandling)
 from .forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
 from .models import Company, TestModel
 

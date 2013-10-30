@@ -21,7 +21,7 @@ class InspectDBTestCase(TestCase):
         # Lets limit the introspection to tables created for models of this
         # application
         call_command('inspectdb',
-                     table_name_filter=lambda tn:tn.startswith('inspectdb_'),
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
                      stdout=out)
         error_message = "inspectdb has examined a table that should have been filtered out."
         # contrib.contenttypes is one of the apps always installed when running
@@ -35,9 +35,10 @@ class InspectDBTestCase(TestCase):
         """Test introspection of various Django field types"""
         out = StringIO()
         call_command('inspectdb',
-                     table_name_filter=lambda tn:tn.startswith('inspectdb_columntypes'),
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'),
                      stdout=out)
         output = out.getvalue()
+
         def assertFieldType(name, definition):
             out_def = re.search(r'^\s*%s = (models.*)$' % name, output, re.MULTILINE).groups()[0]
             self.assertEqual(definition, out_def)
@@ -99,7 +100,7 @@ class InspectDBTestCase(TestCase):
         # Lets limit the introspection to tables created for models of this
         # application
         call_command('inspectdb',
-                     table_name_filter=lambda tn:tn.startswith('inspectdb_'),
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
                      stdout=out)
         output = out.getvalue()
         error_message = "inspectdb generated an attribute name which is a python keyword"
@@ -120,7 +121,7 @@ class InspectDBTestCase(TestCase):
         # Lets limit the introspection to tables created for models of this
         # application
         call_command('inspectdb',
-                     table_name_filter=lambda tn:tn.startswith('inspectdb_'),
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
                      stdout=out)
         output = out.getvalue()
         error_message = "inspectdb generated a model field name which is a number"
@@ -158,7 +159,7 @@ class InspectDBTestCase(TestCase):
         """Test that by default the command generates models with `Meta.managed = False` (#14305)"""
         out = StringIO()
         call_command('inspectdb',
-                     table_name_filter=lambda tn:tn.startswith('inspectdb_columntypes'),
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'),
                      stdout=out)
         output = out.getvalue()
         self.longMessage = False

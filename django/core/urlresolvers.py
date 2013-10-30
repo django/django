@@ -331,7 +331,7 @@ class RegexURLResolver(LocaleRegexProvider):
                         return ResolverMatch(sub_match.func, sub_match.args, sub_match_dict, sub_match.url_name, self.app_name or sub_match.app_name, [self.namespace] + sub_match.namespaces)
                     tried.append([pattern])
             raise Resolver404({'tried': tried, 'path': new_path})
-        raise Resolver404({'path' : path})
+        raise Resolver404({'path': path})
 
     @property
     def urlconf_module(self):

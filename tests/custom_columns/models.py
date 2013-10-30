@@ -31,7 +31,7 @@ class Author(models.Model):
 
     class Meta:
         db_table = 'my_author_table'
-        ordering = ('last_name','first_name')
+        ordering = ('last_name', 'first_name')
 
 @python_2_unicode_compatible
 class Article(models.Model):

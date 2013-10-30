@@ -67,9 +67,9 @@ class GeoQuery(sql.Query):
         elif isinstance(field, DistanceField):
             # Using the field's distance attribute, can instantiate
             # `Distance` with the right context.
-            value = Distance(**{field.distance_att : value})
+            value = Distance(**{field.distance_att: value})
         elif isinstance(field, AreaField):
-            value = Area(**{field.area_att : value})
+            value = Area(**{field.area_att: value})
         elif isinstance(field, (GeomField, GeometryField)) and value:
             value = Geometry(value)
         elif field is not None:

@@ -56,6 +56,7 @@ TEST_DATA = (
     # Quoted-string format (CR not allowed)
     (validate_email, '"\\\011"@here.com', None),
     (validate_email, '"\\\012"@here.com', ValidationError),
+    (validate_email, 'trailingdot@shouldfail.com.', ValidationError),
 
     (validate_slug, 'slug-ok', None),
     (validate_slug, 'longer-slug-still-ok', None),
@@ -184,6 +185,7 @@ TEST_DATA = (
 def create_simple_test_method(validator, expected, value, num):
     if expected is not None and issubclass(expected, Exception):
         test_mask = 'test_%s_raises_error_%d'
+
         def test_func(self):
             # assertRaises not used, so as to be able to produce an error message
             # containing the tested value
@@ -196,6 +198,7 @@ def create_simple_test_method(validator, expected, value, num):
                     expected.__name__, value))
     else:
         test_mask = 'test_%s_%d'
+
         def test_func(self):
             try:
                 self.assertEqual(expected, validator(value))

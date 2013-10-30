@@ -80,7 +80,7 @@ class GeoIPTest(unittest.TestCase):
                 self.assertEqual('US', func(query))
             for func in (g.country_name, g.country_name_by_addr, g.country_name_by_name):
                 self.assertEqual('United States', func(query))
-            self.assertEqual({'country_code' : 'US', 'country_name' : 'United States'},
+            self.assertEqual({'country_code': 'US', 'country_name': 'United States'},
                              g.country(query))
 
     @skipUnless(HAS_GEOS, "Geos is required")
@@ -96,7 +96,7 @@ class GeoIPTest(unittest.TestCase):
                 self.assertEqual('US', func(query))
             for func in (g.country_name, g.country_name_by_addr, g.country_name_by_name):
                 self.assertEqual('United States', func(query))
-            self.assertEqual({'country_code' : 'US', 'country_name' : 'United States'},
+            self.assertEqual({'country_code': 'US', 'country_name': 'United States'},
                              g.country(query))
 
             # City information dictionary.

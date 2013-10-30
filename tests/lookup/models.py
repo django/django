@@ -13,6 +13,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 class Author(models.Model):
     name = models.CharField(max_length=100)
+
     class Meta:
         ordering = ('name', )
 
@@ -21,6 +22,7 @@ class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
     author = models.ForeignKey(Author, blank=True, null=True)
+
     class Meta:
         ordering = ('-pub_date', 'headline')
 
@@ -30,6 +32,7 @@ class Article(models.Model):
 class Tag(models.Model):
     articles = models.ManyToManyField(Article)
     name = models.CharField(max_length=100)
+
     class Meta:
         ordering = ('name', )
 

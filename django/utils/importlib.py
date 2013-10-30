@@ -2,6 +2,8 @@
 import warnings
 import sys
 
+from django.utils import six
+
 warnings.warn("django.utils.importlib will be removed in Django 1.9.",
     PendingDeprecationWarning, stacklevel=2)
 
@@ -20,22 +22,25 @@ def _resolve_name(name, package, level):
     return "%s.%s" % (package[:dot], name)
 
 
-def import_module(name, package=None):
-    """Import a module.
+if six.PY3:
+    from importlib import import_module
+else:
+    def import_module(name, package=None):
+        """Import a module.
 
-    The 'package' argument is required when performing a relative import. It
-    specifies the package to use as the anchor point from which to resolve the
-    relative import to an absolute import.
+        The 'package' argument is required when performing a relative import. It
+        specifies the package to use as the anchor point from which to resolve the
+        relative import to an absolute import.
 
-    """
-    if name.startswith('.'):
-        if not package:
-            raise TypeError("relative imports require the 'package' argument")
-        level = 0
-        for character in name:
-            if character != '.':
-                break
-            level += 1
-        name = _resolve_name(name[level:], package, level)
-    __import__(name)
-    return sys.modules[name]
+        """
+        if name.startswith('.'):
+            if not package:
+                raise TypeError("relative imports require the 'package' argument")
+            level = 0
+            for character in name:
+                if character != '.':
+                    break
+                level += 1
+            name = _resolve_name(name[level:], package, level)
+        __import__(name)
+        return sys.modules[name]

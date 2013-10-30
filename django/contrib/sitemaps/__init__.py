@@ -32,7 +32,7 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
 
     current_site = Site.objects.get_current()
     url = "http://%s%s" % (current_site.domain, sitemap_url)
-    params = urlencode({'sitemap':url})
+    params = urlencode({'sitemap': url})
     urlopen("%s?%s" % (ping_url, params))
 
 class Sitemap(object):

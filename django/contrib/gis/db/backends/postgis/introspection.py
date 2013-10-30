@@ -32,14 +32,14 @@ class PostGISIntrospection(DatabaseIntrospection):
         try:
             cursor.execute(oid_sql, ('geometry',))
             GEOM_TYPE = cursor.fetchone()[0]
-            postgis_types = {GEOM_TYPE : 'GeometryField'}
+            postgis_types = {GEOM_TYPE: 'GeometryField'}
             if self.connection.ops.geography:
                 cursor.execute(oid_sql, ('geography',))
                 GEOG_TYPE = cursor.fetchone()[0]
                 # The value for the geography type is actually a tuple
                 # to pass in the `geography=True` keyword to the field
                 # definition.
-                postgis_types[GEOG_TYPE] = ('GeometryField', {'geography' : True})
+                postgis_types[GEOG_TYPE] = ('GeometryField', {'geography': True})
         finally:
             cursor.close()
 

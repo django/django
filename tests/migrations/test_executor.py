@@ -38,7 +38,58 @@ class ExecutorTests(TransactionTestCase):
         # Are the tables there now?
         self.assertIn("migrations_author", connection.introspection.get_table_list(connection.cursor()))
         self.assertIn("migrations_book", connection.introspection.get_table_list(connection.cursor()))
+        # Rebuild the graph to reflect the new DB state
+        executor.loader.build_graph()
         # Alright, let's undo what we did
+        plan = executor.migration_plan([("migrations", None)])
+        self.assertEqual(
+            plan,
+            [
+                (executor.loader.graph.nodes["migrations", "0002_second"], True),
+                (executor.loader.graph.nodes["migrations", "0001_initial"], True),
+            ],
+        )
+        executor.migrate([("migrations", None)])
+        # Are the tables gone?
+        self.assertNotIn("migrations_author", connection.introspection.get_table_list(connection.cursor()))
+        self.assertNotIn("migrations_book", connection.introspection.get_table_list(connection.cursor()))
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
+    def test_run_with_squashed(self):
+        """
+        Tests running a squashed migration from zero (should ignore what it replaces)
+        """
+        executor = MigrationExecutor(connection)
+        executor.recorder.flush()
+        # Check our leaf node is the squashed one
+        leaves = [key for key in executor.loader.graph.leaf_nodes() if key[0] == "migrations"]
+        self.assertEqual(leaves, [("migrations", "0001_squashed_0002")])
+        # Check the plan
+        plan = executor.migration_plan([("migrations", "0001_squashed_0002")])
+        self.assertEqual(
+            plan,
+            [
+                (executor.loader.graph.nodes["migrations", "0001_squashed_0002"], False),
+            ],
+        )
+        # Were the tables there before?
+        self.assertNotIn("migrations_author", connection.introspection.get_table_list(connection.cursor()))
+        self.assertNotIn("migrations_book", connection.introspection.get_table_list(connection.cursor()))
+        # Alright, let's try running it
+        executor.migrate([("migrations", "0001_squashed_0002")])
+        # Are the tables there now?
+        self.assertIn("migrations_author", connection.introspection.get_table_list(connection.cursor()))
+        self.assertIn("migrations_book", connection.introspection.get_table_list(connection.cursor()))
+        # Rebuild the graph to reflect the new DB state
+        executor.loader.build_graph()
+        # Alright, let's undo what we did. Should also just use squashed.
+        plan = executor.migration_plan([("migrations", None)])
+        self.assertEqual(
+            plan,
+            [
+                (executor.loader.graph.nodes["migrations", "0001_squashed_0002"], True),
+            ],
+        )
         executor.migrate([("migrations", None)])
         # Are the tables gone?
         self.assertNotIn("migrations_author", connection.introspection.get_table_list(connection.cursor()))
@@ -70,6 +121,8 @@ class ExecutorTests(TransactionTestCase):
         )
         # Fake-apply all migrations
         executor.migrate([("migrations", "0002_second"), ("sessions", "0001_initial")], fake=True)
+        # Rebuild the graph to reflect the new DB state
+        executor.loader.build_graph()
         # Now plan a second time and make sure it's empty
         plan = executor.migration_plan([("migrations", "0002_second"), ("sessions", "0001_initial")])
         self.assertEqual(plan, [])
