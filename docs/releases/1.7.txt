@@ -488,6 +488,10 @@ Signals
   ``'app_label.ModelName'`` form – just like related fields – to lazily
   reference their senders.
 
+* Exceptions from the (receiver, exception) tuples returned by
+  :meth:`Signal.send_robust() <django.dispatch.Signal.send_robust>` now have
+  always their traceback attached as their ``__traceback__`` argument.
+
 Templates
 ^^^^^^^^^
 
