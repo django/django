@@ -899,6 +899,10 @@ Miscellaneous
   to prevent django from deleting the temporary .pot file it generates before
   creating the .po file.
 
+* The undocumented ``django.core.servers.basehttp.WSGIServerException`` has
+  been removed. Use ``socket.error`` provided by the standard library instead.
+  This change was also released in Django 1.5.5.
+
 Features deprecated in 1.6
 ==========================
 
