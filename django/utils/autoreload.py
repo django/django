@@ -65,6 +65,16 @@ try:
 except ImportError:
     pass
 
+try:
+    import select
+    select.kevent, select.kqueue
+    USE_KQUEUE = True
+
+    import resource
+    NOFILES_SOFT, NOFILES_HARD = resource.getrlimit(resource.RLIMIT_NOFILE)
+except AttributeError:
+    USE_KQUEUE = False
+
 RUN_RELOADER = True
 
 _mtimes = {}
@@ -117,6 +127,39 @@ def inotify_code_changed():
     notifier.stop()
 
     # If we are here the code must have changed.
+    return True
+
+def kqueue_code_changed():
+    """
+    Checks for changed code using kqueue. After being called
+    it blocks until a change event has been fired.
+    """
+    # Maximum number of open file descriptors is typically too low (256).
+    filenames = list(gen_filenames())
+    resource.setrlimit(resource.RLIMIT_NOFILE,
+                       (NOFILES_SOFT + len(filenames), NOFILES_HARD))
+
+    kqueue = select.kqueue()
+    fds = [open(filename) for filename in filenames]
+
+    _filter = select.KQ_FILTER_VNODE
+    flags = select.KQ_EV_ADD
+    fflags = (
+        select.KQ_NOTE_DELETE |
+        select.KQ_NOTE_WRITE |
+        select.KQ_NOTE_EXTEND |
+        select.KQ_NOTE_ATTRIB |
+        select.KQ_NOTE_LINK |
+        select.KQ_NOTE_RENAME |
+        select.KQ_NOTE_REVOKE
+    )
+    kevents = [select.kevent(fd, _filter, flags, fflags) for fd in fds]
+    kqueue.control(kevents, 1)
+
+    for fd in fds:
+        fd.close()
+    kqueue.close()
+
     return True
 
 def code_changed():
@@ -178,6 +221,8 @@ def reloader_thread():
     ensure_echo_on()
     if USE_INOTIFY:
         fn = inotify_code_changed
+    elif USE_KQUEUE:
+        fn = kqueue_code_changed
     else:
         fn = code_changed
     while RUN_RELOADER:
