@@ -40,6 +40,7 @@ def paginator_number(cl,i):
                            mark_safe(' class="end"' if i == cl.paginator.num_pages-1 else ''),
                            i+1)
 
+
 @register.inclusion_tag('admin/pagination.html')
 def pagination(cl):
     """
@@ -79,12 +80,14 @@ def pagination(cl):
     need_show_all_link = cl.can_show_all and not cl.show_all and cl.multi_page
     return {
         'cl': cl,
+        'verbose_count': cl.opts.verbose_name_count % cl.result_count,
         'pagination_required': pagination_required,
         'show_all_url': need_show_all_link and cl.get_query_string({ALL_VAR: ''}),
         'page_range': page_range,
         'ALL_VAR': ALL_VAR,
         '1': 1,
     }
+
 
 def result_headers(cl):
     """

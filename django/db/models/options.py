@@ -13,7 +13,7 @@ from django.db.models.loading import app_cache_ready, cache
 from django.utils import six
 from django.utils.functional import cached_property
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
-from django.utils.translation import activate, deactivate_all, get_language, string_concat
+from django.utils.translation import activate, deactivate_all, get_language, string_concat, ungettext_lazy
 
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', ' \\1', class_name).lower().strip()
@@ -23,7 +23,7 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
                  'index_together', 'app_cache', 'default_permissions',
-                 'select_on_save')
+                 'select_on_save', 'verbose_name_count')
 
 def normalize_unique_together(unique_together):
     """
@@ -42,6 +42,7 @@ class Options(object):
         self.virtual_fields = []
         self.model_name, self.verbose_name = None, None
         self.verbose_name_plural = None
+        self.verbose_name_count = None
         self.db_table = ''
         self.ordering = []
         self.unique_together = []
@@ -125,6 +126,11 @@ class Options(object):
             # by default.
             if self.verbose_name_plural is None:
                 self.verbose_name_plural = string_concat(self.verbose_name, 's')
+
+            if self.verbose_name_count is None:
+                singular = '%%d %s' % self.verbose_name
+                plural = '%%d %s' % self.verbose_name_plural
+                self.verbose_name_count = ungettext_lazy(singular, plural, None)
 
             # Any leftover attributes must be invalid.
             if meta_attrs != {}:

@@ -345,3 +345,17 @@ Django quotes column and table names behind the scenes.
         verbose_name_plural = "stories"
 
     If this isn't given, Django will use :attr:`~Options.verbose_name` + ``"s"``.
+
+``verbose_name_count``
+----------------------
+
+.. attribute:: Options.verbose_name_count
+
+    The text string for an object count::
+
+        from django.utils.translation import ngettext_lazy
+
+        verbose_name_count = ngettext_lazy('%d story', '%d stories', None)
+
+    If this isn't given, Django will use :attr:`~Options.verbose_name` and
+    :attr:`~Options.verbose_name_plural` accordingly.
