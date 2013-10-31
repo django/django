@@ -476,6 +476,10 @@ these changes.
 
 * The class ``django.utils.datastructures.MergeDict`` will be removed.
 
+* The ``max_age`` parameter of
+  :meth:`django.core.signing.TimestampSigner.unsign` will no longer accept a
+  number of seconds.
+
 2.0
 ---
 
