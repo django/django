@@ -410,13 +410,16 @@ def check_type(cls, attr, type_):
         raise ImproperlyConfigured("'%s.%s' should be a %s."
                 % (cls.__name__, attr, type_.__name__))
 
+
 def check_isseq(cls, label, obj):
     if not isinstance(obj, (list, tuple)):
         raise ImproperlyConfigured("'%s.%s' must be a list or tuple." % (cls.__name__, label))
 
+
 def check_isdict(cls, label, obj):
     if not isinstance(obj, dict):
         raise ImproperlyConfigured("'%s.%s' must be a dictionary." % (cls.__name__, label))
+
 
 def get_field(cls, model, label, field):
     try:
@@ -424,6 +427,7 @@ def get_field(cls, model, label, field):
     except models.FieldDoesNotExist:
         raise ImproperlyConfigured("'%s.%s' refers to field '%s' that is missing from model '%s.%s'."
                 % (cls.__name__, label, field, model._meta.app_label, model.__name__))
+
 
 def fetch_attr(cls, model, label, field):
     try:

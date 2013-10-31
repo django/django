@@ -711,6 +711,7 @@ class LogoutTest(AuthViewsTestCase):
                             "%s should be allowed" % good_url)
             self.confirm_logged_out()
 
+
 @skipIfCustomUser
 @override_settings(
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),

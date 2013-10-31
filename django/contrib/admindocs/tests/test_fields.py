@@ -11,6 +11,7 @@ from django.utils.translation import ugettext as _
 class CustomField(models.Field):
     description = "A custom field type"
 
+
 class DescriptionLackingField(models.Field):
     pass
 

@@ -2,6 +2,7 @@ from django.conf import settings
 from django.conf.urls import patterns, url
 from django.core.urlresolvers import LocaleRegexURLResolver
 
+
 def i18n_patterns(prefix, *args):
     """
     Adds the language code prefix to every URL pattern within this

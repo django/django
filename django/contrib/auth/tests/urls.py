@@ -10,10 +10,12 @@ from django.shortcuts import render_to_response
 from django.template import Template, RequestContext
 from django.views.decorators.cache import never_cache
 
+
 class CustomRequestAuthenticationForm(AuthenticationForm):
     def __init__(self, request, *args, **kwargs):
         assert isinstance(request, HttpRequest)
         super(CustomRequestAuthenticationForm, self).__init__(request, *args, **kwargs)
+
 
 @never_cache
 def remote_user_auth_view(request):
@@ -22,6 +24,7 @@ def remote_user_auth_view(request):
     c = RequestContext(request, {})
     return HttpResponse(t.render(c))
 
+
 def auth_processor_no_attr_access(request):
     render_to_response('context_processors/auth_attrs_no_access.html',
         RequestContext(request, {}, processors=[context_processors.auth]))
@@ -29,31 +32,38 @@ def auth_processor_no_attr_access(request):
     return render_to_response('context_processors/auth_attrs_test_access.html',
         {'session_accessed': request.session.accessed})
 
+
 def auth_processor_attr_access(request):
     render_to_response('context_processors/auth_attrs_access.html',
         RequestContext(request, {}, processors=[context_processors.auth]))
     return render_to_response('context_processors/auth_attrs_test_access.html',
         {'session_accessed': request.session.accessed})
 
+
 def auth_processor_user(request):
     return render_to_response('context_processors/auth_attrs_user.html',
         RequestContext(request, {}, processors=[context_processors.auth]))
+
 
 def auth_processor_perms(request):
     return render_to_response('context_processors/auth_attrs_perms.html',
         RequestContext(request, {}, processors=[context_processors.auth]))
 
+
 def auth_processor_perm_in_perms(request):
     return render_to_response('context_processors/auth_attrs_perm_in_perms.html',
         RequestContext(request, {}, processors=[context_processors.auth]))
+
 
 def auth_processor_messages(request):
     info(request, "Message 1")
     return render_to_response('context_processors/auth_attrs_messages.html',
          RequestContext(request, {}, processors=[context_processors.auth]))
 
+
 def userpage(request):
     pass
+
 
 def custom_request_auth_login(request):
     return login(request, authentication_form=CustomRequestAuthenticationForm)

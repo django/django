@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
 from django.utils.translation import ugettext, ugettext_lazy as _
 
+
 class FlatpageForm(forms.ModelForm):
     url = forms.RegexField(label=_("URL"), max_length=100, regex=r'^[-\w/\.~]+$',
         help_text = _("Example: '/about/contact/'. Make sure to have leading"

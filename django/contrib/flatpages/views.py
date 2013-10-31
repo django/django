@@ -17,6 +17,8 @@ DEFAULT_TEMPLATE = 'flatpages/default.html'
 # or a redirect is required for authentication, the 404 needs to be returned
 # without any CSRF checks. Therefore, we only
 # CSRF protect the internal implementation.
+
+
 def flatpage(request, url):
     """
     Public interface to the flat page view.
@@ -43,6 +45,7 @@ def flatpage(request, url):
         else:
             raise
     return render_flatpage(request, f)
+
 
 @csrf_protect
 def render_flatpage(request, f):

@@ -16,6 +16,7 @@ except ImportError:
 else:
     docutils_is_available = True
 
+
 def trim_docstring(docstring):
     """
     Uniformly trims leading/trailing whitespace from docstrings.
@@ -29,6 +30,7 @@ def trim_docstring(docstring):
     indent = min(len(line) - len(line.lstrip()) for line in lines if line.lstrip())
     trimmed = [lines[0].lstrip()] + [line[indent:].rstrip() for line in lines[1:]]
     return "\n".join(trimmed).strip()
+
 
 def parse_docstring(docstring):
     """
@@ -54,6 +56,7 @@ def parse_docstring(docstring):
             else:
                 body = "\n\n".join(parts[1:])
     return title, body, metadata
+
 
 def parse_rst(text, default_reference_context, thing_being_parsed=None):
     """
@@ -92,6 +95,7 @@ ROLES = {
     'tag': '%s/tags/#%s',
 }
 
+
 def create_reference_role(rolename, urlbase):
     def _role(name, rawtext, text, lineno, inliner, options=None, content=None):
         if options is None:
@@ -101,6 +105,7 @@ def create_reference_role(rolename, urlbase):
         node = docutils.nodes.reference(rawtext, text, refuri=(urlbase % (inliner.document.settings.link_base, text.lower())), **options)
         return [node], []
     docutils.parsers.rst.roles.register_canonical_role(rolename, _role)
+
 
 def default_reference_role(name, rawtext, text, lineno, inliner, options=None, content=None):
     if options is None:

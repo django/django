@@ -6,6 +6,7 @@ import sys
 
 js_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'admin', 'js')
 
+
 def main():
     usage = "usage: %prog [file1..fileN]"
     description = """With no file paths given this script will automatically

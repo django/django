@@ -21,9 +21,11 @@ from django.utils.translation import ugettext as _
 # Exclude methods starting with these strings from documentation
 MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
 
+
 class GenericSite(object):
     domain = 'example.com'
     name = 'my site'
+
 
 @staff_member_required
 def doc_index(request):
@@ -33,6 +35,7 @@ def doc_index(request):
         'root_path': urlresolvers.reverse('admin:index'),
     }, context_instance=RequestContext(request))
 
+
 @staff_member_required
 def bookmarklets(request):
     admin_root = urlresolvers.reverse('admin:index')
@@ -40,6 +43,7 @@ def bookmarklets(request):
         'root_path': admin_root,
         'admin_url': "%s://%s%s" % (request.scheme, request.get_host(), admin_root),
     }, context_instance=RequestContext(request))
+
 
 @staff_member_required
 def template_tag_index(request):
@@ -76,6 +80,7 @@ def template_tag_index(request):
         'tags': tags
     }, context_instance=RequestContext(request))
 
+
 @staff_member_required
 def template_filter_index(request):
     if not utils.docutils_is_available:
@@ -111,6 +116,7 @@ def template_filter_index(request):
         'filters': filters
     }, context_instance=RequestContext(request))
 
+
 @staff_member_required
 def view_index(request):
     if not utils.docutils_is_available:
@@ -141,6 +147,7 @@ def view_index(request):
         'views': views
     }, context_instance=RequestContext(request))
 
+
 @staff_member_required
 def view_detail(request, view):
     if not utils.docutils_is_available:
@@ -166,6 +173,7 @@ def view_detail(request, view):
         'meta': metadata,
     }, context_instance=RequestContext(request))
 
+
 @staff_member_required
 def model_index(request):
     if not utils.docutils_is_available:
@@ -175,6 +183,7 @@ def model_index(request):
         'root_path': urlresolvers.reverse('admin:index'),
         'models': m_list
     }, context_instance=RequestContext(request))
+
 
 @staff_member_required
 def model_detail(request, app_label, model_name):
@@ -278,6 +287,7 @@ def model_detail(request, app_label, model_name):
         'fields': fields,
     }, context_instance=RequestContext(request))
 
+
 @staff_member_required
 def template_detail(request, template):
     templates = []
@@ -307,9 +317,11 @@ def template_detail(request, template):
 # Helper functions #
 ####################
 
+
 def missing_docutils_page(request):
     """Display an error message for people without docutils"""
     return render_to_response('admin_doc/missing_docutils.html')
+
 
 def load_all_installed_template_libraries():
     # Load/register all template tag libraries from installed apps.
@@ -329,6 +341,7 @@ def load_all_installed_template_libraries():
             except template.InvalidTemplateLibrary:
                 pass
 
+
 def get_return_data_type(func_name):
     """Return a somewhat-helpful data type given a function name"""
     if func_name.startswith('get_'):
@@ -338,12 +351,14 @@ def get_return_data_type(func_name):
             return 'Integer'
     return ''
 
+
 def get_readable_field_data_type(field):
     """Returns the description for a given field type, if it exists,
     Fields' descriptions can contain format strings, which will be interpolated
     against the values of field.__dict__ before being output."""
 
     return field.description % field.__dict__
+
 
 def extract_views_from_urlpatterns(urlpatterns, base=''):
     """
@@ -370,6 +385,7 @@ def extract_views_from_urlpatterns(urlpatterns, base=''):
 
 named_group_matcher = re.compile(r'\(\?P(<\w+>).+?\)')
 non_named_group_matcher = re.compile(r'\(.*?\)')
+
 
 def simplify_regex(pattern):
     """

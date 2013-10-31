@@ -19,12 +19,14 @@ from django.conf import settings
 
 ACTION_CHECKBOX_NAME = '_selected_action'
 
+
 class ActionForm(forms.Form):
     action = forms.ChoiceField(label=_('Action:'))
     select_across = forms.BooleanField(label='', required=False, initial=0,
         widget=forms.HiddenInput({'class': 'select-across'}))
 
 checkbox = forms.CheckboxInput({'class': 'action-select'}, lambda value: False)
+
 
 class AdminForm(object):
     def __init__(self, form, fieldsets, prepopulated_fields, readonly_fields=None, model_admin=None):
@@ -53,6 +55,7 @@ class AdminForm(object):
         return media
     media = property(_media)
 
+
 class Fieldset(object):
     def __init__(self, form, name=None, readonly_fields=(), fields=(), classes=(),
       description=None, model_admin=None):
@@ -76,6 +79,7 @@ class Fieldset(object):
     def __iter__(self):
         for field in self.fields:
             yield Fieldline(self.form, field, self.readonly_fields, model_admin=self.model_admin)
+
 
 class Fieldline(object):
     def __init__(self, form, field, readonly_fields=None, model_admin=None):
@@ -103,6 +107,7 @@ class Fieldline(object):
     def errors(self):
         return mark_safe('\n'.join(self.form[f].errors.as_ul() for f in self.fields if f not in self.readonly_fields).strip('\n'))
 
+
 class AdminField(object):
     def __init__(self, form, field, is_first):
         self.field = form[field] # A django.forms.BoundField instance
@@ -127,6 +132,7 @@ class AdminField(object):
 
     def errors(self):
         return mark_safe(self.field.errors.as_ul())
+
 
 class AdminReadonlyField(object):
     def __init__(self, form, field, is_first, model_admin=None):
@@ -183,6 +189,7 @@ class AdminReadonlyField(object):
                     result_repr = display_for_field(value, f)
         return conditional_escape(result_repr)
 
+
 class InlineAdminFormSet(object):
     """
     A wrapper around an inline formset for use in the admin system.
@@ -237,6 +244,7 @@ class InlineAdminFormSet(object):
             media = media + fs.media
         return media
     media = property(_media)
+
 
 class InlineAdminForm(AdminForm):
     """
@@ -300,6 +308,7 @@ class InlineAdminForm(AdminForm):
         from django.forms.formsets import ORDERING_FIELD_NAME
         return AdminField(self.form, ORDERING_FIELD_NAME, False)
 
+
 class InlineFieldset(Fieldset):
     def __init__(self, formset, *args, **kwargs):
         self.formset = formset
@@ -313,6 +322,7 @@ class InlineFieldset(Fieldset):
             yield Fieldline(self.form, field, self.readonly_fields,
                 model_admin=self.model_admin)
 
+
 class AdminErrorList(forms.utils.ErrorList):
     """
     Stores all errors for the form/formsets in an add/change stage view.
@@ -325,6 +335,7 @@ class AdminErrorList(forms.utils.ErrorList):
                 for errors_in_inline_form in inline_formset.errors:
                     self.extend(list(six.itervalues(errors_in_inline_form)))
 
+
 def normalize_fieldsets(fieldsets):
     """
     Make sure the keys in fieldset dictionaries are strings. Returns the
@@ -334,6 +345,7 @@ def normalize_fieldsets(fieldsets):
     for name, options in fieldsets:
         result.append((name, normalize_dictionary(options)))
     return result
+
 
 def normalize_dictionary(data_dict):
     """
