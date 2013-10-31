@@ -144,15 +144,7 @@ def kqueue_code_changed():
 
     _filter = select.KQ_FILTER_VNODE
     flags = select.KQ_EV_ADD
-    fflags = (
-        select.KQ_NOTE_DELETE |
-        select.KQ_NOTE_WRITE |
-        select.KQ_NOTE_EXTEND |
-        select.KQ_NOTE_ATTRIB |
-        select.KQ_NOTE_LINK |
-        select.KQ_NOTE_RENAME |
-        select.KQ_NOTE_REVOKE
-    )
+    fflags = select.KQ_NOTE_DELETE | select.KQ_NOTE_WRITE | select.KQ_NOTE_RENAME
     kevents = [select.kevent(fd, _filter, flags, fflags) for fd in fds]
     kqueue.control(kevents, 1)
 
