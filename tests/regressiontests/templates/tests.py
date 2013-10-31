@@ -1765,9 +1765,7 @@ class RequestContextTests(BaseTemplateResponseTest):
             'none'
         )
 
-
-@unittest.skipIf(' ' in __file__,
-    "The {%% ssi %%} tag in Django 1.4 doesn't support spaces in path.")
+skip_reason = "The {%% ssi %%} tag in Django 1.4 doesn't support spaces in path."
 class SSITests(unittest.TestCase):
     def setUp(self):
         self.this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -1778,11 +1776,13 @@ class SSITests(unittest.TestCase):
         self.assertTrue(os.path.exists(path))
         return template.Template('{%% ssi %s %%}' % path).render(Context())
 
+    @unittest.skipIf(' ' in __file__, skip_reason)
     def test_allowed_paths(self):
         acceptable_path = os.path.join(self.ssi_dir, "..", "first", "test.html")
         with override_settings(ALLOWED_INCLUDE_ROOTS=(self.ssi_dir,)):
             self.assertEqual(self.render_ssi(acceptable_path), 'First template\n')
 
+    @unittest.skipIf(' ' in __file__, skip_reason)
     def test_relative_include_exploit(self):
         """
         May not bypass ALLOWED_INCLUDE_ROOTS with relative paths
