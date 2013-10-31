@@ -613,6 +613,11 @@ Miscellaneous
   you relied on the default field ordering while having fields defined on both
   the current class *and* on a parent ``Form``.
 
+* The ``required`` argument of
+  :class:`~django.forms.extras.widgets.SelectDateWidget` has been removed.
+  This widget now respects the form field's ``is_required`` attribute like
+  other widgets.
+
 * :meth:`~django.db.models.query.QuerySet.select_related` now chains in the
   same way as other similar calls like ``prefetch_related``. That is,
   ``select_related('foo', 'bar')`` is equivalent to
