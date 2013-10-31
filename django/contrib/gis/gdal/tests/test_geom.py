@@ -121,6 +121,9 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual(json.loads(g.json), json.loads(geom.json))
                 self.assertEqual(json.loads(g.json), json.loads(geom.geojson))
             self.assertEqual(OGRGeometry(g.wkt), OGRGeometry(geom.json))
+        # Test input with some garbage content (but valid json) (#15529)
+        geom = OGRGeometry('{"type": "Point", "coordinates": [ 100.0, 0.0 ], "other": "<test>"}')
+        self.assertIsInstance(geom, OGRGeometry)
 
     def test02_points(self):
         "Testing Point objects."
