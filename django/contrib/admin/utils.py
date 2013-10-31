@@ -18,6 +18,7 @@ from django.utils import six
 from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse, NoReverseMatch
 
+
 def lookup_needs_distinct(opts, lookup_path):
     """
     Returns True if 'distinct()' should be used to query the given lookup path.
@@ -30,6 +31,7 @@ def lookup_needs_distinct(opts, lookup_path):
          not field.field.unique)):
         return True
     return False
+
 
 def prepare_lookup_value(key, value):
     """
@@ -45,6 +47,7 @@ def prepare_lookup_value(key, value):
         else:
             value = True
     return value
+
 
 def quote(s):
     """

@@ -16,6 +16,7 @@ from django.contrib.admin.utils import (get_model_from_relation,
     reverse_field_path, get_limit_choices_to_from_path, prepare_lookup_value)
 from django.contrib.admin.options import IncorrectLookupParameters
 
+
 class ListFilter(object):
     title = None  # Human-readable title to appear in the right sidebar.
     template = 'admin/filter.html'

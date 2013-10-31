@@ -154,6 +154,7 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
         setattr(instance, self.fk_field, fk)
         setattr(instance, self.cache_attr, value)
 
+
 class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
 
@@ -293,6 +294,7 @@ class ReverseGenericRelatedObjectsDescriptor(object):
         for obj in value:
             manager.add(obj)
 
+
 def create_generic_related_manager(superclass):
     """
     Factory function for a manager that subclasses 'superclass' (which is a
@@ -390,10 +392,11 @@ def create_generic_related_manager(superclass):
 
     return GenericRelatedObjectManager
 
-class GenericRel(ForeignObjectRel):
 
+class GenericRel(ForeignObjectRel):
     def __init__(self, field, to, related_name=None, limit_choices_to=None):
         super(GenericRel, self).__init__(field, to, related_name, limit_choices_to)
+
 
 class BaseGenericInlineFormSet(BaseModelFormSet):
     """
@@ -475,6 +478,7 @@ def generic_inlineformset_factory(model, form=ModelForm,
     FormSet.for_concrete_model = for_concrete_model
     return FormSet
 
+
 class GenericInlineModelAdmin(InlineModelAdmin):
     ct_field = "content_type"
     ct_fk_field = "object_id"
@@ -516,8 +520,10 @@ class GenericInlineModelAdmin(InlineModelAdmin):
 
         return generic_inlineformset_factory(self.model, **defaults)
 
+
 class GenericStackedInline(GenericInlineModelAdmin):
     template = 'admin/edit_inline/stacked.html'
+
 
 class GenericTabularInline(GenericInlineModelAdmin):
     template = 'admin/edit_inline/tabular.html'

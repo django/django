@@ -1,6 +1,7 @@
 # PermWrapper and PermLookupDict proxy the permissions system into objects that
 # the template system can understand.
 
+
 class PermLookupDict(object):
     def __init__(self, user, app_label):
         self.user, self.app_label = user, app_label

@@ -234,6 +234,7 @@ def password_reset_confirm(request, uidb64=None, token=None,
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
 
+
 def password_reset_complete(request,
                             template_name='registration/password_reset_complete.html',
                             current_app=None, extra_context=None):

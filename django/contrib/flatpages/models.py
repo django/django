@@ -6,6 +6,7 @@ from django.core.urlresolvers import get_script_prefix
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import iri_to_uri, python_2_unicode_compatible
 
+
 @python_2_unicode_compatible
 class FlatPage(models.Model):
     url = models.CharField(_('URL'), max_length=100, db_index=True)

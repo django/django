@@ -25,6 +25,7 @@ register = Library()
 
 DOT = '.'
 
+
 @register.simple_tag
 def paginator_number(cl, i):
     """
@@ -39,6 +40,7 @@ def paginator_number(cl, i):
                            cl.get_query_string({PAGE_VAR: i}),
                            mark_safe(' class="end"' if i == cl.paginator.num_pages-1 else ''),
                            i+1)
+
 
 @register.inclusion_tag('admin/pagination.html')
 def pagination(cl):
@@ -85,6 +87,7 @@ def pagination(cl):
         'ALL_VAR': ALL_VAR,
         '1': 1,
     }
+
 
 def result_headers(cl):
     """
@@ -167,10 +170,12 @@ def result_headers(cl):
             "class_attrib": format_html(' class="{0}"', ' '.join(th_classes)) if th_classes else '',
         }
 
+
 def _boolean_icon(field_val):
     icon_url = static('admin/img/icon-%s.gif' %
                       {True: 'yes', False: 'no', None: 'unknown'}[field_val])
     return format_html('<img src="{0}" alt="{1}" />', icon_url, field_val)
+
 
 def items_for_result(cl, result, form):
     """
@@ -266,6 +271,7 @@ def items_for_result(cl, result, form):
     if form and not form[cl.model._meta.pk.name].is_hidden:
         yield format_html('<td>{0}</td>', force_text(form[cl.model._meta.pk.name]))
 
+
 class ResultList(list):
     # Wrapper class used to return items in a list_editable
     # changelist, annotated with the form object for error
@@ -275,6 +281,7 @@ class ResultList(list):
         self.form = form
         super(ResultList, self).__init__(*items)
 
+
 def results(cl):
     if cl.formset:
         for res, form in zip(cl.result_list, cl.formset.forms):
@@ -283,11 +290,13 @@ def results(cl):
         for res in cl.result_list:
             yield ResultList(None, items_for_result(cl, res, None))
 
+
 def result_hidden_fields(cl):
     if cl.formset:
         for res, form in zip(cl.result_list, cl.formset.forms):
             if form[cl.model._meta.pk.name].is_hidden:
                 yield mark_safe(force_text(form[cl.model._meta.pk.name]))
+
 
 @register.inclusion_tag("admin/change_list_results.html")
 def result_list(cl):
@@ -304,6 +313,7 @@ def result_list(cl):
             'result_headers': headers,
             'num_sorted_fields': num_sorted_fields,
             'results': list(results(cl))}
+
 
 @register.inclusion_tag('admin/date_hierarchy.html')
 def date_hierarchy(cl):
@@ -382,6 +392,7 @@ def date_hierarchy(cl):
                 } for year in years]
             }
 
+
 @register.inclusion_tag('admin/search_form.html')
 def search_form(cl):
     """
@@ -393,6 +404,7 @@ def search_form(cl):
         'search_var': SEARCH_VAR
     }
 
+
 @register.simple_tag
 def admin_list_filter(cl, spec):
     tpl = get_template(spec.template)
@@ -401,6 +413,7 @@ def admin_list_filter(cl, spec):
         'choices': list(spec.choices(cl)),
         'spec': spec,
     }))
+
 
 @register.inclusion_tag('admin/actions.html', takes_context=True)
 def admin_actions(context):

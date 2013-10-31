@@ -19,6 +19,7 @@ from django.contrib.formtools.tests.forms import (
 success_string = "Done was called!"
 success_string_encoded = success_string.encode()
 
+
 class TestFormPreview(preview.FormPreview):
     def get_context(self, request, form):
         context = super(TestFormPreview, self).get_context(request, form)
@@ -30,6 +31,7 @@ class TestFormPreview(preview.FormPreview):
 
     def done(self, request, cleaned_data):
         return http.HttpResponse(success_string)
+
 
 @override_settings(
     TEMPLATE_DIRS=(

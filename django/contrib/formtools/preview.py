@@ -10,6 +10,7 @@ from django.contrib.formtools.utils import form_hmac
 
 AUTO_ID = 'formtools_%s' # Each form here uses this as its auto_id parameter.
 
+
 class FormPreview(object):
     preview_template = 'formtools/preview.html'
     form_template = 'formtools/form.html'

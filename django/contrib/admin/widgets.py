@@ -49,8 +49,8 @@ class FilteredSelectMultiple(forms.SelectMultiple):
             % (name, self.verbose_name.replace('"', '\\"'), int(self.is_stacked), static('admin/')))
         return mark_safe(''.join(output))
 
-class AdminDateWidget(forms.DateInput):
 
+class AdminDateWidget(forms.DateInput):
     @property
     def media(self):
         js = ["calendar.js", "admin/DateTimeShortcuts.js"]
@@ -62,8 +62,8 @@ class AdminDateWidget(forms.DateInput):
             final_attrs.update(attrs)
         super(AdminDateWidget, self).__init__(attrs=final_attrs, format=format)
 
-class AdminTimeWidget(forms.TimeInput):
 
+class AdminTimeWidget(forms.TimeInput):
     @property
     def media(self):
         js = ["calendar.js", "admin/DateTimeShortcuts.js"]
@@ -74,6 +74,7 @@ class AdminTimeWidget(forms.TimeInput):
         if attrs is not None:
             final_attrs.update(attrs)
         super(AdminTimeWidget, self).__init__(attrs=final_attrs, format=format)
+
 
 class AdminSplitDateTime(forms.SplitDateTimeWidget):
     """
@@ -90,6 +91,7 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
                            _('Date:'), rendered_widgets[0],
                            _('Time:'), rendered_widgets[1])
 
+
 class AdminRadioFieldRenderer(RadioFieldRenderer):
     def render(self):
         """Outputs a <ul> for this set of radio fields."""
@@ -98,14 +100,17 @@ class AdminRadioFieldRenderer(RadioFieldRenderer):
                            format_html_join('\n', '<li>{0}</li>',
                                             ((force_text(w),) for w in self)))
 
+
 class AdminRadioSelect(forms.RadioSelect):
     renderer = AdminRadioFieldRenderer
+
 
 class AdminFileWidget(forms.ClearableFileInput):
     template_with_initial = ('<p class="file-upload">%s</p>'
                             % forms.ClearableFileInput.template_with_initial)
     template_with_clear = ('<span class="clearable-file-input">%s</span>'
                            % forms.ClearableFileInput.template_with_clear)
+
 
 def url_params_from_lookup_dict(lookups):
     """
@@ -128,6 +133,7 @@ def url_params_from_lookup_dict(lookups):
             items.append((k, v))
         params.update(dict(items))
     return params
+
 
 class ForeignKeyRawIdWidget(forms.TextInput):
     """
@@ -186,6 +192,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
             return '&nbsp;<strong>%s</strong>' % escape(Truncator(obj).words(14, truncate='...'))
         except (ValueError, self.rel.to.DoesNotExist):
             return ''
+
 
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     """
@@ -275,12 +282,14 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     def id_for_label(self, id_):
         return self.widget.id_for_label(id_)
 
+
 class AdminTextareaWidget(forms.Textarea):
     def __init__(self, attrs=None):
         final_attrs = {'class': 'vLargeTextField'}
         if attrs is not None:
             final_attrs.update(attrs)
         super(AdminTextareaWidget, self).__init__(attrs=final_attrs)
+
 
 class AdminTextInputWidget(forms.TextInput):
     def __init__(self, attrs=None):
@@ -289,12 +298,14 @@ class AdminTextInputWidget(forms.TextInput):
             final_attrs.update(attrs)
         super(AdminTextInputWidget, self).__init__(attrs=final_attrs)
 
+
 class AdminEmailInputWidget(forms.EmailInput):
     def __init__(self, attrs=None):
         final_attrs = {'class': 'vTextField'}
         if attrs is not None:
             final_attrs.update(attrs)
         super(AdminEmailInputWidget, self).__init__(attrs=final_attrs)
+
 
 class AdminURLFieldWidget(forms.URLInput):
     def __init__(self, attrs=None):
@@ -325,8 +336,10 @@ class AdminIntegerFieldWidget(forms.TextInput):
             final_attrs.update(attrs)
         super(AdminIntegerFieldWidget, self).__init__(attrs=final_attrs)
 
+
 class AdminBigIntegerFieldWidget(AdminIntegerFieldWidget):
     class_name = 'vBigIntegerField'
+
 
 class AdminCommaSeparatedIntegerFieldWidget(forms.TextInput):
     def __init__(self, attrs=None):
