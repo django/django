@@ -4,6 +4,7 @@ import warnings
 from django.test import SimpleTestCase, RequestFactory, override_settings
 from django.utils import six, translation
 from django.utils.deprecation import RenameMethodsBase
+from django.utils.functional import memoize
 
 
 class RenameManagerMethods(RenameMethodsBase):
@@ -205,3 +206,18 @@ class DeprecatedChineseLanguageCodes(SimpleTestCase):
                 "The use of the language code 'zh-tw' is deprecated. "
                 "Please use the 'zh-hant' translation instead.",
             ])
+
+
+class DeprecatingMemoizeTest(SimpleTestCase):
+    def test_deprecated_memoize(self):
+        """
+        Ensure the correct warning is raised when memoize is used.
+        """
+        warnings.simplefilter('always')
+
+        with warnings.catch_warnings(record=True) as recorded:
+            memoize(lambda x: x, {}, 1)
+            msg = str(recorded.pop().message)
+            self.assertEqual(msg,
+                'memoize wrapper is deprecated and will be removed in Django '
+                '1.9. Use django.utils.lru_cache instead.')

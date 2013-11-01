@@ -14,10 +14,9 @@ import warnings
 from django.dispatch import receiver
 from django.test.signals import setting_changed
 from django.utils.encoding import force_str, force_text
-from django.utils.functional import memoize
 from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeData
-from django.utils import six
+from django.utils import six, lru_cache
 from django.utils.six import StringIO
 from django.utils.translation import TranslatorCommentWarning, trim_whitespace
 
@@ -33,7 +32,6 @@ _default = None
 # This is a cache for normalized accept-header languages to prevent multiple
 # file lookups when checking the same locale on repeated requests.
 _accepted = {}
-_checked_languages = {}
 
 # magic gettext number to separate context from message
 CONTEXT_SEPARATOR = "\x04"
@@ -390,6 +388,7 @@ def all_locale_paths():
     return [globalpath] + list(settings.LOCALE_PATHS)
 
 
+@lru_cache.lru_cache(maxsize=None)
 def check_for_language(lang_code):
     """
     Checks whether there is a global language file for the given language
@@ -401,7 +400,6 @@ def check_for_language(lang_code):
         if gettext_module.find('django', path, [to_locale(lang_code)]) is not None:
             return True
     return False
-check_for_language = memoize(check_for_language, _checked_languages, 1)
 
 
 def get_supported_language_variant(lang_code, supported=None, strict=False):

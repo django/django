@@ -427,7 +427,7 @@ class TransRealMixin(object):
         trans_real._translations = {}
         trans_real._active = local()
         trans_real._default = None
-        trans_real._checked_languages = {}
+        trans_real.check_for_language.cache_clear()
 
     def tearDown(self):
         self.flush_caches()
