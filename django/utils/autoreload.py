@@ -72,7 +72,11 @@ try:
 
     import resource
     NOFILES_SOFT, NOFILES_HARD = resource.getrlimit(resource.RLIMIT_NOFILE)
-except AttributeError:
+
+    import subprocess
+    command = ["sysctl", "-n", "kern.maxfilesperproc"]
+    NOFILES_KERN = int(subprocess.check_output(command).strip())
+except (AttributeError, OSError):
     USE_KQUEUE = False
 
 RUN_RELOADER = True
@@ -134,10 +138,29 @@ def kqueue_code_changed():
     Checks for changed code using kqueue. After being called
     it blocks until a change event has been fired.
     """
-    # Maximum number of open file descriptors is typically too low (256).
+    # We must increase the maximum number of open file descriptors because
+    # kqueue requires one file descriptor per monitored file and default
+    # resource limits are too low.
+    #
+    # In fact there are two limits:
+    # - kernel limit: `sysctl kern.maxfilesperproc` -> 10240 on OS X.9
+    # - resource limit: `launchctl limit maxfiles` -> 256 on OS X.9
+    #
+    # The latter can be changed with Python's resource module. However, it
+    # cannot exceed the former. Suprisingly, getrlimit(3) -- used by both
+    # launchctl and the resource module -- reports no "hard limit", even
+    # though the kernel sets one.
+
     filenames = list(gen_filenames())
-    resource.setrlimit(resource.RLIMIT_NOFILE,
-                       (NOFILES_SOFT + len(filenames), NOFILES_HARD))
+
+    # If project is too large or kernel limits are too tight, use polling.
+    if len(filenames) > NOFILES_KERN:
+        return code_changed()
+
+    # Add the number of file descriptors we're going to use to the current
+    # resource limit, while staying within the kernel limit.
+    nofiles_target = min(len(filenames) + NOFILES_SOFT, NOFILES_KERN)
+    resource.setrlimit(resource.RLIMIT_NOFILE, (nofiles_target, NOFILES_HARD))
 
     kqueue = select.kqueue()
     fds = [open(filename) for filename in filenames]
