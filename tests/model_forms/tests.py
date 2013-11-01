@@ -824,6 +824,41 @@ class ModelToDictTests(TestCase):
         # Ensure many-to-many relation appears as a list
         self.assertIsInstance(d['categories'], list)
 
+    def test_reuse_prefetched(self):
+        # model_to_dict should not hit the database if it can reuse
+        # the data populated by prefetch_related.
+        categories = [
+            Category(name='TestName1', slug='TestName1', url='url1'),
+            Category(name='TestName2', slug='TestName2', url='url2'),
+            Category(name='TestName3', slug='TestName3', url='url3')
+        ]
+        for c in categories:
+            c.save()
+        writer = Writer(name='Test writer')
+        writer.save()
+
+        art = Article(
+            headline='Test article',
+            slug='test-article',
+            pub_date=datetime.date(1988, 1, 4),
+            writer=writer,
+            article='Hello.'
+        )
+        art.save()
+        for c in categories:
+            art.categories.add(c)
+
+        art = Article.objects.prefetch_related('categories').get(pk=art.pk)
+
+        with self.assertNumQueries(0):
+            d = model_to_dict(art)
+
+        #Ensure all many-to-many categories appear in model_to_dict
+        for c in categories:
+            self.assertIn(c.pk, d['categories'])
+        #Ensure many-to-many relation appears as a list
+        self.assertIsInstance(d['categories'], list)
+
 class OldFormForXTests(TestCase):
     def test_base_form(self):
         self.assertEqual(Category.objects.count(), 0)
