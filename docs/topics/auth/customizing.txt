@@ -276,7 +276,7 @@ can or cannot do with Task instances, specific to your application::
 
 The only thing this does is create those extra permissions when you run
 :djadmin:`manage.py migrate <migrate>`. Your code is in charge of checking the
-value of these permissions when an user is trying to access the functionality
+value of these permissions when a user is trying to access the functionality
 provided by the application (viewing tasks, changing the status of tasks,
 closing tasks.) Continuing the above example, the following checks if a user may
 view tasks::
