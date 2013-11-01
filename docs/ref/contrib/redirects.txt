@@ -6,7 +6,8 @@ The redirects app
    :synopsis: A framework for managing redirects.
 
 Django comes with an optional redirects application. It lets you store simple
-redirects in a database and handles the redirecting for you.
+redirects in a database and handles the redirecting for you. It uses the HTTP
+response status code ``301 Moved Permanently`` by default.
 
 Installation
 ============
@@ -34,7 +35,12 @@ given ``old_path`` with a site ID that corresponds to the
 :setting:`SITE_ID` setting.
 
 * If it finds a match, and ``new_path`` is not empty, it redirects to
-  ``new_path``.
+  ``new_path`` using a 301 ("Moved Permanently") redirect. You can subclass
+  :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
+  and set
+  :attr:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_redirect_class`
+  to :class:`django.http.HttpResponseRedirect` to use a
+  ``302 Moved Temporarily`` redirect instead.
 * If it finds a match, and ``new_path`` is empty, it sends a 410 ("Gone")
   HTTP header and empty (content-less) response.
 * If it doesn't find a match, the request continues to be processed as
