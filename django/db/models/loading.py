@@ -292,8 +292,6 @@ class AppCache(object):
             # in the app_models dictionary
             model_name = model._meta.model_name
             model_dict = self.app_models.setdefault(app_label, SortedDict())
-            if model._meta.proxy and model_name in model_dict:
-                model_name = '%s.%s' % (model.__module__, model_name)
             if model_name in model_dict:
                 # The same model may be imported via different paths (e.g.
                 # appname.models and project.appname.models). We use the source
@@ -305,6 +303,9 @@ class AppCache(object):
                 # comparing.
                 if os.path.splitext(fname1)[0] == os.path.splitext(fname2)[0]:
                     continue
+                existing_model = model_dict[model_name]
+                full_model_name = '%s.%s' % (existing_model.__module__, model_name)
+                model_dict[full_model_name] = existing_model
             model_dict[model_name] = model
         self._get_models_cache.clear()
 
