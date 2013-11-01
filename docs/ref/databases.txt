@@ -299,7 +299,7 @@ the model definition.
 .. _documented thoroughly: http://dev.mysql.com/doc/refman/5.0/en/charset.html
 
 By default, with a UTF-8 database, MySQL will use the
-``utf8_general_ci_swedish`` collation. This results in all string equality
+``utf8_general_ci`` collation. This results in all string equality
 comparisons being done in a *case-insensitive* manner. That is, ``"Fred"`` and
 ``"freD"`` are considered equal at the database level. If you have a unique
 constraint on a field, it would be illegal to try to insert both ``"aa"`` and
@@ -336,7 +336,7 @@ bytestrings (which shouldn't be too difficult) as described above is the
 recommended solution.
 
 Should you decide to use ``utf8_bin`` collation for some of your tables with
-MySQLdb 1.2.1p2 or 1.2.2, you should still use ``utf8_collation_ci_swedish``
+MySQLdb 1.2.1p2 or 1.2.2, you should still use ``utf8_general_ci``
 (the default) collation for the ``django.contrib.sessions.models.Session``
 table (usually called ``django_session``) and the
 ``django.contrib.admin.models.LogEntry`` table (usually called
