@@ -752,3 +752,12 @@ recently introduced language codes ``zh-hans`` and ``zh-hant`` respectively.
 If you use these language codes, you should rename the locale directories
 and update your settings to reflect these changes. The deprecated language
 codes will be removed in Django 1.9.
+
+``django.utils.functional.memoize`` method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The method ``memoize`` is deprecated and should be replaced by the
+``lru_cache`` decorator from Python 3.2. Django ships a backport of this
+decorator for older Python versions and is available at
+``django.utils.lru_cache.lru_cache``. The deprecated method will be removed in
+Django 1.9.

@@ -14,8 +14,9 @@ from django.core.management.color import no_style
 from django.db import (connections, router, transaction, DEFAULT_DB_ALIAS,
       IntegrityError, DatabaseError)
 from django.db.models import get_app_paths
+from django.utils import lru_cache
 from django.utils.encoding import force_text
-from django.utils.functional import cached_property, memoize
+from django.utils.functional import cached_property
 from django.utils._os import upath
 from itertools import product
 
@@ -164,7 +165,8 @@ class Command(BaseCommand):
                     RuntimeWarning
                 )
 
-    def _find_fixtures(self, fixture_label):
+    @lru_cache.lru_cache(maxsize=None)
+    def find_fixtures(self, fixture_label):
         """
         Finds fixture files for a given label.
         """
@@ -219,9 +221,6 @@ class Command(BaseCommand):
             warnings.warn("No fixture named '%s' found." % fixture_name)
 
         return fixture_files
-
-    _label_to_fixtures_cache = {}
-    find_fixtures = memoize(_find_fixtures, _label_to_fixtures_cache, 2)
 
     @cached_property
     def fixture_dirs(self):
