@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
+import datetime
 import time
+import warnings
 
 from django.core import signing
 from django.test import TestCase
@@ -107,7 +109,10 @@ class TestSigner(TestCase):
 
 class TestTimestampSigner(TestCase):
 
-    def test_timestamp_signer(self):
+    def run_test_timestamp_signer(self, timedelta_fn):
+        # we need to run the same test with an number of seconds and with a
+        # timedelta, so timedelta_fn takes a number of seconds and converts it
+        # to the value to be used as max_age.
         value = 'hello'
         _time = time.time
         time.time = lambda: 123456789
@@ -119,9 +124,18 @@ class TestTimestampSigner(TestCase):
 
             self.assertEqual(signer.unsign(ts), value)
             time.time = lambda: 123456800
-            self.assertEqual(signer.unsign(ts, max_age=12), value)
-            self.assertEqual(signer.unsign(ts, max_age=11), value)
+            self.assertEqual(signer.unsign(ts, max_age=timedelta_fn(12)), value)
+            self.assertEqual(signer.unsign(ts, max_age=timedelta_fn(11)), value)
             self.assertRaises(
-                signing.SignatureExpired, signer.unsign, ts, max_age=10)
+                signing.SignatureExpired, signer.unsign, ts, max_age=timedelta_fn(10))
         finally:
             time.time = _time
+
+    def test_seconds(self):
+        # deprecated, remove this in django 1.9
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter('always')
+            self.run_test_timestamp_signer(lambda s: s)
+
+    def test_timedelta(self):
+        self.run_test_timestamp_signer(lambda s: datetime.timedelta(seconds=s))

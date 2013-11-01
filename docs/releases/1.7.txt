@@ -690,3 +690,9 @@ deprecated and will be removed in Django 1.9.
 arguments into a ``REQUEST`` property on ``WSGIRequest``. To merge
 dictionaries, use ``dict.update()`` instead. The class ``MergeDict`` is
 deprecated and will be removed in Django 1.9.
+
+Change to the ``max_age`` parameter of :meth:`TimestampSigner.unsign<django.core.signing.TimestampSigner.unsign>`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Passing a number of seconds to ``unsign`` as the ``max_age`` has been
+deprecated. Use a :class:`datetime.timedelta<python:datetime.timedelta>`
+instead.

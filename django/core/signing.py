@@ -36,8 +36,10 @@ These functions make use of all of them.
 from __future__ import unicode_literals
 
 import base64
+import datetime
 import json
 import time
+import warnings
 import zlib
 
 from django.conf import settings
@@ -191,9 +193,13 @@ class TimestampSigner(Signer):
         value, timestamp = result.rsplit(self.sep, 1)
         timestamp = baseconv.base62.decode(timestamp)
         if max_age is not None:
+            if not isinstance(max_age, datetime.timedelta):
+                warnings.warn("Using a number of seconds for `max_age` is deprecated, "
+                              "use a timedelta instead.", PendingDeprecationWarning, 2)
+                max_age = datetime.timedelta(seconds=max_age)
             # Check timestamp is not older than max_age
-            age = time.time() - timestamp
+            age = datetime.datetime.fromtimestamp(time.time()) - datetime.datetime.fromtimestamp(timestamp)
             if age > max_age:
                 raise SignatureExpired(
-                    'Signature age %s > %s seconds' % (age, max_age))
+                    'Signature age %s > %s' % (age, max_age))
         return value
