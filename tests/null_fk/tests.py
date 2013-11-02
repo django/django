@@ -50,7 +50,7 @@ class NullFkTests(TestCase):
         item = Item.objects.create(title='Some Item')
         pv = PropertyValue.objects.create(label='Some Value')
         item.props.create(key='a', value=pv)
-        item.props.create(key='b') # value=NULL
+        item.props.create(key='b')  # value=NULL
         q1 = Q(props__key='a', props__value=pv)
         q2 = Q(props__key='b', props__value__isnull=True)
 

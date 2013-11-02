@@ -71,7 +71,7 @@ class ConvertingDict(dict):
     def __getitem__(self, key):
         value = dict.__getitem__(self, key)
         result = self.configurator.convert(value)
-        #If the converted value is different, save for next time
+        # If the converted value is different, save for next time
         if value is not result:
             self[key] = result
             if type(result) in (ConvertingDict, ConvertingList,
@@ -83,7 +83,7 @@ class ConvertingDict(dict):
     def get(self, key, default=None):
         value = dict.get(self, key, default)
         result = self.configurator.convert(value)
-        #If the converted value is different, save for next time
+        # If the converted value is different, save for next time
         if value is not result:
             self[key] = result
             if type(result) in (ConvertingDict, ConvertingList,
@@ -107,7 +107,7 @@ class ConvertingList(list):
     def __getitem__(self, key):
         value = list.__getitem__(self, key)
         result = self.configurator.convert(value)
-        #If the converted value is different, save for next time
+        # If the converted value is different, save for next time
         if value is not result:
             self[key] = result
             if type(result) in (ConvertingDict, ConvertingList,
@@ -197,7 +197,7 @@ class BaseConfigurator(object):
         else:
             rest = rest[m.end():]
             d = self.config[m.groups()[0]]
-            #print d, rest
+            # print d, rest
             while rest:
                 m = self.DOT_PATTERN.match(rest)
                 if m:
@@ -219,7 +219,7 @@ class BaseConfigurator(object):
                 else:
                     raise ValueError('Unable to convert '
                                      '%r at %r' % (value, rest))
-        #rest should be empty
+        # rest should be empty
         return d
 
     def convert(self, value):
@@ -359,25 +359,25 @@ class DictConfigurator(BaseConfigurator):
                                          '%r: %s' % (name, e))
                 # Next, do loggers - they refer to handlers and filters
 
-                #we don't want to lose the existing loggers,
-                #since other threads may have pointers to them.
-                #existing is set to contain all existing loggers,
-                #and as we go through the new configuration we
-                #remove any which are configured. At the end,
-                #what's left in existing is the set of loggers
-                #which were in the previous configuration but
-                #which are not in the new configuration.
+                # we don't want to lose the existing loggers,
+                # since other threads may have pointers to them.
+                # existing is set to contain all existing loggers,
+                # and as we go through the new configuration we
+                # remove any which are configured. At the end,
+                # what's left in existing is the set of loggers
+                # which were in the previous configuration but
+                # which are not in the new configuration.
                 root = logging.root
                 existing = list(root.manager.loggerDict)
-                #The list needs to be sorted so that we can
-                #avoid disabling child loggers of explicitly
-                #named loggers. With a sorted list it is easier
-                #to find the child loggers.
+                # The list needs to be sorted so that we can
+                # avoid disabling child loggers of explicitly
+                # named loggers. With a sorted list it is easier
+                # to find the child loggers.
                 existing.sort()
-                #We'll keep the list of existing loggers
-                #which are children of named loggers here...
+                # We'll keep the list of existing loggers
+                # which are children of named loggers here...
                 child_loggers = []
-                #now set up the new ones...
+                # now set up the new ones...
                 loggers = config.get('loggers', EMPTY_DICT)
                 for name in loggers:
                     if name in existing:
@@ -397,11 +397,11 @@ class DictConfigurator(BaseConfigurator):
                         raise ValueError('Unable to configure logger '
                                          '%r: %s' % (name, e))
 
-                #Disable any old loggers. There's no point deleting
-                #them as other threads may continue to hold references
-                #and by disabling them, you stop them doing any logging.
-                #However, don't disable children of named loggers, as that's
-                #probably not what was intended by the user.
+                # Disable any old loggers. There's no point deleting
+                # them as other threads may continue to hold references
+                # and by disabling them, you stop them doing any logging.
+                # However, don't disable children of named loggers, as that's
+                # probably not what was intended by the user.
                 for log in existing:
                     logger = root.manager.loggerDict[log]
                     if log in child_loggers:
@@ -431,9 +431,9 @@ class DictConfigurator(BaseConfigurator):
             except TypeError as te:
                 if "'format'" not in str(te):
                     raise
-                #Name of parameter changed from fmt to format.
-                #Retry with old name.
-                #This is so that code can be used with older Python versions
+                # Name of parameter changed from fmt to format.
+                # Retry with old name.
+                # This is so that code can be used with older Python versions
                 #(e.g. by Django)
                 config['fmt'] = config.pop('format')
                 config['()'] = factory
@@ -479,7 +479,7 @@ class DictConfigurator(BaseConfigurator):
             factory = c
         else:
             klass = self.resolve(config.pop('class'))
-            #Special case for handler which refers to another handler
+            # Special case for handler which refers to another handler
             if issubclass(klass, logging.handlers.MemoryHandler) and\
                 'target' in config:
                 try:
@@ -500,9 +500,9 @@ class DictConfigurator(BaseConfigurator):
         except TypeError as te:
             if "'stream'" not in str(te):
                 raise
-            #The argument name changed from strm to stream
-            #Retry with old name.
-            #This is so that code can be used with older Python versions
+            # The argument name changed from strm to stream
+            # Retry with old name.
+            # This is so that code can be used with older Python versions
             #(e.g. by Django)
             kwargs['strm'] = kwargs.pop('stream')
             result = factory(**kwargs)
@@ -530,7 +530,7 @@ class DictConfigurator(BaseConfigurator):
         if level is not None:
             logger.setLevel(_checkLevel(level))
         if not incremental:
-            #Remove any existing handlers
+            # Remove any existing handlers
             for h in logger.handlers[:]:
                 logger.removeHandler(h)
             handlers = config.get('handlers', None)

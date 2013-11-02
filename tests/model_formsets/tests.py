@@ -54,8 +54,8 @@ class DeletionTests(TestCase):
             'form-0-id': six.text_type(poet.id),
             'form-0-name': 'test',
             'form-1-id': '',
-            'form-1-name': 'x' * 1000, # Too long
-            'form-1-id': six.text_type(poet.id), # Violate unique constraint
+            'form-1-name': 'x' * 1000,  # Too long
+            'form-1-id': six.text_type(poet.id),  # Violate unique constraint
             'form-1-name': 'test2',
         }
         formset = PoetFormSet(data, queryset=Poet.objects.all())
@@ -145,9 +145,9 @@ class ModelFormsetTest(TestCase):
             '<p><label for="id_form-2-name">Name:</label> <input id="id_form-2-name" type="text" name="form-2-name" maxlength="100" /><input type="hidden" name="form-2-id" id="id_form-2-id" /></p>')
 
         data = {
-            'form-TOTAL_FORMS': '3', # the number of forms rendered
-            'form-INITIAL_FORMS': '0', # the number of forms with initial data
-            'form-MAX_NUM_FORMS': '', # the max number of forms
+            'form-TOTAL_FORMS': '3',  # the number of forms rendered
+            'form-INITIAL_FORMS': '0',  # the number of forms with initial data
+            'form-MAX_NUM_FORMS': '',  # the max number of forms
             'form-0-name': 'Charles Baudelaire',
             'form-1-name': 'Arthur Rimbaud',
             'form-2-name': '',
@@ -183,9 +183,9 @@ class ModelFormsetTest(TestCase):
             '<p><label for="id_form-2-name">Name:</label> <input id="id_form-2-name" type="text" name="form-2-name" maxlength="100" /><input type="hidden" name="form-2-id" id="id_form-2-id" /></p>')
 
         data = {
-            'form-TOTAL_FORMS': '3', # the number of forms rendered
-            'form-INITIAL_FORMS': '2', # the number of forms with initial data
-            'form-MAX_NUM_FORMS': '', # the max number of forms
+            'form-TOTAL_FORMS': '3',  # the number of forms rendered
+            'form-INITIAL_FORMS': '2',  # the number of forms with initial data
+            'form-MAX_NUM_FORMS': '',  # the max number of forms
             'form-0-id': str(author2.id),
             'form-0-name': 'Arthur Rimbaud',
             'form-1-id': str(author1.id),
@@ -227,9 +227,9 @@ class ModelFormsetTest(TestCase):
             '<p><label for="id_form-3-DELETE">Delete:</label> <input type="checkbox" name="form-3-DELETE" id="id_form-3-DELETE" /><input type="hidden" name="form-3-id" id="id_form-3-id" /></p>')
 
         data = {
-            'form-TOTAL_FORMS': '4', # the number of forms rendered
-            'form-INITIAL_FORMS': '3', # the number of forms with initial data
-            'form-MAX_NUM_FORMS': '', # the max number of forms
+            'form-TOTAL_FORMS': '4',  # the number of forms rendered
+            'form-INITIAL_FORMS': '3',  # the number of forms with initial data
+            'form-MAX_NUM_FORMS': '',  # the max number of forms
             'form-0-id': str(author2.id),
             'form-0-name': 'Arthur Rimbaud',
             'form-1-id': str(author1.id),
@@ -253,9 +253,9 @@ class ModelFormsetTest(TestCase):
         # Let's edit a record to ensure save only returns that one record.
 
         data = {
-            'form-TOTAL_FORMS': '4', # the number of forms rendered
-            'form-INITIAL_FORMS': '3', # the number of forms with initial data
-            'form-MAX_NUM_FORMS': '', # the max number of forms
+            'form-TOTAL_FORMS': '4',  # the number of forms rendered
+            'form-INITIAL_FORMS': '3',  # the number of forms with initial data
+            'form-MAX_NUM_FORMS': '',  # the max number of forms
             'form-0-id': str(author2.id),
             'form-0-name': 'Walt Whitman',
             'form-1-id': str(author1.id),
@@ -291,9 +291,9 @@ class ModelFormsetTest(TestCase):
 
         AuthorMeetingFormSet = modelformset_factory(AuthorMeeting, fields="__all__", extra=1, can_delete=True)
         data = {
-            'form-TOTAL_FORMS': '2', # the number of forms rendered
-            'form-INITIAL_FORMS': '1', # the number of forms with initial data
-            'form-MAX_NUM_FORMS': '', # the max number of forms
+            'form-TOTAL_FORMS': '2',  # the number of forms rendered
+            'form-INITIAL_FORMS': '1',  # the number of forms with initial data
+            'form-MAX_NUM_FORMS': '',  # the max number of forms
             'form-0-id': str(meeting.id),
             'form-0-name': '2nd Tuesday of the Week Meeting',
             'form-0-authors': [author2.id, author1.id, author3.id, author4.id],
@@ -379,9 +379,9 @@ class ModelFormsetTest(TestCase):
         PoetFormSet = modelformset_factory(Poet, fields="__all__", form=PoetForm)
 
         data = {
-            'form-TOTAL_FORMS': '3', # the number of forms rendered
-            'form-INITIAL_FORMS': '0', # the number of forms with initial data
-            'form-MAX_NUM_FORMS': '', # the max number of forms
+            'form-TOTAL_FORMS': '3',  # the number of forms rendered
+            'form-INITIAL_FORMS': '0',  # the number of forms with initial data
+            'form-MAX_NUM_FORMS': '',  # the max number of forms
             'form-0-name': 'Walt Whitman',
             'form-1-name': 'Charles Baudelaire',
             'form-2-name': '',
@@ -445,9 +445,9 @@ class ModelFormsetTest(TestCase):
             '<p><label for="id_form-0-write_speed">Write speed:</label> <input type="number" name="form-0-write_speed" id="id_form-0-write_speed" /><input type="hidden" name="form-0-author_ptr" id="id_form-0-author_ptr" /></p>')
 
         data = {
-            'form-TOTAL_FORMS': '1', # the number of forms rendered
-            'form-INITIAL_FORMS': '0', # the number of forms with initial data
-            'form-MAX_NUM_FORMS': '', # the max number of forms
+            'form-TOTAL_FORMS': '1',  # the number of forms rendered
+            'form-INITIAL_FORMS': '0',  # the number of forms with initial data
+            'form-MAX_NUM_FORMS': '',  # the max number of forms
             'form-0-author_ptr': '',
             'form-0-name': 'Ernest Hemingway',
             'form-0-write_speed': '10',
@@ -471,9 +471,9 @@ class ModelFormsetTest(TestCase):
             '<p><label for="id_form-1-write_speed">Write speed:</label> <input type="number" name="form-1-write_speed" id="id_form-1-write_speed" /><input type="hidden" name="form-1-author_ptr" id="id_form-1-author_ptr" /></p>')
 
         data = {
-            'form-TOTAL_FORMS': '2', # the number of forms rendered
-            'form-INITIAL_FORMS': '1', # the number of forms with initial data
-            'form-MAX_NUM_FORMS': '', # the max number of forms
+            'form-TOTAL_FORMS': '2',  # the number of forms rendered
+            'form-INITIAL_FORMS': '1',  # the number of forms with initial data
+            'form-MAX_NUM_FORMS': '',  # the max number of forms
             'form-0-author_ptr': hemingway_id,
             'form-0-name': 'Ernest Hemingway',
             'form-0-write_speed': '10',
@@ -503,9 +503,9 @@ class ModelFormsetTest(TestCase):
             '<p><label for="id_book_set-2-title">Title:</label> <input id="id_book_set-2-title" type="text" name="book_set-2-title" maxlength="100" /><input type="hidden" name="book_set-2-author" value="%d" id="id_book_set-2-author" /><input type="hidden" name="book_set-2-id" id="id_book_set-2-id" /></p>' % author.id)
 
         data = {
-            'book_set-TOTAL_FORMS': '3', # the number of forms rendered
-            'book_set-INITIAL_FORMS': '0', # the number of forms with initial data
-            'book_set-MAX_NUM_FORMS': '', # the max number of forms
+            'book_set-TOTAL_FORMS': '3',  # the number of forms rendered
+            'book_set-INITIAL_FORMS': '0',  # the number of forms with initial data
+            'book_set-MAX_NUM_FORMS': '',  # the max number of forms
             'book_set-0-title': 'Les Fleurs du Mal',
             'book_set-1-title': '',
             'book_set-2-title': '',
@@ -537,9 +537,9 @@ class ModelFormsetTest(TestCase):
             '<p><label for="id_book_set-2-title">Title:</label> <input id="id_book_set-2-title" type="text" name="book_set-2-title" maxlength="100" /><input type="hidden" name="book_set-2-author" value="%d" id="id_book_set-2-author" /><input type="hidden" name="book_set-2-id" id="id_book_set-2-id" /></p>' % author.id)
 
         data = {
-            'book_set-TOTAL_FORMS': '3', # the number of forms rendered
-            'book_set-INITIAL_FORMS': '1', # the number of forms with initial data
-            'book_set-MAX_NUM_FORMS': '', # the max number of forms
+            'book_set-TOTAL_FORMS': '3',  # the number of forms rendered
+            'book_set-INITIAL_FORMS': '1',  # the number of forms with initial data
+            'book_set-MAX_NUM_FORMS': '',  # the max number of forms
             'book_set-0-id': str(book1.id),
             'book_set-0-title': 'Les Fleurs du Mal',
             'book_set-1-title': 'Les Paradis Artificiels',
@@ -568,9 +568,9 @@ class ModelFormsetTest(TestCase):
         Author.objects.create(name='Charles Baudelaire')
 
         data = {
-            'book_set-TOTAL_FORMS': '3', # the number of forms rendered
-            'book_set-INITIAL_FORMS': '2', # the number of forms with initial data
-            'book_set-MAX_NUM_FORMS': '', # the max number of forms
+            'book_set-TOTAL_FORMS': '3',  # the number of forms rendered
+            'book_set-INITIAL_FORMS': '2',  # the number of forms with initial data
+            'book_set-MAX_NUM_FORMS': '',  # the max number of forms
             'book_set-0-id': '1',
             'book_set-0-title': 'Les Fleurs du Mal',
             'book_set-1-id': '2',
@@ -613,9 +613,9 @@ class ModelFormsetTest(TestCase):
             '<p><label for="id_bookwithcustompk_set-0-title">Title:</label> <input id="id_bookwithcustompk_set-0-title" type="text" name="bookwithcustompk_set-0-title" maxlength="100" /><input type="hidden" name="bookwithcustompk_set-0-author" value="1" id="id_bookwithcustompk_set-0-author" /></p>')
 
         data = {
-            'bookwithcustompk_set-TOTAL_FORMS': '1', # the number of forms rendered
-            'bookwithcustompk_set-INITIAL_FORMS': '0', # the number of forms with initial data
-            'bookwithcustompk_set-MAX_NUM_FORMS': '', # the max number of forms
+            'bookwithcustompk_set-TOTAL_FORMS': '1',  # the number of forms rendered
+            'bookwithcustompk_set-INITIAL_FORMS': '0',  # the number of forms with initial data
+            'bookwithcustompk_set-MAX_NUM_FORMS': '',  # the max number of forms
             'bookwithcustompk_set-0-my_pk': '77777',
             'bookwithcustompk_set-0-title': 'Les Fleurs du Mal',
         }
@@ -645,9 +645,9 @@ class ModelFormsetTest(TestCase):
             '<p><label for="id_alternatebook_set-0-notes">Notes:</label> <input id="id_alternatebook_set-0-notes" type="text" name="alternatebook_set-0-notes" maxlength="100" /><input type="hidden" name="alternatebook_set-0-author" value="1" id="id_alternatebook_set-0-author" /><input type="hidden" name="alternatebook_set-0-book_ptr" id="id_alternatebook_set-0-book_ptr" /></p>')
 
         data = {
-            'alternatebook_set-TOTAL_FORMS': '1', # the number of forms rendered
-            'alternatebook_set-INITIAL_FORMS': '0', # the number of forms with initial data
-            'alternatebook_set-MAX_NUM_FORMS': '', # the max number of forms
+            'alternatebook_set-TOTAL_FORMS': '1',  # the number of forms rendered
+            'alternatebook_set-INITIAL_FORMS': '0',  # the number of forms with initial data
+            'alternatebook_set-MAX_NUM_FORMS': '',  # the max number of forms
             'alternatebook_set-0-title': 'Flowers of Evil',
             'alternatebook_set-0-notes': 'English translation of Les Fleurs du Mal'
         }
@@ -670,9 +670,9 @@ class ModelFormsetTest(TestCase):
         author = Author.objects.create(pk=1, name='Charles Baudelaire')
 
         data = {
-            'bookwithoptionalalteditor_set-TOTAL_FORMS': '2', # the number of forms rendered
-            'bookwithoptionalalteditor_set-INITIAL_FORMS': '0', # the number of forms with initial data
-            'bookwithoptionalalteditor_set-MAX_NUM_FORMS': '', # the max number of forms
+            'bookwithoptionalalteditor_set-TOTAL_FORMS': '2',  # the number of forms rendered
+            'bookwithoptionalalteditor_set-INITIAL_FORMS': '0',  # the number of forms with initial data
+            'bookwithoptionalalteditor_set-MAX_NUM_FORMS': '',  # the max number of forms
             'bookwithoptionalalteditor_set-0-author': '1',
             'bookwithoptionalalteditor_set-0-title': 'Les Fleurs du Mal',
             'bookwithoptionalalteditor_set-1-author': '1',
@@ -708,9 +708,9 @@ class ModelFormsetTest(TestCase):
         PoemFormSet = inlineformset_factory(Poet, Poem, form=PoemForm, fields="__all__")
 
         data = {
-            'poem_set-TOTAL_FORMS': '3', # the number of forms rendered
-            'poem_set-INITIAL_FORMS': '0', # the number of forms with initial data
-            'poem_set-MAX_NUM_FORMS': '', # the max number of forms
+            'poem_set-TOTAL_FORMS': '3',  # the number of forms rendered
+            'poem_set-INITIAL_FORMS': '0',  # the number of forms with initial data
+            'poem_set-MAX_NUM_FORMS': '',  # the max number of forms
             'poem_set-0-name': 'The Cloud in Trousers',
             'poem_set-1-name': 'I',
             'poem_set-2-name': '',
@@ -743,9 +743,9 @@ class ModelFormsetTest(TestCase):
             '<p><label for="id_book_set-4-title">Title:</label> <input id="id_book_set-4-title" type="text" name="book_set-4-title" maxlength="100" /><input type="hidden" name="book_set-4-author" value="1" id="id_book_set-4-author" /><input type="hidden" name="book_set-4-id" id="id_book_set-4-id" /></p>')
 
         data = {
-            'book_set-TOTAL_FORMS': '5', # the number of forms rendered
-            'book_set-INITIAL_FORMS': '3', # the number of forms with initial data
-            'book_set-MAX_NUM_FORMS': '', # the max number of forms
+            'book_set-TOTAL_FORMS': '5',  # the number of forms rendered
+            'book_set-INITIAL_FORMS': '3',  # the number of forms with initial data
+            'book_set-MAX_NUM_FORMS': '',  # the max number of forms
             'book_set-0-id': str(book1.id),
             'book_set-0-title': 'Les Paradis Artificiels',
             'book_set-1-id': str(book2.id),
@@ -768,9 +768,9 @@ class ModelFormsetTest(TestCase):
             '<p><label for="id_book_set-2-title">Title:</label> <input id="id_book_set-2-title" type="text" name="book_set-2-title" maxlength="100" /><input type="hidden" name="book_set-2-author" value="1" id="id_book_set-2-author" /><input type="hidden" name="book_set-2-id" id="id_book_set-2-id" /></p>')
 
         data = {
-            'book_set-TOTAL_FORMS': '3', # the number of forms rendered
-            'book_set-INITIAL_FORMS': '1', # the number of forms with initial data
-            'book_set-MAX_NUM_FORMS': '', # the max number of forms
+            'book_set-TOTAL_FORMS': '3',  # the number of forms rendered
+            'book_set-INITIAL_FORMS': '1',  # the number of forms with initial data
+            'book_set-MAX_NUM_FORMS': '',  # the max number of forms
             'book_set-0-id': str(book3.id),
             'book_set-0-title': 'Flowers of Evil',
             'book_set-1-title': 'Revue des deux mondes',
@@ -958,7 +958,7 @@ class ModelFormsetTest(TestCase):
         data = {
             'form-TOTAL_FORMS': '2',
             'form-INITIAL_FORMS': '0',
-            'form-MAX_NUM_FORMS': '2', # should be ignored
+            'form-MAX_NUM_FORMS': '2',  # should be ignored
             'form-0-price': '12.00',
             'form-0-quantity': '1',
             'form-1-price': '24.00',
@@ -1064,7 +1064,7 @@ class ModelFormsetTest(TestCase):
         # default. This is required to ensure the value is tested for change correctly
         # when determine what extra forms have changed to save.
 
-        self.assertEqual(len(formset.forms), 1) # this formset only has one form
+        self.assertEqual(len(formset.forms), 1)  # this formset only has one form
         form = formset.forms[0]
         now = form.fields['date_joined'].initial()
         result = form.as_p()

@@ -72,7 +72,7 @@ class GenericAdminViewTest(TestCase):
             "generic_inline_admin-media-content_type-object_id-MAX_NUM_FORMS": "0",
         }
         response = self.client.post('/generic_inline_admin/admin/generic_inline_admin/episode/add/', post_data)
-        self.assertEqual(response.status_code, 302) # redirect somewhere
+        self.assertEqual(response.status_code, 302)  # redirect somewhere
 
     def testBasicEditPost(self):
         """
@@ -93,7 +93,7 @@ class GenericAdminViewTest(TestCase):
         }
         url = '/generic_inline_admin/admin/generic_inline_admin/episode/%d/' % self.episode_pk
         response = self.client.post(url, post_data)
-        self.assertEqual(response.status_code, 302) # redirect somewhere
+        self.assertEqual(response.status_code, 302)  # redirect somewhere
 
     def testGenericInlineFormset(self):
         EpisodeMediaFormSet = generic_inlineformset_factory(Media, can_delete=False, exclude=['description', 'keywords'], extra=3)
@@ -208,7 +208,7 @@ class GenericInlineAdminWithUniqueTogetherTest(TestCase):
         response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/contact/add/')
         self.assertEqual(response.status_code, 200)
         response = self.client.post('/generic_inline_admin/admin/generic_inline_admin/contact/add/', post_data)
-        self.assertEqual(response.status_code, 302) # redirect somewhere
+        self.assertEqual(response.status_code, 302)  # redirect somewhere
 
 class NoInlineDeletionTest(TestCase):
     urls = "generic_inline_admin.urls"

@@ -164,7 +164,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
             else:
                 url = ''
             if "class" not in attrs:
-                attrs['class'] = 'vForeignKeyRawIdAdminField' # The JavaScript code looks for this hook.
+                attrs['class'] = 'vForeignKeyRawIdAdminField'  # The JavaScript code looks for this hook.
             # TODO: "lookup_id_" is hard-coded here. This should instead use
             # the correct API to determine the ID dynamically.
             extra.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> '

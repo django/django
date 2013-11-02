@@ -388,7 +388,7 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
 
     @override_settings(SESSION_CACHE_ALIAS='sessions')
     def test_non_default_cache(self):
-        #21000 - CacheDB backend should respect SESSION_CACHE_ALIAS.
+        # 21000 - CacheDB backend should respect SESSION_CACHE_ALIAS.
         self.assertRaises(InvalidCacheBackendError, self.backend)
 
 

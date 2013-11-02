@@ -423,7 +423,7 @@ class LocationCommentsTests(ExtractorTests):
 
             # #21208 -- Leaky paths in comments on Windows e.g. #: path\to\file.html.py:123
             bad_suffix = '.py'
-            bad_string = 'templates%stest.html%s' % (os.sep, bad_suffix) #
+            bad_string = 'templates%stest.html%s' % (os.sep, bad_suffix)
             self.assertFalse(bad_string in po_contents, '"%s" shouldn\'t be in final .po file.' % bad_string)
 
 

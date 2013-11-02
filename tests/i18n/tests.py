@@ -735,7 +735,7 @@ class FormattingTests(TransRealMixin, TestCase):
         with self.settings(FORMAT_MODULE_PATH='i18n.other.locale'):
             with translation.override('de', deactivate=True):
                 old = str("%r") % get_format_modules(reverse=True)
-                new = str("%r") % get_format_modules(reverse=True) # second try
+                new = str("%r") % get_format_modules(reverse=True)  # second try
                 self.assertEqual(new, old, 'Value returned by get_formats_modules() must be preserved between calls.')
 
     def test_localize_templatetag_and_filter(self):

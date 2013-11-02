@@ -24,9 +24,9 @@ from django.utils import six
 from django.utils.translation import get_language
 
 
-_resolver_cache = {} # Maps URLconf modules to RegexURLResolver instances.
-_ns_resolver_cache = {} # Maps namespaces to RegexURLResolver instances.
-_callable_cache = {} # Maps view and url pattern names to their view functions.
+_resolver_cache = {}  # Maps URLconf modules to RegexURLResolver instances.
+_ns_resolver_cache = {}  # Maps namespaces to RegexURLResolver instances.
+_callable_cache = {}  # Maps view and url pattern names to their view functions.
 
 # SCRIPT_NAME prefixes for each thread are stored here. If there's no entry for
 # the current thread (which is the only one we ever access), it is assumed to

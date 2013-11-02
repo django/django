@@ -121,7 +121,7 @@ def get_commands():
                 _commands.update(dict((name, app_name)
                                        for name in find_commands(path)))
             except ImportError:
-                pass # No management module - ignore this app
+                pass  # No management module - ignore this app
 
     return _commands
 
@@ -379,12 +379,12 @@ class ManagementUtility(object):
             options, args = parser.parse_args(self.argv)
             handle_default_options(options)
         except:  # Needed because parser.parse_args can raise SystemExit
-            pass # Ignore any option errors at this point.
+            pass  # Ignore any option errors at this point.
 
         try:
             subcommand = self.argv[1]
         except IndexError:
-            subcommand = 'help' # Display help if no arguments were given.
+            subcommand = 'help'  # Display help if no arguments were given.
 
         if subcommand == 'help':
             if len(args) <= 2:

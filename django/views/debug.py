@@ -483,7 +483,7 @@ def technical_404_response(request, exception):
     c = Context({
         'urlconf': urlconf,
         'root_urlconf': settings.ROOT_URLCONF,
-        'request_path': request.path_info[1:], # Trim leading slash
+        'request_path': request.path_info[1:],  # Trim leading slash
         'urlpatterns': tried,
         'reason': force_bytes(exception, errors='replace'),
         'request': request,

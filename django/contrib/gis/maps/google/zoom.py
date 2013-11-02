@@ -33,18 +33,18 @@ class GoogleZoom(object):
 
         # Initializing arrays to hold the parameters for each one of the
         # zoom levels.
-        self._degpp = [] # Degrees per pixel
-        self._radpp = [] # Radians per pixel
-        self._npix = [] # 1/2 the number of pixels for a tile at the given zoom level
+        self._degpp = []  # Degrees per pixel
+        self._radpp = []  # Radians per pixel
+        self._npix = []  # 1/2 the number of pixels for a tile at the given zoom level
 
         # Incrementing through the zoom levels and populating the parameter arrays.
-        z = tilesize # The number of pixels per zoom level.
+        z = tilesize  # The number of pixels per zoom level.
         for i in xrange(num_zoom):
             # Getting the degrees and radians per pixel, and the 1/2 the number of
             # for every zoom level.
-            self._degpp.append(z / 360.) # degrees per pixel
-            self._radpp.append(z / (2 * pi)) # radians per pixel
-            self._npix.append(z / 2) # number of pixels to center of tile
+            self._degpp.append(z / 360.)  # degrees per pixel
+            self._radpp.append(z / (2 * pi))  # radians per pixel
+            self._npix.append(z / 2)  # number of pixels to center of tile
 
             # Multiplying `z` by 2 for the next iteration.
             z *= 2

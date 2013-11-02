@@ -43,7 +43,7 @@ class AuthorAdmin(admin.ModelAdmin):
 class InnerInline(admin.StackedInline):
     model = Inner
     can_delete = False
-    readonly_fields = ('readonly',) # For bug #13174 tests.
+    readonly_fields = ('readonly',)  # For bug #13174 tests.
 
 
 class HolderAdmin(admin.ModelAdmin):

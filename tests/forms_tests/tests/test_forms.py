@@ -938,7 +938,7 @@ class FormsTestCase(TestCase):
         class UserRegistration(Form):
             username = CharField(max_length=10)                   # uses TextInput by default
             password = CharField(max_length=10, widget=PasswordInput)
-            realname = CharField(max_length=10, widget=TextInput) # redundantly define widget, just to test
+            realname = CharField(max_length=10, widget=TextInput)  # redundantly define widget, just to test
             address = CharField()                                 # no max_length defined here
 
         p = UserRegistration(auto_id=False)

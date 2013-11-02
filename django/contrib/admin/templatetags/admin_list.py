@@ -136,13 +136,13 @@ def result_headers(cl):
             new_order_type = {'asc': 'desc', 'desc': 'asc'}[order_type]
 
         # build new ordering param
-        o_list_primary = [] # URL for making this field the primary sort
-        o_list_remove = [] # URL for removing this field from sort
-        o_list_toggle = [] # URL for toggling order type for this field
+        o_list_primary = []  # URL for making this field the primary sort
+        o_list_remove = []  # URL for removing this field from sort
+        o_list_toggle = []  # URL for toggling order type for this field
         make_qs_param = lambda t, n: ('-' if t == 'desc' else '') + str(n)
 
         for j, ot in ordering_field_columns.items():
-            if j == i: # Same column
+            if j == i:  # Same column
                 param = make_qs_param(new_order_type, j)
                 # We want clicking on this header to bring the ordering to the
                 # front

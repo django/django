@@ -51,7 +51,7 @@ class TestAdminOrdering(TestCase):
         it actually changes.
         """
         class BandAdmin(ModelAdmin):
-            ordering = ('rank',) # default ordering is ('name',)
+            ordering = ('rank',)  # default ordering is ('name',)
         ma = BandAdmin(Band, None)
         names = [b.name for b in ma.get_queryset(request)]
         self.assertEqual(['Radiohead', 'Van Halen', 'Aerosmith'], names)

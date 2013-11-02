@@ -21,7 +21,7 @@ def dbl_from_geom(func, num_geom=1):
     argtypes = [GEOM_PTR for i in xrange(num_geom)]
     argtypes += [POINTER(c_double)]
     func.argtypes = argtypes
-    func.restype = c_int # Status code returned
+    func.restype = c_int  # Status code returned
     func.errcheck = check_dbl
     return func
 

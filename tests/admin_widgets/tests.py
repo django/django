@@ -911,7 +911,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
             self.assertSelectOptions(to_box,
                         [str(self.peter.id), str(self.jason.id)])
 
-            input.send_keys([Keys.BACK_SPACE]) # Clear text box
+            input.send_keys([Keys.BACK_SPACE])  # Clear text box
             self.assertSelectOptions(from_box,
                         [str(self.arthur.id), str(self.bob.id),
                          str(self.cliff.id), str(self.jenny.id),
@@ -922,7 +922,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         # Save and check that everything is properly stored in the database ---
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         self.wait_page_loaded()
-        self.school = models.School.objects.get(id=self.school.id) # Reload from database
+        self.school = models.School.objects.get(id=self.school.id)  # Reload from database
         self.assertEqual(list(self.school.students.all()),
                          [self.jason, self.peter])
         self.assertEqual(list(self.school.alumni.all()),

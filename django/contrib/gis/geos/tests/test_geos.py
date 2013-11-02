@@ -198,7 +198,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 poly = fromstr(ewkt)
                 self.assertEqual(srid, poly.srid)
                 self.assertEqual(srid, poly.shell.srid)
-                self.assertEqual(srid, fromstr(poly.ewkt).srid) # Checking export
+                self.assertEqual(srid, fromstr(poly.ewkt).srid)  # Checking export
 
     @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_json(self):
@@ -279,7 +279,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
             # Now testing the different constructors
             pnt2 = Point(tup_args)  # e.g., Point((1, 2))
-            pnt3 = Point(*tup_args) # e.g., Point(1, 2)
+            pnt3 = Point(*tup_args)  # e.g., Point(1, 2)
             self.assertEqual(True, pnt == pnt2)
             self.assertEqual(True, pnt == pnt3)
 
@@ -295,7 +295,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             pnt.coords = set_tup2
             self.assertEqual(set_tup2, pnt.coords)
 
-            prev = pnt # setting the previous geometry
+            prev = pnt  # setting the previous geometry
 
     def test_multipoints(self):
         "Testing MultiPoint objects."
@@ -337,11 +337,11 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
             # Creating a LineString from a tuple, list, and numpy array
             self.assertEqual(ls, LineString(ls.tuple))  # tuple
-            self.assertEqual(ls, LineString(*ls.tuple)) # as individual arguments
-            self.assertEqual(ls, LineString([list(tup) for tup in ls.tuple])) # as list
-            self.assertEqual(ls.wkt, LineString(*tuple(Point(tup) for tup in ls.tuple)).wkt) # Point individual arguments
+            self.assertEqual(ls, LineString(*ls.tuple))  # as individual arguments
+            self.assertEqual(ls, LineString([list(tup) for tup in ls.tuple]))  # as list
+            self.assertEqual(ls.wkt, LineString(*tuple(Point(tup) for tup in ls.tuple)).wkt)  # Point individual arguments
             if numpy:
-                self.assertEqual(ls, LineString(numpy.array(ls.tuple))) # as numpy array
+                self.assertEqual(ls, LineString(numpy.array(ls.tuple)))  # as numpy array
 
     def test_multilinestring(self):
         "Testing MultiLineString objects."
@@ -409,7 +409,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(poly.empty, False)
             self.assertEqual(poly.ring, False)
             self.assertEqual(p.n_i, poly.num_interior_rings)
-            self.assertEqual(p.n_i + 1, len(poly)) # Testing __len__
+            self.assertEqual(p.n_i + 1, len(poly))  # Testing __len__
             self.assertEqual(p.n_p, poly.num_points)
 
             # Area & Centroid
@@ -419,7 +419,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
             # Testing the geometry equivalence
             self.assertEqual(True, poly == fromstr(p.wkt))
-            self.assertEqual(False, poly == prev) # Should not be equal to previous geometry
+            self.assertEqual(False, poly == prev)  # Should not be equal to previous geometry
             self.assertEqual(True, poly != prev)
 
             # Testing the exterior ring
@@ -428,7 +428,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(ring.geom_typeid, 2)
             if p.ext_ring_cs:
                 self.assertEqual(p.ext_ring_cs, ring.tuple)
-                self.assertEqual(p.ext_ring_cs, poly[0].tuple) # Testing __getitem__
+                self.assertEqual(p.ext_ring_cs, poly[0].tuple)  # Testing __getitem__
 
             # Testing __getitem__ and __setitem__ on invalid indices
             self.assertRaises(GEOSIndexError, poly.__getitem__, len(poly))
@@ -522,13 +522,13 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 poly = fromstr(p.wkt)
                 cs = poly.exterior_ring.coord_seq
 
-                self.assertEqual(p.ext_ring_cs, cs.tuple) # done in the Polygon test too.
-                self.assertEqual(len(p.ext_ring_cs), len(cs)) # Making sure __len__ works
+                self.assertEqual(p.ext_ring_cs, cs.tuple)  # done in the Polygon test too.
+                self.assertEqual(len(p.ext_ring_cs), len(cs))  # Making sure __len__ works
 
                 # Checks __getitem__ and __setitem__
                 for i in xrange(len(p.ext_ring_cs)):
-                    c1 = p.ext_ring_cs[i] # Expected value
-                    c2 = cs[i] # Value from coordseq
+                    c1 = p.ext_ring_cs[i]  # Expected value
+                    c2 = cs[i]  # Value from coordseq
                     self.assertEqual(c1, c2)
 
                     # Constructing the test value to set the coordinate sequence with
@@ -562,8 +562,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(True, a.intersects(b))
             i2 = a.intersection(b)
             self.assertEqual(i1, i2)
-            self.assertEqual(i1, a & b) # __and__ is intersection operator
-            a &= b # testing __iand__
+            self.assertEqual(i1, a & b)  # __and__ is intersection operator
+            a &= b  # testing __iand__
             self.assertEqual(i1, a)
 
     def test_union(self):
@@ -574,8 +574,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             u1 = fromstr(self.geometries.union_geoms[i].wkt)
             u2 = a.union(b)
             self.assertEqual(u1, u2)
-            self.assertEqual(u1, a | b) # __or__ is union operator
-            a |= b # testing __ior__
+            self.assertEqual(u1, a | b)  # __or__ is union operator
+            a |= b  # testing __ior__
             self.assertEqual(u1, a)
 
     def test_difference(self):
@@ -586,8 +586,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             d1 = fromstr(self.geometries.diff_geoms[i].wkt)
             d2 = a.difference(b)
             self.assertEqual(d1, d2)
-            self.assertEqual(d1, a - b) # __sub__ is difference operator
-            a -= b # testing __isub__
+            self.assertEqual(d1, a - b)  # __sub__ is difference operator
+            a -= b  # testing __isub__
             self.assertEqual(d1, a)
 
     def test_symdifference(self):
@@ -598,8 +598,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             d1 = fromstr(self.geometries.sdiff_geoms[i].wkt)
             d2 = a.sym_difference(b)
             self.assertEqual(d1, d2)
-            self.assertEqual(d1, a ^ b) # __xor__ is symmetric difference operator
-            a ^= b # testing __ixor__
+            self.assertEqual(d1, a ^ b)  # __xor__ is symmetric difference operator
+            a ^= b  # testing __ixor__
             self.assertEqual(d1, a)
 
     def test_buffer(self):
@@ -667,7 +667,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
         p2 = fromstr(p1.hex)
         self.assertEqual(exp_srid, p2.srid)
-        p3 = fromstr(p1.hex, srid=-1) # -1 is intended.
+        p3 = fromstr(p1.hex, srid=-1)  # -1 is intended.
         self.assertEqual(-1, p3.srid)
 
     @skipUnless(HAS_GDAL, "GDAL is required.")
@@ -705,7 +705,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
             # Assigning polygon's exterior ring w/the new shell
             poly.exterior_ring = new_shell
-            str(new_shell) # new shell is still accessible
+            str(new_shell)  # new shell is still accessible
             self.assertEqual(poly.exterior_ring, new_shell)
             self.assertEqual(poly[0], new_shell)
 
@@ -718,7 +718,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 new = Point(random.randint(21, 100), random.randint(21, 100))
                 # Testing the assignment
                 mp[i] = new
-                str(new) # what was used for the assignment is still accessible
+                str(new)  # what was used for the assignment is still accessible
                 self.assertEqual(mp[i], new)
                 self.assertEqual(mp[i].wkt, new.wkt)
                 self.assertNotEqual(pnt, mp[i])
@@ -740,7 +740,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertNotEqual(mpoly[i], poly)
                 # Testing the assignment
                 mpoly[i] = poly
-                str(poly) # Still accessible
+                str(poly)  # Still accessible
                 self.assertEqual(mpoly[i], poly)
                 self.assertNotEqual(mpoly[i], old_poly)
 
@@ -821,7 +821,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
             # Testing len() and num_geom.
             if isinstance(g, Polygon):
-                self.assertEqual(1, len(g)) # Has one empty linear ring
+                self.assertEqual(1, len(g))  # Has one empty linear ring
                 self.assertEqual(1, g.num_geom)
                 self.assertEqual(0, len(g[0]))
             elif isinstance(g, (Point, LineString)):
@@ -1039,7 +1039,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
         # A set of test points.
         pnts = [Point(5, 5), Point(7.5, 7.5), Point(2.5, 7.5)]
-        covers = [True, True, False] # No `covers` op for regular GEOS geoms.
+        covers = [True, True, False]  # No `covers` op for regular GEOS geoms.
         for pnt, c in zip(pnts, covers):
             # Results should be the same (but faster)
             self.assertEqual(mpoly.contains(pnt), prep.contains(pnt))

@@ -112,21 +112,21 @@ class CursorDebugWrapper(CursorWrapper):
 ###############################################
 
 def typecast_date(s):
-    return datetime.date(*map(int, s.split('-'))) if s else None # returns None if s is null
+    return datetime.date(*map(int, s.split('-'))) if s else None  # returns None if s is null
 
 
-def typecast_time(s): # does NOT store time zone information
+def typecast_time(s):  # does NOT store time zone information
     if not s:
         return None
     hour, minutes, seconds = s.split(':')
-    if '.' in seconds: # check whether seconds have a fractional part
+    if '.' in seconds:  # check whether seconds have a fractional part
         seconds, microseconds = seconds.split('.')
     else:
         microseconds = '0'
     return datetime.time(int(hour), int(minutes), int(seconds), int(float('.' + microseconds) * 1000000))
 
 
-def typecast_timestamp(s): # does NOT store time zone information
+def typecast_timestamp(s):  # does NOT store time zone information
     # "2005-07-29 15:48:00.590358-05"
     # "2005-07-29 09:56:00-05"
     if not s:
@@ -147,7 +147,7 @@ def typecast_timestamp(s): # does NOT store time zone information
     dates = d.split('-')
     times = t.split(':')
     seconds = times[2]
-    if '.' in seconds: # check whether seconds have a fractional part
+    if '.' in seconds:  # check whether seconds have a fractional part
         seconds, microseconds = seconds.split('.')
     else:
         microseconds = '0'
