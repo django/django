@@ -54,6 +54,7 @@ def rfc2822_date(date):
     else:
         return time_str + '-0000'
 
+
 def rfc3339_date(date):
     # Support datetime objects older than 1900
     date = datetime_safe.new_datetime(date)
@@ -68,6 +69,7 @@ def rfc3339_date(date):
     else:
         return time_str + 'Z'
 
+
 def get_tag_uri(url, date):
     """
     Creates a TagURI.
@@ -79,6 +81,7 @@ def get_tag_uri(url, date):
     if date is not None:
         d = ',%s' % datetime_safe.new_datetime(date).strftime('%Y-%m-%d')
     return 'tag:%s%s:%s/%s' % (bits.hostname, d, bits.path, bits.fragment)
+
 
 class SyndicationFeed(object):
     "Base class for all syndication feeds. Subclasses should provide write()"
@@ -205,12 +208,14 @@ class SyndicationFeed(object):
 
         return latest_date or datetime.datetime.now()
 
+
 class Enclosure(object):
     "Represents an RSS enclosure"
     def __init__(self, url, length, mime_type):
         "All args are expected to be Python Unicode objects"
         self.length, self.mime_type = length, mime_type
         self.url = iri_to_uri(url)
+
 
 class RssFeed(SyndicationFeed):
     mime_type = 'application/rss+xml; charset=utf-8'
@@ -255,6 +260,7 @@ class RssFeed(SyndicationFeed):
     def endChannelElement(self, handler):
         handler.endElement("channel")
 
+
 class RssUserland091Feed(RssFeed):
     _version = "0.91"
 
@@ -263,6 +269,7 @@ class RssUserland091Feed(RssFeed):
         handler.addQuickElement("link", item['link'])
         if item['description'] is not None:
             handler.addQuickElement("description", item['description'])
+
 
 class Rss201rev2Feed(RssFeed):
     # Spec: http://blogs.law.harvard.edu/tech/rss
@@ -305,6 +312,7 @@ class Rss201rev2Feed(RssFeed):
         # Categories.
         for cat in item['categories']:
             handler.addQuickElement("category", cat)
+
 
 class Atom1Feed(SyndicationFeed):
     # Spec: http://atompub.org/2005/07/11/draft-ietf-atompub-format-10.html

@@ -26,6 +26,7 @@ from django.utils.timezone import get_default_timezone, is_aware, is_naive
 re_formatchars = re.compile(r'(?<!\\)([aAbBcdDeEfFgGhHiIjlLmMnNoOPrsStTUuwWyYzZ])')
 re_escaped = re.compile(r'\\(.)')
 
+
 class Formatter(object):
     def format(self, formatstr):
         pieces = []
@@ -35,6 +36,7 @@ class Formatter(object):
             elif piece:
                 pieces.append(re_escaped.sub(r'\1', piece))
         return ''.join(pieces)
+
 
 class TimeFormat(Formatter):
 

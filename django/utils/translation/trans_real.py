@@ -64,6 +64,7 @@ def to_locale(language, to_lower=False):
     else:
         return language.lower()
 
+
 def to_language(locale):
     """Turns a locale name (en_US) into a language name (en-us)."""
     p = locale.find('_')
@@ -71,6 +72,7 @@ def to_language(locale):
         return locale[:p].lower()+'-'+locale[p+1:].lower()
     else:
         return locale.lower()
+
 
 class DjangoTranslation(gettext_module.GNUTranslations):
     """
@@ -97,6 +99,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def __repr__(self):
         return "<DjangoTranslation lang:%s>" % self.__language
+
 
 def translation(language):
     """
@@ -179,6 +182,7 @@ def translation(language):
 
     return current_translation
 
+
 def activate(language):
     """
     Fetches the translation object for a given tuple of application name and
@@ -186,6 +190,7 @@ def activate(language):
     thread.
     """
     _active.value = translation(language)
+
 
 def deactivate():
     """
@@ -195,6 +200,7 @@ def deactivate():
     if hasattr(_active, "value"):
         del _active.value
 
+
 def deactivate_all():
     """
     Makes the active translation object a NullTranslations() instance. This is
@@ -202,6 +208,7 @@ def deactivate_all():
     for some reason.
     """
     _active.value = gettext_module.NullTranslations()
+
 
 def get_language():
     """Returns the currently selected language."""
@@ -215,6 +222,7 @@ def get_language():
     from django.conf import settings
     return settings.LANGUAGE_CODE
 
+
 def get_language_bidi():
     """
     Returns selected language's BiDi layout.
@@ -226,6 +234,7 @@ def get_language_bidi():
 
     base_lang = get_language().split('-')[0]
     return base_lang in settings.LANGUAGES_BIDI
+
 
 def catalog():
     """
@@ -242,6 +251,7 @@ def catalog():
         from django.conf import settings
         _default = translation(settings.LANGUAGE_CODE)
     return _default
+
 
 def do_translate(message, translation_function):
     """
@@ -266,6 +276,7 @@ def do_translate(message, translation_function):
         return mark_safe(result)
     return result
 
+
 def gettext(message):
     """
     Returns a string of the translation of the message.
@@ -280,6 +291,7 @@ else:
     def ugettext(message):
         return do_translate(message, 'ugettext')
 
+
 def pgettext(context, message):
     msg_with_ctxt = "%s%s%s" % (context, CONTEXT_SEPARATOR, message)
     result = ugettext(msg_with_ctxt)
@@ -287,6 +299,7 @@ def pgettext(context, message):
         # Translation not found
         result = message
     return result
+
 
 def gettext_noop(message):
     """
@@ -296,6 +309,7 @@ def gettext_noop(message):
     later.
     """
     return message
+
 
 def do_ntranslate(singular, plural, number, translation_function):
     global _default
@@ -307,6 +321,7 @@ def do_ntranslate(singular, plural, number, translation_function):
         from django.conf import settings
         _default = translation(settings.LANGUAGE_CODE)
     return getattr(_default, translation_function)(singular, plural, number)
+
 
 def ngettext(singular, plural, number):
     """
@@ -327,6 +342,7 @@ else:
         """
         return do_ntranslate(singular, plural, number, 'ungettext')
 
+
 def npgettext(context, singular, plural, number):
     msgs_with_ctxt = ("%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
                       "%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
@@ -337,6 +353,7 @@ def npgettext(context, singular, plural, number):
         result = ungettext(singular, plural, number)
     return result
 
+
 def all_locale_paths():
     """
     Returns a list of paths to user-provides languages files.
@@ -345,6 +362,7 @@ def all_locale_paths():
     globalpath = os.path.join(
         os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
     return [globalpath] + list(settings.LOCALE_PATHS)
+
 
 def check_for_language(lang_code):
     """
@@ -358,6 +376,7 @@ def check_for_language(lang_code):
             return True
     return False
 check_for_language = memoize(check_for_language, _checked_languages, 1)
+
 
 def get_supported_language_variant(lang_code, supported=None, strict=False):
     """
@@ -386,6 +405,7 @@ def get_supported_language_variant(lang_code, supported=None, strict=False):
                     return supported_code
     raise LookupError(lang_code)
 
+
 def get_language_from_path(path, supported=None, strict=False):
     """
     Returns the language-code if there is a valid language-code
@@ -405,6 +425,7 @@ def get_language_from_path(path, supported=None, strict=False):
         return get_supported_language_variant(lang_code, supported, strict=strict)
     except LookupError:
         return None
+
 
 def get_language_from_request(request, check_path=False):
     """
@@ -470,6 +491,8 @@ def get_language_from_request(request, check_path=False):
         return settings.LANGUAGE_CODE
 
 dot_re = re.compile(r'\S')
+
+
 def blankout(src, char):
     """
     Changes every non-whitespace character to the given char.
@@ -652,6 +675,7 @@ def templatize(src, origin=None):
             else:
                 out.write(blankout(t.contents, 'X'))
     return force_str(out.getvalue())
+
 
 def parse_accept_lang_header(lang_string):
     """

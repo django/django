@@ -13,6 +13,7 @@ from django.utils._os import upath
 from django.utils.http import is_safe_url
 from django.utils import six
 
+
 def set_language(request):
     """
     Redirect to a given url while setting the chosen language in the

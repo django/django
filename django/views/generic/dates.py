@@ -13,6 +13,7 @@ from django.views.generic.base import View
 from django.views.generic.detail import BaseDetailView, SingleObjectTemplateResponseMixin
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
 
+
 class YearMixin(object):
     """
     Mixin for views manipulating year-based data.

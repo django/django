@@ -144,6 +144,8 @@ if sys.platform.startswith('java'):
 # Option constants.
 
 OPTIONFLAGS_BY_NAME = {}
+
+
 def register_optionflag(name):
     # Create a new flag unless `name` is already known.
     return OPTIONFLAGS_BY_NAME.setdefault(name, 1 << len(OPTIONFLAGS_BY_NAME))
@@ -194,6 +196,7 @@ ELLIPSIS_MARKER = '...'
 ## 1. Utility Functions
 ######################################################################
 
+
 def _extract_future_flags(globs):
     """
     Return the compiler-flags associated with the future features that
@@ -205,6 +208,7 @@ def _extract_future_flags(globs):
         if feature is getattr(__future__, fname):
             flags |= feature.compiler_flag
     return flags
+
 
 def _normalize_module(module, depth=2):
     """
@@ -225,6 +229,7 @@ def _normalize_module(module, depth=2):
     else:
         raise TypeError("Expected a module, string, or None")
 
+
 def _load_testfile(filename, package, module_relative):
     if module_relative:
         package = _normalize_module(package, 3)
@@ -238,6 +243,7 @@ def _load_testfile(filename, package, module_relative):
     with open(filename) as fp:
         return fp.read(), filename
 
+
 def _indent(s, indent=4):
     """
     Add the given number of space characters to the beginning every
@@ -245,6 +251,7 @@ def _indent(s, indent=4):
     """
     # This regexp matches the start of non-blank lines:
     return re.sub('(?m)^(?!$)', indent*' ', s)
+
 
 def _exception_traceback(exc_info):
     """
@@ -256,6 +263,7 @@ def _exception_traceback(exc_info):
     exc_type, exc_val, exc_tb = exc_info
     traceback.print_exception(exc_type, exc_val, exc_tb, file=excout)
     return excout.getvalue()
+
 
 # Override some StringIO methods.
 class _SpoofOut(StringIO):
@@ -276,6 +284,7 @@ class _SpoofOut(StringIO):
         StringIO.truncate(self, size)
         if hasattr(self, "softspace"):
             del self.softspace
+
 
 # Worst-case linear-time ellipsis matching.
 def _ellipsis_match(want, got):
@@ -327,6 +336,7 @@ def _ellipsis_match(want, got):
 
     return True
 
+
 def _comment_line(line):
     "Return a commented form of the given line"
     line = line.rstrip()
@@ -334,6 +344,7 @@ def _comment_line(line):
         return '# '+line
     else:
         return '#'
+
 
 class _OutputRedirectingPdb(pdb.Pdb):
     """
@@ -367,6 +378,7 @@ class _OutputRedirectingPdb(pdb.Pdb):
             return pdb.Pdb.trace_dispatch(self, *args)
         finally:
             sys.stdout = save_stdout
+
 
 # [XX] Normalize with respect to os.path.pardir?
 def _module_relative_path(module, path):
@@ -404,6 +416,7 @@ def _module_relative_path(module, path):
 ## - A "doctest" is a collection of examples, typically extracted from
 ##   a string (such as an object's docstring).  The DocTest class also
 ##   includes information about where the string was extracted from.
+
 
 class Example:
     """
@@ -458,6 +471,7 @@ class Example:
         self.options = options
         self.exc_msg = exc_msg
 
+
 class DocTest:
     """
     A collection of doctest examples that should be run in a single
@@ -506,10 +520,10 @@ class DocTest:
         return ('<DocTest %s from %s:%s (%s)>' %
                 (self.name, self.filename, self.lineno, examples))
 
-
     # This lets us sort tests by name:
     def _cmpkey(self):
         return (self.name, self.filename, self.lineno, id(self))
+
     def __cmp__(self, other):
         if not isinstance(other, DocTest):
             return -1
@@ -1054,6 +1068,7 @@ class DocTestFinder:
 ## 5. DocTest Runner
 ######################################################################
 
+
 class DocTestRunner:
     """
     A class used to run DocTest test cases, and accumulate statistics.
@@ -1408,6 +1423,7 @@ class DocTestRunner:
     __LINECACHE_FILENAME_RE = re.compile(r'<doctest '
                                          r'(?P<name>[\w\.]+)'
                                          r'\[(?P<examplenum>\d+)\]>$')
+
     def __patched_linecache_getlines(self, filename, module_globals=None):
         m = self.__LINECACHE_FILENAME_RE.match(filename)
         if m and m.group('name') == self.test.name:
@@ -1540,6 +1556,7 @@ class DocTestRunner:
                 f = f + f2
                 t = t + t2
             d[name] = f, t
+
 
 class OutputChecker:
     """
@@ -1674,6 +1691,7 @@ class OutputChecker:
         else:
             return 'Expected nothing\nGot nothing\n'
 
+
 class DocTestFailure(Exception):
     """A DocTest example has failed in debugging mode.
 
@@ -1693,6 +1711,7 @@ class DocTestFailure(Exception):
     def __str__(self):
         return str(self.test)
 
+
 class UnexpectedException(Exception):
     """A DocTest example has encountered an unexpected exception
 
@@ -1711,6 +1730,7 @@ class UnexpectedException(Exception):
 
     def __str__(self):
         return str(self.test)
+
 
 class DebugRunner(DocTestRunner):
     r"""Run doc tests but raise an exception as soon as there is a failure.
@@ -1824,6 +1844,7 @@ class DebugRunner(DocTestRunner):
 # class, updated by testmod.
 master = None
 
+
 def testmod(m=None, name=None, globs=None, verbose=None,
             report=True, optionflags=0, extraglobs=None,
             raise_on_error=False, exclude_empty=False):
@@ -1927,6 +1948,7 @@ def testmod(m=None, name=None, globs=None, verbose=None,
         master.merge(runner)
 
     return runner.failures, runner.tries
+
 
 def testfile(filename, module_relative=True, name=None, package=None,
              globs=None, verbose=None, report=True, optionflags=0,
@@ -2051,6 +2073,7 @@ def testfile(filename, module_relative=True, name=None, package=None,
 
     return runner.failures, runner.tries
 
+
 def run_docstring_examples(f, globs, verbose=False, name="NoName",
                            compileflags=None, optionflags=0):
     """
@@ -2079,6 +2102,7 @@ def run_docstring_examples(f, globs, verbose=False, name="NoName",
 ######################################################################
 # This is provided only for backwards compatibility.  It's not
 # actually used in any way.
+
 
 class Tester:
     def __init__(self, mod=None, globs=None, verbose=None, optionflags=0):
@@ -2144,6 +2168,7 @@ class Tester:
 ######################################################################
 
 _unittest_reportflags = 0
+
 
 def set_unittest_reportflags(flags):
     """Sets the unittest option flags.
@@ -2328,6 +2353,7 @@ class DocTestCase(unittest.TestCase):
     def shortDescription(self):
         return "Doctest: " + self._dt_test.name
 
+
 def DocTestSuite(module=None, globs=None, extraglobs=None, test_finder=None,
                  test_class=DocTestCase, **options):
     """
@@ -2391,6 +2417,7 @@ def DocTestSuite(module=None, globs=None, extraglobs=None, test_finder=None,
 
     return suite
 
+
 class DocFileCase(DocTestCase):
 
     def id(self):
@@ -2404,6 +2431,7 @@ class DocFileCase(DocTestCase):
         return ('Failed doctest test for %s\n  File "%s", line 0\n\n%s'
                 % (self._dt_test.name, self._dt_test.filename, err)
                 )
+
 
 def DocFileTest(path, module_relative=True, package=None,
                 globs=None, parser=DocTestParser(),
@@ -2433,6 +2461,7 @@ def DocFileTest(path, module_relative=True, package=None,
     # Convert it to a test, and wrap it in a DocFileCase.
     test = parser.get_doctest(doc, globs, name, path, 0)
     return DocFileCase(test, **options)
+
 
 def DocFileSuite(*paths, **kw):
     """A unittest suite for one or more doctest files.
@@ -2506,6 +2535,7 @@ def DocFileSuite(*paths, **kw):
 ######################################################################
 ## 9. Debugging Support
 ######################################################################
+
 
 def script_from_examples(s):
     r"""Extract script from text with examples.
@@ -2587,6 +2617,7 @@ def script_from_examples(s):
     # Combine the output, and return it.
     return '\n'.join(output)
 
+
 def testsource(module, name):
     """Extract the test sources from a doctest docstring as a script.
 
@@ -2603,10 +2634,12 @@ def testsource(module, name):
     testsrc = script_from_examples(test.docstring)
     return testsrc
 
+
 def debug_src(src, pm=False, globs=None):
     """Debug a single doctest docstring, in argument `src`'"""
     testsrc = script_from_examples(src)
     debug_script(testsrc, pm, globs)
+
 
 def debug_script(src, pm=False, globs=None):
     "Debug a test script.  `src` is the script, as a string."
@@ -2639,6 +2672,7 @@ def debug_script(src, pm=False, globs=None):
     finally:
         os.remove(srcfilename)
 
+
 def debug(module, name, pm=False):
     """Debug a single doctest docstring.
 
@@ -2653,6 +2687,8 @@ def debug(module, name, pm=False):
 ######################################################################
 ## 10. Example Usage
 ######################################################################
+
+
 class _TestClass:
     """
     A pointless class, for sanity-checking of docstring testing.
@@ -2746,6 +2782,7 @@ __test__ = {"_TestClass": _TestClass,
                      27, 28, 29]
             """,
            }
+
 
 def _test():
     r = unittest.TextTestRunner()
