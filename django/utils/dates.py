@@ -27,7 +27,7 @@ MONTHS_3_REV = {
     'jan': 1, 'feb': 2, 'mar': 3, 'apr': 4, 'may': 5, 'jun': 6, 'jul': 7, 'aug': 8,
     'sep': 9, 'oct': 10, 'nov': 11, 'dec': 12
 }
-MONTHS_AP = { # month names in Associated Press style
+MONTHS_AP = {  # month names in Associated Press style
     1: pgettext_lazy('abbrev. month', 'Jan.'),
     2: pgettext_lazy('abbrev. month', 'Feb.'),
     3: pgettext_lazy('abbrev. month', 'March'),
@@ -41,7 +41,7 @@ MONTHS_AP = { # month names in Associated Press style
     11: pgettext_lazy('abbrev. month', 'Nov.'),
     12: pgettext_lazy('abbrev. month', 'Dec.')
 }
-MONTHS_ALT = { # required for long date representation by some locales
+MONTHS_ALT = {  # required for long date representation by some locales
     1: pgettext_lazy('alt. month', 'January'),
     2: pgettext_lazy('alt. month', 'February'),
     3: pgettext_lazy('alt. month', 'March'),

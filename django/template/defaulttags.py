@@ -347,7 +347,7 @@ class SsiNode(Node):
             if settings.DEBUG:
                 return "[Didn't have permission to include file]"
             else:
-                return '' # Fail silently for invalid includes.
+                return ''  # Fail silently for invalid includes.
         try:
             with open(filepath, 'r') as fp:
                 output = fp.read()
@@ -361,7 +361,7 @@ class SsiNode(Node):
                 if settings.DEBUG:
                     return "[Included template had syntax error: %s]" % e
                 else:
-                    return '' # Fail silently for invalid included templates.
+                    return ''  # Fail silently for invalid included templates.
         return output
 
 class LoadNode(Node):
@@ -860,7 +860,7 @@ def ifnotequal(parser, token):
 class TemplateLiteral(Literal):
     def __init__(self, value, text):
         self.value = value
-        self.text = text # for better error messages
+        self.text = text  # for better error messages
 
     def display(self):
         return self.text
