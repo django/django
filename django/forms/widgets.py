@@ -161,8 +161,8 @@ class SubWidget(object):
         return self.parent_widget.render(*args)
 
 class Widget(six.with_metaclass(MediaDefiningClass)):
-    is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
-    needs_multipart_form = False # Determines does this widget need multipart form
+    is_hidden = False             # Determines whether this corresponds to an <input type="hidden">.
+    needs_multipart_form = False  # Determines does this widget need multipart form
     is_localized = False
     is_required = False
 
@@ -227,7 +227,7 @@ class Input(Widget):
     Base class for all <input> widgets (except type='checkbox' and
     type='radio', which are special).
     """
-    input_type = None # Subclasses must define this.
+    input_type = None  # Subclasses must define this.
 
     def _format_value(self, value):
         if self.is_localized:
@@ -643,7 +643,7 @@ class ChoiceFieldRenderer(object):
         self.choices = choices
 
     def __getitem__(self, idx):
-        choice = self.choices[idx] # Let the IndexError propogate
+        choice = self.choices[idx]  # Let the IndexError propogate
         return self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, idx)
 
     def __str__(self):

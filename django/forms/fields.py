@@ -45,9 +45,9 @@ __all__ = (
 
 
 class Field(object):
-    widget = TextInput # Default widget to use when rendering this type of Field.
-    hidden_widget = HiddenInput # Default widget to use when rendering this as "hidden".
-    default_validators = [] # Default set of validators
+    widget = TextInput  # Default widget to use when rendering this type of Field.
+    hidden_widget = HiddenInput  # Default widget to use when rendering this as "hidden".
+    default_validators = []  # Default set of validators
     # Add an 'invalid' entry to default_error_message if you want a specific
     # field error message not raised by the field validators.
     default_error_messages = {

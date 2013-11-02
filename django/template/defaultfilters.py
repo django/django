@@ -261,8 +261,8 @@ def truncatechars(value, arg):
     """
     try:
         length = int(arg)
-    except ValueError: # Invalid literal for int().
-        return value # Fail silently.
+    except ValueError:  # Invalid literal for int().
+        return value  # Fail silently.
     return Truncator(value).chars(length)
 
 @register.filter(is_safe=True)
@@ -277,8 +277,8 @@ def truncatewords(value, arg):
     """
     try:
         length = int(arg)
-    except ValueError: # Invalid literal for int().
-        return value # Fail silently.
+    except ValueError:  # Invalid literal for int().
+        return value  # Fail silently.
     return Truncator(value).words(length, truncate=' ...')
 
 @register.filter(is_safe=True)
@@ -293,8 +293,8 @@ def truncatewords_html(value, arg):
     """
     try:
         length = int(arg)
-    except ValueError: # invalid literal for int()
-        return value # Fail silently.
+    except ValueError:  # invalid literal for int()
+        return value  # Fail silently.
     return Truncator(value).words(length, html=True, truncate=' ...')
 
 @register.filter(is_safe=False)
@@ -511,7 +511,7 @@ def join(value, arg, autoescape=None):
         value = [conditional_escape(v) for v in value]
     try:
         data = conditional_escape(arg).join(value)
-    except AttributeError: # fail silently but nicely
+    except AttributeError:  # fail silently but nicely
         return value
     return mark_safe(data)
 
@@ -563,7 +563,7 @@ def slice_filter(value, arg):
         return value[slice(*bits)]
 
     except (ValueError, TypeError):
-        return value # Fail silently.
+        return value  # Fail silently.
 
 @register.filter(is_safe=True, needs_autoescape=True)
 def unordered_list(value, autoescape=None):
@@ -681,7 +681,7 @@ def get_digit(value, arg):
         arg = int(arg)
         value = int(value)
     except ValueError:
-        return value # Fail silently for an invalid argument
+        return value  # Fail silently for an invalid argument
     if arg < 1:
         return value
     try:
@@ -786,7 +786,7 @@ def yesno(value, arg=None):
         arg = ugettext('yes,no,maybe')
     bits = arg.split(',')
     if len(bits) < 2:
-        return value # Invalid arg.
+        return value  # Invalid arg.
     try:
         yes, no, maybe = bits
     except ValueError:
@@ -871,13 +871,13 @@ def pluralize(value, arg='s'):
     try:
         if int(value) != 1:
             return plural_suffix
-    except ValueError: # Invalid string that's not a number.
+    except ValueError:  # Invalid string that's not a number.
         pass
-    except TypeError: # Value isn't a string or a number; maybe it's a list?
+    except TypeError:  # Value isn't a string or a number; maybe it's a list?
         try:
             if len(value) != 1:
                 return plural_suffix
-        except TypeError: # len() of unsized object.
+        except TypeError:  # len() of unsized object.
             pass
     return singular_suffix
 

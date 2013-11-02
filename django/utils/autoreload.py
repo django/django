@@ -257,7 +257,7 @@ def reloader_thread():
         fn = code_changed
     while RUN_RELOADER:
         if fn():
-            sys.exit(3) # force reload
+            sys.exit(3)  # force reload
         time.sleep(1)
 
 

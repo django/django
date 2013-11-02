@@ -13,9 +13,9 @@ class TokenBase(object):
     Base class for operators and literals, mainly for debugging and for throwing
     syntax errors.
     """
-    id = None # node/token type name
-    value = None # used by literals
-    first = second = None # used by tree nodes
+    id = None  # node/token type name
+    value = None  # used by literals
+    first = second = None  # used by tree nodes
 
     def nud(self, parser):
         # Null denotation - called in prefix context
@@ -159,7 +159,7 @@ class IfParser(object):
             token = tokens[i]
             if token == "not" and i + 1 < l and tokens[i+1] == "in":
                 token = "not in"
-                i += 1 # skip 'in'
+                i += 1  # skip 'in'
             mapped_tokens.append(self.translate_token(token))
             i += 1
 

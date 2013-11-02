@@ -210,7 +210,7 @@ class BaseConfigurator(object):
                             d = d[idx]
                         else:
                             try:
-                                n = int(idx) # try as number first (most likely)
+                                n = int(idx)  # try as number first (most likely)
                                 d = d[n]
                             except TypeError:
                                 d = d[idx]
@@ -238,7 +238,7 @@ class BaseConfigurator(object):
                  isinstance(value, tuple):
             value = ConvertingTuple(value)
             value.configurator = self
-        elif isinstance(value, six.string_types): # str for py3k
+        elif isinstance(value, six.string_types):  # str for py3k
             m = self.CONVERT_PATTERN.match(value)
             if m:
                 d = m.groupdict()
@@ -385,7 +385,7 @@ class DictConfigurator(BaseConfigurator):
                         prefixed = name + "."
                         pflen = len(prefixed)
                         num_existing = len(existing)
-                        i = i + 1 # look at the entry after name
+                        i = i + 1  # look at the entry after name
                         while (i < num_existing) and\
                               (existing[i][:pflen] == prefixed):
                             child_loggers.append(existing[i])
@@ -425,7 +425,7 @@ class DictConfigurator(BaseConfigurator):
     def configure_formatter(self, config):
         """Configure a formatter from a dictionary."""
         if '()' in config:
-            factory = config['()'] # for use in exception handler
+            factory = config['()']  # for use in exception handler
             try:
                 result = self.configure_custom(config)
             except TypeError as te:

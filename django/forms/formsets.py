@@ -244,7 +244,7 @@ class BaseFormSet(object):
 
             def compare_ordering_key(k):
                 if k[1] is None:
-                    return (1, 0) # +infinity, larger than any number
+                    return (1, 0)  # +infinity, larger than any number
                 return (0, k[1])
             self._ordering.sort(key=compare_ordering_key)
         # Return a list of form.cleaned_data dicts in the order specified by
@@ -316,7 +316,7 @@ class BaseFormSet(object):
         self._errors = []
         self._non_form_errors = self.error_class()
 
-        if not self.is_bound: # Stop further processing.
+        if not self.is_bound:  # Stop further processing.
             return
         for i in range(0, self.total_form_count()):
             form = self.forms[i]
