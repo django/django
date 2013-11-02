@@ -2719,6 +2719,23 @@ class NullJoinPromotionOrTest(TestCase):
         qs = ModelA.objects.filter(Q(b__name__isnull=True) | Q(b__name__isnull=False))
         self.assertTrue(' LEFT OUTER JOIN ' in str(qs.query))
 
+    def test_ticket_21366(self):
+        n = Note.objects.create(note='n', misc='m')
+        e = ExtraInfo.objects.create(info='info', note=n)
+        a = Author.objects.create(name='Author1', num=1, extra=e)
+        Ranking.objects.create(rank=1, author=a)
+        r1 = Report.objects.create(name='Foo', creator=a)
+        r2 = Report.objects.create(name='Bar')
+        Report.objects.create(name='Bar', creator=a)
+        qs = Report.objects.filter(
+            Q(creator__ranking__isnull=True) |
+            Q(creator__ranking__rank=1, name='Foo')
+        )
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 2)
+        self.assertEqual(str(qs.query).count(' JOIN '), 2)
+        self.assertQuerysetEqual(
+            qs.order_by('name'), [r2, r1], lambda x: x)
+
 class ReverseJoinTrimmingTest(TestCase):
     def test_reverse_trimming(self):
         # Check that we don't accidentally trim reverse joins - we can't know
@@ -2837,7 +2854,6 @@ class DisjunctionPromotionTests(TestCase):
         self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
 
     def test_disjunction_promotion5_demote(self):
-        # Failure because no join demotion logic for this case.
         qs = BaseA.objects.filter(Q(a=1) | Q(a=2))
         # Note that the above filters on a force the join to an
         # inner join even if it is trimmed.
@@ -2845,6 +2861,7 @@ class DisjunctionPromotionTests(TestCase):
         qs = qs.filter(Q(a__f1='foo') | Q(b__f1='foo'))
         # So, now the a__f1 join doesn't need promotion.
         self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+        # But b__f1 does.
         self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 1)
         qs = BaseA.objects.filter(Q(a__f1='foo') | Q(b__f1='foo'))
         # Now the join to a is created as LOUTER

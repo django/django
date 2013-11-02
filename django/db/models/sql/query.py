@@ -740,7 +740,7 @@ class Query(object):
             self.unref_alias(alias, unref_amount)
 
     def promote_disjunction(self, aliases_before, alias_usage_counts,
-                            num_childs):
+                            num_childs, left_joins_before):
         """
         This method is to be used for promoting joins in ORed filters.
 
@@ -749,7 +749,8 @@ class Query(object):
         and isn't pre-existing needs to be promoted to LOUTER join.
         """
         for alias, use_count in alias_usage_counts.items():
-            if use_count < num_childs and alias not in aliases_before:
+            if ((use_count < num_childs and alias not in aliases_before)
+                    or alias in left_joins_before):
                 self.promote_joins([alias])
 
     def change_aliases(self, change_map):
@@ -1314,9 +1315,14 @@ class Query(object):
         if connector == OR:
             alias_usage_counts = dict()
             aliases_before = set(self.tables)
+            left_joins_before = set()
         for child in q_object.children:
             if connector == OR:
                 refcounts_before = self.alias_refcount.copy()
+                left_joins_before = left_joins_before.union(set(
+                    t for t in self.alias_map
+                    if self.alias_map[t].join_type == self.LOUTER and
+                    self.alias_refcount[t] > 0))
             if isinstance(child, Node):
                 child_clause = self._add_q(
                     child, used_aliases, branch_negated,
@@ -1332,7 +1338,7 @@ class Query(object):
                     alias_usage_counts[alias] = alias_usage_counts.get(alias, 0) + 1
         if connector == OR:
             self.promote_disjunction(aliases_before, alias_usage_counts,
-                                     len(q_object.children))
+                                     len(q_object.children), left_joins_before)
         return target_clause
 
     def names_to_path(self, names, opts, allow_many):
