@@ -28,13 +28,13 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import datetime
 import os
 import signal
 import sys
 import time
 import traceback
 
+from django.conf import settings
 from django.core.signals import request_finished
 try:
     from django.utils.six.moves import _thread as thread
@@ -86,13 +86,28 @@ _win = (sys.platform == "win32")
 
 _error_files = []
 
-
 def gen_filenames():
     """
-    Yields a generator over filenames referenced in sys.modules.
+    Yields a generator over filenames referenced in sys.modules and translation
+    files.
     """
     filenames = [filename.__file__ for filename in sys.modules.values()
                 if hasattr(filename, '__file__')]
+
+    # Add the names of the .mo files that can be generated
+    # by compilemessages management command to the list of files watched.
+    basedirs = [os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                             'conf', 'locale'),
+                'locale']
+    basedirs.extend(settings.LOCALE_PATHS)
+    basedirs = [os.path.abspath(basedir) for basedir in basedirs
+                if os.path.isdir(basedir)]
+    for basedir in basedirs:
+        for dirpath, dirnames, locale_filenames in os.walk(basedir):
+            for filename in locale_filenames:
+                if filename.endswith('.mo'):
+                    filenames.append(os.path.join(dirpath, filename))
+
     for filename in filenames + _error_files:
         if not filename:
             continue
