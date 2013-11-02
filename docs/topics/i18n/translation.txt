@@ -991,8 +991,8 @@ for a given version of a site — it's a good candidate for caching.
 
 Server-side caching will reduce CPU load. It's easily implemented with the
 :func:`~django.views.decorators.cache.cache_page` decorator. To trigger cache
-invalidation when your translations change, provide a version-dependant key
-prefix, as shown in the example below, or map the view at a version-dependant
+invalidation when your translations change, provide a version-dependent key
+prefix, as shown in the example below, or map the view at a version-dependent
 URL.
 
 .. code-block:: python
