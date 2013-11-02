@@ -48,3 +48,7 @@ site.register(models.Advisor)
 site.register(models.School, SchoolAdmin)
 
 site.register(models.Profile)
+
+my_admin_site = admin.AdminSite(name='my-admin-name', app_name='my-admin-app')
+my_admin_site.register(models.Band)
+my_admin_site.register(models.Member)

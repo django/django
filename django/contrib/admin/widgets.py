@@ -153,10 +153,11 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         extra = []
         if rel_to in self.admin_site._registry:
             # The related object is registered with the same AdminSite
-            related_url = reverse('admin:%s_%s_changelist' %
-                                    (rel_to._meta.app_label,
-                                    rel_to._meta.model_name),
-                                    current_app=self.admin_site.name)
+            related_url = reverse(self.admin_site.app_name +
+                                  ':%s_%s_changelist' %
+                                  (rel_to._meta.app_label,
+                                  rel_to._meta.model_name),
+                                  current_app=self.admin_site.name)
 
             params = self.url_parameters()
             if params:
@@ -261,7 +262,9 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         self.widget.choices = self.choices
         output = [self.widget.render(name, value, *args, **kwargs)]
         if self.can_add_related:
-            related_url = reverse('admin:%s_%s_add' % info, current_app=self.admin_site.name)
+            related_url = reverse(self.admin_site.app_name +
+                                  ':%s_%s_add' % info,
+                                  current_app=self.admin_site.name)
             url_params = '?%s=%s' % (TO_FIELD_VAR, self.rel.get_related_field().name)
             # TODO: "add_id_" is hard-coded here. This should instead use the
             # correct API to determine the ID dynamically.

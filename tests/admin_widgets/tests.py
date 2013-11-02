@@ -19,6 +19,7 @@ from django.utils import translation
 
 from . import models
 from .widgetadmin import site as widget_admin_site
+from .widgetadmin import my_admin_site as widget_my_admin_site
 
 
 admin_static_prefix = lambda: {
@@ -453,6 +454,14 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
             '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Hidden</strong>' % admin_static_prefix()
         )
 
+    def test_admin_site_with_custom_namespace(self):
+        rel = models.Band._meta.get_field('members').rel
+        w = widgets.ForeignKeyRawIdWidget(rel, widget_my_admin_site)
+        self.assertEqual(w.admin_site.name, 'my-admin-name')
+        self.assertEqual(w.admin_site.app_name, 'my-admin-app')
+        self.assertIn('/widget_admin/my_admin_url/admin_widgets/member/',
+                      w.render('test', None))
+
 
 class ManyToManyRawIdWidgetTest(DjangoTestCase):
     def test_render(self):
@@ -502,6 +511,15 @@ class RelatedFieldWidgetWrapperTests(DjangoTestCase):
         # Used to fail with a name error.
         w = widgets.RelatedFieldWidgetWrapper(w, rel, widget_admin_site)
         self.assertFalse(w.can_add_related)
+
+    def test_admin_site_with_custom_namespace(self):
+        rel = models.Band._meta.get_field('members').rel
+        w = widgets.AdminRadioSelect()
+        w = widgets.RelatedFieldWidgetWrapper(w, rel, widget_my_admin_site)
+        self.assertEqual(w.admin_site.name, 'my-admin-name')
+        self.assertEqual(w.admin_site.app_name, 'my-admin-app')
+        self.assertIn('/widget_admin/my_admin_url/admin_widgets/member/add/',
+                      w.render('spam', None))
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
