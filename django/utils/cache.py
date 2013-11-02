@@ -31,6 +31,7 @@ from django.utils.translation import get_language
 
 cc_delim_re = re.compile(r'\s*,\s*')
 
+
 def patch_cache_control(response, **kwargs):
     """
     This function patches the Cache-Control header by adding all
@@ -79,6 +80,7 @@ def patch_cache_control(response, **kwargs):
     cc = ', '.join(dictvalue(el) for el in cc.items())
     response['Cache-Control'] = cc
 
+
 def get_max_age(response):
     """
     Returns the max-age from the response Cache-Control header as an integer
@@ -94,10 +96,12 @@ def get_max_age(response):
         except (ValueError, TypeError):
             pass
 
+
 def _set_response_etag(response):
     if not response.streaming:
         response['ETag'] = '"%s"' % hashlib.md5(response.content).hexdigest()
     return response
+
 
 def patch_response_headers(response, cache_timeout=None):
     """
@@ -124,11 +128,13 @@ def patch_response_headers(response, cache_timeout=None):
         response['Expires'] = http_date(time.time() + cache_timeout)
     patch_cache_control(response, max_age=cache_timeout)
 
+
 def add_never_cache_headers(response):
     """
     Adds headers to a response to indicate that a page should never be cached.
     """
     patch_response_headers(response, cache_timeout=-1)
+
 
 def patch_vary_headers(response, newheaders):
     """
@@ -149,6 +155,7 @@ def patch_vary_headers(response, newheaders):
                           if newheader.lower() not in existing_headers]
     response['Vary'] = ', '.join(vary_headers + additional_headers)
 
+
 def has_vary_header(response, header_query):
     """
     Checks to see if the response has a given header name in its Vary header.
@@ -158,6 +165,7 @@ def has_vary_header(response, header_query):
     vary_headers = cc_delim_re.split(response['Vary'])
     existing_headers = set(header.lower() for header in vary_headers)
     return header_query.lower() in existing_headers
+
 
 def _i18n_cache_key_suffix(request, cache_key):
     """If necessary, adds the current locale or time zone to the cache key."""
@@ -175,6 +183,7 @@ def _i18n_cache_key_suffix(request, cache_key):
         cache_key += '.%s' % tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
     return cache_key
 
+
 def _generate_cache_key(request, method, headerlist, key_prefix):
     """Returns a cache key from the headers given in the header list."""
     ctx = hashlib.md5()
@@ -187,12 +196,14 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
         key_prefix, method, path.hexdigest(), ctx.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
 
+
 def _generate_cache_header_key(key_prefix, request):
     """Returns a cache key for the header cache."""
     path = hashlib.md5(force_bytes(iri_to_uri(request.get_full_path())))
     cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
         key_prefix, path.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
+
 
 def get_cache_key(request, key_prefix=None, method='GET', cache=None):
     """
@@ -214,6 +225,7 @@ def get_cache_key(request, key_prefix=None, method='GET', cache=None):
         return _generate_cache_key(request, method, headerlist, key_prefix)
     else:
         return None
+
 
 def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cache=None):
     """

@@ -53,6 +53,7 @@ def npath(path):
         return path.encode(fs_encoding)
     return path
 
+
 def safe_join(base, *paths):
     """
     Joins one or more path components to the base path component intelligently.

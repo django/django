@@ -72,6 +72,7 @@ def conditional_escape(text):
     else:
         return escape(text)
 
+
 def format_html(format_string, *args, **kwargs):
     """
     Similar to str.format, but passes all arguments through conditional_escape,
@@ -82,6 +83,7 @@ def format_html(format_string, *args, **kwargs):
     kwargs_safe = dict((k, conditional_escape(v)) for (k, v) in
                         six.iteritems(kwargs))
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
+
 
 def format_html_join(sep, format_string, args_generator):
     """
@@ -133,6 +135,7 @@ class MLStripper(HTMLParser):
     def get_data(self):
         return ''.join(self.fed)
 
+
 def strip_tags(value):
     """Returns the given HTML with all tags stripped."""
     s = MLStripper()
@@ -145,6 +148,7 @@ def strip_tags(value):
         return s.get_data()
 strip_tags = allow_lazy(strip_tags)
 
+
 def remove_tags(html, tags):
     """Returns the given HTML with given tags removed."""
     tags = [re.escape(tag) for tag in tags.split()]
@@ -156,20 +160,24 @@ def remove_tags(html, tags):
     return html
 remove_tags = allow_lazy(remove_tags, six.text_type)
 
+
 def strip_spaces_between_tags(value):
     """Returns the given HTML with spaces between tags removed."""
     return re.sub(r'>\s+<', '><', force_text(value))
 strip_spaces_between_tags = allow_lazy(strip_spaces_between_tags, six.text_type)
+
 
 def strip_entities(value):
     """Returns the given HTML with all entities (&something;) stripped."""
     return re.sub(r'&(?:\w+|#\d+);', '', force_text(value))
 strip_entities = allow_lazy(strip_entities, six.text_type)
 
+
 def fix_ampersands(value):
     """Returns the given HTML with all unencoded ampersands encoded correctly."""
     return unencoded_ampersands_re.sub('&amp;', force_text(value))
 fix_ampersands = allow_lazy(fix_ampersands, six.text_type)
+
 
 def smart_urlquote(url):
     "Quotes a URL if it isn't already quoted."
@@ -191,6 +199,7 @@ def smart_urlquote(url):
     url = quote(url, safe=b'!*\'();:@&=+$,/?#[]~')
 
     return force_text(url)
+
 
 def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
@@ -269,6 +278,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     return ''.join(words)
 urlize = allow_lazy(urlize, six.text_type)
 
+
 def clean_html(text):
     """
     Clean the given HTML.  Specifically, do the following:
@@ -303,6 +313,7 @@ def clean_html(text):
     text = trailing_empty_content_re.sub('', text)
     return text
 clean_html = allow_lazy(clean_html, six.text_type)
+
 
 def avoid_wrapping(value):
     """

@@ -202,6 +202,7 @@ def normalize(pattern):
 
     return list(zip(*flatten_result(result)))
 
+
 def next_char(input_iter):
     """
     An iterator that yields the next character from "pattern_iter", respecting
@@ -222,6 +223,7 @@ def next_char(input_iter):
             continue
         yield representative, True
 
+
 def walk_to_end(ch, input_iter):
     """
     The iterator is currently inside a capturing group. We want to walk to the
@@ -241,6 +243,7 @@ def walk_to_end(ch, input_iter):
             if not nesting:
                 return
             nesting -= 1
+
 
 def get_quantifier(ch, input_iter):
     """
@@ -278,6 +281,7 @@ def get_quantifier(ch, input_iter):
         ch = None
     return int(values[0]), ch
 
+
 def contains(source, inst):
     """
     Returns True if the "source" contains an instance of "inst". False,
@@ -290,6 +294,7 @@ def contains(source, inst):
             if contains(elt, inst):
                 return True
     return False
+
 
 def flatten_result(source):
     """

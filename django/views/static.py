@@ -17,6 +17,7 @@ from django.utils.http import http_date, parse_http_date
 from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import ugettext as _, ugettext_noop
 
+
 def serve(request, path, document_root=None, show_indexes=False):
     """
     Serve static files below a given point in the directory structure.
@@ -95,6 +96,7 @@ DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
 """
 template_translatable = ugettext_noop("Index of %(directory)s")
 
+
 def directory_index(path, fullpath):
     try:
         t = loader.select_template(['static/directory_index.html',
@@ -112,6 +114,7 @@ def directory_index(path, fullpath):
         'file_list': files,
     })
     return HttpResponse(t.render(c))
+
 
 def was_modified_since(header=None, mtime=0, size=0):
     """
