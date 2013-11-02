@@ -544,3 +544,22 @@ class Ticket21203Parent(models.Model):
 class Ticket21203Child(models.Model):
     childid = models.AutoField(primary_key=True)
     parent = models.ForeignKey(Ticket21203Parent)
+
+
+class Person(models.Model):
+    name = models.CharField(max_length=128)
+
+
+@python_2_unicode_compatible
+class Company(models.Model):
+    name = models.CharField(max_length=128)
+    employees = models.ManyToManyField(Person, related_name='employers', through='Employment')
+
+    def __str__(self):
+        return self.name
+
+
+class Employment(models.Model):
+    employer = models.ForeignKey(Company)
+    employee = models.ForeignKey(Person)
+    title = models.CharField(max_length=128)

@@ -25,7 +25,8 @@ from .models import (
     ModelA, ModelB, ModelC, ModelD, Responsibility, Job, JobResponsibilities,
     BaseA, FK1, Identifier, Program, Channel, Page, Paragraph, Chapter, Book,
     MyObject, Order, OrderItem, SharedConnection, Task, Staff, StaffUser,
-    CategoryRelationship, Ticket21203Parent, Ticket21203Child)
+    CategoryRelationship, Ticket21203Parent, Ticket21203Child, Person,
+    Company, Employment)
 
 class BaseQuerysetTest(TestCase):
     def assertValueQuerysetEqual(self, qs, values):
@@ -2352,7 +2353,7 @@ class DefaultValuesInsertTest(TestCase):
         except TypeError:
             self.fail("Creation of an instance of a model with only the PK field shouldn't error out after bulk insert refactoring (#17056)")
 
-class ExcludeTest(TestCase):
+class ExcludeTests(TestCase):
     def setUp(self):
         f1 = Food.objects.create(name='apples')
         Food.objects.create(name='oranges')
@@ -2374,6 +2375,37 @@ class ExcludeTest(TestCase):
         self.assertQuerysetEqual(
             Responsibility.objects.exclude(jobs__name='Manager'),
             ['<Responsibility: Programming>'])
+
+    def test_ticket14511(self):
+        alex = Person.objects.get_or_create(name='Alex')[0]
+        jane = Person.objects.get_or_create(name='Jane')[0]
+
+        oracle = Company.objects.get_or_create(name='Oracle')[0]
+        google = Company.objects.get_or_create(name='Google')[0]
+        microsoft = Company.objects.get_or_create(name='Microsoft')[0]
+        intel = Company.objects.get_or_create(name='Intel')[0]
+
+        def employ(employer, employee, title):
+            Employment.objects.get_or_create(employee=employee, employer=employer, title=title)
+
+        employ(oracle, alex, 'Engineer')
+        employ(oracle, alex, 'Developer')
+        employ(google, alex, 'Engineer')
+        employ(google, alex, 'Manager')
+        employ(microsoft, alex, 'Manager')
+        employ(intel, alex, 'Manager')
+
+        employ(microsoft, jane, 'Developer')
+        employ(intel, jane, 'Manager')
+
+        alex_tech_employers = alex.employers.filter(
+            employment__title__in=('Engineer', 'Developer')).distinct().order_by('name')
+        self.assertQuerysetEqual(alex_tech_employers, [google, oracle], lambda x: x)
+
+        alex_nontech_employers = alex.employers.exclude(
+            employment__title__in=('Engineer', 'Developer')).distinct().order_by('name')
+        self.assertQuerysetEqual(alex_nontech_employers, [google, intel, microsoft], lambda x: x)
+
 
 class ExcludeTest17600(TestCase):
     """
@@ -3135,3 +3167,6 @@ class ValuesJoinPromotionTests(TestCase):
     def test_non_nullable_fk_not_promoted(self):
         qs = ObjectB.objects.values('objecta__name')
         self.assertTrue(' INNER JOIN ' in str(qs.query))
+
+
+class ExcludeJoinTest(TestCase):

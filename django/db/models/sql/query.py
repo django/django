@@ -22,7 +22,7 @@ from django.db.models.related import PathInfo
 from django.db.models.sql import aggregates as base_aggregates_module
 from django.db.models.sql.constants import (QUERY_TERMS, ORDER_DIR, SINGLE,
         ORDER_PATTERN, JoinInfo, SelectInfo)
-from django.db.models.sql.datastructures import EmptyResultSet, Empty, MultiJoin
+from django.db.models.sql.datastructures import EmptyResultSet, Empty, MultiJoin, Col
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.where import (WhereNode, Constraint, EverythingNode,
     ExtraWhere, AND, OR, EmptyWhere)
@@ -820,6 +820,9 @@ class Query(object):
         conflict. Even tables that previously had no alias will get an alias
         after this call.
         """
+        if self.alias_prefix != outer_query.alias_prefix:
+            # No clashes between self and outer query should be possible.
+            return
         self.alias_prefix = chr(ord(self.alias_prefix) + 1)
         while self.alias_prefix in self.subq_aliases:
             self.alias_prefix = chr(ord(self.alias_prefix) + 1)
@@ -1514,9 +1517,19 @@ class Query(object):
         # since we are adding a IN <subquery> clause. This prevents the
         # database from tripping over IN (...,NULL,...) selects and returning
         # nothing
+        alias, col = query.select[0].col
         if self.is_nullable(query.select[0].field):
-            alias, col = query.select[0].col
             query.where.add((Constraint(alias, col, query.select[0].field), 'isnull', False), AND)
+        if alias in can_reuse:
+            pk = query.select[0].field.model._meta.pk
+            # Need to add a restriction so that outer query's filters are in effect for
+            # the subquery, too.
+            query.bump_prefix(self)
+            query.where.add(
+                (Constraint(query.select[0].col[0], pk.column, pk),
+                 'exact', Col(alias, pk.column)),
+                AND
+            )
 
         condition = self.build_filter(
             ('%s__in' % trimmed_prefix, query),
