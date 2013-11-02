@@ -791,8 +791,12 @@ Django.)
 
 The development server automatically reloads Python code for each request, as
 needed. You don't need to restart the server for code changes to take effect.
-However, some actions like adding files or compiling translation files don't
-trigger a restart, so you'll have to restart the server in these cases.
+However, some actions like adding files don't trigger a restart, so you'll 
+have to restart the server in these cases.
+
+.. versionchanged:: 1.7
+
+    Compiling translation files now also restarts the development server.
 
 If you are using Linux and install `pyinotify`_, kernel signals will be used to
 autoreload the server (rather than polling file modification timestamps each
