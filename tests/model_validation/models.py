@@ -25,3 +25,24 @@ class ThingWithIterableChoices(models.Model):
     # Testing choices= Iterable of Iterables
     #   See: https://code.djangoproject.com/ticket/20430
     thing = models.CharField(max_length=100, blank=True, choices=Things())
+
+    class Meta:
+        # Models created as unmanaged as these aren't ever queried
+        managed = False
+
+
+class ManyToManyRel(models.Model):
+    thing1 = models.ManyToManyField(ThingWithIterableChoices, related_name='+')
+    thing2 = models.ManyToManyField(ThingWithIterableChoices, related_name='+')
+
+    class Meta:
+        # Models created as unmanaged as these aren't ever queried
+        managed = False
+
+class FKRel(models.Model):
+    thing1 = models.ForeignKey(ThingWithIterableChoices, related_name='+')
+    thing2 = models.ForeignKey(ThingWithIterableChoices, related_name='+')
+
+    class Meta:
+        # Models created as unmanaged as these aren't ever queried
+        managed = False

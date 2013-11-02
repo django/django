@@ -309,7 +309,7 @@ def get_validation_errors(outfile, app=None):
             # occurs for symmetrical m2m relations to self). If this is the
             # case, there are no clashes to check for this field, as there are
             # no reverse descriptors for this field.
-            if rel_name is not None:
+            if not f.rel.is_hidden():
                 for r in rel_opts.fields:
                     if r.name == rel_name:
                         e.add(opts, "Accessor for m2m field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
