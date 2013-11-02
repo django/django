@@ -10,7 +10,7 @@ YEAR_MONTH_FORMAT = r'F \d\e Y'
 MONTH_DAY_FORMAT = r'j \d\e F'
 SHORT_DATE_FORMAT = 'd/m/Y'
 SHORT_DATETIME_FORMAT = 'd/m/Y H:i'
-FIRST_DAY_OF_WEEK = 1 # Monday: ISO 8601
+FIRST_DAY_OF_WEEK = 1  # Monday: ISO 8601
 DATE_INPUT_FORMATS = (
     '%d/%m/%Y', '%d/%m/%y',            # '25/10/2006', '25/10/06'
     '%Y%m%d',                          # '20061025'

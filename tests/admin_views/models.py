@@ -256,7 +256,7 @@ class Podcast(Media):
     release_date = models.DateField()
 
     class Meta:
-        ordering = ('release_date',) # overridden in PodcastAdmin
+        ordering = ('release_date',)  # overridden in PodcastAdmin
 
 
 class Vodcast(Media):

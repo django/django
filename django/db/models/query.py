@@ -1627,16 +1627,16 @@ def prefetch_related_objects(result_cache, related_lookups):
     from a QuerySet
     """
     if len(result_cache) == 0:
-        return # nothing to do
+        return  # nothing to do
 
     # We need to be able to dynamically add to the list of prefetch_related
     # lookups that we look up (see below).  So we need some book keeping to
     # ensure we don't do duplicate work.
-    done_lookups = set() # list of lookups like foo__bar__baz
+    done_lookups = set()  # list of lookups like foo__bar__baz
     done_queries = {}    # dictionary of things like 'foo__bar': [results]
 
-    auto_lookups = [] # we add to this as we go through.
-    followed_descriptors = set() # recursion protection
+    auto_lookups = []  # we add to this as we go through.
+    followed_descriptors = set()  # recursion protection
 
     all_lookups = itertools.chain(related_lookups, auto_lookups)
     for lookup in all_lookups:

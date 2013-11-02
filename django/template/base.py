@@ -246,9 +246,9 @@ class Parser(object):
         while self.tokens:
             token = self.next_token()
             # Use the raw values here for TOKEN_* for a tiny performance boost.
-            if token.token_type == 0: # TOKEN_TEXT
+            if token.token_type == 0:  # TOKEN_TEXT
                 self.extend_nodelist(nodelist, TextNode(token.contents), token)
-            elif token.token_type == 1: # TOKEN_VAR
+            elif token.token_type == 1:  # TOKEN_VAR
                 if not token.contents:
                     self.empty_variable(token)
                 try:
@@ -258,7 +258,7 @@ class Parser(object):
                         raise
                 var_node = self.create_variable_node(filter_expression)
                 self.extend_nodelist(nodelist, var_node, token)
-            elif token.token_type == 2: # TOKEN_BLOCK
+            elif token.token_type == 2:  # TOKEN_BLOCK
                 try:
                     command = token.contents.split()[0]
                 except IndexError:
@@ -772,12 +772,12 @@ class Variable(object):
                     elif getattr(current, 'alters_data', False):
                         current = settings.TEMPLATE_STRING_IF_INVALID
                     else:
-                        try: # method call (assuming no args required)
+                        try:  # method call (assuming no args required)
                             current = current()
                         except TypeError:
                             try:
                                 getcallargs(current)
-                            except TypeError: # arguments *were* required
+                            except TypeError:  # arguments *were* required
                                 current = settings.TEMPLATE_STRING_IF_INVALID  # invalid method call
                             else:
                                 raise

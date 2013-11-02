@@ -15,7 +15,7 @@ test_srs = ({'srid': 4326,
              'proj4_re': r'\+proj=longlat (\+ellps=WGS84 )?\+datum=WGS84 \+no_defs ',
              'spheroid': 'WGS 84', 'name': 'WGS 84',
              'geographic': True, 'projected': False, 'spatialite': True,
-             'ellipsoid': (6378137.0, 6356752.3, 298.257223563), # From proj's "cs2cs -le" and Wikipedia (semi-minor only)
+             'ellipsoid': (6378137.0, 6356752.3, 298.257223563),  # From proj's "cs2cs -le" and Wikipedia (semi-minor only)
              'eprec': (1, 1, 9),
              },
             {'srid': 32140,
@@ -27,7 +27,7 @@ test_srs = ({'srid': 4326,
                           r'(\+datum=NAD83 |\+towgs84=0,0,0,0,0,0,0 )?\+units=m \+no_defs ',
              'spheroid': 'GRS 1980', 'name': 'NAD83 / Texas South Central',
              'geographic': False, 'projected': True, 'spatialite': False,
-             'ellipsoid': (6378137.0, 6356752.31414, 298.257222101), # From proj's "cs2cs -le" and Wikipedia (semi-minor only)
+             'ellipsoid': (6378137.0, 6356752.31414, 298.257222101),  # From proj's "cs2cs -le" and Wikipedia (semi-minor only)
              'eprec': (1, 5, 10),
              },
             )

@@ -318,7 +318,7 @@ class ModelFormBaseTest(TestCase):
 
             class Meta:
                 model = Category
-                fields = [] # url will still appear, since it is explicit above
+                fields = []  # url will still appear, since it is explicit above
 
         self.assertIsInstance(ReplaceField.base_fields['url'],
                                      forms.fields.BooleanField)
@@ -348,7 +348,7 @@ class ModelFormBaseTest(TestCase):
             class CategoryForm(forms.ModelForm):
                 class Meta:
                     model = Category
-                    fields = ('url') # note the missing comma
+                    fields = ('url')  # note the missing comma
 
     def test_exclude_fields(self):
         class ExcludeFields(forms.ModelForm):
@@ -374,7 +374,7 @@ class ModelFormBaseTest(TestCase):
             class CategoryForm(forms.ModelForm):
                 class Meta:
                     model = Category
-                    exclude = ('url') # note the missing comma
+                    exclude = ('url')  # note the missing comma
 
     def test_confused_form(self):
         class ConfusedForm(forms.ModelForm):
@@ -415,7 +415,7 @@ class ModelFormBaseTest(TestCase):
         )
 
     def test_bad_form(self):
-        #First class with a Meta class wins...
+        # First class with a Meta class wins...
         class BadForm(ArticleForm, BaseCategoryForm):
             pass
 
@@ -818,10 +818,10 @@ class ModelToDictTests(TestCase):
         with self.assertNumQueries(1):
             d = model_to_dict(art)
 
-        #Ensure all many-to-many categories appear in model_to_dict
+        # Ensure all many-to-many categories appear in model_to_dict
         for c in categories:
             self.assertIn(c.pk, d['categories'])
-        #Ensure many-to-many relation appears as a list
+        # Ensure many-to-many relation appears as a list
         self.assertIsInstance(d['categories'], list)
 
 class OldFormForXTests(TestCase):

@@ -228,7 +228,7 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
     def visit_table(self, node):
         self.context.append(self.compact_p)
         self.compact_p = True
-        self._table_row_index = 0 # Needed by Sphinx
+        self._table_row_index = 0  # Needed by Sphinx
         self.body.append(self.starttag(node, 'table', CLASS='docutils'))
 
     def depart_table(self, node):

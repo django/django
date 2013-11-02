@@ -5,7 +5,7 @@ from unittest import skipUnless
 from django.db import connection
 from django.db.models import Q
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.measure import D # alias for Distance
+from django.contrib.gis.measure import D  # alias for Distance
 from django.contrib.gis.tests.utils import (
     HAS_SPATIAL_DB, mysql, oracle, postgis, spatialite, no_oracle, no_spatialite
 )
@@ -123,7 +123,7 @@ class DistanceTest(TestCase):
         if spatialite or oracle:
             dist_qs = [dist1, dist2]
         else:
-            dist3 = SouthTexasCityFt.objects.distance(lagrange.ewkt) # Using EWKT string parameter.
+            dist3 = SouthTexasCityFt.objects.distance(lagrange.ewkt)  # Using EWKT string parameter.
             dist4 = SouthTexasCityFt.objects.distance(lagrange)
             dist_qs = [dist1, dist2, dist3, dist4]
 
@@ -199,7 +199,7 @@ class DistanceTest(TestCase):
             for i, c in enumerate(qs):
                 self.assertAlmostEqual(sphere_distances[i], c.distance.m, tol)
 
-    @no_oracle # Oracle already handles geographic distance calculation.
+    @no_oracle  # Oracle already handles geographic distance calculation.
     def test_distance_transform(self):
         """
         Test the `distance` GeoQuerySet method used with `transform` on a geographic field.
@@ -307,7 +307,7 @@ class DistanceTest(TestCase):
         # Cities that are either really close or really far from Wollongong --
         # and using different units of distance.
         wollongong = AustraliaCity.objects.get(name='Wollongong')
-        d1, d2 = D(yd=19500), D(nm=400) # Yards (~17km) & Nautical miles.
+        d1, d2 = D(yd=19500), D(nm=400)  # Yards (~17km) & Nautical miles.
 
         # Normal geodetic distance lookup (uses `distance_sphere` on PostGIS.
         gq1 = Q(point__distance_lte=(wollongong.point, d1))

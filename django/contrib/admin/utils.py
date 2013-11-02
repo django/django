@@ -154,7 +154,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
 class NestedObjects(Collector):
     def __init__(self, *args, **kwargs):
         super(NestedObjects, self).__init__(*args, **kwargs)
-        self.edges = {} # {from_instance: [to_instances]}
+        self.edges = {}  # {from_instance: [to_instances]}
         self.protected = set()
 
     def add_edge(self, source, target):
@@ -391,7 +391,7 @@ class NotRelationField(Exception):
 def get_model_from_relation(field):
     if isinstance(field, models.related.RelatedObject):
         return field.model
-    elif getattr(field, 'rel'): # or isinstance?
+    elif getattr(field, 'rel'):  # or isinstance?
         return field.rel.to
     else:
         raise NotRelationField
@@ -412,7 +412,7 @@ def reverse_field_path(model, path):
     for piece in pieces:
         field, model, direct, m2m = parent._meta.get_field_by_name(piece)
         # skip trailing data field if extant:
-        if len(reversed_path) == len(pieces)-1: # final iteration
+        if len(reversed_path) == len(pieces)-1:  # final iteration
             try:
                 get_model_from_relation(field)
             except NotRelationField:
@@ -469,8 +469,8 @@ def get_limit_choices_to_from_path(model, path):
         fields and hasattr(fields[-1], 'rel') and
         getattr(fields[-1].rel, 'limit_choices_to', None))
     if not limit_choices_to:
-        return models.Q() # empty Q
+        return models.Q()  # empty Q
     elif isinstance(limit_choices_to, models.Q):
-        return limit_choices_to # already a Q
+        return limit_choices_to  # already a Q
     else:
-        return models.Q(**limit_choices_to) # convert dict to Q
+        return models.Q(**limit_choices_to)  # convert dict to Q

@@ -130,7 +130,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         """
         if not params:
             params = self.params
-        lookup_params = params.copy() # a dictionary of the query string
+        lookup_params = params.copy()  # a dictionary of the query string
         # Remove all the parameters that are globally and systematically
         # ignored.
         for ignored in IGNORED_PARAMS:
@@ -299,10 +299,10 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
                     field_name = self.list_display[int(idx)]
                     order_field = self.get_ordering_field(field_name)
                     if not order_field:
-                        continue # No 'admin_order_field', skip it
+                        continue  # No 'admin_order_field', skip it
                     ordering.append(pfx + order_field)
                 except (IndexError, ValueError):
-                    continue # Invalid ordering specified, skip it.
+                    continue  # Invalid ordering specified, skip it.
 
         # Add the given query's ordering fields, if any.
         ordering.extend(queryset.query.order_by)
@@ -347,7 +347,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
                 try:
                     idx = int(idx)
                 except ValueError:
-                    continue # skip it
+                    continue  # skip it
                 ordering_fields[idx] = 'desc' if pfx == '-' else 'asc'
         return ordering_fields
 

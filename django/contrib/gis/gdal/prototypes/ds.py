@@ -9,7 +9,7 @@ from django.contrib.gis.gdal.libgdal import lgdal
 from django.contrib.gis.gdal.prototypes.generation import (const_string_output,
     double_output, geom_output, int_output, srs_output, void_output, voidptr_output)
 
-c_int_p = POINTER(c_int) # shortcut type
+c_int_p = POINTER(c_int)  # shortcut type
 
 ### Driver Routines ###
 register_all = void_output(lgdal.OGRRegisterAll, [], errcheck=False)

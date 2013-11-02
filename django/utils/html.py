@@ -175,8 +175,8 @@ def smart_urlquote(url):
     try:
         scheme, netloc, path, query, fragment = urlsplit(url)
         try:
-            netloc = netloc.encode('idna').decode('ascii') # IDN -> ACE
-        except UnicodeError: # invalid domain part
+            netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE
+        except UnicodeError:  # invalid domain part
             pass
         else:
             url = urlunsplit((scheme, netloc, path, query, fragment))

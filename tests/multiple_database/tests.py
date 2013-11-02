@@ -1785,10 +1785,10 @@ class RouterAttributeErrorTestCase(TestCase):
 
     def test_attribute_error_read(self):
         "Check that the AttributeError from AttributeErrorRouter bubbles up"
-        router.routers = [] # Reset routers so we can save a Book instance
+        router.routers = []  # Reset routers so we can save a Book instance
         b = Book.objects.create(title="Pro Django",
                                 published=datetime.date(2008, 12, 16))
-        router.routers = [AttributeErrorRouter()] # Install our router
+        router.routers = [AttributeErrorRouter()]  # Install our router
         self.assertRaises(AttributeError, Book.objects.get, pk=b.pk)
 
     def test_attribute_error_save(self):
@@ -1800,22 +1800,22 @@ class RouterAttributeErrorTestCase(TestCase):
 
     def test_attribute_error_delete(self):
         "Check that the AttributeError from AttributeErrorRouter bubbles up"
-        router.routers = [] # Reset routers so we can save our Book, Person instances
+        router.routers = []  # Reset routers so we can save our Book, Person instances
         b = Book.objects.create(title="Pro Django",
                                 published=datetime.date(2008, 12, 16))
         p = Person.objects.create(name="Marty Alchin")
         b.authors = [p]
         b.editor = p
-        router.routers = [AttributeErrorRouter()] # Install our router
+        router.routers = [AttributeErrorRouter()]  # Install our router
         self.assertRaises(AttributeError, b.delete)
 
     def test_attribute_error_m2m(self):
         "Check that the AttributeError from AttributeErrorRouter bubbles up"
-        router.routers = [] # Reset routers so we can save our Book, Person instances
+        router.routers = []  # Reset routers so we can save our Book, Person instances
         b = Book.objects.create(title="Pro Django",
                                 published=datetime.date(2008, 12, 16))
         p = Person.objects.create(name="Marty Alchin")
-        router.routers = [AttributeErrorRouter()] # Install our router
+        router.routers = [AttributeErrorRouter()]  # Install our router
         self.assertRaises(AttributeError, setattr, b, 'authors', [p])
 
 class ModelMetaRouter(object):

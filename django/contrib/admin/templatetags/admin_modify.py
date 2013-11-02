@@ -49,7 +49,7 @@ def submit_row(context):
 @register.filter
 def cell_count(inline_admin_form):
     """Returns the number of cells used in a tabular inline"""
-    count = 1 # Hidden cell with hidden 'id' field
+    count = 1  # Hidden cell with hidden 'id' field
     for fieldset in inline_admin_form:
         # Loop through all the fields (one per cell)
         for line in fieldset:

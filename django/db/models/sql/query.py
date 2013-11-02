@@ -146,7 +146,7 @@ class Query(object):
         # The _aggregates will be an OrderedDict when used. Due to the cost
         # of creating OrderedDict this attribute is created lazily (in
         # self.aggregates property).
-        self._aggregates = None # Maps alias -> SQL aggregate function
+        self._aggregates = None  # Maps alias -> SQL aggregate function
         self.aggregate_select_mask = None
         self._aggregate_select_cache = None
 

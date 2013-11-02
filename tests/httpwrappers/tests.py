@@ -315,11 +315,11 @@ class HttpResponseTests(unittest.TestCase):
         self.assertEqual(r.get('test'), None)
 
     def test_non_string_content(self):
-        #Bug 16494: HttpResponse should behave consistently with non-strings
+        # Bug 16494: HttpResponse should behave consistently with non-strings
         r = HttpResponse(12345)
         self.assertEqual(r.content, b'12345')
 
-        #test content via property
+        # test content via property
         r = HttpResponse()
         r.content = 12345
         self.assertEqual(r.content, b'12345')
@@ -328,7 +328,7 @@ class HttpResponseTests(unittest.TestCase):
         r = HttpResponse(['abc', 'def', 'ghi'])
         self.assertEqual(r.content, b'abcdefghi')
 
-        #test iter content via property
+        # test iter content via property
         r = HttpResponse()
         r.content = ['idan', 'alex', 'jacob']
         self.assertEqual(r.content, b'idanalexjacob')
@@ -337,13 +337,13 @@ class HttpResponseTests(unittest.TestCase):
         r.content = [1, 2, 3]
         self.assertEqual(r.content, b'123')
 
-        #test odd inputs
+        # test odd inputs
         r = HttpResponse()
         r.content = ['1', '2', 3, '\u079e']
         #'\xde\x9e' == unichr(1950).encode('utf-8')
         self.assertEqual(r.content, b'123\xde\x9e')
 
-        #with Content-Encoding header
+        # with Content-Encoding header
         r = HttpResponse()
         r['Content-Encoding'] = 'winning'
         r.content = [b'abc', b'def']
@@ -573,8 +573,8 @@ class CookieTests(unittest.TestCase):
         """
         c = SimpleCookie()
         c['test'] = "An,awkward;value"
-        self.assertTrue(";" not in c.output().rstrip(';')) # IE compat
-        self.assertTrue("," not in c.output().rstrip(';')) # Safari compat
+        self.assertTrue(";" not in c.output().rstrip(';'))  # IE compat
+        self.assertTrue("," not in c.output().rstrip(';'))  # Safari compat
 
     def test_decode(self):
         """

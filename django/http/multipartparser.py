@@ -124,7 +124,7 @@ class MultiPartParser(object):
                                               self._content_length,
                                               self._boundary,
                                               encoding)
-            #Check to see if it was handled
+            # Check to see if it was handled
             if result is not None:
                 return result[0], result[1]
 
@@ -480,7 +480,7 @@ class BoundaryIter(six.Iterator):
         else:
             # make sure we dont treat a partial boundary (and
             # its separators) as data
-            if not chunk[:-rollback]:# and len(chunk) >= (len(self._boundary) + 6):
+            if not chunk[:-rollback]:  # and len(chunk) >= (len(self._boundary) + 6):
                 # There's nothing left, we should just return and mark as done.
                 self._done = True
                 return chunk

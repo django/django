@@ -52,7 +52,7 @@ class LimitedStream(object):
         elif size < len(self.buffer):
             result = self.buffer[:size]
             self.buffer = self.buffer[size:]
-        else: # size >= len(self.buffer)
+        else:  # size >= len(self.buffer)
             result = self.buffer + self._read_limited(size - len(self.buffer))
             self.buffer = b''
         return result

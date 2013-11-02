@@ -127,8 +127,8 @@ class SpatialRefTest(unittest.TestCase):
         for s in srlist:
             srs = SpatialReference(s.wkt)
             for tup in s.attr:
-                att = tup[0] # Attribute to test
-                exp = tup[1] # Expected result
+                att = tup[0]  # Attribute to test
+                exp = tup[1]  # Expected result
                 self.assertEqual(exp, srs[att])
 
     def test11_wellknown(self):

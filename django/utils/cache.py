@@ -112,7 +112,7 @@ def patch_response_headers(response, cache_timeout=None):
     if cache_timeout is None:
         cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
     if cache_timeout < 0:
-        cache_timeout = 0 # Can't have max-age negative
+        cache_timeout = 0  # Can't have max-age negative
     if settings.USE_ETAGS and not response.has_header('ETag'):
         if hasattr(response, 'render') and callable(response.render):
             response.add_post_render_callback(_set_response_etag)

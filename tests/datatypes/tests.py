@@ -37,7 +37,7 @@ class DataTypesTestCase(TestCase):
         self.assertEqual(d2.consumed_at, datetime.datetime(2007, 4, 20, 16, 19, 59))
 
     def test_time_field(self):
-        #Test for ticket #12059: TimeField wrongly handling datetime.datetime object.
+        # Test for ticket #12059: TimeField wrongly handling datetime.datetime object.
         d = Donut(name='Apple Fritter')
         d.baked_time = datetime.datetime(year=2007, month=4, day=20, hour=16, minute=19, second=59)
         d.save()

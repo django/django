@@ -262,7 +262,7 @@ class Podcast(Media):
     release_date = models.DateField()
 
     class Meta:
-        ordering = ('release_date',) # overridden in PodcastAdmin
+        ordering = ('release_date',)  # overridden in PodcastAdmin
 
 
 class PodcastAdmin(admin.ModelAdmin):
@@ -444,7 +444,7 @@ class PostAdmin(admin.ModelAdmin):
 
 class CustomChangeList(ChangeList):
     def get_queryset(self, request):
-        return self.root_queryset.filter(pk=9999) # Does not exist
+        return self.root_queryset.filter(pk=9999)  # Does not exist
 
 
 class GadgetAdmin(admin.ModelAdmin):
@@ -527,7 +527,7 @@ class StoryForm(forms.ModelForm):
 
 class StoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'content')
-    list_display_links = ('title',) # 'id' not in list_display_links
+    list_display_links = ('title',)  # 'id' not in list_display_links
     list_editable = ('content', )
     form = StoryForm
     ordering = ["-pk"]
@@ -535,7 +535,7 @@ class StoryAdmin(admin.ModelAdmin):
 
 class OtherStoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'content')
-    list_display_links = ('title', 'id') # 'id' in list_display_links
+    list_display_links = ('title', 'id')  # 'id' in list_display_links
     list_editable = ('content', )
     ordering = ["-pk"]
 

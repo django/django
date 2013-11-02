@@ -840,7 +840,7 @@ class TemplateTests(TransRealMixin, TestCase):
             # Numbers as filter arguments should work
             'filter-syntax19': ('{{ var|truncatewords:1 }}', {"var": "hello world"}, "hello ..."),
 
-            #filters should accept empty string constants
+            # filters should accept empty string constants
             'filter-syntax20': ('{{ ""|default_if_none:"was none" }}', {}, ""),
 
             # Fail silently for non-callable attribute and dict lookups which

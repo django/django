@@ -60,7 +60,7 @@ class BaseMemcachedCache(six.with_metaclass(BaseMemcachedCacheMethods, BaseCache
             # in memcache backends, a negative timeout must be passed.
             timeout = -1
 
-        if timeout > 2592000: # 60*60*24*30, 30 days
+        if timeout > 2592000:  # 60*60*24*30, 30 days
             # See http://code.google.com/p/memcached/wiki/FAQ
             # "You can set expire times up to 30 days in the future. After that
             # memcached interprets it as a date, and will expire the item after

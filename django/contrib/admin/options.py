@@ -1033,7 +1033,7 @@ class ModelAdmin(BaseModelAdmin):
                 attr = obj._meta.pk.attname
             value = obj.serializable_value(attr)
             return SimpleTemplateResponse('admin/popup_response.html', {
-                'pk_value': escape(pk_value), # for possible backwards-compatibility
+                'pk_value': escape(pk_value),  # for possible backwards-compatibility
                 'value': escape(value),
                 'obj': escapejs(obj)
             })
