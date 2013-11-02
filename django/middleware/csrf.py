@@ -92,8 +92,7 @@ class CsrfViewMiddleware(object):
         return None
 
     def _reject(self, request, reason):
-        logger.warning('Forbidden (%s): %s',
-                       reason, request.path,
+        logger.warning('Forbidden (%s): %s', reason, request.path,
             extra={
                 'status_code': 403,
                 'request': request,
@@ -184,7 +183,7 @@ class CsrfViewMiddleware(object):
             return response
 
         # If CSRF_COOKIE is unset, then CsrfViewMiddleware.process_view was
-        # never called, probaby because a request middleware returned a response
+        # never called, probably because a request middleware returned a response
         # (for example, contrib.auth redirecting to a login page).
         if request.META.get("CSRF_COOKIE") is None:
             return response
