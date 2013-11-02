@@ -33,7 +33,7 @@ features include:
 * A BSD-licensed interface to the GEOS geometry routines, implemented purely
   in Python using ``ctypes``.
 * Loosely-coupled to GeoDjango.  For example, :class:`GEOSGeometry` objects
-  may be used outside of a django project/application.  In other words,
+  may be used outside of a Django project/application.  In other words,
   no need to have ``DJANGO_SETTINGS_MODULE`` set or use a database, etc.
 * Mutability: :class:`GEOSGeometry` objects may be modified.
 * Cross-platform and tested; compatible with Windows, Linux, Solaris, and Mac

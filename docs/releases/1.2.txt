@@ -43,7 +43,7 @@ Django 1.2 introduces several large, important new features, including:
 These are just the highlights; full details and a complete list of features `may
 be found below`_.
 
-.. _may be found below: `what's new in django 1.2`_
+.. _may be found below: `What's new in Django 1.2`_
 
 .. seealso::
 
