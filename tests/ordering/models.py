@@ -28,6 +28,7 @@ class Article(models.Model):
     def __str__(self):
         return self.headline
 
+
 @python_2_unicode_compatible
 class ArticlePKOrdering(models.Model):
     headline = models.CharField(max_length=100)

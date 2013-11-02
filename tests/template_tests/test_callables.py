@@ -4,6 +4,7 @@ from unittest import TestCase
 
 from django import template
 
+
 class CallableVariablesTests(TestCase):
 
     def test_callable(self):

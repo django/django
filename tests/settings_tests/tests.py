@@ -76,6 +76,7 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
 class ParentDecoratedTestCase(TestCase):
     pass
 
+
 @override_settings(TEST='override-child')
 class ChildDecoratedTestCase(ParentDecoratedTestCase):
     def test_override_settings_inheritance(self):

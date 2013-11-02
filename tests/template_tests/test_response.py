@@ -13,6 +13,7 @@ from django.template.response import (TemplateResponse, SimpleTemplateResponse,
 from django.test.utils import override_settings
 from django.utils._os import upath
 
+
 def test_processor(request):
     return {'processors': 'yes'}
 test_processor_name = 'template_tests.test_response.test_processor'
@@ -119,7 +120,7 @@ class SimpleTemplateResponseTest(TestCase):
         self.assertEqual(response.content, b'bar')
 
     def test_kwargs(self):
-        response = self._response(content_type = 'application/json', status=504)
+        response = self._response(content_type='application/json', status=504)
         self.assertEqual(response['content-type'], 'application/json')
         self.assertEqual(response.status_code, 504)
 
@@ -233,7 +234,7 @@ class TemplateResponseTest(TestCase):
         self.assertEqual(response.content, b'bar')
 
     def test_kwargs(self):
-        response = self._response(content_type = 'application/json',
+        response = self._response(content_type='application/json',
                                   status=504)
         self.assertEqual(response['content-type'], 'application/json')
         self.assertEqual(response.status_code, 504)

@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.test import SimpleTestCase
 from django.utils import text
 
+
 class TestUtilsText(SimpleTestCase):
 
     def test_truncate_chars(self):

@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 def standalone_number():
     return 1
 
+
 class Numbers(object):
     @staticmethod
     def get_static_number():
@@ -21,11 +22,14 @@ class Numbers(object):
 
 nn = Numbers()
 
+
 class Group(models.Model):
     name = models.CharField(_('name'), max_length=100)
 
+
 class Event(models.Model):
     group = models.ForeignKey(Group)
+
 
 class Happening(models.Model):
     when = models.DateTimeField(blank=True, default=datetime.datetime.now)
@@ -35,12 +39,14 @@ class Happening(models.Model):
     number3 = models.IntegerField(blank=True, default=Numbers.get_class_number)
     number4 = models.IntegerField(blank=True, default=nn.get_member_number)
 
+
 class Container(object):
     # To test pickling we need a class that isn't defined on module, but
     # is still available from app-cache. So, the Container class moves
     # SomeModel outside of module level
     class SomeModel(models.Model):
         somefield = models.IntegerField()
+
 
 class M2MModel(models.Model):
     groups = models.ManyToManyField(Group)

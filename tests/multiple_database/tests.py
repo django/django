@@ -50,7 +50,8 @@ class QueryTestCase(TestCase):
         except Book.DoesNotExist:
             self.fail('"Pro Django" should exist on default database')
 
-        self.assertRaises(Book.DoesNotExist,
+        self.assertRaises(
+            Book.DoesNotExist,
             Book.objects.using('other').get,
             title="Pro Django"
         )
@@ -61,7 +62,8 @@ class QueryTestCase(TestCase):
         except Book.DoesNotExist:
             self.fail('"Dive into Python" should exist on default database')
 
-        self.assertRaises(Book.DoesNotExist,
+        self.assertRaises(
+            Book.DoesNotExist,
             Book.objects.using('other').get,
             title="Dive into Python"
         )
@@ -84,11 +86,13 @@ class QueryTestCase(TestCase):
         except Book.DoesNotExist:
             self.fail('"Pro Django" should exist on other database')
 
-        self.assertRaises(Book.DoesNotExist,
+        self.assertRaises(
+            Book.DoesNotExist,
             Book.objects.get,
             title="Pro Django"
         )
-        self.assertRaises(Book.DoesNotExist,
+        self.assertRaises(
+            Book.DoesNotExist,
             Book.objects.using('default').get,
             title="Pro Django"
         )
@@ -98,11 +102,13 @@ class QueryTestCase(TestCase):
         except Book.DoesNotExist:
             self.fail('"Dive into Python" should exist on other database')
 
-        self.assertRaises(Book.DoesNotExist,
+        self.assertRaises(
+            Book.DoesNotExist,
             Book.objects.get,
             title="Dive into Python"
         )
-        self.assertRaises(Book.DoesNotExist,
+        self.assertRaises(
+            Book.DoesNotExist,
             Book.objects.using('default').get,
             title="Dive into Python"
         )
@@ -164,14 +170,14 @@ class QueryTestCase(TestCase):
 
         # Check that queries work across m2m joins
         self.assertEqual(list(Book.objects.using('default').filter(authors__name='Marty Alchin').values_list('title', flat=True)),
-                          ['Pro Django'])
+            ['Pro Django'])
         self.assertEqual(list(Book.objects.using('other').filter(authors__name='Marty Alchin').values_list('title', flat=True)),
-                          [])
+            [])
 
         self.assertEqual(list(Book.objects.using('default').filter(authors__name='Mark Pilgrim').values_list('title', flat=True)),
-                          [])
+            [])
         self.assertEqual(list(Book.objects.using('other').filter(authors__name='Mark Pilgrim').values_list('title', flat=True)),
-                          ['Dive into Python'])
+            ['Dive into Python'])
 
         # Reget the objects to clear caches
         dive = Book.objects.using('other').get(title="Dive into Python")
@@ -179,10 +185,10 @@ class QueryTestCase(TestCase):
 
         # Retrive related object by descriptor. Related objects should be database-baound
         self.assertEqual(list(dive.authors.all().values_list('name', flat=True)),
-                          ['Mark Pilgrim'])
+            ['Mark Pilgrim'])
 
         self.assertEqual(list(mark.book_set.all().values_list('title', flat=True)),
-                          ['Dive into Python'])
+            ['Dive into Python'])
 
     def test_m2m_forward_operations(self):
         "M2M forward manipulations are all constrained to a single DB"
@@ -198,13 +204,13 @@ class QueryTestCase(TestCase):
         # Add a second author
         john = Person.objects.using('other').create(name="John Smith")
         self.assertEqual(list(Book.objects.using('other').filter(authors__name='John Smith').values_list('title', flat=True)),
-                          [])
+            [])
 
         dive.authors.add(john)
         self.assertEqual(list(Book.objects.using('other').filter(authors__name='Mark Pilgrim').values_list('title', flat=True)),
-                          ['Dive into Python'])
+            ['Dive into Python'])
         self.assertEqual(list(Book.objects.using('other').filter(authors__name='John Smith').values_list('title', flat=True)),
-                          ['Dive into Python'])
+            ['Dive into Python'])
 
         # Remove the second author
         dive.authors.remove(john)

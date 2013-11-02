@@ -13,9 +13,11 @@ from django.utils.encoding import python_2_unicode_compatible
 class DumbCategory(models.Model):
     pass
 
+
 class ProxyCategory(DumbCategory):
     class Meta:
         proxy = True
+
 
 @python_2_unicode_compatible
 class NamedCategory(DumbCategory):
@@ -23,6 +25,7 @@ class NamedCategory(DumbCategory):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Tag(models.Model):
@@ -36,6 +39,7 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Note(models.Model):
@@ -55,6 +59,7 @@ class Note(models.Model):
         # that use objects of that type as an argument.
         self.lock = threading.Lock()
 
+
 @python_2_unicode_compatible
 class Annotation(models.Model):
     name = models.CharField(max_length=10)
@@ -63,6 +68,7 @@ class Annotation(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class ExtraInfo(models.Model):
@@ -76,6 +82,7 @@ class ExtraInfo(models.Model):
     def __str__(self):
         return self.info
 
+
 @python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=10)
@@ -87,6 +94,7 @@ class Author(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Item(models.Model):
@@ -103,6 +111,7 @@ class Item(models.Model):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class Report(models.Model):
     name = models.CharField(max_length=10)
@@ -110,6 +119,7 @@ class Report(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Ranking(models.Model):
@@ -123,6 +133,7 @@ class Ranking(models.Model):
     def __str__(self):
         return '%d: %s' % (self.rank, self.author.name)
 
+
 @python_2_unicode_compatible
 class Cover(models.Model):
     title = models.CharField(max_length=50)
@@ -134,6 +145,7 @@ class Cover(models.Model):
     def __str__(self):
         return self.title
 
+
 @python_2_unicode_compatible
 class Number(models.Model):
     num = models.IntegerField()
@@ -143,6 +155,8 @@ class Number(models.Model):
 
 # Symmetrical m2m field with a normal field using the reverse accesor name
 # ("valid").
+
+
 class Valid(models.Model):
     valid = models.CharField(max_length=10)
     parent = models.ManyToManyField('self')
@@ -152,19 +166,25 @@ class Valid(models.Model):
 
 # Some funky cross-linked models for testing a couple of infinite recursion
 # cases.
+
+
 class X(models.Model):
     y = models.ForeignKey('Y')
+
 
 class Y(models.Model):
     x1 = models.ForeignKey(X, related_name='y1')
 
 # Some models with a cycle in the default ordering. This would be bad if we
 # didn't catch the infinite loop.
+
+
 class LoopX(models.Model):
     y = models.ForeignKey('LoopY')
 
     class Meta:
         ordering = ['y']
+
 
 class LoopY(models.Model):
     x = models.ForeignKey(LoopX)
@@ -172,17 +192,22 @@ class LoopY(models.Model):
     class Meta:
         ordering = ['x']
 
+
 class LoopZ(models.Model):
     z = models.ForeignKey('self')
 
     class Meta:
         ordering = ['z']
 
+
 # A model and custom default manager combination.
+
+
 class CustomManager(models.Manager):
     def get_queryset(self):
         qs = super(CustomManager, self).get_queryset()
         return qs.filter(public=True, tag__name='t1')
+
 
 @python_2_unicode_compatible
 class ManagedModel(models.Model):
@@ -197,12 +222,16 @@ class ManagedModel(models.Model):
         return self.data
 
 # An inter-related setup with multiple paths from Child to Detail.
+
+
 class Detail(models.Model):
     data = models.CharField(max_length=10)
+
 
 class MemberManager(models.Manager):
     def get_queryset(self):
         return super(MemberManager, self).get_queryset().select_related("details")
+
 
 class Member(models.Model):
     name = models.CharField(max_length=10)
@@ -210,11 +239,14 @@ class Member(models.Model):
 
     objects = MemberManager()
 
+
 class Child(models.Model):
     person = models.OneToOneField(Member, primary_key=True)
     parent = models.ForeignKey(Member, related_name="children")
 
 # Custom primary keys interfered with ordering in the past.
+
+
 class CustomPk(models.Model):
     name = models.CharField(max_length=10, primary_key=True)
     extra = models.CharField(max_length=10)
@@ -222,11 +254,13 @@ class CustomPk(models.Model):
     class Meta:
         ordering = ['name', 'extra']
 
+
 class Related(models.Model):
     custom = models.ForeignKey(CustomPk)
 
 # An inter-related setup with a model subclass that has a nullable
 # path to another model, and a return path from that model.
+
 
 @python_2_unicode_compatible
 class Celebrity(models.Model):
@@ -236,13 +270,17 @@ class Celebrity(models.Model):
     def __str__(self):
         return self.name
 
+
 class TvChef(Celebrity):
     pass
+
 
 class Fan(models.Model):
     fan_of = models.ForeignKey(Celebrity)
 
 # Multiple foreign keys
+
+
 @python_2_unicode_compatible
 class LeafA(models.Model):
     data = models.CharField(max_length=10)
@@ -250,12 +288,15 @@ class LeafA(models.Model):
     def __str__(self):
         return self.data
 
+
 class LeafB(models.Model):
     data = models.CharField(max_length=10)
+
 
 class Join(models.Model):
     a = models.ForeignKey(LeafA)
     b = models.ForeignKey(LeafB)
+
 
 @python_2_unicode_compatible
 class ReservedName(models.Model):
@@ -266,6 +307,8 @@ class ReservedName(models.Model):
         return self.name
 
 # A simpler shared-foreign-key setup that can expose some problems.
+
+
 @python_2_unicode_compatible
 class SharedConnection(models.Model):
     data = models.CharField(max_length=10)
@@ -273,13 +316,17 @@ class SharedConnection(models.Model):
     def __str__(self):
         return self.data
 
+
 class PointerA(models.Model):
     connection = models.ForeignKey(SharedConnection)
+
 
 class PointerB(models.Model):
     connection = models.ForeignKey(SharedConnection)
 
 # Multi-layer ordering
+
+
 @python_2_unicode_compatible
 class SingleObject(models.Model):
     name = models.CharField(max_length=10)
@@ -290,12 +337,14 @@ class SingleObject(models.Model):
     def __str__(self):
         return self.name
 
+
 class RelatedObject(models.Model):
     single = models.ForeignKey(SingleObject, null=True)
     f = models.IntegerField(null=True)
 
     class Meta:
         ordering = ['single']
+
 
 @python_2_unicode_compatible
 class Plaything(models.Model):
@@ -308,9 +357,11 @@ class Plaything(models.Model):
     def __str__(self):
         return self.name
 
+
 class Article(models.Model):
     name = models.CharField(max_length=20)
     created = models.DateTimeField()
+
 
 @python_2_unicode_compatible
 class Food(models.Model):
@@ -319,6 +370,7 @@ class Food(models.Model):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class Eaten(models.Model):
     food = models.ForeignKey(Food, to_field="name", null=True)
@@ -326,6 +378,7 @@ class Eaten(models.Model):
 
     def __str__(self):
         return "%s at %s" % (self.food, self.meal)
+
 
 @python_2_unicode_compatible
 class Node(models.Model):
@@ -336,12 +389,15 @@ class Node(models.Model):
         return "%s" % self.num
 
 # Bug #12252
+
+
 @python_2_unicode_compatible
 class ObjectA(models.Model):
     name = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class ObjectB(models.Model):
@@ -352,6 +408,7 @@ class ObjectB(models.Model):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class ObjectC(models.Model):
     name = models.CharField(max_length=50)
@@ -361,12 +418,14 @@ class ObjectC(models.Model):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class SimpleCategory(models.Model):
     name = models.CharField(max_length=15)
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class SpecialCategory(SimpleCategory):
@@ -375,12 +434,14 @@ class SpecialCategory(SimpleCategory):
     def __str__(self):
         return self.name + " " + self.special_name
 
+
 @python_2_unicode_compatible
 class CategoryItem(models.Model):
     category = models.ForeignKey(SimpleCategory)
 
     def __str__(self):
         return "category item: " + str(self.category)
+
 
 @python_2_unicode_compatible
 class OneToOneCategory(models.Model):
@@ -390,9 +451,11 @@ class OneToOneCategory(models.Model):
     def __str__(self):
         return "one2one " + self.new_name
 
+
 class CategoryRelationship(models.Model):
     first = models.ForeignKey(SimpleCategory, related_name='first_rel')
     second = models.ForeignKey(SimpleCategory, related_name='second_rel')
+
 
 class NullableName(models.Model):
     name = models.CharField(max_length=20, null=True)
@@ -400,20 +463,25 @@ class NullableName(models.Model):
     class Meta:
         ordering = ['id']
 
+
 class ModelD(models.Model):
     name = models.TextField()
 
+
 class ModelC(models.Model):
     name = models.TextField()
+
 
 class ModelB(models.Model):
     name = models.TextField()
     c = models.ForeignKey(ModelC)
 
+
 class ModelA(models.Model):
     name = models.TextField()
     b = models.ForeignKey(ModelB, null=True)
     d = models.ForeignKey(ModelD)
+
 
 @python_2_unicode_compatible
 class Job(models.Model):
@@ -422,9 +490,11 @@ class Job(models.Model):
     def __str__(self):
         return self.name
 
+
 class JobResponsibilities(models.Model):
     job = models.ForeignKey(Job, to_field='name')
     responsibility = models.ForeignKey('Responsibility', to_field='description')
+
 
 @python_2_unicode_compatible
 class Responsibility(models.Model):
@@ -436,22 +506,28 @@ class Responsibility(models.Model):
         return self.description
 
 # Models for disjunction join promotion low level testing.
+
+
 class FK1(models.Model):
     f1 = models.TextField()
     f2 = models.TextField()
+
 
 class FK2(models.Model):
     f1 = models.TextField()
     f2 = models.TextField()
 
+
 class FK3(models.Model):
     f1 = models.TextField()
     f2 = models.TextField()
+
 
 class BaseA(models.Model):
     a = models.ForeignKey(FK1, null=True)
     b = models.ForeignKey(FK2, null=True)
     c = models.ForeignKey(FK3, null=True)
+
 
 @python_2_unicode_compatible
 class Identifier(models.Model):
@@ -460,16 +536,20 @@ class Identifier(models.Model):
     def __str__(self):
         return self.name
 
+
 class Program(models.Model):
     identifier = models.OneToOneField(Identifier)
+
 
 class Channel(models.Model):
     programs = models.ManyToManyField(Program)
     identifier = models.OneToOneField(Identifier)
 
+
 class Book(models.Model):
     title = models.TextField()
     chapter = models.ForeignKey('Chapter')
+
 
 class Chapter(models.Model):
     title = models.TextField()
@@ -480,8 +560,10 @@ class Paragraph(models.Model):
     text = models.TextField()
     page = models.ManyToManyField('Page')
 
+
 class Page(models.Model):
     text = models.TextField()
+
 
 class MyObject(models.Model):
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
@@ -489,6 +571,8 @@ class MyObject(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 # Models for #17600 regressions
+
+
 @python_2_unicode_compatible
 class Order(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -498,6 +582,7 @@ class Order(models.Model):
 
     def __str__(self):
         return '%s' % self.pk
+
 
 @python_2_unicode_compatible
 class OrderItem(models.Model):
@@ -510,8 +595,10 @@ class OrderItem(models.Model):
     def __str__(self):
         return '%s' % self.pk
 
+
 class BaseUser(models.Model):
     pass
+
 
 @python_2_unicode_compatible
 class Task(models.Model):
@@ -522,12 +609,14 @@ class Task(models.Model):
     def __str__(self):
         return self.title
 
+
 @python_2_unicode_compatible
 class Staff(models.Model):
     name = models.CharField(max_length=10)
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class StaffUser(BaseUser):
@@ -536,10 +625,12 @@ class StaffUser(BaseUser):
     def __str__(self):
         return self.staff
 
+
 class Ticket21203Parent(models.Model):
     parentid = models.AutoField(primary_key=True)
     parent_bool = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now=True)
+
 
 class Ticket21203Child(models.Model):
     childid = models.AutoField(primary_key=True)

@@ -1,5 +1,6 @@
 from django.contrib.sessions.backends.base import SessionBase
 
+
 class SessionStore(SessionBase):
     """
     A simple cookie-based session storage implementation.

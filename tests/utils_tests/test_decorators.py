@@ -11,6 +11,7 @@ class ProcessViewMiddleware(object):
 
 process_view_dec = decorator_from_middleware(ProcessViewMiddleware)
 
+
 @process_view_dec
 def process_view(request):
     return HttpResponse()

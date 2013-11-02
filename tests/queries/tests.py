@@ -28,6 +28,7 @@ from .models import (
     CategoryRelationship, Ticket21203Parent, Ticket21203Child, Person,
     Company, Employment)
 
+
 class BaseQuerysetTest(TestCase):
     def assertValueQuerysetEqual(self, qs, values):
         return self.assertQuerysetEqual(qs, values, transform=lambda x: x)
@@ -827,7 +828,7 @@ class Queries1Tests(BaseQuerysetTest):
         qs = Tag.objects.values_list('id', flat=True).order_by('id')
         qs.query.bump_prefix(qs.query)
         first = qs[0]
-        self.assertEqual(list(qs), list(range(first, first+5)))
+        self.assertEqual(list(qs), list(range(first, first + 5)))
 
     def test_ticket8439(self):
         # Complex combinations of conjunctions, disjunctions and nullable
@@ -1262,6 +1263,7 @@ class Queries3Tests(BaseQuerysetTest):
             Item.objects.datetimes, 'name', 'month'
         )
 
+
 class Queries4Tests(BaseQuerysetTest):
     def setUp(self):
         generic = NamedCategory.objects.create(name="Generic")
@@ -1445,8 +1447,8 @@ class Queries4Tests(BaseQuerysetTest):
         c0 = SimpleCategory.objects.create(name="cat0")
         c1 = SimpleCategory.objects.create(name="category1")
 
-        OneToOneCategory.objects.create(category = c1, new_name="new1")
-        OneToOneCategory.objects.create(category = c0, new_name="new2")
+        OneToOneCategory.objects.create(category=c1, new_name="new1")
+        OneToOneCategory.objects.create(category=c0, new_name="new2")
 
         CategoryItem.objects.create(category=c)
         ci2 = CategoryItem.objects.create(category=c0)
@@ -1461,8 +1463,8 @@ class Queries4Tests(BaseQuerysetTest):
         c0 = SimpleCategory.objects.create(name="cat0")
         c1 = SimpleCategory.objects.create(name="category1")
 
-        OneToOneCategory.objects.create(category = c1, new_name="new1")
-        OneToOneCategory.objects.create(category = c0, new_name="new2")
+        OneToOneCategory.objects.create(category=c1, new_name="new1")
+        OneToOneCategory.objects.create(category=c0, new_name="new2")
 
         ci1 = CategoryItem.objects.create(category=c)
         CategoryItem.objects.create(category=c0)
@@ -1477,8 +1479,8 @@ class Queries4Tests(BaseQuerysetTest):
         c0 = SimpleCategory.objects.create(name="cat0")
         c1 = SimpleCategory.objects.create(name="category1")
 
-        OneToOneCategory.objects.create(category = c1, new_name="new1")
-        OneToOneCategory.objects.create(category = c0, new_name="new2")
+        OneToOneCategory.objects.create(category=c1, new_name="new1")
+        OneToOneCategory.objects.create(category=c0, new_name="new2")
 
         ci1 = CategoryItem.objects.create(category=c)
         CategoryItem.objects.create(category=c0)
@@ -1493,8 +1495,8 @@ class Queries4Tests(BaseQuerysetTest):
         c0 = SimpleCategory.objects.create(name="cat0")
         c1 = SimpleCategory.objects.create(name="category1")
 
-        OneToOneCategory.objects.create(category = c1, new_name="new1")
-        OneToOneCategory.objects.create(category = c0, new_name="new2")
+        OneToOneCategory.objects.create(category=c1, new_name="new1")
+        OneToOneCategory.objects.create(category=c0, new_name="new2")
 
         CategoryItem.objects.create(category=c)
         ci2 = CategoryItem.objects.create(category=c0)
@@ -2019,6 +2021,7 @@ class CloneTests(TestCase):
             else:
                 opts_class.__deepcopy__ = note_deepcopy
 
+
 class EmptyQuerySetTests(TestCase):
     def test_emptyqueryset_values(self):
         # #14366 -- Calling .values() on an empty QuerySet and then cloning
@@ -2224,12 +2227,12 @@ class ConditionalTests(BaseQuerysetTest):
         self.assertRaisesMessage(
             FieldError,
             'Infinite loop caused by ordering.',
-            lambda: list(LoopX.objects.all()) # Force queryset evaluation with list()
+            lambda: list(LoopX.objects.all())  # Force queryset evaluation with list()
         )
         self.assertRaisesMessage(
             FieldError,
             'Infinite loop caused by ordering.',
-            lambda: list(LoopZ.objects.all()) # Force queryset evaluation with list()
+            lambda: list(LoopZ.objects.all())  # Force queryset evaluation with list()
         )
 
         # Note that this doesn't cause an infinite loop, since the default
@@ -2352,6 +2355,7 @@ class DefaultValuesInsertTest(TestCase):
             DumbCategory.objects.create()
         except TypeError:
             self.fail("Creation of an instance of a model with only the PK field shouldn't error out after bulk insert refactoring (#17056)")
+
 
 class ExcludeTests(TestCase):
     def setUp(self):
@@ -2504,6 +2508,7 @@ class ExcludeTest17600(TestCase):
             Order.objects.exclude(~Q(items__status=1)).distinct(),
             ['<Order: 1>'])
 
+
 class Exclude15786(TestCase):
     """Regression test for #15786"""
     def test_ticket15786(self):
@@ -2562,6 +2567,7 @@ class NullInExcludeTest(TestCase):
             'IS NOT NULL',
             str(NullableName.objects.filter(~~Q(name='i1')).query))
 
+
 class EmptyStringsAsNullTest(TestCase):
     """
     Test that filtering on non-null character fields works as expected.
@@ -2591,6 +2597,7 @@ class EmptyStringsAsNullTest(TestCase):
             [foo.pk], attrgetter('pk')
         )
 
+
 class ProxyQueryCleanupTest(TestCase):
     def test_evaluated_proxy_count(self):
         """
@@ -2602,6 +2609,7 @@ class ProxyQueryCleanupTest(TestCase):
         self.assertEqual(qs.count(), 1)
         str(qs.query)
         self.assertEqual(qs.count(), 1)
+
 
 class WhereNodeTest(TestCase):
     class DummyNode(object):
@@ -2768,6 +2776,7 @@ class NullJoinPromotionOrTest(TestCase):
         self.assertQuerysetEqual(
             qs.order_by('name'), [r2, r1], lambda x: x)
 
+
 class ReverseJoinTrimmingTest(TestCase):
     def test_reverse_trimming(self):
         # Check that we don't accidentally trim reverse joins - we can't know
@@ -2777,6 +2786,7 @@ class ReverseJoinTrimmingTest(TestCase):
         qs = Tag.objects.filter(annotation__tag=t.pk)
         self.assertIn('INNER JOIN', str(qs.query))
         self.assertEqual(list(qs), [])
+
 
 class JoinReuseTest(TestCase):
     """
@@ -2810,6 +2820,7 @@ class JoinReuseTest(TestCase):
     def test_revfk_noreuse(self):
         qs = Author.objects.filter(report__name='r4').filter(report__name='r1')
         self.assertEqual(str(qs.query).count('JOIN'), 2)
+
 
 class DisjunctionPromotionTests(TestCase):
     def test_disjuction_promotion_select_related(self):
@@ -2986,6 +2997,7 @@ class ManyToManyExcludeTest(TestCase):
         self.assertIn(b2, q)
         self.assertIn(b3, q)
 
+
 class RelabelCloneTest(TestCase):
     def test_ticket_19964(self):
         my1 = MyObject.objects.create(data='foo')
@@ -2999,6 +3011,7 @@ class RelabelCloneTest(TestCase):
         # not change results for the parents query.
         self.assertEqual(list(children), [my2])
         self.assertEqual(list(parents), [my1])
+
 
 class Ticket20101Tests(TestCase):
     def test_ticket_20101(self):
@@ -3016,6 +3029,7 @@ class Ticket20101Tests(TestCase):
         self.assertFalse(n in qs2)
         self.assertTrue(n in (qs1 | qs2))
 
+
 class EmptyStringPromotionTests(TestCase):
     def test_empty_string_promotion(self):
         qs = RelatedObject.objects.filter(single__name='')
@@ -3023,6 +3037,7 @@ class EmptyStringPromotionTests(TestCase):
             self.assertIn('LEFT OUTER JOIN', str(qs.query))
         else:
             self.assertNotIn('LEFT OUTER JOIN', str(qs.query))
+
 
 class ValuesSubqueryTests(TestCase):
     def test_values_in_subquery(self):
@@ -3041,6 +3056,7 @@ class ValuesSubqueryTests(TestCase):
             Order.objects.filter(items__in=OrderItem.objects.values_list('status')),
             [o1.pk], lambda x: x.pk)
 
+
 class DoubleInSubqueryTests(TestCase):
     def test_double_subquery_in(self):
         lfa1 = LeafA.objects.create(data='foo')
@@ -3054,6 +3070,7 @@ class DoubleInSubqueryTests(TestCase):
         qs = LeafB.objects.filter(pk__in=joins)
         self.assertQuerysetEqual(
             qs, [lfb1], lambda x: x)
+
 
 class Ticket18785Tests(TestCase):
     def test_ticket_18785(self):
@@ -3085,6 +3102,7 @@ class Ticket20788Tests(TestCase):
         self.assertQuerysetEqual(
             sentences_not_in_pub, [book2], lambda x: x)
 
+
 class Ticket12807Tests(TestCase):
     def test_ticket_12807(self):
         p1 = Paragraph.objects.create()
@@ -3111,6 +3129,7 @@ class RelatedLookupTypeTests(TestCase):
             ObjectB.objects.filter(objecta__in=[wrong_type]),
             [ob], lambda x: x)
 
+
 class Ticket14056Tests(TestCase):
     def test_ticket_14056(self):
         s1 = SharedConnection.objects.create(data='s1')
@@ -3125,6 +3144,7 @@ class Ticket14056Tests(TestCase):
             SharedConnection.objects.order_by('-pointera__connection', 'pk'),
             expected_ordering, lambda x: x
         )
+
 
 class Ticket20955Tests(TestCase):
     def test_ticket_20955(self):
@@ -3146,6 +3166,7 @@ class Ticket20955Tests(TestCase):
             self.assertEqual(task_select_related.owner.staffuser.staff,
                              task_get.owner.staffuser.staff)
 
+
 class Ticket21203Tests(TestCase):
     def test_ticket_21203(self):
         p = Ticket21203Parent.objects.create(parent_bool=True)
@@ -3153,6 +3174,7 @@ class Ticket21203Tests(TestCase):
         qs = Ticket21203Child.objects.select_related('parent').defer('parent__created')
         self.assertQuerysetEqual(qs, [c], lambda x: x)
         self.assertIs(qs[0].parent.parent_bool, True)
+
 
 class ValuesJoinPromotionTests(TestCase):
     def test_values_no_promotion_for_existing(self):

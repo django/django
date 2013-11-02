@@ -28,6 +28,7 @@ from django.test.utils import override_settings
 
 from .views import get_view
 
+
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class ClientTest(TestCase):
     fixtures = ['testdata.json']
@@ -479,7 +480,7 @@ class ClientTest(TestCase):
 
 
 @override_settings(
-    MIDDLEWARE_CLASSES = ('django.middleware.csrf.CsrfViewMiddleware',)
+    MIDDLEWARE_CLASSES=('django.middleware.csrf.CsrfViewMiddleware',)
 )
 class CSRFEnabledClientTests(TestCase):
     def test_csrf_enabled_client(self):
@@ -497,6 +498,7 @@ class CSRFEnabledClientTests(TestCase):
 
 class CustomTestClient(Client):
     i_am_customized = "Yes"
+
 
 class CustomTestClientTest(TestCase):
     client_class = CustomTestClient

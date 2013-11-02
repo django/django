@@ -16,10 +16,13 @@ from django.utils.safestring import mark_safe
 from django.utils import timezone
 
 # These two classes are used to test auto-escaping of __unicode__ output.
+
+
 @python_2_unicode_compatible
 class UnsafeClass:
     def __str__(self):
         return 'you & me'
+
 
 @python_2_unicode_compatible
 class SafeClass:
@@ -29,6 +32,8 @@ class SafeClass:
 # RESULT SYNTAX --
 # 'template_name': ('template contents', 'context dict',
 #                   'expected string output' or Exception class)
+
+
 def get_filter_tests():
     now = datetime.now()
     now_tz = timezone.make_aware(now, timezone.get_default_timezone())
@@ -38,9 +43,9 @@ def get_filter_tests():
     # NOTE: \xa0 avoids wrapping between value and unit
     return {
         # Default compare with datetime.now()
-        'filter-timesince01': ('{{ a|timesince }}', {'a': datetime.now() + timedelta(minutes=-1, seconds = -10)}, '1\xa0minute'),
-        'filter-timesince02': ('{{ a|timesince }}', {'a': datetime.now() - timedelta(days=1, minutes = 1)}, '1\xa0day'),
-        'filter-timesince03': ('{{ a|timesince }}', {'a': datetime.now() - timedelta(hours=1, minutes=25, seconds = 10)}, '1\xa0hour, 25\xa0minutes'),
+        'filter-timesince01': ('{{ a|timesince }}', {'a': datetime.now() + timedelta(minutes=-1, seconds=-10)}, '1\xa0minute'),
+        'filter-timesince02': ('{{ a|timesince }}', {'a': datetime.now() - timedelta(days=1, minutes=1)}, '1\xa0day'),
+        'filter-timesince03': ('{{ a|timesince }}', {'a': datetime.now() - timedelta(hours=1, minutes=25, seconds=10)}, '1\xa0hour, 25\xa0minutes'),
 
         # Compare to a given parameter
         'filter-timesince04': ('{{ a|timesince:b }}', {'a': now - timedelta(days=2), 'b': now - timedelta(days=1)}, '1\xa0day'),
@@ -71,7 +76,7 @@ def get_filter_tests():
         # Default compare with datetime.now()
         'filter-timeuntil01': ('{{ a|timeuntil }}', {'a': datetime.now() + timedelta(minutes=2, seconds=10)}, '2\xa0minutes'),
         'filter-timeuntil02': ('{{ a|timeuntil }}', {'a': (datetime.now() + timedelta(days=1, seconds=10))}, '1\xa0day'),
-        'filter-timeuntil03': ('{{ a|timeuntil }}', {'a': (datetime.now() + timedelta(hours=8, minutes=10, seconds = 10))}, '8\xa0hours, 10\xa0minutes'),
+        'filter-timeuntil03': ('{{ a|timeuntil }}', {'a': (datetime.now() + timedelta(hours=8, minutes=10, seconds=10))}, '8\xa0hours, 10\xa0minutes'),
 
         # Compare to a given parameter
         'filter-timeuntil04': ('{{ a|timeuntil:b }}', {'a': now - timedelta(days=1), 'b': now - timedelta(days=2)}, '1\xa0day'),

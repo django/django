@@ -177,6 +177,7 @@ class TestUtilsSimpleLazyObject(TestCase):
         self.assertEqual(len(lazy_list), 5)
         self.assertEqual(len(lazy_set), 4)
 
+
 class TestUtilsSimpleLazyObjectDjangoTestCase(DjangoTestCase):
 
     def test_pickle_py2_regression(self):

@@ -55,6 +55,7 @@ class GetUniqueCheckTests(unittest.TestCase):
         ), m._get_unique_checks(exclude='start_date')
         )
 
+
 class PerformUniqueChecksTest(TestCase):
     def test_primary_key_unique_check_not_performed_when_adding_and_pk_not_specified(self):
         # Regression test for #12560

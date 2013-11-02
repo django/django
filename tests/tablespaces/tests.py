@@ -14,8 +14,10 @@ from .models import Article, ArticleRef, Authors, Reviewers, Scientist, Scientis
 # because they're evaluated when the model class is defined. As a consequence,
 # @override_settings doesn't work, and the tests depend
 
+
 def sql_for_table(model):
     return '\n'.join(connection.creation.sql_create_model(model, no_style())[0])
+
 
 def sql_for_index(model):
     return '\n'.join(connection.creation.sql_indexes_for_model(model, no_style()))

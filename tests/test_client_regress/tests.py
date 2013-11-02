@@ -23,6 +23,7 @@ from django.contrib.auth.models import User
 from .models import CustomUser
 from .views import CustomTestException
 
+
 @override_settings(
     TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
 )
@@ -185,6 +186,7 @@ class AssertContainsTests(TestCase):
         response = HttpResponse('Hello')
         self.assertNotContains(response, 'Bye')
 
+
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AssertTemplateUsedTests(TestCase):
     fixtures = ['testdata.json']
@@ -255,6 +257,7 @@ class AssertTemplateUsedTests(TestCase):
             self.assertTemplateUsed(response, "Valid POST Template")
         except AssertionError as e:
             self.assertIn("Template 'Valid POST Template' was not a template used to render the response. Actual template(s) used: form_view.html, base.html", str(e))
+
 
 class AssertRedirectsTests(TestCase):
     def test_redirect_page(self):
@@ -545,6 +548,7 @@ class AssertFormErrorTests(TestCase):
         except AssertionError as e:
             self.assertIn("abc: The form 'form' in context 0 does not contain the non-field error 'Some error.' (actual errors: )", str(e))
 
+
 class AssertFormsetErrorTests(TestCase):
     msg_prefixes = [("", {}), ("abc: ", {"msg_prefix": "abc"})]
 
@@ -737,6 +741,7 @@ class AssertFormsetErrorTests(TestCase):
                                     'addresses.',
                                     **kwargs)
 
+
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class LoginTests(TestCase):
     fixtures = ['testdata']
@@ -801,6 +806,7 @@ class URLEscapingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'Hi, Arthur')
 
+
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class ExceptionTests(TestCase):
     fixtures = ['testdata.json']
@@ -846,6 +852,7 @@ class TemplateExceptionTests(TestCase):
         except TemplateSyntaxError:
             pass
 
+
 # We need two different tests to check URLconf substitution -  one to check
 # it was changed, and another one (without self.urls) to check it was reverted on
 # teardown. This pair of tests relies upon the alphabetical ordering of test execution.
@@ -857,6 +864,7 @@ class UrlconfSubstitutionTests(TestCase):
         url = reverse('arg_view', args=['somename'])
         self.assertEqual(url, '/arg_view/somename/')
 
+
 # This test needs to run *after* UrlconfSubstitutionTests; the zz prefix in the
 # name is to ensure alphabetical ordering.
 class zzUrlconfSubstitutionTests(TestCase):
@@ -864,6 +872,7 @@ class zzUrlconfSubstitutionTests(TestCase):
         "URLconf is reverted to original value after modification in a TestCase"
         url = reverse('arg_view', args=['somename'])
         self.assertEqual(url, '/test_client_regress/arg_view/somename/')
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class ContextTests(TestCase):
@@ -1114,6 +1123,7 @@ class RequestMethodStringDataTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'request method: PATCH')
 
+
 class QueryStringTests(TestCase):
     def test_get_like_requests(self):
         # See: https://code.djangoproject.com/ticket/10571.
@@ -1166,6 +1176,7 @@ class QueryStringTests(TestCase):
         self.assertEqual(response.context['request-foo'], 'whiz')
         self.assertEqual(response.context['request-bar'], 'bang')
 
+
 class UnicodePayloadTests(TestCase):
     def test_simple_unicode_payload(self):
         "A simple ASCII-only unicode JSON document can be POSTed"
@@ -1199,12 +1210,14 @@ class UnicodePayloadTests(TestCase):
                                     content_type="application/json; charset=koi8-r")
         self.assertEqual(response.content, json.encode('koi8-r'))
 
+
 class DummyFile(object):
     def __init__(self, filename):
         self.name = filename
 
     def read(self):
         return b'TEST_FILE_CONTENT'
+
 
 class UploadedFileEncodingTest(TestCase):
     def test_file_encoding(self):
@@ -1225,6 +1238,7 @@ class UploadedFileEncodingTest(TestCase):
             b'Content-Type: application/zip',))
         self.assertEqual(b'Content-Type: application/octet-stream',
                          encode_file('IGNORE', 'IGNORE', DummyFile("file.unknown"))[2])
+
 
 class RequestHeadersTest(TestCase):
     def test_client_headers(self):
@@ -1268,17 +1282,19 @@ class ReadLimitedStreamTest(TestCase):
         """HttpRequest.read() on a test client PUT request with some payload
         should return that payload."""
         payload = b'foobar'
-        self.assertEqual(self.client.put("/test_client_regress/read_all/",
-                                          data=payload,
-                                          content_type='text/plain').content, payload)
+        self.assertEqual(self.client.put(
+            "/test_client_regress/read_all/",
+            data=payload,
+            content_type='text/plain').content, payload)
 
     def test_read_numbytes_from_nonempty_request(self):
         """HttpRequest.read(LARGE_BUFFER) on a test client PUT request with
         some payload should return that payload."""
         payload = b'foobar'
-        self.assertEqual(self.client.put("/test_client_regress/read_buffer/",
-                                          data=payload,
-                                          content_type='text/plain').content, payload)
+        self.assertEqual(
+            self.client.put("/test_client_regress/read_buffer/",
+            data=payload,
+            content_type='text/plain').content, payload)
 
 
 class RequestFactoryStateTest(TestCase):

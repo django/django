@@ -131,12 +131,12 @@ TEST_DATA = (
     (MinValueValidator(NOW), NOW - timedelta(days=1), ValidationError),
 
     (MaxLengthValidator(10), '', None),
-    (MaxLengthValidator(10), 10*'x', None),
+    (MaxLengthValidator(10), 10 * 'x', None),
 
-    (MaxLengthValidator(10), 15*'x', ValidationError),
+    (MaxLengthValidator(10), 15 * 'x', ValidationError),
 
-    (MinLengthValidator(10), 15*'x', None),
-    (MinLengthValidator(10), 10*'x', None),
+    (MinLengthValidator(10), 15 * 'x', None),
+    (MinLengthValidator(10), 10 * 'x', None),
 
     (MinLengthValidator(10), '', ValidationError),
 
@@ -182,6 +182,7 @@ TEST_DATA = (
     (RegexValidator(re.compile('x')), 'y', ValidationError),
 )
 
+
 def create_simple_test_method(validator, expected, value, num):
     if expected is not None and issubclass(expected, Exception):
         test_mask = 'test_%s_raises_error_%d'
@@ -213,6 +214,7 @@ def create_simple_test_method(validator, expected, value, num):
     return test_name, test_func
 
 # Dynamically assemble a test class with the contents of TEST_DATA
+
 
 class TestSimpleValidators(TestCase):
     def test_single_message(self):

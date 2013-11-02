@@ -34,6 +34,7 @@ from django.utils.six import StringIO
 class MockLoader(object):
     pass
 
+
 def create_egg(name, resources):
     """
     Creates a mock egg with a list of resources.
@@ -105,7 +106,7 @@ class EggLoaderTest(TestCase):
 
 
 @override_settings(
-    TEMPLATE_LOADERS = (
+    TEMPLATE_LOADERS=(
         ('django.template.loaders.cached.Loader', (
             'django.template.loaders.filesystem.Loader',
         )),
@@ -139,7 +140,7 @@ class CachedLoader(TestCase):
 
 
 @override_settings(
-    TEMPLATE_DIRS = (
+    TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(upath(__file__)), 'templates'),
     )
 )
@@ -160,13 +161,13 @@ class RenderToStringTest(TestCase):
 
     def test_empty_list(self):
         six.assertRaisesRegex(self, TemplateDoesNotExist,
-                                'No template names provided$',
-                                loader.render_to_string, [])
+            'No template names provided$',
+            loader.render_to_string, [])
 
     def test_select_templates_from_empty_list(self):
         six.assertRaisesRegex(self, TemplateDoesNotExist,
-                                'No template names provided$',
-                                loader.select_template, [])
+            'No template names provided$',
+            loader.select_template, [])
 
 
 class TemplateDirsOverrideTest(unittest.TestCase):

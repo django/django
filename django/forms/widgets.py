@@ -104,6 +104,7 @@ class Media(object):
             getattr(combined, 'add_' + name)(getattr(other, '_' + name, None))
         return combined
 
+
 def media_property(cls):
     def _media(self):
         # Get the media property of the superclass, if it exists
@@ -130,6 +131,7 @@ def media_property(cls):
         else:
             return base
     return property(_media)
+
 
 class MediaDefiningClass(type):
     """
@@ -161,6 +163,7 @@ class SubWidget(object):
         if self.choices:
             args.append(self.choices)
         return self.parent_widget.render(*args)
+
 
 class Widget(six.with_metaclass(MediaDefiningClass)):
     is_hidden = False             # Determines whether this corresponds to an <input type="hidden">.
@@ -224,6 +227,7 @@ class Widget(six.with_metaclass(MediaDefiningClass)):
         """
         return id_
 
+
 class Input(Widget):
     """
     Base class for all <input> widgets (except type='checkbox' and
@@ -279,9 +283,11 @@ class PasswordInput(TextInput):
             value = None
         return super(PasswordInput, self).render(name, value, attrs)
 
+
 class HiddenInput(Input):
     input_type = 'hidden'
     is_hidden = True
+
 
 class MultipleHiddenInput(HiddenInput):
     """
@@ -313,6 +319,7 @@ class MultipleHiddenInput(HiddenInput):
             return data.getlist(name)
         return data.get(name, None)
 
+
 class FileInput(Input):
     input_type = 'file'
     needs_multipart_form = True
@@ -326,6 +333,7 @@ class FileInput(Input):
 
 
 FILE_INPUT_CONTRADICTION = object()
+
 
 class ClearableFileInput(FileInput):
     initial_text = ugettext_lazy('Currently')
@@ -379,7 +387,8 @@ class ClearableFileInput(FileInput):
     def value_from_datadict(self, data, files, name):
         upload = super(ClearableFileInput, self).value_from_datadict(data, files, name)
         if not self.is_required and CheckboxInput().value_from_datadict(
-            data, files, self.clear_checkbox_name(name)):
+                data, files, self.clear_checkbox_name(name)):
+
             if upload:
                 # If the user contradicts themselves (uploads a new file AND
                 # checks the "clear" checkbox), we return a unique marker
@@ -388,6 +397,7 @@ class ClearableFileInput(FileInput):
             # False signals to clear any existing value, as opposed to just None
             return False
         return upload
+
 
 class Textarea(Widget):
     def __init__(self, attrs=None):
@@ -514,6 +524,7 @@ class Select(Widget):
             else:
                 output.append(self.render_option(selected_choices, option_value, option_label))
         return '\n'.join(output)
+
 
 class NullBooleanSelect(Select):
     """
@@ -848,6 +859,7 @@ class SplitDateTimeWidget(MultiWidget):
             value = to_current_timezone(value)
             return [value.date(), value.time().replace(microsecond=0)]
         return [None, None]
+
 
 class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
     """

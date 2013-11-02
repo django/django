@@ -185,7 +185,7 @@ class ExceptionReporterTests(TestCase):
 
         for newline in ['\n', '\r\n', '\r']:
             fd, filename = mkstemp(text=False)
-            os.write(fd, force_bytes(newline.join(LINES)+newline))
+            os.write(fd, force_bytes(newline.join(LINES) + newline))
             os.close(fd)
 
             try:
@@ -375,7 +375,7 @@ class ExceptionReportTestMixin(object):
         Asserts that potentially sensitive info are displayed in the email report.
         """
         with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
-            mail.outbox = [] # Empty outbox
+            mail.outbox = []  # Empty outbox
             request = self.rf.post('/some_url/', self.breakfast_data)
             view(request)
             self.assertEqual(len(mail.outbox), 1)
@@ -408,7 +408,7 @@ class ExceptionReportTestMixin(object):
         Asserts that certain sensitive info are not displayed in the email report.
         """
         with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
-            mail.outbox = [] # Empty outbox
+            mail.outbox = []  # Empty outbox
             request = self.rf.post('/some_url/', self.breakfast_data)
             view(request)
             self.assertEqual(len(mail.outbox), 1)
@@ -448,7 +448,7 @@ class ExceptionReportTestMixin(object):
         Asserts that no variables or POST parameters are displayed in the email report.
         """
         with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
-            mail.outbox = [] # Empty outbox
+            mail.outbox = []  # Empty outbox
             request = self.rf.post('/some_url/', self.breakfast_data)
             view(request)
             self.assertEqual(len(mail.outbox), 1)
@@ -640,6 +640,7 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
             with self.settings(DEBUG=True, FOOBAR=FOOBAR):
                 response = self.client.get('/views/raises500/')
                 self.assertNotContains(response, 'should not be displayed', status_code=500)
+
 
 class AjaxResponseExceptionReporterFilter(TestCase, ExceptionReportTestMixin):
     """
