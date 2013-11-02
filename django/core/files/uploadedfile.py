@@ -2,6 +2,7 @@
 Classes representing uploaded files.
 """
 
+import errno
 import os
 from io import BytesIO
 
@@ -12,6 +13,7 @@ from django.utils.encoding import force_str
 
 __all__ = ('UploadedFile', 'TemporaryUploadedFile', 'InMemoryUploadedFile',
            'SimpleUploadedFile')
+
 
 class UploadedFile(File):
     """
@@ -53,6 +55,7 @@ class UploadedFile(File):
 
     name = property(_get_name, _set_name)
 
+
 class TemporaryUploadedFile(UploadedFile):
     """
     A file uploaded to a temporary location (i.e. stream-to-disk).
@@ -75,11 +78,12 @@ class TemporaryUploadedFile(UploadedFile):
         try:
             return self.file.close()
         except OSError as e:
-            if e.errno != 2:
+            if e.errno != errno.ENOENT:
                 # Means the file was moved or deleted before the tempfile
                 # could unlink it.  Still sets self.file.close_called and
                 # calls self.file.file.close() before the exception
                 raise
+
 
 class InMemoryUploadedFile(UploadedFile):
     """
