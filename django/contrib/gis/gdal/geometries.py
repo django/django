@@ -67,7 +67,7 @@ from django.utils.six.moves import xrange
 #
 # The OGR_G_* routines are relevant here.
 
-#### OGRGeometry Class ####
+
 class OGRGeometry(GDALBase):
     "Generally encapsulates an OGR geometry."
 

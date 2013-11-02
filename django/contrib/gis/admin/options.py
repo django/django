@@ -3,6 +3,7 @@ from django.contrib.gis.admin.widgets import OpenLayersWidget
 from django.contrib.gis.gdal import OGRGeomType
 from django.contrib.gis.db import models
 
+
 class GeoModelAdmin(ModelAdmin):
     """
     The administration options class for Geographic models. Map settings

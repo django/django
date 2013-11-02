@@ -3,6 +3,7 @@ A collection of utility routines and classes used by the spatial
 backends.
 """
 
+
 class SpatialOperation(object):
     """
     Base class for generating spatial SQL.
@@ -27,6 +28,7 @@ class SpatialOperation(object):
                   }
         params.update(self.extra)
         return params
+
 
 class SpatialFunction(SpatialOperation):
     """

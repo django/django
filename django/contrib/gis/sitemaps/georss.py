@@ -1,6 +1,7 @@
 from django.core import urlresolvers
 from django.contrib.sitemaps import Sitemap
 
+
 class GeoRSSSitemap(Sitemap):
     """
     A minimal hook to produce sitemaps for GeoRSS feeds.

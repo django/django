@@ -1,8 +1,10 @@
 from django.db.backends.postgresql_psycopg2.introspection import DatabaseIntrospection
 from django.contrib.gis.gdal import OGRGeomType
 
+
 class GeoIntrospectionError(Exception):
     pass
+
 
 class PostGISIntrospection(DatabaseIntrospection):
     # Reverse dictionary for PostGIS geometry types not populated until

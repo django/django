@@ -3,15 +3,19 @@
  check_err() routine which checks the status code returned by
  OGR methods.
 """
+
 #### OGR & SRS Exceptions ####
 class GDALException(Exception):
     pass
 
+
 class OGRException(Exception):
     pass
 
+
 class SRSException(Exception):
     pass
+
 
 class OGRIndexError(OGRException, KeyError):
     """
@@ -36,6 +40,7 @@ OGRERR_DICT = {
     8: (OGRException, 'Invalid handle.'),
 }
 OGRERR_NONE = 0
+
 
 def check_err(code):
     "Checks the given OGRERR, and raises an exception where appropriate."

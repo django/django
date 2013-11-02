@@ -9,6 +9,7 @@ from django.contrib.sites.models import Site
 from django.contrib.sites import models as site_app
 from django.core.management.color import no_style
 
+
 def create_default_site(app, created_models, verbosity, db, **kwargs):
     # Only create the default sites in databases where Django created the table
     if Site in created_models and router.allow_migrate(db, Site):

@@ -12,6 +12,7 @@ from django.utils.functional import total_ordering
 from django.utils import six
 from django.utils.six.moves import xrange
 
+
 @total_ordering
 class ListMixin(object):
     """

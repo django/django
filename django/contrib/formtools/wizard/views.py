@@ -28,6 +28,7 @@ def normalize_name(name):
     new = re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', '_\\1', name)
     return new.lower().strip('_')
 
+
 class StepsHelper(object):
 
     def __init__(self, wizard):

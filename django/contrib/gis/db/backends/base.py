@@ -143,6 +143,7 @@ class BaseSpatialOperations(object):
     def spatial_ref_sys(self):
         raise NotImplementedError('subclasses of BaseSpatialOperations must a provide spatial_ref_sys() method')
 
+
 @python_2_unicode_compatible
 class SpatialRefSysMixin(object):
     """

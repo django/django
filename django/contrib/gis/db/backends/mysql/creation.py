@@ -1,7 +1,7 @@
 from django.db.backends.mysql.creation import DatabaseCreation
 
-class MySQLCreation(DatabaseCreation):
 
+class MySQLCreation(DatabaseCreation):
     def sql_indexes_for_field(self, model, f, style):
         from django.contrib.gis.db.models.fields import GeometryField
         output = super(MySQLCreation, self).sql_indexes_for_field(model, f, style)

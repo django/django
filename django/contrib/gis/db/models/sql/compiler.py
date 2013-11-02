@@ -10,6 +10,7 @@ from django.utils import timezone
 
 SQLCompiler = compiler.SQLCompiler
 
+
 class GeoSQLCompiler(compiler.SQLCompiler):
 
     def get_columns(self, with_aliases=False):
@@ -249,17 +250,22 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         return "%s.%s" % (self.quote_name_unless_alias(table_alias),
                           self.connection.ops.quote_name(column or field.column))
 
+
 class SQLInsertCompiler(compiler.SQLInsertCompiler, GeoSQLCompiler):
     pass
+
 
 class SQLDeleteCompiler(compiler.SQLDeleteCompiler, GeoSQLCompiler):
     pass
 
+
 class SQLUpdateCompiler(compiler.SQLUpdateCompiler, GeoSQLCompiler):
     pass
 
+
 class SQLAggregateCompiler(compiler.SQLAggregateCompiler, GeoSQLCompiler):
     pass
+
 
 class SQLDateCompiler(compiler.SQLDateCompiler, GeoSQLCompiler):
     """
@@ -285,6 +291,7 @@ class SQLDateCompiler(compiler.SQLDateCompiler, GeoSQLCompiler):
                 if isinstance(date, datetime.datetime):
                     date = date.date()
                 yield date
+
 
 class SQLDateTimeCompiler(compiler.SQLDateTimeCompiler, GeoSQLCompiler):
     """

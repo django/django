@@ -11,6 +11,7 @@ from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base import SpatialRefSysMixin
 from django.utils.encoding import python_2_unicode_compatible
 
+
 @python_2_unicode_compatible
 class GeometryColumns(models.Model):
     "Maps to the Oracle USER_SDO_GEOM_METADATA table."
@@ -41,6 +42,7 @@ class GeometryColumns(models.Model):
 
     def __str__(self):
         return '%s - %s (SRID: %s)' % (self.table_name, self.column_name, self.srid)
+
 
 class SpatialRefSys(models.Model, SpatialRefSysMixin):
     "Maps to the Oracle MDSYS.CS_SRS table."

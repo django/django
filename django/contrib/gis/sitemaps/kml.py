@@ -3,6 +3,7 @@ from django.contrib.sitemaps import Sitemap
 from django.contrib.gis.db.models.fields import GeometryField
 from django.db import models
 
+
 class KMLSitemap(Sitemap):
     """
     A minimal hook to produce KML sitemaps.
@@ -60,5 +61,7 @@ class KMLSitemap(Sitemap):
                                             'field_name': obj[2],
                                             }
                                     )
+
+
 class KMZSitemap(KMLSitemap):
     geo_format = 'kmz'

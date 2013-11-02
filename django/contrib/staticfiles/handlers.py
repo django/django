@@ -6,6 +6,7 @@ from django.utils.six.moves.urllib.request import url2pathname
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.views import serve
 
+
 class StaticFilesHandler(WSGIHandler):
     """
     WSGI middleware that intercepts calls to the static files directory, as

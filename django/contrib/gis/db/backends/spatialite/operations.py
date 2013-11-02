@@ -19,14 +19,17 @@ class SpatiaLiteOperator(SpatialOperation):
     def __init__(self, operator):
         super(SpatiaLiteOperator, self).__init__(operator=operator)
 
+
 class SpatiaLiteFunction(SpatialFunction):
     "For SpatiaLite function calls."
     def __init__(self, function, **kwargs):
         super(SpatiaLiteFunction, self).__init__(function, **kwargs)
 
+
 class SpatiaLiteFunctionParam(SpatiaLiteFunction):
     "For SpatiaLite functions that take another parameter."
     sql_template = '%(function)s(%(geo_col)s, %(geometry)s, %%s)'
+
 
 class SpatiaLiteDistance(SpatiaLiteFunction):
     "For SpatiaLite distance operations."
@@ -37,6 +40,7 @@ class SpatiaLiteDistance(SpatiaLiteFunction):
         super(SpatiaLiteDistance, self).__init__(self.dist_func,
                                                  operator=operator)
 
+
 class SpatiaLiteRelate(SpatiaLiteFunctionParam):
     "For SpatiaLite Relate(<geom>, <pattern>) calls."
     pattern_regex = re.compile(r'^[012TF\*]{9}$')
@@ -46,11 +50,13 @@ class SpatiaLiteRelate(SpatiaLiteFunctionParam):
             raise ValueError('Invalid intersection matrix pattern "%s".' % pattern)
         super(SpatiaLiteRelate, self).__init__('Relate')
 
+
 # Valid distance types and substitutions
 dtypes = (Decimal, Distance, float) + six.integer_types
 def get_dist_ops(operator):
     "Returns operations for regular distances; spherical distances are not currently supported."
     return (SpatiaLiteDistance(operator),)
+
 
 class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
     compiler_module = 'django.contrib.gis.db.models.sql.compiler'

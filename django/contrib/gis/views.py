@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.http import Http404
 from django.utils.translation import ugettext as _
 
+
 def feed(request, url, feed_dict=None):
     """Provided for backwards compatibility."""
     if not feed_dict:

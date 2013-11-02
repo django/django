@@ -21,6 +21,7 @@ ALL_TERMS = set([
 ])
 ALL_TERMS.update(sql.constants.QUERY_TERMS)
 
+
 class GeoQuery(sql.Query):
     """
     A single spatial SQL query.

@@ -144,6 +144,7 @@ class DistanceTest(unittest.TestCase):
         for nm, att in unit_tuple:
             self.assertEqual(att, D.unit_attname(nm))
 
+
 class AreaTest(unittest.TestCase):
     "Testing the Area object"
 

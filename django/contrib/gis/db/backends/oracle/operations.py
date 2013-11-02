@@ -28,6 +28,7 @@ class SDOOperation(SpatialFunction):
         kwargs.setdefault('result', 'TRUE')
         super(SDOOperation, self).__init__(func, **kwargs)
 
+
 class SDODistance(SpatialFunction):
     "Class for Distance queries."
     sql_template = ('%(function)s(%(geo_col)s, %(geometry)s, %(tolerance)s) '
@@ -39,12 +40,14 @@ class SDODistance(SpatialFunction):
                                           tolerance=tolerance,
                                           operator=op, result='%s')
 
+
 class SDODWithin(SpatialFunction):
     dwithin_func = 'SDO_WITHIN_DISTANCE'
     sql_template = "%(function)s(%(geo_col)s, %(geometry)s, %%s) = 'TRUE'"
 
     def __init__(self):
         super(SDODWithin, self).__init__(self.dwithin_func)
+
 
 class SDOGeomRelate(SpatialFunction):
     "Class for using SDO_GEOM.RELATE."
@@ -57,6 +60,7 @@ class SDOGeomRelate(SpatialFunction):
         # Moreover, the runction result is the mask (e.g., 'DISJOINT' instead of 'TRUE').
         super(SDOGeomRelate, self).__init__(self.relate_func, operator='=',
                                             mask=mask, tolerance=tolerance)
+
 
 class SDORelate(SpatialFunction):
     "Class for using SDO_RELATE."
@@ -72,6 +76,7 @@ class SDORelate(SpatialFunction):
 
 # Valid distance types and substitutions
 dtypes = (Decimal, Distance, float) + six.integer_types
+
 
 class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     compiler_module = "django.contrib.gis.db.backends.oracle.compiler"

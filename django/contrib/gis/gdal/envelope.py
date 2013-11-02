@@ -13,6 +13,7 @@
 from ctypes import Structure, c_double
 from django.contrib.gis.gdal.error import OGRException
 
+
 # The OGR definition of an Envelope is a C structure containing four doubles.
 #  See the 'ogr_core.h' source file for more information:
 #   http://www.gdal.org/ogr/ogr__core_8h-source.html
@@ -23,6 +24,7 @@ class OGREnvelope(Structure):
                 ("MinY", c_double),
                 ("MaxY", c_double),
                 ]
+
 
 class Envelope(object):
     """

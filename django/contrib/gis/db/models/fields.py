@@ -11,6 +11,7 @@ from django.utils import six
 # for SRID info each time a distance query is constructed.
 _srid_cache = {}
 
+
 def get_srid_info(srid, connection):
     """
     Returns the units, unit name, and spheroid WKT associated with the
@@ -38,6 +39,7 @@ def get_srid_info(srid, connection):
         _srid_cache[connection.alias][srid] = (units, units_name, spheroid)
 
     return _srid_cache[connection.alias][srid]
+
 
 class GeometryField(Field):
     "The base GIS field -- maps to the OpenGIS Specification Geometry type."
@@ -269,36 +271,43 @@ class GeometryField(Field):
         """
         return connection.ops.get_geom_placeholder(self, value)
 
+
 # The OpenGIS Geometry Type Fields
 class PointField(GeometryField):
     geom_type = 'POINT'
     form_class = forms.PointField
     description = _("Point")
 
+
 class LineStringField(GeometryField):
     geom_type = 'LINESTRING'
     form_class = forms.LineStringField
     description = _("Line string")
+
 
 class PolygonField(GeometryField):
     geom_type = 'POLYGON'
     form_class = forms.PolygonField
     description = _("Polygon")
 
+
 class MultiPointField(GeometryField):
     geom_type = 'MULTIPOINT'
     form_class = forms.MultiPointField
     description = _("Multi-point")
+
 
 class MultiLineStringField(GeometryField):
     geom_type = 'MULTILINESTRING'
     form_class = forms.MultiLineStringField
     description = _("Multi-line string")
 
+
 class MultiPolygonField(GeometryField):
     geom_type = 'MULTIPOLYGON'
     form_class = forms.MultiPolygonField
     description = _("Multi polygon")
+
 
 class GeometryCollectionField(GeometryField):
     geom_type = 'GEOMETRYCOLLECTION'

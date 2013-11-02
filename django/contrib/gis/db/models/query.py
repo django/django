@@ -782,6 +782,7 @@ class GeoQuerySet(QuerySet):
         else:
             return self.query.get_compiler(self.db)._field_column(geo_field)
 
+
 class GeoValuesQuerySet(ValuesQuerySet):
     def __init__(self, *args, **kwargs):
         super(GeoValuesQuerySet, self).__init__(*args, **kwargs)
@@ -789,6 +790,7 @@ class GeoValuesQuerySet(ValuesQuerySet):
         # `convert_values`.  This ensures that Geometry objects instead
         # of string values are returned with `values()` or `values_list()`.
         self.query.geo_values = True
+
 
 class GeoValuesListQuerySet(GeoValuesQuerySet, ValuesListQuerySet):
     pass

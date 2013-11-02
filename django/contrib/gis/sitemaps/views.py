@@ -14,6 +14,7 @@ from django.utils.translation import ugettext as _
 
 from django.contrib.gis.shortcuts import render_to_kml, render_to_kmz
 
+
 def index(request, sitemaps):
     """
     This view generates a sitemap index that uses the proper view

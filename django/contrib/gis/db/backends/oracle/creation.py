@@ -1,6 +1,7 @@
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.utils import truncate_name
 
+
 class OracleCreation(DatabaseCreation):
 
     def sql_indexes_for_field(self, model, f, style):

@@ -3,6 +3,7 @@ from ctypes import c_void_p
 from django.contrib.gis.gdal.error import GDALException
 from django.utils import six
 
+
 class GDALBase(object):
     """
     Base object for GDAL objects that has a pointer access property

@@ -22,14 +22,17 @@ class PostGISOperator(SpatialOperation):
     def __init__(self, operator):
         super(PostGISOperator, self).__init__(operator=operator)
 
+
 class PostGISFunction(SpatialFunction):
     "For PostGIS function calls (e.g., `ST_Contains(table, geom)`)."
     def __init__(self, prefix, function, **kwargs):
         super(PostGISFunction, self).__init__(prefix + function, **kwargs)
 
+
 class PostGISFunctionParam(PostGISFunction):
     "For PostGIS functions that take another parameter (e.g. DWithin, Relate)."
     sql_template = '%(function)s(%(geo_col)s, %(geometry)s, %%s)'
+
 
 class PostGISDistance(PostGISFunction):
     "For PostGIS distance operations."
@@ -39,6 +42,7 @@ class PostGISDistance(PostGISFunction):
     def __init__(self, prefix, operator):
         super(PostGISDistance, self).__init__(prefix, self.dist_func,
                                               operator=operator)
+
 
 class PostGISSpheroidDistance(PostGISFunction):
     "For PostGIS spherical distance operations (using the spheroid)."
@@ -50,9 +54,11 @@ class PostGISSpheroidDistance(PostGISFunction):
         super(PostGISSpheroidDistance, self).__init__(prefix, self.dist_func,
                                                       operator=operator)
 
+
 class PostGISSphereDistance(PostGISDistance):
     "For PostGIS spherical distance operations."
     dist_func = 'distance_sphere'
+
 
 class PostGISRelate(PostGISFunctionParam):
     "For PostGIS Relate(<geom>, <pattern>) calls."

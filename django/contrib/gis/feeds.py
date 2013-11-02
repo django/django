@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.contrib.syndication.views import Feed as BaseFeed
 from django.utils.feedgenerator import Atom1Feed, Rss201rev2Feed
 
+
 class GeoFeedMixin(object):
     """
     This mixin provides the necessary routines for SyndicationFeed subclasses
@@ -79,6 +80,7 @@ class GeoFeedMixin(object):
                     else:
                         raise ValueError('Geometry type "%s" not supported.' % geom.geom_type)
 
+
 ### SyndicationFeed subclasses ###
 class GeoRSSFeed(Rss201rev2Feed, GeoFeedMixin):
     def rss_attributes(self):
@@ -94,6 +96,7 @@ class GeoRSSFeed(Rss201rev2Feed, GeoFeedMixin):
         super(GeoRSSFeed, self).add_root_elements(handler)
         self.add_georss_element(handler, self.feed)
 
+
 class GeoAtom1Feed(Atom1Feed, GeoFeedMixin):
     def root_attributes(self):
         attrs = super(GeoAtom1Feed, self).root_attributes()
@@ -108,6 +111,7 @@ class GeoAtom1Feed(Atom1Feed, GeoFeedMixin):
         super(GeoAtom1Feed, self).add_root_elements(handler)
         self.add_georss_element(handler, self.feed)
 
+
 class W3CGeoFeed(Rss201rev2Feed, GeoFeedMixin):
     def rss_attributes(self):
         attrs = super(W3CGeoFeed, self).rss_attributes()
@@ -121,6 +125,7 @@ class W3CGeoFeed(Rss201rev2Feed, GeoFeedMixin):
     def add_root_elements(self, handler):
         super(W3CGeoFeed, self).add_root_elements(handler)
         self.add_georss_element(handler, self.feed, w3c_geo=True)
+
 
 ### Feed subclass ###
 class Feed(BaseFeed):

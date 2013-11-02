@@ -2,6 +2,7 @@ from django.contrib.gis.gdal import OGRGeomType
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection, FlexibleFieldLookupDict
 from django.utils import six
 
+
 class GeoFlexibleFieldLookupDict(FlexibleFieldLookupDict):
     """
     Sublcass that includes updates the `base_data_types_reverse` dict
@@ -17,6 +18,7 @@ class GeoFlexibleFieldLookupDict(FlexibleFieldLookupDict):
          'multipolygon': 'GeometryField',
          'geometrycollection': 'GeometryField',
          })
+
 
 class SpatiaLiteIntrospection(DatabaseIntrospection):
     data_types_reverse = GeoFlexibleFieldLookupDict()

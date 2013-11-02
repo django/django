@@ -44,6 +44,7 @@ from django.utils import six
 NUMERIC_TYPES = six.integer_types + (float, Decimal)
 AREA_PREFIX = "sq_"
 
+
 def pretty_name(obj):
     return obj.__name__ if obj.__class__ == type else obj.__class__.__name__
 
@@ -217,6 +218,7 @@ class MeasureBase(object):
             return cls.LALIAS[lower]
         else:
             raise Exception('Could not find a unit keyword associated with "%s"' % unit_str)
+
 
 class Distance(MeasureBase):
     STANDARD_UNIT = "m"

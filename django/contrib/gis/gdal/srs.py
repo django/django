@@ -328,6 +328,7 @@ class SpatialReference(GDALBase):
         "Returns the XML representation of this Spatial Reference."
         return capi.to_xml(self.ptr, byref(c_char_p()), dialect)
 
+
 class CoordTransform(GDALBase):
     "The coordinate system transformation object."
 

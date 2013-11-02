@@ -2,6 +2,7 @@ from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.geos.prototypes import prepared as capi
 
+
 class PreparedGeometry(GEOSBase):
     """
     A geometry that is prepared for performing certain operations.

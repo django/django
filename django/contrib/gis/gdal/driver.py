@@ -7,6 +7,7 @@ from django.contrib.gis.gdal.prototypes import ds as capi
 from django.utils import six
 from django.utils.encoding import force_bytes
 
+
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
 #

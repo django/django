@@ -1,6 +1,7 @@
 from django.db.models.sql.aggregates import *
 from django.contrib.gis.db.models.fields import GeometryField
 
+
 class GeoAggregate(Aggregate):
     # Default SQL template for spatial aggregates.
     sql_template = '%(function)s(%(field)s)'
@@ -46,17 +47,22 @@ class GeoAggregate(Aggregate):
 
         return sql_template % substitutions, params
 
+
 class Collect(GeoAggregate):
     pass
+
 
 class Extent(GeoAggregate):
     is_extent = '2D'
 
+
 class Extent3D(GeoAggregate):
     is_extent = '3D'
 
+
 class MakeLine(GeoAggregate):
     pass
+
 
 class Union(GeoAggregate):
     pass

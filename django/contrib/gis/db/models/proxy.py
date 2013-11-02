@@ -8,6 +8,7 @@ Thanks to Robert Coup for providing this functionality (see #4322).
 from django.contrib.gis import memoryview
 from django.utils import six
 
+
 class GeometryProxy(object):
     def __init__(self, klass, field):
         """

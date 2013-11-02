@@ -14,16 +14,20 @@ def no_backend(test_func, backend):
     else:
         return test_func
 
+
 # Decorators to disable entire test functions for specific
 # spatial backends.
 def no_oracle(func):
     return no_backend(func, 'oracle')
 
+
 def no_postgis(func):
     return no_backend(func, 'postgis')
 
+
 def no_mysql(func):
     return no_backend(func, 'mysql')
+
 
 def no_spatialite(func):
     return no_backend(func, 'spatialite')
