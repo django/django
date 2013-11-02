@@ -6,6 +6,7 @@ from django.conf import settings
 
 from .base import SitemapTestsBase
 
+
 class FlatpagesSitemapTests(SitemapTestsBase):
 
     @skipUnless("django.contrib.flatpages" in settings.INSTALLED_APPS,

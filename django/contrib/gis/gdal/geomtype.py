@@ -2,7 +2,7 @@ from django.contrib.gis.gdal.error import OGRException
 
 from django.utils import six
 
-#### OGRGeomType ####
+
 class OGRGeomType(object):
     "Encapulates OGR Geometry Types."
 

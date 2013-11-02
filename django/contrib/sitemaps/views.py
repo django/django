@@ -9,6 +9,7 @@ from django.template.response import TemplateResponse
 from django.utils import six
 from django.utils.http import http_date
 
+
 def x_robots_tag(func):
     @wraps(func)
     def inner(request, *args, **kwargs):
@@ -16,6 +17,7 @@ def x_robots_tag(func):
         response['X-Robots-Tag'] = 'noindex, noodp, noarchive'
         return response
     return inner
+
 
 @x_robots_tag
 def index(request, sitemaps,
@@ -39,6 +41,7 @@ def index(request, sitemaps,
 
     return TemplateResponse(request, template_name, {'sitemaps': sites},
                             content_type=content_type)
+
 
 @x_robots_tag
 def sitemap(request, sitemaps, section=None,

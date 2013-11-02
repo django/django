@@ -20,6 +20,7 @@ TEMPLATE = """{% if messages %}
 {% endif %}
 """
 
+
 @never_cache
 def add(request, message_type):
     # don't default to False here, because we want to test that it defaults
@@ -35,6 +36,7 @@ def add(request, message_type):
     show_url = reverse('django.contrib.messages.tests.urls.show')
     return HttpResponseRedirect(show_url)
 
+
 @never_cache
 def add_template_response(request, message_type):
     for msg in request.POST.getlist('messages'):
@@ -43,10 +45,12 @@ def add_template_response(request, message_type):
     show_url = reverse('django.contrib.messages.tests.urls.show_template_response')
     return HttpResponseRedirect(show_url)
 
+
 @never_cache
 def show(request):
     t = Template(TEMPLATE)
     return HttpResponse(t.render(RequestContext(request)))
+
 
 @never_cache
 def show_template_response(request):

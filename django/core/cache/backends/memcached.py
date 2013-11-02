@@ -157,6 +157,7 @@ class BaseMemcachedCache(six.with_metaclass(BaseMemcachedCacheMethods, BaseCache
     def clear(self):
         self._cache.flush_all()
 
+
 class MemcachedCache(BaseMemcachedCache):
     "An implementation of a cache binding using python-memcached"
     def __init__(self, server, params):
@@ -170,6 +171,7 @@ class MemcachedCache(BaseMemcachedCache):
         if getattr(self, '_client', None) is None:
             self._client = self._lib.Client(self._servers, pickleProtocol=pickle.HIGHEST_PROTOCOL)
         return self._client
+
 
 class PyLibMCCache(BaseMemcachedCache):
     "An implementation of a cache binding using pylibmc"

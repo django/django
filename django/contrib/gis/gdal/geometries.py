@@ -522,6 +522,7 @@ class OGRGeometry(GDALBase):
         """
         return self._geomgen(capi.geom_union, other)
 
+
 # The subclasses for OGR Geometry.
 class Point(OGRGeometry):
 
@@ -549,6 +550,7 @@ class Point(OGRGeometry):
         elif self.coord_dim == 3:
             return (self.x, self.y, self.z)
     coords = tuple
+
 
 class LineString(OGRGeometry):
 
@@ -605,9 +607,11 @@ class LineString(OGRGeometry):
         if self.coord_dim == 3:
             return self._listarr(capi.getz)
 
+
 # LinearRings are used in Polygons.
 class LinearRing(LineString):
     pass
+
 
 class Polygon(OGRGeometry):
 
@@ -653,6 +657,7 @@ class Polygon(OGRGeometry):
         p = OGRGeometry(OGRGeomType('Point'))
         capi.get_centroid(self.ptr, p.ptr)
         return p
+
 
 # Geometry Collection base class.
 class GeometryCollection(OGRGeometry):
@@ -700,12 +705,15 @@ class GeometryCollection(OGRGeometry):
         return tuple(self[i].tuple for i in xrange(self.geom_count))
     coords = tuple
 
+
 # Multiple Geometry types.
 class MultiPoint(GeometryCollection):
     pass
 
+
 class MultiLineString(GeometryCollection):
     pass
+
 
 class MultiPolygon(GeometryCollection):
     pass

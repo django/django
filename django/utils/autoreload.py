@@ -86,6 +86,7 @@ _win = (sys.platform == "win32")
 
 _error_files = []
 
+
 def gen_filenames():
     """
     Yields a generator over filenames referenced in sys.modules and translation

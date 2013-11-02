@@ -304,6 +304,7 @@ class LayerMapTest(TestCase):
         self.assertEqual(City.objects.count(), 1)
         self.assertEqual(City.objects.all()[0].name, "Zürich")
 
+
 class OtherRouter(object):
     def db_for_read(self, model, **hints):
         return 'other'

@@ -54,6 +54,7 @@ class GEvent(object):
         "Returns the parameter part of a GEvent."
         return mark_safe('"%s", %s' % (self.event, self.action))
 
+
 @python_2_unicode_compatible
 class GOverlayBase(object):
     def __init__(self):
@@ -70,6 +71,7 @@ class GOverlayBase(object):
     def __str__(self):
         "The string representation is the JavaScript API call."
         return mark_safe('%s(%s)' % (self.__class__.__name__, self.js_params))
+
 
 class GPolygon(GOverlayBase):
     """
@@ -129,6 +131,7 @@ class GPolygon(GOverlayBase):
     def js_params(self):
         return '%s, "%s", %s, %s, "%s", %s' % (self.points, self.stroke_color, self.stroke_weight, self.stroke_opacity,
                                                self.fill_color, self.fill_opacity)
+
 
 class GPolyline(GOverlayBase):
     """
@@ -252,6 +255,7 @@ class GIcon(object):
         # XOR with hash of GIcon type so that hash('varname') won't
         # equal hash(GIcon('varname')).
         return hash(self.__class__) ^ hash(self.varname)
+
 
 class GMarker(GOverlayBase):
     """

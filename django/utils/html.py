@@ -56,10 +56,12 @@ _js_escapes = {
 # Escape every ASCII character with a value less than 32.
 _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 
+
 def escapejs(value):
     """Hex encodes characters for use in JavaScript strings."""
     return mark_safe(force_text(value).translate(_js_escapes))
 escapejs = allow_lazy(escapejs, six.text_type)
+
 
 def conditional_escape(text):
     """

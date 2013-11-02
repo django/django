@@ -37,6 +37,7 @@ def index(request, sitemaps):
     xml = loader.render_to_string('sitemap_index.xml', {'sitemaps': sites})
     return HttpResponse(xml, content_type='application/xml')
 
+
 def sitemap(request, sitemaps, section=None):
     """
     This view generates a sitemap with additional geographic
@@ -64,6 +65,7 @@ def sitemap(request, sitemaps, section=None):
             raise Http404(_("No page '%s'") % page)
     xml = loader.render_to_string('gis/sitemaps/geo_sitemap.xml', {'urlset': urls})
     return HttpResponse(xml, content_type='application/xml')
+
 
 def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB_ALIAS):
     """
@@ -108,6 +110,7 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
     else:
         render = render_to_kml
     return render('gis/kml/placemarks.kml', {'places': placemarks})
+
 
 def kmz(request, label, model, field_name=None, using=DEFAULT_DB_ALIAS):
     """

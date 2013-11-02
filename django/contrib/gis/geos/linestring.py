@@ -6,6 +6,7 @@ from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos import prototypes as capi
 from django.utils.six.moves import xrange
 
+
 class LineString(GEOSGeometry):
     _init_func = capi.create_linestring
     _minlength = 2
@@ -160,6 +161,7 @@ class LineString(GEOSGeometry):
             return None
         else:
             return self._listarr(self._cs.getZ)
+
 
 # LinearRings are LineStrings used within Polygons.
 class LinearRing(LineString):

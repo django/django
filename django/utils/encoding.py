@@ -9,6 +9,7 @@ from django.utils.functional import Promise
 from django.utils import six
 from django.utils.six.moves.urllib.parse import quote
 
+
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __init__(self, obj, *args):
         self.obj = obj
@@ -18,6 +19,7 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
         original = UnicodeDecodeError.__str__(self)
         return '%s. You passed in %r (%s)' % (original, self.obj,
                 type(self.obj))
+
 
 def python_2_unicode_compatible(klass):
     """

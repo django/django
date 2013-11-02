@@ -13,6 +13,7 @@ from django.views import static
 
 from django.contrib.staticfiles import finders
 
+
 def serve(request, path, insecure=False, **kwargs):
     """
     Serve static files below a given point in the directory structure or

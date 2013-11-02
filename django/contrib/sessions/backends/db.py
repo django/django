@@ -6,6 +6,7 @@ from django.db import IntegrityError, transaction, router
 from django.utils import timezone
 from django.utils.encoding import force_text
 
+
 class SessionStore(SessionBase):
     """
     Implements database session store.

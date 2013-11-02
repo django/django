@@ -13,6 +13,7 @@ from xml.dom import pulldom
 from xml.sax import handler
 from xml.sax.expatreader import ExpatParser as _ExpatParser
 
+
 class Serializer(base.Serializer):
     """
     Serializes a QuerySet to XML.
@@ -142,6 +143,7 @@ class Serializer(base.Serializer):
             "rel": field.rel.__class__.__name__,
             "to": smart_text(field.rel.to._meta),
         })
+
 
 class Deserializer(base.Deserializer):
     """

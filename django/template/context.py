@@ -8,6 +8,7 @@ _standard_context_processors = None
 # this to human error or failure to read migration instructions.
 _builtin_context_processors = ('django.core.context_processors.csrf',)
 
+
 class ContextPopException(Exception):
     "pop() has been called more times than push()"
     pass

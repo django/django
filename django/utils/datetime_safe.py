@@ -11,9 +11,11 @@ from datetime import date as real_date, datetime as real_datetime
 import re
 import time
 
+
 class date(real_date):
     def strftime(self, fmt):
         return strftime(self, fmt)
+
 
 class datetime(real_datetime):
     def strftime(self, fmt):

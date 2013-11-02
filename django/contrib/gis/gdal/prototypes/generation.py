@@ -8,8 +8,10 @@ from django.contrib.gis.gdal.prototypes.errcheck import (
     check_arg_errcode, check_errcode, check_geom, check_geom_offset,
     check_pointer, check_srs, check_str_arg, check_string, check_const_string)
 
+
 class gdal_char_p(c_char_p):
     pass
+
 
 def double_output(func, argtypes, errcheck=False, strarg=False):
     "Generates a ctypes function that returns a double value."
@@ -20,6 +22,7 @@ def double_output(func, argtypes, errcheck=False, strarg=False):
     if strarg:
         func.errcheck = check_str_arg
     return func
+
 
 def geom_output(func, argtypes, offset=None):
     """
@@ -43,11 +46,13 @@ def geom_output(func, argtypes, offset=None):
 
     return func
 
+
 def int_output(func, argtypes):
     "Generates a ctypes function that returns an integer value."
     func.argtypes = argtypes
     func.restype = c_int
     return func
+
 
 def srs_output(func, argtypes):
     """
@@ -59,6 +64,7 @@ def srs_output(func, argtypes):
     func.restype = c_void_p
     func.errcheck = check_srs
     return func
+
 
 def const_string_output(func, argtypes, offset=None, decoding=None):
     func.argtypes = argtypes
@@ -75,6 +81,7 @@ def const_string_output(func, argtypes, offset=None, decoding=None):
     func.errcheck = _check_const
 
     return func
+
 
 def string_output(func, argtypes, offset=-1, str_result=False, decoding=None):
     """
@@ -104,6 +111,7 @@ def string_output(func, argtypes, offset=-1, str_result=False, decoding=None):
     func.errcheck = _check_str
     return func
 
+
 def void_output(func, argtypes, errcheck=True):
     """
     For functions that don't only return an error code that needs to
@@ -120,6 +128,7 @@ def void_output(func, argtypes, errcheck=True):
         func.restype = None
 
     return func
+
 
 def voidptr_output(func, argtypes):
     "For functions that return c_void_p."

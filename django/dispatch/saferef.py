@@ -8,6 +8,7 @@ aren't handled by the core weakref module).
 import traceback
 import weakref
 
+
 def safeRef(target, onDelete = None):
     """Return a *safe* weak reference to a callable target
 
@@ -33,6 +34,7 @@ def safeRef(target, onDelete = None):
         return weakref.ref(target, onDelete)
     else:
         return weakref.ref(target)
+
 
 class BoundMethodWeakref(object):
     """'Safe' and reusable weak references to instance methods
@@ -186,6 +188,7 @@ class BoundMethodWeakref(object):
                 return function.__get__(target)
         return None
 
+
 class BoundNonDescriptorMethodWeakref(BoundMethodWeakref):
     """A specialized BoundMethodWeakref, for platforms where instance methods
     are not descriptors.
@@ -245,6 +248,7 @@ class BoundNonDescriptorMethodWeakref(BoundMethodWeakref):
                 # information.
                 return getattr(target, function.__name__)
         return None
+
 
 def get_bound_method_weakref(target, onDelete):
     """Instantiates the appropiate BoundMethodWeakRef, depending on the details of

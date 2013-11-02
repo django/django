@@ -18,6 +18,7 @@ class TestGeoRSS1(feeds.Feed):
     def item_geometry(self, item):
         return item.point
 
+
 class TestGeoRSS2(TestGeoRSS1):
     def geometry(self, obj):
         # This should attach a <georss:box> element for the extent of
@@ -30,8 +31,10 @@ class TestGeoRSS2(TestGeoRSS1):
         # Returning a simple tuple for the geometry.
         return item.point.x, item.point.y
 
+
 class TestGeoAtom1(TestGeoRSS1):
     feed_type = feeds.GeoAtom1Feed
+
 
 class TestGeoAtom2(TestGeoRSS2):
     feed_type = feeds.GeoAtom1Feed
@@ -40,12 +43,15 @@ class TestGeoAtom2(TestGeoRSS2):
         # This time we'll use a 2-tuple of coordinates for the box.
         return ((-123.30, -41.32), (174.78, 48.46))
 
+
 class TestW3CGeo1(TestGeoRSS1):
     feed_type = feeds.W3CGeoFeed
+
 
 # The following feeds are invalid, and will raise exceptions.
 class TestW3CGeo2(TestGeoRSS2):
     feed_type = feeds.W3CGeoFeed
+
 
 class TestW3CGeo3(TestGeoRSS1):
     feed_type = feeds.W3CGeoFeed

@@ -152,6 +152,7 @@ class FileBasedCache(BaseCache):
         except (IOError, OSError):
             pass
 
+
 # For backwards compatibility
 class CacheClass(FileBasedCache):
     pass

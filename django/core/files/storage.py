@@ -17,6 +17,7 @@ from django.utils._os import safe_join, abspathu
 
 __all__ = ('Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage')
 
+
 class Storage(object):
     """
     A base storage class, providing some default behaviors that all other
@@ -141,6 +142,7 @@ class Storage(object):
         specified by name.
         """
         raise NotImplementedError('subclasses of Storage must provide a modified_time() method')
+
 
 class FileSystemStorage(Storage):
     """
@@ -292,8 +294,10 @@ class FileSystemStorage(Storage):
     def modified_time(self, name):
         return datetime.fromtimestamp(os.path.getmtime(self.path(name)))
 
+
 def get_storage_class(import_path=None):
     return import_by_path(import_path or settings.DEFAULT_FILE_STORAGE)
+
 
 class DefaultStorage(LazyObject):
     def _setup(self):

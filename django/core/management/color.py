@@ -7,6 +7,7 @@ import sys
 
 from django.utils import termcolors
 
+
 def supports_color():
     """
     Returns True if the running system's terminal supports color, and False
@@ -18,6 +19,7 @@ def supports_color():
     if unsupported_platform or not is_a_tty:
         return False
     return True
+
 
 def color_style():
     """Returns a Style object with the Django color scheme."""
@@ -42,6 +44,7 @@ def color_style():
         else:
             style = no_style()
     return style
+
 
 def no_style():
     """Returns a Style object that has no colors."""

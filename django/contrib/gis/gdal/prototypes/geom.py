@@ -5,6 +5,7 @@ from django.contrib.gis.gdal.prototypes.errcheck import check_envelope
 from django.contrib.gis.gdal.prototypes.generation import (const_string_output,
     double_output, geom_output, int_output, srs_output, string_output, void_output)
 
+
 ### Generation routines specific to this module ###
 def env_func(f, argtypes):
     "For getting OGREnvelopes."
@@ -13,9 +14,11 @@ def env_func(f, argtypes):
     f.errcheck = check_envelope
     return f
 
+
 def pnt_func(f):
     "For accessing point information."
     return double_output(f, [c_void_p, c_int])
+
 
 def topology_func(f):
     f.argtypes = [c_void_p, c_void_p]

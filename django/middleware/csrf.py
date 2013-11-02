@@ -26,6 +26,7 @@ REASON_BAD_TOKEN = "CSRF token missing or incorrect."
 
 CSRF_KEY_LENGTH = 32
 
+
 def _get_failure_view():
     """
     Returns the view to be used for CSRF rejections

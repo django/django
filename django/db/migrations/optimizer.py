@@ -1,5 +1,6 @@
 from django.db import migrations
 
+
 class MigrationOptimizer(object):
     """
     Powers the optimization process, where you provide a list of Operations

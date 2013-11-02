@@ -3,6 +3,7 @@ import warnings
 from django.core.exceptions import MiddlewareNotUsed
 from django.db import connection, transaction
 
+
 class TransactionMiddleware(object):
     """
     Transaction middleware. If this is enabled, each view function will be run

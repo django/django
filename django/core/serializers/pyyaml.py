@@ -29,6 +29,7 @@ class DjangoSafeDumper(SafeDumper):
 
 DjangoSafeDumper.add_representer(decimal.Decimal, DjangoSafeDumper.represent_decimal)
 
+
 class Serializer(PythonSerializer):
     """
     Convert a queryset to YAML.
@@ -54,6 +55,7 @@ class Serializer(PythonSerializer):
     def getvalue(self):
         # Grand-parent super
         return super(PythonSerializer, self).getvalue()
+
 
 def Deserializer(stream_or_string, **options):
     """

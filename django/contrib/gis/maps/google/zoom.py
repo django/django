@@ -7,6 +7,7 @@ from math import pi, sin, log, exp, atan
 DTOR = pi / 180.
 RTOD = 180. / pi
 
+
 class GoogleZoom(object):
     """
     GoogleZoom is a utility for performing operations related to the zoom

@@ -264,11 +264,13 @@ class AreaTest(unittest.TestCase):
         self.assertEqual(repr(a1), 'Area(sq_m=100.0)')
         self.assertEqual(repr(a2), 'Area(sq_km=3.5)')
 
+
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(DistanceTest))
     s.addTest(unittest.makeSuite(AreaTest))
     return s
+
 
 def run(verbosity=2):
     unittest.TextTestRunner(verbosity=verbosity).run(suite())

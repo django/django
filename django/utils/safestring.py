@@ -7,14 +7,17 @@ be interpreted by the HTML engine (e.g. '<') into the appropriate entities.
 from django.utils.functional import curry, Promise, allow_lazy
 from django.utils import six
 
+
 class EscapeData(object):
     pass
+
 
 class EscapeBytes(bytes, EscapeData):
     """
     A byte string that should be HTML-escaped when output.
     """
     __new__ = allow_lazy(bytes.__new__, bytes)
+
 
 class EscapeText(six.text_type, EscapeData):
     """

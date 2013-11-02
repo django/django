@@ -53,6 +53,8 @@ class SpatiaLiteRelate(SpatiaLiteFunctionParam):
 
 # Valid distance types and substitutions
 dtypes = (Decimal, Distance, float) + six.integer_types
+
+
 def get_dist_ops(operator):
     "Returns operations for regular distances; spherical distances are not currently supported."
     return (SpatiaLiteDistance(operator),)

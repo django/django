@@ -44,6 +44,7 @@ BASE36_ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyz'
 BASE62_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 BASE64_ALPHABET = BASE62_ALPHABET + '-_'
 
+
 class BaseConverter(object):
     decimal_digits = '0123456789'
 

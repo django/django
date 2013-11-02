@@ -8,6 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.mail.backends.console import EmailBackend as ConsoleEmailBackend
 from django.utils import six
 
+
 class EmailBackend(ConsoleEmailBackend):
     def __init__(self, *args, **kwargs):
         self._fname = None

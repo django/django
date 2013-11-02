@@ -5,6 +5,7 @@ from django.conf import settings
 from django.utils.cache import patch_vary_headers
 from django.utils.http import cookie_date
 
+
 class SessionMiddleware(object):
     def __init__(self):
         engine = import_module(settings.SESSION_ENGINE)

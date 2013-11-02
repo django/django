@@ -1,5 +1,6 @@
 from django.contrib.gis.gdal import SpatialReference
 
+
 def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
                   database=None):
     """

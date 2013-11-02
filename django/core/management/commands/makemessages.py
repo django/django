@@ -150,6 +150,7 @@ class TranslatableFile(object):
         if is_templatized:
             os.unlink(work_file)
 
+
 def write_pot_file(potfile, msgs):
     """
     Write the :param potfile: POT file with the :param msgs: contents,

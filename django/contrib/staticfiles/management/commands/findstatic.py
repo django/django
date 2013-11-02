@@ -7,6 +7,7 @@ from django.utils.encoding import force_text
 
 from django.contrib.staticfiles import finders
 
+
 class Command(LabelCommand):
     help = "Finds the absolute paths for the given static file(s)."
     args = "[file ...]"

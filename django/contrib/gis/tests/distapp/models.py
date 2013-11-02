@@ -1,6 +1,7 @@
 from django.contrib.gis.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
+
 @python_2_unicode_compatible
 class SouthTexasCity(models.Model):
     "City model on projected coordinate system for South Texas."
@@ -10,6 +11,7 @@ class SouthTexasCity(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class SouthTexasCityFt(models.Model):
@@ -21,6 +23,7 @@ class SouthTexasCityFt(models.Model):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class AustraliaCity(models.Model):
     "City model for Australia, using WGS84."
@@ -30,6 +33,7 @@ class AustraliaCity(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class CensusZipcode(models.Model):
@@ -41,6 +45,7 @@ class CensusZipcode(models.Model):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class SouthTexasZipcode(models.Model):
     "Model for a few South Texas ZIP codes."
@@ -51,6 +56,7 @@ class SouthTexasZipcode(models.Model):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class Interstate(models.Model):
     "Geodetic model for U.S. Interstates."
@@ -60,6 +66,7 @@ class Interstate(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class SouthTexasInterstate(models.Model):

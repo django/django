@@ -24,6 +24,7 @@ from django.utils.text import normalize_newlines
 
 register = Library()
 
+
 #######################
 # STRING DECORATOR    #
 #######################

@@ -29,6 +29,7 @@ DEFAULT_MIN_NUM = 0
 # default maximum number of forms in a formset, to prevent memory exhaustion
 DEFAULT_MAX_NUM = 1000
 
+
 class ManagementForm(Form):
     """
     ``ManagementForm`` is used to keep track of how many form instances
@@ -44,6 +45,7 @@ class ManagementForm(Form):
         self.base_fields[MIN_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         self.base_fields[MAX_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         super(ManagementForm, self).__init__(*args, **kwargs)
+
 
 @python_2_unicode_compatible
 class BaseFormSet(object):
@@ -407,6 +409,7 @@ class BaseFormSet(object):
         forms = ' '.join(form.as_ul() for form in self)
         return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
+
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
                     can_delete=False, max_num=None, validate_max=False,
                     min_num=None, validate_min=False):
@@ -426,6 +429,7 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
              'absolute_max': absolute_max, 'validate_min': validate_min,
              'validate_max': validate_max}
     return type(form.__name__ + str('FormSet'), (formset,), attrs)
+
 
 def all_valid(formsets):
     """Returns true if every formset in formsets is valid."""

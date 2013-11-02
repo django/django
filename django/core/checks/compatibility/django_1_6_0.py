@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 
+
 def check_test_runner():
     """
     Checks if the user has *not* overridden the ``TEST_RUNNER`` setting &
@@ -22,6 +23,7 @@ def check_test_runner():
             "for more information.",
         ]
         return ' '.join(message)
+
 
 def check_boolean_field_default_value():
     """

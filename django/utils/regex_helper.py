@@ -26,6 +26,7 @@ ESCAPE_MAPPINGS = {
     "Z": None,
 }
 
+
 class Choice(list):
     """
     Used to represent multiple possibilities at this point in a pattern string.
@@ -33,15 +34,18 @@ class Choice(list):
     code is clear.
     """
 
+
 class Group(list):
     """
     Used to represent a capturing group in the pattern string.
     """
 
+
 class NonCapture(list):
     """
     Used to represent a non-capturing group in the pattern string.
     """
+
 
 def normalize(pattern):
     """

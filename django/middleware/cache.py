@@ -112,6 +112,7 @@ class UpdateCacheMiddleware(object):
                 self.cache.set(cache_key, response, timeout)
         return response
 
+
 class FetchFromCacheMiddleware(object):
     """
     Request-phase cache middleware that fetches a page from the cache.
@@ -153,6 +154,7 @@ class FetchFromCacheMiddleware(object):
         # hit, return cached response
         request._cache_update_cache = False
         return response
+
 
 class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
     """

@@ -17,11 +17,13 @@ __all__ = [
     'StopFutureHandlers'
 ]
 
+
 class UploadFileException(Exception):
     """
     Any error having to do with uploading files.
     """
     pass
+
 
 @python_2_unicode_compatible
 class StopUpload(UploadFileException):
@@ -42,11 +44,13 @@ class StopUpload(UploadFileException):
         else:
             return 'StopUpload: Consume request data, then halt.'
 
+
 class SkipFile(UploadFileException):
     """
     This exception is raised by an upload handler that wants to skip a given file.
     """
     pass
+
 
 class StopFutureHandlers(UploadFileException):
     """
@@ -54,6 +58,7 @@ class StopFutureHandlers(UploadFileException):
     run should raise this exception instead of returning None.
     """
     pass
+
 
 class FileUploadHandler(object):
     """
@@ -124,6 +129,7 @@ class FileUploadHandler(object):
         """
         pass
 
+
 class TemporaryFileUploadHandler(FileUploadHandler):
     """
     Upload handler that streams data into a temporary file.
@@ -145,6 +151,7 @@ class TemporaryFileUploadHandler(FileUploadHandler):
         self.file.seek(0)
         self.file.size = file_size
         return self.file
+
 
 class MemoryFileUploadHandler(FileUploadHandler):
     """

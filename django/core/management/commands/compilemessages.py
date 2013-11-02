@@ -8,12 +8,14 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import find_command, popen_wrapper
 from django.utils._os import npath
 
+
 def has_bom(fn):
     with open(fn, 'rb') as f:
         sample = f.read(4)
     return sample[:3] == b'\xef\xbb\xbf' or \
             sample.startswith(codecs.BOM_UTF16_LE) or \
             sample.startswith(codecs.BOM_UTF16_BE)
+
 
 def compile_messages(stdout, locale=None):
     program = 'msgfmt'

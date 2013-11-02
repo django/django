@@ -7,6 +7,7 @@ produced by the `ogrinfo` utility.
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.gdal.geometries import GEO_CLASSES
 
+
 def ogrinfo(data_source, num_features=10):
     """
     Walks the available layers in the supplied `data_source`, displaying

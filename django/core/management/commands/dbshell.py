@@ -3,6 +3,7 @@ from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections, DEFAULT_DB_ALIAS
 
+
 class Command(BaseCommand):
     help = ("Runs the command-line client for specified database, or the "
         "default database if none is provided.")

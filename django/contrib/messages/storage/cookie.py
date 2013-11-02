@@ -46,6 +46,7 @@ class MessageDecoder(json.JSONDecoder):
         decoded = super(MessageDecoder, self).decode(s, **kwargs)
         return self.process_messages(decoded)
 
+
 class CookieStorage(BaseStorage):
     """
     Stores messages in a cookie.

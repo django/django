@@ -5,6 +5,7 @@ from django import template
 
 register = template.Library()
 
+
 class LoremNode(template.Node):
     def __init__(self, count, method, common):
         self.count, self.method, self.common = count, method, common
@@ -21,6 +22,7 @@ class LoremNode(template.Node):
         if self.method == 'p':
             paras = ['<p>%s</p>' % p for p in paras]
         return '\n\n'.join(paras)
+
 
 @register.tag
 def lorem(parser, token):

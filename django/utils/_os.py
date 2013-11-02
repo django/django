@@ -34,6 +34,7 @@ else:
             path = join(os.getcwdu(), path)
         return normpath(path)
 
+
 def upath(path):
     """
     Always return a unicode path.
@@ -41,6 +42,7 @@ def upath(path):
     if six.PY2 and not isinstance(path, six.text_type):
         return path.decode(fs_encoding)
     return path
+
 
 def npath(path):
     """

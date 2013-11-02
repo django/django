@@ -32,6 +32,7 @@ test_srs = ({'srid': 4326,
              },
             )
 
+
 @unittest.skipUnless(HAS_GDAL and HAS_SPATIALREFSYS,
     "SpatialRefSysTest needs gdal support and a spatial database")
 class SpatialRefSysTest(unittest.TestCase):
@@ -94,10 +95,12 @@ class SpatialRefSysTest(unittest.TestCase):
             for i in range(3):
                 self.assertAlmostEqual(ellps1[i], ellps2[i], prec[i])
 
+
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(SpatialRefSysTest))
     return s
+
 
 def run(verbosity=2):
     unittest.TextTestRunner(verbosity=verbosity).run(suite())

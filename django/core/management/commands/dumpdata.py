@@ -152,6 +152,7 @@ class Command(BaseCommand):
                 raise
             raise CommandError("Unable to serialize database: %s" % e)
 
+
 def sort_dependencies(app_list):
     """Sort a list of app,modellist pairs into a single list of models.
 

@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.utils.six.moves import xrange
 
+
 def clean_ipv6_address(ip_str, unpack_ipv4=False,
         error_message=_("This is not a valid IPv6 address.")):
     """
@@ -123,6 +124,7 @@ def _sanitize_ipv4_mapping(ip_str):
 
     return result
 
+
 def _unpack_ipv4(ip_str):
     """
     Unpack an IPv4 address that was mapped in a compressed IPv6 address.
@@ -140,6 +142,7 @@ def _unpack_ipv4(ip_str):
         return None
 
     return ip_str.rsplit(':', 1)[1]
+
 
 def is_valid_ipv6_address(ip_str):
     """

@@ -17,6 +17,7 @@ from django import get_version
 # doesn't have to reload every time it's called.
 _commands = None
 
+
 def find_commands(management_dir):
     """
     Given a path to a management directory, returns a list of all the command
@@ -30,6 +31,7 @@ def find_commands(management_dir):
                 if not f.startswith('_') and f.endswith('.py')]
     except OSError:
         return []
+
 
 def find_management_module(app_name):
     """
@@ -66,6 +68,7 @@ def find_management_module(app_name):
             f.close()
     return path
 
+
 def load_command_class(app_name, name):
     """
     Given a command name and an application name, returns the Command
@@ -74,6 +77,7 @@ def load_command_class(app_name, name):
     """
     module = import_module('%s.management.commands.%s' % (app_name, name))
     return module.Command()
+
 
 def get_commands():
     """
@@ -121,6 +125,7 @@ def get_commands():
 
     return _commands
 
+
 def call_command(name, *args, **options):
     """
     Calls the given command, with the given options and args/kwargs.
@@ -157,6 +162,7 @@ def call_command(name, *args, **options):
     defaults.update(options)
 
     return klass.execute(*args, **defaults)
+
 
 class LaxOptionParser(OptionParser):
     """
@@ -211,6 +217,7 @@ class LaxOptionParser(OptionParser):
                     raise Exception
             except:  # Needed because we might need to catch a SystemExit
                 largs.append(arg)
+
 
 class ManagementUtility(object):
     """
@@ -399,6 +406,7 @@ class ManagementUtility(object):
             sys.stdout.write(self.main_help_text() + '\n')
         else:
             self.fetch_command(subcommand).run_from_argv(self.argv)
+
 
 def execute_from_command_line(argv=None):
     """

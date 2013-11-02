@@ -30,6 +30,7 @@ __all__ = (
 
 MEDIA_TYPES = ('css', 'js')
 
+
 @python_2_unicode_compatible
 class Media(object):
     def __init__(self, media=None, **kwargs):
@@ -142,6 +143,7 @@ class MediaDefiningClass(type):
             new_class.media = media_property(new_class)
 
         return new_class
+
 
 @python_2_unicode_compatible
 class SubWidget(object):

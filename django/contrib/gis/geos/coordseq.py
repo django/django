@@ -10,6 +10,7 @@ from django.contrib.gis.geos.libgeos import CS_PTR
 from django.contrib.gis.geos import prototypes as capi
 from django.utils.six.moves import xrange
 
+
 class GEOSCoordSeq(GEOSBase):
     "The internal representation of a list of coordinates inside a Geometry."
 

@@ -24,17 +24,22 @@ from django.utils.encoding import force_text
 class LayerMapError(Exception):
     pass
 
+
 class InvalidString(LayerMapError):
     pass
+
 
 class InvalidDecimal(LayerMapError):
     pass
 
+
 class InvalidInteger(LayerMapError):
     pass
 
+
 class MissingForeignKey(LayerMapError):
     pass
+
 
 class LayerMapping(object):
     "A class that maps OGR Layers to GeoDjango Models."

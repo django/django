@@ -6,17 +6,21 @@ import warnings
 from django.db import models
 from django.utils import six
 
+
 class SerializerDoesNotExist(KeyError):
     """The requested serializer was not found."""
     pass
+
 
 class SerializationError(Exception):
     """Something bad happened during serialization."""
     pass
 
+
 class DeserializationError(Exception):
     """Something bad happened during deserialization."""
     pass
+
 
 class Serializer(object):
     """
@@ -117,6 +121,7 @@ class Serializer(object):
         if callable(getattr(self.stream, 'getvalue', None)):
             return self.stream.getvalue()
 
+
 class Deserializer(six.Iterator):
     """
     Abstract base deserializer class.
@@ -142,6 +147,7 @@ class Deserializer(six.Iterator):
     def __next__(self):
         """Iteration iterface -- return the next item in the stream"""
         raise NotImplementedError('subclasses of Deserializer must provide a __next__() method')
+
 
 class DeserializedObject(object):
     """
@@ -175,6 +181,7 @@ class DeserializedObject(object):
         # prevent a second (possibly accidental) call to save() from saving
         # the m2m data twice.
         self.m2m_data = None
+
 
 def build_instance(Model, data, db):
     """

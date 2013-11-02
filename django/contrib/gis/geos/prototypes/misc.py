@@ -11,6 +11,7 @@ from django.utils.six.moves import xrange
 
 __all__ = ['geos_area', 'geos_distance', 'geos_length']
 
+
 ### ctypes generator function ###
 def dbl_from_geom(func, num_geom=1):
     """

@@ -18,6 +18,7 @@ __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
 
 MODELS_MODULE_NAME = 'models'
 
+
 class ModelDict(OrderedDict):
     """
     We need to special-case the deepcopy for this, as the keys are modules,
@@ -26,6 +27,7 @@ class ModelDict(OrderedDict):
     def __deepcopy__(self, memo):
         return self.__class__([(key, copy.deepcopy(value, memo))
                                for key, value in self.items()])
+
 
 class UnavailableApp(Exception):
     pass

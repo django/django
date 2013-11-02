@@ -48,6 +48,7 @@ class CacheNode(Node):
             cache.set(cache_key, value, expire_time)
         return value
 
+
 @register.tag('cache')
 def do_cache(parser, token):
     """

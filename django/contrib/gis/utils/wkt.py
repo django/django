@@ -4,6 +4,7 @@
 
 from django.utils import six
 
+
 def precision_wkt(geom, prec):
     """
     Returns WKT text of the geometry according to the given precision (an

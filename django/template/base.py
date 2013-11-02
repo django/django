@@ -71,14 +71,18 @@ builtins = []
 # uninitialised.
 invalid_var_format_string = None
 
+
 class TemplateSyntaxError(Exception):
     pass
+
 
 class TemplateDoesNotExist(Exception):
     pass
 
+
 class TemplateEncodingError(Exception):
     pass
+
 
 @python_2_unicode_compatible
 class VariableDoesNotExist(Exception):

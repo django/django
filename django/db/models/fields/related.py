@@ -18,6 +18,7 @@ from django import forms
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 
+
 def add_lazy_relation(cls, field, relation, operation):
     """
     Adds a lookup on ``cls`` when a related field is defined using a string,

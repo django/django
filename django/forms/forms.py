@@ -23,6 +23,7 @@ __all__ = ('BaseForm', 'Form')
 
 NON_FIELD_ERRORS = '__all__'
 
+
 def pretty_name(name):
     """Converts 'first_name' to 'First name'"""
     if not name:

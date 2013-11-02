@@ -39,17 +39,20 @@ class UserListA(ListMixin):
     def _get_single_external(self, index):
         return self._list[index]
 
+
 class UserListB(UserListA):
     _mytype = list
 
     def _set_single(self, index, value):
         self._list[index] = value
 
+
 def nextRange(length):
     nextRange.start += 100
     return range(nextRange.start, nextRange.start + length)
 
 nextRange.start = 0
+
 
 class ListMixinTest(unittest.TestCase):
     """
@@ -417,6 +420,7 @@ class ListMixinTest(unittest.TestCase):
         pl[1] = -20
         self.assertTrue(pl < ul, 'cmp for lt self')
         self.assertTrue(pl < ul, 'cmp for lt self')
+
 
 class ListMixinTestSingle(ListMixinTest):
     listType = UserListB

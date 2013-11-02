@@ -21,8 +21,10 @@ from django.core.files.uploadhandler import StopUpload, SkipFile, StopFutureHand
 
 __all__ = ('MultiPartParser', 'MultiPartParserError', 'InputStreamExhausted')
 
+
 class MultiPartParserError(Exception):
     pass
+
 
 class InputStreamExhausted(Exception):
     """
@@ -35,6 +37,7 @@ FILE = "file"
 FIELD = "field"
 
 _BASE64_DECODE_ERROR = TypeError if six.PY2 else binascii.Error
+
 
 class MultiPartParser(object):
     """

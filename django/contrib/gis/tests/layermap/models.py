@@ -1,8 +1,10 @@
 from django.contrib.gis.db import models
 
+
 class State(models.Model):
     name = models.CharField(max_length=20)
     objects = models.GeoManager()
+
 
 class County(models.Model):
     name = models.CharField(max_length=25)
@@ -10,10 +12,12 @@ class County(models.Model):
     mpoly = models.MultiPolygonField(srid=4269) # Multipolygon in NAD83
     objects = models.GeoManager()
 
+
 class CountyFeat(models.Model):
     name = models.CharField(max_length=25)
     poly = models.PolygonField(srid=4269)
     objects = models.GeoManager()
+
 
 class City(models.Model):
     name = models.CharField(max_length=25)
@@ -24,11 +28,13 @@ class City(models.Model):
     point = models.PointField()
     objects = models.GeoManager()
 
+
 class Interstate(models.Model):
     name = models.CharField(max_length=20)
     length = models.DecimalField(max_digits=6, decimal_places=2)
     path = models.LineStringField()
     objects = models.GeoManager()
+
 
 # Same as `City` above, but for testing model inheritance.
 class CityBase(models.Model):
@@ -38,11 +44,14 @@ class CityBase(models.Model):
     point = models.PointField()
     objects = models.GeoManager()
 
+
 class ICity1(CityBase):
     dt = models.DateField()
 
+
 class ICity2(ICity1):
     dt_time = models.DateTimeField(auto_now=True)
+
 
 class Invalid(models.Model):
     point = models.PointField()

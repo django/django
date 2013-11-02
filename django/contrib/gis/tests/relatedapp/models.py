@@ -1,6 +1,7 @@
 from django.contrib.gis.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
+
 @python_2_unicode_compatible
 class Location(models.Model):
     point = models.PointField()
@@ -8,6 +9,7 @@ class Location(models.Model):
 
     def __str__(self):
         return self.point.wkt
+
 
 @python_2_unicode_compatible
 class City(models.Model):
@@ -19,14 +21,17 @@ class City(models.Model):
     def __str__(self):
         return self.name
 
+
 class AugmentedLocation(Location):
     extra_text = models.TextField(blank=True)
     objects = models.GeoManager()
+
 
 class DirectoryEntry(models.Model):
     listing_text = models.CharField(max_length=50)
     location = models.ForeignKey(AugmentedLocation)
     objects = models.GeoManager()
+
 
 @python_2_unicode_compatible
 class Parcel(models.Model):
@@ -42,16 +47,19 @@ class Parcel(models.Model):
     def __str__(self):
         return self.name
 
+
 # These use the GeoManager but do not have any geographic fields.
 class Author(models.Model):
     name = models.CharField(max_length=100)
     dob = models.DateField()
     objects = models.GeoManager()
 
+
 class Article(models.Model):
     title = models.CharField(max_length=100)
     author = models.ForeignKey(Author, unique=True)
     objects = models.GeoManager()
+
 
 class Book(models.Model):
     title = models.CharField(max_length=100)

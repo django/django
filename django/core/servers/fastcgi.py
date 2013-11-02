@@ -81,11 +81,13 @@ Examples:
 
 """ % FASTCGI_OPTIONS
 
+
 def fastcgi_help(message=None):
     print(FASTCGI_HELP)
     if message:
         print(message)
     return False
+
 
 def runfastcgi(argset=[], **kwargs):
     options = FASTCGI_OPTIONS.copy()

@@ -6,6 +6,7 @@ from django.utils.six.moves import xrange
 
 from django.contrib.gis.maps.google.overlays import GPolygon, GPolyline, GMarker
 
+
 class GoogleMapException(Exception):
     pass
 
@@ -153,6 +154,7 @@ class GoogleMap(object):
     def icons(self):
         "Returns a sequence of GIcon objects in this map."
         return set(marker.icon for marker in self.markers if marker.icon)
+
 
 class GoogleMapSet(GoogleMap):
 

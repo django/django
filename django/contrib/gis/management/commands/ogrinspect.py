@@ -2,6 +2,7 @@ from optparse import make_option
 from django.contrib.gis import gdal
 from django.core.management.base import LabelCommand, CommandError
 
+
 def layer_option(option, opt, value, parser):
     """
     Callback for `make_option` for the `ogrinspect` `layer_key`
@@ -12,6 +13,7 @@ def layer_option(option, opt, value, parser):
     except ValueError:
         dest = value
     setattr(parser.values, option.dest, dest)
+
 
 def list_option(option, opt, value, parser):
     """
@@ -24,6 +26,7 @@ def list_option(option, opt, value, parser):
     else:
         dest = [s for s in value.split(',')]
     setattr(parser.values, option.dest, dest)
+
 
 class Command(LabelCommand):
     help = ('Inspects the given OGR-compatible data source (e.g., a shapefile) and outputs\n'
