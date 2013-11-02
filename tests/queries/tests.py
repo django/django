@@ -3167,6 +3167,3 @@ class ValuesJoinPromotionTests(TestCase):
     def test_non_nullable_fk_not_promoted(self):
         qs = ObjectB.objects.values('objecta__name')
         self.assertTrue(' INNER JOIN ' in str(qs.query))
-
-
-class ExcludeJoinTest(TestCase):
