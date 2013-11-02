@@ -18,6 +18,7 @@ class Place(models.Model):
     def __str__(self):
         return "%s the place" % self.name
 
+
 @python_2_unicode_compatible
 class Restaurant(Place):
     serves_sushi = models.BooleanField(default=False)
@@ -25,6 +26,7 @@ class Restaurant(Place):
 
     def __str__(self):
         return "%s the restaurant" % self.name
+
 
 @python_2_unicode_compatible
 class Person(models.Model):

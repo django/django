@@ -5,6 +5,7 @@ import datetime
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
+
 @python_2_unicode_compatible
 class Place(models.Model):
     name = models.CharField(max_length=50)
@@ -16,6 +17,7 @@ class Place(models.Model):
     def __str__(self):
         return "%s the place" % self.name
 
+
 @python_2_unicode_compatible
 class Restaurant(Place):
     serves_hot_dogs = models.BooleanField(default=False)
@@ -24,12 +26,14 @@ class Restaurant(Place):
     def __str__(self):
         return "%s the restaurant" % self.name
 
+
 @python_2_unicode_compatible
 class ItalianRestaurant(Restaurant):
     serves_gnocchi = models.BooleanField(default=False)
 
     def __str__(self):
         return "%s the italian restaurant" % self.name
+
 
 @python_2_unicode_compatible
 class ParkingLot(Place):
@@ -40,15 +44,18 @@ class ParkingLot(Place):
     def __str__(self):
         return "%s the parking lot" % self.name
 
+
 class ParkingLot2(Place):
     # In lieu of any other connector, an existing OneToOneField will be
     # promoted to the primary key.
     parent = models.OneToOneField(Place)
 
+
 class ParkingLot3(Place):
     # The parent_link connector need not be the pk on the model.
     primary_key = models.AutoField(primary_key=True)
     parent = models.OneToOneField(Place, parent_link=True)
+
 
 class ParkingLot4(models.Model):
     # Test parent_link connector can be discovered in abstract classes.
@@ -57,30 +64,39 @@ class ParkingLot4(models.Model):
     class Meta:
         abstract = True
 
+
 class ParkingLot4A(ParkingLot4, Place):
     pass
+
 
 class ParkingLot4B(Place, ParkingLot4):
     pass
 
+
 class Supplier(models.Model):
     restaurant = models.ForeignKey(Restaurant)
+
 
 class Wholesaler(Supplier):
     retailer = models.ForeignKey(Supplier, related_name='wholesale_supplier')
 
+
 class Parent(models.Model):
     created = models.DateTimeField(default=datetime.datetime.now)
 
+
 class Child(Parent):
     name = models.CharField(max_length=10)
+
 
 class SelfRefParent(models.Model):
     parent_data = models.IntegerField()
     self_data = models.ForeignKey('self', null=True)
 
+
 class SelfRefChild(SelfRefParent):
     child_data = models.IntegerField()
+
 
 @python_2_unicode_compatible
 class Article(models.Model):
@@ -93,14 +109,18 @@ class Article(models.Model):
     def __str__(self):
         return self.headline
 
+
 class ArticleWithAuthor(Article):
     author = models.CharField(max_length=100)
+
 
 class M2MBase(models.Model):
     articles = models.ManyToManyField(Article)
 
+
 class M2MChild(M2MBase):
     name = models.CharField(max_length=50)
+
 
 class Evaluation(Article):
     quality = models.IntegerField()
@@ -108,8 +128,10 @@ class Evaluation(Article):
     class Meta:
         abstract = True
 
+
 class QualityControl(Evaluation):
     assignee = models.CharField(max_length=50)
+
 
 @python_2_unicode_compatible
 class BaseM(models.Model):
@@ -117,6 +139,7 @@ class BaseM(models.Model):
 
     def __str__(self):
         return self.base_name
+
 
 @python_2_unicode_compatible
 class DerivedM(BaseM):
@@ -127,6 +150,7 @@ class DerivedM(BaseM):
         return "PK = %d, base_name = %s, derived_name = %s" % (
             self.customPK, self.base_name, self.derived_name)
 
+
 class AuditBase(models.Model):
     planned_date = models.DateField()
 
@@ -134,12 +158,15 @@ class AuditBase(models.Model):
         abstract = True
         verbose_name_plural = 'Audits'
 
+
 class CertificationAudit(AuditBase):
     class Meta(AuditBase.Meta):
         abstract = True
 
+
 class InternalCertificationAudit(CertificationAudit):
     auditing_dept = models.CharField(max_length=20)
+
 
 # Check that abstract classes don't get m2m tables autocreated.
 @python_2_unicode_compatible
@@ -151,6 +178,7 @@ class Person(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class AbstractEvent(models.Model):
@@ -164,18 +192,23 @@ class AbstractEvent(models.Model):
     def __str__(self):
         return self.name
 
+
 class BirthdayParty(AbstractEvent):
     pass
+
 
 class BachelorParty(AbstractEvent):
     pass
 
+
 class MessyBachelorParty(BachelorParty):
     pass
+
 
 # Check concrete -> abstract -> concrete inheritance
 class SearchableLocation(models.Model):
     keywords = models.CharField(max_length=256)
+
 
 class Station(SearchableLocation):
     name = models.CharField(max_length=128)
@@ -183,15 +216,19 @@ class Station(SearchableLocation):
     class Meta:
         abstract = True
 
+
 class BusStation(Station):
     bus_routes = models.CommaSeparatedIntegerField(max_length=128)
     inbound = models.BooleanField(default=False)
 
+
 class TrainStation(Station):
     zone = models.IntegerField()
 
+
 class User(models.Model):
     username = models.CharField(max_length=30, unique=True)
+
 
 class Profile(User):
     profile_id = models.AutoField(primary_key=True)

@@ -18,9 +18,11 @@ class Review(models.Model):
     class Meta:
         ordering = ('source',)
 
+
 class PersonManager(models.Manager):
     def get_by_natural_key(self, name):
         return self.get(name=name)
+
 
 @python_2_unicode_compatible
 class Person(models.Model):
@@ -32,6 +34,7 @@ class Person(models.Model):
 
     class Meta:
         ordering = ('name',)
+
 
 # This book manager doesn't do anything interesting; it just
 # exists to strip out the 'extra_arg' argument to certain
@@ -45,6 +48,7 @@ class BookManager(models.Manager):
     def get_or_create(self, *args, **kwargs):
         kwargs.pop('extra_arg', None)
         return super(BookManager, self).get_or_create(*args, **kwargs)
+
 
 @python_2_unicode_compatible
 class Book(models.Model):
@@ -62,6 +66,7 @@ class Book(models.Model):
     class Meta:
         ordering = ('title',)
 
+
 @python_2_unicode_compatible
 class Pet(models.Model):
     name = models.CharField(max_length=100)
@@ -72,6 +77,7 @@ class Pet(models.Model):
 
     class Meta:
         ordering = ('name',)
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, null=True)

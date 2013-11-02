@@ -58,6 +58,7 @@ class ArticleInline(admin.TabularInline):
         })
     )
 
+
 class ChapterInline(admin.TabularInline):
     model = Chapter
 
@@ -578,9 +579,11 @@ class AdminOrderedFieldAdmin(admin.ModelAdmin):
     ordering = ('order',)
     list_display = ('stuff', 'order')
 
+
 class AdminOrderedModelMethodAdmin(admin.ModelAdmin):
     ordering = ('order',)
     list_display = ('stuff', 'some_order')
+
 
 class AdminOrderedAdminMethodAdmin(admin.ModelAdmin):
     def some_admin_order(self, obj):
@@ -589,12 +592,16 @@ class AdminOrderedAdminMethodAdmin(admin.ModelAdmin):
     ordering = ('order',)
     list_display = ('stuff', 'some_admin_order')
 
+
 def admin_ordered_callable(obj):
     return obj.order
 admin_ordered_callable.admin_order_field = 'order'
+
+
 class AdminOrderedCallableAdmin(admin.ModelAdmin):
     ordering = ('order',)
     list_display = ('stuff', admin_ordered_callable)
+
 
 class ReportAdmin(admin.ModelAdmin):
     def extra(self, request):
@@ -612,6 +619,7 @@ class ReportAdmin(admin.ModelAdmin):
 class CustomTemplateBooleanFieldListFilter(BooleanFieldListFilter):
     template = 'custom_filter_template.html'
 
+
 class CustomTemplateFilterColorAdmin(admin.ModelAdmin):
     list_filter = (('warm', CustomTemplateBooleanFieldListFilter),)
 
@@ -628,11 +636,13 @@ class RelatedPrepopulatedInline1(admin.StackedInline):
     prepopulated_fields = {'slug1': ['name', 'pubdate'],
                            'slug2': ['status', 'name']}
 
+
 class RelatedPrepopulatedInline2(admin.TabularInline):
     model = RelatedPrepopulated
     extra = 1
     prepopulated_fields = {'slug1': ['name', 'pubdate'],
                            'slug2': ['status', 'name']}
+
 
 class MainPrepopulatedAdmin(admin.ModelAdmin):
     inlines = [RelatedPrepopulatedInline1, RelatedPrepopulatedInline2]
@@ -712,13 +722,16 @@ class FormWithoutHiddenField(forms.ModelForm):
     first = forms.CharField()
     second = forms.CharField()
 
+
 class FormWithoutVisibleField(forms.ModelForm):
     first = forms.CharField(widget=forms.HiddenInput)
     second = forms.CharField(widget=forms.HiddenInput)
 
+
 class FormWithVisibleAndHiddenField(forms.ModelForm):
     first = forms.CharField(widget=forms.HiddenInput)
     second = forms.CharField()
+
 
 class EmptyModelVisibleAdmin(admin.ModelAdmin):
     form = FormWithoutHiddenField
@@ -728,38 +741,47 @@ class EmptyModelVisibleAdmin(admin.ModelAdmin):
         }),
     )
 
+
 class EmptyModelHiddenAdmin(admin.ModelAdmin):
     form = FormWithoutVisibleField
     fieldsets = EmptyModelVisibleAdmin.fieldsets
+
 
 class EmptyModelMixinAdmin(admin.ModelAdmin):
     form = FormWithVisibleAndHiddenField
     fieldsets = EmptyModelVisibleAdmin.fieldsets
 
+
 class CityInlineAdmin(admin.TabularInline):
     model = City
     view_on_site = False
 
+
 class StateAdmin(admin.ModelAdmin):
     inlines = [CityInlineAdmin]
+
 
 class RestaurantInlineAdmin(admin.TabularInline):
     model = Restaurant
     view_on_site = True
 
+
 class CityAdmin(admin.ModelAdmin):
     inlines = [RestaurantInlineAdmin]
     view_on_site = True
 
+
 class WorkerAdmin(admin.ModelAdmin):
     def view_on_site(self, obj):
         return '/worker/%s/%s/' % (obj.surname, obj.name)
+
 
 class WorkerInlineAdmin(admin.TabularInline):
     model = Worker
 
     def view_on_site(self, obj):
         return '/worker_inline/%s/%s/' % (obj.surname, obj.name)
+
 
 class RestaurantAdmin(admin.ModelAdmin):
     inlines = [WorkerInlineAdmin]

@@ -39,6 +39,7 @@ class ManyToManyRel(models.Model):
         # Models created as unmanaged as these aren't ever queried
         managed = False
 
+
 class FKRel(models.Model):
     thing1 = models.ForeignKey(ThingWithIterableChoices, related_name='+')
     thing2 = models.ForeignKey(ThingWithIterableChoices, related_name='+')

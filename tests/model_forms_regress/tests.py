@@ -106,6 +106,7 @@ class FullyLocalizedTripleForm(forms.ModelForm):
         localized_fields = '__all__'
         fields = '__all__'
 
+
 class LocalizedModelFormTest(TestCase):
     def test_model_form_applies_localize_to_some_fields(self):
         f = PartiallyLocalizedTripleForm({'left': 10, 'middle': 10, 'right': 10})
@@ -167,6 +168,7 @@ class FilePathFieldTests(TestCase):
         names.sort()
         self.assertEqual(names, ['---------', '__init__.py', 'models.py', 'tests.py'])
 
+
 class ManyToManyCallableInitialTests(TestCase):
     def test_callable(self):
         "Regression for #10349: A callable can be provided as the initial value for an m2m field"
@@ -207,8 +209,9 @@ class CustomFieldSaveTests(TestCase):
 
         # It's enough that the form saves without error -- the custom save routine will
         # generate an AssertionError if it is called more than once during save.
-        form = CFFForm(data = {'f': None})
+        form = CFFForm(data={'f': None})
         form.save()
+
 
 class ModelChoiceIteratorTests(TestCase):
     def test_len(self):
@@ -236,11 +239,13 @@ class CustomModelFormSaveMethod(TestCase):
         self.assertEqual(form.is_valid(), False)
         self.assertEqual(form.errors['__all__'], ['Please specify a real name.'])
 
+
 class ModelClassTests(TestCase):
     def test_no_model_class(self):
         class NoModelModelForm(forms.ModelForm):
             pass
         self.assertRaises(ValueError, NoModelModelForm)
+
 
 class OneToOneFieldTests(TestCase):
     def test_assignment_of_none(self):
