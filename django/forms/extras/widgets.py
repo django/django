@@ -19,6 +19,7 @@ __all__ = ('SelectDateWidget',)
 
 RE_DATE = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
 
+
 def _parse_date_fmt():
     fmt = get_format('DATE_FORMAT')
     escaped = False
@@ -38,6 +39,7 @@ def _parse_date_fmt():
             output.append('day')
             #if not self.first_select: self.first_select = 'day'
     return output
+
 
 class SelectDateWidget(Widget):
     """
@@ -90,7 +92,7 @@ class SelectDateWidget(Widget):
         choices = list(six.iteritems(self.months))
         month_html = self.create_select(name, self.month_field, value, month_val, choices)
         choices = [(i, i) for i in range(1, 32)]
-        day_html = self.create_select(name, self.day_field, value, day_val,  choices)
+        day_html = self.create_select(name, self.day_field, value, day_val, choices)
 
         output = []
         for field in _parse_date_fmt():

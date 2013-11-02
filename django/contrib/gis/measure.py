@@ -234,7 +234,7 @@ class Distance(MeasureBase):
         'british_yd': 0.914398414616,
         'clarke_ft': 0.3047972654,
         'clarke_link': 0.201166195164,
-        'fathom':  1.8288,
+        'fathom': 1.8288,
         'ft': 0.3048,
         'german_m': 1.0000135965,
         'gold_coast_ft': 0.304799710181508,

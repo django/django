@@ -10,7 +10,7 @@ from django.utils import six
 
 __all__ = [
     'activate', 'deactivate', 'override', 'deactivate_all',
-    'get_language',  'get_language_from_request',
+    'get_language', 'get_language_from_request',
     'get_language_info', 'get_language_bidi',
     'check_for_language', 'to_locale', 'templatize', 'string_concat',
     'gettext', 'gettext_lazy', 'gettext_noop',

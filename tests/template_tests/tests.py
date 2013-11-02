@@ -677,7 +677,7 @@ class TemplateTests(TransRealMixin, TestCase):
             'basic-syntax06': ("{{ multi word variable }}", {}, template.TemplateSyntaxError),
 
             # Raise TemplateSyntaxError for empty variable tags
-            'basic-syntax07': ("{{ }}",        {}, template.TemplateSyntaxError),
+            'basic-syntax07': ("{{ }}", {}, template.TemplateSyntaxError),
             'basic-syntax08': ("{{        }}", {}, template.TemplateSyntaxError),
 
             # Attribute syntax allows a template to call an object's attribute
@@ -1685,11 +1685,11 @@ class TemplateTests(TransRealMixin, TestCase):
             'now01': ('{% now "j n Y" %}', {}, "%d %d %d" % (
                 datetime.now().day, datetime.now().month, datetime.now().year)),
             # Check parsing of locale strings
-            'now02': ('{% now "DATE_FORMAT" %}', {},  date_format(datetime.now())),
+            'now02': ('{% now "DATE_FORMAT" %}', {}, date_format(datetime.now())),
             # Also accept simple quotes - #15092
             'now03': ("{% now 'j n Y' %}", {}, "%d %d %d" % (
                 datetime.now().day, datetime.now().month, datetime.now().year)),
-            'now04': ("{% now 'DATE_FORMAT' %}", {},  date_format(datetime.now())),
+            'now04': ("{% now 'DATE_FORMAT' %}", {}, date_format(datetime.now())),
             'now05': ('''{% now 'j "n" Y'%}''', {}, '''%d "%d" %d''' % (
                 datetime.now().day, datetime.now().month, datetime.now().year)),
             'now06': ('''{% now "j 'n' Y"%}''', {}, '''%d '%d' %d''' % (

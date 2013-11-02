@@ -27,7 +27,7 @@ class RelatedGeoModelTest(TestCase):
         cities = (
             ('Aurora', 'TX', -97.516111, 33.058333),
             ('Roswell', 'NM', -104.528056, 33.387222),
-            ('Kecksburg', 'PA',  -79.460734, 40.18476),
+            ('Kecksburg', 'PA', -79.460734, 40.18476),
         )
 
         for qs in (qs1, qs2, qs3):

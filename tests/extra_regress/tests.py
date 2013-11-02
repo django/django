@@ -74,7 +74,7 @@ class ExtraRegressTests(TestCase):
         # select portions. Applies when portions are updated or otherwise
         # moved around.
         qs = User.objects.extra(
-            select=OrderedDict((("alpha", "%s"), ("beta", "2"),  ("gamma", "%s"))),
+            select=OrderedDict((("alpha", "%s"), ("beta", "2"), ("gamma", "%s"))),
             select_params=(1, 3)
         )
         qs = qs.extra(select={"beta": 4})

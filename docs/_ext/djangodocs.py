@@ -19,38 +19,39 @@ from sphinx.util.nodes import set_source_info
 simple_option_desc_re = re.compile(
     r'([-_a-zA-Z0-9]+)(\s*.*?)(?=,\s+(?:/|-|--)|$)')
 
+
 def setup(app):
     app.add_crossref_type(
-        directivename = "setting",
-        rolename = "setting",
-        indextemplate = "pair: %s; setting",
+        directivename="setting",
+        rolename="setting",
+        indextemplate="pair: %s; setting",
     )
     app.add_crossref_type(
-        directivename = "templatetag",
-        rolename = "ttag",
-        indextemplate = "pair: %s; template tag"
+        directivename="templatetag",
+        rolename="ttag",
+        indextemplate="pair: %s; template tag"
     )
     app.add_crossref_type(
-        directivename = "templatefilter",
-        rolename = "tfilter",
-        indextemplate = "pair: %s; template filter"
+        directivename="templatefilter",
+        rolename="tfilter",
+        indextemplate="pair: %s; template filter"
     )
     app.add_crossref_type(
-        directivename = "fieldlookup",
-        rolename = "lookup",
-        indextemplate = "pair: %s; field lookup type",
+        directivename="fieldlookup",
+        rolename="lookup",
+        indextemplate="pair: %s; field lookup type",
     )
     app.add_description_unit(
-        directivename = "django-admin",
-        rolename = "djadmin",
-        indextemplate = "pair: %s; django-admin command",
-        parse_node = parse_django_admin_node,
+        directivename="django-admin",
+        rolename="djadmin",
+        indextemplate="pair: %s; django-admin command",
+        parse_node=parse_django_admin_node,
     )
     app.add_description_unit(
-        directivename = "django-admin-option",
-        rolename = "djadminopt",
-        indextemplate = "pair: %s; django-admin command-line option",
-        parse_node = parse_django_adminopt_node,
+        directivename="django-admin-option",
+        rolename="djadminopt",
+        indextemplate="pair: %s; django-admin command-line option",
+        parse_node=parse_django_adminopt_node,
     )
     app.add_config_value('django_next_version', '0.0', True)
     app.add_directive('versionadded', VersionDirective)
@@ -228,7 +229,7 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
     def visit_table(self, node):
         self.context.append(self.compact_p)
         self.compact_p = True
-        self._table_row_index = 0 # Needed by Sphinx
+        self._table_row_index = 0  # Needed by Sphinx
         self.body.append(self.starttag(node, 'table', CLASS='docutils'))
 
     def depart_table(self, node):
@@ -266,9 +267,9 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
     # that work.
     #
     version_text = {
-        'deprecated':       'Deprecated in Django %s',
-        'versionchanged':   'Changed in Django %s',
-        'versionadded':     'New in Django %s',
+        'deprecated': 'Deprecated in Django %s',
+        'versionchanged': 'Changed in Django %s',
+        'versionadded': 'New in Django %s',
     }
 
     def visit_versionmodified(self, node):

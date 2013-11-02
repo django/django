@@ -2,6 +2,7 @@
 # Originally from https://bitbucket.org/ned/jslex
 import re
 
+
 class Tok(object):
     """
     A specification for a token class.
@@ -14,6 +15,7 @@ class Tok(object):
         self.name = name
         self.regex = regex
         self.next = next
+
 
 def literals(choices, prefix="", suffix=""):
     """
@@ -97,49 +99,49 @@ class JsLexer(Lexer):
     # http://inimino.org/~inimino/blog/javascript_semicolons
 
     both_before = [
-        Tok("comment",      r"/\*(.|\n)*?\*/"),
-        Tok("linecomment",  r"//.*?$"),
-        Tok("ws",           r"\s+"),
-        Tok("keyword",      literals("""
-                                break case catch class const continue debugger
-                                default delete do else enum export extends
-                                finally for function if import in instanceof
-                                new return super switch this throw try typeof
-                                var void while with
-                                """, suffix=r"\b"), next='reg'),
-        Tok("reserved",     literals("null true false", suffix=r"\b"), next='div'),
-        Tok("id",           r"""
-                            ([a-zA-Z_$   ]|\\u[0-9a-fA-Z]{4})   # first char
-                            ([a-zA-Z_$0-9]|\\u[0-9a-fA-F]{4})*  # rest chars
-                            """, next='div'),
-        Tok("hnum",         r"0[xX][0-9a-fA-F]+", next='div'),
-        Tok("onum",         r"0[0-7]+"),
-        Tok("dnum",         r"""
-                            (   (0|[1-9][0-9]*)     # DecimalIntegerLiteral
-                                \.                  # dot
-                                [0-9]*              # DecimalDigits-opt
-                                ([eE][-+]?[0-9]+)?  # ExponentPart-opt
-                            |
-                                \.                  # dot
-                                [0-9]+              # DecimalDigits
-                                ([eE][-+]?[0-9]+)?  # ExponentPart-opt
-                            |
-                                (0|[1-9][0-9]*)     # DecimalIntegerLiteral
-                                ([eE][-+]?[0-9]+)?  # ExponentPart-opt
-                            )
-                            """, next='div'),
-        Tok("punct",        literals("""
-                                >>>= === !== >>> <<= >>= <= >= == != << >> &&
-                                || += -= *= %= &= |= ^=
-                                """), next="reg"),
-        Tok("punct",        literals("++ -- ) ]"), next='div'),
-        Tok("punct",        literals("{ } ( [ . ; , < > + - * % & | ^ ! ~ ? : ="), next='reg'),
-        Tok("string",       r'"([^"\\]|(\\(.|\n)))*?"', next='div'),
-        Tok("string",       r"'([^'\\]|(\\(.|\n)))*?'", next='div'),
+        Tok("comment", r"/\*(.|\n)*?\*/"),
+        Tok("linecomment", r"//.*?$"),
+        Tok("ws", r"\s+"),
+        Tok("keyword", literals("""
+                           break case catch class const continue debugger
+                           default delete do else enum export extends
+                           finally for function if import in instanceof
+                           new return super switch this throw try typeof
+                           var void while with
+                           """, suffix=r"\b"), next='reg'),
+        Tok("reserved", literals("null true false", suffix=r"\b"), next='div'),
+        Tok("id", r"""
+                  ([a-zA-Z_$   ]|\\u[0-9a-fA-Z]{4})   # first char
+                  ([a-zA-Z_$0-9]|\\u[0-9a-fA-F]{4})*  # rest chars
+                  """, next='div'),
+        Tok("hnum", r"0[xX][0-9a-fA-F]+", next='div'),
+        Tok("onum", r"0[0-7]+"),
+        Tok("dnum", r"""
+                    (   (0|[1-9][0-9]*)     # DecimalIntegerLiteral
+                        \.                  # dot
+                        [0-9]*              # DecimalDigits-opt
+                        ([eE][-+]?[0-9]+)?  # ExponentPart-opt
+                    |
+                        \.                  # dot
+                        [0-9]+              # DecimalDigits
+                        ([eE][-+]?[0-9]+)?  # ExponentPart-opt
+                    |
+                        (0|[1-9][0-9]*)     # DecimalIntegerLiteral
+                        ([eE][-+]?[0-9]+)?  # ExponentPart-opt
+                    )
+                    """, next='div'),
+        Tok("punct", literals("""
+                         >>>= === !== >>> <<= >>= <= >= == != << >> &&
+                         || += -= *= %= &= |= ^=
+                         """), next="reg"),
+        Tok("punct", literals("++ -- ) ]"), next='div'),
+        Tok("punct", literals("{ } ( [ . ; , < > + - * % & | ^ ! ~ ? : ="), next='reg'),
+        Tok("string", r'"([^"\\]|(\\(.|\n)))*?"', next='div'),
+        Tok("string", r"'([^'\\]|(\\(.|\n)))*?'", next='div'),
     ]
 
     both_after = [
-        Tok("other",        r"."),
+        Tok("other", r"."),
     ]
 
     states = {
