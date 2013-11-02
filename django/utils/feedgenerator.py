@@ -36,7 +36,7 @@ from django.utils.six import StringIO
 from django.utils.timezone import is_aware
 
 def rfc2822_date(date):
-    # We can't use strftime() because it produces locale-dependant results, so
+    # We can't use strftime() because it produces locale-dependent results, so
     # we have to map english month and day names manually
     months = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',)
     days = ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')
