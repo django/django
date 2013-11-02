@@ -121,6 +121,17 @@ class BasicExtractorTests(ExtractorTests):
             self.assertMsgId('I think that 100%% is more that 50%% of %(obj)s.', po_contents)
             self.assertMsgId("Blocktrans extraction shouldn't double escape this: %%, a=%(a)s", po_contents)
 
+    def test_blocktrans_trimmed(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = force_text(fp.read())
+            # should not be trimmed
+            self.assertNotMsgId('Text with a few line breaks.', po_contents)
+            # should be trimmed
+            self.assertMsgId("Again some text with a few line breaks, this time should be trimmed.", po_contents)
+
     def test_force_en_us_locale(self):
         """Value of locale-munging option used by the command is the right one"""
         from django.core.management.commands.makemessages import Command

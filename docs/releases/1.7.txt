@@ -342,6 +342,15 @@ Internationalization
   still read from in 1.7. Sessions will be migrated to the new ``_language``
   key as they are written.
 
+* The :ttag:`blocktrans` now supports a ``trimmed`` option. This
+  option will remove newline characters from the beginning and the end of the
+  content of the ``{% blocktrans %}`` tag, replace any whitespace at the
+  beginning and end of a line and merge all lines into one using a space
+  character to separate them. This is quite useful for indenting the content of
+  a ``{% blocktrans %}`` tag without having the indentation characters end up
+  in the corresponding entry in the PO file, which makes the translation
+  process easier.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 

@@ -245,6 +245,17 @@ class TranslationTests(TransRealMixin, TestCase):
             rendered = t.render(Context())
             self.assertEqual(rendered, 'Andere: Es gibt 5 Kommentare')
 
+            # Using trimmed
+            t = Template('{% load i18n %}{% blocktrans trimmed %}\n\nThere\n\t are 5  \n\n   comments\n{% endblocktrans %}')
+            rendered = t.render(Context())
+            self.assertEqual(rendered, 'There are 5 comments')
+            t = Template('{% load i18n %}{% blocktrans with num_comments=5 context "comment count" trimmed %}\n\nThere are  \t\n  \t {{ num_comments }} comments\n\n{% endblocktrans %}')
+            rendered = t.render(Context())
+            self.assertEqual(rendered, 'Es gibt 5 Kommentare')
+            t = Template('{% load i18n %}{% blocktrans context "other super search" count number=2 trimmed %}\n{{ number }} super \n result{% plural %}{{ number }} super results{% endblocktrans %}')
+            rendered = t.render(Context())
+            self.assertEqual(rendered, '2 andere Super-Ergebnisse')
+
             # Mis-uses
             self.assertRaises(TemplateSyntaxError, Template, '{% load i18n %}{% blocktrans context with month="May" %}{{ month }}{% endblocktrans %}')
             self.assertRaises(TemplateSyntaxError, Template, '{% load i18n %}{% blocktrans context %}{% endblocktrans %}')

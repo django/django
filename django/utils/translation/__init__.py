@@ -2,7 +2,7 @@
 Internationalization support.
 """
 from __future__ import unicode_literals
-
+import re
 from django.utils.encoding import force_text
 from django.utils.functional import lazy
 from django.utils import six
@@ -218,3 +218,9 @@ def get_language_info(lang_code):
             return LANG_INFO[generic_lang_code]
         except KeyError:
             raise KeyError("Unknown language code %s and %s." % (lang_code, generic_lang_code))
+
+trim_whitespace_re = re.compile('\s*\n\s*')
+
+
+def trim_whitespace(s):
+    return trim_whitespace_re.sub(' ', s.strip())

@@ -97,14 +97,16 @@ class TranslateNode(Node):
 
 
 class BlockTranslateNode(Node):
+
     def __init__(self, extra_context, singular, plural=None, countervar=None,
-            counter=None, message_context=None):
+            counter=None, message_context=None, trimmed=False):
         self.extra_context = extra_context
         self.singular = singular
         self.plural = plural
         self.countervar = countervar
         self.counter = counter
         self.message_context = message_context
+        self.trimmed = trimmed
 
     def render_token_list(self, tokens):
         result = []
@@ -115,7 +117,10 @@ class BlockTranslateNode(Node):
             elif token.token_type == TOKEN_VAR:
                 result.append('%%(%s)s' % token.contents)
                 vars.append(token.contents)
-        return ''.join(result), vars
+        msg = ''.join(result)
+        if self.trimmed:
+            msg = translation.trim_whitespace(msg)
+        return msg, vars
 
     def render(self, context, nested=False):
         if self.message_context:
@@ -438,6 +443,8 @@ def do_block_translate(parser, token):
                     '"context" in %r tag expected '
                     'exactly one argument.') % bits[0]
                 six.reraise(TemplateSyntaxError, TemplateSyntaxError(msg), sys.exc_info()[2])
+        elif option == "trimmed":
+            value = True
         else:
             raise TemplateSyntaxError('Unknown argument for %r tag: %r.' %
                                       (bits[0], option))
@@ -452,6 +459,8 @@ def do_block_translate(parser, token):
     else:
         message_context = None
     extra_context = options.get('with', {})
+
+    trimmed = options.get("trimmed", False)
 
     singular = []
     plural = []
@@ -474,7 +483,7 @@ def do_block_translate(parser, token):
         raise TemplateSyntaxError("'blocktrans' doesn't allow other block tags (seen %r) inside it" % token.contents)
 
     return BlockTranslateNode(extra_context, singular, plural, countervar,
-            counter, message_context)
+                              counter, message_context, trimmed=trimmed)
 
 
 @register.tag
