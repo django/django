@@ -496,7 +496,7 @@ makemessages
 
 Runs over the entire source tree of the current directory and pulls out all
 strings marked for translation. It creates (or updates) a message file in the
-conf/locale (in the django tree) or locale (for project and application)
+conf/locale (in the Django tree) or locale (for project and application)
 directory. After making changes to the messages files you need to compile them
 with ``compilemessages`` for use with the builtin gettext support. See the
 :ref:`i18n documentation <how-to-create-language-files>` for details.
@@ -590,7 +590,7 @@ for technically skilled translators to understand each message's context.
 
 .. versionadded:: 1.6
 
-Use the ``--keep-pot`` option to prevent django from deleting the temporary
+Use the ``--keep-pot`` option to prevent Django from deleting the temporary
 .pot file it generates before creating the .po file. This is useful for
 debugging errors which may prevent the final language files from being created.
 
@@ -791,7 +791,7 @@ Django.)
 
 The development server automatically reloads Python code for each request, as
 needed. You don't need to restart the server for code changes to take effect.
-However, some actions like adding files don't trigger a restart, so you'll 
+However, some actions like adding files don't trigger a restart, so you'll
 have to restart the server in these cases.
 
 .. versionchanged:: 1.7
