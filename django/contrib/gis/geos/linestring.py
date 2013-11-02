@@ -47,7 +47,7 @@ class LineString(GEOSGeometry):
                     raise TypeError('Dimension mismatch.')
             numpy_coords = False
         elif numpy and isinstance(coords, numpy.ndarray):
-            shape = coords.shape # Using numpy's shape.
+            shape = coords.shape  # Using numpy's shape.
             if len(shape) != 2:
                 raise TypeError('Too many dimensions.')
             self._checkdim(shape[1])
@@ -91,8 +91,8 @@ class LineString(GEOSGeometry):
     _get_single_internal = _get_single_external
 
     def _set_list(self, length, items):
-        ndim = self._cs.dims #
-        hasz = self._cs.hasz # I don't understand why these are different
+        ndim = self._cs.dims
+        hasz = self._cs.hasz  # I don't understand why these are different
 
         # create a new coordinate sequence and populate accordingly
         cs = GEOSCoordSeq(capi.create_cs(length, ndim), z=hasz)
@@ -130,7 +130,7 @@ class LineString(GEOSGeometry):
         """
         lst = [func(i) for i in xrange(len(self))]
         if numpy:
-            return numpy.array(lst) # ARRRR!
+            return numpy.array(lst)  # ARRRR!
         else:
             return lst
 

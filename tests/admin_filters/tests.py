@@ -78,12 +78,12 @@ class DecadeListFilterWithQuerysetBasedLookups(DecadeListFilterWithTitleAndParam
 
 class DecadeListFilterParameterEndsWith__In(DecadeListFilter):
     title = 'publication decade'
-    parameter_name = 'decade__in' # Ends with '__in"
+    parameter_name = 'decade__in'  # Ends with '__in"
 
 
 class DecadeListFilterParameterEndsWith__Isnull(DecadeListFilter):
     title = 'publication decade'
-    parameter_name = 'decade__isnull' # Ends with '__isnull"
+    parameter_name = 'decade__isnull'  # Ends with '__isnull"
 
 
 class DepartmentListFilterLookupWithNonStringValue(SimpleListFilter):

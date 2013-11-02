@@ -438,7 +438,7 @@ class ClientTest(TestCase):
         "Request a page that is known to throw an error"
         self.assertRaises(KeyError, self.client.get, "/test_client/broken_view/")
 
-        #Try the same assertion, a different way
+        # Try the same assertion, a different way
         try:
             self.client.get('/test_client/broken_view/')
             self.fail('Should raise an error')

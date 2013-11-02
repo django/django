@@ -48,7 +48,7 @@ class GeographyTest(TestCase):
         "Ensuring exceptions are raised for operators & functions invalid on geography fields."
         # Only a subset of the geometry functions & operator are available
         # to PostGIS geography types.  For more information, visit:
-        #  http://postgis.refractions.net/documentation/manual-1.5/ch08.html#PostGIS_GeographyFunctions
+        # http://postgis.refractions.net/documentation/manual-1.5/ch08.html#PostGIS_GeographyFunctions
         z = Zipcode.objects.get(code='77002')
         # ST_Within not available.
         self.assertRaises(ValueError, City.objects.filter(point__within=z.poly).count)
@@ -76,7 +76,7 @@ class GeographyTest(TestCase):
 
         # Reference county names, number of polygons, and state names.
         names = ['Bexar', 'Galveston', 'Harris', 'Honolulu', 'Pueblo']
-        num_polys = [1, 2, 1, 19, 1] # Number of polygons for each.
+        num_polys = [1, 2, 1, 19, 1]  # Number of polygons for each.
         st_names = ['Texas', 'Texas', 'Texas', 'Hawaii', 'Colorado']
 
         lm = LayerMapping(County, co_shp, co_mapping, source_srs=4269, unique='name')

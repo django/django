@@ -68,7 +68,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
     valid_aggregates = {'Extent', 'Union'}
 
     Adapter = SpatiaLiteAdapter
-    Adaptor = Adapter # Backwards-compatibility alias.
+    Adaptor = Adapter  # Backwards-compatibility alias.
 
     area = 'Area'
     centroid = 'Centroid'
@@ -77,7 +77,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
     distance = 'Distance'
     envelope = 'Envelope'
     intersection = 'Intersection'
-    length = 'GLength' # OpenGis defines Length, but this conflicts with an SQLite reserved keyword
+    length = 'GLength'  # OpenGis defines Length, but this conflicts with an SQLite reserved keyword
     num_geom = 'NumGeometries'
     num_points = 'NumPoints'
     point_on_surface = 'PointOnSurface'
@@ -86,7 +86,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
     sym_difference = 'SymDifference'
     transform = 'Transform'
     translate = 'ShiftCoords'
-    union = 'GUnion' # OpenGis defines Union, but this conflicts with an SQLite reserved keyword
+    union = 'GUnion'  # OpenGis defines Union, but this conflicts with an SQLite reserved keyword
     unionagg = 'GUnion'
 
     from_text = 'GeomFromText'

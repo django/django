@@ -2224,12 +2224,12 @@ class ConditionalTests(BaseQuerysetTest):
         self.assertRaisesMessage(
             FieldError,
             'Infinite loop caused by ordering.',
-            lambda: list(LoopX.objects.all()) # Force queryset evaluation with list()
+            lambda: list(LoopX.objects.all())  # Force queryset evaluation with list()
         )
         self.assertRaisesMessage(
             FieldError,
             'Infinite loop caused by ordering.',
-            lambda: list(LoopZ.objects.all()) # Force queryset evaluation with list()
+            lambda: list(LoopZ.objects.all())  # Force queryset evaluation with list()
         )
 
         # Note that this doesn't cause an infinite loop, since the default

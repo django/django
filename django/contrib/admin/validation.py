@@ -70,7 +70,7 @@ class BaseValidator(object):
     def validate_fields(self, cls, model):
         " Validate that fields only refer to existing fields, doesn't contain duplicates. "
         # fields
-        if cls.fields: # default value is None
+        if cls.fields:  # default value is None
             check_isseq(cls, 'fields', cls.fields)
             self.check_field_spec(cls, model, cls.fields, 'fields')
             if cls.fieldsets:
@@ -81,7 +81,7 @@ class BaseValidator(object):
     def validate_fieldsets(self, cls, model):
         " Validate that fieldsets is properly formatted and doesn't contain duplicates. "
         from django.contrib.admin.options import flatten_fieldsets
-        if cls.fieldsets: # default value is None
+        if cls.fieldsets:  # default value is None
             check_isseq(cls, 'fieldsets', cls.fieldsets)
             for idx, fieldset in enumerate(cls.fieldsets):
                 check_isseq(cls, 'fieldsets[%d]' % idx, fieldset)
@@ -100,7 +100,7 @@ class BaseValidator(object):
 
     def validate_exclude(self, cls, model):
         " Validate that exclude is a sequence without duplicates. "
-        if cls.exclude: # default value is None
+        if cls.exclude:  # default value is None
             check_isseq(cls, 'exclude', cls.exclude)
             if len(cls.exclude) > len(set(cls.exclude)):
                 raise ImproperlyConfigured('There are duplicate field(s) in %s.exclude' % cls.__name__)
@@ -384,7 +384,7 @@ class ModelAdminValidator(BaseValidator):
 class InlineValidator(BaseValidator):
     def validate_fk_name(self, cls, model):
         " Validate that fk_name refers to a ForeignKey. "
-        if cls.fk_name: # default value is None
+        if cls.fk_name:  # default value is None
             f = get_field(cls, model, 'fk_name', cls.fk_name)
             if not isinstance(f, models.ForeignKey):
                 raise ImproperlyConfigured("'%s.fk_name is not an instance of "

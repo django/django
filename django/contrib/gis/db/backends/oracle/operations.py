@@ -86,7 +86,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     valid_aggregates = {'Union', 'Extent'}
 
     Adapter = OracleSpatialAdapter
-    Adaptor = Adapter # Backwards-compatibility alias.
+    Adaptor = Adapter  # Backwards-compatibility alias.
 
     area = 'SDO_GEOM.SDO_AREA'
     gml = 'SDO_UTIL.TO_GMLGEOMETRY'
@@ -126,12 +126,12 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         'coveredby': SDOOperation('SDO_COVEREDBY'),
         'covers': SDOOperation('SDO_COVERS'),
         'disjoint': SDOGeomRelate('DISJOINT'),
-        'intersects': SDOOperation('SDO_OVERLAPBDYINTERSECT'), # TODO: Is this really the same as ST_Intersects()?
+        'intersects': SDOOperation('SDO_OVERLAPBDYINTERSECT'),  # TODO: Is this really the same as ST_Intersects()?
         'equals': SDOOperation('SDO_EQUAL'),
         'exact': SDOOperation('SDO_EQUAL'),
         'overlaps': SDOOperation('SDO_OVERLAPS'),
         'same_as': SDOOperation('SDO_EQUAL'),
-        'relate': (SDORelate, six.string_types), # Oracle uses a different syntax, e.g., 'mask=inside+touch'
+        'relate': (SDORelate, six.string_types),  # Oracle uses a different syntax, e.g., 'mask=inside+touch'
         'touches': SDOOperation('SDO_TOUCH'),
         'within': SDOOperation('SDO_INSIDE'),
     }

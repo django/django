@@ -70,7 +70,7 @@ class AggregationTests(TestCase):
         Regression test for #11916: Extra params + aggregation creates
         incorrect SQL.
         """
-        #oracle doesn't support subqueries in group by clause
+        # oracle doesn't support subqueries in group by clause
         shortest_book_sql = """
         SELECT name
         FROM aggregation_regress_book b

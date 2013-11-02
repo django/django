@@ -256,21 +256,21 @@ The end."""),
     (data_obj, 301, Anchor, "Anchor 2"),
     (data_obj, 302, UniqueAnchor, "UAnchor 1"),
 
-    (fk_obj, 400, FKData, 300), # Post reference
-    (fk_obj, 401, FKData, 500), # Pre reference
-    (fk_obj, 402, FKData, None), # Empty reference
+    (fk_obj, 400, FKData, 300),  # Post reference
+    (fk_obj, 401, FKData, 500),  # Pre reference
+    (fk_obj, 402, FKData, None),  # Empty reference
 
-    (m2m_obj, 410, M2MData, []), # Empty set
-    (m2m_obj, 411, M2MData, [300, 301]), # Post reference
-    (m2m_obj, 412, M2MData, [500, 501]), # Pre reference
-    (m2m_obj, 413, M2MData, [300, 301, 500, 501]), # Pre and Post reference
+    (m2m_obj, 410, M2MData, []),  # Empty set
+    (m2m_obj, 411, M2MData, [300, 301]),  # Post reference
+    (m2m_obj, 412, M2MData, [500, 501]),  # Pre reference
+    (m2m_obj, 413, M2MData, [300, 301, 500, 501]),  # Pre and Post reference
 
-    (o2o_obj, None, O2OData, 300), # Post reference
-    (o2o_obj, None, O2OData, 500), # Pre reference
+    (o2o_obj, None, O2OData, 300),  # Post reference
+    (o2o_obj, None, O2OData, 500),  # Pre reference
 
-    (fk_obj, 430, FKSelfData, 431), # Pre reference
-    (fk_obj, 431, FKSelfData, 430), # Post reference
-    (fk_obj, 432, FKSelfData, None), # Empty reference
+    (fk_obj, 430, FKSelfData, 431),  # Pre reference
+    (fk_obj, 431, FKSelfData, 430),  # Post reference
+    (fk_obj, 432, FKSelfData, None),  # Empty reference
 
     (m2m_obj, 440, M2MSelfData, []),
     (m2m_obj, 441, M2MSelfData, []),
@@ -288,7 +288,7 @@ The end."""),
 
     (im2m_obj, 470, M2MIntermediateData, None),
 
-    #testing post- and prereferences and extra fields
+    # testing post- and prereferences and extra fields
     (im_obj, 480, Intermediate, {'right': 300, 'left': 470}),
     (im_obj, 481, Intermediate, {'right': 300, 'left': 490}),
     (im_obj, 482, Intermediate, {'right': 500, 'left': 470}),

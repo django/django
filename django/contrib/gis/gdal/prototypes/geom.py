@@ -59,7 +59,7 @@ import_wkt = void_output(lgdal.OGR_G_ImportFromWkt, [c_void_p, POINTER(c_char_p)
 destroy_geom = void_output(lgdal.OGR_G_DestroyGeometry, [c_void_p], errcheck=False)
 
 # Geometry export routines.
-to_wkb = void_output(lgdal.OGR_G_ExportToWkb, None, errcheck=True) # special handling for WKB.
+to_wkb = void_output(lgdal.OGR_G_ExportToWkb, None, errcheck=True)  # special handling for WKB.
 to_wkt = string_output(lgdal.OGR_G_ExportToWkt, [c_void_p, POINTER(c_char_p)], decoding='ascii')
 to_gml = string_output(lgdal.OGR_G_ExportToGML, [c_void_p], str_result=True, decoding='ascii')
 get_wkbsize = int_output(lgdal.OGR_G_WkbSize, [c_void_p])

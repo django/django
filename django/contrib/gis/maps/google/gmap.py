@@ -20,9 +20,9 @@ class GoogleMap(object):
     "A class for generating Google Maps JavaScript."
 
     # String constants
-    onunload = mark_safe('onunload="GUnload()"') # Cleans up after Google Maps
-    vml_css = mark_safe('v\:* {behavior:url(#default#VML);}') # CSS for IE VML
-    xmlns = mark_safe('xmlns:v="urn:schemas-microsoft-com:vml"') # XML Namespace (for IE VML).
+    onunload = mark_safe('onunload="GUnload()"')  # Cleans up after Google Maps
+    vml_css = mark_safe('v\:* {behavior:url(#default#VML);}')  # CSS for IE VML
+    xmlns = mark_safe('xmlns:v="urn:schemas-microsoft-com:vml"')  # XML Namespace (for IE VML).
 
     def __init__(self, key=None, api_url=None, version=None,
                  center=None, zoom=None, dom_id='map',

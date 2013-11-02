@@ -50,7 +50,7 @@ class GeoQuerySet(QuerySet):
         if backend.oracle:
             s['procedure_fmt'] = '%(geo_col)s,%(tolerance)s'
             s['procedure_args']['tolerance'] = tolerance
-            s['select_field'] = AreaField('sq_m') # Oracle returns area in units of meters.
+            s['select_field'] = AreaField('sq_m')  # Oracle returns area in units of meters.
         elif backend.postgis or backend.spatialite:
             if backend.geography:
                 # Geography fields support area calculation, returns square meters.
@@ -420,7 +420,7 @@ class GeoQuerySet(QuerySet):
         custom_sel = '%s(%s, %s)' % (connections[self.db].ops.transform, geo_col, srid)
         # TODO: Should we have this as an alias?
         # custom_sel = '(%s(%s, %s)) AS %s' % (SpatialBackend.transform, geo_col, srid, qn(geo_field.name))
-        self.query.transformed_srid = srid # So other GeoQuerySet methods
+        self.query.transformed_srid = srid  # So other GeoQuerySet methods
         self.query.custom_select[geo_field] = custom_sel
         return self._clone()
 

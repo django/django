@@ -92,5 +92,5 @@ class GeoFeedTest(TestCase):
             self.assertChildNodes(item, ['title', 'link', 'description', 'guid', 'geo:lat', 'geo:lon'])
 
         # Boxes and Polygons aren't allowed in W3C Geo feeds.
-        self.assertRaises(ValueError, self.client.get, '/feeds/w3cgeo2/') # Box in <channel>
-        self.assertRaises(ValueError, self.client.get, '/feeds/w3cgeo3/') # Polygons in <entry>
+        self.assertRaises(ValueError, self.client.get, '/feeds/w3cgeo2/')  # Box in <channel>
+        self.assertRaises(ValueError, self.client.get, '/feeds/w3cgeo3/')  # Polygons in <entry>

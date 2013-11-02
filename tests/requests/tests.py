@@ -524,7 +524,7 @@ class HostValidationTests(SimpleTestCase):
             '12.34.56.78:443',
             '[2001:19f0:feee::dead:beef:cafe]',
             '[2001:19f0:feee::dead:beef:cafe]:8080',
-            'xn--4ca9at.com', # Punnycode for öäü.com
+            'xn--4ca9at.com',  # Punnycode for öäü.com
             'anything.multitenant.com',
             'multitenant.com',
             'insensitive.com',
@@ -594,7 +594,7 @@ class HostValidationTests(SimpleTestCase):
             '12.34.56.78:443',
             '[2001:19f0:feee::dead:beef:cafe]',
             '[2001:19f0:feee::dead:beef:cafe]:8080',
-            'xn--4ca9at.com', # Punnycode for öäü.com
+            'xn--4ca9at.com',  # Punnycode for öäü.com
         ]
 
         for host in legit_hosts:
@@ -636,11 +636,11 @@ class HostValidationTests(SimpleTestCase):
         msg_suggestion = msg_invalid_host + "You may need to add %r to ALLOWED_HOSTS."
         msg_suggestion2 = msg_invalid_host + "The domain name provided is not valid according to RFC 1034/1035"
 
-        for host in [ # Valid-looking hosts
+        for host in [  # Valid-looking hosts
             'example.com',
             '12.34.56.78',
             '[2001:19f0:feee::dead:beef:cafe]',
-            'xn--4ca9at.com', # Punnycode for öäü.com
+            'xn--4ca9at.com',  # Punnycode for öäü.com
         ]:
             request = HttpRequest()
             request.META = {'HTTP_HOST': host}
@@ -650,7 +650,7 @@ class HostValidationTests(SimpleTestCase):
                 request.get_host
             )
 
-        for domain, port in [ # Valid-looking hosts with a port number
+        for domain, port in [  # Valid-looking hosts with a port number
             ('example.com', 80),
             ('12.34.56.78', 443),
             ('[2001:19f0:feee::dead:beef:cafe]', 8080),

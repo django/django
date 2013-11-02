@@ -352,7 +352,7 @@ def get_filter_tests():
 
         'date01': (r'{{ d|date:"m" }}', {'d': datetime(2008, 1, 1)}, '01'),
         'date02': (r'{{ d|date }}', {'d': datetime(2008, 1, 1)}, 'Jan. 1, 2008'),
-        #Ticket 9520: Make sure |date doesn't blow up on non-dates
+        # Ticket 9520: Make sure |date doesn't blow up on non-dates
         'date03': (r'{{ d|date:"m" }}', {'d': 'fail_string'}, ''),
         # ISO date formats
         'date04': (r'{{ d|date:"o" }}', {'d': datetime(2008, 12, 29)}, '2009'),

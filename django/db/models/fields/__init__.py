@@ -93,7 +93,7 @@ class Field(object):
     # creates, creation_counter is used for all user-specified fields.
     creation_counter = 0
     auto_creation_counter = -1
-    default_validators = [] # Default set of validators
+    default_validators = []  # Default set of validators
     default_error_messages = {
         'invalid_choice': _('Value %(value)r is not a valid choice.'),
         'null': _('This field cannot be null.'),

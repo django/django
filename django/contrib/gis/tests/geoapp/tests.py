@@ -84,7 +84,7 @@ class GeoModelTest(TestCase):
         # Creating a State object using a built Polygon
         ply = Polygon(shell, inner)
         nullstate = State(name='NullState', poly=ply)
-        self.assertEqual(4326, nullstate.poly.srid) # SRID auto-set from None
+        self.assertEqual(4326, nullstate.poly.srid)  # SRID auto-set from None
         nullstate.save()
 
         ns = State.objects.get(name='NullState')
@@ -111,7 +111,7 @@ class GeoModelTest(TestCase):
         "Testing automatic transform for lookups and inserts."
         # San Antonio in 'WGS84' (SRID 4326)
         sa_4326 = 'POINT (-98.493183 29.424170)'
-        wgs_pnt = fromstr(sa_4326, srid=4326) # Our reference point in WGS84
+        wgs_pnt = fromstr(sa_4326, srid=4326)  # Our reference point in WGS84
 
         # Oracle doesn't have SRID 3084, using 41157.
         if oracle:
@@ -122,7 +122,7 @@ class GeoModelTest(TestCase):
             nad_srid = 41157
         else:
             # San Antonio in 'NAD83(HARN) / Texas Centric Lambert Conformal' (SRID 3084)
-            nad_wkt = 'POINT (1645978.362408288754523 6276356.025927528738976)' # Used ogr.py in gdal 1.4.1 for this transform
+            nad_wkt = 'POINT (1645978.362408288754523 6276356.025927528738976)'  # Used ogr.py in gdal 1.4.1 for this transform
             nad_srid = 3084
 
         # Constructing & querying with a point from a different SRID. Oracle
@@ -156,7 +156,7 @@ class GeoModelTest(TestCase):
         c = City()
         self.assertEqual(c.point, None)
 
-    @no_spatialite # SpatiaLite does not support abstract geometry columns
+    @no_spatialite  # SpatiaLite does not support abstract geometry columns
     def test_geometryfield(self):
         "Testing the general GeometryField."
         Feature(name='Point', geom=Point(1, 1)).save()
@@ -242,8 +242,8 @@ class GeoLookupTest(TestCase):
 
         # Now testing contains on the countries using the points for
         #  Houston and Wellington.
-        tx = Country.objects.get(mpoly__contains=houston.point) # Query w/GEOSGeometry
-        nz = Country.objects.get(mpoly__contains=wellington.point.hex) # Query w/EWKBHEX
+        tx = Country.objects.get(mpoly__contains=houston.point)  # Query w/GEOSGeometry
+        nz = Country.objects.get(mpoly__contains=wellington.point.hex)  # Query w/EWKBHEX
         self.assertEqual('Texas', tx.name)
         self.assertEqual('New Zealand', nz.name)
 
@@ -254,9 +254,9 @@ class GeoLookupTest(TestCase):
 
         # Pueblo and Oklahoma City (even though OK City is within the bounding box of Texas)
         # are not contained in Texas or New Zealand.
-        self.assertEqual(0, len(Country.objects.filter(mpoly__contains=pueblo.point))) # Query w/GEOSGeometry object
+        self.assertEqual(0, len(Country.objects.filter(mpoly__contains=pueblo.point)))  # Query w/GEOSGeometry object
         self.assertEqual((mysql and 1) or 0,
-                         len(Country.objects.filter(mpoly__contains=okcity.point.wkt))) # Qeury w/WKT
+                         len(Country.objects.filter(mpoly__contains=okcity.point.wkt)))  # Qeury w/WKT
 
         # OK City is contained w/in bounding box of Texas.
         if not oracle:
@@ -446,7 +446,7 @@ class GeoQuerySetTest(TestCase):
             self.assertIsInstance(country.envelope, Polygon)
 
     @no_mysql
-    @no_spatialite # SpatiaLite does not have an Extent function
+    @no_spatialite  # SpatiaLite does not have an Extent function
     def test_extent(self):
         "Testing the `extent` GeoQuerySet method."
         # Reference query:
@@ -618,7 +618,7 @@ class GeoQuerySetTest(TestCase):
                 self.assertEqual(1, c.num_geom)
 
     @no_mysql
-    @no_spatialite # SpatiaLite can only count vertices in LineStrings
+    @no_spatialite  # SpatiaLite can only count vertices in LineStrings
     def test_num_points(self):
         "Testing the `num_points` GeoQuerySet method."
         for c in Country.objects.num_points():
@@ -671,7 +671,7 @@ class GeoQuerySetTest(TestCase):
     def test_scale(self):
         "Testing the `scale` GeoQuerySet method."
         xfac, yfac = 2, 3
-        tol = 5 # XXX The low precision tolerance is for SpatiaLite
+        tol = 5  # XXX The low precision tolerance is for SpatiaLite
         qs = Country.objects.scale(xfac, yfac, model_att='scaled')
         for c in qs:
             for p1, p2 in zip(c.mpoly, c.scaled):
@@ -740,7 +740,7 @@ class GeoQuerySetTest(TestCase):
         # Pre-transformed points for Houston and Pueblo.
         htown = fromstr('POINT(1947516.83115183 6322297.06040572)', srid=3084)
         ptown = fromstr('POINT(992363.390841912 481455.395105533)', srid=2774)
-        prec = 3 # Precision is low due to version variations in PROJ and GDAL.
+        prec = 3  # Precision is low due to version variations in PROJ and GDAL.
 
         # Asserting the result of the transform operation with the values in
         #  the pre-transformed points.  Oracle does not have the 3084 SRID.

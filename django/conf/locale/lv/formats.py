@@ -18,7 +18,7 @@ FIRST_DAY_OF_WEEK = 1  # Monday
 # see http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 # Kept ISO formats as they are in first position
 DATE_INPUT_FORMATS = (
-    '%Y-%m-%d', '%d.%m.%Y', '%d.%m.%y', # '2006-10-25', '25.10.2006', '25.10.06'
+    '%Y-%m-%d', '%d.%m.%Y', '%d.%m.%y',  # '2006-10-25', '25.10.2006', '25.10.06'
 )
 TIME_INPUT_FORMATS = (
     '%H:%M:%S',     # '14:30:59'
@@ -45,5 +45,5 @@ DATETIME_INPUT_FORMATS = (
     '%d.%m.%y',              # '25.10.06'
 )
 DECIMAL_SEPARATOR = ','
-THOUSAND_SEPARATOR = ' ' # Non-breaking space
+THOUSAND_SEPARATOR = ' '  # Non-breaking space
 NUMBER_GROUPING = 3

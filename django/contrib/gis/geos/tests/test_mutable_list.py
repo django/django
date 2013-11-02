@@ -223,9 +223,9 @@ class ListMixinTest(unittest.TestCase):
             del x[i]
         pl, ul = self.lists_of_len()
         for i in (-1 - self.limit, self.limit):
-            self.assertRaises(IndexError, setfcn, ul, i) # 'set index %d' % i)
-            self.assertRaises(IndexError, getfcn, ul, i) # 'get index %d' % i)
-            self.assertRaises(IndexError, delfcn, ul, i) # 'del index %d' % i)
+            self.assertRaises(IndexError, setfcn, ul, i)  # 'set index %d' % i)
+            self.assertRaises(IndexError, getfcn, ul, i)  # 'get index %d' % i)
+            self.assertRaises(IndexError, delfcn, ul, i)  # 'del index %d' % i)
 
     def test06_list_methods(self):
         'List methods'

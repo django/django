@@ -9,7 +9,7 @@ class State(models.Model):
 class County(models.Model):
     name = models.CharField(max_length=25)
     state = models.ForeignKey(State)
-    mpoly = models.MultiPolygonField(srid=4269) # Multipolygon in NAD83
+    mpoly = models.MultiPolygonField(srid=4269)  # Multipolygon in NAD83
     objects = models.GeoManager()
 
 
@@ -58,8 +58,8 @@ class Invalid(models.Model):
 
 # Mapping dictionaries for the models above.
 co_mapping = {'name': 'Name',
-              'state': {'name': 'State'}, # ForeignKey's use another mapping dictionary for the _related_ Model (State in this case).
-              'mpoly': 'MULTIPOLYGON', # Will convert POLYGON features into MULTIPOLYGONS.
+              'state': {'name': 'State'},  # ForeignKey's use another mapping dictionary for the _related_ Model (State in this case).
+              'mpoly': 'MULTIPOLYGON',  # Will convert POLYGON features into MULTIPOLYGONS.
               }
 
 cofeat_mapping = {'name': 'Name',

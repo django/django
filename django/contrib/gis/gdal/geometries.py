@@ -339,9 +339,9 @@ class OGRGeometry(GDALBase):
     def wkb(self):
         "Returns the WKB representation of the Geometry."
         if sys.byteorder == 'little':
-            byteorder = 1 # wkbNDR (from ogr_core.h)
+            byteorder = 1  # wkbNDR (from ogr_core.h)
         else:
-            byteorder = 0 # wkbXDR
+            byteorder = 0  # wkbXDR
         sz = self.wkb_size
         # Creating the unsigned character buffer, and passing it in by reference.
         buf = (c_ubyte * sz)()
@@ -635,7 +635,7 @@ class Polygon(OGRGeometry):
     @property
     def shell(self):
         "Returns the shell of this Polygon."
-        return self[0] # First ring is the shell
+        return self[0]  # First ring is the shell
     exterior_ring = shell
 
     @property

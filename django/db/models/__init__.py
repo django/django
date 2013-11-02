@@ -11,7 +11,7 @@ from django.db.models.base import Model  # NOQA
 from django.db.models.aggregates import *  # NOQA
 from django.db.models.fields import *  # NOQA
 from django.db.models.fields.subclassing import SubfieldBase        # NOQA
-from django.db.models.fields.files import FileField, ImageField # NOQA
+from django.db.models.fields.files import FileField, ImageField  # NOQA
 from django.db.models.fields.related import (  # NOQA
     ForeignKey, ForeignObject, OneToOneField, ManyToManyField,
     ManyToOneRel, ManyToManyRel, OneToOneRel)

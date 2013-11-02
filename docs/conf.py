@@ -117,7 +117,7 @@ intersphinx_mapping = {
 }
 
 # Python's docs don't change every week.
-intersphinx_cache_limit = 90 # days
+intersphinx_cache_limit = 90  # days
 
 # -- Options for HTML output ---------------------------------------------------
 

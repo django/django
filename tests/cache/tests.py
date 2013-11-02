@@ -1486,7 +1486,7 @@ class CacheI18nTest(TestCase):
         request = self._get_request()
         response = HttpResponse()
         with timezone.override(CustomTzName()):
-            CustomTzName.name = 'Hora estándar de Argentina'.encode('UTF-8') # UTF-8 string
+            CustomTzName.name = 'Hora estándar de Argentina'.encode('UTF-8')  # UTF-8 string
             sanitized_name = 'Hora_estndar_de_Argentina'
             self.assertIn(sanitized_name, learn_cache_key(request, response),
                     "Cache keys should include the time zone name when time zones are active")
@@ -1645,9 +1645,9 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
         # First, test with "defaults":
         as_view_decorator = CacheMiddleware(cache_alias=None, key_prefix=None)
 
-        self.assertEqual(as_view_decorator.cache_timeout, 300) # Timeout value for 'default' cache, i.e. 300
+        self.assertEqual(as_view_decorator.cache_timeout, 300)  # Timeout value for 'default' cache, i.e. 300
         self.assertEqual(as_view_decorator.key_prefix, '')
-        self.assertEqual(as_view_decorator.cache_alias, 'default') # Value of DEFAULT_CACHE_ALIAS from django.core.cache
+        self.assertEqual(as_view_decorator.cache_alias, 'default')  # Value of DEFAULT_CACHE_ALIAS from django.core.cache
         self.assertEqual(as_view_decorator.cache_anonymous_only, False)
 
         # Next, test with custom values:

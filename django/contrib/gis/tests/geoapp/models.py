@@ -9,7 +9,7 @@ null_flag = not mysql
 @python_2_unicode_compatible
 class Country(models.Model):
     name = models.CharField(max_length=30)
-    mpoly = models.MultiPolygonField() # SRID, by default, is 4326
+    mpoly = models.MultiPolygonField()  # SRID, by default, is 4326
     objects = models.GeoManager()
 
     def __str__(self):
@@ -30,13 +30,13 @@ class City(models.Model):
 class PennsylvaniaCity(City):
     county = models.CharField(max_length=30)
     founded = models.DateTimeField(null=True)
-    objects = models.GeoManager() # TODO: This should be implicitly inherited.
+    objects = models.GeoManager()  # TODO: This should be implicitly inherited.
 
 
 @python_2_unicode_compatible
 class State(models.Model):
     name = models.CharField(max_length=30)
-    poly = models.PolygonField(null=null_flag) # Allowing NULL geometries here.
+    poly = models.PolygonField(null=null_flag)  # Allowing NULL geometries here.
     objects = models.GeoManager()
 
     def __str__(self):
@@ -68,5 +68,5 @@ if not spatialite:
             return self.name
 
     class MinusOneSRID(models.Model):
-        geom = models.PointField(srid=-1) # Minus one SRID.
+        geom = models.PointField(srid=-1)  # Minus one SRID.
         objects = models.GeoManager()

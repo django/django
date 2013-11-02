@@ -304,12 +304,12 @@ class AdminActionsTests(CommentTestCase):
         makeModerator("normaluser")
         self.client.login(username="normaluser", password="normaluser")
         with translation.override('en'):
-            #Test approving
+            # Test approving
             self.performActionAndCheckMessage('approve_comments', one_comment, '1 comment was successfully approved')
             self.performActionAndCheckMessage('approve_comments', many_comments, '3 comments were successfully approved')
-            #Test flagging
+            # Test flagging
             self.performActionAndCheckMessage('flag_comments', one_comment, '1 comment was successfully flagged')
             self.performActionAndCheckMessage('flag_comments', many_comments, '3 comments were successfully flagged')
-            #Test removing
+            # Test removing
             self.performActionAndCheckMessage('remove_comments', one_comment, '1 comment was successfully removed')
             self.performActionAndCheckMessage('remove_comments', many_comments, '3 comments were successfully removed')

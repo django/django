@@ -64,7 +64,7 @@ class FileUploadHandler(object):
     """
     Base class for streaming upload handlers.
     """
-    chunk_size = 64 * 2 ** 10 #: The default chunk size is 64 KB.
+    chunk_size = 64 * 2 ** 10  # : The default chunk size is 64 KB.
 
     def __init__(self, request=None):
         self.file_name = None
