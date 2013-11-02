@@ -2028,7 +2028,7 @@ Formats a time according to the given format.
 
 Given format can be the predefined one :setting:`TIME_FORMAT`, or a custom
 format, same as the :tfilter:`date` filter. Note that the predefined format
-is locale-dependant.
+is locale-dependent.
 
 For example::
 
