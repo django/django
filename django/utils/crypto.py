@@ -134,9 +134,9 @@ def pbkdf2(password, salt, iterations, dklen=0, digest=None):
     inner, outer = digest(), digest()
     if len(password) > inner.block_size:
         password = digest(password).digest()
-    password += b'\x00' * (inner.block_size - len(password))
-    inner.update(password.translate(hmac.trans_36))
-    outer.update(password.translate(hmac.trans_5C))
+    password += '\x00' * (inner.block_size - len(password))
+    inner.update(password.translate(_trans_36))
+    outer.update(password.translate(_trans_5c))
 
     def F(i):
         def U():
