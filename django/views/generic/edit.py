@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 from django.utils.encoding import force_text
 from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
 from django.views.generic.detail import (SingleObjectMixin,
-                        SingleObjectTemplateResponseMixin, BaseDetailView)
+                                         SingleObjectTemplateResponseMixin, BaseDetailView)
 
 
 class FormMixin(ContextMixin):

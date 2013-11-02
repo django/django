@@ -13,6 +13,7 @@ from django.views.generic.base import View
 from django.views.generic.detail import BaseDetailView, SingleObjectTemplateResponseMixin
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
 
+
 class YearMixin(object):
     """
     Mixin for views manipulating year-based data.
@@ -646,7 +647,8 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
         qs = queryset or self.get_queryset()
 
         if not self.get_allow_future() and date > datetime.date.today():
-            raise Http404(_("Future %(verbose_name_plural)s not available because %(class_name)s.allow_future is False.") % {
+            raise Http404(_("Future %(verbose_name_plural)s not available "
+                            "because %(class_name)s.allow_future is False.") % {
                 'verbose_name_plural': qs.model._meta.verbose_name_plural,
                 'class_name': self.__class__.__name__,
             })
