@@ -23,7 +23,7 @@ from django.utils.translation import deactivate
 
 
 __all__ = (
-    'Approximate', 'ContextList',  'get_runner', 'override_settings',
+    'Approximate', 'ContextList', 'get_runner', 'override_settings',
     'requires_tz_support', 'setup_test_environment', 'teardown_test_environment',
 )
 

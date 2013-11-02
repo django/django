@@ -6,8 +6,10 @@ from django.utils.six.moves.urllib.request import urlopen
 
 PING_URL = "http://www.google.com/webmasters/tools/ping"
 
+
 class SitemapNotFound(Exception):
     pass
+
 
 def ping_google(sitemap_url=None, ping_url=PING_URL):
     """
@@ -34,6 +36,7 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
     url = "http://%s%s" % (current_site.domain, sitemap_url)
     params = urlencode({'sitemap': url})
     urlopen("%s?%s" % (ping_url, params))
+
 
 class Sitemap(object):
     # This limit is defined by Google. See the index documentation at
@@ -94,21 +97,23 @@ class Sitemap(object):
                     (latest_lastmod is None or lastmod > latest_lastmod)):
                     latest_lastmod = lastmod
             url_info = {
-                'item':       item,
-                'location':   loc,
-                'lastmod':    lastmod,
+                'item': item,
+                'location': loc,
+                'lastmod': lastmod,
                 'changefreq': self.__get('changefreq', item, None),
-                'priority':   str(priority if priority is not None else ''),
+                'priority': str(priority if priority is not None else ''),
             }
             urls.append(url_info)
         if all_items_lastmod and latest_lastmod:
             self.latest_lastmod = latest_lastmod
         return urls
 
+
 class FlatPageSitemap(Sitemap):
     def items(self):
         current_site = Site.objects.get_current()
         return current_site.flatpage_set.filter(registration_required=False)
+
 
 class GenericSitemap(Sitemap):
     priority = None

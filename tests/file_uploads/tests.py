@@ -26,6 +26,7 @@ UNICODE_FILENAME = 'test-0123456789_中文_Orléans.jpg'
 MEDIA_ROOT = sys_tempfile.mkdtemp()
 UPLOAD_TO = os.path.join(MEDIA_ROOT, 'test_upload')
 
+
 @override_settings(MEDIA_ROOT=MEDIA_ROOT)
 class FileUploadTests(TestCase):
     @classmethod
@@ -85,10 +86,10 @@ class FileUploadTests(TestCase):
         payload.write('--' + client.BOUNDARY + '--\r\n')
         r = {
             'CONTENT_LENGTH': len(payload),
-            'CONTENT_TYPE':   client.MULTIPART_CONTENT,
-            'PATH_INFO':      "/file_uploads/echo_content/",
+            'CONTENT_TYPE': client.MULTIPART_CONTENT,
+            'PATH_INFO': "/file_uploads/echo_content/",
             'REQUEST_METHOD': 'POST',
-            'wsgi.input':     payload,
+            'wsgi.input': payload,
         }
         response = self.client.request(**r)
         received = json.loads(response.content.decode('utf-8'))
@@ -152,10 +153,10 @@ class FileUploadTests(TestCase):
 
         r = {
             'CONTENT_LENGTH': len(payload),
-            'CONTENT_TYPE':   client.MULTIPART_CONTENT,
-            'PATH_INFO':      "/file_uploads/echo/",
+            'CONTENT_TYPE': client.MULTIPART_CONTENT,
+            'PATH_INFO': "/file_uploads/echo/",
             'REQUEST_METHOD': 'POST',
-            'wsgi.input':     payload,
+            'wsgi.input': payload,
         }
         response = self.client.request(**r)
 
@@ -189,10 +190,10 @@ class FileUploadTests(TestCase):
         payload.write('\r\n--' + client.BOUNDARY + '--\r\n')
         r = {
             'CONTENT_LENGTH': len(payload),
-            'CONTENT_TYPE':   client.MULTIPART_CONTENT,
-            'PATH_INFO':      "/file_uploads/echo/",
+            'CONTENT_TYPE': client.MULTIPART_CONTENT,
+            'PATH_INFO': "/file_uploads/echo/",
             'REQUEST_METHOD': 'POST',
-            'wsgi.input':     payload,
+            'wsgi.input': payload,
         }
         result = json.loads(self.client.request(**r).content.decode('utf-8'))
         for name, _, expected in cases:
@@ -444,6 +445,6 @@ class MultiParserTests(unittest.TestCase):
         # We're not actually parsing here; just checking if the parser properly
         # instantiates with empty upload handlers.
         MultiPartParser({
-            'CONTENT_TYPE':     'multipart/form-data; boundary=_foo',
-            'CONTENT_LENGTH':   '1'
+            'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
+            'CONTENT_LENGTH': '1'
         }, StringIO('x'), [], 'utf-8')

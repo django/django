@@ -43,7 +43,7 @@ class DictList(generic.ListView):
     """A ListView that doesn't use a model."""
     queryset = [
         {'first': 'John', 'last': 'Lennon'},
-        {'first': 'Yoko',  'last': 'Ono'}
+        {'first': 'Yoko', 'last': 'Ono'}
     ]
     template_name = 'generic_views/list.html'
 

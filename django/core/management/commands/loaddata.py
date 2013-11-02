@@ -72,9 +72,9 @@ class Command(BaseCommand):
 
         self.serialization_formats = serializers.get_public_serializer_formats()
         self.compression_formats = {
-            None:   open,
-            'gz':   gzip.GzipFile,
-            'zip':  SingleZipReader
+            None: open,
+            'gz': gzip.GzipFile,
+            'zip': SingleZipReader
         }
         if has_bz2:
             self.compression_formats['bz2'] = bz2.BZ2File

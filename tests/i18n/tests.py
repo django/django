@@ -23,7 +23,7 @@ from django.utils.safestring import mark_safe, SafeBytes, SafeString, SafeText
 from django.utils import six
 from django.utils.six import PY3
 from django.utils.translation import (activate, deactivate,
-    get_language,  get_language_from_request, get_language_info,
+    get_language, get_language_from_request, get_language_info,
     to_locale, trans_real,
     gettext_lazy,
     ugettext, ugettext_lazy,

@@ -177,15 +177,15 @@ class ReverseSelectRelatedTestCase(TestCase):
         c = Child4.objects.create(name1='n1', name2='n2', value=1, value4=4)
         with self.assertNumQueries(1):
             p = Parent2.objects.select_related('child1').only(
-                'id2',  'child1__value').get(name2="n2")
+                'id2', 'child1__value').get(name2="n2")
             self.assertEqual(p.id2, c.id2)
             self.assertEqual(p.child1.value, 1)
         p = Parent2.objects.select_related('child1').only(
-            'id2',  'child1__value').get(name2="n2")
+            'id2', 'child1__value').get(name2="n2")
         with self.assertNumQueries(1):
             self.assertEqual(p.name2, 'n2')
         p = Parent2.objects.select_related('child1').only(
-            'id2',  'child1__value').get(name2="n2")
+            'id2', 'child1__value').get(name2="n2")
         with self.assertNumQueries(1):
             self.assertEqual(p.child1.name2, 'n2')
 
@@ -193,7 +193,7 @@ class ReverseSelectRelatedTestCase(TestCase):
     def test_inheritance_deferred2(self):
         c = Child4.objects.create(name1='n1', name2='n2', value=1, value4=4)
         qs = Parent2.objects.select_related('child1', 'child4').only(
-            'id2',  'child1__value', 'child1__child4__value4')
+            'id2', 'child1__value', 'child1__child4__value4')
         with self.assertNumQueries(1):
             p = qs.get(name2="n2")
             self.assertEqual(p.id2, c.id2)

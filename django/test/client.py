@@ -222,21 +222,21 @@ class RequestFactory(object):
         # - REMOTE_ADDR: often useful, see #8551.
         # See http://www.python.org/dev/peps/pep-3333/#environ-variables
         environ = {
-            'HTTP_COOKIE':       self.cookies.output(header='', sep='; '),
-            'PATH_INFO':         str('/'),
-            'REMOTE_ADDR':       str('127.0.0.1'),
-            'REQUEST_METHOD':    str('GET'),
-            'SCRIPT_NAME':       str(''),
-            'SERVER_NAME':       str('testserver'),
-            'SERVER_PORT':       str('80'),
-            'SERVER_PROTOCOL':   str('HTTP/1.1'),
-            'wsgi.version':      (1, 0),
-            'wsgi.url_scheme':   str('http'),
-            'wsgi.input':        FakePayload(b''),
-            'wsgi.errors':       self.errors,
+            'HTTP_COOKIE': self.cookies.output(header='', sep='; '),
+            'PATH_INFO': str('/'),
+            'REMOTE_ADDR': str('127.0.0.1'),
+            'REQUEST_METHOD': str('GET'),
+            'SCRIPT_NAME': str(''),
+            'SERVER_NAME': str('testserver'),
+            'SERVER_PORT': str('80'),
+            'SERVER_PROTOCOL': str('HTTP/1.1'),
+            'wsgi.version': (1, 0),
+            'wsgi.url_scheme': str('http'),
+            'wsgi.input': FakePayload(b''),
+            'wsgi.errors': self.errors,
             'wsgi.multiprocess': True,
-            'wsgi.multithread':  False,
-            'wsgi.run_once':     False,
+            'wsgi.multithread': False,
+            'wsgi.run_once': False,
         }
         environ.update(self.defaults)
         environ.update(request)
@@ -327,7 +327,7 @@ class RequestFactory(object):
         parsed = urlparse(path)
         data = force_bytes(data, settings.DEFAULT_CHARSET)
         r = {
-            'PATH_INFO':      self._get_path(parsed),
+            'PATH_INFO': self._get_path(parsed),
             'REQUEST_METHOD': str(method),
             'SERVER_PORT': str('443') if secure else str('80'),
             'wsgi.url_scheme': str('https') if secure else str('http'),
@@ -335,8 +335,8 @@ class RequestFactory(object):
         if data:
             r.update({
                 'CONTENT_LENGTH': len(data),
-                'CONTENT_TYPE':   str(content_type),
-                'wsgi.input':     FakePayload(data),
+                'CONTENT_TYPE': str(content_type),
+                'wsgi.input': FakePayload(data),
             })
         r.update(extra)
         # If QUERY_STRING is absent or empty, we want to extract it from the URL.

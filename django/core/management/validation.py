@@ -111,7 +111,7 @@ def get_validation_errors(outfile, app=None):
                 try:
                     max_digits = int(f.max_digits)
                     if max_digits <= 0:
-                        e.add(opts,  mdigits_msg % f.name)
+                        e.add(opts, mdigits_msg % f.name)
                     else:
                         mdigits_ok = True
                 except (ValueError, TypeError):
