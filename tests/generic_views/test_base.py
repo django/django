@@ -10,6 +10,7 @@ from django.views.generic import View, TemplateView, RedirectView
 
 from . import views
 
+
 class SimpleView(View):
     """
     A simple view with a docstring.

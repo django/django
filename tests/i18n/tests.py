@@ -956,11 +956,13 @@ class ResolutionOrderI18NTests(TransRealMixin, TestCase):
         self.assertTrue(msgstr in result, ("The string '%s' isn't in the "
             "translation of '%s'; the actual result is '%s'." % (msgstr, msgid, result)))
 
+
 @override_settings(INSTALLED_APPS=['i18n.resolution'] + list(settings.INSTALLED_APPS))
 class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
     def test_app_translation(self):
         self.assertUgettext('Date/time', 'APP')
+
 
 @override_settings(LOCALE_PATHS=extended_locale_paths)
 class LocalePathsResolutionOrderI18NTests(ResolutionOrderI18NTests):
@@ -972,6 +974,7 @@ class LocalePathsResolutionOrderI18NTests(ResolutionOrderI18NTests):
         extended_apps = list(settings.INSTALLED_APPS) + ['i18n.resolution']
         with self.settings(INSTALLED_APPS=extended_apps):
             self.assertUgettext('Time', 'LOCALE_PATHS')
+
 
 class DjangoFallbackResolutionOrderI18NTests(ResolutionOrderI18NTests):
 

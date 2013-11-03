@@ -3,16 +3,20 @@ import unittest
 from django.dispatch.saferef import safeRef
 from django.utils.six.moves import xrange
 
+
 class Test1(object):
     def x(self):
         pass
 
+
 def test2(obj):
     pass
+
 
 class Test2(object):
     def __call__(self, obj):
         pass
+
 
 class SaferefTests(unittest.TestCase):
     def setUp(self):

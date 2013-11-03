@@ -18,6 +18,7 @@ GENDER_CHOICES = (
     ('F', 'Female'),
 )
 
+
 @python_2_unicode_compatible
 class Person(models.Model):
     name = models.CharField(max_length=20)

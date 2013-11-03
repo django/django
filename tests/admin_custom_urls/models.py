@@ -54,6 +54,7 @@ class ActionAdmin(admin.ModelAdmin):
 class Person(models.Model):
     name = models.CharField(max_length=20)
 
+
 class PersonAdmin(admin.ModelAdmin):
 
     def response_post_save_add(self, request, obj):
@@ -67,6 +68,7 @@ class PersonAdmin(admin.ModelAdmin):
 
 class Car(models.Model):
     name = models.CharField(max_length=20)
+
 
 class CarAdmin(admin.ModelAdmin):
 

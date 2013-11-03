@@ -22,6 +22,7 @@ class MyWrapper(object):
             return self.value == other.value
         return self.value == other
 
+
 class MyAutoField(six.with_metaclass(models.SubfieldBase, models.CharField)):
 
     def __init__(self, *args, **kwargs):

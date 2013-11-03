@@ -21,6 +21,7 @@ class ManyToOneRecursiveTests(TestCase):
         self.assertQuerysetEqual(self.c.child_set.all(), [])
         self.assertEqual(self.c.parent.id, self.r.id)
 
+
 class MultipleManyToOneRecursiveTests(TestCase):
 
     def setUp(self):

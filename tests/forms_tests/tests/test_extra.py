@@ -25,11 +25,14 @@ from .test_error_messages import AssertFormErrorsMixin
 class GetDate(Form):
     mydate = DateField(widget=SelectDateWidget)
 
+
 class GetNotRequiredDate(Form):
     mydate = DateField(widget=SelectDateWidget, required=False)
 
+
 class GetDateShowHiddenInitial(Form):
     mydate = DateField(widget=SelectDateWidget, show_hidden_initial=True)
+
 
 class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
     ###############

@@ -290,11 +290,13 @@ class GenericRelationsTests(TestCase):
 class CustomWidget(forms.TextInput):
     pass
 
+
 class TaggedItemForm(forms.ModelForm):
     class Meta:
         model = TaggedItem
         fields = '__all__'
         widgets = {'tag': CustomWidget}
+
 
 class GenericInlineFormsetTest(TestCase):
     def test_generic_inlineformset_factory(self):

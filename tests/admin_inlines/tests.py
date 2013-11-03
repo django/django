@@ -279,6 +279,7 @@ class TestInlineMedia(TestCase):
         self.assertContains(response, 'my_awesome_admin_scripts.js')
         self.assertContains(response, 'my_awesome_inline_scripts.js')
 
+
 class TestInlineAdminForm(TestCase):
     urls = "admin_inlines.urls"
 
@@ -465,9 +466,9 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, 'Add another Inner2')
         # 3 extra forms only, not the existing instance form
         self.assertContains(response, '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" '
-                                'value="3" name="inner2_set-TOTAL_FORMS" />', html=True)
+            'value="3" name="inner2_set-TOTAL_FORMS" />', html=True)
         self.assertNotContains(response, '<input type="hidden" id="id_inner2_set-0-id" '
-                            'value="%i" name="inner2_set-0-id" />' % self.inner2_id, html=True)
+            'value="%i" name="inner2_set-0-id" />' % self.inner2_id, html=True)
 
     def test_inline_change_fk_change_perm(self):
         permission = Permission.objects.get(codename='change_inner2', content_type=self.inner_ct)
@@ -477,12 +478,12 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, '<h2>Inner2s</h2>')
         # Just the one form for existing instances
         self.assertContains(response, '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" '
-                                'value="1" name="inner2_set-TOTAL_FORMS" />', html=True)
+            'value="1" name="inner2_set-TOTAL_FORMS" />', html=True)
         self.assertContains(response, '<input type="hidden" id="id_inner2_set-0-id" '
-                            'value="%i" name="inner2_set-0-id" />' % self.inner2_id, html=True)
+            'value="%i" name="inner2_set-0-id" />' % self.inner2_id, html=True)
         # max-num 0 means we can't add new ones
         self.assertContains(response, '<input type="hidden" id="id_inner2_set-MAX_NUM_FORMS" '
-                                'value="0" name="inner2_set-MAX_NUM_FORMS" />', html=True)
+            'value="0" name="inner2_set-MAX_NUM_FORMS" />', html=True)
 
     def test_inline_change_fk_add_change_perm(self):
         permission = Permission.objects.get(codename='add_inner2', content_type=self.inner_ct)
@@ -494,9 +495,9 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, '<h2>Inner2s</h2>')
         # One form for existing instance and three extra for new
         self.assertContains(response, '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" '
-                                'value="4" name="inner2_set-TOTAL_FORMS" />', html=True)
+            'value="4" name="inner2_set-TOTAL_FORMS" />', html=True)
         self.assertContains(response, '<input type="hidden" id="id_inner2_set-0-id" '
-                            'value="%i" name="inner2_set-0-id" />' % self.inner2_id, html=True)
+            'value="%i" name="inner2_set-0-id" />' % self.inner2_id, html=True)
 
     def test_inline_change_fk_change_del_perm(self):
         permission = Permission.objects.get(codename='change_inner2', content_type=self.inner_ct)
@@ -508,9 +509,9 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, '<h2>Inner2s</h2>')
         # One form for existing instance only, no new
         self.assertContains(response, '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" '
-                                'value="1" name="inner2_set-TOTAL_FORMS" />', html=True)
+            'value="1" name="inner2_set-TOTAL_FORMS" />', html=True)
         self.assertContains(response, '<input type="hidden" id="id_inner2_set-0-id" '
-                            'value="%i" name="inner2_set-0-id" />' % self.inner2_id, html=True)
+            'value="%i" name="inner2_set-0-id" />' % self.inner2_id, html=True)
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
 
     def test_inline_change_fk_all_perms(self):
@@ -525,9 +526,9 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, '<h2>Inner2s</h2>')
         # One form for existing instance only, three for new
         self.assertContains(response, '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" '
-                                'value="4" name="inner2_set-TOTAL_FORMS" />', html=True)
+            'value="4" name="inner2_set-TOTAL_FORMS" />', html=True)
         self.assertContains(response, '<input type="hidden" id="id_inner2_set-0-id" '
-                            'value="%i" name="inner2_set-0-id" />' % self.inner2_id, html=True)
+            'value="%i" name="inner2_set-0-id" />' % self.inner2_id, html=True)
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
 
 
@@ -697,6 +698,7 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
 class SeleniumChromeTests(SeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
 
 class SeleniumIETests(SeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'

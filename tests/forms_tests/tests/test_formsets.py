@@ -57,7 +57,7 @@ SplitDateTimeFormSet = formset_factory(SplitDateTimeForm)
 class FormsFormsetTestCase(TestCase):
 
     def make_choiceformset(self, formset_data=None, formset_class=ChoiceFormSet,
-        total_forms=None, initial_forms=0, max_num_forms=0, min_num_forms=0, **kwargs):
+            total_forms=None, initial_forms=0, max_num_forms=0, min_num_forms=0, **kwargs):
         """
         Make a ChoiceFormset from the given formset_data.
         The data should be given as a list of (choice, votes) tuples.
@@ -1097,11 +1097,13 @@ data = {
     'choices-0-votes': '100',
 }
 
+
 class Choice(Form):
     choice = CharField()
     votes = IntegerField()
 
 ChoiceFormSet = formset_factory(Choice)
+
 
 class FormsetAsFooTests(TestCase):
     def test_as_table(self):
@@ -1129,6 +1131,7 @@ class ArticleForm(Form):
     pub_date = DateField()
 
 ArticleFormSet = formset_factory(ArticleForm)
+
 
 class TestIsBoundBehavior(TestCase):
     def test_no_data_raises_validation_error(self):
@@ -1183,6 +1186,7 @@ class TestIsBoundBehavior(TestCase):
 
         # The empty forms should be equal.
         self.assertHTMLEqual(empty_forms[0].as_p(), empty_forms[1].as_p())
+
 
 class TestEmptyFormSet(TestCase):
     def test_empty_formset_is_valid(self):

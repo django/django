@@ -24,6 +24,7 @@ class Article(models.Model):
     class Meta:
         ordering = ('headline',)
 
+
 @python_2_unicode_compatible
 class Author(models.Model):
     Author_ID = models.AutoField(primary_key=True, db_column='Author ID')

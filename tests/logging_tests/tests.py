@@ -62,6 +62,7 @@ class LoggingFiltersTest(TestCase):
         with self.settings(DEBUG=False):
             self.assertEqual(filter_.filter("record is not used"), False)
 
+
 class DefaultLoggingTest(TestCase):
     def setUp(self):
         self.logger = logging.getLogger('django')
@@ -82,6 +83,7 @@ class DefaultLoggingTest(TestCase):
         with self.settings(DEBUG=True):
             self.logger.error("Hey, this is an error.")
             self.assertEqual(output.getvalue(), 'Hey, this is an error.\n')
+
 
 class WarningLoggerTests(TestCase):
     """

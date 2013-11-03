@@ -18,6 +18,7 @@ class Artist(models.Model):
     def get_absolute_url(self):
         return reverse('artist_detail', kwargs={'pk': self.id})
 
+
 @python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=100)
@@ -28,6 +29,7 @@ class Author(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Book(models.Model):
@@ -43,9 +45,11 @@ class Book(models.Model):
     def __str__(self):
         return self.name
 
+
 class Page(models.Model):
     content = models.TextField()
     template = models.CharField(max_length=300)
+
 
 class BookSigning(models.Model):
     event_date = models.DateTimeField()

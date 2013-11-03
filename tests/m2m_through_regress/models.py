@@ -15,6 +15,7 @@ class Membership(models.Model):
     def __str__(self):
         return "%s is a member of %s" % (self.person.name, self.group.name)
 
+
 # using custom id column to test ticket #11107
 @python_2_unicode_compatible
 class UserMembership(models.Model):
@@ -26,12 +27,14 @@ class UserMembership(models.Model):
     def __str__(self):
         return "%s is a user and member of %s" % (self.user.username, self.group.name)
 
+
 @python_2_unicode_compatible
 class Person(models.Model):
     name = models.CharField(max_length=128)
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Group(models.Model):
@@ -43,16 +46,20 @@ class Group(models.Model):
     def __str__(self):
         return self.name
 
+
 # A set of models that use an non-abstract inherited model as the 'through' model.
 class A(models.Model):
     a_text = models.CharField(max_length=20)
+
 
 class ThroughBase(models.Model):
     a = models.ForeignKey(A)
     b = models.ForeignKey('B')
 
+
 class Through(ThroughBase):
     extra = models.CharField(max_length=20)
+
 
 class B(models.Model):
     b_text = models.CharField(max_length=20)
@@ -68,6 +75,7 @@ class Car(models.Model):
     def __str__(self):
         return "%s" % self.make
 
+
 @python_2_unicode_compatible
 class Driver(models.Model):
     name = models.CharField(max_length=20, unique=True, null=True)
@@ -77,6 +85,7 @@ class Driver(models.Model):
 
     class Meta:
         ordering = ('name',)
+
 
 @python_2_unicode_compatible
 class CarDriver(models.Model):

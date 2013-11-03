@@ -69,6 +69,7 @@ class GetStorageClassTests(SimpleTestCase):
             get_storage_class(
                 'django.core.files.non_existing_storage.NonExistingStorage')
 
+
 class FileStorageTests(unittest.TestCase):
     storage_class = FileSystemStorage
 
@@ -379,6 +380,7 @@ class CustomStorage(FileSystemStorage):
 
         return name
 
+
 class CustomStorageTests(FileStorageTests):
     storage_class = CustomStorage
 
@@ -531,6 +533,7 @@ class SlowFile(ContentFile):
         time.sleep(1)
         return super(ContentFile, self).chunks()
 
+
 class FileSaveRaceConditionTest(unittest.TestCase):
     def setUp(self):
         self.storage_dir = tempfile.mkdtemp()
@@ -551,6 +554,7 @@ class FileSaveRaceConditionTest(unittest.TestCase):
         self.assertTrue(self.storage.exists('conflict_1'))
         self.storage.delete('conflict')
         self.storage.delete('conflict_1')
+
 
 @unittest.skipIf(sys.platform.startswith('win'), "Windows only partially supports umasks and chmod.")
 class FileStoragePermissions(unittest.TestCase):
@@ -590,6 +594,7 @@ class FileStoragePermissions(unittest.TestCase):
         name = self.storage.save("the_directory/the_file", ContentFile("data"))
         dir_mode = os.stat(os.path.dirname(self.storage.path(name)))[0] & 0o777
         self.assertEqual(dir_mode, 0o777 & ~self.umask)
+
 
 class FileStoragePathParsing(unittest.TestCase):
     def setUp(self):

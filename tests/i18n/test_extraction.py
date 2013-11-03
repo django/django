@@ -21,6 +21,7 @@ from django.utils.translation import TranslatorCommentWarning
 LOCALE = 'de'
 has_xgettext = find_command('xgettext')
 
+
 @skipUnless(has_xgettext, 'xgettext is mandatory for extraction tests')
 class ExtractorTests(SimpleTestCase):
 
@@ -130,9 +131,10 @@ class BasicExtractorTests(ExtractorTests):
         self.assertRaises(SyntaxError, management.call_command, 'makemessages', locale=LOCALE, extensions=['tpl'], verbosity=0)
         with self.assertRaises(SyntaxError) as context_manager:
             management.call_command('makemessages', locale=LOCALE, extensions=['tpl'], verbosity=0)
-        six.assertRegex(self, str(context_manager.exception),
-                r'Translation blocks must not include other block tags: blocktrans \(file templates[/\\]template_with_error\.tpl, line 3\)'
-            )
+        six.assertRegex(
+            self, str(context_manager.exception),
+            r'Translation blocks must not include other block tags: blocktrans \(file templates[/\\]template_with_error\.tpl, line 3\)'
+        )
         # Check that the temporary file was cleaned up
         self.assertFalse(os.path.exists('./templates/template_with_error.tpl.py'))
 
@@ -210,13 +212,16 @@ class BasicExtractorTests(ExtractorTests):
             self.assertEqual(len(ws), 3)
             for w in ws:
                 self.assertTrue(issubclass(w.category, TranslatorCommentWarning))
-            six.assertRegex(self, str(ws[0].message),
+            six.assertRegex(
+                self, str(ws[0].message),
                 r"The translator-targeted comment 'Translators: ignored i18n comment #1' \(file templates[/\\]comments.thtml, line 4\) was ignored, because it wasn't the last item on the line\."
             )
-            six.assertRegex(self, str(ws[1].message),
+            six.assertRegex(
+                self, str(ws[1].message),
                 r"The translator-targeted comment 'Translators: ignored i18n comment #3' \(file templates[/\\]comments.thtml, line 6\) was ignored, because it wasn't the last item on the line\."
             )
-            six.assertRegex(self, str(ws[2].message),
+            six.assertRegex(
+                self, str(ws[2].message),
                 r"The translator-targeted comment 'Translators: ignored i18n comment #4' \(file templates[/\\]comments.thtml, line 8\) was ignored, because it wasn't the last item on the line\."
             )
         # Now test .po file contents
@@ -280,6 +285,7 @@ class JavascriptExtractorTests(ExtractorTests):
             self.assertMsgId("baz", po_contents)
             self.assertMsgId("quz", po_contents)
             self.assertMsgId("foobar", po_contents)
+
 
 class IgnoredExtractorTests(ExtractorTests):
 

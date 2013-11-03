@@ -120,7 +120,7 @@ class CommonMiddlewareTest(TestCase):
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url,
-                          'http://www.testserver/middleware/slash/')
+            'http://www.testserver/middleware/slash/')
 
     @override_settings(APPEND_SLASH=True, PREPEND_WWW=True)
     def test_prepend_www_append_slash_slashless(self):
@@ -128,7 +128,7 @@ class CommonMiddlewareTest(TestCase):
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url,
-                          'http://www.testserver/middleware/slash/')
+            'http://www.testserver/middleware/slash/')
 
     # The following tests examine expected behavior given a custom urlconf that
     # overrides the default one through the request object.
@@ -228,7 +228,7 @@ class CommonMiddlewareTest(TestCase):
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url,
-                          'http://www.testserver/middleware/customurlconf/slash/')
+            'http://www.testserver/middleware/customurlconf/slash/')
 
     @override_settings(APPEND_SLASH=True, PREPEND_WWW=True)
     def test_prepend_www_append_slash_slashless_custom_urlconf(self):
@@ -237,7 +237,7 @@ class CommonMiddlewareTest(TestCase):
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url,
-                          'http://www.testserver/middleware/customurlconf/slash/')
+            'http://www.testserver/middleware/customurlconf/slash/')
 
     # Legacy tests for the 404 error reporting via email (to be removed in 1.8)
 
@@ -336,7 +336,7 @@ class BrokenLinkEmailsMiddlewareTest(TestCase):
                     return True
                 user_agent = request.META['HTTP_USER_AGENT']
                 return any(pattern.search(user_agent) for pattern in
-                               self.ignored_user_agent_patterns)
+                    self.ignored_user_agent_patterns)
 
         self.req.META['HTTP_REFERER'] = '/another/url/'
         self.req.META['HTTP_USER_AGENT'] = 'Spider machine 3.4'
@@ -345,6 +345,7 @@ class BrokenLinkEmailsMiddlewareTest(TestCase):
         self.req.META['HTTP_USER_AGENT'] = 'My user agent'
         SubclassedMiddleware().process_response(self.req, self.resp)
         self.assertEqual(len(mail.outbox), 1)
+
 
 class ConditionalGetMiddlewareTest(TestCase):
     urls = 'middleware.cond_get_urls'
@@ -703,6 +704,7 @@ class ETagGZipMiddlewareTest(TestCase):
         nogzip_etag = response.get('ETag')
 
         self.assertNotEqual(gzip_etag, nogzip_etag)
+
 
 class TransactionMiddlewareTest(IgnoreDeprecationWarningsMixin, TransactionTestCase):
     """

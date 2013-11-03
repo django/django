@@ -25,6 +25,7 @@ admin_static_prefix = lambda: {
     'ADMIN_STATIC_PREFIX': "%sadmin/" % settings.STATIC_URL,
 }
 
+
 class AdminFormfieldForDBFieldTests(TestCase):
     """
     Tests for correct behavior of ModelAdmin.formfield_for_dbfield
@@ -269,6 +270,7 @@ class FilteredSelectMultipleWidgetTest(DjangoTestCase):
             '<select multiple="multiple" name="test" class="selectfilterstacked">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 1, "%(ADMIN_STATIC_PREFIX)s"); });</script>\n' % admin_static_prefix()
         )
 
+
 class AdminDateWidgetTest(DjangoTestCase):
     def test_attrs(self):
         """
@@ -287,6 +289,7 @@ class AdminDateWidgetTest(DjangoTestCase):
             '<input value="2007-12-01" type="text" class="myDateField" name="test" size="20" />',
         )
 
+
 class AdminTimeWidgetTest(DjangoTestCase):
     def test_attrs(self):
         """
@@ -304,6 +307,7 @@ class AdminTimeWidgetTest(DjangoTestCase):
             w.render('test', datetime(2007, 12, 1, 9, 30)),
             '<input value="09:30:00" type="text" class="myTimeField" name="test" size="20" />',
         )
+
 
 class AdminSplitDateTimeWidgetTest(DjangoTestCase):
     def test_render(self):
@@ -495,6 +499,7 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
             '<input type="text" name="company_widget2" value="%(c1pk)s" />' % {'c1pk': c1.pk}
         )
 
+
 class RelatedFieldWidgetWrapperTests(DjangoTestCase):
     def test_no_can_add_related(self):
         rel = models.Individual._meta.get_field('parent').rel
@@ -631,6 +636,7 @@ class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 class DateTimePickerSeleniumChromeTests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
 
+
 class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
@@ -686,8 +692,10 @@ class DateTimePickerShortcutsSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase
         self.assertGreater(member.birthdate, now - error_margin)
         self.assertLess(member.birthdate, now + error_margin)
 
+
 class DateTimePickerShortcutsSeleniumChromeTests(DateTimePickerShortcutsSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
 
 class DateTimePickerShortcutsSeleniumIETests(DateTimePickerShortcutsSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
@@ -714,7 +722,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         super(HorizontalVerticalFilterSeleniumFirefoxTests, self).setUp()
 
     def assertActiveButtons(self, mode, field_name, choose, remove,
-                             choose_all=None, remove_all=None):
+            choose_all=None, remove_all=None):
         choose_link = '#id_%s_add_link' % field_name
         choose_all_link = '#id_%s_add_all_link' % field_name
         remove_link = '#id_%s_remove_link' % field_name
@@ -928,8 +936,10 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         self.assertEqual(list(self.school.alumni.all()),
                          [self.jason, self.peter])
 
+
 class HorizontalVerticalFilterSeleniumChromeTests(HorizontalVerticalFilterSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
 
 class HorizontalVerticalFilterSeleniumIETests(HorizontalVerticalFilterSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
@@ -1025,8 +1035,10 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
             self.selenium.find_element_by_id('id_supporting_bands').get_attribute('value'),
             '42,98')
 
+
 class AdminRawIdWidgetSeleniumChromeTests(AdminRawIdWidgetSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
 
 class AdminRawIdWidgetSeleniumIETests(AdminRawIdWidgetSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
@@ -1072,8 +1084,10 @@ class RelatedFieldWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.assertEqual(len(profiles), 1)
         self.assertEqual(profiles[0].user.username, username_value)
 
+
 class RelatedFieldWidgetSeleniumChromeTests(RelatedFieldWidgetSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
 
 class RelatedFieldWidgetSeleniumIETests(RelatedFieldWidgetSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'

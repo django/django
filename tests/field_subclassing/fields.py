@@ -20,6 +20,7 @@ class Small(object):
     def __str__(self):
         return '%s%s' % (force_text(self.first), force_text(self.second))
 
+
 class SmallField(six.with_metaclass(models.SubfieldBase, models.Field)):
     """
     Turns the "Small" class into a Django field. Because of the similarities
@@ -50,6 +51,7 @@ class SmallField(six.with_metaclass(models.SubfieldBase, models.Field)):
         if lookup_type == 'isnull':
             return []
         raise TypeError('Invalid lookup type: %r' % lookup_type)
+
 
 class SmallerField(SmallField):
     pass

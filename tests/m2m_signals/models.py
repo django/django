@@ -12,6 +12,7 @@ class Part(models.Model):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class Car(models.Model):
     name = models.CharField(max_length=20)
@@ -24,8 +25,10 @@ class Car(models.Model):
     def __str__(self):
         return self.name
 
+
 class SportsCar(Car):
     price = models.IntegerField()
+
 
 @python_2_unicode_compatible
 class Person(models.Model):

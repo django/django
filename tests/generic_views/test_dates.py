@@ -15,8 +15,9 @@ def _make_books(n, base_date):
         Book.objects.create(
             name='Book %d' % i,
             slug='book-%d' % i,
-            pages=100+i,
+            pages=100 + i,
             pubdate=base_date - datetime.timedelta(days=i))
+
 
 class ArchiveIndexViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']

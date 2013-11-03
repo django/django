@@ -217,6 +217,7 @@ class FormsModelTestCase(TestCase):
         self.assertEqual(obj.value, 99)
         self.assertEqual(obj.def_date, datetime.date(1999, 3, 2))
 
+
 class RelatedModelFormTests(TestCase):
     def test_invalid_loading_order(self):
         """

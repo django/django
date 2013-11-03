@@ -22,6 +22,7 @@ class MaxLengthArgumentsTests(unittest.TestCase):
         self.verify_max_length(PersonWithCustomMaxLengths, 'homepage', 250)
         self.verify_max_length(PersonWithCustomMaxLengths, 'avatar', 250)
 
+
 class MaxLengthORMTests(unittest.TestCase):
 
     def test_custom_max_lengths(self):

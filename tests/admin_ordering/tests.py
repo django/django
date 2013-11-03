@@ -12,6 +12,7 @@ from .models import (Band, Song, SongInlineDefaultOrdering,
 class MockRequest(object):
     pass
 
+
 class MockSuperUser(object):
     def has_perm(self, perm):
         return True

@@ -80,6 +80,7 @@ class NestedObjectsTests(TestCase):
             # One for Location, one for Guest, and no query for EventGuide
             n.collect(objs)
 
+
 class UtilTests(SimpleTestCase):
     def test_values_from_lookup_field(self):
         """
@@ -228,9 +229,8 @@ class UtilTests(SimpleTestCase):
         )
         self.assertEqual(
             label_for_field("test_from_model", Article,
-                model_admin = MockModelAdmin,
-                return_attr = True
-            ),
+                model_admin=MockModelAdmin,
+                return_attr=True),
             ("not Really the Model", MockModelAdmin.test_from_model)
         )
 

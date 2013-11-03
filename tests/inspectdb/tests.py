@@ -14,6 +14,7 @@ if connection.vendor == 'oracle':
 else:
     expectedFailureOnOracle = lambda f: f
 
+
 class InspectDBTestCase(TestCase):
 
     def test_stealth_table_name_filter_option(self):
@@ -166,7 +167,7 @@ class InspectDBTestCase(TestCase):
         self.assertIn("        managed = False", output, msg='inspectdb should generate unmanaged models.')
 
     @skipUnless(connection.vendor == 'sqlite',
-                         "Only patched sqlite's DatabaseIntrospection.data_types_reverse for this test")
+        "Only patched sqlite's DatabaseIntrospection.data_types_reverse for this test")
     def test_custom_fields(self):
         """
         Introspection of columns with a custom field (#21090)

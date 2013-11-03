@@ -40,9 +40,11 @@ from django.views.decorators.cache import cache_page
 
 from .models import Poll, expensive_calculation
 
+
 # functions/classes for complex data type tests
 def f():
     return 42
+
 
 class C:
     def m(n):
@@ -823,6 +825,7 @@ class BaseCacheTests(object):
         self.assertEqual(get_cache_data.content, content.encode('utf-8'))
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
+
 def custom_key_func(key, key_prefix, version):
     "A customized cache key function"
     return 'CUSTOM-' + '-'.join([key_prefix, str(version), key])
@@ -1003,6 +1006,7 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
         self.assertEqual(expire, self.cache._expire_info[_key])
         self.cache.decr(key)
         self.assertEqual(expire, self.cache._expire_info[_key])
+
 
 # memcached backend isn't guaranteed to be available.
 # To check the memcached backend, the test settings file will
@@ -1581,6 +1585,7 @@ class CacheI18nTest(TestCase):
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertIsNone(get_cache_data)
 
+
 @override_settings(
     CACHES={
         'default': {
@@ -1815,6 +1820,7 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
         # .. even if it has a prefix
         response = other_with_prefix_view(request, '16')
         self.assertEqual(response.content, b'Hello World 16')
+
 
 @override_settings(
     CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',

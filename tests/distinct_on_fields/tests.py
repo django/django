@@ -6,6 +6,7 @@ from django.test.utils import str_prefix
 
 from .models import Tag, Celebrity, Fan, Staff, StaffTag
 
+
 @skipUnlessDBFeature('can_distinct_on_fields')
 class DistinctOnTests(TestCase):
     def setUp(self):
@@ -77,7 +78,7 @@ class DistinctOnTests(TestCase):
             # Fetch the alphabetically first coworker for each worker
             (
                 (Staff.objects.distinct('id').order_by('id', 'coworkers__name').
-                               values_list('id', 'coworkers__name')),
+                    values_list('id', 'coworkers__name')),
                 [str_prefix("(1, %(_)s'p2')"), str_prefix("(2, %(_)s'p1')"),
                  str_prefix("(3, %(_)s'p1')"), "(4, None)"]
             ),

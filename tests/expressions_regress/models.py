@@ -14,6 +14,7 @@ class Number(models.Model):
     def __str__(self):
         return '%i, %.3f' % (self.integer, self.float)
 
+
 class Experiment(models.Model):
     name = models.CharField(max_length=24)
     assigned = models.DateField()
