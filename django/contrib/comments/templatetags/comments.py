@@ -114,15 +114,18 @@ class BaseCommentNode(six.with_metaclass(RenameBaseCommentNodeMethods, template.
         """Subclasses should override this."""
         raise NotImplementedError('subclasses of BaseCommentNode must provide a get_context_value_from_queryset() method')
 
+
 class CommentListNode(BaseCommentNode):
     """Insert a list of comments into the context."""
     def get_context_value_from_queryset(self, context, qs):
         return list(qs)
 
+
 class CommentCountNode(BaseCommentNode):
     """Insert a count of comments into the context."""
     def get_context_value_from_queryset(self, context, qs):
         return qs.count()
+
 
 class CommentFormNode(BaseCommentNode):
     """Insert a form for the comment model into the context."""
@@ -148,6 +151,7 @@ class CommentFormNode(BaseCommentNode):
     def render(self, context):
         context[self.as_varname] = self.get_form(context)
         return ''
+
 
 class RenderCommentFormNode(CommentFormNode):
     """Render the comment form directly"""
@@ -184,6 +188,7 @@ class RenderCommentFormNode(CommentFormNode):
             return formstr
         else:
             return ''
+
 
 class RenderCommentListNode(CommentListNode):
     """Render the comment list directly"""
@@ -228,6 +233,7 @@ class RenderCommentListNode(CommentListNode):
 # the automagic docstrings-into-admin-docs tricks. So each node gets a cute
 # wrapper function that just exists to hold the docstring.
 
+
 @register.tag
 def get_comment_count(parser, token):
     """
@@ -248,6 +254,7 @@ def get_comment_count(parser, token):
 
     """
     return CommentCountNode.handle_token(parser, token)
+
 
 @register.tag
 def get_comment_list(parser, token):
@@ -271,6 +278,7 @@ def get_comment_list(parser, token):
     """
     return CommentListNode.handle_token(parser, token)
 
+
 @register.tag
 def render_comment_list(parser, token):
     """
@@ -289,6 +297,7 @@ def render_comment_list(parser, token):
     """
     return RenderCommentListNode.handle_token(parser, token)
 
+
 @register.tag
 def get_comment_form(parser, token):
     """
@@ -300,6 +309,7 @@ def get_comment_form(parser, token):
         {% get_comment_form for [app].[model] [object_id] as [varname] %}
     """
     return CommentFormNode.handle_token(parser, token)
+
 
 @register.tag
 def render_comment_form(parser, token):
@@ -314,6 +324,7 @@ def render_comment_form(parser, token):
     """
     return RenderCommentFormNode.handle_token(parser, token)
 
+
 @register.simple_tag
 def comment_form_target():
     """
@@ -324,6 +335,7 @@ def comment_form_target():
         <form action="{% comment_form_target %}" method="post">
     """
     return comments.get_form_target()
+
 
 @register.simple_tag
 def get_comment_permalink(comment, anchor_pattern=None):

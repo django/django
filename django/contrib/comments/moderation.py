@@ -65,6 +65,7 @@ from django.contrib import comments
 from django.contrib.sites.models import get_current_site
 from django.utils import timezone
 
+
 class AlreadyModerated(Exception):
     """
     Raised when a model which is already registered for moderation is
@@ -73,6 +74,7 @@ class AlreadyModerated(Exception):
     """
     pass
 
+
 class NotModerated(Exception):
     """
     Raised when a model which is not registered for moderation is
@@ -80,6 +82,7 @@ class NotModerated(Exception):
 
     """
     pass
+
 
 class CommentModerator(object):
     """
@@ -244,6 +247,7 @@ class CommentModerator(object):
                                                           content_object)
         message = t.render(c)
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list, fail_silently=True)
+
 
 class Moderator(object):
     """

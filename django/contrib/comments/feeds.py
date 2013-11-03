@@ -3,6 +3,7 @@ from django.contrib.sites.models import get_current_site
 from django.contrib import comments
 from django.utils.translation import ugettext as _
 
+
 class LatestCommentFeed(Feed):
     """Feed of latest comments on the current site."""
 

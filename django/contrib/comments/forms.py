@@ -12,6 +12,7 @@ from django.utils.translation import ungettext, ugettext, ugettext_lazy as _
 
 COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)
 
+
 class CommentSecurityForm(forms.Form):
     """
     Handles the security aspects (anti-spoofing) for comment forms.
@@ -88,6 +89,7 @@ class CommentSecurityForm(forms.Form):
         key_salt = "django.contrib.forms.CommentSecurityForm"
         value = "-".join(info)
         return salted_hmac(key_salt, value).hexdigest()
+
 
 class CommentDetailsForm(CommentSecurityForm):
     """
@@ -180,6 +182,7 @@ class CommentDetailsForm(CommentSecurityForm):
                         ['"%s%s%s"' % (i[0], '-'*(len(i)-2), i[-1])
                          for i in bad_words], ugettext('and')))
         return comment
+
 
 class CommentForm(CommentDetailsForm):
     honeypot      = forms.CharField(required=False,
