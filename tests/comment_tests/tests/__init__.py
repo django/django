@@ -71,10 +71,10 @@ class CommentTestCase(TestCase):
 
     def getData(self):
         return {
-            'name'      : 'Jim Bob',
-            'email'     : 'jim.bob@example.com',
-            'url'       : '',
-            'comment'   : 'This is my comment',
+            'name': 'Jim Bob',
+            'email': 'jim.bob@example.com',
+            'url': '',
+            'comment': 'This is my comment',
         }
 
     def getValidData(self, obj):
