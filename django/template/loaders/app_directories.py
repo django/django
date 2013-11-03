@@ -32,6 +32,7 @@ for app in settings.INSTALLED_APPS:
 # It won't change, so convert it to a tuple to save memory.
 app_template_dirs = tuple(app_template_dirs)
 
+
 class Loader(BaseLoader):
     is_usable = True
 

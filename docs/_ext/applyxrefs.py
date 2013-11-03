@@ -9,10 +9,12 @@ DONT_TOUCH = (
     './index.txt',
 )
 
+
 def target_name(fn):
     if fn.endswith('.txt'):
         fn = fn[:-4]
     return '_' + fn.lstrip('./').replace('/', '-')
+
 
 def process_file(fn, lines):
     lines.insert(0, '\n')
@@ -22,6 +24,7 @@ def process_file(fn, lines):
             fp.writelines(lines)
     except IOError:
         print("Can't open %s for writing. Not touching it." % fn)
+
 
 def has_target(fn):
     try:
@@ -38,6 +41,7 @@ def has_target(fn):
     if lines[0].startswith('.. _'):
         return (True, None)
     return (False, lines)
+
 
 def main(argv=None):
     if argv is None:

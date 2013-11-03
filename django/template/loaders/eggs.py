@@ -11,6 +11,7 @@ from django.template.base import TemplateDoesNotExist
 from django.template.loader import BaseLoader
 from django.utils import six
 
+
 class Loader(BaseLoader):
     is_usable = resource_string is not None
 

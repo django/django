@@ -11,8 +11,10 @@ register = Library()
 
 BLOCK_CONTEXT_KEY = 'block_context'
 
+
 class ExtendsError(Exception):
     pass
+
 
 class BlockContext(object):
     def __init__(self):
@@ -37,6 +39,7 @@ class BlockContext(object):
             return self.blocks[name][-1]
         except IndexError:
             return None
+
 
 class BlockNode(Node):
     def __init__(self, name, nodelist, parent=None):
@@ -70,6 +73,7 @@ class BlockNode(Node):
             render_context[BLOCK_CONTEXT_KEY].get_block(self.name) is not None):
             return mark_safe(self.render(self.context))
         return ''
+
 
 class ExtendsNode(Node):
     must_be_first = True
@@ -120,6 +124,7 @@ class ExtendsNode(Node):
         # Call Template._render explicitly so the parser context stays
         # the same.
         return compiled_parent._render(context)
+
 
 class IncludeNode(Node):
     def __init__(self, template, *args, **kwargs):
@@ -177,6 +182,7 @@ def do_block(parser, token):
 
     return BlockNode(block_name, nodelist)
 
+
 @register.tag('extends')
 def do_extends(parser, token):
     """
@@ -196,6 +202,7 @@ def do_extends(parser, token):
     if nodelist.get_nodes_by_type(ExtendsNode):
         raise TemplateSyntaxError("'%s' cannot appear more than once in the same template" % bits[0])
     return ExtendsNode(nodelist, parent_name)
+
 
 @register.tag('include')
 def do_include(parser, token):

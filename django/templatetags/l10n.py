@@ -5,6 +5,7 @@ from django.utils.encoding import force_text
 
 register = Library()
 
+
 @register.filter(is_safe=False)
 def localize(value):
     """
@@ -13,6 +14,7 @@ def localize(value):
     """
     return force_text(formats.localize(value, use_l10n=True))
 
+
 @register.filter(is_safe=False)
 def unlocalize(value):
     """
@@ -20,6 +22,7 @@ def unlocalize(value):
     regardless of the value of ``settings.USE_L10N``.
     """
     return force_text(value)
+
 
 class LocalizeNode(Node):
     def __init__(self, nodelist, use_l10n):
@@ -35,6 +38,7 @@ class LocalizeNode(Node):
         output = self.nodelist.render(context)
         context.use_l10n = old_setting
         return output
+
 
 @register.tag('localize')
 def localize_tag(parser, token):
