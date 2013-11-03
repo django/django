@@ -251,7 +251,7 @@ class ApproveViewTests(CommentTestCase):
     def testApprovedView(self):
         comments = self.createSomeComments()
         pk = comments[0].pk
-        response = self.client.get("/approved/", data={"c":pk})
+        response = self.client.get("/approved/", data={"c": pk})
         self.assertTemplateUsed(response, "comments/approved.html")
 
 class AdminActionsTests(CommentTestCase):

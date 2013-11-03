@@ -10,7 +10,7 @@ from django.utils.text import get_text_list
 from django.utils import timezone
 from django.utils.translation import ungettext, ugettext, ugettext_lazy as _
 
-COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)
+COMMENT_MAX_LENGTH = getattr(settings, 'COMMENT_MAX_LENGTH', 3000)
 
 class CommentSecurityForm(forms.Form):
     """

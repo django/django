@@ -1416,7 +1416,7 @@ class DocTestRunner:
         Record the fact that the given DocTest (`test`) generated `f`
         failures out of `t` tried examples.
         """
-        f2, t2 = self._name2ft.get(test.name, (0,0))
+        f2, t2 = self._name2ft.get(test.name, (0, 0))
         self._name2ft[test.name] = (f+f2, t+t2)
         self.failures += f
         self.tries += t
@@ -1585,9 +1585,9 @@ class OutputChecker:
         # The values True and False replaced 1 and 0 as the return
         # value for boolean comparisons in Python 2.3.
         if not (optionflags & DONT_ACCEPT_TRUE_FOR_1):
-            if (got,want) == ("True\n", "1\n"):
+            if (got, want) == ("True\n", "1\n"):
                 return True
-            if (got,want) == ("False\n", "0\n"):
+            if (got, want) == ("False\n", "0\n"):
                 return True
 
         # <BLANKLINE> can be used as a special sequence to signify a
@@ -2125,10 +2125,10 @@ class Tester:
         test = DocTestParser().get_doctest(s, self.globs, name, None, None)
         if self.verbose:
             print("Running string %s" % name)
-        (f,t) = self.testrunner.run(test)
+        (f, t) = self.testrunner.run(test)
         if self.verbose:
             print("%s of %s examples failed in string %s" % (f, t, name))
-        return (f,t)
+        return (f, t)
 
     def rundoc(self, object, name=None, module=None):
         f = t = 0
@@ -2136,8 +2136,8 @@ class Tester:
                                      globs=self.globs)
         for test in tests:
             (f2, t2) = self.testrunner.run(test)
-            (f,t) = (f+f2, t+t2)
-        return (f,t)
+            (f, t) = (f+f2, t+t2)
+        return (f, t)
 
     def rundict(self, d, name, module=None):
         import new
