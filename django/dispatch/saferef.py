@@ -9,7 +9,7 @@ import traceback
 import weakref
 
 
-def safeRef(target, onDelete = None):
+def safeRef(target, onDelete=None):
     """Return a *safe* weak reference to a callable target
 
     target -- the object to be weakly referenced, if it's a

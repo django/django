@@ -126,9 +126,9 @@ class TemplateResponseMixin(object):
         """
         response_kwargs.setdefault('content_type', self.content_type)
         return self.response_class(
-            request = self.request,
-            template = self.get_template_names(),
-            context = context,
+            request=self.request,
+            template=self.get_template_names(),
+            context=context,
             **response_kwargs
         )
 

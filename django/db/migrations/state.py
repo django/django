@@ -26,7 +26,7 @@ class ProjectState(object):
     def clone(self):
         "Returns an exact copy of this ProjectState"
         return ProjectState(
-            models = dict((k, v.clone()) for k, v in self.models.items())
+            models=dict((k, v.clone()) for k, v in self.models.items())
         )
 
     def render(self):
@@ -137,11 +137,11 @@ class ModelState(object):
             fields.append((name, field_class(*args, **kwargs)))
         # Now make a copy
         return self.__class__(
-            app_label = self.app_label,
-            name = self.name,
-            fields = fields,
-            options = dict(self.options),
-            bases = self.bases,
+            app_label=self.app_label,
+            name=self.name,
+            fields=fields,
+            options=dict(self.options),
+            bases=self.bases,
         )
 
     def render(self, app_cache):

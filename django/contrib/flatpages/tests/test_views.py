@@ -75,7 +75,7 @@ class FlatpageViewTests(TestCase):
 
 
 @override_settings(
-    APPEND_SLASH = True,
+    APPEND_SLASH=True,
     LOGIN_URL='/accounts/login/',
     MIDDLEWARE_CLASSES=(
         'django.middleware.common.CommonMiddleware',
