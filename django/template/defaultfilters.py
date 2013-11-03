@@ -40,7 +40,7 @@ def stringfilter(func):
             args = list(args)
             args[0] = force_text(args[0])
             if (isinstance(args[0], SafeData) and
-                getattr(_dec._decorated_function, 'is_safe', False)):
+                    getattr(_dec._decorated_function, 'is_safe', False)):
                 return mark_safe(func(*args, **kwargs))
         return func(*args, **kwargs)
 
@@ -680,14 +680,14 @@ def unordered_list(value, autoescape=None):
                 sublist_item = title
                 title = ''
             elif i < list_length - 1:
-                next_item = list_[i+1]
+                next_item = list_[i + 1]
                 if next_item and isinstance(next_item, (list, tuple)):
                     # The next item is a sub-list.
                     sublist_item = next_item
                     # We've processed the next item now too.
                     i += 1
             if sublist_item:
-                sublist = _helper(sublist_item, tabs+1)
+                sublist = _helper(sublist_item, tabs + 1)
                 sublist = '\n%s<ul>\n%s\n%s</ul>\n%s' % (indent, sublist,
                                                          indent, indent)
             output.append('%s<li>%s%s</li>' % (indent,

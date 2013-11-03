@@ -153,7 +153,7 @@ class QuerySet(object):
         assert ((not isinstance(k, slice) and (k >= 0))
                 or (isinstance(k, slice) and (k.start is None or k.start >= 0)
                     and (k.stop is None or k.stop >= 0))), \
-                "Negative indexing is not supported."
+            "Negative indexing is not supported."
 
         if self._result_cache is not None:
             return self._result_cache[k]
@@ -392,7 +392,7 @@ class QuerySet(object):
         fields = self.model._meta.local_fields
         with transaction.commit_on_success_unless_managed(using=self.db):
             if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk
-                and self.model._meta.has_auto_field):
+                    and self.model._meta.has_auto_field):
                 self._batched_insert(objs, fields, batch_size)
             else:
                 objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
@@ -521,7 +521,7 @@ class QuerySet(object):
         that ID.
         """
         assert self.query.can_filter(), \
-                "Cannot use 'limit' or 'offset' with in_bulk"
+            "Cannot use 'limit' or 'offset' with in_bulk"
         if not id_list:
             return {}
         qs = self.filter(pk__in=id_list).order_by()
@@ -532,7 +532,7 @@ class QuerySet(object):
         Deletes the records in the current QuerySet.
         """
         assert self.query.can_filter(), \
-                "Cannot use 'limit' or 'offset' with delete."
+            "Cannot use 'limit' or 'offset' with delete."
 
         del_query = self._clone()
 
@@ -569,7 +569,7 @@ class QuerySet(object):
         fields to the appropriate values.
         """
         assert self.query.can_filter(), \
-                "Cannot update a query once a slice has been taken."
+            "Cannot update a query once a slice has been taken."
         self._for_write = True
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
@@ -587,7 +587,7 @@ class QuerySet(object):
         useful at that level).
         """
         assert self.query.can_filter(), \
-                "Cannot update a query once a slice has been taken."
+            "Cannot update a query once a slice has been taken."
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_fields(values)
         self._result_cache = None
@@ -635,11 +635,11 @@ class QuerySet(object):
         the given field_name, scoped to 'kind'.
         """
         assert kind in ("year", "month", "day"), \
-                "'kind' must be one of 'year', 'month' or 'day'."
+            "'kind' must be one of 'year', 'month' or 'day'."
         assert order in ('ASC', 'DESC'), \
-                "'order' must be either 'ASC' or 'DESC'."
+            "'order' must be either 'ASC' or 'DESC'."
         return self._clone(klass=DateQuerySet, setup=True,
-                _field_name=field_name, _kind=kind, _order=order)
+            _field_name=field_name, _kind=kind, _order=order)
 
     def datetimes(self, field_name, kind, order='ASC', tzinfo=None):
         """
@@ -647,9 +647,9 @@ class QuerySet(object):
         datetimes for the given field_name, scoped to 'kind'.
         """
         assert kind in ("year", "month", "day", "hour", "minute", "second"), \
-                "'kind' must be one of 'year', 'month', 'day', 'hour', 'minute' or 'second'."
+            "'kind' must be one of 'year', 'month', 'day', 'hour', 'minute' or 'second'."
         assert order in ('ASC', 'DESC'), \
-                "'order' must be either 'ASC' or 'DESC'."
+            "'order' must be either 'ASC' or 'DESC'."
         if settings.USE_TZ:
             if tzinfo is None:
                 tzinfo = timezone.get_current_timezone()
@@ -804,7 +804,7 @@ class QuerySet(object):
         Returns a new QuerySet instance with the ordering changed.
         """
         assert self.query.can_filter(), \
-                "Cannot reorder a query once a slice has been taken."
+            "Cannot reorder a query once a slice has been taken."
         obj = self._clone()
         obj.query.clear_ordering(force_empty=False)
         obj.query.add_ordering(*field_names)
@@ -815,7 +815,7 @@ class QuerySet(object):
         Returns a new QuerySet instance that will select only distinct results.
         """
         assert self.query.can_filter(), \
-                "Cannot create distinct fields once a slice has been taken."
+            "Cannot create distinct fields once a slice has been taken."
         obj = self._clone()
         obj.query.add_distinct_fields(*field_names)
         return obj
@@ -826,7 +826,7 @@ class QuerySet(object):
         Adds extra SQL fragments to the query.
         """
         assert self.query.can_filter(), \
-                "Cannot change a query once a slice has been taken"
+            "Cannot change a query once a slice has been taken"
         clone = self._clone()
         clone.query.add_extra(select, select_params, where, params, tables, order_by)
         return clone
@@ -1359,7 +1359,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
                 next = requested[f.name]
             else:
                 next = None
-            klass_info = get_klass_info(f.rel.to, max_depth=max_depth, cur_depth=cur_depth+1,
+            klass_info = get_klass_info(f.rel.to, max_depth=max_depth, cur_depth=cur_depth + 1,
                                         requested=next, only_load=only_load)
             related_fields.append((f, klass_info))
 
@@ -1486,7 +1486,7 @@ class RawQuerySet(object):
     annotated model instances.
     """
     def __init__(self, raw_query, model=None, query=None, params=None,
-        translations=None, using=None, hints=None):
+            translations=None, using=None, hints=None):
         self.raw_query = raw_query
         self.model = model
         self._db = using

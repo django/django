@@ -122,7 +122,7 @@ class CommonMiddleware(object):
                 etag = '"%s"' % hashlib.md5(response.content).hexdigest()
             if etag is not None:
                 if (200 <= response.status_code < 300
-                    and request.META.get('HTTP_IF_NONE_MATCH') == etag):
+                        and request.META.get('HTTP_IF_NONE_MATCH') == etag):
                     cookies = response.cookies
                     response = http.HttpResponseNotModified()
                     response.cookies = cookies

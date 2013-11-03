@@ -593,7 +593,7 @@ class Field(object):
         rel_model = self.rel.to
         if hasattr(self.rel, 'get_related_field'):
             lst = [(getattr(x, self.rel.get_related_field().attname),
-                        smart_text(x))
+                    smart_text(x))
                    for x in rel_model._default_manager.complex_filter(
                        self.rel.limit_choices_to)]
         else:
@@ -1281,7 +1281,7 @@ class IntegerField(Field):
 
     def get_prep_lookup(self, lookup_type, value):
         if ((lookup_type == 'gte' or lookup_type == 'lt')
-            and isinstance(value, float)):
+                and isinstance(value, float)):
             value = math.ceil(value)
         return super(IntegerField, self).get_prep_lookup(lookup_type, value)
 
@@ -1676,8 +1676,8 @@ class BinaryField(Field):
         return default
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        value = super(BinaryField, self
-            ).get_db_prep_value(value, connection, prepared)
+        value = super(BinaryField,
+            self).get_db_prep_value(value, connection, prepared)
         if value is not None:
             return connection.Database.Binary(value)
         return value

@@ -81,7 +81,7 @@ def format_html(format_string, *args, **kwargs):
     """
     args_safe = map(conditional_escape, args)
     kwargs_safe = dict((k, conditional_escape(v)) for (k, v) in
-                        six.iteritems(kwargs))
+        six.iteritems(kwargs))
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
 
 
@@ -238,7 +238,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                     lead = lead + opening
                 # Keep parentheses at the end only if they're balanced.
                 if (middle.endswith(closing)
-                    and middle.count(closing) == middle.count(opening) + 1):
+                        and middle.count(closing) == middle.count(opening) + 1):
                     middle = middle[:-len(closing)]
                     trail = closing + trail
 

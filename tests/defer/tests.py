@@ -11,7 +11,7 @@ class DeferTests(TestCase):
         count = 0
         for field in obj._meta.fields:
             if isinstance(obj.__class__.__dict__.get(field.attname),
-                DeferredAttribute):
+                    DeferredAttribute):
                 count += 1
         self.assertEqual(count, num)
 

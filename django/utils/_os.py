@@ -75,7 +75,7 @@ def safe_join(base, *paths):
     #  c) The base path must be the most root path (meaning either "/" or "C:\\")
     if (not normcase(final_path).startswith(normcase(base_path + sep)) and
         normcase(final_path) != normcase(base_path) and
-        dirname(normcase(base_path)) != normcase(base_path)):
+            dirname(normcase(base_path)) != normcase(base_path)):
         raise ValueError('The joined path (%s) is located outside of the base '
                          'path component (%s)' % (final_path, base_path))
     return final_path

@@ -73,7 +73,7 @@ def get_test_modules():
                 f == '__pycache__' or
                 f.startswith('sql') or
                 os.path.basename(f) in SUBDIRS_TO_SKIP or
-                os.path.isfile(f)):
+                    os.path.isfile(f)):
                 continue
             modules.append((modpath, f))
     return modules
