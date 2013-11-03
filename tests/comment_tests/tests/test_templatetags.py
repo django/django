@@ -83,7 +83,7 @@ class CommentTemplateTagTests(CommentTestCase):
 
     def verifyGetCommentList(self, tag=None):
         c1, c2, c3, c4 = Comment.objects.all()[:4]
-        t = "{% load comments %}" +  (tag or "{% get_comment_list for comment_tests.author a.id as cl %}")
+        t = "{% load comments %}" + (tag or "{% get_comment_list for comment_tests.author a.id as cl %}")
         ctx, out = self.render(t, a=Author.objects.get(pk=1))
         self.assertEqual(out, "")
         self.assertEqual(list(ctx["cl"]), [c2])

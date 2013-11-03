@@ -100,13 +100,13 @@ def perform_flag(request, comment):
     """
     flag, created = comments.models.CommentFlag.objects.get_or_create(
         comment = comment,
-        user    = request.user,
-        flag    = comments.models.CommentFlag.SUGGEST_REMOVAL
+        user = request.user,
+        flag = comments.models.CommentFlag.SUGGEST_REMOVAL
     )
     signals.comment_was_flagged.send(
-        sender  = comment.__class__,
+        sender = comment.__class__,
         comment = comment,
-        flag    = flag,
+        flag = flag,
         created = created,
         request = request,
     )
@@ -114,15 +114,15 @@ def perform_flag(request, comment):
 def perform_delete(request, comment):
     flag, created = comments.models.CommentFlag.objects.get_or_create(
         comment = comment,
-        user    = request.user,
-        flag    = comments.models.CommentFlag.MODERATOR_DELETION
+        user = request.user,
+        flag = comments.models.CommentFlag.MODERATOR_DELETION
     )
     comment.is_removed = True
     comment.save()
     signals.comment_was_flagged.send(
-        sender  = comment.__class__,
+        sender = comment.__class__,
         comment = comment,
-        flag    = flag,
+        flag = flag,
         created = created,
         request = request,
     )
@@ -131,8 +131,8 @@ def perform_delete(request, comment):
 def perform_approve(request, comment):
     flag, created = comments.models.CommentFlag.objects.get_or_create(
         comment = comment,
-        user    = request.user,
-        flag    = comments.models.CommentFlag.MODERATOR_APPROVAL,
+        user = request.user,
+        flag = comments.models.CommentFlag.MODERATOR_APPROVAL,
     )
 
     comment.is_removed = False
@@ -140,9 +140,9 @@ def perform_approve(request, comment):
     comment.save()
 
     signals.comment_was_flagged.send(
-        sender  = comment.__class__,
+        sender = comment.__class__,
         comment = comment,
-        flag    = flag,
+        flag = flag,
         created = created,
         request = request,
     )

@@ -16,9 +16,9 @@ class CommentSecurityForm(forms.Form):
     """
     Handles the security aspects (anti-spoofing) for comment forms.
     """
-    content_type  = forms.CharField(widget=forms.HiddenInput)
-    object_pk     = forms.CharField(widget=forms.HiddenInput)
-    timestamp     = forms.IntegerField(widget=forms.HiddenInput)
+    content_type = forms.CharField(widget=forms.HiddenInput)
+    object_pk = forms.CharField(widget=forms.HiddenInput)
+    timestamp = forms.IntegerField(widget=forms.HiddenInput)
     security_hash = forms.CharField(min_length=40, max_length=40, widget=forms.HiddenInput)
 
     def __init__(self, target_object, data=None, initial=None):
@@ -59,7 +59,7 @@ class CommentSecurityForm(forms.Form):
     def generate_security_data(self):
         """Generate a dict of security data for "initial" data."""
         timestamp = int(time.time())
-        security_dict =   {
+        security_dict = {
             'content_type': str(self.target_object._meta),
             'object_pk': str(self.target_object._get_pk_val()),
             'timestamp': str(timestamp),
@@ -93,10 +93,10 @@ class CommentDetailsForm(CommentSecurityForm):
     """
     Handles the specific details of the comment (name, comment, etc.).
     """
-    name          = forms.CharField(label=_("Name"), max_length=50)
-    email         = forms.EmailField(label=_("Email address"))
-    url           = forms.URLField(label=_("URL"), required=False)
-    comment       = forms.CharField(label=_('Comment'), widget=forms.Textarea,
+    name = forms.CharField(label=_("Name"), max_length=50)
+    email = forms.EmailField(label=_("Email address"))
+    url = forms.URLField(label=_("URL"), required=False)
+    comment = forms.CharField(label=_('Comment'), widget=forms.Textarea,
                                     max_length=COMMENT_MAX_LENGTH)
 
     def get_comment_object(self):
@@ -133,15 +133,15 @@ class CommentDetailsForm(CommentSecurityForm):
         """
         return dict(
             content_type = ContentType.objects.get_for_model(self.target_object),
-            object_pk    = force_text(self.target_object._get_pk_val()),
-            user_name    = self.cleaned_data["name"],
-            user_email   = self.cleaned_data["email"],
-            user_url     = self.cleaned_data["url"],
-            comment      = self.cleaned_data["comment"],
-            submit_date  = timezone.now(),
-            site_id      = settings.SITE_ID,
-            is_public    = True,
-            is_removed   = False,
+            object_pk = force_text(self.target_object._get_pk_val()),
+            user_name = self.cleaned_data["name"],
+            user_email = self.cleaned_data["email"],
+            user_url = self.cleaned_data["url"],
+            comment = self.cleaned_data["comment"],
+            submit_date = timezone.now(),
+            site_id = settings.SITE_ID,
+            is_public = True,
+            is_removed = False,
         )
 
     def check_for_duplicate_comment(self, new):
@@ -182,7 +182,7 @@ class CommentDetailsForm(CommentSecurityForm):
         return comment
 
 class CommentForm(CommentDetailsForm):
-    honeypot      = forms.CharField(required=False,
+    honeypot = forms.CharField(required=False,
                                     label=_('If you enter anything in this field '
                                             'your comment will be treated as spam'))
 

@@ -84,8 +84,8 @@ class BaseCommentNode(six.with_metaclass(RenameBaseCommentNodeMethods, template.
 
         qs = self.comment_model.objects.filter(
             content_type = ctype,
-            object_pk    = smart_text(object_pk),
-            site__pk     = settings.SITE_ID,
+            object_pk = smart_text(object_pk),
+            site__pk = settings.SITE_ID,
         )
 
         # The is_public and is_removed fields are implementation details of the
