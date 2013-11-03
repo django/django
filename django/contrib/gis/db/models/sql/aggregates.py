@@ -1,6 +1,8 @@
-from django.db.models.sql.aggregates import Aggregate
+from django.db.models.sql.aggregates import Aggregate, Count
 from django.contrib.gis.db.models.fields import GeometryField
 
+
+__all__ = ['Count', 'Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union']
 
 class GeoAggregate(Aggregate):
     # Default SQL template for spatial aggregates.
