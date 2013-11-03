@@ -518,7 +518,6 @@ class DocTest:
         return ('<DocTest %s from %s:%s (%s)>' %
                 (self.name, self.filename, self.lineno, examples))
 
-
     # This lets us sort tests by name:
     def _cmpkey(self):
         return (self.name, self.filename, self.lineno, id(self))
