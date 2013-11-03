@@ -31,7 +31,7 @@ class NullFkTests(TestCase):
                 (c1.id, 'My first comment', '<Post: First Post>'),
                 (c2.id, 'My second comment', 'None')
             ],
-            transform = lambda c: (c.id, c.comment_text, repr(c.post))
+            transform=lambda c: (c.id, c.comment_text, repr(c.post))
         )
 
         # Regression test for #7530, #7716.
@@ -43,7 +43,7 @@ class NullFkTests(TestCase):
                 (c1.id, 'My first comment', '<Post: First Post>'),
                 (c2.id, 'My second comment', 'None')
             ],
-            transform = lambda c: (c.id, c.comment_text, repr(c.post))
+            transform=lambda c: (c.id, c.comment_text, repr(c.post))
         )
 
     def test_combine_isnull(self):

@@ -64,7 +64,7 @@ class OptimizerTests(TestCase):
         self.assertOptimizesTo(
             [migrations.DeleteModel("Foo")],
             [migrations.DeleteModel("Foo")],
-            exact = 1,
+            exact=1,
         )
 
     def test_create_delete_model(self):

@@ -61,7 +61,7 @@ class DataTypesTestCase(TestCase):
                          Donut.objects.filter(baked_date__year=2006)[0].name)
 
         Donut.objects.create(name='Apple Fritter',
-            consumed_at = datetime.datetime(year=2007, month=4, day=20, hour=16, minute=19, second=59))
+            consumed_at=datetime.datetime(year=2007, month=4, day=20, hour=16, minute=19, second=59))
 
         self.assertEqual(['Apple Fritter', 'Date Test 2007'],
             list(Donut.objects.filter(consumed_at__year=2007).order_by('name').values_list('name', flat=True)))

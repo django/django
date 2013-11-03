@@ -6,7 +6,7 @@ from django.db import models
 
 
 class Counter(models.Model):
-    name = models.CharField(max_length = 10)
+    name = models.CharField(max_length=10)
     value = models.IntegerField()
 
 

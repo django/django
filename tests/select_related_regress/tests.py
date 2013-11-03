@@ -58,8 +58,8 @@ class SelectRelatedRegressTests(TestCase):
         usp = Person.objects.create(user=us)
         uo = TUser.objects.create(name="org")
         uop = Person.objects.create(user=uo)
-        s = Student.objects.create(person = usp)
-        o = Organizer.objects.create(person = uop)
+        s = Student.objects.create(person=usp)
+        o = Organizer.objects.create(person=uop)
         c = Class.objects.create(org=o)
         Enrollment.objects.create(std=s, cls=c)
 

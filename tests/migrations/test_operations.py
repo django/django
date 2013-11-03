@@ -303,7 +303,7 @@ class OperationTests(MigrationTestBase):
         operation = migrations.RunSQL(
             "CREATE TABLE i_love_ponies (id int, special_thing int)",
             "DROP TABLE i_love_ponies",
-            state_operations = [migrations.CreateModel("SomethingElse", [("id", models.AutoField(primary_key=True))])],
+            state_operations=[migrations.CreateModel("SomethingElse", [("id", models.AutoField(primary_key=True))])],
         )
         # Test the state alteration
         new_state = project_state.clone()

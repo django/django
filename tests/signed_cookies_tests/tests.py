@@ -59,6 +59,6 @@ class SignedCookieTest(TestCase):
             self.assertEqual(request.get_signed_cookie('c', max_age=12), value)
             self.assertEqual(request.get_signed_cookie('c', max_age=11), value)
             self.assertRaises(signing.SignatureExpired,
-                request.get_signed_cookie, 'c', max_age = 10)
+                request.get_signed_cookie, 'c', max_age=10)
         finally:
             time.time = _time
