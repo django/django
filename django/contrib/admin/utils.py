@@ -412,7 +412,7 @@ def reverse_field_path(model, path):
     for piece in pieces:
         field, model, direct, m2m = parent._meta.get_field_by_name(piece)
         # skip trailing data field if extant:
-        if len(reversed_path) == len(pieces)-1:  # final iteration
+        if len(reversed_path) == len(pieces) - 1:  # final iteration
             try:
                 get_model_from_relation(field)
             except NotRelationField:

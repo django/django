@@ -436,13 +436,13 @@ class BaseCacheTests(object):
         it is an absolute expiration timestamp instead of a relative
         offset. Test that we honour this convention. Refs #12399.
         '''
-        self.cache.set('key1', 'eggs', 60*60*24*30 + 1)  # 30 days + 1 second
+        self.cache.set('key1', 'eggs', 60 * 60 * 24 * 30 + 1)  # 30 days + 1 second
         self.assertEqual(self.cache.get('key1'), 'eggs')
 
-        self.cache.add('key2', 'ham', 60*60*24*30 + 1)
+        self.cache.add('key2', 'ham', 60 * 60 * 24 * 30 + 1)
         self.assertEqual(self.cache.get('key2'), 'ham')
 
-        self.cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, 60*60*24*30 + 1)
+        self.cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, 60 * 60 * 24 * 30 + 1)
         self.assertEqual(self.cache.get('key3'), 'sausage')
         self.assertEqual(self.cache.get('key4'), 'lobster bisque')
 
@@ -1000,7 +1000,7 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
         """incr/decr does not modify expiry time (matches memcached behavior)"""
         key = 'value'
         _key = self.cache.make_key(key)
-        self.cache.set(key, 1, timeout=self.cache.default_timeout*10)
+        self.cache.set(key, 1, timeout=self.cache.default_timeout * 10)
         expire = self.cache._expire_info[_key]
         self.cache.incr(key)
         self.assertEqual(expire, self.cache._expire_info[_key])

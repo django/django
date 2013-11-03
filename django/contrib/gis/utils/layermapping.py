@@ -600,7 +600,7 @@ class LayerMapping(object):
             for i, end in enumerate(indices):
                 # Constructing the slice to use for this step; the last slice is
                 # special (e.g, [100:] instead of [90:100]).
-                if i+1 == n_i:
+                if i + 1 == n_i:
                     step_slice = slice(beg, None)
                 else:
                     step_slice = slice(beg, end)

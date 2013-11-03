@@ -94,7 +94,7 @@ class MultiPartParser(object):
         # For compatibility with low-level network APIs (with 32-bit integers),
         # the chunk size should be < 2^31, but still divisible by 4.
         possible_sizes = [x.chunk_size for x in upload_handlers if x.chunk_size]
-        self._chunk_size = min([2**31-4] + possible_sizes)
+        self._chunk_size = min([2 ** 31 - 4] + possible_sizes)
 
         self._meta = META
         self._encoding = encoding or settings.DEFAULT_CHARSET
@@ -267,7 +267,7 @@ class MultiPartParser(object):
 
     def IE_sanitize(self, filename):
         """Cleanup filename from Internet Explorer full paths."""
-        return filename and filename[filename.rfind("\\")+1:].strip()
+        return filename and filename[filename.rfind("\\") + 1:].strip()
 
 
 class LazyStream(six.Iterator):
@@ -512,11 +512,11 @@ class BoundaryIter(six.Iterator):
             end = index
             next = index + len(self._boundary)
             # backup over CRLF
-            last = max(0, end-1)
-            if data[last:last+1] == b'\n':
+            last = max(0, end - 1)
+            if data[last:last + 1] == b'\n':
                 end -= 1
-            last = max(0, end-1)
-            if data[last:last+1] == b'\r':
+            last = max(0, end - 1)
+            if data[last:last + 1] == b'\r':
                 end -= 1
             return end, next
 
@@ -623,7 +623,7 @@ def parse_header(line):
         i = p.find(b'=')
         if i >= 0:
             name = p[:i].strip().lower().decode('ascii')
-            value = p[i+1:].strip()
+            value = p[i + 1:].strip()
             if len(value) >= 2 and value[:1] == value[-1:] == b'"':
                 value = value[1:-1]
                 value = value.replace(b'\\\\', b'\\').replace(b'\\"', b'"')

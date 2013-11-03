@@ -33,7 +33,7 @@ class SeparateDatabaseAndState(Operation):
         base_state = to_state
         for pos, database_operation in enumerate(reversed(self.database_operations)):
             to_state = base_state.clone()
-            for dbop in self.database_operations[:-(pos+1)]:
+            for dbop in self.database_operations[:-(pos + 1)]:
                 dbop.state_forwards(app_label, to_state)
             from_state = base_state.clone()
             database_operation.state_forwards(app_label, from_state)

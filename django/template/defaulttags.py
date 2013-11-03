@@ -171,7 +171,7 @@ class ForNode(Node):
             for i, item in enumerate(values):
                 # Shortcuts for current loop iteration number.
                 loop_dict['counter0'] = i
-                loop_dict['counter'] = i+1
+                loop_dict['counter'] = i + 1
                 # Reverse counter iteration numbers.
                 loop_dict['revcounter'] = len_values - i
                 loop_dict['revcounter0'] = len_values - i - 1
@@ -832,7 +832,7 @@ def do_for(parser, token):
             raise TemplateSyntaxError("'for' tag received an invalid argument:"
                                       " %s" % token.contents)
 
-    sequence = parser.compile_filter(bits[in_index+1])
+    sequence = parser.compile_filter(bits[in_index + 1])
     nodelist_loop = parser.parse(('empty', 'endfor',))
     token = parser.next_token()
     if token.contents == 'empty':

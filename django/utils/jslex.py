@@ -25,7 +25,7 @@ def literals(choices, prefix="", suffix=""):
     individually.
 
     """
-    return "|".join(prefix+re.escape(c)+suffix for c in choices.split())
+    return "|".join(prefix + re.escape(c) + suffix for c in choices.split())
 
 
 class Lexer(object):

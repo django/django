@@ -55,12 +55,12 @@ def to_locale(language, to_lower=False):
     p = language.find('-')
     if p >= 0:
         if to_lower:
-            return language[:p].lower()+'_'+language[p+1:].lower()
+            return language[:p].lower() + '_' + language[p + 1:].lower()
         else:
             # Get correct locale for sr-latn
-            if len(language[p+1:]) > 2:
-                return language[:p].lower()+'_'+language[p+1].upper()+language[p+2:].lower()
-            return language[:p].lower()+'_'+language[p+1:].upper()
+            if len(language[p + 1:]) > 2:
+                return language[:p].lower() + '_' + language[p + 1].upper() + language[p + 2:].lower()
+            return language[:p].lower() + '_' + language[p + 1:].upper()
     else:
         return language.lower()
 
@@ -69,7 +69,7 @@ def to_language(locale):
     """Turns a locale name (en_US) into a language name (en-us)."""
     p = locale.find('_')
     if p >= 0:
-        return locale[:p].lower()+'-'+locale[p+1:].lower()
+        return locale[:p].lower() + '-' + locale[p + 1:].lower()
     else:
         return locale.lower()
 

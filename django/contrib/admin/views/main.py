@@ -236,7 +236,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
             result_list = self.queryset._clone()
         else:
             try:
-                result_list = paginator.page(self.page_num+1).object_list
+                result_list = paginator.page(self.page_num + 1).object_list
             except InvalidPage:
                 raise IncorrectLookupParameters
 

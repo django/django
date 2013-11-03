@@ -613,15 +613,15 @@ class DefaultFiltersTests(TestCase):
         # NOTE: \xa0 avoids wrapping between value and unit
         self.assertEqual(filesizeformat(1023), '1023\xa0bytes')
         self.assertEqual(filesizeformat(1024), '1.0\xa0KB')
-        self.assertEqual(filesizeformat(10*1024), '10.0\xa0KB')
-        self.assertEqual(filesizeformat(1024*1024-1), '1024.0\xa0KB')
-        self.assertEqual(filesizeformat(1024*1024), '1.0\xa0MB')
-        self.assertEqual(filesizeformat(1024*1024*50), '50.0\xa0MB')
-        self.assertEqual(filesizeformat(1024*1024*1024-1), '1024.0\xa0MB')
-        self.assertEqual(filesizeformat(1024*1024*1024), '1.0\xa0GB')
-        self.assertEqual(filesizeformat(1024*1024*1024*1024), '1.0\xa0TB')
-        self.assertEqual(filesizeformat(1024*1024*1024*1024*1024), '1.0\xa0PB')
-        self.assertEqual(filesizeformat(1024*1024*1024*1024*1024*2000),
+        self.assertEqual(filesizeformat(10 * 1024), '10.0\xa0KB')
+        self.assertEqual(filesizeformat(1024 * 1024 - 1), '1024.0\xa0KB')
+        self.assertEqual(filesizeformat(1024 * 1024), '1.0\xa0MB')
+        self.assertEqual(filesizeformat(1024 * 1024 * 50), '50.0\xa0MB')
+        self.assertEqual(filesizeformat(1024 * 1024 * 1024 - 1), '1024.0\xa0MB')
+        self.assertEqual(filesizeformat(1024 * 1024 * 1024), '1.0\xa0GB')
+        self.assertEqual(filesizeformat(1024 * 1024 * 1024 * 1024), '1.0\xa0TB')
+        self.assertEqual(filesizeformat(1024 * 1024 * 1024 * 1024 * 1024), '1.0\xa0PB')
+        self.assertEqual(filesizeformat(1024 * 1024 * 1024 * 1024 * 1024 * 2000),
                           '2000.0\xa0PB')
         self.assertEqual(filesizeformat(complex(1, -1)), '0\xa0bytes')
         self.assertEqual(filesizeformat(""), '0\xa0bytes')
@@ -680,16 +680,16 @@ class DefaultFiltersI18NTests(TransRealMixin, TestCase):
         with self.settings(USE_L10N=True), translation.override('de', deactivate=True):
             self.assertEqual(filesizeformat(1023), '1023\xa0Bytes')
             self.assertEqual(filesizeformat(1024), '1,0\xa0KB')
-            self.assertEqual(filesizeformat(10*1024), '10,0\xa0KB')
-            self.assertEqual(filesizeformat(1024*1024-1), '1024,0\xa0KB')
-            self.assertEqual(filesizeformat(1024*1024), '1,0\xa0MB')
-            self.assertEqual(filesizeformat(1024*1024*50), '50,0\xa0MB')
-            self.assertEqual(filesizeformat(1024*1024*1024-1), '1024,0\xa0MB')
-            self.assertEqual(filesizeformat(1024*1024*1024), '1,0\xa0GB')
-            self.assertEqual(filesizeformat(1024*1024*1024*1024), '1,0\xa0TB')
-            self.assertEqual(filesizeformat(1024*1024*1024*1024*1024),
+            self.assertEqual(filesizeformat(10 * 1024), '10,0\xa0KB')
+            self.assertEqual(filesizeformat(1024 * 1024 - 1), '1024,0\xa0KB')
+            self.assertEqual(filesizeformat(1024 * 1024), '1,0\xa0MB')
+            self.assertEqual(filesizeformat(1024 * 1024 * 50), '50,0\xa0MB')
+            self.assertEqual(filesizeformat(1024 * 1024 * 1024 - 1), '1024,0\xa0MB')
+            self.assertEqual(filesizeformat(1024 * 1024 * 1024), '1,0\xa0GB')
+            self.assertEqual(filesizeformat(1024 * 1024 * 1024 * 1024), '1,0\xa0TB')
+            self.assertEqual(filesizeformat(1024 * 1024 * 1024 * 1024 * 1024),
                               '1,0\xa0PB')
-            self.assertEqual(filesizeformat(1024*1024*1024*1024*1024*2000),
+            self.assertEqual(filesizeformat(1024 * 1024 * 1024 * 1024 * 1024 * 2000),
                               '2000,0\xa0PB')
             self.assertEqual(filesizeformat(complex(1, -1)), '0\xa0Bytes')
             self.assertEqual(filesizeformat(""), '0\xa0Bytes')

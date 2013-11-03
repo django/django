@@ -346,7 +346,7 @@ class AggregationTests(TestCase):
     def test_aggregate_fexpr(self):
         # Aggregates can be used with F() expressions
         # ... where the F() is pushed into the HAVING clause
-        qs = Publisher.objects.annotate(num_books=Count('book')).filter(num_books__lt=F('num_awards')/2).order_by('name').values('name', 'num_books', 'num_awards')
+        qs = Publisher.objects.annotate(num_books=Count('book')).filter(num_books__lt=F('num_awards') / 2).order_by('name').values('name', 'num_books', 'num_awards')
         self.assertQuerysetEqual(
             qs, [
                 {'num_books': 1, 'name': 'Morgan Kaufmann', 'num_awards': 9},
@@ -355,7 +355,7 @@ class AggregationTests(TestCase):
             lambda p: p,
         )
 
-        qs = Publisher.objects.annotate(num_books=Count('book')).exclude(num_books__lt=F('num_awards')/2).order_by('name').values('name', 'num_books', 'num_awards')
+        qs = Publisher.objects.annotate(num_books=Count('book')).exclude(num_books__lt=F('num_awards') / 2).order_by('name').values('name', 'num_books', 'num_awards')
         self.assertQuerysetEqual(
             qs, [
                 {'num_books': 2, 'name': 'Apress', 'num_awards': 3},
@@ -366,7 +366,7 @@ class AggregationTests(TestCase):
         )
 
         # ... and where the F() references an aggregate
-        qs = Publisher.objects.annotate(num_books=Count('book')).filter(num_awards__gt=2*F('num_books')).order_by('name').values('name', 'num_books', 'num_awards')
+        qs = Publisher.objects.annotate(num_books=Count('book')).filter(num_awards__gt=2 * F('num_books')).order_by('name').values('name', 'num_books', 'num_awards')
         self.assertQuerysetEqual(
             qs, [
                 {'num_books': 1, 'name': 'Morgan Kaufmann', 'num_awards': 9},
@@ -375,7 +375,7 @@ class AggregationTests(TestCase):
             lambda p: p,
         )
 
-        qs = Publisher.objects.annotate(num_books=Count('book')).exclude(num_books__lt=F('num_awards')/2).order_by('name').values('name', 'num_books', 'num_awards')
+        qs = Publisher.objects.annotate(num_books=Count('book')).exclude(num_books__lt=F('num_awards') / 2).order_by('name').values('name', 'num_books', 'num_awards')
         self.assertQuerysetEqual(
             qs, [
                 {'num_books': 2, 'name': 'Apress', 'num_awards': 3},

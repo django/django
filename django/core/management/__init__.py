@@ -317,7 +317,7 @@ class ManagementUtility(object):
         cword = int(os.environ['COMP_CWORD'])
 
         try:
-            curr = cwords[cword-1]
+            curr = cwords[cword - 1]
         except IndexError:
             curr = ''
 
@@ -350,7 +350,7 @@ class ManagementUtility(object):
             options += [(s_opt.get_opt_string(), s_opt.nargs) for s_opt in
                         subcommand_cls.option_list]
             # filter out previously specified options from available options
-            prev_opts = [x.split('=')[0] for x in cwords[1:cword-1]]
+            prev_opts = [x.split('=')[0] for x in cwords[1:cword - 1]]
             options = [opt for opt in options if opt[0] not in prev_opts]
 
             # filter options by current input

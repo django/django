@@ -65,7 +65,7 @@ def get_image_dimensions(file_or_path, close=False):
                     raise
             if p.image:
                 return p.image.size
-            chunk_size = chunk_size*2
+            chunk_size *= 2
         return None
     finally:
         if close:

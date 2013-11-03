@@ -572,7 +572,7 @@ class BaseModelFormSet(BaseFormSet):
         if i >= self.initial_form_count() and self.initial_extra:
             # Set initial values for extra forms
             try:
-                kwargs['initial'] = self.initial_extra[i-self.initial_form_count()]
+                kwargs['initial'] = self.initial_extra[i - self.initial_form_count()]
             except IndexError:
                 pass
         return super(BaseModelFormSet, self)._construct_form(i, **kwargs)
