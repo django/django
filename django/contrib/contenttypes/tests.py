@@ -271,9 +271,9 @@ class ContentTypesTests(TestCase):
         is defined anymore.
         """
         ct = ContentType.objects.create(
-            name = 'Old model',
-            app_label = 'contenttypes',
-            model = 'OldModel',
+            name='Old model',
+            app_label='contenttypes',
+            model='OldModel',
         )
         self.assertEqual(six.text_type(ct), 'Old model')
         self.assertIsNone(ct.model_class())

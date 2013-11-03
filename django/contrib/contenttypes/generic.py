@@ -276,14 +276,14 @@ class ReverseGenericRelatedObjectsDescriptor(object):
 
         join_cols = self.field.get_joining_columns(reverse_join=True)[0]
         manager = RelatedManager(
-            model = rel_model,
-            instance = instance,
-            source_col_name = qn(join_cols[0]),
-            target_col_name = qn(join_cols[1]),
-            content_type = content_type,
-            content_type_field_name = self.field.content_type_field_name,
-            object_id_field_name = self.field.object_id_field_name,
-            prefetch_cache_name = self.field.attname,
+            model=rel_model,
+            instance=instance,
+            source_col_name=qn(join_cols[0]),
+            target_col_name=qn(join_cols[1]),
+            content_type=content_type,
+            content_type_field_name=self.field.content_type_field_name,
+            object_id_field_name=self.field.object_id_field_name,
+            prefetch_cache_name=self.field.attname,
         )
 
         return manager
@@ -329,15 +329,15 @@ def create_generic_related_manager(superclass):
             manager = getattr(self.model, kwargs.pop('manager'))
             manager_class = create_generic_related_manager(manager.__class__)
             return manager_class(
-                model = self.model,
-                instance = self.instance,
-                symmetrical = self.symmetrical,
-                source_col_name = self.source_col_name,
-                target_col_name = self.target_col_name,
-                content_type = self.content_type,
-                content_type_field_name = self.content_type_field_name,
-                object_id_field_name = self.object_id_field_name,
-                prefetch_cache_name = self.prefetch_cache_name,
+                model=self.model,
+                instance=self.instance,
+                symmetrical=self.symmetrical,
+                source_col_name=self.source_col_name,
+                target_col_name=self.target_col_name,
+                content_type=self.content_type,
+                content_type_field_name=self.content_type_field_name,
+                object_id_field_name=self.object_id_field_name,
+                prefetch_cache_name=self.prefetch_cache_name,
             )
         do_not_call_in_templates = True
 

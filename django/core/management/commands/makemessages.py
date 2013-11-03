@@ -239,7 +239,7 @@ class Command(NoArgsCommand):
         if settings.configured:
             settings.USE_I18N = True
         else:
-            settings.configure(USE_I18N = True)
+            settings.configure(USE_I18N=True)
 
         self.invoked_for_django = False
         if os.path.isdir(os.path.join('conf', 'locale')):

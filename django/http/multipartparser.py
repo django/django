@@ -495,7 +495,7 @@ class BoundaryIter(six.Iterator):
                 stream.unget(chunk[-rollback:])
                 return chunk[:-rollback]
 
-    def _find_boundary(self, data, eof = False):
+    def _find_boundary(self, data, eof=False):
         """
         Finds a multipart boundary in data.
 

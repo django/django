@@ -96,8 +96,8 @@ def result_headers(cl):
     ordering_field_columns = cl.get_ordering_field_columns()
     for i, field_name in enumerate(cl.list_display):
         text, attr = label_for_field(field_name, cl.model,
-            model_admin = cl.model_admin,
-            return_attr = True
+            model_admin=cl.model_admin,
+            return_attr=True
         )
         if attr:
             # Potentially not sortable

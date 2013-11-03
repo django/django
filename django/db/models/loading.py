@@ -43,20 +43,20 @@ def _initialize():
         app_store=ModelDict(),
 
         # Mapping of installed app_labels to model modules for that app.
-        app_labels = {},
+        app_labels={},
 
         # Mapping of app_labels to a dictionary of model names to model code.
         # May contain apps that are not installed.
         app_models=ModelDict(),
 
         # Mapping of app_labels to errors raised when trying to import the app.
-        app_errors = {},
+        app_errors={},
 
         # Pending lookups for lazy relations
-        pending_lookups = {},
+        pending_lookups={},
 
         # -- Everything below here is only used when populating the cache --
-        loads_installed = True,
+        loads_installed=True,
         loaded=False,
         handled=set(),
         postponed=[],

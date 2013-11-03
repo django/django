@@ -249,29 +249,29 @@ class BaseForm(object):
     def as_table(self):
         "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
         return self._html_output(
-            normal_row = '<tr%(html_class_attr)s><th>%(label)s</th><td>%(errors)s%(field)s%(help_text)s</td></tr>',
-            error_row = '<tr><td colspan="2">%s</td></tr>',
-            row_ender = '</td></tr>',
-            help_text_html = '<br /><span class="helptext">%s</span>',
-            errors_on_separate_row = False)
+            normal_row='<tr%(html_class_attr)s><th>%(label)s</th><td>%(errors)s%(field)s%(help_text)s</td></tr>',
+            error_row='<tr><td colspan="2">%s</td></tr>',
+            row_ender='</td></tr>',
+            help_text_html='<br /><span class="helptext">%s</span>',
+            errors_on_separate_row=False)
 
     def as_ul(self):
         "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
         return self._html_output(
-            normal_row = '<li%(html_class_attr)s>%(errors)s%(label)s %(field)s%(help_text)s</li>',
-            error_row = '<li>%s</li>',
-            row_ender = '</li>',
-            help_text_html = ' <span class="helptext">%s</span>',
-            errors_on_separate_row = False)
+            normal_row='<li%(html_class_attr)s>%(errors)s%(label)s %(field)s%(help_text)s</li>',
+            error_row='<li>%s</li>',
+            row_ender='</li>',
+            help_text_html=' <span class="helptext">%s</span>',
+            errors_on_separate_row=False)
 
     def as_p(self):
         "Returns this form rendered as HTML <p>s."
         return self._html_output(
-            normal_row = '<p%(html_class_attr)s>%(label)s %(field)s%(help_text)s</p>',
-            error_row = '%s',
-            row_ender = '</p>',
-            help_text_html = ' <span class="helptext">%s</span>',
-            errors_on_separate_row = True)
+            normal_row='<p%(html_class_attr)s>%(label)s %(field)s%(help_text)s</p>',
+            error_row='%s',
+            row_ender='</p>',
+            help_text_html=' <span class="helptext">%s</span>',
+            errors_on_separate_row=True)
 
     def non_field_errors(self):
         """

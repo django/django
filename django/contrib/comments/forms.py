@@ -132,16 +132,16 @@ class CommentDetailsForm(CommentSecurityForm):
         method to add extra fields onto a custom comment model.
         """
         return dict(
-            content_type = ContentType.objects.get_for_model(self.target_object),
-            object_pk    = force_text(self.target_object._get_pk_val()),
-            user_name    = self.cleaned_data["name"],
-            user_email   = self.cleaned_data["email"],
-            user_url     = self.cleaned_data["url"],
-            comment      = self.cleaned_data["comment"],
-            submit_date  = timezone.now(),
-            site_id      = settings.SITE_ID,
-            is_public    = True,
-            is_removed   = False,
+            content_type=ContentType.objects.get_for_model(self.target_object),
+            object_pk=force_text(self.target_object._get_pk_val()),
+            user_name=self.cleaned_data["name"],
+            user_email=self.cleaned_data["email"],
+            user_url=self.cleaned_data["url"],
+            comment=self.cleaned_data["comment"],
+            submit_date=timezone.now(),
+            site_id=settings.SITE_ID,
+            is_public=True,
+            is_removed=False,
         )
 
     def check_for_duplicate_comment(self, new):
@@ -152,11 +152,11 @@ class CommentDetailsForm(CommentSecurityForm):
         possible_duplicates = self.get_comment_model()._default_manager.using(
             self.target_object._state.db
         ).filter(
-            content_type = new.content_type,
-            object_pk = new.object_pk,
-            user_name = new.user_name,
-            user_email = new.user_email,
-            user_url = new.user_url,
+            content_type=new.content_type,
+            object_pk=new.object_pk,
+            user_name=new.user_name,
+            user_email=new.user_email,
+            user_url=new.user_url,
         )
         for old in possible_duplicates:
             if old.submit_date.date() == new.submit_date.date() and old.comment == new.comment:
