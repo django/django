@@ -28,7 +28,9 @@ def cache_page(*args, **kwargs):
     if kwargs:
         raise TypeError("cache_page has two optional keyword arguments: cache and key_prefix")
 
-    return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=cache_timeout, cache_alias=cache_alias, key_prefix=key_prefix)
+    return decorator_from_middleware_with_args(CacheMiddleware)(
+        cache_timeout=cache_timeout, cache_alias=cache_alias, key_prefix=key_prefix
+    )
 
 
 def cache_control(**kwargs):

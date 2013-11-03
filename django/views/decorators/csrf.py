@@ -32,7 +32,9 @@ class _EnsureCsrfCookie(CsrfViewMiddleware):
         return None
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
-        retval = super(_EnsureCsrfCookie, self).process_view(request, callback, callback_args, callback_kwargs)
+        retval = super(_EnsureCsrfCookie, self).process_view(
+            request, callback, callback_args, callback_kwargs
+        )
         # Forces process_response to send the cookie
         get_token(request)
         return retval

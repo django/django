@@ -31,7 +31,8 @@ def require_http_methods(request_method_list):
         @wraps(func, assigned=available_attrs(func))
         def inner(request, *args, **kwargs):
             if request.method not in request_method_list:
-                logger.warning('Method Not Allowed (%s): %s', request.method, request.path,
+                logger.warning(
+                    'Method Not Allowed (%s): %s', request.method, request.path,
                     extra={
                         'status_code': 405,
                         'request': request
@@ -116,14 +117,15 @@ def condition(etag_func=None, last_modified_func=None):
                 # We only get here if no undefined combinations of headers are
                 # specified.
                 if ((if_none_match and (res_etag in etags or
-                        "*" in etags and res_etag)) and
+                     "*" in etags and res_etag)) and
                         (not if_modified_since or
                             (res_last_modified and if_modified_since and
-                            res_last_modified <= if_modified_since))):
+                             res_last_modified <= if_modified_since))):
                     if request.method in ("GET", "HEAD"):
                         response = HttpResponseNotModified()
                     else:
-                        logger.warning('Precondition Failed: %s', request.path,
+                        logger.warning(
+                            'Precondition Failed: %s', request.path,
                             extra={
                                 'status_code': 412,
                                 'request': request
@@ -131,8 +133,9 @@ def condition(etag_func=None, last_modified_func=None):
                         )
                         response = HttpResponse(status=412)
                 elif if_match and ((not res_etag and "*" in etags) or
-                        (res_etag and res_etag not in etags)):
-                    logger.warning('Precondition Failed: %s', request.path,
+                                   (res_etag and res_etag not in etags)):
+                    logger.warning(
+                        'Precondition Failed: %s', request.path,
                         extra={
                             'status_code': 412,
                             'request': request

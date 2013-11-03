@@ -11,7 +11,7 @@ import posixpath
 import re
 
 from django.http import (Http404, HttpResponse, HttpResponseRedirect,
-    HttpResponseNotModified, StreamingHttpResponse)
+                         HttpResponseNotModified, StreamingHttpResponse)
 from django.template import loader, Template, Context, TemplateDoesNotExist
 from django.utils.http import http_date, parse_http_date
 from django.utils.six.moves.urllib.parse import unquote
@@ -100,7 +100,7 @@ template_translatable = ugettext_noop("Index of %(directory)s")
 def directory_index(path, fullpath):
     try:
         t = loader.select_template(['static/directory_index.html',
-                'static/directory_index'])
+                                    'static/directory_index'])
     except TemplateDoesNotExist:
         t = Template(DEFAULT_DIRECTORY_INDEX_TEMPLATE, name='Default directory index template')
     files = []

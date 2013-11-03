@@ -8,7 +8,7 @@ import types
 
 from django.conf import settings
 from django.http import (HttpResponse, HttpResponseServerError,
-    HttpResponseNotFound, HttpRequest, build_request_repr)
+                         HttpResponseNotFound, HttpRequest, build_request_repr)
 from django.template import Template, Context, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
 from django.utils.datastructures import MultiValueDict
@@ -188,8 +188,8 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
         current_frame = tb_frame.f_back
         sensitive_variables = None
         while current_frame is not None:
-            if (current_frame.f_code.co_name == 'sensitive_variables_wrapper'
-                and 'sensitive_variables_wrapper' in current_frame.f_locals):
+            if ((current_frame.f_code.co_name == 'sensitive_variables_wrapper'
+                 and 'sensitive_variables_wrapper' in current_frame.f_locals)):
                 # The sensitive_variables decorator was used, so we take note
                 # of the sensitive variables' names.
                 wrapper = current_frame.f_locals['sensitive_variables_wrapper']
@@ -217,8 +217,8 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
             for name, value in tb_frame.f_locals.items():
                 cleansed[name] = self.cleanse_special_types(request, value)
 
-        if (tb_frame.f_code.co_name == 'sensitive_variables_wrapper'
-            and 'sensitive_variables_wrapper' in tb_frame.f_locals):
+        if ((tb_frame.f_code.co_name == 'sensitive_variables_wrapper'
+             and 'sensitive_variables_wrapper' in tb_frame.f_locals)):
             # For good measure, obfuscate the decorated function's arguments in
             # the sensitive_variables decorator's frame, in case the variables
             # associated with those arguments were meant to be obfuscated from
@@ -286,8 +286,7 @@ class ExceptionReporter(object):
                     'loader': loader_name,
                     'templates': template_list,
                 })
-        if (settings.TEMPLATE_DEBUG and
-            hasattr(self.exc_value, 'django_template_source')):
+        if (settings.TEMPLATE_DEBUG and hasattr(self.exc_value, 'django_template_source')):
             self.get_template_exception_info()
 
         frames = self.get_traceback_frames()
@@ -302,7 +301,10 @@ class ExceptionReporter(object):
             end = getattr(self.exc_value, 'end', None)
             if start is not None and end is not None:
                 unicode_str = self.exc_value.args[1]
-                unicode_hint = smart_text(unicode_str[max(start-5, 0):min(end+5, len(unicode_str))], 'ascii', errors='replace')
+                unicode_hint = smart_text(
+                    unicode_str[max(start-5, 0):min(end+5, len(unicode_str))],
+                    'ascii', errors='replace'
+                )
         from django import get_version
         c = {
             'is_email': self.is_email,

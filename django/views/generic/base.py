@@ -87,7 +87,8 @@ class View(object):
         return handler(request, *args, **kwargs)
 
     def http_method_not_allowed(self, request, *args, **kwargs):
-        logger.warning('Method Not Allowed (%s): %s', request.method, request.path,
+        logger.warning(
+            'Method Not Allowed (%s): %s', request.method, request.path,
             extra={
                 'status_code': 405,
                 'request': self.request
@@ -126,9 +127,9 @@ class TemplateResponseMixin(object):
         """
         response_kwargs.setdefault('content_type', self.content_type)
         return self.response_class(
-            request = self.request,
-            template = self.get_template_names(),
-            context = context,
+            request=self.request,
+            template=self.get_template_names(),
+            context=context,
             **response_kwargs
         )
 
@@ -193,11 +194,13 @@ class RedirectView(View):
             else:
                 return http.HttpResponseRedirect(url)
         else:
-            logger.warning('Gone: %s', self.request.path,
-                        extra={
-                            'status_code': 410,
-                            'request': self.request
-                        })
+            logger.warning(
+                'Gone: %s', self.request.path,
+                extra={
+                    'status_code': 410,
+                    'request': self.request
+                }
+            )
             return http.HttpResponseGone()
 
     def head(self, request, *args, **kwargs):

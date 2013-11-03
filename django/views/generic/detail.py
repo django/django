@@ -153,7 +153,8 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
                     self.object._meta.model_name,
                     self.template_name_suffix
                 ))
-            elif hasattr(self, 'model') and self.model is not None and issubclass(self.model, models.Model):
+            elif ((hasattr(self, 'model') and self.model is not None
+                   and issubclass(self.model, models.Model))):
                 names.append("%s/%s%s.html" % (
                     self.model._meta.app_label,
                     self.model._meta.model_name,
