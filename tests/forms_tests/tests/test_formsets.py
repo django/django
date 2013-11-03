@@ -57,7 +57,7 @@ SplitDateTimeFormSet = formset_factory(SplitDateTimeForm)
 class FormsFormsetTestCase(TestCase):
 
     def make_choiceformset(self, formset_data=None, formset_class=ChoiceFormSet,
-        total_forms=None, initial_forms=0, max_num_forms=0, min_num_forms=0, **kwargs):
+            total_forms=None, initial_forms=0, max_num_forms=0, min_num_forms=0, **kwargs):
         """
         Make a ChoiceFormset from the given formset_data.
         The data should be given as a list of (choice, votes) tuples.

@@ -372,7 +372,7 @@ class SavepointTest(IgnoreDeprecationWarningsMixin, TransactionTestCase):
         # _mysql_storage_engine issues a query and as such can't be applied in
         # a skipIf decorator since that would execute the query on module load.
         if (connection.vendor == 'mysql' and
-            connection.features._mysql_storage_engine == 'MyISAM'):
+                connection.features._mysql_storage_engine == 'MyISAM'):
             raise SkipTest("MyISAM MySQL storage engine doesn't support savepoints")
 
         @commit_manually

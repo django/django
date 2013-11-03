@@ -153,7 +153,7 @@ class BaseDatabaseWrapper(object):
         """
         self.validate_thread_sharing()
         if (self.use_debug_cursor or
-            (self.use_debug_cursor is None and settings.DEBUG)):
+                (self.use_debug_cursor is None and settings.DEBUG)):
             cursor = self.make_debug_cursor(self._cursor())
         else:
             cursor = utils.CursorWrapper(self._cursor(), self)

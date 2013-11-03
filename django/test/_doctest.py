@@ -731,7 +731,7 @@ class DocTestParser:
             option_strings = m.group(1).replace(',', ' ').split()
             for option in option_strings:
                 if (option[0] not in '+-' or
-                    option[1:] not in OPTIONFLAGS_BY_NAME):
+                        option[1:] not in OPTIONFLAGS_BY_NAME):
                     raise ValueError('line %r of the doctest for %s '
                                      'has an invalid option: %r' %
                                      (lineno+1, name, option))
@@ -938,7 +938,7 @@ class DocTestFinder:
                 valname = '%s.%s' % (name, valname)
                 # Recurse to functions & classes.
                 if ((inspect.isfunction(val) or inspect.isclass(val)) and
-                    self._from_module(module, val)):
+                        self._from_module(module, val)):
                     self._find(tests, val, valname, module, source_lines,
                                globs, seen)
 

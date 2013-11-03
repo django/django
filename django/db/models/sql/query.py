@@ -1001,7 +1001,7 @@ class Query(object):
         elif ((len(field_list) > 1) or
             (field_list[0] not in [i.name for i in opts.fields]) or
             self.group_by is None or
-            not is_summary):
+                not is_summary):
             # If:
             #   - the field descriptor has more than one part (foo__bar), or
             #   - the field descriptor is referencing an m2m/m2o field, or
@@ -1978,7 +1978,7 @@ class Query(object):
         # is_nullable() is needed to the compiler stage, but that is not easy
         # to do currently.
         if ((connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls)
-            and field.empty_strings_allowed):
+                and field.empty_strings_allowed):
             return True
         else:
             return field.null
