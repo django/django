@@ -470,7 +470,7 @@ the intermediate model::
     >>> beatles = Group.objects.create(name="The Beatles")
     >>> m1 = Membership(person=ringo, group=beatles,
     ...     date_joined=date(1962, 8, 16),
-    ...     invite_reason= "Needed a new drummer.")
+    ...     invite_reason="Needed a new drummer.")
     >>> m1.save()
     >>> beatles.members.all()
     [<Person: Ringo Starr>]
@@ -478,7 +478,7 @@ the intermediate model::
     [<Group: The Beatles>]
     >>> m2 = Membership.objects.create(person=paul, group=beatles,
     ...     date_joined=date(1960, 8, 1),
-    ...     invite_reason= "Wanted to form a band.")
+    ...     invite_reason="Wanted to form a band.")
     >>> beatles.members.all()
     [<Person: Ringo Starr>, <Person: Paul McCartney>]
 
@@ -505,8 +505,11 @@ disabled for similar reasons. However, the
 :meth:`~django.db.models.fields.related.RelatedManager.clear` method can be
 used to remove all many-to-many relationships for an instance::
 
-    # Beatles have broken up
+    >>> # Beatles have broken up
     >>> beatles.members.clear()
+    >>> # Note that this deletes the intermediate model instances
+    >>> Membership.objects.all()
+    []
 
 Once you have established the many-to-many relationships by creating instances
 of your intermediate model, you can issue queries. Just as with normal
