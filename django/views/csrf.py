@@ -41,6 +41,10 @@ CSRF_FAILURE_TEMPLATE = """
   <p>{{ no_referer1 }}</p>
   <p>{{ no_referer2 }}</p>
 {% endif %}
+{% if no_cookie %}
+  <p>{{ no_cookie1 }}</p>
+  <p>{{ no_cookie2 }}</p>
+{% endif %}
 </div>
 {% if DEBUG %}
 <div id="info">
@@ -95,7 +99,7 @@ def csrf_failure(request, reason=""):
     """
     Default view used when request fails CSRF protection
     """
-    from django.middleware.csrf import REASON_NO_REFERER
+    from django.middleware.csrf import REASON_NO_REFERER, REASON_NO_CSRF_COOKIE
     t = Template(CSRF_FAILURE_TEMPLATE)
     c = Context({
         'title': _("Forbidden"),
@@ -111,6 +115,16 @@ def csrf_failure(request, reason=""):
             "If you have configured your browser to disable 'Referer' headers, "
             "please re-enable them, at least for this site, or for HTTPS "
             "connections, or for 'same-origin' requests."),
+        'no_cookie': reason == REASON_NO_CSRF_COOKIE,
+        'no_cookie1': _(
+            "You are seeing this message because this site requires a CSRF "
+            "cookie when submitting forms. This cookie is required for "
+            "security reasons, to ensure that your browser is not being "
+            "hijacked by third parties."),
+        'no_cookie2': _(
+            "If you have configured your browser to disable cookies, please "
+            "re-enable them, at least for this site, or for 'same-origin' "
+            "requests."),
         'DEBUG': settings.DEBUG,
         'more': _("More information is available with DEBUG=True."),
     })
