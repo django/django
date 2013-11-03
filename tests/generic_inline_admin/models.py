@@ -34,6 +34,7 @@ class Media(models.Model):
 # Generic inline with extra = 0
 #
 
+
 class EpisodeExtra(Episode):
     pass
 
@@ -66,6 +67,7 @@ class PhoneNumber(models.Model):
 class Contact(models.Model):
     name = models.CharField(max_length=50)
     phone_numbers = generic.GenericRelation(PhoneNumber)
+
 
 #
 # Generic inline with can_delete=False

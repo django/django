@@ -129,6 +129,7 @@ class GenericAdminViewTest(TestCase):
         formset = inline_formset(instance=e)
         self.assertTrue(formset.get_queryset().ordered)
 
+
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class GenericInlineAdminParametersTest(TestCase):
     urls = "generic_inline_admin.urls"
@@ -210,6 +211,7 @@ class GenericInlineAdminWithUniqueTogetherTest(TestCase):
         response = self.client.post('/generic_inline_admin/admin/generic_inline_admin/contact/add/', post_data)
         self.assertEqual(response.status_code, 302)  # redirect somewhere
 
+
 class NoInlineDeletionTest(TestCase):
     urls = "generic_inline_admin.urls"
 
@@ -223,6 +225,7 @@ class NoInlineDeletionTest(TestCase):
 
 class MockRequest(object):
     pass
+
 
 class MockSuperUser(object):
     def has_perm(self, perm):

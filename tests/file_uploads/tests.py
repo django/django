@@ -397,6 +397,7 @@ class FileUploadTests(TestCase):
         # shouldn't differ.
         self.assertEqual(os.path.basename(obj.testfile.path), 'MiXeD_cAsE.txt')
 
+
 @override_settings(MEDIA_ROOT=MEDIA_ROOT)
 class DirectoryCreationTests(TestCase):
     """
@@ -436,7 +437,7 @@ class DirectoryCreationTests(TestCase):
         # The test needs to be done on a specific string as IOError
         # is raised even without the patch (just not early enough)
         self.assertEqual(exc_info.exception.args[0],
-                          "%s exists and is not a directory." % UPLOAD_TO)
+            "%s exists and is not a directory." % UPLOAD_TO)
 
 
 class MultiParserTests(unittest.TestCase):

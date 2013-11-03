@@ -330,6 +330,7 @@ class FormfieldCallbackTests(TestCase):
                              formfield_callback=callback)
         self.assertCallbackCalled(callback)
 
+
 class BaseCustomDeleteFormSet(BaseFormSet):
     """
     A formset mix-in that lets a form decide if it's to be deleted.

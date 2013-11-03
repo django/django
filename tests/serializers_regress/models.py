@@ -13,38 +13,50 @@ from django.contrib.contenttypes.models import ContentType
 # The following classes are for testing basic data
 # marshalling, including NULL values, where allowed.
 
+
 class BinaryData(models.Model):
     data = models.BinaryField(null=True)
+
 
 class BooleanData(models.Model):
     data = models.BooleanField(default=False)
 
+
 class CharData(models.Model):
     data = models.CharField(max_length=30, null=True)
+
 
 class DateData(models.Model):
     data = models.DateField(null=True)
 
+
 class DateTimeData(models.Model):
     data = models.DateTimeField(null=True)
+
 
 class DecimalData(models.Model):
     data = models.DecimalField(null=True, decimal_places=3, max_digits=5)
 
+
 class EmailData(models.Model):
     data = models.EmailField(null=True)
+
 
 class FileData(models.Model):
     data = models.FileField(null=True, upload_to='/foo/bar')
 
+
 class FilePathData(models.Model):
     data = models.FilePathField(null=True)
+
 
 class FloatData(models.Model):
     data = models.FloatField(null=True)
 
+
 class IntegerData(models.Model):
     data = models.IntegerField(null=True)
+
 
 class BigIntegerData(models.Model):
     data = models.BigIntegerField(null=True)
@@ -52,34 +64,44 @@ class BigIntegerData(models.Model):
 # class ImageData(models.Model):
 #    data = models.ImageField(null=True)
 
+
 class IPAddressData(models.Model):
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
         data = models.IPAddressField(null=True)
 
+
 class GenericIPAddressData(models.Model):
     data = models.GenericIPAddressField(null=True)
+
 
 class NullBooleanData(models.Model):
     data = models.NullBooleanField(null=True)
 
+
 class PositiveIntegerData(models.Model):
     data = models.PositiveIntegerField(null=True)
+
 
 class PositiveSmallIntegerData(models.Model):
     data = models.PositiveSmallIntegerField(null=True)
 
+
 class SlugData(models.Model):
     data = models.SlugField(null=True)
+
 
 class SmallData(models.Model):
     data = models.SmallIntegerField(null=True)
 
+
 class TextData(models.Model):
     data = models.TextField(null=True)
 
+
 class TimeData(models.Model):
     data = models.TimeField(null=True)
+
 
 class Tag(models.Model):
     """A tag on an item."""
@@ -92,6 +114,7 @@ class Tag(models.Model):
     class Meta:
         ordering = ["data"]
 
+
 class GenericData(models.Model):
     data = models.CharField(max_length=30)
 
@@ -100,6 +123,7 @@ class GenericData(models.Model):
 # The following test classes are all for validation
 # of related objects; in particular, forward, backward,
 # and self references.
+
 
 class Anchor(models.Model):
     """This is a model that can be used as
@@ -110,9 +134,11 @@ class Anchor(models.Model):
     class Meta:
         ordering = ('id',)
 
+
 class NaturalKeyAnchorManager(models.Manager):
     def get_by_natural_key(self, data):
         return self.get(data=data)
+
 
 class NaturalKeyAnchor(models.Model):
     objects = NaturalKeyAnchorManager()
@@ -123,39 +149,50 @@ class NaturalKeyAnchor(models.Model):
     def natural_key(self):
         return (self.data,)
 
+
 class UniqueAnchor(models.Model):
     """This is a model that can be used as
     something for other models to point at"""
 
     data = models.CharField(unique=True, max_length=30)
 
+
 class FKData(models.Model):
     data = models.ForeignKey(Anchor, null=True)
+
 
 class FKDataNaturalKey(models.Model):
     data = models.ForeignKey(NaturalKeyAnchor, null=True)
 
+
 class M2MData(models.Model):
     data = models.ManyToManyField(Anchor, null=True)
+
 
 class O2OData(models.Model):
     # One to one field can't be null here, since it is a PK.
     data = models.OneToOneField(Anchor, primary_key=True)
 
+
 class FKSelfData(models.Model):
     data = models.ForeignKey('self', null=True)
+
 
 class M2MSelfData(models.Model):
     data = models.ManyToManyField('self', null=True, symmetrical=False)
 
+
 class FKDataToField(models.Model):
     data = models.ForeignKey(UniqueAnchor, null=True, to_field='data')
+
 
 class FKDataToO2O(models.Model):
     data = models.ForeignKey(O2OData, null=True)
 
+
 class M2MIntermediateData(models.Model):
     data = models.ManyToManyField(Anchor, null=True, through='Intermediate')
+
 
 class Intermediate(models.Model):
     left = models.ForeignKey(M2MIntermediateData)
@@ -169,8 +206,10 @@ class Intermediate(models.Model):
 # because they can't be used as a primary key on one
 # or all database backends.
 
+
 class BooleanPKData(models.Model):
     data = models.BooleanField(primary_key=True, default=False)
+
 
 class CharPKData(models.Model):
     data = models.CharField(max_length=30, primary_key=True)
@@ -181,8 +220,10 @@ class CharPKData(models.Model):
 # class DateTimePKData(models.Model):
 #    data = models.DateTimeField(primary_key=True)
 
+
 class DecimalPKData(models.Model):
     data = models.DecimalField(primary_key=True, decimal_places=3, max_digits=5)
+
 
 class EmailPKData(models.Model):
     data = models.EmailField(primary_key=True)
@@ -190,11 +231,14 @@ class EmailPKData(models.Model):
 # class FilePKData(models.Model):
 #    data = models.FileField(primary_key=True, upload_to='/foo/bar')
 
+
 class FilePathPKData(models.Model):
     data = models.FilePathField(primary_key=True)
 
+
 class FloatPKData(models.Model):
     data = models.FloatField(primary_key=True)
+
 
 class IntegerPKData(models.Model):
     data = models.IntegerField(primary_key=True)
@@ -202,10 +246,12 @@ class IntegerPKData(models.Model):
 # class ImagePKData(models.Model):
 #    data = models.ImageField(primary_key=True)
 
+
 class IPAddressPKData(models.Model):
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
         data = models.IPAddressField(primary_key=True)
+
 
 class GenericIPAddressPKData(models.Model):
     data = models.GenericIPAddressField(primary_key=True)
@@ -214,14 +260,18 @@ class GenericIPAddressPKData(models.Model):
 # class NullBooleanPKData(models.Model):
 #     data = models.NullBooleanField(primary_key=True)
 
+
 class PositiveIntegerPKData(models.Model):
     data = models.PositiveIntegerField(primary_key=True)
+
 
 class PositiveSmallIntegerPKData(models.Model):
     data = models.PositiveSmallIntegerField(primary_key=True)
 
+
 class SlugPKData(models.Model):
     data = models.SlugField(primary_key=True)
+
 
 class SmallPKData(models.Model):
     data = models.SmallIntegerField(primary_key=True)
@@ -232,6 +282,7 @@ class SmallPKData(models.Model):
 # class TimePKData(models.Model):
 #    data = models.TimeField(primary_key=True)
 
+
 class ComplexModel(models.Model):
     field1 = models.CharField(max_length=10)
     field2 = models.CharField(max_length=10)
@@ -239,8 +290,11 @@ class ComplexModel(models.Model):
 
 # Tests for handling fields with pre_save functions, or
 # models with save functions that modify data
+
+
 class AutoNowDateTimeData(models.Model):
     data = models.DateTimeField(null=True, auto_now=True)
+
 
 class ModifyingSaveData(models.Model):
     data = models.IntegerField(null=True)
@@ -256,32 +310,41 @@ class ModifyingSaveData(models.Model):
 
 # Tests for serialization of models using inheritance.
 # Regression for #7202, #7350
+
+
 class AbstractBaseModel(models.Model):
     parent_data = models.IntegerField()
 
     class Meta:
         abstract = True
 
+
 class InheritAbstractModel(AbstractBaseModel):
     child_data = models.IntegerField()
+
 
 class BaseModel(models.Model):
     parent_data = models.IntegerField()
 
+
 class InheritBaseModel(BaseModel):
     child_data = models.IntegerField()
+
 
 class ExplicitInheritBaseModel(BaseModel):
     parent = models.OneToOneField(BaseModel)
     child_data = models.IntegerField()
 
+
 class ProxyBaseModel(BaseModel):
     class Meta:
         proxy = True
 
+
 class ProxyProxyBaseModel(ProxyBaseModel):
     class Meta:
         proxy = True
+
 
 class LengthModel(models.Model):
     data = models.IntegerField()

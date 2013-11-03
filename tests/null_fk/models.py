@@ -9,13 +9,16 @@ from django.utils.encoding import python_2_unicode_compatible
 class SystemDetails(models.Model):
     details = models.TextField()
 
+
 class SystemInfo(models.Model):
     system_details = models.ForeignKey(SystemDetails)
     system_name = models.CharField(max_length=32)
 
+
 class Forum(models.Model):
     system_info = models.ForeignKey(SystemInfo)
     forum_name = models.CharField(max_length=32)
+
 
 @python_2_unicode_compatible
 class Post(models.Model):
@@ -24,6 +27,7 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
 
 @python_2_unicode_compatible
 class Comment(models.Model):
@@ -38,11 +42,14 @@ class Comment(models.Model):
 
 # Ticket 15823
 
+
 class Item(models.Model):
     title = models.CharField(max_length=100)
 
+
 class PropertyValue(models.Model):
     label = models.CharField(max_length=100)
+
 
 class Property(models.Model):
     item = models.ForeignKey(Item, related_name='props')

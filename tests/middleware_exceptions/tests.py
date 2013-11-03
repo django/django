@@ -778,6 +778,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
 
 
 _missing = object()
+
+
 class RootUrlconfTests(TestCase):
     urls = 'middleware_exceptions.urls'
 

@@ -6,6 +6,7 @@ from django.test import TestCase
 from .models import (Place, Restaurant, Waiter, ManualPrimaryKey, RelatedModel,
     MultiModel)
 
+
 class OneToOneTests(TestCase):
 
     def setUp(self):

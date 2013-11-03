@@ -24,6 +24,7 @@ class AssertFormErrorsMixin(object):
         except ValidationError as e:
             self.assertEqual(e.messages, expected)
 
+
 class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
     def test_charfield(self):
         e = {

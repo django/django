@@ -148,6 +148,7 @@ test_data = (
     ('defaults', NoReverseMatch, [], {'arg2': 1}),
 )
 
+
 class NoURLPatternsTests(TestCase):
     urls = 'urlpatterns_reverse.no_urls'
 
@@ -160,6 +161,7 @@ class NoURLPatternsTests(TestCase):
         self.assertRaisesMessage(ImproperlyConfigured,
             "The included urlconf urlpatterns_reverse.no_urls "
             "doesn't have any patterns in it", getattr, resolver, 'url_patterns')
+
 
 class URLPatternReverse(TestCase):
     urls = 'urlpatterns_reverse.urls'
@@ -282,6 +284,7 @@ class ResolverTests(unittest.TestCase):
                         else:
                             self.assertEqual(t.name, e['name'], 'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], t.name))
 
+
 class ReverseLazyTest(TestCase):
     urls = 'urlpatterns_reverse.reverse_lazy_urls'
 
@@ -296,6 +299,7 @@ class ReverseLazyTest(TestCase):
         self.client.login(username='alfred', password='testpw')
         response = self.client.get('/login_required_view/')
         self.assertEqual(response.status_code, 200)
+
 
 class ReverseShortcutTests(TestCase):
     urls = 'urlpatterns_reverse.urls'
@@ -454,7 +458,7 @@ class NamespaceTests(TestCase):
         self.assertEqual('/inc78/extra/foobar/', reverse('inc-ns5:inner-extra', args=['78', 'foobar']))
 
 
-@override_settings(ROOT_URLCONF = urlconf_outer.__name__)
+@override_settings(ROOT_URLCONF=urlconf_outer.__name__)
 class RequestURLconfTests(TestCase):
     def test_urlconf(self):
         response = self.client.get('/test/me/')
@@ -549,6 +553,7 @@ class RequestURLconfTests(TestCase):
             self.client.get('/second_test/')
             b''.join(self.client.get('/second_test/'))
 
+
 class ErrorHandlerResolutionTests(TestCase):
     """Tests for handler400, handler404 and handler500"""
 
@@ -573,6 +578,7 @@ class ErrorHandlerResolutionTests(TestCase):
         self.assertEqual(self.callable_resolver.resolve404(), handler)
         self.assertEqual(self.callable_resolver.resolve500(), handler)
 
+
 class DefaultErrorHandlerTests(TestCase):
     urls = 'urlpatterns_reverse.urls_without_full_import'
 
@@ -589,12 +595,14 @@ class DefaultErrorHandlerTests(TestCase):
         except AttributeError:
             self.fail("Shouldn't get an AttributeError due to undefined 500 handler")
 
+
 class NoRootUrlConfTests(TestCase):
     """Tests for handler404 and handler500 if urlconf is None"""
     urls = None
 
     def test_no_handler_exception(self):
         self.assertRaises(ImproperlyConfigured, self.client.get, '/test/me/')
+
 
 class ResolverMatchTests(TestCase):
     urls = 'urlpatterns_reverse.namespace_urls'
@@ -631,6 +639,7 @@ class ResolverMatchTests(TestCase):
         request = HttpRequest()
         self.assertIsNone(request.resolver_match)
 
+
 class ErroneousViewTests(TestCase):
     urls = 'urlpatterns_reverse.erroneous_urls'
 
@@ -649,6 +658,7 @@ class ErroneousViewTests(TestCase):
         """
         # The regex error will be hit before NoReverseMatch can be raised
         self.assertRaises(ImproperlyConfigured, reverse, 'whatever blah blah')
+
 
 class ViewLoadingTests(TestCase):
     def test_view_loading(self):

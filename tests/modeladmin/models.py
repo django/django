@@ -16,6 +16,7 @@ class Band(models.Model):
     def __str__(self):
         return self.name
 
+
 class Concert(models.Model):
     main_band = models.ForeignKey(Band, related_name='main_concerts')
     opening_band = models.ForeignKey(Band, related_name='opening_concerts',
@@ -26,6 +27,7 @@ class Concert(models.Model):
         (2, 'Train'),
         (3, 'Bus')
     ), blank=True)
+
 
 class ValidationTestModel(models.Model):
     name = models.CharField(max_length=100)
@@ -39,6 +41,7 @@ class ValidationTestModel(models.Model):
 
     def decade_published_in(self):
         return self.pub_date.strftime('%Y')[:3] + "0's"
+
 
 class ValidationTestInlineModel(models.Model):
     parent = models.ForeignKey(ValidationTestModel)

@@ -15,9 +15,11 @@ from django.test.utils import setup_test_environment
 class CustomTestException(Exception):
     pass
 
+
 def no_template_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
     return HttpResponse("No template used. Sample content: twice once twice. Content ends.")
+
 
 def staff_only_view(request):
     "A view that can only be visited by staff. Non staff members get an exception"
@@ -26,10 +28,12 @@ def staff_only_view(request):
     else:
         raise CustomTestException()
 
+
 def get_view(request):
     "A simple login protected view"
     return HttpResponse("Hello world")
 get_view = login_required(get_view)
+
 
 def request_data(request, template='base.html', data='sausage'):
     "A simple view that returns the request data in the context"
@@ -50,6 +54,7 @@ def request_data(request, template='base.html', data='sausage'):
         'data': data,
     })
 
+
 def view_with_argument(request, name):
     """A view that takes a string argument
 
@@ -62,6 +67,7 @@ def view_with_argument(request, name):
     else:
         return HttpResponse('Howdy, %s' % name)
 
+
 def nested_view(request):
     """
     A view that uses test client to call another view.
@@ -71,31 +77,38 @@ def nested_view(request):
     c.get("/test_client_regress/no_template_view")
     return render_to_response('base.html', {'nested': 'yes'})
 
+
 def login_protected_redirect_view(request):
     "A view that redirects all requests to the GET view"
     return HttpResponseRedirect('/test_client_regress/get_view/')
 login_protected_redirect_view = login_required(login_protected_redirect_view)
+
 
 def set_session_view(request):
     "A view that sets a session variable"
     request.session['session_var'] = 'YES'
     return HttpResponse('set_session')
 
+
 def check_session_view(request):
     "A view that reads a session variable"
     return HttpResponse(request.session.get('session_var', 'NO'))
+
 
 def request_methods_view(request):
     "A view that responds with the request method"
     return HttpResponse('request method: %s' % request.method)
 
+
 def return_unicode(request):
     return render_to_response('unicode.html')
+
 
 def return_undecodable_binary(request):
     return HttpResponse(
         b'%PDF-1.4\r\n%\x93\x8c\x8b\x9e ReportLab Generated PDF document http://www.reportlab.com'
     )
+
 
 def return_json_file(request):
     "A view that parses and returns a JSON string as a file."
@@ -113,21 +126,26 @@ def return_json_file(request):
     response['Content-Disposition'] = 'attachment; filename=testfile.json'
     return response
 
+
 def check_headers(request):
     "A view that responds with value of the X-ARG-CHECK header"
     return HttpResponse('HTTP_X_ARG_CHECK: %s' % request.META.get('HTTP_X_ARG_CHECK', 'Undefined'))
+
 
 def body(request):
     "A view that is requested with GET and accesses request.body. Refs #14753."
     return HttpResponse(request.body)
 
+
 def read_all(request):
     "A view that is requested with accesses request.read()."
     return HttpResponse(request.read())
 
+
 def read_buffer(request):
     "A view that is requested with accesses request.read(LARGE_BUFFER)."
     return HttpResponse(request.read(99999))
+
 
 def request_context_view(request):
     # Special attribute that won't be present on a plain HttpRequest

@@ -12,12 +12,14 @@ from django.utils.encoding import python_2_unicode_compatible
 
 # Who remembers high school biology?
 
+
 @python_2_unicode_compatible
 class Domain(models.Model):
     name = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Kingdom(models.Model):
@@ -27,6 +29,7 @@ class Kingdom(models.Model):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class Phylum(models.Model):
     name = models.CharField(max_length=50)
@@ -34,6 +37,7 @@ class Phylum(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Klass(models.Model):
@@ -43,6 +47,7 @@ class Klass(models.Model):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class Order(models.Model):
     name = models.CharField(max_length=50)
@@ -50,6 +55,7 @@ class Order(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Family(models.Model):
@@ -59,6 +65,7 @@ class Family(models.Model):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class Genus(models.Model):
     name = models.CharField(max_length=50)
@@ -66,6 +73,7 @@ class Genus(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Species(models.Model):
@@ -76,6 +84,8 @@ class Species(models.Model):
         return self.name
 
 # and we'll invent a new thing so we have a model with two foreign keys
+
+
 @python_2_unicode_compatible
 class HybridSpecies(models.Model):
     name = models.CharField(max_length=50)

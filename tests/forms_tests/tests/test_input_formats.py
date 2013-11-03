@@ -490,6 +490,7 @@ class CustomDateInputFormatsTests(SimpleTestCase):
         text = f.widget._format_value(result)
         self.assertEqual(text, "21.12.2010")
 
+
 class SimpleDateFormatTests(SimpleTestCase):
     def test_dateField(self):
         "DateFields can parse dates in the default format"
@@ -775,6 +776,7 @@ class CustomDateTimeInputFormatsTests(SimpleTestCase):
         # Check that the parsed result does a round trip to default format
         text = f.widget._format_value(result)
         self.assertEqual(text, "01:30:00 PM 21/12/2010")
+
 
 class SimpleDateTimeFormatTests(SimpleTestCase):
     def test_dateTimeField(self):

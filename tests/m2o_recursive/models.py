@@ -22,6 +22,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class Person(models.Model):
     full_name = models.CharField(max_length=20)

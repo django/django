@@ -34,6 +34,7 @@ ARTICLE_STATUS_CHAR = (
     ('l', 'Live'),
 )
 
+
 @python_2_unicode_compatible
 class Category(models.Model):
     name = models.CharField(max_length=20)
@@ -46,6 +47,7 @@ class Category(models.Model):
     def __repr__(self):
         return self.__str__()
 
+
 @python_2_unicode_compatible
 class Writer(models.Model):
     name = models.CharField(max_length=50, help_text='Use both first and last names.')
@@ -55,6 +57,7 @@ class Writer(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Article(models.Model):
@@ -76,14 +79,18 @@ class Article(models.Model):
     def __str__(self):
         return self.headline
 
+
 class ImprovedArticle(models.Model):
     article = models.OneToOneField(Article)
+
 
 class ImprovedArticleWithParentLink(models.Model):
     article = models.OneToOneField(Article, parent_link=True)
 
+
 class BetterWriter(Writer):
     score = models.IntegerField()
+
 
 @python_2_unicode_compatible
 class WriterProfile(models.Model):
@@ -92,6 +99,7 @@ class WriterProfile(models.Model):
 
     def __str__(self):
         return "%s is %s" % (self.writer, self.age)
+
 
 @python_2_unicode_compatible
 class TextFile(models.Model):
@@ -144,6 +152,7 @@ try:
 except ImproperlyConfigured:
     test_images = False
 
+
 @python_2_unicode_compatible
 class CommaSeparatedInteger(models.Model):
     field = models.CommaSeparatedIntegerField(max_length=20)
@@ -151,12 +160,14 @@ class CommaSeparatedInteger(models.Model):
     def __str__(self):
         return self.field
 
+
 @python_2_unicode_compatible
 class Product(models.Model):
     slug = models.SlugField(unique=True)
 
     def __str__(self):
         return self.slug
+
 
 @python_2_unicode_compatible
 class Price(models.Model):
@@ -169,8 +180,10 @@ class Price(models.Model):
     class Meta:
         unique_together = (('price', 'quantity'),)
 
+
 class ArticleStatus(models.Model):
     status = models.CharField(max_length=2, choices=ARTICLE_STATUS_CHAR, blank=True, null=True)
+
 
 @python_2_unicode_compatible
 class Inventory(models.Model):
@@ -187,6 +200,7 @@ class Inventory(models.Model):
     def __repr__(self):
         return self.__str__()
 
+
 class Book(models.Model):
     title = models.CharField(max_length=40)
     author = models.ForeignKey(Writer, blank=True, null=True)
@@ -194,6 +208,7 @@ class Book(models.Model):
 
     class Meta:
         unique_together = ('title', 'author')
+
 
 class BookXtra(models.Model):
     isbn = models.CharField(max_length=16, unique=True)
@@ -204,8 +219,10 @@ class BookXtra(models.Model):
         unique_together = (('suffix1', 'suffix2'))
         abstract = True
 
+
 class DerivedBook(Book, BookXtra):
     pass
+
 
 @python_2_unicode_compatible
 class ExplicitPK(models.Model):
@@ -218,6 +235,7 @@ class ExplicitPK(models.Model):
     def __str__(self):
         return self.key
 
+
 @python_2_unicode_compatible
 class Post(models.Model):
     title = models.CharField(max_length=50, unique_for_date='posted', blank=True)
@@ -227,6 +245,7 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
 
 @python_2_unicode_compatible
 class DateTimePost(models.Model):
@@ -238,8 +257,10 @@ class DateTimePost(models.Model):
     def __str__(self):
         return self.title
 
+
 class DerivedPost(Post):
     pass
+
 
 @python_2_unicode_compatible
 class BigInt(models.Model):
@@ -247,6 +268,7 @@ class BigInt(models.Model):
 
     def __str__(self):
         return six.text_type(self.biggie)
+
 
 class MarkupField(models.CharField):
     def __init__(self, *args, **kwargs):
@@ -260,15 +282,18 @@ class MarkupField(models.CharField):
         # regressed at r10062
         return None
 
+
 class CustomFieldForExclusionModel(models.Model):
     name = models.CharField(max_length=10)
     markup = MarkupField()
+
 
 class FlexibleDatePost(models.Model):
     title = models.CharField(max_length=50, unique_for_date='posted', blank=True)
     slug = models.CharField(max_length=50, unique_for_year='posted', blank=True)
     subtitle = models.CharField(max_length=50, unique_for_month='posted', blank=True)
     posted = models.DateField(blank=True, null=True)
+
 
 @python_2_unicode_compatible
 class Colour(models.Model):
@@ -281,13 +306,16 @@ class Colour(models.Model):
     def __str__(self):
         return self.name
 
+
 class ColourfulItem(models.Model):
     name = models.CharField(max_length=50)
     colours = models.ManyToManyField(Colour)
 
+
 class ArticleStatusNote(models.Model):
     name = models.CharField(max_length=20)
     status = models.ManyToManyField(ArticleStatus)
+
 
 class CustomErrorMessage(models.Model):
     name1 = models.CharField(max_length=50,

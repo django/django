@@ -120,10 +120,12 @@ class Color(models.Model):
     def __str__(self):
         return self.value
 
+
 # we replicate Color to register with another ModelAdmin
 class Color2(Color):
     class Meta:
         proxy = True
+
 
 @python_2_unicode_compatible
 class Thing(models.Model):
@@ -613,9 +615,11 @@ class PrePopulatedPostLargeSlug(models.Model):
     published = models.BooleanField(default=False)
     slug = models.SlugField(max_length=1000)
 
+
 class AdminOrderedField(models.Model):
     order = models.IntegerField()
     stuff = models.CharField(max_length=200)
+
 
 class AdminOrderedModelMethod(models.Model):
     order = models.IntegerField()
@@ -625,13 +629,16 @@ class AdminOrderedModelMethod(models.Model):
         return self.order
     some_order.admin_order_field = 'order'
 
+
 class AdminOrderedAdminMethod(models.Model):
     order = models.IntegerField()
     stuff = models.CharField(max_length=200)
 
+
 class AdminOrderedCallable(models.Model):
     order = models.IntegerField()
     stuff = models.CharField(max_length=200)
+
 
 @python_2_unicode_compatible
 class Report(models.Model):
@@ -650,6 +657,7 @@ class MainPrepopulated(models.Model):
                  ('option two', 'Option Two')))
     slug1 = models.SlugField(blank=True)
     slug2 = models.SlugField(blank=True)
+
 
 class RelatedPrepopulated(models.Model):
     parent = models.ForeignKey(MainPrepopulated)
@@ -671,6 +679,7 @@ class UnorderedObject(models.Model):
     name = models.CharField(max_length=255)
     bool = models.BooleanField(default=True)
 
+
 class UndeletableObject(models.Model):
     """
     Model whose show_delete in admin change_view has been disabled
@@ -678,29 +687,35 @@ class UndeletableObject(models.Model):
     """
     name = models.CharField(max_length=255)
 
+
 class UnchangeableObject(models.Model):
     """
     Model whose change_view is disabled in admin
     Refs #20640.
     """
 
+
 class UserMessenger(models.Model):
     """
     Dummy class for testing message_user functions on ModelAdmin
     """
+
 
 class Simple(models.Model):
     """
     Simple model with nothing on it for use in testing
     """
 
+
 class Choice(models.Model):
     choice = models.IntegerField(blank=True, null=True,
         choices=((1, 'Yes'), (0, 'No'), (None, 'No opinion')))
 
+
 class _Manager(models.Manager):
     def get_queryset(self):
         return super(_Manager, self).get_queryset().filter(pk__gt=1)
+
 
 class FilteredManager(models.Model):
     def __str__(self):
@@ -709,25 +724,32 @@ class FilteredManager(models.Model):
     pk_gt_1 = _Manager()
     objects = models.Manager()
 
+
 class EmptyModelVisible(models.Model):
     """ See ticket #11277. """
+
 
 class EmptyModelHidden(models.Model):
     """ See ticket #11277. """
 
+
 class EmptyModelMixin(models.Model):
     """ See ticket #11277. """
 
+
 class State(models.Model):
     name = models.CharField(max_length=100)
+
 
 class City(models.Model):
     state = models.ForeignKey(State)
     name = models.CharField(max_length=100)
 
+
 class Restaurant(models.Model):
     city = models.ForeignKey(City)
     name = models.CharField(max_length=100)
+
 
 class Worker(models.Model):
     work_at = models.ForeignKey(Restaurant)

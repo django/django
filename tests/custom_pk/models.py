@@ -16,7 +16,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 @python_2_unicode_compatible
 class Employee(models.Model):
-    employee_code = models.IntegerField(primary_key=True, db_column = 'code')
+    employee_code = models.IntegerField(primary_key=True, db_column='code')
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
 
@@ -25,6 +25,7 @@ class Employee(models.Model):
 
     def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
+
 
 @python_2_unicode_compatible
 class Business(models.Model):
@@ -36,6 +37,7 @@ class Business(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Bar(models.Model):

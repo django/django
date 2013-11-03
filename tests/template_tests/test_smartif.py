@@ -2,6 +2,7 @@ import unittest
 
 from django.template.smartif import IfParser
 
+
 class SmartIfTests(unittest.TestCase):
 
     def assertCalcEqual(self, expected, tokens):

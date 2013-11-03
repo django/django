@@ -4,8 +4,10 @@ from django.db import models
 class Publisher(models.Model):
     name = models.CharField(max_length=100)
 
+
 class Author(models.Model):
     name = models.CharField(max_length=100)
+
 
 class Book(models.Model):
     name = models.CharField(max_length=100)

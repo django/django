@@ -18,6 +18,7 @@ class PostDeleteHandler(object):
             (instance, instance.id is None)
         )
 
+
 class MyReceiver(object):
     def __init__(self, param):
         self.param = param
@@ -26,6 +27,7 @@ class MyReceiver(object):
     def __call__(self, signal, sender, **kwargs):
         self._run = True
         signal.disconnect(receiver=self, sender=sender)
+
 
 class SignalTests(TestCase):
     def test_basic(self):

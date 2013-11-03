@@ -48,11 +48,14 @@ from .models import (BinaryData, BooleanData, CharData, DateData, DateTimeData, 
 # The save method is a raw base model save, to make
 # sure that the data in the database matches the
 # exact test case.
+
+
 def data_create(pk, klass, data):
     instance = klass(id=pk)
     instance.data = data
     models.Model.save_base(instance, raw=True)
     return [instance]
+
 
 def generic_create(pk, klass, data):
     instance = klass(id=pk)
@@ -62,11 +65,13 @@ def generic_create(pk, klass, data):
         instance.tags.create(data=tag)
     return [instance]
 
+
 def fk_create(pk, klass, data):
     instance = klass(id=pk)
     setattr(instance, 'data_id', data)
     models.Model.save_base(instance, raw=True)
     return [instance]
+
 
 def m2m_create(pk, klass, data):
     instance = klass(id=pk)
@@ -74,10 +79,12 @@ def m2m_create(pk, klass, data):
     instance.data = data
     return [instance]
 
+
 def im2m_create(pk, klass, data):
     instance = klass(id=pk)
     models.Model.save_base(instance, raw=True)
     return [instance]
+
 
 def im_create(pk, klass, data):
     instance = klass(id=pk)
@@ -88,17 +95,20 @@ def im_create(pk, klass, data):
     models.Model.save_base(instance, raw=True)
     return [instance]
 
+
 def o2o_create(pk, klass, data):
     instance = klass()
     instance.data_id = data
     models.Model.save_base(instance, raw=True)
     return [instance]
 
+
 def pk_create(pk, klass, data):
     instance = klass()
     instance.data = data
     models.Model.save_base(instance, raw=True)
     return [instance]
+
 
 def inherited_create(pk, klass, data):
     instance = klass(id=pk, **data)
@@ -115,6 +125,8 @@ def inherited_create(pk, klass, data):
 
 # A set of functions that can be used to compare
 # test data objects of various kinds
+
+
 def data_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
     if klass == BinaryData and data is not None:
@@ -129,22 +141,27 @@ def data_compare(testcase, pk, klass, data):
                  pk, data, type(data), instance, type(instance.data))
         )
 
+
 def generic_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
     testcase.assertEqual(data[0], instance.data)
     testcase.assertEqual(data[1:], [t.data for t in instance.tags.order_by('id')])
 
+
 def fk_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
     testcase.assertEqual(data, instance.data_id)
+
 
 def m2m_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
     testcase.assertEqual(data, [obj.id for obj in instance.data.order_by('id')])
 
+
 def im2m_compare(testcase, pk, klass, data):
     klass.objects.get(id=pk)
     # actually nothing else to check, the instance just should exist
+
 
 def im_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
@@ -155,13 +172,16 @@ def im_compare(testcase, pk, klass, data):
     else:
         testcase.assertEqual("doesn't matter", instance.extra)
 
+
 def o2o_compare(testcase, pk, klass, data):
     instance = klass.objects.get(data=data)
     testcase.assertEqual(data, instance.data_id)
 
+
 def pk_compare(testcase, pk, klass, data):
     instance = klass.objects.get(data=data)
     testcase.assertEqual(data, instance.data)
+
 
 def inherited_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
@@ -380,6 +400,8 @@ if connection.features.allows_primary_key_0:
 
 # Dynamically create serializer tests to ensure that all
 # registered serializers are automatically tested.
+
+
 class SerializerTests(TestCase):
     def test_get_unknown_serializer(self):
         """
@@ -496,6 +518,7 @@ def naturalKeySerializerTest(format, self):
     for klass, count in instance_count.items():
         self.assertEqual(count, klass.objects.count())
 
+
 def fieldsTest(format, self):
     obj = ComplexModel(field1='first', field2='second', field3='third')
     obj.save_base(raw=True)
@@ -508,6 +531,7 @@ def fieldsTest(format, self):
     self.assertEqual(result.object.field1, 'first')
     self.assertEqual(result.object.field2, '')
     self.assertEqual(result.object.field3, 'third')
+
 
 def streamTest(format, self):
     obj = ComplexModel(field1='first', field2='second', field3='third')

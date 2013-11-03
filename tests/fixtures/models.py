@@ -26,6 +26,7 @@ class Category(models.Model):
     class Meta:
         ordering = ('title',)
 
+
 @python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')
@@ -36,6 +37,7 @@ class Article(models.Model):
 
     class Meta:
         ordering = ('-pub_date', 'headline')
+
 
 @python_2_unicode_compatible
 class Blog(models.Model):
@@ -60,9 +62,11 @@ class Tag(models.Model):
         return '<%s: %s> tagged "%s"' % (self.tagged.__class__.__name__,
                                          self.tagged, self.name)
 
+
 class PersonManager(models.Manager):
     def get_by_natural_key(self, name):
         return self.get(name=name)
+
 
 @python_2_unicode_compatible
 class Person(models.Model):
@@ -78,13 +82,16 @@ class Person(models.Model):
     def natural_key(self):
         return (self.name,)
 
+
 class SpyManager(PersonManager):
     def get_queryset(self):
         return super(SpyManager, self).get_queryset().filter(cover_blown=False)
 
+
 class Spy(Person):
     objects = SpyManager()
     cover_blown = models.BooleanField(default=False)
+
 
 @python_2_unicode_compatible
 class Visa(models.Model):
@@ -94,6 +101,7 @@ class Visa(models.Model):
     def __str__(self):
         return '%s %s' % (self.person.name,
                           ', '.join(p.name for p in self.permissions.all()))
+
 
 @python_2_unicode_compatible
 class Book(models.Model):

@@ -58,6 +58,7 @@ class TestRouter(object):
     def allow_migrate(self, db, model):
         return False
 
+
 class SQLCommandsRouterTestCase(TestCase):
     def setUp(self):
         self._old_routers = router.routers

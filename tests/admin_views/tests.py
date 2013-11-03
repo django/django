@@ -84,8 +84,8 @@ class AdminViewBasicTestCase(TestCase):
         """
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.content.index(force_bytes(text1)) < response.content.index(force_bytes(text2)),
-            failing_msg
-        )
+            failing_msg)
+
 
 class AdminViewBasicTest(AdminViewBasicTestCase):
     def testTrailingSlashRequired(self):
@@ -94,8 +94,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         """
         response = self.client.get('/test_admin/%s/admin_views/article/add' % self.urlbit)
         self.assertRedirects(response,
-            '/test_admin/%s/admin_views/article/add/' % self.urlbit, status_code=301
-        )
+            '/test_admin/%s/admin_views/article/add/' % self.urlbit,
+            status_code=301)
 
     def testBasicAddGet(self):
         """
@@ -109,8 +109,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get('/test_admin/%s/admin_views/section/add/' % self.urlbit, {'name': 'My Section'})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'value="My Section"',
-            msg_prefix="Couldn't find an input with the right value in the response"
-        )
+            msg_prefix="Couldn't find an input with the right value in the response")
 
     def testBasicEditGet(self):
         """
@@ -394,11 +393,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get('/test_admin/%s/admin_views/thing/' % self.urlbit)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<div id="changelist-filter">',
-            msg_prefix="Expected filter not found in changelist view"
-        )
+            msg_prefix="Expected filter not found in changelist view")
         self.assertNotContains(response, '<a href="?color__id__exact=3">Blue</a>',
-            msg_prefix="Changelist filter not correctly limited by limit_choices_to"
-        )
+            msg_prefix="Changelist filter not correctly limited by limit_choices_to")
 
     def testRelationSpanningFilters(self):
         response = self.client.get('/test_admin/%s/admin_views/chapterxtra1/' %
@@ -1557,7 +1554,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         response = self.client.get('/test_admin/admin/')
         counted_presence_after = response.content.count(force_bytes(should_contain))
         self.assertEqual(counted_presence_before - 1,
-                          counted_presence_after)
+            counted_presence_after)
 
     def test_logentry_get_admin_url(self):
         "LogEntry.get_admin_url returns a URL to edit the entry's object or None for non-existent (possibly deleted) models"
@@ -1612,13 +1609,13 @@ class AdminViewStringPrimaryKeyTest(TestCase):
     def test_change_view_history_link(self):
         """Object history button link should work and contain the pk value quoted."""
         url = reverse('admin:%s_modelwithstringprimarykey_change' %
-                          ModelWithStringPrimaryKey._meta.app_label,
-                      args=(quote(self.pk),))
+            ModelWithStringPrimaryKey._meta.app_label,
+            args=(quote(self.pk),))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         expected_link = reverse('admin:%s_modelwithstringprimarykey_history' %
-                                    ModelWithStringPrimaryKey._meta.app_label,
-                                args=(quote(self.pk),))
+            ModelWithStringPrimaryKey._meta.app_label,
+            args=(quote(self.pk),))
         self.assertContains(response, '<a href="%s" class="historylink"' % expected_link)
 
 
@@ -2553,8 +2550,7 @@ action)</option>
         response = self.client.get('/test_admin/admin/admin_views/oldsubscriber/')
         self.assertEqual(response.context["action_form"], None)
         self.assertContains(response, 'jquery.min.js',
-            msg_prefix="jQuery missing from admin pages for model with no admin actions"
-        )
+            msg_prefix="jQuery missing from admin pages for model with no admin actions")
 
     def test_action_column_class(self):
         "Tests that the checkbox column class is present in the response"
@@ -3631,8 +3627,7 @@ class ReadonlyTest(TestCase):
         self.assertContains(response, "InlineMultiline<br />test<br />string")
 
         self.assertContains(response,
-            formats.localize(datetime.date.today() - datetime.timedelta(days=7))
-        )
+            formats.localize(datetime.date.today() - datetime.timedelta(days=7)))
 
         self.assertContains(response, '<div class="form-row field-coolness">')
         self.assertContains(response, '<div class="form-row field-awesomeness_level">')
@@ -3829,7 +3824,7 @@ class UserAdminTest(TestCase):
         adminform = response.context['adminform']
         self.assertTrue('password' not in adminform.form.errors)
         self.assertEqual(adminform.form.errors['password2'],
-                          ["The two password fields didn't match."])
+            ["The two password fields didn't match."])
 
     def test_user_fk_popup(self):
         """Quick user addition in a FK popup shouldn't invoke view for further user customization"""

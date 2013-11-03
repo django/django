@@ -12,9 +12,11 @@ from .models import Song, Book, Album, TwoAlbumFKAndAnE, City
 class SongForm(forms.ModelForm):
     pass
 
+
 class ValidFields(admin.ModelAdmin):
     form = SongForm
     fields = ['title']
+
 
 class ValidFormFieldsets(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
@@ -27,6 +29,7 @@ class ValidFormFieldsets(admin.ModelAdmin):
             'fields': ('name',),
         }),
     )
+
 
 class ValidationTestCase(TestCase):
 

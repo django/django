@@ -15,6 +15,7 @@ class Person(models.Model):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class Group(models.Model):
     name = models.CharField(max_length=128)
@@ -27,6 +28,7 @@ class Group(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Membership(models.Model):
@@ -41,6 +43,7 @@ class Membership(models.Model):
     def __str__(self):
         return "%s is a member of %s" % (self.person.name, self.group.name)
 
+
 @python_2_unicode_compatible
 class CustomMembership(models.Model):
     person = models.ForeignKey(Person, db_column="custom_person_column", related_name="custom_person_related_name")
@@ -54,10 +57,12 @@ class CustomMembership(models.Model):
     class Meta:
         db_table = "test_table"
 
+
 class TestNoDefaultsOrNulls(models.Model):
     person = models.ForeignKey(Person)
     group = models.ForeignKey(Group)
     nodefaultnonull = models.CharField(max_length=5)
+
 
 @python_2_unicode_compatible
 class PersonSelfRefM2M(models.Model):
@@ -66,6 +71,7 @@ class PersonSelfRefM2M(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Friendship(models.Model):
     first = models.ForeignKey(PersonSelfRefM2M, related_name="rel_from_set")

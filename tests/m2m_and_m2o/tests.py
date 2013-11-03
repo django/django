@@ -50,7 +50,7 @@ class RelatedObjectTests(TestCase):
         # These queries combine results from the m2m and the m2o relationships.
         # They're three ways of saying the same thing.
         self.assertQuerysetEqual(
-            Issue.objects.filter(Q(cc__id__exact = r.id) | Q(client=r.id)), [
+            Issue.objects.filter(Q(cc__id__exact=r.id) | Q(client=r.id)), [
                 1,
                 2,
                 3,
@@ -73,6 +73,7 @@ class RelatedObjectTests(TestCase):
             ],
             lambda i: i.num
         )
+
 
 class RelatedObjectUnicodeTests(TestCase):
     def test_m2m_with_unicode_reference(self):

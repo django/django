@@ -19,9 +19,11 @@ def post_form_response():
 """, mimetype="text/html")
     return resp
 
+
 def post_form_view(request):
     """A view that returns a POST form (without a token)"""
     return post_form_response()
+
 
 # Response/views used for template tag tests
 
@@ -31,6 +33,7 @@ def token_view(request):
     template = Template("{% csrf_token %}")
     return HttpResponse(template.render(context))
 
+
 def non_token_view_using_request_processor(request):
     """
     A view that doesn't use the token, but does use the csrf view processor.
@@ -39,6 +42,7 @@ def non_token_view_using_request_processor(request):
     template = Template("")
     return HttpResponse(template.render(context))
 
+
 class TestingHttpRequest(HttpRequest):
     """
     A version of HttpRequest that allows us to change some things
@@ -46,6 +50,7 @@ class TestingHttpRequest(HttpRequest):
     """
     def is_secure(self):
         return getattr(self, '_is_secure_override', False)
+
 
 class CsrfViewMiddlewareTest(TestCase):
     # The csrf token is potentially from an untrusted source, so could have

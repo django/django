@@ -19,6 +19,7 @@ class Place(models.Model):
     def __str__(self):
         return "%s the place" % self.name
 
+
 @python_2_unicode_compatible
 class Restaurant(models.Model):
     place = models.OneToOneField(Place, primary_key=True)
@@ -28,6 +29,7 @@ class Restaurant(models.Model):
     def __str__(self):
         return "%s the restaurant" % self.place.name
 
+
 @python_2_unicode_compatible
 class Waiter(models.Model):
     restaurant = models.ForeignKey(Restaurant)
@@ -36,13 +38,16 @@ class Waiter(models.Model):
     def __str__(self):
         return "%s the waiter at %s" % (self.name, self.restaurant)
 
+
 class ManualPrimaryKey(models.Model):
     primary_key = models.CharField(max_length=10, primary_key=True)
-    name = models.CharField(max_length = 50)
+    name = models.CharField(max_length=50)
+
 
 class RelatedModel(models.Model):
     link = models.OneToOneField(ManualPrimaryKey)
-    name = models.CharField(max_length = 50)
+    name = models.CharField(max_length=50)
+
 
 @python_2_unicode_compatible
 class MultiModel(models.Model):

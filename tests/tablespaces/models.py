@@ -7,14 +7,17 @@ from django.db import models
 # "reference" models to avoid errors when other tests run 'migrate'
 # (proxy_models_inheritance does).
 
+
 class ScientistRef(models.Model):
     name = models.CharField(max_length=50)
+
 
 class ArticleRef(models.Model):
     title = models.CharField(max_length=50, unique=True)
     code = models.CharField(max_length=50, unique=True)
     authors = models.ManyToManyField(ScientistRef, related_name='articles_written_set')
     reviewers = models.ManyToManyField(ScientistRef, related_name='articles_reviewed_set')
+
 
 class Scientist(models.Model):
     name = models.CharField(max_length=50)
@@ -23,6 +26,7 @@ class Scientist(models.Model):
         db_table = 'tablespaces_scientistref'
         db_tablespace = 'tbl_tbsp'
         managed = False
+
 
 class Article(models.Model):
     title = models.CharField(max_length=50, unique=True)

@@ -105,6 +105,7 @@ class TestSigner(TestCase):
             self.assertRaises(
                 signing.BadSignature, signing.loads, transform(encoded))
 
+
 class TestTimestampSigner(TestCase):
 
     def test_timestamp_signer(self):

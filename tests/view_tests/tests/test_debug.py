@@ -185,7 +185,7 @@ class ExceptionReporterTests(TestCase):
 
         for newline in ['\n', '\r\n', '\r']:
             fd, filename = mkstemp(text=False)
-            os.write(fd, force_bytes(newline.join(LINES)+newline))
+            os.write(fd, force_bytes(newline.join(LINES) + newline))
             os.close(fd)
 
             try:
@@ -640,6 +640,7 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
             with self.settings(DEBUG=True, FOOBAR=FOOBAR):
                 response = self.client.get('/views/raises500/')
                 self.assertNotContains(response, 'should not be displayed', status_code=500)
+
 
 class AjaxResponseExceptionReporterFilter(TestCase, ExceptionReportTestMixin):
     """

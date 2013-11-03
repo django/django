@@ -33,6 +33,7 @@ class Author(models.Model):
         db_table = 'my_author_table'
         ordering = ('last_name', 'first_name')
 
+
 @python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)

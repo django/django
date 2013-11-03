@@ -15,6 +15,7 @@ from django.core.files.storage import FileSystemStorage
 temp_storage_location = tempfile.mkdtemp()
 temp_storage = FileSystemStorage(location=temp_storage_location)
 
+
 class Storage(models.Model):
     def custom_upload_to(self, filename):
         return 'foo'

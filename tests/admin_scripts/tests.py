@@ -289,6 +289,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
+
 class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
     """A series of tests for django-admin.py when using a settings.py file that
     contains the test application specified using a full path.
@@ -355,6 +356,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
+
 class DjangoAdminMinimalSettings(AdminScriptTestCase):
     """A series of tests for django-admin.py when using a settings.py file that
     doesn't contain the test application.
@@ -420,6 +422,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         out, err = self.run_django_admin(args, 'test_project.settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
+
 
 class DjangoAdminAlternateSettings(AdminScriptTestCase):
     """A series of tests for django-admin.py when using a settings file
@@ -796,6 +799,7 @@ class ManageFullPathDefaultSettings(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
+
 class ManageMinimalSettings(AdminScriptTestCase):
     """A series of tests for manage.py when using a settings.py file that
     doesn't contain the test application.
@@ -861,6 +865,7 @@ class ManageMinimalSettings(AdminScriptTestCase):
         out, err = self.run_manage(args, 'test_project.settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
+
 
 class ManageAlternateSettings(AdminScriptTestCase):
     """A series of tests for manage.py when using a settings file
@@ -1121,6 +1126,7 @@ class CustomTestRunner(DiscoverRunner):
     def run_tests(self, test_labels, extra_tests=None, **kwargs):
         pass
 
+
 class ManageTestCommand(AdminScriptTestCase):
     def setUp(self):
         from django.core.management.commands.test import Command as TestCommand
@@ -1213,6 +1219,7 @@ class ManageRunserver(AdminScriptTestCase):
         # Uses only characters that could be in an ipv6 address
         self.cmd.handle(addrport="deadbeef:7654")
         self.assertServerSettings('deadbeef', '7654')
+
 
 class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
     def setUp(self):
@@ -1463,6 +1470,7 @@ class CommandTypes(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, str_prefix("EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
         self.assertOutput(out, str_prefix("EXECUTE:LabelCommand label=anotherlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+
 
 class ArgumentOrder(AdminScriptTestCase):
     """Tests for 2-stage argument parsing scheme.
@@ -1750,6 +1758,7 @@ class DiffSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "### STATIC_URL = None")
+
 
 class Dumpdata(AdminScriptTestCase):
     """Tests for dumpdata management command."""

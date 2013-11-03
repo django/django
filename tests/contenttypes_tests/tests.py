@@ -5,6 +5,7 @@ from django.test import TestCase
 
 from .models import Author, Article
 
+
 class ContentTypesViewsTests(TestCase):
     fixtures = ['testdata.json']
     urls = 'contenttypes_tests.urls'

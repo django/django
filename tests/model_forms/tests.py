@@ -185,6 +185,7 @@ class BetterWriterForm(forms.ModelForm):
         model = BetterWriter
         fields = '__all__'
 
+
 class WriterProfileForm(forms.ModelForm):
     class Meta:
         model = WriterProfile
@@ -233,6 +234,7 @@ class ColourfulItemForm(forms.ModelForm):
         fields = '__all__'
 
 # model forms for testing work on #9321:
+
 
 class StatusNoteForm(forms.ModelForm):
     class Meta:
@@ -295,7 +297,7 @@ class ModelFormBaseTest(TestCase):
                 fields = '__all__'
 
         self.assertIsInstance(ReplaceField.base_fields['url'],
-                                     forms.fields.BooleanField)
+            forms.fields.BooleanField)
 
     def test_replace_field_variant_2(self):
         # Should have the same result as before,
@@ -308,7 +310,7 @@ class ModelFormBaseTest(TestCase):
                 fields = ['url']
 
         self.assertIsInstance(ReplaceField.base_fields['url'],
-                                     forms.fields.BooleanField)
+            forms.fields.BooleanField)
 
     def test_replace_field_variant_3(self):
         # Should have the same result as before,
@@ -321,7 +323,7 @@ class ModelFormBaseTest(TestCase):
                 fields = []  # url will still appear, since it is explicit above
 
         self.assertIsInstance(ReplaceField.base_fields['url'],
-                                     forms.fields.BooleanField)
+            forms.fields.BooleanField)
 
     def test_override_field(self):
         class WriterForm(forms.ModelForm):
@@ -583,6 +585,7 @@ class IncompleteCategoryFormWithFields(forms.ModelForm):
         fields = ('name', 'slug')
         model = Category
 
+
 class IncompleteCategoryFormWithExclude(forms.ModelForm):
     """
     A form that replaces the model's url field with a custom one. This should
@@ -788,6 +791,7 @@ class UniqueTest(TestCase):
             "slug": "Django 1.0"}, instance=p)
         self.assertTrue(form.is_valid())
 
+
 class ModelToDictTests(TestCase):
     """
     Tests for forms.models.model_to_dict
@@ -858,6 +862,7 @@ class ModelToDictTests(TestCase):
             self.assertIn(c.pk, d['categories'])
         #Ensure many-to-many relation appears as a list
         self.assertIsInstance(d['categories'], list)
+
 
 class OldFormForXTests(TestCase):
     def test_base_form(self):

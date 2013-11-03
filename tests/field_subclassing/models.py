@@ -17,8 +17,10 @@ class MyModel(models.Model):
     def __str__(self):
         return force_text(self.name)
 
+
 class OtherModel(models.Model):
     data = SmallerField()
+
 
 class DataModel(models.Model):
     data = JSONField()

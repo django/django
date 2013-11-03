@@ -49,6 +49,7 @@ class FeedTestCase(TestCase):
 # Feed view
 ######################################
 
+
 class SyndicationFeedTest(FeedTestCase):
     """
     Tests for the high-level syndication feed framework.

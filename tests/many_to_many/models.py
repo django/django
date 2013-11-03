@@ -22,6 +22,7 @@ class Publication(models.Model):
     class Meta:
         ordering = ('title',)
 
+
 @python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)

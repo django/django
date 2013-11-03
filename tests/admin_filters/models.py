@@ -27,6 +27,7 @@ class Department(models.Model):
     def __str__(self):
         return self.description
 
+
 @python_2_unicode_compatible
 class Employee(models.Model):
     department = models.ForeignKey(Department, to_field="code")

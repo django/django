@@ -5,6 +5,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 ## Basic tests
 
+
 @python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -55,6 +56,7 @@ class Book(models.Model):
     class Meta:
         ordering = ['id']
 
+
 class BookWithYear(Book):
     book = models.OneToOneField(Book, parent_link=True)
     published_year = models.IntegerField()
@@ -73,11 +75,13 @@ class Reader(models.Model):
     class Meta:
         ordering = ['id']
 
+
 class BookReview(models.Model):
     book = models.ForeignKey(BookWithYear)
     notes = models.TextField(null=True, blank=True)
 
 ## Models for default manager tests
+
 
 class Qualification(models.Model):
     name = models.CharField(max_length=10)
@@ -160,6 +164,7 @@ class House(models.Model):
 
     class Meta:
         ordering = ['id']
+
 
 class Room(models.Model):
     name = models.CharField(max_length=50)

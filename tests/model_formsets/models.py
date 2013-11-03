@@ -17,8 +17,10 @@ class Author(models.Model):
     def __str__(self):
         return self.name
 
+
 class BetterAuthor(Author):
     write_speed = models.IntegerField()
+
 
 @python_2_unicode_compatible
 class Book(models.Model):
@@ -34,6 +36,7 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
+
 @python_2_unicode_compatible
 class BookWithCustomPK(models.Model):
     my_pk = models.DecimalField(max_digits=5, decimal_places=0, primary_key=True)
@@ -43,8 +46,10 @@ class BookWithCustomPK(models.Model):
     def __str__(self):
         return '%s: %s' % (self.my_pk, self.title)
 
+
 class Editor(models.Model):
     name = models.CharField(max_length=100)
+
 
 @python_2_unicode_compatible
 class BookWithOptionalAltEditor(models.Model):
@@ -61,12 +66,14 @@ class BookWithOptionalAltEditor(models.Model):
     def __str__(self):
         return self.title
 
+
 @python_2_unicode_compatible
 class AlternateBook(Book):
     notes = models.CharField(max_length=100)
 
     def __str__(self):
         return '%s - %s' % (self.title, self.notes)
+
 
 @python_2_unicode_compatible
 class AuthorMeeting(models.Model):
@@ -77,12 +84,14 @@ class AuthorMeeting(models.Model):
     def __str__(self):
         return self.name
 
+
 class CustomPrimaryKey(models.Model):
     my_pk = models.CharField(max_length=10, primary_key=True)
     some_field = models.CharField(max_length=100)
 
 
 # models for inheritance tests.
+
 
 @python_2_unicode_compatible
 class Place(models.Model):
@@ -91,6 +100,7 @@ class Place(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Owner(models.Model):
@@ -101,11 +111,13 @@ class Owner(models.Model):
     def __str__(self):
         return "%s at %s" % (self.name, self.place)
 
+
 class Location(models.Model):
     place = models.ForeignKey(Place, unique=True)
     # this is purely for testing the data doesn't matter here :)
     lat = models.CharField(max_length=100)
     lon = models.CharField(max_length=100)
+
 
 @python_2_unicode_compatible
 class OwnerProfile(models.Model):
@@ -115,6 +127,7 @@ class OwnerProfile(models.Model):
     def __str__(self):
         return "%s is %d" % (self.owner.name, self.age)
 
+
 @python_2_unicode_compatible
 class Restaurant(Place):
     serves_pizza = models.BooleanField(default=False)
@@ -122,12 +135,14 @@ class Restaurant(Place):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class Product(models.Model):
     slug = models.SlugField(unique=True)
 
     def __str__(self):
         return self.slug
+
 
 @python_2_unicode_compatible
 class Price(models.Model):
@@ -140,12 +155,15 @@ class Price(models.Model):
     class Meta:
         unique_together = (('price', 'quantity'),)
 
+
 class MexicanRestaurant(Restaurant):
     serves_tacos = models.BooleanField(default=False)
+
 
 class ClassyMexicanRestaurant(MexicanRestaurant):
     restaurant = models.OneToOneField(MexicanRestaurant, parent_link=True, primary_key=True)
     tacos_are_yummy = models.BooleanField(default=False)
+
 
 # models for testing unique_together validation when a fk is involved and
 # using inlineformset_factory.
@@ -155,6 +173,7 @@ class Repository(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Revision(models.Model):
@@ -167,20 +186,24 @@ class Revision(models.Model):
     def __str__(self):
         return "%s (%s)" % (self.revision, six.text_type(self.repository))
 
+
 # models for testing callable defaults (see bug #7975). If you define a model
 # with a callable default value, you cannot rely on the initial value in a
 # form.
 class Person(models.Model):
     name = models.CharField(max_length=128)
 
+
 class Membership(models.Model):
     person = models.ForeignKey(Person)
     date_joined = models.DateTimeField(default=datetime.datetime.now)
     karma = models.IntegerField()
 
+
 # models for testing a null=True fk to a parent
 class Team(models.Model):
     name = models.CharField(max_length=100)
+
 
 @python_2_unicode_compatible
 class Player(models.Model):
@@ -190,6 +213,7 @@ class Player(models.Model):
     def __str__(self):
         return self.name
 
+
 # Models for testing custom ModelForm save methods in formsets and inline formsets
 @python_2_unicode_compatible
 class Poet(models.Model):
@@ -198,6 +222,7 @@ class Poet(models.Model):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class Poem(models.Model):
     poet = models.ForeignKey(Poet)
@@ -205,6 +230,7 @@ class Poem(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Post(models.Model):

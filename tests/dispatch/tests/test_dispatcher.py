@@ -23,8 +23,10 @@ else:
     def garbage_collect():
         gc.collect()
 
+
 def receiver_1_arg(val, **kwargs):
     return val
+
 
 class Callable(object):
     def __call__(self, val, **kwargs):
@@ -116,10 +118,10 @@ class DispatcherTests(unittest.TestCase):
         def uid_based_receiver_2(**kwargs):
             pass
 
-        a_signal.connect(uid_based_receiver_1, dispatch_uid = "uid")
-        a_signal.connect(uid_based_receiver_2, dispatch_uid = "uid")
+        a_signal.connect(uid_based_receiver_1, dispatch_uid="uid")
+        a_signal.connect(uid_based_receiver_2, dispatch_uid="uid")
         self.assertEqual(len(a_signal.receivers), 1)
-        a_signal.disconnect(dispatch_uid = "uid")
+        a_signal.disconnect(dispatch_uid="uid")
         self._testIsClean(a_signal)
 
     def testRobust(self):

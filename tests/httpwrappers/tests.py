@@ -239,6 +239,7 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual(copy.copy(q).encoding, 'iso-8859-15')
         self.assertEqual(copy.deepcopy(q).encoding, 'iso-8859-15')
 
+
 class HttpResponseTests(unittest.TestCase):
 
     def test_headers_type(self):
@@ -414,6 +415,7 @@ class HttpResponseTests(unittest.TestCase):
             self.assertRaises(SuspiciousOperation,
                               HttpResponsePermanentRedirect, url)
 
+
 class HttpResponseSubclassesTests(TestCase):
     def test_redirect(self):
         response = HttpResponseRedirect('/redirected/')
@@ -447,6 +449,7 @@ class HttpResponseSubclassesTests(TestCase):
             content='Only the GET method is allowed',
             content_type='text/html')
         self.assertContains(response, 'Only the GET method is allowed', status_code=405)
+
 
 class StreamingHttpResponseTests(TestCase):
     def test_streaming_response(self):
@@ -500,6 +503,7 @@ class StreamingHttpResponseTests(TestCase):
         # and we can't tell the current position.
         with self.assertRaises(Exception):
             r.tell()
+
 
 class FileCloseTests(TestCase):
 
@@ -565,6 +569,7 @@ class FileCloseTests(TestCase):
         r.close()
         self.assertTrue(file1.closed)
         self.assertTrue(file2.closed)
+
 
 class CookieTests(unittest.TestCase):
     def test_encode(self):

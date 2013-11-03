@@ -432,6 +432,7 @@ class EscapingChecks(TestCase):
         # response should be an non-zero integer
         self.assertTrue(int(response))
 
+
 @override_settings(DEBUG=True)
 class EscapingChecksDebug(EscapingChecks):
     pass
@@ -509,12 +510,12 @@ class BackendTestCase(TestCase):
 
     def test_cursor_executemany(self):
         #4896: Test cursor.executemany
-        args = [(i, i**2) for i in range(-5, 6)]
+        args = [(i, i ** 2) for i in range(-5, 6)]
         self.create_squares_with_executemany(args)
         self.assertEqual(models.Square.objects.count(), 11)
         for i in range(-5, 6):
             square = models.Square.objects.get(root=i)
-            self.assertEqual(square.square, i**2)
+            self.assertEqual(square.square, i ** 2)
 
     def test_cursor_executemany_with_empty_params_list(self):
         #4765: executemany with params=[] does nothing
@@ -524,11 +525,11 @@ class BackendTestCase(TestCase):
 
     def test_cursor_executemany_with_iterator(self):
         #10320: executemany accepts iterators
-        args = iter((i, i**2) for i in range(-3, 2))
+        args = iter((i, i ** 2) for i in range(-3, 2))
         self.create_squares_with_executemany(args)
         self.assertEqual(models.Square.objects.count(), 5)
 
-        args = iter((i, i**2) for i in range(3, 7))
+        args = iter((i, i ** 2) for i in range(3, 7))
         with override_settings(DEBUG=True):
             # same test for DebugCursorWrapper
             self.create_squares_with_executemany(args)
@@ -544,20 +545,20 @@ class BackendTestCase(TestCase):
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_cursor_executemany_with_pyformat(self):
         #10070: Support pyformat style passing of paramters
-        args = [{'root': i, 'square': i**2} for i in range(-5, 6)]
+        args = [{'root': i, 'square': i ** 2} for i in range(-5, 6)]
         self.create_squares(args, 'pyformat', multiple=True)
         self.assertEqual(models.Square.objects.count(), 11)
         for i in range(-5, 6):
             square = models.Square.objects.get(root=i)
-            self.assertEqual(square.square, i**2)
+            self.assertEqual(square.square, i ** 2)
 
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_cursor_executemany_with_pyformat_iterator(self):
-        args = iter({'root': i, 'square': i**2} for i in range(-3, 2))
+        args = iter({'root': i, 'square': i ** 2} for i in range(-3, 2))
         self.create_squares(args, 'pyformat', multiple=True)
         self.assertEqual(models.Square.objects.count(), 5)
 
-        args = iter({'root': i, 'square': i**2} for i in range(3, 7))
+        args = iter({'root': i, 'square': i ** 2} for i in range(3, 7))
         with override_settings(DEBUG=True):
             # same test for DebugCursorWrapper
             self.create_squares(args, 'pyformat', multiple=True)
@@ -986,6 +987,7 @@ class BackendUtilTests(TestCase):
               '0.1')
         equal('0.1234567890', 12, 0,
               '0')
+
 
 @unittest.skipUnless(
     connection.vendor == 'postgresql',

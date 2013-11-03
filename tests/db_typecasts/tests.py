@@ -48,6 +48,7 @@ TEST_CASES = {
     ),
 }
 
+
 class DBTypeCasts(unittest.TestCase):
     def test_typeCasts(self):
         for k, v in six.iteritems(TEST_CASES):

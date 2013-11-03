@@ -15,6 +15,7 @@ class Employee(models.Model):
     def __str__(self):
         return '%s %s' % (self.firstname, self.lastname)
 
+
 @python_2_unicode_compatible
 class Company(models.Model):
     name = models.CharField(max_length=100)

@@ -26,7 +26,7 @@ from .models import (Category, Author, Article, AuthorProfile, Actor, Movie,
 
 
 @override_settings(
-    SERIALIZATION_MODULES = {
+    SERIALIZATION_MODULES={
         "json2": "django.core.serializers.json",
     }
 )
@@ -70,6 +70,7 @@ class SerializerRegistrationTests(TestCase):
 
         self.assertIn('python', all_formats)
         self.assertNotIn('python', public_formats)
+
 
 class SerializersTestBase(object):
     @staticmethod
@@ -241,9 +242,9 @@ class SerializersTestBase(object):
         # Regression for #12524 -- dates before 1000AD get prefixed
         # 0's on the year
         a = Article.objects.create(
-            author = self.jane,
-            headline = "Nobody remembers the early years",
-            pub_date = datetime(1, 2, 3, 4, 5, 6))
+            author=self.jane,
+            headline="Nobody remembers the early years",
+            pub_date=datetime(1, 2, 3, 4, 5, 6))
 
         serial_str = serializers.serialize(self.serializer_name, [a])
         date_values = self._get_field_values(serial_str, "pub_date")
@@ -337,6 +338,7 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
                     temp.append(child.nodeValue)
                 ret_list.append("".join(temp))
         return ret_list
+
 
 class XmlSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
     serializer_name = "xml"
@@ -438,6 +440,8 @@ class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, Transact
 
 
 YAML_IMPORT_ERROR_MESSAGE = r'No module named yaml'
+
+
 class YamlImportModuleMock(object):
     """Provides a wrapped import_module function to simulate yaml ImportError
 
