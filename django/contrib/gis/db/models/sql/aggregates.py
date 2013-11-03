@@ -1,8 +1,9 @@
-from django.db.models.sql.aggregates import Aggregate, Count
+from django.db.models.sql import aggregates
+from django.db.models.sql.aggregates import *  # NOQA
 from django.contrib.gis.db.models.fields import GeometryField
 
 
-__all__ = ['Count', 'Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union']
+__all__ = ['Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union'] + aggregates.__all__
 
 
 class GeoAggregate(Aggregate):
