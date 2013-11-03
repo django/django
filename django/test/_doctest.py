@@ -107,8 +107,16 @@ __all__ = [
 
 import __future__
 
-import sys, traceback, inspect, linecache, os, re
-import unittest, difflib, pdb, tempfile
+import difflib
+import inspect
+import linecache
+import os
+import pdb
+import re
+import sys
+import tempfile
+import traceback
+import unittest
 import warnings
 
 from django.utils import six
