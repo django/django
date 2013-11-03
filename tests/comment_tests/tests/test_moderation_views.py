@@ -191,7 +191,8 @@ class ApproveViewTests(CommentTestCase):
     def testApprovePost(self):
         """POSTing the approve view should mark the comment as removed"""
         c1, c2, c3, c4 = self.createSomeComments()
-        c1.is_public = False; c1.save()
+        c1.is_public = False
+        c1.save()
 
         makeModerator("normaluser")
         self.client.login(username="normaluser", password="normaluser")
@@ -207,7 +208,8 @@ class ApproveViewTests(CommentTestCase):
         url.
         """
         c1, c2, c3, c4 = self.createSomeComments()
-        c1.is_public = False; c1.save()
+        c1.is_public = False
+        c1.save()
 
         makeModerator("normaluser")
         self.client.login(username="normaluser", password="normaluser")
@@ -222,7 +224,8 @@ class ApproveViewTests(CommentTestCase):
         provided url when redirecting.
         """
         c1, c2, c3, c4 = self.createSomeComments()
-        c1.is_public = False; c1.save()
+        c1.is_public = False
+        c1.save()
 
         makeModerator("normaluser")
         self.client.login(username="normaluser", password="normaluser")
