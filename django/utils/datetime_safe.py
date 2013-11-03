@@ -30,9 +30,11 @@ class datetime(real_datetime):
     def date(self):
         return date(self.year, self.month, self.day)
 
+
 def new_date(d):
     "Generate a safe date from a datetime.date object."
     return date(d.year, d.month, d.day)
+
 
 def new_datetime(d):
     """
@@ -47,6 +49,7 @@ def new_datetime(d):
 # Allowed if there's an even number of "%"s because they are escaped.
 _illegal_formatting = re.compile(r"((^|[^%])(%%)*%[sy])")
 
+
 def _findall(text, substr):
     # Also finds overlaps
     sites = []
@@ -58,6 +61,7 @@ def _findall(text, substr):
         sites.append(j)
         i = j + 1
     return sites
+
 
 def strftime(dt, fmt):
     if dt.year >= 1900:

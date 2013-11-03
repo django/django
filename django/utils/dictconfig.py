@@ -32,6 +32,7 @@ from django.utils import six
 
 IDENTIFIER = re.compile('^[a-z_][a-z0-9_]*$', re.I)
 
+
 def valid_ident(s):
     m = IDENTIFIER.match(s)
     if not m:
@@ -64,6 +65,7 @@ except ImportError:
 #
 # Each wrapper should have a configurator attribute holding the actual
 # configurator to use for conversion.
+
 
 class ConvertingDict(dict):
     """A converting dictionary wrapper."""
@@ -102,6 +104,7 @@ class ConvertingDict(dict):
                 result.key = key
         return result
 
+
 class ConvertingList(list):
     """A converting list wrapper."""
     def __getitem__(self, key):
@@ -125,6 +128,7 @@ class ConvertingList(list):
                 result.parent = self
         return result
 
+
 class ConvertingTuple(tuple):
     """A converting tuple wrapper."""
     def __getitem__(self, key):
@@ -136,6 +140,7 @@ class ConvertingTuple(tuple):
                 result.parent = self
                 result.key = key
         return result
+
 
 class BaseConfigurator(object):
     """
@@ -269,6 +274,7 @@ class BaseConfigurator(object):
         if isinstance(value, list):
             value = tuple(value)
         return value
+
 
 class DictConfigurator(BaseConfigurator):
     """
@@ -554,6 +560,7 @@ class DictConfigurator(BaseConfigurator):
         self.common_logger_config(root, config, incremental)
 
 dictConfigClass = DictConfigurator
+
 
 def dictConfig(config):
     """Configure logging using a dictionary."""

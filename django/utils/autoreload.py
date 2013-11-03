@@ -119,6 +119,7 @@ def gen_filenames():
         if os.path.exists(filename):
             yield filename
 
+
 def inotify_code_changed():
     """
     Checks for changed code using inotify. After being called
@@ -148,6 +149,7 @@ def inotify_code_changed():
 
     # If we are here the code must have changed.
     return True
+
 
 def kqueue_code_changed():
     """
@@ -193,6 +195,7 @@ def kqueue_code_changed():
 
     return True
 
+
 def code_changed():
     global _mtimes, _win
     for filename in gen_filenames():
@@ -211,6 +214,7 @@ def code_changed():
                 pass
             return True
     return False
+
 
 def check_errors(fn):
     def wrapper(*args, **kwargs):
@@ -233,6 +237,7 @@ def check_errors(fn):
 
     return wrapper
 
+
 def ensure_echo_on():
     if termios:
         fd = sys.stdin
@@ -247,6 +252,7 @@ def ensure_echo_on():
                 termios.tcsetattr(fd, termios.TCSANOW, attr_list)
                 if old_handler is not None:
                     signal.signal(signal.SIGTTOU, old_handler)
+
 
 def reloader_thread():
     ensure_echo_on()
@@ -273,6 +279,7 @@ def restart_with_reloader():
         if exit_code != 3:
             return exit_code
 
+
 def python_reloader(main_func, args, kwargs):
     if os.environ.get("RUN_MAIN") == "true":
         thread.start_new_thread(main_func, args, kwargs)
@@ -289,6 +296,7 @@ def python_reloader(main_func, args, kwargs):
                 sys.exit(exit_code)
         except KeyboardInterrupt:
             pass
+
 
 def jython_reloader(main_func, args, kwargs):
     from _systemrestart import SystemRestart
