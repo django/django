@@ -426,15 +426,63 @@ default is to display 100 items per page. Change-list pagination, search boxes,
 filters, date-hierarchies and column-header-ordering all work together like you
 think they should.
 
-Customize the admin look and feel
-=================================
+Customizing the admin header
+============================
 
 Clearly, having "Django administration" at the top of each admin page is
 ridiculous. It's just placeholder text.
 
-That's easy to change, though, using Django's template system. The Django admin
-is powered by Django itself, and its interfaces use Django's own template
-system.
+That's easy to change, though, using Django's admin site feature.
+
+.. _ref-subclassing-your-projects-admin-site:
+
+Subclassing your *project's* admin site
+---------------------------------------
+
+To do this, open the :file:`polls/admin.py` file, and edit it to look like
+this:
+
+.. snippet::
+    :filename: polls/admin.py
+
+    class MyAdminSite(admin.AdminSite):
+        site_header = 'Polls Admin'
+
+    my_admin_site = MyAdminSite()
+    my_admin_site.register(Poll, PollAdmin)
+    my_admin_site.register(Choice)
+
+Then open the :file:`mysite/urls.py` file, and edit it to look like this:
+
+.. snippet::
+    :filename: mysite/urls.py
+
+    from django.conf.urls import patterns, include, url
+
+    from django.contrib import admin
+    from polls.admin import my_admin_site
+    admin.autodiscover()
+
+    urlpatterns = patterns('',
+        # Examples:
+        # url(r'^$', 'mysite.views.home', name='home'),
+        # url(r'^blog/', include('blog.urls')),
+
+        url(r'^admin/', include(my_admin_site.urls)),
+    )
+
+Now you will have "Polls Admin" at the top of each admin page as shown here:
+
+.. image:: _images/admin16.png
+   :alt: Custom admin site header
+
+Customize the admin look and feel
+=================================
+
+The Django admin is powered by Django itself, and its interfaces use Django's
+own template system. You can alter the admin template file by overriding it.
+Suppose you want to add a line under site header, which is "Polls Admin" now,
+here is the way to do it.
 
 .. _ref-customizing-your-projects-templates:
 
@@ -475,8 +523,20 @@ template directory in the source code of Django itself
         import django
         print(django.__path__)"
 
-Then, just edit the file and replace the generic Django text with your own
-site's name as you see fit.
+Then open the :file:`template/admin/base_site.html` file, and edit it to look
+like this:
+
+.. snippet::
+    :filename: template/admin/base_site.html
+
+    {% extends "admin/base.html" %}
+
+    {% block title %}{{ title }} | {{ site_title }}{% endblock %}
+
+    {% block branding %}
+    <h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header }}</a></h1>
+    <h2>Administration Page for Polls</h2>
+    {% endblock %}
 
 This template file contains lots of text like ``{% block branding %}``
 and ``{{ title }}``. The ``{%`` and ``{{`` tags are part of Django's
@@ -484,6 +544,13 @@ template language. When Django renders ``admin/base_site.html``, this
 template language will be evaluated to produce the final HTML page.
 Don't worry if you can't make any sense of the template right now --
 we'll delve into Django's templating language in Tutorial 3.
+
+The admin site header is enclosed in ``h1`` tag with id ``site-name``. Here we
+added additional ``h2`` tag with text "Administration Page for Polls". The
+line will be shown under the admin site header as shown here:
+
+.. image:: _images/admin17.png
+   :alt: Additional line under admin site header
 
 Note that any of Django's default admin templates can be overridden. To
 override a template, just do the same thing you did with ``base_site.html`` --
