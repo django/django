@@ -155,8 +155,8 @@ class BaseConfigurator(object):
     DIGIT_PATTERN = re.compile(r'^\d+$')
 
     value_converters = {
-        'ext' : 'ext_convert',
-        'cfg' : 'cfg_convert',
+        'ext': 'ext_convert',
+        'cfg': 'cfg_convert',
     }
 
     # We might want to use a different one, e.g. importlib
