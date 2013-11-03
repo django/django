@@ -34,6 +34,7 @@ def flag(request, comment_id, next=None):
             template.RequestContext(request)
         )
 
+
 @csrf_protect
 @permission_required("comments.can_moderate")
 def delete(request, comment_id, next=None):
@@ -61,6 +62,7 @@ def delete(request, comment_id, next=None):
             {'comment': comment, "next": next},
             template.RequestContext(request)
         )
+
 
 @csrf_protect
 @permission_required("comments.can_moderate")
@@ -94,6 +96,7 @@ def approve(request, comment_id, next=None):
 # actions. They've been broken out into separate functions to that they
 # may be called from admin actions.
 
+
 def perform_flag(request, comment):
     """
     Actually perform the flagging of a comment from a request.
@@ -110,6 +113,7 @@ def perform_flag(request, comment):
         created=created,
         request=request,
     )
+
 
 def perform_delete(request, comment):
     flag, created = comments.models.CommentFlag.objects.get_or_create(

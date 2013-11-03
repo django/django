@@ -12,6 +12,7 @@ from django.contrib import comments
 from django.utils.http import is_safe_url
 from django.utils.six.moves.urllib.parse import urlencode
 
+
 def next_redirect(request, fallback, **get_kwargs):
     """
     Handle the "where should I go next?" part of comment views.
@@ -37,6 +38,7 @@ def next_redirect(request, fallback, **get_kwargs):
         joiner = '&' if '?' in next else '?'
         next += joiner + urlencode(get_kwargs) + anchor
     return HttpResponseRedirect(next)
+
 
 def confirmation_view(template, doc="Display a confirmation view."):
     """

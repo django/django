@@ -10,6 +10,7 @@ warnings.warn("django.contrib.comments is deprecated and will be removed before 
 
 DEFAULT_COMMENTS_APP = 'django.contrib.comments'
 
+
 def get_comment_app():
     """
     Get the comment app (i.e. "django.contrib.comments") as defined in the settings
@@ -29,12 +30,14 @@ def get_comment_app():
 
     return package
 
+
 def get_comment_app_name():
     """
     Returns the name of the comment app (either the setting value, if it
     exists, or the default).
     """
     return getattr(settings, 'COMMENTS_APP', DEFAULT_COMMENTS_APP)
+
 
 def get_model():
     """
@@ -45,6 +48,7 @@ def get_model():
     else:
         return Comment
 
+
 def get_form():
     """
     Returns the comment ModelForm class.
@@ -54,6 +58,7 @@ def get_form():
     else:
         return CommentForm
 
+
 def get_form_target():
     """
     Returns the target URL for the comment form submission view.
@@ -62,6 +67,7 @@ def get_form_target():
         return get_comment_app().get_form_target()
     else:
         return urlresolvers.reverse("django.contrib.comments.views.comments.post_comment")
+
 
 def get_flag_url(comment):
     """
@@ -73,6 +79,7 @@ def get_flag_url(comment):
         return urlresolvers.reverse("django.contrib.comments.views.moderation.flag",
                                     args=(comment.id,))
 
+
 def get_delete_url(comment):
     """
     Get the URL for the "delete this comment" view.
@@ -82,6 +89,7 @@ def get_delete_url(comment):
     else:
         return urlresolvers.reverse("django.contrib.comments.views.moderation.delete",
                                     args=(comment.id,))
+
 
 def get_approve_url(comment):
     """
