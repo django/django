@@ -1344,11 +1344,11 @@ class OldFormForXTests(TestCase):
         self.assertIsInstance(f.clean([]), EmptyQuerySet)
         self.assertIsInstance(f.clean(()), EmptyQuerySet)
         with self.assertRaises(ValidationError):
-            f.clean(['10'])
+            f.clean(['0'])
         with self.assertRaises(ValidationError):
-            f.clean([str(c3.id), '10'])
+            f.clean([str(c3.id), '0'])
         with self.assertRaises(ValidationError):
-            f.clean([str(c1.id), '10'])
+            f.clean([str(c1.id), '0'])
 
         # queryset can be changed after the field is created.
         f.queryset = Category.objects.exclude(name='Fourth')
