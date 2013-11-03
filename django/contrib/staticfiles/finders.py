@@ -19,6 +19,7 @@ class BaseFinder(object):
     """
     A base file finder to be used for custom staticfiles finder classes.
     """
+
     def find(self, path, all=False):
         """
         Given a relative file path this ought to find an
@@ -44,6 +45,7 @@ class FileSystemFinder(BaseFinder):
     A static files finder that uses the ``STATICFILES_DIRS`` setting
     to locate files.
     """
+
     def __init__(self, apps=None, *args, **kwargs):
         # List of locations with static files
         self.locations = []

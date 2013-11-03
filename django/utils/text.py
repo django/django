@@ -60,6 +60,7 @@ class Truncator(SimpleLazyObject):
     """
     An object used to truncate text, either by characters or words.
     """
+
     def __init__(self, text):
         super(Truncator, self).__init__(lambda: force_text(text))
 

@@ -141,6 +141,7 @@ class F(ExpressionNode):
     """
     An expression representing the value of the given field.
     """
+
     def __init__(self, name):
         super(F, self).__init__(None, None, False)
         self.name = name
@@ -178,6 +179,7 @@ class DateModifierNode(ExpressionNode):
     Only adding and subtracting timedeltas is supported, attempts to use other
     operations raise a TypeError.
     """
+
     def __init__(self, children, connector, negated=False):
         if len(children) != 2:
             raise TypeError('Must specify a node and a timedelta.')

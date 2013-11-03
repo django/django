@@ -334,6 +334,7 @@ class FileUploadTests(TestCase):
         """
         class POSTAccessingHandler(client.ClientHandler):
             """A handler that'll access POST during an exception."""
+
             def handle_uncaught_exception(self, request, resolver, exc_info):
                 ret = super(POSTAccessingHandler, self).handle_uncaught_exception(request, resolver, exc_info)
                 request.POST  # evaluate

@@ -36,6 +36,7 @@ class ManagementForm(Form):
     are displayed on the page. If adding new forms via javascript, you should
     increment the count field of this form as well.
     """
+
     def __init__(self, *args, **kwargs):
         self.base_fields[TOTAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
         self.base_fields[INITIAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
@@ -52,6 +53,7 @@ class BaseFormSet(object):
     """
     A collection of instances of the same Form class.
     """
+
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList):
         self.is_bound = data is not None or files is not None

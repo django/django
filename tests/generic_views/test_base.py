@@ -14,6 +14,7 @@ class SimpleView(View):
     """
     A simple view with a docstring.
     """
+
     def get(self, request):
         return HttpResponse('This is a simple view')
 

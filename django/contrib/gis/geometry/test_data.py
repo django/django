@@ -40,6 +40,7 @@ class TestObj(object):
     """
     Base testing object, turns keyword args into attributes.
     """
+
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
@@ -49,6 +50,7 @@ class TestDS(TestObj):
     """
     Object for testing GDAL data sources.
     """
+
     def __init__(self, name, **kwargs):
         # Shapefile is default extension, unless specified otherwise.
         ext = kwargs.pop('ext', 'shp')
@@ -61,6 +63,7 @@ class TestGeom(TestObj):
     Testing object used for wrapping reference geometry data
     in GEOS/GDAL tests.
     """
+
     def __init__(self, **kwargs):
         # Converting lists to tuples of certain keyword args
         # so coordinate test cases will match (JSON has no
@@ -85,6 +88,7 @@ class TestGeomSet(object):
     """
     Each attribute of this object is a list of `TestGeom` instances.
     """
+
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, [TestGeom(**strconvert(kw)) for kw in value])

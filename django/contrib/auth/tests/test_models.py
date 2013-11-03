@@ -135,6 +135,7 @@ class TestCreateSuperUserSignals(TestCase):
     """
     Simple test case for ticket #20541
     """
+
     def post_save_listener(self, *args, **kwargs):
         self.signals_count += 1
 

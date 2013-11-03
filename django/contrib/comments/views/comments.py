@@ -19,6 +19,7 @@ class CommentPostBadRequest(http.HttpResponseBadRequest):
     nice-ish error message will be displayed (for debugging purposes), but in
     production mode a simple opaque 400 page will be displayed.
     """
+
     def __init__(self, why):
         super(CommentPostBadRequest, self).__init__()
         if settings.DEBUG:

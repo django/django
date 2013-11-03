@@ -46,6 +46,7 @@ class ErrorDict(dict):
 
     The dictionary keys are the field names, and the values are the errors.
     """
+
     def __str__(self):
         return self.as_ul()
 
@@ -67,6 +68,7 @@ class ErrorList(list):
     """
     A collection of errors that knows how to display itself in various formats.
     """
+
     def __str__(self):
         return self.as_ul()
 

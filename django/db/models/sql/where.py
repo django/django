@@ -327,6 +327,7 @@ class NothingNode(object):
     """
     A node that matches nothing.
     """
+
     def as_sql(self, qn=None, connection=None):
         raise EmptyResultSet
 
@@ -346,6 +347,7 @@ class Constraint(object):
     An object that can be passed to WhereNode.add() and knows how to
     pre-process itself prior to including in the WhereNode.
     """
+
     def __init__(self, alias, col, field):
         self.alias, self.col, self.field = alias, col, field
 

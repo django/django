@@ -44,6 +44,7 @@ class TestingHttpRequest(HttpRequest):
     A version of HttpRequest that allows us to change some things
     more easily
     """
+
     def is_secure(self):
         return getattr(self, '_is_secure_override', False)
 

@@ -213,6 +213,7 @@ class CustomLoader(EggLoader):
     split into two classes. Although the EggLoader combines both functions
     into one class, this isn't required.
     """
+
     def setUp(self):
         super(CustomLoader, self).setUp()
         sys.path_hooks.insert(0, TestFinder)

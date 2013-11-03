@@ -9,6 +9,7 @@ class ConditionalGetMiddleware(object):
 
     Also sets the Date and Content-Length response-headers.
     """
+
     def process_response(self, request, response):
         response['Date'] = http_date()
         if not response.streaming and not response.has_header('Content-Length'):

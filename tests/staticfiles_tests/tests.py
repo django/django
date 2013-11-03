@@ -48,6 +48,7 @@ class BaseStaticFilesTestCase(object):
     """
     Test case with a couple utility assertions.
     """
+
     def setUp(self):
         # Clear the cached staticfiles_storage out, this is because when it first
         # gets accessed (by some other test), it evaluates settings.STATIC_ROOT,
@@ -117,6 +118,7 @@ class BaseCollectionTestCase(BaseStaticFilesTestCase):
     is separated because some test cases need those asserts without
     all these tests.
     """
+
     def setUp(self):
         super(BaseCollectionTestCase, self).setUp()
         self.old_root = settings.STATIC_ROOT
@@ -149,6 +151,7 @@ class TestDefaults(object):
     """
     A few standard test cases.
     """
+
     def test_staticfiles_dirs(self):
         """
         Can find a file in a STATICFILES_DIRS directory.
@@ -192,6 +195,7 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
     """
     Test ``findstatic`` management command.
     """
+
     def _get_file(self, filepath):
         out = six.StringIO()
         call_command('findstatic', filepath, all=False, verbosity=0, stdout=out)
@@ -229,6 +233,7 @@ class TestCollection(CollectionTestCase, TestDefaults):
     """
     Test ``collectstatic`` management command.
     """
+
     def test_ignore(self):
         """
         Test that -i patterns are ignored.
@@ -248,6 +253,7 @@ class TestCollectionClear(CollectionTestCase):
     """
     Test the ``--clear`` option of the ``collectstatic`` management command.
     """
+
     def run_collectstatic(self, **kwargs):
         clear_filepath = os.path.join(settings.STATIC_ROOT, 'cleared.txt')
         with open(clear_filepath, 'w') as f:
@@ -263,6 +269,7 @@ class TestCollectionExcludeNoDefaultIgnore(CollectionTestCase, TestDefaults):
     Test ``--exclude-dirs`` and ``--no-default-ignore`` options of the
     ``collectstatic`` management command.
     """
+
     def run_collectstatic(self):
         super(TestCollectionExcludeNoDefaultIgnore, self).run_collectstatic(
             use_default_ignore_patterns=False)
@@ -291,6 +298,7 @@ class TestCollectionDryRun(CollectionTestCase, TestNoFilesCreated):
     """
     Test ``--dry-run`` option for ``collectstatic`` management command.
     """
+
     def run_collectstatic(self):
         super(TestCollectionDryRun, self).run_collectstatic(dry_run=True)
 
@@ -305,6 +313,7 @@ class TestCollectionFilesOverride(CollectionTestCase):
         'staticfiles_tests.apps.no_label',
 
     """
+
     def setUp(self):
         self.orig_path = os.path.join(TEST_ROOT, 'apps', 'no_label', 'static', 'file2.txt')
         # get modification and access times for no_label/static/file2.txt
@@ -371,6 +380,7 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
     """
     Tests for the Cache busting storage
     """
+
     def cached_file_path(self, path):
         fullpath = self.render_template(self.static_template_snippet(path))
         return fullpath.replace(settings.STATIC_URL, '')
@@ -578,6 +588,7 @@ class TestCollectionSimpleCachedStorage(BaseCollectionTestCase,
     """
     Tests for the Cache busting storage
     """
+
     def cached_file_path(self, path):
         fullpath = self.render_template(self.static_template_snippet(path))
         return fullpath.replace(settings.STATIC_URL, '')
@@ -616,6 +627,7 @@ if sys.platform != 'win32':
         the standard file resolving tests here, to make sure using
         ``--link`` does not change the file-selection semantics.
         """
+
         def run_collectstatic(self):
             super(TestCollectionLinks, self).run_collectstatic(link=True)
 
@@ -647,6 +659,7 @@ class TestServeDisabled(TestServeStatic):
     """
     Test serving static files disabled when DEBUG is False.
     """
+
     def setUp(self):
         super(TestServeDisabled, self).setUp()
         settings.DEBUG = False
@@ -673,6 +686,7 @@ class TestServeAdminMedia(TestServeStatic):
     """
     Test serving media from django.contrib.admin.
     """
+
     def _response(self, filepath):
         return self.client.get(
             posixpath.join(settings.STATIC_URL, 'admin/', filepath))
@@ -689,6 +703,7 @@ class FinderTestCase(object):
     path(s) they find can differ. Compare them using os.path.normcase() to
     avoid false negatives.
     """
+
     def test_find_first(self):
         src, dst = self.find_first
         found = self.finder.find(src)
@@ -706,6 +721,7 @@ class TestFileSystemFinder(StaticFilesTestCase, FinderTestCase):
     """
     Test FileSystemFinder.
     """
+
     def setUp(self):
         super(TestFileSystemFinder, self).setUp()
         self.finder = finders.FileSystemFinder()
@@ -718,6 +734,7 @@ class TestAppDirectoriesFinder(StaticFilesTestCase, FinderTestCase):
     """
     Test AppDirectoriesFinder.
     """
+
     def setUp(self):
         super(TestAppDirectoriesFinder, self).setUp()
         self.finder = finders.AppDirectoriesFinder()
@@ -730,6 +747,7 @@ class TestDefaultStorageFinder(StaticFilesTestCase, FinderTestCase):
     """
     Test DefaultStorageFinder.
     """
+
     def setUp(self):
         super(TestDefaultStorageFinder, self).setUp()
         self.finder = finders.DefaultStorageFinder(
@@ -743,6 +761,7 @@ class TestMiscFinder(TestCase):
     """
     A few misc finder tests.
     """
+
     def test_get_finder(self):
         self.assertIsInstance(finders.get_finder(
             'django.contrib.staticfiles.finders.FileSystemFinder'),
@@ -812,6 +831,7 @@ class CustomStaticFilesStorage(storage.StaticFilesStorage):
     """
     Used in TestStaticFilePermissions
     """
+
     def __init__(self, *args, **kwargs):
         kwargs['file_permissions_mode'] = 0o640
         super(CustomStaticFilesStorage, self).__init__(*args, **kwargs)

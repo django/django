@@ -140,6 +140,7 @@ class SilentAttrClass(object):
 @python_2_unicode_compatible
 class UTF8Class:
     "Class whose __str__ returns non-ASCII data on Python 2"
+
     def __str__(self):
         return 'ŠĐĆŽćžšđ'
 

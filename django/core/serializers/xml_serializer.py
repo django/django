@@ -312,6 +312,7 @@ class DefusedExpatParser(_ExpatParser):
     Forbids DTDs, external entity references
 
     """
+
     def __init__(self, *args, **kwargs):
         _ExpatParser.__init__(self, *args, **kwargs)
         self.setFeature(handler.feature_external_ges, False)
@@ -342,12 +343,14 @@ class DefusedExpatParser(_ExpatParser):
 
 class DefusedXmlException(ValueError):
     """Base exception."""
+
     def __repr__(self):
         return str(self)
 
 
 class DTDForbidden(DefusedXmlException):
     """Document type definition is forbidden."""
+
     def __init__(self, name, sysid, pubid):
         super(DTDForbidden, self).__init__()
         self.name = name
@@ -361,6 +364,7 @@ class DTDForbidden(DefusedXmlException):
 
 class EntitiesForbidden(DefusedXmlException):
     """Entity definition is forbidden."""
+
     def __init__(self, name, value, base, sysid, pubid, notation_name):
         super(EntitiesForbidden, self).__init__()
         self.name = name
@@ -377,6 +381,7 @@ class EntitiesForbidden(DefusedXmlException):
 
 class ExternalReferenceForbidden(DefusedXmlException):
     """Resolving an external reference is forbidden."""
+
     def __init__(self, context, base, sysid, pubid):
         super(ExternalReferenceForbidden, self).__init__()
         self.context = context

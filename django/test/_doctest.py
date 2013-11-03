@@ -349,6 +349,7 @@ class _OutputRedirectingPdb(pdb.Pdb):
     to a given stream when interacting with the user.  Stdout is *not*
     redirected when traced code is executed.
     """
+
     def __init__(self, out):
         self.__out = out
         self.__debugger_used = False
@@ -448,6 +449,7 @@ class Example:
         are left at their default value (as specified by the
         DocTestRunner's optionflags).  By default, no options are set.
     """
+
     def __init__(self, source, want, exc_msg=None, lineno=0, indent=0,
                  options=None):
         # Normalize inputs.
@@ -491,6 +493,7 @@ class DocTest:
       - docstring: The string that the examples were extracted from,
         or `None` if the string is unavailable.
     """
+
     def __init__(self, examples, globs, name, filename, lineno, docstring):
         """
         Create a new DocTest containing the given examples.  The
@@ -519,6 +522,7 @@ class DocTest:
     # This lets us sort tests by name:
     def _cmpkey(self):
         return (self.name, self.filename, self.lineno, id(self))
+
     def __cmp__(self, other):
         if not isinstance(other, DocTest):
             return -1
@@ -1421,6 +1425,7 @@ class DocTestRunner:
     __LINECACHE_FILENAME_RE = re.compile(r'<doctest '
                                          r'(?P<name>[\w\.]+)'
                                          r'\[(?P<examplenum>\d+)\]>$')
+
     def __patched_linecache_getlines(self, filename, module_globals=None):
         m = self.__LINECACHE_FILENAME_RE.match(filename)
         if m and m.group('name') == self.test.name:
@@ -1562,6 +1567,7 @@ class OutputChecker:
     and returns true if they match; and `output_difference`, which
     returns a string describing the differences between two outputs.
     """
+
     def check_output(self, want, got, optionflags):
         """
         Return True iff the actual output from an example (`got`)
@@ -1698,6 +1704,7 @@ class DocTestFailure(Exception):
 
     - got: the actual output
     """
+
     def __init__(self, test, example, got):
         self.test = test
         self.example = example
@@ -1717,6 +1724,7 @@ class UnexpectedException(Exception):
 
     - exc_info: the exception info
     """
+
     def __init__(self, test, example, exc_info):
         self.test = test
         self.example = example

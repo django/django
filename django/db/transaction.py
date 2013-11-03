@@ -403,6 +403,7 @@ class Transaction(object):
     autocommit, commit_on_success, and commit_manually contain the
     implementations of entering and exiting.
     """
+
     def __init__(self, entering, exiting, using):
         self.entering = entering
         self.exiting = exiting

@@ -19,12 +19,14 @@ from .models import GeometryColumns, SpatialRefSys
 #### Classes used in constructing PostGIS spatial SQL ####
 class PostGISOperator(SpatialOperation):
     "For PostGIS operators (e.g. `&&`, `~`)."
+
     def __init__(self, operator):
         super(PostGISOperator, self).__init__(operator=operator)
 
 
 class PostGISFunction(SpatialFunction):
     "For PostGIS function calls (e.g., `ST_Contains(table, geom)`)."
+
     def __init__(self, prefix, function, **kwargs):
         super(PostGISFunction, self).__init__(prefix + function, **kwargs)
 

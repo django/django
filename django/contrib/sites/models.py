@@ -81,6 +81,7 @@ class RequestSite(object):
 
     The save() and delete() methods raise NotImplementedError.
     """
+
     def __init__(self, request):
         self.domain = self.name = request.get_host()
 

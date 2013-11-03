@@ -276,6 +276,7 @@ class Moderator(object):
     around, will send any notification emails the comment generated.
 
     """
+
     def __init__(self):
         self._registry = {}
         self.connect()

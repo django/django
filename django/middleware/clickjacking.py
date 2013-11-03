@@ -26,6 +26,7 @@ class XFrameOptionsMiddleware(object):
 
     http://en.wikipedia.org/wiki/Clickjacking#Server_and_client
     """
+
     def process_response(self, request, response):
         # Don't set it if it's already in the response
         if response.get('X-Frame-Options', None) is not None:

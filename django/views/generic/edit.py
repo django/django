@@ -152,6 +152,7 @@ class ProcessFormView(View):
     """
     A mixin that renders a form on GET and processes it on POST.
     """
+
     def get(self, request, *args, **kwargs):
         """
         Handles GET requests and instantiates a blank version of the form.
@@ -196,6 +197,7 @@ class BaseCreateView(ModelFormMixin, ProcessFormView):
 
     Using this base class requires subclassing to provide a response mixin.
     """
+
     def get(self, request, *args, **kwargs):
         self.object = None
         return super(BaseCreateView, self).get(request, *args, **kwargs)
@@ -219,6 +221,7 @@ class BaseUpdateView(ModelFormMixin, ProcessFormView):
 
     Using this base class requires subclassing to provide a response mixin.
     """
+
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         return super(BaseUpdateView, self).get(request, *args, **kwargs)

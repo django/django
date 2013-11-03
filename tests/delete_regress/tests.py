@@ -164,6 +164,7 @@ class ProxyDeleteTest(TestCase):
     See #16128.
 
     """
+
     def create_image(self):
         """Return an Image referenced by both a FooImage and a FooFile."""
         # Create an Image
@@ -278,6 +279,7 @@ class Ticket19102Tests(TestCase):
     Note that .values() is not tested here on purpose. .values().delete()
     doesn't work for non fast-path deletes at all.
     """
+
     def setUp(self):
         self.o1 = OrgUnit.objects.create(name='o1')
         self.o2 = OrgUnit.objects.create(name='o2')

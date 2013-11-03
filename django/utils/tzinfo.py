@@ -21,6 +21,7 @@ warnings.warn(
 
 class FixedOffset(tzinfo):
     "Fixed offset in minutes east from UTC."
+
     def __init__(self, offset):
         warnings.warn(
             "django.utils.tzinfo.FixedOffset will be removed in Django 1.9. "
@@ -59,6 +60,7 @@ class FixedOffset(tzinfo):
 
 class LocalTimezone(tzinfo):
     "Proxy timezone information from time module."
+
     def __init__(self, dt):
         warnings.warn(
             "django.utils.tzinfo.LocalTimezone will be removed in Django 1.9. "

@@ -46,6 +46,7 @@ class MultiPartParser(object):
     ``MultiValueDict.parse()`` reads the input stream in ``chunk_size`` chunks
     and returns a tuple of ``(MultiValueDict(POST), MultiValueDict(FILES))``.
     """
+
     def __init__(self, META, input_data, upload_handlers, encoding=None):
         """
         Initialize the MultiPartParser object.
@@ -278,6 +279,7 @@ class LazyStream(six.Iterator):
     LazyStream object will support iteration, reading, and keeping a "look-back"
     variable in case you need to "unget" some bytes.
     """
+
     def __init__(self, producer, length=None):
         """
         Every LazyStream must have a producer when instantiated.
@@ -388,6 +390,7 @@ class ChunkIter(six.Iterator):
     constructor, this object will yield chunks of read operations from that
     object.
     """
+
     def __init__(self, flo, chunk_size=64 * 1024):
         self.flo = flo
         self.chunk_size = chunk_size
@@ -410,6 +413,7 @@ class InterBoundaryIter(six.Iterator):
     """
     A Producer that will iterate over boundaries.
     """
+
     def __init__(self, stream, boundary):
         self._stream = stream
         self._boundary = boundary

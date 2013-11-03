@@ -160,6 +160,7 @@ class BaseMemcachedCache(six.with_metaclass(BaseMemcachedCacheMethods, BaseCache
 
 class MemcachedCache(BaseMemcachedCache):
     "An implementation of a cache binding using python-memcached"
+
     def __init__(self, server, params):
         import memcache
         super(MemcachedCache, self).__init__(server, params,
@@ -175,6 +176,7 @@ class MemcachedCache(BaseMemcachedCache):
 
 class PyLibMCCache(BaseMemcachedCache):
     "An implementation of a cache binding using pylibmc"
+
     def __init__(self, server, params):
         import pylibmc
         self._local = local()

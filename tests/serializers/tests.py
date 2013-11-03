@@ -449,6 +449,7 @@ class YamlImportModuleMock(object):
 
     Refs: #12756
     """
+
     def __init__(self):
         self._import_module = importlib.import_module
 

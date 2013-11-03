@@ -258,6 +258,7 @@ class override(object):
     time zone name, or ``None``. If is it a time zone name, pytz is required.
     If it is ``None``, Django enables the default time zone.
     """
+
     def __init__(self, timezone):
         self.timezone = timezone
         self.old_timezone = getattr(_active, 'value', None)

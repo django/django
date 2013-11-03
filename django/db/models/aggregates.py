@@ -25,6 +25,7 @@ class Aggregate(object):
     """
     Default Aggregate definition.
     """
+
     def __init__(self, lookup, **extra):
         """Instantiate a new aggregate.
 

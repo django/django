@@ -12,6 +12,7 @@ class GZipMiddleware(object):
     It sets the Vary header accordingly, so that caches will base their storage
     on the Accept-Encoding header.
     """
+
     def process_response(self, request, response):
         # It's not worth attempting to compress really short responses.
         if not response.streaming and len(response.content) < 200:

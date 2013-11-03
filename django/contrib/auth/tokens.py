@@ -10,6 +10,7 @@ class PasswordResetTokenGenerator(object):
     Strategy object used to generate and check tokens for the password
     reset mechanism.
     """
+
     def make_token(self, user):
         """
         Returns a token that can be used once to do a password reset

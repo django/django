@@ -6,6 +6,7 @@ class XViewMiddleware(object):
     """
     Adds an X-View header to internal HEAD requests -- used by the documentation system.
     """
+
     def process_view(self, request, view_func, view_args, view_kwargs):
         """
         If the request method is HEAD and either the IP is internal or the

@@ -24,6 +24,7 @@ class QueryWrapper(object):
     A type that indicates the contents are an SQL fragment and the associate
     parameters. Can be used to pass opaque data to a where-clause, for example.
     """
+
     def __init__(self, sql, params):
         self.data = sql, list(params)
 
@@ -81,6 +82,7 @@ class DeferredAttribute(object):
     A wrapper for a deferred-loading field. When the value is read from this
     object the first time, the query is executed.
     """
+
     def __init__(self, field_name, model):
         self.field_name = field_name
 

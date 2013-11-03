@@ -156,6 +156,7 @@ class LocaleRegexProvider(object):
     language.
 
     """
+
     def __init__(self, regex):
         # regex is either a string representing a regular expression, or a
         # translatable string (using ugettext_lazy) representing a regular
@@ -444,6 +445,7 @@ class LocaleRegexURLResolver(RegexURLResolver):
     Rather than taking a regex argument, we just override the ``regex``
     function to always return the active language-code as regex.
     """
+
     def __init__(self, urlconf_name, default_kwargs=None, app_name=None, namespace=None):
         super(LocaleRegexURLResolver, self).__init__(
             None, urlconf_name, default_kwargs, app_name, namespace)

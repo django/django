@@ -103,6 +103,7 @@ class StaticHelperTest(StaticTests):
     """
     Test case to make sure the static URL pattern helper works as expected
     """
+
     def setUp(self):
         super(StaticHelperTest, self).setUp()
         self._old_views_urlpatterns = urls.urlpatterns[:]

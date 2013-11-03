@@ -47,6 +47,7 @@ class ClassDecoratedTestCaseSuper(TestCase):
     super().  Refs #17011.
 
     """
+
     def test_max_recursion_error(self):
         pass
 

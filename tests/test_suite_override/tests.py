@@ -27,6 +27,7 @@ class SuiteOverrideTest(IgnoreAllDeprecationWarningsMixin, unittest.TestCase):
 
 class SampleTests(unittest.TestCase):
     """These tests should not be discovered, due to the custom suite."""
+
     def test_one(self):
         pass
 

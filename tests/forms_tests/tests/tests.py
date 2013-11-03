@@ -58,6 +58,7 @@ class FileForm(Form):
 
 class TestTicket12510(TestCase):
     ''' It is not necessary to generate choices for ModelChoiceField (regression test for #12510). '''
+
     def setUp(self):
         self.groups = [Group.objects.create(name=name) for name in 'abc']
 
@@ -72,6 +73,7 @@ class TestTicket14567(TestCase):
     """
     Check that the return values of ModelMultipleChoiceFields are QuerySets
     """
+
     def test_empty_queryset_return(self):
         "If a model's ManyToManyField has blank=True and is saved with no data, a queryset is returned."
         option = ChoiceOptionModel.objects.create(name='default')

@@ -60,6 +60,7 @@ class PermissionsRequiredDecoratorTest(TestCase):
     """
     Tests for the permission_required decorator
     """
+
     def setUp(self):
         self.user = models.User.objects.create(username='joe', password='qwerty')
         self.factory = RequestFactory()

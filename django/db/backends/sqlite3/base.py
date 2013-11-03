@@ -482,6 +482,7 @@ class SQLiteCursorWrapper(Database.Cursor):
     This fixes it -- but note that if you want to use a literal "%s" in a query,
     you'll need to use "%%s".
     """
+
     def execute(self, query, params=None):
         if params is None:
             return Database.Cursor.execute(self, query)

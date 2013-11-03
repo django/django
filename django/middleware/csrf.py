@@ -85,6 +85,7 @@ class CsrfViewMiddleware(object):
     """
     # The _accept and _reject methods currently only exist for the sake of the
     # requires_csrf_token decorator.
+
     def _accept(self, request):
         # Avoid checking the request twice by adding a custom attribute to
         # request.  This will be relevant when both decorator and middleware

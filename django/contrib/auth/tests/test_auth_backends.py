@@ -364,6 +364,7 @@ class NoBackendsTest(TestCase):
     """
     Tests that an appropriate error is raised if no auth backends are provided.
     """
+
     def setUp(self):
         self.user = User.objects.create_user('test', 'test@example.com', 'test')
 

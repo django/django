@@ -152,6 +152,7 @@ class FileDescriptor(object):
         ...     instance.file = File(f)
 
     """
+
     def __init__(self, field):
         self.field = field
 
@@ -313,6 +314,7 @@ class ImageFileDescriptor(FileDescriptor):
     Just like the FileDescriptor, but for ImageFields. The only difference is
     assigning the width/height to the width_field/height_field, if appropriate.
     """
+
     def __set__(self, instance, value):
         previous_file = instance.__dict__.get(self.field.name)
         super(ImageFileDescriptor, self).__set__(instance, value)

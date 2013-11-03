@@ -100,6 +100,7 @@ class ArticleTranslationDescriptor(ReverseSingleRelatedObjectDescriptor):
     """
     The set of articletranslation should not set any local fields.
     """
+
     def __set__(self, instance, value):
         if instance is None:
             raise AttributeError("%s must be accessed via instance" % self.field.name)

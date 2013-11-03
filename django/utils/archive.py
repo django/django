@@ -54,6 +54,7 @@ class Archive(object):
     """
     The external API class that encapsulates an archive implementation.
     """
+
     def __init__(self, file):
         self._archive = self._archive_cls(file)(file)
 
@@ -98,6 +99,7 @@ class BaseArchive(object):
     """
     Base Archive class.  Implementations should inherit this class.
     """
+
     def split_leading_dir(self, path):
         path = str(path)
         path = path.lstrip('/').lstrip('\\')

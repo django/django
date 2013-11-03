@@ -194,6 +194,7 @@ class InlineAdminFormSet(object):
     """
     A wrapper around an inline formset for use in the admin system.
     """
+
     def __init__(self, inline, formset, fieldsets, prepopulated_fields=None,
             readonly_fields=None, model_admin=None):
         self.opts = inline
@@ -250,6 +251,7 @@ class InlineAdminForm(AdminForm):
     """
     A wrapper around an inline form for use in the admin system.
     """
+
     def __init__(self, formset, form, fieldsets, prepopulated_fields, original,
       readonly_fields=None, model_admin=None, view_on_site_url=None):
         self.formset = formset
@@ -327,6 +329,7 @@ class AdminErrorList(forms.utils.ErrorList):
     """
     Stores all errors for the form/formsets in an add/change stage view.
     """
+
     def __init__(self, form, inline_formsets):
         if form.is_bound:
             self.extend(list(six.itervalues(form.errors)))

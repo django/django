@@ -6,6 +6,7 @@ class GeoRSSSitemap(Sitemap):
     """
     A minimal hook to produce sitemaps for GeoRSS feeds.
     """
+
     def __init__(self, feed_dict, slug_dict=None):
         """
         This sitemap object initializes on a feed dictionary (as would be passed

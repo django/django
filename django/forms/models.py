@@ -825,6 +825,7 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
 
 class BaseInlineFormSet(BaseModelFormSet):
     """A formset for child objects related to a parent."""
+
     def __init__(self, data=None, files=None, instance=None,
                  save_as_new=False, prefix=None, queryset=None, **kwargs):
         if instance is None:

@@ -233,6 +233,7 @@ class ExceptionReporter(object):
     """
     A class to organize and coordinate reporting on exceptions.
     """
+
     def __init__(self, request, exc_type, exc_value, tb, is_email=False):
         self.request = request
         self.filter = get_exception_reporter_filter(self.request)

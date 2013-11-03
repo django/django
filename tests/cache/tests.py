@@ -1107,6 +1107,7 @@ class CustomCacheKeyValidationTests(unittest.TestCase):
     backend, and override the default key validation. Refs #6447.
 
     """
+
     def test_custom_key_validation(self):
         cache = get_cache('cache.liberal_backend.CacheClass')
 
@@ -1835,6 +1836,7 @@ class TestWithTemplateResponse(TestCase):
     content being complete (which is not necessarily always the case
     with a TemplateResponse)
     """
+
     def setUp(self):
         self.path = '/cache/test/'
         self.cache = get_cache('default')

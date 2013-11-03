@@ -338,6 +338,7 @@ class ModelState(object):
     """
     A class for storing instance state
     """
+
     def __init__(self, db=None):
         self.db = db
         # If true, uniqueness validation checks will consider this a new, as-yet-unsaved object.

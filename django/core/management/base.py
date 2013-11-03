@@ -50,6 +50,7 @@ class OutputWrapper(object):
     """
     Wrapper around stdout/stderr
     """
+
     def __init__(self, out, style_func=None, ending='\n'):
         self._out = out
         self.style_func = None

@@ -10,6 +10,7 @@ class GeoConstraint(Constraint):
     This subclass overrides `process` to better handle geographic SQL
     construction.
     """
+
     def __init__(self, init_constraint):
         self.alias = init_constraint.alias
         self.col = init_constraint.col

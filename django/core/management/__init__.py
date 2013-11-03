@@ -171,6 +171,7 @@ class LaxOptionParser(OptionParser):
     This is needed because the --settings and --pythonpath options affect
     the commands (and thus the options) that are available to the user.
     """
+
     def error(self, msg):
         pass
 
@@ -226,6 +227,7 @@ class ManagementUtility(object):
     A ManagementUtility has a number of commands, which can be manipulated
     by editing the self.commands dictionary.
     """
+
     def __init__(self, argv=None):
         self.argv = argv or sys.argv[:]
         self.prog_name = os.path.basename(self.argv[0])

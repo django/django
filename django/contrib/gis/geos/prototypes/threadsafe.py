@@ -6,6 +6,7 @@ class GEOSContextHandle(object):
     """
     Python object representing a GEOS context handle.
     """
+
     def __init__(self):
         # Initializing the context handler for this thread with
         # the notice and error handler.
@@ -29,6 +30,7 @@ class GEOSFunc(object):
     Class that serves as a wrapper for GEOS C Functions, and will
     use thread-safe function variants when available.
     """
+
     def __init__(self, func_name):
         try:
             # GEOS thread-safe function signatures end with '_r', and

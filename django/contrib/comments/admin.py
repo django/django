@@ -13,6 +13,7 @@ class UsernameSearch(object):
     a mechanism for issuing the equivalent of a .filter(user__username=...)
     search in CommentAdmin.
     """
+
     def __str__(self):
         return 'user__%s' % get_user_model().USERNAME_FIELD
 

@@ -135,6 +135,7 @@ class ContentFile(File):
     """
     A File-like object that takes just raw content, rather than an actual file.
     """
+
     def __init__(self, content, name=None):
         if six.PY3:
             stream_class = StringIO if isinstance(content, six.text_type) else BytesIO

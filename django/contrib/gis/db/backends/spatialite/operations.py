@@ -16,12 +16,14 @@ from django.utils.functional import cached_property
 
 class SpatiaLiteOperator(SpatialOperation):
     "For SpatiaLite operators (e.g. `&&`, `~`)."
+
     def __init__(self, operator):
         super(SpatiaLiteOperator, self).__init__(operator=operator)
 
 
 class SpatiaLiteFunction(SpatialFunction):
     "For SpatiaLite function calls."
+
     def __init__(self, function, **kwargs):
         super(SpatiaLiteFunction, self).__init__(function, **kwargs)
 

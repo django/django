@@ -920,6 +920,7 @@ class ComboField(Field):
     """
     A Field whose clean() method calls multiple Field clean() methods.
     """
+
     def __init__(self, fields=(), *args, **kwargs):
         super(ComboField, self).__init__(*args, **kwargs)
         # Set 'required' to False on the individual fields, because the

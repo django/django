@@ -92,6 +92,7 @@ class ArticlesFeed(TestRss2Feed):
     A feed to test no link being defined. Articles have no get_absolute_url()
     method, and item_link() is not defined.
     """
+
     def items(self):
         return Article.objects.all()
 
@@ -129,6 +130,7 @@ class NaiveDatesFeed(TestAtomFeed):
     """
     A feed with naive (non-timezone-aware) dates.
     """
+
     def item_pubdate(self, item):
         return item.published
 
@@ -137,6 +139,7 @@ class TZAwareDatesFeed(TestAtomFeed):
     """
     A feed with timezone-aware dates.
     """
+
     def item_pubdate(self, item):
         # Provide a weird offset so that the test can know it's getting this
         # specific offset and not accidentally getting on from
@@ -152,6 +155,7 @@ class MyCustomAtom1Feed(feedgenerator.Atom1Feed):
     """
     Test of a custom feed generator class.
     """
+
     def root_attributes(self):
         attrs = super(MyCustomAtom1Feed, self).root_attributes()
         attrs['django'] = 'rocks'

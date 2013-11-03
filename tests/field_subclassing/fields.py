@@ -14,6 +14,7 @@ class Small(object):
     A simple class to show that non-trivial Python objects can be used as
     attributes.
     """
+
     def __init__(self, first, second):
         self.first, self.second = first, second
 

@@ -28,6 +28,7 @@ register = Library()
 
 class AutoEscapeControlNode(Node):
     """Implements the actions of the autoescape tag."""
+
     def __init__(self, setting, nodelist):
         self.setting, self.nodelist = setting, nodelist
 

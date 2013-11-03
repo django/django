@@ -1019,6 +1019,7 @@ class MultipleLocaleActivationTests(TransRealMixin, TestCase):
     Tests for template rendering behavior when multiple locales are activated
     during the lifetime of the same process.
     """
+
     def setUp(self):
         super(MultipleLocaleActivationTests, self).setUp()
         self._old_language = get_language()

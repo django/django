@@ -20,6 +20,7 @@ class Options(object):
 
     This allows cache operations to be controlled by the router
     """
+
     def __init__(self, table):
         self.db_table = table
         self.app_label = 'django_cache'

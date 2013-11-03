@@ -136,6 +136,7 @@ class JsI18NTestsMultiPackage(TestCase):
     Tests for django views in django/views/i18n.py that need to change
     settings.LANGUAGE_CODE and merge JS translation from several packages.
     """
+
     def testI18NLanguageEnglishDefault(self):
         """
         Check if the JavaScript i18n view returns a complete language catalog

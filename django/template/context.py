@@ -100,6 +100,7 @@ class BaseContext(object):
 
 class Context(BaseContext):
     "A stack container for variable context"
+
     def __init__(self, dict_=None, autoescape=True, current_app=None,
             use_l10n=None, use_tz=None):
         self.autoescape = autoescape
@@ -137,6 +138,7 @@ class RenderContext(BaseContext):
     rendering of other templates as they would if they were stored in the normal
     template context.
     """
+
     def __iter__(self):
         for d in self.dicts[-1]:
             yield d
@@ -175,6 +177,7 @@ class RequestContext(Context):
     Additional processors can be specified as a list of callables
     using the "processors" keyword argument.
     """
+
     def __init__(self, request, dict_=None, processors=None, current_app=None,
             use_l10n=None, use_tz=None):
         Context.__init__(self, dict_, current_app=current_app,

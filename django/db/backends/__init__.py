@@ -1393,6 +1393,7 @@ class BaseDatabaseValidation(object):
     """
     This class encapsualtes all backend-specific model validation.
     """
+
     def __init__(self, connection):
         self.connection = connection
 

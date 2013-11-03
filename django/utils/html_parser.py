@@ -21,6 +21,7 @@ else:
         Patched version of stdlib's HTMLParser with patch from:
         http://bugs.python.org/issue670664
         """
+
         def __init__(self):
             _html_parser.HTMLParser.__init__(self)
             self.cdata_tag = None

@@ -23,6 +23,7 @@ class NestedObjectsTests(TestCase):
     """
     Tests for ``NestedObject`` utility collection.
     """
+
     def setUp(self):
         self.n = NestedObjects(using=DEFAULT_DB_ALIAS)
         self.objs = [Count.objects.create(num=i) for i in range(5)]

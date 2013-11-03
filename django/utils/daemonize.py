@@ -54,5 +54,6 @@ else:
 
     class NullDevice:
         "A writeable object that writes to nowhere -- like /dev/null."
+
         def write(self, s):
             pass

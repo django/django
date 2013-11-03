@@ -3,6 +3,7 @@ class WKTAdapter(object):
     This provides an adaptor for Geometries sent to the
     MySQL and Oracle database backends.
     """
+
     def __init__(self, geom):
         self.wkt = geom.wkt
         self.srid = geom.srid

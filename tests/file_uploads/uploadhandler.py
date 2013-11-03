@@ -31,5 +31,6 @@ class CustomUploadError(Exception):
 
 class ErroringUploadHandler(FileUploadHandler):
     """A handler that raises an exception."""
+
     def receive_data_chunk(self, raw_data, start):
         raise CustomUploadError("Oops!")

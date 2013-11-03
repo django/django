@@ -164,6 +164,7 @@ class ReceiverTestCase(unittest.TestCase):
     Test suite for receiver.
 
     """
+
     def testReceiverSingleSignal(self):
         @receiver(a_signal)
         def f(val, **kwargs):

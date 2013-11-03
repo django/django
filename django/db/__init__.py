@@ -35,6 +35,7 @@ class DefaultConnectionProxy(object):
     need to access the DatabaseWrapper object itself, use
     connections[DEFAULT_DB_ALIAS] instead.
     """
+
     def __getattr__(self, item):
         return getattr(connections[DEFAULT_DB_ALIAS], item)
 

@@ -544,6 +544,7 @@ class LoginTest(AuthViewsTestCase):
 @skipIfCustomUser
 class LoginURLSettings(AuthViewsTestCase):
     """Tests for settings.LOGIN_URL."""
+
     def assertLoginURLEquals(self, url, parse_qs=False):
         response = self.client.get('/login_required/')
         self.assertEqual(response.status_code, 302)
@@ -583,6 +584,7 @@ class LoginURLSettings(AuthViewsTestCase):
 @skipIfCustomUser
 class LoginRedirectUrlTest(AuthViewsTestCase):
     """Tests for settings.LOGIN_REDIRECT_URL."""
+
     def assertLoginRedirectURLEqual(self, url):
         response = self.login()
         self.assertEqual(response.status_code, 302)

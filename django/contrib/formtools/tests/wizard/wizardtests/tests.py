@@ -324,6 +324,7 @@ class WizardTestGenericViewInterface(TestCase):
 
             See ticket #17148.
             """
+
             def get_context_data(self, **kwargs):
                 context = super(TestWizard, self).get_context_data(**kwargs)
                 context['test_key'] = 'test_value'
@@ -349,6 +350,7 @@ class WizardTestGenericViewInterface(TestCase):
 
             See ticket #17148.
             """
+
             def get_context_data(self, **kwargs):
                 context = super(TestWizard, self).get_context_data(**kwargs)
                 context['test_key'] = 'test_value'

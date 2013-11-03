@@ -25,6 +25,7 @@ class Creator(object):
     """
     A placeholder class that provides a way to set the attribute on the model.
     """
+
     def __init__(self, field):
         self.field = field
 
@@ -46,6 +47,7 @@ def make_contrib(superclass, func=None):
     case that the existing contribute_to_class() calls all the necessary
     superclass methods.
     """
+
     def contribute_to_class(self, cls, name):
         if func:
             func(self, cls, name)

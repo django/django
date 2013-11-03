@@ -227,6 +227,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
     """A series of tests for django-admin.py when using a settings.py file that
     contains the test application.
     """
+
     def setUp(self):
         self.write_settings('settings.py')
 
@@ -293,6 +294,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
     """A series of tests for django-admin.py when using a settings.py file that
     contains the test application specified using a full path.
     """
+
     def setUp(self):
         self.write_settings('settings.py', ['django.contrib.auth', 'django.contrib.contenttypes', 'admin_scripts'])
 
@@ -359,6 +361,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
     """A series of tests for django-admin.py when using a settings.py file that
     doesn't contain the test application.
     """
+
     def setUp(self):
         self.write_settings('settings.py', apps=['django.contrib.auth', 'django.contrib.contenttypes'])
 
@@ -425,6 +428,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
     """A series of tests for django-admin.py when using a settings file
     with a name other than 'settings.py'.
     """
+
     def setUp(self):
         self.write_settings('alternate_settings.py')
 
@@ -494,6 +498,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
     file is insufficient for performing the operations described, so the
     alternate settings must be used by the running script.
     """
+
     def setUp(self):
         self.write_settings('settings.py', apps=['django.contrib.auth', 'django.contrib.contenttypes'])
         self.write_settings('alternate_settings.py')
@@ -667,6 +672,7 @@ class ManageDefaultSettings(AdminScriptTestCase):
     """A series of tests for manage.py when using a settings.py file that
     contains the test application.
     """
+
     def setUp(self):
         self.write_settings('settings.py')
 
@@ -734,6 +740,7 @@ class ManageFullPathDefaultSettings(AdminScriptTestCase):
     """A series of tests for manage.py when using a settings.py file that
     contains the test application specified using a full path.
     """
+
     def setUp(self):
         self.write_settings('settings.py', ['django.contrib.auth', 'django.contrib.contenttypes', 'admin_scripts'])
 
@@ -800,6 +807,7 @@ class ManageMinimalSettings(AdminScriptTestCase):
     """A series of tests for manage.py when using a settings.py file that
     doesn't contain the test application.
     """
+
     def setUp(self):
         self.write_settings('settings.py', apps=['django.contrib.auth', 'django.contrib.contenttypes'])
 
@@ -866,6 +874,7 @@ class ManageAlternateSettings(AdminScriptTestCase):
     """A series of tests for manage.py when using a settings file
     with a name other than 'settings.py'.
     """
+
     def setUp(self):
         self.write_settings('alternate_settings.py')
 
@@ -946,6 +955,7 @@ class ManageMultipleSettings(AdminScriptTestCase):
     file is insufficient for performing the operations described, so the
     alternate settings must be used by the running script.
     """
+
     def setUp(self):
         self.write_settings('settings.py', apps=['django.contrib.auth', 'django.contrib.contenttypes'])
         self.write_settings('alternate_settings.py')
@@ -1016,6 +1026,7 @@ class ManageSettingsWithSettingsErrors(AdminScriptTestCase):
     Tests for manage.py when using the default settings.py file containing
     runtime errors.
     """
+
     def tearDown(self):
         self.remove_settings('settings.py')
 
@@ -1238,6 +1249,7 @@ class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
 
 class CommandTypes(AdminScriptTestCase):
     "Tests for the various types of base command types that can be defined."
+
     def setUp(self):
         self.write_settings('settings.py')
 
@@ -1473,6 +1485,7 @@ class ArgumentOrder(AdminScriptTestCase):
     passed to the command parser, which extracts commands of interest to the
     individual command.
     """
+
     def setUp(self):
         self.write_settings('settings.py', apps=['django.contrib.auth', 'django.contrib.contenttypes'])
         self.write_settings('alternate_settings.py')

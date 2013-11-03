@@ -320,6 +320,7 @@ class PostgresVersionTest(TestCase):
         # Helper mocks
         class CursorMock(object):
             "Very simple mock of DB-API cursor"
+
             def execute(self, arg):
                 pass
 
@@ -328,6 +329,7 @@ class PostgresVersionTest(TestCase):
 
         class OlderConnectionMock(object):
             "Mock of psycopg2 (< 2.0.12) connection"
+
             def cursor(self):
                 return CursorMock()
 

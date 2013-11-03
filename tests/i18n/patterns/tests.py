@@ -55,6 +55,7 @@ class URLPrefixTests(URLTestCaseBase):
     """
     Tests if the `i18n_patterns` is adding the prefix correctly.
     """
+
     def test_not_prefixed(self):
         with translation.override('en'):
             self.assertEqual(reverse('not-prefixed'), '/not-prefixed/')
@@ -104,6 +105,7 @@ class URLTranslationTests(URLTestCaseBase):
     Tests if the pattern-strings are translated correctly (within the
     `i18n_patterns` and the normal `patterns` function).
     """
+
     def test_no_prefix_translated(self):
         with translation.override('en'):
             self.assertEqual(reverse('no-prefix-translated'), '/translated/')
@@ -133,6 +135,7 @@ class URLNamespaceTests(URLTestCaseBase):
     """
     Tests if the translations are still working within namespaces.
     """
+
     def test_account_register(self):
         with translation.override('en'):
             self.assertEqual(reverse('account:register'), '/en/account/register/')
@@ -146,6 +149,7 @@ class URLRedirectTests(URLTestCaseBase):
     Tests if the user gets redirected to the right URL when there is no
     language-prefix in the request URL.
     """
+
     def test_no_prefix_response(self):
         response = self.client.get('/not-prefixed/')
         self.assertEqual(response.status_code, 200)
@@ -203,6 +207,7 @@ class URLVaryAcceptLanguageTests(URLTestCaseBase):
     Tests that 'Accept-Language' is not added to the Vary header when using
     prefixed URLs.
     """
+
     def test_no_prefix_response(self):
         response = self.client.get('/not-prefixed/')
         self.assertEqual(response.status_code, 200)
@@ -223,6 +228,7 @@ class URLRedirectWithoutTrailingSlashTests(URLTestCaseBase):
     Tests the redirect when the requested URL doesn't end with a slash
     (`settings.APPEND_SLASH=True`).
     """
+
     def test_not_prefixed_redirect(self):
         response = self.client.get('/not-prefixed', HTTP_ACCEPT_LANGUAGE='en')
         self.assertRedirects(response, '/not-prefixed/', 301)
@@ -260,6 +266,7 @@ class URLResponseTests(URLTestCaseBase):
     """
     Tests if the response has the right language-code.
     """
+
     def test_not_prefixed_with_prefix(self):
         response = self.client.get('/en/not-prefixed/')
         self.assertEqual(response.status_code, 404)
@@ -295,6 +302,7 @@ class URLTagTests(URLTestCaseBase):
     """
     Test if the language tag works.
     """
+
     def test_strings_only(self):
         t = Template("""{% load i18n %}
             {% language 'nl' %}{% url 'no-prefix-translated' %}{% endlanguage %}

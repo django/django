@@ -26,6 +26,7 @@ class RWLock(object):
         writer_enters()
         writer_leaves()
     """
+
     def __init__(self):
         self.mutex = threading.RLock()
         self.can_read = threading.Semaphore(0)

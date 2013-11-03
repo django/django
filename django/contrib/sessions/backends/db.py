@@ -11,6 +11,7 @@ class SessionStore(SessionBase):
     """
     Implements database session store.
     """
+
     def __init__(self, session_key=None):
         super(SessionStore, self).__init__(session_key)
 

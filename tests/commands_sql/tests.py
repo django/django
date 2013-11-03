@@ -12,6 +12,7 @@ from django.utils import six
 
 class SQLCommandsTestCase(TestCase):
     """Tests for several functions in django/core/management/sql.py"""
+
     def count_ddl(self, output, cmd):
         return len([o for o in output if o.startswith(cmd)])
 

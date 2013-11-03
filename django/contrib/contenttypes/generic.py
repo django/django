@@ -256,6 +256,7 @@ class ReverseGenericRelatedObjectsDescriptor(object):
     "article.publications", the publications attribute is a
     ReverseGenericRelatedObjectsDescriptor instance.
     """
+
     def __init__(self, field, for_concrete_model=True):
         self.field = field
         self.for_concrete_model = for_concrete_model

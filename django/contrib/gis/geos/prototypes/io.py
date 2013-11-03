@@ -131,6 +131,7 @@ wkb_writer_set_include_srid = wkb_writer_set(GEOSFunc('GEOSWKBWriter_setIncludeS
 ### Base I/O Class ###
 class IOBase(GEOSBase):
     "Base class for GEOS I/O objects."
+
     def __init__(self):
         # Getting the pointer with the constructor.
         self.ptr = self._constructor()

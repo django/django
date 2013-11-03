@@ -7,6 +7,7 @@ class DummyStorage(storage.Storage):
     A storage class that does implement modified_time() but raises
     NotImplementedError when calling
     """
+
     def _save(self, name, content):
         return 'dummy'
 

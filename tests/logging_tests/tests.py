@@ -88,6 +88,7 @@ class WarningLoggerTests(TestCase):
     Tests that warnings output for DeprecationWarnings is enabled
     and captured to the logging system
     """
+
     def setUp(self):
         # If tests are invoke with "-Wall" (or any -W flag actually) then
         # warning logging gets disabled (see django/conf/__init__.py). However,
@@ -313,6 +314,7 @@ class SettingsConfigTest(AdminScriptTestCase):
     Test that accessing settings in a custom logging handler does not trigger
     a circular import error.
     """
+
     def setUp(self):
         log_config = """{
     'version': 1,
@@ -345,6 +347,7 @@ class SettingsConfigureLogging(TestCase):
     Test that calling settings.configure() initializes the logging
     configuration.
     """
+
     def test_configure_initializes_logging(self):
         settings = LazySettings()
         settings.configure(

@@ -30,6 +30,7 @@ class StopUpload(UploadFileException):
     """
     This exception is raised when an upload must abort.
     """
+
     def __init__(self, connection_reset=False):
         """
         If ``connection_reset`` is ``True``, Django knows will halt the upload
@@ -134,6 +135,7 @@ class TemporaryFileUploadHandler(FileUploadHandler):
     """
     Upload handler that streams data into a temporary file.
     """
+
     def __init__(self, *args, **kwargs):
         super(TemporaryFileUploadHandler, self).__init__(*args, **kwargs)
 

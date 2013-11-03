@@ -443,6 +443,7 @@ class Form(six.with_metaclass(DeclarativeFieldsMetaclass, BaseForm)):
 @python_2_unicode_compatible
 class BoundField(object):
     "A Field plus data"
+
     def __init__(self, form, field, name):
         self.form = form
         self.field = field

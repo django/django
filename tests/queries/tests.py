@@ -2289,6 +2289,7 @@ class UnionTests(unittest.TestCase):
     """
     Tests for the union of two querysets. Bug #12252.
     """
+
     def setUp(self):
         objectas = []
         objectbs = []
@@ -2506,6 +2507,7 @@ class ExcludeTest17600(TestCase):
 
 class Exclude15786(TestCase):
     """Regression test for #15786"""
+
     def test_ticket15786(self):
         c1 = SimpleCategory.objects.create(name='c1')
         c2 = SimpleCategory.objects.create(name='c2')
@@ -2783,6 +2785,7 @@ class JoinReuseTest(TestCase):
     Test that the queries reuse joins sensibly (for example, direct joins
     are always reused).
     """
+
     def test_fk_reuse(self):
         qs = Annotation.objects.filter(tag__name='foo').filter(tag__name='bar')
         self.assertEqual(str(qs.query).count('JOIN'), 1)

@@ -153,6 +153,7 @@ class SubWidget(object):
     Some widgets are made of multiple HTML elements -- namely, RadioSelect.
     This is a class that represents the "inner" HTML element of a widget.
     """
+
     def __init__(self, parent_widget, name, value, attrs, choices):
         self.parent_widget = parent_widget
         self.name, self.value = name, value
@@ -294,6 +295,7 @@ class MultipleHiddenInput(HiddenInput):
     A widget that handles <input type="hidden"> for fields that have a list
     of values.
     """
+
     def __init__(self, attrs=None, choices=()):
         super(MultipleHiddenInput, self).__init__(attrs)
         # choices can be any iterable
@@ -529,6 +531,7 @@ class NullBooleanSelect(Select):
     """
     A Select Widget intended to be used with NullBooleanField.
     """
+
     def __init__(self, attrs=None):
         choices = (('1', ugettext_lazy('Unknown')),
                    ('2', ugettext_lazy('Yes')),
@@ -773,6 +776,7 @@ class MultiWidget(Widget):
 
     You'll probably want to use this class with MultiValueField.
     """
+
     def __init__(self, widgets, attrs=None):
         self.widgets = [w() if isinstance(w, type) else w for w in widgets]
         super(MultiWidget, self).__init__(attrs)

@@ -875,6 +875,7 @@ class TestCase(TransactionTestCase):
 
 class CheckCondition(object):
     """Descriptor class for deferred condition checking"""
+
     def __init__(self, cond_func):
         self.cond_func = cond_func
 
@@ -933,6 +934,7 @@ class FSFilesHandler(WSGIHandler):
     WSGI middleware that intercepts calls to a directory, as defined by one of
     the *_ROOT settings, and serves those files, publishing them under *_URL.
     """
+
     def __init__(self, application):
         self.application = application
         self.base_url = urlparse(self.get_base_url())

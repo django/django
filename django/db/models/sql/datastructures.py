@@ -29,6 +29,7 @@ class MultiJoin(Exception):
     multi-valued join was attempted (if the caller wants to treat that
     exceptionally).
     """
+
     def __init__(self, names_pos, path_with_names):
         self.level = names_pos
         # The path travelled, this includes the path to the multijoin.
@@ -43,6 +44,7 @@ class Date(object):
     """
     Add a date selection column.
     """
+
     def __init__(self, col, lookup_type):
         self.col = col
         self.lookup_type = lookup_type
@@ -62,6 +64,7 @@ class DateTime(object):
     """
     Add a datetime selection column.
     """
+
     def __init__(self, col, lookup_type, tzname):
         self.col = col
         self.lookup_type = lookup_type

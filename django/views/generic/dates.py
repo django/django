@@ -570,6 +570,7 @@ class BaseDayArchiveView(YearMixin, MonthMixin, DayMixin, BaseDateListView):
     """
     List of objects published on a given day.
     """
+
     def get_dated_items(self):
         """
         Return (date_list, items, extra_context) for this request.
@@ -632,6 +633,7 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
     Detail view of a single object on a single date; this differs from the
     standard DetailView by accepting a year/month/day in the URL.
     """
+
     def get_object(self, queryset=None):
         """
         Get the object this request displays.

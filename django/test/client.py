@@ -41,6 +41,7 @@ class FakePayload(object):
     length. This makes sure that views can't do anything under the test client
     that wouldn't work in Real Life.
     """
+
     def __init__(self, content=None):
         self.__content = BytesIO()
         self.__len = 0
@@ -86,6 +87,7 @@ class ClientHandler(BaseHandler):
     Uses the WSGI interface to compose requests, but returns
     the raw HttpResponse object
     """
+
     def __init__(self, enforce_csrf_checks=True, *args, **kwargs):
         self.enforce_csrf_checks = enforce_csrf_checks
         super(ClientHandler, self).__init__(*args, **kwargs)
@@ -208,6 +210,7 @@ class RequestFactory(object):
     Once you have a request object you can pass it to any view function,
     just as if that view had been hooked up using a URLconf.
     """
+
     def __init__(self, **defaults):
         self.defaults = defaults
         self.cookies = SimpleCookie()
@@ -367,6 +370,7 @@ class Client(RequestFactory):
     contexts and templates produced by a view, rather than the
     HTML rendered to the end-user.
     """
+
     def __init__(self, enforce_csrf_checks=False, **defaults):
         super(Client, self).__init__(**defaults)
         self.handler = ClientHandler(enforce_csrf_checks)

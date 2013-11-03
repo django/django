@@ -206,6 +206,7 @@ class BoundNonDescriptorMethodWeakref(BoundMethodWeakref):
     aren't descriptors (such as Jython) this implementation has the advantage
     of working in the most cases.
     """
+
     def __init__(self, target, onDelete=None):
         """Return a weak-reference-like instance for a bound method
 

@@ -27,6 +27,7 @@ class Signal(object):
         receivers
             { receriverkey (id) : weakref(receiver) }
     """
+
     def __init__(self, providing_args=None, use_caching=False):
         """
         Create a new signal.

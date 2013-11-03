@@ -1485,6 +1485,7 @@ class RawQuerySet(object):
     Provides an iterator which converts the results of raw SQL queries into
     annotated model instances.
     """
+
     def __init__(self, raw_query, model=None, query=None, params=None,
         translations=None, using=None, hints=None):
         self.raw_query = raw_query

@@ -85,6 +85,7 @@ def get_tag_uri(url, date):
 
 class SyndicationFeed(object):
     "Base class for all syndication feeds. Subclasses should provide write()"
+
     def __init__(self, title, link, description, language=None, author_email=None,
             author_name=None, author_link=None, subtitle=None, categories=None,
             feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs):
@@ -211,6 +212,7 @@ class SyndicationFeed(object):
 
 class Enclosure(object):
     "Represents an RSS enclosure"
+
     def __init__(self, url, length, mime_type):
         "All args are expected to be Python Unicode objects"
         self.length, self.mime_type = length, mime_type

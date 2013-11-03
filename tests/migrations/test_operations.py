@@ -362,6 +362,7 @@ class MigrateNothingRouter(object):
     """
     A router that sends all writes to the other database.
     """
+
     def allow_migrate(self, db, model):
         return False
 

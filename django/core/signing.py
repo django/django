@@ -84,6 +84,7 @@ class JSONSerializer(object):
     Simple wrapper around json to be used in signing.dumps and
     signing.loads.
     """
+
     def dumps(self, obj):
         return json.dumps(obj, separators=(',', ':')).encode('latin-1')
 

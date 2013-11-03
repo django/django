@@ -1056,6 +1056,7 @@ class SelectAndTextWidget(MultiWidget):
     """
     MultiWidget subclass
     """
+
     def __init__(self, choices=[]):
         widgets = [
             RadioSelect(choices=choices),

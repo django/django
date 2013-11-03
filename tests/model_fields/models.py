@@ -139,6 +139,7 @@ if Image:
         Custom Field File class that records whether or not the underlying file
         was opened.
         """
+
         def __init__(self, *args, **kwargs):
             self.was_opened = False
             super(TestImageFieldFile, self).__init__(*args, **kwargs)

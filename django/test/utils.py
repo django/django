@@ -49,6 +49,7 @@ class ContextList(list):
     """A wrapper that provides direct key access to context items contained
     in a list of context objects.
     """
+
     def __getitem__(self, key):
         if isinstance(key, six.string_types):
             for subcontext in self:
@@ -188,6 +189,7 @@ class override_settings(object):
     it's used with the ``with`` statement. In either event entering/exiting
     are called before and after, respectively, the function/block is executed.
     """
+
     def __init__(self, **kwargs):
         self.options = kwargs
 
@@ -341,6 +343,7 @@ class CaptureQueriesContext(object):
     """
     Context manager that captures queries executed by the specified connection.
     """
+
     def __init__(self, connection):
         self.connection = connection
 
@@ -422,6 +425,7 @@ class TransRealMixin(object):
     """This is the only way to reset the translation machinery. Otherwise
     the test suite occasionally fails because of global state pollution
     between tests."""
+
     def flush_caches(self):
         from django.utils.translation import trans_real
         trans_real._translations = {}

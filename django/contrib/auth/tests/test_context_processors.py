@@ -32,6 +32,7 @@ class PermWrapperTests(TestCase):
         """
         This object makes sure __eq__ will not be called endlessly.
         """
+
         def __init__(self):
             self.eq_calls = 0
 

@@ -174,6 +174,7 @@ class MethodDecoratorTests(TestCase):
     """
     Tests for method_decorator
     """
+
     def test_preserve_signature(self):
         class Test(object):
             @simple_dec_m
@@ -214,6 +215,7 @@ class XFrameOptionsDecoratorsTests(TestCase):
     """
     Tests for the X-Frame-Options decorators.
     """
+
     def test_deny_decorator(self):
         """
         Ensures @xframe_options_deny properly sets the X-Frame-Options header.

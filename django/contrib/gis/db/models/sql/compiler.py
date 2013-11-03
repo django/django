@@ -273,6 +273,7 @@ class SQLDateCompiler(compiler.SQLDateCompiler, GeoSQLCompiler):
     `GeoQuery.resolve_columns` is used for spatial values.
     See #14648, #16757.
     """
+
     def results_iter(self):
         if self.connection.ops.oracle:
             from django.db.models.fields import DateTimeField
@@ -299,6 +300,7 @@ class SQLDateTimeCompiler(compiler.SQLDateTimeCompiler, GeoSQLCompiler):
     `GeoQuery.resolve_columns` is used for spatial values.
     See #14648, #16757.
     """
+
     def results_iter(self):
         if self.connection.ops.oracle:
             from django.db.models.fields import DateTimeField

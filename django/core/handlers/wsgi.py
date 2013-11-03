@@ -30,6 +30,7 @@ class LimitedStream(object):
     LimitedStream wraps another stream in order to not allow reading from it
     past specified amount of bytes.
     '''
+
     def __init__(self, stream, limit, buf_size=64 * 1024 * 1024):
         self.stream = stream
         self.remaining = limit

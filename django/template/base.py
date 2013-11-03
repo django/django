@@ -388,6 +388,7 @@ class TokenParser(object):
     The parser's "tagname" instance-variable stores the name of the tag that
     the filter was called with.
     """
+
     def __init__(self, subject):
         self.subject = subject
         self.pointer = 0
@@ -550,6 +551,7 @@ class FilterExpression(object):
     This class should never be instantiated outside of the
     get_filters_from_token helper function.
     """
+
     def __init__(self, token, parser):
         self.token = token
         matches = filter_re.finditer(token)

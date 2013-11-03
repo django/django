@@ -792,6 +792,7 @@ class ModelToDictTests(TestCase):
     """
     Tests for forms.models.model_to_dict
     """
+
     def test_model_to_dict_many_to_many(self):
         categories = [
             Category(name='TestName1', slug='TestName1', url='url1'),
@@ -1821,6 +1822,7 @@ class OldFormForXTests(TestCase):
 
 class M2mHelpTextTest(TestCase):
     """Tests for ticket #9321."""
+
     def test_multiple_widgets(self):
         """Help text of different widgets for ManyToManyFields model fields"""
         dreaded_help_text = '<span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span>'

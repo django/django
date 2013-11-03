@@ -60,6 +60,7 @@ class TemporaryUploadedFile(UploadedFile):
     """
     A file uploaded to a temporary location (i.e. stream-to-disk).
     """
+
     def __init__(self, name, content_type, size, charset, content_type_extra):
         if settings.FILE_UPLOAD_TEMP_DIR:
             file = tempfile.NamedTemporaryFile(suffix='.upload',
@@ -89,6 +90,7 @@ class InMemoryUploadedFile(UploadedFile):
     """
     A file uploaded into memory (i.e. stream-to-memory).
     """
+
     def __init__(self, file, field_name, name, content_type, size, charset, content_type_extra):
         super(InMemoryUploadedFile, self).__init__(file, name, content_type, size, charset, content_type_extra)
         self.field_name = field_name
@@ -112,6 +114,7 @@ class SimpleUploadedFile(InMemoryUploadedFile):
     """
     A simple representation of a file, which just has content, size, and a name.
     """
+
     def __init__(self, name, content, content_type='text/plain'):
         content = content or b''
         super(SimpleUploadedFile, self).__init__(BytesIO(content), None, name,

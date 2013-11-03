@@ -70,6 +70,7 @@ class NoNameFileTestCase(unittest.TestCase):
     Other examples of unnamed files may be tempfile.SpooledTemporaryFile or
     urllib.urlopen()
     """
+
     def test_noname_file_default_name(self):
         self.assertEqual(File(BytesIO(b'A file with no name')).name, None)
 

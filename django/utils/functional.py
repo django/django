@@ -40,6 +40,7 @@ class cached_property(object):
     Decorator that converts a method with a single self argument into a
     property cached on the instance.
     """
+
     def __init__(self, func):
         self.func = func
 
@@ -282,6 +283,7 @@ class SimpleLazyObject(LazyObject):
     Designed for compound objects of unknown type. For builtins or objects of
     known type, use django.utils.functional.lazy.
     """
+
     def __init__(self, func):
         """
         Pass in a callable that returns the object to be wrapped.

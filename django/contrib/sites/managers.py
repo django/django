@@ -5,6 +5,7 @@ from django.db.models.fields import FieldDoesNotExist
 
 class CurrentSiteManager(models.Manager):
     "Use this to limit objects to those associated with the current site."
+
     def __init__(self, field_name=None):
         super(CurrentSiteManager, self).__init__()
         self.__field_name = field_name

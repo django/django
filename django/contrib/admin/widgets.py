@@ -80,6 +80,7 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
     """
     A SplitDateTime Widget that has some admin-specific styling.
     """
+
     def __init__(self, attrs=None):
         widgets = [AdminDateWidget, AdminTimeWidget]
         # Note that we're calling MultiWidget, not SplitDateTimeWidget, because
@@ -140,6 +141,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
     A Widget for displaying ForeignKeys in the "raw_id" interface rather than
     in a <select> box.
     """
+
     def __init__(self, rel, admin_site, attrs=None, using=None):
         self.rel = rel
         self.admin_site = admin_site
@@ -199,6 +201,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     A Widget for displaying ManyToMany ids in the "raw_id" interface rather than
     in a <select multiple> box.
     """
+
     def render(self, name, value, attrs=None):
         if attrs is None:
             attrs = {}
@@ -228,6 +231,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     This class is a wrapper to a given widget to add the add icon for the
     admin interface.
     """
+
     def __init__(self, widget, rel, admin_site, can_add_related=None):
         self.is_hidden = widget.is_hidden
         self.needs_multipart_form = widget.needs_multipart_form

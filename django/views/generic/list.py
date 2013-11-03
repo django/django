@@ -141,6 +141,7 @@ class BaseListView(MultipleObjectMixin, View):
     """
     A base view for displaying a list of objects.
     """
+
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
         allow_empty = self.get_allow_empty()

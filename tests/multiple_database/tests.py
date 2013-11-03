@@ -1648,6 +1648,7 @@ class DatabaseReceiver(object):
     """
     Used in the tests for the database argument in signals (#13552)
     """
+
     def __call__(self, signal, sender, **kwargs):
         self._database = kwargs['using']
 
@@ -1655,6 +1656,7 @@ class WriteToOtherRouter(object):
     """
     A router that sends all writes to the other database.
     """
+
     def db_for_write(self, model, **hints):
         return "other"
 
@@ -1767,6 +1769,7 @@ class SignalTests(TestCase):
 
 class AttributeErrorRouter(object):
     "A router to test the exception handling of ConnectionRouter"
+
     def db_for_read(self, model, **hints):
         raise AttributeError
 
@@ -1820,6 +1823,7 @@ class RouterAttributeErrorTestCase(TestCase):
 
 class ModelMetaRouter(object):
     "A router to ensure model arguments are real model classes"
+
     def db_for_write(self, model, **hints):
         if not hasattr(model, '_meta'):
             raise ValueError

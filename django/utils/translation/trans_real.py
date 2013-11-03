@@ -79,6 +79,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     This class sets up the GNUTranslations context with regard to output
     charset.
     """
+
     def __init__(self, *args, **kw):
         gettext_module.GNUTranslations.__init__(self, *args, **kw)
         self.set_output_charset('utf-8')

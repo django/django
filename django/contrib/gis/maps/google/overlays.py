@@ -79,6 +79,7 @@ class GPolygon(GOverlayBase):
     please see the Google Maps API Reference:
      http://code.google.com/apis/maps/documentation/reference.html#GPolygon
     """
+
     def __init__(self, poly,
                  stroke_color='#0000ff', stroke_weight=2, stroke_opacity=1,
                  fill_color='#0000ff', fill_opacity=0.4):
@@ -139,6 +140,7 @@ class GPolyline(GOverlayBase):
     please see the Google Maps API Reference:
      http://code.google.com/apis/maps/documentation/reference.html#GPolyline
     """
+
     def __init__(self, geom, color='#0000ff', weight=2, opacity=1):
         """
         The GPolyline object may be initialized on GEOS LineStirng, LinearRing,
@@ -234,6 +236,7 @@ class GIcon(object):
             image at which the info window is anchored to this icon.
 
     """
+
     def __init__(self, varname, image=None, iconsize=None,
                  shadow=None, shadowsize=None, iconanchor=None,
                  infowindowanchor=None):
@@ -276,6 +279,7 @@ class GMarker(GOverlayBase):
           return render_to_response('mytemplate.html',
                  {'google' : GoogleMap(markers=[marker])})
     """
+
     def __init__(self, geom, title=None, draggable=False, icon=None):
         """
         The GMarker object may initialize on GEOS Points or a parameter
