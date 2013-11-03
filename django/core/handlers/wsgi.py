@@ -92,7 +92,11 @@ class WSGIRequest(http.HttpRequest):
             path_info = '/'
         self.environ = environ
         self.path_info = path_info
-        self.path = '%s/%s' % (script_name.rstrip('/'), path_info.lstrip('/'))
+        # be careful to only replace the first slash in the path because of
+        # http://test/something and http://test//something being different as
+        # stated in http://www.ietf.org/rfc/rfc2396.txt
+        self.path = '%s/%s' % (script_name.rstrip('/'),
+                               path_info.replace('/', '', 1))
         self.META = environ
         self.META['PATH_INFO'] = path_info
         self.META['SCRIPT_NAME'] = script_name

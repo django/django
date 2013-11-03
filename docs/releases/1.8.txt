@@ -188,7 +188,11 @@ Templates
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* ``WSGIRequest`` now respects paths starting with ``//``.
+
+* The :meth:`HttpRequest.build_absolute_uri()
+  <django.http.HttpRequest.build_absolute_uri>` method now handles paths
+  starting with ``//`` correctly.
 
 Tests
 ^^^^^
