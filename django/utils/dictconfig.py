@@ -302,7 +302,7 @@ class DictConfigurator(BaseConfigurator):
                     for name in handlers:
                         if name not in logging._handlers:
                             raise ValueError('No handler found with '
-                                             'name %r'  % name)
+                                             'name %r' % name)
                         else:
                             try:
                                 handler = logging._handlers[name]
