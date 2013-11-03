@@ -11,7 +11,8 @@ from decimal import Decimal, InvalidOperation as DecimalInvalidOperation
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connections, router
 from django.contrib.gis.db.models import GeometryField
-from django.contrib.gis.gdal import (CoordTransform, DataSource,
+from django.contrib.gis.gdal import (
+    CoordTransform, DataSource,
     OGRException, OGRGeometry, OGRGeomType, SpatialReference)
 from django.contrib.gis.gdal.field import (
     OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime)
@@ -600,7 +601,7 @@ class LayerMapping(object):
             for i, end in enumerate(indices):
                 # Constructing the slice to use for this step; the last slice is
                 # special (e.g, [100:] instead of [90:100]).
-                if i+1 == n_i:
+                if i + 1 == n_i:
                     step_slice = slice(beg, None)
                 else:
                     step_slice = slice(beg, end)

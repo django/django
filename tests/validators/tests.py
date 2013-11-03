@@ -131,12 +131,12 @@ TEST_DATA = (
     (MinValueValidator(NOW), NOW - timedelta(days=1), ValidationError),
 
     (MaxLengthValidator(10), '', None),
-    (MaxLengthValidator(10), 10*'x', None),
+    (MaxLengthValidator(10), 10 * 'x', None),
 
-    (MaxLengthValidator(10), 15*'x', ValidationError),
+    (MaxLengthValidator(10), 15 * 'x', ValidationError),
 
-    (MinLengthValidator(10), 15*'x', None),
-    (MinLengthValidator(10), 10*'x', None),
+    (MinLengthValidator(10), 15 * 'x', None),
+    (MinLengthValidator(10), 10 * 'x', None),
 
     (MinLengthValidator(10), '', ValidationError),
 

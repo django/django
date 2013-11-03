@@ -12,7 +12,8 @@ from django.conf import settings
 from django.utils import formats
 from django.utils.dateformat import format, time_format
 from django.utils.encoding import force_text, iri_to_uri
-from django.utils.html import (conditional_escape, escapejs, fix_ampersands,
+from django.utils.html import (
+    conditional_escape, escapejs, fix_ampersands,
     escape, urlize as urlize_impl, linebreaks, strip_tags, avoid_wrapping)
 from django.utils.http import urlquote
 from django.utils.text import Truncator, wrap, phone2numeric
@@ -354,7 +355,8 @@ def urlizetrunc(value, limit, autoescape=None):
     Argument: Length to truncate URLs to.
     """
     return mark_safe(urlize_impl(value, trim_url_limit=int(limit), nofollow=True,
-                            autoescape=autoescape))
+                                 autoescape=autoescape))
+
 
 
 @register.filter(is_safe=False)
@@ -420,6 +422,7 @@ def cut(value, arg):
 ###################
 # HTML STRINGS    #
 ###################
+
 
 @register.filter("escape", is_safe=True)
 @stringfilter
@@ -504,6 +507,7 @@ def striptags(value):
 ###################
 # LISTS           #
 ###################
+
 
 @register.filter(is_safe=False)
 def dictsort(value, arg):
@@ -680,14 +684,14 @@ def unordered_list(value, autoescape=None):
                 sublist_item = title
                 title = ''
             elif i < list_length - 1:
-                next_item = list_[i+1]
+                next_item = list_[i + 1]
                 if next_item and isinstance(next_item, (list, tuple)):
                     # The next item is a sub-list.
                     sublist_item = next_item
                     # We've processed the next item now too.
                     i += 1
             if sublist_item:
-                sublist = _helper(sublist_item, tabs+1)
+                sublist = _helper(sublist_item, tabs + 1)
                 sublist = '\n%s<ul>\n%s\n%s</ul>\n%s' % (indent, sublist,
                                                          indent, indent)
             output.append('%s<li>%s%s</li>' % (indent,
@@ -701,6 +705,7 @@ def unordered_list(value, autoescape=None):
 ###################
 # INTEGERS        #
 ###################
+
 
 @register.filter(is_safe=False)
 def add(value, arg):
@@ -738,6 +743,7 @@ def get_digit(value, arg):
 ###################
 # DATES           #
 ###################
+
 
 @register.filter(expects_localtime=True, is_safe=False)
 def date(value, arg=None):
@@ -799,6 +805,7 @@ def timeuntil_filter(value, arg=None):
 # LOGIC           #
 ###################
 
+
 @register.filter(is_safe=False)
 def default(value, arg):
     """If value is unavailable, use given default."""
@@ -855,6 +862,7 @@ def yesno(value, arg=None):
 ###################
 # MISC            #
 ###################
+
 
 @register.filter(is_safe=True)
 def filesizeformat(bytes):

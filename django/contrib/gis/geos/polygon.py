@@ -134,7 +134,7 @@ class Polygon(GEOSGeometry):
             return capi.get_extring(self.ptr)
         else:
             # Getting the interior ring, have to subtract 1 from the index.
-            return capi.get_intring(self.ptr, index-1)
+            return capi.get_intring(self.ptr, index - 1)
 
     def _get_single_external(self, index):
         return GEOSGeometry(capi.geom_clone(self._get_single_internal(index)), srid=self.srid)
@@ -170,6 +170,6 @@ class Polygon(GEOSGeometry):
     @property
     def kml(self):
         "Returns the KML representation of this Polygon."
-        inner_kml = ''.join("<innerBoundaryIs>%s</innerBoundaryIs>" % self[i+1].kml
+        inner_kml = ''.join("<innerBoundaryIs>%s</innerBoundaryIs>" % self[i + 1].kml
                              for i in xrange(self.num_interior_rings))
         return "<Polygon><outerBoundaryIs>%s</outerBoundaryIs>%s</Polygon>" % (self[0].kml, inner_kml)

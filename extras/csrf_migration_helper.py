@@ -161,7 +161,7 @@ def make_template_info(filename, root_dirs):
     relative_filenames from the supplied filename and root template directories
     """
     return Template(filename,
-                    [filename[len(d)+1:] for d in root_dirs if filename.startswith(d)])
+                    [filename[len(d) + 1:] for d in root_dirs if filename.startswith(d)])
 
 
 class Template(object):

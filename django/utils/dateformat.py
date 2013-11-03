@@ -303,7 +303,7 @@ class DateFormat(TimeFormat):
         weekday = self.data.weekday() + 1
         day_of_year = self.z()
         if day_of_year <= (8 - jan1_weekday) and jan1_weekday > 4:
-            if jan1_weekday == 5 or (jan1_weekday == 6 and calendar.isleap(self.data.year-1)):
+            if jan1_weekday == 5 or (jan1_weekday == 6 and calendar.isleap(self.data.year - 1)):
                 week_number = 53
             else:
                 week_number = 52

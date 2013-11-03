@@ -61,7 +61,7 @@ class DecadeListFilterWithNoneReturningLookups(DecadeListFilterWithTitleAndParam
 class DecadeListFilterWithFailingQueryset(DecadeListFilterWithTitleAndParameter):
 
     def queryset(self, request, queryset):
-        raise 1/0
+        raise 1 / 0
 
 
 class DecadeListFilterWithQuerysetBasedLookups(DecadeListFilterWithTitleAndParameter):

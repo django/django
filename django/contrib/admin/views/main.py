@@ -16,7 +16,8 @@ from django.utils.http import urlencode
 from django.contrib.admin import FieldListFilter
 from django.contrib.admin.exceptions import DisallowedModelAdminLookup
 from django.contrib.admin.options import IncorrectLookupParameters, IS_POPUP_VAR, TO_FIELD_VAR
-from django.contrib.admin.utils import (quote, get_fields_from_path,
+from django.contrib.admin.utils import (
+    quote, get_fields_from_path,
     lookup_needs_distinct, prepare_lookup_value)
 
 # Changelist settings
@@ -65,8 +66,8 @@ class RenameChangeListMethods(RenameMethodsBase):
 
 class ChangeList(six.with_metaclass(RenameChangeListMethods)):
     def __init__(self, request, model, list_display, list_display_links,
-            list_filter, date_hierarchy, search_fields, list_select_related,
-            list_per_page, list_max_show_all, list_editable, model_admin):
+                 list_filter, date_hierarchy, search_fields, list_select_related,
+                 list_per_page, list_max_show_all, list_editable, model_admin):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
@@ -159,7 +160,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
                 if callable(list_filter):
                     # This is simply a custom list filter class.
                     spec = list_filter(request, lookup_params,
-                        self.model, self.model_admin)
+                                       self.model, self.model_admin)
                 else:
                     field_path = None
                     if isinstance(list_filter, (tuple, list)):
@@ -174,7 +175,8 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
                         field_path = field
                         field = get_fields_from_path(self.model, field_path)[-1]
                     spec = field_list_filter_class(field, request, lookup_params,
-                        self.model, self.model_admin, field_path=field_path)
+                                                   self.model, self.model_admin,
+                                                   field_path=field_path)
                     # Check if we need to use distinct()
                     use_distinct = (use_distinct or
                                     lookup_needs_distinct(self.lookup_opts,
@@ -236,7 +238,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
             result_list = self.queryset._clone()
         else:
             try:
-                result_list = paginator.page(self.page_num+1).object_list
+                result_list = paginator.page(self.page_num + 1).object_list
             except InvalidPage:
                 raise IncorrectLookupParameters
 

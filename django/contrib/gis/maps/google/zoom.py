@@ -79,7 +79,7 @@ class GoogleZoom(object):
         fac = min(max(sin(DTOR * lat), -0.9999), 0.9999)
 
         # Calculating the pixel y coordinate.
-        px_y = round(npix + (0.5 * log((1 + fac)/(1 - fac)) * (-1.0 * self._radpp[zoom])))
+        px_y = round(npix + (0.5 * log((1 + fac) / (1 - fac)) * (-1.0 * self._radpp[zoom])))
 
         # Returning the pixel x, y to the caller of the function.
         return (px_x, px_y)
@@ -116,8 +116,8 @@ class GoogleZoom(object):
 
         # Getting the lower-left and upper-right lat/lon coordinates
         # for the bounding box of the tile.
-        ll = self.pixel_to_lonlat((px[0]-delta, px[1]-delta), zoom)
-        ur = self.pixel_to_lonlat((px[0]+delta, px[1]+delta), zoom)
+        ll = self.pixel_to_lonlat((px[0] - delta, px[1] - delta), zoom)
+        ur = self.pixel_to_lonlat((px[0] + delta, px[1] + delta), zoom)
 
         # Constructing the Polygon, representing the tile and returning.
         return Polygon(LinearRing(ll, (ll[0], ur[1]), ur, (ur[0], ll[1]), ll), srid=4326)
@@ -143,10 +143,10 @@ class GoogleZoom(object):
             if (env_w > tile_w) or (env_h > tile_h):
                 if z == 0:
                     raise GoogleMapException('Geometry width and height should not exceed that of the Earth.')
-                return z-1
+                return z - 1
 
         # Otherwise, we've zoomed in to the max.
-        return self._nzoom-1
+        return self._nzoom - 1
 
     def get_width_height(self, extent):
         """

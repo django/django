@@ -3,9 +3,11 @@ from __future__ import unicode_literals
 import datetime
 
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
-from django.contrib.admin.utils import (lookup_field, display_for_field,
+from django.contrib.admin.utils import (
+    lookup_field, display_for_field,
     display_for_value, label_for_field)
-from django.contrib.admin.views.main import (ALL_VAR, EMPTY_CHANGELIST_VALUE,
+from django.contrib.admin.views.main import (
+    ALL_VAR, EMPTY_CHANGELIST_VALUE,
     ORDER_VAR, PAGE_VAR, SEARCH_VAR)
 from django.contrib.admin.templatetags.admin_static import static
 from django.core.exceptions import ObjectDoesNotExist
@@ -34,12 +36,12 @@ def paginator_number(cl, i):
     if i == DOT:
         return '... '
     elif i == cl.page_num:
-        return format_html('<span class="this-page">{0}</span> ', i+1)
+        return format_html('<span class="this-page">{0}</span> ', i + 1)
     else:
         return format_html('<a href="{0}"{1}>{2}</a> ',
                            cl.get_query_string({PAGE_VAR: i}),
-                           mark_safe(' class="end"' if i == cl.paginator.num_pages-1 else ''),
-                           i+1)
+                           mark_safe(' class="end"' if i == cl.paginator.num_pages - 1 else ''),
+                           i + 1)
 
 
 @register.inclusion_tag('admin/pagination.html')
@@ -96,9 +98,8 @@ def result_headers(cl):
     ordering_field_columns = cl.get_ordering_field_columns()
     for i, field_name in enumerate(cl.list_display):
         text, attr = label_for_field(field_name, cl.model,
-            model_admin = cl.model_admin,
-            return_attr = True
-        )
+                                     model_admin=cl.model_admin,
+                                     return_attr=True)
         if attr:
             # Potentially not sortable
 

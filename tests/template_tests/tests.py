@@ -643,7 +643,7 @@ class TemplateTests(TransRealMixin, TestCase):
         settings.ALLOWED_INCLUDE_ROOTS = old_allowed_include_roots
 
         self.assertEqual(failures, [], "Tests failed:\n%s\n%s" %
-            ('-'*70, ("\n%s\n" % ('-'*70)).join(failures)))
+            ('-' * 70, ("\n%s\n" % ('-' * 70)).join(failures)))
 
     def render(self, test_template, vals):
         context = template.Context(vals[1])

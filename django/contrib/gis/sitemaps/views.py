@@ -32,7 +32,7 @@ def index(request, sitemaps):
         sites.append('%s://%s%s' % (protocol, current_site.domain, sitemap_url))
 
         if pages > 1:
-            for page in range(2, pages+1):
+            for page in range(2, pages + 1):
                 sites.append('%s://%s%s?p=%s' % (protocol, current_site.domain, sitemap_url, page))
     xml = loader.render_to_string('sitemap_index.xml', {'sitemaps': sites})
     return HttpResponse(xml, content_type='application/xml')

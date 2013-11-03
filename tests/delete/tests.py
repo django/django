@@ -4,7 +4,8 @@ from django.db import models, IntegrityError, connection
 from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
 from django.utils.six.moves import xrange
 
-from .models import (R, RChild, S, T, A, M, MR, MRNull,
+from .models import (
+    R, RChild, S, T, A, M, MR, MRNull,
     create_a, get_default_r, User, Avatar, HiddenUser, HiddenUserProfile,
     M2MTo, M2MFrom, Parent, Child, Base)
 
@@ -167,7 +168,7 @@ class DeletionTests(TestCase):
     def test_bulk(self):
         from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
         s = S.objects.create(r=R.objects.create())
-        for i in xrange(2*GET_ITERATOR_CHUNK_SIZE):
+        for i in xrange(2 * GET_ITERATOR_CHUNK_SIZE):
             T.objects.create(s=s)
         #   1 (select related `T` instances)
         # + 1 (select related `U` instances)

@@ -158,7 +158,7 @@ class IfParser(object):
         i = 0
         while i < l:
             token = tokens[i]
-            if token == "not" and i + 1 < l and tokens[i+1] == "in":
+            if token == "not" and i + 1 < l and tokens[i + 1] == "in":
                 token = "not in"
                 i += 1  # skip 'in'
             mapped_tokens.append(self.translate_token(token))

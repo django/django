@@ -11,7 +11,8 @@ from django.core import exceptions
 from django.db import connections, router, transaction, IntegrityError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import AutoField, Empty
-from django.db.models.query_utils import (Q, select_related_descend,
+from django.db.models.query_utils import (
+    Q, select_related_descend,
     deferred_class_factory, InvalidQuery)
 from django.db.models.deletion import Collector
 from django.db.models import sql
@@ -1359,7 +1360,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
                 next = requested[f.name]
             else:
                 next = None
-            klass_info = get_klass_info(f.rel.to, max_depth=max_depth, cur_depth=cur_depth+1,
+            klass_info = get_klass_info(f.rel.to, max_depth=max_depth, cur_depth=cur_depth + 1,
                                         requested=next, only_load=only_load)
             related_fields.append((f, klass_info))
 
