@@ -326,14 +326,14 @@ class BaseFormSet(object):
         try:
             if (self.validate_max and
                 self.total_form_count() - len(self.deleted_forms) > self.max_num) or \
-                self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
+                    self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
                 raise ValidationError(ungettext(
                     "Please submit %d or fewer forms.",
                     "Please submit %d or fewer forms.", self.max_num) % self.max_num,
                     code='too_many_forms',
                 )
             if (self.validate_min and
-                self.total_form_count() - len(self.deleted_forms) < self.min_num):
+                    self.total_form_count() - len(self.deleted_forms) < self.min_num):
                 raise ValidationError(ungettext(
                     "Please submit %d or more forms.",
                     "Please submit %d or more forms.", self.min_num) % self.min_num,
@@ -363,7 +363,7 @@ class BaseFormSet(object):
         if self.can_order:
             # Only pre-fill the ordering field for initial forms.
             if index is not None and index < self.initial_form_count():
-                form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_('Order'), initial=index+1, required=False)
+                form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_('Order'), initial=index + 1, required=False)
             else:
                 form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_('Order'), required=False)
         if self.can_delete:

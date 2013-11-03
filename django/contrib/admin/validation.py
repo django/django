@@ -155,7 +155,7 @@ class BaseValidator(object):
             for field, val in cls.prepopulated_fields.items():
                 f = get_field(cls, model, 'prepopulated_fields', field)
                 if isinstance(f, (models.DateTimeField, models.ForeignKey,
-                    models.ManyToManyField)):
+                        models.ManyToManyField)):
                     raise ImproperlyConfigured("'%s.prepopulated_fields['%s']' "
                             "is either a DateTimeField, ForeignKey or "
                             "ManyToManyField. This isn't allowed."

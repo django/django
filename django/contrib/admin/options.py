@@ -611,7 +611,7 @@ class ModelAdmin(BaseModelAdmin):
         }
         defaults.update(kwargs)
         if (defaults.get('fields') is None
-            and not modelform_defines_fields(defaults.get('form'))):
+                and not modelform_defines_fields(defaults.get('form'))):
             defaults['fields'] = forms.ALL_FIELDS
 
         return modelform_factory(self.model, **defaults)
@@ -1518,7 +1518,8 @@ class ModelAdmin(BaseModelAdmin):
         selection_note_all = ungettext('%(total_count)s selected',
             'All %(total_count)s selected', cl.result_count)
 
-        context = dict(self.admin_site.each_context(),
+        context = dict(
+            self.admin_site.each_context(),
             module_name=force_text(opts.verbose_name_plural),
             selection_note=_('0 of %(cnt)s selected') % {'cnt': len(cl.result_list)},
             selection_note_all=selection_note_all % {'total_count': cl.result_count},
@@ -1585,7 +1586,8 @@ class ModelAdmin(BaseModelAdmin):
         else:
             title = _("Are you sure?")
 
-        context = dict(self.admin_site.each_context(),
+        context = dict(
+            self.admin_site.each_context(),
             title=title,
             object_name=object_name,
             object=obj,

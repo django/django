@@ -123,7 +123,7 @@ class WizardView(TemplateView):
 
     @classmethod
     def get_initkwargs(cls, form_list=None, initial_dict=None,
-        instance_dict=None, condition_dict=None, *args, **kwargs):
+            instance_dict=None, condition_dict=None, *args, **kwargs):
         """
         Creates a dict with all needed parameters for the form wizard instances.
 

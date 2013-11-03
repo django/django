@@ -203,10 +203,10 @@ def reorder_suite(suite, classes):
     """
     class_count = len(classes)
     suite_class = type(suite)
-    bins = [suite_class() for i in range(class_count+1)]
+    bins = [suite_class() for i in range(class_count + 1)]
     partition_suite(suite, classes, bins)
     for i in range(class_count):
-        bins[0].addTests(bins[i+1])
+        bins[0].addTests(bins[i + 1])
     return bins[0]
 
 
@@ -272,7 +272,7 @@ def setup_databases(verbosity, interactive, **kwargs):
     mirrors = []
 
     for signature, (db_name, aliases) in dependency_ordered(
-        test_databases.items(), dependencies):
+            test_databases.items(), dependencies):
         test_db_name = None
         # Actually create the database for the first connection
         for alias in aliases:

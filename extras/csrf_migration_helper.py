@@ -145,11 +145,11 @@ def get_template_dirs():
     from django.conf import settings
     dirs = set()
     if ('django.template.loaders.filesystem.load_template_source' in settings.TEMPLATE_LOADERS
-        or 'django.template.loaders.filesystem.Loader' in settings.TEMPLATE_LOADERS):
+            or 'django.template.loaders.filesystem.Loader' in settings.TEMPLATE_LOADERS):
         dirs.update(map(unicode, settings.TEMPLATE_DIRS))
 
     if ('django.template.loaders.app_directories.load_template_source' in settings.TEMPLATE_LOADERS
-        or 'django.template.loaders.app_directories.Loader' in settings.TEMPLATE_LOADERS):
+            or 'django.template.loaders.app_directories.Loader' in settings.TEMPLATE_LOADERS):
         from django.template.loaders.app_directories import app_template_dirs
         dirs.update(app_template_dirs)
     return dirs
@@ -161,7 +161,7 @@ def make_template_info(filename, root_dirs):
     relative_filenames from the supplied filename and root template directories
     """
     return Template(filename,
-                    [filename[len(d)+1:] for d in root_dirs if filename.startswith(d)])
+        [filename[len(d)+1:] for d in root_dirs if filename.startswith(d)])
 
 
 class Template(object):

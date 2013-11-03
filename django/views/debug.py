@@ -26,8 +26,8 @@ def linebreak_iter(template_source):
     yield 0
     p = template_source.find('\n')
     while p >= 0:
-        yield p+1
-        p = template_source.find('\n', p+1)
+        yield p + 1
+        p = template_source.find('\n', p + 1)
     yield len(template_source) + 1
 
 
@@ -189,7 +189,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
         sensitive_variables = None
         while current_frame is not None:
             if (current_frame.f_code.co_name == 'sensitive_variables_wrapper'
-                and 'sensitive_variables_wrapper' in current_frame.f_locals):
+                    and 'sensitive_variables_wrapper' in current_frame.f_locals):
                 # The sensitive_variables decorator was used, so we take note
                 # of the sensitive variables' names.
                 wrapper = current_frame.f_locals['sensitive_variables_wrapper']
@@ -218,7 +218,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                 cleansed[name] = self.cleanse_special_types(request, value)
 
         if (tb_frame.f_code.co_name == 'sensitive_variables_wrapper'
-            and 'sensitive_variables_wrapper' in tb_frame.f_locals):
+                and 'sensitive_variables_wrapper' in tb_frame.f_locals):
             # For good measure, obfuscate the decorated function's arguments in
             # the sensitive_variables decorator's frame, in case the variables
             # associated with those arguments were meant to be obfuscated from
@@ -287,7 +287,7 @@ class ExceptionReporter(object):
                     'templates': template_list,
                 })
         if (settings.TEMPLATE_DEBUG and
-            hasattr(self.exc_value, 'django_template_source')):
+                hasattr(self.exc_value, 'django_template_source')):
             self.get_template_exception_info()
 
         frames = self.get_traceback_frames()
@@ -302,7 +302,7 @@ class ExceptionReporter(object):
             end = getattr(self.exc_value, 'end', None)
             if start is not None and end is not None:
                 unicode_str = self.exc_value.args[1]
-                unicode_hint = smart_text(unicode_str[max(start-5, 0):min(end+5, len(unicode_str))], 'ascii', errors='replace')
+                unicode_hint = smart_text(unicode_str[max(start - 5, 0):min(end + 5, len(unicode_str))], 'ascii', errors='replace')
         from django import get_version
         c = {
             'is_email': self.is_email,
@@ -419,7 +419,7 @@ class ExceptionReporter(object):
 
         pre_context = source[lower_bound:lineno]
         context_line = source[lineno]
-        post_context = source[lineno+1:upper_bound]
+        post_context = source[lineno + 1:upper_bound]
 
         return lower_bound, pre_context, context_line, post_context
 

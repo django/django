@@ -153,7 +153,7 @@ class BaseDatabaseWrapper(object):
         """
         self.validate_thread_sharing()
         if (self.use_debug_cursor or
-            (self.use_debug_cursor is None and settings.DEBUG)):
+                (self.use_debug_cursor is None and settings.DEBUG)):
             cursor = self.make_debug_cursor(self._cursor())
         else:
             cursor = utils.CursorWrapper(self._cursor(), self)
@@ -1214,7 +1214,8 @@ class BaseDatabaseOperations(object):
 
 
 # Structure returned by the DB-API cursor.description interface (PEP 249)
-FieldInfo = namedtuple('FieldInfo',
+FieldInfo = namedtuple(
+    'FieldInfo',
     'name type_code display_size internal_size precision scale null_ok'
 )
 

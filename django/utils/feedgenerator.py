@@ -113,9 +113,9 @@ class SyndicationFeed(object):
         self.items = []
 
     def add_item(self, title, link, description, author_email=None,
-        author_name=None, author_link=None, pubdate=None, comments=None,
-        unique_id=None, unique_id_is_permalink=None, enclosure=None,
-        categories=(), item_copyright=None, ttl=None, updateddate=None, **kwargs):
+            author_name=None, author_link=None, pubdate=None, comments=None,
+            unique_id=None, unique_id_is_permalink=None, enclosure=None,
+            categories=(), item_copyright=None, ttl=None, updateddate=None, **kwargs):
         """
         Adds an item to the feed. All args are expected to be Python Unicode
         objects except pubdate and updateddate, which are datetime.datetime
