@@ -135,7 +135,7 @@ def get_ns_resolver(ns_pattern, resolver):
     # This makes it possible to have captured parameters in the parent
     # urlconf pattern.
     ns_resolver = RegexURLResolver(ns_pattern,
-                                          resolver.url_patterns)
+                                   resolver.url_patterns)
     return RegexURLResolver(r'^/', [ns_resolver])
 get_ns_resolver = memoize(get_ns_resolver, _ns_resolver_cache, 2)
 
@@ -147,7 +147,7 @@ def get_mod_func(callback):
         dot = callback.rindex('.')
     except ValueError:
         return callback, ''
-    return callback[:dot], callback[dot+1:]
+    return callback[:dot], callback[dot + 1:]
 
 
 class LocaleRegexProvider(object):
@@ -433,7 +433,7 @@ class RegexURLResolver(LocaleRegexProvider):
 
         patterns = [pattern for (possibility, pattern, defaults) in possibilities]
         raise NoReverseMatch("Reverse for '%s' with arguments '%s' and keyword "
-                "arguments '%s' not found. %d pattern(s) tried: %s" %
+                             "arguments '%s' not found. %d pattern(s) tried: %s" %
                              (lookup_view_s, args, kwargs, len(patterns), patterns))
 
 

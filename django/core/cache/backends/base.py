@@ -214,12 +214,12 @@ class BaseCache(object):
         """
         if len(key) > MEMCACHE_MAX_KEY_LENGTH:
             warnings.warn('Cache key will cause errors if used with memcached: '
-                    '%s (longer than %s)' % (key, MEMCACHE_MAX_KEY_LENGTH),
-                    CacheKeyWarning)
+                          '%s (longer than %s)' % (key, MEMCACHE_MAX_KEY_LENGTH),
+                          CacheKeyWarning)
         for char in key:
             if ord(char) < 33 or ord(char) == 127:
                 warnings.warn('Cache key contains characters that will cause '
-                        'errors if used with memcached: %r' % key,
+                              'errors if used with memcached: %r' % key,
                               CacheKeyWarning)
 
     def incr_version(self, key, delta=1, version=None):
@@ -233,9 +233,9 @@ class BaseCache(object):
         if value is None:
             raise ValueError("Key '%s' not found" % key)
 
-        self.set(key, value, version=version+delta)
+        self.set(key, value, version=version + delta)
         self.delete(key, version=version)
-        return version+delta
+        return version + delta
 
     def decr_version(self, key, delta=1, version=None):
         """Substracts delta from the cache version for the supplied key. Returns

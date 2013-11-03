@@ -827,7 +827,7 @@ class Queries1Tests(BaseQuerysetTest):
         qs = Tag.objects.values_list('id', flat=True).order_by('id')
         qs.query.bump_prefix(qs.query)
         first = qs[0]
-        self.assertEqual(list(qs), list(range(first, first+5)))
+        self.assertEqual(list(qs), list(range(first, first + 5)))
 
     def test_ticket8439(self):
         # Complex combinations of conjunctions, disjunctions and nullable

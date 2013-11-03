@@ -94,7 +94,7 @@ class BulkCreateTests(TestCase):
         with override_settings(DEBUG=True):
             connection.queries = []
             TwoFields.objects.bulk_create([
-                TwoFields(f1=i, f2=i+1) for i in range(0, 1001)
+                TwoFields(f1=i, f2=i + 1) for i in range(0, 1001)
             ])
         self.assertEqual(TwoFields.objects.count(), 1001)
         self.assertEqual(
@@ -115,7 +115,7 @@ class BulkCreateTests(TestCase):
         with override_settings(DEBUG=True):
             connection.queries = []
             TwoFields.objects.bulk_create([
-                TwoFields(f1=i, f2=i+1) for i in range(0, 1001)
+                TwoFields(f1=i, f2=i + 1) for i in range(0, 1001)
             ])
             self.assertTrue(len(connection.queries) < 10)
 
@@ -127,7 +127,7 @@ class BulkCreateTests(TestCase):
         with override_settings(DEBUG=True):
             connection.queries = []
             TwoFields.objects.bulk_create([
-                TwoFields(id=i if i % 2 == 0 else None, f1=i, f2=i+1)
+                TwoFields(id=i if i % 2 == 0 else None, f1=i, f2=i + 1)
                 for i in range(100000, 101000)])
         self.assertEqual(TwoFields.objects.count(), 1000)
         # We can't assume much about the ID's created, except that the above
@@ -145,7 +145,7 @@ class BulkCreateTests(TestCase):
         with override_settings(DEBUG=True):
             connection.queries = []
             TwoFields.objects.bulk_create([
-                TwoFields(id=i if i % 2 == 0 else None, f1=i, f2=i+1)
+                TwoFields(id=i if i % 2 == 0 else None, f1=i, f2=i + 1)
                 for i in range(100000, 101000)])
             self.assertTrue(len(connection.queries) < 10)
 

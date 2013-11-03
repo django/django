@@ -13,7 +13,8 @@ from django.forms.fields import Field, ChoiceField
 from django.forms.forms import DeclarativeFieldsMetaclass, BaseForm
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.utils import ErrorList
-from django.forms.widgets import (SelectMultiple, HiddenInput,
+from django.forms.widgets import (
+    SelectMultiple, HiddenInput,
     MultipleHiddenInput, CheckboxSelectMultiple)
 from django.utils.encoding import smart_text, force_text
 from django.utils import six
@@ -568,7 +569,7 @@ class BaseModelFormSet(BaseFormSet):
         if i >= self.initial_form_count() and self.initial_extra:
             # Set initial values for extra forms
             try:
-                kwargs['initial'] = self.initial_extra[i-self.initial_form_count()]
+                kwargs['initial'] = self.initial_extra[i - self.initial_form_count()]
             except IndexError:
                 pass
         return super(BaseModelFormSet, self)._construct_form(i, **kwargs)

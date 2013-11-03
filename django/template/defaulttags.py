@@ -9,7 +9,8 @@ from itertools import groupby, cycle as itertools_cycle
 import warnings
 
 from django.conf import settings
-from django.template.base import (Node, NodeList, Template, Context, Library,
+from django.template.base import (
+    Node, NodeList, Template, Context, Library,
     TemplateSyntaxError, VariableDoesNotExist, InvalidTemplateLibrary,
     BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END,
     SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END,
@@ -171,7 +172,7 @@ class ForNode(Node):
             for i, item in enumerate(values):
                 # Shortcuts for current loop iteration number.
                 loop_dict['counter0'] = i
-                loop_dict['counter'] = i+1
+                loop_dict['counter'] = i + 1
                 # Reverse counter iteration numbers.
                 loop_dict['revcounter'] = len_values - i
                 loop_dict['revcounter0'] = len_values - i - 1
@@ -430,13 +431,13 @@ class URLNode(Node):
         from django.core.urlresolvers import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
         kwargs = dict((smart_text(k, 'ascii'), v.resolve(context))
-                       for k, v in self.kwargs.items())
+                      for k, v in self.kwargs.items())
 
         view_name = self.view_name.resolve(context)
 
         if not view_name:
             raise NoReverseMatch("'url' requires a non-empty first argument. "
-                "The syntax changed in Django 1.5, see the docs.")
+                                 "The syntax changed in Django 1.5, see the docs.")
 
         # Try to look up the URL twice: once given the view name, and again
         # relative to what we guess is the "main" app. If they both fail,
@@ -451,8 +452,8 @@ class URLNode(Node):
                 project_name = settings.SETTINGS_MODULE.split('.')[0]
                 try:
                     url = reverse(project_name + '.' + view_name,
-                              args=args, kwargs=kwargs,
-                              current_app=context.current_app)
+                                  args=args, kwargs=kwargs,
+                                  current_app=context.current_app)
                 except NoReverseMatch:
                     if self.asvar is None:
                         # Re-raise the original exception, not the one with
@@ -525,7 +526,7 @@ class WithNode(Node):
 
     def render(self, context):
         values = dict((key, val.resolve(context)) for key, val in
-                       six.iteritems(self.extra_context))
+                      six.iteritems(self.extra_context))
         with context.push(**values):
             return self.nodelist.render(context)
 
@@ -832,7 +833,7 @@ def do_for(parser, token):
             raise TemplateSyntaxError("'for' tag received an invalid argument:"
                                       " %s" % token.contents)
 
-    sequence = parser.compile_filter(bits[in_index+1])
+    sequence = parser.compile_filter(bits[in_index + 1])
     nodelist_loop = parser.parse(('empty', 'endfor',))
     token = parser.next_token()
     if token.contents == 'empty':
@@ -1349,7 +1350,7 @@ def url(parser, token):
         viewname = parser.compile_filter(bits[1])
     except TemplateSyntaxError as exc:
         exc.args = (exc.args[0] + ". "
-                "The syntax of 'url' changed in Django 1.5, see the docs."),
+                    "The syntax of 'url' changed in Django 1.5, see the docs."),
         raise
     args = []
     kwargs = {}

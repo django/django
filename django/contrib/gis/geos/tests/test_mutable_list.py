@@ -349,8 +349,8 @@ class ListMixinTest(unittest.TestCase):
         ul.sort()
         self.assertEqual(pl[:], ul[:], 'sort')
         mid = pl[len(pl) // 2]
-        pl.sort(key=lambda x: (mid-x)**2)
-        ul.sort(key=lambda x: (mid-x)**2)
+        pl.sort(key=lambda x: (mid - x) ** 2)
+        ul.sort(key=lambda x: (mid - x) ** 2)
         self.assertEqual(pl[:], ul[:], 'sort w/ key')
 
         pl.insert(0, pl.pop())
@@ -359,8 +359,8 @@ class ListMixinTest(unittest.TestCase):
         ul.sort(reverse=True)
         self.assertEqual(pl[:], ul[:], 'sort w/ reverse')
         mid = pl[len(pl) // 2]
-        pl.sort(key=lambda x: (mid-x)**2)
-        ul.sort(key=lambda x: (mid-x)**2)
+        pl.sort(key=lambda x: (mid - x) ** 2)
+        ul.sort(key=lambda x: (mid - x) ** 2)
         self.assertEqual(pl[:], ul[:], 'sort w/ key')
 
     def test_12_arithmetic(self):

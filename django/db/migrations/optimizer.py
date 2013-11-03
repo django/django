@@ -48,13 +48,13 @@ class MigrationOptimizer(object):
         new_operations = []
         for i, operation in enumerate(operations):
             # Compare it to each operation after it
-            for j, other in enumerate(operations[i+1:]):
+            for j, other in enumerate(operations[i + 1:]):
                 result = self.reduce(operation, other)
                 if result is not None:
                     # Optimize! Add result, then remaining others, then return
                     new_operations.extend(result)
-                    new_operations.extend(operations[i+1:i+1+j])
-                    new_operations.extend(operations[i+j+2:])
+                    new_operations.extend(operations[i + 1:i + 1 + j])
+                    new_operations.extend(operations[i + j + 2:])
                     return new_operations
                 if not self.can_optimize_through(operation, other, app_label):
                     new_operations.append(operation)

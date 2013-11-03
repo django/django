@@ -7,7 +7,8 @@ from django.db import transaction, DEFAULT_DB_ALIAS, models
 from django.db.utils import ConnectionHandler
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
-from .models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
+from .models import (
+    Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
     PlayedWithNote, Email, Researcher, Food, Eaten, Policy, Version, Location,
     Item, Image, File, Photo, FooFile, FooImage, FooPhoto, FooFileProxy, Login,
     OrgUnit, OrderedPerson, House)
@@ -146,7 +147,7 @@ class LargeDeleteTests(TestCase):
     def test_large_deletes(self):
         "Regression for #13309 -- if the number of objects > chunk size, deletion still occurs"
         for x in range(300):
-            Book.objects.create(pagecount=x+100)
+            Book.objects.create(pagecount=x + 100)
         # attach a signal to make sure we will not fast-delete
 
         def noop(*args, **kwargs):

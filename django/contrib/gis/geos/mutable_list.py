@@ -145,7 +145,7 @@ class ListMixin(object):
             del self[:]
         else:
             cache = list(self)
-            for i in range(n-1):
+            for i in range(n - 1):
                 self.extend(cache)
         return self
 

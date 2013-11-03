@@ -23,7 +23,7 @@ class UploadedFile(File):
     An ``UploadedFile`` object behaves somewhat like a file object and
     represents some file data that the user submitted with a form.
     """
-    DEFAULT_CHUNK_SIZE = 64 * 2**10
+    DEFAULT_CHUNK_SIZE = 64 * 2 ** 10
 
     def __init__(self, file=None, name=None, content_type=None, size=None, charset=None, content_type_extra=None):
         super(UploadedFile, self).__init__(file, name)

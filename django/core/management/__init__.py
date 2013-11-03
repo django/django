@@ -279,7 +279,7 @@ class ManagementUtility(object):
             app_name = commands[subcommand]
         except KeyError:
             sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" %
-                (subcommand, self.prog_name))
+                             (subcommand, self.prog_name))
             sys.exit(1)
         if isinstance(app_name, BaseCommand):
             # If the command is already loaded, use it directly.
@@ -317,7 +317,7 @@ class ManagementUtility(object):
         cword = int(os.environ['COMP_CWORD'])
 
         try:
-            curr = cwords[cword-1]
+            curr = cwords[cword - 1]
         except IndexError:
             curr = ''
 
@@ -338,7 +338,7 @@ class ManagementUtility(object):
                 options += [(k, 1) for k in FASTCGI_OPTIONS]
             # special case: add the names of installed apps to options
             elif cwords[0] in ('dumpdata', 'sql', 'sqlall', 'sqlclear',
-                    'sqlcustom', 'sqlindexes', 'sqlsequencereset', 'test'):
+                               'sqlcustom', 'sqlindexes', 'sqlsequencereset', 'test'):
                 try:
                     from django.conf import settings
                     # Get the last part of the dotted path as the app name.
@@ -350,7 +350,7 @@ class ManagementUtility(object):
             options += [(s_opt.get_opt_string(), s_opt.nargs) for s_opt in
                         subcommand_cls.option_list]
             # filter out previously specified options from available options
-            prev_opts = [x.split('=')[0] for x in cwords[1:cword-1]]
+            prev_opts = [x.split('=')[0] for x in cwords[1:cword - 1]]
             options = [opt for opt in options if opt[0] not in prev_opts]
 
             # filter options by current input

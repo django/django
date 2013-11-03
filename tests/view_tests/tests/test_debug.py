@@ -16,13 +16,15 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from django.template.base import TemplateDoesNotExist
 from django.test import TestCase, RequestFactory
-from django.test.utils import (override_settings, setup_test_template_loader,
+from django.test.utils import (
+    override_settings, setup_test_template_loader,
     restore_template_loaders)
 from django.utils.encoding import force_text, force_bytes
 from django.views.debug import ExceptionReporter
 
 from .. import BrokenException, except_args
-from ..views import (sensitive_view, non_sensitive_view, paranoid_view,
+from ..views import (
+    sensitive_view, non_sensitive_view, paranoid_view,
     custom_exception_reporter_filter_view, sensitive_method_view,
     sensitive_args_function_caller, sensitive_kwargs_function_caller,
     multivalue_dict_key_error)
@@ -185,7 +187,7 @@ class ExceptionReporterTests(TestCase):
 
         for newline in ['\n', '\r\n', '\r']:
             fd, filename = mkstemp(text=False)
-            os.write(fd, force_bytes(newline.join(LINES)+newline))
+            os.write(fd, force_bytes(newline.join(LINES) + newline))
             os.close(fd)
 
             try:

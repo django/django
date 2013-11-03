@@ -74,7 +74,7 @@ class ExpressionsTests(TestCase):
 
         # We can perform arithmetic operations in expressions
         # Make sure we have 2 spare chairs
-        company_query.update(num_chairs=F("num_employees")+2)
+        company_query.update(num_chairs=F("num_employees") + 2)
         self.assertQuerysetEqual(
             company_query, [
                 {

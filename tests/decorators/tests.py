@@ -44,7 +44,7 @@ full_decorator = compose(
     vary_on_cookie,
 
     # django.views.decorators.cache
-    cache_page(60*15),
+    cache_page(60 * 15),
     cache_control(private=True),
     never_cache,
 
