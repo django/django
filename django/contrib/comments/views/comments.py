@@ -55,15 +55,15 @@ def post_comment(request, next=None, using=None):
             "Invalid content_type value: %r" % escape(ctype))
     except AttributeError:
         return CommentPostBadRequest(
-            "The given content-type %r does not resolve to a valid model." % \
+            "The given content-type %r does not resolve to a valid model." %
                 escape(ctype))
     except ObjectDoesNotExist:
         return CommentPostBadRequest(
-            "No object matching content-type %r and object PK %r exists." % \
+            "No object matching content-type %r and object PK %r exists." %
                 (escape(ctype), escape(object_pk)))
     except (ValueError, ValidationError) as e:
         return CommentPostBadRequest(
-            "Attempting go get content-type %r and object PK %r exists raised %s" % \
+            "Attempting go get content-type %r and object PK %r exists raised %s" %
                 (escape(ctype), escape(object_pk), e.__class__.__name__))
 
     # Do we want to preview the comment?
@@ -75,7 +75,7 @@ def post_comment(request, next=None, using=None):
     # Check security information
     if form.security_errors():
         return CommentPostBadRequest(
-            "The comment form failed security verification: %s" % \
+            "The comment form failed security verification: %s" %
                 escape(str(form.security_errors())))
 
     # If there are errors or if we requested a preview show the comment

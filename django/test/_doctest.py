@@ -1534,7 +1534,7 @@ class DocTestRunner:
         d = self._name2ft
         for name, (f, t) in other._name2ft.items():
             if name in d:
-                print("*** DocTestRunner.merge: '" + name + "' in both" \
+                print("*** DocTestRunner.merge: '" + name + "' in both"
                     " testers; summing outcomes.")
                 f2, t2 = d[name]
                 f = f + f2

@@ -17,14 +17,14 @@ def get_comment_app():
     # Make sure the app's in INSTALLED_APPS
     comments_app = get_comment_app_name()
     if comments_app not in settings.INSTALLED_APPS:
-        raise ImproperlyConfigured("The COMMENTS_APP (%r) "\
+        raise ImproperlyConfigured("The COMMENTS_APP (%r) "
                                    "must be in INSTALLED_APPS" % settings.COMMENTS_APP)
 
     # Try to import the package
     try:
         package = import_module(comments_app)
     except ImportError as e:
-        raise ImproperlyConfigured("The COMMENTS_APP setting refers to "\
+        raise ImproperlyConfigured("The COMMENTS_APP setting refers to "
                                    "a non-existing package. (%s)" % e)
 
     return package

@@ -62,11 +62,11 @@ class Comment(BaseCommentAbstractModel):
     submit_date = models.DateTimeField(_('date/time submitted'), default=None)
     ip_address = models.GenericIPAddressField(_('IP address'), unpack_ipv4=True, blank=True, null=True)
     is_public = models.BooleanField(_('is public'), default=True,
-                    help_text=_('Uncheck this box to make the comment effectively ' \
+                    help_text=_('Uncheck this box to make the comment effectively '
                                 'disappear from the site.'))
     is_removed = models.BooleanField(_('is removed'), default=False,
-                    help_text=_('Check this box if the comment is inappropriate. ' \
-                                'A "This comment has been removed" message will ' \
+                    help_text=_('Check this box if the comment is inappropriate. '
+                                'A "This comment has been removed" message will '
                                 'be displayed instead.'))
 
     # Manager
@@ -121,7 +121,7 @@ class Comment(BaseCommentAbstractModel):
 
     def _set_name(self, val):
         if self.user_id:
-            raise AttributeError(_("This comment was posted by an authenticated "\
+            raise AttributeError(_("This comment was posted by an authenticated "
                                    "user and thus the name is read-only."))
         self.user_name = val
     name = property(_get_name, _set_name, doc="The name of the user who posted this comment")
@@ -131,7 +131,7 @@ class Comment(BaseCommentAbstractModel):
 
     def _set_email(self, val):
         if self.user_id:
-            raise AttributeError(_("This comment was posted by an authenticated "\
+            raise AttributeError(_("This comment was posted by an authenticated "
                                    "user and thus the email is read-only."))
         self.user_email = val
     email = property(_get_email, _set_email, doc="The email of the user who posted this comment")
