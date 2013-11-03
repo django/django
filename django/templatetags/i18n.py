@@ -195,6 +195,7 @@ def do_get_available_languages(parser, token):
         raise TemplateSyntaxError("'get_available_languages' requires 'as variable' (got %r)" % args)
     return GetAvailableLanguagesNode(args[2])
 
+
 @register.tag("get_language_info")
 def do_get_language_info(parser, token):
     """
@@ -213,6 +214,7 @@ def do_get_language_info(parser, token):
     if len(args) != 5 or args[1] != 'for' or args[3] != 'as':
         raise TemplateSyntaxError("'%s' requires 'for string as variable' (got %r)" % (args[0], args[1:]))
     return GetLanguageInfoNode(parser.compile_filter(args[2]), args[4])
+
 
 @register.tag("get_language_info_list")
 def do_get_language_info_list(parser, token):
@@ -237,17 +239,21 @@ def do_get_language_info_list(parser, token):
         raise TemplateSyntaxError("'%s' requires 'for sequence as variable' (got %r)" % (args[0], args[1:]))
     return GetLanguageInfoListNode(parser.compile_filter(args[2]), args[4])
 
+
 @register.filter
 def language_name(lang_code):
     return translation.get_language_info(lang_code)['name']
+
 
 @register.filter
 def language_name_local(lang_code):
     return translation.get_language_info(lang_code)['name_local']
 
+
 @register.filter
 def language_bidi(lang_code):
     return translation.get_language_info(lang_code)['bidi']
+
 
 @register.tag("get_current_language")
 def do_get_current_language(parser, token):
@@ -268,6 +274,7 @@ def do_get_current_language(parser, token):
         raise TemplateSyntaxError("'get_current_language' requires 'as variable' (got %r)" % args)
     return GetCurrentLanguageNode(args[2])
 
+
 @register.tag("get_current_language_bidi")
 def do_get_current_language_bidi(parser, token):
     """
@@ -286,6 +293,7 @@ def do_get_current_language_bidi(parser, token):
     if len(args) != 3 or args[1] != 'as':
         raise TemplateSyntaxError("'get_current_language_bidi' requires 'as variable' (got %r)" % args)
     return GetCurrentLanguageBidiNode(args[2])
+
 
 @register.tag("trans")
 def do_translate(parser, token):
@@ -365,6 +373,7 @@ def do_translate(parser, token):
     value, noop, asvar, message_context = TranslateParser(token.contents).top()
     return TranslateNode(parser.compile_filter(value), noop, asvar,
                          message_context)
+
 
 @register.tag("blocktrans")
 def do_block_translate(parser, token):
@@ -466,6 +475,7 @@ def do_block_translate(parser, token):
 
     return BlockTranslateNode(extra_context, singular, plural, countervar,
             counter, message_context)
+
 
 @register.tag
 def language(parser, token):

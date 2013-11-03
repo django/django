@@ -150,6 +150,7 @@ class RenderContext(BaseContext):
             return d[key]
         return otherwise
 
+
 # This is a function rather than module-level procedural code because we only
 # want it to execute if somebody uses RequestContext.
 def get_standard_processors():
@@ -165,6 +166,7 @@ def get_standard_processors():
             processors.append(func)
         _standard_context_processors = tuple(processors)
     return _standard_context_processors
+
 
 class RequestContext(Context):
     """

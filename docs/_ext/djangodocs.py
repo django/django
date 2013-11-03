@@ -293,12 +293,14 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
         SmartyPantsHTMLTranslator.visit_section(self, node)
         node['ids'] = old_ids
 
+
 def parse_django_admin_node(env, sig, signode):
     command = sig.split(' ')[0]
     env._django_curr_admin_command = command
     title = "django-admin.py %s" % sig
     signode += addnodes.desc_name(title, title)
     return sig
+
 
 def parse_django_adminopt_node(env, sig, signode):
     """A copy of sphinx.directives.CmdoptionDesc.parse_signature()"""

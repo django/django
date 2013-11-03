@@ -33,6 +33,7 @@ from django.utils import six
 
 template_source_loaders = None
 
+
 class BaseLoader(object):
     is_usable = False
 
@@ -71,6 +72,7 @@ class BaseLoader(object):
         """
         pass
 
+
 class LoaderOrigin(Origin):
     def __init__(self, display_name, loader, name, dirs):
         super(LoaderOrigin, self).__init__(display_name)
@@ -79,11 +81,13 @@ class LoaderOrigin(Origin):
     def reload(self):
         return self.loader(self.loadname, self.dirs)[0]
 
+
 def make_origin(display_name, loader, name, dirs):
     if settings.TEMPLATE_DEBUG and display_name:
         return LoaderOrigin(display_name, loader, name, dirs)
     else:
         return None
+
 
 def find_template_loader(loader):
     if isinstance(loader, (tuple, list)):
@@ -110,6 +114,7 @@ def find_template_loader(loader):
     else:
         raise ImproperlyConfigured('Loader does not define a "load_template" callable template source loader')
 
+
 def find_template(name, dirs=None):
     # Calculate template_source_loaders the first time the function is executed
     # because putting this logic in the module-level namespace may cause
@@ -130,6 +135,7 @@ def find_template(name, dirs=None):
             pass
     raise TemplateDoesNotExist(name)
 
+
 def get_template(template_name, dirs=None):
     """
     Returns a compiled Template object for the given template name,
@@ -141,12 +147,14 @@ def get_template(template_name, dirs=None):
         template = get_template_from_string(template, origin, template_name)
     return template
 
+
 def get_template_from_string(source, origin=None, name=None):
     """
     Returns a compiled Template object for the given template code,
     handling template inheritance recursively.
     """
     return Template(source, origin, name)
+
 
 def render_to_string(template_name, dictionary=None, context_instance=None,
                      dirs=None):
@@ -167,6 +175,7 @@ def render_to_string(template_name, dictionary=None, context_instance=None,
     # to keep the context_instance in the same state it started in.
     with context_instance.push(dictionary):
         return t.render(context_instance)
+
 
 def select_template(template_name_list, dirs=None):
     "Given a list of template names, returns the first that can be loaded."

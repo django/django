@@ -25,6 +25,7 @@ from django.utils import timezone
 
 register = Library()
 
+
 class AutoEscapeControlNode(Node):
     """Implements the actions of the autoescape tag."""
     def __init__(self, setting, nodelist):
@@ -40,9 +41,11 @@ class AutoEscapeControlNode(Node):
         else:
             return output
 
+
 class CommentNode(Node):
     def render(self, context):
         return ''
+
 
 class CsrfTokenNode(Node):
     def render(self, context):
@@ -58,6 +61,7 @@ class CsrfTokenNode(Node):
             if settings.DEBUG:
                 warnings.warn("A {% csrf_token %} was used in a template, but the context did not provide the value.  This is usually caused by not using RequestContext.")
             return ''
+
 
 class CycleNode(Node):
     def __init__(self, cyclevars, variable_name=None, silent=False, escape=False):
@@ -80,6 +84,7 @@ class CycleNode(Node):
             value = mark_safe(value)
         return render_value_in_context(value, context)
 
+
 class DebugNode(Node):
     def render(self, context):
         from pprint import pformat
@@ -87,6 +92,7 @@ class DebugNode(Node):
         output.append('\n\n')
         output.append(pformat(sys.modules))
         return ''.join(output)
+
 
 class FilterNode(Node):
     def __init__(self, filter_expr, nodelist):
@@ -112,6 +118,7 @@ class FirstOfNode(Node):
                     value = mark_safe(value)
                 return render_value_in_context(value, context)
         return ''
+
 
 class ForNode(Node):
     child_nodelists = ('nodelist_loop', 'nodelist_empty')
@@ -207,6 +214,7 @@ class ForNode(Node):
                     context.pop()
         return mark_safe(''.join(force_text(n) for n in nodelist))
 
+
 class IfChangedNode(Node):
     child_nodelists = ('nodelist_true', 'nodelist_false')
 
@@ -251,6 +259,7 @@ class IfChangedNode(Node):
             # Using ifchanged outside loops. Effectively this is a no-op because the state is associated with 'self'.
             return context.render_context
 
+
 class IfEqualNode(Node):
     child_nodelists = ('nodelist_true', 'nodelist_false')
 
@@ -268,6 +277,7 @@ class IfEqualNode(Node):
         if (self.negate and val1 != val2) or (not self.negate and val1 == val2):
             return self.nodelist_true.render(context)
         return self.nodelist_false.render(context)
+
 
 class IfNode(Node):
 
@@ -302,6 +312,7 @@ class IfNode(Node):
 
         return ''
 
+
 class RegroupNode(Node):
     def __init__(self, target, expression, var_name):
         self.target, self.expression = target, expression
@@ -328,12 +339,14 @@ class RegroupNode(Node):
         ]
         return ''
 
+
 def include_is_allowed(filepath):
     filepath = os.path.abspath(filepath)
     for root in settings.ALLOWED_INCLUDE_ROOTS:
         if filepath.startswith(root):
             return True
     return False
+
 
 class SsiNode(Node):
     def __init__(self, filepath, parsed):
@@ -364,9 +377,11 @@ class SsiNode(Node):
                     return ''  # Fail silently for invalid included templates.
         return output
 
+
 class LoadNode(Node):
     def render(self, context):
         return ''
+
 
 class NowNode(Node):
     def __init__(self, format_string):
@@ -376,6 +391,7 @@ class NowNode(Node):
         tzinfo = timezone.get_current_timezone() if settings.USE_TZ else None
         return date(datetime.now(tz=tzinfo), self.format_string)
 
+
 class SpacelessNode(Node):
     def __init__(self, nodelist):
         self.nodelist = nodelist
@@ -383,6 +399,7 @@ class SpacelessNode(Node):
     def render(self, context):
         from django.utils.html import strip_spaces_between_tags
         return strip_spaces_between_tags(self.nodelist.render(context).strip())
+
 
 class TemplateTagNode(Node):
     mapping = {'openblock': BLOCK_TAG_START,
@@ -400,6 +417,7 @@ class TemplateTagNode(Node):
 
     def render(self, context):
         return self.mapping.get(self.tagtype, '')
+
 
 class URLNode(Node):
     def __init__(self, view_name, args, kwargs, asvar):
@@ -451,12 +469,14 @@ class URLNode(Node):
         else:
             return url
 
+
 class VerbatimNode(Node):
     def __init__(self, content):
         self.content = content
 
     def render(self, context):
         return self.content
+
 
 class WidthRatioNode(Node):
     def __init__(self, val_expr, max_expr, max_width, asvar=None):
@@ -489,6 +509,7 @@ class WidthRatioNode(Node):
             return ''
         else:
             return result
+
 
 class WithNode(Node):
     def __init__(self, var, name, nodelist, extra_context=None):
@@ -525,6 +546,7 @@ def autoescape(parser, token):
     parser.delete_first_token()
     return AutoEscapeControlNode((arg == 'on'), nodelist)
 
+
 @register.tag
 def comment(parser, token):
     """
@@ -532,6 +554,7 @@ def comment(parser, token):
     """
     parser.skip_past('endcomment')
     return CommentNode()
+
 
 @register.tag
 def cycle(parser, token, escape=False):
@@ -629,9 +652,11 @@ def cycle(parser, token, escape=False):
         node = CycleNode(values, escape=escape)
     return node
 
+
 @register.tag
 def csrf_token(parser, token):
     return CsrfTokenNode()
+
 
 @register.tag
 def debug(parser, token):
@@ -646,6 +671,7 @@ def debug(parser, token):
         </pre>
     """
     return DebugNode()
+
 
 @register.tag('filter')
 def do_filter(parser, token):
@@ -675,6 +701,7 @@ def do_filter(parser, token):
     nodelist = parser.parse(('endfilter',))
     parser.delete_first_token()
     return FilterNode(filter_expr, nodelist)
+
 
 @register.tag
 def firstof(parser, token, escape=False):
@@ -722,6 +749,7 @@ def firstof(parser, token, escape=False):
     if len(bits) < 1:
         raise TemplateSyntaxError("'firstof' statement requires at least one argument")
     return FirstOfNode([parser.compile_filter(bit) for bit in bits], escape=escape)
+
 
 @register.tag('for')
 def do_for(parser, token):
@@ -814,6 +842,7 @@ def do_for(parser, token):
         nodelist_empty = None
     return ForNode(loopvars, sequence, is_reversed, nodelist_loop, nodelist_empty)
 
+
 def do_ifequal(parser, token, negate):
     bits = list(token.split_contents())
     if len(bits) != 3:
@@ -829,6 +858,7 @@ def do_ifequal(parser, token, negate):
     val1 = parser.compile_filter(bits[1])
     val2 = parser.compile_filter(bits[2])
     return IfEqualNode(val1, val2, nodelist_true, nodelist_false, negate)
+
 
 @register.tag
 def ifequal(parser, token):
@@ -849,6 +879,7 @@ def ifequal(parser, token):
     """
     return do_ifequal(parser, token, False)
 
+
 @register.tag
 def ifnotequal(parser, token):
     """
@@ -856,6 +887,7 @@ def ifnotequal(parser, token):
     See ifequal.
     """
     return do_ifequal(parser, token, True)
+
 
 class TemplateLiteral(Literal):
     def __init__(self, value, text):
@@ -868,6 +900,7 @@ class TemplateLiteral(Literal):
     def eval(self, context):
         return self.value.resolve(context, ignore_failures=True)
 
+
 class TemplateIfParser(IfParser):
     error_class = TemplateSyntaxError
 
@@ -877,6 +910,7 @@ class TemplateIfParser(IfParser):
 
     def create_var(self, value):
         return TemplateLiteral(self.template_parser.compile_filter(value), value)
+
 
 @register.tag('if')
 def do_if(parser, token):
@@ -1006,6 +1040,7 @@ def ifchanged(parser, token):
     values = [parser.compile_filter(bit) for bit in bits[1:]]
     return IfChangedNode(nodelist_true, nodelist_false, *values)
 
+
 @register.tag
 def ssi(parser, token):
     """
@@ -1035,6 +1070,7 @@ def ssi(parser, token):
                                       " must be 'parsed'" % bits[0])
     filepath = parser.compile_filter(bits[1])
     return SsiNode(filepath, parsed)
+
 
 @register.tag
 def load(parser, token):
@@ -1086,6 +1122,7 @@ def load(parser, token):
                                           (taglib, e))
     return LoadNode()
 
+
 @register.tag
 def now(parser, token):
     """
@@ -1103,6 +1140,7 @@ def now(parser, token):
         raise TemplateSyntaxError("'now' statement takes one argument")
     format_string = bits[1][1:-1]
     return NowNode(format_string)
+
 
 @register.tag
 def regroup(parser, token):
@@ -1172,6 +1210,7 @@ def regroup(parser, token):
                                        bits[3])
     return RegroupNode(target, expression, var_name)
 
+
 @register.tag
 def spaceless(parser, token):
     """
@@ -1201,6 +1240,7 @@ def spaceless(parser, token):
     nodelist = parser.parse(('endspaceless',))
     parser.delete_first_token()
     return SpacelessNode(nodelist)
+
 
 @register.tag
 def templatetag(parser, token):
@@ -1235,6 +1275,7 @@ def templatetag(parser, token):
                                   " Must be one of: %s" %
                                   (tag, list(TemplateTagNode.mapping)))
     return TemplateTagNode(tag)
+
 
 @register.tag
 def url(parser, token):
@@ -1331,6 +1372,7 @@ def url(parser, token):
 
     return URLNode(viewname, args, kwargs, asvar)
 
+
 @register.tag
 def verbatim(parser, token):
     """
@@ -1352,6 +1394,7 @@ def verbatim(parser, token):
     nodelist = parser.parse(('endverbatim',))
     parser.delete_first_token()
     return VerbatimNode(nodelist.render(Context()))
+
 
 @register.tag
 def widthratio(parser, token):
@@ -1389,6 +1432,7 @@ def widthratio(parser, token):
                           parser.compile_filter(max_value_expr),
                           parser.compile_filter(max_width),
                           asvar=asvar)
+
 
 @register.tag('with')
 def do_with(parser, token):

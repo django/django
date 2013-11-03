@@ -37,6 +37,7 @@ ALWAYS_SKIP = [
     "False",
 ]
 
+
 def fixliterals(fname):
     with open(fname) as fp:
         data = fp.read()
