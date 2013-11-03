@@ -210,7 +210,8 @@ class CommentViewTests(CommentTestCase):
         Test that the comment_will_be_posted signal can prevent the comment from
         actually getting saved
         """
-        def receive(sender, **kwargs): return False
+        def receive(sender, **kwargs):
+            return False
         signals.comment_will_be_posted.connect(receive, dispatch_uid="comment-test")
         a = Article.objects.get(pk=1)
         data = self.getValidData(a)

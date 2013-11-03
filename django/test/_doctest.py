@@ -454,7 +454,8 @@ class Example:
         self.want = want
         self.lineno = lineno
         self.indent = indent
-        if options is None: options = {}
+        if options is None:
+            options = {}
         self.options = options
         self.exc_msg = exc_msg
 
@@ -1027,10 +1028,14 @@ class DocTestFinder:
                     break
 
         # Find the line number for functions & methods.
-        if inspect.ismethod(obj): obj = obj.__func__
-        if inspect.isfunction(obj): obj = six.get_function_code(obj)
-        if inspect.istraceback(obj): obj = obj.tb_frame
-        if inspect.isframe(obj): obj = obj.f_code
+        if inspect.ismethod(obj):
+            obj = obj.__func__
+        if inspect.isfunction(obj):
+            obj = six.get_function_code(obj)
+        if inspect.istraceback(obj):
+            obj = obj.tb_frame
+        if inspect.isframe(obj):
+            obj = obj.f_code
         if inspect.iscode(obj):
             lineno = getattr(obj, 'co_firstlineno', None)-1
 
