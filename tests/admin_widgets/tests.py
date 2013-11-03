@@ -2,7 +2,12 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
-from unittest import TestCase
+from unittest import TestCase, skipIf
+
+try:
+    import pytz
+except ImportError:
+    pytz = None
 
 from django import forms
 from django.conf import settings
@@ -641,6 +646,7 @@ class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
+@skipIf(pytz is None, "this test requires pytz")
 @override_settings(TIME_ZONE='Asia/Singapore')
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class DateTimePickerShortcutsSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
@@ -660,8 +666,17 @@ class DateTimePickerShortcutsSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase
         """
         self.admin_login(username='super', password='secret', login_url='/')
 
-        now = datetime.now()
         error_margin = timedelta(seconds=10)
+
+        # If we are neighbouring a DST, we add an hour of error margin.
+        tz = pytz.timezone('America/Chicago')
+        utc_now = datetime.now(pytz.utc)
+        tz_yesterday = (utc_now - timedelta(days=1)).astimezone(tz).tzname()
+        tz_tomorrow = (utc_now + timedelta(days=1)).astimezone(tz).tzname()
+        if tz_yesterday != tz_tomorrow:
+            error_margin += timedelta(hours=1)
+
+        now = datetime.now()
 
         self.selenium.get('%s%s' % (self.live_server_url,
             '/admin_widgets/member/add/'))
