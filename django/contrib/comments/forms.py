@@ -39,9 +39,9 @@ class CommentSecurityForm(forms.Form):
     def clean_security_hash(self):
         """Check the security hash."""
         security_hash_dict = {
-            'content_type' : self.data.get("content_type", ""),
-            'object_pk' : self.data.get("object_pk", ""),
-            'timestamp' : self.data.get("timestamp", ""),
+            'content_type': self.data.get("content_type", ""),
+            'object_pk': self.data.get("object_pk", ""),
+            'timestamp': self.data.get("timestamp", ""),
         }
         expected_hash = self.generate_security_hash(**security_hash_dict)
         actual_hash = self.cleaned_data["security_hash"]
@@ -60,10 +60,10 @@ class CommentSecurityForm(forms.Form):
         """Generate a dict of security data for "initial" data."""
         timestamp = int(time.time())
         security_dict =   {
-            'content_type'  : str(self.target_object._meta),
-            'object_pk'     : str(self.target_object._get_pk_val()),
-            'timestamp'     : str(timestamp),
-            'security_hash' : self.initial_security_hash(timestamp),
+            'content_type': str(self.target_object._meta),
+            'object_pk': str(self.target_object._get_pk_val()),
+            'timestamp': str(timestamp),
+            'security_hash': self.initial_security_hash(timestamp),
         }
         return security_dict
 
@@ -74,9 +74,9 @@ class CommentSecurityForm(forms.Form):
         """
 
         initial_security_dict = {
-            'content_type' : str(self.target_object._meta),
-            'object_pk' : str(self.target_object._get_pk_val()),
-            'timestamp' : str(timestamp),
+            'content_type': str(self.target_object._meta),
+            'object_pk': str(self.target_object._get_pk_val()),
+            'timestamp': str(timestamp),
           }
         return self.generate_security_hash(**initial_security_dict)
 
