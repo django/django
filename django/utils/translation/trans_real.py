@@ -202,7 +202,7 @@ def activate(language):
     language and installs it as the current translation object for the current
     thread.
     """
-    if isinstance(language, basestring):
+    if isinstance(language, six.string_types):
         if language == 'zh-cn':
             warnings.warn(
                 "The use of the language code 'zh-cn' is deprecated. "
