@@ -21,7 +21,8 @@ from django.core.urlresolvers import reverse
 from django.db import models, transaction, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.related import RelatedObject
-from django.db.models.fields import BLANK_CHOICE_DASH, FieldDoesNotExist
+from django.db.models.fields import (BLANK_CHOICE_DASH, FieldDoesNotExist,
+                                     AutoField)
 from django.db.models.sql.constants import QUERY_TERMS
 from django.forms.formsets import all_valid, DELETION_FIELD_NAME
 from django.forms.models import (modelform_factory, modelformset_factory,
@@ -96,6 +97,7 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
     radio_fields = {}
     prepopulated_fields = {}
     formfield_overrides = {}
+    auto_pk_readonly_field = True
     readonly_fields = ()
     ordering = None
     view_on_site = True
@@ -311,7 +313,11 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         """
         Hook for specifying custom readonly fields.
         """
-        return self.readonly_fields
+        if (self.auto_pk_readonly_field and obj is not None
+                and not isinstance(self.opts.pk, AutoField)):
+            return self.readonly_fields + (self.opts.pk.attname,)
+        else:
+            return self.readonly_fields
 
     def get_prepopulated_fields(self, request, obj=None):
         """
