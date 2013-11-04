@@ -3189,3 +3189,17 @@ class ValuesJoinPromotionTests(TestCase):
     def test_non_nullable_fk_not_promoted(self):
         qs = ObjectB.objects.values('objecta__name')
         self.assertTrue(' INNER JOIN ' in str(qs.query))
+
+    def test_ticket_21376(self):
+        # fails after ecaba3602837d1e02fe1e961f7d3bf9086453259
+        # LEFT OUTER JOIN below is now INNER JOIN
+        a = ObjectA.objects.create()
+        c = ObjectC.objects.create(objecta=a)
+        qs = ObjectC.objects.filter(
+            Q(objecta=a) | Q(objectb__objecta=a),
+        )
+        qs = qs.filter(
+            Q(objectb=1) | Q(objecta=a),
+        )
+        self.assertEqual(qs.count(), 1)
+        self.assertTrue(' LEFT OUTER JOIN "queries_objectb"' in str(qs.query))
