@@ -121,8 +121,7 @@ class StringOrigin(Origin):
 
 
 class Template(object):
-    def __init__(self, template_string, origin=None,
-                 name='<Unknown Template>'):
+    def __init__(self, template_string, origin=None, name=None):
         try:
             template_string = force_text(template_string)
         except UnicodeDecodeError:
