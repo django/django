@@ -152,15 +152,15 @@ def pbkdf2(password, salt, iterations, dklen=0, digest=None):
     outer.update(password.translate(hmac.trans_5C))
 
     def F(i):
-        def U():
-            u = salt + struct.pack(b'>I', i)
-            for j in xrange(int(iterations)):
-                dig1, dig2 = inner.copy(), outer.copy()
-                dig1.update(u)
-                dig2.update(dig1.digest())
-                u = dig2.digest()
-                yield _bin_to_long(u)
-        return _long_to_bin(reduce(operator.xor, U()), hex_format_string)
+        u = salt + struct.pack(b'>I', i)
+        result = 0
+        for j in xrange(int(iterations)):
+            dig1, dig2 = inner.copy(), outer.copy()
+            dig1.update(u)
+            dig2.update(dig1.digest())
+            u = dig2.digest()
+            result ^= _bin_to_long(u)
+        return _long_to_bin(result, hex_format_string)
 
-    T = [F(x) for x in range(1, l + 1)]
-    return b''.join(T[:-1]) + T[-1][:r]
+    T = [F(x) for x in range(1, l)]
+    return b''.join(T) + F(l)[:r]
