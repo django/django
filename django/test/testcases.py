@@ -506,7 +506,8 @@ class SimpleTestCase(unittest.TestCase):
             # use this template with context manager
             return template_name, None, msg_prefix
 
-        template_names = [t.name for t in response.templates]
+        template_names = [t.name for t in response.templates if t.name is not
+                          None]
         return None, template_names, msg_prefix
 
     def assertTemplateUsed(self, response=None, template_name=None, msg_prefix=''):
