@@ -1,8 +1,5 @@
 # This file is distributed under the same license as the Django package.
 #
-# This is the *old* Simplified Chinese translation of Django
-# For future updates please use the translation in the "zh_Hans" directory.
-#
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # Kevin Shi <leiarix@gmail.com>, 2012.

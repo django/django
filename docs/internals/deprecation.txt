@@ -476,6 +476,9 @@ these changes.
 
 * The class ``django.utils.datastructures.MergeDict`` will be removed.
 
+* The ``zh_CN`` and ``zh_TW`` language codes will be removed and have been
+  replaced by the ``zh_Hans`` and ``zh_Hant`` language code respectively.
+
 2.0
 ---
 
