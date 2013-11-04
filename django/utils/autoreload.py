@@ -180,12 +180,13 @@ def kqueue_code_changed():
 
     # We have to manage a set of descriptors to avoid the overhead of opening
     # and closing every files whenever we reload the set of files to watch.
-    old_filenames = set()
-    filenames = set(gen_filenames())
+    filenames = set()
     descriptors = set()
 
     while True:
-        old_filenames, new_filenames = filenames, filenames - old_filenames
+        old_filenames = filenames
+        filenames = set(gen_filenames())
+        new_filenames = filenames - old_filenames
 
         # If new files were added since the last time we went through the loop,
         # add them to the kqueue.
