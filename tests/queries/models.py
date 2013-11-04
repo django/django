@@ -412,8 +412,8 @@ class ObjectB(models.Model):
 @python_2_unicode_compatible
 class ObjectC(models.Model):
     name = models.CharField(max_length=50)
-    objecta = models.ForeignKey(ObjectA)
-    objectb = models.ForeignKey(ObjectB)
+    objecta = models.ForeignKey(ObjectA, null=True)
+    objectb = models.ForeignKey(ObjectB, null=True)
 
     def __str__(self):
         return self.name
