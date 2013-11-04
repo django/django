@@ -11,6 +11,8 @@ from importlib import import_module
 from threading import local
 import warnings
 
+from django.dispatch import receiver
+from django.test.signals import setting_changed
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import memoize
 from django.utils._os import upath
@@ -45,6 +47,17 @@ accept_language_re = re.compile(r'''
         ''', re.VERBOSE)
 
 language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
+
+
+@receiver(setting_changed)
+def reset_cache(**kwargs):
+    """
+    Reset global state when LANGUAGES setting has been changed, as some
+    languages should no longer be accepted.
+    """
+    if kwargs['setting'] == 'LANGUAGES':
+        global _accepted
+        _accepted = {}
 
 
 def to_locale(language, to_lower=False):
