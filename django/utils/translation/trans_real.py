@@ -17,7 +17,7 @@ from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six
 from django.utils.six import StringIO
-from django.utils.translation import TranslatorCommentWarning
+from django.utils.translation import TranslatorCommentWarning, get_language_info
 
 
 # Translations are cached in a dictionary for every language+app tuple.
@@ -140,6 +140,20 @@ def translation(language):
 
         res = _translation(globalpath)
 
+        # When a globalpath translation is none, one of two possibilities:
+        # 1- An IOError was encountered while searching for the .po files
+        # 2- Trying to implement a language unknown to django (uncommon but
+        #    possible).  Use an empty DjangoTranslation to enable following
+        #    merges of all the locale directories
+        if res is None:
+            try:
+                get_language_info(lang)
+                raise IOError(("Unable to find translation files for "
+                    "language:%s at path:%s"), lang, globalpath)
+            except KeyError:
+                res = DjangoTranslation()
+                res._catalog = {}
+
         # We want to ensure that, for example,  "en-gb" and "en-us" don't share
         # the same translation object (thus, merging en-us with a local update
         # doesn't affect en-gb), even though they will both use the core "en"
@@ -152,10 +166,7 @@ def translation(language):
         def _merge(path):
             t = _translation(path)
             if t is not None:
-                if res is None:
-                    return t
-                else:
-                    res.merge(t)
+                res.merge(t)
             return res
 
         for appname in reversed(settings.INSTALLED_APPS):
@@ -169,13 +180,13 @@ def translation(language):
             if os.path.isdir(localepath):
                 res = _merge(localepath)
 
-        if res is None:
-            if fallback is not None:
-                res = fallback
-            else:
-                return gettext_module.NullTranslations()
-        _translations[lang] = res
-        return res
+        if res._catalog:
+            _translations[lang] = res
+            return res
+        if fallback._catalog:
+            _translations[lang] = fallback
+            return fallback
+        return gettext_module.NullTranslations()
 
     default_translation = _fetch(settings.LANGUAGE_CODE)
     current_translation = _fetch(language, fallback=default_translation)
