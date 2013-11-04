@@ -485,6 +485,18 @@ LANG_INFO = {
         'name': 'Simplified Chinese',
         'name_local': '简体中文',
     },
+    'zh-hans': {
+        'bidi': False,
+        'code': 'zh-hans',
+        'name': 'Simplified Chinese',
+        'name_local': '简体中文',
+    },
+    'zh-hant': {
+        'bidi': False,
+        'code': 'zh-hant',
+        'name': 'Traditional Chinese',
+        'name_local': '繁體中文',
+    },
     'zh-tw': {
         'bidi': False,
         'code': 'zh-tw',

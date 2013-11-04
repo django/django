@@ -202,6 +202,17 @@ def activate(language):
     language and installs it as the current translation object for the current
     thread.
     """
+    if isinstance(language, basestring):
+        if language == 'zh-cn':
+            warnings.warn(
+                "The use of the language code 'zh-cn' is deprecated. "
+                "Please use the 'zh-hans' translation instead.",
+                PendingDeprecationWarning, stacklevel=2)
+        elif language == 'zh-tw':
+            warnings.warn(
+                "The use of the language code 'zh-tw' is deprecated. "
+                "Please use the 'zh-hant' translation instead.",
+                PendingDeprecationWarning, stacklevel=2)
     _active.value = translation(language)
 
 
@@ -399,6 +410,12 @@ def get_supported_language_variant(lang_code, supported=None, strict=False):
     If `strict` is False (the default), the function will look for an alternative
     country-specific variant when the currently checked is not found.
     """
+    # some browsers use deprecated language codes -- #18419
+    if lang_code == 'zh-cn' and 'zh-hans' in supported:
+        return 'zh-hans'
+    elif lang_code == 'zh-tw' and 'zh-hant' in supported:
+        return 'zh-hant'
+
     if supported is None:
         from django.conf import settings
         supported = OrderedDict(settings.LANGUAGES)

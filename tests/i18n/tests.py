@@ -871,6 +871,31 @@ class MiscTests(TransRealMixin, TestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-cn,de'}
         self.assertEqual(g(r), 'zh-cn')
 
+    @override_settings(
+        LANGUAGES=(
+            ('en', 'English'),
+            ('zh-hans', 'Simplified Chinese'),
+            ('zh-hant', 'Traditional Chinese'),
+        )
+    )
+    def test_support_for_deprecated_chinese_language_codes(self):
+        """
+        Some browsers (Firefox, IE etc) use deprecated language codes. As these
+        language codes will be removed in Django 1.9, these will be incorrectly
+        matched. For example zh-tw (traditional) will be interpreted as zh-hans
+        (simplified), which is wrong. So we should also accept these deprecated
+        language codes.
+
+        refs #18419 -- this is explicitly for browser compatibility
+        """
+        g = get_language_from_request
+        r = self.rf.get('/')
+        r.COOKIES = {}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-cn,en'}
+        self.assertEqual(g(r), 'zh-hans')
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-tw,en'}
+        self.assertEqual(g(r), 'zh-hant')
+
     def test_parse_language_cookie(self):
         """
         Now test that we parse language preferences stored in a cookie correctly.
