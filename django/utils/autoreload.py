@@ -31,6 +31,7 @@
 import os
 import signal
 import sys
+import tempfile
 import time
 import traceback
 
@@ -140,10 +141,11 @@ def inotify_code_changed():
         for path in gen_filenames():
             wm.add_watch(path, mask)
 
+    # New modules may get imported when a request is processed.
     request_finished.connect(update_watch)
-    update_watch()
 
-    # Block forever
+    # Block until an event happens.
+    update_watch()
     notifier.check_events(timeout=None)
     notifier.stop()
 
@@ -156,44 +158,81 @@ def kqueue_code_changed():
     Checks for changed code using kqueue. After being called
     it blocks until a change event has been fired.
     """
-    # We must increase the maximum number of open file descriptors because
-    # kqueue requires one file descriptor per monitored file and default
-    # resource limits are too low.
-    #
-    # In fact there are two limits:
-    # - kernel limit: `sysctl kern.maxfilesperproc` -> 10240 on OS X.9
-    # - resource limit: `launchctl limit maxfiles` -> 256 on OS X.9
-    #
-    # The latter can be changed with Python's resource module. However, it
-    # cannot exceed the former. Suprisingly, getrlimit(3) -- used by both
-    # launchctl and the resource module -- reports no "hard limit", even
-    # though the kernel sets one.
-
-    filenames = list(gen_filenames())
-
-    # If project is too large or kernel limits are too tight, use polling.
-    if len(filenames) > NOFILES_KERN:
-        return code_changed()
-
-    # Add the number of file descriptors we're going to use to the current
-    # resource limit, while staying within the kernel limit.
-    nofiles_target = min(len(filenames) + NOFILES_SOFT, NOFILES_KERN)
-    resource.setrlimit(resource.RLIMIT_NOFILE, (nofiles_target, NOFILES_HARD))
-
     kqueue = select.kqueue()
-    fds = [open(filename) for filename in filenames]
 
+    # Utility function to create kevents.
     _filter = select.KQ_FILTER_VNODE
     flags = select.KQ_EV_ADD
     fflags = select.KQ_NOTE_DELETE | select.KQ_NOTE_WRITE | select.KQ_NOTE_RENAME
-    kevents = [select.kevent(fd, _filter, flags, fflags) for fd in fds]
-    kqueue.control(kevents, 1)
 
-    for fd in fds:
-        fd.close()
-    kqueue.close()
+    def make_kevent(descriptor):
+        return select.kevent(descriptor, _filter, flags, fflags)
 
-    return True
+    # New modules may get imported when a request is processed. We add a file
+    # descriptor to the kqueue to exit the kqueue.control after each request.
+    watcher = tempfile.TemporaryFile(bufsize=0)
+    kqueue.control([make_kevent(watcher)], 0)
+
+    def update_watch(sender=None, **kwargs):
+        watcher.write('.')
+
+    request_finished.connect(update_watch)
+
+    # We have to manage a set of descriptors to avoid the overhead of opening
+    # and closing every files whenever we reload the set of files to watch.
+    filenames = set()
+    descriptors = set()
+
+    while True:
+        old_filenames = filenames
+        filenames = set(gen_filenames())
+        new_filenames = filenames - old_filenames
+
+        # If new files were added since the last time we went through the loop,
+        # add them to the kqueue.
+        if new_filenames:
+
+            # We must increase the maximum number of open file descriptors
+            # because each kevent uses one file descriptor and resource limits
+            # are too low by default.
+            #
+            # In fact there are two limits:
+            # - kernel limit: `sysctl kern.maxfilesperproc` -> 10240 on OS X.9
+            # - resource limit: `launchctl limit maxfiles` -> 256 on OS X.9
+            #
+            # The latter can be changed with Python's resource module, but it
+            # can never exceed the former. Unfortunately, getrlimit(3) -- used
+            # by both launchctl and the resource module -- reports no "hard
+            # limit", even though the kernel sets one.
+
+            # If project is too large or kernel limits are too tight, use polling.
+            if len(filenames) >= NOFILES_KERN:
+                return code_changed()
+
+            # Add the number of file descriptors we're going to use to the current
+            # resource limit, while staying within the kernel limit.
+            nofiles_target = min(len(filenames) + NOFILES_SOFT, NOFILES_KERN)
+            resource.setrlimit(resource.RLIMIT_NOFILE, (nofiles_target, NOFILES_HARD))
+
+            new_descriptors = set(open(filename) for filename in new_filenames)
+            descriptors |= new_descriptors
+
+            kqueue.control([make_kevent(descriptor) for descriptor in new_descriptors], 0)
+
+        events = kqueue.control([], 1)
+
+        # After a request, reload the set of watched files.
+        if len(events) == 1 and events[0].ident == watcher.fileno():
+            continue
+
+        # If the change affected another file, clean up and exit.
+        for descriptor in descriptors:
+            descriptor.close()
+        watcher.close()
+        kqueue.close()
+
+        return True
+
 
 
 def code_changed():
