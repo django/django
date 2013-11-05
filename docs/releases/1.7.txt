@@ -707,10 +707,12 @@ arguments into a ``REQUEST`` property on ``WSGIRequest``. To merge
 dictionaries, use ``dict.update()`` instead. The class ``MergeDict`` is
 deprecated and will be removed in Django 1.9.
 
-Language codes ``zh_CN`` and ``zh_TW``
+Language codes ``zh-cn`` and ``zh-tw``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The currently used language codes for Simplified Chinese ``zh_CN`` and
-Traditional Chinese ``zh_TW`` are deprecated and should be replaced by the
-recently introduced language codes ``zh_Hans`` and ``zh_Hant`` respectively.
-The deprecated language codes will be removed in Django 1.9.
+The currently used language codes for Simplified Chinese ``zh-cn`` and
+Traditional Chinese ``zh-tw`` are deprecated and should be replaced by the
+recently introduced language codes ``zh-hans`` and ``zh-hant`` respectively.
+If you use these language codes, you should rename the locale directories
+and update your settings to reflect these changes. The deprecated language
+codes will be removed in Django 1.9.
