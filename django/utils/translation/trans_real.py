@@ -48,6 +48,12 @@ accept_language_re = re.compile(r'''
 
 language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
 
+# some browsers use deprecated locales. refs #18419
+_DEPRECATED_LOCALES = {
+    'zh-cn': 'zh-hans',
+    'zh-tw': 'zh-hant',
+}
+
 
 @receiver(setting_changed)
 def reset_cache(**kwargs):
@@ -202,17 +208,11 @@ def activate(language):
     language and installs it as the current translation object for the current
     thread.
     """
-    if isinstance(language, six.string_types):
-        if language == 'zh-cn':
-            warnings.warn(
-                "The use of the language code 'zh-cn' is deprecated. "
-                "Please use the 'zh-hans' translation instead.",
-                PendingDeprecationWarning, stacklevel=2)
-        elif language == 'zh-tw':
-            warnings.warn(
-                "The use of the language code 'zh-tw' is deprecated. "
-                "Please use the 'zh-hant' translation instead.",
-                PendingDeprecationWarning, stacklevel=2)
+    if language in _DEPRECATED_LOCALES:
+        msg = ("The use of the language code %r is deprecated. "
+               "Please use the %r translation instead.")
+        warnings.warn(msg % (language, _DEPRECATED_LOCALES[language]),
+                      PendingDeprecationWarning, stacklevel=2)
     _active.value = translation(language)
 
 
@@ -410,16 +410,14 @@ def get_supported_language_variant(lang_code, supported=None, strict=False):
     If `strict` is False (the default), the function will look for an alternative
     country-specific variant when the currently checked is not found.
     """
-    # some browsers use deprecated language codes -- #18419
-    if lang_code == 'zh-cn' and 'zh-hans' in supported:
-        return 'zh-hans'
-    elif lang_code == 'zh-tw' and 'zh-hant' in supported:
-        return 'zh-hant'
-
     if supported is None:
         from django.conf import settings
         supported = OrderedDict(settings.LANGUAGES)
     if lang_code:
+        # some browsers use deprecated language codes -- #18419
+        if (lang_code not in supported and lang_code in _DEPRECATED_LOCALES and
+                _DEPRECATED_LOCALES[lang_code] in supported):
+            return _DEPRECATED_LOCALES[lang_code]
         # if fr-CA is not supported, try fr-ca; if that fails, fallback to fr.
         generic_lang_code = lang_code.split('-')[0]
         variants = (lang_code, lang_code.lower(), generic_lang_code,
