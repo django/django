@@ -1433,6 +1433,27 @@ then the output would be:
         {'name': 'zed', 'age': 19},
     ]
 
+You can also do more complicated things like::
+    {{ for book in books|dictsort:"author.age"
+        * {{ book.title }} ({{ book.author.name }})
+    {% endfor %}
+
+If ``books`` is:
+
+.. code-block:: python
+
+    [
+        {'title': '1984', 'author': {'name': 'George', 'age': 45}},
+        {'title': 'Timequake', 'author': {'name': 'Kurt', 'age': 75}},
+        {'title': 'Alice', 'author': {'name': 'Lewis', 'age': 33}},
+    ]
+
+the the output would be::
+
+    * Alice (Lewis)
+    * 1984 (George)
+    * Timequake (Kurt)
+
 .. templatefilter:: dictsortreversed
 
 dictsortreversed

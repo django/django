@@ -441,6 +441,20 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(dictsort({'a': 1}, 'age'), '')
         self.assertEqual(dictsort(1, 'age'), '')
 
+    def test_dictsort_complex_sorting_key(self):
+        """
+        Since dictsort uses template.Variable under the hood, it can sort
+        on keys like 'foo.bar'.
+        """
+        data = [
+            {'foo': {'bar': 1, 'baz': 'c'}},
+            {'foo': {'bar': 2, 'baz': 'b'}},
+            {'foo': {'bar': 3, 'baz': 'a'}},
+        ]
+        sorted_data = dictsort(data, 'foo.baz')
+
+        self.assertEqual([d['foo']['bar'] for d in sorted_data], [3, 2, 1])
+
     def test_dictsortreversed(self):
         sorted_dicts = dictsortreversed([{'age': 23, 'name': 'Barbara-Ann'},
                                          {'age': 63, 'name': 'Ra Ra Rasputin'},
