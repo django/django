@@ -1135,9 +1135,15 @@ FILE_UPLOAD_DIRECTORY_PERMISSIONS
 
 Default: ``None``
 
-The numeric mode to apply to directories created in the process of
-uploading files. This value mirrors the functionality and caveats of
-the :setting:`FILE_UPLOAD_PERMISSIONS` setting.
+The numeric mode to apply to directories created in the process of uploading
+files.
+
+This setting also determines the default permissions for collected static
+directories when using the :djadmin:`collectstatic` management command. See
+:djadmin:`collectstatic` for details on overriding it.
+
+This value mirrors the functionality and caveats of the
+:setting:`FILE_UPLOAD_PERMISSIONS` setting.
 
 .. setting:: FILE_UPLOAD_PERMISSIONS
 
@@ -1157,7 +1163,7 @@ system's standard umask.
 
 This setting also determines the default permissions for collected static files
 when using the :djadmin:`collectstatic` management command. See
-:djadmin:`collectstatic` for details on overridding it.
+:djadmin:`collectstatic` for details on overriding it.
 
 .. warning::
 

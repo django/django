@@ -149,7 +149,8 @@ class FileSystemStorage(Storage):
     Standard filesystem storage
     """
 
-    def __init__(self, location=None, base_url=None, file_permissions_mode=None):
+    def __init__(self, location=None, base_url=None, file_permissions_mode=None,
+            directory_permissions_mode=None):
         if location is None:
             location = settings.MEDIA_ROOT
         self.base_location = location
@@ -160,6 +161,10 @@ class FileSystemStorage(Storage):
         self.file_permissions_mode = (
             file_permissions_mode if file_permissions_mode is not None
             else settings.FILE_UPLOAD_PERMISSIONS
+        )
+        self.directory_permissions_mode = (
+            directory_permissions_mode if directory_permissions_mode is not None
+            else settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS
         )
 
     def _open(self, name, mode='rb'):
@@ -175,12 +180,12 @@ class FileSystemStorage(Storage):
         directory = os.path.dirname(full_path)
         if not os.path.exists(directory):
             try:
-                if settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS is not None:
+                if self.directory_permissions_mode is not None:
                     # os.makedirs applies the global umask, so we reset it,
-                    # for consistency with FILE_UPLOAD_PERMISSIONS behavior.
+                    # for consistency with file_permissions_mode behavior.
                     old_umask = os.umask(0)
                     try:
-                        os.makedirs(directory, settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS)
+                        os.makedirs(directory, self.directory_permissions_mode)
                     finally:
                         os.umask(old_umask)
                 else:
