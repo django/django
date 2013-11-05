@@ -49,10 +49,12 @@ accept_language_re = re.compile(r'''
 language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
 
 # some browsers use deprecated locales. refs #18419
-_DEPRECATED_LOCALES = {
+_BROWSERS_DEPRECATED_LOCALES  = {
     'zh-cn': 'zh-hans',
     'zh-tw': 'zh-hant',
 }
+
+_DJANGO_DEPRECATED_LOCALES = _BROWSERS_DEPRECATED_LOCALES
 
 
 @receiver(setting_changed)
@@ -208,10 +210,10 @@ def activate(language):
     language and installs it as the current translation object for the current
     thread.
     """
-    if language in _DEPRECATED_LOCALES:
+    if language in _DJANGO_DEPRECATED_LOCALES:
         msg = ("The use of the language code '%s' is deprecated. "
                "Please use the '%s' translation instead.")
-        warnings.warn(msg % (language, _DEPRECATED_LOCALES[language]),
+        warnings.warn(msg % (language, _DJANGO_DEPRECATED_LOCALES[language]),
                       PendingDeprecationWarning, stacklevel=2)
     _active.value = translation(language)
 
@@ -415,9 +417,9 @@ def get_supported_language_variant(lang_code, supported=None, strict=False):
         supported = OrderedDict(settings.LANGUAGES)
     if lang_code:
         # some browsers use deprecated language codes -- #18419
-        if (lang_code not in supported and lang_code in _DEPRECATED_LOCALES and
-                _DEPRECATED_LOCALES[lang_code] in supported):
-            return _DEPRECATED_LOCALES[lang_code]
+        replacement = _BROWSERS_DEPRECATED_LOCALES.get(lang_code)
+        if lang_code not in supported and replacement in supported:
+            return replacement
         # if fr-CA is not supported, try fr-ca; if that fails, fallback to fr.
         generic_lang_code = lang_code.split('-')[0]
         variants = (lang_code, lang_code.lower(), generic_lang_code,
