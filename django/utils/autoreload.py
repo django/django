@@ -234,7 +234,6 @@ def kqueue_code_changed():
         return True
 
 
-
 def code_changed():
     global _mtimes, _win
     for filename in gen_filenames():
