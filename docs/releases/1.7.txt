@@ -880,3 +880,9 @@ Callable arguments were evaluated when a queryset was constructed rather than
 when it was evaluated, thus this feature didn't offer any benefit compared to
 evaluating arguments before passing them to queryset and created confusion that
 the arguments may have been evaluated at query time.
+
+``ADMIN_FOR`` setting
+~~~~~~~~~~~~~~~~~~~~~
+
+The ``ADMIN_FOR`` feature, part of the admindocs, has been removed. You can
+remove the setting from your configuration at your convenience.

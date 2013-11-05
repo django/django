@@ -28,8 +28,6 @@ the following:
   ``r'^admin/'`` entry, so that requests to ``/admin/doc/`` don't get
   handled by the latter entry.
 * Install the docutils Python module (http://docutils.sf.net/).
-* **Optional:** Linking to templates requires the :setting:`ADMIN_FOR`
-  setting to be configured.
 * **Optional:** Using the admindocs bookmarklets requires
   ``django.contrib.admindocs.middleware.XViewMiddleware`` to be installed.
 

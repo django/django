@@ -1,10 +1,39 @@
 import unittest
 
+from django.conf import settings
+from django.contrib.sites.models import Site
 from django.contrib.admindocs import utils
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
+
+
+class MiscTests(TestCase):
+    urls = 'admin_docs.urls'
+
+    def setUp(self):
+        self._old_installed = Site._meta.app_config.installed
+        User.objects.create_superuser('super', None, 'secret')
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        Site._meta.app_config.installed = self._old_installed
+
+    @override_settings(
+        SITE_ID=None,
+        INSTALLED_APPS=[app for app in settings.INSTALLED_APPS
+                        if app != 'django.contrib.sites'],
+    )
+    def test_no_sites_framework(self):
+        """
+        Without the sites framework, should not access SITE_ID or Site
+        objects. Deleting settings is fine here as UserSettingsHolder is used.
+        """
+        Site._meta.app_config.installed = False
+        Site.objects.all().delete()
+        del settings.SITE_ID
+        self.client.get('/admindocs/views/')  # should not raise
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -46,6 +75,8 @@ class AdminDocViewTests(TestCase):
         self.assertContains(response,
             '<h3><a href="/admindocs/views/django.contrib.admindocs.views.BaseAdminDocsView/">/admindocs/</a></h3>',
             html=True)
+        self.assertContains(response, 'Views by namespace test')
+        self.assertContains(response, 'Name: <code>test:func</code>.')
 
     def test_view_detail(self):
         response = self.client.get(

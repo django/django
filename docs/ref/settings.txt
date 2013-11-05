@@ -2097,25 +2097,6 @@ The default value for the X-Frame-Options header used by
 :doc:`clickjacking protection </ref/clickjacking/>` documentation.
 
 
-Admindocs
-=========
-
-Settings for :mod:`django.contrib.admindocs`.
-
-.. setting:: ADMIN_FOR
-
-ADMIN_FOR
----------
-
-Default: ``()`` (Empty tuple)
-
-Used for admin-site settings modules, this should be a tuple of settings
-modules (in the format ``'foo.bar.baz'``) for which this site is an admin.
-
-The admin site uses this in its automatically-introspected documentation of
-models, views and template tags.
-
-
 Auth
 ====
 
