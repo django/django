@@ -1797,6 +1797,10 @@ class Queries6Tests(TestCase):
         q1 = Tag.objects.order_by('name')
         self.assertIsNot(q1, q1.all())
 
+    def test_ticket_11320(self):
+        qs = Tag.objects.exclude(category=None).exclude(category__name='foo')
+        self.assertEqual(str(qs.query).count(' INNER JOIN '), 1)
+
 
 class RawQueriesTests(TestCase):
     def setUp(self):
