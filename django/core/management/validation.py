@@ -1,5 +1,6 @@
 import collections
 import sys
+import types
 
 from django.conf import settings
 from django.core.management.color import color_style
@@ -25,7 +26,7 @@ def get_validation_errors(outfile, app=None):
     validates all models of all installed apps. Writes errors, if any, to outfile.
     Returns number of errors.
     """
-    from django.db import models, connection
+    from django.db import connection, models
     from django.db.models.loading import get_app_errors
     from django.db.models.deletion import SET_NULL, SET_DEFAULT
 
@@ -363,6 +364,8 @@ def get_validation_errors(outfile, app=None):
             for it in opts.index_together:
                 validate_local_fields(e, opts, "index_together", it)
 
+    validate_model_signals(e)
+
     return len(e.errors)
 
 
@@ -382,3 +385,28 @@ def validate_local_fields(e, opts, field_name, fields):
                     e.add(opts, '"%s" refers to %s. ManyToManyFields are not supported in %s.' % (field_name, f.name, field_name))
                 if f not in opts.local_fields:
                     e.add(opts, '"%s" refers to %s. This is not in the same model as the %s statement.' % (field_name, f.name, field_name))
+
+
+def validate_model_signals(e):
+    """Ensure lazily referenced model signals senders are installed."""
+    from django.db import models
+
+    for name in dir(models.signals):
+        obj = getattr(models.signals, name)
+        if isinstance(obj, models.signals.ModelSignal):
+            for reference, receivers in obj.unresolved_references.items():
+                for receiver, _, _ in receivers:
+                    # The receiver is either a function or an instance of class
+                    # defining a `__call__` method.
+                    if isinstance(receiver, types.FunctionType):
+                        description = "The `%s` function" % receiver.__name__
+                    else:
+                        description = "An instance of the `%s` class" % receiver.__class__.__name__
+                    e.add(
+                        receiver.__module__,
+                        "%s was connected to the `%s` signal "
+                        "with a lazy reference to the '%s' sender, "
+                        "which has not been installed." % (
+                            description, name, '.'.join(reference)
+                        )
+                    )
