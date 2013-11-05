@@ -345,18 +345,19 @@ Management Commands
 
 * The :djadmin:`runserver` command received several improvements:
 
-  * On BSD systems, including OS X, the development server will reload
-    immediately when a file is changed. Previously, it was polling the
-    filesystem for changes every second. That caused a small delay before
-    reloads and reduced battery life on laptops.
+  # On BSD systems, including OS X, the development server will reload
+    immediately when a file is changed. Previously, it polled the filesystem
+    for changes every second. That caused a small delay before reloads and
+    reduced battery life on laptops.
 
   * On Linux, the same improvements are available when pyinotify_ is
     installed.
 
     .. _pyinotify: https://pypi.python.org/pypi/pyinotify
 
-  * Besides, the development server automatically reloads when a translation
-    file is updated, ie. after running :djadmin:`compilemessages`.
+  * In addition, the development server automatically reloads when a
+    translation file is updated, i.e. after running
+    :djadmin:`compilemessages`.
 
 Models
 ^^^^^^
