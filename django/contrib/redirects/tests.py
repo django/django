@@ -56,13 +56,6 @@ class RedirectTests(TestCase):
         response = self.client.get('/initial')
         self.assertEqual(response.status_code, 410)
 
-    @override_settings(
-        INSTALLED_APPS=[app for app in settings.INSTALLED_APPS
-                        if app != 'django.contrib.sites'])
-    def test_sites_not_installed(self):
-        with self.assertRaises(ImproperlyConfigured):
-            RedirectFallbackMiddleware()
-
 
 class OverriddenRedirectFallbackMiddleware(RedirectFallbackMiddleware):
     # Use HTTP responses different from the defaults

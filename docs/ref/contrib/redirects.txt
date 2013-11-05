@@ -14,24 +14,28 @@ Installation
 
 To install the redirects app, follow these steps:
 
-1. Ensure that the ``django.contrib.sites`` framework
-   :ref:`is installed <enabling-the-sites-framework>`.
-2. Add ``'django.contrib.redirects'`` to your :setting:`INSTALLED_APPS` setting.
-3. Add ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'``
+1. Add ``'django.contrib.redirects'`` to your :setting:`INSTALLED_APPS` setting.
+2. Add ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'``
    to your :setting:`MIDDLEWARE_CLASSES` setting.
-4. Run the command :djadmin:`manage.py migrate <migrate>`.
+3. Run the command :djadmin:`manage.py migrate <migrate>`.
+
+.. versionchanged:: 1.7
+
+    The ``redirects`` framework no longer depends on the ``sites`` framework.
 
 How it works
 ============
 
-``manage.py migrate`` creates a ``django_redirect`` table in your database. This
-is a simple lookup table with ``site_id``, ``old_path`` and ``new_path`` fields.
+``manage.py migrate`` creates a ``django_redirect`` table in your database.
+This is a simple lookup table with ``old_path`` and ``new_path`` fields. It
+also contains a ``site_id`` field if the ``sites`` framework :ref:`is
+installed <enabling-the-sites-framework>`.
 
 The :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
 does all of the work. Each time any Django application raises a 404
 error, this middleware checks the redirects database for the requested
 URL as a last resort. Specifically, it checks for a redirect with the
-given ``old_path`` with a site ID that corresponds to the
+given ``old_path``, optionally with a site ID that corresponds to the
 :setting:`SITE_ID` setting.
 
 * If it finds a match, and ``new_path`` is not empty, it redirects to
@@ -43,7 +47,7 @@ given ``old_path`` with a site ID that corresponds to the
   ``302 Moved Temporarily`` redirect instead.
 * If it finds a match, and ``new_path`` is empty, it sends a 410 ("Gone")
   HTTP header and empty (content-less) response.
-* If it doesn't find a match, the request continues to be processed as
+* If it doesn't find a match, the response continues to be processed as
   usual.
 
 The middleware only gets activated for 404s -- not for 500s or responses of any
@@ -51,10 +55,19 @@ other status code.
 
 Note that the order of :setting:`MIDDLEWARE_CLASSES` matters. Generally, you
 can put :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
-at the end of the list, because it's a last resort.
+at the beginning of the list, because it's a last resort and response middleware
+runs in reverse order.
 
 For more on middleware, read the :doc:`middleware docs
 </topics/http/middleware>`.
+
+.. admonition:: Enabling or disabling the sites framework
+
+    Once you've created the ``django_redirect`` table, you shouldn't enable or
+    disable the ``sites`` framework, because that will create a mismatch
+    between the actual definition of the table and the definition Django
+    expects. If you have to do it, you can add or remove the ``site_id``
+    column and its indexes with a :doc:`migration </topics/migrations>`.
 
 How to add, change and delete redirects
 =======================================
