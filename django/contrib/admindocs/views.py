@@ -5,6 +5,7 @@ import re
 
 from django import template
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
@@ -36,11 +37,12 @@ class BaseAdminDocsView(TemplateView):
         if not utils.docutils_is_available:
             # Display an error message for people without docutils
             self.template_name = 'admin_doc/missing_docutils.html'
-            return self.render_to_response({})
+            return self.render_to_response(admin.site.each_context())
         return super(BaseAdminDocsView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs.update({'root_path': urlresolvers.reverse('admin:index')})
+        kwargs.update(admin.site.each_context())
         return super(BaseAdminDocsView, self).get_context_data(**kwargs)
 
 

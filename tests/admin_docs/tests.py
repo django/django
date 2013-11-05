@@ -25,6 +25,9 @@ class AdminDocViewTests(TestCase):
         self.client.login(username='super', password='secret')
         response = self.client.get(reverse('django-admindocs-docroot'))
         self.assertContains(response, '<h1>Documentation</h1>', html=True)
+        self.assertContains(response,
+                            '<h1 id="site-name"><a href="/admin/">Django '
+                            'administration</a></h1>')
 
     def test_bookmarklets(self):
         response = self.client.get(reverse('django-admindocs-bookmarklets'))
@@ -80,6 +83,9 @@ class AdminDocViewTests(TestCase):
                 '<h3>The admin documentation system requires Python\'s '
                 '<a href="http://docutils.sf.net/">docutils</a> library.</h3>',
                 html=True)
+            self.assertContains(response,
+                                '<h1 id="site-name"><a href="/admin/">Django '
+                                'administration</a></h1>')
         finally:
             utils.docutils_is_available = True
 
