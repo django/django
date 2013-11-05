@@ -210,6 +210,8 @@ Minor features
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * The ``redirects`` framework no longer depends on the ``sites`` framework.
+  However you cannot simply disable ``sites``; you have to :ref:`adapt the
+  database schema <redirects-enable-or-disable-sites>`.
 
 * :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
   has two new attributes

@@ -61,6 +61,8 @@ runs in reverse order.
 For more on middleware, read the :doc:`middleware docs
 </topics/http/middleware>`.
 
+.. _redirects-enable-or-disable-sites:
+
 .. admonition:: Enabling or disabling the sites framework
 
     Once you've created the ``django_redirect`` table, you shouldn't enable or
