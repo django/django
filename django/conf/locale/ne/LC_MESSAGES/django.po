@@ -1,16 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-#   <chalisesagar@gmail.com>, 2012.
-# Paras Nath Chaudhary <opnchaudhary@gmail.com>, 2012.
-# Sagar Chalise <chalisesagar@gmail.com>, 2011.
+# Paras Nath Chaudhary <opnchaudhary@gmail.com>, 2012
+# Sagar Chalise <chalisesagar@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:47+0000\n"
-"Last-Translator: Paras Nath Chaudhary <opnchaudhary@gmail.com>\n"
+"POT-Creation-Date: 2013-08-22 09:54+0200\n"
+"PO-Revision-Date: 2013-10-02 17:03+0000\n"
+"Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
 "Language-Team: Nepali (http://www.transifex.com/projects/p/django/language/"
 "ne/)\n"
 "MIME-Version: 1.0\n"
@@ -19,654 +18,698 @@ msgstr ""
 "Language: ne\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:51
 msgid "Afrikaans"
-msgstr ""
+msgstr "अफ्रिकन"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "अरबिक"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:53
 msgid "Azerbaijani"
 msgstr "अजरबैजानी"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:54
 msgid "Bulgarian"
 msgstr "बुल्गेरियाली"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:55
 msgid "Belarusian"
-msgstr ""
+msgstr "बेलारुसियन"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:56
 msgid "Bengali"
 msgstr "बंगाली"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:57
 msgid "Breton"
-msgstr ""
+msgstr "ब्रेटोन"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:58
 msgid "Bosnian"
 msgstr "बोस्नियाली"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:59
 msgid "Catalan"
 msgstr "क्याटालान"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:60
 msgid "Czech"
 msgstr "चेक"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:61
 msgid "Welsh"
 msgstr "वेल्स"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:62
 msgid "Danish"
 msgstr "डेनिस"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:63
 msgid "German"
 msgstr "जर्मन"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:64
 msgid "Greek"
 msgstr "ग्रिक"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:65
 msgid "English"
 msgstr "अंग्रेजी"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:66
 msgid "British English"
 msgstr "बेलायती अंग्रेजी"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:67
 msgid "Esperanto"
 msgstr ""
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:68
 msgid "Spanish"
 msgstr "स्पेनिस"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:69
 msgid "Argentinian Spanish"
 msgstr "अर्जेन्टिनाली स्पेनिस"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:70
 msgid "Mexican Spanish"
 msgstr "मेक्सिकन स्पेनिस"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:71
 msgid "Nicaraguan Spanish"
 msgstr "निकारागुँवा स्पेनिस"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:72
 msgid "Venezuelan Spanish"
-msgstr ""
+msgstr "भेनेजुएला स्पेनिस"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:73
 msgid "Estonian"
 msgstr "इस्टोनियन"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:74
 msgid "Basque"
 msgstr "बास्क"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:75
 msgid "Persian"
 msgstr "फारसी"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:76
 msgid "Finnish"
 msgstr "फिन्निस"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:77
 msgid "French"
 msgstr "फ्रान्सेली"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:78
 msgid "Frisian"
 msgstr "फ्रिसियन"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:79
 msgid "Irish"
 msgstr "आयरिस"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:80
 msgid "Galician"
 msgstr "ग्यलिसियन"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:81
 msgid "Hebrew"
 msgstr "हिब्रु"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:82
 msgid "Hindi"
 msgstr "हिन्दि "
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:83
 msgid "Croatian"
 msgstr "क्रोषियन"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:84
 msgid "Hungarian"
 msgstr "हन्गेरियन"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:85
 msgid "Interlingua"
 msgstr ""
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:86
 msgid "Indonesian"
 msgstr "इन्डोनेसियाली"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:87
 msgid "Icelandic"
 msgstr "आइसल्यान्डिक"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:88
 msgid "Italian"
 msgstr "ईटालियन"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:89
 msgid "Japanese"
 msgstr "जापनिज"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:90
 msgid "Georgian"
 msgstr "जर्जीयन"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:91
 msgid "Kazakh"
 msgstr "कजाक"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:92
 msgid "Khmer"
 msgstr "ख्मेर"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:93
 msgid "Kannada"
 msgstr "कन्नडा"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:94
 msgid "Korean"
 msgstr "कोरियाली"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:95
 msgid "Luxembourgish"
 msgstr ""
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:96
 msgid "Lithuanian"
 msgstr "लिथुवानियाली"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:97
 msgid "Latvian"
 msgstr "लाट्भियन"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:98
 msgid "Macedonian"
 msgstr "म्यासेडोनियन"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:99
 msgid "Malayalam"
 msgstr "मलायलम"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:100
 msgid "Mongolian"
 msgstr "मंगोलियन"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:101
+msgid "Burmese"
+msgstr "बर्मेली"
+
+#: conf/global_settings.py:102
 msgid "Norwegian Bokmal"
 msgstr "नर्वेली बोक्मल"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:103
 msgid "Nepali"
 msgstr "नेपाली"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:104
 msgid "Dutch"
 msgstr "डच"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:105
 msgid "Norwegian Nynorsk"
 msgstr "नर्वेली न्योर्स्क"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:106
+msgid "Ossetic"
+msgstr ""
+
+#: conf/global_settings.py:107
 msgid "Punjabi"
 msgstr "पञ्जावी"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:108
 msgid "Polish"
 msgstr "पोलिस"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:109
 msgid "Portuguese"
 msgstr "पुर्तगाली"
 
-#: conf/global_settings.py:105
+#: conf/global_settings.py:110
 msgid "Brazilian Portuguese"
 msgstr "ब्राजिली पुर्तगाली"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:111
 msgid "Romanian"
 msgstr "रोमानियाली"
 
-#: conf/global_settings.py:107
+#: conf/global_settings.py:112
 msgid "Russian"
 msgstr "रुसी"
 
-#: conf/global_settings.py:108
+#: conf/global_settings.py:113
 msgid "Slovak"
 msgstr "सलोभाक"
 
-#: conf/global_settings.py:109
+#: conf/global_settings.py:114
 msgid "Slovenian"
 msgstr "स्लोभेनियाली"
 
-#: conf/global_settings.py:110
+#: conf/global_settings.py:115
 msgid "Albanian"
 msgstr "अल्बानियाली"
 
-#: conf/global_settings.py:111
+#: conf/global_settings.py:116
 msgid "Serbian"
 msgstr "सर्वियाली"
 
-#: conf/global_settings.py:112
+#: conf/global_settings.py:117
 msgid "Serbian Latin"
 msgstr "सर्वियाली ल्याटिन"
 
-#: conf/global_settings.py:113
+#: conf/global_settings.py:118
 msgid "Swedish"
 msgstr "स्विडिस"
 
-#: conf/global_settings.py:114
+#: conf/global_settings.py:119
 msgid "Swahili"
-msgstr ""
+msgstr "स्वाहिली"
 
-#: conf/global_settings.py:115
+#: conf/global_settings.py:120
 msgid "Tamil"
 msgstr "तामिल"
 
-#: conf/global_settings.py:116
+#: conf/global_settings.py:121
 msgid "Telugu"
 msgstr "तेलुगु"
 
-#: conf/global_settings.py:117
+#: conf/global_settings.py:122
 msgid "Thai"
 msgstr "थाई"
 
-#: conf/global_settings.py:118
+#: conf/global_settings.py:123
 msgid "Turkish"
 msgstr "टर्किस"
 
-#: conf/global_settings.py:119
+#: conf/global_settings.py:124
 msgid "Tatar"
-msgstr ""
+msgstr "टाटर"
 
-#: conf/global_settings.py:120
+#: conf/global_settings.py:125
 msgid "Udmurt"
 msgstr ""
 
-#: conf/global_settings.py:121
+#: conf/global_settings.py:126
 msgid "Ukrainian"
 msgstr "युक्रेनि"
 
-#: conf/global_settings.py:122
+#: conf/global_settings.py:127
 msgid "Urdu"
 msgstr "उर्दु"
 
-#: conf/global_settings.py:123
+#: conf/global_settings.py:128
 msgid "Vietnamese"
 msgstr "भियतनामी"
 
-#: conf/global_settings.py:124
+#: conf/global_settings.py:129
 msgid "Simplified Chinese"
 msgstr "सरल चिनि"
 
-#: conf/global_settings.py:125
+#: conf/global_settings.py:130
 msgid "Traditional Chinese"
 msgstr "प्राचिन चिनि"
 
-#: core/validators.py:21 forms/fields.py:52
+#: core/validators.py:21
 msgid "Enter a valid value."
 msgstr "उपयुक्त मान राख्नुहोस ।"
 
-#: core/validators.py:104 forms/fields.py:464
-msgid "Enter a valid email address."
-msgstr ""
+#: core/validators.py:53 forms/fields.py:650
+msgid "Enter a valid URL."
+msgstr "उपयुक्त URL राख्नुहोस ।"
 
-#: core/validators.py:107 forms/fields.py:1013
+#: core/validators.py:79
+msgid "Enter a valid integer."
+msgstr "मनासिव अंक राख्नु होस ।"
+
+#: core/validators.py:83
+msgid "Enter a valid email address."
+msgstr "सही ई-मेल ठेगाना राख्नु होस ।"
+
+#: core/validators.py:131
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "अक्षर, अंक, _  र - भएका 'स्लग' मात्र हाल्नुहोस ।"
 
-#: core/validators.py:110 core/validators.py:129 forms/fields.py:987
+#: core/validators.py:134 core/validators.py:153
 msgid "Enter a valid IPv4 address."
 msgstr "उपयुक्त IPv4 ठेगाना राख्नुहोस"
 
-#: core/validators.py:115 core/validators.py:130
+#: core/validators.py:139 core/validators.py:154
 msgid "Enter a valid IPv6 address."
 msgstr "उपयुक्त आइ.पी.६ ठेगाना राख्नुहोस ।"
 
-#: core/validators.py:125 core/validators.py:128
+#: core/validators.py:149 core/validators.py:152
 msgid "Enter a valid IPv4 or IPv6 address."
 msgstr "उपयुक्त आइ.पी.६ र आइ.पी.४ ठेगाना राख्नुहोस ।"
 
-#: core/validators.py:151 db/models/fields/__init__.py:655
+#: core/validators.py:175 db/models/fields/__init__.py:712
 msgid "Enter only digits separated by commas."
 msgstr "कम्मा सहितका वर्ण मात्र राख्नुहोस ।"
 
-#: core/validators.py:157
+#: core/validators.py:181
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr "यो मान %(limit_value)s छ भन्ने निश्चित गर्नुहोस । (यो %(show_value)s हो ।)"
 
-#: core/validators.py:176 forms/fields.py:210 forms/fields.py:263
+#: core/validators.py:196
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "यो मान %(limit_value)s भन्दा कम अथवा बराबर छ भन्ने निश्चित गर्नुहोस ।"
 
-#: core/validators.py:182 forms/fields.py:211 forms/fields.py:264
+#: core/validators.py:202
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "यो मान %(limit_value)s भन्दा बढी अथवा बराबर छ भन्ने निशचित गर्नुहोस ।"
 
-#: core/validators.py:189
+#: core/validators.py:210
 #, python-format
 msgid ""
+"Ensure this value has at least %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
-msgstr ""
+msgstr[0] ""
 "यो मान कम्तिमा पनि %(limit_value)d अक्षर छ भन्ने निश्चित गर्नुहोस । (यसमा "
 "%(show_value)d छ ।)"
-
-#: core/validators.py:196
-#, python-format
-msgid ""
-"Ensure this value has at most %(limit_value)d characters (it has "
-"%(show_value)d)."
-msgstr ""
-"यो मान बढिमा पनि %(limit_value)d अक्षर छ भन्ने निश्चित गर्नुहोस । (यसमा "
+msgstr[1] ""
+"यो मान कम्तिमा पनि %(limit_value)d अक्षरहरु छ भन्ने निश्चित गर्नुहोस । (यसमा "
 "%(show_value)d छ ।)"
 
-#: db/models/base.py:857
+#: core/validators.py:220
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"यो मान बढिमा पनि %(limit_value)d अक्षर छ भन्ने निश्चित गर्नुहोस । (यसमा "
+"%(show_value)d छ ।)"
+msgstr[1] ""
+"यो मान बढिमा पनि %(limit_value)d अक्षरहरु छ भन्ने निश्चित गर्नुहोस । (यसमा "
+"%(show_value)d छ ।)"
+
+#: db/models/base.py:884
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr "%(date_field)s %(lookup)s को %(field_name)s नौलो हुनुपर्दछ ।"
 
-#: db/models/base.py:880 forms/models.py:573
+#: db/models/base.py:907 forms/models.py:686
 msgid "and"
 msgstr "र"
 
-#: db/models/base.py:881 db/models/fields/__init__.py:70
+#: db/models/base.py:908 db/models/fields/__init__.py:83
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(field_label)s भएको %(model_name)s पहिलै विद्धमान छ ।"
 
-#: db/models/fields/__init__.py:67
+#: db/models/fields/__init__.py:80
 #, python-format
-msgid "Value %r is not a valid choice."
-msgstr "%r उपयुक्त रोजाई होइन ।"
+msgid "Value %(value)r is not a valid choice."
+msgstr ""
 
-#: db/models/fields/__init__.py:68
+#: db/models/fields/__init__.py:81
 msgid "This field cannot be null."
 msgstr "यो फाँट शून्य हुन सक्दैन ।"
 
-#: db/models/fields/__init__.py:69
+#: db/models/fields/__init__.py:82
 msgid "This field cannot be blank."
 msgstr "यो फाँट खाली हुन सक्दैन ।"
 
-#: db/models/fields/__init__.py:76
+#: db/models/fields/__init__.py:89
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "फाँटको प्रकार: %(field_type)s"
 
-#: db/models/fields/__init__.py:517 db/models/fields/__init__.py:985
+#: db/models/fields/__init__.py:570 db/models/fields/__init__.py:1063
 msgid "Integer"
 msgstr "अंक"
 
-#: db/models/fields/__init__.py:521 db/models/fields/__init__.py:983
+#: db/models/fields/__init__.py:574 db/models/fields/__init__.py:1061
 #, python-format
-msgid "'%s' value must be an integer."
-msgstr "'%s' को मान अंकमा हुनुपर्दछ ।"
+msgid "'%(value)s' value must be an integer."
+msgstr "'%(value)s' मान अंक हुनु पर्छ ।"
 
-#: db/models/fields/__init__.py:569
+#: db/models/fields/__init__.py:625
 #, python-format
-msgid "'%s' value must be either True or False."
-msgstr "'%s' को मान True वा False हुनुपर्छ।"
+msgid "'%(value)s' value must be either True or False."
+msgstr ""
 
-#: db/models/fields/__init__.py:571
+#: db/models/fields/__init__.py:627
 msgid "Boolean (Either True or False)"
 msgstr "बुलियन (True अथवा False)"
 
-#: db/models/fields/__init__.py:622
+#: db/models/fields/__init__.py:679
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "वर्ण  (%(max_length)s सम्म)"
 
-#: db/models/fields/__init__.py:650
+#: db/models/fields/__init__.py:707
 msgid "Comma-separated integers"
 msgstr "कम्माले छुट्याइएका अंकहरु ।"
 
-#: db/models/fields/__init__.py:664
-#, python-format
-msgid "'%s' value has an invalid date format. It must be in YYYY-MM-DD format."
-msgstr "'%s' मिित को मान अमान्य स्वरूपमा छ। यो YYYY-MM-DDको स्वरूपमा हुनुपर्छ।"
-
-#: db/models/fields/__init__.py:666 db/models/fields/__init__.py:754
+#: db/models/fields/__init__.py:721
 #, python-format
 msgid ""
-"'%s' value has the correct format (YYYY-MM-DD) but it is an invalid date."
+"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"format."
 msgstr ""
 
-#: db/models/fields/__init__.py:669
+#: db/models/fields/__init__.py:723 db/models/fields/__init__.py:817
+#, python-format
+msgid ""
+"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"date."
+msgstr ""
+
+#: db/models/fields/__init__.py:726
 msgid "Date (without time)"
 msgstr "मिति (समय रहित)"
 
-#: db/models/fields/__init__.py:752
+#: db/models/fields/__init__.py:815
 #, python-format
 msgid ""
-"'%s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
 
-#: db/models/fields/__init__.py:756
+#: db/models/fields/__init__.py:819
 #, python-format
 msgid ""
-"'%s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) but "
-"it is an invalid date/time."
+"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) but it is an invalid date/time."
 msgstr ""
 
-#: db/models/fields/__init__.py:760
+#: db/models/fields/__init__.py:823
 msgid "Date (with time)"
 msgstr "मिति (समय सहित)"
 
-#: db/models/fields/__init__.py:849
+#: db/models/fields/__init__.py:921
 #, python-format
-msgid "'%s' value must be a decimal number."
-msgstr "'%s' को मान दशमलव संख्यामा हुनुपर्छ।"
+msgid "'%(value)s' value must be a decimal number."
+msgstr ""
 
-#: db/models/fields/__init__.py:851
+#: db/models/fields/__init__.py:923
 msgid "Decimal number"
 msgstr "दश्मलव संख्या"
 
-#: db/models/fields/__init__.py:908
+#: db/models/fields/__init__.py:983
 msgid "Email address"
 msgstr "ई-मेल ठेगाना"
 
-#: db/models/fields/__init__.py:927
+#: db/models/fields/__init__.py:1002
 msgid "File path"
 msgstr "फाइलको मार्ग"
 
-#: db/models/fields/__init__.py:954
+#: db/models/fields/__init__.py:1029
 #, python-format
-msgid "'%s' value must be a float."
+msgid "'%(value)s' value must be a float."
 msgstr ""
 
-#: db/models/fields/__init__.py:956
+#: db/models/fields/__init__.py:1031
 msgid "Floating point number"
 msgstr "दश्मलव हुने संख्या"
 
-#: db/models/fields/__init__.py:1017
+#: db/models/fields/__init__.py:1098
 msgid "Big (8 byte) integer"
 msgstr "ठूलो (८ बाइटको) अंक"
 
-#: db/models/fields/__init__.py:1031
+#: db/models/fields/__init__.py:1112
 msgid "IPv4 address"
 msgstr "आइ.पी.भी४ ठेगाना"
 
-#: db/models/fields/__init__.py:1047
+#: db/models/fields/__init__.py:1128
 msgid "IP address"
 msgstr "IP ठेगाना"
 
-#: db/models/fields/__init__.py:1090
+#: db/models/fields/__init__.py:1175
 #, python-format
-msgid "'%s' value must be either None, True or False."
-msgstr "'%s' को मान None, True वा False हुनुपर्छ।"
+msgid "'%(value)s' value must be either None, True or False."
+msgstr ""
 
-#: db/models/fields/__init__.py:1092
+#: db/models/fields/__init__.py:1177
 msgid "Boolean (Either True, False or None)"
 msgstr "बुलियन (True, False अथवा None)"
 
-#: db/models/fields/__init__.py:1141
+#: db/models/fields/__init__.py:1229
 msgid "Positive integer"
 msgstr "सकारात्मक पूर्णांक"
 
-#: db/models/fields/__init__.py:1152
+#: db/models/fields/__init__.py:1240
 msgid "Positive small integer"
-msgstr ""
+msgstr "सानो जोड अङ्क"
 
-#: db/models/fields/__init__.py:1163
+#: db/models/fields/__init__.py:1252
 #, python-format
 msgid "Slug (up to %(max_length)s)"
 msgstr "स्लग(%(max_length)s सम्म)"
 
-#: db/models/fields/__init__.py:1181
+#: db/models/fields/__init__.py:1270
 msgid "Small integer"
-msgstr ""
+msgstr "सानो अङ्क"
 
-#: db/models/fields/__init__.py:1187
+#: db/models/fields/__init__.py:1276
 msgid "Text"
 msgstr "पाठ"
 
-#: db/models/fields/__init__.py:1205
+#: db/models/fields/__init__.py:1294
 #, python-format
 msgid ""
-"'%s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] format."
+"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"format."
 msgstr ""
 
-#: db/models/fields/__init__.py:1207
+#: db/models/fields/__init__.py:1296
 #, python-format
 msgid ""
-"'%s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an invalid "
-"time."
+"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"invalid time."
 msgstr ""
 
-#: db/models/fields/__init__.py:1210
+#: db/models/fields/__init__.py:1299
 msgid "Time"
 msgstr "समय"
 
-#: db/models/fields/__init__.py:1272
+#: db/models/fields/__init__.py:1368
 msgid "URL"
 msgstr "URL"
 
-#: db/models/fields/files.py:216
+#: db/models/fields/__init__.py:1384
+msgid "Raw binary data"
+msgstr "र बाइनरी डाटा"
+
+#: db/models/fields/files.py:217
 msgid "File"
 msgstr "फाइल"
 
-#: db/models/fields/files.py:323
+#: db/models/fields/files.py:324
 msgid "Image"
 msgstr "चित्र"
 
-#: db/models/fields/related.py:979
+#: db/models/fields/related.py:1128
 #, python-format
-msgid "Model %(model)s with pk %(pk)r does not exist."
-msgstr "प्राइमरी की %(pk)r भएको मोडल %(model)s छैन ।"
+msgid "%(model)s instance with pk %(pk)r does not exist."
+msgstr ""
 
-#: db/models/fields/related.py:981
+#: db/models/fields/related.py:1130
 msgid "Foreign Key (type determined by related field)"
 msgstr "फोरेन कि (प्रकार नातागत फाँटले जनाउछ)"
 
-#: db/models/fields/related.py:1111
+#: db/models/fields/related.py:1271
 msgid "One-to-one relationship"
 msgstr "एक-देखि-एक नाता"
 
-#: db/models/fields/related.py:1178
+#: db/models/fields/related.py:1338
 msgid "Many-to-many relationship"
 msgstr "अनेक-देखि-अनेक नाता"
 
-#: db/models/fields/related.py:1203
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "एक भन्दा बढी छान्न म्याकमा \"Control\" अथवा \"Command\" थिच्नुहोस ।"
-
-#: forms/fields.py:51
+#: forms/fields.py:56
 msgid "This field is required."
 msgstr "यो फाँट अनिवार्य छ ।"
 
-#: forms/fields.py:209
+#: forms/fields.py:225
 msgid "Enter a whole number."
 msgstr "संख्या राख्नुहोस ।"
 
-#: forms/fields.py:241 forms/fields.py:262
+#: forms/fields.py:266 forms/fields.py:294
 msgid "Enter a number."
 msgstr "संख्या राख्नुहोस ।"
 
-#: forms/fields.py:265
+#: forms/fields.py:296
 #, python-format
-msgid "Ensure that there are no more than %s digits in total."
-msgstr "समग्रमा %s भन्दा बढी अक्षर नभएको निश्चित पार्नुहोस ।"
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "जम्मा %(max)s भन्दा बढी अक्षर नभएको निश्चित पार्नु होस ।"
+msgstr[1] "जम्मा %(max)s भन्दा बढी अक्षरहरु नभएको निश्चित पार्नु होस ।"
 
-#: forms/fields.py:266
+#: forms/fields.py:300
 #, python-format
-msgid "Ensure that there are no more than %s decimal places."
-msgstr "%s भन्दा बढी दश्मलव नभएको निश्चित पार्नुहोस ।"
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "दशमलव पछि %(max)s भन्दा बढी अक्षर नभएको निश्चित पार्नु होस ।"
+msgstr[1] "दशमलव पछि %(max)s भन्दा बढी अक्षरहरु नभएको निश्चित पार्नु होस ।"
 
-#: forms/fields.py:267
+#: forms/fields.py:304
 #, python-format
-msgid "Ensure that there are no more than %s digits before the decimal point."
-msgstr "दश्मलव अघि %s भन्दा बढी अक्षर नभएको निश्चित पार्नुहोस ।"
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "दशमलव अघि %(max)s भन्दा बढी अक्षर नभएको निश्चित पार्नु होस ।"
+msgstr[1] "दशमलव अघि %(max)s भन्दा बढी अक्षरहरु नभएको निश्चित पार्नु होस ।"
 
-#: forms/fields.py:355 forms/fields.py:953
+#: forms/fields.py:415 forms/fields.py:1088
 msgid "Enter a valid date."
 msgstr "उपयुक्त मिति राख्नुहोस ।"
 
-#: forms/fields.py:378 forms/fields.py:954
+#: forms/fields.py:439 forms/fields.py:1089
 msgid "Enter a valid time."
 msgstr "उपयुक्त समय राख्नुहोस ।"
 
-#: forms/fields.py:399
+#: forms/fields.py:461
 msgid "Enter a valid date/time."
 msgstr "उपयुक्त मिति/समय राख्नुहोस ।"
 
-#: forms/fields.py:475
+#: forms/fields.py:539
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "कुनै फाईल पेश गरिएको छैन । फारममा ईनकोडिङको प्रकार जाँच गर्नुहोस । "
 
-#: forms/fields.py:476
+#: forms/fields.py:540
 msgid "No file was submitted."
 msgstr "कुनै फाईल पेश गरिएको छैन ।"
 
-#: forms/fields.py:477
+#: forms/fields.py:541
 msgid "The submitted file is empty."
 msgstr "पेश गरिएको फाइल खाली छ ।"
 
-#: forms/fields.py:478
+#: forms/fields.py:543
 #, python-format
-msgid ""
+msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
+msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
-msgstr ""
-"यो फाइलको नाममा बढीमा %(max)d अंक भएको निश्चित गर्नुहोस । (यसमा %(length)d छ ।)"
+msgstr[0] ""
+"यो फाइलको नाममा बाढीमा %(max)d अङ्क भएको निश्चित गर्नु होस । (यसमा %(length)d छ "
+"।)"
+msgstr[1] ""
+"यो फाइलको नाममा बढी मा %(max)d अङ्कहरू भएको निश्चित गर्नु होस । (यसमा %(length)d "
+"छ ।)"
 
-#: forms/fields.py:479
+#: forms/fields.py:546
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr "दुवै नछान्नुहोस, कि त फाइल पेश गर्नुहोस वा चेक बाकस मा छान्नुहोस ।"
 
-#: forms/fields.py:534
+#: forms/fields.py:607
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -674,38 +717,62 @@ msgstr ""
 "उपयुक्त चित्र अपलोड गर्नुहोस । तपाइले अपलोड गर्नु भएको फाइल चित्र होइन वा बिग्रेको चित्र "
 "हो ।"
 
-#: forms/fields.py:580
-msgid "Enter a valid URL."
-msgstr "उपयुक्त URL राख्नुहोस ।"
-
-#: forms/fields.py:666 forms/fields.py:746
+#: forms/fields.py:757 forms/fields.py:844 forms/models.py:1145
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "उपयुक्त विकल्प छान्नुहोस ।  %(value)s प्रस्तावित विकल्प होइन ।"
 
-#: forms/fields.py:747 forms/fields.py:835 forms/models.py:1002
+#: forms/fields.py:845 forms/fields.py:957 forms/models.py:1144
 msgid "Enter a list of values."
 msgstr "मानहरु राख्नुहोस"
 
-#: forms/formsets.py:324 forms/formsets.py:326
+#. Translators: This is the default suffix added to form field labels
+#: forms/forms.py:90
+msgid ":"
+msgstr ":"
+
+#: forms/forms.py:159
+#, python-format
+msgid "(Hidden field %(name)s) %(error)s"
+msgstr "(लुकेका %(name)s) %(error)s"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+#: forms/forms.py:527
+msgid ":?.!"
+msgstr ":?.!"
+
+#: forms/formsets.py:88
+msgid "ManagementForm data is missing or has been tampered with"
+msgstr ""
+
+#: forms/formsets.py:321
+#, python-format
+msgid "Please submit %d or fewer forms."
+msgid_plural "Please submit %d or fewer forms."
+msgstr[0] "कृपया %d अथवा सो भन्दा थोरै फारम बुझाउनु होस ।"
+msgstr[1] "कृपया %d अथवा सो भन्दा थोरै फारमहरु बुझाउनु होस ।"
+
+#: forms/formsets.py:350 forms/formsets.py:352
 msgid "Order"
 msgstr "क्रम"
 
-#: forms/formsets.py:328
+#: forms/formsets.py:354
 msgid "Delete"
 msgstr "मेट्नुहोस"
 
-#: forms/models.py:567
+#: forms/models.py:680
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "कृपया %(field)s का लागि दोहोरिइका तथ्याङ्कहरु सच्याउनुहोस ।"
 
-#: forms/models.py:571
+#: forms/models.py:684
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr "कृपया %(field)s का लागि दोहोरिइका तथ्याङ्कहरु नौलो तथ्याङ्क सहित सच्याउनुहोस ।"
 
-#: forms/models.py:577
+#: forms/models.py:690
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -714,91 +781,91 @@ msgstr ""
 "कृपया %(field_name)s का लागि दोहोरिइका तथ्याङ्कहरु सच्याउनुहोस जसमा "
 "%(date_field)sको %(lookup)s नौलो हुनुपर्दछ ।"
 
-#: forms/models.py:585
+#: forms/models.py:698
 msgid "Please correct the duplicate values below."
 msgstr "कृपया तलका दोहोरिइका मानहरु सच्याउनुहोस ।"
 
-#: forms/models.py:852
+#: forms/models.py:986
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "भित्रि फोरेन की र अभिभावक प्राइमरी की मिलेन ।"
 
-#: forms/models.py:913
+#: forms/models.py:1050
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "उपयुक्त विकल्प छान्नुहोस ।  छानिएको विकल्प प्रस्तावित विकल्प होइन ।"
 
-#: forms/models.py:1003
+#: forms/models.py:1147
 #, python-format
-msgid "Select a valid choice. %s is not one of the available choices."
-msgstr "उपयुक्त विकल्प छान्नुहोस ।  %s प्रस्तावित विकल्प होइन ।"
+msgid "\"%(pk)s\" is not a valid value for a primary key."
+msgstr ""
 
-#: forms/models.py:1005
-#, python-format
-msgid "\"%s\" is not a valid value for a primary key."
-msgstr "\"%s\" प्राइमरी की को लागि उपयुक्त मान होइन ।"
+#: forms/models.py:1158
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "एक भन्दा बढी छान्न म्याकमा \"Control\" अथवा \"Command\" थिच्नुहोस ।"
 
-#: forms/util.py:81
+#: forms/util.py:83
 #, python-format
 msgid ""
 "%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
 
-#: forms/widgets.py:336
+#: forms/widgets.py:326
 msgid "Currently"
 msgstr "अहिले"
 
-#: forms/widgets.py:337
+#: forms/widgets.py:327
 msgid "Change"
 msgstr "फेर्नुहोस"
 
-#: forms/widgets.py:338
+#: forms/widgets.py:328
 msgid "Clear"
 msgstr "सबै खाली गर्नु होस ।"
 
-#: forms/widgets.py:594
+#: forms/widgets.py:546
 msgid "Unknown"
 msgstr "अज्ञात"
 
-#: forms/widgets.py:595
+#: forms/widgets.py:547
 msgid "Yes"
 msgstr "हुन्छ"
 
-#: forms/widgets.py:596
+#: forms/widgets.py:548
 msgid "No"
 msgstr "होइन"
 
-#: template/defaultfilters.py:794
+#: template/defaultfilters.py:784
 msgid "yes,no,maybe"
 msgstr "हो, होइन, सायद"
 
-#: template/defaultfilters.py:822 template/defaultfilters.py:833
+#: template/defaultfilters.py:812 template/defaultfilters.py:824
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d बाइट"
 msgstr[1] "%(size)d बाइटहरु"
 
-#: template/defaultfilters.py:835
+#: template/defaultfilters.py:826
 #, python-format
 msgid "%s KB"
 msgstr "%s किलोबाइट"
 
-#: template/defaultfilters.py:837
+#: template/defaultfilters.py:828
 #, python-format
 msgid "%s MB"
 msgstr "%s मेगाबाइट"
 
-#: template/defaultfilters.py:839
+#: template/defaultfilters.py:830
 #, python-format
 msgid "%s GB"
 msgstr "%s गिगाबाइट"
 
-#: template/defaultfilters.py:841
+#: template/defaultfilters.py:832
 #, python-format
 msgid "%s TB"
 msgstr "%s टेराबाइट"
 
-#: template/defaultfilters.py:842
+#: template/defaultfilters.py:834
 #, python-format
 msgid "%s PB"
 msgstr "%s पिटाबाइट"
@@ -1099,70 +1166,80 @@ msgctxt "alt. month"
 msgid "December"
 msgstr "डिसम्वर"
 
-#: utils/text.py:70
+#: utils/image.py:105
+#, python-format
+msgid "Neither Pillow nor PIL could be imported: %s"
+msgstr "PIL अथवा Pillow, कुनै पनो आयात गर्न सकिएन : %s"
+
+#: utils/image.py:127
+#, python-format
+msgid "The '_imaging' module for the PIL could not be imported: %s"
+msgstr "PIL को '_imaging' मोडुल आयात गर्न सकिएन : %s"
+
+#: utils/ipv6.py:9
+msgid "This is not a valid IPv6 address."
+msgstr "यो मनासिव IPv6 होइन ।"
+
+#: utils/text.py:69
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s..."
-msgstr ""
+msgstr "%(truncated_text)s..."
 
-#: utils/text.py:239
+#: utils/text.py:224
 msgid "or"
 msgstr "अथवा"
 
 #. Translators: This string is used as a separator between list elements
-#: utils/text.py:256
+#: utils/text.py:241 utils/timesince.py:56
 msgid ", "
 msgstr ","
 
-#: utils/timesince.py:22
-msgid "year"
-msgid_plural "years"
-msgstr[0] "साल"
-msgstr[1] "सालहरु"
-
-#: utils/timesince.py:23
-msgid "month"
-msgid_plural "months"
-msgstr[0] "महिना"
-msgstr[1] "महिनाहरु"
-
 #: utils/timesince.py:24
-msgid "week"
-msgid_plural "weeks"
-msgstr[0] "साता"
-msgstr[1] "साताहरु"
+#, python-format
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d वर्ष"
+msgstr[1] "%d वर्षहरु"
 
 #: utils/timesince.py:25
-msgid "day"
-msgid_plural "days"
-msgstr[0] "दिन"
-msgstr[1] "दिनहरु"
+#, python-format
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%d महिना"
+msgstr[1] "%d महिनाहरु"
 
 #: utils/timesince.py:26
-msgid "hour"
-msgid_plural "hours"
-msgstr[0] "घण्टा"
-msgstr[1] "घण्टाहरु"
+#, python-format
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "%d सप्ताह"
+msgstr[1] "%d सप्ताहहरु"
 
 #: utils/timesince.py:27
-msgid "minute"
-msgid_plural "minutes"
-msgstr[0] "मिनट"
-msgstr[1] "मिनटहरु"
-
-#: utils/timesince.py:43
-msgid "minutes"
-msgstr "मिनटहरु"
-
-#: utils/timesince.py:48
 #, python-format
-msgid "%(number)d %(type)s"
-msgstr "%(number)d %(type)s"
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d दिन"
+msgstr[1] "%d दिनहरु"
 
-#: utils/timesince.py:54
+#: utils/timesince.py:28
 #, python-format
-msgid ", %(number)d %(type)s"
-msgstr ", %(number)d %(type)s"
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d घण्टा"
+msgstr[1] "%d घण्टाहरु"
+
+#: utils/timesince.py:29
+#, python-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d मिनट"
+msgstr[1] "%d मिनटहरु"
+
+#: utils/timesince.py:45
+msgid "0 minutes"
+msgstr "० मिनट"
 
 #: views/static.py:56
 msgid "Directory indexes are not allowed here."
@@ -1171,9 +1248,9 @@ msgstr ""
 #: views/static.py:58
 #, python-format
 msgid "\"%(path)s\" does not exist"
-msgstr ""
+msgstr "\"%(path)s\" नभएको पाइयो ।"
 
-#: views/static.py:98
+#: views/static.py:99
 #, python-format
 msgid "Index of %(directory)s"
 msgstr ""
@@ -1194,12 +1271,12 @@ msgstr "दिन तोकिएको छैन ।"
 msgid "No week specified"
 msgstr "साता तोकिएको छैन ।"
 
-#: views/generic/dates.py:368 views/generic/dates.py:393
+#: views/generic/dates.py:368 views/generic/dates.py:396
 #, python-format
 msgid "No %(verbose_name_plural)s available"
 msgstr "%(verbose_name_plural)s उपलब्ध छैन ।"
 
-#: views/generic/dates.py:646
+#: views/generic/dates.py:649
 #, python-format
 msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
@@ -1208,7 +1285,7 @@ msgstr ""
 "%(class_name)s.allow_future 'False' हुनाले आगामी %(verbose_name_plural)s उपलब्ध "
 "छैन ।"
 
-#: views/generic/dates.py:678
+#: views/generic/dates.py:681
 #, python-format
 msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
 msgstr "मिति ढाँचा'%(format)s'को लागि अनुपयुक्त मिति '%(datestr)s'"
@@ -1218,16 +1295,16 @@ msgstr "मिति ढाँचा'%(format)s'को लागि अनुप
 msgid "No %(verbose_name)s found matching the query"
 msgstr "%(verbose_name)s भेटिएन ।"
 
-#: views/generic/list.py:51
+#: views/generic/list.py:54
 msgid "Page is not 'last', nor can it be converted to an int."
 msgstr "पृष्ठ अन्तिमा पनि होइन र अंकमा बदलिन पनि सकिदैन ।"
 
-#: views/generic/list.py:56
+#: views/generic/list.py:59
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr ""
+msgstr "रद्द पृष्ठ (%(page_number)s): %(message)s"
 
-#: views/generic/list.py:137
+#: views/generic/list.py:150
 #, python-format
 msgid "Empty list and '%(class_name)s.allow_empty' is False."
 msgstr "'%(class_name)s.allow_empty' 'False' छ र लिस्ट पनि खालि छ । "
