@@ -294,12 +294,6 @@ Type 'yes' to continue, or 'no' to cancel: """
             self.log("Pretending to copy '%s'" % source_path, level=1)
         else:
             self.log("Copying '%s'" % source_path, level=1)
-            if self.local:
-                full_path = self.storage.path(prefixed_path)
-                try:
-                    os.makedirs(os.path.dirname(full_path))
-                except OSError:
-                    pass
             with source_storage.open(path) as source_file:
                 self.storage.save(prefixed_path, source_file)
         if not prefixed_path in self.copied_files:
