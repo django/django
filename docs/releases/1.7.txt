@@ -425,7 +425,7 @@ Models
 * Is it now possible to avoid creating a backward relation for
   :class:`~django.db.models.OneToOneField` by setting its
   :attr:`~django.db.models.ForeignKey.related_name` to
-  `'+'` or ending it with `'+'`.
+  ``'+'`` or ending it with ``'+'``.
 
 * :class:`F expressions <django.db.models.F>` support the power operator
   (``**``).
@@ -435,6 +435,10 @@ Signals
 
 * The ``enter`` argument was added to the
   :data:`~django.test.signals.setting_changed` signal.
+
+* The model signals can be now be connected to using a ``str`` of the
+  ``'app_label.ModelName'`` form – just like related fields – to lazily
+  reference their senders.
 
 Templates
 ^^^^^^^^^
