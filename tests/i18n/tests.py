@@ -893,8 +893,35 @@ class MiscTests(TransRealMixin, TestCase):
         r.COOKIES = {}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-cn,en'}
         self.assertEqual(g(r), 'zh-hans')
+
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-tw,en'}
         self.assertEqual(g(r), 'zh-hant')
+
+    @override_settings(
+        LANGUAGES=(
+            ('en', 'English'),
+            ('zh-cn', 'Simplified Chinese'),
+            ('zh-hans', 'Simplified Chinese'),
+            ('zh-hant', 'Traditional Chinese'),
+            ('zh-tw', 'Traditional Chinese'),
+        )
+    )
+    def test_backwards_compatibility(self):
+        """
+        While the old chinese language codes are being deprecated, they should
+        still work as before the new language codes were introduced.
+
+        refs #18419 -- this is explicitly for backwards compatibility and
+        should be removed in Django 1.9
+        """
+        g = get_language_from_request
+        r = self.rf.get('/')
+        r.COOKIES = {}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-cn,en'}
+        self.assertEqual(g(r), 'zh-cn')
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-tw,en'}
+        self.assertEqual(g(r), 'zh-tw')
 
     def test_parse_language_cookie(self):
         """
