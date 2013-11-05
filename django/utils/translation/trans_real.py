@@ -209,8 +209,8 @@ def activate(language):
     thread.
     """
     if language in _DEPRECATED_LOCALES:
-        msg = ("The use of the language code %r is deprecated. "
-               "Please use the %r translation instead.")
+        msg = ("The use of the language code '%s' is deprecated. "
+               "Please use the '%s' translation instead.")
         warnings.warn(msg % (language, _DEPRECATED_LOCALES[language]),
                       PendingDeprecationWarning, stacklevel=2)
     _active.value = translation(language)
