@@ -1,18 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# jargalan <jargalanch@gmail.com>, 2011.
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2013.
-# Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011.
+# ankhaa1002 <ankhaa1002@gmail.com>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
+# jargalan <jargalanch@gmail.com>, 2011
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013
+# Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-02-04 07:00+0000\n"
-"Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-09-30 09:37+0000\n"
+"Last-Translator: ankhaa1002 <ankhaa1002@gmail.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
 "MIME-Version: 1.0\n"
@@ -21,21 +21,21 @@ msgstr ""
 "Language: mn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: actions.py:48
+#: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(items)s ээс   %(count)d-ийг амжилттай устгалаа."
 
-#: actions.py:60 options.py:1347
+#: actions.py:61 options.py:1418
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s устгаж чадахгүй."
 
-#: actions.py:62 options.py:1349
+#: actions.py:63 options.py:1420
 msgid "Are you sure?"
 msgstr "Итгэлтэй байна уу?"
 
-#: actions.py:83
+#: actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Сонгосон %(verbose_name_plural)s-ийг устга"
@@ -93,86 +93,86 @@ msgstr "Орсон хуудас тань хүчингүй болсон тул а
 msgid "Action:"
 msgstr "Үйлдэл:"
 
-#: models.py:24
+#: models.py:25
 msgid "action time"
 msgstr "үйлдлийн хугацаа"
 
-#: models.py:27
+#: models.py:28
 msgid "object id"
 msgstr "обектийн id"
 
-#: models.py:28
+#: models.py:29
 msgid "object repr"
 msgstr "обектийн хамаарал"
 
-#: models.py:29
+#: models.py:30
 msgid "action flag"
 msgstr "үйлдэлийн тэмдэг"
 
-#: models.py:30
+#: models.py:31
 msgid "change message"
 msgstr "өөрчлөлтийн мэдээлэл"
 
-#: models.py:35
+#: models.py:36
 msgid "log entry"
 msgstr "лог өгөгдөл"
 
-#: models.py:36
+#: models.py:37
 msgid "log entries"
 msgstr "лог өгөгдөлүүд"
 
-#: models.py:45
+#: models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "\"%(object)s\" нэмсэн."
 
-#: models.py:47
+#: models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "\"%(object)s\"-ийг %(changes)s өөрчилсөн."
 
-#: models.py:52
+#: models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "\"%(object)s\" устгасан."
 
-#: models.py:54
+#: models.py:55
 msgid "LogEntry Object"
 msgstr "Лог бүртгэлийн обект"
 
-#: options.py:156 options.py:172
+#: options.py:173 options.py:202
 msgid "None"
 msgstr "Хоосон"
 
-#: options.py:684
+#: options.py:763
 #, python-format
 msgid "Changed %s."
 msgstr "Өөрчлөгдсөн %s."
 
-#: options.py:684 options.py:694
+#: options.py:763 options.py:773 options.py:1570
 msgid "and"
 msgstr "ба"
 
-#: options.py:689
+#: options.py:768
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Нэмэгдсэн %(name)s \"%(object)s\"."
 
-#: options.py:693
+#: options.py:772
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\"-ийн өөрчлөгдсөн %(list)s"
 
-#: options.py:698
+#: options.py:777
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Устгасан %(name)s \"%(object)s\"."
 
-#: options.py:702
+#: options.py:781
 msgid "No fields changed."
 msgstr "Өөрчилсөн талбар алга байна."
 
-#: options.py:807 options.py:860
+#: options.py:884 options.py:927
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -180,7 +180,7 @@ msgstr ""
 "%(name)s \"%(obj)s\" амжилттай нэмэгдлээ. Доорх хэсэгт үүнийг ахин засварлах "
 "боломжтой."
 
-#: options.py:835
+#: options.py:902
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -189,12 +189,12 @@ msgstr ""
 "%(name)s \"%(obj)s\" амжилттай нэмэгдлээ. Доорх хэсгээс %(name)s өөрийн "
 "нэмэх боломжтой."
 
-#: options.py:839
+#: options.py:906
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr " %(name)s \"%(obj)s\" амжилттай нэмэгдлээ."
 
-#: options.py:853
+#: options.py:920
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
@@ -203,7 +203,7 @@ msgstr ""
 "%(name)s \"%(obj)s\" амжилттай өөрчлөгдлөө. Доорх хэсэгт дахин засах "
 "боломжтой."
 
-#: options.py:867
+#: options.py:934
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -212,77 +212,92 @@ msgstr ""
 "%(name)s \"%(obj)s\" амжилттай өөрчлөгдлөө. Доорх %(name)s хэсгээс дахин "
 "нэмэх боломжтой."
 
-#: options.py:873
+#: options.py:940
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr " %(name)s \"%(obj)s\" амжилттай өөрчлөгдлөө. "
 
-#: options.py:951 options.py:1211
+#: options.py:1018 options.py:1278
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 "Үйлдэл хийхийн тулд Та ядаж 1-ийг сонгох хэрэгтэй. Өөрчилөлт хийгдсэнгүй."
 
-#: options.py:970
+#: options.py:1037
 msgid "No action selected."
 msgstr "Үйлдэл сонгоогүй."
 
-#: options.py:1050
+#: options.py:1117
 #, python-format
 msgid "Add %s"
 msgstr "%s-ийг нэмэх"
 
-#: options.py:1074 options.py:1319
+#: options.py:1141 options.py:1386
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s обектийн үндсэн түлхүүр %(key)r олдохгүй байна."
 
-#: options.py:1140
+#: options.py:1207
 #, python-format
 msgid "Change %s"
 msgstr "%s-ийг өөрчлөх"
 
-#: options.py:1190
+#: options.py:1257
 msgid "Database error"
 msgstr "Өгөгдлийн сангийн алдаа"
 
-#: options.py:1253
+#: options.py:1320
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s-ийг амжилттай өөрчиллөө."
 msgstr[1] "%(count)s %(name)s-ийг амжилттай өөрчиллөө."
 
-#: options.py:1280
+#: options.py:1347
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "Бүгд %(total_count)s сонгогдсон"
 msgstr[1] "Бүгд %(total_count)s сонгогдсон"
 
-#: options.py:1285
+#: options.py:1352
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s оос 0 сонгосон"
 
-#: options.py:1335
+#: options.py:1403
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr " %(name)s \"%(obj)s\" амжилттай устгагдлаа."
 
-#: options.py:1382
+#: options.py:1459
 #, python-format
 msgid "Change history: %s"
 msgstr "Өөрчлөлтийн түүх: %s"
 
-#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#. Translators: Model verbose name and instance representation, suitable to be
+#. an item in a list
+#: options.py:1564
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(instance)s %(class_name)s"
+
+#: options.py:1571
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+""
+
+#: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19
 #: views/decorators.py:24
 msgid "Log in"
 msgstr "Нэвтрэх"
 
-#: sites.py:388
+#: sites.py:386
 msgid "Site administration"
 msgstr "Сайтын удирдлага"
 
@@ -303,15 +318,15 @@ msgstr "Цаг:"
 msgid "Lookup"
 msgstr "Хайх"
 
-#: widgets.py:271
+#: widgets.py:260
 msgid "Add Another"
 msgstr "Ахиад нэмэх"
 
-#: widgets.py:316
+#: widgets.py:302
 msgid "Currently:"
 msgstr "Одоогийнх:"
 
-#: widgets.py:317
+#: widgets.py:303
 msgid "Change:"
 msgstr "Өөрчилөлт:"
 
@@ -437,9 +452,14 @@ msgstr "Сайтаас харах"
 #: templates/admin/auth/user/change_password.html:27
 #: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Доорх алдааг засна уу."
-msgstr[1] "Доорх алдаануудыг засна уу."
+msgstr "Доорх алдаануудыг засна уу."
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the errors below."
+msgstr "Доор гарсан алдаануудыг засна уу."
 
 #: templates/admin/change_list.html:58
 #, python-format
@@ -792,11 +812,19 @@ msgstr "Нууц үг шинэчилэх амжилттай боллоо"
 
 #: templates/registration/password_reset_done.html:17
 msgid ""
-"We've emailed you instructions for setting your password to the email "
-"address you submitted. You should be receiving it shortly."
+"We've emailed you instructions for setting your password. You should be "
+"receiving them shortly."
 msgstr ""
-"Таны оруулсан цахим шуудангийн хаягруу нууц үг сэргээх зааварчилгааг "
-"илгээлээ. Энэ зааварчилгаа танд удахгүй очих болно."
+"Бид таний оруулсан email хаягруу нууц үг оруулах заавар явуулсан. Та удахгүй "
+"хүлээж авах болно. "
+
+#: templates/registration/password_reset_done.html:19
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Хэрвээ та email хүлээж аваагүй бол оруулсан email хаягаараа бүртгүүлсэн "
+"эсхээ шалгаад мөн email ийнхаа Spam фолдер ийг шалгана уу."
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
@@ -840,20 +868,20 @@ msgstr "ИМайл хаяг:"
 msgid "Reset my password"
 msgstr "Нууц үгээ шинэчлэх"
 
-#: templatetags/admin_list.py:344
+#: templatetags/admin_list.py:348
 msgid "All dates"
 msgstr "Бүх огноо"
 
-#: views/main.py:33
+#: views/main.py:35
 msgid "(None)"
 msgstr "(Хоосон)"
 
-#: views/main.py:76
+#: views/main.py:84
 #, python-format
 msgid "Select %s"
 msgstr "%s-г сонго"
 
-#: views/main.py:78
+#: views/main.py:86
 #, python-format
 msgid "Select %s to change"
 msgstr "Өөрчлөх %s-г сонгоно уу"

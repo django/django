@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# eallik <eallik@gmail.com>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# madisvain <madisvain@gmail.com>, 2011.
+# eallik <eallik@gmail.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
+# madisvain <madisvain@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-08 12:32+0000\n"
-"Last-Translator: madisvain <madisvain@gmail.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-24 18:56+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Estonian (http://www.transifex.com/projects/p/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -32,47 +32,47 @@ msgstr ""
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "Baas GIS väli -- ühildub OpenGIS Spetsifikatsiooni Geomeetria tüübiga."
 
-#: db/models/fields.py:271
+#: db/models/fields.py:270
 msgid "Point"
 msgstr "Punkt"
 
-#: db/models/fields.py:275
+#: db/models/fields.py:274
 msgid "Line string"
 msgstr ""
 
-#: db/models/fields.py:279
+#: db/models/fields.py:278
 msgid "Polygon"
 msgstr "Polügon"
 
-#: db/models/fields.py:283
+#: db/models/fields.py:282
 msgid "Multi-point"
 msgstr "Multi-punkt"
 
-#: db/models/fields.py:287
+#: db/models/fields.py:286
 msgid "Multi-line string"
 msgstr "Mitmerealine string"
 
-#: db/models/fields.py:291
+#: db/models/fields.py:290
 msgid "Multi polygon"
 msgstr "Multi-polügon"
 
-#: db/models/fields.py:295
+#: db/models/fields.py:294
 msgid "Geometry collection"
 msgstr "Geomeetriakogum"
 
-#: forms/fields.py:19
+#: forms/fields.py:23
 msgid "No geometry value provided."
 msgstr "Geomeetriline väärtus puudub."
 
-#: forms/fields.py:20
+#: forms/fields.py:24
 msgid "Invalid geometry value."
 msgstr "Vigane geomeetriline väärtus."
 
-#: forms/fields.py:21
+#: forms/fields.py:25
 msgid "Invalid geometry type."
 msgstr "Vigane geomeetriline tüüp."
 
-#: forms/fields.py:22
+#: forms/fields.py:26
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."

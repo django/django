@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ali Ismayilov <ali@ismailov.info>, 2011, 2012.
+# Ali Ismayilov <ali@ismailov.info>, 2011-2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-05-08 13:33+0000\n"
-"Last-Translator: Ali Ismayilov <ali@ismailov.info>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-29 08:25+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/projects/p/django/"
 "language/az/)\n"
 "MIME-Version: 1.0\n"
@@ -93,7 +93,7 @@ msgstr ""
 "Bəzi sahələrdə etdiyiniz dəyişiklikləri hələ yadda saxlamamışıq. Əgər "
 "əməliyyatı işə salsanız, dəyişikliklər əldən gedəcək."
 
-#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
+#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -112,14 +112,14 @@ msgstr ""
 "Siz əməliyyatı seçmisiniz və heç bir sahəyə dəyişiklik etməmisiniz. Siz "
 "yəqin ki, Yadda saxla düyməsini deyil, Getdik düyməsini axtarırsınız."
 
-#: static/admin/js/calendar.js:26
+#: static/admin/js/calendar.js:8
 msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr ""
 "Yanvar Fevral Mart Aprel May İyun İyul Avqust Sentyabr Oktyabr Noyabr Dekabr"
 
-#: static/admin/js/calendar.js:27
+#: static/admin/js/calendar.js:9
 msgid "S M T W T F S"
 msgstr "B B Ç Ç C C Ş"
 
@@ -128,53 +128,53 @@ msgstr "B B Ç Ç C C Ş"
 msgid "Show"
 msgstr "Göstər"
 
-#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
+#: static/admin/js/collapse.js:16 static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "Gizlət"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:49
-#: static/admin/js/admin/DateTimeShortcuts.js:85
+#: static/admin/js/admin/DateTimeShortcuts.js:52
+#: static/admin/js/admin/DateTimeShortcuts.js:88
 msgid "Now"
 msgstr "İndi"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:53
+#: static/admin/js/admin/DateTimeShortcuts.js:56
 msgid "Clock"
 msgstr "Saat"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:81
+#: static/admin/js/admin/DateTimeShortcuts.js:84
 msgid "Choose a time"
 msgstr "Vaxtı seçin"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:86
+#: static/admin/js/admin/DateTimeShortcuts.js:89
 msgid "Midnight"
 msgstr "Gecə yarısı"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:87
+#: static/admin/js/admin/DateTimeShortcuts.js:90
 msgid "6 a.m."
 msgstr "6 a.m."
 
-#: static/admin/js/admin/DateTimeShortcuts.js:88
+#: static/admin/js/admin/DateTimeShortcuts.js:91
 msgid "Noon"
 msgstr "Günorta"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:92
-#: static/admin/js/admin/DateTimeShortcuts.js:204
+#: static/admin/js/admin/DateTimeShortcuts.js:95
+#: static/admin/js/admin/DateTimeShortcuts.js:208
 msgid "Cancel"
 msgstr "Ləğv et"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:144
-#: static/admin/js/admin/DateTimeShortcuts.js:197
+#: static/admin/js/admin/DateTimeShortcuts.js:148
+#: static/admin/js/admin/DateTimeShortcuts.js:201
 msgid "Today"
 msgstr "Bu gün"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:148
+#: static/admin/js/admin/DateTimeShortcuts.js:152
 msgid "Calendar"
 msgstr "Təqvim"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:195
+#: static/admin/js/admin/DateTimeShortcuts.js:199
 msgid "Yesterday"
 msgstr "Dünən"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:199
+#: static/admin/js/admin/DateTimeShortcuts.js:203
 msgid "Tomorrow"
 msgstr "Sabah"

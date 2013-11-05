@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-#   <ilay@ilay.tw>, 2012.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# quantum9876 <quantum9876@gmail.com>, 2011.
+# ilay <ilay@ilay.tw>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# quantum9876 <quantum9876@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-10-18 10:56+0000\n"
-"Last-Translator: ilay <ilay@ilay.tw>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-29 09:01+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -80,18 +80,18 @@ msgstr ""
 msgid "registration required"
 msgstr "請先註冊"
 
-#: models.py:17
+#: models.py:18
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "如果此項被選取，則只有登入的使用者可以檢視頁面。"
 
-#: models.py:22
+#: models.py:24
 msgid "flat page"
 msgstr "簡平頁面"
 
-#: models.py:23
+#: models.py:25
 msgid "flat pages"
 msgstr "簡平頁面"
 
-#: tests/forms.py:97
+#: tests/test_forms.py:98
 msgid "This field is required."
 msgstr "這個欄位是必須的。"

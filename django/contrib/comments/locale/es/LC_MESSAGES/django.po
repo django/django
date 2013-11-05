@@ -1,15 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Marc Garcia <garcia.marc@gmail.com>, 2011.
+# Antoni Aloy <aaloy@apsl.net>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Marc Garcia <garcia.marc@gmail.com>, 2011
+# Sebastián Ramírez Magrí <sebasmagri@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Marc Garcia <garcia.marc@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-06-07 01:28+0000\n"
+"Last-Translator: Sebastián Ramírez Magrí <sebasmagri@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -20,48 +22,44 @@ msgstr ""
 
 #: admin.py:25
 msgid "Content"
-msgstr "contenido"
+msgstr "Contenido"
 
 #: admin.py:28
 msgid "Metadata"
-msgstr "metadatos"
+msgstr "Metadatos"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "marcado"
-msgstr[1] "marcados"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] "%d comentario ha sido marcado"
+msgstr[1] "%d comentarios han sido marcados"
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
-msgstr "Marcar los comentarios seleccionados"
-
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "aprobado"
-msgstr[1] "aprobados"
+msgstr "Marca los comentarios seleccionados"
 
 #: admin.py:61
-msgid "Approve selected comments"
-msgstr "aprobar los comentarios seleccionados"
-
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "eliminado"
-msgstr[1] "eliminados"
-
-#: admin.py:66
-msgid "Remove selected comments"
-msgstr "Eliminar los comentarios seleccionados"
-
-#: admin.py:78
 #, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "1 comentarios ha sido %(action)s satisfactoriamente."
-msgstr[1] "%(count)s comentarios han sido %(action)s satisfactoriamente."
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "%d comentario ha sido aprobado"
+msgstr[1] "%d comentarios han sido aprobados"
+
+#: admin.py:63
+msgid "Approve selected comments"
+msgstr "Aprueba los comentarios seleccionados"
+
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "%d comentario fue eliminado con éxito"
+msgstr[1] "%d comentarios fueron eliminados con éxito"
+
+#: admin.py:69
+msgid "Remove selected comments"
+msgstr "Elimina los comentarios seleccionados"
 
 #: feeds.py:14
 #, python-format
@@ -79,7 +77,7 @@ msgstr "Nombre"
 
 #: forms.py:97
 msgid "Email address"
-msgstr "dirección de correo electrónico"
+msgstr "Dirección de correo electrónico"
 
 #: forms.py:98
 msgid "URL"
@@ -293,9 +291,11 @@ msgstr "Previsualizar su comentario"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Por favor, corrija el siguiente error."
-msgstr[1] "Por favor, corrija los siguientes errores."
+msgstr "Por favor, corrija los siguientes errores."
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "Por favor corrija los siguientes errores"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

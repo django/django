@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# bhaskar teja yerneni <prudhviy@gmail.com>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Veeven  <veeven@gmail.com>, 2011.
+# bhaskar teja yerneni <prudhviy@gmail.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
+# వీవెన్ వీరపనేని <veeven@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: bhaskar teja yerneni <prudhviy@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-05-26 08:39+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Telugu (http://www.transifex.com/projects/p/django/language/"
 "te/)\n"
 "MIME-Version: 1.0\n"
@@ -28,41 +28,37 @@ msgid "Metadata"
 msgstr ""
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr ""
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "అంగికరించబడినది"
-msgstr[1] "అంగికరించబడినది"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "ఎంచుకున్న వ్యాఖ్యానమునలను సంమతించుము"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "తీసివేయబడినది "
-msgstr[1] "తీసివేయబడినది "
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] ""
+msgstr[1] ""
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "ఎంచుకున్న వ్యాఖ్యానమునలను తీసివేయుము "
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "1 వ్యాఖ్యానము జయప్రదముగా %(action)s."
-msgstr[1] "%(count)s వ్యాఖ్యానములు జయప్రదముగా %(action)s."
 
 #: feeds.py:14
 #, python-format
@@ -279,9 +275,11 @@ msgstr "వ్యాఖ్యను ముందస్తు గా వీక్
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "దయచేసి క్రింద వున్న వ్యాఖ్యను సరిచేసుకోండి "
-msgstr[1] "దయచేసి క్రింద వున్న వ్యాఖ్యలను సరిచేసుకోండి "
+msgstr "దయచేసి క్రింద వున్న వ్యాఖ్యలను సరిచేసుకోండి "
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr ""
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

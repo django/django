@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Besnik <besnik@programeshqip.org>, 2011.
+# Besnik <besnik@programeshqip.org>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-11-25 19:30+0000\n"
-"Last-Translator: Besnik <besnik@programeshqip.org>\n"
+"POT-Creation-Date: 2013-08-16 15:07+0200\n"
+"PO-Revision-Date: 2013-08-17 09:27+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -29,10 +29,6 @@ msgstr "hapi i mëparshëm"
 msgid "submit"
 msgstr "parashtroje"
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
+#: wizard/views.py:275
+msgid "ManagementForm data is missing or has been tampered."
 msgstr ""
-"Kërkojmë ndjesë, por formulari juaj ka skaduar. Ju lutem, vazhdoni "
-"plotësimin e formularit nga kjo faqe."

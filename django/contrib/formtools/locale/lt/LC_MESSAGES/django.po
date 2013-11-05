@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# lauris <lauris@runbox.com>, 2011.
-# Simonas Simas <simonas@kazlauskas.me>, 2012.
+# lauris <lauris@runbox.com>, 2011
+# Simonas Kazlauskas <simonas@kazlauskas.me>, 2012-2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-09 16:54+0000\n"
+"POT-Creation-Date: 2013-08-16 15:07+0200\n"
+"PO-Revision-Date: 2013-10-23 16:04+0000\n"
 "Last-Translator: Simonas Kazlauskas <simonas@kazlauskas.me>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/projects/p/django/"
 "language/lt/)\n"
@@ -31,10 +31,6 @@ msgstr "praeitas žingsnis"
 msgid "submit"
 msgstr "pateikti"
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
-msgstr ""
-"Atsiprašome, tačiau jūsų forma nebegalioja. Prašau tęsti anketos pildymą "
-"šiame puslapyje."
+#: wizard/views.py:275
+msgid "ManagementForm data is missing or has been tampered."
+msgstr "ManagementForm duomenys yra sugadinti arba neegzistuoja."

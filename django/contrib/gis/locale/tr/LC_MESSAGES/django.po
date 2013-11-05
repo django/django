@@ -1,23 +1,23 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Murat Çorlu <muratcorlu@gmail.com>, 2012.
-# Murat Sahin <martinamca@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Murat Çorlu <muratcorlu@gmail.com>, 2012
+# Murat Sahin <martinamca@gmail.com>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-08 21:17+0000\n"
-"Last-Translator: Murat Sahin <martinamca@gmail.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-24 18:55+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: tr\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: views.py:9
 msgid "No feeds are registered."
@@ -33,47 +33,47 @@ msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "Taban GIS alanı -- OpenGIS Spesifikasyonu Geometri türüne eşleşmektedir."
 
-#: db/models/fields.py:271
+#: db/models/fields.py:270
 msgid "Point"
 msgstr "Nokta"
 
-#: db/models/fields.py:275
+#: db/models/fields.py:274
 msgid "Line string"
 msgstr "Satır dizisi"
 
-#: db/models/fields.py:279
+#: db/models/fields.py:278
 msgid "Polygon"
 msgstr "Poligon"
 
-#: db/models/fields.py:283
+#: db/models/fields.py:282
 msgid "Multi-point"
 msgstr "Çok noktalı"
 
-#: db/models/fields.py:287
+#: db/models/fields.py:286
 msgid "Multi-line string"
 msgstr "Çok satırlı metin"
 
-#: db/models/fields.py:291
+#: db/models/fields.py:290
 msgid "Multi polygon"
 msgstr "Çoklu poligon"
 
-#: db/models/fields.py:295
+#: db/models/fields.py:294
 msgid "Geometry collection"
 msgstr "Geometri kolleksiyonu"
 
-#: forms/fields.py:19
+#: forms/fields.py:23
 msgid "No geometry value provided."
 msgstr "Hiçbir geometri değeri verilmemiştir."
 
-#: forms/fields.py:20
+#: forms/fields.py:24
 msgid "Invalid geometry value."
 msgstr "Geçersiz geometri değeri."
 
-#: forms/fields.py:21
+#: forms/fields.py:25
 msgid "Invalid geometry type."
 msgstr "Geçersiz geometri türü."
 
-#: forms/fields.py:22
+#: forms/fields.py:26
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."

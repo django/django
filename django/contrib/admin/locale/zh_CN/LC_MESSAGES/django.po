@@ -1,18 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Lele Long <schemacs@gmail.com>, 2011.
-# slene <vslene@gmail.com>, 2011.
-# Ziang Song <songziang@gmail.com>, 2012.
-# 磊 施 <leiarix@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Lele Long <schemacs@gmail.com>, 2011
+# 鸿宇 欧阳 <ouyanghongyu@gmail.com>, 2013
+# seansay <iseansay@gmail.com>, 2013
+# slene <vslene@gmail.com>, 2011
+# Ziang Song <songziang@gmail.com>, 2012
+# Kevin Shi <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:52+0000\n"
-"Last-Translator: 磊 施 <leiarix@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-08-17 08:29+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -21,21 +23,21 @@ msgstr ""
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: actions.py:48
+#: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "成功删除了 %(count)d 个 %(items)s"
 
-#: actions.py:60 options.py:1347
+#: actions.py:61 options.py:1418
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "无法删除 %(name)s"
 
-#: actions.py:62 options.py:1349
+#: actions.py:63 options.py:1420
 msgid "Are you sure?"
 msgstr "你确定吗？"
 
-#: actions.py:83
+#: actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "删除所选的 %(verbose_name_plural)s"
@@ -81,7 +83,7 @@ msgstr "今年"
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
-msgstr ""
+msgstr "请输入一个正确的 %(username)s 和密码. 注意他们都是区分大小写的."
 
 #: forms.py:19
 msgid "Please log in again, because your session has expired."
@@ -91,92 +93,92 @@ msgstr "请重新登录，因为你的会话已经过期。"
 msgid "Action:"
 msgstr "动作"
 
-#: models.py:24
+#: models.py:25
 msgid "action time"
 msgstr "动作时间"
 
-#: models.py:27
+#: models.py:28
 msgid "object id"
 msgstr "对象id"
 
-#: models.py:28
+#: models.py:29
 msgid "object repr"
 msgstr "对象表示"
 
-#: models.py:29
+#: models.py:30
 msgid "action flag"
 msgstr "动作标志"
 
-#: models.py:30
+#: models.py:31
 msgid "change message"
 msgstr "修改消息"
 
-#: models.py:35
+#: models.py:36
 msgid "log entry"
 msgstr "日志记录"
 
-#: models.py:36
+#: models.py:37
 msgid "log entries"
 msgstr "日志记录"
 
-#: models.py:45
+#: models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "已经添加了 \"%(object)s\"."
 
-#: models.py:47
+#: models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "修改了 \"%(object)s\" - %(changes)s"
 
-#: models.py:52
+#: models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "删除了 \"%(object)s.\""
 
-#: models.py:54
+#: models.py:55
 msgid "LogEntry Object"
 msgstr "LogEntry对象"
 
-#: options.py:156 options.py:172
+#: options.py:173 options.py:202
 msgid "None"
 msgstr "无"
 
-#: options.py:684
+#: options.py:763
 #, python-format
 msgid "Changed %s."
 msgstr "已修改 %s 。"
 
-#: options.py:684 options.py:694
+#: options.py:763 options.py:773 options.py:1570
 msgid "and"
 msgstr "和"
 
-#: options.py:689
+#: options.py:768
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "已添加 %(name)s \"%(object)s\"."
 
-#: options.py:693
+#: options.py:772
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "已变更 %(list)s for %(name)s \"%(object)s\"."
 
-#: options.py:698
+#: options.py:777
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "已删除 %(name)s \"%(object)s\"."
 
-#: options.py:702
+#: options.py:781
 msgid "No fields changed."
 msgstr "没有字段被修改。"
 
-#: options.py:807 options.py:860
+#: options.py:884 options.py:927
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" 添加成功。你可以在下面再次编辑它。"
 
-#: options.py:835
+#: options.py:902
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -184,19 +186,19 @@ msgid ""
 msgstr ""
 " %(name)s \"%(obj)s\" 已经成功添加。你可以在下面添加另外的 %(name)s  。"
 
-#: options.py:839
+#: options.py:906
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" 添加成功。"
 
-#: options.py:853
+#: options.py:920
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
 msgstr " %(name)s \"%(obj)s\" 已经成功进行变更。你可以在下面再次编辑它。"
 
-#: options.py:867
+#: options.py:934
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -204,74 +206,89 @@ msgid ""
 msgstr ""
 " %(name)s \"%(obj)s\" 已经成功进行变更。你可以在下面添加其它的 %(name)s。"
 
-#: options.py:873
+#: options.py:940
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" 修改成功。"
 
-#: options.py:951 options.py:1211
+#: options.py:1018 options.py:1278
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr "条目必须选中以对其进行操作。没有任何条目被更改。"
 
-#: options.py:970
+#: options.py:1037
 msgid "No action selected."
 msgstr "未选择动作"
 
-#: options.py:1050
+#: options.py:1117
 #, python-format
 msgid "Add %s"
 msgstr "增加 %s"
 
-#: options.py:1074 options.py:1319
+#: options.py:1141 options.py:1386
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "具有主键 %(key)r 的对象 %(name)s 不存在。"
 
-#: options.py:1140
+#: options.py:1207
 #, python-format
 msgid "Change %s"
 msgstr "修改 %s"
 
-#: options.py:1190
+#: options.py:1257
 msgid "Database error"
 msgstr "数据库错误"
 
-#: options.py:1253
+#: options.py:1320
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "总共 %(count)s 个 %(name)s 变更成功。"
 
-#: options.py:1280
+#: options.py:1347
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "选中了 %(total_count)s 个"
 
-#: options.py:1285
+#: options.py:1352
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s 个中 0 个被选"
 
-#: options.py:1335
+#: options.py:1403
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" 删除成功。"
 
-#: options.py:1382
+#: options.py:1459
 #, python-format
 msgid "Change history: %s"
 msgstr "变更历史： %s"
 
-#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#. Translators: Model verbose name and instance representation, suitable to be
+#. an item in a list
+#: options.py:1564
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#: options.py:1571
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+""
+
+#: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19
 #: views/decorators.py:24
 msgid "Log in"
 msgstr "登录"
 
-#: sites.py:388
+#: sites.py:386
 msgid "Site administration"
 msgstr "站点管理"
 
@@ -292,15 +309,15 @@ msgstr "时间："
 msgid "Lookup"
 msgstr "查询"
 
-#: widgets.py:271
+#: widgets.py:260
 msgid "Add Another"
 msgstr "添加另一个"
 
-#: widgets.py:316
+#: widgets.py:302
 msgid "Currently:"
 msgstr "当前："
 
-#: widgets.py:317
+#: widgets.py:303
 msgid "Change:"
 msgstr "更改："
 
@@ -426,8 +443,14 @@ msgstr "在站点上查看"
 #: templates/admin/auth/user/change_password.html:27
 #: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "请修正下面的错误。"
+msgstr "请修正下面的错误。"
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the errors below."
+msgstr ""
 
 #: templates/admin/change_list.html:58
 #, python-format
@@ -767,11 +790,17 @@ msgstr "密码重设成功"
 
 #: templates/registration/password_reset_done.html:17
 msgid ""
-"We've emailed you instructions for setting your password to the email "
-"address you submitted. You should be receiving it shortly."
+"We've emailed you instructions for setting your password. You should be "
+"receiving them shortly."
 msgstr ""
-"我们已经使用你提供的电子邮件地址发送了电子邮件，以便你设置密码。不久之后你应"
-"当可以收到这封邮件。"
+"我们将把设置你提供的email地址的密码的指南发到你的邮箱。 你很快将会收到。"
+
+#: templates/registration/password_reset_done.html:19
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"如果你没有收到邮件, 请确保您所输入的地址是正确的, 并检查您的垃圾邮件文件夹."
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
@@ -813,20 +842,20 @@ msgstr "电子邮件地址："
 msgid "Reset my password"
 msgstr "重设我的密码"
 
-#: templatetags/admin_list.py:344
+#: templatetags/admin_list.py:348
 msgid "All dates"
 msgstr "所有日期"
 
-#: views/main.py:33
+#: views/main.py:35
 msgid "(None)"
 msgstr "(None)"
 
-#: views/main.py:76
+#: views/main.py:84
 #, python-format
 msgid "Select %s"
 msgstr "选择 %s"
 
-#: views/main.py:78
+#: views/main.py:86
 #, python-format
 msgid "Select %s to change"
 msgstr "选择 %s 来修改"

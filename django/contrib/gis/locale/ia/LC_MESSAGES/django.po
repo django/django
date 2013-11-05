@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Martijn Dekker <mcdutchie@hotmail.com>, 2012.
+# Martijn Dekker <mcdutchie@hotmail.com>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-08-20 19:30+0000\n"
-"Last-Translator: Martijn Dekker <mcdutchie@hotmail.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-24 18:56+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Interlingua (http://www.transifex.com/projects/p/django/"
 "language/ia/)\n"
 "MIME-Version: 1.0\n"
@@ -32,47 +32,47 @@ msgstr ""
 "Le campo GIS de base. Corresponde al typo geometric del specification "
 "OpenGIS."
 
-#: db/models/fields.py:271
+#: db/models/fields.py:270
 msgid "Point"
 msgstr "Puncto"
 
-#: db/models/fields.py:275
+#: db/models/fields.py:274
 msgid "Line string"
 msgstr "Texto de linea"
 
-#: db/models/fields.py:279
+#: db/models/fields.py:278
 msgid "Polygon"
 msgstr "Polygono"
 
-#: db/models/fields.py:283
+#: db/models/fields.py:282
 msgid "Multi-point"
 msgstr "Plure punctos"
 
-#: db/models/fields.py:287
+#: db/models/fields.py:286
 msgid "Multi-line string"
 msgstr "Texto con plure lineas"
 
-#: db/models/fields.py:291
+#: db/models/fields.py:290
 msgid "Multi polygon"
 msgstr "Plure polygonos"
 
-#: db/models/fields.py:295
+#: db/models/fields.py:294
 msgid "Geometry collection"
 msgstr "Collection geometric"
 
-#: forms/fields.py:19
+#: forms/fields.py:23
 msgid "No geometry value provided."
 msgstr "Nulle valor geometric fornite."
 
-#: forms/fields.py:20
+#: forms/fields.py:24
 msgid "Invalid geometry value."
 msgstr "Valor geometric invalide."
 
-#: forms/fields.py:21
+#: forms/fields.py:25
 msgid "Invalid geometry type."
 msgstr "Typo geometric invalide."
 
-#: forms/fields.py:22
+#: forms/fields.py:26
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."

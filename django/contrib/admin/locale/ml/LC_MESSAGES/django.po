@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Junaid  <junu.pv@gmail.com>, 2012.
-# Rajeesh Nair <rajeeshrnair@gmail.com>, 2011, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Junaid <junu.pv@gmail.com>, 2012
+# Rajeesh Nair <rajeeshrnair@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:52+0000\n"
-"Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-08-17 08:29+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Malayalam (http://www.transifex.com/projects/p/django/"
 "language/ml/)\n"
 "MIME-Version: 1.0\n"
@@ -19,21 +19,21 @@ msgstr ""
 "Language: ml\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: actions.py:48
+#: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s വിജയകരമായി ഡിലീറ്റ് ചെയ്തു."
 
-#: actions.py:60 options.py:1347
+#: actions.py:61 options.py:1418
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Cannot delete %(name)s"
 
-#: actions.py:62 options.py:1349
+#: actions.py:63 options.py:1420
 msgid "Are you sure?"
 msgstr "തീര്‍ച്ചയാണോ?"
 
-#: actions.py:83
+#: actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "തെരഞ്ഞെടുത്ത %(verbose_name_plural)s ഡിലീറ്റ് ചെയ്യുക."
@@ -89,187 +89,201 @@ msgstr "താങ്കളുടെ സെഷന്റെ കാലാവധി 
 msgid "Action:"
 msgstr "ആക്ഷന്‍"
 
-#: models.py:24
+#: models.py:25
 msgid "action time"
 msgstr "ആക്ഷന്‍ സമയം"
 
-#: models.py:27
+#: models.py:28
 msgid "object id"
 msgstr "ഒബ്ജെക്ട് ഐഡി"
 
-#: models.py:28
+#: models.py:29
 msgid "object repr"
 msgstr "ഒബ്ജെക്ട് സൂചന"
 
-#: models.py:29
+#: models.py:30
 msgid "action flag"
 msgstr "ആക്ഷന്‍ ഫ്ളാഗ്"
 
-#: models.py:30
+#: models.py:31
 msgid "change message"
 msgstr "സന്ദേശം മാറ്റുക"
 
-#: models.py:35
+#: models.py:36
 msgid "log entry"
 msgstr "ലോഗ് എന്ട്രി"
 
-#: models.py:36
+#: models.py:37
 msgid "log entries"
 msgstr "ലോഗ് എന്ട്രികള്‍"
 
-#: models.py:45
+#: models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "\"%(object)s\" ചേര്‍ത്തു."
 
-#: models.py:47
+#: models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "\"%(object)s\"ല്‍ %(changes)s മാറ്റം വരുത്തി"
 
-#: models.py:52
+#: models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "\"%(object)s\" നീക്കം ചെയ്തു."
 
-#: models.py:54
+#: models.py:55
 msgid "LogEntry Object"
 msgstr "ലോഗ്‌എന്‍ട്രി വസ്തു"
 
-#: options.py:156 options.py:172
+#: options.py:173 options.py:202
 msgid "None"
 msgstr "ഒന്നുമില്ല"
 
-#: options.py:684
+#: options.py:763
 #, python-format
 msgid "Changed %s."
 msgstr "%s മാറ്റി."
 
-#: options.py:684 options.py:694
+#: options.py:763 options.py:773 options.py:1570
 msgid "and"
 msgstr "ഉം"
 
-#: options.py:689
+#: options.py:768
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" ചേര്‍ത്തു."
 
-#: options.py:693
+#: options.py:772
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" ന്റെ %(list)s മാറ്റി."
 
-#: options.py:698
+#: options.py:777
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" ഡിലീറ്റ് ചെയ്തു."
 
-#: options.py:702
+#: options.py:781
 msgid "No fields changed."
 msgstr "ഒരു മാറ്റവുമില്ല."
 
-#: options.py:807 options.py:860
+#: options.py:884 options.py:927
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" കൂട്ടി ചേര്‍ത്തു. താഴെ നിന്നും മാറ്റം വരുത്താം."
 
-#: options.py:835
+#: options.py:902
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
 "%(name)s below."
 msgstr ""
 
-#: options.py:839
+#: options.py:906
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" വിജയകരമായി കൂട്ടിച്ചേര്ത്തു."
 
-#: options.py:853
+#: options.py:920
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
 msgstr ""
 
-#: options.py:867
+#: options.py:934
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
 "%(name)s below."
 msgstr ""
 
-#: options.py:873
+#: options.py:940
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" ല്‍ മാറ്റം വരുത്തി."
 
-#: options.py:951 options.py:1211
+#: options.py:1018 options.py:1278
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr "ആക്ഷന്‍ നടപ്പിലാക്കേണ്ട വകകള്‍ തെരഞ്ഞെടുക്കണം. ഒന്നും മാറ്റിയിട്ടില്ല."
 
-#: options.py:970
+#: options.py:1037
 msgid "No action selected."
 msgstr "ആക്ഷനൊന്നും തെരഞ്ഞെടുത്തില്ല."
 
-#: options.py:1050
+#: options.py:1117
 #, python-format
 msgid "Add %s"
 msgstr "%s ചേര്‍ക്കുക"
 
-#: options.py:1074 options.py:1319
+#: options.py:1141 options.py:1386
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(key)r എന്ന പ്രാഥമിക കീ ഉള്ള %(name)s വസ്തു ഒന്നും നിലവിലില്ല."
 
-#: options.py:1140
+#: options.py:1207
 #, python-format
 msgid "Change %s"
 msgstr "%s മാറ്റാം"
 
-#: options.py:1190
+#: options.py:1257
 msgid "Database error"
 msgstr "ഡേറ്റാബേസ് തകരാറാണ്."
 
-#: options.py:1253
+#: options.py:1320
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s ല്‍ മാറ്റം വരുത്തി."
 msgstr[1] "%(count)s %(name)s ല്‍ മാറ്റം വരുത്തി."
 
-#: options.py:1280
+#: options.py:1347
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s തെരഞ്ഞെടുത്തു."
 msgstr[1] "%(total_count)sഉം തെരഞ്ഞെടുത്തു."
 
-#: options.py:1285
+#: options.py:1352
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s ല്‍ ഒന്നും തെരഞ്ഞെടുത്തില്ല."
 
-#: options.py:1335
+#: options.py:1403
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" ഡിലീറ്റ് ചെയ്തു."
 
-#: options.py:1382
+#: options.py:1459
 #, python-format
 msgid "Change history: %s"
 msgstr "%s ലെ മാറ്റങ്ങള്‍."
 
-#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#. Translators: Model verbose name and instance representation, suitable to be
+#. an item in a list
+#: options.py:1564
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr ""
+
+#: options.py:1571
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+
+#: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19
 #: views/decorators.py:24
 msgid "Log in"
 msgstr "ലോഗ്-ഇന്‍"
 
-#: sites.py:388
+#: sites.py:386
 msgid "Site administration"
 msgstr "സൈറ്റ് ഭരണം"
 
@@ -290,15 +304,15 @@ msgstr "സമയം:"
 msgid "Lookup"
 msgstr "തിരയുക"
 
-#: widgets.py:271
+#: widgets.py:260
 msgid "Add Another"
 msgstr "ഒന്നു കൂടി ചേര്‍ക്കുക"
 
-#: widgets.py:316
+#: widgets.py:302
 msgid "Currently:"
 msgstr ""
 
-#: widgets.py:317
+#: widgets.py:303
 msgid "Change:"
 msgstr ""
 
@@ -422,9 +436,14 @@ msgstr "View on site"
 #: templates/admin/auth/user/change_password.html:27
 #: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "ദയവായി താഴെയുള്ള തെറ്റ് പരിഹരിക്കുക."
-msgstr[1] "ദയവായി താഴെയുള്ള തെറ്റുകള്‍ പരിഹരിക്കുക."
+msgstr "ദയവായി താഴെയുള്ള തെറ്റുകള്‍ പരിഹരിക്കുക."
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the errors below."
+msgstr ""
 
 #: templates/admin/change_list.html:58
 #, python-format
@@ -776,8 +795,14 @@ msgstr "പാസ് വേര്‍ഡ് പുനസ്ഥാപിക്ക�
 
 #: templates/registration/password_reset_done.html:17
 msgid ""
-"We've emailed you instructions for setting your password to the email "
-"address you submitted. You should be receiving it shortly."
+"We've emailed you instructions for setting your password. You should be "
+"receiving them shortly."
+msgstr ""
+
+#: templates/registration/password_reset_done.html:19
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
 msgstr ""
 
 #: templates/registration/password_reset_email.html:2
@@ -818,20 +843,20 @@ msgstr ""
 msgid "Reset my password"
 msgstr "എന്റെ പാസ് വേര്‍ഡ് പുനസ്ഥാപിക്കൂ"
 
-#: templatetags/admin_list.py:344
+#: templatetags/admin_list.py:348
 msgid "All dates"
 msgstr "എല്ലാ തീയതികളും"
 
-#: views/main.py:33
+#: views/main.py:35
 msgid "(None)"
 msgstr "(None)"
 
-#: views/main.py:76
+#: views/main.py:84
 #, python-format
 msgid "Select %s"
 msgstr "%s തെരഞ്ഞെടുക്കൂ"
 
-#: views/main.py:78
+#: views/main.py:86
 #, python-format
 msgid "Select %s to change"
 msgstr "മാറ്റാനുള്ള %s തെരഞ്ഞെടുക്കൂ"

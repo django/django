@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Baptiste  <baptiste+transifex@darthenay.fr>, 2012.
+# Baptiste <baptiste+transifex@darthenay.fr>, 2012-2013
+# Baptiste <baptiste+transifex@darthenay.fr>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2012-12-16 08:51+0000\n"
+"POT-Creation-Date: 2013-10-09 20:17+0200\n"
+"PO-Revision-Date: 2013-10-23 14:42+0000\n"
 "Last-Translator: Baptiste <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/projects/p/django/"
 "language/eo/)\n"
@@ -29,57 +30,58 @@ msgstr "Permesoj"
 msgid "Important dates"
 msgstr "Gravaj datoj"
 
-#: admin.py:126
+#: admin.py:132
 msgid "Password changed successfully."
 msgstr "Pasvorto suksese ŝanĝita."
 
-#: admin.py:136
+#: admin.py:142
 #, python-format
 msgid "Change password: %s"
 msgstr "Ŝanĝi pasvorton: %s"
 
-#: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
+#: forms.py:33 tests/test_forms.py:261 tests/test_forms.py:266
+#: tests/test_forms.py:407
 msgid "No password set."
-msgstr ""
+msgstr "Neniu pasvorto agordita."
 
-#: forms.py:37 tests/forms.py:261 tests/forms.py:267
+#: forms.py:39 tests/test_forms.py:271 tests/test_forms.py:277
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr ""
+msgstr "Nevalida pasvorta formato, aŭ nekonata haketa algoritmo."
 
-#: forms.py:67
+#: forms.py:72
 msgid "A user with that username already exists."
 msgstr "Uzanto kun sama salutnomo jam ekzistas."
 
-#: forms.py:68 forms.py:269 forms.py:329
+#: forms.py:73 forms.py:254 forms.py:314
 msgid "The two password fields didn't match."
 msgstr "La du pasvotaj kampoj ne kongruas."
 
-#: forms.py:70 forms.py:115
+#: forms.py:75 forms.py:120
 msgid "Username"
 msgstr "Salutnomo"
 
-#: forms.py:72 forms.py:116
+#: forms.py:77 forms.py:121
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr "Petita. 30 karakteroj aŭ malpli. Literoj, ciferoj kaj @/./+/-/_ nure."
 
-#: forms.py:75 forms.py:119
+#: forms.py:80 forms.py:124
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr ""
 "Ĉi-tiu valoro povas enhavi nur literoj, ciferoj kaj la @/./+/-/_ karakteroj."
 
-#: forms.py:77 forms.py:121 forms.py:148 forms.py:331
+#: forms.py:82 forms.py:126 forms.py:153 forms.py:316
 msgid "Password"
 msgstr "Pasvorto"
 
-#: forms.py:79
+#: forms.py:84
 msgid "Password confirmation"
 msgstr "Pasvorta konfirmo"
 
-#: forms.py:81
+#: forms.py:86
 msgid "Enter the same password as above, for verification."
 msgstr "Entajpu la saman pasvorton kiel supre, por konfirmo."
 
-#: forms.py:122
+#: forms.py:127
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -89,84 +91,67 @@ msgstr ""
 "uzanto, sed vi povas ŝanĝi la pasvorton uzante <a href=\"password/\">tiu "
 "formalaro</a>."
 
-#: forms.py:151
+#: forms.py:156
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
+"Bonvolu enigi korektan %(username)s-n kaj pasvorton. Notu, ke ambaŭ kampoj "
+"povas esti usklecodistingaj."
 
-#: forms.py:153
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-"Ŝajnas ke via retumilo ne havas kuketoj enŝaltitaj. Kuketoj estas postulitaj "
-"por ensaluti."
-
-#: forms.py:155
+#: forms.py:158
 msgid "This account is inactive."
 msgstr "Ĉi-tiu konto ne estas aktiva."
 
 #: forms.py:206
-msgid ""
-"That email address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-
-#: forms.py:208 tests/forms.py:374
-msgid ""
-"The user account associated with this email address cannot reset the "
-"password."
-msgstr ""
-
-#: forms.py:211
 msgid "Email"
-msgstr ""
+msgstr "Retpoŝto"
 
-#: forms.py:271
+#: forms.py:256
 msgid "New password"
 msgstr "Nova pasvorto"
 
-#: forms.py:273
+#: forms.py:258
 msgid "New password confirmation"
 msgstr "Nova pasvorto por konfirmo"
 
-#: forms.py:302
+#: forms.py:287
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
 "Via malnova pasvorto estis nekorekte tajpita. Bonvolu denove entajpi ĝin."
 
-#: forms.py:305
+#: forms.py:290
 msgid "Old password"
 msgstr "Malnova pasvorto"
 
-#: forms.py:333
+#: forms.py:318
 msgid "Password (again)"
 msgstr "Pasvorto (denove)"
 
-#: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
-#: hashers.py:412
+#: hashers.py:243 hashers.py:317 hashers.py:365 hashers.py:393 hashers.py:426
+#: hashers.py:459 hashers.py:493
 msgid "algorithm"
 msgstr "algoritmo"
 
-#: hashers.py:242
+#: hashers.py:244
 msgid "iterations"
 msgstr "iteracioj"
 
-#: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
+#: hashers.py:245 hashers.py:319 hashers.py:366 hashers.py:394 hashers.py:494
 msgid "salt"
 msgstr "salo"
 
-#: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
+#: hashers.py:246 hashers.py:367 hashers.py:395 hashers.py:427 hashers.py:460
+#: hashers.py:495
 msgid "hash"
 msgstr "haketo"
 
-#: hashers.py:293
+#: hashers.py:318
 msgid "work factor"
 msgstr "laborfaktoro"
 
-#: hashers.py:295
+#: hashers.py:320
 msgid "checksum"
 msgstr "kontrolsumo"
 
@@ -190,7 +175,7 @@ msgstr "permesoj"
 msgid "group"
 msgstr "grupo"
 
-#: models.py:129 models.py:301
+#: models.py:129 models.py:294
 msgid "groups"
 msgstr "grupoj"
 
@@ -202,18 +187,18 @@ msgstr "pasvorto"
 msgid "last login"
 msgstr "lasta ensaluto"
 
-#: models.py:298
+#: models.py:291
 msgid "superuser status"
 msgstr "ĉefuzanta statuso"
 
-#: models.py:299
+#: models.py:292
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
 "Indikas ke tiu uzanto havas ĉiujn permesojn, sen eksplicite asigni ilin."
 
-#: models.py:302
+#: models.py:295
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of his/her group."
@@ -221,49 +206,53 @@ msgstr ""
 "La grupoj en kiu tiu uzanto apartenas. Uzanto akiros ĉiuj permesoj donita al "
 "ĉiuj de lia/ŝia grupo."
 
-#: models.py:306
+#: models.py:299
 msgid "user permissions"
 msgstr "uzantaj permesoj"
 
-#: models.py:377
+#: models.py:301
+msgid "Specific permissions for this user."
+msgstr "Apartaj permesoj por tiu uzanto."
+
+#: models.py:368
 msgid "username"
 msgstr "salutnomo"
 
-#: models.py:378
+#: models.py:367
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
 "Petita. 30 karakteroj aŭ malpli. Literoj, nombroj kaj @/./+/-/_ karakteroj"
 
-#: models.py:381
+#: models.py:370
 msgid "Enter a valid username."
-msgstr ""
+msgstr "Enigu validan salutnomon."
 
-#: models.py:383
+#: models.py:372
 msgid "first name"
 msgstr "persona nomo"
 
-#: models.py:384
+#: models.py:373
 msgid "last name"
 msgstr "famalia nomo"
 
-#: models.py:385
+#: models.py:374
 msgid "email address"
-msgstr ""
+msgstr "retpoŝta adreso"
 
-#: models.py:386
+#: models.py:375
 msgid "staff status"
 msgstr "personara statuso"
 
-#: models.py:387
+#: models.py:376
 msgid "Designates whether the user can log into this admin site."
 msgstr "Indikas ĉu la uzanto povas saluti en ĉi-tiu administranta retejo."
 
-#: models.py:389
+#: models.py:378
 msgid "active"
 msgstr "aktiva"
 
-#: models.py:390
+#: models.py:379
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -271,19 +260,19 @@ msgstr ""
 "Indikas ĉu tiu uzanto devus esti traktita kiel aktiva. Malselekti tion ĉi "
 "anstataŭ forigi kontojn."
 
-#: models.py:392
+#: models.py:381
 msgid "date joined"
 msgstr "dato aliĝita"
 
-#: models.py:400
+#: models.py:389
 msgid "user"
 msgstr "uzanto"
 
-#: models.py:401
+#: models.py:390
 msgid "users"
 msgstr "uzantoj"
 
-#: views.py:94
+#: views.py:89
 msgid "Logged out"
 msgstr "Adiaŭita"
 
@@ -291,3 +280,7 @@ msgstr "Adiaŭita"
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Pasvorta rekomencigo ĉe %(site_name)s"
+
+#: tests/test_forms.py:325
+msgid "Enter a valid email address."
+msgstr "Enigu validan retpoŝtan adreson."

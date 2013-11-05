@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-05-26 08:39+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Latvian (http://www.transifex.com/projects/p/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -27,45 +27,40 @@ msgid "Metadata"
 msgstr "Metadati"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "atzīmēts"
-msgstr[1] "atzīmēti"
-msgstr[2] "atzīmēts"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Atzīmēt izvēlētos komentārus"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "apstiprināts"
-msgstr[1] "apstiprināti"
-msgstr[2] "apstiprināti"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Apstiprināt izvēlētos komentārus"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "dzēsts"
-msgstr[1] "dzēsti"
-msgstr[2] "dzēsts"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Dzēst izvēlētos komentārus"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "%(count)s komentārs tika veiksmīgi %(action)s."
-msgstr[1] "%(count)s komentāri tika veiksmīgi %(action)s."
-msgstr[2] "%(count)s komentāru tika veiksmīgi %(action)s."
 
 #: feeds.py:14
 #, python-format
@@ -295,10 +290,11 @@ msgstr "Pirmsskatīt komentāru"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Lūdzu izlabojiet kļūdu zemāk."
-msgstr[1] "Lūdzu izlabojiet kļūdas zemāk."
-msgstr[2] "Lūdzu, izlabojiet kļūdu zemāk."
+msgstr "Lūdzu, izlabojiet kļūdu zemāk."
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr ""
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

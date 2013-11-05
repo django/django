@@ -1,17 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jacara <baskhuujacara@gmail.com>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011, 2012.
-# Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011.
+# Jacara <baskhuujacara@gmail.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2012
+# Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-11 05:35+0000\n"
-"Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-24 18:56+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
 "MIME-Version: 1.0\n"
@@ -35,47 +35,47 @@ msgstr ""
 "Үндсэн GIS талбар -- OpenGIS газрын зургын Геометрын дүрсны онцгой төрөлтэй "
 "байна."
 
-#: db/models/fields.py:271
+#: db/models/fields.py:270
 msgid "Point"
 msgstr "Цэг"
 
-#: db/models/fields.py:275
+#: db/models/fields.py:274
 msgid "Line string"
 msgstr "Тэмдэгт мөр"
 
-#: db/models/fields.py:279
+#: db/models/fields.py:278
 msgid "Polygon"
 msgstr "Олон өнцөгт"
 
-#: db/models/fields.py:283
+#: db/models/fields.py:282
 msgid "Multi-point"
 msgstr "Олон цэг"
 
-#: db/models/fields.py:287
+#: db/models/fields.py:286
 msgid "Multi-line string"
 msgstr "Олон мөр бүхий тэмтэгт мөр"
 
-#: db/models/fields.py:291
+#: db/models/fields.py:290
 msgid "Multi polygon"
 msgstr "Олон өнцөгтийн олонлог"
 
-#: db/models/fields.py:295
+#: db/models/fields.py:294
 msgid "Geometry collection"
 msgstr "Дүрсний цуглуулга"
 
-#: forms/fields.py:19
+#: forms/fields.py:23
 msgid "No geometry value provided."
 msgstr "Дүрс оруулаагүй байна."
 
-#: forms/fields.py:20
+#: forms/fields.py:24
 msgid "Invalid geometry value."
 msgstr "Буруу дүрс байна."
 
-#: forms/fields.py:21
+#: forms/fields.py:25
 msgid "Invalid geometry type."
 msgstr "Дүрсийн төрөл буруу байна."
 
-#: forms/fields.py:22
+#: forms/fields.py:26
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."

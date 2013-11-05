@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-#   <alok.kumar@gmail.com>, 2013.
-# Chandan kumar <chandankumar.093047@gmail.com>, 2012.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Sandeep Satavlekar <sandysat@gmail.com>, 2011.
+# आलोक कुमार <alok.kumar@gmail.com>, 2013
+# Chandan kumar <chandankumar.093047@gmail.com>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# pratik kumar <kpratik217@gmail.com>, 2013
+# Sandeep Satavlekar <sandysat@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-09 10:14+0000\n"
-"Last-Translator: alkuma <alok.kumar@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-08-17 08:29+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/django/language/"
 "hi/)\n"
 "MIME-Version: 1.0\n"
@@ -20,21 +21,21 @@ msgstr ""
 "Language: hi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: actions.py:48
+#: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr "%(count)d %(items)s सफलतापूर्वक हट गयें |"
+msgstr "%(count)d %(items)s सफलतापूर्वक हटा दिया गया है| |"
 
-#: actions.py:60 options.py:1347
+#: actions.py:61 options.py:1418
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s नहीं हटा सकते"
 
-#: actions.py:62 options.py:1349
+#: actions.py:63 options.py:1420
 msgid "Are you sure?"
 msgstr "क्या आप निश्चित हैं?"
 
-#: actions.py:83
+#: actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "चुने हुए %(verbose_name_plural)s  हटा दीजिये "
@@ -92,93 +93,93 @@ msgstr "कृपया फिर से प्रवेश करें, क्
 msgid "Action:"
 msgstr " क्रिया:"
 
-#: models.py:24
+#: models.py:25
 msgid "action time"
 msgstr "कार्य समय"
 
-#: models.py:27
+#: models.py:28
 msgid "object id"
 msgstr "वस्तु आई डी "
 
-#: models.py:28
+#: models.py:29
 msgid "object repr"
 msgstr "वस्तु प्रतिनिधित्व"
 
-#: models.py:29
+#: models.py:30
 msgid "action flag"
 msgstr "कार्य ध्वज"
 
-#: models.py:30
+#: models.py:31
 msgid "change message"
 msgstr "परिवर्तन सन्देश"
 
-#: models.py:35
+#: models.py:36
 msgid "log entry"
 msgstr "लॉग प्रविष्टि"
 
-#: models.py:36
+#: models.py:37
 msgid "log entries"
 msgstr "लॉग प्रविष्टियाँ"
 
-#: models.py:45
+#: models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "\"%(object)s\" को जोड़ा गया."
 
-#: models.py:47
+#: models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "परिवर्तित \"%(object)s\" - %(changes)s "
 
-#: models.py:52
+#: models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "\"%(object)s\" को नष्ट कर दिया है."
 
-#: models.py:54
+#: models.py:55
 msgid "LogEntry Object"
 msgstr "LogEntry ऑब्जेक्ट"
 
-#: options.py:156 options.py:172
+#: options.py:173 options.py:202
 msgid "None"
 msgstr "कोई नहीं"
 
-#: options.py:684
+#: options.py:763
 #, python-format
 msgid "Changed %s."
 msgstr "%s को बदला गया हैं"
 
-#: options.py:684 options.py:694
+#: options.py:763 options.py:773 options.py:1570
 msgid "and"
 msgstr "और"
 
-#: options.py:689
+#: options.py:768
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" को जोडा गया हैं"
 
-#: options.py:693
+#: options.py:772
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" की %(list)s बदला गया है"
 
-#: options.py:698
+#: options.py:777
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" निकाला गया है"
 
-#: options.py:702
+#: options.py:781
 msgid "No fields changed."
 msgstr "कोई क्षेत्र नहीं बदला"
 
-#: options.py:807 options.py:860
+#: options.py:884 options.py:927
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" कामयाबी से जोडा गया हैं । आप इसे फिर से संपादित कर सकते हैं"
 
-#: options.py:835
+#: options.py:902
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -187,12 +188,12 @@ msgstr ""
 " %(name)s \"%(obj)s\" सफलतापूर्वक जोड़ दिया गया। आप चाहें तो नीचे एक और %(name)s "
 "जोड़ सकते हैं।"
 
-#: options.py:839
+#: options.py:906
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" को कामयाबी से जोडा गया है"
 
-#: options.py:853
+#: options.py:920
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
@@ -200,7 +201,7 @@ msgid ""
 msgstr ""
 " %(name)s \"%(obj)s\" सफलतापूर्वक जोड़ दिया गया। आप चाहें तो नीचे इसे बदल भी सकते हैं।"
 
-#: options.py:867
+#: options.py:934
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -209,76 +210,91 @@ msgstr ""
 " %(name)s \"%(obj)s\" सफलतापूर्वक बदल दिया गया। आप चाहें तो नीचे एक और %(name)s "
 "जोड़ सकते हैं।"
 
-#: options.py:873
+#: options.py:940
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" को कामयाबी से बदला गया हैं"
 
-#: options.py:951 options.py:1211
+#: options.py:1018 options.py:1278
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr "कार्रवाई हेतु आयटम सही अनुक्रम में चुने जाने चाहिए | कोई आइटम नहीं बदले गये हैं."
 
-#: options.py:970
+#: options.py:1037
 msgid "No action selected."
 msgstr "कोई कार्रवाई नहीं चुनी है |"
 
-#: options.py:1050
+#: options.py:1117
 #, python-format
 msgid "Add %s"
 msgstr "%s बढाएं"
 
-#: options.py:1074 options.py:1319
+#: options.py:1141 options.py:1386
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s  नामक कोई वस्तू जिस की प्राथमिक कुंजी %(key)r हो, अस्तित्व में नहीं हैं |"
 
-#: options.py:1140
+#: options.py:1207
 #, python-format
 msgid "Change %s"
 msgstr "%s बदलो"
 
-#: options.py:1190
+#: options.py:1257
 msgid "Database error"
 msgstr "डेटाबेस त्रुटि"
 
-#: options.py:1253
+#: options.py:1320
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s का परिवर्तन कामयाब हुआ |"
 msgstr[1] "%(count)s %(name)s का परिवर्तन कामयाब हुआ |"
 
-#: options.py:1280
+#: options.py:1347
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s चुने"
 msgstr[1] "सभी %(total_count)s चुने "
 
-#: options.py:1285
+#: options.py:1352
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s में से 0 चुने"
 
-#: options.py:1335
+#: options.py:1403
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" को कामयाबी से निकाला गया है"
 
-#: options.py:1382
+#: options.py:1459
 #, python-format
 msgid "Change history: %s"
 msgstr "इतिहास बदलो: %s"
 
-#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#. Translators: Model verbose name and instance representation, suitable to be
+#. an item in a list
+#: options.py:1564
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#: options.py:1571
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+""
+
+#: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19
 #: views/decorators.py:24
 msgid "Log in"
 msgstr "लॉगिन"
 
-#: sites.py:388
+#: sites.py:386
 msgid "Site administration"
 msgstr "साइट प्रशासन"
 
@@ -299,15 +315,15 @@ msgstr "समय:"
 msgid "Lookup"
 msgstr "लुक अप"
 
-#: widgets.py:271
+#: widgets.py:260
 msgid "Add Another"
 msgstr "अन्य बढाएं"
 
-#: widgets.py:316
+#: widgets.py:302
 msgid "Currently:"
 msgstr "फ़िलहाल - "
 
-#: widgets.py:317
+#: widgets.py:303
 msgid "Change:"
 msgstr "बदलाव -"
 
@@ -433,9 +449,14 @@ msgstr "साइट पे देखें"
 #: templates/admin/auth/user/change_password.html:27
 #: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "कृपया नीचे पायी गयी गलती ठीक करें ।"
-msgstr[1] "कृपया नीचे पायी गयी गलतियाँ ठीक करें ।"
+msgstr "कृपया नीचे पायी गयी गलतियाँ ठीक करें ।"
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the errors below."
+msgstr ""
 
 #: templates/admin/change_list.html:58
 #, python-format
@@ -785,11 +806,19 @@ msgstr "कूटशब्द पुनस्थाप सफल"
 
 #: templates/registration/password_reset_done.html:17
 msgid ""
-"We've emailed you instructions for setting your password to the email "
-"address you submitted. You should be receiving it shortly."
+"We've emailed you instructions for setting your password. You should be "
+"receiving them shortly."
 msgstr ""
 "हमने आपके डाक पते पर कूटशब्द स्थापित करने के निर्देश भेजे है । थोडी ही देर में ये आपको मिल "
 "जाएँगे।"
+
+#: templates/registration/password_reset_done.html:19
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"अगर आपको कोई ईमेल प्राप्त नई होता है,यह ध्यान रखे की आपने सही पता रजिस्ट्रीकृत किया है "
+"और आपने स्पॅम फोल्डर को जाचे|"
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
@@ -832,20 +861,20 @@ msgstr "डाक पता -"
 msgid "Reset my password"
 msgstr " मेरे कूटशब्द की पुनःस्थापना"
 
-#: templatetags/admin_list.py:344
+#: templatetags/admin_list.py:348
 msgid "All dates"
 msgstr "सभी तिथियों"
 
-#: views/main.py:33
+#: views/main.py:35
 msgid "(None)"
 msgstr "(कोई नहीं)"
 
-#: views/main.py:76
+#: views/main.py:84
 #, python-format
 msgid "Select %s"
 msgstr "%s चुनें"
 
-#: views/main.py:78
+#: views/main.py:86
 #, python-format
 msgid "Select %s to change"
 msgstr "%s के बदली के लिए चयन करें"

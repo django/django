@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# vvangelovski <vvangelovski@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-07-26 11:37+0000\n"
+"Last-Translator: vvangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/projects/p/django/"
 "language/mk/)\n"
 "MIME-Version: 1.0\n"
@@ -26,41 +27,37 @@ msgid "Metadata"
 msgstr "Метаподатоци"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "обележан"
-msgstr[1] "обележани"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] "%d коментар беше успешно обележан"
+msgstr[1] "%d коментари беа успешно обележани"
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Обележи го одбраните коментари"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "одобрен"
-msgstr[1] "одобрени"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "%d коментар беше успешно одобрен"
+msgstr[1] "%d коментари беа успешно одобрени"
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Одобри ги одбраните коментари"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "отстранет"
-msgstr[1] "отстранети"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "%d коментар беше успешно отстранет"
+msgstr[1] "%d коментари беа успешно отстранети"
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Отстрани ги избраните коментари"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "1 коментар беше успешно %(action)s."
-msgstr[1] "%(count)s коментари беа успешно %(action)s."
 
 #: feeds.py:14
 #, python-format
@@ -292,9 +289,11 @@ msgstr "Прегледајте го вашиот коментар"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Ве молам поправете ја грешката подолу."
-msgstr[1] "Ве молам поправете ги грешките подолу."
+msgstr "Ве молам поправете ја грешката подолу"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "Ве молам поправете ги грешките подолу"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

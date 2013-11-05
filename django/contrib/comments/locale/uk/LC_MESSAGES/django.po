@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Sergey Lysach <sergikoff88@gmail.com>, 2011.
-# Sergiy Kuzmenko <s.kuzmenko@gmail.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Sergey Lysach <sergikoff88@gmail.com>, 2011
+# Sergiy Kuzmenko <s.kuzmenko@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-05-26 08:39+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
 "language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -29,45 +29,40 @@ msgid "Metadata"
 msgstr "Мета-дані"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "позначено"
-msgstr[1] "позначено"
-msgstr[2] "позначено"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Позначити відзначені коментарі"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "апробовано"
-msgstr[1] "апробовано"
-msgstr[2] "апробовано"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Апробувати відзначені коментарі"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "видалено"
-msgstr[1] "видалено"
-msgstr[2] "видалено"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Видалити відзначені коментарі"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "%(count)s коментар було %(action)s."
-msgstr[1] "%(count)s коментарі було %(action)s."
-msgstr[2] "%(count)s коментарів було %(action)s."
 
 #: feeds.py:14
 #, python-format
@@ -298,10 +293,11 @@ msgstr "Попередній перегляд коментаря"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Будь ласка, виправте помилку зазначену нижче"
-msgstr[1] "Будь ласка, виправте помилки зазначені нижче"
-msgstr[2] "Будь ласка, виправте помилки зазначені нижче"
+msgstr "Будь ласка, виправте помилки зазначені нижче"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr ""
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

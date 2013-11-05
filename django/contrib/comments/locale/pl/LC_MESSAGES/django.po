@@ -1,14 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# angularcircle, 2013
+# angularcircle, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Kacper Krupa <pagenoare@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-06-14 13:24+0000\n"
+"Last-Translator: Kacper Krupa <pagenoare@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/django/language/"
 "pl/)\n"
 "MIME-Version: 1.0\n"
@@ -27,45 +30,40 @@ msgid "Metadata"
 msgstr "Metadane"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "oflagowany"
-msgstr[1] "oflagowane"
-msgstr[2] "oflagowanych"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Oflaguj wybrane komentarze"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "zaakceptowany"
-msgstr[1] "zaakceptowane"
-msgstr[2] "zaakceptowanych"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Zaakceptuj wybrane komentarze"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "usunięty"
-msgstr[1] "usunięte"
-msgstr[2] "usuniętych"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Usuń wybrane komentarze"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "1 komentarz został %(action)s"
-msgstr[1] "%(count)s komentarze zostały %(action)s"
-msgstr[2] "%(count)s komentarzy zostało %(action)s"
 
 #: feeds.py:14
 #, python-format
@@ -297,10 +295,11 @@ msgstr "Podgląd komentarza"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Proszę popraw poniższy błąd."
-msgstr[1] "Proszę popraw poniższe błędy."
-msgstr[2] "Proszę popraw poniższe błędy."
+msgstr "Proszę popraw poniższe błędy."
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "Proszę popraw poniższe błędy."
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

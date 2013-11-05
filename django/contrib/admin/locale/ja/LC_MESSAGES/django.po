@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Shinya Okano <tokibito@gmail.com>, 2012.
-# Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Shinya Okano <tokibito@gmail.com>, 2012-2013
+# Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:52+0000\n"
-"Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-10-05 06:38+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -19,21 +19,21 @@ msgstr ""
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: actions.py:48
+#: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr "%(count)d 個の %(items)sを削除しました。"
+msgstr "%(count)d 個の %(items)s を削除しました。"
 
-#: actions.py:60 options.py:1347
+#: actions.py:61 options.py:1418
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s が削除できません"
 
-#: actions.py:62 options.py:1349
+#: actions.py:63 options.py:1420
 msgid "Are you sure?"
 msgstr "よろしいですか？"
 
-#: actions.py:83
+#: actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "選択された %(verbose_name_plural)s の削除"
@@ -80,6 +80,8 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
+"スタッフアカウントの正しい%(username)sとパスワードを入力してください。どちら"
+"のフィールドも大文字と小文字は区別されます。"
 
 #: forms.py:19
 msgid "Please log in again, because your session has expired."
@@ -90,186 +92,203 @@ msgstr ""
 msgid "Action:"
 msgstr "操作:"
 
-#: models.py:24
+#: models.py:25
 msgid "action time"
 msgstr "操作時刻"
 
-#: models.py:27
+#: models.py:28
 msgid "object id"
 msgstr "オブジェクト ID"
 
-#: models.py:28
+#: models.py:29
 msgid "object repr"
 msgstr "オブジェクトの文字列表現"
 
-#: models.py:29
+#: models.py:30
 msgid "action flag"
 msgstr "操作種別"
 
-#: models.py:30
+#: models.py:31
 msgid "change message"
 msgstr "変更メッセージ"
 
-#: models.py:35
+#: models.py:36
 msgid "log entry"
 msgstr "ログエントリー"
 
-#: models.py:36
+#: models.py:37
 msgid "log entries"
 msgstr "ログエントリー"
 
-#: models.py:45
+#: models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "\"%(object)s\" を追加しました。"
 
-#: models.py:47
+#: models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "\"%(object)s\" を変更しました - %(changes)s"
 
-#: models.py:52
+#: models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "\"%(object)s\"を削除しました。"
 
-#: models.py:54
+#: models.py:55
 msgid "LogEntry Object"
 msgstr "ログエントリー オブジェクト"
 
-#: options.py:156 options.py:172
+#: options.py:173 options.py:202
 msgid "None"
 msgstr "None"
 
-#: options.py:684
+#: options.py:763
 #, python-format
 msgid "Changed %s."
 msgstr "%s を変更しました。"
 
-#: options.py:684 options.py:694
+#: options.py:763 options.py:773 options.py:1570
 msgid "and"
 msgstr "と"
 
-#: options.py:689
+#: options.py:768
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\"を追加しました。"
 
-#: options.py:693
+#: options.py:772
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" の %(list)s を変更しました。"
 
-#: options.py:698
+#: options.py:777
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" を削除しました。"
 
-#: options.py:702
+#: options.py:781
 msgid "No fields changed."
 msgstr "変更はありませんでした。"
 
-#: options.py:807 options.py:860
+#: options.py:884 options.py:927
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" を追加しました。続けて編集できます。"
 
-#: options.py:835
+#: options.py:902
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
 "%(name)s below."
 msgstr ""
+"%(name)s \"%(obj)s\" を追加しました。 別の %(name)s を以下から追加できます。"
 
-#: options.py:839
+#: options.py:906
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" を追加しました。"
 
-#: options.py:853
+#: options.py:920
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" を変更しました。 以下から再度編集できます。"
 
-#: options.py:867
+#: options.py:934
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
 "%(name)s below."
 msgstr ""
+"%(name)s \"%(obj)s\" を変更しました。 別の %(name)s を以下から追加できます。"
 
-#: options.py:873
+#: options.py:940
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" を変更しました。"
 
-#: options.py:951 options.py:1211
+#: options.py:1018 options.py:1278
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 "操作を実行するには、対象を選択する必要があります。何も変更されませんでした。"
 
-#: options.py:970
+#: options.py:1037
 msgid "No action selected."
 msgstr "操作が選択されていません。"
 
-#: options.py:1050
+#: options.py:1117
 #, python-format
 msgid "Add %s"
 msgstr "%s を追加"
 
-#: options.py:1074 options.py:1319
+#: options.py:1141 options.py:1386
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "主キーが %(key)r である %(name)s オブジェクトは存在しません。"
 
-#: options.py:1140
+#: options.py:1207
 #, python-format
 msgid "Change %s"
 msgstr "%s を変更"
 
-#: options.py:1190
+#: options.py:1257
 msgid "Database error"
 msgstr "データベースエラー"
 
-#: options.py:1253
+#: options.py:1320
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s 個の %(name)s を変更しました。"
 
-#: options.py:1280
+#: options.py:1347
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s 個選択されました"
 
-#: options.py:1285
+#: options.py:1352
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s個の内ひとつも選択されていません"
 
-#: options.py:1335
+#: options.py:1403
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" を削除しました。"
 
-#: options.py:1382
+#: options.py:1459
 #, python-format
 msgid "Change history: %s"
 msgstr "変更履歴: %s"
 
-#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#. Translators: Model verbose name and instance representation, suitable to be
+#. an item in a list
+#: options.py:1564
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#: options.py:1571
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+""
+
+#: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19
 #: views/decorators.py:24
 msgid "Log in"
 msgstr "ログイン"
 
-#: sites.py:388
+#: sites.py:386
 msgid "Site administration"
 msgstr "サイト管理"
 
@@ -290,17 +309,17 @@ msgstr "時刻:"
 msgid "Lookup"
 msgstr "検索"
 
-#: widgets.py:271
+#: widgets.py:260
 msgid "Add Another"
 msgstr "追加"
 
-#: widgets.py:316
+#: widgets.py:302
 msgid "Currently:"
-msgstr ""
+msgstr "現在の値:"
 
-#: widgets.py:317
+#: widgets.py:303
 msgid "Change:"
-msgstr ""
+msgstr "変更後:"
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -344,6 +363,8 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"エラーが発生しました。サイト管理者にメールで報告されたので、修正されるまでし"
+"ばらくお待ちください。"
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
@@ -422,8 +443,14 @@ msgstr "サイト上で表示"
 #: templates/admin/auth/user/change_password.html:27
 #: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "下記のエラーを修正してください。"
+msgstr "下記のエラーを修正してください。"
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the errors below."
+msgstr "下記のエラーを修正してください。"
 
 #: templates/admin/change_list.html:58
 #, python-format
@@ -526,7 +553,7 @@ msgstr "%(filter_title)s で絞り込む"
 #: templates/admin/index.html:20
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr ""
+msgstr "%(name)s アプリケーション内のモデル"
 
 #: templates/admin/index.html:39
 msgid "Change"
@@ -774,9 +801,19 @@ msgstr "パスワードをリセットしました"
 
 #: templates/registration/password_reset_done.html:17
 msgid ""
-"We've emailed you instructions for setting your password to the email "
-"address you submitted. You should be receiving it shortly."
+"We've emailed you instructions for setting your password. You should be "
+"receiving them shortly."
 msgstr ""
+"送信されたメールアドレスに、パスワードを変更する方法をメールしました。受け"
+"取った内容を確認してください。"
+
+#: templates/registration/password_reset_done.html:19
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"メールが届かない場合は、登録したメールアドレスを入力したか確認し、スパムフォ"
+"ルダに入っていないか確認してください。"
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
@@ -784,6 +821,8 @@ msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"このメールは %(site_name)s で、あなたのアカウントのパスワードリセットが要求さ"
+"れたため、送信されました。"
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -807,29 +846,31 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
+"パスワードを忘れましたか? メールアドレスを以下に入力すると、新しいパスワード"
+"の設定方法をお知らせします。"
 
 #: templates/registration/password_reset_form.html:21
 msgid "Email address:"
-msgstr ""
+msgstr "メールアドレス:"
 
 #: templates/registration/password_reset_form.html:21
 msgid "Reset my password"
 msgstr "パスワードをリセット"
 
-#: templatetags/admin_list.py:344
+#: templatetags/admin_list.py:348
 msgid "All dates"
 msgstr "いつでも"
 
-#: views/main.py:33
+#: views/main.py:35
 msgid "(None)"
 msgstr "(なし)"
 
-#: views/main.py:76
+#: views/main.py:84
 #, python-format
 msgid "Select %s"
 msgstr "%s を選択"
 
-#: views/main.py:78
+#: views/main.py:86
 #, python-format
 msgid "Select %s to change"
 msgstr "変更する %s を選択"

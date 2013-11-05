@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-10-18 10:56+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-29 09:01+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Tamil (http://www.transifex.com/projects/p/django/language/"
 "ta/)\n"
 "MIME-Version: 1.0\n"
@@ -77,19 +77,19 @@ msgstr ""
 msgid "registration required"
 msgstr "முன்பதிவு தேவை"
 
-#: models.py:17
+#: models.py:18
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "இது தெரிவு செய்யப்பட்டிருந்தால், உள்நுழைந்த பயனர்கள் மட்டுமே இந்தப் பக்கத்தை பார்க்க முடியும்."
 
-#: models.py:22
+#: models.py:24
 msgid "flat page"
 msgstr "எளிய பக்கம்"
 
-#: models.py:23
+#: models.py:25
 msgid "flat pages"
 msgstr "எளிய பக்கங்கள்"
 
-#: tests/forms.py:97
+#: tests/test_forms.py:98
 msgid "This field is required."
 msgstr "இந்த  புலத்தில் மதிப்பு தேவை"

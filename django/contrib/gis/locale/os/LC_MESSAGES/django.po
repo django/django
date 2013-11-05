@@ -1,0 +1,94 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Soslan Khubulov <soslanx@gmail.com>, 2013
+# Soslan Khubulov <soslanx@gmail.com>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: django-core\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-05-09 05:30+0000\n"
+"Last-Translator: Soslan Khubulov <soslanx@gmail.com>\n"
+"Language-Team: Ossetic (http://www.transifex.com/projects/p/django/language/"
+"os/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: os\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: views.py:9
+msgid "No feeds are registered."
+msgstr "Ницы лӕсӕн уыд регистрацигонд."
+
+#: views.py:19
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr "Слаг %r регистрацигонд нӕу."
+
+#: db/models/fields.py:51
+msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
+msgstr "Бындурон GIS бӕрц -- ӕндавы OpenGIS бӕрӕг геометрион хуызӕм."
+
+#: db/models/fields.py:270
+msgid "Point"
+msgstr "Стъӕлф"
+
+#: db/models/fields.py:274
+msgid "Line string"
+msgstr "Хаахы рӕнхъ"
+
+#: db/models/fields.py:278
+msgid "Polygon"
+msgstr "Бирӕкъуымон"
+
+#: db/models/fields.py:282
+msgid "Multi-point"
+msgstr "Бирӕ-стъӕлф"
+
+#: db/models/fields.py:286
+msgid "Multi-line string"
+msgstr "Бирӕ-хаххы рӕнхъ"
+
+#: db/models/fields.py:290
+msgid "Multi polygon"
+msgstr "Бирӕ бирӕкъуымон"
+
+#: db/models/fields.py:294
+msgid "Geometry collection"
+msgstr "Геометриты ӕмбырд"
+
+#: forms/fields.py:23
+msgid "No geometry value provided."
+msgstr "Геометрийы бӕрц амынд нӕу."
+
+#: forms/fields.py:24
+msgid "Invalid geometry value."
+msgstr "Геометрийы бӕрц раст нӕу."
+
+#: forms/fields.py:25
+msgid "Invalid geometry type."
+msgstr "Геометрийы хуыз раст нӕу."
+
+#: forms/fields.py:26
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+"Рӕдыд ӕрцыд SRID геометри формӕйы бынаты геометримӕ ивд куы цыдис, уӕд."
+
+#: sitemaps/views.py:46
+#, python-format
+msgid "No sitemap available for section: %r"
+msgstr "Ацы хайӕн сайтмап нӕй: %r"
+
+#: sitemaps/views.py:60
+#, python-format
+msgid "Page %s empty"
+msgstr "Фарс %s афтид у"
+
+#: sitemaps/views.py:62
+#, python-format
+msgid "No page '%s'"
+msgstr "Фарс '%s' нӕй"

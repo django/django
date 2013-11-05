@@ -1,14 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Translators:
-# Yhal Htet Aung <jumoun@gmail.com>, 2013.
+# Yhal Htet Aung <jumoun@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2013-03-18 11:10+0000\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-05-01 13:16+0000\n"
 "Last-Translator: Yhal Htet Aung <jumoun@gmail.com>\n"
 "Language-Team: Burmese (http://www.transifex.com/projects/p/django/language/"
 "my/)\n"
@@ -29,11 +28,13 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"%s သည်ရယူနိုင်သောစာရင်းဖြစ်။ အောက်ဖော်ပြပါဘူးများတွင်အချို့ကိုရွေးချယ်နိုင်ပြီးဘူးနှစ်ခုကြားရှိ\"ရွေး"
+"\"များကိုကလစ်နှိပ်။"
 
 #: static/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "ယခုဘူးထဲတွင်စာသားရိုက်ထည့်ပြီး %s ရယူနိုင်သောစာရင်းကိုစိစစ်နိုင်။"
 
 #: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
@@ -46,7 +47,7 @@ msgstr "အားလံုးရွေး"
 #: static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "%s အားလံုးကိုတစ်ကြိမ်တည်းဖြင့်ရွေးချယ်ရန်ကလစ်နှိပ်။"
 
 #: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
@@ -67,6 +68,8 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"%s သည်ရယူနိုင်သောစာရင်းဖြစ်။ အောက်ဖော်ပြပါဘူးများတွင်အချို့ကိုဖယ်ရှားနိုင်ပြီးဘူးနှစ်ခုကြားရှိ\"ဖယ်ရှား"
+"\"ကိုကလစ်နှိပ်။"
 
 #: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
@@ -75,7 +78,7 @@ msgstr "အားလံုးဖယ်ရှား"
 #: static/admin/js/SelectFilter2.js:80
 #, c-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "%s အားလံုးကိုတစ်ကြိမ်တည်းဖြင့်ဖယ်ရှားရန်ကလစ်နှိပ်။"
 
 #: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
@@ -88,7 +91,7 @@ msgid ""
 "action, your unsaved changes will be lost."
 msgstr ""
 
-#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
+#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -102,68 +105,68 @@ msgid ""
 "button."
 msgstr ""
 
-#: static/admin/js/calendar.js:26
+#: static/admin/js/calendar.js:8
 msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr ""
 
-#: static/admin/js/calendar.js:27
+#: static/admin/js/calendar.js:9
 msgid "S M T W T F S"
-msgstr ""
+msgstr "နွေ လာ ဂါ ဟူး တေး ကြာ နေ"
 
 #: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
 #: static/admin/js/collapse.min.js:1
 msgid "Show"
 msgstr "ပြသ"
 
-#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
+#: static/admin/js/collapse.js:16 static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "ဖုံးကွယ်"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:49
-#: static/admin/js/admin/DateTimeShortcuts.js:85
+#: static/admin/js/admin/DateTimeShortcuts.js:52
+#: static/admin/js/admin/DateTimeShortcuts.js:88
 msgid "Now"
 msgstr "ယခု"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:53
+#: static/admin/js/admin/DateTimeShortcuts.js:56
 msgid "Clock"
 msgstr "နာရီ"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:81
+#: static/admin/js/admin/DateTimeShortcuts.js:84
 msgid "Choose a time"
 msgstr "အချိန်ရွေးပါ"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:86
+#: static/admin/js/admin/DateTimeShortcuts.js:89
 msgid "Midnight"
 msgstr "သန်းခေါင်"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:87
+#: static/admin/js/admin/DateTimeShortcuts.js:90
 msgid "6 a.m."
 msgstr "မနက်၆နာရီ"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:88
+#: static/admin/js/admin/DateTimeShortcuts.js:91
 msgid "Noon"
 msgstr "မွန်းတည့်"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:92
-#: static/admin/js/admin/DateTimeShortcuts.js:204
+#: static/admin/js/admin/DateTimeShortcuts.js:95
+#: static/admin/js/admin/DateTimeShortcuts.js:208
 msgid "Cancel"
 msgstr "ပယ်ဖျက်"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:144
-#: static/admin/js/admin/DateTimeShortcuts.js:197
+#: static/admin/js/admin/DateTimeShortcuts.js:148
+#: static/admin/js/admin/DateTimeShortcuts.js:201
 msgid "Today"
 msgstr "ယနေ့"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:148
+#: static/admin/js/admin/DateTimeShortcuts.js:152
 msgid "Calendar"
 msgstr "ပြက္ခဒိန်"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:195
+#: static/admin/js/admin/DateTimeShortcuts.js:199
 msgid "Yesterday"
 msgstr "မနေ့"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:199
+#: static/admin/js/admin/DateTimeShortcuts.js:203
 msgid "Tomorrow"
 msgstr "မနက်ဖြန်"

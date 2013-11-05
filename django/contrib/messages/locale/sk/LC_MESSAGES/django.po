@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:16+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-06-16 12:46+0000\n"
+"Last-Translator: Marian Andre <marian@andre.sk>\n"
 "Language-Team: Slovak (http://www.transifex.com/projects/p/django/language/"
 "sk/)\n"
 "MIME-Version: 1.0\n"
@@ -17,6 +17,6 @@ msgstr ""
 "Language: sk\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-#: tests/base.py:101
+#: tests/base.py:100
 msgid "lazy message"
 msgstr "lenivá správa"

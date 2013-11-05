@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-#   <ilay@ilay.tw>, 2012.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# quantum9876 <quantum9876@gmail.com>, 2011.
+# ilay <ilay@ilay.tw>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# quantum9876 <quantum9876@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-08-06 03:15+0000\n"
-"Last-Translator: ilay <ilay@ilay.tw>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-24 18:55+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -32,47 +32,47 @@ msgstr "嵌入式語法 %r 尚未註冊。"
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "將基本的 GIS 平面以OpenGIS  Specification Geometry type對應。"
 
-#: db/models/fields.py:271
+#: db/models/fields.py:270
 msgid "Point"
 msgstr "Point 類別"
 
-#: db/models/fields.py:275
+#: db/models/fields.py:274
 msgid "Line string"
 msgstr "Line string 類別"
 
-#: db/models/fields.py:279
+#: db/models/fields.py:278
 msgid "Polygon"
 msgstr "Polygon 類別"
 
-#: db/models/fields.py:283
+#: db/models/fields.py:282
 msgid "Multi-point"
 msgstr "Multi-point 類別"
 
-#: db/models/fields.py:287
+#: db/models/fields.py:286
 msgid "Multi-line string"
 msgstr "Multi-line string 類別"
 
-#: db/models/fields.py:291
+#: db/models/fields.py:290
 msgid "Multi polygon"
 msgstr "Multi polygon 類別"
 
-#: db/models/fields.py:295
+#: db/models/fields.py:294
 msgid "Geometry collection"
 msgstr "Geometry collection (幾何型別之叢集) 類別"
 
-#: forms/fields.py:19
+#: forms/fields.py:23
 msgid "No geometry value provided."
 msgstr "沒有幾何資訊。"
 
-#: forms/fields.py:20
+#: forms/fields.py:24
 msgid "Invalid geometry value."
 msgstr "無效的幾何參數。"
 
-#: forms/fields.py:21
+#: forms/fields.py:25
 msgid "Invalid geometry type."
 msgstr "無效的幾何類型。"
 
-#: forms/fields.py:22
+#: forms/fields.py:26
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."

@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# zejn <zejn@kiberpipa.org>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-10-31 19:51+0000\n"
-"Last-Translator: mateju <>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-07-12 10:23+0000\n"
+"Last-Translator: zejn <zejn@kiberpipa.org>\n"
 "Language-Team: Slovenian (http://www.transifex.com/projects/p/django/"
 "language/sl/)\n"
 "MIME-Version: 1.0\n"
@@ -18,18 +19,22 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
 "%100==4 ? 2 : 3);\n"
 
-#: models.py:39
+#: models.py:25
+msgid "The domain name cannot contain any spaces or tabs."
+msgstr "Domena ne more vsebovati presledkov ali tabulatorjev."
+
+#: models.py:58
 msgid "domain name"
 msgstr "ime domene"
 
-#: models.py:40
+#: models.py:60
 msgid "display name"
 msgstr "prikazano ime"
 
-#: models.py:45
+#: models.py:65
 msgid "site"
 msgstr "stran"
 
-#: models.py:46
+#: models.py:66
 msgid "sites"
 msgstr "strani"

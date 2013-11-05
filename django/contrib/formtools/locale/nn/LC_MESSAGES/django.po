@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-#   <odin.omdal@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# velmont <odin.omdal@gmail.com>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-06-03 20:20+0000\n"
-"Last-Translator: velmont <odin.omdal@gmail.com>\n"
+"POT-Creation-Date: 2013-08-16 15:07+0200\n"
+"PO-Revision-Date: 2013-08-17 09:27+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Norwegian Nynorsk (http://www.transifex.com/projects/p/django/"
 "language/nn/)\n"
 "MIME-Version: 1.0\n"
@@ -30,10 +30,6 @@ msgstr "førre steg"
 msgid "submit"
 msgstr "lagre"
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
+#: wizard/views.py:275
+msgid "ManagementForm data is missing or has been tampered."
 msgstr ""
-"Du har brukt for lang tid på å fylle ut skjemaet. Fyll ut skjemaet frå denne "
-"sida."

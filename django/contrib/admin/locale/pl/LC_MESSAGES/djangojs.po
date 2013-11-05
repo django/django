@@ -1,17 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# angularcircle <angular.circle@gmail.com>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# konryd <konryd@gmail.com>, 2011.
-# Roman Barczyński <rombar@gmail.com>, 2012.
+# angularcircle, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
+# konryd <konryd@gmail.com>, 2011
+# Roman Barczyński <rombar@gmail.com>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-03-19 16:08+0000\n"
-"Last-Translator: Roman Barczyński <rombar@gmail.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-29 08:25+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/django/language/"
 "pl/)\n"
 "MIME-Version: 1.0\n"
@@ -99,7 +99,7 @@ msgstr ""
 "Zmiany w niektórych polach nie zostały zachowane. Po wykonaniu akcji zmiany "
 "te zostaną utracone."
 
-#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
+#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -117,7 +117,7 @@ msgstr ""
 "Wybrano akcję, lecz nie dokonano żadnych zmian. Prawdopodobnie szukasz "
 "przycisku \"Wykonaj\" (a nie \"Zapisz\")"
 
-#: static/admin/js/calendar.js:26
+#: static/admin/js/calendar.js:8
 msgid ""
 "January February March April May June July August September October November "
 "December"
@@ -125,7 +125,7 @@ msgstr ""
 "Styczeń Luty Marzec Kwiecień Maj Czerwiec Lipiec Sierpień Wrzesień "
 "Październik Listopad Grudzień"
 
-#: static/admin/js/calendar.js:27
+#: static/admin/js/calendar.js:9
 msgid "S M T W T F S"
 msgstr "N Pn Wt Śr Cz Pt So"
 
@@ -134,53 +134,53 @@ msgstr "N Pn Wt Śr Cz Pt So"
 msgid "Show"
 msgstr "Pokaż"
 
-#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
+#: static/admin/js/collapse.js:16 static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "Ukryj"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:49
-#: static/admin/js/admin/DateTimeShortcuts.js:85
+#: static/admin/js/admin/DateTimeShortcuts.js:52
+#: static/admin/js/admin/DateTimeShortcuts.js:88
 msgid "Now"
 msgstr "Teraz"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:53
+#: static/admin/js/admin/DateTimeShortcuts.js:56
 msgid "Clock"
 msgstr "Zegar"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:81
+#: static/admin/js/admin/DateTimeShortcuts.js:84
 msgid "Choose a time"
 msgstr "Wybierz czas"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:86
+#: static/admin/js/admin/DateTimeShortcuts.js:89
 msgid "Midnight"
 msgstr "Północ"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:87
+#: static/admin/js/admin/DateTimeShortcuts.js:90
 msgid "6 a.m."
 msgstr "6 rano"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:88
+#: static/admin/js/admin/DateTimeShortcuts.js:91
 msgid "Noon"
 msgstr "Południe"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:92
-#: static/admin/js/admin/DateTimeShortcuts.js:204
+#: static/admin/js/admin/DateTimeShortcuts.js:95
+#: static/admin/js/admin/DateTimeShortcuts.js:208
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:144
-#: static/admin/js/admin/DateTimeShortcuts.js:197
+#: static/admin/js/admin/DateTimeShortcuts.js:148
+#: static/admin/js/admin/DateTimeShortcuts.js:201
 msgid "Today"
 msgstr "Dzisiaj"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:148
+#: static/admin/js/admin/DateTimeShortcuts.js:152
 msgid "Calendar"
 msgstr "Kalendarz"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:195
+#: static/admin/js/admin/DateTimeShortcuts.js:199
 msgid "Yesterday"
 msgstr "Wczoraj"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:199
+#: static/admin/js/admin/DateTimeShortcuts.js:203
 msgid "Tomorrow"
 msgstr "Jutro"

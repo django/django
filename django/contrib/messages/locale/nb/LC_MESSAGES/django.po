@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-#   <sigurdga-transifex@sigurdga.no>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Sigurd Gartmann <sigurdga-transifex@sigurdga.no>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-03-12 14:51+0000\n"
-"Last-Translator: Sigurd Gartmann <sigurdga-transifex@sigurdga.no>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-29 08:30+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/projects/p/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -18,6 +18,6 @@ msgstr ""
 "Language: nb\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: tests/base.py:101
+#: tests/base.py:100
 msgid "lazy message"
 msgstr "«lazy»-melding"

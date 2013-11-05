@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# lauris <lauris@runbox.com>, 2011.
-# Simonas Simas <simonas@kazlauskas.me>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# lauris <lauris@runbox.com>, 2011
+# Simonas Kazlauskas <simonas@kazlauskas.me>, 2012-2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-09 16:58+0000\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-08-06 12:32+0000\n"
 "Last-Translator: Simonas Kazlauskas <simonas@kazlauskas.me>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/projects/p/django/"
 "language/lt/)\n"
@@ -29,45 +29,40 @@ msgid "Metadata"
 msgstr "Meta-duomenys"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "pažymėtas"
-msgstr[1] "pažymėti"
-msgstr[2] "pažymėti"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] "Sėkmingai pažymėtas %d komentaras"
+msgstr[1] "Sėkmingai pažymėti %d komentarai"
+msgstr[2] "Sėkmingai pažymėti %d komentarų"
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Žymėti pasirinktus komentarus"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "patvirtintas"
-msgstr[1] "patvirtinti"
-msgstr[2] "patvirtinti"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "Sėkmingai patvirtintas %d komentaras"
+msgstr[1] "Sėkmingai patvirtinti %d komentarai"
+msgstr[2] "Sėkmingai patvirtinti %d komentarų"
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Patvirtinti pasirinktus komentarus"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "pašalintas"
-msgstr[1] "pašalinti"
-msgstr[2] "pašalinti"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "Sėkmingai pašalintas %d komentaras"
+msgstr[1] "Sėkmingai pašalinti %d komentarai"
+msgstr[2] "Sėkmingai pašalinti %d komentarų"
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Pašalinti pasirinktus įrašus"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "%(count)s komentaras buvo sėkmingai %(action)s."
-msgstr[1] "%(count)s komentarai buvo sėkmingai %(action)s."
-msgstr[2] "%(count)s komentarai buvo sėkmingai %(action)s."
 
 #: feeds.py:14
 #, python-format
@@ -297,10 +292,11 @@ msgstr "Peržiūrėti savo komentarą"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Prašau ištaisyti žemiau esančią klaidą"
-msgstr[1] "Prašau ištaisyti žemiau esančias klaidas"
-msgstr[2] "Prašau ištaisyti žemiau esančias klaidas"
+msgstr "Prašau ištaisyti žemiau esančias klaidas"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "Ištaisykite žemiau esančias klaidas"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

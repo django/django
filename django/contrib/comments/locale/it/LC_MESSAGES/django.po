@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Nicola Larosa <transifex@teknico.net>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Nicola Larosa <transifex@teknico.net>, 2011,2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-05-29 20:19+0000\n"
 "Last-Translator: Nicola Larosa <transifex@teknico.net>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/django/language/"
 "it/)\n"
@@ -27,42 +27,37 @@ msgid "Metadata"
 msgstr "Metadati"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "segnalato"
-msgstr[1] "segnalati"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] "È stato marcato %d commento"
+msgstr[1] "Sono stati marcati %d commenti"
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Segnala i commenti selezionati"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "approvato"
-msgstr[1] "approvati"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "È stato approvato %d commento"
+msgstr[1] "Sono stati approvati %d commenti"
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Approva i commenti selezionati"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "eliminato"
-msgstr[1] "eliminati"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "È stato rimosso %d commento."
+msgstr[1] "Sono stati rimossi %d commenti."
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Elimina i commenti selezionati"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "Ad 1 commento è stata applicata con successo l'azione %(action)s."
-msgstr[1] ""
-"A %(count)s commenti è stata applicata con successo l'azione %(action)s."
 
 #: feeds.py:14
 #, python-format
@@ -294,9 +289,11 @@ msgstr "Mostra l'anteprima del tuo commento"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Correggi l'errore qui sotto"
-msgstr[1] "Correggi gli errori qui sotto"
+msgstr "Correggi gli errori qui sotto"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "Correggi gli errori qui sotto"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

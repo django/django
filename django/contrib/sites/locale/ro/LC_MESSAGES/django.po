@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Daniel Ursache-Dogariu <contact@danniel.net>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Daniel Ursache-Dogariu <contact@danniel.net>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:49+0000\n"
-"Last-Translator: Daniel Ursache-Dogariu <contact@danniel.net>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-29 08:23+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Romanian (http://www.transifex.com/projects/p/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -19,18 +19,22 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
 "2:1));\n"
 
-#: models.py:39
+#: models.py:25
+msgid "The domain name cannot contain any spaces or tabs."
+msgstr ""
+
+#: models.py:58
 msgid "domain name"
 msgstr "nume domeniu"
 
-#: models.py:40
+#: models.py:60
 msgid "display name"
 msgstr "nume afișat"
 
-#: models.py:45
+#: models.py:65
 msgid "site"
 msgstr "sit"
 
-#: models.py:46
+#: models.py:66
 msgid "sites"
 msgstr "situri"

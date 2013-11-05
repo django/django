@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# jannolii <jannolii@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:49+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-05-28 15:33+0000\n"
+"Last-Translator: jannolii <jannolii@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/projects/p/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -17,18 +18,22 @@ msgstr ""
 "Language: et\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:39
+#: models.py:25
+msgid "The domain name cannot contain any spaces or tabs."
+msgstr "Domeeni nimes ei tohi olla ei tühikuid ega tabeldusmärke."
+
+#: models.py:58
 msgid "domain name"
 msgstr "domeeninimi"
 
-#: models.py:40
+#: models.py:60
 msgid "display name"
 msgstr "hüüdnimi"
 
-#: models.py:45
+#: models.py:65
 msgid "site"
 msgstr "sait"
 
-#: models.py:46
+#: models.py:66
 msgid "sites"
 msgstr "saidid"

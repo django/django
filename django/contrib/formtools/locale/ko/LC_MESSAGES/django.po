@@ -1,14 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:42+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2013-08-16 15:07+0200\n"
+"PO-Revision-Date: 2013-04-24 18:55+0000\n"
+"Last-Translator: Django team\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/django/language/"
 "ko/)\n"
 "MIME-Version: 1.0\n"
@@ -29,10 +28,6 @@ msgstr ""
 msgid "submit"
 msgstr ""
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
+#: wizard/views.py:275
+msgid "ManagementForm data is missing or has been tampered."
 msgstr ""
-"죄송합니다. 입력하신 양식이 더 이상 유효하지 않습니다. 이 페이지부터 다시 양"
-"식을 채워주세요."

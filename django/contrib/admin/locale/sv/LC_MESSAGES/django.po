@@ -1,19 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Alex Nordlund <deep.alexander@gmail.com>, 2012.
-# Andreas Pelme <andreas@pelme.se>, 2011-2013.
-# cvitan <tome@cvitan.com>, 2011.
-#   <cybjit@gmail.com>, 2012.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# sorl <mikko@aino.se>, 2011.
+# Alex Nordlund <deep.alexander@gmail.com>, 2012
+# cvitan <tome@cvitan.com>, 2011
+# Cybjit <cybjit@gmail.com>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# sorl <mikko@aino.se>, 2011
+# biljettshop <thomas@biljettshop.se>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-06 08:53+0000\n"
-"Last-Translator: Andreas Pelme <andreas@pelme.se>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-10-28 10:03+0000\n"
+"Last-Translator: biljettshop <thomas@biljettshop.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -22,21 +22,21 @@ msgstr ""
 "Language: sv\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: actions.py:48
+#: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Tog bort %(count)d %(items)s"
 
-#: actions.py:60 options.py:1347
+#: actions.py:61 options.py:1418
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Kan inte ta bort %(name)s"
 
-#: actions.py:62 options.py:1349
+#: actions.py:63 options.py:1420
 msgid "Are you sure?"
 msgstr "Är du säker?"
 
-#: actions.py:83
+#: actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Tag bort markerade %(verbose_name_plural)s"
@@ -94,93 +94,93 @@ msgstr "Var god logga in igen, eftersom din session har förfallit."
 msgid "Action:"
 msgstr "Åtgärd:"
 
-#: models.py:24
+#: models.py:25
 msgid "action time"
 msgstr "händelsetid"
 
-#: models.py:27
+#: models.py:28
 msgid "object id"
 msgstr "objektets id"
 
-#: models.py:28
+#: models.py:29
 msgid "object repr"
 msgstr "objektets beskrivning"
 
-#: models.py:29
+#: models.py:30
 msgid "action flag"
 msgstr "händelseflagga"
 
-#: models.py:30
+#: models.py:31
 msgid "change message"
 msgstr "ändra meddelande"
 
-#: models.py:35
+#: models.py:36
 msgid "log entry"
 msgstr "loggpost"
 
-#: models.py:36
+#: models.py:37
 msgid "log entries"
 msgstr "loggposter"
 
-#: models.py:45
+#: models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "Lade till \"%(object)s\"."
 
-#: models.py:47
+#: models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "Ändrade \"%(object)s\" - %(changes)s"
 
-#: models.py:52
+#: models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "Tog bort \"%(object)s.\""
 
-#: models.py:54
+#: models.py:55
 msgid "LogEntry Object"
 msgstr "LogEntry-Objekt"
 
-#: options.py:156 options.py:172
+#: options.py:173 options.py:202
 msgid "None"
 msgstr "Inget"
 
-#: options.py:684
+#: options.py:763
 #, python-format
 msgid "Changed %s."
 msgstr "Ändrade %s."
 
-#: options.py:684 options.py:694
+#: options.py:763 options.py:773 options.py:1570
 msgid "and"
 msgstr "och"
 
-#: options.py:689
+#: options.py:768
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Lade till %(name)s \"%(object)s\"."
 
-#: options.py:693
+#: options.py:772
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Ändrade %(list)s på %(name)s \"%(object)s\"."
 
-#: options.py:698
+#: options.py:777
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Tog bort %(name)s \"%(object)s\"."
 
-#: options.py:702
+#: options.py:781
 msgid "No fields changed."
 msgstr "Inga fält ändrade."
 
-#: options.py:807 options.py:860
+#: options.py:884 options.py:927
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" lades till. Du kan redigera objektet igen nedanför."
 
-#: options.py:835
+#: options.py:902
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -189,19 +189,19 @@ msgstr ""
 "%(name)s \"%(obj)s\" lades till. Du kan lägga till ytterligare %(name)s "
 "nedan."
 
-#: options.py:839
+#: options.py:906
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" lades till."
 
-#: options.py:853
+#: options.py:920
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
 msgstr "%(name)s \"%(obj)s\" ändrades. Du kan ändra det igen nedan."
 
-#: options.py:867
+#: options.py:934
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -210,77 +210,93 @@ msgstr ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
 "%(name)s below."
 
-#: options.py:873
+#: options.py:940
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" ändrades."
 
-#: options.py:951 options.py:1211
+#: options.py:1018 options.py:1278
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 "Poster måste väljas för att genomföra åtgärder. Inga poster har ändrats."
 
-#: options.py:970
+#: options.py:1037
 msgid "No action selected."
 msgstr "Inga åtgärder valda."
 
-#: options.py:1050
+#: options.py:1117
 #, python-format
 msgid "Add %s"
 msgstr "Lägg till %s"
 
-#: options.py:1074 options.py:1319
+#: options.py:1141 options.py:1386
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s-objekt med primärnyckel %(key)r finns inte."
 
-#: options.py:1140
+#: options.py:1207
 #, python-format
 msgid "Change %s"
 msgstr "Ändra %s"
 
-#: options.py:1190
+#: options.py:1257
 msgid "Database error"
 msgstr "Databasfel"
 
-#: options.py:1253
+#: options.py:1320
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s ändrades."
 msgstr[1] "%(count)s %(name)s ändrades."
 
-#: options.py:1280
+#: options.py:1347
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s vald"
 msgstr[1] "Alla %(total_count)s valda"
 
-#: options.py:1285
+#: options.py:1352
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 av %(cnt)s valda"
 
-#: options.py:1335
+#: options.py:1403
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" togs bort."
 
-#: options.py:1382
+#: options.py:1459
 #, python-format
 msgid "Change history: %s"
 msgstr "Ändringshistorik: %s"
 
-#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#. Translators: Model verbose name and instance representation, suitable to be
+#. an item in a list
+#: options.py:1564
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#: options.py:1571
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+"Borttagning av %(class_name)s %(instance)s  kräver borttagning av följande "
+"skyddade relaterade objekt: %(related_objects)s"
+
+#: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19
 #: views/decorators.py:24
 msgid "Log in"
 msgstr "Logga in"
 
-#: sites.py:388
+#: sites.py:386
 msgid "Site administration"
 msgstr "Webbplatsadministration"
 
@@ -301,15 +317,15 @@ msgstr "Tid:"
 msgid "Lookup"
 msgstr "Uppslag"
 
-#: widgets.py:271
+#: widgets.py:260
 msgid "Add Another"
 msgstr "Lägg till ytterligare"
 
-#: widgets.py:316
+#: widgets.py:302
 msgid "Currently:"
 msgstr "Nuvarande:"
 
-#: widgets.py:317
+#: widgets.py:303
 msgid "Change:"
 msgstr "Ändra:"
 
@@ -436,9 +452,14 @@ msgstr "Visa på webbplats"
 #: templates/admin/auth/user/change_password.html:27
 #: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Rätta till felet nedan."
-msgstr[1] "Rätta till felen nedan."
+msgstr "Rätta till felen nedan."
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the errors below."
+msgstr "Vänligen rätta till felen nedan."
 
 #: templates/admin/change_list.html:58
 #, python-format
@@ -792,11 +813,19 @@ msgstr "Lösenordsnollställning lyckades"
 
 #: templates/registration/password_reset_done.html:17
 msgid ""
-"We've emailed you instructions for setting your password to the email "
-"address you submitted. You should be receiving it shortly."
+"We've emailed you instructions for setting your password. You should be "
+"receiving them shortly."
 msgstr ""
-"Vi har skickat ett e-postmeddelande med instruktioner för att ändra ditt "
-"lösenord till den e-postaddress du angivit. Det bör anlända inom kort."
+"Vi har skickat instruktioner för att sätta ert lösenord till er via e-post . "
+"De borde komma inom en snar framtid."
+
+#: templates/registration/password_reset_done.html:19
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Om ni inte får ett e-brev, vänligen kontrollera att du har skrivit in "
+"adressen du registrerade dig med och kolla din skräppostmapp."
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
@@ -840,20 +869,20 @@ msgstr "E-postaddress:"
 msgid "Reset my password"
 msgstr "Nollställ mitt lösenord"
 
-#: templatetags/admin_list.py:344
+#: templatetags/admin_list.py:348
 msgid "All dates"
 msgstr "Alla datum"
 
-#: views/main.py:33
+#: views/main.py:35
 msgid "(None)"
 msgstr "(Ingen)"
 
-#: views/main.py:76
+#: views/main.py:84
 #, python-format
 msgid "Select %s"
 msgstr "Välj %s"
 
-#: views/main.py:78
+#: views/main.py:86
 #, python-format
 msgid "Select %s to change"
 msgstr "Välj %s att ändra"

@@ -1,14 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Mansoorulhaq Mansoor <mansoorulhaq1986@gmail.com>, 2011.
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:42+0000\n"
-"Last-Translator: Mansoorulhaq Mansoor <mansoorulhaq1986@gmail.com>\n"
+"POT-Creation-Date: 2013-08-16 15:07+0200\n"
+"PO-Revision-Date: 2013-04-24 18:55+0000\n"
+"Last-Translator: Django team\n"
 "Language-Team: Urdu (http://www.transifex.com/projects/p/django/language/"
 "ur/)\n"
 "MIME-Version: 1.0\n"
@@ -29,10 +28,6 @@ msgstr ""
 msgid "submit"
 msgstr ""
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
+#: wizard/views.py:275
+msgid "ManagementForm data is missing or has been tampered."
 msgstr ""
-"ھم معذرت خواہ ھیں، آپ کے فارم کی مدت ختم ھو چکی ھے۔ براہ مھربانی اس صفحے سے "
-"فارم پر کریں۔"

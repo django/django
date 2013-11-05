@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Andreas Pelme <andreas@pelme.se>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Andreas Pelme <andreas@pelme.se>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
+# biljettshop <thomas@biljettshop.se>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Andreas Pelme <andreas@pelme.se>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-10-28 10:06+0000\n"
+"Last-Translator: biljettshop <thomas@biljettshop.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -27,41 +28,37 @@ msgid "Metadata"
 msgstr "Metadata"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "flaggad"
-msgstr[1] "flaggade"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] "Flaggade %d kommentar"
+msgstr[1] "Flaggade %d kommentarer"
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Flagga markerade kommentarer"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "godkänd"
-msgstr[1] "godkända"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "Godkände %d kommentar"
+msgstr[1] "Godkände %d kommentarer"
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Godkänn valda kommentarer"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "borttagen"
-msgstr[1] "borttagna"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "Tog bort %d kommentar"
+msgstr[1] "Tog bort %d kommentarer"
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Ta bort valda kommentarer"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] ""
-msgstr[1] "%(count)s kommentarer har blivit %(action)s."
 
 #: feeds.py:14
 #, python-format
@@ -291,9 +288,11 @@ msgstr "Förhandsgranska din kommentar"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Rätta till felet nedan."
-msgstr[1] "Rätta till felen nedan."
+msgstr "Rätta till felen nedan."
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "Vänligen korrigera felen nedan."
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

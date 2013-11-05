@@ -1,14 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Juraj Bubniak <translations@jbub.eu>, 2013
+# Marian Andre <marian@andre.sk>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-06-16 12:17+0000\n"
+"Last-Translator: Marian Andre <marian@andre.sk>\n"
 "Language-Team: Slovak (http://www.transifex.com/projects/p/django/language/"
 "sk/)\n"
 "MIME-Version: 1.0\n"
@@ -26,45 +28,40 @@ msgid "Metadata"
 msgstr "Metaúdaje"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "označený"
-msgstr[1] "označené"
-msgstr[2] "označených"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Označiť vybraný komentár"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "schválený"
-msgstr[1] "schválené"
-msgstr[2] "schválených"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "%d komentár schválený"
+msgstr[1] "%d komentáre schválené"
+msgstr[2] "%d komentárov schválených"
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Schváliť vybraný komentár"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "odstránený"
-msgstr[1] "odstránené"
-msgstr[2] "odstránených"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "%d komentár úspešne odstránený"
+msgstr[1] "%d komentáre úspešne odstránené"
+msgstr[2] "%d komentárov úspešne odstránených"
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Odstrániť vybrané komentáre"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "1 komentár bol úspešne %(action)s."
-msgstr[1] "%(count)s komentáre boli úspešne %(action)s."
-msgstr[2] "%(count)s komentárov bolo úspešne %(action)s."
 
 #: feeds.py:14
 #, python-format
@@ -296,10 +293,11 @@ msgstr "Náhľad komentára"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Opravte, prosím, chybu uvedenú nižšie"
-msgstr[1] "Opravte, prosím, chyby uvedené nižšie"
-msgstr[2] "Opravte, prosím, chyby uvedené nižšie"
+msgstr "Opravte, prosím, chyby uvedené nižšie"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "Opravte, prosím, chyby uvedené nižšie"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

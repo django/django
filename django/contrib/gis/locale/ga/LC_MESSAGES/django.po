@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Michael Thornhill <michael@maithu.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Michael Thornhill <michael@maithu.com>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-16 13:13+0000\n"
-"Last-Translator: Michael Thornhill <michael@maithu.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-24 18:55+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Irish (http://www.transifex.com/projects/p/django/language/"
 "ga/)\n"
 "MIME-Version: 1.0\n"
@@ -34,47 +34,47 @@ msgstr ""
 "GIS an bonn réimse - léarscáileanna chun an Sonraíocht OpenGIS cineál "
 "Céimseata."
 
-#: db/models/fields.py:271
+#: db/models/fields.py:270
 msgid "Point"
 msgstr "Pointe"
 
-#: db/models/fields.py:275
+#: db/models/fields.py:274
 msgid "Line string"
 msgstr "Líne teaghrán"
 
-#: db/models/fields.py:279
+#: db/models/fields.py:278
 msgid "Polygon"
 msgstr "Polagán"
 
-#: db/models/fields.py:283
+#: db/models/fields.py:282
 msgid "Multi-point"
 msgstr "Il-phointe"
 
-#: db/models/fields.py:287
+#: db/models/fields.py:286
 msgid "Multi-line string"
 msgstr "Il-líne teaghrán"
 
-#: db/models/fields.py:291
+#: db/models/fields.py:290
 msgid "Multi polygon"
 msgstr "Il polagán"
 
-#: db/models/fields.py:295
+#: db/models/fields.py:294
 msgid "Geometry collection"
 msgstr "Céimseata bhailiú"
 
-#: forms/fields.py:19
+#: forms/fields.py:23
 msgid "No geometry value provided."
 msgstr "Ní soláthair méid geoiméadracht"
 
-#: forms/fields.py:20
+#: forms/fields.py:24
 msgid "Invalid geometry value."
 msgstr "Méid geoiméadracht neamhbhailí"
 
-#: forms/fields.py:21
+#: forms/fields.py:25
 msgid "Invalid geometry type."
 msgstr "Tíopa geoiméadracht neamhbhailí"
 
-#: forms/fields.py:22
+#: forms/fields.py:26
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."

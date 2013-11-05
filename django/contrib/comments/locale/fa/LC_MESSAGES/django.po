@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ali Nikneshan <ali@nikneshan.com>, 2012.
-# Arash Fazeli <arash_fazeli77@yahoo.com>, 2012.
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Ali Nikneshan <ali@nikneshan.com>, 2012
+# Arash Fazeli <a.fazeli@gmail.com>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Reza Mohammadi <reza@teeleh.ir>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-08-11 08:27+0000\n"
-"Last-Translator: Ali Nikneshan <ali@nikneshan.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-11-05 08:56+0000\n"
+"Last-Translator: Reza Mohammadi <reza@teeleh.ir>\n"
 "Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -28,37 +29,34 @@ msgid "Metadata"
 msgstr "فوق داده"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "پرچم دار"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] "%d نظر علامت خوردند"
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "نشان‌گذاری نظرات انتخاب شده"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "تایید شده"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "%d نظر تأیید شدند"
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "تایید نظرات انتخاب شده"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "حذف شده"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "%d نظر حذف شدند"
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "حذف نظر های انتخاب شده"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "%(count)s کامنت با موفقیت %(action)s شدند."
 
 #: feeds.py:14
 #, python-format
@@ -283,8 +281,11 @@ msgstr "پیش نمایش نظر شما"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "لطفا خطاهای زیر را تصحیح"
+msgstr "لطفا خطاهای زیر را تصحیح"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "لطفاً خطاهای زیر را تصحیح کنید"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Michael Thornhill <michael@maithu.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Michael Thornhill <michael@maithu.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Michael Thornhill <michael@maithu.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-05-26 08:39+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Irish (http://www.transifex.com/projects/p/django/language/"
 "ga/)\n"
 "MIME-Version: 1.0\n"
@@ -28,53 +28,46 @@ msgid "Metadata"
 msgstr "Meiteashonraí"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "bratach curtha leis "
-msgstr[1] "bratach curtha leis "
-msgstr[2] "bratach curtha leis "
-msgstr[3] "bratach curtha leis "
-msgstr[4] "bratach curtha leis "
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Bratach nótaí tráchta roghnaithe"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "ceadaithe"
-msgstr[1] "ceadaithe"
-msgstr[2] "ceadaithe"
-msgstr[3] "ceadaithe"
-msgstr[4] "ceadaithe"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Cheadú nótaí tráchta roghnaithe"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "bhaint"
-msgstr[1] "bhaint"
-msgstr[2] "bhaint"
-msgstr[3] "bhaint"
-msgstr[4] "bhaint"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Bain nótaí tráchta roghnaithe"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "Bhí %(count)s nóta tráchta %(action)s go rathúil."
-msgstr[1] "Bhí %(count)s nótaí tráchta %(action)s go rathúil."
-msgstr[2] "Bhí %(count)s nótaí tráchta %(action)s go rathúil."
-msgstr[3] "Bhí %(count)s nótaí tráchta %(action)s go rathúil."
-msgstr[4] "Bhí %(count)s nótaí tráchta %(action)s go rathúil."
 
 #: feeds.py:14
 #, python-format
@@ -308,12 +301,11 @@ msgstr "Nóta tráchta réamhamharc"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Le do thoil, ceartaigh an botún thíos."
-msgstr[1] "Le do thoil, ceartaigh na botúin thíos."
-msgstr[2] "Le do thoil, ceartaigh na botúin thíos."
-msgstr[3] "Le do thoil, ceartaigh na botúin thíos."
-msgstr[4] "Le do thoil, ceartaigh na botúin thíos."
+msgstr "Le do thoil, ceartaigh na botúin thíos."
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr ""
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

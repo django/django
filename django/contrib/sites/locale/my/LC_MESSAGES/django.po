@@ -1,0 +1,38 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Yhal Htet Aung <jumoun@gmail.com>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: django-core\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-05-01 13:17+0000\n"
+"Last-Translator: Yhal Htet Aung <jumoun@gmail.com>\n"
+"Language-Team: Burmese (http://www.transifex.com/projects/p/django/language/"
+"my/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: my\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: models.py:25
+msgid "The domain name cannot contain any spaces or tabs."
+msgstr "ဒိုမိန်းနာမည်တွင်ကွက်လပ်(သို့)အမည်များမပါဝင်နိုင်။"
+
+#: models.py:58
+msgid "domain name"
+msgstr "ဒိုမိန်းနာမည်"
+
+#: models.py:60
+msgid "display name"
+msgstr "ပြသနာမည်"
+
+#: models.py:65
+msgid "site"
+msgstr "ဆိုက်"
+
+#: models.py:66
+msgid "sites"
+msgstr "ဆိုက်များ"

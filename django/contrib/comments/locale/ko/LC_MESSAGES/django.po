@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-05-26 08:39+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/django/language/"
 "ko/)\n"
 "MIME-Version: 1.0\n"
@@ -26,37 +26,34 @@ msgid "Metadata"
 msgstr "메타데이터"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "플래그되었습니다"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] ""
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "선택된 코멘트에 플래그 달기"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "승인되었습니다"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] ""
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "선택된 코멘트 승인하기"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "삭제되었습니다"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] ""
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "선택된 코멘트 삭제"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "%(count)s개의 코멘트가 성공적으로 %(action)s."
 
 #: feeds.py:14
 #, python-format
@@ -279,8 +276,11 @@ msgstr "코멘트 미리보기"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "아래의 오류를 수정해 주세요."
+msgstr "아래의 오류를 수정해 주세요."
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr ""
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

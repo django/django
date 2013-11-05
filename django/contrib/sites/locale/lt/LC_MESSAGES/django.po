@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Kostas  <tamosiunas@gmail.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Kostas <tamosiunas@gmail.com>, 2011
+# Simonas Kazlauskas <simonas@kazlauskas.me>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:49+0000\n"
-"Last-Translator: mar <m@mar.lt>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-08-06 12:35+0000\n"
+"Last-Translator: Simonas Kazlauskas <simonas@kazlauskas.me>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/projects/p/django/"
 "language/lt/)\n"
 "MIME-Version: 1.0\n"
@@ -19,18 +20,22 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
 "%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: models.py:39
+#: models.py:25
+msgid "The domain name cannot contain any spaces or tabs."
+msgstr "Domene negali būti tarpų ar tabuliavimo ženklų."
+
+#: models.py:58
 msgid "domain name"
 msgstr "domeno vardas"
 
-#: models.py:40
+#: models.py:60
 msgid "display name"
 msgstr "rodomas vardas"
 
-#: models.py:45
+#: models.py:65
 msgid "site"
 msgstr "svetainė"
 
-#: models.py:46
+#: models.py:66
 msgid "sites"
 msgstr "svetainės"

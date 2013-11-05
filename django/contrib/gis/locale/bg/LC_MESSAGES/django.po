@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-#   <grgkostadinov@gmail.com>, 2012.
-# Todor Lubenov <tlubenov@gmail.com>, 2011.
+# Georgi Kostadinov <grgkostadinov@gmail.com>, 2012
+# Todor Lube <tlubenov@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-04-01 19:16+0000\n"
-"Last-Translator: Georgi Kostadinov <grgkostadinov@gmail.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-24 18:57+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/projects/p/django/"
 "language/bg/)\n"
 "MIME-Version: 1.0\n"
@@ -31,47 +31,47 @@ msgstr "Слъгът %r не е регистриран."
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "Основно ГИС поле - карти за спецификация от OpenGIS  геометричен тип."
 
-#: db/models/fields.py:271
+#: db/models/fields.py:270
 msgid "Point"
 msgstr "Точка"
 
-#: db/models/fields.py:275
+#: db/models/fields.py:274
 msgid "Line string"
 msgstr "Линеен елемент"
 
-#: db/models/fields.py:279
+#: db/models/fields.py:278
 msgid "Polygon"
 msgstr "Полигон"
 
-#: db/models/fields.py:283
+#: db/models/fields.py:282
 msgid "Multi-point"
 msgstr "Комплексна-точка"
 
-#: db/models/fields.py:287
+#: db/models/fields.py:286
 msgid "Multi-line string"
 msgstr "Комплексен-линеен елемент"
 
-#: db/models/fields.py:291
+#: db/models/fields.py:290
 msgid "Multi polygon"
 msgstr "Комплексен полигон"
 
-#: db/models/fields.py:295
+#: db/models/fields.py:294
 msgid "Geometry collection"
 msgstr "Геометрична колекция"
 
-#: forms/fields.py:19
+#: forms/fields.py:23
 msgid "No geometry value provided."
 msgstr "Няма предоставена геометрична стойност."
 
-#: forms/fields.py:20
+#: forms/fields.py:24
 msgid "Invalid geometry value."
 msgstr "Невалидна геометрична стойност."
 
-#: forms/fields.py:21
+#: forms/fields.py:25
 msgid "Invalid geometry type."
 msgstr "Невалиден геометричен тип."
 
-#: forms/fields.py:22
+#: forms/fields.py:26
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."

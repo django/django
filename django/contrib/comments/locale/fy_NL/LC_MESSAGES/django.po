@@ -1,70 +1,68 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
-"PO-Revision-Date: 2011-03-15 15:37+0000\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-04-24 19:38+0000\n"
 "Last-Translator: Django team\n"
-"Language-Team: English <en@li.org>\n"
-"Language: fy_NL\n"
+"Language-Team: Western Frisian (Netherlands) (http://www.transifex.com/"
+"projects/p/django/language/fy_NL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: fy_NL\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin.py:12
+#: admin.py:25
 msgid "Content"
 msgstr ""
 
-#: admin.py:15
+#: admin.py:28
 msgid "Metadata"
 msgstr ""
 
-#: admin.py:42
-msgid "flagged"
-msgid_plural "flagged"
+#: admin.py:55
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin.py:43
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr ""
 
-#: admin.py:47
-msgid "approved"
-msgid_plural "approved"
+#: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin.py:48
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr ""
 
-#: admin.py:52
-msgid "removed"
-msgid_plural "removed"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin.py:53
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr ""
 
-#: admin.py:65
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] ""
-msgstr[1] ""
-
-#: feeds.py:13
+#: feeds.py:14
 #, python-format
 msgid "%(site_name)s comments"
 msgstr ""
 
-#: feeds.py:23
+#: feeds.py:20
 #, python-format
 msgid "Latest comments on %(site_name)s"
 msgstr ""
@@ -101,78 +99,78 @@ msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
 
-#: models.py:22
+#: models.py:23
 msgid "content type"
 msgstr ""
 
-#: models.py:24
+#: models.py:25
 msgid "object ID"
 msgstr ""
 
-#: models.py:50 models.py:168
+#: models.py:53 models.py:177
 msgid "user"
 msgstr ""
 
-#: models.py:52
+#: models.py:55
 msgid "user's name"
 msgstr ""
 
-#: models.py:53
+#: models.py:56
 msgid "user's email address"
 msgstr ""
 
-#: models.py:54
+#: models.py:57
 msgid "user's URL"
 msgstr ""
 
-#: models.py:56 models.py:76 models.py:169
+#: models.py:59 models.py:79 models.py:178
 msgid "comment"
 msgstr ""
 
-#: models.py:59
+#: models.py:62
 msgid "date/time submitted"
 msgstr ""
 
-#: models.py:60
+#: models.py:63
 msgid "IP address"
 msgstr ""
 
-#: models.py:61
+#: models.py:64
 msgid "is public"
 msgstr ""
 
-#: models.py:62
+#: models.py:65
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr ""
 
-#: models.py:64
+#: models.py:67
 msgid "is removed"
 msgstr ""
 
-#: models.py:65
+#: models.py:68
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
 
-#: models.py:77
+#: models.py:80
 msgid "comments"
 msgstr ""
 
-#: models.py:119
+#: models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
 
-#: models.py:128
+#: models.py:134
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
 
-#: models.py:153
+#: models.py:160
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -182,19 +180,19 @@ msgid ""
 "http://%(domain)s%(url)s"
 msgstr ""
 
-#: models.py:170
+#: models.py:179
 msgid "flag"
 msgstr ""
 
-#: models.py:171
+#: models.py:180
 msgid "date"
 msgstr ""
 
-#: models.py:181
+#: models.py:190
 msgid "comment flag"
 msgstr ""
 
-#: models.py:182
+#: models.py:191
 msgid "comment flags"
 msgstr ""
 
@@ -274,9 +272,11 @@ msgstr ""
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] ""
-msgstr[1] ""
+msgstr ""
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr ""
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

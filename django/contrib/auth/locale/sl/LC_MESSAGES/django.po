@@ -1,18 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Jure Cuhalev <gandalf@owca.info>, 2012.
-# Jure Čuhalev <gandalf@owca.info>, 2012.
-#  <zejn@kiberpipa.org>, 2013.
-#   <zejn@kiberpipa.org>, 2011, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Jure Cuhalev <gandalf@owca.info>, 2012
+# zejn <zejn@kiberpipa.org>, 2013
+# zejn <zejn@kiberpipa.org>, 2011-2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2013-02-15 18:00+0000\n"
+"POT-Creation-Date: 2013-10-09 20:17+0200\n"
+"PO-Revision-Date: 2013-10-23 14:17+0000\n"
 "Last-Translator: zejn <zejn@kiberpipa.org>\n"
 "Language-Team: Slovenian (http://www.transifex.com/projects/p/django/"
 "language/sl/)\n"
@@ -35,58 +33,59 @@ msgstr "Dovoljenja"
 msgid "Important dates"
 msgstr "Pomembni datumi"
 
-#: admin.py:126
+#: admin.py:132
 msgid "Password changed successfully."
 msgstr "Geslo je uspešno spremenjeno."
 
-#: admin.py:136
+#: admin.py:142
 #, python-format
 msgid "Change password: %s"
 msgstr "Spremeni geslo: %s"
 
-#: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
+#: forms.py:33 tests/test_forms.py:261 tests/test_forms.py:266
+#: tests/test_forms.py:407
 msgid "No password set."
 msgstr "Geslo ni nastavljeno."
 
-#: forms.py:37 tests/forms.py:261 tests/forms.py:267
+#: forms.py:39 tests/test_forms.py:271 tests/test_forms.py:277
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Neveljavna oblika gesla ali neznan algoritem razpršila."
 
-#: forms.py:67
+#: forms.py:72
 msgid "A user with that username already exists."
 msgstr "Uporabnik s tem uporabniškim imenom že obstaja."
 
-#: forms.py:68 forms.py:269 forms.py:329
+#: forms.py:73 forms.py:254 forms.py:314
 msgid "The two password fields didn't match."
 msgstr "Gesli se ne ujemata."
 
-#: forms.py:70 forms.py:115
+#: forms.py:75 forms.py:120
 msgid "Username"
 msgstr "Uporabniško ime"
 
-#: forms.py:72 forms.py:116
+#: forms.py:77 forms.py:121
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "Polje je obvezno. Vpisanih mora biti do 30 znakov, ti pa so lahko črke, "
 "številke in znaki @/./+/-/_."
 
-#: forms.py:75 forms.py:119
+#: forms.py:80 forms.py:124
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr "Ta vrednost lahko vsebuje le črke, števila in znake @/./+/-/_."
 
-#: forms.py:77 forms.py:121 forms.py:148 forms.py:331
+#: forms.py:82 forms.py:126 forms.py:153 forms.py:316
 msgid "Password"
 msgstr "Geslo"
 
-#: forms.py:79
+#: forms.py:84
 msgid "Password confirmation"
 msgstr "Potrditev gesla"
 
-#: forms.py:81
+#: forms.py:86
 msgid "Enter the same password as above, for verification."
 msgstr "Ponovno vpišite izbrano geslo za overitev."
 
-#: forms.py:122
+#: forms.py:127
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -96,7 +95,7 @@ msgstr ""
 "mogoče videti. Geslo lahko spremenite s pomočjo <a href=\"password/\">tega "
 "obrazca</a>."
 
-#: forms.py:151
+#: forms.py:156
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
@@ -105,79 +104,57 @@ msgstr ""
 "Vnesite veljavno %(username)s in geslo. Opomba: obe polji upoštevata "
 "velikost črk."
 
-#: forms.py:153
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-"Videti je, da brskalnik nima omogočenih piškotkov. Piškotki so nujni za "
-"overjanje prijave."
-
-#: forms.py:155
+#: forms.py:158
 msgid "This account is inactive."
 msgstr "Ta uporabniški račun ni dejaven."
 
 #: forms.py:206
-msgid ""
-"That email address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-"Tega elektronskega naslova ni mogoče pripisati nobenemu uporabniku. Ali ste "
-"prepričani, da ste že vpisani?"
-
-#: forms.py:208 tests/forms.py:374
-msgid ""
-"The user account associated with this email address cannot reset the "
-"password."
-msgstr ""
-"Uporabnik s tem elektronskim naslovom nima dovoljen za ponastavitev gesla."
-
-#: forms.py:211
 msgid "Email"
 msgstr "Elektronski naslov"
 
-#: forms.py:271
+#: forms.py:256
 msgid "New password"
 msgstr "Novo geslo"
 
-#: forms.py:273
+#: forms.py:258
 msgid "New password confirmation"
 msgstr "Potrditev novega gesla"
 
-#: forms.py:302
+#: forms.py:287
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Vaše staro geslo ni vneseno pravilno. Poskusite znova."
 
-#: forms.py:305
+#: forms.py:290
 msgid "Old password"
 msgstr "Staro geslo"
 
-#: forms.py:333
+#: forms.py:318
 msgid "Password (again)"
 msgstr "Geslo (znova)"
 
-#: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
-#: hashers.py:412
+#: hashers.py:243 hashers.py:317 hashers.py:365 hashers.py:393 hashers.py:426
+#: hashers.py:459 hashers.py:493
 msgid "algorithm"
 msgstr "algoritem"
 
-#: hashers.py:242
+#: hashers.py:244
 msgid "iterations"
 msgstr "ponovitev"
 
-#: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
+#: hashers.py:245 hashers.py:319 hashers.py:366 hashers.py:394 hashers.py:494
 msgid "salt"
 msgstr "naključna vrednost"
 
-#: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
+#: hashers.py:246 hashers.py:367 hashers.py:395 hashers.py:427 hashers.py:460
+#: hashers.py:495
 msgid "hash"
 msgstr "razpršilo"
 
-#: hashers.py:293
+#: hashers.py:318
 msgid "work factor"
 msgstr "faktor obremenitve"
 
-#: hashers.py:295
+#: hashers.py:320
 msgid "checksum"
 msgstr "nadzorna vsota"
 
@@ -201,7 +178,7 @@ msgstr "dovoljenja"
 msgid "group"
 msgstr "skupina"
 
-#: models.py:129 models.py:301
+#: models.py:129 models.py:294
 msgid "groups"
 msgstr "skupine"
 
@@ -213,17 +190,17 @@ msgstr "geslo"
 msgid "last login"
 msgstr "zadnja prijava"
 
-#: models.py:298
+#: models.py:291
 msgid "superuser status"
 msgstr "stanje skrbnika"
 
-#: models.py:299
+#: models.py:292
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "Uporabnik bo imel skrbniška dovoljenja."
 
-#: models.py:302
+#: models.py:295
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of his/her group."
@@ -231,50 +208,54 @@ msgstr ""
 "Skupine, katerih član je ta uporabnik. Uporabnik pridobi vsa dovoljenja, "
 "povezana s to skupino."
 
-#: models.py:306
+#: models.py:299
 msgid "user permissions"
 msgstr "uporabniška dovoljenja"
 
-#: models.py:377
+#: models.py:301
+msgid "Specific permissions for this user."
+msgstr "Dovoljenja specifična za tega uporabnika."
+
+#: models.py:368
 msgid "username"
 msgstr "uporabniško ime"
 
-#: models.py:378
+#: models.py:367
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
 "Polje je obvezno. Vpisanih mora biti do 30 znakov, ti pa so lahko črke, "
 "številke in znaki @/./+/-/_."
 
-#: models.py:381
+#: models.py:370
 msgid "Enter a valid username."
 msgstr "Vnesite veljavno uporabniško ime."
 
-#: models.py:383
+#: models.py:372
 msgid "first name"
 msgstr "ime"
 
-#: models.py:384
+#: models.py:373
 msgid "last name"
 msgstr "priimek"
 
-#: models.py:385
+#: models.py:374
 msgid "email address"
 msgstr "elektronski naslov"
 
-#: models.py:386
+#: models.py:375
 msgid "staff status"
 msgstr "stanje osebja"
 
-#: models.py:387
+#: models.py:376
 msgid "Designates whether the user can log into this admin site."
 msgstr "Določi, ali se sme uporabnik prijaviti kot skrbnik."
 
-#: models.py:389
+#: models.py:378
 msgid "active"
 msgstr "dejaven"
 
-#: models.py:390
+#: models.py:379
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -282,19 +263,19 @@ msgstr ""
 "Določi, ali je uporabnik dejaven. Možnost je priročna in preprečuje brisanje "
 "računov."
 
-#: models.py:392
+#: models.py:381
 msgid "date joined"
 msgstr "vpisan od"
 
-#: models.py:400
+#: models.py:389
 msgid "user"
 msgstr "uporabnik"
 
-#: models.py:401
+#: models.py:390
 msgid "users"
 msgstr "uporabniki"
 
-#: views.py:94
+#: views.py:89
 msgid "Logged out"
 msgstr "Odjavljen"
 
@@ -302,3 +283,7 @@ msgstr "Odjavljen"
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Geslo na %(site_name)s je ponastavljeno."
+
+#: tests/test_forms.py:325
+msgid "Enter a valid email address."
+msgstr "Vnesite veljaven e-poštni naslov."

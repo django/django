@@ -1,14 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Baptiste  <bapdarth@yahoo.fr>, 2011-2012.
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-09-15 19:58+0000\n"
-"Last-Translator: Baptiste <baptiste+transifex@darthenay.fr>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-26 14:19+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Esperanto (http://www.transifex.com/projects/p/django/"
 "language/eo/)\n"
 "MIME-Version: 1.0\n"

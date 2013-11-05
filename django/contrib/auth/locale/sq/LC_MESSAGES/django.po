@@ -1,15 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Translators:
-# Besnik <besnik@programeshqip.org>, 2011.
+# Besnik <besnik@programeshqip.org>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2013-02-20 08:30+0000\n"
-"Last-Translator: Besnik <besnik@programeshqip.org>\n"
+"POT-Creation-Date: 2013-10-09 20:17+0200\n"
+"PO-Revision-Date: 2013-10-10 08:45+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -30,59 +29,60 @@ msgstr "Leje"
 msgid "Important dates"
 msgstr "Të dhëna të rëndësishme"
 
-#: admin.py:126
+#: admin.py:132
 msgid "Password changed successfully."
 msgstr "Fjalëkalimi u ndryshua me sukses."
 
-#: admin.py:136
+#: admin.py:142
 #, python-format
 msgid "Change password: %s"
 msgstr "Ndryshoni fjalëkalimin: %s"
 
-#: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
+#: forms.py:33 tests/test_forms.py:261 tests/test_forms.py:266
+#: tests/test_forms.py:407
 msgid "No password set."
 msgstr "Nuk ka fjalëkalim të caktuar."
 
-#: forms.py:37 tests/forms.py:261 tests/forms.py:267
+#: forms.py:39 tests/test_forms.py:271 tests/test_forms.py:277
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Format i pavlefshëm fjalëkalimi ose algoritëm i panjohur hashi."
 
-#: forms.py:67
+#: forms.py:72
 msgid "A user with that username already exists."
 msgstr "Ka tashmë një emër të tillë përdoruesi."
 
-#: forms.py:68 forms.py:269 forms.py:329
+#: forms.py:73 forms.py:254 forms.py:314
 msgid "The two password fields didn't match."
 msgstr "Dy fushat për fjalëkalim nuk u përputhën."
 
-#: forms.py:70 forms.py:115
+#: forms.py:75 forms.py:120
 msgid "Username"
 msgstr "Emër përdoruesi"
 
-#: forms.py:72 forms.py:116
+#: forms.py:77 forms.py:121
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "E domosdoshme. 30 ose më pak shenja. Vetëm shkronja, shifra dhe shenjat @/./"
 "+/-/_ ."
 
-#: forms.py:75 forms.py:119
+#: forms.py:80 forms.py:124
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr ""
 "Kjo vlerë mund të përmbajë vetëm shkronja, numra dhe shenja si @/./+/-/_ ."
 
-#: forms.py:77 forms.py:121 forms.py:148 forms.py:331
+#: forms.py:82 forms.py:126 forms.py:153 forms.py:316
 msgid "Password"
 msgstr "Fjalëkalim"
 
-#: forms.py:79
+#: forms.py:84
 msgid "Password confirmation"
 msgstr "Ripohim fjalëkalimi"
 
-#: forms.py:81
+#: forms.py:86
 msgid "Enter the same password as above, for verification."
 msgstr "Jepni, për verifikim, të njëjtin fjalëkalim si më sipër."
 
-#: forms.py:122
+#: forms.py:127
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -92,87 +92,67 @@ msgstr ""
 "fjalëkalimi i këtij përdoruesi, por mund ta ndryshoni fjalëkalimin duke "
 "përdorur <a href=\"password/\">këtë formular</a>."
 
-#: forms.py:151
+#: forms.py:156
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
+"Ju lutemi, jepni një %(username)s dhe një fjalëkalim të saktë. Kini parasysh "
+"se që të dyja fushat mund të jenë të ndjeshme ndaj shkrimit me shkronja të "
+"mëdha ose të vogla."
 
-#: forms.py:153
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-"Shfletuesi juaj Web nuk duket se i ka të aktivizuara \"cookie\"-t. \"Cookie"
-"\"-t janë të domosdoshme për hyrjen."
-
-#: forms.py:155
+#: forms.py:158
 msgid "This account is inactive."
 msgstr "Kjo llogari nuk është aktive."
 
 #: forms.py:206
-msgid ""
-"That email address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-"Kësaj adrese email nuk i përshoqërohet ndonjë llogari përdoruesi. Jeni i "
-"sigurt se jeni regjistruar?"
-
-#: forms.py:208 tests/forms.py:374
-msgid ""
-"The user account associated with this email address cannot reset the "
-"password."
-msgstr ""
-"Llogaria e përdoruesit të përshoqëruar me këtë adres email nuk mund të "
-"kryejë ricaktim të fjalëkalimit."
-
-#: forms.py:211
 msgid "Email"
 msgstr "Email"
 
-#: forms.py:271
+#: forms.py:256
 msgid "New password"
 msgstr "Fjalëkalim i ri"
 
-#: forms.py:273
+#: forms.py:258
 msgid "New password confirmation"
 msgstr "Ripohim fjalëkalimi të ri"
 
-#: forms.py:302
+#: forms.py:287
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Fjalëkalimi juaj i vjetër u dha pasaktësisht. Ju lutem, jepeni sërish."
 
-#: forms.py:305
+#: forms.py:290
 msgid "Old password"
 msgstr "Fjalëkalim i vjetër"
 
-#: forms.py:333
+#: forms.py:318
 msgid "Password (again)"
 msgstr "Fjalëkalim (sërish)"
 
-#: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
-#: hashers.py:412
+#: hashers.py:243 hashers.py:317 hashers.py:365 hashers.py:393 hashers.py:426
+#: hashers.py:459 hashers.py:493
 msgid "algorithm"
 msgstr "algoritëm"
 
-#: hashers.py:242
+#: hashers.py:244
 msgid "iterations"
 msgstr "përsëritje"
 
-#: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
+#: hashers.py:245 hashers.py:319 hashers.py:366 hashers.py:394 hashers.py:494
 msgid "salt"
 msgstr "kripë"
 
-#: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
+#: hashers.py:246 hashers.py:367 hashers.py:395 hashers.py:427 hashers.py:460
+#: hashers.py:495
 msgid "hash"
 msgstr "hash"
 
-#: hashers.py:293
+#: hashers.py:318
 msgid "work factor"
 msgstr ""
 
-#: hashers.py:295
+#: hashers.py:320
 msgid "checksum"
 msgstr ""
 
@@ -196,7 +176,7 @@ msgstr "leje"
 msgid "group"
 msgstr "grup"
 
-#: models.py:129 models.py:301
+#: models.py:129 models.py:294
 msgid "groups"
 msgstr "grupe"
 
@@ -208,18 +188,18 @@ msgstr "fjalëkalim"
 msgid "last login"
 msgstr "hyrja e fundit"
 
-#: models.py:298
+#: models.py:291
 msgid "superuser status"
 msgstr "gjendje superpërdoruesi"
 
-#: models.py:299
+#: models.py:292
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
 "Përcakton që ky përdorues ka krejt lejet, pa ia akorduar ato shprehimisht."
 
-#: models.py:302
+#: models.py:295
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of his/her group."
@@ -227,49 +207,53 @@ msgstr ""
 "Grupet ku bën pjesë ky përdorues. Një përdorues përfiton krejt lejet e dhëna "
 "për secilin grup të tij/saj."
 
-#: models.py:306
+#: models.py:299
 msgid "user permissions"
 msgstr "leje përdoruesi"
 
-#: models.py:377
+#: models.py:301
+msgid "Specific permissions for this user."
+msgstr ""
+
+#: models.py:368
 msgid "username"
 msgstr "emër përdoruesi"
 
-#: models.py:378
+#: models.py:367
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
 "E domosdoshme. 30 ose më pak shenja. Shkronja, numra dhe shenjat @/./+/-/_"
 
-#: models.py:381
+#: models.py:370
 msgid "Enter a valid username."
 msgstr "Jepni emër përdoruesi të vlefshëm."
 
-#: models.py:383
+#: models.py:372
 msgid "first name"
 msgstr "emër"
 
-#: models.py:384
+#: models.py:373
 msgid "last name"
 msgstr "mbiemër"
 
-#: models.py:385
+#: models.py:374
 msgid "email address"
 msgstr "adresë email"
 
-#: models.py:386
+#: models.py:375
 msgid "staff status"
 msgstr "vend në ekip"
 
-#: models.py:387
+#: models.py:376
 msgid "Designates whether the user can log into this admin site."
 msgstr "Përcakton nëse mund të hyjë ose jo përdoruesi te ky site administrimi."
 
-#: models.py:389
+#: models.py:378
 msgid "active"
 msgstr "veprues"
 
-#: models.py:390
+#: models.py:379
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -277,19 +261,19 @@ msgstr ""
 "Përcakton nëse ky përdorues do të duhej trajtuar si aktiv. Çpërzgjidhni "
 "këtë, në vend se të fshihni llogarira."
 
-#: models.py:392
+#: models.py:381
 msgid "date joined"
 msgstr "datë anëtarësimi"
 
-#: models.py:400
+#: models.py:389
 msgid "user"
 msgstr "përdorues"
 
-#: models.py:401
+#: models.py:390
 msgid "users"
 msgstr "përdoruesa"
 
-#: views.py:94
+#: views.py:89
 msgid "Logged out"
 msgstr "I dalë"
 
@@ -297,3 +281,7 @@ msgstr "I dalë"
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Ricaktim fjalëkalimi për te %(site_name)s"
+
+#: tests/test_forms.py:325
+msgid "Enter a valid email address."
+msgstr "Jepni një adresë email të vlefshme."

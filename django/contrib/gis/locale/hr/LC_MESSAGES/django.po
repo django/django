@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-#   <berislav.lopac@gmail.com>, 2012.
-# Davor Lučić <r.dav.lc@gmail.com>, 2012.
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# berislavlopac <berislav.lopac@gmail.com>, 2012
+# Davor Lučić <r.dav.lc@gmail.com>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-11-25 11:32+0000\n"
-"Last-Translator: Davor Lučić <r.dav.lc@gmail.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-24 18:55+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Croatian (http://www.transifex.com/projects/p/django/language/"
 "hr/)\n"
 "MIME-Version: 1.0\n"
@@ -33,47 +33,47 @@ msgstr "Slug %r nije registriran."
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "Osnovno GIS polje -- mapira OpenGIS Specification Geometry tip."
 
-#: db/models/fields.py:271
+#: db/models/fields.py:270
 msgid "Point"
 msgstr "Točka"
 
-#: db/models/fields.py:275
+#: db/models/fields.py:274
 msgid "Line string"
 msgstr "Linija (Line string)"
 
-#: db/models/fields.py:279
+#: db/models/fields.py:278
 msgid "Polygon"
 msgstr "Poligon"
 
-#: db/models/fields.py:283
+#: db/models/fields.py:282
 msgid "Multi-point"
 msgstr "Više točaka"
 
-#: db/models/fields.py:287
+#: db/models/fields.py:286
 msgid "Multi-line string"
 msgstr "Više linija (Line string)"
 
-#: db/models/fields.py:291
+#: db/models/fields.py:290
 msgid "Multi polygon"
 msgstr "Više poligona"
 
-#: db/models/fields.py:295
+#: db/models/fields.py:294
 msgid "Geometry collection"
 msgstr "Geometrijska kolekcija"
 
-#: forms/fields.py:19
+#: forms/fields.py:23
 msgid "No geometry value provided."
 msgstr "Geometrijska vrijednost nije priložena."
 
-#: forms/fields.py:20
+#: forms/fields.py:24
 msgid "Invalid geometry value."
 msgstr "Neispravna geometrijska vrijednost."
 
-#: forms/fields.py:21
+#: forms/fields.py:25
 msgid "Invalid geometry type."
 msgstr "Neispravan geometrijski tip."
 
-#: forms/fields.py:22
+#: forms/fields.py:26
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."

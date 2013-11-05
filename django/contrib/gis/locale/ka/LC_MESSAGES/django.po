@@ -1,17 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Translators:
-# André Bouatchidzé <a@anbz.net>, 2013.
-# avsd05 <avsd05@gmail.com>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# André Bouatchidzé <a@anbz.net>, 2013
+# David Avsajanishvili <avsd05@gmail.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2013-03-01 07:50+0000\n"
-"Last-Translator: André Bouatchidzé <a@anbz.net>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-24 18:57+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Georgian (http://www.transifex.com/projects/p/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
@@ -33,47 +32,47 @@ msgstr "სლაგი %r არ არის რეგისტრირებ
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "GIS-ის ბაზური ველი -- შეესაბამება OpenGIS სპეციფიკაციის Geometry ტიპს."
 
-#: db/models/fields.py:271
+#: db/models/fields.py:270
 msgid "Point"
 msgstr "წერტილი"
 
-#: db/models/fields.py:275
+#: db/models/fields.py:274
 msgid "Line string"
 msgstr "ხაზის მასივი"
 
-#: db/models/fields.py:279
+#: db/models/fields.py:278
 msgid "Polygon"
 msgstr "მრავალკუთხედი"
 
-#: db/models/fields.py:283
+#: db/models/fields.py:282
 msgid "Multi-point"
 msgstr "წერტილების სიმრავლე"
 
-#: db/models/fields.py:287
+#: db/models/fields.py:286
 msgid "Multi-line string"
 msgstr "ხაზების სიმრავლის მასივი"
 
-#: db/models/fields.py:291
+#: db/models/fields.py:290
 msgid "Multi polygon"
 msgstr "მრავალკუთხედების სიმრავლე"
 
-#: db/models/fields.py:295
+#: db/models/fields.py:294
 msgid "Geometry collection"
 msgstr "გეომეტრიული კოლექცია"
 
-#: forms/fields.py:19
+#: forms/fields.py:23
 msgid "No geometry value provided."
 msgstr "გეომეტრიის მნიშვნელობა მოცემული არ არის."
 
-#: forms/fields.py:20
+#: forms/fields.py:24
 msgid "Invalid geometry value."
 msgstr "გეომეტრიის მნიშვნელობა არასწორია."
 
-#: forms/fields.py:21
+#: forms/fields.py:25
 msgid "Invalid geometry type."
 msgstr "გეომეტრიის ტიპი არასწორია."
 
-#: forms/fields.py:22
+#: forms/fields.py:26
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."

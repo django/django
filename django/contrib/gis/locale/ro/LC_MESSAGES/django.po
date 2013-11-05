@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Daniel Ursache-Dogariu <contact@danniel.net>, 2011.
-# Denis Darii <sinednx@gmail.com>, 2011.
+# Daniel Ursache-Dogariu <contact@danniel.net>, 2011
+# Denis Darii <sinednx@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-08 12:32+0000\n"
-"Last-Translator: Daniel Ursache-Dogariu <contact@danniel.net>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-24 18:57+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Romanian (http://www.transifex.com/projects/p/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -33,47 +33,47 @@ msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "Câmpul GIS de bază -- mapat către tipul OpenGIS Specification Geometry."
 
-#: db/models/fields.py:271
+#: db/models/fields.py:270
 msgid "Point"
 msgstr "Punct"
 
-#: db/models/fields.py:275
+#: db/models/fields.py:274
 msgid "Line string"
 msgstr "Șir linii"
 
-#: db/models/fields.py:279
+#: db/models/fields.py:278
 msgid "Polygon"
 msgstr "Poligon"
 
-#: db/models/fields.py:283
+#: db/models/fields.py:282
 msgid "Multi-point"
 msgstr "Multi-punct"
 
-#: db/models/fields.py:287
+#: db/models/fields.py:286
 msgid "Multi-line string"
 msgstr "Șir multi-linie"
 
-#: db/models/fields.py:291
+#: db/models/fields.py:290
 msgid "Multi polygon"
 msgstr "Multi poligon"
 
-#: db/models/fields.py:295
+#: db/models/fields.py:294
 msgid "Geometry collection"
 msgstr "Colecție geometrie"
 
-#: forms/fields.py:19
+#: forms/fields.py:23
 msgid "No geometry value provided."
 msgstr "Nicio valoare geometrică furnizată."
 
-#: forms/fields.py:20
+#: forms/fields.py:24
 msgid "Invalid geometry value."
 msgstr "Valoare geometrică nevalidă."
 
-#: forms/fields.py:21
+#: forms/fields.py:25
 msgid "Invalid geometry type."
 msgstr "Tip geometric nevalid."
 
-#: forms/fields.py:22
+#: forms/fields.py:26
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."

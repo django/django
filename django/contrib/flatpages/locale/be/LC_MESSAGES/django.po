@@ -3,11 +3,11 @@
 # Translators:
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-10-18 10:56+0000\n"
-"Last-Translator: Павал Клёк <yehekim@gmail.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-29 09:01+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Belarusian (http://www.transifex.com/projects/p/django/"
 "language/be/)\n"
 "MIME-Version: 1.0\n"
@@ -81,20 +81,20 @@ msgstr ""
 msgid "registration required"
 msgstr "трэба запісацца"
 
-#: models.py:17
+#: models.py:18
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "Калі абраць гэта, бачыну змогуць пабачыць толькі тыя карыстальнікі, што "
 "апазналіся."
 
-#: models.py:22
+#: models.py:24
 msgid "flat page"
 msgstr "нязьменная бачына"
 
-#: models.py:23
+#: models.py:25
 msgid "flat pages"
 msgstr "нязьменныя бачыны"
 
-#: tests/forms.py:97
+#: tests/test_forms.py:98
 msgid "This field is required."
 msgstr "Поле трэба запоўніць."

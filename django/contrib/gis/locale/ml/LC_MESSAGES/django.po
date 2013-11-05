@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Rajeesh Nair <rajeeshrnair@gmail.com>, 2011, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Rajeesh Nair <rajeeshrnair@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-04-17 19:18+0000\n"
-"Last-Translator: Rajeesh Nair <rajeeshrnair@gmail.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-24 18:56+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Malayalam (http://www.transifex.com/projects/p/django/"
 "language/ml/)\n"
 "MIME-Version: 1.0\n"
@@ -33,47 +33,47 @@ msgstr ""
 "അടിസ്ഥാന ജി.ഐ.എസ് കളം (ഫീല്‍ഡ്) -- ഓപ്പണ്‍ ജി.ഐ.എസ് നിര്‍ദേശിച്ച തരം ജ്യാമിതീയ രൂപത്തെ "
 "സൂചിപ്പിക്കാന്‍"
 
-#: db/models/fields.py:271
+#: db/models/fields.py:270
 msgid "Point"
 msgstr "ബിന്ദു"
 
-#: db/models/fields.py:275
+#: db/models/fields.py:274
 msgid "Line string"
 msgstr "രേഖാ സ്ട്രിങ്ങ്"
 
-#: db/models/fields.py:279
+#: db/models/fields.py:278
 msgid "Polygon"
 msgstr "ബഹുഭുജം"
 
-#: db/models/fields.py:283
+#: db/models/fields.py:282
 msgid "Multi-point"
 msgstr "ബഹുബിന്ദു"
 
-#: db/models/fields.py:287
+#: db/models/fields.py:286
 msgid "Multi-line string"
 msgstr "ബഹു രേഖാ സ്ട്രിങ്ങ്"
 
-#: db/models/fields.py:291
+#: db/models/fields.py:290
 msgid "Multi polygon"
 msgstr "ബഹു ബഹുഭുജം"
 
-#: db/models/fields.py:295
+#: db/models/fields.py:294
 msgid "Geometry collection"
 msgstr "ജ്യാമിതി ശേഖരം"
 
-#: forms/fields.py:19
+#: forms/fields.py:23
 msgid "No geometry value provided."
 msgstr "ജ്യാമിതീയ മൂല്യമൊന്നും തന്നിട്ടില്ല."
 
-#: forms/fields.py:20
+#: forms/fields.py:24
 msgid "Invalid geometry value."
 msgstr "തെറ്റായ ജ്യാമിതീയ മൂല്യം."
 
-#: forms/fields.py:21
+#: forms/fields.py:25
 msgid "Invalid geometry type."
 msgstr "തെറ്റായ തരം ജ്യാമിതി."
 
-#: forms/fields.py:22
+#: forms/fields.py:26
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."

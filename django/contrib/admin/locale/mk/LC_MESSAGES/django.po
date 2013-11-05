@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-#   <vvangelovski@gmail.com>, 2012.
-# vvangelovski <vvangelovski@gmail.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# vvangelovski <vvangelovski@gmail.com>, 2013
+# vvangelovski <vvangelovski@gmail.com>, 2011-2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:52+0000\n"
-"Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-09-23 10:59+0000\n"
+"Last-Translator: vvangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/projects/p/django/"
 "language/mk/)\n"
 "MIME-Version: 1.0\n"
@@ -19,21 +19,21 @@ msgstr ""
 "Language: mk\n"
 "Plural-Forms: nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;\n"
 
-#: actions.py:48
+#: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Успешно беа избришани %(count)d %(items)s."
 
-#: actions.py:60 options.py:1347
+#: actions.py:61 options.py:1418
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Не може да се избрише %(name)s"
 
-#: actions.py:62 options.py:1349
+#: actions.py:63 options.py:1420
 msgid "Are you sure?"
 msgstr "Сигурни сте?"
 
-#: actions.py:83
+#: actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Избриши ги избраните %(verbose_name_plural)s"
@@ -80,6 +80,8 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
+"Ве молиме внесете ги точните %(username)s и лозинка за член. Внимавајте, "
+"двете полиња се осетливи на големи и мали букви."
 
 #: forms.py:19
 msgid "Please log in again, because your session has expired."
@@ -89,86 +91,86 @@ msgstr "Ве молам најавете се повторно бидејќи в
 msgid "Action:"
 msgstr "Акција:"
 
-#: models.py:24
+#: models.py:25
 msgid "action time"
 msgstr "време на акција"
 
-#: models.py:27
+#: models.py:28
 msgid "object id"
 msgstr "идентификационен број на објект"
 
-#: models.py:28
+#: models.py:29
 msgid "object repr"
 msgstr "репрезентација на објект"
 
-#: models.py:29
+#: models.py:30
 msgid "action flag"
 msgstr "знакче за акција"
 
-#: models.py:30
+#: models.py:31
 msgid "change message"
 msgstr "измени ја пораката"
 
-#: models.py:35
+#: models.py:36
 msgid "log entry"
 msgstr "ставка во записникот"
 
-#: models.py:36
+#: models.py:37
 msgid "log entries"
 msgstr "ставки во записникот"
 
-#: models.py:45
+#: models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "Додадено \"%(object)s\"."
 
-#: models.py:47
+#: models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "Променето \"%(object)s\" - %(changes)s"
 
-#: models.py:52
+#: models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "Избришано \"%(object)s.\""
 
-#: models.py:54
+#: models.py:55
 msgid "LogEntry Object"
 msgstr "Запис во дневник"
 
-#: options.py:156 options.py:172
+#: options.py:173 options.py:202
 msgid "None"
 msgstr "Ништо"
 
-#: options.py:684
+#: options.py:763
 #, python-format
 msgid "Changed %s."
 msgstr "Изменета %s."
 
-#: options.py:684 options.py:694
+#: options.py:763 options.py:773 options.py:1570
 msgid "and"
 msgstr "и"
 
-#: options.py:689
+#: options.py:768
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Додадено %(name)s „%(object)s“."
 
-#: options.py:693
+#: options.py:772
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Изменето %(list)s за %(name)s „%(object)s“."
 
-#: options.py:698
+#: options.py:777
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Избришан  %(name)s „%(object)s“."
 
-#: options.py:702
+#: options.py:781
 msgid "No fields changed."
 msgstr "Не беше изменето ниедно поле."
 
-#: options.py:807 options.py:860
+#: options.py:884 options.py:927
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -176,38 +178,44 @@ msgstr ""
 "Ставката %(name)s \"%(obj)s\" беше успешно додадена. Подолу можете повторно "
 "да ја уредите."
 
-#: options.py:835
+#: options.py:902
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
 "%(name)s below."
 msgstr ""
+"Ставката %(name)s \"%(obj)s\" беше успешно додаден. Можете да додадете нов "
+"%(name)s подолу."
 
-#: options.py:839
+#: options.py:906
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Ставката %(name)s \"%(obj)s\" беше успешно додадена."
 
-#: options.py:853
+#: options.py:920
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
 msgstr ""
+"Ставката %(name)s \"%(obj)s\" беше успешно уредена. Подолу можете повторно "
+"да ја уредите."
 
-#: options.py:867
+#: options.py:934
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
 "%(name)s below."
 msgstr ""
+"Ставката %(name)s \"%(obj)s\" беше успешно уредена. Подолу можете да "
+"додадете нов %(name)s."
 
-#: options.py:873
+#: options.py:940
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" беше успешно изменета."
 
-#: options.py:951 options.py:1211
+#: options.py:1018 options.py:1278
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -215,65 +223,80 @@ msgstr ""
 "Мора да се одберат предмети за да се изврши акција врз нив. Ниеден предмет "
 "не беше променет."
 
-#: options.py:970
+#: options.py:1037
 msgid "No action selected."
 msgstr "Ниедна акција не е одбрана."
 
-#: options.py:1050
+#: options.py:1117
 #, python-format
 msgid "Add %s"
 msgstr "Додади %s"
 
-#: options.py:1074 options.py:1319
+#: options.py:1141 options.py:1386
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "објект %(name)s со примарен клуч %(key)r не постои."
 
-#: options.py:1140
+#: options.py:1207
 #, python-format
 msgid "Change %s"
 msgstr "Измени %s"
 
-#: options.py:1190
+#: options.py:1257
 msgid "Database error"
 msgstr "Грешка во базата на податоци"
 
-#: options.py:1253
+#: options.py:1320
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s ставка %(name)s беше успешно изменета."
 msgstr[1] "%(count)s ставки %(name)s беа успешно изменети."
 
-#: options.py:1280
+#: options.py:1347
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s одбран"
 msgstr[1] "Сите %(total_count)s одбрани"
 
-#: options.py:1285
+#: options.py:1352
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 од %(cnt)s избрани"
 
-#: options.py:1335
+#: options.py:1403
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Ставаката %(name)s \"%(obj)s\" беше избришана успешно."
 
-#: options.py:1382
+#: options.py:1459
 #, python-format
 msgid "Change history: %s"
 msgstr "Историја на измени: %s"
 
-#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#. Translators: Model verbose name and instance representation, suitable to be
+#. an item in a list
+#: options.py:1564
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#: options.py:1571
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+""
+
+#: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19
 #: views/decorators.py:24
 msgid "Log in"
 msgstr "Најава"
 
-#: sites.py:388
+#: sites.py:386
 msgid "Site administration"
 msgstr "Администрација на сајт"
 
@@ -294,17 +317,17 @@ msgstr "Време:"
 msgid "Lookup"
 msgstr "Побарај"
 
-#: widgets.py:271
+#: widgets.py:260
 msgid "Add Another"
 msgstr "Додади друго"
 
-#: widgets.py:316
+#: widgets.py:302
 msgid "Currently:"
-msgstr ""
+msgstr "Моментално:"
 
-#: widgets.py:317
+#: widgets.py:303
 msgid "Change:"
-msgstr ""
+msgstr "Измени:"
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -348,6 +371,8 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"Имаше грешка. Администраторите на сајтот се известени и треба да биде брзо "
+"поправена. Ви благодариме за вашето трпение."
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
@@ -426,9 +451,14 @@ msgstr "Погледни на сајтот"
 #: templates/admin/auth/user/change_password.html:27
 #: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Ве молам поправете ја грешката подолу."
-msgstr[1] "Ве молам поправете ги грешките подолу."
+msgstr "Ве молам поправете ги грешките подолу."
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the errors below."
+msgstr "Ве молам поправете ги грешките подолу."
 
 #: templates/admin/change_list.html:58
 #, python-format
@@ -531,7 +561,7 @@ msgstr " Според %(filter_title)s "
 #: templates/admin/index.html:20
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr ""
+msgstr "Модели во %(name)s апликација"
 
 #: templates/admin/index.html:39
 msgid "Change"
@@ -783,9 +813,19 @@ msgstr "Успешно е ресетирањето на лозинката"
 
 #: templates/registration/password_reset_done.html:17
 msgid ""
-"We've emailed you instructions for setting your password to the email "
-"address you submitted. You should be receiving it shortly."
+"We've emailed you instructions for setting your password. You should be "
+"receiving them shortly."
 msgstr ""
+"Ви испративме инстуркции за внесување на вашата лозинка на email адресата "
+"што ја внесовте. Треба да ги добиете за кратко време."
+
+#: templates/registration/password_reset_done.html:19
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Ако не примивте email, ве молиме осигурајте се дека сте ја внесле правата "
+"адреса кога се регистриравте и проверете го spam фолдерот."
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
@@ -793,6 +833,8 @@ msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"Го примате овој email бидејќи побаравте ресетирање на лозинка за вашето "
+"корисничко име на %(site_name)s."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -816,29 +858,31 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
+"Ја заборавивте вашата лозинка? Внесете ја вашата email адреса подолу, ќе "
+"добиете порака со инструкции за промена на лозинката."
 
 #: templates/registration/password_reset_form.html:21
 msgid "Email address:"
-msgstr ""
+msgstr "Email адреса:"
 
 #: templates/registration/password_reset_form.html:21
 msgid "Reset my password"
 msgstr "Ресетирај ја мојата лозинка"
 
-#: templatetags/admin_list.py:344
+#: templatetags/admin_list.py:348
 msgid "All dates"
 msgstr "Сите датуми"
 
-#: views/main.py:33
+#: views/main.py:35
 msgid "(None)"
 msgstr "(Ништо)"
 
-#: views/main.py:76
+#: views/main.py:84
 #, python-format
 msgid "Select %s"
 msgstr "Изберете %s"
 
-#: views/main.py:78
+#: views/main.py:86
 #, python-format
 msgid "Select %s to change"
 msgstr "Изберете %s за измена"

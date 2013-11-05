@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Paras Nath Chaudhary <opnchaudhary@gmail.com>, 2012.
-# Sagar Chalise <chalisesagar@gmail.com>, 2011.
+# Paras Nath Chaudhary <opnchaudhary@gmail.com>, 2012
+# Sagar Chalise <chalisesagar@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-10-04 11:29+0000\n"
-"Last-Translator: Paras Nath Chaudhary <opnchaudhary@gmail.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-29 08:27+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Nepali (http://www.transifex.com/projects/p/django/language/"
 "ne/)\n"
 "MIME-Version: 1.0\n"

@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-#   <adam.raizen@gmail.com>, 2012.
-# Baptiste  <bapdarth@yahoo.fr>, 2011.
+# Baptiste <baptiste+transifex@darthenay.fr>, 2011
+# Baptiste <baptiste+transifex@darthenay.fr>, 2013
+# sagittarian <adam.raizen@gmail.com>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-12-11 19:21+0000\n"
-"Last-Translator: sagittarian <adam.raizen@gmail.com>\n"
+"POT-Creation-Date: 2013-08-16 15:07+0200\n"
+"PO-Revision-Date: 2013-10-23 14:26+0000\n"
+"Last-Translator: Baptiste <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/projects/p/django/"
 "language/eo/)\n"
 "MIME-Version: 1.0\n"
@@ -30,10 +31,6 @@ msgstr "antaŭa paŝo"
 msgid "submit"
 msgstr "sendi"
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
-msgstr ""
-"Ni pardonpetas, sed via formularo eksvalidiĝis. Bonvolu daŭre plenigi la "
-"formularon el ĉi tiu paĝo."
+#: wizard/views.py:275
+msgid "ManagementForm data is missing or has been tampered."
+msgstr "ManagementForm datumoj mankas, aŭ estas tuŝaĉitaj."

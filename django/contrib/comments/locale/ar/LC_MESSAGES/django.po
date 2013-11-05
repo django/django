@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Ossama Khayat <okhayat@gmail.com>, 2011.
+# dado_eyad <d.eyad.t@gmail.com>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Ossama Khayat <okhayat@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Ossama Khayat <okhayat@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-10-28 08:57+0000\n"
+"Last-Translator: dado_eyad <d.eyad.t@gmail.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/django/language/"
 "ar/)\n"
 "MIME-Version: 1.0\n"
@@ -28,57 +29,49 @@ msgid "Metadata"
 msgstr "ميتاداتا"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "لا يوجد"
-msgstr[1] "عليه علامة"
-msgstr[2] "عليهما علامة"
-msgstr[3] "عليها علامة"
-msgstr[4] "عليها علامة"
-msgstr[5] "عليها علامة"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "تعليم التعليقات المحددة"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "اعتُمد"
-msgstr[1] "اعتُمد"
-msgstr[2] "اعتُمدا"
-msgstr[3] "اعتُمدت"
-msgstr[4] "اعتُمدت"
-msgstr[5] "اعتُمدت"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "تمت الموافقة على %d من التعليقات بنجاح"
+msgstr[1] "تمت الموافقة على %d من التعليقات بنجاح"
+msgstr[2] "تمت الموافقة على %d من التعليقات بنجاح"
+msgstr[3] "تمت الموافقة على %d من التعليقات بنجاح"
+msgstr[4] "تمت الموافقة على %d من التعليقات بنجاح"
+msgstr[5] "تمت الموافقة على %d من التعليقات بنجاح"
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "اعتماد التعليقات المحددة"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "أزيل"
-msgstr[1] "أزيل"
-msgstr[2] "أزيلا"
-msgstr[3] "أزيلت"
-msgstr[4] "أزيل"
-msgstr[5] "أزيل"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "تم حذف %d من التعليقات بنجاح"
+msgstr[1] "تم حذف %d من التعليقات بنجاح"
+msgstr[2] "تم حذف %d من التعليقات بنجاح"
+msgstr[3] "تم حذف %d من التعليقات بنجاح"
+msgstr[4] "تم حذف %d من التعليقات بنجاح"
+msgstr[5] "تم حذف %d من التعليقات بنجاح"
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "احذف التعليقات المحددة"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "تعليق %(count)s %(action)s."
-msgstr[1] "تعليق %(count)s %(action)s."
-msgstr[2] "تعليقان %(count)s %(action)s."
-msgstr[3] "تعليقات %(count)s %(action)s."
-msgstr[4] "تعليق %(count)s %(action)s."
-msgstr[5] "تعليقات %(count)s %(action)s."
 
 #: feeds.py:14
 #, python-format
@@ -307,13 +300,11 @@ msgstr "عاين تعليقك"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "لا يوجد أخطاء"
-msgstr[1] "رجاءً صحح الخطأ أدناه"
-msgstr[2] "رجاءً صحح الخطأين أدناه"
-msgstr[3] "رجاءً صحح الأخطاء أدناه"
-msgstr[4] "رجاءً صحح الأخطاء أدناه"
-msgstr[5] "رجاءً صحح الأخطاء أدناه"
+msgstr "رجاءً صحح الأخطاء أدناه"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "الرجاء تصحيح الأخطاء أدناه"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

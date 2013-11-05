@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Harro van der Klauw <hvdklauw@gmail.com>, 2012.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Jeffrey Gelens <jeffrey@noppo.pro>, 2011, 2012.
-# wunki <petar@wunki.org>, 2011.
+# Bouke Haarsma <bouke@webatoom.nl>, 2013
+# Harro van der Klauw <hvdklauw@gmail.com>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012
+# wunki <petar@wunki.org>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-03-08 10:42+0000\n"
-"Last-Translator: Harro van der Klauw <hvdklauw@gmail.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-10-30 08:16+0000\n"
+"Last-Translator: Bouke Haarsma <bouke@webatoom.nl>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/django/language/"
 "nl/)\n"
 "MIME-Version: 1.0\n"
@@ -51,7 +52,7 @@ msgstr "Kies alle"
 #: static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr "Klik om alle %s kiezen in een keer."
+msgstr "Klik om alle %s te kiezen."
 
 #: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
@@ -99,7 +100,7 @@ msgstr ""
 "U heeft niet opgeslagen wijzigingen op enkele indviduele velden. Als u nu "
 "een actie uitvoert zullen uw wijzigingen verloren gaan."
 
-#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
+#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -119,7 +120,7 @@ msgstr ""
 "individuele velden. U zoekt waarschijnlijk naar de Gaan knop in plaats van "
 "de Opslaan knop."
 
-#: static/admin/js/calendar.js:26
+#: static/admin/js/calendar.js:8
 msgid ""
 "January February March April May June July August September October November "
 "December"
@@ -127,7 +128,7 @@ msgstr ""
 "januari februari maart april mei juni juli augustus september oktober "
 "november december"
 
-#: static/admin/js/calendar.js:27
+#: static/admin/js/calendar.js:9
 msgid "S M T W T F S"
 msgstr "Z M D W D V Z"
 
@@ -136,53 +137,53 @@ msgstr "Z M D W D V Z"
 msgid "Show"
 msgstr "Tonen"
 
-#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
+#: static/admin/js/collapse.js:16 static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "Verbergen"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:49
-#: static/admin/js/admin/DateTimeShortcuts.js:85
+#: static/admin/js/admin/DateTimeShortcuts.js:52
+#: static/admin/js/admin/DateTimeShortcuts.js:88
 msgid "Now"
 msgstr "Nu"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:53
+#: static/admin/js/admin/DateTimeShortcuts.js:56
 msgid "Clock"
 msgstr "Klok"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:81
+#: static/admin/js/admin/DateTimeShortcuts.js:84
 msgid "Choose a time"
 msgstr "Kies een tijd"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:86
+#: static/admin/js/admin/DateTimeShortcuts.js:89
 msgid "Midnight"
 msgstr "Middernacht"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:87
+#: static/admin/js/admin/DateTimeShortcuts.js:90
 msgid "6 a.m."
 msgstr "Zes uur 's ochtends"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:88
+#: static/admin/js/admin/DateTimeShortcuts.js:91
 msgid "Noon"
 msgstr "Twaalf uur 's middags"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:92
-#: static/admin/js/admin/DateTimeShortcuts.js:204
+#: static/admin/js/admin/DateTimeShortcuts.js:95
+#: static/admin/js/admin/DateTimeShortcuts.js:208
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:144
-#: static/admin/js/admin/DateTimeShortcuts.js:197
+#: static/admin/js/admin/DateTimeShortcuts.js:148
+#: static/admin/js/admin/DateTimeShortcuts.js:201
 msgid "Today"
 msgstr "Vandaag"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:148
+#: static/admin/js/admin/DateTimeShortcuts.js:152
 msgid "Calendar"
 msgstr "Kalender"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:195
+#: static/admin/js/admin/DateTimeShortcuts.js:199
 msgid "Yesterday"
 msgstr "Gisteren"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:199
+#: static/admin/js/admin/DateTimeShortcuts.js:203
 msgid "Tomorrow"
 msgstr "Morgen"

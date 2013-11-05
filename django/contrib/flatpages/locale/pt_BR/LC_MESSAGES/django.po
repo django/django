@@ -1,18 +1,22 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Eduardo Carvalho <eduardocereto@gmail.com>, 2011.
-# Guilherme Gondim <semente+transifex@taurinus.org>, 2012.
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# andrewsmedina <andrewsmedina@gmail.com>, 2013
+# Eduardo Carvalho <eduardocereto@gmail.com>, 2011
+# Fábio <bnafta@gmail.com>, 2013
+# Guilherme Gondim <semente@taurinus.org>, 2012-2013
+# Jannis Leidel <jannis@leidel.info>, 2011
+# seocam <seocam@seocam.com>, 2013
+# Thiago Avelino <Thiagoavelinoster@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-10-18 10:56+0000\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-08-13 19:01+0000\n"
 "Last-Translator: Guilherme Gondim <semente@taurinus.org>\n"
-"Language-Team: Portuguese (Brazil) <django-l10n-portuguese@googlegroups."
-"com>\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/"
+"django/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -51,7 +55,7 @@ msgstr "Está faltando uma barra no final da URL."
 #: forms.py:38
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
-msgstr "Uma Flatpage com a URL %(url)s já existe para o site %(site)s "
+msgstr "Uma flatpage com a URL %(url)s já existe para o site %(site)s"
 
 #: models.py:12
 msgid "title"
@@ -81,19 +85,19 @@ msgstr ""
 msgid "registration required"
 msgstr "registro obrigatório"
 
-#: models.py:17
+#: models.py:18
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "Se estiver assinalado, apenas usuários autenticados poderão ver a página."
 
-#: models.py:22
+#: models.py:24
 msgid "flat page"
 msgstr "página plana"
 
-#: models.py:23
+#: models.py:25
 msgid "flat pages"
 msgstr "páginas planas"
 
-#: tests/forms.py:97
+#: tests/test_forms.py:98
 msgid "This field is required."
 msgstr "Este campo é obrigatório."

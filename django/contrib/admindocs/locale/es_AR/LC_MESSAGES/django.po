@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Ramiro Morales <cramm0@gmail.com>, 2012.
+# federicobond <federicobond@gmail.com>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Ramiro Morales <cramm0@gmail.com>, 2012-2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-22 09:28+0200\n"
-"PO-Revision-Date: 2012-10-22 08:46+0000\n"
+"POT-Creation-Date: 2013-06-02 00:30-0400\n"
+"PO-Revision-Date: 2013-11-05 10:20+0000\n"
 "Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/projects/p/"
 "django/language/es_AR/)\n"
@@ -18,59 +19,60 @@ msgstr ""
 "Language: es_AR\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:58 views.py:60 views.py:62
+#: views.py:59 views.py:61 views.py:63
 msgid "tag:"
 msgstr "etiqueta:"
 
-#: views.py:93 views.py:95 views.py:97
+#: views.py:94 views.py:96 views.py:98
 msgid "filter:"
-msgstr "filtrar:"
+msgstr "filtro:"
 
-#: views.py:156 views.py:158 views.py:160
+#: views.py:157 views.py:159 views.py:161
 msgid "view:"
-msgstr "ver:"
+msgstr "vista:"
 
-#: views.py:188
+#: views.py:189
 #, python-format
 msgid "App %r not found"
 msgstr "Aplicación %r no encontrada"
 
-#: views.py:195
+#: views.py:196
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "Modelo %(model_name)r no encontrado en aplicación %(app_label)r"
 
-#: views.py:207
+#: views.py:208
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "el objeto `%(app_label)s.%(data_type)s` relacionado"
 
-#: views.py:207 views.py:226 views.py:231 views.py:245 views.py:259
-#: views.py:264
+#: views.py:208 views.py:227 views.py:232 views.py:246 views.py:260
+#: views.py:265
 msgid "model:"
 msgstr "modelo:"
 
-#: views.py:222 views.py:254
+#: views.py:223 views.py:255
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "objetos `%(app_label)s.%(object_name)s` relacionados"
 
-#: views.py:226 views.py:259
+#: views.py:227 views.py:260
 #, python-format
 msgid "all %s"
 msgstr "todos los %s"
 
-#: views.py:231 views.py:264
+#: views.py:232 views.py:265
 #, python-format
 msgid "number of %s"
 msgstr "número de %s"
 
-#: views.py:269
+#. Translators: %s is an object type name
+#: views.py:271
 #, python-format
-msgid "Fields on %s objects"
-msgstr "Campos en objetos %s"
+msgid "Attributes on %s objects"
+msgstr "Atributos de objetos %s"
 
-#: views.py:361
+#: views.py:363
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s no parece ser un objeto urlpattern"
@@ -88,7 +90,9 @@ msgid "Home"
 msgstr "Inicio"
 
 #: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
+#: templates/admin_doc/index.html.py:10 templates/admin_doc/index.html:14
 #: templates/admin_doc/missing_docutils.html:7
+#: templates/admin_doc/missing_docutils.html:14
 #: templates/admin_doc/model_detail.html:15
 #: templates/admin_doc/model_index.html:9
 #: templates/admin_doc/template_detail.html:7
@@ -99,7 +103,7 @@ msgstr "Inicio"
 msgid "Documentation"
 msgstr "Documentación"
 
-#: templates/admin_doc/bookmarklets.html:8
+#: templates/admin_doc/bookmarklets.html:8 templates/admin_doc/index.html:29
 msgid "Bookmarklets"
 msgstr "Bookmarklets"
 
@@ -168,33 +172,227 @@ msgstr "Editar este objeto (nueva ventana)"
 msgid "As above, but opens the admin page in a new window."
 msgstr "Ídem, pero abre la página de administración en una nueva ventana."
 
-#: templates/admin_doc/model_detail.html:16
+#: templates/admin_doc/index.html:17
+#: templates/admin_doc/template_tag_index.html:9
+msgid "Tags"
+msgstr "Etiquetas"
+
+#: templates/admin_doc/index.html:18
+msgid "List of all the template tags and their functions."
+msgstr "Lista de todas las etiquetas de plantilla y sus funciones."
+
+#: templates/admin_doc/index.html:20
+#: templates/admin_doc/template_filter_index.html:9
+msgid "Filters"
+msgstr "Filtros"
+
+#: templates/admin_doc/index.html:21
+msgid ""
+"Filters are actions which can be applied to variables in a template to alter "
+"the output."
+msgstr ""
+"Los filtros son acciones que pueden ser aplicadas a variables en una "
+"plantilla para alterar el resultado final."
+
+#: templates/admin_doc/index.html:23 templates/admin_doc/model_detail.html:16
 #: templates/admin_doc/model_index.html:10
+#: templates/admin_doc/model_index.html:14
 msgid "Models"
 msgstr "Modelos"
+
+#: templates/admin_doc/index.html:24
+msgid ""
+"Models are descriptions of all the objects in the system and their "
+"associated fields. Each model has a list of fields which can be accessed as "
+"template variables"
+msgstr ""
+"Los modelos son especificaciones de todos los objetos en el sistema y sus "
+"campos asociados. Cada modelo contiene una lista de campos accesibles como "
+"variables de plantilla"
+
+#: templates/admin_doc/index.html:26 templates/admin_doc/view_detail.html:8
+#: templates/admin_doc/view_index.html:9
+#: templates/admin_doc/view_index.html:12
+msgid "Views"
+msgstr "Vistas"
+
+#: templates/admin_doc/index.html:27
+msgid ""
+"Each page on the public site is generated by a view. The view defines which "
+"template is used to generate the page and which objects are available to "
+"that template."
+msgstr ""
+"Cada página en el sitio público es generada por una vista. La vista define "
+"qué plantilla es utilizada para generar la página y qué objetos están "
+"disponibles para esta plantilla."
+
+#: templates/admin_doc/index.html:30
+msgid "Tools for your browser to quickly access admin functionality."
+msgstr ""
+"Herramientas para tu navegador para acceder rápidamente a la funcionalidad "
+"de administración."
+
+#: templates/admin_doc/missing_docutils.html:10
+msgid "Please install docutils"
+msgstr "Por favor instale docutils"
+
+#: templates/admin_doc/missing_docutils.html:17
+#, python-format
+msgid ""
+"The admin documentation system requires Python's <a href=\"%(link)s"
+"\">docutils</a> library."
+msgstr ""
+"El sistema de documentación de admin requiere la biblioteca Python <a href="
+"\"%(link)s\">docutils</a>."
+
+#: templates/admin_doc/missing_docutils.html:19
+#, python-format
+msgid ""
+"Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
+msgstr ""
+"Por favor solicite a sus administradores de sistemas que instalen <a href="
+"\"%(link)s\">docutils</a>."
+
+#: templates/admin_doc/model_detail.html:21
+#, python-format
+msgid "Model: %(name)s"
+msgstr "Modelo: %(name)s"
+
+#: templates/admin_doc/model_detail.html:35
+msgid "Field"
+msgstr "Campo"
+
+#: templates/admin_doc/model_detail.html:36
+msgid "Type"
+msgstr "Tipo"
+
+#: templates/admin_doc/model_detail.html:37
+msgid "Description"
+msgstr "Descripción"
+
+#: templates/admin_doc/model_detail.html:52
+msgid "Back to Models Documentation"
+msgstr "Volver a la documentación de los modelos"
+
+#: templates/admin_doc/model_index.html:18
+msgid "Model documentation"
+msgstr "Documentación de modelos"
+
+#: templates/admin_doc/model_index.html:43
+msgid "Model groups"
+msgstr "Grupos de modelos"
 
 #: templates/admin_doc/template_detail.html:8
 msgid "Templates"
 msgstr "Plantillas"
 
-#: templates/admin_doc/template_filter_index.html:9
-msgid "Filters"
-msgstr "Filtros"
+#: templates/admin_doc/template_detail.html:13
+#, python-format
+msgid "Template: %(name)s"
+msgstr "Plantilla: %(name)s"
 
-#: templates/admin_doc/template_tag_index.html:9
-msgid "Tags"
-msgstr "Etiquetas"
+#: templates/admin_doc/template_detail.html:16
+#, python-format
+msgid "Template: \"%(name)s\""
+msgstr "Plantilla: \"%(name)s\""
 
-#: templates/admin_doc/view_detail.html:8
-#: templates/admin_doc/view_index.html:9
-msgid "Views"
-msgstr "Vistas"
+#: templates/admin_doc/template_detail.html:20
+#, python-format
+msgid "Search path for template \"%(name)s\" on %(grouper)s:"
+msgstr "Buscar ruta para la plantilla \"%(name)s\" en %(grouper)s:"
 
-#: tests/__init__.py:23
+#: templates/admin_doc/template_detail.html:23
+msgid "(does not exist)"
+msgstr "(no existe)"
+
+#: templates/admin_doc/template_detail.html:28
+msgid "Back to Documentation"
+msgstr "Volver a la documentación"
+
+#: templates/admin_doc/template_filter_index.html:12
+msgid "Template filters"
+msgstr "Filtros de plantilla"
+
+#: templates/admin_doc/template_filter_index.html:16
+msgid "Template filter documentation"
+msgstr "Documentación de filtros de plantilla"
+
+#: templates/admin_doc/template_filter_index.html:22
+#: templates/admin_doc/template_filter_index.html:43
+msgid "Built-in filters"
+msgstr "Filtros Django 'de fábrica'"
+
+#: templates/admin_doc/template_filter_index.html:23
+#, python-format
+msgid ""
+"To use these filters, put <code>%(code)s</code> in your template before "
+"using the filter."
+msgstr ""
+"Para usar estos filtros, escriba <code>%(code)s</code> en su plantilla antes "
+"de usar el filtro."
+
+#: templates/admin_doc/template_tag_index.html:12
+msgid "Template tags"
+msgstr "Etiquetas de plantilla"
+
+#: templates/admin_doc/template_tag_index.html:16
+msgid "Template tag documentation"
+msgstr "Documentación de etiquetas de plantilla"
+
+#: templates/admin_doc/template_tag_index.html:22
+#: templates/admin_doc/template_tag_index.html:43
+msgid "Built-in tags"
+msgstr "Etiquetas Django 'de fábrica'"
+
+#: templates/admin_doc/template_tag_index.html:23
+#, python-format
+msgid ""
+"To use these tags, put <code>%(code)s</code> in your template before using "
+"the tag."
+msgstr ""
+"Para usar estas etiquetas, escriba <code>%(code)s</code> en su plantilla "
+"antes de usar la etiqueta."
+
+#: templates/admin_doc/view_detail.html:12
+#, python-format
+msgid "View: %(name)s"
+msgstr "Vista: %(name)s"
+
+#: templates/admin_doc/view_detail.html:23
+msgid "Context:"
+msgstr "Contexto:"
+
+#: templates/admin_doc/view_detail.html:28
+msgid "Templates:"
+msgstr "Plantillas:"
+
+#: templates/admin_doc/view_detail.html:32
+msgid "Back to Views Documentation"
+msgstr "Volver a la documentación de vistas"
+
+#: templates/admin_doc/view_index.html:16
+msgid "View documentation"
+msgstr "Documentación de vistas"
+
+#: templates/admin_doc/view_index.html:22
+msgid "Jump to site"
+msgstr "Ir al sitio"
+
+#: templates/admin_doc/view_index.html:35
+#, python-format
+msgid "Views by URL on %(name)s"
+msgstr "Vistas por URL en %(name)s"
+
+#: templates/admin_doc/view_index.html:40
+#, python-format
+msgid "View function: %(name)s"
+msgstr "Función de vista: %(name)s"
+
+#: tests/test_fields.py:29
 msgid "Boolean (Either True or False)"
 msgstr "Booleano (Verdadero o Falso)"
 
-#: tests/__init__.py:33
+#: tests/test_fields.py:39
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "Campo tipo: %(field_type)s"

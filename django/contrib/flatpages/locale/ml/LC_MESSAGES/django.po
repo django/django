@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Rajeesh Nair <rajeeshrnair@gmail.com>, 2011, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Rajeesh Nair <rajeeshrnair@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-10-18 10:56+0000\n"
-"Last-Translator: Rajeesh Nair <rajeeshrnair@gmail.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-29 09:01+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Malayalam (http://www.transifex.com/projects/p/django/"
 "language/ml/)\n"
 "MIME-Version: 1.0\n"
@@ -80,18 +80,18 @@ msgstr ""
 msgid "registration required"
 msgstr "രജിസ്ട്രേഷന്‍ ആവശ്യമാണ്"
 
-#: models.py:17
+#: models.py:18
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "ഇതു ടിക് ചെയ്താല്‍ പിന്നെ ലോഗ്-ഇന്‍ ചെയ്ത യൂസര്‍ക്കു മാത്രമേ ഈ പേജ് കാണാന്‍ കഴിയൂ."
 
-#: models.py:22
+#: models.py:24
 msgid "flat page"
 msgstr "ഫ്ളാറ്റ് പേജ്"
 
-#: models.py:23
+#: models.py:25
 msgid "flat pages"
 msgstr "ഫ്ളാറ്റ് പേജുകള്‍"
 
-#: tests/forms.py:97
+#: tests/test_forms.py:98
 msgid "This field is required."
 msgstr "ഈ കള്ളി(ഫീല്‍ഡ്) നിര്‍ബന്ധമാണ്."

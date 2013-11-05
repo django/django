@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# André Hagenbruch <ahagenbruch@googlemail.com>, 2012.
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# André Hagenbruch <ahagenbruch@googlemail.com>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011,2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-08 13:16+0000\n"
-"Last-Translator: André Hagenbruch <ahagenbruch@googlemail.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-10-23 08:26+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/django/language/"
 "de/)\n"
 "MIME-Version: 1.0\n"
@@ -43,4 +43,4 @@ msgstr "Objekt %(obj_id)s des Inhaltstyps %(ct_id)s ist nicht vorhanden"
 #: views.py:27
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
-msgstr " %(ct_name)s  Objekte haben keine get_absolute_url ()-Methode"
+msgstr " %(ct_name)s Objekte haben keine get_absolute_url ()-Methode"

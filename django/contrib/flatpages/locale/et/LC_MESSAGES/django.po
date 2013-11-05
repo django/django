@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# madisvain <madisvain@gmail.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# jannolii <jannolii@gmail.com>, 2013
+# madisvain <madisvain@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-10-18 10:56+0000\n"
-"Last-Translator: madisvain <madisvain@gmail.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-05-28 15:29+0000\n"
+"Last-Translator: jannolii <jannolii@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/projects/p/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -42,16 +43,16 @@ msgstr ""
 
 #: forms.py:19
 msgid "URL is missing a leading slash."
-msgstr ""
+msgstr "Internetiaadressil puudub alustav kaldkriips"
 
 #: forms.py:23
 msgid "URL is missing a trailing slash."
-msgstr ""
+msgstr "Internetiaadressil puudub lõpetav kaldkriips"
 
 #: forms.py:38
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
-msgstr ""
+msgstr "Saidil %(site)s on sisuleht aadressiga %(url)s juba olemas"
 
 #: models.py:12
 msgid "title"
@@ -81,18 +82,18 @@ msgstr ""
 msgid "registration required"
 msgstr "registreerumine nõutav"
 
-#: models.py:17
+#: models.py:18
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "Kui see on valitud, näevad lehte ainult sisselogitud kasutajad"
 
-#: models.py:22
+#: models.py:24
 msgid "flat page"
 msgstr "sisuleht"
 
-#: models.py:23
+#: models.py:25
 msgid "flat pages"
 msgstr "sisulehed"
 
-#: tests/forms.py:97
+#: tests/test_forms.py:98
 msgid "This field is required."
 msgstr "See lahter on nõutav."

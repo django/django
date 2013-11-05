@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Jeffrey Gelens <jeffrey@noppo.pro>, 2012.
+# Bouke Haarsma <bouke@webatoom.nl>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Jeffrey Gelens <jeffrey@noppo.pro>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-17 22:39+0000\n"
-"Last-Translator: Jeffrey Gelens <jeffrey@noppo.pro>\n"
+"POT-Creation-Date: 2013-08-16 15:07+0200\n"
+"PO-Revision-Date: 2013-10-30 08:12+0000\n"
+"Last-Translator: Bouke Haarsma <bouke@webatoom.nl>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/django/language/"
 "nl/)\n"
 "MIME-Version: 1.0\n"
@@ -30,10 +31,6 @@ msgstr "vorige stap"
 msgid "submit"
 msgstr "verzenden"
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
-msgstr ""
-"Onze excuses, maar uw formulier is verlopen. Gaat u alstublieft verder met "
-"het invullen van het formulier op deze pagina."
+#: wizard/views.py:275
+msgid "ManagementForm data is missing or has been tampered."
+msgstr "ManagementForm ontbreekt of is mee gesjoemeld."

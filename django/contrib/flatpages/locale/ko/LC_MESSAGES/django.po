@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jaehong Kim <mixe@korea.com>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jaehong Kim <mixe@korea.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-10-18 10:56+0000\n"
-"Last-Translator: Jaehong Kim <mixe@korea.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-29 09:01+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/django/language/"
 "ko/)\n"
 "MIME-Version: 1.0\n"
@@ -79,18 +79,18 @@ msgstr ""
 msgid "registration required"
 msgstr "등록하세요."
 
-#: models.py:17
+#: models.py:18
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "체크할 경우, 로그인 사용자만 해당 페이지를 볼 수 있습니다."
 
-#: models.py:22
+#: models.py:24
 msgid "flat page"
 msgstr "플랫 페이지"
 
-#: models.py:23
+#: models.py:25
 msgid "flat pages"
 msgstr "플랫 페이지(들)"
 
-#: tests/forms.py:97
+#: tests/test_forms.py:98
 msgid "This field is required."
 msgstr "필수 항목입니다."

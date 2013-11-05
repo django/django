@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-#   <germanilyin@gmail.com>, 2011.
-# Nurlan Rakhimzhanov <nurlan.rakhimzhanov@gmail.com>, 2011.
+# Nurlan Rakhimzhanov <nurlan.rakhimzhanov@gmail.com>, 2011
+# yun_man_ger <germanilyin@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:52+0000\n"
-"Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-08-17 08:29+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Kazakh (http://www.transifex.com/projects/p/django/language/"
 "kk/)\n"
 "MIME-Version: 1.0\n"
@@ -18,21 +18,21 @@ msgstr ""
 "Language: kk\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: actions.py:48
+#: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Таңдалған %(count)d %(items)s элемент өшірілді."
 
-#: actions.py:60 options.py:1347
+#: actions.py:61 options.py:1418
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s өшіре алмайды"
 
-#: actions.py:62 options.py:1349
+#: actions.py:63 options.py:1420
 msgid "Are you sure?"
 msgstr "Сенімдісіз бе?"
 
-#: actions.py:83
+#: actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Таңдалған %(verbose_name_plural)s өшірілді"
@@ -88,153 +88,153 @@ msgstr "Сіздің сессия уақытыңыз өтіп кентті, өт
 msgid "Action:"
 msgstr "Әрекет:"
 
-#: models.py:24
+#: models.py:25
 msgid "action time"
 msgstr "әрекет уақыты"
 
-#: models.py:27
+#: models.py:28
 msgid "object id"
 msgstr "объекттің id-i"
 
-#: models.py:28
+#: models.py:29
 msgid "object repr"
 msgstr "объекттің repr-i"
 
-#: models.py:29
+#: models.py:30
 msgid "action flag"
 msgstr "әрекет белгісі"
 
-#: models.py:30
+#: models.py:31
 msgid "change message"
 msgstr "хабарламаны өзгерту"
 
-#: models.py:35
+#: models.py:36
 msgid "log entry"
 msgstr "Жорнал жазуы"
 
-#: models.py:36
+#: models.py:37
 msgid "log entries"
 msgstr "Жорнал жазулары"
 
-#: models.py:45
+#: models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr ""
 
-#: models.py:47
+#: models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr ""
 
-#: models.py:52
+#: models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr ""
 
-#: models.py:54
+#: models.py:55
 msgid "LogEntry Object"
 msgstr ""
 
-#: options.py:156 options.py:172
+#: options.py:173 options.py:202
 msgid "None"
 msgstr "Ешнәрсе"
 
-#: options.py:684
+#: options.py:763
 #, python-format
 msgid "Changed %s."
 msgstr "%s өзгертілді."
 
-#: options.py:684 options.py:694
+#: options.py:763 options.py:773 options.py:1570
 msgid "and"
 msgstr "және"
 
-#: options.py:689
+#: options.py:768
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" қосылды."
 
-#: options.py:693
+#: options.py:772
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "\"%(object)s\" %(name)s-нің %(list)s өзгертілді."
 
-#: options.py:698
+#: options.py:777
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" өшірілді."
 
-#: options.py:702
+#: options.py:781
 msgid "No fields changed."
 msgstr "Ешқандай толтырма өзгермеді."
 
-#: options.py:807 options.py:860
+#: options.py:884 options.py:927
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" сәтті қосылды. Оны төменде өзгерте аласыз."
 
-#: options.py:835
+#: options.py:902
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
 "%(name)s below."
 msgstr ""
 
-#: options.py:839
+#: options.py:906
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" сәтті қосылды."
 
-#: options.py:853
+#: options.py:920
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
 msgstr ""
 
-#: options.py:867
+#: options.py:934
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
 "%(name)s below."
 msgstr ""
 
-#: options.py:873
+#: options.py:940
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" сәтті өзгертілді."
 
-#: options.py:951 options.py:1211
+#: options.py:1018 options.py:1278
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 "Бірнәрсені өзгерту үшін бірінші оларды таңдау керек. Ешнәрсе өзгертілмеді."
 
-#: options.py:970
+#: options.py:1037
 msgid "No action selected."
 msgstr "Ешқандай әрекет таңдалмады."
 
-#: options.py:1050
+#: options.py:1117
 #, python-format
 msgid "Add %s"
 msgstr "%s қосу"
 
-#: options.py:1074 options.py:1319
+#: options.py:1141 options.py:1386
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Бірінші кілті %(key)r бар %(name)s объекті жоқ."
 
-#: options.py:1140
+#: options.py:1207
 #, python-format
 msgid "Change %s"
 msgstr "%s өзгету"
 
-#: options.py:1190
+#: options.py:1257
 msgid "Database error"
 msgstr "Мәліметтер базасының қатесі"
 
-#: options.py:1253
+#: options.py:1320
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -243,7 +243,7 @@ msgstr[0] ""
 "\n"
 "other: %(count)s %(name)s таңдалғандарының барі өзгертілді."
 
-#: options.py:1280
+#: options.py:1347
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -252,28 +252,42 @@ msgstr[0] ""
 "\n"
 "other: Барлығы %(total_count)s таңдалды"
 
-#: options.py:1285
+#: options.py:1352
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 of %(cnt)s-ден 0 таңдалды"
 
-#: options.py:1335
+#: options.py:1403
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" сәтті өшірілді."
 
-#: options.py:1382
+#: options.py:1459
 #, python-format
 msgid "Change history: %s"
 msgstr "Өзгерес тарихы: %s"
 
-#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#. Translators: Model verbose name and instance representation, suitable to be
+#. an item in a list
+#: options.py:1564
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr ""
+
+#: options.py:1571
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+
+#: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19
 #: views/decorators.py:24
 msgid "Log in"
 msgstr "Кіру"
 
-#: sites.py:388
+#: sites.py:386
 msgid "Site administration"
 msgstr "Сайт әкімшілігі"
 
@@ -294,15 +308,15 @@ msgstr "Уақыт:"
 msgid "Lookup"
 msgstr "Іздеу"
 
-#: widgets.py:271
+#: widgets.py:260
 msgid "Add Another"
 msgstr "Тағы қосу"
 
-#: widgets.py:316
+#: widgets.py:302
 msgid "Currently:"
 msgstr ""
 
-#: widgets.py:317
+#: widgets.py:303
 msgid "Change:"
 msgstr ""
 
@@ -426,10 +440,16 @@ msgstr "Сайтта көру"
 #: templates/admin/auth/user/change_password.html:27
 #: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] ""
+msgstr ""
 "one: Астындағы қатені дұрыстаңыз.\n"
 "other: Астындағы қателерді дұрыстаңыз."
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the errors below."
+msgstr ""
 
 #: templates/admin/change_list.html:58
 #, python-format
@@ -778,8 +798,14 @@ msgstr "Құпия сөз сәтті өзгертілді"
 
 #: templates/registration/password_reset_done.html:17
 msgid ""
-"We've emailed you instructions for setting your password to the email "
-"address you submitted. You should be receiving it shortly."
+"We've emailed you instructions for setting your password. You should be "
+"receiving them shortly."
+msgstr ""
+
+#: templates/registration/password_reset_done.html:19
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
 msgstr ""
 
 #: templates/registration/password_reset_email.html:2
@@ -820,20 +846,20 @@ msgstr ""
 msgid "Reset my password"
 msgstr "Құпия сөзді жаңала"
 
-#: templatetags/admin_list.py:344
+#: templatetags/admin_list.py:348
 msgid "All dates"
 msgstr "Барлық мерзімдер"
 
-#: views/main.py:33
+#: views/main.py:35
 msgid "(None)"
 msgstr "(Ешнарсе)"
 
-#: views/main.py:76
+#: views/main.py:84
 #, python-format
 msgid "Select %s"
 msgstr "%s таңда"
 
-#: views/main.py:78
+#: views/main.py:86
 #, python-format
 msgid "Select %s to change"
 msgstr "%s өзгерту үщін таңда"

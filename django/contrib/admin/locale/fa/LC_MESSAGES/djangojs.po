@@ -1,17 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ali Nikneshan <ali@nikneshan.com>, 2011, 2012.
-# Alireza Savand <alireza.savand@gmail.com>, 2012.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Sina Cheraghi <sinacher@gmail.com>, 2011.
+# Ali Nikneshan <ali@nikneshan.com>, 2011-2012
+# Alireza Savand <alireza.savand@gmail.com>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Sina Cheraghi <sinacher@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-08-11 08:33+0000\n"
-"Last-Translator: Ali Nikneshan <ali@nikneshan.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-29 08:25+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -96,7 +96,7 @@ msgstr ""
 "شما تغییراتی در بعضی فیلدهای قابل تغییر انجام داده اید. اگر کاری انجام "
 "دهید،  تغییرات از دست خواهند رفت"
 
-#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
+#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -115,13 +115,13 @@ msgstr ""
 "شما عملی را انجام داده اید، ولی تغییری انجام نداده اید. احتمالا دنبال کلید "
 "Go به جای Save میگردید."
 
-#: static/admin/js/calendar.js:26
+#: static/admin/js/calendar.js:8
 msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr "ژانویه فوریه مارس آوریل مه ژوئن ژوئیه اوت سپتامبر اکتبر نوامبر دسامبر"
 
-#: static/admin/js/calendar.js:27
+#: static/admin/js/calendar.js:9
 msgid "S M T W T F S"
 msgstr "یکشنبه دوشنبه سه‌شنبه چهارشنبه پنجشنبه جمعه شنبه"
 
@@ -130,53 +130,53 @@ msgstr "یکشنبه دوشنبه سه‌شنبه چهارشنبه پنجشنب�
 msgid "Show"
 msgstr "نمایش"
 
-#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
+#: static/admin/js/collapse.js:16 static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "پنهان کردن"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:49
-#: static/admin/js/admin/DateTimeShortcuts.js:85
+#: static/admin/js/admin/DateTimeShortcuts.js:52
+#: static/admin/js/admin/DateTimeShortcuts.js:88
 msgid "Now"
 msgstr "حالا"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:53
+#: static/admin/js/admin/DateTimeShortcuts.js:56
 msgid "Clock"
 msgstr "ساعت"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:81
+#: static/admin/js/admin/DateTimeShortcuts.js:84
 msgid "Choose a time"
 msgstr "یک زمان انتخاب کنید"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:86
+#: static/admin/js/admin/DateTimeShortcuts.js:89
 msgid "Midnight"
 msgstr "نیمه‌شب"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:87
+#: static/admin/js/admin/DateTimeShortcuts.js:90
 msgid "6 a.m."
 msgstr "۶ صبح"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:88
+#: static/admin/js/admin/DateTimeShortcuts.js:91
 msgid "Noon"
 msgstr "ظهر"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:92
-#: static/admin/js/admin/DateTimeShortcuts.js:204
+#: static/admin/js/admin/DateTimeShortcuts.js:95
+#: static/admin/js/admin/DateTimeShortcuts.js:208
 msgid "Cancel"
 msgstr "انصراف"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:144
-#: static/admin/js/admin/DateTimeShortcuts.js:197
+#: static/admin/js/admin/DateTimeShortcuts.js:148
+#: static/admin/js/admin/DateTimeShortcuts.js:201
 msgid "Today"
 msgstr "امروز"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:148
+#: static/admin/js/admin/DateTimeShortcuts.js:152
 msgid "Calendar"
 msgstr "تقویم"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:195
+#: static/admin/js/admin/DateTimeShortcuts.js:199
 msgid "Yesterday"
 msgstr "دیروز"
 
-#: static/admin/js/admin/DateTimeShortcuts.js:199
+#: static/admin/js/admin/DateTimeShortcuts.js:203
 msgid "Tomorrow"
 msgstr "فردا"

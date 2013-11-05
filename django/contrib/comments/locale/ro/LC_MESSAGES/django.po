@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Daniel Ursache-Dogariu <contact@danniel.net>, 2011.
-# Denis Darii <sinednx@gmail.com>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Daniel Ursache-Dogariu <contact@danniel.net>, 2011
+# Denis Darii <sinednx@gmail.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Daniel Ursache-Dogariu <contact@danniel.net>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-05-26 08:39+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Romanian (http://www.transifex.com/projects/p/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -29,45 +29,40 @@ msgid "Metadata"
 msgstr "Metadate"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "marcat"
-msgstr[1] "marcate"
-msgstr[2] "marcate"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Marchează comentariile selectate"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "aprobat"
-msgstr[1] "aprobate"
-msgstr[2] "aprobate"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Aprobă comentariile selectate"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "eliminat"
-msgstr[1] "eliminate"
-msgstr[2] "eliminate"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Elimină comentariile selectate"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "%(count)s comentariu a fost %(action)s cu succes."
-msgstr[1] "%(count)s comentarii au fost %(action)s cu succes."
-msgstr[2] "%(count)s de comentarii au fost %(action)s cu succes."
 
 #: feeds.py:14
 #, python-format
@@ -301,10 +296,11 @@ msgstr "Previzualizați-vă comentariul"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Corectați eroarea de mai jos"
-msgstr[1] "Corectați erorile de mai jos"
-msgstr[2] "Corectați erorile de mai jos"
+msgstr "Corectați erorile de mai jos"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr ""
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

@@ -1,17 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Translators:
-#  <anubhab91@gmail.com>, 2013.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-#   <rafi.tahmid@gmail.com>, 2012.
+# anubhab91, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Tahmid Rafi <rafi.tahmid@gmail.com>, 2012-2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-02-20 15:10+0000\n"
-"Last-Translator: anubhab91 <anubhab91@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-08-17 08:29+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Bengali (http://www.transifex.com/projects/p/django/language/"
 "bn/)\n"
 "MIME-Version: 1.0\n"
@@ -20,21 +19,21 @@ msgstr ""
 "Language: bn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: actions.py:48
+#: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d টি %(items)s সফলভাবে মুছে ফেলা হয়েছে"
 
-#: actions.py:60 options.py:1347
+#: actions.py:61 options.py:1418
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s ডিলিট করা সম্ভব নয়"
 
-#: actions.py:62 options.py:1349
+#: actions.py:63 options.py:1420
 msgid "Are you sure?"
 msgstr "আপনি কি নিশ্চিত?"
 
-#: actions.py:83
+#: actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "চিহ্নিত অংশটি %(verbose_name_plural)s মুছে ফেলুন"
@@ -90,86 +89,86 @@ msgstr "অনুগ্রহ করে পুনরায় প্রবেশ �
 msgid "Action:"
 msgstr "কাজ:"
 
-#: models.py:24
+#: models.py:25
 msgid "action time"
 msgstr "কার্য সময়"
 
-#: models.py:27
+#: models.py:28
 msgid "object id"
 msgstr "অবজেক্ট আইডি"
 
-#: models.py:28
+#: models.py:29
 msgid "object repr"
 msgstr "অবজেক্ট উপস্থাপক"
 
-#: models.py:29
+#: models.py:30
 msgid "action flag"
 msgstr "কার্যচিহ্ন"
 
-#: models.py:30
+#: models.py:31
 msgid "change message"
 msgstr "বার্তা পরিবর্তন করুন"
 
-#: models.py:35
+#: models.py:36
 msgid "log entry"
 msgstr "লগ এন্ট্রি"
 
-#: models.py:36
+#: models.py:37
 msgid "log entries"
 msgstr "লগ এন্ট্রিসমূহ"
 
-#: models.py:45
+#: models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "%(object)s অ্যাড করা হয়েছে"
 
-#: models.py:47
+#: models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr ""
 
-#: models.py:52
+#: models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "\"%(object)s\" ডিলিট করা হয়েছে"
 
-#: models.py:54
+#: models.py:55
 msgid "LogEntry Object"
 msgstr "লগ-এন্ট্রি দ্রব্য"
 
-#: options.py:156 options.py:172
+#: options.py:173 options.py:202
 msgid "None"
 msgstr "কিছু না"
 
-#: options.py:684
+#: options.py:763
 #, python-format
 msgid "Changed %s."
 msgstr "%s পরিবর্তিত হয়েছে।"
 
-#: options.py:684 options.py:694
+#: options.py:763 options.py:773 options.py:1570
 msgid "and"
 msgstr "এবং"
 
-#: options.py:689
+#: options.py:768
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" যুক্ত হয়েছে।"
 
-#: options.py:693
+#: options.py:772
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" এর জন্য %(list)s পরিবর্তিত হয়েছে।"
 
-#: options.py:698
+#: options.py:777
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" মোছা হয়েছে।"
 
-#: options.py:702
+#: options.py:781
 msgid "No fields changed."
 msgstr "কোন ফিল্ড পরিবর্তন হয়নি।"
 
-#: options.py:807 options.py:860
+#: options.py:884 options.py:927
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -177,102 +176,118 @@ msgstr ""
 "%(name)s \"%(obj)s\" সফলতার সাথে যুক্ত হয়েছে। আপনি নিচে থেকে এটি পুনরায় সম্পাদন "
 "করতে পারেন।"
 
-#: options.py:835
+#: options.py:902
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
 "%(name)s below."
 msgstr ""
+"\"%(obj)s\" %(name)s টি সফলতার সাথে যোগ করা হয়েছে। আপনি চাইলে নিচ থেকে আরো "
+"একটি %(name)s যোগ করতে পারেন।"
 
-#: options.py:839
+#: options.py:906
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" সফলতার সাথে যুক্ত হয়েছে।"
 
-#: options.py:853
+#: options.py:920
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
 msgstr ""
 
-#: options.py:867
+#: options.py:934
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
 "%(name)s below."
 msgstr ""
 
-#: options.py:873
+#: options.py:940
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" সফলতার সাথে পরিবর্তিত হয়েছে।"
 
-#: options.py:951 options.py:1211
+#: options.py:1018 options.py:1278
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr "কাজ করার আগে বস্তুগুলিকে অবশ্যই চিহ্নিত করতে হবে। কোনো বস্তু পরিবর্তিত হয়নি।"
 
-#: options.py:970
+#: options.py:1037
 msgid "No action selected."
 msgstr "কোনো কাজ "
 
-#: options.py:1050
+#: options.py:1117
 #, python-format
 msgid "Add %s"
 msgstr "%s যোগ করুন"
 
-#: options.py:1074 options.py:1319
+#: options.py:1141 options.py:1386
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "%(key)r প্রাইমারি কি সম্বলিত %(name)s অবজেক্ট এর অস্তিত্ব নেই।"
 
-#: options.py:1140
+#: options.py:1207
 #, python-format
 msgid "Change %s"
 msgstr "%s পরিবর্তন করুন"
 
-#: options.py:1190
+#: options.py:1257
 msgid "Database error"
 msgstr "ডাটাবেস সমস্যা"
 
-#: options.py:1253
+#: options.py:1320
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] ""
 msgstr[1] ""
 
-#: options.py:1280
+#: options.py:1347
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: options.py:1285
+#: options.py:1352
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s টি থেকে ০ টি সিলেক্ট করা হয়েছে"
 
-#: options.py:1335
+#: options.py:1403
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" সফলতার সাথে মুছে ফেলা হয়েছে।"
 
-#: options.py:1382
+#: options.py:1459
 #, python-format
 msgid "Change history: %s"
 msgstr "ইতিহাস পরিবর্তনঃ %s"
 
-#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#. Translators: Model verbose name and instance representation, suitable to be
+#. an item in a list
+#: options.py:1564
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr ""
+
+#: options.py:1571
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+
+#: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19
 #: views/decorators.py:24
 msgid "Log in"
 msgstr "প্রবেশ করুন"
 
-#: sites.py:388
+#: sites.py:386
 msgid "Site administration"
 msgstr "সাইট প্রশাসন"
 
@@ -293,15 +308,15 @@ msgstr "সময়ঃ"
 msgid "Lookup"
 msgstr "খুঁজুন"
 
-#: widgets.py:271
+#: widgets.py:260
 msgid "Add Another"
 msgstr "আরেকটি যোগ করুন"
 
-#: widgets.py:316
+#: widgets.py:302
 msgid "Currently:"
 msgstr "বর্তমান অবস্থা:"
 
-#: widgets.py:317
+#: widgets.py:303
 msgid "Change:"
 msgstr "পরিবর্তন:"
 
@@ -363,7 +378,7 @@ msgstr "সকল পৃষ্ঠার দ্রব্য পছন্দ ক�
 #: templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
-msgstr ""
+msgstr "%(total_count)s টি %(module_name)s এর সবগুলোই সিলেক্ট করুন"
 
 #: templates/admin/actions.html:13
 msgid "Clear selection"
@@ -425,9 +440,14 @@ msgstr "সাইটে দেখুন"
 #: templates/admin/auth/user/change_password.html:27
 #: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "অনুগ্রহ করে নিচের ভুলটি সংশোধন করুন।"
-msgstr[1] "অনুগ্রহ করে নিচের ভুলগুলো সংশোধন করুন।"
+msgstr "অনুগ্রহ করে নিচের ভুলগুলো সংশোধন করুন।"
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the errors below."
+msgstr ""
 
 #: templates/admin/change_list.html:58
 #, python-format
@@ -445,7 +465,7 @@ msgstr "ক্রমানুসারে সাজানো থেকে বি
 #: templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
-msgstr ""
+msgstr "সাজানোর ক্রম: %(priority_number)s"
 
 #: templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
@@ -521,7 +541,7 @@ msgstr " %(filter_title)s অনুযায়ী "
 #: templates/admin/index.html:20
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr ""
+msgstr "%(name)s এপ্লিকেশন এর মডেল গুলো"
 
 #: templates/admin/index.html:39
 msgid "Change"
@@ -657,7 +677,7 @@ msgstr "মুছে ফেলুন"
 #: templates/admin/edit_inline/tabular.html:75
 #, python-format
 msgid "Add another %(verbose_name)s"
-msgstr ""
+msgstr "আরো একটি %(verbose_name)s যোগ করুন"
 
 #: templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
@@ -769,8 +789,16 @@ msgstr "পাসওয়ার্ড রিসেট সফল হয়েছে"
 
 #: templates/registration/password_reset_done.html:17
 msgid ""
-"We've emailed you instructions for setting your password to the email "
-"address you submitted. You should be receiving it shortly."
+"We've emailed you instructions for setting your password. You should be "
+"receiving them shortly."
+msgstr ""
+"আমরা আপনার পাসওয়ার্ড সেট করার নিয়ম-কানুন আপনার দেয়া ইমেইল এড্রেসে পাঠিয়ে "
+"দিয়েছি। শীঘ্রই আপনি ইমেইলটি পাবেন।"
+
+#: templates/registration/password_reset_done.html:19
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
 msgstr ""
 
 #: templates/registration/password_reset_email.html:2
@@ -779,6 +807,8 @@ msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"আপনি এই ই-মেইলটি পেয়েছেন কারন আপনি %(site_name)s এ আপনার ইউজার একাউন্টের "
+"পাসওয়ার্ড রিসেট এর জন্য অনুরোধ করেছেন।"
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -802,6 +832,8 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
+"পাসওয়ার্ড ভুলে গেছেন? নিচে আপনার ইমেইল এড্রেস দিন, এবং আমরা নতুন পাসওয়ার্ড সেট "
+"করার নিয়ম-কানুন আপনাকে ই-মেইল করব।"
 
 #: templates/registration/password_reset_form.html:21
 msgid "Email address:"
@@ -811,20 +843,20 @@ msgstr "ইমেইল ঠিকানা:"
 msgid "Reset my password"
 msgstr "আমার পাসওয়ার্ড রিসেট করুন"
 
-#: templatetags/admin_list.py:344
+#: templatetags/admin_list.py:348
 msgid "All dates"
 msgstr "সকল তারিখ"
 
-#: views/main.py:33
+#: views/main.py:35
 msgid "(None)"
 msgstr "(কিছুই না)"
 
-#: views/main.py:76
+#: views/main.py:84
 #, python-format
 msgid "Select %s"
 msgstr "%s বাছাই করুন"
 
-#: views/main.py:78
+#: views/main.py:86
 #, python-format
 msgid "Select %s to change"
 msgstr "%s পরিবর্তনের জন্য বাছাই করুন"

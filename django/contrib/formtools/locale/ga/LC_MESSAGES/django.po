@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Michael Thornhill <michael@maithu.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Michael Thornhill <michael@maithu.com>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-16 13:32+0000\n"
-"Last-Translator: Michael Thornhill <michael@maithu.com>\n"
+"POT-Creation-Date: 2013-08-16 15:07+0200\n"
+"PO-Revision-Date: 2013-08-17 09:27+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Irish (http://www.transifex.com/projects/p/django/language/"
 "ga/)\n"
 "MIME-Version: 1.0\n"
@@ -31,10 +31,6 @@ msgstr "chéim roimhe seo"
 msgid "submit"
 msgstr "chur faoi bhráid"
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
+#: wizard/views.py:275
+msgid "ManagementForm data is missing or has been tampered."
 msgstr ""
-"Gabh ár leithscéal, ach tá do fhoirm in éag. Lean ar aghaidh le do thoil "
-"líonadh amach an fhoirm ón leathanach seo."

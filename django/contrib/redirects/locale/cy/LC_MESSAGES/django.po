@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Maredudd ap Gwyndaf <maredudd@maredudd.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Maredudd ap Gwyndaf <maredudd@maredudd.com>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-08-03 14:11+0000\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-10-12 20:33+0000\n"
 "Last-Translator: Maredudd ap Gwyndaf <maredudd@maredudd.com>\n"
 "Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
 "cy/)\n"

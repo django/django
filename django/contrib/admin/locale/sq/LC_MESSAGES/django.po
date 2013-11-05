@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Besnik <besnik@programeshqip.org>, 2011.
+# Besnik <besnik@programeshqip.org>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:52+0000\n"
-"Last-Translator: Besnik <besnik@programeshqip.org>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-08-17 08:29+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -17,21 +17,21 @@ msgstr ""
 "Language: sq\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: actions.py:48
+#: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "U fshinë me sukses %(count)d %(items)s."
 
-#: actions.py:60 options.py:1347
+#: actions.py:61 options.py:1418
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "S'mund të fshijë %(name)s"
 
-#: actions.py:62 options.py:1349
+#: actions.py:63 options.py:1420
 msgid "Are you sure?"
 msgstr "Jeni i sigurt?"
 
-#: actions.py:83
+#: actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Fshiji %(verbose_name_plural)s e përzgjdhur"
@@ -78,6 +78,9 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
+"Ju lutemi, jepni %(username)s dhe fjalëkalimin e saktë për një llogari "
+"ekipi. Kini parasysh se që të dyja fushat mund të jenë të ndjeshme ndaj "
+"shkrimit me shkronja të mëdha ose të vogla."
 
 #: forms.py:19
 msgid "Please log in again, because your session has expired."
@@ -87,93 +90,93 @@ msgstr "Ju lutem, hyni sërish, sepse sesioni juaj ka skaduar."
 msgid "Action:"
 msgstr "Veprim:"
 
-#: models.py:24
+#: models.py:25
 msgid "action time"
 msgstr "kohë veprimi"
 
-#: models.py:27
+#: models.py:28
 msgid "object id"
 msgstr "id objekti"
 
-#: models.py:28
+#: models.py:29
 msgid "object repr"
 msgstr ""
 
-#: models.py:29
+#: models.py:30
 msgid "action flag"
 msgstr "shenjë veprimi"
 
-#: models.py:30
+#: models.py:31
 msgid "change message"
 msgstr "mesazh ndryshimi"
 
-#: models.py:35
+#: models.py:36
 msgid "log entry"
 msgstr "zë regjistrimi"
 
-#: models.py:36
+#: models.py:37
 msgid "log entries"
 msgstr "zëra regjistrimi"
 
-#: models.py:45
+#: models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "U shtua \"%(object)s\"."
 
-#: models.py:47
+#: models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "U ndryshua \"%(object)s\" - %(changes)s"
 
-#: models.py:52
+#: models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "U fshi \"%(object)s.\""
 
-#: models.py:54
+#: models.py:55
 msgid "LogEntry Object"
 msgstr ""
 
-#: options.py:156 options.py:172
+#: options.py:173 options.py:202
 msgid "None"
 msgstr "Asnjë"
 
-#: options.py:684
+#: options.py:763
 #, python-format
 msgid "Changed %s."
 msgstr "Ndryshoi %s."
 
-#: options.py:684 options.py:694
+#: options.py:763 options.py:773 options.py:1570
 msgid "and"
 msgstr " dhe "
 
-#: options.py:689
+#: options.py:768
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "U shtua %(name)s \"%(object)s\"."
 
-#: options.py:693
+#: options.py:772
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "U ndryshua %(list)s për %(name)s \"%(object)s\"."
 
-#: options.py:698
+#: options.py:777
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "U fshi %(name)s \"%(object)s\"."
 
-#: options.py:702
+#: options.py:781
 msgid "No fields changed."
 msgstr "Nuk u ndryshuan fusha."
 
-#: options.py:807 options.py:860
+#: options.py:884 options.py:927
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" u shtua me sukses. Mund ta përpunoni sërish më poshtë."
 
-#: options.py:835
+#: options.py:902
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -182,12 +185,12 @@ msgstr ""
 "%(name)s \"%(obj)s\" u shtua me sukses. Mund të shtoni një tjetër %(name)s  "
 "më poshtë."
 
-#: options.py:839
+#: options.py:906
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" u shtua me sukses."
 
-#: options.py:853
+#: options.py:920
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
@@ -195,7 +198,7 @@ msgid ""
 msgstr ""
 "%(name)s \"%(obj)s\" u shtua me sukses. Mund ta përpunoni sërish më poshtë."
 
-#: options.py:867
+#: options.py:934
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -204,12 +207,12 @@ msgstr ""
 "%(name)s \"%(obj)s\" u ndryshua me sukses. Mund të shtoni një tjetër "
 "%(name)s më poshtë."
 
-#: options.py:873
+#: options.py:940
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" u ndryshua me sukses."
 
-#: options.py:951 options.py:1211
+#: options.py:1018 options.py:1278
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -217,65 +220,81 @@ msgstr ""
 "Duhen përzgjedhur objekte që të kryhen veprime mbi ta. Nuk u ndryshua ndonjë "
 "objekt."
 
-#: options.py:970
+#: options.py:1037
 msgid "No action selected."
 msgstr "Pa përzgjedhje veprimi."
 
-#: options.py:1050
+#: options.py:1117
 #, python-format
 msgid "Add %s"
 msgstr "Shtoni %s"
 
-#: options.py:1074 options.py:1319
+#: options.py:1141 options.py:1386
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Objekti %(name)s me kyç parësor %(key)r nuk ekziston."
 
-#: options.py:1140
+#: options.py:1207
 #, python-format
 msgid "Change %s"
 msgstr "Ndrysho %s"
 
-#: options.py:1190
+#: options.py:1257
 msgid "Database error"
 msgstr "Gabimi baze të dhënash"
 
-#: options.py:1253
+#: options.py:1320
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s u ndryshua me sukses."
 msgstr[1] "%(count)s %(name)s u ndryshuan me sukses."
 
-#: options.py:1280
+#: options.py:1347
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s të përzgjedhur"
 msgstr[1] "Krejt %(total_count)s të përzgjedhurat"
 
-#: options.py:1285
+#: options.py:1352
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 nga %(cnt)s të përzgjedhur"
 
-#: options.py:1335
+#: options.py:1403
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" u fshi me sukses."
 
-#: options.py:1382
+#: options.py:1459
 #, python-format
 msgid "Change history: %s"
 msgstr "Ndryshoni historikun: %s"
 
-#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#. Translators: Model verbose name and instance representation, suitable to be
+#. an item in a list
+#: options.py:1564
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr ""
+
+#: options.py:1571
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+"Fshirja e %(class_name)s %(instance)s do të lypte fshirjen e objekteve "
+"vijuese të mbrojtura që kanë lidhje me ta: %(related_objects)s"
+
+#: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19
 #: views/decorators.py:24
 msgid "Log in"
 msgstr "Hyni"
 
-#: sites.py:388
+#: sites.py:386
 msgid "Site administration"
 msgstr "Administrim site-i"
 
@@ -296,15 +315,15 @@ msgstr "Kohë:"
 msgid "Lookup"
 msgstr "Kërkim"
 
-#: widgets.py:271
+#: widgets.py:260
 msgid "Add Another"
 msgstr "Shtoni Një Tjetër"
 
-#: widgets.py:316
+#: widgets.py:302
 msgid "Currently:"
 msgstr "Tani:"
 
-#: widgets.py:317
+#: widgets.py:303
 msgid "Change:"
 msgstr "Ndryshim:"
 
@@ -430,9 +449,14 @@ msgstr "Shiheni në site"
 #: templates/admin/auth/user/change_password.html:27
 #: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Ju lutem, ndreqni gabimin e mëposhtëm."
-msgstr[1] "Ju lutem, ndreqini gabimet e mëposhtme."
+msgstr "Ju lutem, ndreqini gabimet e mëposhtme."
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the errors below."
+msgstr ""
 
 #: templates/admin/change_list.html:58
 #, python-format
@@ -790,11 +814,20 @@ msgstr "Ndryshim i sukseshëm fjalëkalimi"
 
 #: templates/registration/password_reset_done.html:17
 msgid ""
-"We've emailed you instructions for setting your password to the email "
-"address you submitted. You should be receiving it shortly."
+"We've emailed you instructions for setting your password. You should be "
+"receiving them shortly."
 msgstr ""
-"Ju dërguam me email udhëzimet për rregullimin e fjalëkalimit tuaj, te adresa "
-"e-mail që keni dhënë. Do të duhej t'ju vinte pas pak."
+"Ju kemi dërguar me email udhëzime për caktimin e fjalëkalimit tuaj. Do të "
+"duhej t'ju vinin pas pak."
+
+#: templates/registration/password_reset_done.html:19
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Nëse nuk merrni një email, ju lutemi, sigurohuni që keni dhënë adresën e "
+"saktë me të cilën u regjistruat, dhe kontrolloni dosjen tuaj të mesazheve "
+"hedhurinë."
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
@@ -838,20 +871,20 @@ msgstr "Adresë email:"
 msgid "Reset my password"
 msgstr "Ricakto fjalëkalimin tim"
 
-#: templatetags/admin_list.py:344
+#: templatetags/admin_list.py:348
 msgid "All dates"
 msgstr "Krejt datat"
 
-#: views/main.py:33
+#: views/main.py:35
 msgid "(None)"
 msgstr "(Asnjë)"
 
-#: views/main.py:76
+#: views/main.py:84
 #, python-format
 msgid "Select %s"
 msgstr "Përzgjidhni %s"
 
-#: views/main.py:78
+#: views/main.py:86
 #, python-format
 msgid "Select %s to change"
 msgstr "Përzgjidhni %s për ta ndryshuar"

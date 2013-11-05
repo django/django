@@ -3,11 +3,11 @@
 # Translators:
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-07 15:24+0000\n"
-"Last-Translator: machaku <bmachaku@gmail.com>\n"
+"POT-Creation-Date: 2013-08-16 15:07+0200\n"
+"PO-Revision-Date: 2013-08-17 09:27+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Swahili (http://www.transifex.com/projects/p/django/language/"
 "sw/)\n"
 "MIME-Version: 1.0\n"
@@ -28,10 +28,6 @@ msgstr "hatua iliyopita"
 msgid "submit"
 msgstr "kusanya"
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
+#: wizard/views.py:275
+msgid "ManagementForm data is missing or has been tampered."
 msgstr ""
-"Samahani, fomu yako imekwisha muda wake. Tafadhali endelea kujaza fomu "
-"kuanzia ukurasa huu."

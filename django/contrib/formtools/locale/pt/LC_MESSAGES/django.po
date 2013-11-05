@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Nuno Mariz <nmariz@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Nuno Mariz <nmariz@gmail.com>, 2012-2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-07 09:40+0000\n"
+"POT-Creation-Date: 2013-08-16 15:07+0200\n"
+"PO-Revision-Date: 2013-10-31 16:28+0000\n"
 "Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/projects/p/django/"
 "language/pt/)\n"
@@ -30,10 +30,6 @@ msgstr "passo anterior"
 msgid "submit"
 msgstr "submeter"
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
-msgstr ""
-"Pedimos desculpa, mas o seu formulário expirou. Por favor continue a "
-"preencher o formulário a partir desta página."
+#: wizard/views.py:275
+msgid "ManagementForm data is missing or has been tampered."
+msgstr "Os dados do ManagementForm está omisso ou foi adulterado."

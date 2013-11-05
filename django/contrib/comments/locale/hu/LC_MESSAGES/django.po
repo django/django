@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Szilveszter Farkas <szilveszter.farkas@gmail.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Máté Őry <orymate@iit.bme.hu>, 2013
+# Szilveszter Farkas <szilveszter.farkas@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Szilveszter Farkas <szilveszter.farkas@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-05-26 08:39+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Hungarian (http://www.transifex.com/projects/p/django/"
 "language/hu/)\n"
 "MIME-Version: 1.0\n"
@@ -27,41 +28,37 @@ msgid "Metadata"
 msgstr "Metaadat"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "megjelölve"
-msgstr[1] "megjelölve"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] ""
+msgstr[1] ""
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Kiválasztott hozzászólások megjelölése"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "jóváhagyva"
-msgstr[1] "jóváhagyva"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Kiválasztott hozzászólások jóváhagyása"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "törölve"
-msgstr[1] "törölve"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] ""
+msgstr[1] ""
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Kiválasztott hozzászólások törlése"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "%(count)s hozzászólás sikeresen %(action)s."
-msgstr[1] "%(count)s hozzászólás sikeresen %(action)s."
 
 #: feeds.py:14
 #, python-format
@@ -295,9 +292,11 @@ msgstr "Hozzászólás előnézetének megtekintése"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Javítsa ki az alábbi hibát"
-msgstr[1] "Javítsa ki az alábbi hibákat"
+msgstr "Javítsa ki az alábbi hibákat"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr ""
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# fasouto <fsoutomoure@gmail.com>, 2011.
-#   <fonzzo@gmail.com>, 2013.
+# fasouto <fsoutomoure@gmail.com>, 2011
+# fonso <fonzzo@gmail.com>, 2013
+# Leandro Regueiro <leandro.regueiro@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2013-01-07 11:44+0000\n"
-"Last-Translator: fonso <fonzzo@gmail.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-09-07 11:47+0000\n"
+"Last-Translator: Leandro Regueiro <leandro.regueiro@gmail.com>\n"
 "Language-Team: Galician (http://www.transifex.com/projects/p/django/language/"
 "gl/)\n"
 "MIME-Version: 1.0\n"
@@ -32,47 +33,47 @@ msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "O campo GIS base -- correspóndese co tipo Geometry da especificación OpenGIS."
 
-#: db/models/fields.py:271
+#: db/models/fields.py:270
 msgid "Point"
 msgstr "Punto"
 
-#: db/models/fields.py:275
+#: db/models/fields.py:274
 msgid "Line string"
 msgstr "Secuencia de liñas"
 
-#: db/models/fields.py:279
+#: db/models/fields.py:278
 msgid "Polygon"
 msgstr "Polígono"
 
-#: db/models/fields.py:283
+#: db/models/fields.py:282
 msgid "Multi-point"
 msgstr "Punto múltiple"
 
-#: db/models/fields.py:287
+#: db/models/fields.py:286
 msgid "Multi-line string"
 msgstr "Cadea multi-liña"
 
-#: db/models/fields.py:291
+#: db/models/fields.py:290
 msgid "Multi polygon"
 msgstr "Multi polígono"
 
-#: db/models/fields.py:295
+#: db/models/fields.py:294
 msgid "Geometry collection"
 msgstr "Colección de xeometrías"
 
-#: forms/fields.py:19
+#: forms/fields.py:23
 msgid "No geometry value provided."
 msgstr "Non se proporcionou un valor de xeometría."
 
-#: forms/fields.py:20
+#: forms/fields.py:24
 msgid "Invalid geometry value."
 msgstr "Valor xeométrico non válido."
 
-#: forms/fields.py:21
+#: forms/fields.py:25
 msgid "Invalid geometry type."
-msgstr "Tipo xeometríco non válido."
+msgstr "Tipo xeométrico non válido."
 
-#: forms/fields.py:22
+#: forms/fields.py:26
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."

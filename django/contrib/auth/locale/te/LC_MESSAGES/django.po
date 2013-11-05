@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-#   <prudhviy@gmail.com>, 2011.
-# Veeven  <veeven@gmail.com>, 2011.
+# bhaskar teja yerneni <prudhviy@gmail.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
+# వీవెన్ వీరపనేని <veeven@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2012-12-16 08:51+0000\n"
-"Last-Translator: bhaskar teja yerneni <prudhviy@gmail.com>\n"
+"POT-Creation-Date: 2013-10-09 20:17+0200\n"
+"PO-Revision-Date: 2013-10-10 08:45+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Telugu (http://www.transifex.com/projects/p/django/language/"
 "te/)\n"
 "MIME-Version: 1.0\n"
@@ -31,137 +31,121 @@ msgstr "అనుమతులు"
 msgid "Important dates"
 msgstr "ముఖ్యమైన తేదీలు"
 
-#: admin.py:126
+#: admin.py:132
 msgid "Password changed successfully."
 msgstr "సంకేతపదాన్ని విజయవంతంగా మార్చారు."
 
-#: admin.py:136
+#: admin.py:142
 #, python-format
 msgid "Change password: %s"
 msgstr "సంకేతపదాన్ని మార్చుకోండి: %s"
 
-#: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
+#: forms.py:33 tests/test_forms.py:261 tests/test_forms.py:266
+#: tests/test_forms.py:407
 msgid "No password set."
 msgstr ""
 
-#: forms.py:37 tests/forms.py:261 tests/forms.py:267
+#: forms.py:39 tests/test_forms.py:271 tests/test_forms.py:277
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr ""
 
-#: forms.py:67
+#: forms.py:72
 msgid "A user with that username already exists."
 msgstr "ఈ నామముతొ ఇంకొ వినియొగదారి ఉన్నరు"
 
-#: forms.py:68 forms.py:269 forms.py:329
+#: forms.py:73 forms.py:254 forms.py:314
 msgid "The two password fields didn't match."
 msgstr "ఈ రెండు అనుమతి పదాలు అసమానమైనంగ ఉన్నాయి"
 
-#: forms.py:70 forms.py:115
+#: forms.py:75 forms.py:120
 msgid "Username"
 msgstr "వాడుకరిపేరు"
 
-#: forms.py:72 forms.py:116
+#: forms.py:77 forms.py:121
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 
-#: forms.py:75 forms.py:119
+#: forms.py:80 forms.py:124
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr ""
 
-#: forms.py:77 forms.py:121 forms.py:148 forms.py:331
+#: forms.py:82 forms.py:126 forms.py:153 forms.py:316
 msgid "Password"
 msgstr "సంకేతపదం"
 
-#: forms.py:79
+#: forms.py:84
 msgid "Password confirmation"
 msgstr "సంకేపదపు నిర్ధారణ"
 
-#: forms.py:81
+#: forms.py:86
 msgid "Enter the same password as above, for verification."
 msgstr "ఇందాక ఇచ్చిన అనుమతిపదం మళ్ళీ ఇవ్వండి పరిశీలన కోసము"
 
-#: forms.py:122
+#: forms.py:127
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
 "form</a>."
 msgstr ""
 
-#: forms.py:151
+#: forms.py:156
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
 
-#: forms.py:153
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-
-#: forms.py:155
+#: forms.py:158
 msgid "This account is inactive."
 msgstr "ఈ ఖాతా అచేతనమైనది"
 
 #: forms.py:206
-msgid ""
-"That email address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-
-#: forms.py:208 tests/forms.py:374
-msgid ""
-"The user account associated with this email address cannot reset the "
-"password."
-msgstr ""
-
-#: forms.py:211
 msgid "Email"
 msgstr ""
 
-#: forms.py:271
+#: forms.py:256
 msgid "New password"
 msgstr "కొత్త సంకేతపదం"
 
-#: forms.py:273
+#: forms.py:258
 msgid "New password confirmation"
 msgstr "కొత్త సంకేతపదపు నిర్ధారణ"
 
-#: forms.py:302
+#: forms.py:287
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
 
-#: forms.py:305
+#: forms.py:290
 msgid "Old password"
 msgstr "పాత  సంకేతపదం"
 
-#: forms.py:333
+#: forms.py:318
 msgid "Password (again)"
 msgstr "సంకేతపదం (మళ్ళీ)"
 
-#: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
-#: hashers.py:412
+#: hashers.py:243 hashers.py:317 hashers.py:365 hashers.py:393 hashers.py:426
+#: hashers.py:459 hashers.py:493
 msgid "algorithm"
 msgstr ""
 
-#: hashers.py:242
+#: hashers.py:244
 msgid "iterations"
 msgstr ""
 
-#: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
+#: hashers.py:245 hashers.py:319 hashers.py:366 hashers.py:394 hashers.py:494
 msgid "salt"
 msgstr ""
 
-#: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
+#: hashers.py:246 hashers.py:367 hashers.py:395 hashers.py:427 hashers.py:460
+#: hashers.py:495
 msgid "hash"
 msgstr ""
 
-#: hashers.py:293
+#: hashers.py:318
 msgid "work factor"
 msgstr ""
 
-#: hashers.py:295
+#: hashers.py:320
 msgid "checksum"
 msgstr ""
 
@@ -185,7 +169,7 @@ msgstr "అనుమతులు"
 msgid "group"
 msgstr "గుంపు"
 
-#: models.py:129 models.py:301
+#: models.py:129 models.py:294
 msgid "groups"
 msgstr "గుంపులు"
 
@@ -197,86 +181,94 @@ msgstr "సంకేతపదం"
 msgid "last login"
 msgstr "చివరి ప్రవేశం"
 
-#: models.py:298
+#: models.py:291
 msgid "superuser status"
 msgstr ""
 
-#: models.py:299
+#: models.py:292
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
 
-#: models.py:302
+#: models.py:295
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of his/her group."
 msgstr ""
 
-#: models.py:306
+#: models.py:299
 msgid "user permissions"
 msgstr "వాడుకరి అనుమతులు"
 
-#: models.py:377
+#: models.py:301
+msgid "Specific permissions for this user."
+msgstr ""
+
+#: models.py:368
 msgid "username"
 msgstr "వాడుకరిపేరు"
 
-#: models.py:378
+#: models.py:367
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
 
-#: models.py:381
+#: models.py:370
 msgid "Enter a valid username."
 msgstr ""
 
-#: models.py:383
+#: models.py:372
 msgid "first name"
 msgstr "మొదటి పేరు"
 
-#: models.py:384
+#: models.py:373
 msgid "last name"
 msgstr "ఇంటి పేరు"
 
-#: models.py:385
+#: models.py:374
 msgid "email address"
 msgstr ""
 
-#: models.py:386
+#: models.py:375
 msgid "staff status"
 msgstr "ఉద్యోగస్తుల  స్థితి"
 
-#: models.py:387
+#: models.py:376
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 
-#: models.py:389
+#: models.py:378
 msgid "active"
 msgstr "క్రియాశీలం"
 
-#: models.py:390
+#: models.py:379
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
 
-#: models.py:392
+#: models.py:381
 msgid "date joined"
 msgstr "చేరిన తేదీ"
 
-#: models.py:400
+#: models.py:389
 msgid "user"
 msgstr "వాడుకరి"
 
-#: models.py:401
+#: models.py:390
 msgid "users"
 msgstr "వాడుకరులు"
 
-#: views.py:94
+#: views.py:89
 msgid "Logged out"
 msgstr "నిష్క్రమించారు"
 
 #: templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
+msgstr ""
+
+#: tests/test_forms.py:325
+msgid "Enter a valid email address."
 msgstr ""

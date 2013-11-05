@@ -1,16 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Eduardo Carvalho <eduardocereto@gmail.com>, 2013
+# Gladson Simplício Brito <gladsonbrito@gmail.com>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Portuguese (Brazil) <django-l10n-portuguese@googlegroups."
-"com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-07-02 14:12+0000\n"
+"Last-Translator: Gladson Simplício Brito <gladsonbrito@gmail.com>\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/"
+"django/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -26,41 +28,37 @@ msgid "Metadata"
 msgstr "Meta-dados"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "marcado"
-msgstr[1] "marcados"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] "%d comentário foi sinalizado com sucesso"
+msgstr[1] "%d comentários foram sinalizadas com sucesso"
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Marcar comentários selecionados"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "aprovado"
-msgstr[1] "aprovados"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "%d comentário foi aprovado com sucesso"
+msgstr[1] "%d comentários foram aprovados com sucesso"
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Aprovar comentários selecionados"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "removido"
-msgstr[1] "removidos"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "%d comentário foi removido com sucesso"
+msgstr[1] "%d comentários foram removidos com sucesso"
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Remover comentários selecionados"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "1 comentários foi %(action)s com sucesso."
-msgstr[1] "%(count)s comentários foram %(action)s com sucesso."
 
 #: feeds.py:14
 #, python-format
@@ -294,9 +292,11 @@ msgstr "Visualizar seu comentário"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Por favor, corrija o erro abaixo."
-msgstr[1] "Por favor, corrija os erros abaixo."
+msgstr "Por favor, corrija os erros abaixo."
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "Por favor, corrija os erros abaixo"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

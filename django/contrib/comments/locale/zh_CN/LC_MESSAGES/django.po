@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Lele Long <schemacs@gmail.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Lele Long <schemacs@gmail.com>, 2011
+# XiangYu <bupt.aswmtjdsj@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Lele Long <schemacs@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-05-30 06:09+0000\n"
+"Last-Translator: XiangYu <bupt.aswmtjdsj@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -27,37 +28,34 @@ msgid "Metadata"
 msgstr "元数据"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "标记"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] "%d 个评论已被成功标记"
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "标记选中的评论"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "批准"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "%d 个评论已被成功批准"
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "批准选中的评论"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "移除"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "%d 个评论已被成功移除"
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "移除选中的评论"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "%(count)s 条评论被成功 %(action)s。"
 
 #: feeds.py:14
 #, python-format
@@ -248,7 +246,7 @@ msgstr "标记该评论"
 
 #: templates/comments/flag.html:7
 msgid "Really flag this comment?"
-msgstr "真的要标记该评论？"
+msgstr "确定要标记该评论？"
 
 #: templates/comments/flag.html:12
 msgid "Flag"
@@ -260,7 +258,7 @@ msgstr "感谢标记"
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
 msgid "Post"
-msgstr "张贴"
+msgstr "发表"
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
 msgid "Preview"
@@ -272,7 +270,7 @@ msgstr "感谢评论"
 
 #: templates/comments/posted.html:7
 msgid "Thank you for your comment"
-msgstr "感谢您所作的评论"
+msgstr "感谢您的评论"
 
 #: templates/comments/preview.html:4 templates/comments/preview.html.py:13
 msgid "Preview your comment"
@@ -280,12 +278,15 @@ msgstr "预览您的评论"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "请修正如下错误"
+msgstr "请修正如下错误"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "请改正下列错误"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"
-msgstr "张贴您的评论"
+msgstr "发表您的评论"
 
 #: templates/comments/preview.html:16
 msgid "or make changes"

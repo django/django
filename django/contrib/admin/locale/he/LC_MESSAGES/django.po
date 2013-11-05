@@ -1,17 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Alex Gaynor <alex.gaynor@gmail.com>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Meir Kriheli <meir@mksoft.co.il>, 2011.
-# Meir Kriheli <mkriheli@gmail.com>, 2012.
+# Alex Gaynor <alex.gaynor@gmail.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Meir Kriheli <mkriheli@gmail.com>, 2011-2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:52+0000\n"
-"Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-11-02 11:45+0000\n"
+"Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/projects/p/django/language/"
 "he/)\n"
 "MIME-Version: 1.0\n"
@@ -20,21 +19,21 @@ msgstr ""
 "Language: he\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: actions.py:48
+#: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s  נמחקו בהצלחה."
 
-#: actions.py:60 options.py:1347
+#: actions.py:61 options.py:1418
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "לא ניתן למחוק %(name)s"
 
-#: actions.py:62 options.py:1349
+#: actions.py:63 options.py:1420
 msgid "Are you sure?"
 msgstr "האם את/ה בטוח/ה ?"
 
-#: actions.py:83
+#: actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "מחק %(verbose_name_plural)s שנבחרו"
@@ -81,6 +80,8 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
+"נא להזין את %(username)s והסיסמה הנכונים לחשבון איש צוות. נא לשים לב כי שני "
+"השדות רגישים לאותיות גדולות/קטנות."
 
 #: forms.py:19
 msgid "Please log in again, because your session has expired."
@@ -90,187 +91,204 @@ msgstr "עליך להתחבר שנית כי פג הזמן המוקצב לך."
 msgid "Action:"
 msgstr "פעולה"
 
-#: models.py:24
+#: models.py:25
 msgid "action time"
 msgstr "זמן פעולה"
 
-#: models.py:27
+#: models.py:28
 msgid "object id"
 msgstr "מזהה אובייקט"
 
-#: models.py:28
+#: models.py:29
 msgid "object repr"
 msgstr "ייצוג אובייקט"
 
-#: models.py:29
+#: models.py:30
 msgid "action flag"
 msgstr "דגל פעולה"
 
-#: models.py:30
+#: models.py:31
 msgid "change message"
 msgstr "הערה לשינוי"
 
-#: models.py:35
+#: models.py:36
 msgid "log entry"
 msgstr "רישום יומן"
 
-#: models.py:36
+#: models.py:37
 msgid "log entries"
 msgstr "רישומי יומן"
 
-#: models.py:45
+#: models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "בוצעה הוספת \"%(object)s\"."
 
-#: models.py:47
+#: models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "בוצע שינוי \"%(object)s\" - %(changes)s"
 
-#: models.py:52
+#: models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "בוצעה מחיקת \"%(object)s\"."
 
-#: models.py:54
+#: models.py:55
 msgid "LogEntry Object"
 msgstr "אובייקט LogEntry"
 
-#: options.py:156 options.py:172
+#: options.py:173 options.py:202
 msgid "None"
 msgstr "ללא"
 
-#: options.py:684
+#: options.py:763
 #, python-format
 msgid "Changed %s."
 msgstr "%s שונה."
 
-#: options.py:684 options.py:694
+#: options.py:763 options.py:773 options.py:1570
 msgid "and"
 msgstr "ו"
 
-#: options.py:689
+#: options.py:768
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "בוצעה הוספת %(name)s \"%(object)s\"."
 
-#: options.py:693
+#: options.py:772
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "בוצע שינוי %(list)s עבור %(name)s \"%(object)s\"."
 
-#: options.py:698
+#: options.py:777
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "בוצעה מחיקת %(name)s \"%(object)s\"."
 
-#: options.py:702
+#: options.py:781
 msgid "No fields changed."
 msgstr "אף שדה לא השתנה."
 
-#: options.py:807 options.py:860
+#: options.py:884 options.py:927
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה. ניתן לערוך אותו שוב מתחת."
 
-#: options.py:835
+#: options.py:902
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
 "%(name)s below."
 msgstr ""
+"הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה. ניתן להוסיף עוד %(name)s מתחת."
 
-#: options.py:839
+#: options.py:906
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה."
 
-#: options.py:853
+#: options.py:920
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
-msgstr ""
+msgstr "עדכון %(name)s \"%(obj)s\" בוצע בהצלחה. ניתן לערוך שוב מתחת."
 
-#: options.py:867
+#: options.py:934
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
 "%(name)s below."
-msgstr ""
+msgstr "עדכון %(name)s \"%(obj)s\" בוצע בהצלחה. ניתן להוסיף עוד %(name)s מתחת."
 
-#: options.py:873
+#: options.py:940
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "שינוי %(name)s \"%(obj)s\" בוצע בהצלחה."
 
-#: options.py:951 options.py:1211
+#: options.py:1018 options.py:1278
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr "יש לסמן פריטים כדי לבצע עליהם פעולות. לא שונו פריטים."
 
-#: options.py:970
+#: options.py:1037
 msgid "No action selected."
 msgstr "לא נבחרה פעולה."
 
-#: options.py:1050
+#: options.py:1117
 #, python-format
 msgid "Add %s"
 msgstr "הוספת %s"
 
-#: options.py:1074 options.py:1319
+#: options.py:1141 options.py:1386
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "הפריט %(name)s עם המפתח הראשי %(key)r אינו קיים."
 
-#: options.py:1140
+#: options.py:1207
 #, python-format
 msgid "Change %s"
 msgstr "שינוי %s"
 
-#: options.py:1190
+#: options.py:1257
 msgid "Database error"
 msgstr "שגיאת בסיס נתונים"
 
-#: options.py:1253
+#: options.py:1320
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "שינוי %(count)s %(name)s בוצע בהצלחה."
 msgstr[1] "שינוי %(count)s %(name)s בוצע בהצלחה."
 
-#: options.py:1280
+#: options.py:1347
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s נבחר"
 msgstr[1] "כל ה־%(total_count)s נבחרו"
 
-#: options.py:1285
+#: options.py:1352
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 מ %(cnt)s נבחרים"
 
-#: options.py:1335
+#: options.py:1403
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "מחיקת %(name)s \"%(obj)s\" בוצעה בהצלחה."
 
-#: options.py:1382
+#: options.py:1459
 #, python-format
 msgid "Change history: %s"
 msgstr "היסטוריית שינוי: %s"
 
-#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#. Translators: Model verbose name and instance representation, suitable to be
+#. an item in a list
+#: options.py:1564
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#: options.py:1571
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+"מחיקת %(class_name)s %(instance)s תדרוש מחיקת האובייקטים הקשורים והמוגנים "
+"הבאים: %(related_objects)s"
+
+#: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19
 #: views/decorators.py:24
 msgid "Log in"
 msgstr "כניסה"
 
-#: sites.py:388
+#: sites.py:386
 msgid "Site administration"
 msgstr "ניהול אתר"
 
@@ -291,17 +309,17 @@ msgstr "שעה:"
 msgid "Lookup"
 msgstr "חפש"
 
-#: widgets.py:271
+#: widgets.py:260
 msgid "Add Another"
 msgstr "הוסף עוד אחת"
 
-#: widgets.py:316
+#: widgets.py:302
 msgid "Currently:"
-msgstr ""
+msgstr "נוכחי:"
 
-#: widgets.py:317
+#: widgets.py:303
 msgid "Change:"
-msgstr ""
+msgstr "שינוי:"
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -424,9 +442,14 @@ msgstr "צפיה באתר"
 #: templates/admin/auth/user/change_password.html:27
 #: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "נא לתקן את השגיאה המופיעה מתחת."
-msgstr[1] "נא לתקן את השגיאות המופיעות מתחת."
+msgstr "נא לתקן את השגיאות המופיעות מתחת."
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the errors below."
+msgstr "נא לתקן את השגיאות מתחת."
 
 #: templates/admin/change_list.html:58
 #, python-format
@@ -775,10 +798,18 @@ msgstr "הסיסמה אופסה בהצלחה"
 
 #: templates/registration/password_reset_done.html:17
 msgid ""
-"We've emailed you instructions for setting your password to the email "
-"address you submitted. You should be receiving it shortly."
+"We've emailed you instructions for setting your password. You should be "
+"receiving them shortly."
 msgstr ""
-"שלחנו הוראות לקביעת הסיסמה אל כתובת הדוא\"ל שהזנת. ההודעה אמורה להתקבל בקרוב."
+"שלחנו אליך דוא\"ל עם הוראות לאיפוס הסיסמה. ההוראות אמורות להתקבל בקרוב."
+
+#: templates/registration/password_reset_done.html:19
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"אם הדוא\"ל לא הגיע, נא לוודא שהזנת כתובת נכונה בעת הרישום ולבדוק את תיקיית "
+"דואר הזבל."
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
@@ -822,20 +853,20 @@ msgstr "כתובת דוא\"ל:"
 msgid "Reset my password"
 msgstr "אפס את סיסמתי"
 
-#: templatetags/admin_list.py:344
+#: templatetags/admin_list.py:348
 msgid "All dates"
 msgstr "כל התאריכים"
 
-#: views/main.py:33
+#: views/main.py:35
 msgid "(None)"
 msgstr "(אין)"
 
-#: views/main.py:76
+#: views/main.py:84
 #, python-format
 msgid "Select %s"
 msgstr "בחירת %s"
 
-#: views/main.py:78
+#: views/main.py:86
 #, python-format
 msgid "Select %s to change"
 msgstr "בחירת %s לשינוי"

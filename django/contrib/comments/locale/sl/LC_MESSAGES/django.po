@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# zejn <zejn@kiberpipa.org>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-10-31 20:17+0000\n"
-"Last-Translator: mateju <>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-07-12 09:03+0000\n"
+"Last-Translator: zejn <zejn@kiberpipa.org>\n"
 "Language-Team: Slovenian (http://www.transifex.com/projects/p/django/"
 "language/sl/)\n"
 "MIME-Version: 1.0\n"
@@ -27,49 +28,43 @@ msgid "Metadata"
 msgstr "Metapodatki"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "označenih"
-msgstr[1] "označen"
-msgstr[2] "označena"
-msgstr[3] "označeni"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] "%d komentar je bil uspešno označen"
+msgstr[1] "%d komentarja sta bila uspešno označena"
+msgstr[2] "%d komentarji so bili uspešno označeni"
+msgstr[3] "%d komentarjev je bilo uspešno označenih"
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Označi izbrane komentarje"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "odobrenih"
-msgstr[1] "odobren"
-msgstr[2] "odobrena"
-msgstr[3] "odobreni"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "%d komentar je bil uspešno odobren"
+msgstr[1] "%d komentarja sta bila uspešno odobrena"
+msgstr[2] "%d komentarji so bili uspešno odobreni"
+msgstr[3] "%d komentarjev je bilo uspešno odobrenih"
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Odobri izbrane opokomentarje"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "odstranjenih"
-msgstr[1] "odstranjen"
-msgstr[2] "odstranjena"
-msgstr[3] "odstranjeni"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "%d komentar je bil uspešno izbrisan"
+msgstr[1] "%d komentarja sta bila uspešno izbrisana"
+msgstr[2] "%d komentarji so bili uspešno izbrisani"
+msgstr[3] "%d komentarjev je bilo uspešno izbrisanih"
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Odstrani izbrane komentarje"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "%(count)s komentarev je uspešno %(action)s."
-msgstr[1] "%(count)s komentar je uspešno %(action)s."
-msgstr[2] "%(count)s komentarja sta uspešno %(action)s."
-msgstr[3] "%(count)s komentarji so uspešno %(action)s."
 
 #: feeds.py:14
 #, python-format
@@ -302,11 +297,11 @@ msgstr "Predogled komentarja"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Odpravite naslednje napake"
-msgstr[1] "Odpravite naslednjo napako"
-msgstr[2] "Odpravite naslednji napaki"
-msgstr[3] "Odpravite naslednje napake"
+msgstr "Odpravite naslednje napake"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "Odpravite naslednje napake"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

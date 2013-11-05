@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# tcc <tcchou@tcchou.org>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# tcc <tcchou@tcchou.org>, 2011
+# yyc1217 <yyc1217@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: tcc <tcchou@tcchou.org>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-07-31 01:29+0000\n"
+"Last-Translator: yyc1217 <yyc1217@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -27,37 +28,34 @@ msgid "Metadata"
 msgstr "元資料"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "已標記"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] "成功地標記了 %d 個評論。"
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "標記已選評論"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "已核可"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "成功地核可了 %d 個評論。"
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "核可已選評論"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "已移除"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "成功地刪除了 %d 個評論。"
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "移除已選評論"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "%(count)s 個評論已成功完成%(action)s。"
 
 #: feeds.py:14
 #, python-format
@@ -204,7 +202,7 @@ msgstr "評論標記"
 
 #: templates/comments/approve.html:4
 msgid "Approve a comment"
-msgstr "審核一個評論"
+msgstr "核可評論"
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
@@ -278,8 +276,11 @@ msgstr "預覽你的評論"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "請修正下面的錯誤"
+msgstr "請修正下面的錯誤"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "請修正下面的錯誤"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

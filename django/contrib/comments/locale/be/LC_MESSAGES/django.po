@@ -3,11 +3,11 @@
 # Translators:
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-08-01 10:41+0000\n"
-"Last-Translator: Павал Клёк <yehekim@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-05-26 08:39+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Belarusian (http://www.transifex.com/projects/p/django/"
 "language/be/)\n"
 "MIME-Version: 1.0\n"
@@ -26,49 +26,43 @@ msgid "Metadata"
 msgstr "Зьвесткі"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "Пазначылі"
-msgstr[1] "пазначылі"
-msgstr[2] "Пазначылі"
-msgstr[3] "Пазначылі"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Пазначыць абраныя выказваньні"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "Ухвалілі"
-msgstr[1] "Ухвалілі"
-msgstr[2] "Ухвалілі"
-msgstr[3] "Ухвалілі"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Ухваліць абраныя выказваньні"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "Прыбралі"
-msgstr[1] "Прыбралі"
-msgstr[2] "Прыбралі"
-msgstr[3] "Прыбралі"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Прыбраць абраныя выказваньні"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "%(action)s %(count)s заўвагу."
-msgstr[1] "%(action)s %(count)s заўвагі."
-msgstr[2] "%(action)s %(count)s заўвагаў."
-msgstr[3] "%(action)s %(count)s заўвагаў."
 
 #: feeds.py:14
 #, python-format
@@ -300,11 +294,11 @@ msgstr "Прагледзець выказваньне"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Выпраўце памылку ніжэй"
-msgstr[1] "Выпраўце памылкі ніжэй"
-msgstr[2] "Выпраўце памылкі ніжэй"
-msgstr[3] "Выпраўце памылкі ніжэй"
+msgstr "Выпраўце памылкі ніжэй"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr ""
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

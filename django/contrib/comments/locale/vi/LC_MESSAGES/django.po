@@ -1,15 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Tran  <hongdiepkien@gmail.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Lê Thanh <lethanhx2k@gmail.com>, 2013
+# Tran <hongdiepkien@gmail.com>, 2011
+# Tran Van <vantxm@yahoo.co.uk>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Tran <hongdiepkien@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-05-26 17:05+0000\n"
+"Last-Translator: Tran Van <vantxm@yahoo.co.uk>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/django/"
 "language/vi/)\n"
 "MIME-Version: 1.0\n"
@@ -27,42 +29,39 @@ msgid "Metadata"
 msgstr "Siêu dữ liệu"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] ""
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] "%d nhận xét được đặt cờ thành công"
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Đặt cờ những nhận xét được chọn"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "phê duyệt"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "%d bình luận đã được duyệt"
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Phê duyệt những nhận xét đã chọn"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "loại bỏ"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "%d bình luận đã được xoá"
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Loại bỏ nhận xét được chọn"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] ""
 
 #: feeds.py:14
 #, python-format
 msgid "%(site_name)s comments"
-msgstr ""
+msgstr "nhận xét %(site_name)s "
 
 #: feeds.py:20
 #, python-format
@@ -192,7 +191,7 @@ msgstr ""
 
 #: models.py:179
 msgid "flag"
-msgstr ""
+msgstr "cờ"
 
 #: models.py:180
 msgid "date"
@@ -204,7 +203,7 @@ msgstr "cờ nhận xét"
 
 #: models.py:191
 msgid "comment flags"
-msgstr ""
+msgstr "nhận xét được đặt cờ"
 
 #: templates/comments/approve.html:4
 msgid "Approve a comment"
@@ -212,7 +211,7 @@ msgstr "Phê duyệt một nhận xét"
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
-msgstr ""
+msgstr "Bạn thực sự muốn hiện nhận xét này cho mọi người xem?"
 
 #: templates/comments/approve.html:12
 msgid "Approve"
@@ -248,11 +247,11 @@ msgstr "Cảm ơn đã loại bỏ"
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
-msgstr ""
+msgstr "Dựng cờ nhận xét này"
 
 #: templates/comments/flag.html:7
 msgid "Really flag this comment?"
-msgstr ""
+msgstr "Bạn thực sự muốn đặt cờ nhận xét này?"
 
 #: templates/comments/flag.html:12
 msgid "Flag"
@@ -260,7 +259,7 @@ msgstr "Flag"
 
 #: templates/comments/flagged.html:4
 msgid "Thanks for flagging"
-msgstr ""
+msgstr "Cảm ơn đã đặt cờ"
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
 msgid "Post"
@@ -284,8 +283,11 @@ msgstr "Xem trước bình luận của bạn"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Hãy sửa các lỗi dưới đây"
+msgstr "Hãy sửa các lỗi dưới đây"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "Hãy sửa các lỗi dưới đây"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

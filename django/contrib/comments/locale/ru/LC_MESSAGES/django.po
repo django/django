@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Translators:
-# Denis Darii <sinednx@gmail.com>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Алексей Борискин <sun.void@gmail.com>, 2013.
+# Denis Darii <sinednx@gmail.com>, 2011
+# Eugene MechanisM <contact@mechanism.name>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Mikhail Zholobov <legal90@gmail.com>, 2013
+# Алексей Борискин <sun.void@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2013-02-05 20:10+0000\n"
-"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-06-04 21:35+0000\n"
+"Last-Translator: Mikhail Zholobov <legal90@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -23,52 +24,47 @@ msgstr ""
 
 #: admin.py:25
 msgid "Content"
-msgstr "Содержание"
+msgstr "Содержимое"
 
 #: admin.py:28
 msgid "Metadata"
 msgstr "Метаданные"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "помечен"
-msgstr[1] "помечены"
-msgstr[2] "помечены"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Пометить выбранные комментарии"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "одобрен"
-msgstr[1] "одобрены"
-msgstr[2] "одобрены"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Одобрить выбранные комментарии"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "удален"
-msgstr[1] "удалены"
-msgstr[2] "удалены"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Удалить выбранные комментарии"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "%(count)s комментарий был успешно %(action)s."
-msgstr[1] "%(count)s комментария были успешно %(action)s."
-msgstr[2] "%(count)s комментариев были успешно %(action)s."
 
 #: feeds.py:14
 #, python-format
@@ -301,10 +297,11 @@ msgstr "Предпросмотр вашего комментария"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Пожалуйста, исправьте ошибку ниже"
-msgstr[1] "Пожалуйста, исправьте ошибки ниже"
-msgstr[2] "Пожалуйста, исправьте ошибки ниже"
+msgstr "Пожалуйста, исправьте ошибки ниже"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "Пожалуйста, исправьте ошибки, указанные ниже"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

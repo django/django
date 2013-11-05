@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# A S Alam <apreet.alam@gmail.com>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-08 12:32+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-06-23 14:15+0000\n"
+"Last-Translator: A S Alam <apreet.alam@gmail.com>\n"
 "Language-Team: Panjabi (Punjabi) (http://www.transifex.com/projects/p/django/"
 "language/pa/)\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +20,7 @@ msgstr ""
 
 #: views.py:9
 msgid "No feeds are registered."
-msgstr ""
+msgstr "ਕੋਈ ਫੀਡ ਰਜਿਸਟਰ ਨਹੀਂ ਹੈ।"
 
 #: views.py:19
 #, python-format
@@ -30,47 +31,47 @@ msgstr ""
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 
-#: db/models/fields.py:271
+#: db/models/fields.py:270
 msgid "Point"
 msgstr "ਪੁਆਇੰਟ"
 
-#: db/models/fields.py:275
+#: db/models/fields.py:274
 msgid "Line string"
 msgstr "ਲਾਈਨ ਸਤਰ"
 
-#: db/models/fields.py:279
+#: db/models/fields.py:278
 msgid "Polygon"
 msgstr "ਬਹੁਭੁਜ"
 
-#: db/models/fields.py:283
+#: db/models/fields.py:282
 msgid "Multi-point"
 msgstr "ਕਈ-ਪੁਆਇੰਟ"
 
-#: db/models/fields.py:287
+#: db/models/fields.py:286
 msgid "Multi-line string"
 msgstr ""
 
-#: db/models/fields.py:291
+#: db/models/fields.py:290
 msgid "Multi polygon"
 msgstr "ਮਲਟੀ ਬਹੁ-ਭੁਜ"
 
-#: db/models/fields.py:295
+#: db/models/fields.py:294
 msgid "Geometry collection"
 msgstr "ਜੁਮੈਟਰੀ ਭੰਡਾਰ"
 
-#: forms/fields.py:19
+#: forms/fields.py:23
 msgid "No geometry value provided."
 msgstr "ਕੋਈ ਜੁਮੈਟਰੀ ਮੁੱਲ ਨਹੀਂ ਦਿੱਤਾ ਗਿਆ।"
 
-#: forms/fields.py:20
+#: forms/fields.py:24
 msgid "Invalid geometry value."
 msgstr "ਗਲਤ ਜੁਮੈਟਰੀ ਮੁੱਲ।"
 
-#: forms/fields.py:21
+#: forms/fields.py:25
 msgid "Invalid geometry type."
 msgstr "ਗਲਤ ਜੁਮੈਟਰੀ ਕਿਸਮ।"
 
-#: forms/fields.py:22
+#: forms/fields.py:26
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
@@ -84,9 +85,9 @@ msgstr ""
 #: sitemaps/views.py:60
 #, python-format
 msgid "Page %s empty"
-msgstr ""
+msgstr "ਪੇਜ਼ %s ਖਾਲੀ ਹੈ"
 
 #: sitemaps/views.py:62
 #, python-format
 msgid "No page '%s'"
-msgstr ""
+msgstr "ਪੇਜ਼ '%s' ਨਹੀਂ ਹੈ"

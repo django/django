@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Sandeep Satavlekar <sandysat@gmail.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# pratik kumar <kpratik217@gmail.com>, 2013
+# Sandeep Satavlekar <sandysat@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Sandeep Satavlekar <sandysat@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-07-06 06:27+0000\n"
+"Last-Translator: pratik kumar <kpratik217@gmail.com>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/django/language/"
 "hi/)\n"
 "MIME-Version: 1.0\n"
@@ -20,48 +21,44 @@ msgstr ""
 
 #: admin.py:25
 msgid "Content"
-msgstr "विषय सूची"
+msgstr "विषय"
 
 #: admin.py:28
 msgid "Metadata"
 msgstr "मेटाडाटा"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "झंडी ऊंचायी"
-msgstr[1] "झंडी ऊंचायी"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] ""
+msgstr[1] ""
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
-msgstr "चयनित टिप्पणियों के लिए झंडी ऊंचाओ"
-
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "स्वीकृत"
-msgstr[1] "स्वीकृत"
+msgstr "टिप्पनी को फ्लैग करो"
 
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "चयनित टिप्पणियों को स्वीकार करो"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "हटाया"
-msgstr[1] "हटाया"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] ""
+msgstr[1] ""
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "चयनित टिप्पणियाँ हटाएँ"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "%(count)s टिप्पणि सफलतापूर्वक %(action)s"
-msgstr[1] "%(count)s टिप्पणियाँ सफलतापूर्वक %(action)s"
 
 #: feeds.py:14
 #, python-format
@@ -291,9 +288,11 @@ msgstr "आपके टिप्पणी का पूर्व दर्श�
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "कृपया नीचे पायी गयी गलती को ठीक करें"
-msgstr[1] "कृपया नीचे पाये गये गलतियाँ को ठीक करें"
+msgstr "कृपया नीचे पाये गये गलतियाँ को ठीक करें"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "नीचे त्रुटियों को ठीक करें"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

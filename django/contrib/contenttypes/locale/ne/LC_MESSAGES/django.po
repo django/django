@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Sagar Chalise <chalisesagar@gmail.com>, 2011.
+# Sagar Chalise <chalisesagar@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-08 11:45+0000\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-06-01 04:44+0000\n"
 "Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
 "Language-Team: Nepali (http://www.transifex.com/projects/p/django/language/"
 "ne/)\n"
@@ -23,23 +23,23 @@ msgstr "पाइथन मोडेल क्लासको नाम"
 
 #: models.py:134
 msgid "content type"
-msgstr "विषयको ढाँचा"
+msgstr "कन्टेन्ट टाइप"
 
 #: models.py:135
 msgid "content types"
-msgstr "विषयको ढाँचाहरु"
+msgstr "कन्टेन्ट टाइपहरु"
 
 #: views.py:17
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
-msgstr ""
+msgstr "कन्टेन्ट टाइप %(ct_id)s वस्तु सँग सम्बन्धित मोडेल छैन ।"
 
 #: views.py:21
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
-msgstr ""
+msgstr "कन्टेन्ट टाइप %(ct_id)s वस्तु %(obj_id)s छैन ।"
 
 #: views.py:27
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
-msgstr ""
+msgstr "%(ct_name)s वस्तुमा get_absolute_url() तरिका छैन ।"

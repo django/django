@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Hafsteinn Einarsson <haffi67@gmail.com>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Hafsteinn Einarsson <haffi67@gmail.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
+# einherji <kthelgason@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Hafsteinn Einarsson <haffi67@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-05-30 11:54+0000\n"
+"Last-Translator: einherji <kthelgason@gmail.com>\n"
 "Language-Team: Icelandic (http://www.transifex.com/projects/p/django/"
 "language/is/)\n"
 "MIME-Version: 1.0\n"
@@ -27,41 +28,37 @@ msgid "Metadata"
 msgstr "Hengigögn"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "flaggað"
-msgstr[1] "flaggað"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] "%d umsögn hefur verið merkt"
+msgstr[1] "%d umsagnir hafa verið merktar"
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Flagga valdar athugasemdir"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "samþykkt"
-msgstr[1] "samþykkt"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "%d umsögn hefur verið samþykkt"
+msgstr[1] "%d umsagnir hafa verið samþykktar"
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Samþykkja valdar athugasemdir"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "fjarlægð"
-msgstr[1] "fjarlægðar"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "%d umsögn hefur verið fjarlægð"
+msgstr[1] "%d umsagnir hafa verið fjarlægðar"
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Fjarlægja valdar athugasemdir"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] ""
-msgstr[1] "Það tókst að %(action)s %(count)s athugasemdum."
 
 #: feeds.py:14
 #, python-format
@@ -291,9 +288,11 @@ msgstr "Skoða athugasemd"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Vinsamlegast lagfærðu villuna fyrir neðan"
-msgstr[1] "Vinsamlegast lagfærðu villurnar fyrir neðan"
+msgstr "Vinsamlegast lagfærðu villuna fyrir neðan"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "Vinsamlegast lagfærðu villurnar fyrir neðan"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

@@ -1,16 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Kowit Charoenratchatabhan <kowito@gmail.com>, 2012-2013.
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2013-03-04 22:30+0000\n"
-"Last-Translator: Kowit Charoenratchatabhan <kowit.s.c@gmail.com>\n"
+"POT-Creation-Date: 2013-10-09 20:17+0200\n"
+"PO-Revision-Date: 2013-10-10 08:45+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Thai (http://www.transifex.com/projects/p/django/language/"
 "th/)\n"
 "MIME-Version: 1.0\n"
@@ -31,57 +29,58 @@ msgstr "สิทธิ์"
 msgid "Important dates"
 msgstr "วันที่ที่สำคัญ"
 
-#: admin.py:126
+#: admin.py:132
 msgid "Password changed successfully."
 msgstr "เปลี่ยนรหัสผ่านสำเร็จแล้ว"
 
-#: admin.py:136
+#: admin.py:142
 #, python-format
 msgid "Change password: %s"
 msgstr "เปลี่ยนรหัสผ่าน: %s "
 
-#: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
+#: forms.py:33 tests/test_forms.py:261 tests/test_forms.py:266
+#: tests/test_forms.py:407
 msgid "No password set."
 msgstr "ไม่ได้ตั้งค่ารหัสผ่าน"
 
-#: forms.py:37 tests/forms.py:261 tests/forms.py:267
+#: forms.py:39 tests/test_forms.py:271 tests/test_forms.py:277
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "รูปแบบรหัสผ่านไม่ถูกต้อง หรือไม่รู้จักแฮชอัลกอริทึมนี้"
 
-#: forms.py:67
+#: forms.py:72
 msgid "A user with that username already exists."
 msgstr "ชื่อผู้ใช้นั้นได้ถูกใช้ไปแล้ว"
 
-#: forms.py:68 forms.py:269 forms.py:329
+#: forms.py:73 forms.py:254 forms.py:314
 msgid "The two password fields didn't match."
 msgstr "รหัสผ่านไม่ตรงกัน"
 
-#: forms.py:70 forms.py:115
+#: forms.py:75 forms.py:120
 msgid "Username"
 msgstr "ชื่อผู้ใช้"
 
-#: forms.py:72 forms.py:116
+#: forms.py:77 forms.py:121
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "จำเป็น ต้องการไม่เกิน 30 ตัวอักษร ต้องเป็นตัวอักษรตัวเลขและเครื่องหมาย @/./+/-/_ เท่านั้น"
 
-#: forms.py:75 forms.py:119
+#: forms.py:80 forms.py:124
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr "ค่านี้ต้องเป็นตัวอักษรตัวเลขและเครื่องหมาย @/./+/-/_ เท่านั้น"
 
-#: forms.py:77 forms.py:121 forms.py:148 forms.py:331
+#: forms.py:82 forms.py:126 forms.py:153 forms.py:316
 msgid "Password"
 msgstr "รหัสผ่าน"
 
-#: forms.py:79
+#: forms.py:84
 msgid "Password confirmation"
 msgstr "ยืนยันรหัสผ่าน"
 
-#: forms.py:81
+#: forms.py:86
 msgid "Enter the same password as above, for verification."
 msgstr "ใส่รหัสผ่านเหมือนด้านบน เพื่อตรวจสอบความถูกต้อง"
 
-#: forms.py:122
+#: forms.py:127
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -90,81 +89,64 @@ msgstr ""
 "รหัสผ่านที่ดิบจะไม่เก็บไว้ เพื่อไม่ให้มีวิธีการดูรหัสผ่านของผู้ใช้นี้ แต่คุณสามารถเปลี่ยนรหัสผ่านโดยใช้ <a "
 "href=\"password/\">แบบฟอร์มนี้</a> ."
 
-#: forms.py:151
+#: forms.py:156
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr "กรุณาใส่  %(username)s  และรหัสผ่านที่ถูกต้อง มีการแยกแยะตัวพิมพ์ใหญ่-เล็ก"
 
-#: forms.py:153
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr "เว็บเบราเซอร์ของคุณไม่สามารถใช้งานระบบคุกกี้ได้ จำเป็นต้องใช้ระบบคุกกี้ในการเข้าสู่ระบบ"
-
-#: forms.py:155
+#: forms.py:158
 msgid "This account is inactive."
 msgstr "บัญชีนี้ไม่ทำงาน"
 
 #: forms.py:206
-msgid ""
-"That email address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr "อีเมลนี้ไม่ตรงกับบัญชีใดๆในระบบ คุณแน่ใจหรือว่าคุณได้ลงทะเบียนแล้ว"
-
-#: forms.py:208 tests/forms.py:374
-msgid ""
-"The user account associated with this email address cannot reset the "
-"password."
-msgstr "บัญชีผู้ใช้ที่เกี่ยวข้องกับที่อยู่อีเมล์นี้ไม่สามารถตั้งค่ารหัสผ่าน"
-
-#: forms.py:211
 msgid "Email"
 msgstr "อีเมล"
 
-#: forms.py:271
+#: forms.py:256
 msgid "New password"
 msgstr "รหัสผ่านใหม่"
 
-#: forms.py:273
+#: forms.py:258
 msgid "New password confirmation"
 msgstr "ยืนยันการตั้งรหัสผ่านใหม่"
 
-#: forms.py:302
+#: forms.py:287
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "ใส่รหัสผ่านเก่าผิด กรุณาใส่รหัสผ่านอีกครั้ง"
 
-#: forms.py:305
+#: forms.py:290
 msgid "Old password"
 msgstr "รหัสผ่านเก่า"
 
-#: forms.py:333
+#: forms.py:318
 msgid "Password (again)"
 msgstr "รหัสผ่าน (อีกครั้ง)"
 
-#: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
-#: hashers.py:412
+#: hashers.py:243 hashers.py:317 hashers.py:365 hashers.py:393 hashers.py:426
+#: hashers.py:459 hashers.py:493
 msgid "algorithm"
 msgstr "algorithm"
 
-#: hashers.py:242
+#: hashers.py:244
 msgid "iterations"
 msgstr "iterations"
 
-#: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
+#: hashers.py:245 hashers.py:319 hashers.py:366 hashers.py:394 hashers.py:494
 msgid "salt"
 msgstr "salt"
 
-#: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
+#: hashers.py:246 hashers.py:367 hashers.py:395 hashers.py:427 hashers.py:460
+#: hashers.py:495
 msgid "hash"
 msgstr "hash"
 
-#: hashers.py:293
+#: hashers.py:318
 msgid "work factor"
 msgstr "ปัจจัยการทำงาน"
 
-#: hashers.py:295
+#: hashers.py:320
 msgid "checksum"
 msgstr "checksum"
 
@@ -188,7 +170,7 @@ msgstr "สิทธิ์"
 msgid "group"
 msgstr "กลุ่ม"
 
-#: models.py:129 models.py:301
+#: models.py:129 models.py:294
 msgid "groups"
 msgstr "กลุ่ม"
 
@@ -200,82 +182,86 @@ msgstr "รหัสผ่าน"
 msgid "last login"
 msgstr "เข้าสู่ระบบครั้งสุดท้าย"
 
-#: models.py:298
+#: models.py:291
 msgid "superuser status"
 msgstr "สถานะผู้ใช้พิเศษ"
 
-#: models.py:299
+#: models.py:292
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "กำหนดสิทธิ์ทุกอย่างให้ผู้ใช้ โดยไม่ต้องการมอบหมายอย่างเป็นทางการ"
 
-#: models.py:302
+#: models.py:295
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of his/her group."
 msgstr "กลุ่มที่ผู้ใช้อยู่ ผู้ใช้จะได้รับสิทธิ์ทั้งหมดที่กลุ่มของเขาได้รับ"
 
-#: models.py:306
+#: models.py:299
 msgid "user permissions"
 msgstr "สิทธิ์ของผู้ใช้"
 
-#: models.py:377
+#: models.py:301
+msgid "Specific permissions for this user."
+msgstr ""
+
+#: models.py:368
 msgid "username"
 msgstr "ชื่อผู้ใช้"
 
-#: models.py:378
+#: models.py:367
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr "จำเป็น ต้องการไม่เกิน 30 ตัวอักษร ต้องเป็นตัวอักษรตัวเลขและตัวอักษร @/./+/-/_"
 
-#: models.py:381
+#: models.py:370
 msgid "Enter a valid username."
 msgstr "กรุณาใส่ชื่อผู้ใช้ที่ถูกต้อง"
 
-#: models.py:383
+#: models.py:372
 msgid "first name"
 msgstr "ชื่อ"
 
-#: models.py:384
+#: models.py:373
 msgid "last name"
 msgstr "นามสกุล"
 
-#: models.py:385
+#: models.py:374
 msgid "email address"
 msgstr "ที่อยู่อีเมล"
 
-#: models.py:386
+#: models.py:375
 msgid "staff status"
 msgstr "สถานะของพนักงาน"
 
-#: models.py:387
+#: models.py:376
 msgid "Designates whether the user can log into this admin site."
 msgstr "กำหนดผู้ที่จะเข้ามาใช้งานในส่วนของผู้ดูแลระบบ"
 
-#: models.py:389
+#: models.py:378
 msgid "active"
 msgstr "ใช้งานได้"
 
-#: models.py:390
+#: models.py:379
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr "กำหนดให้ผู้ใช้มีสถานะที่สามารถเข้ามาใช้งานได้ เลือกออกแทนที่จะลบชื่อผู้ใช้ทิ้งไป "
 
-#: models.py:392
+#: models.py:381
 msgid "date joined"
 msgstr "วันที่เข้าร่วม"
 
-#: models.py:400
+#: models.py:389
 msgid "user"
 msgstr "ผู้ใช้"
 
-#: models.py:401
+#: models.py:390
 msgid "users"
 msgstr "ผู้ใช้"
 
-#: views.py:94
+#: views.py:89
 msgid "Logged out"
 msgstr "ออกจากระบบ"
 
@@ -283,3 +269,7 @@ msgstr "ออกจากระบบ"
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "รีเซ็ตรหัสผ่านบน %(site_name)s"
+
+#: tests/test_forms.py:325
+msgid "Enter a valid email address."
+msgstr "กรุณาใส่ชื่อผู้ใช้ที่ถูกต้อง"

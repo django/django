@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# A S Alam <apreet.alam@gmail.com>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-06-23 14:13+0000\n"
+"Last-Translator: A S Alam <apreet.alam@gmail.com>\n"
 "Language-Team: Panjabi (Punjabi) (http://www.transifex.com/projects/p/django/"
 "language/pa/)\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +20,7 @@ msgstr ""
 
 #: models.py:9
 msgid "redirect from"
-msgstr ""
+msgstr "ਇਸ ਤੋਂ ਮੁੜ-ਡਾਇਰੈਕਟ"
 
 #: models.py:10
 msgid ""
@@ -29,7 +30,7 @@ msgstr ""
 
 #: models.py:11
 msgid "redirect to"
-msgstr ""
+msgstr "ਇਸ ਵੱਲ ਡਾਇਰੈਕਟ"
 
 #: models.py:12
 msgid ""
@@ -43,4 +44,4 @@ msgstr "ਰੀ-ਡਾਇਰੈਕਟ"
 
 #: models.py:16
 msgid "redirects"
-msgstr ""
+msgstr "ਮੁੜ-ਡਾਇਰੈਕਟ"

@@ -1,12 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Baptiste <baptiste+transifex@darthenay.fr>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-06-05 07:08+0000\n"
 "Last-Translator: Baptiste <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/projects/p/django/"
 "language/eo/)\n"
@@ -25,41 +26,37 @@ msgid "Metadata"
 msgstr "Metadatumo"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "markita"
-msgstr[1] "markitaj"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] "%d komento sukcese flagitaj"
+msgstr[1] "%d komentoj sukcese flagitaj"
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Marki elektitajn komentojn"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "aprobita"
-msgstr[1] "aprobitaj"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "%d komento sukcese aprovita"
+msgstr[1] "%d komentoj sukcese aprovitaj"
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Aprobi elektitajn komentojn"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "forigita"
-msgstr[1] "forigitaj"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "%d komento sukcese forigita"
+msgstr[1] "%d komentoj sukcese forigitaj"
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Forigi elektitajn komentojn"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "1 komento estis suksese %(action)s."
-msgstr[1] "%(count)s komentoj estis suksese %(action)s."
 
 #: feeds.py:14
 #, python-format
@@ -291,9 +288,11 @@ msgstr "Antaŭrigardi vian komenton"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Bonvolu ĝustigi la eraron sube."
-msgstr[1] "Bonvolu ĝustigi la erarojn sube."
+msgstr "Bonvolu ĝustigi la erarojn sube."
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "Bonvolu korekti la subajn erarojn"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

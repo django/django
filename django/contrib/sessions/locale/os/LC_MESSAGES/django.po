@@ -1,0 +1,38 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Soslan Khubulov <soslanx@gmail.com>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: django-core\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-05-09 05:36+0000\n"
+"Last-Translator: Soslan Khubulov <soslanx@gmail.com>\n"
+"Language-Team: Ossetic (http://www.transifex.com/projects/p/django/language/"
+"os/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: os\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: models.py:38
+msgid "session key"
+msgstr "сессийы амонӕн"
+
+#: models.py:40
+msgid "session data"
+msgstr "сессийы рардтӕ"
+
+#: models.py:41
+msgid "expire date"
+msgstr "фӕуды афон"
+
+#: models.py:46
+msgid "session"
+msgstr "сесси"
+
+#: models.py:47
+msgid "sessions"
+msgstr "сесситӕ"

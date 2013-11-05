@@ -1,18 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-#   <bart@dispectu.com>, 2012-2013.
-# Harro van der Klauw <hvdklauw@gmail.com>, 2012.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Jeffrey Gelens <jeffrey@noppo.pro>, 2011, 2012.
-# Tino de Bruijn <tinodb@gmail.com>, 2011.
+# Bas Peschier <bas.peschier@gmail.com>, 2013
+# Harro van der Klauw <hvdklauw@gmail.com>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012
+# Tino de Bruijn <tinodb@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-03 11:13+0000\n"
-"Last-Translator: bartdegoede <bart@dispectu.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-10-23 17:46+0000\n"
+"Last-Translator: Bas Peschier <bas.peschier@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/django/language/"
 "nl/)\n"
 "MIME-Version: 1.0\n"
@@ -21,21 +21,21 @@ msgstr ""
 "Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: actions.py:48
+#: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s succesvol verwijderd."
 
-#: actions.py:60 options.py:1347
+#: actions.py:61 options.py:1418
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s kan niet worden verwijderd "
 
-#: actions.py:62 options.py:1349
+#: actions.py:63 options.py:1420
 msgid "Are you sure?"
 msgstr "Weet u het zeker?"
 
-#: actions.py:83
+#: actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Verwijder geselecteerde %(verbose_name_plural)s"
@@ -93,92 +93,92 @@ msgstr "Uw sessie is verlopen, meld u opnieuw aan."
 msgid "Action:"
 msgstr "Actie:"
 
-#: models.py:24
+#: models.py:25
 msgid "action time"
 msgstr "actietijd"
 
-#: models.py:27
+#: models.py:28
 msgid "object id"
 msgstr "object-id"
 
-#: models.py:28
+#: models.py:29
 msgid "object repr"
 msgstr "object-repr"
 
-#: models.py:29
+#: models.py:30
 msgid "action flag"
 msgstr "actievlag"
 
-#: models.py:30
+#: models.py:31
 msgid "change message"
 msgstr "wijzig bericht"
 
-#: models.py:35
+#: models.py:36
 msgid "log entry"
 msgstr "logregistratie"
 
-#: models.py:36
+#: models.py:37
 msgid "log entries"
 msgstr "logregistraties"
 
-#: models.py:45
+#: models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "Toegevoegd \"%(object)s\"."
 
-#: models.py:47
+#: models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "Gewijzigd \"%(object)s\" - %(changes)s"
 
-#: models.py:52
+#: models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "Verwijderd \"%(object)s.\""
 
-#: models.py:54
+#: models.py:55
 msgid "LogEntry Object"
 msgstr "LogEntry Object"
 
-#: options.py:156 options.py:172
+#: options.py:173 options.py:202
 msgid "None"
 msgstr "Geen"
 
-#: options.py:684
+#: options.py:763
 #, python-format
 msgid "Changed %s."
 msgstr "%s gewijzigd."
 
-#: options.py:684 options.py:694
+#: options.py:763 options.py:773 options.py:1570
 msgid "and"
 msgstr "en"
 
-#: options.py:689
+#: options.py:768
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" toegevoegd."
 
-#: options.py:693
+#: options.py:772
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(list)s aangepast voor %(name)s \"%(object)s\"."
 
-#: options.py:698
+#: options.py:777
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" verwijderd."
 
-#: options.py:702
+#: options.py:781
 msgid "No fields changed."
 msgstr "Geen velden gewijzigd."
 
-#: options.py:807 options.py:860
+#: options.py:884 options.py:927
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "De %(name)s \"%(obj)s\" was toegevoegd. U kunt het hieronder wijzigen."
 
-#: options.py:835
+#: options.py:902
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -187,12 +187,12 @@ msgstr ""
 "De %(name)s \"%(obj)s\" was succesvol gewijzigd. Je kan hieronder een andere "
 "%(name)s toevoegen."
 
-#: options.py:839
+#: options.py:906
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "De %(name)s \"%(obj)s\" is toegevoegd."
 
-#: options.py:853
+#: options.py:920
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
@@ -201,7 +201,7 @@ msgstr ""
 "De %(name)s \"%(obj)s\" was succesvol gewijzigd. Je kunt het hieronder "
 "wijzigen."
 
-#: options.py:867
+#: options.py:934
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -210,12 +210,12 @@ msgstr ""
 "De %(name)s \"%(obj)s\" was succesvol gewijzigd. Je kan hieronder een andere "
 "%(name)s toevoegen."
 
-#: options.py:873
+#: options.py:940
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Het wijzigen van %(name)s \"%(obj)s\" is geslaagd."
 
-#: options.py:951 options.py:1211
+#: options.py:1018 options.py:1278
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -223,65 +223,81 @@ msgstr ""
 "Er moeten items worden geselecteerd om acties op uit te voeren. Geen items "
 "zijn veranderd."
 
-#: options.py:970
+#: options.py:1037
 msgid "No action selected."
 msgstr "Geen actie geselecteerd."
 
-#: options.py:1050
+#: options.py:1117
 #, python-format
 msgid "Add %s"
 msgstr "Toevoegen %s"
 
-#: options.py:1074 options.py:1319
+#: options.py:1141 options.py:1386
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s object met primaire sleutel %(key)r bestaat niet."
 
-#: options.py:1140
+#: options.py:1207
 #, python-format
 msgid "Change %s"
 msgstr "Wijzig %s"
 
-#: options.py:1190
+#: options.py:1257
 msgid "Database error"
 msgstr "Databasefout"
 
-#: options.py:1253
+#: options.py:1320
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s is succesvol gewijzigd."
 msgstr[1] "%(count)s %(name)s zijn succesvol gewijzigd."
 
-#: options.py:1280
+#: options.py:1347
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s geselecteerd"
 msgstr[1] "Alle %(total_count)s geselecteerd"
 
-#: options.py:1285
+#: options.py:1352
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 van de %(cnt)s geselecteerd"
 
-#: options.py:1335
+#: options.py:1403
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Gebruiker %(name)s \"%(obj)s\" is verwijderd."
 
-#: options.py:1382
+#: options.py:1459
 #, python-format
 msgid "Change history: %s"
 msgstr "Wijzigingsgeschiedenis: %s"
 
-#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#. Translators: Model verbose name and instance representation, suitable to be
+#. an item in a list
+#: options.py:1564
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#: options.py:1571
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+"Het verwijderen van %(class_name)s %(instance)s vereist het verwijderen van "
+"de volgende beschermde gerelateerde objecten: %(related_objects)s"
+
+#: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19
 #: views/decorators.py:24
 msgid "Log in"
 msgstr "Inloggen"
 
-#: sites.py:388
+#: sites.py:386
 msgid "Site administration"
 msgstr "Sitebeheer"
 
@@ -302,15 +318,15 @@ msgstr "Tijd:"
 msgid "Lookup"
 msgstr "Opzoeken"
 
-#: widgets.py:271
+#: widgets.py:260
 msgid "Add Another"
 msgstr "Voeg nog één toe"
 
-#: widgets.py:316
+#: widgets.py:302
 msgid "Currently:"
 msgstr "Huidig:"
 
-#: widgets.py:317
+#: widgets.py:303
 msgid "Change:"
 msgstr "Wijzig:"
 
@@ -437,9 +453,14 @@ msgstr "Toon op site"
 #: templates/admin/auth/user/change_password.html:27
 #: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Herstel de fout hieronder."
-msgstr[1] "Herstel de fouten hieronder."
+msgstr "Herstel de fouten hieronder."
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the errors below."
+msgstr "Herstel de fouten hieronder."
 
 #: templates/admin/change_list.html:58
 #, python-format
@@ -794,11 +815,19 @@ msgstr "Wachtwoord herstel geslaagd"
 
 #: templates/registration/password_reset_done.html:17
 msgid ""
-"We've emailed you instructions for setting your password to the email "
-"address you submitted. You should be receiving it shortly."
+"We've emailed you instructions for setting your password. You should be "
+"receiving them shortly."
 msgstr ""
-"We hebben instructies voor het resetten van uw wachtwoord naar het ingevulde "
-"emailadres gestuurd. U zou ze snel binnen moeten krijgen."
+"We hebben u instructies voor het instellen van uw wachtwoord gemaild. U zou "
+"deze binnenkort moeten ontvangen."
+
+#: templates/registration/password_reset_done.html:19
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Als u geen e-mail ontvangt, controleer dan of u het e-mailadres hebt "
+"opgegeven waar u zich mee geregistreerd heeft en controleer uw spam-map."
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
@@ -842,20 +871,20 @@ msgstr "Emailadres:"
 msgid "Reset my password"
 msgstr "Herstel mijn wachtwoord"
 
-#: templatetags/admin_list.py:344
+#: templatetags/admin_list.py:348
 msgid "All dates"
 msgstr "Alle data"
 
-#: views/main.py:33
+#: views/main.py:35
 msgid "(None)"
 msgstr "(Geen)"
 
-#: views/main.py:76
+#: views/main.py:84
 #, python-format
 msgid "Select %s"
 msgstr "Selecteer %s"
 
-#: views/main.py:78
+#: views/main.py:86
 #, python-format
 msgid "Select %s to change"
 msgstr "Selecteer %s om te wijzigen"

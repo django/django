@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Janos Guljas <janos@resenje.org>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Janos Guljas <janos@resenje.org>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-17 05:18+0000\n"
-"Last-Translator: Janos Guljas <janos@resenje.org>\n"
+"POT-Creation-Date: 2013-08-16 15:07+0200\n"
+"PO-Revision-Date: 2013-08-17 09:27+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Serbian (http://www.transifex.com/projects/p/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -31,10 +31,6 @@ msgstr "претходни корак"
 msgid "submit"
 msgstr "постави"
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
+#: wizard/views.py:275
+msgid "ManagementForm data is missing or has been tampered."
 msgstr ""
-"Жао нам је, али Ваша сесија је истекла. Попуњавање формулара наставите на "
-"овој страници."

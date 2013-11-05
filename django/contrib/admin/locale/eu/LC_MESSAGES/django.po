@@ -1,18 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Translators:
-# Aitzol Naberan <anaberan@codesyntax.com>, 2011-2013.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-#  <julenx@gmail.com>, 2013.
-#   <julenx@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# julen <julenx@gmail.com>, 2012-2013
+# julen <julenx@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-16 11:21+0000\n"
-"Last-Translator: julen <julenx@gmail.com>\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-08-17 08:29+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Basque (http://www.transifex.com/projects/p/django/language/"
 "eu/)\n"
 "MIME-Version: 1.0\n"
@@ -21,21 +19,21 @@ msgstr ""
 "Language: eu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: actions.py:48
+#: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s elementu ezabatu dira."
 
-#: actions.py:60 options.py:1347
+#: actions.py:61 options.py:1418
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Ezin da %(name)s ezabatu"
 
-#: actions.py:62 options.py:1349
+#: actions.py:63 options.py:1420
 msgid "Are you sure?"
 msgstr "Ziur zaude?"
 
-#: actions.py:83
+#: actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Ezabatu aukeratutako %(verbose_name_plural)s"
@@ -93,92 +91,92 @@ msgstr "Hasi saioa berriro, zure sesioa iraungitu egin da."
 msgid "Action:"
 msgstr "Ekintza:"
 
-#: models.py:24
+#: models.py:25
 msgid "action time"
 msgstr "Ekintza hordua"
 
-#: models.py:27
+#: models.py:28
 msgid "object id"
 msgstr "Objetuaren id-a"
 
-#: models.py:28
+#: models.py:29
 msgid "object repr"
 msgstr "Objeturaren aurkezpena"
 
-#: models.py:29
+#: models.py:30
 msgid "action flag"
 msgstr "Ekintza botoia"
 
-#: models.py:30
+#: models.py:31
 msgid "change message"
 msgstr "Mezua aldatu"
 
-#: models.py:35
+#: models.py:36
 msgid "log entry"
 msgstr "Log sarrera"
 
-#: models.py:36
+#: models.py:37
 msgid "log entries"
 msgstr "log sarrerak"
 
-#: models.py:45
+#: models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "\"%(object)s\" gehituta."
 
-#: models.py:47
+#: models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "\"%(object)s\" aldatuta - %(changes)s"
 
-#: models.py:52
+#: models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "\"%(object)s\" ezabatuta."
 
-#: models.py:54
+#: models.py:55
 msgid "LogEntry Object"
 msgstr "LogEntry objektua"
 
-#: options.py:156 options.py:172
+#: options.py:173 options.py:202
 msgid "None"
 msgstr "Bat ere ez"
 
-#: options.py:684
+#: options.py:763
 #, python-format
 msgid "Changed %s."
 msgstr "%s aldatuta."
 
-#: options.py:684 options.py:694
+#: options.py:763 options.py:773 options.py:1570
 msgid "and"
 msgstr "eta"
 
-#: options.py:689
+#: options.py:768
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" gehituta."
 
-#: options.py:693
+#: options.py:772
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Changed %(list)s for %(name)s \"%(object)s\"."
 
-#: options.py:698
+#: options.py:777
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" ezabatuta."
 
-#: options.py:702
+#: options.py:781
 msgid "No fields changed."
 msgstr "Ez da eremurik aldatu."
 
-#: options.py:807 options.py:860
+#: options.py:884 options.py:927
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" ondo gehitu da. Jarraian aldatu dezakezu berriro."
 
-#: options.py:835
+#: options.py:902
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -187,12 +185,12 @@ msgstr ""
 "%(name)s \"%(obj)s\" ondo gehitu da. Beste %(name)s bat gehitu dezakezu "
 "jarraian."
 
-#: options.py:839
+#: options.py:906
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" ondo gehitu da."
 
-#: options.py:853
+#: options.py:920
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
@@ -201,7 +199,7 @@ msgstr ""
 "%(name)s \"%(obj)s\" ondo aldatu da. Aldaketa gehiago egin ditzazkezu "
 "jarraian."
 
-#: options.py:867
+#: options.py:934
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -210,12 +208,12 @@ msgstr ""
 "%(name)s \"%(obj)s\" ondo aldatu da. Beste %(name)s bat gehitu dezakezu "
 "jarraian."
 
-#: options.py:873
+#: options.py:940
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" ondo aldatu da."
 
-#: options.py:951 options.py:1211
+#: options.py:1018 options.py:1278
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -223,65 +221,80 @@ msgstr ""
 "Elementuak aukeratu behar dira beraien gain ekintzak burutzeko. Ez da "
 "elementurik aldatu."
 
-#: options.py:970
+#: options.py:1037
 msgid "No action selected."
 msgstr "Ez dago ekintzarik aukeratuta."
 
-#: options.py:1050
+#: options.py:1117
 #, python-format
 msgid "Add %s"
 msgstr "Gehitu %s"
 
-#: options.py:1074 options.py:1319
+#: options.py:1141 options.py:1386
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Ez dago %(key)r gakodun %(name)s objekturik."
 
-#: options.py:1140
+#: options.py:1207
 #, python-format
 msgid "Change %s"
 msgstr "Aldatu %s"
 
-#: options.py:1190
+#: options.py:1257
 msgid "Database error"
 msgstr "Datu-basearen errorea"
 
-#: options.py:1253
+#: options.py:1320
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(name)s %(count)s  ondo aldatu da."
 msgstr[1] "%(count)s %(name)s ondo aldatu dira."
 
-#: options.py:1280
+#: options.py:1347
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "Guztira %(total_count)s aukeratuta"
 msgstr[1] "Guztira %(total_count)s aukeratuta"
 
-#: options.py:1285
+#: options.py:1352
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "Guztira %(cnt)s, 0 aukeratuta"
 
-#: options.py:1335
+#: options.py:1403
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" ondo ezabatu da."
 
-#: options.py:1382
+#: options.py:1459
 #, python-format
 msgid "Change history: %s"
 msgstr "Aldaketen historia: %s"
 
-#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#. Translators: Model verbose name and instance representation, suitable to be
+#. an item in a list
+#: options.py:1564
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#: options.py:1571
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+""
+
+#: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19
 #: views/decorators.py:24
 msgid "Log in"
 msgstr "Sartu"
 
-#: sites.py:388
+#: sites.py:386
 msgid "Site administration"
 msgstr "Webgunearen kudeaketa"
 
@@ -302,15 +315,15 @@ msgstr "Ordua:"
 msgid "Lookup"
 msgstr "Lookup"
 
-#: widgets.py:271
+#: widgets.py:260
 msgid "Add Another"
 msgstr "Beste bat gehitu"
 
-#: widgets.py:316
+#: widgets.py:302
 msgid "Currently:"
 msgstr "Oraingoa:"
 
-#: widgets.py:317
+#: widgets.py:303
 msgid "Change:"
 msgstr "Aldatu:"
 
@@ -436,9 +449,14 @@ msgstr "Ikusi gunean"
 #: templates/admin/auth/user/change_password.html:27
 #: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Zuzendu azpiko errorea."
-msgstr[1] "Zuzendu azpiko erroreak."
+msgstr "Zuzendu azpiko erroreak."
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the errors below."
+msgstr ""
 
 #: templates/admin/change_list.html:58
 #, python-format
@@ -790,11 +808,19 @@ msgstr "Pasahitza ondo berrezarri da"
 
 #: templates/registration/password_reset_done.html:17
 msgid ""
-"We've emailed you instructions for setting your password to the email "
-"address you submitted. You should be receiving it shortly."
+"We've emailed you instructions for setting your password. You should be "
+"receiving them shortly."
 msgstr ""
 "Emandako helbide elektronikora bidali dizkizugu pasahitza berrezartzeko "
 "jarraibideak. Epe laburrean jaso behar zenuke."
+
+#: templates/registration/password_reset_done.html:19
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Ez baduzu mezurik jasotzen, ziurtatu izena ematean erabilitako helbide "
+"berdina idatzi duzula eta egiaztatu spam karpeta."
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
@@ -838,20 +864,20 @@ msgstr "Helbide elektronikoa:"
 msgid "Reset my password"
 msgstr "Berrezarri pasahitza"
 
-#: templatetags/admin_list.py:344
+#: templatetags/admin_list.py:348
 msgid "All dates"
 msgstr "Data guztiak"
 
-#: views/main.py:33
+#: views/main.py:35
 msgid "(None)"
 msgstr "(Bat ere ez)"
 
-#: views/main.py:76
+#: views/main.py:84
 #, python-format
 msgid "Select %s"
 msgstr "Hautatu %s"
 
-#: views/main.py:78
+#: views/main.py:86
 #, python-format
 msgid "Select %s to change"
 msgstr "Hautatu %s aldatzeko"

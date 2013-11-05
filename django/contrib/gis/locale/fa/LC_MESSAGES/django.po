@@ -1,17 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ali Nikneshan <ali@nikneshan.com>, 2012.
-# Alireza Savand <alireza.savand@gmail.com>, 2013.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Saeed  <sd.javadi@gmail.com>, 2011.
+# Ali Nikneshan <ali@nikneshan.com>, 2012
+# Alireza Savand <alireza.savand@gmail.com>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Saeed <sd.javadi@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2013-01-11 08:32+0000\n"
-"Last-Translator: Alireza Savand <alireza.savand@gmail.com>\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-04-24 18:57+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -33,47 +33,47 @@ msgstr "Slug %r ثبت نشده"
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "فیلد  GIS  پایه -- نقشه‌ها برای مشخصه‌های هندسی OpenGIS"
 
-#: db/models/fields.py:271
+#: db/models/fields.py:270
 msgid "Point"
 msgstr "نقطه"
 
-#: db/models/fields.py:275
+#: db/models/fields.py:274
 msgid "Line string"
 msgstr "رشته خط"
 
-#: db/models/fields.py:279
+#: db/models/fields.py:278
 msgid "Polygon"
 msgstr "چندضلعی"
 
-#: db/models/fields.py:283
+#: db/models/fields.py:282
 msgid "Multi-point"
 msgstr "چند نقطه ای"
 
-#: db/models/fields.py:287
+#: db/models/fields.py:286
 msgid "Multi-line string"
 msgstr "چند خط رشته"
 
-#: db/models/fields.py:291
+#: db/models/fields.py:290
 msgid "Multi polygon"
 msgstr "چندین چند ضلعی "
 
-#: db/models/fields.py:295
+#: db/models/fields.py:294
 msgid "Geometry collection"
 msgstr "مجموعه هندسی"
 
-#: forms/fields.py:19
+#: forms/fields.py:23
 msgid "No geometry value provided."
 msgstr "مقدار جغرافیایی‌ای مقرر نشده است."
 
-#: forms/fields.py:20
+#: forms/fields.py:24
 msgid "Invalid geometry value."
 msgstr "مقدار جغرافیایی نامعتبر"
 
-#: forms/fields.py:21
+#: forms/fields.py:25
 msgid "Invalid geometry type."
 msgstr "نوعِ جغرافیایی نامعتبر"
 
-#: forms/fields.py:22
+#: forms/fields.py:26
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."

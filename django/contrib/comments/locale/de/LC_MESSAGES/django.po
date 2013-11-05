@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011,2013
+# Markus Holtermann <inyoka@markusholtermann.eu>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-07-07 10:35+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/django/language/"
 "de/)\n"
@@ -26,41 +27,37 @@ msgid "Metadata"
 msgstr "Metadaten"
 
 #: admin.py:55
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "markiert"
-msgstr[1] "markiert"
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] "%d Kommentar erfolgreich markiert"
+msgstr[1] "%d Kommentare erfolgreich markiert"
 
-#: admin.py:56
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Ausgewählte Kommentare markieren"
 
-#: admin.py:60
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "freigegeben"
-msgstr[1] "freigegeben"
-
 #: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "%d Kommentar erfolgreich freigegeben"
+msgstr[1] "%d Kommentare erfolgreich freigegeben"
+
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Ausgewählte Kommentare freigeben"
 
-#: admin.py:65
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "entfernt"
-msgstr[1] "entfernt"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "%d Kommentar erfolgreich entfernt"
+msgstr[1] "%d Kommentare erfolgreich entfernt"
 
-#: admin.py:66
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Ausgewählte Kommentare entfernen"
-
-#: admin.py:78
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "1 Kommentar wurde erfolgreich %(action)s."
-msgstr[1] "%(count)s Kommentare wurden erfolgreich %(action)s."
 
 #: feeds.py:14
 #, python-format
@@ -120,7 +117,7 @@ msgstr "Benutzer"
 
 #: models.py:55
 msgid "user's name"
-msgstr "Benutzername"
+msgstr "Name"
 
 #: models.py:56
 msgid "user's email address"
@@ -136,7 +133,7 @@ msgstr "Kommentar"
 
 #: models.py:62
 msgid "date/time submitted"
-msgstr "Datum/Zeit Erstellung"
+msgstr "Erstellungs-Datum/Zeit"
 
 #: models.py:63
 msgid "IP address"
@@ -153,7 +150,7 @@ msgstr "Deaktivieren, um den Kommentar sofort von der Website zu entfernen."
 
 #: models.py:67
 msgid "is removed"
-msgstr "ist gelöscht"
+msgstr "ist entfernt"
 
 #: models.py:68
 msgid ""
@@ -172,20 +169,16 @@ msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
-"Dieser Kommentar wurde von einem authentifizierten Benutzer geschrieben.\n"
-"Der Name ist daher schreibgeschützt.\n"
-"\n"
-"%(text)s"
+"Dieser Kommentar wurde von einem authentifizierten Benutzer geschrieben. Der "
+"Name ist daher schreibgeschützt."
 
 #: models.py:134
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
-"Dieser Kommentar wurde von einem authentifizierten Benutzer geschrieben.\n"
-"Die E-Mail-Adresse ist daher schreibgeschützt.\n"
-"\n"
-"%(text)s"
+"Dieser Kommentar wurde von einem authentifizierten Benutzer geschrieben. Die "
+"E-Mail-Adresse ist daher schreibgeschützt."
 
 #: models.py:160
 #, python-format
@@ -296,9 +289,11 @@ msgstr "Kommentarvorschau"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Bitte den unten aufgeführten Fehler korrigieren."
-msgstr[1] "Bitte die unten aufgeführten Fehler korrigieren."
+msgstr "Bitte die unten aufgeführten Fehler korrigieren."
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "Bitte die unten aufgeführten Fehler korrigieren"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"
