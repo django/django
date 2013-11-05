@@ -47,7 +47,7 @@ Specifying authentication backends
 Behind the scenes, Django maintains a list of "authentication backends" that it
 checks for authentication. When somebody calls
 :func:`django.contrib.auth.authenticate()` -- as described in :ref:`How to log
-a user in <how-to-log-a-user-in>` above -- Django tries authenticating across
+a user in <how-to-log-a-user-in>` -- Django tries authenticating across
 all of its authentication backends. If the first authentication method fails,
 Django tries the second one, and so on, until all backends have been attempted.
 
