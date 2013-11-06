@@ -1434,7 +1434,8 @@ then the output would be:
     ]
 
 You can also do more complicated things like::
-    {{ for book in books|dictsort:"author.age"
+
+    {% for book in books|dictsort:"author.age" %}
         * {{ book.title }} ({{ book.author.name }})
     {% endfor %}
 
