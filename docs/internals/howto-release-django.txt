@@ -169,6 +169,9 @@ OK, this is the fun part, where we actually push out a release!
 
    __ https://github.com/django/django/commit/18d920ea4839fb54f9d2a5dcb555b6a5666ee469
 
+#. For a version release, remove the ``UNDER DEVELOPMENT`` header at the top of
+   the release notes.
+
 #. If this is a pre-release package, update the "Development Status" trove
    classifier in ``setup.py`` to reflect this. Otherwise, make sure the
    classifier is set to ``Development Status :: 5 - Production/Stable``.
@@ -338,6 +341,9 @@ You're almost done! All that's left to do now is:
    take example on previous releases.
 
 .. _Trac's versions list: https://code.djangoproject.com/admin/ticket/versions
+
+#. On the master branch, remove the ``UNDER DEVELOPMENT`` header in the notes
+   of the release that's just been pushed out.
 
 Notes on setting the VERSION tuple
 ==================================
