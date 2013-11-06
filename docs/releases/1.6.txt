@@ -812,6 +812,31 @@ as JSON requires string keys, you will likely run into problems if you are
 using non-string keys in ``request.session``. See the
 :ref:`session_serialization` documentation for more details.
 
+Object Relational Mapper changes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.6 contains many changes to the ORM. These changes fall mostly in
+three categories:
+
+  1. Bug fixes (e.g. proper join clauses for generic relations, query
+     combining, join promotion, and join trimming fixes)
+  2. Preparation for new features. For example the ORM is now internally ready
+     for multicolumn foreign keys.
+  3. General cleanup.
+
+These changes can result in some compatibility problems. For example, some
+queries will now generate different table aliases. This can affect
+:meth:`QuerySet.extra() <django.db.models.query.QuerySet.extra>`. In addition
+some queries will now produce different results. An example is
+:meth:`exclude(condition) <django.db.models.query.QuerySet.exclude>`
+where the condition is a complex one (referencing multijoins inside
+:class:`Q objects <django.db.models.Q>`). In many cases the affected
+queries didn't produce correct results in Django 1.5 but do now.
+Unfortunately there are also cases that produce different results, but
+neither Django 1.5 nor 1.6 produce correct results.
+
+Finally, there have been many changes to the ORM internal APIs.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
