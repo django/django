@@ -98,6 +98,21 @@ Using a custom manager when traversing reverse relations
 It is now possible to :ref:`specify a custom manager
 <using-custom-reverse-manager>` when traversing a reverse relationship.
 
+New ``Prefetch`` object for advanced ``prefetch_related`` operations.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The new :class:`~django.db.models.Prefetch` object allows customizing
+prefetch operations.
+
+You can specify the ``QuerySet`` used to traverse a given relation
+or customize the storage location of prefetch results.
+
+This enables things like filtering prefetched relations, calling
+:meth:`~django.db.models.query.QuerySet.select_related()` from a prefetched
+relation, or prefetching the same relation multiple times with different
+querysets. See :meth:`~django.db.models.query.QuerySet.prefetch_related()`
+for more details.
+
 Admin shortcuts support time zones
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

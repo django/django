@@ -137,6 +137,9 @@ class TaggedItem(models.Model):
     def __str__(self):
         return self.tag
 
+    class Meta:
+        ordering = ['id']
+
 
 class Bookmark(models.Model):
     url = models.URLField()
@@ -145,6 +148,9 @@ class Bookmark(models.Model):
                                     content_type_field='favorite_ct',
                                     object_id_field='favorite_fkey',
                                     related_name='favorite_bookmarks')
+
+    class Meta:
+        ordering = ['id']
 
 
 class Comment(models.Model):
@@ -155,12 +161,16 @@ class Comment(models.Model):
     object_pk = models.TextField()
     content_object = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
 
+    class Meta:
+        ordering = ['id']
+
 
 ## Models for lookup ordering tests
 
 
 class House(models.Model):
     address = models.CharField(max_length=255)
+    owner = models.ForeignKey('Person', null=True)
 
     class Meta:
         ordering = ['id']

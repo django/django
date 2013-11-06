@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured  # N
 from django.db.models.loading import (  # NOQA
     get_apps, get_app_path, get_app_paths, get_app, get_models, get_model,
     register_models, UnavailableApp)
-from django.db.models.query import Q, QuerySet  # NOQA
+from django.db.models.query import Q, QuerySet, Prefetch  # NOQA
 from django.db.models.expressions import F  # NOQA
 from django.db.models.manager import Manager  # NOQA
 from django.db.models.base import Model  # NOQA
