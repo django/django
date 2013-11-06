@@ -91,6 +91,54 @@ class DeleteModel(Operation):
         return "Delete model %s" % (self.name, )
 
 
+class RenameModel(Operation):
+    """
+    Renames a model.
+    """
+
+    def __init__(self, old_name, new_name):
+        self.old_name = old_name
+        self.new_name = new_name
+
+    def state_forwards(self, app_label, state):
+        state.models[app_label, self.new_name.lower()] = state.models[app_label, self.old_name.lower()]
+        state.models[app_label, self.new_name.lower()].name = self.new_name
+        del state.models[app_label, self.old_name.lower()]
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        old_app_cache = from_state.render()
+        new_app_cache = to_state.render()
+        old_model = old_app_cache.get_model(app_label, self.old_name)
+        new_model = new_app_cache.get_model(app_label, self.new_name)
+        if router.allow_migrate(schema_editor.connection.alias, new_model):
+            schema_editor.alter_db_table(
+                new_model,
+                old_model._meta.db_table,
+                new_model._meta.db_table,
+            )
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        old_app_cache = from_state.render()
+        new_app_cache = to_state.render()
+        old_model = old_app_cache.get_model(app_label, self.new_name)
+        new_model = new_app_cache.get_model(app_label, self.old_name)
+        if router.allow_migrate(schema_editor.connection.alias, new_model):
+            schema_editor.alter_db_table(
+                new_model,
+                old_model._meta.db_table,
+                new_model._meta.db_table,
+            )
+
+    def references_model(self, name, app_label=None):
+        return (
+            name.lower() == self.old_name.lower() or
+            name.lower() == self.new_name.lower()
+        )
+
+    def describe(self):
+        return "Rename model %s to %s" % (self.old_name, self.new_name)
+
+
 class AlterModelTable(Operation):
     """
     Renames a model's table
