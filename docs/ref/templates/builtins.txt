@@ -1449,7 +1449,7 @@ If ``books`` is:
         {'title': 'Alice', 'author': {'name': 'Lewis', 'age': 33}},
     ]
 
-the the output would be::
+then the output would be::
 
     * Alice (Lewis)
     * 1984 (George)
