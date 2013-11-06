@@ -93,7 +93,7 @@ setup(
     package_data=package_data,
     scripts=['django/bin/django-admin.py'],
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',
