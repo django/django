@@ -299,7 +299,8 @@ Now you're ready to actually put the release out there. To do this:
 
 #. Go to the `Add release page in the admin`__, enter the new release number
    exactly as it appears in the name of the tarball (Django-<version>.tar.gz).
-   So for example enter "1.5.1" or "1.4-rc-2", etc.
+   So for example enter "1.5.1" or "1.4-rc-2", etc. If the release is part of
+   an LTS branch, mark it so.
 
    __ https://www.djangoproject.com/admin/releases/release/add/
 
@@ -332,8 +333,9 @@ You're almost done! All that's left to do now is:
    JSON fixture, so people without access to the production DB can still
    run an up-to-date copy of the docs site.
 
-#. Add the release in `Trac's versions list`_ if necessary. Not all versions
-   are declared; take example on previous releases.
+#. Add the release in `Trac's versions list`_ if necessary (and make it the
+   default if it's a final release). Not all versions are declared;
+   take example on previous releases.
 
 .. _Trac's versions list: https://code.djangoproject.com/admin/ticket/versions
 
