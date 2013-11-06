@@ -159,6 +159,15 @@ subclass::
     By default, the admin changelist will display it
     (``actions_selection_counter = True``).
 
+.. attribute:: ModelAdmin.auto_pk_readonly_field
+
+    .. versionadded:: 1.7
+
+        If the primary key is not an ``AutoField``, this controls whether the
+        primary key field is made read-only for existing objects. If set to
+        ``False``, the change form reverts to pre-1.7 behaviour and the primary
+        key field will remain editable.
+
 .. attribute:: ModelAdmin.date_hierarchy
 
     Set ``date_hierarchy`` to the name of a ``DateField`` or ``DateTimeField``

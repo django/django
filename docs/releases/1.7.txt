@@ -172,6 +172,11 @@ Minor features
   <django.contrib.admin.ModelAdmin.view_on_site>` to control whether or not to
   display the "View on site" link.
 
+* Primary key fields will now be read-only for change forms by default, but
+  can be made editable again by setting
+  :attr:`ModelAdmin.auto_pk_readonly_field<django.contrib.admin.ModelAdmin.auto_pk_readonly_field>`
+  to ``False``.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
