@@ -491,8 +491,7 @@ class Query(object):
             lhs = change_map.get(lhs, lhs)
             new_alias = self.join(
                 (lhs, table, join_cols), reuse=reuse,
-                outer_if_first=True, nullable=nullable,
-                join_field=join_field)
+                nullable=nullable, join_field=join_field)
             if join_type == self.INNER:
                 rhs_votes.add(new_alias)
             # We can't reuse the same join again in the query. If we have two
@@ -854,8 +853,7 @@ class Query(object):
         """
         return len([1 for count in self.alias_refcount.values() if count])
 
-    def join(self, connection, reuse=None, outer_if_first=False,
-             nullable=False, join_field=None):
+    def join(self, connection, reuse=None, nullable=False, join_field=None):
         """
         Returns an alias for the join in 'connection', either reusing an
         existing alias for that join or creating a new one. 'connection' is a
@@ -870,11 +868,9 @@ class Query(object):
         (matching the connection) are reusable, or it can be a set containing
         the aliases that can be reused.
 
-        If 'outer_if_first' is True and a new join is created, it will have the
-        LOUTER join type.
-
         A join is always created as LOUTER if the lhs alias is LOUTER to make
-        sure we do not generate chains like t1 LOUTER t2 INNER t3.
+        sure we do not generate chains like t1 LOUTER t2 INNER t3. All new
+        joins are created as LOUTER if nullable is True.
 
         If 'nullable' is True, the join can potentially involve NULL values and
         is a candidate for promotion (to "left outer") when combining querysets.
@@ -904,15 +900,13 @@ class Query(object):
             # Not all tables need to be joined to anything. No join type
             # means the later columns are ignored.
             join_type = None
-        elif self.alias_map[lhs].join_type == self.LOUTER:
+        elif self.alias_map[lhs].join_type == self.LOUTER or nullable:
             join_type = self.LOUTER
         else:
             join_type = self.INNER
         join = JoinInfo(table, alias, join_type, lhs, join_cols or ((None, None),), nullable,
                         join_field)
         self.alias_map[alias] = join
-        if outer_if_first:
-            self.promote_joins([alias])
         if connection in self.join_map:
             self.join_map[connection] += (alias,)
         else:
@@ -1010,7 +1004,7 @@ class Query(object):
             # Join promotion note - we must not remove any rows here, so use
             # outer join if there isn't any existing join.
             field, sources, opts, join_list, path = self.setup_joins(
-                field_list, opts, self.get_initial_alias(), outer_if_first=True)
+                field_list, opts, self.get_initial_alias())
 
             # Process the join chain to see if it can be trimmed
             targets, _, join_list = self.trim_joins(sources, join_list, path)
@@ -1139,7 +1133,7 @@ class Query(object):
 
         try:
             field, sources, opts, join_list, path = self.setup_joins(
-                parts, opts, alias, can_reuse, allow_many, outer_if_first=True)
+                parts, opts, alias, can_reuse, allow_many)
         except MultiJoin as e:
             return self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]),
                                       can_reuse, e.names_with_path)
@@ -1343,8 +1337,7 @@ class Query(object):
                 raise FieldError("Join on field %r not permitted." % name)
         return path, final_field, targets
 
-    def setup_joins(self, names, opts, alias, can_reuse=None, allow_many=True,
-                    outer_if_first=False):
+    def setup_joins(self, names, opts, alias, can_reuse=None, allow_many=True):
         """
         Compute the necessary table joins for the passage through the fields
         given in 'names'. 'opts' is the Options class for the current model
@@ -1385,8 +1378,7 @@ class Query(object):
             connection = alias, opts.db_table, join.join_field.get_joining_columns()
             reuse = can_reuse if join.m2m else None
             alias = self.join(
-                connection, reuse=reuse, nullable=nullable, join_field=join.join_field,
-                outer_if_first=outer_if_first)
+                connection, reuse=reuse, nullable=nullable, join_field=join.join_field)
             joins.append(alias)
         if hasattr(final_field, 'field'):
             final_field = final_field.field
@@ -1561,7 +1553,7 @@ class Query(object):
                 # if there is no existing joins, use outer join.
                 field, targets, u2, joins, path = self.setup_joins(
                     name.split(LOOKUP_SEP), opts, alias, can_reuse=None,
-                    allow_many=allow_m2m, outer_if_first=True)
+                    allow_many=allow_m2m)
                 targets, final_alias, joins = self.trim_joins(targets, joins, path)
                 for target in targets:
                     self.select.append(SelectInfo((final_alias, target.column), target))

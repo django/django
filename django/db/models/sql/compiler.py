@@ -453,7 +453,7 @@ class SQLCompiler(object):
     def _setup_joins(self, pieces, opts, alias):
         """
         A helper method for get_ordering and get_distinct. This method will
-        call query.setup_joins, handle refcounts and then promote the joins.
+        call query.setup_joins and handle refcounts.
 
         Note that get_ordering and get_distinct must produce same target
         columns on same input, as the prefixes of get_ordering and get_distinct
@@ -463,20 +463,12 @@ class SQLCompiler(object):
             alias = self.query.get_initial_alias()
         field, targets, opts, joins, path = self.query.setup_joins(
             pieces, opts, alias)
-        # We will later on need to promote those joins that were added to the
-        # query afresh above.
-        joins_to_promote = [j for j in joins if self.query.alias_refcount[j] < 2]
         alias = joins[-1]
         if not field.rel:
             # To avoid inadvertent trimming of a necessary alias, use the
             # refcount to show that we are referencing a non-relation field on
             # the model.
             self.query.ref_alias(alias)
-
-        # Must use left outer joins for nullable fields and their relations.
-        # Ordering or distinct must not affect the returned set, and INNER
-        # JOINS for nullable fields could do this.
-        self.query.promote_joins(joins_to_promote)
         return field, targets, alias, joins, path, opts
 
     def get_from_clause(self):
@@ -589,7 +581,7 @@ class SQLCompiler(object):
         return result, params
 
     def fill_related_selections(self, opts=None, root_alias=None, cur_depth=1,
-            requested=None, restricted=None, nullable=None):
+            requested=None, restricted=None):
         """
         Fill in the information needed for a select_related query. The current
         depth is measured as the number of connections away from the root model
@@ -623,9 +615,8 @@ class SQLCompiler(object):
             if not select_related_descend(f, restricted, requested,
                                           only_load.get(field_model)):
                 continue
-            promote = nullable or f.null
             _, _, _, joins, _ = self.query.setup_joins(
-                [f.name], opts, root_alias, outer_if_first=promote)
+                [f.name], opts, root_alias)
             alias = joins[-1]
             columns, aliases = self.get_default_columns(start_alias=alias,
                     opts=f.rel.to._meta, as_pairs=True)
@@ -635,9 +626,8 @@ class SQLCompiler(object):
                 next = requested.get(f.name, {})
             else:
                 next = False
-            new_nullable = f.null or promote
             self.fill_related_selections(f.rel.to._meta, alias, cur_depth + 1,
-                    next, restricted, new_nullable)
+                    next, restricted)
 
         if restricted:
             related_fields = [
@@ -651,7 +641,7 @@ class SQLCompiler(object):
                     continue
 
                 _, _, _, joins, _ = self.query.setup_joins(
-                    [f.related_query_name()], opts, root_alias, outer_if_first=True)
+                    [f.related_query_name()], opts, root_alias)
                 alias = joins[-1]
                 from_parent = (opts.model if issubclass(model, opts.model)
                                else None)
@@ -661,11 +651,8 @@ class SQLCompiler(object):
                     SelectInfo(col, field) for col, field
                     in zip(columns, model._meta.concrete_fields))
                 next = requested.get(f.related_query_name(), {})
-                # Use True here because we are looking at the _reverse_ side of
-                # the relation, which is always nullable.
-                new_nullable = True
                 self.fill_related_selections(model._meta, alias, cur_depth + 1,
-                                             next, restricted, new_nullable)
+                                             next, restricted)
 
     def deferred_to_columns(self):
         """
