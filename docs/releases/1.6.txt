@@ -1,6 +1,6 @@
-============================================
-Django 1.6 release notes - UNDER DEVELOPMENT
-============================================
+=========================
+ Django 1.6 release notes
+=========================
 
 .. note::
 
@@ -19,6 +19,8 @@ Django 1.6 release notes - UNDER DEVELOPMENT
     This release of Django is for Malcolm.
 
     -- The Django Developers
+
+*November 6, 2013*
 
 Welcome to Django 1.6!
 
