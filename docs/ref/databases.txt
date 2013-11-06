@@ -214,7 +214,7 @@ indexing and searching until MySQL 5.6.4.
 
 Since MySQL 5.5.5, the default storage engine is InnoDB_. This engine is fully
 transactional and supports foreign key references. It's probably the best
-choice at this point. However, note that the the InnoDB autoincrement counter
+choice at this point. However, note that the InnoDB autoincrement counter
 is lost on a MySQL restart because it does not remember the
 ``AUTO_INCREMENT`` value, instead recreating it as "max(id)+1". This may
 result in an inadvertent reuse of :class:`~django.db.models.AutoField` values.
