@@ -37,9 +37,9 @@ class Command(BaseCommand):
         try:
             migration = executor.loader.get_migration_by_prefix(app_label, migration_name)
         except AmbiguityError:
-            raise CommandError("More than one migration matches '%s' in app '%s'. Please be more specific." % (app_label, migration_name))
+            raise CommandError("More than one migration matches '%s' in app '%s'. Please be more specific." % (migration_name, app_label))
         except KeyError:
-            raise CommandError("Cannot find a migration matching '%s' from app '%s'." % (app_label, migration_name))
+            raise CommandError("Cannot find a migration matching '%s' from app '%s'." % (migration_name, app_label))
 
         # Work out the list of predecessor migrations
         migrations_to_squash = [
@@ -83,11 +83,20 @@ class Command(BaseCommand):
             else:
                 self.stdout.write("  Optimized from %s operations to %s operations." % (len(operations), len(new_operations)))
 
+        # Work out the value of replaces (any squashed ones we're re-squashing)
+        # need to feed their replaces into ours
+        replaces = []
+        for migration in migrations_to_squash:
+            if migration.replaces:
+                replaces.extend(migration.replaces)
+            else:
+                replaces.append((migration.app_label, migration.name))
+
         # Make a new migration with those operations
         subclass = type("Migration", (migrations.Migration, ), {
             "dependencies": [],
             "operations": new_operations,
-            "replaces": [(m.app_label, m.name) for m in migrations_to_squash],
+            "replaces": replaces,
         })
         new_migration = subclass("0001_squashed_%s" % migration.name, app_label)
 
