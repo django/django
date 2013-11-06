@@ -452,8 +452,7 @@ class SQLCompiler(object):
 
     def _setup_joins(self, pieces, opts, alias):
         """
-        A helper method for get_ordering and get_distinct. This method will
-        call query.setup_joins and handle refcounts.
+        A helper method for get_ordering and get_distinct.
 
         Note that get_ordering and get_distinct must produce same target
         columns on same input, as the prefixes of get_ordering and get_distinct
@@ -464,11 +463,6 @@ class SQLCompiler(object):
         field, targets, opts, joins, path = self.query.setup_joins(
             pieces, opts, alias)
         alias = joins[-1]
-        if not field.rel:
-            # To avoid inadvertent trimming of a necessary alias, use the
-            # refcount to show that we are referencing a non-relation field on
-            # the model.
-            self.query.ref_alias(alias)
         return field, targets, alias, joins, path, opts
 
     def get_from_clause(self):
