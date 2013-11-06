@@ -898,7 +898,7 @@ objects have already been fetched, and it will skip fetching them again.
 
 Chaining ``prefetch_related`` calls will accumulate the lookups that are
 prefetched. To clear any ``prefetch_related`` behavior, pass ``None`` as a
-parameter::
+parameter:
 
    >>> non_prefetched = qs.prefetch_related(None)
 
@@ -924,6 +924,91 @@ profile for your use case!
 
 Note that if you use ``iterator()`` to run the query, ``prefetch_related()``
 calls will be ignored since these two optimizations do not make sense together.
+
+.. versionadded:: 1.7
+
+You can use the :class:`~django.db.models.Prefetch` object to further control
+the prefetch operation.
+
+In its simplest form ``Prefetch`` is equivalent to the traditional string based
+lookups:
+
+    >>> Restaurant.objects.prefetch_related(Prefetch('pizzas__toppings'))
+
+You can provide a custom queryset with the optional ``queryset`` argument.
+This can be used to change the default ordering of the queryset:
+
+    >>> Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas__toppings', queryset=Toppings.objects.order_by('name')))
+
+Or to call :meth:`~django.db.models.query.QuerySet.select_related()` when
+applicable to reduce the number of queries even further:
+
+    >>> Pizza.objects.prefetch_related(
+    ...     Prefetch('restaurants', queryset=Restaurant.objects.select_related('best_pizza')))
+
+You can also assign the prefetched result to a custom attribute with the optional
+``to_attr`` argument. The result will be stored directly in a list.
+
+This allows prefetching the same relation multiple times with a different
+``QuerySet``; for instance:
+
+    >>> vegetarian_pizzas = Pizza.objects.filter(vegetarian=True)
+    >>> Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas', to_attr('menu')),
+    ...     Prefetch('pizzas', queryset=vegetarian_pizzas to_attr='vegetarian_menu'))
+
+Lookups created with custom ``to_attr`` can still be traversed as usual by other
+lookups:
+
+    >>> vegetarian_pizzas = Pizza.objects.filter(vegetarian=True)
+    >>> Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas', queryset=vegetarian_pizzas to_attr='vegetarian_menu'),
+    ...     'vegetarian_menu__toppings')
+
+Using ``to_attr`` is recommended when filtering down the prefetch result as it is
+less ambiguous than storing a filtered result in the related manager's cache:
+
+    >>> queryset = Pizza.objects.filter(vegetarian=True)
+    >>>
+    >>> # Recommended:
+    >>> restaurants = Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas', to_attr='vegetarian_pizzas' queryset=queryset))
+    >>> vegetarian_pizzas = restaurants[0].vegetarian_pizzas
+    >>>
+    >>> # Not recommended:
+    >>> restaurants = Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas', queryset=queryset))
+    >>> vegetarian_pizzas = restaurants[0].pizzas.all()
+
+.. note::
+
+    The ordering of lookups matters.
+
+    Take the following examples:
+
+       >>> prefetch_related('pizzas__toppings', 'pizzas')
+
+    This works even though it's unordered because ``'pizzas__toppings'``
+    already contains all the needed information, therefore the second argument
+    ``'pizzas'`` is actually redundant.
+
+        >>> prefetch_related('pizzas__toppings', Prefetch('pizzas', queryset=Pizza.objects.all()))
+
+    This will raise a ``ValueError`` because of the attempt to redefine the
+    queryset of a previously seen lookup. Note that an implicit queryset was
+    created to traverse ``'pizzas'`` as part of the ``'pizzas__toppings'``
+    lookup.
+
+        >>> prefetch_related('pizza_list__toppings', Prefetch('pizzas', to_attr='pizza_list'))
+
+    This will trigger an ``AttributeError`` because ``'pizza_list'`` doesn't exist yet
+    when ``'pizza_list__toppings'`` is being processed.
+
+    This consideration is not limited to the use of ``Prefetch`` objects. Some
+    advanced techniques may require that the lookups be performed in a
+    specific order to avoid creating extra queries; therefore it's recommended
+    to always carefully order ``prefetch_related`` arguments.
 
 extra
 ~~~~~
