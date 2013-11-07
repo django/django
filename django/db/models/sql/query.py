@@ -506,7 +506,7 @@ class Query(object):
                 # the join type for the unused alias.
                 self.unref_alias(new_alias)
         joinpromoter.add_votes(rhs_votes)
-        joinpromoter.promote_voted(self)
+        joinpromoter.update_join_types(self)
 
         # Now relabel a copy of the rhs where-clause and add it to the current
         # one.
@@ -728,8 +728,9 @@ class Query(object):
 
         Similarly to promote_joins(), this method must ensure no join chains
         containing first an outer, then an inner join are generated. If we
-        are demoting b->c join in chain a LOUTER b LOUTER c, we must also
-        demote a->b or the b->c demotion doesn't actually have any effect.
+        are demoting b->c join in chain a LOUTER b LOUTER c then we must
+        demote a->b automatically, or otherwise the demotion of b->c doesn't
+        actually change anything in the query results. .
         """
         aliases = list(aliases)
         while aliases:
@@ -1266,7 +1267,7 @@ class Query(object):
                     current_negated=current_negated, connector=connector)
                 joinpromoter.add_votes(needed_inner)
             target_clause.add(child_clause, connector)
-        needed_inner = joinpromoter.promote_voted(self)
+        needed_inner = joinpromoter.update_join_types(self)
         return target_clause, needed_inner
 
     def names_to_path(self, names, opts, allow_many):
@@ -1958,9 +1959,9 @@ class JoinPromoter(object):
     conditions.
     """
 
-    def __init__(self, connector, num_childs):
+    def __init__(self, connector, num_children):
         self.connector = connector
-        self.num_childs = num_childs
+        self.num_children = num_children
         # Maps of table alias to how many times it is seen as required for
         # inner and/or outer joins.
         self.outer_votes = {}
@@ -1974,7 +1975,7 @@ class JoinPromoter(object):
         for voted in inner_votes:
             self.inner_votes[voted] = self.inner_votes.get(voted, 0) + 1
 
-    def promote_voted(self, query):
+    def update_join_types(self, query):
         """
         Change join types so that the generated query is as efficient as
         possible, but still correct. So, change as many joins as possible
@@ -1986,35 +1987,40 @@ class JoinPromoter(object):
         for table, votes in self.inner_votes.items():
             # We must use outer joins in OR case when the join isn't contained
             # in all of the joins. Otherwise the INNER JOIN itself could remove
-            # valid results. Considre case where a model with rel_a and rel_b
-            # relations is queried with rel_a__col=1 | rel_b__col=2. Now, if
-            # rel_a is null (that is, there isn't any row at all for given
-            # model), and there is a matching row in rel_b with col=2, then
-            # an INNER JOIN to rel_a would remove matching rows. We need to do
-            # promotion as something could have demoted joins before us (and
-            # it is possible this promotion in turn will be demoted later on).
-            if self.connector == 'OR' and votes < self.num_childs:
+            # valid results. Consider the case where a model with rel_a and
+            # rel_b relations is queried with rel_a__col=1 | rel_b__col=2. Now,
+            # if rel_a join doesn't produce any results is null (for example
+            # reverse foreign key or null value in direct foreign key), and
+            # there is a matching row in rel_b with col=2, then an INNER join
+            # to rel_a would remove a valid match from the query. So, we need
+            # to promote any existing INNER to LOUTER (it is possible this
+            # promotion in turn will be demoted later on).
+            if self.connector == 'OR' and votes < self.num_children:
                 to_promote.add(table)
             # If connector is AND and there is a filter that can match only
             # when there is a joinable row, then use INNER. For example, in
             # rel_a__col=1 & rel_b__col=2, if either of the rels produce NULL
             # as join output, then the col=1 or col=2 can't match (as
-            # NULL=anything is always false). For the OR case, if all childs
-            # refer same children. For example:
+            # NULL=anything is always false).
+            # For the OR case, if all children voted for a join to be inner,
+            # then we can use INNER for the join. For example:
             #     (rel_a__col__icontains=Alex | rel_a__col__icontains=Russell)
             # then if rel_a doesn't produce any rows, the whole condition
             # can't match. Hence we can safely use INNER join.
-            if self.connector == 'AND' or (self.connector == 'OR' and votes == self.num_childs):
+            if self.connector == 'AND' or (self.connector == 'OR' and
+                                           votes == self.num_children):
                 to_demote.add(table)
             # Finally, what happens in cases where we have:
             #    (rel_a__col=1|rel_b__col=2) & rel_a__col__gte=0
             # Now, we first generate the OR clause, and promote joins for it
-            # in the first if above. Both rel_a and rel_b are LOUTER joins.
-            # After that we do the AND case. The OR case voted no inner joins
-            # but the rel_a__col__gte=0 votes inner join for rel_a. We demote
-            # it back to INNER join. But this is OK, if rel_a doesn't produce
-            # rows, then the rel_a__col__gte=0 can't be true, and thus the
-            # whole clause must be false. So, it is safe to use INNER join.
+            # in the first if branch above. Both rel_a and rel_b are promoted
+            # to LOUTER joins. After that we do the AND case. The OR case
+            # voted no inner joins but the rel_a__col__gte=0 votes inner join
+            # for rel_a. We demote it back to INNER join (in AND case a single
+            # vote is enough). The demotion is OK, if rel_a doesn't produce
+            # rows, then the rel_a__col__gte=0 clause can't be true, and thus
+            # the whole clause must be false. So, it is safe to use INNER
+            # join.
             # Note that in this example we could just as well have the __gte
             # clause and the OR clause swapped. Or we could replace the __gte
             # clause with a OR clause containing rel_a__col=1|rel_a__col=2,
