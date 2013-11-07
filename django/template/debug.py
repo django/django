@@ -56,10 +56,6 @@ class DebugParser(Parser):
     def create_variable_node(self, contents):
         return DebugVariableNode(contents)
 
-    def extend_nodelist(self, nodelist, node, token):
-        node.source = token.source
-        super(DebugParser, self).extend_nodelist(nodelist, node, token)
-
     def unclosed_block_tag(self, parse_until):
         command, source = self.command_stack.pop()
         msg = "Unclosed tag '%s'. Looking for one of: %s " % (command, ', '.join(parse_until))

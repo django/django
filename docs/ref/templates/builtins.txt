@@ -230,7 +230,9 @@ Signals that this template extends a parent template.
 This tag can be used in two ways:
 
 * ``{% extends "base.html" %}`` (with quotes) uses the literal value
-  ``"base.html"`` as the name of the parent template to extend.
+  ``"base.html"`` as the name of the parent template to extend. If the path of
+  the current template is used here, the current template will be skipped. This
+  allows to extend third app templates.
 
 * ``{% extends variable %}`` uses the value of ``variable``. If the variable
   evaluates to a string, Django will use that string as the name of the

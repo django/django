@@ -423,6 +423,9 @@ Signals
 Templates
 ^^^^^^^^^
 
+* The :ttag:`extends` template tag now avoids recursion, making it possible for
+  templates to inherit from third party app templates with the same name.
+
 * The :meth:`Context.push() <django.template.Context.push>` method now returns
   a context manager which automatically calls :meth:`pop()
   <django.template.Context.pop>` upon exiting the ``with`` statement.
@@ -440,9 +443,9 @@ Templates
 
 * It is now possible to :ttag:`include` templates recursively.
 
-* Template objects now have an origin attribute set when
-  :setting:`TEMPLATE_DEBUG` is ``True``. This allows template origins to be
-  inspected and logged outside of the ``django.template`` infrastructure.
+* Template objects now have an ``origin`` attribute set. This allows avoiding
+  template recursion and inspecting and loging the origins outside of the
+  ``django.template`` infrastructure.
 
 * ``TypeError`` exceptions are no longer silenced when raised during the
   rendering of a template.
