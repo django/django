@@ -212,6 +212,32 @@ is a mapping of the message level names to their numeric value::
     </ul>
     {% endif %}
 
+The ``Message`` class
+---------------------
+
+.. class:: storage.base.Message
+
+    When you loop over the list of messages in a template, what you get are
+    instances of the ``Message`` class. It's quite a simple object, with only a
+    few attributes:
+
+    * ``message``: The actual text of the message.
+
+    * ``level``: An integer describing the type of the message (see the
+      `message levels`_ section above).
+
+    * ``tags``: A string combining all the message's tags (``extra_tags`` and
+      ``level_tag``) separated by spaces.
+
+    * ``extra_tags``: A string containing custom tags for this message,
+      separated by spaces. It's empty by default.
+
+    .. versionadded:: 1.7
+
+    * ``level_tag``: The string representation of the level. By default, it's
+      the lowercase version of the name of the associated constant, but this
+      can be changed if you need by using the :setting:`MESSAGE_TAGS` setting.
+
 Creating custom message levels
 ------------------------------
 
