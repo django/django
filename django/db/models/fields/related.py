@@ -162,7 +162,10 @@ class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescri
     def get_queryset(self, **hints):
         return self.related.model._base_manager.db_manager(hints=hints)
 
-    def get_prefetch_queryset(self, instances):
+    def get_prefetch_queryset(self, instances, queryset=None):
+        if queryset is not None:
+            raise ValueError("Custom queryset can't be used for this lookup.")
+
         rel_obj_attr = attrgetter(self.related.field.attname)
         instance_attr = lambda obj: obj._get_pk_val()
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
@@ -264,7 +267,10 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
         else:
             return QuerySet(self.field.rel.to, hints=hints)
 
-    def get_prefetch_queryset(self, instances):
+    def get_prefetch_queryset(self, instances, queryset=None):
+        if queryset is not None:
+            raise ValueError("Custom queryset can't be used for this lookup.")
+
         rel_obj_attr = self.field.get_foreign_related_value
         instance_attr = self.field.get_local_related_value
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
@@ -397,23 +403,26 @@ def create_foreign_related_manager(superclass, rel_field, rel_model):
                 qs._known_related_objects = {rel_field: {self.instance.pk: self.instance}}
                 return qs
 
-        def get_prefetch_queryset(self, instances):
+        def get_prefetch_queryset(self, instances, queryset=None):
+            if queryset is None:
+                queryset = super(RelatedManager, self).get_queryset()
+
+            queryset._add_hints(instance=instances[0])
+            queryset = queryset.using(queryset._db or self._db)
+
             rel_obj_attr = rel_field.get_local_related_value
             instance_attr = rel_field.get_foreign_related_value
             instances_dict = dict((instance_attr(inst), inst) for inst in instances)
             query = {'%s__in' % rel_field.name: instances}
-            qs = super(RelatedManager, self).get_queryset()
-            qs._add_hints(instance=instances[0])
-            if self._db:
-                qs = qs.using(self._db)
-            qs = qs.filter(**query)
+            queryset = queryset.filter(**query)
+
             # Since we just bypassed this class' get_queryset(), we must manage
             # the reverse relation manually.
-            for rel_obj in qs:
+            for rel_obj in queryset:
                 instance = instances_dict[rel_obj_attr(rel_obj)]
                 setattr(rel_obj, rel_field.name, instance)
             cache_name = rel_field.related_query_name()
-            return qs, rel_obj_attr, instance_attr, False, cache_name
+            return queryset, rel_obj_attr, instance_attr, False, cache_name
 
         def add(self, *objs):
             objs = list(objs)
@@ -563,15 +572,15 @@ def create_many_related_manager(superclass, rel):
                     qs = qs.using(self._db)
                 return qs._next_is_sticky().filter(**self.core_filters)
 
-        def get_prefetch_queryset(self, instances):
-            instance = instances[0]
-            db = self._db or router.db_for_read(instance.__class__, instance=instance)
+        def get_prefetch_queryset(self, instances, queryset=None):
+            if queryset is None:
+                queryset = super(ManyRelatedManager, self).get_queryset()
+
+            queryset._add_hints(instance=instances[0])
+            queryset = queryset.using(queryset._db or self._db)
+
             query = {'%s__in' % self.query_field_name: instances}
-            qs = super(ManyRelatedManager, self).get_queryset()
-            qs._add_hints(instance=instance)
-            if self._db:
-                qs = qs.using(db)
-            qs = qs._next_is_sticky().filter(**query)
+            queryset = queryset._next_is_sticky().filter(**query)
 
             # M2M: need to annotate the query in order to get the primary model
             # that the secondary model was actually related to. We know that
@@ -582,12 +591,12 @@ def create_many_related_manager(superclass, rel):
             # dealing with PK values.
             fk = self.through._meta.get_field(self.source_field_name)
             join_table = self.through._meta.db_table
-            connection = connections[db]
+            connection = connections[queryset.db]
             qn = connection.ops.quote_name
-            qs = qs.extra(select=dict(
+            queryset = queryset.extra(select=dict(
                 ('_prefetch_related_val_%s' % f.attname,
                 '%s.%s' % (qn(join_table), qn(f.column))) for f in fk.local_related_fields))
-            return (qs,
+            return (queryset,
                     lambda result: tuple(getattr(result, '_prefetch_related_val_%s' % f.attname) for f in fk.local_related_fields),
                     lambda inst: tuple(getattr(inst, f.attname) for f in fk.foreign_related_fields),
                     False,
