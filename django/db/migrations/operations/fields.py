@@ -171,5 +171,5 @@ class RenameField(Operation):
     def references_field(self, model_name, name, app_label=None):
         return self.references_model(model_name) and (
             name.lower() == self.old_name.lower() or
-            name.lower() == self.new_name.lower() 
+            name.lower() == self.new_name.lower()
         )

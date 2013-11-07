@@ -49,7 +49,7 @@ accept_language_re = re.compile(r'''
 language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
 
 # some browsers use deprecated locales. refs #18419
-_BROWSERS_DEPRECATED_LOCALES  = {
+_BROWSERS_DEPRECATED_LOCALES = {
     'zh-cn': 'zh-hans',
     'zh-tw': 'zh-hant',
 }

@@ -10,7 +10,7 @@ class Operation(object):
     copying operations), and some will need their modifications to be
     optionally specified by the user (e.g. custom Python code snippets)
 
-    Due to the way this class deals with deconstruction, it should be 
+    Due to the way this class deals with deconstruction, it should be
     considered immutable.
     """
 
