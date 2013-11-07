@@ -1288,7 +1288,7 @@ or by the order of test execution.
 
 By default, fixtures are only loaded into the ``default`` database. If you are
 using multiple databases and set :attr:`multi_db=True
-<TransactionTestCase.multi_db>`, fixtures will be loaded into all databases.
+<TestCase.multi_db>`, fixtures will be loaded into all databases.
 
 URLconf configuration
 ~~~~~~~~~~~~~~~~~~~~~
