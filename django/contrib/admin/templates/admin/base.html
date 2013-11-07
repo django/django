@@ -13,7 +13,7 @@
 </head>
 {% load i18n %}
 
-<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{{ block.super }}{% endblock %}">
 
 <!-- Container -->
 <div id="container">
