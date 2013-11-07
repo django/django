@@ -98,7 +98,9 @@ class ExtendsNode(Node):
             raise TemplateSyntaxError(error_msg)
         if hasattr(parent, 'render'):
             return parent  # parent is a Template object
-        return get_template(parent)
+        # skip this very same template
+        origin, source = self.source
+        return get_template(parent, skip_template=origin)
 
     def render(self, context):
         compiled_parent = self.get_parent(context)

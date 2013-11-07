@@ -145,6 +145,38 @@ for the following, instead of backend specific behavior.
     finally:
         c.close()
 
+Extending a template refering to itself
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :ttag:`extends` template tag now avoids recursion, making it possible to
+extend a template to another with exactly the same name but loaded through a
+different loader. This allows you to inherit and extend a third party app
+template without having to copy all the template over again. You only need to
+change the template blocks you actually want to change.
+
+Lets say you have an app in your ``INSTALLED_APPS`` that defines the
+``list_items.html`` template:
+
+.. code-block:: html
+
+    {% block title %}List of items{% endblock title %}
+
+    {% block content %}
+    {% for item in items %}
+    ...
+    {% endfor %}
+    {% endblock content %}
+
+If you simply want to change the title, you don't have to copy all the template
+over. Instead, create a template named ``list_items.html`` in one of your
+template directories and put the following in it:
+
+.. code-block:: html
+
+    {% extends 'list_items.html' %}
+
+    {% block title %}Customized title{% endblock title %}
+
 Minor features
 ~~~~~~~~~~~~~~
 
@@ -477,9 +509,9 @@ Templates
 
 * It is now possible to :ttag:`include` templates recursively.
 
-* Template objects now have an origin attribute set when
-  :setting:`TEMPLATE_DEBUG` is ``True``. This allows template origins to be
-  inspected and logged outside of the ``django.template`` infrastructure.
+* Template objects now have an ``origin`` attribute set. This allows avoiding
+  template recursion and inspecting and loging the origins outside of the
+  ``django.template`` infrastructure.
 
 * ``TypeError`` exceptions are no longer silenced when raised during the
   rendering of a template.
@@ -491,6 +523,12 @@ Templates
   * :func:`django.template.loader.select_template()`
   * :func:`django.shortcuts.render()`
   * :func:`django.shortcuts.render_to_response()`
+
+* The following functions now accept a ``skip_template`` parameter which is a
+  template who's loader will be skipped:
+
+  * :func:`django.template.loader.get_template()`
+  * :func:`django.template.loader.select_template()`
 
 * The :tfilter:`time` filter now accepts timzone-related :ref:`format
   specifiers <date-and-time-formatting-specifiers>` ``'e'``, ``'O'`` , ``'T'``

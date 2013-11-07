@@ -596,7 +596,7 @@ The Python API
 
 ``django.template.loader`` has two functions to load templates from files:
 
-.. function:: get_template(template_name[, dirs])
+.. function:: get_template(template_name[, dirs][, skip_template])
 
     ``get_template`` returns the compiled template (a ``Template`` object) for
     the template with the given name. If the template doesn't exist, it raises
@@ -605,9 +605,13 @@ The Python API
     To override the :setting:`TEMPLATE_DIRS` setting, use the ``dirs``
     parameter. The ``dirs`` parameter may be a tuple or list.
 
+    In case you provide a template to be skipped the loader of that template
+    will not be used to load the template.
+
     .. versionchanged:: 1.7
 
        The ``dirs`` parameter was added.
+       The ``skip_template`` parameter was added.
 
 .. function:: select_template(template_name_list[, dirs])
 
@@ -617,9 +621,13 @@ The Python API
     To override the :setting:`TEMPLATE_DIRS` setting, use the ``dirs``
     parameter. The ``dirs`` parameter may be a tuple or list.
 
+    In case you provide a template to be skipped the loader of that template
+    will not be used to load the template.
+
     .. versionchanged:: 1.7
 
        The ``dirs`` parameter was added.
+       The ``skip_template`` parameter was added.
 
 For example, if you call ``get_template('story_detail.html')`` and have the
 above :setting:`TEMPLATE_DIRS` setting, here are the files Django will look for,
