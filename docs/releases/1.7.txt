@@ -469,6 +469,9 @@ Tests
   client can't fetch externals URLs, this allows you to use ``assertRedirects``
   with redirects that aren't part of your Django app.
 
+* Correct handling of scheme when making comparisons in
+  :meth:`~django.test.SimpleTestCase.assertRedirects`.
+
 * The ``secure`` argument was added to all the request methods of
   :class:`~django.test.Client`. If ``True``, the request will be made
   through HTTPS.
