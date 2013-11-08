@@ -152,7 +152,6 @@ class FileBasedCache(BaseCache):
         return filelist
 
 
-
 # For backwards compatibility
 class CacheClass(FileBasedCache):
     pass

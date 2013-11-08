@@ -4,7 +4,6 @@
 # Uses whatever cache backend is set in the test settings file.
 from __future__ import unicode_literals
 
-import hashlib
 import os
 import pickle
 import random

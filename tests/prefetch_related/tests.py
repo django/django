@@ -492,6 +492,7 @@ class CustomPrefetchTests(TestCase):
         self.assertEqual(lst2[0].houses_lst[0].rooms_lst[1], self.room1_2)
         self.assertEqual(len(lst2[1].houses_lst), 0)
 
+
 class DefaultManagerTests(TestCase):
 
     def setUp(self):
