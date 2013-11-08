@@ -858,7 +858,7 @@ For a complete discussion on the usage of the following see the
 
 .. function:: ngettext_lazy(singular, plural, number)
 .. function:: ungettext_lazy(singular, plural, number)
-.. function:: npgettext_lazy(singular, plural, number)
+.. function:: npgettext_lazy(context, singular, plural, number)
 
     Same as the non-lazy versions above, but using lazy execution.
 
