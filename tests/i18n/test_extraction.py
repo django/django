@@ -66,6 +66,43 @@ class ExtractorTests(SimpleTestCase):
         msgid = re.escape(msgid)
         return self.assertTrue(not re.search('^msgid %s' % msgid, s, re.MULTILINE))
 
+    def _assertPoLocComment(self, assert_presence, po_filename, line_number, *comment_parts):
+        with open(po_filename, 'r') as fp:
+            po_contents = force_text(fp.read())
+        if os.name == 'nt':
+            # #: .\path\to\file.html:123
+            cwd_prefix = '%s%s' % (os.curdir, os.sep)
+        else:
+            # #: path/to/file.html:123
+            cwd_prefix = ''
+        parts = ['#: ']
+        parts.append(os.path.join(cwd_prefix, *comment_parts))
+        if line_number is not None:
+            parts.append(':%d' % line_number)
+        needle = ''.join(parts)
+        if assert_presence:
+            return self.assertTrue(needle in po_contents, '"%s" not found in final .po file.' % needle)
+        else:
+            return self.assertFalse(needle in po_contents, '"%s" shouldn\'t be in final .po file.' % needle)
+
+    def assertLocationCommentPresent(self, po_filename, line_number, *comment_parts):
+        """
+        self.assertLocationCommentPresent('django.po', 42, 'dirA', 'dirB', 'foo.py')
+
+        verifies that the django.po file has a gettext-style location comment of the form
+
+        `#: dirA/dirB/foo.py:42`
+
+        (or `#: .\dirA\dirB\foo.py:42` on Windows)
+
+        None can be passed for the line_number argument to skip checking of the :42 suffix part.
+        """
+        return self._assertPoLocComment(True, po_filename, line_number, *comment_parts)
+
+    def assertLocationCommentNotPresent(self, po_filename, line_number, *comment_parts):
+        """Check the oposite of assertLocationComment()"""
+        return self._assertPoLocComment(False, po_filename, line_number, *comment_parts)
+
 
 class BasicExtractorTests(ExtractorTests):
 
@@ -133,6 +170,9 @@ class BasicExtractorTests(ExtractorTests):
             self.assertNotMsgId('Text with a few line breaks.', po_contents)
             # should be trimmed
             self.assertMsgId("Again some text with a few line breaks, this time should be trimmed.", po_contents)
+        # #21406 -- Should adjust for eaten line numbers
+        self.assertMsgId("I'm on line 97", po_contents)
+        self.assertLocationCommentPresent(self.PO_FILE, 97, 'templates', 'test.html')
 
     def test_force_en_us_locale(self):
         """Value of locale-munging option used by the command is the right one"""
@@ -418,32 +458,18 @@ class LocationCommentsTests(ExtractorTests):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=[LOCALE], verbosity=0, no_location=True)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        with open(self.PO_FILE, 'r') as fp:
-            po_contents = force_text(fp.read())
-            needle = os.sep.join(['#: templates', 'test.html:55'])
-            self.assertFalse(needle in po_contents, '"%s" shouldn\'t be in final .po file.' % needle)
+        self.assertLocationCommentNotPresent(self.PO_FILE, 55, 'templates', 'test.html.py')
 
     def test_no_location_disabled(self):
         """Behavior is correct if --no-location switch isn't specified."""
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=[LOCALE], verbosity=0, no_location=False)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        with open(self.PO_FILE, 'r') as fp:
-            # Standard comment with source file relative path should be present -- #16903
-            po_contents = force_text(fp.read())
-            if os.name == 'nt':
-                # #: .\path\to\file.html:123
-                cwd_prefix = '%s%s' % (os.curdir, os.sep)
-            else:
-                # #: path/to/file.html:123
-                cwd_prefix = ''
-            needle = os.sep.join(['#: %stemplates' % cwd_prefix, 'test.html:55'])
-            self.assertTrue(needle in po_contents, '"%s" not found in final .po file.' % needle)
+        # #16903 -- Standard comment with source file relative path should be present
+        self.assertLocationCommentPresent(self.PO_FILE, 55, 'templates', 'test.html')
 
-            # #21208 -- Leaky paths in comments on Windows e.g. #: path\to\file.html.py:123
-            bad_suffix = '.py'
-            bad_string = 'templates%stest.html%s' % (os.sep, bad_suffix)
-            self.assertFalse(bad_string in po_contents, '"%s" shouldn\'t be in final .po file.' % bad_string)
+        # #21208 -- Leaky paths in comments on Windows e.g. #: path\to\file.html.py:123
+        self.assertLocationCommentNotPresent(self.PO_FILE, None, 'templates', 'test.html.py')
 
 
 class KeepPotFileExtractorTests(ExtractorTests):
