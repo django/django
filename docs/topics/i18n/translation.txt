@@ -1215,21 +1215,6 @@ Once the string literals of an application have been tagged for later
 translation, the translation themselves need to be written (or obtained). Here's
 how that works.
 
-.. _locale-restrictions:
-
-.. admonition:: Locale restrictions
-
-    Django does not support localizing your application into a locale for which
-    Django itself has not been translated. In this case, it will ignore your
-    translation files. If you were to try this and Django supported it, you
-    would inevitably see a mixture of translated strings (from your application)
-    and English strings (from Django itself). If you want to support a locale
-    for your application that is not already part of Django, you'll need to make
-    at least a minimal translation of the Django core.
-
-    A good starting point is to copy the Django English ``.po`` file and to
-    translate at least some :term:`translation strings <translation string>`.
-
 Message files
 -------------
 
@@ -1688,13 +1673,6 @@ Notes:
   won't happen at runtime -- so you'll have to remember to wrap the languages in
   the *real* ``ugettext()`` in any code that uses :setting:`LANGUAGES` at
   runtime.
-
-* The ``LocaleMiddleware`` can only select languages for which there is a
-  Django-provided base translation. If you want to provide translations
-  for your application that aren't already in the set of translations
-  in Django's source tree, you'll want to provide at least a basic
-  one as described in the :ref:`Locale restrictions<locale-restrictions>`
-  note.
 
 Once ``LocaleMiddleware`` determines the user's preference, it makes this
 preference available as ``request.LANGUAGE_CODE`` for each
