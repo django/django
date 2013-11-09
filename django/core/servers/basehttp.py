@@ -19,7 +19,6 @@ from wsgiref.util import FileWrapper   # NOQA: for backwards compatibility
 from django.core.management.color import color_style
 from django.core.wsgi import get_wsgi_application
 from django.utils.module_loading import import_by_path
-from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.six.moves import socketserver
 
 __all__ = ('WSGIServer', 'WSGIRequestHandler', 'MAX_SOCKET_CHUNK_SIZE')
@@ -116,11 +115,6 @@ class WSGIServer(simple_server.WSGIServer, object):
 class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
 
     def __init__(self, *args, **kwargs):
-        from django.conf import settings
-        self.admin_static_prefix = urljoin(settings.STATIC_URL, 'admin/')
-        # We set self.path to avoid crashes in log_message() on unsupported
-        # requests (like "OPTIONS").
-        self.path = ''
         self.style = color_style()
         super(WSGIRequestHandler, self).__init__(*args, **kwargs)
 
@@ -129,11 +123,6 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         return self.client_address[0]
 
     def log_message(self, format, *args):
-        # Don't bother logging requests for admin images or the favicon.
-        if (self.path.startswith(self.admin_static_prefix)
-                or self.path == '/favicon.ico'):
-            return
-
         msg = "[%s] %s\n" % (self.log_date_time_string(), format % args)
 
         # Utilize terminal colors, if available
