@@ -67,13 +67,13 @@ class SimpleListFilter(ListFilter):
             raise ImproperlyConfigured(
                 "The list filter '%s' does not specify "
                 "a 'parameter_name'." % self.__class__.__name__)
+        if self.parameter_name in params:
+            value = params.pop(self.parameter_name)
+            self.used_parameters[self.parameter_name] = value
         lookup_choices = self.lookups(request, model_admin)
         if lookup_choices is None:
             lookup_choices = ()
         self.lookup_choices = list(lookup_choices)
-        if self.parameter_name in params:
-            value = params.pop(self.parameter_name)
-            self.used_parameters[self.parameter_name] = value
 
     def has_output(self):
         return len(self.lookup_choices) > 0
