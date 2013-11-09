@@ -475,8 +475,13 @@ template directory in the source code of Django itself
         import django
         print(django.__path__)"
 
-Then, just edit the file and replace the generic Django text with your own
-site's name as you see fit.
+Then, just edit the file and replace ``{{ site_header }}`` with your own
+site's name as you see fit. We used this approach to teach you how to override
+templates. But in an actual project, you probably would not do this.
+
+See the :doc:`admin site documentation </ref/contrib/admin/index>`
+for more information about how you can override ``site_header`` attribute
+of ``admin.site`` properly.
 
 This template file contains lots of text like ``{% block branding %}``
 and ``{{ title }}``. The ``{%`` and ``{{`` tags are part of Django's
