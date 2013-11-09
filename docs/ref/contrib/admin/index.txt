@@ -853,7 +853,7 @@ subclass::
     the list of objects on the admin change list page. This can save you a
     bunch of database queries.
 
-    .. versionchanged:: dev
+    .. versionchanged:: 1.6
 
     The value should be either a boolean, a list or a tuple. Default is
     ``False``.
