@@ -322,8 +322,10 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
 
         # Ensure that our data is a bytestring
         data = force_bytes(data)
+        # force_bytes() necessary for py-bcrypt compatibility
+        hashpw = force_bytes(bcrypt.hashpw(password, data))
 
-        return constant_time_compare(data, bcrypt.hashpw(password, data))
+        return constant_time_compare(data, hashpw)
 
     def safe_summary(self, encoded):
         algorithm, empty, algostr, work_factor, data = encoded.split('$', 4)
