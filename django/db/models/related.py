@@ -1,17 +1,27 @@
-from collections import namedtuple
+import warnings
 
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import smart_text
+from django.utils import six
 from django.db.models.fields import BLANK_CHOICE_DASH
+from django.db.models.fields.related import ForeignObjectRel
+from django.db.models.query_utils import PathInfo
 
-# PathInfo is used when converting lookups (fk__somecol). The contents
-# describe the relation in Model terms (model Options and Fields for both
-# sides of the relation. The join_field is the field backing the relation.
-PathInfo = namedtuple('PathInfo',
-                      'from_opts to_opts target_fields join_field '
-                      'm2m direct')
+__all__ = ['PathInfo', 'RelatedObject']
 
 
-class RelatedObject(object):
+warnings.warn(
+    "The django.db.models.related module has been removed. "
+    "PathInfo has been moved to django.db.models.query_utils, and "
+    "RelatedObject has been deprecated.", RemovedInDjango20Warning, 2)
+
+
+class InstanceCheckMeta(type):
+    def __instancecheck__(self, instance):
+        return isinstance(instance, ForeignObjectRel)
+
+
+class RelatedObject(six.with_metaclass(InstanceCheckMeta)):
     def __init__(self, parent_model, model, field):
         self.parent_model = parent_model
         self.model = model

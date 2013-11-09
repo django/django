@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
 import threading
+import warnings
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import connections, DEFAULT_DB_ALIAS
@@ -770,3 +771,26 @@ class ModelRefreshTests(TestCase):
         a = Article.objects.create(pub_date=self._truncate_ms(datetime.now()))
         with self.assertNumQueries(0):
             a.refresh_from_db(fields=[])
+
+
+class TestRelatedObjectDeprecation(TestCase):
+    def test_deprecation(self):
+        field = SelfRef._meta.get_field_by_name('selfref')[0]
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            from django.db.models.related import RelatedObject
+            self.assertTrue(isinstance(field.rel, RelatedObject))
+            self.assertEqual(len(warns), 1)
+            self.assertEqual(
+                str(warns.pop().message),
+                'The django.db.models.related module has been removed. '
+                'PathInfo has been moved to django.db.models.query_utils, and '
+                'RelatedObject has been deprecated.'
+            )
+            self.assertTrue(isinstance(field.related, RelatedObject))
+            self.assertEqual(len(warns), 1)
+            self.assertEqual(
+                str(warns.pop().message),
+                'Usage of field.related has been deprecated. Use field.rel instead.'
+            )
+            # TODO: RelatedObject is no longer tested, I think
