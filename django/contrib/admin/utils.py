@@ -304,7 +304,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
         try:
             label = field.verbose_name
         except AttributeError:
-            # field is likely a RelatedObject
+            # field is likely a ForeignObjectRel
             label = field.opts.verbose_name
     except models.FieldDoesNotExist:
         if name == "__unicode__":
