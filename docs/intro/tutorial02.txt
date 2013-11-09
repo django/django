@@ -479,7 +479,7 @@ Then, just edit the file and replace ``{{ site_header }}`` with your own
 site's name as you see fit. We use this approach to teach you how to override
 templates. In an actual project, you would probably use the
 :attr:`django.contrib.admin.AdminSite.site_header` attribute to more easily
-make this paritcular customization.
+make this particular customization.
 
 This template file contains lots of text like ``{% block branding %}``
 and ``{{ title }}``. The ``{%`` and ``{{`` tags are part of Django's
