@@ -451,7 +451,7 @@ these changes.
 
 * Instances of ``util.py`` in the Django codebase have been renamed to
   ``utils.py`` in an effort to unify all util and utils references.
-  The modules that provided backwards compatability will be removed:
+  The modules that provided backwards compatibility will be removed:
 
   * ``django.contrib.admin.util``
   * ``django.contrib.gis.db.backends.util``
