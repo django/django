@@ -408,7 +408,7 @@ class Options(object):
         the Field instance for the given name, model is the model containing
         this field (None for local fields), direct is True if the field exists
         on this model, and m2m is True for many-to-many relations. When
-        'direct' is False, 'field_object' is the corresponding RelatedObject
+        'direct' is False, 'field_object' is the corresponding ForeignObjectRel
         for this field (since the field doesn't have an instance associated
         with it).
 
@@ -456,7 +456,7 @@ class Options(object):
         for f, model in self.get_fields_with_model():
             cache[f.name] = cache[f.attname] = (f, model, True, False)
         for f in self.virtual_fields:
-            if hasattr(f, 'related'):
+            if f.rel:
                 cache[f.name] = cache[f.attname] = (
                     f, None if f.model == self.model else f.model, True, False)
         if apps.ready:
@@ -508,10 +508,10 @@ class Options(object):
                     if (hasattr(f, 'rel') and f.rel and not isinstance(f.rel.to, six.string_types)
                             and f.generate_reverse_relation):
                         if self == f.rel.to._meta:
-                            cache[f.related] = None
-                            proxy_cache[f.related] = None
+                            cache[f.rel] = None
+                            proxy_cache[f.rel] = None
                         elif self.concrete_model == f.rel.to._meta.concrete_model:
-                            proxy_cache[f.related] = None
+                            proxy_cache[f.rel] = None
         self._related_objects_cache = cache
         self._related_objects_proxy_cache = proxy_cache
 
@@ -552,7 +552,7 @@ class Options(object):
                     if (f.rel
                             and not isinstance(f.rel.to, six.string_types)
                             and self == f.rel.to._meta):
-                        cache[f.related] = None
+                        cache[f.rel] = None
         if apps.ready:
             self._related_many_to_many_cache = cache
         return cache

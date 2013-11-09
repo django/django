@@ -99,6 +99,8 @@ details on these changes.
   ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` is in
   ``MIDDLEWARE_CLASSES``.
 
+* Private attribute ``django.db.models.Field.related`` will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9

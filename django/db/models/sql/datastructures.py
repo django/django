@@ -55,7 +55,7 @@ class Join(object):
         # A list of 2-tuples to use in the ON clause of the JOIN.
         # Each 2-tuple will create one join condition in the ON clause.
         self.join_cols = join_field.get_joining_columns()
-        # Along which field (or RelatedObject in the reverse join case)
+        # Along which field (or ForeignObjectRel in the reverse join case)
         self.join_field = join_field
         # Is this join nullabled?
         self.nullable = nullable

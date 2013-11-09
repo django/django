@@ -8,7 +8,7 @@ certain test -- e.g. being a DateField or ForeignKey.
 import datetime
 
 from django.db import models
-from django.db.models.fields.related import ManyToManyField
+from django.db.models.fields.related import ForeignObjectRel, ManyToManyField
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils.encoding import smart_text, force_text
 from django.utils.translation import ugettext_lazy as _
@@ -180,7 +180,7 @@ class RelatedFieldListFilter(FieldListFilter):
         self.title = self.lookup_title
 
     def has_output(self):
-        if (isinstance(self.field, models.related.RelatedObject) and
+        if (isinstance(self.field, ForeignObjectRel) and
                 self.field.field.null or hasattr(self.field, 'rel') and
                 self.field.null):
             extra = 1
@@ -210,7 +210,7 @@ class RelatedFieldListFilter(FieldListFilter):
                 }, [self.lookup_kwarg_isnull]),
                 'display': val,
             }
-        if (isinstance(self.field, models.related.RelatedObject) and
+        if (isinstance(self.field, ForeignObjectRel) and
                 (self.field.field.null or isinstance(self.field.field, ManyToManyField)) or
                 hasattr(self.field, 'rel') and (self.field.null or isinstance(self.field, ManyToManyField))):
             yield {
@@ -223,7 +223,7 @@ class RelatedFieldListFilter(FieldListFilter):
 
 FieldListFilter.register(lambda f: (
     bool(f.rel) if hasattr(f, 'rel') else
-    isinstance(f, models.related.RelatedObject)), RelatedFieldListFilter)
+    isinstance(f, ForeignObjectRel)), RelatedFieldListFilter)
 
 
 class BooleanFieldListFilter(FieldListFilter):
