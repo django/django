@@ -25,7 +25,7 @@ Bugfixes
 ========
 
 * Fixed a data corruption bug with ``datetime_safe.datetime.combine`` (#21256).
-* Fixed a Python 3 incompatability in ``django.utils.text.unescape_entities()``
+* Fixed a Python 3 incompatibility in ``django.utils.text.unescape_entities()``
   (#21185).
 * Fixed a couple data corruption issues with ``QuerySet`` edge cases under
   Oracle and MySQL (#21203, #21126).
