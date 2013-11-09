@@ -14,6 +14,7 @@ from .utils import truncate_name
 # The prefix to put on the default database name when creating
 # the test database.
 TEST_DATABASE_PREFIX = 'test_'
+NO_DB_ALIAS = '__no_db__'
 
 
 class BaseDatabaseCreation(object):
@@ -44,7 +45,7 @@ class BaseDatabaseCreation(object):
         backend = load_backend(settings_dict['ENGINE'])
         nodb_connection = backend.DatabaseWrapper(
              settings_dict,
-             alias='__no_db__',
+             alias=NO_DB_ALIAS,
              allow_thread_sharing=False)
         return nodb_connection
 
