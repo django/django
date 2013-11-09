@@ -44,9 +44,9 @@ class BaseDatabaseCreation(object):
         settings_dict['NAME'] = None
         backend = load_backend(settings_dict['ENGINE'])
         nodb_connection = backend.DatabaseWrapper(
-             settings_dict,
-             alias=NO_DB_ALIAS,
-             allow_thread_sharing=False)
+            settings_dict,
+            alias=NO_DB_ALIAS,
+            allow_thread_sharing=False)
         return nodb_connection
 
     @classmethod
