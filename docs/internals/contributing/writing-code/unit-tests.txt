@@ -76,17 +76,21 @@ If you're using a backend that isn't SQLite, you will need to provide other
 details for each database:
 
 * The :setting:`USER` option needs to specify an existing user account
-  for the database.
+  for the database. That user needs permission to execute ``CREATE DATABASE``
+  so that the test database can be created.
 
 * The :setting:`PASSWORD` option needs to provide the password for
   the :setting:`USER` that has been specified.
 
-* The :setting:`NAME` option must be the name of an existing database to
-  which the given user has permission to connect. The unit tests will not
-  touch this database; the test runner creates a new database whose name
-  is :setting:`NAME` prefixed with ``test_``, and this test database is
-  deleted when the tests are finished. This means your user account needs
-  permission to execute ``CREATE DATABASE``.
+Test databases get their names by prepending ``test_`` to the value of the
+:setting:`NAME` settings for the databases defined in :setting:`DATABASES`.
+These test databases are deleted when the tests are finished.
+
+.. versionchanged:: 1.7
+
+    Before Django 1.7, the :setting:`NAME` setting was mandatory and had to
+    be the name of an existing database to which the given user had permission
+    to connect.
 
 You will also need to ensure that your database uses UTF-8 as the default
 character set. If your database server doesn't use UTF-8 as a default charset,
