@@ -1651,28 +1651,18 @@ Notes:
   en-us).
 
 * If you define a custom :setting:`LANGUAGES` setting, as explained in the
-  previous bullet, it's OK to mark the languages as translation strings
-  -- but use a "dummy" ``ugettext()`` function, not the one in
-  ``django.utils.translation``. You should *never* import
-  ``django.utils.translation`` from within your settings file, because that
-  module in itself depends on the settings, and that would cause a circular
-  import.
+  previous bullet, you can mark the language names as translation strings
+  -- but use :func:`~django.utils.translation.ugettext_lazy` instead of
+  :func:`~django.utils.translation.ugettext` to avoid a circular import.
 
-  The solution is to use a "dummy" ``ugettext()`` function. Here's a sample
-  settings file::
+  Here's a sample settings file::
 
-      ugettext = lambda s: s
+      from django.utils.translation import ugettext_lazy as _
 
       LANGUAGES = (
-          ('de', ugettext('German')),
-          ('en', ugettext('English')),
+          ('de', _('German')),
+          ('en', _('English')),
       )
-
-  With this arrangement, :djadmin:`django-admin.py makemessages <makemessages>`
-  will still find and mark these strings for translation, but the translation
-  won't happen at runtime -- so you'll have to remember to wrap the languages in
-  the *real* ``ugettext()`` in any code that uses :setting:`LANGUAGES` at
-  runtime.
 
 Once ``LocaleMiddleware`` determines the user's preference, it makes this
 preference available as ``request.LANGUAGE_CODE`` for each
