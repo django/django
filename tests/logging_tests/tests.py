@@ -370,3 +370,12 @@ class SecurityLoggerTest(TestCase):
             self.client.get('/suspicious_spec/')
             self.assertEqual(len(calls), 1)
             self.assertEqual(calls[0], 'dubious')
+
+    @override_settings(
+        ADMINS=(('admin', 'admin@example.com'),),
+        DEBUG=False,
+    )
+    def test_suspicious_email_admins(self):
+        self.client.get('/suspicious/')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('path:/suspicious/,', mail.outbox[0].body)

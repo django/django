@@ -407,8 +407,8 @@ def patch_logger(logger_name, log_level):
     """
     calls = []
 
-    def replacement(msg):
-        calls.append(msg)
+    def replacement(msg, *args, **kwargs):
+        calls.append(msg % args)
     logger = logging.getLogger(logger_name)
     orig = getattr(logger, log_level)
     setattr(logger, log_level, replacement)

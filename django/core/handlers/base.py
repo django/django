@@ -174,7 +174,12 @@ class BaseHandler(object):
             # The security logger receives events for all SuspiciousOperations
             security_logger = logging.getLogger('django.security.%s' %
                             e.__class__.__name__)
-            security_logger.error(force_text(e))
+            security_logger.error(
+                force_text(e),
+                extra={
+                    'status_code': 400,
+                    'request': request
+                })
 
             try:
                 callback, param_dict = resolver.resolve400()
