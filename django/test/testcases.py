@@ -1069,9 +1069,6 @@ class LiveServerThread(threading.Thread):
             self.is_ready.set()
 
     def terminate(self):
-        """
-        Shuts down live WSGI server.
-        """
         if hasattr(self, 'httpd'):
             # Stop the WSGI server
             self.httpd.shutdown()
