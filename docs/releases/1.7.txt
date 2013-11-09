@@ -383,6 +383,9 @@ Management Commands
     translation file is updated, i.e. after running
     :djadmin:`compilemessages`.
 
+  * Console logging of requests doesn't filter out requests for static files or
+    for ``favicon.ico`` like it used to.
+
 Models
 ^^^^^^
 

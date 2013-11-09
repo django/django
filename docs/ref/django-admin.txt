@@ -783,6 +783,11 @@ are reserved for the superuser (root).
 This server uses the WSGI application object specified by the
 :setting:`WSGI_APPLICATION` setting.
 
+.. versionchanged:: 1.7
+
+    All requests are logged to the console. There are no more filtering on
+    static file or ``favicon.ico`` requests.
+
 DO NOT USE THIS SERVER IN A PRODUCTION SETTING. It has not gone through
 security audits or performance tests. (And that's how it's gonna stay. We're in
 the business of making Web frameworks, not Web servers, so improving this
