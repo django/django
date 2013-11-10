@@ -13,7 +13,6 @@ from django.template import Template, Context
 from django.template.base import TemplateSyntaxError
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings, TransRealMixin
-from django.utils import translation
 from django.utils.formats import (get_format, date_format, time_format,
     localize, localize_input, iter_format_modules, get_format_modules,
     reset_format_cache, sanitize_separators)
@@ -22,6 +21,7 @@ from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeBytes, SafeString, SafeText
 from django.utils import six
 from django.utils.six import PY3
+from django.utils import translation
 from django.utils.translation import (activate, deactivate,
     get_language, get_language_from_request, get_language_info,
     to_locale, trans_real,
@@ -1020,10 +1020,13 @@ class MiscTests(TransRealMixin, TestCase):
 
 
 class ResolutionOrderI18NTests(TransRealMixin, TestCase):
+    """Helper used as base of the translation resolution tests below."""
+
+    LANG = 'de'
 
     def setUp(self):
         super(ResolutionOrderI18NTests, self).setUp()
-        activate('de')
+        activate(self.LANG)
 
     def tearDown(self):
         deactivate()
@@ -1035,20 +1038,26 @@ class ResolutionOrderI18NTests(TransRealMixin, TestCase):
             "translation of '%s'; the actual result is '%s'." % (msgstr, msgid, result)))
 
 
-@override_settings(INSTALLED_APPS=['i18n.resolution'] + list(settings.INSTALLED_APPS))
+@override_settings(
+    USE_I18N=True,
+    INSTALLED_APPS=['i18n.resolution'] + list(settings.INSTALLED_APPS),
+)
 class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
     def test_app_translation(self):
+        """Application-provided translation overrides one shipped with Django."""
         self.assertUgettext('Date/time', 'APP')
 
 
-@override_settings(LOCALE_PATHS=extended_locale_paths)
+@override_settings(USE_I18N=True, LOCALE_PATHS=extended_locale_paths)
 class LocalePathsResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
     def test_locale_paths_translation(self):
+        """Translation in LOCALE_PATHS overrides one shipped with Django."""
         self.assertUgettext('Time', 'LOCALE_PATHS')
 
     def test_locale_paths_override_app_translation(self):
+        """Translation in LOCALE_PATHS overrides an application-provided one."""
         extended_apps = list(settings.INSTALLED_APPS) + ['i18n.resolution']
         with self.settings(INSTALLED_APPS=extended_apps):
             self.assertUgettext('Time', 'LOCALE_PATHS')
@@ -1057,7 +1066,18 @@ class LocalePathsResolutionOrderI18NTests(ResolutionOrderI18NTests):
 class DjangoFallbackResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
     def test_django_fallback(self):
+        """Translation lookup falls back to use Django-provided if no other is available."""
         self.assertEqual(ugettext('Date/time'), 'Datum/Zeit')
+
+
+@override_settings(USE_I18N=True, LOCALE_PATHS=extended_locale_paths)
+class TranslationNotInDjangoSimple(ResolutionOrderI18NTests):
+
+    LANG = 'xy-ab'
+
+    def test_locale_paths_translation(self):
+        """#14461: Translation to locale found in LOCALE_PATHS used even if isn't shipped w/Django."""
+        self.assertUgettext('Time', "Translation of 'Time' to locale 'xy_AB'")
 
 
 class TestModels(TestCase):
@@ -1344,3 +1364,33 @@ class CountrySpecificLanguageTests(TransRealMixin, TestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt-pt,en-US;q=0.8,en;q=0.6,ru;q=0.4'}
         lang = get_language_from_request(r)
         self.assertEqual('pt-br', lang)
+
+
+@override_settings(
+    USE_I18N=True,
+    LOCALE_PATHS=extended_locale_paths,
+    LANGUAGES=(('xy-ab', 'Xy as spoken in Ab'),),
+    MIDDLEWARE_CLASSES=(
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.common.CommonMiddleware',
+    ),
+)
+class TranslationNotInDjangoUrls(TransRealMixin, TestCase):
+    """
+    Regression test for #14461. LocaleMidleware uses custom locale in
+    LOCALE_PATHS that isn't shipped with Django.
+    """
+
+    urls = 'i18n.urls'
+
+    def test_locale_paths_translation_prefixed_url(self):
+        """Custom locale in LOCALE_PATHS used when prefixed URLs is requested."""
+        response = self.client.get('/xy-ab/extra/')
+        self.assertEqual(response['content-language'], 'xy-ab')
+        self.assertContains(response, "Translation of 'Time' to locale 'xy_AB'")
+
+    def test_locale_paths_translation_ua_lang_pref(self):
+        """Custom locale in LOCALE_PATHS used when user preference specifies it."""
+        response = self.client.get('/translated/', HTTP_ACCEPT_LANGUAGE='xy-ab')
+        self.assertContains(response, "Translation of 'Time' to locale 'xy_AB'")
+        self.assertEqual(response['content-language'], 'xy-ab')
