@@ -1,13 +1,13 @@
 from __future__ import unicode_literals
 
-from django.core.cache import get_cache, InvalidCacheBackendError
+from django.core.cache import caches, InvalidCacheBackendError
 from django.core.cache.utils import make_template_fragment_key
 from django.template import Library, Node, TemplateSyntaxError, VariableDoesNotExist
 
 register = Library()
 
 try:
-    default_cache = get_cache('template_fragments')
+    default_cache = caches['template_fragments']
 except InvalidCacheBackendError:
     from django.core.cache import cache as default_cache
 
@@ -35,7 +35,7 @@ class CacheNode(Node):
             except VariableDoesNotExist:
                 raise TemplateSyntaxError('"cache" tag got an unknown variable: %r' % self.cache_name.var)
             try:
-                cache = get_cache(cache_name)
+                cache = caches[cache_name]
             except InvalidCacheBackendError:
                 raise TemplateSyntaxError('Invalid cache name specified for cache tag: %r' % cache_name)
         else:

@@ -2,13 +2,13 @@
 
 import time
 import pickle
-from threading import local
 
 from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
 
 from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
 from django.utils.encoding import force_str
+from django.utils.functional import cached_property
 
 
 class BaseMemcachedCacheMethods(RenameMethodsBase):
@@ -177,24 +177,14 @@ class PyLibMCCache(BaseMemcachedCache):
     "An implementation of a cache binding using pylibmc"
     def __init__(self, server, params):
         import pylibmc
-        self._local = local()
         super(PyLibMCCache, self).__init__(server, params,
                                            library=pylibmc,
                                            value_not_found_exception=pylibmc.NotFound)
 
-    @property
+    @cached_property
     def _cache(self):
-        # PylibMC uses cache options as the 'behaviors' attribute.
-        # It also needs to use threadlocals, because some versions of
-        # PylibMC don't play well with the GIL.
-        client = getattr(self._local, 'client', None)
-        if client:
-            return client
-
         client = self._lib.Client(self._servers)
         if self._options:
             client.behaviors = self._options
-
-        self._local.client = client
 
         return client
