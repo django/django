@@ -105,6 +105,7 @@ class DepartmentListFilterLookupWithNonStringValue(SimpleListFilter):
 class DepartmentListFilterLookupWithUnderscoredParameter(DepartmentListFilterLookupWithNonStringValue):
     parameter_name = 'department__whatever'
 
+
 class DepartmentListFilterLookupWithDynamicValue(DecadeListFilterWithTitleAndParameter):
 
     def lookups(self, request, model_admin):
@@ -841,16 +842,14 @@ class ListFiltersTests(TestCase):
             changelist = self.get_changelist(request, Book, modeladmin)
             filterspec = changelist.get_filters(request)[0][0]
             self.assertEqual(force_text(filterspec.title), 'publication decade')
-            choices = list(filterspec.choices(changelist))
-            self.assertEqual(len(choices), len(expected_displays))
-            for i, display in enumerate(expected_displays):
-                self.assertEqual(choices[i]['display'], display)
+            choices = tuple(c['display'] for c in filterspec.choices(changelist))
+            self.assertEqual(choices, expected_displays)
 
         _test_choices(self.request_factory.get('/', {}),
-                      ('All', 'the 1980\'s', 'the 1990\'s'))
+                      ("All", "the 1980's", "the 1990's"))
 
         _test_choices(self.request_factory.get('/', {'publication-decade': 'the 80s'}),
-                      ('All', 'the 1990\'s'))
+                      ("All", "the 1990's"))
 
         _test_choices(self.request_factory.get('/', {'publication-decade': 'the 90s'}),
-                      ('All', 'the 1980\'s'))
+                      ("All", "the 1980's"))
