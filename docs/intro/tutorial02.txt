@@ -386,7 +386,7 @@ You can improve that by giving that method (in :file:`polls/models.py`) a few
 attributes, as follows:
 
 .. snippet::
-    :filename: polls/admin.py
+    :filename: polls/models.py
 
     class Question(models.Model):
         # ...
