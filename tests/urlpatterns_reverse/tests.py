@@ -17,6 +17,7 @@ from django.test.utils import override_settings
 from django.utils import six
 
 from . import urlconf_outer, middleware, views
+from .views import empty_view
 
 
 resolve_test_data = (
@@ -662,12 +663,20 @@ class ErroneousViewTests(TestCase):
 
 class ViewLoadingTests(TestCase):
     def test_view_loading(self):
+        self.assertEqual(get_callable('urlpatterns_reverse.views.empty_view'),
+                         empty_view)
+
+        # passing a callable should return the callable
+        self.assertEqual(get_callable(empty_view), empty_view)
+
+    def test_exceptions(self):
         # A missing view (identified by an AttributeError) should raise
         # ViewDoesNotExist, ...
-        six.assertRaisesRegex(self, ViewDoesNotExist, ".*View does not exist in.*",
-            get_callable,
-            'urlpatterns_reverse.views.i_should_not_exist')
+        six.assertRaisesRegex(self, ViewDoesNotExist,
+                              ".*View does not exist in.*",
+                              get_callable,
+                              'urlpatterns_reverse.views.i_should_not_exist')
         # ... but if the AttributeError is caused by something else don't
         # swallow it.
         self.assertRaises(AttributeError, get_callable,
-            'urlpatterns_reverse.views_broken.i_am_broken')
+                          'urlpatterns_reverse.views_broken.i_am_broken')

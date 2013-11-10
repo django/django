@@ -16,17 +16,13 @@ from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str, force_text, iri_to_uri
-from django.utils.functional import memoize, lazy
+from django.utils.functional import lazy
 from django.utils.http import urlquote
 from django.utils.module_loading import module_has_submodule
 from django.utils.regex_helper import normalize
-from django.utils import six
+from django.utils import six, lru_cache
 from django.utils.translation import get_language
 
-
-_resolver_cache = {}  # Maps URLconf modules to RegexURLResolver instances.
-_ns_resolver_cache = {}  # Maps namespaces to RegexURLResolver instances.
-_callable_cache = {}  # Maps view and url pattern names to their view functions.
 
 # SCRIPT_NAME prefixes for each thread are stored here. If there's no entry for
 # the current thread (which is the only one we ever access), it is assumed to
@@ -80,6 +76,7 @@ class NoReverseMatch(Exception):
     pass
 
 
+@lru_cache.lru_cache(maxsize=None)
 def get_callable(lookup_view, can_fail=False):
     """
     Convert a string version of a function name to the callable object.
@@ -119,17 +116,17 @@ def get_callable(lookup_view, can_fail=False):
                         "Could not import %s. View does not exist in module %s." %
                         (lookup_view, mod_name))
     return lookup_view
-get_callable = memoize(get_callable, _callable_cache, 1)
 
 
+@lru_cache.lru_cache(maxsize=None)
 def get_resolver(urlconf):
     if urlconf is None:
         from django.conf import settings
         urlconf = settings.ROOT_URLCONF
     return RegexURLResolver(r'^/', urlconf)
-get_resolver = memoize(get_resolver, _resolver_cache, 1)
 
 
+@lru_cache.lru_cache(maxsize=None)
 def get_ns_resolver(ns_pattern, resolver):
     # Build a namespaced resolver for the given parent urlconf pattern.
     # This makes it possible to have captured parameters in the parent
@@ -137,7 +134,6 @@ def get_ns_resolver(ns_pattern, resolver):
     ns_resolver = RegexURLResolver(ns_pattern,
                                           resolver.url_patterns)
     return RegexURLResolver(r'^/', [ns_resolver])
-get_ns_resolver = memoize(get_ns_resolver, _ns_resolver_cache, 2)
 
 
 def get_mod_func(callback):
@@ -523,12 +519,9 @@ reverse_lazy = lazy(reverse, str)
 
 
 def clear_url_caches():
-    global _resolver_cache
-    global _ns_resolver_cache
-    global _callable_cache
-    _resolver_cache.clear()
-    _ns_resolver_cache.clear()
-    _callable_cache.clear()
+    get_callable.cache_clear()
+    get_resolver.cache_clear()
+    get_ns_resolver.cache_clear()
 
 
 def set_script_prefix(prefix):
