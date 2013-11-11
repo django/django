@@ -39,7 +39,6 @@ from django.conf import settings
 from django.core.signals import request_finished
 from django.utils._os import upath
 from django.utils.importlib import import_module
-from django.utils.translation.trans_real import all_locale_paths
 from django.utils import six
 try:
     from django.utils.six.moves import _thread as thread

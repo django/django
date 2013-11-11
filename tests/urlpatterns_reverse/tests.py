@@ -566,14 +566,12 @@ class ErrorHandlerResolutionTests(TestCase):
         self.callable_resolver = RegexURLResolver(r'^$', urlconf_callables)
 
     def test_named_handlers(self):
-        from .views import empty_view
         handler = (empty_view, {})
         self.assertEqual(self.resolver.resolve400(), handler)
         self.assertEqual(self.resolver.resolve404(), handler)
         self.assertEqual(self.resolver.resolve500(), handler)
 
     def test_callable_handers(self):
-        from .views import empty_view
         handler = (empty_view, {})
         self.assertEqual(self.callable_resolver.resolve400(), handler)
         self.assertEqual(self.callable_resolver.resolve404(), handler)
