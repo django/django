@@ -122,13 +122,16 @@ than this will be ignored.
 Message tags
 ------------
 
-Message tags are a string representation of the message level plus any
-extra tags that were added directly in the view (see
-`Adding extra message tags`_ below for more details). Tags are stored in a
-string and are separated by spaces. Typically, message tags
-are used as CSS classes to customize message style based on message type. By
-default, each level has a single tag that's a lowercase version of its own
-constant:
+Each message has at least one tag which is the string representation of the
+message level. The ``level_tag`` property contains a string with only the
+name of the level. Additionally, you can add extra tags by supplying the
+``extra_tags`` argument (see `Adding extra message tags`_ below for more
+details). The ``tags`` property of a message contains a string with
+both the ``extra_tags`` and the ``level_tag`` separated by spaces.
+
+These tags are typically used as CSS classes to customize message style based
+on message type. By default, each level has a single tag that's a lowercase
+version of its own constant:
 
 ==============  ===========
 Level Constant  Tag
