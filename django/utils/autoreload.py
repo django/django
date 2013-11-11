@@ -37,6 +37,7 @@ import traceback
 
 from django.conf import settings
 from django.core.signals import request_finished
+from django.utils import six
 try:
     from django.utils.six.moves import _thread as thread
 except ImportError:
@@ -170,7 +171,8 @@ def kqueue_code_changed():
 
     # New modules may get imported when a request is processed. We add a file
     # descriptor to the kqueue to exit the kqueue.control after each request.
-    watcher = tempfile.TemporaryFile(bufsize=0)
+    buf_kwargs = {'buffering' if six.PY3 else 'bufsize': 0}
+    watcher = tempfile.TemporaryFile(**buf_kwargs)
     kqueue.control([make_kevent(watcher)], 0)
 
     def update_watch(sender=None, **kwargs):
