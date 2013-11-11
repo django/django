@@ -237,11 +237,38 @@ running ``migrate``::
    had reports that the Windows Community Server installer sets up InnoDB as
    the default storage engine, for example.
 
-MySQLdb
--------
+.. _mysql-db-api-drivers:
 
-`MySQLdb`_ is the Python interface to MySQL. Version 1.2.1p2 or later is
-required for full MySQL support in Django.
+MySQL DB API Drivers
+--------------------
+
+The Python Database API is described in `PEP 249`_. MySQL has two prominent
+drivers that implement this API:
+
+.. _PEP 249: http://www.python.org/dev/peps/pep-0249/
+
+- `MySQLdb`_ is a native driver that has been developed and supported for over
+  a decade by Andy Dustman.
+- `MySQL Connector/Python`_ is a pure Python driver from Oracle that does not
+  require the MySQL client library or any Python modules outside the standard
+  library.
+
+.. _MySQLdb: https://pypi.python.org/pypi/MySQL-python/1.2.4
+.. _MySQL Connector/Python: http://dev.mysql.com/downloads/connector/python
+
+Both drivers are thread-safe and both provide connection pooling. The major
+difference is that MySQL Connector/Python supports Python 3.
+
+In addition to a DB API driver, Django needs an adaptor to access the database
+drivers from its ORM. Django provides an adaptor for MySQLdb while MySQL
+Connector/Python includes `its own`_.
+
+.. _its own: http://dev.mysql.com/doc/refman/5.6/en/connector-python-django-backend.html
+
+MySQLdb
+~~~~~~~
+
+Django requires MySQLdb version 1.2.1p2 or later.
 
 .. note::
     If you see ``ImportError: cannot import name ImmutableSet`` when trying to
@@ -253,25 +280,31 @@ required for full MySQL support in Django.
 
 .. note::
     There are known issues with the way MySQLdb converts date strings into
-    datetime objects. Specifically, date strings with value 0000-00-00 are valid for
-    MySQL but will be converted into None by MySQLdb.
+    datetime objects. Specifically, date strings with value 0000-00-00 are
+    valid for MySQL but will be converted into None by MySQLdb.
 
     This means you should be careful while using loaddata/dumpdata with rows
     that may have 0000-00-00 values, as they will be converted to None.
 
-.. _MySQLdb: http://sourceforge.net/projects/mysql-python
+.. note::
+    At the time of writing, the latest release of MySQLdb (1.2.4) doesn't
+    support Python 3. In order to use MySQLdb under Python 3, you'll have to
+    install an unofficial fork, such as `MySQL-for-Python-3`_.
 
-Python 3
---------
-
-At the time of writing, the latest release of MySQLdb (1.2.4) doesn't support
-Python 3. In order to use MySQL under Python 3, you'll have to install an
-unofficial fork, such as `MySQL-for-Python-3`_.
-
-This port is still in alpha. In particular, it doesn't support binary data,
-making it impossible to use :class:`django.db.models.BinaryField`.
+    This port is still in alpha. In particular, it doesn't support binary
+    data, making it impossible to use :class:`django.db.models.BinaryField`.
 
 .. _MySQL-for-Python-3: https://github.com/clelland/MySQL-for-Python-3
+
+MySQL Connector/Python
+~~~~~~~~~~~~~~~~~~~~~~
+
+MySQL Connector/Python is available through two `release branches`_: Generally
+Available (GA, currently 1.0.x) and Development (Dev, currently 1.1.x).
+The Django adapter is currently available in the Dev branch and is described
+as Alpha.
+
+.. _release branches: http://dev.mysql.com/downloads/connector/python/
 
 Creating your database
 ----------------------
