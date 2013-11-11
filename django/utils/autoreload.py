@@ -184,7 +184,7 @@ def kqueue_code_changed():
     kqueue.control([make_kevent(watcher)], 0)
 
     def update_watch(sender=None, **kwargs):
-        watcher.write('.')
+        watcher.write(b'.')
 
     request_finished.connect(update_watch)
 
