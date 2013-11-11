@@ -167,11 +167,11 @@ LANG_INFO = {
         'name': 'French',
         'name_local': 'français',
     },
-    'fy-nl': {
+    'fy': {
         'bidi': False,
-        'code': 'fy-nl',
+        'code': 'fy',
         'name': 'Frisian',
-        'name_local': 'Frisian',
+        'name_local': 'frysk',
     },
     'ga': {
         'bidi': False,
