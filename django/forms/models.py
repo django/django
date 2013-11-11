@@ -326,27 +326,6 @@ class BaseModelForm(BaseForm):
         super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
                                             error_class, label_suffix, empty_permitted)
 
-    def _update_errors(self, errors):
-        for field, messages in errors.error_dict.items():
-            if field not in self.fields:
-                continue
-            field = self.fields[field]
-            for message in messages:
-                if isinstance(message, ValidationError):
-                    if message.code in field.error_messages:
-                        message.message = field.error_messages[message.code]
-
-        message_dict = errors.message_dict
-        for k, v in message_dict.items():
-            if k != NON_FIELD_ERRORS:
-                self._errors.setdefault(k, self.error_class()).extend(v)
-                # Remove the data from the cleaned_data dict since it was invalid
-                if k in self.cleaned_data:
-                    del self.cleaned_data[k]
-        if NON_FIELD_ERRORS in message_dict:
-            messages = message_dict[NON_FIELD_ERRORS]
-            self._errors.setdefault(NON_FIELD_ERRORS, self.error_class()).extend(messages)
-
     def _get_validation_exclusions(self):
         """
         For backwards-compatibility, several types of fields need to be
@@ -393,6 +372,20 @@ class BaseModelForm(BaseForm):
         self._validate_unique = True
         return self.cleaned_data
 
+    def _update_errors(self, errors):
+        # Override any validation error messages defined at the model level
+        # with those defined on the form fields.
+        for field, messages in errors.error_dict.items():
+            if field not in self.fields:
+                continue
+            field = self.fields[field]
+            for message in messages:
+                if (isinstance(message, ValidationError) and
+                        message.code in field.error_messages):
+                    message.message = field.error_messages[message.code]
+
+        self.add_error(None, errors)
+
     def _post_clean(self):
         opts = self._meta
         # Update the model instance with self.cleaned_data.
@@ -407,13 +400,12 @@ class BaseModelForm(BaseForm):
         # object being referred to may not yet fully exist (#12749).
         # However, these fields *must* be included in uniqueness checks,
         # so this can't be part of _get_validation_exclusions().
-        for f_name, field in self.fields.items():
+        for name, field in self.fields.items():
             if isinstance(field, InlineForeignKeyField):
-                exclude.append(f_name)
+                exclude.append(name)
 
         try:
-            self.instance.full_clean(exclude=exclude,
-                validate_unique=False)
+            self.instance.full_clean(exclude=exclude, validate_unique=False)
         except ValidationError as e:
             self._update_errors(e)
 
@@ -695,6 +687,7 @@ class BaseModelFormSet(BaseFormSet):
                         del form.cleaned_data[field]
                     # mark the data as seen
                     seen_data.add(data)
+
         if errors:
             raise ValidationError(errors)
 

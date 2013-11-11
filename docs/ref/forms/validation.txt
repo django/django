@@ -464,3 +464,31 @@ Secondly, once we have decided that the combined data in the two fields we are
 considering aren't valid, we must remember to remove them from the
 ``cleaned_data``. `cleaned_data`` is present even if the form doesn't
 validate, but it contains only field values that did validate.
+
+.. versionchanged:: 1.7
+
+In lieu of manipulating ``_errors`` directly, it's now possible to add errors
+to specific fields with :meth:`django.forms.Form.add_error()`::
+
+    from django import forms
+
+    class ContactForm(forms.Form):
+        # Everything as before.
+        ...
+
+        def clean(self):
+            cleaned_data = super(ContactForm, self).clean()
+            cc_myself = cleaned_data.get("cc_myself")
+            subject = cleaned_data.get("subject")
+
+            if cc_myself and subject and "help" not in subject:
+                msg = u"Must put 'help' in subject when cc'ing yourself."
+                self.add_error('cc_myself', msg)
+                self.add_error('subject', msg)
+
+The second argument of ``add_error()`` can be a simple string, or preferably
+an instance of ``ValidationError``. See :ref:`raising-validation-error` for
+more details.
+
+Unlike the ``_errors`` approach, ``add_error()` automatically removes the field
+from ``cleaned_data``.

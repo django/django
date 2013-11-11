@@ -77,64 +77,78 @@ class ValidationError(Exception):
     """An error while validating data."""
     def __init__(self, message, code=None, params=None):
         """
-        ValidationError can be passed any object that can be printed (usually
-        a string), a list of objects or a dictionary.
+        The `message` argument can be a single error, a list of errors, or a
+        dictionary that maps field names to lists of errors. What we define as
+        an "error" can be either a simple string or an instance of
+        ValidationError with its message attribute set, and what we define as
+        list or dictionary can be an actual `list` or `dict` or an instance
+        of ValidationError with its `error_list` or `error_dict` attribute set.
         """
+        if isinstance(message, ValidationError):
+            if hasattr(message, 'error_dict'):
+                message = message.error_dict
+            elif not hasattr(message, 'message'):
+                message = message.error_list
+            else:
+                message, code, params = message.message, message.code, message.params
+
         if isinstance(message, dict):
-            self.error_dict = message
+            self.error_dict = {}
+            for field, messages in message.items():
+                if not isinstance(messages, ValidationError):
+                    messages = ValidationError(messages)
+                self.error_dict[field] = messages.error_list
+
         elif isinstance(message, list):
-            self.error_list = message
+            self.error_list = []
+            for message in message:
+                # Normalize plain strings to instances of ValidationError.
+                if not isinstance(message, ValidationError):
+                    message = ValidationError(message)
+                self.error_list.extend(message.error_list)
+
         else:
+            self.message = message
             self.code = code
             self.params = params
-            self.message = message
             self.error_list = [self]
 
     @property
     def message_dict(self):
-        message_dict = {}
-        for field, messages in self.error_dict.items():
-            message_dict[field] = []
-            for message in messages:
-                if isinstance(message, ValidationError):
-                    message_dict[field].extend(message.messages)
-                else:
-                    message_dict[field].append(force_text(message))
-        return message_dict
+        return dict(self)
 
     @property
     def messages(self):
         if hasattr(self, 'error_dict'):
-            message_list = reduce(operator.add, self.error_dict.values())
-        else:
-            message_list = self.error_list
-
-        messages = []
-        for message in message_list:
-            if isinstance(message, ValidationError):
-                params = message.params
-                message = message.message
-                if params:
-                    message %= params
-            message = force_text(message)
-            messages.append(message)
-        return messages
-
-    def __str__(self):
-        if hasattr(self, 'error_dict'):
-            return repr(self.message_dict)
-        return repr(self.messages)
-
-    def __repr__(self):
-        return 'ValidationError(%s)' % self
+            return reduce(operator.add, dict(self).values())
+        return list(self)
 
     def update_error_dict(self, error_dict):
         if hasattr(self, 'error_dict'):
             if error_dict:
-                for k, v in self.error_dict.items():
-                    error_dict.setdefault(k, []).extend(v)
+                for field, errors in self.error_dict.items():
+                    error_dict.setdefault(field, []).extend(errors)
             else:
                 error_dict = self.error_dict
         else:
             error_dict[NON_FIELD_ERRORS] = self.error_list
         return error_dict
+
+    def __iter__(self):
+        if hasattr(self, 'error_dict'):
+            for field, errors in self.error_dict.items():
+                yield field, list(ValidationError(errors))
+        else:
+            for error in self.error_list:
+                message = error.message
+                if error.params:
+                    message %= error.params
+                yield force_text(message)
+
+    def __str__(self):
+        if hasattr(self, 'error_dict'):
+            return repr(dict(self))
+        return repr(list(self))
+
+    def __repr__(self):
+        return 'ValidationError(%s)' % self

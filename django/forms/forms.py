@@ -290,6 +290,51 @@ class BaseForm(object):
         prefix = self.add_prefix(fieldname)
         return field.widget.value_from_datadict(self.data, self.files, prefix)
 
+    def add_error(self, field, error):
+        """
+        Update the content of `self._errors`.
+
+        The `field` argument is the name of the field to which the errors
+        should be added. If its value is None the errors will be treated as
+        NON_FIELD_ERRORS.
+
+        The `error` argument can be a single error, a list of errors, or a
+        dictionary that maps field names to lists of errors. What we define as
+        an "error" can be either a simple string or an instance of
+        ValidationError with its message attribute set and what we define as
+        list or dictionary can be an actual `list` or `dict` or an instance
+        of ValidationError with its `error_list` or `error_dict` attribute set.
+
+        If `error` is a dictionary, the `field` argument *must* be None and
+        errors will be added to the fields that correspond to the keys of the
+        dictionary.
+        """
+        if not isinstance(error, ValidationError):
+            # Normalize to ValidationError and let its constructor
+            # do the hard work of making sense of the input.
+            error = ValidationError(error)
+
+        if hasattr(error, 'error_dict'):
+            if field is not None:
+                raise TypeError(
+                    "The argument `field` must be `None` when the `error` "
+                    "argument contains errors for multiple fields."
+                )
+            else:
+                error = dict(error)
+        else:
+            error = {field or NON_FIELD_ERRORS: list(error)}
+
+        for field, error_list in error.items():
+            if field not in self.errors:
+                if field != NON_FIELD_ERRORS and field not in self.fields:
+                    raise ValueError(
+                        "'%s' has no field named '%s'." % (self.__class__.__name__, field))
+                self._errors[field] = self.error_class()
+            self._errors[field].extend(error_list)
+            if field in self.cleaned_data:
+                del self.cleaned_data[field]
+
     def full_clean(self):
         """
         Cleans all of self.data and populates self._errors and
@@ -303,6 +348,7 @@ class BaseForm(object):
         # changed from the initial data, short circuit any validation.
         if self.empty_permitted and not self.has_changed():
             return
+
         self._clean_fields()
         self._clean_form()
         self._post_clean()
@@ -324,15 +370,13 @@ class BaseForm(object):
                     value = getattr(self, 'clean_%s' % name)()
                     self.cleaned_data[name] = value
             except ValidationError as e:
-                self._errors[name] = self.error_class(e.messages)
-                if name in self.cleaned_data:
-                    del self.cleaned_data[name]
+                self.add_error(name, e)
 
     def _clean_form(self):
         try:
             cleaned_data = self.clean()
         except ValidationError as e:
-            self._errors[NON_FIELD_ERRORS] = self.error_class(e.messages)
+            self.add_error(None, e)
         else:
             if cleaned_data is not None:
                 self.cleaned_data = cleaned_data
