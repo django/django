@@ -78,6 +78,10 @@ overridden:
   like. This method can return a completely different dictionary if it wishes,
   which will be used as the ``cleaned_data``.
 
+  Since the field validation method have been run by the time ``clean()`` is
+  called, you also have access to the form's ``errors`` attribute which
+  contains all the errors raised by previous steps.
+
   Note that any errors raised by your ``Form.clean()`` override will not
   be associated with any field in particular. They go into a special
   "field" (called ``__all__``), which you can access via the
@@ -95,7 +99,8 @@ These methods are run in the order given above, one field at a time.  That is,
 for each field in the form (in the order they are declared in the form
 definition), the ``Field.clean()`` method (or its override) is run, then
 ``clean_<fieldname>()``. Finally, once those two methods are run for every
-field, the ``Form.clean()`` method, or its override, is executed.
+field, the ``Form.clean()`` method, or its override, is executed, no matter if
+the previous methods have raised errors or not.
 
 Examples of each of these methods are provided below.
 
@@ -103,15 +108,6 @@ As mentioned, any of these methods can raise a ``ValidationError``. For any
 field, if the ``Field.clean()`` method raises a ``ValidationError``, any
 field-specific cleaning method is not called. However, the cleaning methods
 for all remaining fields are still executed.
-
-The ``clean()`` method for the ``Form`` class or subclass is always run. If
-that method raises a ``ValidationError``, ``cleaned_data`` will be an empty
-dictionary.
-
-The previous paragraph means that if you are overriding ``Form.clean()``, you
-should iterate through ``self.cleaned_data.items()``, possibly considering the
-``_errors`` dictionary attribute on the form as well. In this way, you will
-already know which fields have passed their individual validation requirements.
 
 .. _raising-validation-error:
 
