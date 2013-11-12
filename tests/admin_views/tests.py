@@ -4645,13 +4645,13 @@ class AdminViewOnSiteTests(TestCase):
         # The form validation should fail because 'some_required_info' is
         # not included on the parent form, and the family_name of the parent
         # does not match that of the child
-        post_data = {"family_name": "Test1",
+        post_data = {"family_name": "Test2",
                      "dependentchild_set-TOTAL_FORMS": "1",
                      "dependentchild_set-INITIAL_FORMS": "0",
                      "dependentchild_set-MAX_NUM_FORMS": "1",
                      "dependentchild_set-0-id": "",
                      "dependentchild_set-0-parent": str(pwdc.id),
-                     "dependentchild_set-0-family_name": "Test2"}
+                     "dependentchild_set-0-family_name": "Test1"}
         response = self.client.post('/test_admin/admin/admin_views/parentwithdependentchildren/%d/' 
                                     % pwdc.id, post_data)
         
