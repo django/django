@@ -4596,7 +4596,7 @@ class TestLabelVisibility(TestCase):
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
-class AdminViewOnSiteTest(TestCase):
+class AdminViewOnSiteTests(TestCase):
     urls = "admin_views.urls"
     fixtures = ['admin-views-users.xml', 'admin-views-restaurants.xml']
 
@@ -4624,9 +4624,15 @@ class AdminViewOnSiteTest(TestCase):
                      "dependentchild_set-0-family_name": "Test2"}
         response = self.client.post('/test_admin/admin/admin_views/parentwithdependentchildren/add/', 
                                     post_data)
-        self.assertTrue(response.context['adminform'].form.errors)
+        
+        # just verifying the parent form failed validation, as expected --
+        # this isn't the regression test
+        self.assertTrue('some_required_info' in response.context['adminform'].form.errors)
+        
+        # actual regression test
         for error_set in response.context['inline_admin_formset'].formset.errors:
-            self.assertTrue(error_set)
+            self.assertEquals([u'Children must share a family name with their parents in this contrived test case'],
+                              error_set.get('__all__'))
     
     def test_change_view_form_and_formsets_run_validation(self):
         """
@@ -4649,9 +4655,14 @@ class AdminViewOnSiteTest(TestCase):
         response = self.client.post('/test_admin/admin/admin_views/parentwithdependentchildren/%d/' 
                                     % pwdc.id, post_data)
         
-        self.assertTrue(response.context['adminform'].form.errors)
+        # just verifying the parent form failed validation, as expected --
+        # this isn't the regression test
+        self.assertTrue('some_required_info' in response.context['adminform'].form.errors)
+        
+        # actual regression test
         for error_set in response.context['inline_admin_formset'].formset.errors:
-            self.assertTrue(error_set)
+            self.assertEquals([u'Children must share a family name with their parents in this contrived test case'],
+                              error_set.get('__all__'))
 
     def test_validate(self):
         "Ensure that the view_on_site value is either a boolean or a callable"
