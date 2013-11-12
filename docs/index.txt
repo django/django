@@ -17,7 +17,7 @@ Having trouble? We'd like to help!
 * Looking for specific information? Try the :ref:`genindex`, :ref:`modindex` or
   the :doc:`detailed table of contents <contents>`.
 
-* Search for information in the `archives of the django-users mailing list`_, or
+* Search for information in the archives of the |django-users| mailing list, or
   `post a question`_.
 
 * Ask a question in the `#django IRC channel`_, or search the `IRC logs`_ to see
@@ -25,7 +25,7 @@ Having trouble? We'd like to help!
 
 * Report bugs with Django in our `ticket tracker`_.
 
-.. _archives of the django-users mailing list: http://groups.google.com/group/django-users/
+.. _archives: http://groups.google.com/group/django-users/
 .. _post a question: http://groups.google.com/group/django-users/
 .. _#django IRC channel: irc://irc.freenode.net/django
 .. _IRC logs: http://django-irc-logs.com/
@@ -215,6 +215,7 @@ Security is a topic of paramount importance in the development of Web
 applications and Django provides multiple protection tools and mechanisms:
 
 * :doc:`Security overview <topics/security>`
+* :doc:`Disclosed security issues in Django <releases/security>`
 * :doc:`Clickjacking protection <ref/clickjacking>`
 * :doc:`Cross Site Request Forgery protection <ref/contrib/csrf>`
 * :doc:`Cryptographic signing <topics/signing>`
@@ -231,6 +232,14 @@ regions:
   :ref:`Localization <how-to-create-language-files>`
 * :doc:`"Local flavor" <topics/localflavor>`
 * :doc:`Time zones </topics/i18n/timezones>`
+
+Performance and optimization
+============================
+
+There are a variety of techniques and tools that can help get your code running
+more efficiently - faster, and using fewer system resources.
+
+* :doc:`Performance and optimization overview <topics/performance>`
 
 Python compatibility
 ====================
@@ -291,7 +300,8 @@ you can contribute:
   :doc:`The release process <internals/release-process>` |
   :doc:`Team of committers <internals/committers>` |
   :doc:`The Django source code repository <internals/git>` |
-  :doc:`Security policies <internals/security>`
+  :doc:`Security policies <internals/security>` |
+  :doc:`Mailing lists <internals/mailing-lists>`
 
 * **Design philosophies:**
   :doc:`Overview <misc/design-philosophies>`

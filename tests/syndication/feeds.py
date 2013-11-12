@@ -2,7 +2,8 @@ from __future__ import unicode_literals
 
 from django.contrib.syndication import views
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils import feedgenerator, tzinfo
+from django.utils import feedgenerator
+from django.utils.timezone import get_fixed_timezone
 
 from .models import Article, Entry
 
@@ -140,7 +141,7 @@ class TZAwareDatesFeed(TestAtomFeed):
         # Provide a weird offset so that the test can know it's getting this
         # specific offset and not accidentally getting on from
         # settings.TIME_ZONE.
-        return item.published.replace(tzinfo=tzinfo.FixedOffset(42))
+        return item.published.replace(tzinfo=get_fixed_timezone(42))
 
 
 class TestFeedUrlFeed(TestAtomFeed):

@@ -51,7 +51,7 @@ class TemplateCommand(BaseCommand):
                     help='The file name(s) to render. '
                          'Separate multiple extensions with commas, or use '
                          '-n multiple times.')
-        )
+    )
     requires_model_validation = False
     # Can't import settings during this command, because they haven't
     # necessarily been created.
@@ -229,7 +229,7 @@ class TemplateCommand(BaseCommand):
             tmp = url.rstrip('/')
             filename = tmp.split('/')[-1]
             if url.endswith('/'):
-                display_url  = tmp + '/'
+                display_url = tmp + '/'
             else:
                 display_url = url
             return filename, display_url

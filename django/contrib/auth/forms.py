@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 
 from django import forms
-from django.forms.util import flatatt
+from django.forms.utils import flatatt
 from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.html import format_html, format_html_join
@@ -238,8 +238,9 @@ class PasswordResetForm(forms.Form):
         from django.core.mail import send_mail
         UserModel = get_user_model()
         email = self.cleaned_data["email"]
-        users = UserModel._default_manager.filter(email__iexact=email)
-        for user in users:
+        active_users = UserModel._default_manager.filter(
+            email__iexact=email, is_active=True)
+        for user in active_users:
             # Make sure that no email is sent to a user that actually has
             # a password marked as unusable
             if not user.has_usable_password():

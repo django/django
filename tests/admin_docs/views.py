@@ -5,8 +5,10 @@ from django.contrib.admindocs.middleware import XViewMiddleware
 
 xview_dec = decorator_from_middleware(XViewMiddleware)
 
+
 def xview(request):
     return HttpResponse()
+
 
 class XViewClass(View):
     def get(self, request):

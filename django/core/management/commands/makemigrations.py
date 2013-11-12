@@ -82,5 +82,6 @@ class Command(BaseCommand):
                         open(init_path, "w").close()
                     # We just do this once per app
                     directory_created[app_label] = True
+                migration_string = writer.as_string()
                 with open(writer.path, "wb") as fh:
-                    fh.write(writer.as_string())
+                    fh.write(migration_string)

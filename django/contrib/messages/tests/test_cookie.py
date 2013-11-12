@@ -77,7 +77,7 @@ class CookieTest(BaseTests, TestCase):
         response = self.get_response()
         storage.add(constants.INFO, 'test')
         for m in storage:
-            pass # Iterate through the storage to simulate consumption of messages.
+            pass  # Iterate through the storage to simulate consumption of messages.
         storage.update(response)
         self.assertEqual(response.cookies['messages'].value, '')
         self.assertEqual(response.cookies['messages']['domain'], '.example.com')
@@ -126,8 +126,8 @@ class CookieTest(BaseTests, TestCase):
         messages = [
             {
                 'message': Message(constants.INFO, 'Test message'),
-                'message_list': [Message(constants.INFO, 'message %s') \
-                                 for x in range(5)] + [{'another-message': \
+                'message_list': [Message(constants.INFO, 'message %s')
+                                 for x in range(5)] + [{'another-message':
                                  Message(constants.ERROR, 'error')}],
             },
             Message(constants.INFO, 'message %s'),

@@ -117,9 +117,9 @@ these changes.
 * The ``mod_python`` request handler will be removed. The ``mod_wsgi``
   handler should be used instead.
 
-* The ``template`` attribute on :class:`~django.test.client.Response`
+* The ``template`` attribute on :class:`~django.test.Response`
   objects returned by the :ref:`test client <test-client>` will be removed.
-  The :attr:`~django.test.client.Response.templates` attribute should be
+  The :attr:`~django.test.Response.templates` attribute should be
   used instead.
 
 * The ``django.test.simple.DjangoTestRunner`` will be removed.
@@ -410,12 +410,17 @@ these changes.
 * The ``Model._meta.get_(add|change|delete)_permission`` methods will
   be removed.
 
+* The session key ``django_language`` will no longer be read for backwards
+  compatibility.
+
 1.9
 ---
 
 * ``django.utils.dictconfig`` will be removed.
 
 * ``django.utils.importlib`` will be removed.
+
+* ``django.utils.tzinfo`` will be removed.
 
 * ``django.utils.unittest`` will be removed.
 
@@ -434,6 +439,8 @@ these changes.
   :ref:`initial SQL data<initial-sql>` in ``myapp/models/sql/``. Move your
   custom SQL files to ``myapp/sql/``.
 
+* The model and form ``IPAddressField`` will be removed.
+
 * FastCGI support via the ``runfcgi`` management command will be
   removed. Please deploy your project using WSGI.
 
@@ -441,6 +448,38 @@ these changes.
   :class:`collections.OrderedDict` from the Python standard library instead.
 
 * ``ModelAdmin.declared_fieldsets`` will be removed.
+
+* Instances of ``util.py`` in the Django codebase have been renamed to
+  ``utils.py`` in an effort to unify all util and utils references.
+  The modules that provided backwards compatibility will be removed:
+
+  * ``django.contrib.admin.util``
+  * ``django.contrib.gis.db.backends.util``
+  * ``django.db.backends.util``
+  * ``django.forms.util``
+
+* ``ModelAdmin.get_formsets`` will be removed.
+
+* Remove the backward compatible shims introduced to rename the
+  ``BaseMemcachedCache._get_memcache_timeout()`` method to
+  ``get_backend_timeout()``.
+
+* The ``--natural`` and ``-n`` options for :djadmin:`dumpdata` will be removed.
+  Use :djadminopt:`--natural-foreign` instead.
+
+* The ``use_natural_keys`` argument for ``serializers.serialize()`` will be
+  removed. Use ``use_natural_foreign_keys`` instead.
+
+* ``django.forms.get_declared_fields`` will be removed.
+
+* The ``WSGIRequest.REQUEST`` property will be removed.
+
+* The class ``django.utils.datastructures.MergeDict`` will be removed.
+
+* The ``zh-cn`` and ``zh-tw`` language codes will be removed and have been
+  replaced by the ``zh-hans`` and ``zh-hant`` language code respectively.
+
+* The internal ``django.utils.functional.memoize`` will be removed.
 
 2.0
 ---

@@ -11,6 +11,7 @@ class ProcessViewMiddleware(object):
 
 process_view_dec = decorator_from_middleware(ProcessViewMiddleware)
 
+
 @process_view_dec
 def process_view(request):
     return HttpResponse()
@@ -73,7 +74,7 @@ class DecoratorFromMiddlewareTests(TestCase):
             return HttpResponse(t.render(Context({})))
 
         request = self.rf.get('/')
-        response = normal_view(request)
+        normal_view(request)
         self.assertTrue(getattr(request, 'process_request_reached', False))
         self.assertTrue(getattr(request, 'process_view_reached', False))
         # process_template_response must not be called for HttpResponse

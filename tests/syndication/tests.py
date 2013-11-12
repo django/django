@@ -1,18 +1,36 @@
 from __future__ import unicode_literals
 
+import datetime
 from xml.dom import minidom
+
+try:
+    import pytz
+except ImportError:
+    pytz = None
 
 from django.contrib.syndication import views
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
-from django.utils import tzinfo
+from django.test.utils import requires_tz_support
 from django.utils.feedgenerator import rfc2822_date, rfc3339_date
+from django.utils import timezone
 
 from .models import Entry
 
 
+TZ = timezone.get_default_timezone()
+
+
 class FeedTestCase(TestCase):
     fixtures = ['feeddata.json']
+
+    def setUp(self):
+        # Django cannot deal with very old dates when pytz isn't installed.
+        if pytz is None:
+            old_entry = Entry.objects.get(pk=1)
+            old_entry.updated = datetime.datetime(1980, 1, 1, 12, 30)
+            old_entry.published = datetime.datetime(1986, 9, 25, 20, 15, 00)
+            old_entry.save()
 
     def assertChildNodes(self, elem, expected):
         actual = set(n.nodeName for n in elem.childNodes)
@@ -30,6 +48,7 @@ class FeedTestCase(TestCase):
 ######################################
 # Feed view
 ######################################
+
 
 class SyndicationFeedTest(FeedTestCase):
     """
@@ -59,8 +78,7 @@ class SyndicationFeedTest(FeedTestCase):
 
         # Find the last build date
         d = Entry.objects.latest('published').published
-        ltz = tzinfo.LocalTimezone(d)
-        last_build_date = rfc2822_date(d.replace(tzinfo=ltz))
+        last_build_date = rfc2822_date(timezone.make_aware(d, TZ))
 
         self.assertChildNodes(chan, ['title', 'link', 'description', 'language', 'lastBuildDate', 'item', 'atom:link', 'ttl', 'copyright', 'category'])
         self.assertChildNodeContent(chan, {
@@ -89,8 +107,7 @@ class SyndicationFeedTest(FeedTestCase):
 
         # Find the pubdate of the first feed item
         d = Entry.objects.get(pk=1).published
-        ltz = tzinfo.LocalTimezone(d)
-        pub_date = rfc2822_date(d.replace(tzinfo=ltz))
+        pub_date = rfc2822_date(timezone.make_aware(d, TZ))
 
         items = chan.getElementsByTagName('item')
         self.assertEqual(len(items), Entry.objects.count())
@@ -242,8 +259,7 @@ class SyndicationFeedTest(FeedTestCase):
         updated = feed.getElementsByTagName('updated')[0].firstChild.wholeText
 
         d = Entry.objects.latest('published').published
-        ltz = tzinfo.LocalTimezone(d)
-        latest_published = rfc3339_date(d.replace(tzinfo=ltz))
+        latest_published = rfc3339_date(timezone.make_aware(d, TZ))
 
         self.assertEqual(updated, latest_published)
 
@@ -253,8 +269,7 @@ class SyndicationFeedTest(FeedTestCase):
         updated = feed.getElementsByTagName('updated')[0].firstChild.wholeText
 
         d = Entry.objects.exclude(pk=5).latest('updated').updated
-        ltz = tzinfo.LocalTimezone(d)
-        latest_updated = rfc3339_date(d.replace(tzinfo=ltz))
+        latest_updated = rfc3339_date(timezone.make_aware(d, TZ))
 
         self.assertEqual(updated, latest_updated)
 
@@ -308,8 +323,7 @@ class SyndicationFeedTest(FeedTestCase):
         updated = doc.getElementsByTagName('updated')[0].firstChild.wholeText
 
         d = Entry.objects.latest('published').published
-        ltz = tzinfo.LocalTimezone(d)
-        latest = rfc3339_date(d.replace(tzinfo=ltz))
+        latest = rfc3339_date(timezone.make_aware(d, TZ))
 
         self.assertEqual(updated, latest)
 
@@ -322,9 +336,20 @@ class SyndicationFeedTest(FeedTestCase):
         published = doc.getElementsByTagName('published')[0].firstChild.wholeText
         self.assertEqual(published[-6:], '+00:42')
 
-    def test_feed_last_modified_time(self):
+    @requires_tz_support
+    def test_feed_last_modified_time_naive_date(self):
+        """
+        Tests the Last-Modified header with naive publication dates.
+        """
         response = self.client.get('/syndication/naive-dates/')
         self.assertEqual(response['Last-Modified'], 'Tue, 26 Mar 2013 01:00:00 GMT')
+
+    def test_feed_last_modified_time(self):
+        """
+        Tests the Last-Modified header with aware publication dates.
+        """
+        response = self.client.get('/syndication/aware-dates/')
+        self.assertEqual(response['Last-Modified'], 'Mon, 25 Mar 2013 19:18:00 GMT')
 
         # No last-modified when feed has no item_pubdate
         response = self.client.get('/syndication/no_pubdate/')

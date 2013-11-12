@@ -133,8 +133,7 @@ class SimpleTemplateResponse(HttpResponse):
 
 
 class TemplateResponse(SimpleTemplateResponse):
-    rendering_attrs = SimpleTemplateResponse.rendering_attrs + \
-        ['_request', '_current_app']
+    rendering_attrs = SimpleTemplateResponse.rendering_attrs + ['_request', '_current_app']
 
     def __init__(self, request, template, context=None, content_type=None,
             status=None, current_app=None):

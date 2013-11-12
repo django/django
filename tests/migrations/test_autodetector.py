@@ -16,8 +16,11 @@ class AutodetectorTests(TestCase):
     author_name_longer = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=400))])
     author_name_renamed = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("names", models.CharField(max_length=200))])
     author_with_book = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))])
+    author_with_publisher = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("publisher", models.ForeignKey("testapp.Publisher"))])
     author_proxy = ModelState("testapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author", ))
     author_proxy_notproxy = ModelState("testapp", "AuthorProxy", [], {}, ("testapp.author", ))
+    publisher = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=100))])
+    publisher_with_author = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("name", models.CharField(max_length=100))])
     other_pony = ModelState("otherapp", "Pony", [("id", models.AutoField(primary_key=True))])
     other_stable = ModelState("otherapp", "Stable", [("id", models.AutoField(primary_key=True))])
     third_thing = ModelState("thirdapp", "Thing", [("id", models.AutoField(primary_key=True))])
@@ -205,6 +208,29 @@ class AutodetectorTests(TestCase):
         self.assertEqual(migration2.dependencies, [("testapp", "auto_1")])
         self.assertEqual(migration3.dependencies, [("otherapp", "auto_1")])
 
+    def test_same_app_no_fk_dependency(self):
+        """
+        Tests that a migration with a FK between two models of the same app
+        does not have a dependency to itself.
+        """
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_with_publisher, self.publisher])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['testapp']), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 2)
+        # Right actions?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "CreateModel")
+        action = migration.operations[1]
+        self.assertEqual(action.__class__.__name__, "CreateModel")
+        # Right dependencies?
+        self.assertEqual(migration.dependencies, [])
+
     def test_circular_fk_dependency(self):
         """
         Tests that having a circular ForeignKey dependency automatically
@@ -238,6 +264,35 @@ class AutodetectorTests(TestCase):
         self.assertEqual(migration1.dependencies, [("otherapp", "auto_1")])
         self.assertEqual(migration2.dependencies, [])
         self.assertEqual(set(migration3.dependencies), set([("otherapp", "auto_1"), ("testapp", "auto_1")]))
+
+    def test_same_app_circular_fk_dependency(self):
+        """
+        Tests that a migration with a FK between two models of the same app
+        does not have a dependency to itself.
+        """
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_with_publisher, self.publisher_with_author])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['testapp']), 2)
+        # Right number of actions?
+        migration1 = changes['testapp'][0]
+        self.assertEqual(len(migration1.operations), 2)
+        migration2 = changes['testapp'][1]
+        self.assertEqual(len(migration2.operations), 1)
+        # Right actions?
+        action = migration1.operations[0]
+        self.assertEqual(action.__class__.__name__, "CreateModel")
+        action = migration1.operations[1]
+        self.assertEqual(action.__class__.__name__, "CreateModel")
+        action = migration2.operations[0]
+        self.assertEqual(action.__class__.__name__, "AddField")
+        self.assertEqual(action.name, "publisher")
+        # Right dependencies?
+        self.assertEqual(migration1.dependencies, [])
+        self.assertEqual(migration2.dependencies, [("testapp", "auto_1")])
 
     def test_unique_together(self):
         "Tests unique_together detection"

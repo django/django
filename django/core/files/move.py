@@ -12,6 +12,7 @@ try:
     from shutil import copystat
 except ImportError:
     import stat
+
     def copystat(src, dst):
         """Copy all stat info (mode bits, atime and mtime) from src to dst"""
         st = os.stat(src)
@@ -23,9 +24,10 @@ except ImportError:
 
 __all__ = ['file_move_safe']
 
+
 def _samefile(src, dst):
     # Macintosh, Unix.
-    if hasattr(os.path,'samefile'):
+    if hasattr(os.path, 'samefile'):
         try:
             return os.path.samefile(src, dst)
         except OSError:
@@ -35,7 +37,8 @@ def _samefile(src, dst):
     return (os.path.normcase(os.path.abspath(src)) ==
             os.path.normcase(os.path.abspath(dst)))
 
-def file_move_safe(old_file_name, new_file_name, chunk_size = 1024*64, allow_overwrite=False):
+
+def file_move_safe(old_file_name, new_file_name, chunk_size=1024 * 64, allow_overwrite=False):
     """
     Moves a file from one location to another in the safest way possible.
 

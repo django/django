@@ -34,6 +34,8 @@ Decisions on new committers will follow the process explained in
 existing committer privately. Public requests for commit access are potential
 flame-war starters, and will simply be ignored.
 
+.. _handling-pull-requests:
+
 Handling pull requests
 ----------------------
 
@@ -129,10 +131,10 @@ Django's Git repository:
   reasons for example) first discuss the situation with the core team.
 
 * For any medium-to-big changes, where "medium-to-big" is according to
-  your judgment, please bring things up on the `django-developers`_
+  your judgment, please bring things up on the |django-developers|
   mailing list before making the change.
 
-  If you bring something up on `django-developers`_ and nobody responds,
+  If you bring something up on |django-developers| and nobody responds,
   please don't take that to mean your idea is great and should be
   implemented immediately because nobody contested it. Django's lead
   developers don't have a lot of time to read mailing-list discussions
@@ -237,13 +239,13 @@ When a mistaken commit is discovered, please follow these guidelines:
 * If the original author can't be reached (within a reasonable amount
   of time -- a day or so) and the problem is severe -- crashing bug,
   major test failures, etc -- then ask for objections on the
-  `django-developers`_ mailing list then revert if there are none.
+  |django-developers| mailing list then revert if there are none.
 
 * If the problem is small (a feature commit after feature freeze,
   say), wait it out.
 
 * If there's a disagreement between the committer and the
-  reverter-to-be then try to work it out on the `django-developers`_
+  reverter-to-be then try to work it out on the |django-developers|
   mailing list. If an agreement can't be reached then it should
   be put to a vote.
 
@@ -258,5 +260,4 @@ When a mistaken commit is discovered, please follow these guidelines:
   For instance, if you did: ``git push upstream feature_antigravity``,
   just do a reverse push: ``git push upstream :feature_antigravity``.
 
-.. _django-developers: http://groups.google.com/group/django-developers
 .. _ticket tracker: https://code.djangoproject.com/newticket

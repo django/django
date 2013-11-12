@@ -56,7 +56,7 @@ needs to be customized so that SQLite knows to build the R*Tree module::
 __ http://www.sqlite.org/rtree.html
 __ http://www.sqlite.org/download.html
 
-.. _spatialitebuild :
+.. _spatialitebuild:
 
 SpatiaLite library (``libspatialite``) and tools (``spatialite``)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -74,15 +74,17 @@ customization of the ``configure`` command is necessary.  If not, then run the
 ``configure`` script, make, and install for the SpatiaLite library::
 
     $ cd libspatialite-amalgamation-2.3.1
-    $ ./configure # May need to modified, see notes below.
+    $ ./configure # May need to be modified, see notes below.
     $ make
     $ sudo make install
-    $ cd .... _spatialite
+    $ cd ..
+
+.. _spatialite_tools:
 
 Finally, do the same for the SpatiaLite tools::
 
     $ cd spatialite-tools-2.3.1
-    $ ./configure # May need to modified, see notes below.
+    $ ./configure # May need to be modified, see notes below.
     $ make
     $ sudo make install
     $ cd ..

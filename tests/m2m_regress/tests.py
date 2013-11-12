@@ -108,4 +108,3 @@ class M2MRegressionTests(TestCase):
         worksheet.lines = hi
         self.assertEqual(1, worksheet.lines.count())
         self.assertEqual(1, hi.count())
-

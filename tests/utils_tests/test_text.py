@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import warnings
-
 from django.test import SimpleTestCase
 from django.utils import text
+
 
 class TestUtilsText(SimpleTestCase):
 
@@ -76,11 +75,20 @@ class TestUtilsText(SimpleTestCase):
         truncator = text.Truncator('<br/>The <hr />quick brown fox jumped over'
             ' the lazy dog.')
         self.assertEqual('<br/>The <hr />quick brown...',
-            truncator.words(3, '...', html=True ))
+            truncator.words(3, '...', html=True))
         truncator = text.Truncator('<br>The <hr/>quick <em>brown fox</em> '
             'jumped over the lazy dog.')
         self.assertEqual('<br>The <hr/>quick <em>brown...</em>',
-            truncator.words(3, '...', html=True ))
+            truncator.words(3, '...', html=True))
+
+        # Test html entities
+        truncator = text.Truncator('<i>Buenos d&iacute;as!'
+            ' &#x00bf;C&oacute;mo est&aacute;?</i>')
+        self.assertEqual('<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo...</i>',
+            truncator.words(3, '...', html=True))
+        truncator = text.Truncator('<p>I &lt;3 python, what about you?</p>')
+        self.assertEqual('<p>I &lt;3 python...</p>',
+            truncator.words(3, '...', html=True))
 
     def test_wrap(self):
         digits = '1234 67 9'
@@ -106,3 +114,16 @@ class TestUtilsText(SimpleTestCase):
         )
         for value, output in items:
             self.assertEqual(text.slugify(value), output)
+
+    def test_unescape_entities(self):
+        items = [
+            ('', ''),
+            ('foo', 'foo'),
+            ('&amp;', '&'),
+            ('&#x26;', '&'),
+            ('&#38;', '&'),
+            ('foo &amp; bar', 'foo & bar'),
+            ('foo & bar', 'foo & bar'),
+        ]
+        for value, output in items:
+            self.assertEqual(text.unescape_entities(value), output)

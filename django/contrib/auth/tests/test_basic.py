@@ -6,7 +6,7 @@ import locale
 from django.contrib.auth import get_user_model
 from django.contrib.auth.management.commands import createsuperuser
 from django.contrib.auth.models import User, AnonymousUser
-from django.contrib.auth.tests.test_custom_user import CustomUser
+from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
@@ -23,7 +23,6 @@ from django.utils.six import binary_type, PY2, StringIO
 def user_model_swapped(**kwargs):
     if kwargs['setting'] == 'AUTH_USER_MODEL':
         from django.db.models.manager import ensure_default_manager
-        from django.contrib.auth.models import User
         # Reset User manager
         setattr(User, 'objects', User._default_manager)
         ensure_default_manager(User)

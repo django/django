@@ -15,8 +15,8 @@ from .html_parser import HTMLParser, HTMLParseError
 
 
 # Configuration for urlize() function.
-TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)']
-WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;')]
+TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)', '"', '\'']
+WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;'), ('"', '"'), ('\'', '\'')]
 
 # List of possible strings used for bullets in bulleted lists.
 DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
@@ -56,19 +56,22 @@ _js_escapes = {
 # Escape every ASCII character with a value less than 32.
 _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 
+
 def escapejs(value):
     """Hex encodes characters for use in JavaScript strings."""
     return mark_safe(force_text(value).translate(_js_escapes))
 escapejs = allow_lazy(escapejs, six.text_type)
 
+
 def conditional_escape(text):
     """
     Similar to escape(), except that it doesn't operate on pre-escaped strings.
     """
-    if isinstance(text, SafeData):
-        return text
+    if hasattr(text, '__html__'):
+        return text.__html__()
     else:
         return escape(text)
+
 
 def format_html(format_string, *args, **kwargs):
     """
@@ -80,6 +83,7 @@ def format_html(format_string, *args, **kwargs):
     kwargs_safe = dict((k, conditional_escape(v)) for (k, v) in
                         six.iteritems(kwargs))
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
+
 
 def format_html_join(sep, format_string, args_generator):
     """
@@ -97,8 +101,8 @@ def format_html_join(sep, format_string, args_generator):
 
     """
     return mark_safe(conditional_escape(sep).join(
-            format_html(format_string, *tuple(args))
-            for args in args_generator))
+        format_html(format_string, *tuple(args))
+        for args in args_generator))
 
 
 def linebreaks(value, autoescape=False):
@@ -118,14 +122,19 @@ class MLStripper(HTMLParser):
         HTMLParser.__init__(self)
         self.reset()
         self.fed = []
+
     def handle_data(self, d):
         self.fed.append(d)
+
     def handle_entityref(self, name):
         self.fed.append('&%s;' % name)
+
     def handle_charref(self, name):
         self.fed.append('&#%s;' % name)
+
     def get_data(self):
         return ''.join(self.fed)
+
 
 def strip_tags(value):
     """Returns the given HTML with all tags stripped."""
@@ -139,6 +148,7 @@ def strip_tags(value):
         return s.get_data()
 strip_tags = allow_lazy(strip_tags)
 
+
 def remove_tags(html, tags):
     """Returns the given HTML with given tags removed."""
     tags = [re.escape(tag) for tag in tags.split()]
@@ -150,20 +160,24 @@ def remove_tags(html, tags):
     return html
 remove_tags = allow_lazy(remove_tags, six.text_type)
 
+
 def strip_spaces_between_tags(value):
     """Returns the given HTML with spaces between tags removed."""
     return re.sub(r'>\s+<', '><', force_text(value))
 strip_spaces_between_tags = allow_lazy(strip_spaces_between_tags, six.text_type)
+
 
 def strip_entities(value):
     """Returns the given HTML with all entities (&something;) stripped."""
     return re.sub(r'&(?:\w+|#\d+);', '', force_text(value))
 strip_entities = allow_lazy(strip_entities, six.text_type)
 
+
 def fix_ampersands(value):
     """Returns the given HTML with all unencoded ampersands encoded correctly."""
     return unencoded_ampersands_re.sub('&amp;', force_text(value))
 fix_ampersands = allow_lazy(fix_ampersands, six.text_type)
+
 
 def smart_urlquote(url):
     "Quotes a URL if it isn't already quoted."
@@ -171,8 +185,8 @@ def smart_urlquote(url):
     try:
         scheme, netloc, path, query, fragment = urlsplit(url)
         try:
-            netloc = netloc.encode('idna').decode('ascii') # IDN -> ACE
-        except UnicodeError: # invalid domain part
+            netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE
+        except UnicodeError:  # invalid domain part
             pass
         else:
             url = urlunsplit((scheme, netloc, path, query, fragment))
@@ -185,6 +199,7 @@ def smart_urlquote(url):
     url = quote(url, safe=b'!*\'();:@&=+$,/?#[]~')
 
     return force_text(url)
+
 
 def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
@@ -263,6 +278,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     return ''.join(words)
 urlize = allow_lazy(urlize, six.text_type)
 
+
 def clean_html(text):
     """
     Clean the given HTML.  Specifically, do the following:
@@ -285,6 +301,7 @@ def clean_html(text):
     # Trim stupid HTML such as <br clear="all">.
     text = html_gunk_re.sub('', text)
     # Convert hard-coded bullets into HTML unordered lists.
+
     def replace_p_tags(match):
         s = match.group().replace('</p>', '</li>')
         for d in DOTS:
@@ -296,6 +313,7 @@ def clean_html(text):
     text = trailing_empty_content_re.sub('', text)
     return text
 clean_html = allow_lazy(clean_html, six.text_type)
+
 
 def avoid_wrapping(value):
     """

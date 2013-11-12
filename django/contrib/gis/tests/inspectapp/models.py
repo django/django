@@ -1,5 +1,6 @@
 from django.contrib.gis.db import models
 
+
 class AllOGRFields(models.Model):
     f_decimal = models.FloatField()
     f_float = models.FloatField()
@@ -9,5 +10,6 @@ class AllOGRFields(models.Model):
     f_datetime = models.DateTimeField()
     f_time = models.TimeField()
     geom = models.PolygonField()
+    point = models.PointField()
 
     objects = models.GeoManager()

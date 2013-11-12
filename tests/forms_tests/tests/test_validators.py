@@ -9,15 +9,15 @@ from django.core.exceptions import ValidationError
 
 class UserForm(forms.Form):
     full_name = forms.CharField(
-        max_length = 50,
-        validators = [
+        max_length=50,
+        validators=[
             validators.validate_integer,
             validators.validate_email,
         ]
     )
     string = forms.CharField(
-        max_length = 50,
-        validators = [
+        max_length=50,
+        validators=[
             validators.RegexValidator(
                 regex='^[a-zA-Z]*$',
                 message="Letters only.",

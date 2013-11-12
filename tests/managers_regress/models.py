@@ -3,7 +3,9 @@ Various edge-cases for model managers.
 """
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
+from django.utils.encoding import python_2_unicode_compatible, force_text
 
 
 class OnlyFred(models.Manager):
@@ -119,3 +121,26 @@ class Child6(Child4):
 # Will not inherit default manager from parent.
 class Child7(Parent):
     pass
+
+
+# RelatedManagers
+@python_2_unicode_compatible
+class RelatedModel(models.Model):
+    test_gfk = generic.GenericRelation('RelationModel', content_type_field='gfk_ctype', object_id_field='gfk_id')
+
+    def __str__(self):
+        return force_text(self.pk)
+
+
+@python_2_unicode_compatible
+class RelationModel(models.Model):
+    fk = models.ForeignKey(RelatedModel, related_name='test_fk')
+
+    m2m = models.ManyToManyField(RelatedModel, related_name='test_m2m')
+
+    gfk_ctype = models.ForeignKey(ContentType)
+    gfk_id = models.IntegerField()
+    gfk = generic.GenericForeignKey(ct_field='gfk_ctype', fk_field='gfk_id')
+
+    def __str__(self):
+        return force_text(self.pk)

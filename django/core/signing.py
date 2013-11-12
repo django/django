@@ -187,7 +187,7 @@ class TimestampSigner(Signer):
         Retrieve original value and check it wasn't signed more
         than max_age seconds ago.
         """
-        result =  super(TimestampSigner, self).unsign(value)
+        result = super(TimestampSigner, self).unsign(value)
         value, timestamp = result.rsplit(self.sep, 1)
         timestamp = baseconv.base62.decode(timestamp)
         if max_age is not None:

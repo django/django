@@ -147,7 +147,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         }
 
         cursor = self.connection.cursor()
-        time.sleep(1) # To avoid "database is being accessed by other users" errors.
+        time.sleep(1)  # To avoid "database is being accessed by other users" errors.
         if self._test_user_create():
             if verbosity >= 1:
                 print('Destroying test user...')
@@ -181,6 +181,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                IDENTIFIED BY %(password)s
                DEFAULT TABLESPACE %(tblspace)s
                TEMPORARY TABLESPACE %(tblspace_temp)s
+               QUOTA UNLIMITED ON %(tblspace)s
             """,
             """GRANT CONNECT, RESOURCE TO %(user)s""",
         ]

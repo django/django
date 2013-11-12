@@ -11,6 +11,7 @@ from django.http import (HttpResponse, HttpResponseServerError,
     HttpResponseNotFound, HttpRequest, build_request_repr)
 from django.template import Template, Context, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
+from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
 from django.utils.encoding import force_bytes, smart_text
 from django.utils.module_loading import import_by_path
@@ -20,13 +21,15 @@ HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|PROFANITIES_LIST|SIGNATU
 
 CLEANSED_SUBSTITUTE = '********************'
 
+
 def linebreak_iter(template_source):
     yield 0
     p = template_source.find('\n')
     while p >= 0:
-        yield p+1
-        p = template_source.find('\n', p+1)
+        yield p + 1
+        p = template_source.find('\n', p + 1)
     yield len(template_source) + 1
+
 
 def cleanse_setting(key, value):
     """Cleanse an individual setting key/value of sensitive content.
@@ -39,13 +42,18 @@ def cleanse_setting(key, value):
             cleansed = CLEANSED_SUBSTITUTE
         else:
             if isinstance(value, dict):
-                cleansed = dict((k, cleanse_setting(k, v)) for k,v in value.items())
+                cleansed = dict((k, cleanse_setting(k, v)) for k, v in value.items())
             else:
                 cleansed = value
     except TypeError:
         # If the key isn't regex-able, just return as-is.
         cleansed = value
+
+    if callable(cleansed):
+        cleansed.do_not_call_in_templates = True
+
     return cleansed
+
 
 def get_safe_settings():
     "Returns a dictionary of the settings module, with sensitive settings blurred out."
@@ -54,6 +62,7 @@ def get_safe_settings():
         if k.isupper():
             settings_dict[k] = cleanse_setting(k, getattr(settings, k))
     return settings_dict
+
 
 def technical_500_response(request, exc_type, exc_value, tb):
     """
@@ -71,6 +80,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
 # Cache for the default exception reporter filter instance.
 default_exception_reporter_filter = None
 
+
 def get_exception_reporter_filter(request):
     global default_exception_reporter_filter
     if default_exception_reporter_filter is None:
@@ -81,6 +91,7 @@ def get_exception_reporter_filter(request):
         return getattr(request, 'exception_reporter_filter', default_exception_reporter_filter)
     else:
         return default_exception_reporter_filter
+
 
 class ExceptionReporterFilter(object):
     """
@@ -103,6 +114,7 @@ class ExceptionReporterFilter(object):
     def get_traceback_frame_variables(self, request, tb_frame):
         return list(six.iteritems(tb_frame.f_locals))
 
+
 class SafeExceptionReporterFilter(ExceptionReporterFilter):
     """
     Use annotations made by the sensitive_post_parameters and
@@ -117,6 +129,20 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
         deactivate the filter on a per request basis.
         """
         return settings.DEBUG is False
+
+    def get_cleansed_multivaluedict(self, request, multivaluedict):
+        """
+        Replaces the keys in a MultiValueDict marked as sensitive with stars.
+        This mitigates leaking sensitive POST parameters if something like
+        request.POST['nonexistent_key'] throws an exception (#21098).
+        """
+        sensitive_post_parameters = getattr(request, 'sensitive_post_parameters', [])
+        if self.is_active(request) and sensitive_post_parameters:
+            multivaluedict = multivaluedict.copy()
+            for param in sensitive_post_parameters:
+                if param in multivaluedict:
+                    multivaluedict[param] = CLEANSED_SUBSTITUTE
+        return multivaluedict
 
     def get_post_parameters(self, request):
         """
@@ -142,6 +168,15 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                     return cleansed
             else:
                 return request.POST
+
+    def cleanse_special_types(self, request, value):
+        if isinstance(value, HttpRequest):
+            # Cleanse the request's POST parameters.
+            value = self.get_request_repr(value)
+        elif isinstance(value, MultiValueDict):
+            # Cleanse MultiValueDicts (request.POST is the one we usually care about)
+            value = self.get_cleansed_multivaluedict(request, value)
+        return value
 
     def get_traceback_frame_variables(self, request, tb_frame):
         """
@@ -173,17 +208,14 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                 for name, value in tb_frame.f_locals.items():
                     if name in sensitive_variables:
                         value = CLEANSED_SUBSTITUTE
-                    elif isinstance(value, HttpRequest):
-                        # Cleanse the request's POST parameters.
-                        value = self.get_request_repr(value)
+                    else:
+                        value = self.cleanse_special_types(request, value)
                     cleansed[name] = value
         else:
-            # Potentially cleanse only the request if it's one of the frame variables.
+            # Potentially cleanse the request and any MultiValueDicts if they
+            # are one of the frame variables.
             for name, value in tb_frame.f_locals.items():
-                if isinstance(value, HttpRequest):
-                    # Cleanse the request's POST parameters.
-                    value = self.get_request_repr(value)
-                cleansed[name] = value
+                cleansed[name] = self.cleanse_special_types(request, value)
 
         if (tb_frame.f_code.co_name == 'sensitive_variables_wrapper'
             and 'sensitive_variables_wrapper' in tb_frame.f_locals):
@@ -195,6 +227,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
             cleansed['func_kwargs'] = CLEANSED_SUBSTITUTE
 
         return cleansed.items()
+
 
 class ExceptionReporter(object):
     """
@@ -269,7 +302,7 @@ class ExceptionReporter(object):
             end = getattr(self.exc_value, 'end', None)
             if start is not None and end is not None:
                 unicode_str = self.exc_value.args[1]
-                unicode_hint = smart_text(unicode_str[max(start-5, 0):min(end+5, len(unicode_str))], 'ascii', errors='replace')
+                unicode_hint = smart_text(unicode_str[max(start - 5, 0):min(end + 5, len(unicode_str))], 'ascii', errors='replace')
         from django import get_version
         c = {
             'is_email': self.is_email,
@@ -282,7 +315,7 @@ class ExceptionReporter(object):
             'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
             'server_time': datetime.datetime.now(),
             'django_version_info': get_version(),
-            'sys_path' : sys.path,
+            'sys_path': sys.path,
             'template_info': self.template_info,
             'template_does_not_exist': self.template_does_not_exist,
             'loader_debug_info': self.loader_debug_info,
@@ -322,7 +355,7 @@ class ExceptionReporter(object):
                 before = escape(template_source[upto:start])
                 during = escape(template_source[start:end])
                 after = escape(template_source[end:next])
-            source_lines.append( (num, escape(template_source[upto:next])) )
+            source_lines.append((num, escape(template_source[upto:next])))
             upto = next
         total = len(source_lines)
 
@@ -386,7 +419,7 @@ class ExceptionReporter(object):
 
         pre_context = source[lower_bound:lineno]
         context_line = source[lineno]
-        post_context = source[lineno+1:upper_bound]
+        post_context = source[lineno + 1:upper_bound]
 
         return lower_bound, pre_context, context_line, post_context
 
@@ -429,7 +462,7 @@ class ExceptionReporter(object):
         """
         import traceback
         frames = self.get_traceback_frames()
-        tb = [ (f['filename'], f['lineno'], f['function'], f['context_line']) for f in frames ]
+        tb = [(f['filename'], f['lineno'], f['function'], f['context_line']) for f in frames]
         list = ['Traceback (most recent call last):\n']
         list += traceback.format_list(tb)
         list += traceback.format_exception_only(self.exc_type, self.exc_value)
@@ -458,13 +491,14 @@ def technical_404_response(request, exception):
     c = Context({
         'urlconf': urlconf,
         'root_urlconf': settings.ROOT_URLCONF,
-        'request_path': request.path_info[1:], # Trim leading slash
+        'request_path': request.path_info[1:],  # Trim leading slash
         'urlpatterns': tried,
         'reason': force_bytes(exception, errors='replace'),
         'request': request,
         'settings': get_safe_settings(),
     })
     return HttpResponseNotFound(t.render(c), content_type='text/html')
+
 
 def default_urlconf(request):
     "Create an empty URLconf 404 error response."
@@ -571,7 +605,7 @@ TECHNICAL_500_TEMPLATE = """
       for (var i = 0; i < arguments.length; i++) {
         var e = document.getElementById(arguments[i]);
         if (e) {
-          e.style.display = e.style.display == 'none' ? 'block' : 'none';
+          e.style.display = e.style.display == 'none' ? 'block': 'none';
         }
       }
       return false;
@@ -587,7 +621,7 @@ TECHNICAL_500_TEMPLATE = """
     function switchPastebinFriendly(link) {
       s1 = "Switch to copy-and-paste view";
       s2 = "Switch back to interactive view";
-      link.innerHTML = link.innerHTML == s1 ? s2 : s1;
+      link.innerHTML = link.innerHTML == s1 ? s2: s1;
       toggle('browserTraceback', 'pastebinTraceback');
       return false;
     }

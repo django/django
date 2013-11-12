@@ -293,8 +293,9 @@ var DateTimeShortcuts = {
             var date_parts = inp.value.split('-');
             var year = date_parts[0];
             var month = parseFloat(date_parts[1]);
+            var selected = new Date(inp.value);
             if (year.match(/\d\d\d\d/) && month >= 1 && month <= 12) {
-                DateTimeShortcuts.calendars[num].drawDate(month, year);
+                DateTimeShortcuts.calendars[num].drawDate(month, year, selected);
             }
         }
 

@@ -3,7 +3,7 @@
 import datetime
 import unittest
 
-from django.db.backends import util as typecasts
+from django.db.backends import utils as typecasts
 from django.utils import six
 
 
@@ -47,6 +47,7 @@ TEST_CASES = {
         ('2010-10-12 15:29:22.0632029', datetime.datetime(2010, 10, 12, 15, 29, 22, 63202)),
     ),
 }
+
 
 class DBTypeCasts(unittest.TestCase):
     def test_typeCasts(self):

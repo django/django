@@ -28,7 +28,8 @@ def login(request, template_name='registration/login.html',
     """
     Displays the login form and handles the login action.
     """
-    redirect_to = request.REQUEST.get(redirect_field_name, '')
+    redirect_to = request.POST.get(redirect_field_name,
+                                   request.GET.get(redirect_field_name, ''))
 
     if request.method == "POST":
         form = authentication_form(request, data=request.POST)
@@ -71,8 +72,10 @@ def logout(request, next_page=None,
     if next_page is not None:
         next_page = resolve_url(next_page)
 
-    if redirect_field_name in request.REQUEST:
-        next_page = request.REQUEST[redirect_field_name]
+    if (redirect_field_name in request.POST or
+            redirect_field_name in request.GET):
+        next_page = request.POST.get(redirect_field_name,
+                                     request.GET.get(redirect_field_name))
         # Security check -- don't allow redirection to a different host.
         if not is_safe_url(url=next_page, host=request.get_host()):
             next_page = request.path
@@ -216,7 +219,7 @@ def password_reset_confirm(request, uidb64=None, token=None,
                 form.save()
                 return HttpResponseRedirect(post_reset_redirect)
         else:
-            form = set_password_form(None)
+            form = set_password_form(user)
     else:
         validlink = False
         form = None
@@ -230,6 +233,7 @@ def password_reset_confirm(request, uidb64=None, token=None,
         context.update(extra_context)
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
+
 
 def password_reset_complete(request,
                             template_name='registration/password_reset_complete.html',

@@ -126,10 +126,10 @@ class BaseArchive(object):
         return True
 
     def extract(self):
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseArchive must provide an extract() method')
 
     def list(self):
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseArchive must provide a list() method')
 
 
 class TarArchive(BaseArchive):

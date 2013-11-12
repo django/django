@@ -12,13 +12,13 @@ YEAR_MONTH_FORMAT = 'Y年n月'
 MONTH_DAY_FORMAT = 'n月j日'
 SHORT_DATE_FORMAT = 'Y/m/d'
 SHORT_DATETIME_FORMAT = 'Y/m/d G:i:s'
-# FIRST_DAY_OF_WEEK = 
+# FIRST_DAY_OF_WEEK =
 
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
 # see http://docs.python.org/library/datetime.html#strftime-strptime-behavior
-# DATE_INPUT_FORMATS = 
-# TIME_INPUT_FORMATS = 
-# DATETIME_INPUT_FORMATS = 
+# DATE_INPUT_FORMATS =
+# TIME_INPUT_FORMATS =
+# DATETIME_INPUT_FORMATS =
 DECIMAL_SEPARATOR = '.'
 THOUSAND_SEPARATOR = ','
-# NUMBER_GROUPING = 
+# NUMBER_GROUPING =

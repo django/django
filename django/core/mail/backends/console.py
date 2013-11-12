@@ -6,6 +6,7 @@ import threading
 
 from django.core.mail.backends.base import BaseEmailBackend
 
+
 class EmailBackend(BaseEmailBackend):
     def __init__(self, *args, **kwargs):
         self.stream = kwargs.pop('stream', sys.stdout)
@@ -28,7 +29,7 @@ class EmailBackend(BaseEmailBackend):
                     msg_count += 1
                 if stream_created:
                     self.close()
-            except:
+            except Exception:
                 if not self.fail_silently:
                     raise
         return msg_count

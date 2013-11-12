@@ -26,6 +26,7 @@ REASON_BAD_TOKEN = "CSRF token missing or incorrect."
 
 CSRF_KEY_LENGTH = 32
 
+
 def _get_failure_view():
     """
     Returns the view to be used for CSRF rejections
@@ -56,7 +57,10 @@ def rotate_token(request):
     Changes the CSRF token in use for a request - should be done on login
     for security purposes.
     """
-    request.META["CSRF_COOKIE"] = _get_new_csrf_key()
+    request.META.update({
+        "CSRF_COOKIE_USED": True,
+        "CSRF_COOKIE": _get_new_csrf_key(),
+    })
 
 
 def _sanitize_token(token):
@@ -89,8 +93,7 @@ class CsrfViewMiddleware(object):
         return None
 
     def _reject(self, request, reason):
-        logger.warning('Forbidden (%s): %s',
-                       reason, request.path,
+        logger.warning('Forbidden (%s): %s', reason, request.path,
             extra={
                 'status_code': 403,
                 'request': request,
@@ -181,7 +184,7 @@ class CsrfViewMiddleware(object):
             return response
 
         # If CSRF_COOKIE is unset, then CsrfViewMiddleware.process_view was
-        # never called, probaby because a request middleware returned a response
+        # never called, probably because a request middleware returned a response
         # (for example, contrib.auth redirecting to a login page).
         if request.META.get("CSRF_COOKIE") is None:
             return response
@@ -193,7 +196,7 @@ class CsrfViewMiddleware(object):
         # the expiry timer.
         response.set_cookie(settings.CSRF_COOKIE_NAME,
                             request.META["CSRF_COOKIE"],
-                            max_age = 60 * 60 * 24 * 7 * 52,
+                            max_age=60 * 60 * 24 * 7 * 52,
                             domain=settings.CSRF_COOKIE_DOMAIN,
                             path=settings.CSRF_COOKIE_PATH,
                             secure=settings.CSRF_COOKIE_SECURE,

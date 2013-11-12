@@ -17,6 +17,7 @@ from django.utils._os import safe_join, abspathu
 
 __all__ = ('Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage')
 
+
 class Storage(object):
     """
     A base storage class, providing some default behaviors that all other
@@ -92,62 +93,63 @@ class Storage(object):
         """
         Deletes the specified file from the storage system.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a delete() method')
 
     def exists(self, name):
         """
         Returns True if a file referened by the given name already exists in the
         storage system, or False if the name is available for a new file.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a exists() method')
 
     def listdir(self, path):
         """
         Lists the contents of the specified path, returning a 2-tuple of lists;
         the first item being directories, the second item being files.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a listdir() method')
 
     def size(self, name):
         """
         Returns the total size, in bytes, of the file specified by name.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a size() method')
 
     def url(self, name):
         """
         Returns an absolute URL where the file's contents can be accessed
         directly by a Web browser.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a url() method')
 
     def accessed_time(self, name):
         """
         Returns the last accessed time (as datetime object) of the file
         specified by name.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide an accessed_time() method')
 
     def created_time(self, name):
         """
         Returns the creation time (as datetime object) of the file
         specified by name.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a created_time() method')
 
     def modified_time(self, name):
         """
         Returns the last modified time (as datetime object) of the file
         specified by name.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a modified_time() method')
+
 
 class FileSystemStorage(Storage):
     """
     Standard filesystem storage
     """
 
-    def __init__(self, location=None, base_url=None):
+    def __init__(self, location=None, base_url=None, file_permissions_mode=None):
         if location is None:
             location = settings.MEDIA_ROOT
         self.base_location = location
@@ -155,6 +157,10 @@ class FileSystemStorage(Storage):
         if base_url is None:
             base_url = settings.MEDIA_URL
         self.base_url = base_url
+        self.file_permissions_mode = (
+            file_permissions_mode if file_permissions_mode is not None
+            else settings.FILE_UPLOAD_PERMISSIONS
+        )
 
     def _open(self, name, mode='rb'):
         return File(open(self.path(name), mode))
@@ -215,6 +221,7 @@ class FileSystemStorage(Storage):
                                 _file = os.fdopen(fd, mode)
                             _file.write(chunk)
                     finally:
+                        content.close()
                         locks.unlock(fd)
                         if _file is not None:
                             _file.close()
@@ -231,8 +238,8 @@ class FileSystemStorage(Storage):
                 # OK, the file save worked. Break out of the loop.
                 break
 
-        if settings.FILE_UPLOAD_PERMISSIONS is not None:
-            os.chmod(full_path, settings.FILE_UPLOAD_PERMISSIONS)
+        if self.file_permissions_mode is not None:
+            os.chmod(full_path, self.file_permissions_mode)
 
         return name
 
@@ -287,8 +294,10 @@ class FileSystemStorage(Storage):
     def modified_time(self, name):
         return datetime.fromtimestamp(os.path.getmtime(self.path(name)))
 
+
 def get_storage_class(import_path=None):
     return import_by_path(import_path or settings.DEFAULT_FILE_STORAGE)
+
 
 class DefaultStorage(LazyObject):
     def _setup(self):

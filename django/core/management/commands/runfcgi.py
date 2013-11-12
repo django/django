@@ -2,6 +2,7 @@ import warnings
 
 from django.core.management.base import BaseCommand
 
+
 class Command(BaseCommand):
     help = "Runs this project as a FastCGI application. Requires flup."
     args = '[various KEY=val options, use `runfcgi help` for help]'

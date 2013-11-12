@@ -1,4 +1,4 @@
-#encoding=utf-8
+# encoding=utf-8
 """
 26. Invalid models
 
@@ -19,7 +19,6 @@ class FieldErrors(models.Model):
     decimalfield3 = models.DecimalField(max_digits="bad", decimal_places="bad")
     decimalfield4 = models.DecimalField(max_digits=9, decimal_places=10)
     decimalfield5 = models.DecimalField(max_digits=10, decimal_places=10)
-    filefield = models.FileField()
     choices = models.CharField(max_length=10, choices='bad')
     choices2 = models.CharField(max_length=10, choices=[(1, 2, 3), (1, 2, 3)])
     index = models.CharField(max_length=10, db_index='bad')
@@ -364,6 +363,56 @@ class BadIndexTogether1(models.Model):
         ]
 
 
+class DuplicateColumnNameModel1(models.Model):
+    """
+    A field (bar) attempts to use a column name which is already auto-assigned
+    earlier in the class. This should raise a validation error.
+    """
+    foo = models.IntegerField()
+    bar = models.IntegerField(db_column='foo')
+
+    class Meta:
+        db_table = 'foobar'
+
+
+class DuplicateColumnNameModel2(models.Model):
+    """
+    A field (foo) attempts to use a column name which is already auto-assigned
+    later in the class. This should raise a validation error.
+    """
+    foo = models.IntegerField(db_column='bar')
+    bar = models.IntegerField()
+
+    class Meta:
+        db_table = 'foobar'
+
+
+class DuplicateColumnNameModel3(models.Model):
+    """Two fields attempt to use each others' names.
+
+    This is not a desirable scenario but valid nonetheless.
+
+    It should not raise a validation error.
+    """
+    foo = models.IntegerField(db_column='bar')
+    bar = models.IntegerField(db_column='foo')
+
+    class Meta:
+        db_table = 'foobar3'
+
+
+class DuplicateColumnNameModel4(models.Model):
+    """Two fields attempt to use the same db_column value.
+
+    This should raise a validation error.
+    """
+    foo = models.IntegerField(db_column='baz')
+    bar = models.IntegerField(db_column='baz')
+
+    class Meta:
+        db_table = 'foobar'
+
+
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute that is a positive integer.
 invalid_models.fielderrors: "charfield2": CharFields require a "max_length" attribute that is a positive integer.
 invalid_models.fielderrors: "charfield3": CharFields require a "max_length" attribute that is a positive integer.
@@ -374,7 +423,6 @@ invalid_models.fielderrors: "decimalfield2": DecimalFields require a "max_digits
 invalid_models.fielderrors: "decimalfield3": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
 invalid_models.fielderrors: "decimalfield3": DecimalFields require a "max_digits" attribute that is a positive integer.
 invalid_models.fielderrors: "decimalfield4": DecimalFields require a "max_digits" attribute value that is greater than or equal to the value of the "decimal_places" attribute.
-invalid_models.fielderrors: "filefield": FileFields require an "upload_to" attribute.
 invalid_models.fielderrors: "choices": "choices" should be iterable (e.g., a tuple or list).
 invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-item iterables (e.g. list of 2 item tuples).
 invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-item iterables (e.g. list of 2 item tuples).
@@ -477,6 +525,9 @@ invalid_models.hardreferencemodel: 'm2m_4' defines a relation with the model 'in
 invalid_models.badswappablevalue: TEST_SWAPPED_MODEL_BAD_VALUE is not of the form 'app_label.app_name'.
 invalid_models.badswappablemodel: Model has been swapped out for 'not_an_app.Target' which has not been installed or is abstract.
 invalid_models.badindextogether1: "index_together" refers to field_that_does_not_exist, a field that doesn't exist.
+invalid_models.duplicatecolumnnamemodel1: Field 'bar' has column name 'foo' that is already used.
+invalid_models.duplicatecolumnnamemodel2: Field 'bar' has column name 'bar' that is already used.
+invalid_models.duplicatecolumnnamemodel4: Field 'bar' has column name 'baz' that is already used.
 """
 
 if not connection.features.interprets_empty_strings_as_nulls:

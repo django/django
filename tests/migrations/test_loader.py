@@ -82,21 +82,34 @@ class LoaderTests(TestCase):
             migration_loader.get_migration_by_prefix("migrations", "blarg")
 
     def test_load_import_error(self):
-        migration_loader = MigrationLoader(connection)
-
         with override_settings(MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.import_error"}):
             with self.assertRaises(ImportError):
-                migration_loader.load_disk()
+                MigrationLoader(connection)
 
     def test_load_module_file(self):
-        migration_loader = MigrationLoader(connection)
-
         with override_settings(MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.file"}):
-            migration_loader.load_disk()
+            MigrationLoader(connection)
 
     @skipIf(six.PY2, "PY2 doesn't load empty dirs.")
     def test_load_empty_dir(self):
-        migration_loader = MigrationLoader(connection)
-
         with override_settings(MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.namespace"}):
-            migration_loader.load_disk()
+            MigrationLoader(connection)
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
+    def test_loading_squashed(self):
+        "Tests loading a squashed migration"
+        migration_loader = MigrationLoader(connection)
+        recorder = MigrationRecorder(connection)
+        # Loading with nothing applied should just give us the one node
+        self.assertEqual(
+            len(migration_loader.graph.nodes),
+            1,
+        )
+        # However, fake-apply one migration and it should now use the old two
+        recorder.record_applied("migrations", "0001_initial")
+        migration_loader.build_graph()
+        self.assertEqual(
+            len(migration_loader.graph.nodes),
+            2,
+        )
+        recorder.flush()

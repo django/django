@@ -292,7 +292,8 @@ class EmailMessage(object):
         into the resulting message attachments.
         """
         if isinstance(filename, MIMEBase):
-            assert content == mimetype == None
+            assert content is None
+            assert mimetype is None
             self.attachments.append(filename)
         else:
             assert content is not None

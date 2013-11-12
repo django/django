@@ -9,12 +9,13 @@ import datetime
 import os
 import re
 import sys
+import warnings
 from decimal import Decimal, DecimalException
 from io import BytesIO
 
 from django.core import validators
 from django.core.exceptions import ValidationError
-from django.forms.util import ErrorList, from_current_timezone, to_current_timezone
+from django.forms.utils import ErrorList, from_current_timezone, to_current_timezone
 from django.forms.widgets import (
     TextInput, NumberInput, EmailInput, URLInput, HiddenInput,
     MultipleHiddenInput, ClearableFileInput, CheckboxInput, Select,
@@ -29,7 +30,7 @@ from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
 # Provide this import for backwards compatibility.
-from django.core.validators import EMPTY_VALUES
+from django.core.validators import EMPTY_VALUES  # NOQA
 
 
 __all__ = (
@@ -44,9 +45,9 @@ __all__ = (
 
 
 class Field(object):
-    widget = TextInput # Default widget to use when rendering this type of Field.
-    hidden_widget = HiddenInput # Default widget to use when rendering this as "hidden".
-    default_validators = [] # Default set of validators
+    widget = TextInput  # Default widget to use when rendering this type of Field.
+    hidden_widget = HiddenInput  # Default widget to use when rendering this as "hidden".
+    default_validators = []  # Default set of validators
     # Add an 'invalid' entry to default_error_message if you want a specific
     # field error message not raised by the field validators.
     default_error_messages = {
@@ -115,8 +116,6 @@ class Field(object):
         super(Field, self).__init__()
 
     def prepare_value(self, value):
-        if self.widget.is_localized:
-            value = formats.localize_input(value)
         return value
 
     def to_python(self, value):
@@ -468,7 +467,6 @@ class DateTimeField(BaseTemporalField):
     }
 
     def prepare_value(self, value):
-        value = super(DateTimeField, self).prepare_value(value)
         if isinstance(value, datetime.datetime):
             value = to_current_timezone(value)
         return value
@@ -569,7 +567,7 @@ class FileField(Field):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
 
         if self.max_length is not None and len(file_name) > self.max_length:
-            params =  {'max': self.max_length, 'length': len(file_name)}
+            params = {'max': self.max_length, 'length': len(file_name)}
             raise ValidationError(self.error_messages['max_length'], code='max_length', params=params)
         if not file_name:
             raise ValidationError(self.error_messages['invalid'], code='invalid')
@@ -977,6 +975,11 @@ class MultiValueField(Field):
                 f.required = False
         self.fields = fields
 
+    def __deepcopy__(self, memo):
+        result = super(MultiValueField, self).__deepcopy__(memo)
+        result.fields = tuple([x.__deepcopy__(memo) for x in self.fields])
+        return result
+
     def validate(self, value):
         pass
 
@@ -1141,6 +1144,11 @@ class SplitDateTimeField(MultiValueField):
 
 class IPAddressField(CharField):
     default_validators = [validators.validate_ipv4_address]
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn("IPAddressField has been deprecated. Use GenericIPAddressField instead.",
+                      PendingDeprecationWarning)
+        super(IPAddressField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
         if value in self.empty_values:

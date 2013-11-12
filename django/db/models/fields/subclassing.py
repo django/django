@@ -30,7 +30,7 @@ class Creator(object):
 
     def __get__(self, obj, type=None):
         if obj is None:
-            raise AttributeError('Can only be accessed via an instance.')
+            return self
         return obj.__dict__[self.field.name]
 
     def __set__(self, obj, value):

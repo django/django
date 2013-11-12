@@ -16,7 +16,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         700: 'FloatField',
         701: 'FloatField',
         869: 'GenericIPAddressField',
-        1042: 'CharField', # blank-padded
+        1042: 'CharField',  # blank-padded
         1043: 'CharField',
         1082: 'DateField',
         1083: 'TimeField',
@@ -137,6 +137,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE
                 kc.table_schema = %s AND
                 kc.table_name = %s
+            ORDER BY kc.ordinal_position ASC
         """, ["public", table_name])
         for constraint, column, kind, used_cols in cursor.fetchall():
             # If we're the first column, make the record

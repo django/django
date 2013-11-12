@@ -59,7 +59,7 @@ class GeoSitemapTest(TestCase):
             self.assertEqual(urlset.getAttribute('xmlns:geo'), 'http://www.google.com/geo/schemas/sitemap/1.0')
 
             urls = urlset.getElementsByTagName('url')
-            self.assertEqual(2, len(urls)) # Should only be 2 sitemaps.
+            self.assertEqual(2, len(urls))  # Should only be 2 sitemaps.
             for url in urls:
                 self.assertChildNodes(url, ['loc', 'geo:geo'])
                 # Making sure the 'geo:format' element was properly set.

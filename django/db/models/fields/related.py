@@ -1,7 +1,7 @@
 from operator import attrgetter
 
-from django.db import connection, connections, router
-from django.db.backends import util
+from django.db import connection, connections, router, transaction
+from django.db.backends import utils
 from django.db.models import signals
 from django.db.models.fields import (AutoField, Field, IntegerField,
     PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist)
@@ -159,11 +159,13 @@ class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescri
     def is_cached(self, instance):
         return hasattr(instance, self.cache_name)
 
-    def get_queryset(self, **db_hints):
-        db = router.db_for_read(self.related.model, **db_hints)
-        return self.related.model._base_manager.using(db)
+    def get_queryset(self, **hints):
+        return self.related.model._base_manager.db_manager(hints=hints)
 
-    def get_prefetch_queryset(self, instances):
+    def get_prefetch_queryset(self, instances, queryset=None):
+        if queryset is not None:
+            raise ValueError("Custom queryset can't be used for this lookup.")
+
         rel_obj_attr = attrgetter(self.related.field.attname)
         instance_attr = lambda obj: obj._get_pk_val()
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
@@ -256,17 +258,19 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
     def is_cached(self, instance):
         return hasattr(instance, self.cache_name)
 
-    def get_queryset(self, **db_hints):
-        db = router.db_for_read(self.field.rel.to, **db_hints)
-        rel_mgr = self.field.rel.to._default_manager
+    def get_queryset(self, **hints):
+        rel_mgr = self.field.rel.to._default_manager.db_manager(hints=hints)
         # If the related manager indicates that it should be used for
         # related fields, respect that.
         if getattr(rel_mgr, 'use_for_related_fields', False):
-            return rel_mgr.using(db)
+            return rel_mgr
         else:
-            return QuerySet(self.field.rel.to).using(db)
+            return QuerySet(self.field.rel.to, hints=hints)
 
-    def get_prefetch_queryset(self, instances):
+    def get_prefetch_queryset(self, instances, queryset=None):
+        if queryset is not None:
+            raise ValueError("Custom queryset can't be used for this lookup.")
+
         rel_obj_attr = self.field.get_foreign_related_value
         instance_attr = self.field.get_local_related_value
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
@@ -365,6 +369,108 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
             setattr(value, self.field.related.get_cache_name(), instance)
 
 
+def create_foreign_related_manager(superclass, rel_field, rel_model):
+    class RelatedManager(superclass):
+        def __init__(self, instance):
+            super(RelatedManager, self).__init__()
+            self.instance = instance
+            self.core_filters = {'%s__exact' % rel_field.name: instance}
+            self.model = rel_model
+
+        def __call__(self, **kwargs):
+            # We use **kwargs rather than a kwarg argument to enforce the
+            # `manager='manager_name'` syntax.
+            manager = getattr(self.model, kwargs.pop('manager'))
+            manager_class = create_foreign_related_manager(manager.__class__, rel_field, rel_model)
+            return manager_class(self.instance)
+        do_not_call_in_templates = True
+
+        def get_queryset(self):
+            try:
+                return self.instance._prefetched_objects_cache[rel_field.related_query_name()]
+            except (AttributeError, KeyError):
+                db = self._db or router.db_for_read(self.model, instance=self.instance)
+                empty_strings_as_null = connections[db].features.interprets_empty_strings_as_nulls
+                qs = super(RelatedManager, self).get_queryset()
+                qs._add_hints(instance=self.instance)
+                if self._db:
+                    qs = qs.using(self._db)
+                qs = qs.filter(**self.core_filters)
+                for field in rel_field.foreign_related_fields:
+                    val = getattr(self.instance, field.attname)
+                    if val is None or (val == '' and empty_strings_as_null):
+                        return qs.none()
+                qs._known_related_objects = {rel_field: {self.instance.pk: self.instance}}
+                return qs
+
+        def get_prefetch_queryset(self, instances, queryset=None):
+            if queryset is None:
+                queryset = super(RelatedManager, self).get_queryset()
+
+            queryset._add_hints(instance=instances[0])
+            queryset = queryset.using(queryset._db or self._db)
+
+            rel_obj_attr = rel_field.get_local_related_value
+            instance_attr = rel_field.get_foreign_related_value
+            instances_dict = dict((instance_attr(inst), inst) for inst in instances)
+            query = {'%s__in' % rel_field.name: instances}
+            queryset = queryset.filter(**query)
+
+            # Since we just bypassed this class' get_queryset(), we must manage
+            # the reverse relation manually.
+            for rel_obj in queryset:
+                instance = instances_dict[rel_obj_attr(rel_obj)]
+                setattr(rel_obj, rel_field.name, instance)
+            cache_name = rel_field.related_query_name()
+            return queryset, rel_obj_attr, instance_attr, False, cache_name
+
+        def add(self, *objs):
+            objs = list(objs)
+            db = router.db_for_write(self.model, instance=self.instance)
+            with transaction.commit_on_success_unless_managed(
+                    using=db, savepoint=False):
+                for obj in objs:
+                    if not isinstance(obj, self.model):
+                        raise TypeError("'%s' instance expected, got %r" %
+                                        (self.model._meta.object_name, obj))
+                    setattr(obj, rel_field.name, self.instance)
+                    obj.save()
+        add.alters_data = True
+
+        def create(self, **kwargs):
+            kwargs[rel_field.name] = self.instance
+            db = router.db_for_write(self.model, instance=self.instance)
+            return super(RelatedManager, self.db_manager(db)).create(**kwargs)
+        create.alters_data = True
+
+        def get_or_create(self, **kwargs):
+            # Update kwargs with the related object that this
+            # ForeignRelatedObjectsDescriptor knows about.
+            kwargs[rel_field.name] = self.instance
+            db = router.db_for_write(self.model, instance=self.instance)
+            return super(RelatedManager, self.db_manager(db)).get_or_create(**kwargs)
+        get_or_create.alters_data = True
+
+        # remove() and clear() are only provided if the ForeignKey can have a value of null.
+        if rel_field.null:
+            def remove(self, *objs):
+                val = rel_field.get_foreign_related_value(self.instance)
+                for obj in objs:
+                    # Is obj actually part of this descriptor set?
+                    if rel_field.get_local_related_value(obj) == val:
+                        setattr(obj, rel_field.name, None)
+                        obj.save()
+                    else:
+                        raise rel_field.rel.to.DoesNotExist("%r is not related to %r." % (obj, self.instance))
+            remove.alters_data = True
+
+            def clear(self):
+                self.update(**{rel_field.name: None})
+            clear.alters_data = True
+
+    return RelatedManager
+
+
 class ForeignRelatedObjectsDescriptor(object):
     # This class provides the functionality that makes the related-object
     # managers available as attributes on a model class, for fields that have
@@ -392,86 +498,11 @@ class ForeignRelatedObjectsDescriptor(object):
     def related_manager_cls(self):
         # Dynamically create a class that subclasses the related model's default
         # manager.
-        superclass = self.related.model._default_manager.__class__
-        rel_field = self.related.field
-        rel_model = self.related.model
-
-        class RelatedManager(superclass):
-            def __init__(self, instance):
-                super(RelatedManager, self).__init__()
-                self.instance = instance
-                self.core_filters = {'%s__exact' % rel_field.name: instance}
-                self.model = rel_model
-
-            def get_queryset(self):
-                try:
-                    return self.instance._prefetched_objects_cache[rel_field.related_query_name()]
-                except (AttributeError, KeyError):
-                    db = self._db or router.db_for_read(self.model, instance=self.instance)
-                    qs = super(RelatedManager, self).get_queryset().using(db).filter(**self.core_filters)
-                    empty_strings_as_null = connections[db].features.interprets_empty_strings_as_nulls
-                    for field in rel_field.foreign_related_fields:
-                        val = getattr(self.instance, field.attname)
-                        if val is None or (val == '' and empty_strings_as_null):
-                            return qs.none()
-                    qs._known_related_objects = {rel_field: {self.instance.pk: self.instance}}
-                    return qs
-
-            def get_prefetch_queryset(self, instances):
-                rel_obj_attr = rel_field.get_local_related_value
-                instance_attr = rel_field.get_foreign_related_value
-                instances_dict = dict((instance_attr(inst), inst) for inst in instances)
-                db = self._db or router.db_for_read(self.model, instance=instances[0])
-                query = {'%s__in' % rel_field.name: instances}
-                qs = super(RelatedManager, self).get_queryset().using(db).filter(**query)
-                # Since we just bypassed this class' get_queryset(), we must manage
-                # the reverse relation manually.
-                for rel_obj in qs:
-                    instance = instances_dict[rel_obj_attr(rel_obj)]
-                    setattr(rel_obj, rel_field.name, instance)
-                cache_name = rel_field.related_query_name()
-                return qs, rel_obj_attr, instance_attr, False, cache_name
-
-            def add(self, *objs):
-                for obj in objs:
-                    if not isinstance(obj, self.model):
-                        raise TypeError("'%s' instance expected, got %r" % (self.model._meta.object_name, obj))
-                    setattr(obj, rel_field.name, self.instance)
-                    obj.save()
-            add.alters_data = True
-
-            def create(self, **kwargs):
-                kwargs[rel_field.name] = self.instance
-                db = router.db_for_write(self.model, instance=self.instance)
-                return super(RelatedManager, self.db_manager(db)).create(**kwargs)
-            create.alters_data = True
-
-            def get_or_create(self, **kwargs):
-                # Update kwargs with the related object that this
-                # ForeignRelatedObjectsDescriptor knows about.
-                kwargs[rel_field.name] = self.instance
-                db = router.db_for_write(self.model, instance=self.instance)
-                return super(RelatedManager, self.db_manager(db)).get_or_create(**kwargs)
-            get_or_create.alters_data = True
-
-            # remove() and clear() are only provided if the ForeignKey can have a value of null.
-            if rel_field.null:
-                def remove(self, *objs):
-                    val = rel_field.get_foreign_related_value(self.instance)
-                    for obj in objs:
-                        # Is obj actually part of this descriptor set?
-                        if rel_field.get_local_related_value(obj) == val:
-                            setattr(obj, rel_field.name, None)
-                            obj.save()
-                        else:
-                            raise rel_field.rel.to.DoesNotExist("%r is not related to %r." % (obj, self.instance))
-                remove.alters_data = True
-
-                def clear(self):
-                    self.update(**{rel_field.name: None})
-                clear.alters_data = True
-
-        return RelatedManager
+        return create_foreign_related_manager(
+            self.related.model._default_manager.__class__,
+            self.related.field,
+            self.related.model,
+        )
 
 
 def create_many_related_manager(superclass, rel):
@@ -513,18 +544,43 @@ def create_many_related_manager(superclass, rel):
                                  "a many-to-many relationship can be used." %
                                  instance.__class__.__name__)
 
+        def __call__(self, **kwargs):
+            # We use **kwargs rather than a kwarg argument to enforce the
+            # `manager='manager_name'` syntax.
+            manager = getattr(self.model, kwargs.pop('manager'))
+            manager_class = create_many_related_manager(manager.__class__, rel)
+            return manager_class(
+                model=self.model,
+                query_field_name=self.query_field_name,
+                instance=self.instance,
+                symmetrical=self.symmetrical,
+                source_field_name=self.source_field_name,
+                target_field_name=self.target_field_name,
+                reverse=self.reverse,
+                through=self.through,
+                prefetch_cache_name=self.prefetch_cache_name,
+            )
+        do_not_call_in_templates = True
+
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
             except (AttributeError, KeyError):
-                db = self._db or router.db_for_read(self.instance.__class__, instance=self.instance)
-                return super(ManyRelatedManager, self).get_queryset().using(db)._next_is_sticky().filter(**self.core_filters)
+                qs = super(ManyRelatedManager, self).get_queryset()
+                qs._add_hints(instance=self.instance)
+                if self._db:
+                    qs = qs.using(self._db)
+                return qs._next_is_sticky().filter(**self.core_filters)
 
-        def get_prefetch_queryset(self, instances):
-            instance = instances[0]
-            db = self._db or router.db_for_read(instance.__class__, instance=instance)
+        def get_prefetch_queryset(self, instances, queryset=None):
+            if queryset is None:
+                queryset = super(ManyRelatedManager, self).get_queryset()
+
+            queryset._add_hints(instance=instances[0])
+            queryset = queryset.using(queryset._db or self._db)
+
             query = {'%s__in' % self.query_field_name: instances}
-            qs = super(ManyRelatedManager, self).get_queryset().using(db)._next_is_sticky().filter(**query)
+            queryset = queryset._next_is_sticky().filter(**query)
 
             # M2M: need to annotate the query in order to get the primary model
             # that the secondary model was actually related to. We know that
@@ -535,12 +591,12 @@ def create_many_related_manager(superclass, rel):
             # dealing with PK values.
             fk = self.through._meta.get_field(self.source_field_name)
             join_table = self.through._meta.db_table
-            connection = connections[db]
+            connection = connections[queryset.db]
             qn = connection.ops.quote_name
-            qs = qs.extra(select=dict(
+            queryset = queryset.extra(select=dict(
                 ('_prefetch_related_val_%s' % f.attname,
                 '%s.%s' % (qn(join_table), qn(f.column))) for f in fk.local_related_fields))
-            return (qs,
+            return (queryset,
                     lambda result: tuple(getattr(result, '_prefetch_related_val_%s' % f.attname) for f in fk.local_related_fields),
                     lambda inst: tuple(getattr(inst, f.attname) for f in fk.foreign_related_fields),
                     False,
@@ -918,6 +974,7 @@ class ManyToManyRel(object):
 class ForeignObject(RelatedField):
     requires_unique_target = True
     generate_reverse_relation = True
+    related_accessor_class = ForeignRelatedObjectsDescriptor
 
     def __init__(self, to, from_fields, to_fields, **kwargs):
         self.from_fields = from_fields
@@ -1118,7 +1175,7 @@ class ForeignObject(RelatedField):
         # Internal FK's - i.e., those with a related name ending with '+' -
         # and swapped models don't get a related descriptor.
         if not self.rel.is_hidden() and not related.model._meta.swapped:
-            setattr(cls, related.get_accessor_name(), ForeignRelatedObjectsDescriptor(related))
+            setattr(cls, related.get_accessor_name(), self.related_accessor_class(related))
             if self.rel.limit_choices_to:
                 cls._meta.related_fkey_lookups.append(self.rel.limit_choices_to)
 
@@ -1200,8 +1257,8 @@ class ForeignKey(ForeignObject):
 
         using = router.db_for_read(model_instance.__class__, instance=model_instance)
         qs = self.rel.to._default_manager.using(using).filter(
-          **{self.rel.field_name: value}
-         )
+            **{self.rel.field_name: value}
+        )
         qs = qs.complex_filter(self.rel.limit_choices_to)
         if not qs.exists():
             raise exceptions.ValidationError(
@@ -1292,6 +1349,7 @@ class OneToOneField(ForeignKey):
     always returns the object pointed to (since there will only ever be one),
     rather than returning a list.
     """
+    related_accessor_class = SingleRelatedObjectDescriptor
     description = _("One-to-one relationship")
 
     def __init__(self, to, to_field=None, **kwargs):
@@ -1303,10 +1361,6 @@ class OneToOneField(ForeignKey):
         if "unique" in kwargs:
             del kwargs['unique']
         return name, path, args, kwargs
-
-    def contribute_to_related_class(self, cls, related):
-        setattr(cls, related.get_accessor_name(),
-                SingleRelatedObjectDescriptor(related))
 
     def formfield(self, **kwargs):
         if self.rel.parent_link:
@@ -1440,7 +1494,7 @@ class ManyToManyField(RelatedField):
         elif self.db_table:
             return self.db_table
         else:
-            return util.truncate_name('%s_%s' % (opts.db_table, self.name),
+            return utils.truncate_name('%s_%s' % (opts.db_table, self.name),
                                       connection.ops.max_name_length())
 
     def _get_m2m_attr(self, related, attr):

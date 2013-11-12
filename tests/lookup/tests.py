@@ -125,7 +125,7 @@ class LookupTests(TestCase):
     def test_values(self):
         # values() returns a list of dictionaries instead of object instances --
         # and you can specify which fields you want to retrieve.
-        identity = lambda x:x
+        identity = lambda x: x
         self.assertQuerysetEqual(Article.objects.values('headline'),
             [
                 {'headline': 'Article 5'},
@@ -256,7 +256,7 @@ class LookupTests(TestCase):
         # returned as a list of tuples, rather than a list of dictionaries.
         # Within each tuple, the order of the elements is the same as the order
         # of fields in the values_list() call.
-        identity = lambda x:x
+        identity = lambda x: x
         self.assertQuerysetEqual(Article.objects.values_list('headline'),
             [
                 ('Article 5',),
@@ -283,26 +283,26 @@ class LookupTests(TestCase):
             Article.objects.extra(select={'id_plus_one': 'id+1'})
                            .order_by('id').values_list('id_plus_one', 'id'),
             [
-                (self.a1.id+1, self.a1.id),
-                (self.a2.id+1, self.a2.id),
-                (self.a3.id+1, self.a3.id),
-                (self.a4.id+1, self.a4.id),
-                (self.a5.id+1, self.a5.id),
-                (self.a6.id+1, self.a6.id),
-                (self.a7.id+1, self.a7.id)
+                (self.a1.id + 1, self.a1.id),
+                (self.a2.id + 1, self.a2.id),
+                (self.a3.id + 1, self.a3.id),
+                (self.a4.id + 1, self.a4.id),
+                (self.a5.id + 1, self.a5.id),
+                (self.a6.id + 1, self.a6.id),
+                (self.a7.id + 1, self.a7.id)
             ],
             transform=identity)
         self.assertQuerysetEqual(
             Article.objects.extra(select={'id_plus_one': 'id+1'})
                            .order_by('id').values_list('id', 'id_plus_one'),
             [
-                (self.a1.id, self.a1.id+1),
-                (self.a2.id, self.a2.id+1),
-                (self.a3.id, self.a3.id+1),
-                (self.a4.id, self.a4.id+1),
-                (self.a5.id, self.a5.id+1),
-                (self.a6.id, self.a6.id+1),
-                (self.a7.id, self.a7.id+1)
+                (self.a1.id, self.a1.id + 1),
+                (self.a2.id, self.a2.id + 1),
+                (self.a3.id, self.a3.id + 1),
+                (self.a4.id, self.a4.id + 1),
+                (self.a5.id, self.a5.id + 1),
+                (self.a6.id, self.a6.id + 1),
+                (self.a7.id, self.a7.id + 1)
             ],
             transform=identity)
         self.assertQuerysetEqual(
@@ -394,9 +394,9 @@ class LookupTests(TestCase):
                                  ['<Article: Article with \ backslash>'])
 
     def test_exclude(self):
-        a8 = Article.objects.create(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20))
-        a9 = Article.objects.create(headline='Article% with percent sign', pub_date=datetime(2005, 11, 21))
-        a10 = Article.objects.create(headline='Article with \\ backslash', pub_date=datetime(2005, 11, 22))
+        Article.objects.create(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20))
+        Article.objects.create(headline='Article% with percent sign', pub_date=datetime(2005, 11, 21))
+        Article.objects.create(headline='Article with \\ backslash', pub_date=datetime(2005, 11, 22))
 
         # exclude() is the opposite of filter() when doing lookups:
         self.assertQuerysetEqual(

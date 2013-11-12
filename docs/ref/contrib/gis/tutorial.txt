@@ -499,14 +499,13 @@ Afterwards, invoke the Django shell from the ``geodjango`` project directory:
 
 .. code-block:: bash
 
-   $ python manage.py shell
+    $ python manage.py shell
 
 Next, import the ``load`` module, call the ``run`` routine, and watch
 ``LayerMapping`` do the work::
 
-   >>> from world import load
-   >>> load.run()
-
+    >>> from world import load
+    >>> load.run()
 
 .. _ogrinspect-intro:
 

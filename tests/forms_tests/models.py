@@ -19,6 +19,8 @@ class BoundaryModel(models.Model):
 
 
 callable_default_value = 0
+
+
 def callable_default():
     global callable_default_value
     callable_default_value = callable_default_value + 1
@@ -27,7 +29,7 @@ def callable_default():
 
 class Defaults(models.Model):
     name = models.CharField(max_length=255, default='class default value')
-    def_date = models.DateField(default = datetime.date(1980, 1, 1))
+    def_date = models.DateField(default=datetime.date(1980, 1, 1))
     value = models.IntegerField(default=42)
     callable_default = models.IntegerField(default=callable_default)
 
@@ -85,6 +87,7 @@ class ChoiceFieldModel(models.Model):
                                           default=lambda: ChoiceOptionModel.objects.filter(name='default'))
     multi_choice_int = models.ManyToManyField(ChoiceOptionModel, blank=False, related_name='multi_choice_int',
                                               default=lambda: [1])
+
 
 class OptionalMultiChoiceModel(models.Model):
     multi_choice = models.ManyToManyField(ChoiceOptionModel, blank=False, related_name='not_relevant',

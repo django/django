@@ -85,7 +85,7 @@ class CommonMiddleware(object):
             return
         if new_url[0]:
             newurl = "%s://%s%s" % (
-                'https' if request.is_secure() else 'http',
+                request.scheme,
                 new_url[0], urlquote(new_url[1]))
         else:
             newurl = urlquote(new_url[1])

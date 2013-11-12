@@ -33,11 +33,11 @@ class GeoRegressionTests(TestCase):
     def test_kmz(self):
         "Testing `render_to_kmz` with non-ASCII data. See #11624."
         name = "Åland Islands"
-        places = [{'name' : name,
-                  'description' : name,
-                  'kml' : '<Point><coordinates>5.0,23.0</coordinates></Point>'
+        places = [{'name': name,
+                  'description': name,
+                  'kml': '<Point><coordinates>5.0,23.0</coordinates></Point>'
                   }]
-        kmz = render_to_kmz('gis/kml/placemarks.kml', {'places' : places})
+        render_to_kmz('gis/kml/placemarks.kml', {'places': places})
 
     @no_spatialite
     @no_mysql
@@ -52,8 +52,8 @@ class GeoRegressionTests(TestCase):
     def test_unicode_date(self):
         "Testing dates are converted properly, even on SpatiaLite. See #16408."
         founded = datetime(1857, 5, 23)
-        mansfield = PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)',
-                                                    founded=founded)
+        PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)',
+                                        founded=founded)
         self.assertEqual(founded, PennsylvaniaCity.objects.datetimes('founded', 'day')[0])
         self.assertEqual(founded, PennsylvaniaCity.objects.aggregate(Min('founded'))['founded__min'])
 

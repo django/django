@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from unittest import skipIf, skipUnless
+from unittest import skipIf, skipUnless, SkipTest
 
 from django.db import (connection, connections, transaction, DEFAULT_DB_ALIAS, DatabaseError,
                        IntegrityError)
@@ -9,6 +9,7 @@ from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import override_settings, IgnoreDeprecationWarningsMixin
 
 from .models import Mod, M2mA, M2mB, SubMod
+
 
 class ModelInheritanceTests(TransactionTestCase):
 
@@ -30,6 +31,7 @@ class ModelInheritanceTests(TransactionTestCase):
             connection.rollback()
         self.assertEqual(SubMod.objects.count(), 1)
         self.assertEqual(Mod.objects.count(), 1)
+
 
 class TestTransactionClosing(IgnoreDeprecationWarningsMixin, TransactionTestCase):
     """
@@ -190,6 +192,7 @@ class TestTransactionClosing(IgnoreDeprecationWarningsMixin, TransactionTestCase
         Regression for #6669. Same test as above, with DEBUG=True.
         """
         self.test_failing_query_transaction_closed()
+
 
 @skipIf(connection.vendor == 'sqlite'
         and connection.settings_dict['TEST_NAME'] in (None, '', ':memory:'),
@@ -367,11 +370,14 @@ class SavepointTest(IgnoreDeprecationWarningsMixin, TransactionTestCase):
 
     @skipIf(connection.vendor == 'sqlite',
             "SQLite doesn't support savepoints in managed mode")
-    @skipIf(connection.vendor == 'mysql' and
-            connection.features._mysql_storage_engine == 'MyISAM',
-            "MyISAM MySQL storage engine doesn't support savepoints")
     @skipUnlessDBFeature('uses_savepoints')
     def test_savepoint_rollback(self):
+        # _mysql_storage_engine issues a query and as such can't be applied in
+        # a skipIf decorator since that would execute the query on module load.
+        if (connection.vendor == 'mysql' and
+                connection.features._mysql_storage_engine == 'MyISAM'):
+            raise SkipTest("MyISAM MySQL storage engine doesn't support savepoints")
+
         @commit_manually
         def work():
             mod = Mod.objects.create(fld=1)

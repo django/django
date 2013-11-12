@@ -5,6 +5,10 @@ import copy
 
 from django.db.models.fields import IntegerField, FloatField
 
+
+__all__ = ['Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance']
+
+
 # Fake fields used to identify aggregate types in data-conversion operations.
 ordinal_aggregate_field = IntegerField()
 computed_aggregate_field = FloatField()
@@ -79,7 +83,7 @@ class Aggregate(object):
         elif isinstance(self.col, (list, tuple)):
             field_name = '.'.join(qn(c) for c in self.col)
         else:
-            field_name = self.col
+            field_name = qn(self.col)
 
         substitutions = {
             'function': self.sql_function,

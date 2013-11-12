@@ -8,10 +8,11 @@ import json
 import os
 import posixpath
 import re
+import socket
 import sys
 import threading
 import unittest
-from unittest import skipIf         # Imported here for backward compatibility
+from unittest import skipIf         # NOQA: Imported here for backward compatibility
 from unittest.util import safe_repr
 
 from django.conf import settings
@@ -21,8 +22,7 @@ from django.core.handlers.wsgi import get_path_info, WSGIHandler
 from django.core.management import call_command
 from django.core.management.color import no_style
 from django.core.management.commands import flush
-from django.core.servers.basehttp import (WSGIRequestHandler, WSGIServer,
-    WSGIServerException)
+from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
 from django.core.urlresolvers import clear_url_caches, set_urlconf
 from django.db import connection, connections, DEFAULT_DB_ALIAS, transaction
 from django.db.models.loading import cache
@@ -61,8 +61,10 @@ real_enter_transaction_management = transaction.enter_transaction_management
 real_leave_transaction_management = transaction.leave_transaction_management
 real_abort = transaction.abort
 
+
 def nop(*args, **kwargs):
     return
+
 
 def disable_transaction_methods():
     transaction.commit = nop
@@ -70,6 +72,7 @@ def disable_transaction_methods():
     transaction.enter_transaction_management = nop
     transaction.leave_transaction_management = nop
     transaction.abort = nop
+
 
 def restore_transaction_methods():
     transaction.commit = real_commit
@@ -157,6 +160,7 @@ class SimpleTestCase(unittest.TestCase):
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
+    _custom_settings = None
 
     def __call__(self, result=None):
         """
@@ -193,6 +197,9 @@ class SimpleTestCase(unittest.TestCase):
         * If the class has a 'urls' attribute, replace ROOT_URLCONF with it.
         * Clearing the mail test outbox.
         """
+        if self._custom_settings:
+            self._overridden = override_settings(**self._custom_settings)
+            self._overridden.enable()
         self.client = self.client_class()
         self._urlconf_setup()
         mail.outbox = []
@@ -210,6 +217,8 @@ class SimpleTestCase(unittest.TestCase):
         * Putting back the original ROOT_URLCONF if it was changed.
         """
         self._urlconf_teardown()
+        if self._custom_settings:
+            self._overridden.disable()
 
     def _urlconf_teardown(self):
         set_urlconf(None)
@@ -225,15 +234,19 @@ class SimpleTestCase(unittest.TestCase):
         return override_settings(**kwargs)
 
     def assertRedirects(self, response, expected_url, status_code=302,
-                        target_status_code=200, host=None, msg_prefix=''):
+                        target_status_code=200, host=None, msg_prefix='',
+                        fetch_redirect_response=True):
         """Asserts that a response redirected to a specific URL, and that the
         redirect URL can be loaded.
 
         Note that assertRedirects won't work for external links since it uses
-        TestClient to do a request.
+        TestClient to do a request (use fetch_redirect_response=False to check
+        such links without fetching thtem).
         """
         if msg_prefix:
             msg_prefix += ": "
+
+        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(expected_url)
 
         if hasattr(response, 'redirect_chain'):
             # The request was a followed redirect
@@ -248,6 +261,7 @@ class SimpleTestCase(unittest.TestCase):
                     (response.redirect_chain[0][1], status_code))
 
             url, status_code = response.redirect_chain[-1]
+            scheme, netloc, path, query, fragment = urlsplit(url)
 
             self.assertEqual(response.status_code, target_status_code,
                 msg_prefix + "Response didn't redirect as expected: Final"
@@ -264,20 +278,21 @@ class SimpleTestCase(unittest.TestCase):
             url = response.url
             scheme, netloc, path, query, fragment = urlsplit(url)
 
-            redirect_response = response.client.get(path, QueryDict(query))
+            if fetch_redirect_response:
+                redirect_response = response.client.get(path, QueryDict(query),
+                                                        secure=(scheme == 'https'))
 
-            # Get the redirection page, using the same client that was used
-            # to obtain the original response.
-            self.assertEqual(redirect_response.status_code, target_status_code,
-                msg_prefix + "Couldn't retrieve redirection page '%s':"
-                " response code was %d (expected %d)" %
-                    (path, redirect_response.status_code, target_status_code))
+                # Get the redirection page, using the same client that was used
+                # to obtain the original response.
+                self.assertEqual(redirect_response.status_code, target_status_code,
+                    msg_prefix + "Couldn't retrieve redirection page '%s':"
+                    " response code was %d (expected %d)" %
+                        (path, redirect_response.status_code, target_status_code))
 
-        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(
-                                                              expected_url)
-        if not (e_scheme or e_netloc):
-            expected_url = urlunsplit(('http', host or 'testserver', e_path,
-                e_query, e_fragment))
+        e_scheme = e_scheme if e_scheme else scheme or 'http'
+        e_netloc = e_netloc if e_netloc else host or 'testserver'
+        expected_url = urlunsplit((e_scheme, e_netloc, e_path, e_query,
+            e_fragment))
 
         self.assertEqual(url, expected_url,
             msg_prefix + "Response redirected to '%s', expected '%s'" %
@@ -367,7 +382,7 @@ class SimpleTestCase(unittest.TestCase):
 
         # Search all contexts for the error.
         found_form = False
-        for i,context in enumerate(contexts):
+        for i, context in enumerate(contexts):
             if form not in context:
                 continue
             found_form = True
@@ -491,7 +506,8 @@ class SimpleTestCase(unittest.TestCase):
             # use this template with context manager
             return template_name, None, msg_prefix
 
-        template_names = [t.name for t in response.templates]
+        template_names = [t.name for t in response.templates if t.name is not
+                          None]
         return None, template_names, msg_prefix
 
     def assertTemplateUsed(self, response=None, template_name=None, msg_prefix=''):
@@ -592,7 +608,7 @@ class SimpleTestCase(unittest.TestCase):
             self.assertEqual(optional.clean(e), empty_value)
         # test that max_length and min_length are always accepted
         if issubclass(fieldclass, CharField):
-            field_kwargs.update({'min_length':2, 'max_length':20})
+            field_kwargs.update({'min_length': 2, 'max_length': 20})
             self.assertTrue(isinstance(fieldclass(*field_args, **field_kwargs),
                                        fieldclass))
 
@@ -696,6 +712,9 @@ class TransactionTestCase(SimpleTestCase):
     # Subclasses can enable only a subset of apps for faster tests
     available_apps = None
 
+    # Subclasses can define fixtures which will be automatically installed.
+    fixtures = None
+
     def _pre_setup(self):
         """Performs any pre-test setup. This includes:
 
@@ -728,9 +747,8 @@ class TransactionTestCase(SimpleTestCase):
     def _reset_sequences(self, db_name):
         conn = connections[db_name]
         if conn.features.supports_sequence_reset:
-            sql_list = \
-                conn.ops.sequence_reset_by_name_sql(no_style(),
-                                                    conn.introspection.sequence_list())
+            sql_list = conn.ops.sequence_reset_by_name_sql(
+                no_style(), conn.introspection.sequence_list())
             if sql_list:
                 with transaction.commit_on_success_unless_managed(using=db_name):
                     cursor = conn.cursor()
@@ -743,7 +761,7 @@ class TransactionTestCase(SimpleTestCase):
             if self.reset_sequences:
                 self._reset_sequences(db_name)
 
-            if hasattr(self, 'fixtures'):
+            if self.fixtures:
                 # We have to use this slightly awkward syntax due to the fact
                 # that we're using *args and **kwargs together.
                 call_command('loaddata', *self.fixtures,
@@ -835,14 +853,14 @@ class TestCase(TransactionTestCase):
         disable_transaction_methods()
 
         for db_name in self._databases_names(include_mirrors=False):
-            if hasattr(self, 'fixtures'):
+            if self.fixtures:
                 try:
                     call_command('loaddata', *self.fixtures,
                                  **{
-                                    'verbosity': 0,
-                                    'commit': False,
-                                    'database': db_name,
-                                    'skip_validation': True,
+                                     'verbosity': 0,
+                                     'commit': False,
+                                     'database': db_name,
+                                     'skip_validation': True,
                                  })
                 except Exception:
                     self._fixture_teardown()
@@ -953,7 +971,11 @@ class FSFilesHandler(WSGIHandler):
 
     def serve(self, request):
         os_rel_path = self.file_path(request.path)
-        final_rel_path = posixpath.normpath(unquote(os_rel_path)).lstrip('/')
+        os_rel_path = posixpath.normpath(unquote(os_rel_path))
+        # Emulate behavior of django.contrib.staticfiles.views.serve() when it
+        # invokes staticfiles' finders functionality.
+        # TODO: Modify if/when that internal API is refactored
+        final_rel_path = os_rel_path.replace('\\', '/').lstrip('/')
         return serve(request, final_rel_path, document_root=self.get_base_dir())
 
     def __call__(self, environ, start_response):
@@ -1023,10 +1045,9 @@ class LiveServerThread(threading.Thread):
                 try:
                     self.httpd = WSGIServer(
                         (self.host, port), QuietWSGIRequestHandler)
-                except WSGIServerException as e:
+                except socket.error as e:
                     if (index + 1 < len(self.possible_ports) and
-                        hasattr(e.args[0], 'errno') and
-                        e.args[0].errno == errno.EADDRINUSE):
+                        e.errno == errno.EADDRINUSE):
                         # This port is already in use, so we go on and try with
                         # the next one in the list.
                         continue
@@ -1047,12 +1068,11 @@ class LiveServerThread(threading.Thread):
             self.error = e
             self.is_ready.set()
 
-    def join(self, timeout=None):
+    def terminate(self):
         if hasattr(self, 'httpd'):
             # Stop the WSGI server
             self.httpd.shutdown()
             self.httpd.server_close()
-        super(LiveServerThread, self).join(timeout)
 
 
 class LiveServerTestCase(TransactionTestCase):
@@ -1119,16 +1139,20 @@ class LiveServerTestCase(TransactionTestCase):
         # Wait for the live server to be ready
         cls.server_thread.is_ready.wait()
         if cls.server_thread.error:
+            # Clean up behind ourselves, since tearDownClass won't get called in
+            # case of errors.
+            cls._tearDownClassInternal()
             raise cls.server_thread.error
 
         super(LiveServerTestCase, cls).setUpClass()
 
     @classmethod
-    def tearDownClass(cls):
+    def _tearDownClassInternal(cls):
         # There may not be a 'server_thread' attribute if setUpClass() for some
         # reasons has raised an exception.
         if hasattr(cls, 'server_thread'):
             # Terminate the live server's thread
+            cls.server_thread.terminate()
             cls.server_thread.join()
 
         # Restore sqlite connections' non-sharability
@@ -1137,4 +1161,7 @@ class LiveServerTestCase(TransactionTestCase):
                 and conn.settings_dict['NAME'] == ':memory:'):
                 conn.allow_thread_sharing = False
 
+    @classmethod
+    def tearDownClass(cls):
+        cls._tearDownClassInternal()
         super(LiveServerTestCase, cls).tearDownClass()

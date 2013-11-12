@@ -32,9 +32,18 @@ class Migration(object):
     # are not applied.
     replaces = []
 
+    # Error class which is raised when a migration is irreversible
+    class IrreversibleError(RuntimeError):
+        pass
+
     def __init__(self, name, app_label):
         self.name = name
         self.app_label = app_label
+        # Copy dependencies & other attrs as we might mutate them at runtime
+        self.operations = list(self.__class__.operations)
+        self.dependencies = list(self.__class__.dependencies)
+        self.run_before = list(self.__class__.run_before)
+        self.replaces = list(self.__class__.replaces)
 
     def __eq__(self, other):
         if not isinstance(other, Migration):
@@ -63,7 +72,7 @@ class Migration(object):
             operation.state_forwards(self.app_label, new_state)
         return new_state
 
-    def apply(self, project_state, schema_editor):
+    def apply(self, project_state, schema_editor, collect_sql=False):
         """
         Takes a project_state representing all migrations prior to this one
         and a schema_editor for a live database and applies the migration
@@ -73,6 +82,14 @@ class Migration(object):
         Migrations.
         """
         for operation in self.operations:
+            # If this operation cannot be represented as SQL, place a comment
+            # there instead
+            if collect_sql and not operation.reduces_to_sql:
+                schema_editor.collected_sql.append("--")
+                schema_editor.collected_sql.append("-- MIGRATION NOW PERFORMS OPERATION THAT CANNOT BE WRITTEN AS SQL:")
+                schema_editor.collected_sql.append("-- %s" % operation.describe())
+                schema_editor.collected_sql.append("--")
+                continue
             # Get the state after the operation has run
             new_state = project_state.clone()
             operation.state_forwards(self.app_label, new_state)
@@ -82,7 +99,7 @@ class Migration(object):
             project_state = new_state
         return project_state
 
-    def unapply(self, project_state, schema_editor):
+    def unapply(self, project_state, schema_editor, collect_sql=False):
         """
         Takes a project_state representing all migrations prior to this one
         and a schema_editor for a live database and applies the migration
@@ -91,6 +108,17 @@ class Migration(object):
         # We need to pre-calculate the stack of project states
         to_run = []
         for operation in self.operations:
+            # If this operation cannot be represented as SQL, place a comment
+            # there instead
+            if collect_sql and not operation.reduces_to_sql:
+                schema_editor.collected_sql.append("--")
+                schema_editor.collected_sql.append("-- MIGRATION NOW PERFORMS OPERATION THAT CANNOT BE WRITTEN AS SQL:")
+                schema_editor.collected_sql.append("-- %s" % operation.describe())
+                schema_editor.collected_sql.append("--")
+                continue
+            # If it's irreversible, error out
+            if not operation.reversible:
+                raise Migration.IrreversibleError("Operation %s in %s is not reversible" % (operation, self))
             new_state = project_state.clone()
             operation.state_forwards(self.app_label, new_state)
             to_run.append((operation, project_state, new_state))

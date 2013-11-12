@@ -36,10 +36,9 @@ older versions of Django and install a newer one.
 .. admonition:: Where to get help:
 
     If you're having trouble going through this tutorial, please post a message
-    to `django-users`__ or drop by `#django on irc.freenode.net`__ to chat
+    to |django-users| or drop by `#django on irc.freenode.net`__ to chat
     with other Django users who might be able to help.
 
-__ http://groups.google.com/group/django-users
 __ irc://irc.freenode.net/django
 
 Creating a project
@@ -169,7 +168,7 @@ It worked!
 
     .. code-block:: bash
 
-        python manage.py runserver 8080
+        $ python manage.py runserver 8080
 
     If you want to change the server's IP, pass it along with the port. So to
     listen on all public IPs (useful if you want to show off your work on other
@@ -177,10 +176,18 @@ It worked!
 
     .. code-block:: bash
 
-        python manage.py runserver 0.0.0.0:8000
+        $ python manage.py runserver 0.0.0.0:8000
 
     Full docs for the development server can be found in the
     :djadmin:`runserver` reference.
+
+.. admonition:: Automatic reloading of :djadmin:`runserver`
+
+    The development server automatically reloads Python code for each request
+    as needed. You don't need to restart the server for code changes to take
+    effect. However, some actions like adding files or compiling translation
+    files don't trigger a restart, so you'll have to restart the server in
+    these cases.
 
 Database setup
 --------------
@@ -256,7 +263,7 @@ that, run the following command:
 
 .. code-block:: bash
 
-    python manage.py syncdb
+    $ python manage.py syncdb
 
 The :djadmin:`syncdb` command looks at the :setting:`INSTALLED_APPS` setting
 and creates any necessary database tables according to the database settings
@@ -308,7 +315,7 @@ and type this command:
 
 .. code-block:: bash
 
-    python manage.py startapp polls
+    $ python manage.py startapp polls
 
 That'll create a directory :file:`polls`, which is laid out like this::
 
@@ -337,7 +344,10 @@ the text of the choice and a vote tally. Each ``Choice`` is associated with a
 ``Question``.
 
 These concepts are represented by simple Python classes. Edit the
-:file:`polls/models.py` file so it looks like this::
+:file:`polls/models.py` file so it looks like this:
+
+.. snippet::
+    :filename: polls/models.py
 
     from django.db import models
 
@@ -408,7 +418,10 @@ But first we need to tell our project that the ``polls`` app is installed.
 
 Edit the :file:`mysite/settings.py` file again, and change the
 :setting:`INSTALLED_APPS` setting to include the string ``'polls'``. So it'll
-look like this::
+look like this:
+
+.. snippet::
+    :filename: mysite/settings.py
 
     INSTALLED_APPS = (
         'django.contrib.admin',
@@ -424,7 +437,7 @@ Now Django knows to include the ``polls`` app. Let's run another command:
 
 .. code-block:: bash
 
-    python manage.py sql polls
+    $ python manage.py sql polls
 
 You should see something similar to the following (the ``CREATE TABLE`` SQL
 statements for the polls app):
@@ -433,12 +446,12 @@ statements for the polls app):
 
     BEGIN;
     CREATE TABLE "polls_question" (
-        "id" integer NOT NULL PRIMARY KEY,
+        "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
         "question_text" varchar(200) NOT NULL,
         "pub_date" datetime NOT NULL
     );
     CREATE TABLE "polls_choice" (
-        "id" integer NOT NULL PRIMARY KEY,
+        "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
         "question_id" integer NOT NULL REFERENCES "polls_poll" ("id"),
         "choice_text" varchar(200) NOT NULL,
         "votes" integer NOT NULL
@@ -462,9 +475,9 @@ Note the following:
 * The foreign key relationship is made explicit by a ``REFERENCES``
   statement.
 
-* It's tailored to the database you're using, so database-specific field
-  types such as ``auto_increment`` (MySQL), ``serial`` (PostgreSQL), or
-  ``integer primary key`` (SQLite) are handled for you automatically. Same
+* It's tailored to the database you're using, so database-specific field types
+  such as ``auto_increment`` (MySQL), ``serial`` (PostgreSQL), or ``integer
+  primary key autoincrement`` (SQLite) are handled for you automatically. Same
   goes for quoting of field names -- e.g., using double quotes or single
   quotes.
 
@@ -501,7 +514,7 @@ Now, run :djadmin:`syncdb` again to create those model tables in your database:
 
 .. code-block:: bash
 
-    python manage.py syncdb
+    $ python manage.py syncdb
 
 The :djadmin:`syncdb` command runs the SQL from :djadmin:`sqlall` on your
 database for all apps in :setting:`INSTALLED_APPS` that don't already exist in
@@ -521,7 +534,7 @@ API Django gives you. To invoke the Python shell, use this command:
 
 .. code-block:: bash
 
-    python manage.py shell
+    $ python manage.py shell
 
 We're using this instead of simply typing "python", because :file:`manage.py`
 sets the ``DJANGO_SETTINGS_MODULE`` environment variable, which gives Django
@@ -582,7 +595,10 @@ of this object. Let's fix that by editing the ``Question`` model (in the
 ``polls/models.py`` file) and adding a
 :meth:`~django.db.models.Model.__unicode__` method to both ``Question`` and
 ``Choice``. On Python 3, simply replace ``__unicode__`` by ``__str__`` in the
-following example::
+following example:
+
+.. snippet::
+    :filename: polls/models.py
 
     from django.db import models
 
@@ -626,7 +642,10 @@ admin.
     luck, things should Just Work for you.
 
 Note these are normal Python methods. Let's add a custom method, just for
-demonstration::
+demonstration:
+
+.. snippet::
+    :filename: polls/models.py
 
     import datetime
     from django.utils import timezone

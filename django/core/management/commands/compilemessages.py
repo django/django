@@ -6,7 +6,8 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import find_command, popen_wrapper
-from django.utils._os import npath
+from django.utils._os import npath, upath
+
 
 def has_bom(fn):
     with open(fn, 'rb') as f:
@@ -14,6 +15,7 @@ def has_bom(fn):
     return sample[:3] == b'\xef\xbb\xbf' or \
             sample.startswith(codecs.BOM_UTF16_LE) or \
             sample.startswith(codecs.BOM_UTF16_BE)
+
 
 def compile_messages(stdout, locale=None):
     program = 'msgfmt'
@@ -23,7 +25,7 @@ def compile_messages(stdout, locale=None):
     basedirs = [os.path.join('conf', 'locale'), 'locale']
     if os.environ.get('DJANGO_SETTINGS_MODULE'):
         from django.conf import settings
-        basedirs.extend(settings.LOCALE_PATHS)
+        basedirs.extend([upath(path) for path in settings.LOCALE_PATHS])
 
     # Gather existing directories.
     basedirs = set(map(os.path.abspath, filter(os.path.isdir, basedirs)))

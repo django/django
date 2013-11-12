@@ -5,6 +5,7 @@ Regression tests for the Test Client, especially the customized assertions.
 from __future__ import unicode_literals
 
 import os
+import itertools
 
 from django.core.urlresolvers import reverse
 from django.template import (TemplateSyntaxError,
@@ -22,6 +23,7 @@ from django.contrib.auth.models import User
 
 from .models import CustomUser
 from .views import CustomTestException
+
 
 @override_settings(
     TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
@@ -121,14 +123,14 @@ class AssertContainsTests(TestCase):
 
     def test_unicode_contains(self):
         "Unicode characters can be found in template context"
-        #Regression test for #10183
+        # Regression test for #10183
         r = self.client.get('/test_client_regress/check_unicode/')
         self.assertContains(r, 'さかき')
         self.assertContains(r, b'\xe5\xb3\xa0'.decode('utf-8'))
 
     def test_unicode_not_contains(self):
         "Unicode characters can be searched for, and not found in template context"
-        #Regression test for #10183
+        # Regression test for #10183
         r = self.client.get('/test_client_regress/check_unicode/')
         self.assertNotContains(r, 'はたけ')
         self.assertNotContains(r, b'\xe3\x81\xaf\xe3\x81\x9f\xe3\x81\x91'.decode('utf-8'))
@@ -185,6 +187,7 @@ class AssertContainsTests(TestCase):
         response = HttpResponse('Hello')
         self.assertNotContains(response, 'Bye')
 
+
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AssertTemplateUsedTests(TestCase):
     fixtures = ['testdata.json']
@@ -237,7 +240,7 @@ class AssertTemplateUsedTests(TestCase):
             'email': 'foo@example.com',
             'value': 37,
             'single': 'b',
-            'multi': ('b','c','e')
+            'multi': ('b', 'c', 'e')
         }
         response = self.client.post('/test_client/form_view_with_template/', post_data)
         self.assertContains(response, 'POST data OK')
@@ -255,6 +258,7 @@ class AssertTemplateUsedTests(TestCase):
             self.assertTemplateUsed(response, "Valid POST Template")
         except AssertionError as e:
             self.assertIn("Template 'Valid POST Template' was not a template used to render the response. Actual template(s) used: form_view.html, base.html", str(e))
+
 
 class AssertRedirectsTests(TestCase):
     def test_redirect_page(self):
@@ -430,6 +434,24 @@ class AssertRedirectsTests(TestCase):
         except AssertionError as e:
             self.assertIn("abc: Response didn't redirect as expected: Response code was 200 (expected 302)", str(e))
 
+    def test_redirect_scheme(self):
+        "An assertion is raised if the response doesn't have the scheme specified in expected_url"
+
+        # Assure that original request scheme is preserved if no scheme specified in the redirect location
+        response = self.client.get('/test_client/redirect_view/', secure=True)
+        self.assertRedirects(response, 'https://testserver/test_client/get_view/')
+
+        # For all possible True/False combinations of follow and secure
+        for follow, secure in itertools.product([True, False], repeat=2):
+            # always redirects to https
+            response = self.client.get('/test_client/https_redirect_view/', follow=follow, secure=secure)
+            # no scheme to compare too, always succeeds
+            self.assertRedirects(response, '/test_client/secure_view/', status_code=301)
+            # the goal scheme is https
+            self.assertRedirects(response, 'https://testserver/test_client/secure_view/', status_code=301)
+            with self.assertRaises(AssertionError):
+                self.assertRedirects(response, 'http://testserver/test_client/secure_view/', status_code=301)
+
 
 class AssertFormErrorTests(TestCase):
     def test_unknown_form(self):
@@ -439,7 +461,7 @@ class AssertFormErrorTests(TestCase):
             'email': 'not an email address',
             'value': 37,
             'single': 'b',
-            'multi': ('b','c','e')
+            'multi': ('b', 'c', 'e')
         }
         response = self.client.post('/test_client/form_view/', post_data)
         self.assertEqual(response.status_code, 200)
@@ -461,7 +483,7 @@ class AssertFormErrorTests(TestCase):
             'email': 'not an email address',
             'value': 37,
             'single': 'b',
-            'multi': ('b','c','e')
+            'multi': ('b', 'c', 'e')
         }
         response = self.client.post('/test_client/form_view/', post_data)
         self.assertEqual(response.status_code, 200)
@@ -483,7 +505,7 @@ class AssertFormErrorTests(TestCase):
             'email': 'not an email address',
             'value': 37,
             'single': 'b',
-            'multi': ('b','c','e')
+            'multi': ('b', 'c', 'e')
         }
         response = self.client.post('/test_client/form_view/', post_data)
         self.assertEqual(response.status_code, 200)
@@ -505,7 +527,7 @@ class AssertFormErrorTests(TestCase):
             'email': 'not an email address',
             'value': 37,
             'single': 'b',
-            'multi': ('b','c','e')
+            'multi': ('b', 'c', 'e')
         }
         response = self.client.post('/test_client/form_view/', post_data)
         self.assertEqual(response.status_code, 200)
@@ -530,7 +552,7 @@ class AssertFormErrorTests(TestCase):
             'email': 'not an email address',
             'value': 37,
             'single': 'b',
-            'multi': ('b','c','e')
+            'multi': ('b', 'c', 'e')
         }
         response = self.client.post('/test_client/form_view/', post_data)
         self.assertEqual(response.status_code, 200)
@@ -545,8 +567,10 @@ class AssertFormErrorTests(TestCase):
         except AssertionError as e:
             self.assertIn("abc: The form 'form' in context 0 does not contain the non-field error 'Some error.' (actual errors: )", str(e))
 
+
 class AssertFormsetErrorTests(TestCase):
     msg_prefixes = [("", {}), ("abc: ", {"msg_prefix": "abc"})]
+
     def setUp(self):
         """Makes response object for testing field and non-field errors"""
         # For testing field and non-field errors
@@ -557,12 +581,12 @@ class AssertFormsetErrorTests(TestCase):
             'form-0-email': 'not an email address',
             'form-0-value': 37,
             'form-0-single': 'b',
-            'form-0-multi': ('b','c','e'),
+            'form-0-multi': ('b', 'c', 'e'),
             'form-1-text': 'Hello World',
             'form-1-email': 'email@domain.com',
             'form-1-value': 37,
             'form-1-single': 'b',
-            'form-1-multi': ('b','c','e'),
+            'form-1-multi': ('b', 'c', 'e'),
         })
         # For testing non-form errors
         self.response_nonform_errors = self.getResponse({
@@ -572,12 +596,12 @@ class AssertFormsetErrorTests(TestCase):
             'form-0-email': 'email@domain.com',
             'form-0-value': 37,
             'form-0-single': 'b',
-            'form-0-multi': ('b','c','e'),
+            'form-0-multi': ('b', 'c', 'e'),
             'form-1-text': 'Hello World',
             'form-1-email': 'email@domain.com',
             'form-1-value': 37,
             'form-1-single': 'b',
-            'form-1-multi': ('b','c','e'),
+            'form-1-multi': ('b', 'c', 'e'),
         })
 
     def getResponse(self, post_data):
@@ -736,6 +760,7 @@ class AssertFormsetErrorTests(TestCase):
                                     'addresses.',
                                     **kwargs)
 
+
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class LoginTests(TestCase):
     fixtures = ['testdata']
@@ -800,6 +825,7 @@ class URLEscapingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'Hi, Arthur')
 
+
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class ExceptionTests(TestCase):
     fixtures = ['testdata.json']
@@ -807,10 +833,10 @@ class ExceptionTests(TestCase):
     def test_exception_cleared(self):
         "#5836 - A stale user exception isn't re-raised by the test client."
 
-        login = self.client.login(username='testclient',password='password')
+        login = self.client.login(username='testclient', password='password')
         self.assertTrue(login, 'Could not log in')
         try:
-            response = self.client.get("/test_client_regress/staff_only/")
+            self.client.get("/test_client_regress/staff_only/")
             self.fail("General users should not be able to visit this page")
         except CustomTestException:
             pass
@@ -840,10 +866,11 @@ class TemplateExceptionTests(TestCase):
     def test_bad_404_template(self):
         "Errors found when rendering 404 error templates are re-raised"
         try:
-            response = self.client.get("/no_such_view/")
+            self.client.get("/no_such_view/")
             self.fail("Should get error about syntax error in template")
         except TemplateSyntaxError:
             pass
+
 
 # We need two different tests to check URLconf substitution -  one to check
 # it was changed, and another one (without self.urls) to check it was reverted on
@@ -856,6 +883,7 @@ class UrlconfSubstitutionTests(TestCase):
         url = reverse('arg_view', args=['somename'])
         self.assertEqual(url, '/arg_view/somename/')
 
+
 # This test needs to run *after* UrlconfSubstitutionTests; the zz prefix in the
 # name is to ensure alphabetical ordering.
 class zzUrlconfSubstitutionTests(TestCase):
@@ -864,13 +892,14 @@ class zzUrlconfSubstitutionTests(TestCase):
         url = reverse('arg_view', args=['somename'])
         self.assertEqual(url, '/test_client_regress/arg_view/somename/')
 
+
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class ContextTests(TestCase):
     fixtures = ['testdata']
 
     def test_single_context(self):
         "Context variables can be retrieved from a single context"
-        response = self.client.get("/test_client_regress/request_data/", data={'foo':'whiz'})
+        response = self.client.get("/test_client_regress/request_data/", data={'foo': 'whiz'})
         self.assertEqual(response.context.__class__, Context)
         self.assertTrue('get-foo' in response.context)
         self.assertEqual(response.context['get-foo'], 'whiz')
@@ -885,7 +914,7 @@ class ContextTests(TestCase):
 
     def test_inherited_context(self):
         "Context variables can be retrieved from a list of contexts"
-        response = self.client.get("/test_client_regress/request_data_extended/", data={'foo':'whiz'})
+        response = self.client.get("/test_client_regress/request_data_extended/", data={'foo': 'whiz'})
         self.assertEqual(response.context.__class__, ContextList)
         self.assertEqual(len(response.context), 2)
         self.assertTrue('get-foo' in response.context)
@@ -956,7 +985,7 @@ class SessionTests(TestCase):
         self.assertEqual(response.content, b'YES')
 
         # Log in
-        login = self.client.login(username='testclient',password='password')
+        login = self.client.login(username='testclient', password='password')
         self.assertTrue(login, 'Could not log in')
 
         # Session should still contain the modified value
@@ -967,7 +996,7 @@ class SessionTests(TestCase):
     def test_logout(self):
         """Logout should work whether the user is logged in or not (#9978)."""
         self.client.logout()
-        login = self.client.login(username='testclient',password='password')
+        login = self.client.login(username='testclient', password='password')
         self.assertTrue(login, 'Could not log in')
         self.client.logout()
         self.client.logout()
@@ -1113,13 +1142,14 @@ class RequestMethodStringDataTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'request method: PATCH')
 
+
 class QueryStringTests(TestCase):
     def test_get_like_requests(self):
         # See: https://code.djangoproject.com/ticket/10571.
         for method_name in ('get', 'head'):
             # A GET-like request can pass a query string as data
             method = getattr(self.client, method_name)
-            response = method("/test_client_regress/request_data/", data={'foo':'whiz'})
+            response = method("/test_client_regress/request_data/", data={'foo': 'whiz'})
             self.assertEqual(response.context['get-foo'], 'whiz')
             self.assertEqual(response.context['request-foo'], 'whiz')
 
@@ -1129,11 +1159,11 @@ class QueryStringTests(TestCase):
             self.assertEqual(response.context['request-foo'], 'whiz')
 
             # Data provided in the URL to a GET-like request is overridden by actual form data
-            response = method("/test_client_regress/request_data/?foo=whiz", data={'foo':'bang'})
+            response = method("/test_client_regress/request_data/?foo=whiz", data={'foo': 'bang'})
             self.assertEqual(response.context['get-foo'], 'bang')
             self.assertEqual(response.context['request-foo'], 'bang')
 
-            response = method("/test_client_regress/request_data/?foo=whiz", data={'bar':'bang'})
+            response = method("/test_client_regress/request_data/?foo=whiz", data={'bar': 'bang'})
             self.assertEqual(response.context['get-foo'], None)
             self.assertEqual(response.context['get-bar'], 'bang')
             self.assertEqual(response.context['request-foo'], None)
@@ -1141,7 +1171,7 @@ class QueryStringTests(TestCase):
 
     def test_post_like_requests(self):
         # A POST-like request can pass a query string as data
-        response = self.client.post("/test_client_regress/request_data/", data={'foo':'whiz'})
+        response = self.client.post("/test_client_regress/request_data/", data={'foo': 'whiz'})
         self.assertEqual(response.context['get-foo'], None)
         self.assertEqual(response.context['post-foo'], 'whiz')
 
@@ -1152,18 +1182,19 @@ class QueryStringTests(TestCase):
         self.assertEqual(response.context['request-foo'], 'whiz')
 
         # POST data provided in the URL augments actual form data
-        response = self.client.post("/test_client_regress/request_data/?foo=whiz", data={'foo':'bang'})
+        response = self.client.post("/test_client_regress/request_data/?foo=whiz", data={'foo': 'bang'})
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['post-foo'], 'bang')
         self.assertEqual(response.context['request-foo'], 'bang')
 
-        response = self.client.post("/test_client_regress/request_data/?foo=whiz", data={'bar':'bang'})
+        response = self.client.post("/test_client_regress/request_data/?foo=whiz", data={'bar': 'bang'})
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['get-bar'], None)
         self.assertEqual(response.context['post-foo'], None)
         self.assertEqual(response.context['post-bar'], 'bang')
         self.assertEqual(response.context['request-foo'], 'whiz')
         self.assertEqual(response.context['request-bar'], 'bang')
+
 
 class UnicodePayloadTests(TestCase):
     def test_simple_unicode_payload(self):
@@ -1192,17 +1223,20 @@ class UnicodePayloadTests(TestCase):
 
     def test_unicode_payload_non_utf(self):
         "A non-ASCII unicode data as a non-UTF based encoding can be POSTed"
-        #Regression test for #10571
+        # Regression test for #10571
         json = '{"dog": "собака"}'
         response = self.client.post("/test_client_regress/parse_unicode_json/", json,
                                     content_type="application/json; charset=koi8-r")
         self.assertEqual(response.content, json.encode('koi8-r'))
 
+
 class DummyFile(object):
     def __init__(self, filename):
         self.name = filename
+
     def read(self):
         return b'TEST_FILE_CONTENT'
+
 
 class UploadedFileEncodingTest(TestCase):
     def test_file_encoding(self):
@@ -1217,12 +1251,13 @@ class UploadedFileEncodingTest(TestCase):
         self.assertEqual(b'Content-Type: text/plain',
                          encode_file('IGNORE', 'IGNORE', DummyFile("file.txt"))[2])
         self.assertIn(encode_file('IGNORE', 'IGNORE', DummyFile("file.zip"))[2], (
-                        b'Content-Type: application/x-compress',
-                        b'Content-Type: application/x-zip',
-                        b'Content-Type: application/x-zip-compressed',
-                        b'Content-Type: application/zip',))
+            b'Content-Type: application/x-compress',
+            b'Content-Type: application/x-zip',
+            b'Content-Type: application/x-zip-compressed',
+            b'Content-Type: application/zip',))
         self.assertEqual(b'Content-Type: application/octet-stream',
                          encode_file('IGNORE', 'IGNORE', DummyFile("file.unknown"))[2])
+
 
 class RequestHeadersTest(TestCase):
     def test_client_headers(self):
@@ -1266,17 +1301,19 @@ class ReadLimitedStreamTest(TestCase):
         """HttpRequest.read() on a test client PUT request with some payload
         should return that payload."""
         payload = b'foobar'
-        self.assertEqual(self.client.put("/test_client_regress/read_all/",
-                                          data=payload,
-                                          content_type='text/plain').content, payload)
+        self.assertEqual(self.client.put(
+            "/test_client_regress/read_all/",
+            data=payload,
+            content_type='text/plain').content, payload)
 
     def test_read_numbytes_from_nonempty_request(self):
         """HttpRequest.read(LARGE_BUFFER) on a test client PUT request with
         some payload should return that payload."""
         payload = b'foobar'
-        self.assertEqual(self.client.put("/test_client_regress/read_buffer/",
-                                          data=payload,
-                                          content_type='text/plain').content, payload)
+        self.assertEqual(
+            self.client.put("/test_client_regress/read_buffer/",
+            data=payload,
+            content_type='text/plain').content, payload)
 
 
 class RequestFactoryStateTest(TestCase):

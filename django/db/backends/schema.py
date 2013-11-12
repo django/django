@@ -2,7 +2,7 @@ import hashlib
 import operator
 
 from django.db.backends.creation import BaseDatabaseCreation
-from django.db.backends.util import truncate_name
+from django.db.backends.utils import truncate_name
 from django.db.models.fields.related import ManyToManyField
 from django.db.transaction import atomic
 from django.utils.log import getLogger
@@ -148,7 +148,7 @@ class BaseDatabaseSchemaEditor(object):
         """
         Only used for backends which have requires_literal_defaults feature
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseDatabaseSchemaEditor for backends which have requires_literal_defaults must provide a prepare_default() method')
 
     def effective_default(self, field):
         """

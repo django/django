@@ -16,6 +16,7 @@ class Reporter(models.Model):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)

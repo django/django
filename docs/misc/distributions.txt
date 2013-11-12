@@ -26,11 +26,8 @@ For distributors
 ================
 
 If you'd like to package Django for distribution, we'd be happy to help out!
-Please join the `django-developers mailing list`_ and introduce yourself.
+Please join the |django-developers| mailing list and introduce yourself.
 
-We also encourage all distributors to subscribe to the `django-announce mailing
-list`_, which is a (very) low-traffic list for announcing new releases of Django
+We also encourage all distributors to subscribe to the |django-announce| mailing
+list, which is a (very) low-traffic list for announcing new releases of Django
 and important bugfixes.
-
-.. _django-developers mailing list: http://groups.google.com/group/django-developers/
-.. _django-announce mailing list: http://groups.google.com/group/django-announce/

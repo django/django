@@ -15,6 +15,7 @@ class Person(models.Model):
     def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
+
 @python_2_unicode_compatible
 class Car(models.Model):
     make = models.CharField(max_length=20)

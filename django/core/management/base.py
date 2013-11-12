@@ -3,6 +3,8 @@ Base classes for writing management commands (named commands which can
 be executed through ``django-admin.py`` or ``manage.py``).
 
 """
+from __future__ import unicode_literals
+
 import os
 import sys
 
@@ -263,7 +265,7 @@ class BaseCommand(object):
             self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
 
         if self.can_import_settings:
-            from django.conf import settings
+            from django.conf import settings  # NOQA
 
         saved_locale = None
         if not self.leave_locale_alone:
@@ -325,7 +327,7 @@ class BaseCommand(object):
         this method.
 
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseCommand must provide a handle() method')
 
 
 class AppCommand(BaseCommand):
@@ -361,7 +363,7 @@ class AppCommand(BaseCommand):
         the command line.
 
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of AppCommand must provide a handle_app() method')
 
 
 class LabelCommand(BaseCommand):
@@ -397,7 +399,7 @@ class LabelCommand(BaseCommand):
         string as given on the command line.
 
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of LabelCommand must provide a handle_label() method')
 
 
 class NoArgsCommand(BaseCommand):
@@ -423,4 +425,4 @@ class NoArgsCommand(BaseCommand):
         Perform this command's actions.
 
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of NoArgsCommand must provide a handle_noargs() method')

@@ -24,7 +24,8 @@ from django.views.debug import ExceptionReporter
 from .. import BrokenException, except_args
 from ..views import (sensitive_view, non_sensitive_view, paranoid_view,
     custom_exception_reporter_filter_view, sensitive_method_view,
-    sensitive_args_function_caller, sensitive_kwargs_function_caller)
+    sensitive_args_function_caller, sensitive_kwargs_function_caller,
+    multivalue_dict_key_error)
 
 
 @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
@@ -184,7 +185,7 @@ class ExceptionReporterTests(TestCase):
 
         for newline in ['\n', '\r\n', '\r']:
             fd, filename = mkstemp(text=False)
-            os.write(fd, force_bytes(newline.join(LINES)+newline))
+            os.write(fd, force_bytes(newline.join(LINES) + newline))
             os.close(fd)
 
             try:
@@ -282,17 +283,17 @@ class PlainTextReportTests(TestCase):
         "An exception report can be generated for just a request"
         request = self.rf.get('/test_view/')
         reporter = ExceptionReporter(request, None, None, None)
-        text = reporter.get_traceback_text()
+        reporter.get_traceback_text()
 
     def test_request_and_message(self):
         "A message can be provided in addition to a request"
         request = self.rf.get('/test_view/')
         reporter = ExceptionReporter(request, None, "I'm a little teapot", None)
-        text = reporter.get_traceback_text()
+        reporter.get_traceback_text()
 
     def test_message_only(self):
         reporter = ExceptionReporter(None, None, "I'm a little teapot", None)
-        text = reporter.get_traceback_text()
+        reporter.get_traceback_text()
 
 
 class ExceptionReportTestMixin(object):
@@ -303,7 +304,7 @@ class ExceptionReportTestMixin(object):
     breakfast_data = {'sausage-key': 'sausage-value',
                       'baked-beans-key': 'baked-beans-value',
                       'hash-brown-key': 'hash-brown-value',
-                      'bacon-key': 'bacon-value',}
+                      'bacon-key': 'bacon-value'}
 
     def verify_unsafe_response(self, view, check_for_vars=True,
                                check_for_POST_params=True):
@@ -374,9 +375,9 @@ class ExceptionReportTestMixin(object):
         Asserts that potentially sensitive info are displayed in the email report.
         """
         with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
-            mail.outbox = [] # Empty outbox
+            mail.outbox = []  # Empty outbox
             request = self.rf.post('/some_url/', self.breakfast_data)
-            response = view(request)
+            view(request)
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
 
@@ -407,9 +408,9 @@ class ExceptionReportTestMixin(object):
         Asserts that certain sensitive info are not displayed in the email report.
         """
         with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
-            mail.outbox = [] # Empty outbox
+            mail.outbox = []  # Empty outbox
             request = self.rf.post('/some_url/', self.breakfast_data)
-            response = view(request)
+            view(request)
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
 
@@ -447,9 +448,9 @@ class ExceptionReportTestMixin(object):
         Asserts that no variables or POST parameters are displayed in the email report.
         """
         with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
-            mail.outbox = [] # Empty outbox
+            mail.outbox = []  # Empty outbox
             request = self.rf.post('/some_url/', self.breakfast_data)
-            response = view(request)
+            view(request)
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
             # Frames vars are never shown in plain text email reports.
@@ -511,6 +512,19 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
             self.verify_paranoid_response(paranoid_view)
             self.verify_paranoid_email(paranoid_view)
 
+    def test_multivalue_dict_key_error(self):
+        """
+        #21098 -- Ensure that sensitive POST parameters cannot be seen in the
+        error reports for if request.POST['nonexistent_key'] throws an error.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(multivalue_dict_key_error)
+            self.verify_unsafe_email(multivalue_dict_key_error)
+
+        with self.settings(DEBUG=False):
+            self.verify_safe_response(multivalue_dict_key_error)
+            self.verify_safe_email(multivalue_dict_key_error)
+
     def test_custom_exception_reporter_filter(self):
         """
         Ensure that it's possible to assign an exception reporter filter to
@@ -571,6 +585,61 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
         with self.settings(DEBUG=False):
             self.verify_safe_response(sensitive_kwargs_function_caller, check_for_POST_params=False)
             self.verify_safe_email(sensitive_kwargs_function_caller, check_for_POST_params=False)
+
+    def test_callable_settings(self):
+        """
+        Callable settings should not be evaluated in the debug page (#21345).
+        """
+        def callable_setting():
+            return "This should not be displayed"
+        with self.settings(DEBUG=True, FOOBAR=callable_setting):
+            response = self.client.get('/views/raises500/')
+            self.assertNotContains(response, "This should not be displayed", status_code=500)
+
+    def test_dict_setting_with_non_str_key(self):
+        """
+        A dict setting containing a non-string key should not break the
+        debug page (#12744).
+        """
+        with self.settings(DEBUG=True, FOOBAR={42: None}):
+            response = self.client.get('/views/raises500/')
+            self.assertContains(response, 'FOOBAR', status_code=500)
+
+    def test_sensitive_settings(self):
+        """
+        The debug page should not show some sensitive settings
+        (password, secret key, ...).
+        """
+        sensitive_settings = [
+            'SECRET_KEY',
+            'PASSWORD',
+            'API_KEY',
+            'AUTH_TOKEN',
+        ]
+        for setting in sensitive_settings:
+            with self.settings(DEBUG=True, **{setting: "should not be displayed"}):
+                response = self.client.get('/views/raises500/')
+                self.assertNotContains(response, 'should not be displayed', status_code=500)
+
+    def test_settings_with_sensitive_keys(self):
+        """
+        The debug page should filter out some sensitive information found in
+        dict settings.
+        """
+        sensitive_settings = [
+            'SECRET_KEY',
+            'PASSWORD',
+            'API_KEY',
+            'AUTH_TOKEN',
+        ]
+        for setting in sensitive_settings:
+            FOOBAR = {
+                setting: "should not be displayed",
+                'recursive': {setting: "should not be displayed"},
+            }
+            with self.settings(DEBUG=True, FOOBAR=FOOBAR):
+                response = self.client.get('/views/raises500/')
+                self.assertNotContains(response, 'should not be displayed', status_code=500)
 
 
 class AjaxResponseExceptionReporterFilter(TestCase, ExceptionReportTestMixin):

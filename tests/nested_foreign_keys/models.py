@@ -17,12 +17,14 @@ class Event(models.Model):
 class Screening(Event):
     movie = models.ForeignKey(Movie)
 
+
 class ScreeningNullFK(Event):
     movie = models.ForeignKey(Movie, null=True)
 
 
 class Package(models.Model):
     screening = models.ForeignKey(Screening, null=True)
+
 
 class PackageNullFK(models.Model):
     screening = models.ForeignKey(ScreeningNullFK, null=True)

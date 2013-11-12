@@ -8,6 +8,7 @@ from django.forms import ModelForm
 temp_storage_dir = tempfile.mkdtemp()
 temp_storage = FileSystemStorage(temp_storage_dir)
 
+
 class Photo(models.Model):
     title = models.CharField(max_length=30)
     image = models.FileField(storage=temp_storage, upload_to='tests')
@@ -21,6 +22,7 @@ class Photo(models.Model):
     def save(self, force_insert=False, force_update=False):
         super(Photo, self).save(force_insert, force_update)
         self._savecount += 1
+
 
 class PhotoForm(ModelForm):
     class Meta:

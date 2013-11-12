@@ -1,5 +1,6 @@
 import fnmatch
 import glob
+import io
 import os
 import re
 import sys
@@ -10,6 +11,7 @@ import django
 from django.core.management.base import CommandError, NoArgsCommand
 from django.core.management.utils import (handle_extensions, find_command,
     popen_wrapper)
+from django.utils.encoding import force_str
 from django.utils.functional import total_ordering
 from django.utils.text import get_text_list
 from django.utils.jslex import prepare_js_for_gettext
@@ -135,12 +137,19 @@ class TranslatableFile(object):
                 command.stdout.write(errors)
         if msgs:
             if is_templatized:
-                old = '#: ' + work_file[2:]
-                new = '#: ' + orig_file[2:]
+                # Remove '.py' suffix
+                if os.name == 'nt':
+                    # Preserve '.\' prefix on Windows to respect gettext behavior
+                    old = '#: ' + work_file
+                    new = '#: ' + orig_file
+                else:
+                    old = '#: ' + work_file[2:]
+                    new = '#: ' + orig_file[2:]
                 msgs = msgs.replace(old, new)
             write_pot_file(potfile, msgs)
         if is_templatized:
             os.unlink(work_file)
+
 
 def write_pot_file(potfile, msgs):
     """
@@ -219,7 +228,7 @@ class Command(NoArgsCommand):
 
         if (locale is None and not process_all) or self.domain is None:
             raise CommandError("Type '%s help %s' for usage information." % (
-                                os.path.basename(sys.argv[0]), sys.argv[1]))
+                os.path.basename(sys.argv[0]), sys.argv[1]))
 
         if self.verbosity > 1:
             self.stdout.write('examining files with the extensions: %s\n'
@@ -230,7 +239,7 @@ class Command(NoArgsCommand):
         if settings.configured:
             settings.USE_I18N = True
         else:
-            settings.configure(USE_I18N = True)
+            settings.configure(USE_I18N=True)
 
         self.invoked_for_django = False
         if os.path.isdir(os.path.join('conf', 'locale')):
@@ -396,16 +405,17 @@ class Command(NoArgsCommand):
         for domain in domains:
             django_po = os.path.join(django_dir, 'conf', 'locale', locale, 'LC_MESSAGES', '%s.po' % domain)
             if os.path.exists(django_po):
-                with open(django_po, 'rU') as fp:
+                with io.open(django_po, 'rU', encoding='utf-8') as fp:
                     m = plural_forms_re.search(fp.read())
                 if m:
+                    plural_form_line = force_str(m.group('value'))
                     if self.verbosity > 1:
-                        self.stdout.write("copying plural forms: %s\n" % m.group('value'))
+                        self.stdout.write("copying plural forms: %s\n" % plural_form_line)
                     lines = []
                     found = False
                     for line in msgs.split('\n'):
                         if not found and (not line or plural_forms_re.search(line)):
-                            line = '%s\n' % m.group('value')
+                            line = '%s\n' % plural_form_line
                             found = True
                         lines.append(line)
                     msgs = '\n'.join(lines)

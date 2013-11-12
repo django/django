@@ -13,6 +13,7 @@ from django.utils.encoding import force_text
 
 from django.contrib.sessions.exceptions import InvalidSessionKey
 
+
 class SessionStore(SessionBase):
     """
     Implements a file based session store.

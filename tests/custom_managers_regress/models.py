@@ -13,12 +13,14 @@ class RestrictedManager(models.Manager):
     def get_queryset(self):
         return super(RestrictedManager, self).get_queryset().filter(is_public=True)
 
+
 @python_2_unicode_compatible
 class RelatedModel(models.Model):
     name = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class RestrictedModel(models.Model):
@@ -31,6 +33,7 @@ class RestrictedModel(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class OneToOneRestrictedModel(models.Model):

@@ -2,6 +2,9 @@ from contextlib import contextmanager
 import logging
 import re
 import sys
+from threading import local
+import time
+from unittest import skipUnless
 import warnings
 from functools import wraps
 from xml.dom.minidom import parseString, Node
@@ -20,11 +23,12 @@ from django.utils.translation import deactivate
 
 
 __all__ = (
-    'Approximate', 'ContextList',  'get_runner', 'override_settings',
-    'setup_test_environment', 'teardown_test_environment',
+    'Approximate', 'ContextList', 'get_runner', 'override_settings',
+    'requires_tz_support', 'setup_test_environment', 'teardown_test_environment',
 )
 
 RESTORE_LOADERS_ATTR = '_original_template_source_loaders'
+TZ_SUPPORT = hasattr(time, 'tzset')
 
 
 class Approximate(object):
@@ -200,18 +204,11 @@ class override_settings(object):
                 raise Exception(
                     "Only subclasses of Django SimpleTestCase can be decorated "
                     "with override_settings")
-            original_pre_setup = test_func._pre_setup
-            original_post_teardown = test_func._post_teardown
-
-            def _pre_setup(innerself):
-                self.enable()
-                original_pre_setup(innerself)
-
-            def _post_teardown(innerself):
-                original_post_teardown(innerself)
-                self.disable()
-            test_func._pre_setup = _pre_setup
-            test_func._post_teardown = _post_teardown
+            if test_func._custom_settings:
+                test_func._custom_settings = dict(
+                    test_func._custom_settings, **self.options)
+            else:
+                test_func._custom_settings = self.options
             return test_func
         else:
             @wraps(test_func)
@@ -248,6 +245,7 @@ def compare_xml(want, got):
     Based on http://codespeak.net/svn/lxml/trunk/src/lxml/doctestcompare.py
     """
     _norm_whitespace_re = re.compile(r'[ \t\n][ \t\n]+')
+
     def norm_whitespace(v):
         return _norm_whitespace_re.sub(' ', v)
 
@@ -287,8 +285,8 @@ def compare_xml(want, got):
                 return node
 
     want, got = strip_quotes(want, got)
-    want = want.replace('\\n','\n')
-    got = got.replace('\\n','\n')
+    want = want.replace('\\n', '\n')
+    got = got.replace('\\n', '\n')
 
     # If the string is not a complete xml document, we may need to add a
     # root element. This allow us to compare fragments, like "<foo/><bar/>"
@@ -408,8 +406,9 @@ def patch_logger(logger_name, log_level):
     and provides a simple mock-like list of messages received
     """
     calls = []
-    def replacement(msg):
-        calls.append(msg)
+
+    def replacement(msg, *args, **kwargs):
+        calls.append(msg % args)
     logger = logging.getLogger(logger_name)
     orig = getattr(logger, log_level)
     setattr(logger, log_level, replacement)
@@ -417,3 +416,29 @@ def patch_logger(logger_name, log_level):
         yield calls
     finally:
         setattr(logger, log_level, orig)
+
+
+class TransRealMixin(object):
+    """This is the only way to reset the translation machinery. Otherwise
+    the test suite occasionally fails because of global state pollution
+    between tests."""
+    def flush_caches(self):
+        from django.utils.translation import trans_real
+        trans_real._translations = {}
+        trans_real._active = local()
+        trans_real._default = None
+        trans_real.check_for_language.cache_clear()
+
+    def tearDown(self):
+        self.flush_caches()
+        super(TransRealMixin, self).tearDown()
+
+
+# On OSes that don't provide tzset (Windows), we can't set the timezone
+# in which the program runs. As a consequence, we must skip tests that
+# don't enforce a specific timezone (with timezone.override or equivalent),
+# or attempt to interpret naive datetimes in the default timezone.
+
+requires_tz_support = skipUnless(TZ_SUPPORT,
+        "This test relies on the ability to run a program in an arbitrary "
+        "time zone, but your operating system isn't able to do that.")

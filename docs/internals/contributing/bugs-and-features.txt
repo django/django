@@ -18,16 +18,16 @@ general points:
   `searching`_ or running `custom queries`_ in the ticket tracker.
 
 * Don't use the ticket system to ask support questions. Use the
-  `django-users`_ list or the `#django`_ IRC channel for that.
+  |django-users| list or the `#django`_ IRC channel for that.
 
 * Don't reopen issues that have been marked "wontfix" by a core developer.
   This mark means that the decision has been made that we can't or won't fix
   this particular issue. If you're not sure why, please ask
-  on `django-developers`_.
+  on |django-developers|.
 
 * Don't use the ticket tracker for lengthy discussions, because they're
   likely to get lost. If a particular ticket is controversial, please move the
-  discussion to `django-developers`_.
+  discussion to |django-developers|.
 
 .. _reporting-bugs:
 
@@ -42,7 +42,7 @@ particular:
 * **Do** read the :doc:`FAQ </faq/index>` to see if your issue might
   be a well-known question.
 
-* **Do** ask on `django-users`_ or `#django`_ *first* if you're not sure if
+* **Do** ask on |django-users| or `#django`_ *first* if you're not sure if
   what you're seeing is a bug.
 
 * **Do** write complete, reproducible, specific bug reports. You must
@@ -52,15 +52,13 @@ particular:
   small test case is the best way to report a bug, as it gives us an easy
   way to confirm the bug quickly.
 
-* **Don't** post to `django-developers`_ just to announce that you have
+* **Don't** post to |django-developers| just to announce that you have
   filed a bug report. All the tickets are mailed to another list,
-  `django-updates`_, which is tracked by developers and interested
+  |django-updates|, which is tracked by developers and interested
   community members; we see them as they are filed.
 
 To understand the lifecycle of your ticket once you have created it, refer to
 :doc:`triaging-tickets`.
-
-.. _django-updates: http://groups.google.com/group/django-updates
 
 Reporting user interface bugs and features
 ------------------------------------------
@@ -101,7 +99,7 @@ part of that. Here are some tips on how to make a request most effectively:
   gathers sufficient community support, we may consider it for inclusion in
   Django.
 
-* First request the feature on the `django-developers`_ list, not in the
+* First request the feature on the |django-developers| list, not in the
   ticket tracker. It'll get read more closely if it's on the mailing list.
   This is even more important for large-scale feature requests. We like to
   discuss any big changes to Django's core on the mailing list before
@@ -117,7 +115,7 @@ part of that. Here are some tips on how to make a request most effectively:
   useful.
 
 If core developers agree on the feature, then it's appropriate to create a
-ticket. Include a link the discussion on `django-developers`_ in the ticket
+ticket. Include a link the discussion on |django-developers| in the ticket
 description.
 
 As with most open-source projects, code talks. If you are willing to write the
@@ -133,7 +131,7 @@ How we make decisions
 ---------------------
 
 Whenever possible, we strive for a rough consensus. To that end, we'll often
-have informal votes on `django-developers`_ about a feature. In these votes we
+have informal votes on |django-developers| about a feature. In these votes we
 follow the voting style invented by Apache and used on Python itself, where
 votes are given as +1, +0, -0, or -1. Roughly translated, these votes mean:
 
@@ -146,7 +144,7 @@ votes are given as +1, +0, -0, or -1. Roughly translated, these votes mean:
 * -1: "I strongly disagree and would be very unhappy to see the idea turn
   into reality."
 
-Although these votes on `django-developers`_ are informal, they'll be taken very
+Although these votes on |django-developers| are informal, they'll be taken very
 seriously. After a suitable voting period, if an obvious consensus arises we'll
 follow the votes.
 
@@ -174,13 +172,11 @@ votes (or BDFL vetos) should be accompanied by an explanation that explains
 what it would take to convert that "-1" into at least a "+0".
 
 Whenever possible, these formal votes should be announced and held in
-public on the `django-developers`_ mailing list. However, overly sensitive
+public on the |django-developers| mailing list. However, overly sensitive
 or contentious issues -- including, most notably, votes on new core
 committers -- may be held in private.
 
 
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
-.. _django-developers: http://groups.google.com/group/django-developers
-.. _django-users: http://groups.google.com/group/django-users
 .. _#django: irc://irc.freenode.net/django

@@ -66,9 +66,9 @@ class Command(NoArgsCommand):
                 indexes = connection.introspection.get_indexes(cursor, table_name)
             except NotImplementedError:
                 indexes = {}
-            used_column_names = [] # Holds column names used in the table so far
+            used_column_names = []  # Holds column names used in the table so far
             for i, row in enumerate(connection.introspection.get_table_description(cursor, table_name)):
-                comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
+                comment_notes = []  # Holds Field notes, to be displayed in a Python comment.
                 extra_params = OrderedDict()  # Holds Field parameters such as 'db_column'.
                 column_name = row[0]
                 is_relation = i in relations
@@ -104,12 +104,15 @@ class Command(NoArgsCommand):
 
                 # Don't output 'id = meta.AutoField(primary_key=True)', because
                 # that's assumed if it doesn't exist.
-                if att_name == 'id' and field_type == 'AutoField(' and extra_params == {'primary_key': True}:
-                    continue
+                if att_name == 'id' and extra_params == {'primary_key': True}:
+                    if field_type == 'AutoField(':
+                        continue
+                    elif field_type == 'IntegerField(' and not connection.features.can_introspect_autofield:
+                        comment_notes.append('AutoField?')
 
                 # Add 'null' and 'blank', if the 'null_ok' flag was present in the
                 # table description.
-                if row[6]: # If it's NULL...
+                if row[6]:  # If it's NULL...
                     if field_type == 'BooleanField(':
                         field_type = 'NullBooleanField('
                     else:
@@ -117,7 +120,12 @@ class Command(NoArgsCommand):
                         if not field_type in ('TextField(', 'CharField('):
                             extra_params['null'] = True
 
-                field_desc = '%s = models.%s' % (att_name, field_type)
+                field_desc = '%s = %s%s' % (
+                    att_name,
+                    # Custom fields will have a dotted path
+                    '' if '.' in field_type else 'models.',
+                    field_type,
+                )
                 if extra_params:
                     if not field_desc.endswith('('):
                         field_desc += ', '

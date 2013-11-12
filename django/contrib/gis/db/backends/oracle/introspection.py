@@ -3,6 +3,7 @@ import sys
 from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.utils import six
 
+
 class OracleIntrospection(DatabaseIntrospection):
     # Associating any OBJECTVAR instances with GeometryField.  Of course,
     # this won't work right on Oracle objects that aren't MDSYS.SDO_GEOMETRY,

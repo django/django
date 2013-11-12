@@ -49,7 +49,7 @@ class GeoFeedTest(TestCase):
         # Incrementing through the feeds.
         for feed in [feed1, feed2]:
             # Ensuring the georss namespace was added to the <rss> element.
-            self.assertEqual(feed.getAttribute('xmlns:georss'),  'http://www.georss.org/georss')
+            self.assertEqual(feed.getAttribute('xmlns:georss'), 'http://www.georss.org/georss')
             chan = feed.getElementsByTagName('channel')[0]
             items = chan.getElementsByTagName('item')
             self.assertEqual(len(items), City.objects.count())
@@ -69,7 +69,7 @@ class GeoFeedTest(TestCase):
 
         for feed in [feed1, feed2]:
             # Ensuring the georsss namespace was added to the <feed> element.
-            self.assertEqual(feed.getAttribute('xmlns:georss'),  'http://www.georss.org/georss')
+            self.assertEqual(feed.getAttribute('xmlns:georss'), 'http://www.georss.org/georss')
             entries = feed.getElementsByTagName('entry')
             self.assertEqual(len(entries), City.objects.count())
 
@@ -92,5 +92,5 @@ class GeoFeedTest(TestCase):
             self.assertChildNodes(item, ['title', 'link', 'description', 'guid', 'geo:lat', 'geo:lon'])
 
         # Boxes and Polygons aren't allowed in W3C Geo feeds.
-        self.assertRaises(ValueError, self.client.get, '/feeds/w3cgeo2/') # Box in <channel>
-        self.assertRaises(ValueError, self.client.get, '/feeds/w3cgeo3/') # Polygons in <entry>
+        self.assertRaises(ValueError, self.client.get, '/feeds/w3cgeo2/')  # Box in <channel>
+        self.assertRaises(ValueError, self.client.get, '/feeds/w3cgeo3/')  # Polygons in <entry>

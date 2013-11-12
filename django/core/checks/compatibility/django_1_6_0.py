@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 
+
 def check_test_runner():
     """
     Checks if the user has *not* overridden the ``TEST_RUNNER`` setting &
@@ -16,14 +17,13 @@ def check_test_runner():
 
     if test_runner_setting == new_default:
         message = [
-            "You have not explicitly set 'TEST_RUNNER'. In Django 1.6,",
-            "there is a new test runner ('%s')" % new_default,
-            "by default. You should ensure your tests are still all",
-            "running & behaving as expected. See",
+            "Django 1.6 introduced a new default test runner ('%s')" % new_default,
+            "You should ensure your tests are all running & behaving as expected. See",
             "https://docs.djangoproject.com/en/dev/releases/1.6/#discovery-of-tests-in-any-test-module",
             "for more information.",
         ]
         return ' '.join(message)
+
 
 def check_boolean_field_default_value():
     """

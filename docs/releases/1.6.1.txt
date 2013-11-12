@@ -1,0 +1,14 @@
+==========================
+Django 1.6.1 release notes
+==========================
+
+*Under development*
+
+This is Django 1.6.1, a bugfix release for Django 1.6.
+
+...
+
+Bug fixes
+=========
+
+* Fixed ``BCryptSHA256PasswordHasher`` with py-bcrypt and Python 3 (#21398).

@@ -26,6 +26,7 @@ Introductions to all the key parts of Django you'll need to know:
    pagination
    python3
    security
+   performance
    serialization
    settings
    signals

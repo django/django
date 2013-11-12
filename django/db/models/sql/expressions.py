@@ -60,6 +60,7 @@ class SQLEvaluator(object):
                 field, sources, opts, join_list, path = query.setup_joins(
                     field_list, query.get_meta(),
                     query.get_initial_alias(), self.reuse)
+                self._used_joins = join_list
                 targets, _, join_list = query.trim_joins(sources, join_list, path)
                 if self.reuse is not None:
                     self.reuse.update(join_list)
@@ -111,8 +112,7 @@ class SQLEvaluator(object):
         timedelta = node.children.pop()
         sql, params = self.evaluate_node(node, qn, connection)
 
-        if timedelta.days == 0 and timedelta.seconds == 0 and \
-                timedelta.microseconds == 0:
+        if (timedelta.days == timedelta.seconds == timedelta.microseconds == 0):
             return sql, params
 
         return connection.ops.date_interval_sql(sql, node.connector, timedelta), params

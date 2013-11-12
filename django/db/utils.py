@@ -1,4 +1,3 @@
-from functools import wraps
 from importlib import import_module
 import os
 import pkgutil
@@ -82,7 +81,7 @@ class DatabaseErrorWrapper(object):
                 DatabaseError,
                 InterfaceError,
                 Error,
-            ):
+        ):
             db_exc_type = getattr(self.wrapper.Database, dj_exc_type.__name__)
             if issubclass(exc_type, db_exc_type):
                 dj_exc_value = dj_exc_type(*exc_value.args)
@@ -94,7 +93,8 @@ class DatabaseErrorWrapper(object):
                 six.reraise(dj_exc_type, dj_exc_value, traceback)
 
     def __call__(self, func):
-        @wraps(func)
+        # Note that we are intentionally not using @wraps here for performance
+        # reasons. Refs #21109.
         def inner(*args, **kwargs):
             with self:
                 return func(*args, **kwargs)
@@ -277,3 +277,11 @@ class ConnectionRouter(object):
                 if allow is not None:
                     return allow
         return True
+
+    def get_migratable_models(self, app, db, include_auto_created=False):
+        """
+        Return app models allowed to be synchronized on provided db.
+        """
+        from .models import get_models
+        return [model for model in get_models(app, include_auto_created=include_auto_created)
+                if self.allow_migrate(db, model)]

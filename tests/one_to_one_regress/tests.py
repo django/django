@@ -2,7 +2,8 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from .models import Place, Restaurant, Bar, Favorites, Target, UndergroundBar
+from .models import (Bar, Favorites, HiddenPointer, Place, Restaurant, Target,
+    UndergroundBar)
 
 
 class OneToOneRegressionTests(TestCase):
@@ -125,11 +126,11 @@ class OneToOneRegressionTests(TestCase):
             []
         )
         self.assertQuerysetEqual(
-            Target.objects.filter(pointer2=None),
+            Target.objects.filter(second_pointer=None),
             ['<Target: Target object>']
         )
         self.assertQuerysetEqual(
-            Target.objects.exclude(pointer2=None),
+            Target.objects.exclude(second_pointer=None),
             []
         )
 
@@ -141,10 +142,12 @@ class OneToOneRegressionTests(TestCase):
         """
         p = Place(name='Zombie Cats', address='Not sure')
         p.save()
-        with self.assertNumQueries(1), self.assertRaises(Restaurant.DoesNotExist):
-            p.restaurant
-        with self.assertNumQueries(0), self.assertRaises(Restaurant.DoesNotExist):
-            p.restaurant
+        with self.assertNumQueries(1):
+            with self.assertRaises(Restaurant.DoesNotExist):
+                p.restaurant
+        with self.assertNumQueries(0):
+            with self.assertRaises(Restaurant.DoesNotExist):
+                p.restaurant
 
     def test_reverse_object_cached_when_related_is_accessed(self):
         """
@@ -197,8 +200,9 @@ class OneToOneRegressionTests(TestCase):
             self.assertEqual(self.p1.undergroundbar, b)
         b.place = None
         b.save()
-        with self.assertNumQueries(0), self.assertRaises(UndergroundBar.DoesNotExist):
-            self.p1.undergroundbar
+        with self.assertNumQueries(0):
+            with self.assertRaises(UndergroundBar.DoesNotExist):
+                self.p1.undergroundbar
 
     def test_get_reverse_on_unsaved_object(self):
         """
@@ -210,21 +214,24 @@ class OneToOneRegressionTests(TestCase):
         p = Place()
 
         # When there's no instance of the origin of the one-to-one
-        with self.assertNumQueries(0), self.assertRaises(UndergroundBar.DoesNotExist):
-            p.undergroundbar
+        with self.assertNumQueries(0):
+            with self.assertRaises(UndergroundBar.DoesNotExist):
+                p.undergroundbar
 
         UndergroundBar.objects.create()
 
         # When there's one instance of the origin
         # (p.undergroundbar used to return that instance)
-        with self.assertNumQueries(0), self.assertRaises(UndergroundBar.DoesNotExist):
-            p.undergroundbar
+        with self.assertNumQueries(0):
+            with self.assertRaises(UndergroundBar.DoesNotExist):
+                p.undergroundbar
 
         UndergroundBar.objects.create()
 
         # When there are several instances of the origin
-        with self.assertNumQueries(0), self.assertRaises(UndergroundBar.DoesNotExist):
-            p.undergroundbar
+        with self.assertNumQueries(0):
+            with self.assertRaises(UndergroundBar.DoesNotExist):
+                p.undergroundbar
 
     def test_set_reverse_on_unsaved_object(self):
         """
@@ -233,8 +240,9 @@ class OneToOneRegressionTests(TestCase):
         """
         p = Place()
         b = UndergroundBar.objects.create()
-        with self.assertNumQueries(0), self.assertRaises(ValueError):
-            p.undergroundbar = b
+        with self.assertNumQueries(0):
+            with self.assertRaises(ValueError):
+                p.undergroundbar = b
 
     def test_nullable_o2o_delete(self):
         u = UndergroundBar.objects.create(place=self.p1)
@@ -243,3 +251,12 @@ class OneToOneRegressionTests(TestCase):
         self.p1.delete()
         self.assertTrue(UndergroundBar.objects.filter(pk=u.pk).exists())
         self.assertIsNone(UndergroundBar.objects.get(pk=u.pk).place)
+
+    def test_hidden_accessor(self):
+        """
+        When a '+' ending related name is specified no reverse accessor should
+        be added to the related model.
+        """
+        self.assertFalse(
+            hasattr(Target, HiddenPointer._meta.get_field('target').related.get_accessor_name())
+        )

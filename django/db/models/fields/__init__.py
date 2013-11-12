@@ -25,6 +25,18 @@ from django.utils.encoding import smart_text, force_text, force_bytes
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
 
+# Avoid "TypeError: Item in ``from list'' not a string" -- unicode_literals
+# makes these strings unicode
+__all__ = [str(x) for x in (
+    'AutoField', 'BLANK_CHOICE_DASH', 'BigIntegerField', 'BinaryField',
+    'BooleanField', 'CharField', 'CommaSeparatedIntegerField', 'DateField',
+    'DateTimeField', 'DecimalField', 'EmailField', 'Empty', 'Field',
+    'FieldDoesNotExist', 'FilePathField', 'FloatField',
+    'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
+    'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
+    'SlugField', 'SmallIntegerField', 'TextField', 'TimeField', 'URLField',
+)]
+
 
 class Empty(object):
     pass
@@ -81,7 +93,7 @@ class Field(object):
     # creates, creation_counter is used for all user-specified fields.
     creation_counter = 0
     auto_creation_counter = -1
-    default_validators = [] # Default set of validators
+    default_validators = []  # Default set of validators
     default_error_messages = {
         'invalid_choice': _('Value %(value)r is not a valid choice.'),
         'null': _('This field cannot be null.'),
@@ -704,7 +716,7 @@ class AutoField(Field):
 
     def __init__(self, *args, **kwargs):
         assert kwargs.get('primary_key', False) is True, \
-               "%ss must have primary_key=True." % self.__class__.__name__
+            "%ss must have primary_key=True." % self.__class__.__name__
         kwargs['blank'] = True
         Field.__init__(self, *args, **kwargs)
 
@@ -746,7 +758,7 @@ class AutoField(Field):
 
     def contribute_to_class(self, cls, name):
         assert not cls._meta.has_auto_field, \
-               "A model can't have more than one AutoField."
+            "A model can't have more than one AutoField."
         super(AutoField, self).contribute_to_class(cls, name)
         cls._meta.has_auto_field = True
         cls._meta.auto_field = self
@@ -998,8 +1010,9 @@ class DateTimeField(DateField):
                 # local time. This won't work during DST change, but we can't
                 # do much about it, so we let the exceptions percolate up the
                 # call stack.
-                warnings.warn("DateTimeField received a naive datetime (%s)"
-                              " while time zone support is active." % value,
+                warnings.warn("DateTimeField %s.%s received a naive datetime "
+                              "(%s) while time zone support is active." %
+                              (self.model.__name__, self.name, value),
                               RuntimeWarning)
                 default_timezone = timezone.get_default_timezone()
                 value = timezone.make_aware(value, default_timezone)
@@ -1053,8 +1066,9 @@ class DateTimeField(DateField):
             # For backwards compatibility, interpret naive datetimes in local
             # time. This won't work during DST change, but we can't do much
             # about it, so we let the exceptions percolate up the call stack.
-            warnings.warn("DateTimeField received a naive datetime (%s)"
-                          " while time zone support is active." % value,
+            warnings.warn("DateTimeField %s.%s received a naive datetime (%s)"
+                          " while time zone support is active." %
+                          (self.model.__name__, self.name, value),
                           RuntimeWarning)
             default_timezone = timezone.get_default_timezone()
             value = timezone.make_aware(value, default_timezone)
@@ -1122,14 +1136,14 @@ class DecimalField(Field):
         Formats a number into a string with the requisite number of digits and
         decimal places.
         """
-        # Method moved to django.db.backends.util.
+        # Method moved to django.db.backends.utils.
         #
         # It is preserved because it is used by the oracle backend
         # (django.db.backends.oracle.query), and also for
         # backwards-compatibility with any external code which may have used
         # this method.
-        from django.db.backends import util
-        return util.format_number(value, self.max_digits, self.decimal_places)
+        from django.db.backends import utils
+        return utils.format_number(value, self.max_digits, self.decimal_places)
 
     def get_db_prep_save(self, value, connection):
         return connection.ops.value_to_db_decimal(self.to_python(value),
@@ -1312,6 +1326,8 @@ class IPAddressField(Field):
     description = _("IPv4 address")
 
     def __init__(self, *args, **kwargs):
+        warnings.warn("IPAddressField has been deprecated. Use GenericIPAddressField instead.",
+                      PendingDeprecationWarning)
         kwargs['max_length'] = 15
         Field.__init__(self, *args, **kwargs)
 

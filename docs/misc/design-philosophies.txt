@@ -67,7 +67,7 @@ as possible.
     The `discussion of DRY on the Portland Pattern Repository`__
 
     __ http://c2.com/cgi/wiki?DontRepeatYourself
-    
+
 .. _explicit-is-better-than-implicit:
 
 Explicit is better than implicit

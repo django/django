@@ -285,8 +285,6 @@ full description, and some important notes on database support.
 Test client improvements
 ------------------------
 
-.. currentmodule:: django.test.client
-
 A couple of small -- but highly useful -- improvements have been made to the
 test client:
 

@@ -1,5 +1,4 @@
 from __future__ import unicode_literals
-import re
 
 from django.core.mail import send_mail
 from django.core import validators
@@ -245,10 +244,10 @@ class AbstractBaseUser(models.Model):
         return is_password_usable(self.password)
 
     def get_full_name(self):
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of AbstractBaseUser must provide a get_full_name() method')
 
     def get_short_name(self):
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of AbstractBaseUser must provide a get_short_name() method.')
 
 
 # A few helper functions for common logic between User and AnonymousUser.
@@ -291,7 +290,7 @@ class PermissionsMixin(models.Model):
         related_name="user_set", related_query_name="user")
     user_permissions = models.ManyToManyField(Permission,
         verbose_name=_('user permissions'), blank=True,
-        help_text='Specific permissions for this user.',
+        help_text=_('Specific permissions for this user.'),
         related_name="user_set", related_query_name="user")
 
     class Meta:
@@ -359,10 +358,10 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
     Username, password and email are required. Other fields are optional.
     """
     username = models.CharField(_('username'), max_length=30, unique=True,
-        help_text=_('Required. 30 characters or fewer. Letters, numbers and '
-                    '@/./+/-/_ characters'),
+        help_text=_('Required. 30 characters or fewer. Letters, digits and '
+                    '@/./+/-/_ only.'),
         validators=[
-            validators.RegexValidator(re.compile('^[\w.@+-]+$'), _('Enter a valid username.'), 'invalid')
+            validators.RegexValidator(r'^[\w.@+-]+$', _('Enter a valid username.'), 'invalid')
         ])
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
@@ -441,16 +440,16 @@ class AnonymousUser(object):
         return 1  # instances always return the same hash value
 
     def save(self):
-        raise NotImplementedError
+        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
 
     def delete(self):
-        raise NotImplementedError
+        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
 
     def set_password(self, raw_password):
-        raise NotImplementedError
+        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
 
     def check_password(self, raw_password):
-        raise NotImplementedError
+        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
 
     def _get_groups(self):
         return self._groups

@@ -12,14 +12,11 @@ from django.conf import settings
 from django.contrib.humanize.templatetags import humanize
 from django.template import Template, Context, defaultfilters
 from django.test import TestCase
-from django.test.utils import override_settings
+from django.test.utils import override_settings, TransRealMixin
 from django.utils.html import escape
-from django.utils.timezone import utc
+from django.utils.timezone import utc, get_fixed_timezone
 from django.utils import translation
 from django.utils.translation import ugettext as _
-from django.utils import tzinfo
-
-from i18n import TransRealMixin
 
 
 # Mock out datetime in some tests so they don't fail occasionally when they
@@ -91,9 +88,9 @@ class HumanizeTests(TransRealMixin, TestCase):
                        '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.1234567', '1,234,567.1234567',
                      None)
 
-        with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=False), \
-                translation.override('en'):
-            self.humanize_tester(test_list, result_list, 'intcomma')
+        with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=False):
+            with translation.override('en'):
+                self.humanize_tester(test_list, result_list, 'intcomma')
 
     def test_intcomma_without_number_grouping(self):
         # Regression for #17414
@@ -117,18 +114,18 @@ class HumanizeTests(TransRealMixin, TestCase):
                      '100', '1000', '10123', '10311', '1000000', None)
         result_list = ('100', '1.000', '10.123', '10.311', '1.000.000', '1.234.567,25',
                        '100', '1.000', '10.123', '10.311', '1.000.000', None)
-        with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True), \
-                translation.override('de'):
-            self.humanize_tester(test_list, result_list, 'intcomma')
+        with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True):
+            with translation.override('de'):
+                self.humanize_tester(test_list, result_list, 'intcomma')
 
     def test_i18n_intword(self):
         test_list = ('100', '1000000', '1200000', '1290000',
                      '1000000000', '2000000000', '6000000000000')
         result_list = ('100', '1,0 Million', '1,2 Millionen', '1,3 Millionen',
                        '1,0 Milliarde', '2,0 Milliarden', '6,0 Billionen')
-        with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True), \
-                translation.override('de'):
-            self.humanize_tester(test_list, result_list, 'intword')
+        with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True):
+            with translation.override('de'):
+                self.humanize_tester(test_list, result_list, 'intword')
 
     def test_apnumber(self):
         test_list = [str(x) for x in range(1, 11)]
@@ -153,8 +150,8 @@ class HumanizeTests(TransRealMixin, TestCase):
 
     def test_naturalday_tz(self):
         today = datetime.date.today()
-        tz_one = tzinfo.FixedOffset(datetime.timedelta(hours=-12))
-        tz_two = tzinfo.FixedOffset(datetime.timedelta(hours=12))
+        tz_one = get_fixed_timezone(-720)
+        tz_two = get_fixed_timezone(720)
 
         # Can be today or yesterday
         date_one = datetime.datetime(today.year, today.month, today.day, tzinfo=tz_one)
@@ -175,9 +172,9 @@ class HumanizeTests(TransRealMixin, TestCase):
 
         orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
         try:
-            with override_settings(TIME_ZONE="America/Chicago", USE_TZ=True), \
-                    translation.override('en'):
-                self.humanize_tester([dt], ['yesterday'], 'naturalday')
+            with override_settings(TIME_ZONE="America/Chicago", USE_TZ=True):
+                with translation.override('en'):
+                    self.humanize_tester([dt], ['yesterday'], 'naturalday')
         finally:
             humanize.datetime = orig_humanize_datetime
 

@@ -6,7 +6,7 @@ Django is a community that lives on its volunteers. As it keeps growing, we
 always need more people to help others. As soon as you learn Django, you can
 contribute in many ways:
 
-* Join the `django-users`_ mailing list and answer questions. This
+* Join the |django-users| mailing list and answer questions. This
   mailing list has a huge audience, and we really want to maintain a
   friendly and helpful atmosphere. If you're new to the Django community,
   you should read the `posting guidelines`_.
@@ -31,7 +31,7 @@ development:
 
 * :doc:`Report bugs <bugs-and-features>` in our `ticket tracker`_.
 
-* Join the `django-developers`_ mailing list and share your ideas for how
+* Join the |django-developers| mailing list and share your ideas for how
   to improve Django. We're always open to suggestions.
 
 * :doc:`Submit patches <writing-code/submitting-patches>` for new and/or
@@ -59,11 +59,9 @@ Browse the following sections to find out how:
    localizing
    committing-code
 
-.. _django-users: http://groups.google.com/group/django-users
 .. _posting guidelines: https://code.djangoproject.com/wiki/UsingTheMailingList
 .. _#django IRC channel: irc://irc.freenode.net/django
 .. _community page: https://www.djangoproject.com/community/
 .. _register it here: https://www.djangoproject.com/community/add/blogs/
-.. _django-developers: http://groups.google.com/group/django-developers
 .. _ticket tracker: https://code.djangoproject.com/newticket
 .. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1

@@ -17,7 +17,7 @@ class Admin2(admin.AdminSite):
     login_form = forms.CustomAdminAuthenticationForm
     login_template = 'custom_admin/login.html'
     logout_template = 'custom_admin/logout.html'
-    index_template = ['custom_admin/index.html'] # a list, to test fix for #18697
+    index_template = ['custom_admin/index.html']  # a list, to test fix for #18697
     password_change_template = 'custom_admin/password_change_form.html'
     password_change_done_template = 'custom_admin/password_change_done.html'
 
@@ -42,7 +42,7 @@ class UserLimitedAdmin(UserAdmin):
 
 
 class CustomPwdTemplateUserAdmin(UserAdmin):
-    change_user_password_template = ['admin/auth/user/change_password.html'] # a list, to test fix for #18697
+    change_user_password_template = ['admin/auth/user/change_password.html']  # a list, to test fix for #18697
 
 
 site = Admin2(name="admin2")

@@ -116,19 +116,23 @@ class ModelWithStringPrimaryKey(models.Model):
 class Color(models.Model):
     value = models.CharField(max_length=10)
     warm = models.BooleanField(default=False)
+
     def __str__(self):
         return self.value
+
 
 # we replicate Color to register with another ModelAdmin
 class Color2(Color):
     class Meta:
         proxy = True
 
+
 @python_2_unicode_compatible
 class Thing(models.Model):
     title = models.CharField(max_length=20)
     color = models.ForeignKey(Color, limit_choices_to={'warm': True})
     pub_date = models.DateField(blank=True, null=True)
+
     def __str__(self):
         return self.title
 
@@ -138,6 +142,7 @@ class Actor(models.Model):
     name = models.CharField(max_length=50)
     age = models.IntegerField()
     title = models.CharField(max_length=50, null=True, blank=True)
+
     def __str__(self):
         return self.name
 
@@ -169,10 +174,9 @@ class Sketch(models.Model):
 class Fabric(models.Model):
     NG_CHOICES = (
         ('Textured', (
-                ('x', 'Horizontal'),
-                ('y', 'Vertical'),
-            )
-        ),
+            ('x', 'Horizontal'),
+            ('y', 'Vertical'),
+        )),
         ('plain', 'Smooth'),
     )
     surface = models.CharField(max_length=20, choices=NG_CHOICES)
@@ -200,6 +204,7 @@ class Persona(models.Model):
     accounts which inherit from a common accounts class.
     """
     name = models.CharField(blank=False, max_length=80)
+
     def __str__(self):
         return self.name
 
@@ -253,7 +258,7 @@ class Podcast(Media):
     release_date = models.DateField()
 
     class Meta:
-        ordering = ('release_date',) # overridden in PodcastAdmin
+        ordering = ('release_date',)  # overridden in PodcastAdmin
 
 
 class Vodcast(Media):
@@ -390,8 +395,8 @@ class Post(models.Model):
     title = models.CharField(max_length=100, help_text="Some help text for the title (with unicode ŠĐĆŽćžšđ)")
     content = models.TextField(help_text="Some help text for the content (with unicode ŠĐĆŽćžšđ)")
     posted = models.DateField(
-            default=datetime.date.today,
-            help_text="Some help text for the date (with unicode ŠĐĆŽćžšđ)"
+        default=datetime.date.today,
+        help_text="Some help text for the date (with unicode ŠĐĆŽćžšđ)"
     )
     public = models.NullBooleanField()
 
@@ -610,24 +615,30 @@ class PrePopulatedPostLargeSlug(models.Model):
     published = models.BooleanField(default=False)
     slug = models.SlugField(max_length=1000)
 
+
 class AdminOrderedField(models.Model):
     order = models.IntegerField()
     stuff = models.CharField(max_length=200)
 
+
 class AdminOrderedModelMethod(models.Model):
     order = models.IntegerField()
     stuff = models.CharField(max_length=200)
+
     def some_order(self):
         return self.order
     some_order.admin_order_field = 'order'
+
 
 class AdminOrderedAdminMethod(models.Model):
     order = models.IntegerField()
     stuff = models.CharField(max_length=200)
 
+
 class AdminOrderedCallable(models.Model):
     order = models.IntegerField()
     stuff = models.CharField(max_length=200)
+
 
 @python_2_unicode_compatible
 class Report(models.Model):
@@ -646,6 +657,7 @@ class MainPrepopulated(models.Model):
                  ('option two', 'Option Two')))
     slug1 = models.SlugField(blank=True)
     slug2 = models.SlugField(blank=True)
+
 
 class RelatedPrepopulated(models.Model):
     parent = models.ForeignKey(MainPrepopulated)
@@ -667,6 +679,7 @@ class UnorderedObject(models.Model):
     name = models.CharField(max_length=255)
     bool = models.BooleanField(default=True)
 
+
 class UndeletableObject(models.Model):
     """
     Model whose show_delete in admin change_view has been disabled
@@ -674,21 +687,25 @@ class UndeletableObject(models.Model):
     """
     name = models.CharField(max_length=255)
 
+
 class UnchangeableObject(models.Model):
     """
     Model whose change_view is disabled in admin
     Refs #20640.
     """
 
+
 class UserMessenger(models.Model):
     """
     Dummy class for testing message_user functions on ModelAdmin
     """
 
+
 class Simple(models.Model):
     """
     Simple model with nothing on it for use in testing
     """
+
 
 class Choice(models.Model):
     choice = models.IntegerField(blank=True, null=True,
@@ -713,3 +730,48 @@ class DependentChild(models.Model):
     """
     parent = models.ForeignKey(ParentWithDependentChildren)
     family_name = models.CharField(max_length=255)
+
+
+class _Manager(models.Manager):
+    def get_queryset(self):
+        return super(_Manager, self).get_queryset().filter(pk__gt=1)
+
+
+class FilteredManager(models.Model):
+    def __str__(self):
+        return "PK=%d" % self.pk
+
+    pk_gt_1 = _Manager()
+    objects = models.Manager()
+
+
+class EmptyModelVisible(models.Model):
+    """ See ticket #11277. """
+
+
+class EmptyModelHidden(models.Model):
+    """ See ticket #11277. """
+
+
+class EmptyModelMixin(models.Model):
+    """ See ticket #11277. """
+
+
+class State(models.Model):
+    name = models.CharField(max_length=100)
+
+
+class City(models.Model):
+    state = models.ForeignKey(State)
+    name = models.CharField(max_length=100)
+
+
+class Restaurant(models.Model):
+    city = models.ForeignKey(City)
+    name = models.CharField(max_length=100)
+
+
+class Worker(models.Model):
+    work_at = models.ForeignKey(Restaurant)
+    name = models.CharField(max_length=50)
+    surname = models.CharField(max_length=50)

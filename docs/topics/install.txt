@@ -113,6 +113,9 @@ database bindings are installed.
   1.2.1p2 or higher. You will also want to read the database-specific
   :ref:`notes for the MySQL backend <mysql-notes>`.
 
+* If you're using SQLite you might want to read the :ref:`SQLite backend notes
+  <sqlite-notes>`.
+
 * If you're using Oracle, you'll need a copy of cx_Oracle_, but please
   read the database-specific :ref:`notes for the Oracle backend <oracle-notes>`
   for important information regarding supported versions of both Oracle and

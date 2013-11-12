@@ -62,7 +62,7 @@ class DeleteQuery(Query):
                               if innerq.alias_refcount[t]]
         if ((not innerq_used_tables or innerq_used_tables == self.tables)
             and not len(innerq.having)):
-            # There is only the base table in use in the query, and there are
+            # There is only the base table in use in the query, and there is
             # no aggregate filtering going on.
             self.where = innerq.where
         else:
@@ -262,7 +262,7 @@ class DateTimeQuery(DateQuery):
 
     def _check_field(self, field):
         assert isinstance(field, DateTimeField), \
-                "%r isn't a DateTimeField." % field.name
+            "%r isn't a DateTimeField." % field.name
 
     def _get_select(self, col, lookup_type):
         if self.tzinfo is None:

@@ -209,12 +209,12 @@ in the server configuration.
 
 Until MySQL 5.5.4, the default engine was MyISAM_ [#]_. The main drawbacks of
 MyISAM are that it doesn't support transactions or enforce foreign-key
-constraints. On the plus side, it's currently the only engine that supports
-full-text indexing and searching.
+constraints. On the plus side, it was the only engine that supported full-text
+indexing and searching until MySQL 5.6.4.
 
 Since MySQL 5.5.5, the default storage engine is InnoDB_. This engine is fully
 transactional and supports foreign key references. It's probably the best
-choice at this point. However, note that the the InnoDB autoincrement counter
+choice at this point. However, note that the InnoDB autoincrement counter
 is lost on a MySQL restart because it does not remember the
 ``AUTO_INCREMENT`` value, instead recreating it as "max(id)+1". This may
 result in an inadvertent reuse of :class:`~django.db.models.AutoField` values.
@@ -237,11 +237,38 @@ running ``migrate``::
    had reports that the Windows Community Server installer sets up InnoDB as
    the default storage engine, for example.
 
-MySQLdb
--------
+.. _mysql-db-api-drivers:
 
-`MySQLdb`_ is the Python interface to MySQL. Version 1.2.1p2 or later is
-required for full MySQL support in Django.
+MySQL DB API Drivers
+--------------------
+
+The Python Database API is described in `PEP 249`_. MySQL has two prominent
+drivers that implement this API:
+
+.. _PEP 249: http://www.python.org/dev/peps/pep-0249/
+
+- `MySQLdb`_ is a native driver that has been developed and supported for over
+  a decade by Andy Dustman.
+- `MySQL Connector/Python`_ is a pure Python driver from Oracle that does not
+  require the MySQL client library or any Python modules outside the standard
+  library.
+
+.. _MySQLdb: https://pypi.python.org/pypi/MySQL-python/1.2.4
+.. _MySQL Connector/Python: http://dev.mysql.com/downloads/connector/python
+
+Both drivers are thread-safe and both provide connection pooling. The major
+difference is that MySQL Connector/Python supports Python 3.
+
+In addition to a DB API driver, Django needs an adaptor to access the database
+drivers from its ORM. Django provides an adaptor for MySQLdb while MySQL
+Connector/Python includes `its own`_.
+
+.. _its own: http://dev.mysql.com/doc/refman/5.6/en/connector-python-django-backend.html
+
+MySQLdb
+~~~~~~~
+
+Django requires MySQLdb version 1.2.1p2 or later.
 
 .. note::
     If you see ``ImportError: cannot import name ImmutableSet`` when trying to
@@ -253,25 +280,31 @@ required for full MySQL support in Django.
 
 .. note::
     There are known issues with the way MySQLdb converts date strings into
-    datetime objects. Specifically, date strings with value 0000-00-00 are valid for
-    MySQL but will be converted into None by MySQLdb.
+    datetime objects. Specifically, date strings with value 0000-00-00 are
+    valid for MySQL but will be converted into None by MySQLdb.
 
     This means you should be careful while using loaddata/dumpdata with rows
     that may have 0000-00-00 values, as they will be converted to None.
 
-.. _MySQLdb: http://sourceforge.net/projects/mysql-python
+.. note::
+    At the time of writing, the latest release of MySQLdb (1.2.4) doesn't
+    support Python 3. In order to use MySQLdb under Python 3, you'll have to
+    install an unofficial fork, such as `MySQL-for-Python-3`_.
 
-Python 3
---------
-
-At the time of writing, the latest release of MySQLdb (1.2.4) doesn't support
-Python 3. In order to use MySQL under Python 3, you'll have to install an
-unofficial fork, such as `MySQL-for-Python-3`_.
-
-This port is still in alpha. In particular, it doesn't support binary data,
-making it impossible to use :class:`django.db.models.BinaryField`.
+    This port is still in alpha. In particular, it doesn't support binary
+    data, making it impossible to use :class:`django.db.models.BinaryField`.
 
 .. _MySQL-for-Python-3: https://github.com/clelland/MySQL-for-Python-3
+
+MySQL Connector/Python
+~~~~~~~~~~~~~~~~~~~~~~
+
+MySQL Connector/Python is available through two `release branches`_: Generally
+Available (GA, currently 1.0.x) and Development (Dev, currently 1.1.x).
+The Django adapter is currently available in the Dev branch and is described
+as Alpha.
+
+.. _release branches: http://dev.mysql.com/downloads/connector/python/
 
 Creating your database
 ----------------------
@@ -299,7 +332,7 @@ the model definition.
 .. _documented thoroughly: http://dev.mysql.com/doc/refman/5.0/en/charset.html
 
 By default, with a UTF-8 database, MySQL will use the
-``utf8_general_ci_swedish`` collation. This results in all string equality
+``utf8_general_ci`` collation. This results in all string equality
 comparisons being done in a *case-insensitive* manner. That is, ``"Fred"`` and
 ``"freD"`` are considered equal at the database level. If you have a unique
 constraint on a field, it would be illegal to try to insert both ``"aa"`` and
@@ -336,7 +369,7 @@ bytestrings (which shouldn't be too difficult) as described above is the
 recommended solution.
 
 Should you decide to use ``utf8_bin`` collation for some of your tables with
-MySQLdb 1.2.1p2 or 1.2.2, you should still use ``utf8_collation_ci_swedish``
+MySQLdb 1.2.1p2 or 1.2.2, you should still use ``utf8_general_ci``
 (the default) collation for the ``django.contrib.sessions.models.Session``
 table (usually called ``django_session``) and the
 ``django.contrib.admin.models.LogEntry`` table (usually called
@@ -758,6 +791,22 @@ Naming issues
 Oracle imposes a name length limit of 30 characters. To accommodate this, the
 backend truncates database identifiers to fit, replacing the final four
 characters of the truncated name with a repeatable MD5 hash value.
+Additionally, the backend turns database identifiers to all-uppercase.
+
+To prevent these transformations (this is usually required only when dealing
+with legacy databases or accessing tables which belong to other users), use
+a quoted name as the value for ``db_table``::
+
+    class LegacyModel(models.Model):
+        class Meta:
+       	    db_table = '"name_left_in_lowercase"'
+
+    class ForeignModel(models.Model):
+        class Meta:
+       	    db_table = '"OTHER_USER"."NAME_ONLY_SEEMS_OVER_30"'
+
+Quoted names can also be used with Django's other supported database 
+backends; except for Oracle, however, the quotes have no effect.
 
 When running ``migrate``, an ``ORA-06552`` error may be encountered if
 certain Oracle keywords are used as the name of a model field or the

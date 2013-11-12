@@ -27,11 +27,11 @@ class EarliestOrLatestTests(TestCase):
             headline="Article 2", pub_date=datetime(2005, 7, 27),
             expire_date=datetime(2005, 7, 28)
         )
-        a3 = Article.objects.create(
+        Article.objects.create(
             headline="Article 3", pub_date=datetime(2005, 7, 28),
             expire_date=datetime(2005, 8, 27)
         )
-        a4 = Article.objects.create(
+        Article.objects.create(
             headline="Article 4", pub_date=datetime(2005, 7, 28),
             expire_date=datetime(2005, 7, 30)
         )
@@ -72,7 +72,7 @@ class EarliestOrLatestTests(TestCase):
             headline="Article 1", pub_date=datetime(2005, 7, 26),
             expire_date=datetime(2005, 9, 1)
         )
-        a2 = Article.objects.create(
+        Article.objects.create(
             headline="Article 2", pub_date=datetime(2005, 7, 27),
             expire_date=datetime(2005, 7, 28)
         )
@@ -117,7 +117,7 @@ class EarliestOrLatestTests(TestCase):
     def test_latest_manual(self):
         # You can still use latest() with a model that doesn't have
         # "get_latest_by" set -- just pass in the field name manually.
-        p1 = Person.objects.create(name="Ralph", birthday=datetime(1950, 1, 1))
+        Person.objects.create(name="Ralph", birthday=datetime(1950, 1, 1))
         p2 = Person.objects.create(name="Stephanie", birthday=datetime(1960, 2, 3))
         self.assertRaises(AssertionError, Person.objects.latest)
         self.assertEqual(Person.objects.latest("birthday"), p2)

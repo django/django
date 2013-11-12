@@ -260,5 +260,5 @@ urlpatterns = patterns('',
         views.BookSigningDetail.as_view()),
 
     # Useful for testing redirects
-    (r'^accounts/login/$',  'django.contrib.auth.views.login')
+    (r'^accounts/login/$', 'django.contrib.auth.views.login')
 )

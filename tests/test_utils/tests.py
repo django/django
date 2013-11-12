@@ -152,8 +152,9 @@ class CaptureQueriesContextManagerTests(TestCase):
         self.assertEqual(2, len(captured_queries))
 
     def test_failure(self):
-        with self.assertRaises(TypeError), CaptureQueriesContext(connection):
-            raise TypeError
+        with self.assertRaises(TypeError):
+            with CaptureQueriesContext(connection):
+                raise TypeError
 
     def test_with_client(self):
         with CaptureQueriesContext(connection) as captured_queries:
@@ -189,12 +190,14 @@ class AssertNumQueriesContextManagerTests(TestCase):
             Person.objects.count()
 
     def test_failure(self):
-        with self.assertRaises(AssertionError) as exc_info, self.assertNumQueries(2):
-            Person.objects.count()
+        with self.assertRaises(AssertionError) as exc_info:
+            with self.assertNumQueries(2):
+                Person.objects.count()
         self.assertIn("1 queries executed, 2 expected", str(exc_info.exception))
 
-        with self.assertRaises(TypeError), self.assertNumQueries(4000):
-            raise TypeError
+        with self.assertRaises(TypeError):
+            with self.assertNumQueries(4000):
+                raise TypeError
 
     def test_with_client(self):
         person = Person.objects.create(name="test")
@@ -211,6 +214,8 @@ class AssertNumQueriesContextManagerTests(TestCase):
 
 
 class AssertTemplateUsedContextManagerTests(TestCase):
+    urls = 'test_utils.urls'
+
     def test_usage(self):
         with self.assertTemplateUsed('template_used/base.html'):
             render_to_string('template_used/base.html')
@@ -229,13 +234,13 @@ class AssertTemplateUsedContextManagerTests(TestCase):
             render_to_string('template_used/base.html')
 
     def test_nested_usage(self):
-        with self.assertTemplateUsed('template_used/base.html'), \
-                self.assertTemplateUsed('template_used/include.html'):
-            render_to_string('template_used/include.html')
+        with self.assertTemplateUsed('template_used/base.html'):
+            with self.assertTemplateUsed('template_used/include.html'):
+                render_to_string('template_used/include.html')
 
-        with self.assertTemplateUsed('template_used/extends.html'), \
-                self.assertTemplateUsed('template_used/base.html'):
-            render_to_string('template_used/extends.html')
+        with self.assertTemplateUsed('template_used/extends.html'):
+            with self.assertTemplateUsed('template_used/base.html'):
+                render_to_string('template_used/extends.html')
 
         with self.assertTemplateUsed('template_used/base.html'):
             with self.assertTemplateUsed('template_used/alternative.html'):
@@ -255,34 +260,43 @@ class AssertTemplateUsedContextManagerTests(TestCase):
             pass
 
     def test_error_message(self):
-        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'), \
-                self.assertTemplateUsed('template_used/base.html'):
-            pass
+        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'):
+            with self.assertTemplateUsed('template_used/base.html'):
+                pass
 
-        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'), \
-                self.assertTemplateUsed(template_name='template_used/base.html'):
-            pass
+        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'):
+            with self.assertTemplateUsed(template_name='template_used/base.html'):
+                pass
 
-        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'), \
-                self.assertTemplateUsed('template_used/base.html'):
-            render_to_string('template_used/alternative.html')
+        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
+            with self.assertTemplateUsed('template_used/base.html'):
+                render_to_string('template_used/alternative.html')
+
+        with self.assertRaises(AssertionError) as cm:
+            response = self.client.get('/test_utils/no_template_used/')
+            self.assertTemplateUsed(response, 'template_used/base.html')
+        self.assertEqual(cm.exception.args[0], "No templates used to render the response")
 
     def test_failure(self):
-        with self.assertRaises(TypeError), self.assertTemplateUsed():
-            pass
+        with self.assertRaises(TypeError):
+            with self.assertTemplateUsed():
+                pass
 
-        with self.assertRaises(AssertionError), self.assertTemplateUsed(''):
-            pass
+        with self.assertRaises(AssertionError):
+            with self.assertTemplateUsed(''):
+                pass
 
-        with self.assertRaises(AssertionError), self.assertTemplateUsed(''):
-            render_to_string('template_used/base.html')
+        with self.assertRaises(AssertionError):
+            with self.assertTemplateUsed(''):
+                render_to_string('template_used/base.html')
 
-        with self.assertRaises(AssertionError), self.assertTemplateUsed(template_name=''):
-            pass
+        with self.assertRaises(AssertionError):
+            with self.assertTemplateUsed(template_name=''):
+                pass
 
-        with self.assertRaises(AssertionError), \
-                self.assertTemplateUsed('template_used/base.html'):
-            render_to_string('template_used/alternative.html')
+        with self.assertRaises(AssertionError):
+            with self.assertTemplateUsed('template_used/base.html'):
+                render_to_string('template_used/alternative.html')
 
 
 class HTMLEqualTests(TestCase):
@@ -300,7 +314,7 @@ class HTMLEqualTests(TestCase):
         self.assertEqual(dom[0], 'foo')
 
     def test_parse_html_in_script(self):
-        parse_html('<script>var a = "<p" + ">";</script>');
+        parse_html('<script>var a = "<p" + ">";</script>')
         parse_html('''
             <script>
             var js_sha_link='<p>***</p>';
@@ -315,7 +329,7 @@ class HTMLEqualTests(TestCase):
         self.assertEqual(dom.children[0], "<p>foo</p> '</scr'+'ipt>' <span>bar</span>")
 
     def test_self_closing_tags(self):
-        self_closing_tags = ('br' , 'hr', 'input', 'img', 'meta', 'spacer',
+        self_closing_tags = ('br', 'hr', 'input', 'img', 'meta', 'spacer',
             'link', 'frame', 'base', 'col')
         for tag in self_closing_tags:
             dom = parse_html('<p>Hello <%s> world</p>' % tag)
@@ -390,13 +404,13 @@ class HTMLEqualTests(TestCase):
 
     def test_complex_examples(self):
         self.assertHTMLEqual(
-        """<tr><th><label for="id_first_name">First name:</label></th>
+            """<tr><th><label for="id_first_name">First name:</label></th>
 <td><input type="text" name="first_name" value="John" id="id_first_name" /></td></tr>
 <tr><th><label for="id_last_name">Last name:</label></th>
 <td><input type="text" id="id_last_name" name="last_name" value="Lennon" /></td></tr>
 <tr><th><label for="id_birthday">Birthday:</label></th>
 <td><input type="text" value="1940-10-9" name="birthday" id="id_birthday" /></td></tr>""",
-        """
+            """
         <tr><th>
             <label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" value="John" id="id_first_name" />
         </td></tr>
@@ -409,7 +423,7 @@ class HTMLEqualTests(TestCase):
         """)
 
         self.assertHTMLEqual(
-        """<!DOCTYPE html>
+            """<!DOCTYPE html>
         <html>
         <head>
             <link rel="stylesheet">

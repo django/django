@@ -2,6 +2,7 @@ import copy
 import operator
 from functools import wraps
 import sys
+import warnings
 
 from django.utils import six
 from django.utils.six.moves import copyreg
@@ -24,6 +25,10 @@ def memoize(func, cache, num_args):
 
     Only the first num_args are considered when creating the key.
     """
+    warnings.warn("memoize wrapper is deprecated and will be removed in "
+                  "Django 1.9. Use django.utils.lru_cache instead.",
+                  PendingDeprecationWarning, stacklevel=2)
+
     @wraps(func)
     def wrapper(*args):
         mem_args = args[:num_args]
@@ -257,7 +262,7 @@ class LazyObject(object):
         """
         Must be implemented by subclasses to initialise the wrapped object.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of LazyObject must provide a _setup() method')
 
     # Introspection support
     __dir__ = new_method_proxy(dir)
