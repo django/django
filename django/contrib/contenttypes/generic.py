@@ -54,7 +54,7 @@ class GenericForeignKey(object):
         # using this model
         ContentType = get_model("contenttypes", "contenttype")
         if obj:
-             return ContentType.objects.db_manager(ContentType.objects.db).get_for_model(obj)
+             return ContentType.objects.get_for_model(obj)
         elif id is not None:
              return ContentType.objects.db_manager(using).get_for_id(id)
         else:
@@ -224,7 +224,7 @@ class ReverseGenericRelatedObjectsDescriptor(object):
             join_table = qn(self.field.m2m_db_table()),
             source_col_name = qn(self.field.m2m_column_name()),
             target_col_name = qn(self.field.m2m_reverse_name()),
-            content_type = ContentType.objects.db_manager(instance._state.db).get_for_model(instance),
+            content_type = ContentType.objects.get_for_model(instance),
             content_type_field_name = self.field.content_type_field_name,
             object_id_field_name = self.field.object_id_field_name
         )
