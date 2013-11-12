@@ -1,4 +1,5 @@
 from django.db import models
+from django.db import router, DEFAULT_DB_ALIAS  
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 
@@ -99,7 +100,7 @@ class ContentType(models.Model):
         method. The ObjectNotExist exception, if thrown, will not be caught,
         so code that calls this method should catch it.
         """
-        return self.model_class()._default_manager.using(self._state.db).get(**kwargs)
+        return self.model_class()._default_manager.using(router.db_for_read(self.model_class()) or DEFAULT_DB_ALIAS).get(**kwargs)
 
     def natural_key(self):
         return (self.app_label, self.model)

@@ -54,7 +54,7 @@ class GenericForeignKey(object):
         # using this model
         ContentType = get_model("contenttypes", "contenttype")
         if obj:
-             return ContentType.objects.db_manager(obj._state.db).get_for_model(obj)
+             return ContentType.objects.db_manager(ContentType.objects.db).get_for_model(obj)
         elif id is not None:
              return ContentType.objects.db_manager(using).get_for_id(id)
         else:
