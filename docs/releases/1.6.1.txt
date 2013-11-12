@@ -20,3 +20,5 @@ Bug fixes
 * Fixed :class:`~django.contrib.auth.backends.ModelBackend` raising
   ``UnboundLocalError`` if :func:`~django.contrib.auth.get_user_model`
   raised an error (#21439).
+* Fixed a regression that prevented editable ``GenericRelation`` subclasses
+  from working in ``ModelForms``.

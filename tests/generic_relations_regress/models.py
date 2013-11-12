@@ -143,8 +143,18 @@ class Board(models.Model):
     name = models.CharField(primary_key=True, max_length=15)
 
 
+class SpecialGenericRelation(generic.GenericRelation):
+    def __init__(self, *args, **kwargs):
+        super(SpecialGenericRelation, self).__init__(*args, **kwargs)
+        self.editable = True
+        self.save_form_data_calls = 0
+
+    def save_form_data(self, *args, **kwargs):
+        self.save_form_data_calls += 1
+
+
 class HasLinks(models.Model):
-    links = generic.GenericRelation(Link)
+    links = SpecialGenericRelation(Link)
 
     class Meta:
         abstract = True
