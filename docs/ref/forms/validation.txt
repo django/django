@@ -78,9 +78,9 @@ overridden:
   like. This method can return a completely different dictionary if it wishes,
   which will be used as the ``cleaned_data``.
 
-  Since the field validation method have been run by the time ``clean()`` is
-  called, you also have access to the form's ``errors`` attribute which
-  contains all the errors raised by previous steps.
+  Since the field validation methods have been run by the time ``clean()`` is
+  called, you also have access to the form's errors attribute which
+  contains all the errors raised by cleaning of individual fields.
 
   Note that any errors raised by your ``Form.clean()`` override will not
   be associated with any field in particular. They go into a special
@@ -99,8 +99,8 @@ These methods are run in the order given above, one field at a time.  That is,
 for each field in the form (in the order they are declared in the form
 definition), the ``Field.clean()`` method (or its override) is run, then
 ``clean_<fieldname>()``. Finally, once those two methods are run for every
-field, the ``Form.clean()`` method, or its override, is executed, no matter if
-the previous methods have raised errors or not.
+field, the ``Form.clean()`` method, or its override, is executed whether or not
+the previous methods have raised errors.
 
 Examples of each of these methods are provided below.
 
