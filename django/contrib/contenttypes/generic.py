@@ -56,7 +56,7 @@ class GenericForeignKey(object):
         if obj:
              return ContentType.objects.get_for_model(obj)
         elif id is not None:
-             return ContentType.objects.db_manager(using).get_for_id(id)
+             return ContentType.objects.get_for_id(id)
         else:
             # This should never happen. I love comments like this, don't you?
             raise Exception("Impossible arguments to GFK.get_content_type!")
