@@ -2,7 +2,7 @@ try:
     from functools import lru_cache
 
 except ImportError:
-    # backport of Python's 3.2 lru_cache, written by Raymond Hettinger and
+    # backport of Python's 3.3 lru_cache, written by Raymond Hettinger and
     # licensed under MIT license, from:
     # <http://code.activestate.com/recipes/578078-py26-and-py30-backport-of-python-33s-lru-cache/>
     # Should be removed when Django only supports Python 3.2 and above.
