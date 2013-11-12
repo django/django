@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from collections import OrderedDict
-import locale
 import os
 import re
 import sys
@@ -29,9 +28,9 @@ _active = local()
 # The default translation is based on the settings file.
 _default = None
 
-# This is a cache for normalized accept-header languages to prevent multiple
-# file lookups when checking the same locale on repeated requests.
-_accepted = {}
+# This is a cache of settings.LANGUAGES in an OrderedDict for easy lookups by
+# key
+_supported = None
 
 # magic gettext number to separate context from message
 CONTEXT_SEPARATOR = "\x04"
@@ -63,9 +62,11 @@ def reset_cache(**kwargs):
     Reset global state when LANGUAGES setting has been changed, as some
     languages should no longer be accepted.
     """
-    if kwargs['setting'] == 'LANGUAGES':
-        global _accepted
-        _accepted = {}
+    if kwargs['setting'] in ('LANGUAGES', 'LANGUAGE_CODE'):
+        global _supported
+        _supported = None
+        check_for_language.cache_clear()
+        get_supported_language_variant.cache_clear()
 
 
 def to_locale(language, to_lower=False):
@@ -388,7 +389,7 @@ def all_locale_paths():
     return [globalpath] + list(settings.LOCALE_PATHS)
 
 
-@lru_cache.lru_cache(maxsize=None)
+@lru_cache.lru_cache()
 def check_for_language(lang_code):
     """
     Checks whether there is a global language file for the given language
@@ -404,39 +405,42 @@ def check_for_language(lang_code):
     return False
 
 
-def get_supported_language_variant(lang_code, supported=None, strict=False):
+@lru_cache.lru_cache(maxsize=1000)
+def get_supported_language_variant(lang_code, strict=False):
     """
     Returns the language-code that's listed in supported languages, possibly
     selecting a more generic variant. Raises LookupError if nothing found.
 
     If `strict` is False (the default), the function will look for an alternative
     country-specific variant when the currently checked is not found.
+
+    lru_cache should have a maxsize to prevent from memory exhaustion attacks,
+    as the provided language codes are taken from the HTTP request. See also
+    <https://www.djangoproject.com/weblog/2007/oct/26/security-fix/>.
     """
-    if supported is None:
+    global _supported
+    if _supported is None:
         from django.conf import settings
-        supported = OrderedDict(settings.LANGUAGES)
+        _supported = OrderedDict(settings.LANGUAGES)
     if lang_code:
         # some browsers use deprecated language codes -- #18419
         replacement = _BROWSERS_DEPRECATED_LOCALES.get(lang_code)
-        if lang_code not in supported and replacement in supported:
+        if lang_code not in _supported and replacement in _supported:
             return replacement
-        # if fr-CA is not supported, try fr-ca; if that fails, fallback to fr.
+        # if fr-ca is not supported, try fr.
         generic_lang_code = lang_code.split('-')[0]
-        variants = (lang_code, lang_code.lower(), generic_lang_code,
-                    generic_lang_code.lower())
-        for code in variants:
-            if code in supported and check_for_language(code):
+        for code in (lang_code, generic_lang_code):
+            if code in _supported and check_for_language(code):
                 return code
         if not strict:
             # if fr-fr is not supported, try fr-ca.
-            for supported_code in supported:
-                if supported_code.startswith((generic_lang_code + '-',
-                                              generic_lang_code.lower() + '-')):
+            for supported_code in _supported:
+                if supported_code.startswith(generic_lang_code + '-'):
                     return supported_code
     raise LookupError(lang_code)
 
 
-def get_language_from_path(path, supported=None, strict=False):
+def get_language_from_path(path, strict=False):
     """
     Returns the language-code if there is a valid language-code
     found in the `path`.
@@ -444,15 +448,12 @@ def get_language_from_path(path, supported=None, strict=False):
     If `strict` is False (the default), the function will look for an alternative
     country-specific variant when the currently checked is not found.
     """
-    if supported is None:
-        from django.conf import settings
-        supported = OrderedDict(settings.LANGUAGES)
     regex_match = language_code_prefix_re.match(path)
     if not regex_match:
         return None
     lang_code = regex_match.group(1)
     try:
-        return get_supported_language_variant(lang_code, supported, strict=strict)
+        return get_supported_language_variant(lang_code, strict=strict)
     except LookupError:
         return None
 
@@ -467,25 +468,26 @@ def get_language_from_request(request, check_path=False):
     If check_path is True, the URL path prefix will be checked for a language
     code, otherwise this is skipped for backwards compatibility.
     """
-    global _accepted
     from django.conf import settings
-    supported = OrderedDict(settings.LANGUAGES)
+    global _supported
+    if _supported is None:
+        _supported = OrderedDict(settings.LANGUAGES)
 
     if check_path:
-        lang_code = get_language_from_path(request.path_info, supported)
+        lang_code = get_language_from_path(request.path_info)
         if lang_code is not None:
             return lang_code
 
     if hasattr(request, 'session'):
         # for backwards compatibility django_language is also checked (remove in 1.8)
         lang_code = request.session.get(LANGUAGE_SESSION_KEY, request.session.get('django_language'))
-        if lang_code in supported and lang_code is not None and check_for_language(lang_code):
+        if lang_code in _supported and lang_code is not None and check_for_language(lang_code):
             return lang_code
 
     lang_code = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
 
     try:
-        return get_supported_language_variant(lang_code, supported)
+        return get_supported_language_variant(lang_code)
     except LookupError:
         pass
 
@@ -494,29 +496,16 @@ def get_language_from_request(request, check_path=False):
         if accept_lang == '*':
             break
 
-        # 'normalized' is the root name of the locale in POSIX format (which is
-        # the format used for the directories holding the MO files).
-        normalized = locale.locale_alias.get(to_locale(accept_lang, True))
-        if not normalized:
+        if not language_code_re.search(accept_lang):
             continue
-        # Remove the default encoding from locale_alias.
-        normalized = normalized.split('.')[0]
-
-        if normalized in _accepted:
-            # We've seen this locale before and have an MO file for it, so no
-            # need to check again.
-            return _accepted[normalized]
 
         try:
-            accept_lang = get_supported_language_variant(accept_lang, supported)
+            return get_supported_language_variant(accept_lang)
         except LookupError:
             continue
-        else:
-            _accepted[normalized] = accept_lang
-            return accept_lang
 
     try:
-        return get_supported_language_variant(settings.LANGUAGE_CODE, supported)
+        return get_supported_language_variant(settings.LANGUAGE_CODE)
     except LookupError:
         return settings.LANGUAGE_CODE
 
@@ -732,7 +721,7 @@ def parse_accept_lang_header(lang_string):
     Any format errors in lang_string results in an empty list being returned.
     """
     result = []
-    pieces = accept_language_re.split(lang_string)
+    pieces = accept_language_re.split(lang_string.lower())
     if pieces[-1]:
         return []
     for i in range(0, len(pieces) - 1, 3):
