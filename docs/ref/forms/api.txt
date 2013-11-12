@@ -123,8 +123,7 @@ if validation has side effects, those side effects will only be triggered once.
 
 This method allows adding errors to specific fields from within the
 ``Form.clean()`` method, or from outside the form altogether; for instance
-from a view. This is a better alternative to fiddling directly with
-``Form._errors`` as described in :ref:`modifying-field-errors`.
+from a view.
 
 The ``field`` argument is the name of the field to which the errors
 should be added. If its value is ``None`` the error will be treated as
