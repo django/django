@@ -39,6 +39,7 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
         self.ct_field = ct_field
         self.fk_field = fk_field
         self.for_concrete_model = for_concrete_model
+        self.editable = False
 
     def contribute_to_class(self, cls, name):
         self.name = name
