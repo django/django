@@ -68,5 +68,5 @@ def get_language_from_request(request, check_path=False):
     return settings.LANGUAGE_CODE
 
 
-def get_language_from_path(request, supported=None):
+def get_language_from_path(request):
     return None
