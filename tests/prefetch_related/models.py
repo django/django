@@ -215,3 +215,18 @@ class WordEntry(models.Model):
 
     def __str__(self):
         return "%s (%s)" % (self.name, self.id)
+
+
+## Ticket #21410: Regression when related_name="+"
+
+@python_2_unicode_compatible
+class Author2(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    first_book = models.ForeignKey('Book', related_name='first_time_authors+')
+    favorite_books = models.ManyToManyField('Book', related_name='+')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['id']
