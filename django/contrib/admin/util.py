@@ -379,7 +379,7 @@ class NotRelationField(Exception):
 
 
 def get_model_from_relation(field):
-    if getattr(field, 'parent_model'):
+    if hasattr(field, 'parent_model'):
         return field.parent_model
     elif isinstance(field, models.related.RelatedObject):
         return field.model
