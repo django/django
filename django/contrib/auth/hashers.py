@@ -8,6 +8,7 @@ import importlib
 
 from django.dispatch import receiver
 from django.conf import settings
+from django.core.cache import cache
 from django.test.signals import setting_changed
 from django.utils.encoding import force_bytes, force_str, force_text
 from django.core.exceptions import ImproperlyConfigured
@@ -512,3 +513,49 @@ class CryptPasswordHasher(BasePasswordHasher):
             (_('salt'), salt),
             (_('hash'), mask_hash(data, show=3)),
         ])
+
+
+class CachingPasswordHasherMixin(object):
+    """A mixin that caches the result of `BasePasswordHasher.verify()`.
+
+    This is valuable for iteration-based hashers like BCrypt or PBKDF2 that
+    derive their strength from artificially increasing CPU load. This makes
+    these algorithms less suitable for high-volume services that rely on Basic
+    HTTP Auth.
+
+    This mixin addresses some of this. Note that the user's password is pat of
+    the cache key that ends up in Memcached. In an attempt to lower the risk
+    of exposure, we concatenate the encoded representation (that contains a
+    salt) and SHA1 the result first.
+    """
+
+    def verify(self, password, encoded):
+        # no extra SHA1 salt necessary, as `encoded` already contains a salt
+        key = '%s:%s' % (type(self).__name__,
+                         hashlib.sha1(encoded + '!' + password).hexdigest())
+        is_correct = cache.get(key)
+        if is_correct is None:
+            is_correct = super(CachingPasswordHasherMixin, self).verify(
+                password, encoded)
+            cache.set(key, is_correct)
+        return is_correct
+
+
+class CachingBCryptPasswordHasher(CachingPasswordHasherMixin,
+                                  BCryptPasswordHasher):
+    pass
+
+
+class CachingBCryptSHA256PasswordHasher(CachingPasswordHasherMixin,
+                                        BCryptSHA256PasswordHasher):
+    pass
+
+
+class CachingPBKDF2PasswordHasher(CachingPasswordHasherMixin,
+                                  PBKDF2PasswordHasher):
+    pass
+
+
+class CachingPBKDF2SHA1PasswordHasher(CachingPasswordHasherMixin,
+                                      PBKDF2SHA1PasswordHasher):
+    pass
