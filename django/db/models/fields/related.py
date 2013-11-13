@@ -274,7 +274,17 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
         rel_obj_attr = self.field.get_foreign_related_value
         instance_attr = self.field.get_local_related_value
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
-        query = {'%s__in' % self.field.related_query_name(): instances}
+        related_field = self.field.foreign_related_fields[0]
+
+        # FIXME: This will need to be revisited when we introduce support for
+        # composite fields. In the meantime we take this practical approach to
+        # solve a regression on 1.6 when the reverse manager in hidden
+        # (related_name ends with a '+'). Refs #21410.
+        if self.field.rel.is_hidden():
+            query = {'%s__in' % related_field.name: set(instance_attr(inst)[0] for inst in instances)}
+        else:
+            query = {'%s__in' % self.field.related_query_name(): instances}
+
         qs = self.get_queryset(instance=instances[0]).filter(**query)
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.

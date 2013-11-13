@@ -10,7 +10,7 @@ from django.utils import six
 from .models import (Author, Book, Reader, Qualification, Teacher, Department,
     TaggedItem, Bookmark, AuthorAddress, FavoriteAuthors, AuthorWithAge,
     BookWithYear, BookReview, Person, House, Room, Employee, Comment,
-    LessonEntry, WordEntry)
+    LessonEntry, WordEntry, Author2)
 
 
 class PrefetchRelatedTests(TestCase):
@@ -973,3 +973,29 @@ class Ticket19607Tests(TestCase):
 
     def test_bug(self):
         list(WordEntry.objects.prefetch_related('lesson_entry', 'lesson_entry__wordentry_set'))
+
+
+class Ticket21410Tests(TestCase):
+
+    def setUp(self):
+        self.book1 = Book.objects.create(title="Poems")
+        self.book2 = Book.objects.create(title="Jane Eyre")
+        self.book3 = Book.objects.create(title="Wuthering Heights")
+        self.book4 = Book.objects.create(title="Sense and Sensibility")
+
+        self.author1 = Author2.objects.create(name="Charlotte",
+                                             first_book=self.book1)
+        self.author2 = Author2.objects.create(name="Anne",
+                                             first_book=self.book1)
+        self.author3 = Author2.objects.create(name="Emily",
+                                             first_book=self.book1)
+        self.author4 = Author2.objects.create(name="Jane",
+                                             first_book=self.book4)
+
+        self.author1.favorite_books.add(self.book1, self.book2, self.book3)
+        self.author2.favorite_books.add(self.book1)
+        self.author3.favorite_books.add(self.book2)
+        self.author4.favorite_books.add(self.book3)
+
+    def test_bug(self):
+        list(Author2.objects.prefetch_related('first_book', 'favorite_books'))

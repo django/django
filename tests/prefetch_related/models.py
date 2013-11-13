@@ -3,8 +3,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
-## Basic tests
 
+## Basic tests
 
 @python_2_unicode_compatible
 class Author(models.Model):
@@ -80,8 +80,8 @@ class BookReview(models.Model):
     book = models.ForeignKey(BookWithYear)
     notes = models.TextField(null=True, blank=True)
 
-## Models for default manager tests
 
+## Models for default manager tests
 
 class Qualification(models.Model):
     name = models.CharField(max_length=10)
@@ -167,7 +167,6 @@ class Comment(models.Model):
 
 ## Models for lookup ordering tests
 
-
 class House(models.Model):
     address = models.CharField(max_length=255)
     owner = models.ForeignKey('Person', null=True)
@@ -212,7 +211,7 @@ class Employee(models.Model):
         ordering = ['id']
 
 
-### Ticket 19607
+## Ticket #19607
 
 @python_2_unicode_compatible
 class LessonEntry(models.Model):
@@ -230,3 +229,18 @@ class WordEntry(models.Model):
 
     def __str__(self):
         return "%s (%s)" % (self.name, self.id)
+
+
+## Ticket #21410: Regression when related_name="+"
+
+@python_2_unicode_compatible
+class Author2(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    first_book = models.ForeignKey('Book', related_name='first_time_authors+')
+    favorite_books = models.ManyToManyField('Book', related_name='+')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['id']
