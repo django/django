@@ -686,8 +686,9 @@ the ``!=`` operator.
 include
 ^^^^^^^
 
-Loads a template and renders it with the current context. This is a way of
-"including" other templates within a template.
+Loads a template and renders it with the current context raising a
+``django.template.IncludedTemplateNotFound`` if the included template isn't
+found. This is a way of "including" other templates within a template.
 
 The template name can either be a variable or a hard-coded (quoted) string,
 in either single or double quotes.

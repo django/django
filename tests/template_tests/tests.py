@@ -282,12 +282,10 @@ class TemplateLoaderTests(TestCase):
 
             load_name = 'test_include_error.html'
             r = None
-            try:
+            with self.assertRaises(template.IncludedTemplateDoesNotExist) as e:
                 tmpl = loader.select_template([load_name])
                 r = tmpl.render(template.Context({}))
-            except template.TemplateDoesNotExist as e:
-                self.assertEqual(e.args[0], 'missing.html')
-            self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
+            self.assertEqual(e.exception.args[0], 'missing.html')
         finally:
             loader.template_source_loaders = old_loaders
 
@@ -312,11 +310,9 @@ class TemplateLoaderTests(TestCase):
             load_name = 'test_extends_error.html'
             tmpl = loader.get_template(load_name)
             r = None
-            try:
+            with self.assertRaises(template.IncludedTemplateDoesNotExist) as e:
                 r = tmpl.render(template.Context({}))
-            except template.TemplateDoesNotExist as e:
-                self.assertEqual(e.args[0], 'missing.html')
-            self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
+            self.assertEqual(e.exception.args[0], 'missing.html')
         finally:
             loader.template_source_loaders = old_loaders
 
@@ -337,20 +333,16 @@ class TemplateLoaderTests(TestCase):
             load_name = 'test_extends_error.html'
             tmpl = loader.get_template(load_name)
             r = None
-            try:
+            with self.assertRaises(template.IncludedTemplateDoesNotExist) as e:
                 r = tmpl.render(template.Context({}))
-            except template.TemplateDoesNotExist as e:
-                self.assertEqual(e.args[0], 'missing.html')
-            self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
+            self.assertEqual(e.exception.args[0], 'missing.html')
 
             # For the cached loader, repeat the test, to ensure the first attempt did not cache a
             # result that behaves incorrectly on subsequent attempts.
             tmpl = loader.get_template(load_name)
-            try:
+            with self.assertRaises(template.IncludedTemplateDoesNotExist) as e:
                 tmpl.render(template.Context({}))
-            except template.TemplateDoesNotExist as e:
-                self.assertEqual(e.args[0], 'missing.html')
-            self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
+            self.assertEqual(e.exception.args[0], 'missing.html')
         finally:
             loader.template_source_loaders = old_loaders
 
@@ -1220,7 +1212,7 @@ class TemplateTests(TransRealMixin, TestCase):
             'include01': ('{% include "basic-syntax01" %}', {}, "something cool"),
             'include02': ('{% include "basic-syntax02" %}', {'headline': 'Included'}, "Included"),
             'include03': ('{% include template_name %}', {'template_name': 'basic-syntax02', 'headline': 'Included'}, "Included"),
-            'include04': ('a{% include "nonexistent" %}b', {}, ("ab", "ab", template.TemplateDoesNotExist)),
+            'include04': ('a{% include "nonexistent" %}b', {}, ("ab", "ab", template.IncludedTemplateDoesNotExist)),
             'include 05': ('template with a space', {}, 'template with a space'),
             'include06': ('{% include "include 05"%}', {}, 'template with a space'),
 
