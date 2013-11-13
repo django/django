@@ -1483,6 +1483,12 @@ Example: ``"http://media.example.com/"``
 
 .. warning::
 
+    There are security risks if you are accepting uploaded content from
+    untrusted users! See the security guide's topic on
+    :ref:`user-uploaded-content-security` for mitigation details.
+
+.. warning::
+
     :setting:`MEDIA_URL` and :setting:`STATIC_URL` must have different
     values. See :setting:`MEDIA_ROOT` for more details.
 
