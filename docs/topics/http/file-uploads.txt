@@ -10,6 +10,12 @@ When Django handles a file upload, the file data ends up placed in
 </ref/request-response>`). This document explains how files are stored on disk
 and in memory, and how to customize the default behavior.
 
+.. warning::
+
+    There are security risks if you are accepting uploaded content from
+    untrusted users! See the security guide's topic on
+    :ref:`user-uploaded-content-security` for mitigation details.
+
 Basic file uploads
 ==================
 
