@@ -202,19 +202,22 @@ def naturaltime(value):
             return _('now')
         elif delta.seconds < 60:
             return ungettext(
-                # Translators: \\u00a0 is non-breaking space
+                # Translators: \\u00a0 should be reflected in the translation
+                # as non-breaking space (U+00A0) between number and time unit.
                 'a second ago', '%(count)s\u00a0seconds ago', delta.seconds
             ) % {'count': delta.seconds}
         elif delta.seconds // 60 < 60:
             count = delta.seconds // 60
             return ungettext(
-                # Translators: \\u00a0 is non-breaking space
+                # Translators: \\u00a0 should be reflected in the translation
+                # as non-breaking space (U+00A0) between number and time unit.
                 'a minute ago', '%(count)s\u00a0minutes ago', count
             ) % {'count': count}
         else:
             count = delta.seconds // 60 // 60
             return ungettext(
-                # Translators: \\u00a0 is non-breaking space
+                # Translators: \\u00a0 should be reflected in the translation
+                # as non-breaking space (U+00A0) between number and time unit.
                 'an hour ago', '%(count)s\u00a0hours ago', count
             ) % {'count': count}
     else:
@@ -227,18 +230,21 @@ def naturaltime(value):
             return _('now')
         elif delta.seconds < 60:
             return ungettext(
-                # Translators: \\u00a0 is non-breaking space
+                # Translators: \\u00a0 should be reflected in the translation
+                # as non-breaking space (U+00A0) between number and time unit.
                 'a second from now', '%(count)s\u00a0seconds from now', delta.seconds
             ) % {'count': delta.seconds}
         elif delta.seconds // 60 < 60:
             count = delta.seconds // 60
             return ungettext(
-                # Translators: \\u00a0 is non-breaking space
+                # Translators: \\u00a0 should be reflected in the translation
+                # as non-breaking space (U+00A0) between number and time unit.
                 'a minute from now', '%(count)s\u00a0minutes from now', count
             ) % {'count': count}
         else:
             count = delta.seconds // 60 // 60
             return ungettext(
-                # Translators: \\u00a0 is non-breaking space
+                # Translators: \\u00a0 should be reflected in the translation
+                # as non-breaking space (U+00A0) between number and time unit.
                 'an hour from now', '%(count)s\u00a0hours from now', count
             ) % {'count': count}
