@@ -15,3 +15,8 @@ Bug fixes
 * Fixed a regression that prevented a ``ForeignKey`` with a hidden reverse
   manager (``related_name`` ending with '+') from being used as a lookup for
   ``prefetch_related`` (#21410).
+* Fixed :meth:`Queryset.datetimes<django.db.models.query.QuerySet.datetimes>`
+  raising ``AttributeError`` in some situations (#21432).
+* Fixed :class:`~django.contrib.auth.backends.ModelBackend` raising
+  ``UnboundLocalError`` if :func:`~django.contrib.auth.get_user_model`
+  raised an error (#21439).
