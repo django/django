@@ -260,6 +260,11 @@ class DateTimeQuery(DateQuery):
 
     compiler = 'SQLDateTimeCompiler'
 
+    def clone(self, klass=None, memo=None, **kwargs):
+        if 'tzinfo' not in kwargs and hasattr(self, 'tzinfo'):
+            kwargs['tzinfo'] = self.tzinfo
+        return super(DateTimeQuery, self).clone(klass, memo, **kwargs)
+
     def _check_field(self, field):
         assert isinstance(field, DateTimeField), \
             "%r isn't a DateTimeField." % field.name
