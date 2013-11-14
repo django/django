@@ -3,6 +3,7 @@ from django.contrib.gis.gdal.libgdal import lgdal, std_call
 from django.contrib.gis.gdal.prototypes.generation import (const_string_output,
     double_output, int_output, srs_output, string_output, void_output)
 
+
 ## Shortcut generation for routines with known parameters.
 def srs_double(f):
     """
@@ -10,6 +11,7 @@ def srs_double(f):
     the OSRSpatialReference object and
     """
     return double_output(f, [c_void_p, POINTER(c_int)], errcheck=True)
+
 
 def units_func(f):
     """
@@ -67,5 +69,5 @@ islocal = int_output(lgdal.OSRIsLocal, [c_void_p])
 isprojected = int_output(lgdal.OSRIsProjected, [c_void_p])
 
 # Coordinate transformation
-new_ct= srs_output(std_call('OCTNewCoordinateTransformation'), [c_void_p, c_void_p])
+new_ct = srs_output(std_call('OCTNewCoordinateTransformation'), [c_void_p, c_void_p])
 destroy_ct = void_output(std_call('OCTDestroyCoordinateTransformation'), [c_void_p], errcheck=False)

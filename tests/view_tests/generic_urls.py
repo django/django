@@ -4,8 +4,7 @@ from __future__ import unicode_literals
 from django.conf.urls import patterns, url
 from django.views.generic import RedirectView
 
-from . import views
-from .models import Article, DateArticle, UrlArticle
+from .models import Article, DateArticle
 
 
 date_based_info_dict = {

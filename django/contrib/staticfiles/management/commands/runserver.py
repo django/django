@@ -5,6 +5,7 @@ from django.core.management.commands.runserver import Command as RunserverComman
 
 from django.contrib.staticfiles.handlers import StaticFilesHandler
 
+
 class Command(RunserverCommand):
     option_list = RunserverCommand.option_list + (
         make_option('--nostatic', action="store_false", dest='use_static_handler', default=True,

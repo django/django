@@ -15,6 +15,7 @@ EXPIRED_LAST_MODIFIED_STR = 'Sat, 20 Oct 2007 23:21:47 GMT'
 ETAG = 'b4246ffc4f62314ca13147c9d4f76974'
 EXPIRED_ETAG = '7fae4cd4b0f81e7d2914700043aa8ed6'
 
+
 class ConditionalGet(TestCase):
     urls = 'conditional_processing.urls'
 

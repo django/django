@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 from psycopg2 import Binary
 from psycopg2.extensions import ISQLQuote
 
+
 class PostGISAdapter(object):
     def __init__(self, geom):
         "Initializes on the geometry."

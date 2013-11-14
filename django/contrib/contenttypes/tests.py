@@ -15,9 +15,11 @@ from django.utils.encoding import python_2_unicode_compatible
 class ConcreteModel(models.Model):
     name = models.CharField(max_length=10)
 
+
 class ProxyModel(ConcreteModel):
     class Meta:
         proxy = True
+
 
 @python_2_unicode_compatible
 class FooWithoutUrl(models.Model):
@@ -39,6 +41,7 @@ class FooWithUrl(FooWithoutUrl):
     def get_absolute_url(self):
         return "/users/%s/" % urlquote(self.name)
 
+
 class FooWithBrokenAbsoluteUrl(FooWithoutUrl):
     """
     Fake model defining a ``get_absolute_url`` method containing an error
@@ -47,8 +50,8 @@ class FooWithBrokenAbsoluteUrl(FooWithoutUrl):
     def get_absolute_url(self):
         return "/users/%s/" % self.unknown_field
 
-class ContentTypesTests(TestCase):
 
+class ContentTypesTests(TestCase):
     def setUp(self):
         self.old_Site_meta_installed = Site._meta.installed
         ContentType.objects.clear_cache()
@@ -203,7 +206,6 @@ class ContentTypesTests(TestCase):
             DeferredProxyModel: proxy_model_ct,
         })
 
-
     @override_settings(ALLOWED_HOSTS=['example.com'])
     def test_shortcut_view(self):
         """
@@ -269,9 +271,9 @@ class ContentTypesTests(TestCase):
         is defined anymore.
         """
         ct = ContentType.objects.create(
-            name = 'Old model',
-            app_label = 'contenttypes',
-            model = 'OldModel',
+            name='Old model',
+            app_label='contenttypes',
+            model='OldModel',
         )
         self.assertEqual(six.text_type(ct), 'Old model')
         self.assertIsNone(ct.model_class())

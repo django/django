@@ -431,8 +431,11 @@ Use the ``django.test.Client`` class to make requests.
     Once you have a ``Client`` instance, you can call any of the following
     methods:
 
-    .. method:: Client.get(path, data={}, follow=False, **extra)
+    .. method:: Client.get(path, data={}, follow=False, secure=False, **extra)
 
+        .. versionadded:: 1.7
+
+            The ``secure`` argument was added.
 
         Makes a GET request on the provided ``path`` and returns a ``Response``
         object, which is documented below.
@@ -488,7 +491,10 @@ Use the ``django.test.Client`` class to make requests.
             >>> response.redirect_chain
             [(u'http://testserver/next/', 302), (u'http://testserver/final/', 302)]
 
-    .. method:: Client.post(path, data={}, content_type=MULTIPART_CONTENT, follow=False, **extra)
+        If you set ``secure`` to ``True`` the client will emulate an HTTPS
+        request.
+
+    .. method:: Client.post(path, data={}, content_type=MULTIPART_CONTENT, follow=False, secure=False, **extra)
 
         Makes a POST request on the provided ``path`` and returns a
         ``Response`` object, which is documented below.
@@ -562,14 +568,17 @@ Use the ``django.test.Client`` class to make requests.
         and a ``redirect_chain`` attribute will be set in the response object
         containing tuples of the intermediate urls and status codes.
 
-    .. method:: Client.head(path, data={}, follow=False, **extra)
+        If you set ``secure`` to ``True`` the client will emulate an HTTPS
+        request.
+
+    .. method:: Client.head(path, data={}, follow=False, secure=False, **extra)
 
         Makes a HEAD request on the provided ``path`` and returns a
         ``Response`` object. This method works just like :meth:`Client.get`,
-        including the ``follow`` and ``extra`` arguments, except it does not
-        return a message body.
+        including the ``follow``, ``secure`` and ``extra`` arguments, except
+        it does not return a message body.
 
-    .. method:: Client.options(path, data='', content_type='application/octet-stream', follow=False, **extra)
+    .. method:: Client.options(path, data='', content_type='application/octet-stream', follow=False, secure=False, **extra)
 
         Makes an OPTIONS request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
@@ -577,10 +586,10 @@ Use the ``django.test.Client`` class to make requests.
         When ``data`` is provided, it is used as the request body, and
         a ``Content-Type`` header is set to ``content_type``.
 
-        The ``follow`` and ``extra`` arguments act the same as for
+        The ``follow``, ``secure`` and ``extra`` arguments act the same as for
         :meth:`Client.get`.
 
-    .. method:: Client.put(path, data='', content_type='application/octet-stream', follow=False, **extra)
+    .. method:: Client.put(path, data='', content_type='application/octet-stream', follow=False, secure=False, **extra)
 
         Makes a PUT request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
@@ -588,18 +597,18 @@ Use the ``django.test.Client`` class to make requests.
         When ``data`` is provided, it is used as the request body, and
         a ``Content-Type`` header is set to ``content_type``.
 
-        The ``follow`` and ``extra`` arguments act the same as for
+        The ``follow``, ``secure`` and ``extra`` arguments act the same as for
         :meth:`Client.get`.
 
-    .. method:: Client.patch(path, data='', content_type='application/octet-stream', follow=False, **extra)
+    .. method:: Client.patch(path, data='', content_type='application/octet-stream', follow=False, secure=False, **extra)
 
         Makes a PATCH request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
 
-        The ``follow`` and ``extra`` arguments act the same as for
+        The ``follow``, ``secure`` and ``extra`` arguments act the same as for
         :meth:`Client.get`.
 
-    .. method:: Client.delete(path, data='', content_type='application/octet-stream', follow=False, **extra)
+    .. method:: Client.delete(path, data='', content_type='application/octet-stream', follow=False, secure=False, **extra)
 
         Makes an DELETE request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
@@ -607,7 +616,7 @@ Use the ``django.test.Client`` class to make requests.
         When ``data`` is provided, it is used as the request body, and
         a ``Content-Type`` header is set to ``content_type``.
 
-        The ``follow`` and ``extra`` arguments act the same as for
+        The ``follow``, ``secure`` and ``extra`` arguments act the same as for
         :meth:`Client.get`.
 
     .. method:: Client.login(**credentials)
@@ -1229,6 +1238,10 @@ This flush/load procedure is repeated for each test in the test case, so you
 can be certain that the outcome of a test will not be affected by another test,
 or by the order of test execution.
 
+By default, fixtures are only loaded into the ``default`` database. If you are
+using multiple databases and set :attr:`multi_db=True
+<TransactionTestCase.multi_db>`, fixtures will be loaded into all databases.
+
 URLconf configuration
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -1293,6 +1306,11 @@ For example::
 
 This test case will flush *all* the test databases before running
 ``testIndexPageView``.
+
+The ``multi_db`` flag also affects into which databases the
+attr:`TransactionTestCase.fixtures` are loaded. By default (when
+``multi_db=False``), fixtures are only loaded into the ``default`` database.
+If ``multi_db=True``, fixtures are loaded into all databases.
 
 .. _overriding-settings:
 
@@ -1557,6 +1575,13 @@ your test suite.
     If ``fetch_redirect_response`` is ``False``, the final page won't be
     loaded. Since the test client can't fetch externals URLs, this is
     particularly useful if ``expected_url`` isn't part of your Django app.
+
+    .. versionadded:: 1.7
+
+    Scheme is handled correctly when making comparisons between two URLs. If
+    there isn't any scheme specified in the location where we are redirected to,
+    the original request's scheme is used. If present, the scheme in
+    ``expected_url`` is the one used to make the comparisons to.
 
 .. method:: SimpleTestCase.assertHTMLEqual(html1, html2, msg=None)
 

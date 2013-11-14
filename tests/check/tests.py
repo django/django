@@ -7,6 +7,7 @@ from django.test import TestCase
 
 from .models import Book
 
+
 class StubCheckModule(object):
     # Has no ``run_checks`` attribute & will trigger a warning.
     __name__ = 'StubCheckModule'

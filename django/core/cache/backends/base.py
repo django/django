@@ -233,9 +233,9 @@ class BaseCache(object):
         if value is None:
             raise ValueError("Key '%s' not found" % key)
 
-        self.set(key, value, version=version+delta)
+        self.set(key, value, version=version + delta)
         self.delete(key, version=version)
-        return version+delta
+        return version + delta
 
     def decr_version(self, key, delta=1, version=None):
         """Substracts delta from the cache version for the supplied key. Returns

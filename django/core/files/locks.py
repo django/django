@@ -14,7 +14,7 @@ Example Usage::
     ...     f.write('Django')
 """
 
-__all__ = ('LOCK_EX','LOCK_SH','LOCK_NB','lock','unlock')
+__all__ = ('LOCK_EX', 'LOCK_SH', 'LOCK_NB', 'lock', 'unlock')
 
 system_type = None
 
@@ -38,6 +38,7 @@ try:
     system_type = 'posix'
 except (ImportError, AttributeError):
     pass
+
 
 def fd(f):
     """Get a filedescriptor from something which could be a file or an fd."""

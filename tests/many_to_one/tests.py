@@ -118,10 +118,10 @@ class ManyToOneTests(TestCase):
         self.assertFalse(hasattr(self.r2.article_set, 'clear'))
 
     def test_selects(self):
-        new_article = self.r.article_set.create(headline="John's second story",
-                                                pub_date=datetime.date(2005, 7, 29))
-        new_article2 = self.r2.article_set.create(headline="Paul's story",
-                                                  pub_date=datetime.date(2006, 1, 17))
+        self.r.article_set.create(headline="John's second story",
+                                  pub_date=datetime.date(2005, 7, 29))
+        self.r2.article_set.create(headline="Paul's story",
+                                   pub_date=datetime.date(2006, 1, 17))
         # Reporter objects have access to their related Article objects.
         self.assertQuerysetEqual(self.r.article_set.all(), [
             "<Article: John's second story>",
@@ -211,14 +211,14 @@ class ManyToOneTests(TestCase):
                 "<Article: This is a test>",
             ])
         self.assertQuerysetEqual(
-            Article.objects.filter(reporter__in=[self.r.id,self.r2.id]).distinct(),
+            Article.objects.filter(reporter__in=[self.r.id, self.r2.id]).distinct(),
             [
-                    "<Article: John's second story>",
-                    "<Article: Paul's story>",
-                    "<Article: This is a test>",
+                "<Article: John's second story>",
+                "<Article: Paul's story>",
+                "<Article: This is a test>",
             ])
         self.assertQuerysetEqual(
-            Article.objects.filter(reporter__in=[self.r,self.r2]).distinct(),
+            Article.objects.filter(reporter__in=[self.r, self.r2]).distinct(),
             [
                 "<Article: John's second story>",
                 "<Article: Paul's story>",
@@ -229,8 +229,8 @@ class ManyToOneTests(TestCase):
         # then converted into a query
         self.assertQuerysetEqual(
             Article.objects.filter(
-                        reporter__in=Reporter.objects.filter(first_name='John').values('pk').query
-                    ).distinct(),
+                reporter__in=Reporter.objects.filter(first_name='John').values('pk').query
+            ).distinct(),
             [
                 "<Article: John's second story>",
                 "<Article: This is a test>",
@@ -239,8 +239,8 @@ class ManyToOneTests(TestCase):
     def test_reverse_selects(self):
         a3 = Article.objects.create(id=None, headline="Third article",
                                     pub_date=datetime.date(2005, 7, 27), reporter_id=self.r.id)
-        a4 = Article.objects.create(id=None, headline="Fourth article",
-                                    pub_date=datetime.date(2005, 7, 27), reporter_id=str(self.r.id))
+        Article.objects.create(id=None, headline="Fourth article",
+                               pub_date=datetime.date(2005, 7, 27), reporter_id=str(self.r.id))
         # Reporters can be queried
         self.assertQuerysetEqual(Reporter.objects.filter(id__exact=self.r.id),
                                  ["<Reporter: John Smith>"])
@@ -258,13 +258,13 @@ class ManyToOneTests(TestCase):
         self.assertQuerysetEqual(Reporter.objects.filter(article=self.a),
                                  ["<Reporter: John Smith>"])
         self.assertQuerysetEqual(
-            Reporter.objects.filter(article__in=[self.a.id,a3.id]).distinct(),
+            Reporter.objects.filter(article__in=[self.a.id, a3.id]).distinct(),
             ["<Reporter: John Smith>"])
         self.assertQuerysetEqual(
-            Reporter.objects.filter(article__in=[self.a.id,a3]).distinct(),
+            Reporter.objects.filter(article__in=[self.a.id, a3]).distinct(),
             ["<Reporter: John Smith>"])
         self.assertQuerysetEqual(
-            Reporter.objects.filter(article__in=[self.a,a3]).distinct(),
+            Reporter.objects.filter(article__in=[self.a, a3]).distinct(),
             ["<Reporter: John Smith>"])
         self.assertQuerysetEqual(
             Reporter.objects.filter(article__headline__startswith='T'),
@@ -336,14 +336,14 @@ class ManyToOneTests(TestCase):
             ])
 
     def test_delete(self):
-        new_article = self.r.article_set.create(headline="John's second story",
+        self.r.article_set.create(headline="John's second story",
                                                 pub_date=datetime.date(2005, 7, 29))
-        new_article2 = self.r2.article_set.create(headline="Paul's story",
-                                                  pub_date=datetime.date(2006, 1, 17))
-        a3 = Article.objects.create(id=None, headline="Third article",
-                                    pub_date=datetime.date(2005, 7, 27), reporter_id=self.r.id)
-        a4 = Article.objects.create(id=None, headline="Fourth article",
-                                    pub_date=datetime.date(2005, 7, 27), reporter_id=str(self.r.id))
+        self.r2.article_set.create(headline="Paul's story",
+                                   pub_date=datetime.date(2006, 1, 17))
+        Article.objects.create(id=None, headline="Third article",
+                               pub_date=datetime.date(2005, 7, 27), reporter_id=self.r.id)
+        Article.objects.create(id=None, headline="Fourth article",
+                               pub_date=datetime.date(2005, 7, 27), reporter_id=str(self.r.id))
         # If you delete a reporter, his articles will be deleted.
         self.assertQuerysetEqual(Article.objects.all(),
             [
@@ -439,6 +439,6 @@ class ManyToOneTests(TestCase):
                                  Article.objects.values_list,
                                  'reporter__notafield')
         self.assertRaisesMessage(FieldError,
-                                 expected_message % ', '.join(['EXTRA',] + Article._meta.get_all_field_names()),
+                                 expected_message % ', '.join(['EXTRA'] + Article._meta.get_all_field_names()),
                                  Article.objects.extra(select={'EXTRA': 'EXTRA_SELECT'}).values_list,
                                  'notafield')

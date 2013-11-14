@@ -52,8 +52,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cursor.execute("SELECT * FROM %s WHERE ROWNUM < 2" % self.connection.ops.quote_name(table_name))
         description = []
         for desc in cursor.description:
-            name = force_text(desc[0]) # cx_Oracle always returns a 'str' on both Python 2 and 3
-            name = name % {} # cx_Oracle, for some reason, doubles percent signs.
+            name = force_text(desc[0])  # cx_Oracle always returns a 'str' on both Python 2 and 3
+            name = name % {}  # cx_Oracle, for some reason, doubles percent signs.
             description.append(FieldInfo(*(name.lower(),) + desc[1:]))
         return description
 

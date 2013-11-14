@@ -2,6 +2,7 @@ from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.geos.prototypes import prepared as capi
 
+
 class PreparedGeometry(GEOSBase):
     """
     A geometry that is prepared for performing certain operations.
@@ -11,11 +12,13 @@ class PreparedGeometry(GEOSBase):
     ptr_type = capi.PREPGEOM_PTR
 
     def __init__(self, geom):
-        if not isinstance(geom, GEOSGeometry): raise TypeError
+        if not isinstance(geom, GEOSGeometry):
+            raise TypeError
         self.ptr = capi.geos_prepare(geom.ptr)
 
     def __del__(self):
-        if self._ptr: capi.prepared_destroy(self._ptr)
+        if self._ptr:
+            capi.prepared_destroy(self._ptr)
 
     def contains(self, other):
         return capi.prepared_contains(self.ptr, other.ptr)

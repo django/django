@@ -27,6 +27,7 @@ class Plant(models.Model):
         # For testing when upper case letter in app name; regression for #4057
         db_table = "Fixtures_regress_plant"
 
+
 @python_2_unicode_compatible
 class Stuff(models.Model):
     name = models.CharField(max_length=20, null=True)

@@ -15,7 +15,7 @@ from django.utils.safestring import mark_safe
 if six.PY2:
     # Import force_unicode even though this module doesn't use it, because some
     # people rely on it being here.
-    from django.utils.encoding import force_unicode
+    from django.utils.encoding import force_unicode  # NOQA
 
 # Capitalizes the first letter of a string.
 capfirst = lambda x: x and force_text(x)[0].upper() + force_text(x)[1:]
@@ -33,6 +33,7 @@ def wrap(text, width):
     the text. Expects that existing line breaks are posix newlines.
     """
     text = force_text(text)
+
     def _generator():
         it = iter(text.split(' '))
         word = next(it)
@@ -223,6 +224,7 @@ class Truncator(SimpleLazyObject):
         # Return string
         return out
 
+
 def get_valid_filename(s):
     """
     Returns the given string converted to a string that can be used for a clean
@@ -235,6 +237,7 @@ def get_valid_filename(s):
     s = force_text(s).strip().replace(' ', '_')
     return re.sub(r'(?u)[^-\w.]', '', s)
 get_valid_filename = allow_lazy(get_valid_filename, six.text_type)
+
 
 def get_text_list(list_, last_word=ugettext_lazy('or')):
     """
@@ -249,17 +252,21 @@ def get_text_list(list_, last_word=ugettext_lazy('or')):
     >>> get_text_list([])
     ''
     """
-    if len(list_) == 0: return ''
-    if len(list_) == 1: return force_text(list_[0])
+    if len(list_) == 0:
+        return ''
+    if len(list_) == 1:
+        return force_text(list_[0])
     return '%s %s %s' % (
         # Translators: This string is used as a separator between list elements
         _(', ').join(force_text(i) for i in list_[:-1]),
         force_text(last_word), force_text(list_[-1]))
 get_text_list = allow_lazy(get_text_list, six.text_type)
 
+
 def normalize_newlines(text):
     return force_text(re.sub(r'\r\n|\r|\n', '\n', text))
 normalize_newlines = allow_lazy(normalize_newlines, six.text_type)
+
 
 def recapitalize(text):
     "Recapitalizes text, placing caps after end-of-sentence punctuation."
@@ -268,6 +275,7 @@ def recapitalize(text):
     text = capsRE.sub(lambda x: x.group(1).upper(), text)
     return text
 recapitalize = allow_lazy(recapitalize)
+
 
 def phone2numeric(phone):
     "Converts a phone number with letters into its numeric equivalent."
@@ -279,6 +287,7 @@ def phone2numeric(phone):
     return ''.join(char2number.get(c, c) for c in phone.lower())
 phone2numeric = allow_lazy(phone2numeric)
 
+
 # From http://www.xhaus.com/alan/python/httpcomp.html#gzip
 # Used with permission.
 def compress_string(s):
@@ -287,6 +296,7 @@ def compress_string(s):
     zfile.write(s)
     zfile.close()
     return zbuf.getvalue()
+
 
 class StreamingBuffer(object):
     def __init__(self):
@@ -306,6 +316,7 @@ class StreamingBuffer(object):
     def close(self):
         return
 
+
 # Like compress_string, but for iterators of strings.
 def compress_sequence(sequence):
     buf = StreamingBuffer()
@@ -320,6 +331,7 @@ def compress_sequence(sequence):
     yield buf.read()
 
 ustring_re = re.compile("([\u0080-\uffff])")
+
 
 def javascript_quote(s, quote_double_quotes=False):
 
@@ -352,6 +364,7 @@ smart_split_re = re.compile(r"""
     ) | \S+)
 """, re.VERBOSE)
 
+
 def smart_split(text):
     r"""
     Generator that splits a string by spaces, leaving quoted phrases together.
@@ -370,6 +383,7 @@ def smart_split(text):
     text = force_text(text)
     for bit in smart_split_re.finditer(text):
         yield bit.group(0)
+
 
 def _replace_entity(match):
     text = match.group(1)
@@ -391,9 +405,11 @@ def _replace_entity(match):
 
 _entity_re = re.compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
 
+
 def unescape_entities(text):
     return _entity_re.sub(_replace_entity, text)
 unescape_entities = allow_lazy(unescape_entities, six.text_type)
+
 
 def unescape_string_literal(s):
     r"""
@@ -414,6 +430,7 @@ def unescape_string_literal(s):
     quote = s[0]
     return s[1:-1].replace(r'\%s' % quote, quote).replace(r'\\', '\\')
 unescape_string_literal = allow_lazy(unescape_string_literal)
+
 
 def slugify(value):
     """

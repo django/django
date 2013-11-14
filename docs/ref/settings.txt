@@ -79,17 +79,21 @@ responsible to provide your own validation of the ``Host`` header (perhaps in a
 middleware; if so this middleware must be listed first in
 :setting:`MIDDLEWARE_CLASSES`).
 
-.. note::
+.. versionchanged:: 1.7
 
-    If you want to also allow the `fully qualified domain name (FQDN)`_, which
-    some browsers can send in the Host header, you must explicitly add another
-    ALLOWED_HOSTS entry that includes a trailing period. This entry can also be
-    a subdomain wildcard::
+    In previous versions of Django, if you wanted to also allow the
+    `fully qualified domain name (FQDN)`_, which some browsers can send in the
+    ``Host`` header, you had to explicitly add another ``ALLOWED_HOSTS`` entry
+    that included a trailing period. This entry could also be a subdomain
+    wildcard::
 
         ALLOWED_HOSTS = [
             '.example.com', # Allow domain and subdomains
             '.example.com.', # Also allow FQDN and subdomains
         ]
+
+    In Django 1.7, the trailing dot is stripped when performing host validation,
+    thus an entry with a trailing dot isn't required.
 
 .. _`fully qualified domain name (FQDN)`: http://en.wikipedia.org/wiki/Fully_qualified_domain_name
 
@@ -506,8 +510,10 @@ this value is assumed to be the host.
 
 If you're using PostgreSQL, by default (empty :setting:`HOST`), the connection
 to the database is done through UNIX domain sockets ('local' lines in
-``pg_hba.conf``). If you want to connect through TCP sockets, set
-:setting:`HOST` to 'localhost' or '127.0.0.1' ('host' lines in ``pg_hba.conf``).
+``pg_hba.conf``). If your UNIX domain socket is not in the standard location,
+use the same value of ``unix_socket_directory`` from ``postgresql.conf``.
+If you want to connect through TCP sockets, set :setting:`HOST` to 'localhost'
+or '127.0.0.1' ('host' lines in ``pg_hba.conf``).
 On Windows, you should always define :setting:`HOST`, as UNIX domain sockets
 are not available.
 
@@ -1153,6 +1159,10 @@ dependent behavior. On most platforms, temporary files will have a mode
 of ``0600``, and files saved from memory will be saved using the
 system's standard umask.
 
+This setting also determines the default permissions for collected static files
+when using the :djadmin:`collectstatic` management command. See
+:djadmin:`collectstatic` for details on overridding it.
+
 .. warning::
 
     **Always prefix the mode with a 0.**
@@ -1356,28 +1366,18 @@ This specifies which languages are available for language selection. See
 Generally, the default value should suffice. Only set this setting if you want
 to restrict language selection to a subset of the Django-provided languages.
 
-If you define a custom :setting:`LANGUAGES` setting, it's OK to mark the
-languages as translation strings (as in the default value referred to above)
--- but use a "dummy" ``gettext()`` function, not the one in
-``django.utils.translation``. You should *never* import
-``django.utils.translation`` from within your settings file, because that
-module in itself depends on the settings, and that would cause a circular
-import.
+If you define a custom :setting:`LANGUAGES` setting, you can mark the
+language names as translation strings using the
+:func:`~django.utils.translation.ugettext_lazy` function.
 
-The solution is to use a "dummy" ``gettext()`` function. Here's a sample
-settings file::
+Here's a sample settings file::
 
-    gettext = lambda s: s
+    from django.utils.translation import ugettext_lazy as _
 
     LANGUAGES = (
-        ('de', gettext('German')),
-        ('en', gettext('English')),
+        ('de', _('German')),
+        ('en', _('English')),
     )
-
-With this arrangement, ``django-admin.py makemessages`` will still find and
-mark these strings for translation, but the translation won't happen at
-runtime -- so you'll have to remember to wrap the languages in the *real*
-``gettext()`` in any code that uses :setting:`LANGUAGES` at runtime.
 
 .. setting:: LOCALE_PATHS
 

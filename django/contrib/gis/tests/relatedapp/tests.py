@@ -27,7 +27,7 @@ class RelatedGeoModelTest(TestCase):
         cities = (
             ('Aurora', 'TX', -97.516111, 33.058333),
             ('Roswell', 'NM', -104.528056, 33.387222),
-            ('Kecksburg', 'PA',  -79.460734, 40.18476),
+            ('Kecksburg', 'PA', -79.460734, 40.18476),
         )
 
         for qs in (qs1, qs2, qs3):
@@ -79,7 +79,8 @@ class RelatedGeoModelTest(TestCase):
         # between the Oracle and PostGIS spatial backends on the extent calculation.
         tol = 4
         for ref, e in [(all_extent, e1), (txpa_extent, e2), (all_extent, e3)]:
-            for ref_val, e_val in zip(ref, e): self.assertAlmostEqual(ref_val, e_val, tol)
+            for ref_val, e_val in zip(ref, e):
+                self.assertAlmostEqual(ref_val, e_val, tol)
 
     @no_mysql
     def test04b_related_union_aggregate(self):

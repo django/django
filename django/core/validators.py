@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import re
 
 from django.core.exceptions import ValidationError
+from django.utils.deconstruct import deconstructible
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 from django.utils.encoding import force_text
 from django.utils.ipv6 import is_valid_ipv6_address
@@ -14,6 +15,7 @@ from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 EMPTY_VALUES = (None, '', [], (), {})
 
 
+@deconstructible
 class RegexValidator(object):
     regex = ''
     message = _('Enter a valid value.')
@@ -39,6 +41,7 @@ class RegexValidator(object):
             raise ValidationError(self.message, code=self.code)
 
 
+@deconstructible
 class URLValidator(RegexValidator):
     regex = re.compile(
         r'^(?:http|ftp)s?://'  # http:// or https://
@@ -77,15 +80,16 @@ def validate_integer(value):
         raise ValidationError(_('Enter a valid integer.'), code='invalid')
 
 
+@deconstructible
 class EmailValidator(object):
     message = _('Enter a valid email address.')
     code = 'invalid'
     user_regex = re.compile(
         r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*$"  # dot-atom
-        r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"$)', # quoted-string
+        r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"$)',  # quoted-string
         re.IGNORECASE)
     domain_regex = re.compile(
-        r'(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}|[A-Z0-9-]{2,})\.?$'  # domain
+        r'(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}|[A-Z0-9-]{2,})$'  # domain
         # literal form, ipv4 address (SMTP 4.1.3)
         r'|^\[(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}\]$',
         re.IGNORECASE)
@@ -173,6 +177,7 @@ comma_separated_int_list_re = re.compile('^[\d,]+$')
 validate_comma_separated_integer_list = RegexValidator(comma_separated_int_list_re, _('Enter only digits separated by commas.'), 'invalid')
 
 
+@deconstructible
 class BaseValidator(object):
     compare = lambda self, a, b: a is not b
     clean = lambda self, x: x
@@ -189,18 +194,21 @@ class BaseValidator(object):
             raise ValidationError(self.message, code=self.code, params=params)
 
 
+@deconstructible
 class MaxValueValidator(BaseValidator):
     compare = lambda self, a, b: a > b
     message = _('Ensure this value is less than or equal to %(limit_value)s.')
     code = 'max_value'
 
 
+@deconstructible
 class MinValueValidator(BaseValidator):
     compare = lambda self, a, b: a < b
     message = _('Ensure this value is greater than or equal to %(limit_value)s.')
     code = 'min_value'
 
 
+@deconstructible
 class MinLengthValidator(BaseValidator):
     compare = lambda self, a, b: a < b
     clean = lambda self, x: len(x)
@@ -211,6 +219,7 @@ class MinLengthValidator(BaseValidator):
     code = 'min_length'
 
 
+@deconstructible
 class MaxLengthValidator(BaseValidator):
     compare = lambda self, a, b: a > b
     clean = lambda self, x: len(x)

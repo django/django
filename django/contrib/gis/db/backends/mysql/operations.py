@@ -14,11 +14,11 @@ class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
     from_text = 'GeomFromText'
 
     Adapter = WKTAdapter
-    Adaptor = Adapter # Backwards-compatibility alias.
+    Adaptor = Adapter  # Backwards-compatibility alias.
 
     geometry_functions = {
-        'bbcontains': 'MBRContains', # For consistency w/PostGIS API
-        'bboverlaps': 'MBROverlaps', # .. ..
+        'bbcontains': 'MBRContains',  # For consistency w/PostGIS API
+        'bboverlaps': 'MBROverlaps',  # .. ..
         'contained': 'MBRWithin',    # .. ..
         'contains': 'MBRContains',
         'disjoint': 'MBRDisjoint',

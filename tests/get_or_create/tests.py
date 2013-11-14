@@ -51,7 +51,7 @@ class GetOrCreateTests(TestCase):
 
         # If you specify an existing primary key, but different other fields,
         # then you will get an error and data will not be updated.
-        m = ManualPrimaryKeyTest.objects.create(id=1, data="Original")
+        ManualPrimaryKeyTest.objects.create(id=1, data="Original")
         self.assertRaises(IntegrityError,
             ManualPrimaryKeyTest.objects.get_or_create, id=1, data="Different"
         )
@@ -63,7 +63,7 @@ class GetOrCreateTests(TestCase):
         # the actual traceback. Refs #16340.
         try:
             ManualPrimaryKeyTest.objects.get_or_create(id=1, data="Different")
-        except IntegrityError as e:
+        except IntegrityError:
             formatted_traceback = traceback.format_exc()
             self.assertIn(str('obj.save'), formatted_traceback)
 
@@ -193,6 +193,6 @@ class UpdateOrCreateTests(TestCase):
         # the actual traceback. Refs #16340.
         try:
             ManualPrimaryKeyTest.objects.update_or_create(id=1, data="Different")
-        except IntegrityError as e:
+        except IntegrityError:
             formatted_traceback = traceback.format_exc()
             self.assertIn('obj.save', formatted_traceback)

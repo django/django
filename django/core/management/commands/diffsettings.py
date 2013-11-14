@@ -2,9 +2,11 @@ from optparse import make_option
 
 from django.core.management.base import NoArgsCommand
 
+
 def module_to_dict(module, omittable=lambda k: k.startswith('_')):
     """Converts a module namespace to a Python dictionary."""
     return dict((k, repr(v)) for k, v in module.__dict__.items() if not omittable(k))
+
 
 class Command(NoArgsCommand):
     help = """Displays differences between the current settings.py and Django's

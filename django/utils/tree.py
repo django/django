@@ -5,6 +5,7 @@ ORM.
 
 import copy
 
+
 class Node(object):
     """
     A single internal node in the tree graph. A Node should be viewed as a

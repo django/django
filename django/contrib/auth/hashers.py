@@ -56,6 +56,8 @@ def check_password(password, encoded, setter=None, preferred='default'):
     hasher = identify_hasher(encoded)
 
     must_update = hasher.algorithm != preferred.algorithm
+    if not must_update:
+        must_update = hasher.must_update(encoded)
     is_correct = hasher.verify(password, encoded)
     if setter and is_correct and must_update:
         setter(password)
@@ -212,6 +214,9 @@ class BasePasswordHasher(object):
         """
         raise NotImplementedError('subclasses of BasePasswordHasher must provide a safe_summary() method')
 
+    def must_update(self, encoded):
+        return False
+
 
 class PBKDF2PasswordHasher(BasePasswordHasher):
     """
@@ -249,6 +254,10 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
             (_('salt'), mask_hash(salt)),
             (_('hash'), mask_hash(hash)),
         ])
+
+    def must_update(self, encoded):
+        algorithm, iterations, salt, hash = encoded.split('$', 3)
+        return int(iterations) != self.iterations
 
 
 class PBKDF2SHA1PasswordHasher(PBKDF2PasswordHasher):
@@ -313,8 +322,10 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
 
         # Ensure that our data is a bytestring
         data = force_bytes(data)
+        # force_bytes() necessary for py-bcrypt compatibility
+        hashpw = force_bytes(bcrypt.hashpw(password, data))
 
-        return constant_time_compare(data, bcrypt.hashpw(password, data))
+        return constant_time_compare(data, hashpw)
 
     def safe_summary(self, encoded):
         algorithm, empty, algostr, work_factor, data = encoded.split('$', 4)
@@ -501,4 +512,3 @@ class CryptPasswordHasher(BasePasswordHasher):
             (_('salt'), salt),
             (_('hash'), mask_hash(data, show=3)),
         ])
-

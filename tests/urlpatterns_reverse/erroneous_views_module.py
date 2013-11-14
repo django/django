@@ -1,4 +1,5 @@
-import non_existent
+import non_existent  # NOQA
+
 
 def erroneous_view(request):
     pass

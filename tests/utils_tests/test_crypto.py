@@ -2,8 +2,6 @@ from __future__ import unicode_literals
 
 import binascii
 import hashlib
-import math
-import timeit
 import unittest
 
 from django.utils.crypto import constant_time_compare, pbkdf2

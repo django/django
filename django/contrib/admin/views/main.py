@@ -49,9 +49,9 @@ def _is_changelist_popup(request):
     IS_LEGACY_POPUP_VAR = 'pop'
     if IS_LEGACY_POPUP_VAR in request.GET:
         warnings.warn(
-        "The `%s` GET parameter has been renamed to `%s`." %
-        (IS_LEGACY_POPUP_VAR, IS_POPUP_VAR),
-        DeprecationWarning, 2)
+            "The `%s` GET parameter has been renamed to `%s`." %
+            (IS_LEGACY_POPUP_VAR, IS_POPUP_VAR),
+            DeprecationWarning, 2)
         return True
 
     return False
@@ -130,7 +130,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         """
         if not params:
             params = self.params
-        lookup_params = params.copy() # a dictionary of the query string
+        lookup_params = params.copy()  # a dictionary of the query string
         # Remove all the parameters that are globally and systematically
         # ignored.
         for ignored in IGNORED_PARAMS:
@@ -198,8 +198,10 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
             six.reraise(IncorrectLookupParameters, IncorrectLookupParameters(e), sys.exc_info()[2])
 
     def get_query_string(self, new_params=None, remove=None):
-        if new_params is None: new_params = {}
-        if remove is None: remove = []
+        if new_params is None:
+            new_params = {}
+        if remove is None:
+            remove = []
         p = self.params.copy()
         for r in remove:
             for k in list(p):
@@ -234,7 +236,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
             result_list = self.queryset._clone()
         else:
             try:
-                result_list = paginator.page(self.page_num+1).object_list
+                result_list = paginator.page(self.page_num + 1).object_list
             except InvalidPage:
                 raise IncorrectLookupParameters
 
@@ -297,10 +299,10 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
                     field_name = self.list_display[int(idx)]
                     order_field = self.get_ordering_field(field_name)
                     if not order_field:
-                        continue # No 'admin_order_field', skip it
+                        continue  # No 'admin_order_field', skip it
                     ordering.append(pfx + order_field)
                 except (IndexError, ValueError):
-                    continue # Invalid ordering specified, skip it.
+                    continue  # Invalid ordering specified, skip it.
 
         # Add the given query's ordering fields, if any.
         ordering.extend(queryset.query.order_by)
@@ -345,7 +347,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
                 try:
                     idx = int(idx)
                 except ValueError:
-                    continue # skip it
+                    continue  # skip it
                 ordering_fields[idx] = 'desc' if pfx == '-' else 'asc'
         return ordering_fields
 

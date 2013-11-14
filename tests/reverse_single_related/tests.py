@@ -19,8 +19,8 @@ class ReverseSingleRelatedTests(TestCase):
 
         # Only one source is available via all() due to the custom default manager.
         self.assertQuerysetEqual(
-                Source.objects.all(),
-                ["<Source: Source object>"]
+            Source.objects.all(),
+            ["<Source: Source object>"]
         )
 
         self.assertEqual(public_item.source, public_source)

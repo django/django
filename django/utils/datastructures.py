@@ -3,6 +3,7 @@ import warnings
 from collections import OrderedDict
 from django.utils import six
 
+
 class MergeDict(object):
     """
     A simple class for creating new "virtual" dictionaries that actually look
@@ -12,6 +13,8 @@ class MergeDict(object):
     first occurrence will be used.
     """
     def __init__(self, *dicts):
+        warnings.warn('`MergeDict` is deprecated, use `dict.update()` '
+                      'instead.', PendingDeprecationWarning, 2)
         self.dicts = dicts
 
     def __bool__(self):
@@ -114,6 +117,7 @@ class MergeDict(object):
         '''
         dictreprs = ', '.join(repr(d) for d in self.dicts)
         return '%s(%s)' % (self.__class__.__name__, dictreprs)
+
 
 class SortedDict(dict):
     """
@@ -237,6 +241,7 @@ class SortedDict(dict):
         super(SortedDict, self).clear()
         self.keyOrder = []
 
+
 class OrderedSet(object):
     """
     A set which keeps the ordering of the inserted items.
@@ -267,8 +272,10 @@ class OrderedSet(object):
     def __nonzero__(self):
         return bool(self.dict)
 
+
 class MultiValueDictKeyError(KeyError):
     pass
+
 
 class MultiValueDict(dict):
     """
@@ -488,19 +495,20 @@ class ImmutableList(tuple):
             raise AttributeError(self.warning)
 
     # All list mutation functions complain.
-    __delitem__  = complain
+    __delitem__ = complain
     __delslice__ = complain
-    __iadd__     = complain
-    __imul__     = complain
-    __setitem__  = complain
+    __iadd__ = complain
+    __imul__ = complain
+    __setitem__ = complain
     __setslice__ = complain
-    append       = complain
-    extend       = complain
-    insert       = complain
-    pop          = complain
-    remove       = complain
-    sort         = complain
-    reverse      = complain
+    append = complain
+    extend = complain
+    insert = complain
+    pop = complain
+    remove = complain
+    sort = complain
+    reverse = complain
+
 
 class DictWrapper(dict):
     """

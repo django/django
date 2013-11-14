@@ -6,9 +6,8 @@ from io import BytesIO
 from itertools import chain
 import time
 from unittest import skipIf
-import warnings
 
-from django.db import connection, connections, DEFAULT_DB_ALIAS
+from django.db import connection, connections
 from django.core import signals
 from django.core.exceptions import SuspiciousOperation
 from django.core.handlers.wsgi import WSGIRequest, LimitedStream
@@ -163,7 +162,7 @@ class RequestsTests(SimpleTestCase):
         response.set_cookie('max_age', max_age=10)
         max_age_cookie = response.cookies['max_age']
         self.assertEqual(max_age_cookie['max-age'], 10)
-        self.assertEqual(max_age_cookie['expires'], cookie_date(time.time()+10))
+        self.assertEqual(max_age_cookie['expires'], cookie_date(time.time() + 10))
 
     def test_httponly_cookie(self):
         response = HttpResponse()
@@ -298,12 +297,12 @@ class RequestsTests(SimpleTestCase):
         # we don't want the data held in memory twice, and we don't want to
         # silence the error by setting body = '' either.
         payload = FakePayload("\r\n".join([
-                '--boundary',
-                'Content-Disposition: form-data; name="name"',
-                '',
-                'value',
-                '--boundary--'
-                '']))
+            '--boundary',
+            'Content-Disposition: form-data; name="name"',
+            '',
+            'value',
+            '--boundary--'
+            '']))
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
                                'CONTENT_LENGTH': len(payload),
@@ -320,12 +319,12 @@ class RequestsTests(SimpleTestCase):
         # being a binary upload, in which case it should still be accessible
         # via body.
         payload_data = b"\r\n".join([
-                b'--boundary',
-                b'Content-ID: id; name="name"',
-                b'',
-                b'value',
-                b'--boundary--'
-                b''])
+            b'--boundary',
+            b'Content-ID: id; name="name"',
+            b'',
+            b'value',
+            b'--boundary--'
+            b''])
         payload = FakePayload(payload_data)
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_TYPE': 'multipart/related; boundary=boundary',
@@ -343,12 +342,12 @@ class RequestsTests(SimpleTestCase):
         # Every request.POST with Content-Length >= 0 is a valid request,
         # this test ensures that we handle Content-Length == 0.
         payload = FakePayload("\r\n".join([
-                '--boundary',
-                'Content-Disposition: form-data; name="name"',
-                '',
-                'value',
-                '--boundary--'
-                '']))
+            '--boundary',
+            'Content-Disposition: form-data; name="name"',
+            '',
+            'value',
+            '--boundary--'
+            '']))
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
                                'CONTENT_LENGTH': 0,
@@ -390,7 +389,7 @@ class RequestsTests(SimpleTestCase):
                                'CONTENT_TYPE': 'application/x-www-form-urlencoded',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': payload})
-        raw_data = request.body
+        request.body  # evaluate
         self.assertEqual(request.POST, {'name': ['value']})
 
     def test_POST_after_body_read_and_stream_read(self):
@@ -403,7 +402,7 @@ class RequestsTests(SimpleTestCase):
                                'CONTENT_TYPE': 'application/x-www-form-urlencoded',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': payload})
-        raw_data = request.body
+        request.body  # evaluate
         self.assertEqual(request.read(1), b'n')
         self.assertEqual(request.POST, {'name': ['value']})
 
@@ -413,17 +412,17 @@ class RequestsTests(SimpleTestCase):
         the stream is read second. Using multipart/form-data instead of urlencoded.
         """
         payload = FakePayload("\r\n".join([
-                '--boundary',
-                'Content-Disposition: form-data; name="name"',
-                '',
-                'value',
-                '--boundary--'
-                '']))
+            '--boundary',
+            'Content-Disposition: form-data; name="name"',
+            '',
+            'value',
+            '--boundary--'
+            '']))
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': payload})
-        raw_data = request.body
+        request.body  # evaluate
         # Consume enough data to mess up the parsing:
         self.assertEqual(request.read(13), b'--boundary\r\nC')
         self.assertEqual(request.POST, {'name': ['value']})
@@ -480,7 +479,7 @@ class HostValidationTests(SimpleTestCase):
             'forward.com', 'example.com', 'internal.com', '12.34.56.78',
             '[2001:19f0:feee::dead:beef:cafe]', 'xn--4ca9at.com',
             '.multitenant.com', 'INSENSITIVE.com',
-            ])
+        ])
     def test_http_get_host(self):
         # Check if X_FORWARDED_HOST is provided.
         request = HttpRequest()
@@ -525,10 +524,12 @@ class HostValidationTests(SimpleTestCase):
             '12.34.56.78:443',
             '[2001:19f0:feee::dead:beef:cafe]',
             '[2001:19f0:feee::dead:beef:cafe]:8080',
-            'xn--4ca9at.com', # Punnycode for öäü.com
+            'xn--4ca9at.com',  # Punnycode for öäü.com
             'anything.multitenant.com',
             'multitenant.com',
             'insensitive.com',
+            'example.com.',
+            'example.com.:80',
         ]
 
         for host in legit_hosts:
@@ -539,7 +540,7 @@ class HostValidationTests(SimpleTestCase):
             request.get_host()
 
         # Poisoned host headers are rejected as suspicious
-        for host in chain(self.poisoned_hosts, ['other.com']):
+        for host in chain(self.poisoned_hosts, ['other.com', 'example.com..']):
             with self.assertRaises(SuspiciousOperation):
                 request = HttpRequest()
                 request.META = {
@@ -593,7 +594,7 @@ class HostValidationTests(SimpleTestCase):
             '12.34.56.78:443',
             '[2001:19f0:feee::dead:beef:cafe]',
             '[2001:19f0:feee::dead:beef:cafe]:8080',
-            'xn--4ca9at.com', # Punnycode for öäü.com
+            'xn--4ca9at.com',  # Punnycode for öäü.com
         ]
 
         for host in legit_hosts:
@@ -610,7 +611,6 @@ class HostValidationTests(SimpleTestCase):
                     'HTTP_HOST': host,
                 }
                 request.get_host()
-
 
     @override_settings(DEBUG=True, ALLOWED_HOSTS=[])
     def test_host_validation_disabled_in_debug_mode(self):
@@ -636,11 +636,11 @@ class HostValidationTests(SimpleTestCase):
         msg_suggestion = msg_invalid_host + "You may need to add %r to ALLOWED_HOSTS."
         msg_suggestion2 = msg_invalid_host + "The domain name provided is not valid according to RFC 1034/1035"
 
-        for host in [ # Valid-looking hosts
+        for host in [  # Valid-looking hosts
             'example.com',
             '12.34.56.78',
             '[2001:19f0:feee::dead:beef:cafe]',
-            'xn--4ca9at.com', # Punnycode for öäü.com
+            'xn--4ca9at.com',  # Punnycode for öäü.com
         ]:
             request = HttpRequest()
             request.META = {'HTTP_HOST': host}
@@ -650,7 +650,7 @@ class HostValidationTests(SimpleTestCase):
                 request.get_host
             )
 
-        for domain, port in [ # Valid-looking hosts with a port number
+        for domain, port in [  # Valid-looking hosts with a port number
             ('example.com', 80),
             ('12.34.56.78', 443),
             ('[2001:19f0:feee::dead:beef:cafe]', 8080),
@@ -720,6 +720,7 @@ class DatabaseConnectionHandlingTests(TransactionTestCase):
 
         connection.enter_transaction_management()
         connection.set_dirty()
+
         # Test that the rollback doesn't succeed (for example network failure
         # could cause this).
         def fail_horribly():

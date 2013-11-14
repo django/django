@@ -111,7 +111,7 @@ def get_validation_errors(outfile, app=None):
                 try:
                     max_digits = int(f.max_digits)
                     if max_digits <= 0:
-                        e.add(opts,  mdigits_msg % f.name)
+                        e.add(opts, mdigits_msg % f.name)
                     else:
                         mdigits_ok = True
                 except (ValueError, TypeError):
@@ -120,11 +120,9 @@ def get_validation_errors(outfile, app=None):
                 if decimalp_ok and mdigits_ok:
                     if decimal_places > max_digits:
                         e.add(opts, invalid_values_msg % f.name)
-            if isinstance(f, models.FileField) and not f.upload_to:
-                e.add(opts, '"%s": FileFields require an "upload_to" attribute.' % f.name)
             if isinstance(f, models.ImageField):
                 try:
-                    from django.utils.image import Image
+                    from django.utils.image import Image  # NOQA
                 except ImportError:
                     e.add(opts, '"%s": To use ImageFields, you need to install Pillow. Get it at https://pypi.python.org/pypi/Pillow.' % f.name)
             if isinstance(f, models.BooleanField) and getattr(f, 'null', False):
@@ -253,9 +251,9 @@ def get_validation_errors(outfile, app=None):
                                     "than one foreign key to %s, which is "
                                     "ambiguous and is not permitted." % (
                                         f.rel.through._meta.object_name,
-                                         from_model._meta.object_name
-                                     )
-                                 )
+                                        from_model._meta.object_name
+                                    )
+                                )
                             else:
                                 seen_from = True
                         elif rel_to == to_model:
@@ -311,7 +309,7 @@ def get_validation_errors(outfile, app=None):
             # occurs for symmetrical m2m relations to self). If this is the
             # case, there are no clashes to check for this field, as there are
             # no reverse descriptors for this field.
-            if rel_name is not None:
+            if not f.rel.is_hidden():
                 for r in rel_opts.fields:
                     if r.name == rel_name:
                         e.add(opts, "Accessor for m2m field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))

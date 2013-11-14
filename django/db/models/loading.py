@@ -18,6 +18,7 @@ __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
 
 MODELS_MODULE_NAME = 'models'
 
+
 class ModelDict(OrderedDict):
     """
     We need to special-case the deepcopy for this, as the keys are modules,
@@ -26,6 +27,7 @@ class ModelDict(OrderedDict):
     def __deepcopy__(self, memo):
         return self.__class__([(key, copy.deepcopy(value, memo))
                                for key, value in self.items()])
+
 
 class UnavailableApp(Exception):
     pass
@@ -41,20 +43,20 @@ def _initialize():
         app_store=ModelDict(),
 
         # Mapping of installed app_labels to model modules for that app.
-        app_labels = {},
+        app_labels={},
 
         # Mapping of app_labels to a dictionary of model names to model code.
         # May contain apps that are not installed.
         app_models=ModelDict(),
 
         # Mapping of app_labels to errors raised when trying to import the app.
-        app_errors = {},
+        app_errors={},
 
         # Pending lookups for lazy relations
-        pending_lookups = {},
+        pending_lookups={},
 
         # -- Everything below here is only used when populating the cache --
-        loads_installed = True,
+        loads_installed=True,
         loaded=False,
         handled=set(),
         postponed=[],
@@ -184,6 +186,12 @@ class BaseAppCache(object):
         apps = sorted(apps, key=lambda elt: elt[1])
 
         return [elt[0] for elt in apps]
+
+    def _get_app_package(self, app):
+        return '.'.join(app.__name__.split('.')[:-1])
+
+    def get_app_package(self, app_label):
+        return self._get_app_package(self.get_app(app_label))
 
     def _get_app_path(self, app):
         if hasattr(app, '__path__'):        # models/__init__.py package
@@ -380,6 +388,7 @@ cache = AppCache()
 # These methods were always module level, so are kept that way for backwards
 # compatibility.
 get_apps = cache.get_apps
+get_app_package = cache.get_app_package
 get_app_path = cache.get_app_path
 get_app_paths = cache.get_app_paths
 get_app = cache.get_app

@@ -7,6 +7,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import translation
 
+
 @override_settings(SITE_ID=1)
 class FlatpageAdminFormTests(TestCase):
     fixtures = ['example_site']
@@ -96,4 +97,3 @@ class FlatpageAdminFormTests(TestCase):
         self.assertEqual(
             f.errors,
             {'sites': [translation.ugettext('This field is required.')]})
-

@@ -25,6 +25,7 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'index_together', 'app_cache', 'default_permissions',
                  'select_on_save')
 
+
 def normalize_unique_together(unique_together):
     """
     unique_together can be either a tuple of tuples, or a single
@@ -34,6 +35,7 @@ def normalize_unique_together(unique_together):
     if unique_together and not isinstance(unique_together[0], (tuple, list)):
         unique_together = (unique_together,)
     return unique_together
+
 
 @python_2_unicode_compatible
 class Options(object):

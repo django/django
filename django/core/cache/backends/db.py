@@ -1,6 +1,5 @@
 "Database cache backend."
 import base64
-import time
 from datetime import datetime
 
 try:
@@ -32,6 +31,7 @@ class Options(object):
         self.managed = True
         self.proxy = False
 
+
 class BaseDatabaseCache(BaseCache):
     def __init__(self, table, params):
         BaseCache.__init__(self, params)
@@ -40,6 +40,7 @@ class BaseDatabaseCache(BaseCache):
         class CacheEntry(object):
             _meta = Options(table)
         self.cache_model_class = CacheEntry
+
 
 class DatabaseCache(BaseDatabaseCache):
 
@@ -198,6 +199,7 @@ class DatabaseCache(BaseDatabaseCache):
         table = connections[db].ops.quote_name(self._table)
         cursor = connections[db].cursor()
         cursor.execute('DELETE FROM %s' % table)
+
 
 # For backwards compatibility
 class CacheClass(DatabaseCache):

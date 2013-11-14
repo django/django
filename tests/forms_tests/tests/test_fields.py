@@ -33,7 +33,14 @@ import os
 from decimal import Decimal
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import *
+from django.forms import (
+    BooleanField, CharField, ChoiceField, ComboField, DateField, DateTimeField,
+    DecimalField, EmailField, Field, FileField, FilePathField, FloatField,
+    Form, forms, HiddenInput, IntegerField, MultipleChoiceField,
+    NullBooleanField, NumberInput, PasswordInput, RadioSelect, RegexField,
+    SplitDateTimeField, TextInput, TimeField, TypedChoiceField,
+    TypedMultipleChoiceField, URLField, ValidationError, Widget,
+)
 from django.test import SimpleTestCase
 from django.utils import formats
 from django.utils import six
@@ -68,7 +75,6 @@ class FieldsTests(SimpleTestCase):
             def __init__(self):
                 self.class_a_var = True
                 super(A, self).__init__()
-
 
         class ComplexField(Field, A):
             def __init__(self):
@@ -685,7 +691,7 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', b'Some File Content'), 'files/test4.pdf')))
 
     def test_filefield_2(self):
-        f = FileField(max_length = 5)
+        f = FileField(max_length=5)
         self.assertRaisesMessage(ValidationError, "'Ensure this filename has at most 5 characters (it has 18).'", f.clean, SimpleUploadedFile('test_maxlength.txt', b'hello world'))
         self.assertEqual('files/test1.pdf', f.clean('', 'files/test1.pdf'))
         self.assertEqual('files/test2.pdf', f.clean(None, 'files/test2.pdf'))
@@ -717,7 +723,6 @@ class FieldsTests(SimpleTestCase):
         # A file was uploaded and there is initial data (file identity is not dealt
         # with here)
         self.assertTrue(f._has_changed('resume.txt', {'filename': 'resume.txt', 'content': 'My resume'}))
-
 
     # URLField ##################################################################
 
@@ -755,11 +760,11 @@ class FieldsTests(SimpleTestCase):
     def test_url_regex_ticket11198(self):
         f = URLField()
         # hangs "forever" if catastrophic backtracking in ticket:#11198 not fixed
-        self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://%s' % ("X"*200,))
+        self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://%s' % ("X" * 200,))
 
         # a second test, to make sure the problem is really addressed, even on
         # domains that don't fail the domain label length check in the regex
-        self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://%s' % ("X"*60,))
+        self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://%s' % ("X" * 60,))
 
     def test_urlfield_2(self):
         f = URLField(required=False)
@@ -900,7 +905,7 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. John is not one of the available choices.'", f.clean, 'John')
 
     def test_choicefield_4(self):
-        f = ChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3','A'),('4','B'))), ('5','Other')])
+        f = ChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3', 'A'), ('4', 'B'))), ('5', 'Other')])
         self.assertEqual('1', f.clean(1))
         self.assertEqual('1', f.clean('1'))
         self.assertEqual('3', f.clean(3))
@@ -965,7 +970,6 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(None, f.clean('3'))
         self.assertEqual(None, f.clean('hello'))
 
-
     def test_nullbooleanfield_2(self):
         # Make sure that the internal value is preserved if using HiddenInput (#7753)
         class HiddenNullBooleanForm(Form):
@@ -978,7 +982,7 @@ class FieldsTests(SimpleTestCase):
         class HiddenNullBooleanForm(Form):
             hidden_nullbool1 = NullBooleanField(widget=HiddenInput, initial=True)
             hidden_nullbool2 = NullBooleanField(widget=HiddenInput, initial=False)
-        f = HiddenNullBooleanForm({ 'hidden_nullbool1': 'True', 'hidden_nullbool2': 'False' })
+        f = HiddenNullBooleanForm({'hidden_nullbool1': 'True', 'hidden_nullbool2': 'False'})
         self.assertEqual(None, f.full_clean())
         self.assertEqual(True, f.cleaned_data['hidden_nullbool1'])
         self.assertEqual(False, f.cleaned_data['hidden_nullbool2'])
@@ -987,11 +991,12 @@ class FieldsTests(SimpleTestCase):
         # Make sure we're compatible with MySQL, which uses 0 and 1 for its boolean
         # values. (#9609)
         NULLBOOL_CHOICES = (('1', 'Yes'), ('0', 'No'), ('', 'Unknown'))
+
         class MySQLNullBooleanForm(Form):
             nullbool0 = NullBooleanField(widget=RadioSelect(choices=NULLBOOL_CHOICES))
             nullbool1 = NullBooleanField(widget=RadioSelect(choices=NULLBOOL_CHOICES))
             nullbool2 = NullBooleanField(widget=RadioSelect(choices=NULLBOOL_CHOICES))
-        f = MySQLNullBooleanForm({ 'nullbool0': '1', 'nullbool1': '0', 'nullbool2': '' })
+        f = MySQLNullBooleanForm({'nullbool0': '1', 'nullbool1': '0', 'nullbool2': ''})
         self.assertEqual(None, f.full_clean())
         self.assertEqual(True, f.cleaned_data['nullbool0'])
         self.assertEqual(False, f.cleaned_data['nullbool1'])
@@ -1038,7 +1043,7 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. 3 is not one of the available choices.'", f.clean, ['3'])
 
     def test_multiplechoicefield_3(self):
-        f = MultipleChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3','A'),('4','B'))), ('5','Other')])
+        f = MultipleChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3', 'A'), ('4', 'B'))), ('5', 'Other')])
         self.assertEqual(['1'], f.clean([1]))
         self.assertEqual(['1'], f.clean(['1']))
         self.assertEqual(['1', '5'], f.clean([1, 5]))
@@ -1046,7 +1051,7 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(['1', '5'], f.clean(['1', 5]))
         self.assertEqual(['1', '5'], f.clean(['1', '5']))
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. 6 is not one of the available choices.'", f.clean, ['6'])
-        self.assertRaisesMessage(ValidationError, "'Select a valid choice. 6 is not one of the available choices.'", f.clean, ['1','6'])
+        self.assertRaisesMessage(ValidationError, "'Select a valid choice. 6 is not one of the available choices.'", f.clean, ['1', '6'])
 
     def test_multiplechoicefield_changed(self):
         f = MultipleChoiceField(choices=[('1', 'One'), ('2', 'Two'), ('3', 'Three')])
@@ -1079,8 +1084,8 @@ class FieldsTests(SimpleTestCase):
 
     def test_typedmultiplechoicefield_4(self):
         f = TypedMultipleChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int)
-        self.assertEqual([1, -1], f.clean(['1','-1']))
-        self.assertRaisesMessage(ValidationError, "'Select a valid choice. 2 is not one of the available choices.'", f.clean, ['1','2'])
+        self.assertEqual([1, -1], f.clean(['1', '-1']))
+        self.assertRaisesMessage(ValidationError, "'Select a valid choice. 2 is not one of the available choices.'", f.clean, ['1', '2'])
 
     def test_typedmultiplechoicefield_5(self):
         # Even more weirdness: if you have a valid choice but your coercion function
@@ -1137,15 +1142,15 @@ class FieldsTests(SimpleTestCase):
         f.choices = [p for p in f.choices if p[0].endswith('.py')]
         f.choices.sort()
         expected = [
-                ('/django/forms/__init__.py', '__init__.py'),
-                ('/django/forms/fields.py', 'fields.py'),
-                ('/django/forms/forms.py', 'forms.py'),
-                ('/django/forms/formsets.py', 'formsets.py'),
-                ('/django/forms/models.py', 'models.py'),
-                ('/django/forms/util.py', 'util.py'),
-                ('/django/forms/utils.py', 'utils.py'),
-                ('/django/forms/widgets.py', 'widgets.py')
-            ]
+            ('/django/forms/__init__.py', '__init__.py'),
+            ('/django/forms/fields.py', 'fields.py'),
+            ('/django/forms/forms.py', 'forms.py'),
+            ('/django/forms/formsets.py', 'formsets.py'),
+            ('/django/forms/models.py', 'models.py'),
+            ('/django/forms/util.py', 'util.py'),
+            ('/django/forms/utils.py', 'utils.py'),
+            ('/django/forms/widgets.py', 'widgets.py')
+        ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
             self.assertTrue(got[0].endswith(exp[0]))
@@ -1158,15 +1163,15 @@ class FieldsTests(SimpleTestCase):
         f = FilePathField(path=path, match='^.*?\.py$')
         f.choices.sort()
         expected = [
-                ('/django/forms/__init__.py', '__init__.py'),
-                ('/django/forms/fields.py', 'fields.py'),
-                ('/django/forms/forms.py', 'forms.py'),
-                ('/django/forms/formsets.py', 'formsets.py'),
-                ('/django/forms/models.py', 'models.py'),
-                ('/django/forms/util.py', 'util.py'),
-                ('/django/forms/utils.py', 'utils.py'),
-                ('/django/forms/widgets.py', 'widgets.py')
-            ]
+            ('/django/forms/__init__.py', '__init__.py'),
+            ('/django/forms/fields.py', 'fields.py'),
+            ('/django/forms/forms.py', 'forms.py'),
+            ('/django/forms/formsets.py', 'formsets.py'),
+            ('/django/forms/models.py', 'models.py'),
+            ('/django/forms/util.py', 'util.py'),
+            ('/django/forms/utils.py', 'utils.py'),
+            ('/django/forms/widgets.py', 'widgets.py')
+        ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
             self.assertTrue(got[0].endswith(exp[0]))
@@ -1177,17 +1182,17 @@ class FieldsTests(SimpleTestCase):
         f = FilePathField(path=path, recursive=True, match='^.*?\.py$')
         f.choices.sort()
         expected = [
-                ('/django/forms/__init__.py', '__init__.py'),
-                ('/django/forms/extras/__init__.py', 'extras/__init__.py'),
-                ('/django/forms/extras/widgets.py', 'extras/widgets.py'),
-                ('/django/forms/fields.py', 'fields.py'),
-                ('/django/forms/forms.py', 'forms.py'),
-                ('/django/forms/formsets.py', 'formsets.py'),
-                ('/django/forms/models.py', 'models.py'),
-                ('/django/forms/util.py', 'util.py'),
-                ('/django/forms/utils.py', 'utils.py'),
-                ('/django/forms/widgets.py', 'widgets.py')
-            ]
+            ('/django/forms/__init__.py', '__init__.py'),
+            ('/django/forms/extras/__init__.py', 'extras/__init__.py'),
+            ('/django/forms/extras/widgets.py', 'extras/widgets.py'),
+            ('/django/forms/fields.py', 'fields.py'),
+            ('/django/forms/forms.py', 'forms.py'),
+            ('/django/forms/formsets.py', 'formsets.py'),
+            ('/django/forms/models.py', 'models.py'),
+            ('/django/forms/util.py', 'util.py'),
+            ('/django/forms/utils.py', 'utils.py'),
+            ('/django/forms/widgets.py', 'widgets.py')
+        ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
             self.assertTrue(got[0].endswith(exp[0]))
@@ -1217,7 +1222,6 @@ class FieldsTests(SimpleTestCase):
         for exp, got in zip(expected, actual):
             self.assertEqual(exp[1], got[1])
             self.assertTrue(got[0].endswith(exp[0]))
-
 
     # SplitDateTimeField ##########################################################
 

@@ -20,10 +20,10 @@ class UnicodeTests(TestCase):
         self.assertRaises(TemplateEncodingError, Template, s)
 
         # Contexts can be constructed from unicode or UTF-8 bytestrings.
-        c1 = Context({b"var": b"foo"})
-        c2 = Context({"var": b"foo"})
+        Context({b"var": b"foo"})
+        Context({"var": b"foo"})
         c3 = Context({b"var": "Đđ"})
-        c4 = Context({"var": b"\xc4\x90\xc4\x91"})
+        Context({"var": b"\xc4\x90\xc4\x91"})
 
         # Since both templates and all four contexts represent the same thing,
         # they all render the same (and are returned as unicode objects and

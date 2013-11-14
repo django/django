@@ -1,6 +1,5 @@
 from contextlib import contextmanager
 import os
-import sys
 from unittest import expectedFailure, TestSuite, TextTestRunner, defaultTestLoader
 
 from django.test import TestCase

@@ -22,12 +22,12 @@ rather than the HTML rendered to the end-user.
 """
 from __future__ import unicode_literals
 
-from django.conf import settings
 from django.core import mail
 from django.test import Client, TestCase, RequestFactory
 from django.test.utils import override_settings
 
 from .views import get_view
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class ClientTest(TestCase):
@@ -93,6 +93,18 @@ class ClientTest(TestCase):
         self.assertEqual(response.templates[0].name, "Book template")
         self.assertEqual(response.content, b"Blink - Malcolm Gladwell")
 
+    def test_insecure(self):
+        "GET a URL through http"
+        response = self.client.get('/test_client/secure_view/', secure=False)
+        self.assertFalse(response.test_was_secure_request)
+        self.assertEqual(response.test_server_port, '80')
+
+    def test_secure(self):
+        "GET a URL through https"
+        response = self.client.get('/test_client/secure_view/', secure=True)
+        self.assertTrue(response.test_was_secure_request)
+        self.assertEqual(response.test_server_port, '443')
+
     def test_redirect(self):
         "GET a URL that redirects elsewhere"
         response = self.client.get('/test_client/redirect_view/')
@@ -147,12 +159,12 @@ class ClientTest(TestCase):
 
     def test_redirect_http(self):
         "GET a URL that redirects to an http URI"
-        response = self.client.get('/test_client/http_redirect_view/',follow=True)
+        response = self.client.get('/test_client/http_redirect_view/', follow=True)
         self.assertFalse(response.test_was_secure_request)
 
     def test_redirect_https(self):
         "GET a URL that redirects to an https URI"
-        response = self.client.get('/test_client/https_redirect_view/',follow=True)
+        response = self.client.get('/test_client/https_redirect_view/', follow=True)
         self.assertTrue(response.test_was_secure_request)
 
     def test_notfound_response(self):
@@ -169,7 +181,7 @@ class ClientTest(TestCase):
             'email': 'foo@example.com',
             'value': 37,
             'single': 'b',
-            'multi': ('b','c','e')
+            'multi': ('b', 'c', 'e')
         }
         response = self.client.post('/test_client/form_view/', post_data)
         self.assertEqual(response.status_code, 200)
@@ -179,7 +191,7 @@ class ClientTest(TestCase):
         "GET a form, providing hints in the GET data"
         hints = {
             'text': 'Hello World',
-            'multi': ('b','c','e')
+            'multi': ('b', 'c', 'e')
         }
         response = self.client.get('/test_client/form_view/', data=hints)
         self.assertEqual(response.status_code, 200)
@@ -209,7 +221,7 @@ class ClientTest(TestCase):
             'email': 'not an email address',
             'value': 37,
             'single': 'b',
-            'multi': ('b','c','e')
+            'multi': ('b', 'c', 'e')
         }
         response = self.client.post('/test_client/form_view/', post_data)
         self.assertEqual(response.status_code, 200)
@@ -224,7 +236,7 @@ class ClientTest(TestCase):
             'email': 'foo@example.com',
             'value': 37,
             'single': 'b',
-            'multi': ('b','c','e')
+            'multi': ('b', 'c', 'e')
         }
         response = self.client.post('/test_client/form_view_with_template/', post_data)
         self.assertContains(response, 'POST data OK')
@@ -255,7 +267,7 @@ class ClientTest(TestCase):
             'email': 'not an email address',
             'value': 37,
             'single': 'b',
-            'multi': ('b','c','e')
+            'multi': ('b', 'c', 'e')
         }
         response = self.client.post('/test_client/form_view_with_template/', post_data)
         self.assertContains(response, 'POST data has errors')
@@ -418,8 +430,7 @@ class ClientTest(TestCase):
         except KeyError:
             pass
 
-        from django.contrib.sessions.models import Session
-        response = self.client.post('/test_client/session_view/')
+        self.client.post('/test_client/session_view/')
 
         # Check that the session was modified
         self.assertEqual(self.client.session['tobacconist'], 'hovercraft')
@@ -428,7 +439,7 @@ class ClientTest(TestCase):
         "Request a page that is known to throw an error"
         self.assertRaises(KeyError, self.client.get, "/test_client/broken_view/")
 
-        #Try the same assertion, a different way
+        # Try the same assertion, a different way
         try:
             self.client.get('/test_client/broken_view/')
             self.fail('Should raise an error')
@@ -467,17 +478,11 @@ class ClientTest(TestCase):
         self.assertEqual(mail.outbox[1].to[0], 'second@example.com')
         self.assertEqual(mail.outbox[1].to[1], 'third@example.com')
 
+
+@override_settings(
+    MIDDLEWARE_CLASSES=('django.middleware.csrf.CsrfViewMiddleware',)
+)
 class CSRFEnabledClientTests(TestCase):
-    def setUp(self):
-        # Enable the CSRF middleware for this test
-        self.old_MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES
-        csrf_middleware_class = 'django.middleware.csrf.CsrfViewMiddleware'
-        if csrf_middleware_class not in settings.MIDDLEWARE_CLASSES:
-            settings.MIDDLEWARE_CLASSES += (csrf_middleware_class,)
-
-    def tearDown(self):
-        settings.MIDDLEWARE_CLASSES = self.old_MIDDLEWARE_CLASSES
-
     def test_csrf_enabled_client(self):
         "A client can be instantiated with CSRF checks enabled"
         csrf_client = Client(enforce_csrf_checks=True)
@@ -493,6 +498,7 @@ class CSRFEnabledClientTests(TestCase):
 
 class CustomTestClient(Client):
     i_am_customized = "Yes"
+
 
 class CustomTestClientTest(TestCase):
     client_class = CustomTestClient

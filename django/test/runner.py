@@ -25,7 +25,7 @@ class DiscoverRunner(object):
         make_option('-p', '--pattern', action='store', dest='pattern',
             default="test*.py",
             help='The test matching pattern. Defaults to test*.py.'),
-        )
+    )
 
     def __init__(self, pattern=None, top_level=None,
                  verbosity=1, interactive=True, failfast=False,
@@ -88,7 +88,6 @@ class DiscoverRunner(object):
                         continue
                     break
                 kwargs['top_level_dir'] = top_level
-
 
             if not (tests and tests.countTestCases()):
                 # if no tests found, it's probably a package; try discovery
@@ -204,10 +203,10 @@ def reorder_suite(suite, classes):
     """
     class_count = len(classes)
     suite_class = type(suite)
-    bins = [suite_class() for i in range(class_count+1)]
+    bins = [suite_class() for i in range(class_count + 1)]
     partition_suite(suite, classes, bins)
     for i in range(class_count):
-        bins[0].addTests(bins[i+1])
+        bins[0].addTests(bins[i + 1])
     return bins[0]
 
 
@@ -280,7 +279,7 @@ def setup_databases(verbosity, interactive, **kwargs):
             connection = connections[alias]
             if test_db_name is None:
                 test_db_name = connection.creation.create_test_db(
-                        verbosity, autoclobber=not interactive)
+                    verbosity, autoclobber=not interactive)
                 destroy = True
             else:
                 connection.settings_dict['NAME'] = test_db_name

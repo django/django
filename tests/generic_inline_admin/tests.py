@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 import warnings
 
-from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.contenttypes.generic import (
@@ -18,7 +17,8 @@ from .models import (Episode, EpisodeExtra, EpisodeMaxNum, Media,
     EpisodePermanent, Category)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   TEMPLATE_DEBUG=True)
 class GenericAdminViewTest(TestCase):
     urls = "generic_inline_admin.urls"
     fixtures = ['users.xml']
@@ -27,8 +27,7 @@ class GenericAdminViewTest(TestCase):
         # set TEMPLATE_DEBUG to True to ensure {% include %} will raise
         # exceptions since that is how inlines are rendered and #9498 will
         # bubble up if it is an issue.
-        self.original_template_debug = settings.TEMPLATE_DEBUG
-        settings.TEMPLATE_DEBUG = True
+
         self.client.login(username='super', password='secret')
 
         # Can't load content via a fixture (since the GenericForeignKey
@@ -46,7 +45,6 @@ class GenericAdminViewTest(TestCase):
 
     def tearDown(self):
         self.client.logout()
-        settings.TEMPLATE_DEBUG = self.original_template_debug
 
     def testBasicAddGet(self):
         """
@@ -74,7 +72,7 @@ class GenericAdminViewTest(TestCase):
             "generic_inline_admin-media-content_type-object_id-MAX_NUM_FORMS": "0",
         }
         response = self.client.post('/generic_inline_admin/admin/generic_inline_admin/episode/add/', post_data)
-        self.assertEqual(response.status_code, 302) # redirect somewhere
+        self.assertEqual(response.status_code, 302)  # redirect somewhere
 
     def testBasicEditPost(self):
         """
@@ -95,7 +93,7 @@ class GenericAdminViewTest(TestCase):
         }
         url = '/generic_inline_admin/admin/generic_inline_admin/episode/%d/' % self.episode_pk
         response = self.client.post(url, post_data)
-        self.assertEqual(response.status_code, 302) # redirect somewhere
+        self.assertEqual(response.status_code, 302)  # redirect somewhere
 
     def testGenericInlineFormset(self):
         EpisodeMediaFormSet = generic_inlineformset_factory(Media, can_delete=False, exclude=['description', 'keywords'], extra=3)
@@ -130,6 +128,7 @@ class GenericAdminViewTest(TestCase):
         e = Episode.objects.get(name='This Week in Django')
         formset = inline_formset(instance=e)
         self.assertTrue(formset.get_queryset().ordered)
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class GenericInlineAdminParametersTest(TestCase):
@@ -178,7 +177,6 @@ class GenericInlineAdminParametersTest(TestCase):
         With extra=5 and max_num=2, there should be only 2 forms.
         """
         e = self._create_object(EpisodeMaxNum)
-        inline_form_data = '<input type="hidden" name="generic_inline_admin-media-content_type-object_id-TOTAL_FORMS" value="2" id="id_generic_inline_admin-media-content_type-object_id-TOTAL_FORMS" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-INITIAL_FORMS" value="1" id="id_generic_inline_admin-media-content_type-object_id-INITIAL_FORMS" />'
         response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodemaxnum/%s/' % e.pk)
         formset = response.context['inline_admin_formsets'][0].formset
         self.assertEqual(formset.total_form_count(), 2)
@@ -211,7 +209,8 @@ class GenericInlineAdminWithUniqueTogetherTest(TestCase):
         response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/contact/add/')
         self.assertEqual(response.status_code, 200)
         response = self.client.post('/generic_inline_admin/admin/generic_inline_admin/contact/add/', post_data)
-        self.assertEqual(response.status_code, 302) # redirect somewhere
+        self.assertEqual(response.status_code, 302)  # redirect somewhere
+
 
 class NoInlineDeletionTest(TestCase):
     urls = "generic_inline_admin.urls"
@@ -226,6 +225,7 @@ class NoInlineDeletionTest(TestCase):
 
 class MockRequest(object):
     pass
+
 
 class MockSuperUser(object):
     def has_perm(self, perm):
@@ -422,13 +422,13 @@ class GenericInlineModelAdminTest(TestCase):
 
             def get_formsets(self, request, obj=None):
                 # Catch the deprecation warning to force the usage of get_formsets
-                with warnings.catch_warnings(record=True) as w:
+                with warnings.catch_warnings(record=True):
                     warnings.simplefilter("always")
                     return super(EpisodeAdmin, self).get_formsets(request, obj)
 
         ma = EpisodeAdmin(Episode, self.site)
         inlines = ma.get_inline_instances(request)
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True):
             warnings.simplefilter("always")
             for (formset, inline), other_inline in zip(ma.get_formsets_with_inlines(request), inlines):
                 self.assertIsInstance(formset, other_inline.get_formset(request).__class__)

@@ -1433,6 +1433,28 @@ then the output would be:
         {'name': 'zed', 'age': 19},
     ]
 
+You can also do more complicated things like::
+
+    {% for book in books|dictsort:"author.age" %}
+        * {{ book.title }} ({{ book.author.name }})
+    {% endfor %}
+
+If ``books`` is:
+
+.. code-block:: python
+
+    [
+        {'title': '1984', 'author': {'name': 'George', 'age': 45}},
+        {'title': 'Timequake', 'author': {'name': 'Kurt', 'age': 75}},
+        {'title': 'Alice', 'author': {'name': 'Lewis', 'age': 33}},
+    ]
+
+then the output would be::
+
+    * Alice (Lewis)
+    * 1984 (George)
+    * Timequake (Kurt)
+
 .. templatefilter:: dictsortreversed
 
 dictsortreversed
@@ -2028,7 +2050,7 @@ Formats a time according to the given format.
 
 Given format can be the predefined one :setting:`TIME_FORMAT`, or a custom
 format, same as the :tfilter:`date` filter. Note that the predefined format
-is locale-dependant.
+is locale-dependent.
 
 For example::
 
@@ -2116,14 +2138,15 @@ date that is in the past relative to the comparison point.
 title
 ^^^^^
 
-Converts a string into titlecase by capitalizing each word in the string.
-This tag makes no effort to keep "trivial words" in lowercase.
+Converts a string into titlecase by making words start with an uppercase
+character and the remaining characters lowercase. This tag makes no effort to
+keep "trivial words" in lowercase.
 
 For example::
 
     {{ value|title }}
 
-If ``value`` is ``"my first post"``, the output will be ``"My First Post"``.
+If ``value`` is ``"my FIRST post"``, the output will be ``"My First Post"``.
 
 .. templatefilter:: truncatechars
 

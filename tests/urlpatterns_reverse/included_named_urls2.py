@@ -8,4 +8,3 @@ urlpatterns = patterns('',
     url(r'^extra/(?P<extra>\w+)/$', empty_view, name="named-url6"),
     url(r'^(?P<one>\d+)|(?P<two>\d+)/$', empty_view),
 )
-

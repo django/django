@@ -58,4 +58,3 @@ class WriteRouter(object):
     # A router that only expresses an opinion on writes
     def db_for_write(self, model, **hints):
         return 'writer'
-

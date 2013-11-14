@@ -24,9 +24,9 @@ class M2mThroughTests(TestCase):
             []
         )
         # To make Jim a member of Group Rock, simply create a Membership object.
-        m1 = Membership.objects.create(person=self.jim, group=self.rock)
+        Membership.objects.create(person=self.jim, group=self.rock)
         # We can do the same for Jane and Rock.
-        m2 = Membership.objects.create(person=self.jane, group=self.rock)
+        Membership.objects.create(person=self.jane, group=self.rock)
         # Let's check to make sure that it worked.  Jane and Jim should be members of Rock.
         self.assertQuerysetEqual(
             self.rock.members.all(), [
@@ -36,9 +36,9 @@ class M2mThroughTests(TestCase):
             attrgetter("name")
         )
         # Now we can add a bunch more Membership objects to test with.
-        m3 = Membership.objects.create(person=self.bob, group=self.roll)
-        m4 = Membership.objects.create(person=self.jim, group=self.roll)
-        m5 = Membership.objects.create(person=self.jane, group=self.roll)
+        Membership.objects.create(person=self.bob, group=self.roll)
+        Membership.objects.create(person=self.jim, group=self.roll)
+        Membership.objects.create(person=self.jane, group=self.roll)
         # We can get Jim's Group membership as with any ForeignKey.
         self.assertQuerysetEqual(
             self.jim.group_set.all(), [
@@ -65,8 +65,6 @@ class M2mThroughTests(TestCase):
             self.rock.members.all(),
             []
         )
-
-
 
     def test_forward_descriptors(self):
         # Due to complications with adding via an intermediary model,
@@ -103,7 +101,7 @@ class M2mThroughTests(TestCase):
         m2.save()
         # Verifying that those instances were re-saved successfully.
         self.assertQuerysetEqual(
-            self.rock.members.all(),[
+            self.rock.members.all(), [
                 'Jane',
                 'Jim'
             ],
@@ -144,7 +142,7 @@ class M2mThroughTests(TestCase):
         m2.save()
         # Verifying that those instances were re-saved successfully.
         self.assertQuerysetEqual(
-            self.jim.group_set.all(),[
+            self.jim.group_set.all(), [
                 'Rock',
                 'Roll'
             ],
@@ -163,12 +161,12 @@ class M2mThroughTests(TestCase):
             []
         )
 
-        cm1 = CustomMembership.objects.create(person=self.bob, group=self.rock)
-        cm2 = CustomMembership.objects.create(person=self.jim, group=self.rock)
+        CustomMembership.objects.create(person=self.bob, group=self.rock)
+        CustomMembership.objects.create(person=self.jim, group=self.rock)
 
         # If we get the number of people in Rock, it should be both Bob and Jim.
         self.assertQuerysetEqual(
-            self.rock.custom_members.all(),[
+            self.rock.custom_members.all(), [
                 'Bob',
                 'Jim'
             ],
@@ -176,14 +174,14 @@ class M2mThroughTests(TestCase):
         )
         # Bob should only be in one custom group.
         self.assertQuerysetEqual(
-            self.bob.custom.all(),[
+            self.bob.custom.all(), [
                 'Rock'
             ],
             attrgetter("name")
         )
         # Let's make sure our new descriptors don't conflict with the FK related_name.
         self.assertQuerysetEqual(
-            self.bob.custom_person_related_name.all(),[
+            self.bob.custom_person_related_name.all(), [
                 '<CustomMembership: Bob is a member of Rock>'
             ]
         )
@@ -197,11 +195,11 @@ class M2mThroughTests(TestCase):
         )
 
         chris = PersonSelfRefM2M.objects.create(name="Chris")
-        f = Friendship.objects.create(first=tony, second=chris, date_friended=datetime.now())
+        Friendship.objects.create(first=tony, second=chris, date_friended=datetime.now())
 
         # Tony should now show that Chris is his friend.
         self.assertQuerysetEqual(
-            tony.friends.all(),[
+            tony.friends.all(), [
                 'Chris'
             ],
             attrgetter("name")
@@ -211,12 +209,12 @@ class M2mThroughTests(TestCase):
             chris.friends.all(),
             []
         )
-        f2 = Friendship.objects.create(first=chris, second=tony, date_friended=datetime.now())
+        Friendship.objects.create(first=chris, second=tony, date_friended=datetime.now())
 
         # Having added Chris as a friend, let's make sure that his friend set reflects
         # that addition.
         self.assertQuerysetEqual(
-            chris.friends.all(),[
+            chris.friends.all(), [
                 'Tony'
             ],
             attrgetter("name")
@@ -231,17 +229,17 @@ class M2mThroughTests(TestCase):
         )
         # Since this isn't a symmetrical relation, Tony's friend link still exists.
         self.assertQuerysetEqual(
-            tony.friends.all(),[
+            tony.friends.all(), [
                 'Chris'
             ],
             attrgetter("name")
         )
 
     def test_query_tests(self):
-        m1 = Membership.objects.create(person=self.jim, group=self.rock)
+        Membership.objects.create(person=self.jim, group=self.rock)
         m2 = Membership.objects.create(person=self.jane, group=self.rock)
         m3 = Membership.objects.create(person=self.bob, group=self.roll)
-        m4 = Membership.objects.create(person=self.jim, group=self.roll)
+        Membership.objects.create(person=self.jim, group=self.roll)
         m5 = Membership.objects.create(person=self.jane, group=self.roll)
 
         m2.invite_reason = "She was just awesome."
@@ -255,7 +253,7 @@ class M2mThroughTests(TestCase):
         # We can query for the related model by using its attribute name (members, in
         # this case).
         self.assertQuerysetEqual(
-            Group.objects.filter(members__name='Bob'),[
+            Group.objects.filter(members__name='Bob'), [
                 'Roll'
             ],
             attrgetter("name")
@@ -264,7 +262,7 @@ class M2mThroughTests(TestCase):
         # To query through the intermediary model, we specify its model name.
         # In this case, membership.
         self.assertQuerysetEqual(
-            Group.objects.filter(membership__invite_reason="She was just awesome."),[
+            Group.objects.filter(membership__invite_reason="She was just awesome."), [
                 'Rock'
             ],
             attrgetter("name")
@@ -273,18 +271,18 @@ class M2mThroughTests(TestCase):
         # If we want to query in the reverse direction by the related model, use its
         # model name (group, in this case).
         self.assertQuerysetEqual(
-            Person.objects.filter(group__name="Rock"),[
+            Person.objects.filter(group__name="Rock"), [
                 'Jane',
                 'Jim'
             ],
             attrgetter("name")
         )
 
-        cm1 = CustomMembership.objects.create(person=self.bob, group=self.rock)
-        cm2 = CustomMembership.objects.create(person=self.jim, group=self.rock)
+        CustomMembership.objects.create(person=self.bob, group=self.rock)
+        CustomMembership.objects.create(person=self.jim, group=self.rock)
         # If the m2m field has specified a related_name, using that will work.
         self.assertQuerysetEqual(
-            Person.objects.filter(custom__name="Rock"),[
+            Person.objects.filter(custom__name="Rock"), [
                 'Bob',
                 'Jim'
             ],
@@ -294,7 +292,7 @@ class M2mThroughTests(TestCase):
         # To query through the intermediary model in the reverse direction, we again
         # specify its model name (membership, in this case).
         self.assertQuerysetEqual(
-            Person.objects.filter(membership__invite_reason="She was just awesome."),[
+            Person.objects.filter(membership__invite_reason="She was just awesome."), [
                 'Jane'
             ],
             attrgetter("name")
@@ -302,7 +300,7 @@ class M2mThroughTests(TestCase):
 
         # Let's see all of the groups that Jane joined after 1 Jan 2005:
         self.assertQuerysetEqual(
-            Group.objects.filter(membership__date_joined__gt=datetime(2005, 1, 1), membership__person=self.jane),[
+            Group.objects.filter(membership__date_joined__gt=datetime(2005, 1, 1), membership__person=self.jane), [
                 'Rock'
             ],
             attrgetter("name")
@@ -311,7 +309,7 @@ class M2mThroughTests(TestCase):
         # Queries also work in the reverse direction: Now let's see all of the people
         # that have joined Rock since 1 Jan 2005:
         self.assertQuerysetEqual(
-            Person.objects.filter(membership__date_joined__gt=datetime(2005, 1, 1), membership__group=self.rock),[
+            Person.objects.filter(membership__date_joined__gt=datetime(2005, 1, 1), membership__group=self.rock), [
                 'Jane',
                 'Jim'
             ],
@@ -322,7 +320,7 @@ class M2mThroughTests(TestCase):
         # querysets.  To demonstrate this, we query for all people who have joined a
         # group after 2004:
         self.assertQuerysetEqual(
-            Person.objects.filter(membership__date_joined__gt=datetime(2004, 1, 1)),[
+            Person.objects.filter(membership__date_joined__gt=datetime(2004, 1, 1)), [
                 'Jane',
                 'Jim',
                 'Jim'
@@ -337,7 +335,7 @@ class M2mThroughTests(TestCase):
         )
         # QuerySet's distinct() method can correct this problem.
         self.assertQuerysetEqual(
-            Person.objects.filter(membership__date_joined__gt=datetime(2004, 1, 1)).distinct(),[
+            Person.objects.filter(membership__date_joined__gt=datetime(2004, 1, 1)).distinct(), [
                 'Jane',
                 'Jim'
             ],

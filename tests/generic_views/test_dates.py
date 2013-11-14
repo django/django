@@ -12,16 +12,16 @@ from .models import Book, BookSigning
 
 def _make_books(n, base_date):
     for i in range(n):
-        b = Book.objects.create(
+        Book.objects.create(
             name='Book %d' % i,
             slug='book-%d' % i,
-            pages=100+i,
+            pages=100 + i,
             pubdate=base_date - datetime.timedelta(days=i))
+
 
 class ArchiveIndexViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
     urls = 'generic_views.urls'
-
 
     def test_archive_view(self):
         res = self.client.get('/dates/books/')
@@ -159,7 +159,7 @@ class YearArchiveViewTests(TestCase):
     def test_year_view_allow_future(self):
         # Create a new book in the future
         year = datetime.date.today().year + 1
-        b = Book.objects.create(name="The New New Testement", pages=600, pubdate=datetime.date(year, 1, 1))
+        Book.objects.create(name="The New New Testement", pages=600, pubdate=datetime.date(year, 1, 1))
         res = self.client.get('/dates/books/%s/' % year)
         self.assertEqual(res.status_code, 404)
 
@@ -292,7 +292,7 @@ class MonthArchiveViewTests(TestCase):
         "Content can exist on any day of the previous month. Refs #14711"
         self.pubdate_list = [
             datetime.date(2010, month, day)
-            for month,day in ((9,1), (10,2), (11,3))
+            for month, day in ((9, 1), (10, 2), (11, 3))
         ]
         for pubdate in self.pubdate_list:
             name = str(pubdate)
@@ -300,15 +300,15 @@ class MonthArchiveViewTests(TestCase):
 
         res = self.client.get('/dates/books/2010/nov/allow_empty/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['previous_month'], datetime.date(2010,10,1))
+        self.assertEqual(res.context['previous_month'], datetime.date(2010, 10, 1))
         # The following test demonstrates the bug
         res = self.client.get('/dates/books/2010/nov/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['previous_month'], datetime.date(2010,10,1))
+        self.assertEqual(res.context['previous_month'], datetime.date(2010, 10, 1))
         # The bug does not occur here because a Book with pubdate of Sep 1 exists
         res = self.client.get('/dates/books/2010/oct/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['previous_month'], datetime.date(2010,9,1))
+        self.assertEqual(res.context['previous_month'], datetime.date(2010, 9, 1))
 
     def test_datetime_month_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 2, 1, 12, 0))

@@ -11,6 +11,7 @@ from django.template.response import TemplateResponse
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy, ugettext as _
 
+
 def delete_selected(modeladmin, request, queryset):
     """
     Default action which deletes the selected objects.

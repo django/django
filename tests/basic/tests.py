@@ -33,7 +33,7 @@ class ModelTest(TestCase):
         a.save()
 
         # Now it has an ID.
-        self.assertTrue(a.id != None)
+        self.assertTrue(a.id is not None)
 
         # Models have a pk property that is an alias for the primary key
         # attribute (by default, the 'id' attribute).
@@ -87,7 +87,8 @@ class ModelTest(TestCase):
 
         # Django raises an Article.DoesNotExist exception for get() if the
         # parameters don't match any object.
-        six.assertRaisesRegex(self,
+        six.assertRaisesRegex(
+            self,
             ObjectDoesNotExist,
             "Article matching query does not exist.",
             Article.objects.get,
@@ -102,7 +103,8 @@ class ModelTest(TestCase):
             pub_date__month=8,
         )
 
-        six.assertRaisesRegex(self,
+        six.assertRaisesRegex(
+            self,
             ObjectDoesNotExist,
             "Article matching query does not exist.",
             Article.objects.get,
@@ -135,21 +137,24 @@ class ModelTest(TestCase):
 
         # Django raises an Article.MultipleObjectsReturned exception if the
         # lookup matches more than one object
-        six.assertRaisesRegex(self,
+        six.assertRaisesRegex(
+            self,
             MultipleObjectsReturned,
             "get\(\) returned more than one Article -- it returned 2!",
             Article.objects.get,
             headline__startswith='Area',
         )
 
-        six.assertRaisesRegex(self,
+        six.assertRaisesRegex(
+            self,
             MultipleObjectsReturned,
             "get\(\) returned more than one Article -- it returned 2!",
             Article.objects.get,
             pub_date__year=2005,
         )
 
-        six.assertRaisesRegex(self,
+        six.assertRaisesRegex(
+            self,
             MultipleObjectsReturned,
             "get\(\) returned more than one Article -- it returned 2!",
             Article.objects.get,
@@ -165,14 +170,16 @@ class ModelTest(TestCase):
             Article(headline='Area %s' % i, pub_date=datetime(2005, 7, 28))
             for i in range(MAX_GET_RESULTS)
         )
-        six.assertRaisesRegex(self,
+        six.assertRaisesRegex(
+            self,
             MultipleObjectsReturned,
             "get\(\) returned more than one Article -- it returned %d!" % MAX_GET_RESULTS,
             Article.objects.get,
             headline__startswith='Area',
         )
         Article.objects.create(headline='Area %s' % MAX_GET_RESULTS, pub_date=datetime(2005, 7, 28))
-        six.assertRaisesRegex(self,
+        six.assertRaisesRegex(
+            self,
             MultipleObjectsReturned,
             "get\(\) returned more than one Article -- it returned more than %d!" % MAX_GET_RESULTS,
             Article.objects.get,
@@ -219,7 +226,8 @@ class ModelTest(TestCase):
         self.assertEqual(a4.headline, 'Fourth article')
 
         # Don't use invalid keyword arguments.
-        six.assertRaisesRegex(self,
+        six.assertRaisesRegex(
+            self,
             TypeError,
             "'foo' is an invalid keyword argument for this function",
             Article,
@@ -315,7 +323,8 @@ class ModelTest(TestCase):
             Article.objects.dates,
         )
 
-        six.assertRaisesRegex(self,
+        six.assertRaisesRegex(
+            self,
             FieldDoesNotExist,
             "Article has no field named 'invalid_field'",
             Article.objects.dates,
@@ -323,7 +332,8 @@ class ModelTest(TestCase):
             "year",
         )
 
-        six.assertRaisesRegex(self,
+        six.assertRaisesRegex(
+            self,
             AssertionError,
             "'kind' must be one of 'year', 'month' or 'day'.",
             Article.objects.dates,
@@ -331,7 +341,8 @@ class ModelTest(TestCase):
             "bad_kind",
         )
 
-        six.assertRaisesRegex(self,
+        six.assertRaisesRegex(
+            self,
             AssertionError,
             "'order' must be either 'ASC' or 'DESC'.",
             Article.objects.dates,
@@ -419,14 +430,16 @@ class ModelTest(TestCase):
              "<Article: Updated article 8>"])
 
         # Also, once you have sliced you can't filter, re-order or combine
-        six.assertRaisesRegex(self,
+        six.assertRaisesRegex(
+            self,
             AssertionError,
             "Cannot filter a query once a slice has been taken.",
             Article.objects.all()[0:5].filter,
             id=a.id,
         )
 
-        six.assertRaisesRegex(self,
+        six.assertRaisesRegex(
+            self,
             AssertionError,
             "Cannot reorder a query once a slice has been taken.",
             Article.objects.all()[0:5].order_by,
@@ -461,7 +474,8 @@ class ModelTest(TestCase):
 
         # An Article instance doesn't have access to the "objects" attribute.
         # That's only available on the class.
-        six.assertRaisesRegex(self,
+        six.assertRaisesRegex(
+            self,
             AttributeError,
             "Manager isn't accessible via Article instances",
             getattr,
@@ -585,7 +599,7 @@ class ModelTest(TestCase):
         f3 = Field()
         self.assertTrue(f2 < f1)
         self.assertTrue(f3 > f1)
-        self.assertFalse(f1 == None)
+        self.assertFalse(f1 is None)
         self.assertFalse(f2 in (None, 1, ''))
 
     def test_extra_method_select_argument_with_dashes_and_values(self):
@@ -606,8 +620,7 @@ class ModelTest(TestCase):
 
         dicts = Article.objects.filter(
             pub_date__year=2008).extra(
-                select={'dashed-value': '1'}
-            ).values('headline', 'dashed-value')
+            select={'dashed-value': '1'}).values('headline', 'dashed-value')
         self.assertEqual([sorted(d.items()) for d in dicts],
             [[('dashed-value', 1), ('headline', 'Article 11')], [('dashed-value', 1), ('headline', 'Article 12')]])
 
@@ -629,8 +642,7 @@ class ModelTest(TestCase):
         )
 
         articles = Article.objects.filter(
-            pub_date__year=2008).extra(
-                select={'dashed-value': '1', 'undashedvalue': '2'})
+            pub_date__year=2008).extra(select={'dashed-value': '1', 'undashedvalue': '2'})
         self.assertEqual(articles[0].undashedvalue, 2)
 
     def test_create_relation_with_ugettext_lazy(self):
@@ -675,6 +687,7 @@ class ModelTest(TestCase):
     def test_emptyqs_customqs(self):
         # A hacky test for custom QuerySet subclass - refs #17271
         Article.objects.create(headline='foo', pub_date=datetime.now())
+
         class CustomQuerySet(QuerySet):
             def do_something(self):
                 return 'did something'
@@ -724,6 +737,7 @@ class ModelTest(TestCase):
             # hash)
             hash(Article())
 
+
 class ConcurrentSaveTests(TransactionTestCase):
 
     available_apps = ['basic']
@@ -736,6 +750,7 @@ class ConcurrentSaveTests(TransactionTestCase):
         """
         a = Article.objects.create(headline='foo', pub_date=datetime.now())
         exceptions = []
+
         def deleter():
             try:
                 # Do not delete a directly - doing so alters its state.
@@ -807,6 +822,7 @@ class ManagerTest(TestCase):
             sorted(BaseManager._get_queryset_methods(QuerySet).keys()),
             sorted(self.QUERYSET_PROXY_METHODS),
         )
+
 
 class SelectOnSaveTests(TestCase):
     def test_select_on_save(self):

@@ -1,8 +1,8 @@
-import re
 from unittest import TestCase
 
 from django import get_version
 from django.utils import six
+
 
 class VersionTests(TestCase):
 
@@ -24,4 +24,3 @@ class VersionTests(TestCase):
         )
         for ver_tuple, ver_string in tuples_to_strings:
             self.assertEqual(get_version(ver_tuple), ver_string)
-

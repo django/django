@@ -50,6 +50,7 @@ class FixedOffset(tzinfo):
     def dst(self, dt):
         return timedelta(0)
 
+
 # This implementation is used for display purposes. It uses an approximation
 # for DST computations on dates >= 2038.
 

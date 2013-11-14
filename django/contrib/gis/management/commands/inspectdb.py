@@ -1,5 +1,6 @@
 from django.core.management.commands.inspectdb import Command as InspectDBCommand
 
+
 class Command(InspectDBCommand):
     db_module = 'django.contrib.gis.db'
     gis_tables = {}

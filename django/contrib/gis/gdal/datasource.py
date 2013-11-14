@@ -49,6 +49,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils import six
 from django.utils.six.moves import xrange
 
+
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
 #
@@ -86,7 +87,7 @@ class DataSource(GDALBase):
         else:
             raise OGRException('Invalid data source input type: %s' % type(ds_input))
 
-        if bool(ds):
+        if ds:
             self.ptr = ds
             self.driver = Driver(ds_driver)
         else:
@@ -95,7 +96,8 @@ class DataSource(GDALBase):
 
     def __del__(self):
         "Destroys this DataStructure object."
-        if self._ptr: capi.destroy_ds(self._ptr)
+        if self._ptr:
+            capi.destroy_ds(self._ptr)
 
     def __iter__(self):
         "Allows for iteration over the layers in a data source."
@@ -106,7 +108,8 @@ class DataSource(GDALBase):
         "Allows use of the index [] operator to get a layer at the index."
         if isinstance(index, six.string_types):
             l = capi.get_layer_by_name(self.ptr, force_bytes(index))
-            if not l: raise OGRIndexError('invalid OGR Layer name given: "%s"' % index)
+            if not l:
+                raise OGRIndexError('invalid OGR Layer name given: "%s"' % index)
         elif isinstance(index, int):
             if index < 0 or index >= self.layer_count:
                 raise OGRIndexError('index out of range')

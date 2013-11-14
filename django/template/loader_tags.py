@@ -11,8 +11,10 @@ register = Library()
 
 BLOCK_CONTEXT_KEY = 'block_context'
 
+
 class ExtendsError(Exception):
     pass
+
 
 class BlockContext(object):
     def __init__(self):
@@ -37,6 +39,7 @@ class BlockContext(object):
             return self.blocks[name][-1]
         except IndexError:
             return None
+
 
 class BlockNode(Node):
     def __init__(self, name, nodelist, parent=None):
@@ -71,6 +74,7 @@ class BlockNode(Node):
             return mark_safe(self.render(self.context))
         return ''
 
+
 class ExtendsNode(Node):
     must_be_first = True
 
@@ -93,7 +97,7 @@ class ExtendsNode(Node):
                     self.parent_name.token
             raise TemplateSyntaxError(error_msg)
         if hasattr(parent, 'render'):
-            return parent # parent is a Template object
+            return parent  # parent is a Template object
         return get_template(parent)
 
     def render(self, context):
@@ -120,6 +124,7 @@ class ExtendsNode(Node):
         # Call Template._render explicitly so the parser context stays
         # the same.
         return compiled_parent._render(context)
+
 
 class IncludeNode(Node):
     def __init__(self, template, *args, **kwargs):
@@ -165,7 +170,7 @@ def do_block(parser, token):
         if block_name in parser.__loaded_blocks:
             raise TemplateSyntaxError("'%s' tag with name '%s' appears more than once" % (bits[0], block_name))
         parser.__loaded_blocks.append(block_name)
-    except AttributeError: # parser.__loaded_blocks isn't a list yet
+    except AttributeError:  # parser.__loaded_blocks isn't a list yet
         parser.__loaded_blocks = [block_name]
     nodelist = parser.parse(('endblock',))
 
@@ -176,6 +181,7 @@ def do_block(parser, token):
         parser.invalid_block_tag(endblock, 'endblock', acceptable_endblocks)
 
     return BlockNode(block_name, nodelist)
+
 
 @register.tag('extends')
 def do_extends(parser, token):
@@ -196,6 +202,7 @@ def do_extends(parser, token):
     if nodelist.get_nodes_by_type(ExtendsNode):
         raise TemplateSyntaxError("'%s' cannot appear more than once in the same template" % bits[0])
     return ExtendsNode(nodelist, parent_name)
+
 
 @register.tag('include')
 def do_include(parser, token):

@@ -43,7 +43,8 @@ else:
 if lib_names:
     for lib_name in lib_names:
         lib_path = find_library(lib_name)
-        if not lib_path is None: break
+        if not lib_path is None:
+            break
 
 # No GEOS library could be found.
 if lib_path is None:
@@ -61,6 +62,8 @@ lgeos = CDLL(lib_path)
 # Supposed to mimic the GEOS message handler (C below):
 #  typedef void (*GEOSMessageHandler)(const char *fmt, ...);
 NOTICEFUNC = CFUNCTYPE(None, c_char_p, c_char_p)
+
+
 def notice_h(fmt, lst):
     fmt, lst = fmt.decode(), lst.decode()
     try:
@@ -71,6 +74,8 @@ def notice_h(fmt, lst):
 notice_h = NOTICEFUNC(notice_h)
 
 ERRORFUNC = CFUNCTYPE(None, c_char_p, c_char_p)
+
+
 def error_h(fmt, lst):
     fmt, lst = fmt.decode(), lst.decode()
     try:
@@ -82,17 +87,29 @@ error_h = ERRORFUNC(error_h)
 
 #### GEOS Geometry C data structures, and utility functions. ####
 
+
 # Opaque GEOS geometry structures, used for GEOM_PTR and CS_PTR
-class GEOSGeom_t(Structure): pass
-class GEOSPrepGeom_t(Structure): pass
-class GEOSCoordSeq_t(Structure): pass
-class GEOSContextHandle_t(Structure): pass
+class GEOSGeom_t(Structure):
+    pass
+
+
+class GEOSPrepGeom_t(Structure):
+    pass
+
+
+class GEOSCoordSeq_t(Structure):
+    pass
+
+
+class GEOSContextHandle_t(Structure):
+    pass
 
 # Pointers to opaque GEOS geometry structures.
 GEOM_PTR = POINTER(GEOSGeom_t)
 PREPGEOM_PTR = POINTER(GEOSPrepGeom_t)
 CS_PTR = POINTER(GEOSCoordSeq_t)
-CONTEXT_PTR  = POINTER(GEOSContextHandle_t)
+CONTEXT_PTR = POINTER(GEOSContextHandle_t)
+
 
 # Used specifically by the GEOSGeom_createPolygon and GEOSGeom_createCollection
 #  GEOS routines
@@ -113,6 +130,8 @@ version_regex = re.compile(
     r'^(?P<version>(?P<major>\d+)\.(?P<minor>\d+)\.(?P<subminor>\d+))'
     r'((rc(?P<release_candidate>\d+))|dev)?-CAPI-(?P<capi_version>\d+\.\d+\.\d+)( r\d+)?$'
 )
+
+
 def geos_version_info():
     """
     Returns a dictionary containing the various version metadata parsed from

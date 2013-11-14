@@ -6,6 +6,7 @@ from django.contrib.sites.models import Site, get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 
+
 def shortcut(request, content_type_id, object_id):
     """
     Redirect to an object's page based on a content-type ID and an object ID.
@@ -75,7 +76,7 @@ def shortcut(request, content_type_id, object_id):
     # If all that malarkey found an object domain, use it. Otherwise, fall back
     # to whatever get_absolute_url() returned.
     if object_domain is not None:
-        protocol = 'https' if request.is_secure() else 'http'
+        protocol = request.scheme
         return http.HttpResponseRedirect('%s://%s%s'
                                          % (protocol, object_domain, absurl))
     else:

@@ -20,6 +20,7 @@ from django.utils.encoding import python_2_unicode_compatible
 # Abstract base classes
 #
 
+
 @python_2_unicode_compatible
 class CommonInfo(models.Model):
     name = models.CharField(max_length=50)
@@ -32,8 +33,10 @@ class CommonInfo(models.Model):
     def __str__(self):
         return '%s %s' % (self.__class__.__name__, self.name)
 
+
 class Worker(CommonInfo):
     job = models.CharField(max_length=50)
+
 
 class Student(CommonInfo):
     school_class = models.CharField(max_length=10)
@@ -41,8 +44,10 @@ class Student(CommonInfo):
     class Meta:
         pass
 
+
 class StudentWorker(Student, Worker):
     pass
+
 
 #
 # Abstract base classes with related models
@@ -50,6 +55,7 @@ class StudentWorker(Student, Worker):
 
 class Post(models.Model):
     title = models.CharField(max_length=50)
+
 
 @python_2_unicode_compatible
 class Attachment(models.Model):
@@ -62,11 +68,14 @@ class Attachment(models.Model):
     def __str__(self):
         return self.content
 
+
 class Comment(Attachment):
     is_spam = models.BooleanField(default=False)
 
+
 class Link(Attachment):
     url = models.URLField()
+
 
 #
 # Multi-table inheritance
@@ -79,6 +88,7 @@ class Chef(models.Model):
     def __str__(self):
         return "%s the chef" % self.name
 
+
 @python_2_unicode_compatible
 class Place(models.Model):
     name = models.CharField(max_length=50)
@@ -87,12 +97,14 @@ class Place(models.Model):
     def __str__(self):
         return "%s the place" % self.name
 
+
 class Rating(models.Model):
     rating = models.IntegerField(null=True, blank=True)
 
     class Meta:
         abstract = True
         ordering = ['-rating']
+
 
 @python_2_unicode_compatible
 class Restaurant(Place, Rating):
@@ -106,6 +118,7 @@ class Restaurant(Place, Rating):
     def __str__(self):
         return "%s the restaurant" % self.name
 
+
 @python_2_unicode_compatible
 class ItalianRestaurant(Restaurant):
     serves_gnocchi = models.BooleanField(default=False)
@@ -113,12 +126,14 @@ class ItalianRestaurant(Restaurant):
     def __str__(self):
         return "%s the italian restaurant" % self.name
 
+
 @python_2_unicode_compatible
 class Supplier(Place):
     customers = models.ManyToManyField(Restaurant, related_name='provider')
 
     def __str__(self):
         return "%s the supplier" % self.name
+
 
 @python_2_unicode_compatible
 class ParkingLot(Place):
@@ -128,6 +143,7 @@ class ParkingLot(Place):
 
     def __str__(self):
         return "%s the parking lot" % self.name
+
 
 #
 # Abstract base classes with related models where the sub-class has the
@@ -141,12 +157,14 @@ class ParkingLot(Place):
 class Title(models.Model):
     title = models.CharField(max_length=50)
 
+
 class NamedURL(models.Model):
     title = models.ForeignKey(Title, related_name='attached_%(app_label)s_%(class)s_set')
     url = models.URLField()
 
     class Meta:
         abstract = True
+
 
 @python_2_unicode_compatible
 class Copy(NamedURL):
@@ -155,16 +173,20 @@ class Copy(NamedURL):
     def __str__(self):
         return self.content
 
+
 class Mixin(object):
     def __init__(self):
         self.other_attr = 1
         super(Mixin, self).__init__()
 
+
 class MixinModel(models.Model, Mixin):
     pass
 
+
 class Base(models.Model):
     titles = models.ManyToManyField(Title)
+
 
 class SubBase(Base):
     sub_id = models.IntegerField(primary_key=True)

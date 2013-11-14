@@ -5,6 +5,7 @@ import logging
 import sys
 from io import BytesIO
 from threading import Lock
+import warnings
 
 from django import http
 from django.conf import settings
@@ -16,7 +17,7 @@ from django.utils.encoding import force_str, force_text
 from django.utils import six
 
 # For backwards compatibility -- lots of code uses this in the wild!
-from django.http.response import REASON_PHRASES as STATUS_CODE_TEXT
+from django.http.response import REASON_PHRASES as STATUS_CODE_TEXT  # NOQA
 
 logger = logging.getLogger('django.request')
 
@@ -51,7 +52,7 @@ class LimitedStream(object):
         elif size < len(self.buffer):
             result = self.buffer[:size]
             self.buffer = self.buffer[size:]
-        else: # size >= len(self.buffer)
+        else:  # size >= len(self.buffer)
             result = self.buffer + self._read_limited(size - len(self.buffer))
             self.buffer = b''
         return result
@@ -110,8 +111,8 @@ class WSGIRequest(http.HttpRequest):
         self._read_started = False
         self.resolver_match = None
 
-    def _is_secure(self):
-        return self.environ.get('wsgi.url_scheme') == 'https'
+    def _get_scheme(self):
+        return self.environ.get('wsgi.url_scheme')
 
     def _parse_content_type(self, ctype):
         """
@@ -129,6 +130,8 @@ class WSGIRequest(http.HttpRequest):
         return content_type, content_params
 
     def _get_request(self):
+        warnings.warn('`request.REQUEST` is deprecated, use `request.GET` or '
+                      '`request.POST` instead.', PendingDeprecationWarning, 2)
         if not hasattr(self, '_request'):
             self._request = datastructures.MergeDict(self.POST, self.GET)
         return self._request

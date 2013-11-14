@@ -13,6 +13,7 @@ with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
     from django.utils.tzinfo import FixedOffset, LocalTimezone
 
+
 class TzinfoTests(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
 
     @classmethod
@@ -47,10 +48,10 @@ class TzinfoTests(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
         self.assertEqual(repr(FixedOffset(-280)), '-0440')
         self.assertEqual(repr(FixedOffset(-78.4)), '-0118')
         self.assertEqual(repr(FixedOffset(78.4)), '+0118')
-        self.assertEqual(repr(FixedOffset(-5.5*60)), '-0530')
-        self.assertEqual(repr(FixedOffset(5.5*60)), '+0530')
-        self.assertEqual(repr(FixedOffset(-.5*60)), '-0030')
-        self.assertEqual(repr(FixedOffset(.5*60)), '+0030')
+        self.assertEqual(repr(FixedOffset(-5.5 * 60)), '-0530')
+        self.assertEqual(repr(FixedOffset(5.5 * 60)), '+0530')
+        self.assertEqual(repr(FixedOffset(-.5 * 60)), '-0030')
+        self.assertEqual(repr(FixedOffset(.5 * 60)), '+0030')
 
     def test_16899(self):
         if not self.tz_tests:
@@ -61,14 +62,14 @@ class TzinfoTests(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
         # US/Eastern -- we force its representation to "EST"
         tz = LocalTimezone(dt + datetime.timedelta(days=1))
         self.assertEqual(
-                repr(datetime.datetime.fromtimestamp(ts - 3600, tz)),
-                'datetime.datetime(2010, 11, 7, 0, 0, tzinfo=EST)')
+            repr(datetime.datetime.fromtimestamp(ts - 3600, tz)),
+            'datetime.datetime(2010, 11, 7, 0, 0, tzinfo=EST)')
         self.assertEqual(
-                repr(datetime.datetime.fromtimestamp(ts, tz)),
-                'datetime.datetime(2010, 11, 7, 1, 0, tzinfo=EST)')
+            repr(datetime.datetime.fromtimestamp(ts, tz)),
+            'datetime.datetime(2010, 11, 7, 1, 0, tzinfo=EST)')
         self.assertEqual(
-                repr(datetime.datetime.fromtimestamp(ts + 3600, tz)),
-                'datetime.datetime(2010, 11, 7, 1, 0, tzinfo=EST)')
+            repr(datetime.datetime.fromtimestamp(ts + 3600, tz)),
+            'datetime.datetime(2010, 11, 7, 1, 0, tzinfo=EST)')
 
     def test_copy(self):
         now = datetime.datetime.now()

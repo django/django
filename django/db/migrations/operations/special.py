@@ -33,7 +33,7 @@ class SeparateDatabaseAndState(Operation):
         base_state = to_state
         for pos, database_operation in enumerate(reversed(self.database_operations)):
             to_state = base_state.clone()
-            for dbop in self.database_operations[:-(pos+1)]:
+            for dbop in self.database_operations[:-(pos + 1)]:
                 dbop.state_forwards(app_label, to_state)
             from_state = base_state.clone()
             database_operation.state_forwards(app_label, from_state)
@@ -137,7 +137,7 @@ class RunPython(Operation):
         # object, representing the versioned models as an AppCache.
         # We could try to override the global cache, but then people will still
         # use direct imports, so we go with a documentation approach instead.
-        if six.callable(self.code):
+        if callable(self.code):
             self.code(models=from_state.render(), schema_editor=schema_editor)
         else:
             context = {
@@ -149,7 +149,7 @@ class RunPython(Operation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.reverse_code is None:
             raise NotImplementedError("You cannot reverse this operation")
-        elif six.callable(self.reverse_code):
+        elif callable(self.reverse_code):
             self.reverse_code(models=from_state.render(), schema_editor=schema_editor)
         else:
             context = {

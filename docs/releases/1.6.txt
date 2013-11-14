@@ -1,6 +1,6 @@
-============================================
-Django 1.6 release notes - UNDER DEVELOPMENT
-============================================
+=========================
+ Django 1.6 release notes
+=========================
 
 .. note::
 
@@ -19,6 +19,8 @@ Django 1.6 release notes - UNDER DEVELOPMENT
     This release of Django is for Malcolm.
 
     -- The Django Developers
+
+*November 6, 2013*
 
 Welcome to Django 1.6!
 
@@ -368,8 +370,9 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher has been
   increased by 20%. This backwards compatible change will not affect
   existing passwords or users who have subclassed
-  `django.contrib.auth.hashers.PBKDF2PasswordHasher`` to change the
-  default value.
+  ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` to change the
+  default value. Passwords :ref:`will be upgraded <password-upgrades>` to use
+  the new iteration count as necessary.
 
 Backwards incompatible changes in 1.6
 =====================================
@@ -809,22 +812,6 @@ as JSON requires string keys, you will likely run into problems if you are
 using non-string keys in ``request.session``. See the
 :ref:`session_serialization` documentation for more details.
 
-4096-byte limit on passwords
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. note::
-    This behavior was also added in the Django 1.5.4 and 1.4.8 security
-    releases.
-
-Historically, Django has imposed no length limit on plaintext
-passwords. This enables a denial-of-service attack through submission
-of bogus but extremely large passwords, tying up server resources
-performing the (expensive, and increasingly expensive with the length
-of the password) calculation of the corresponding hash.
-
-Django now imposes a 4096-byte limit on password length, and will fail
-authentication with any submitted password of greater length.
-
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -844,6 +831,14 @@ Miscellaneous
   field documentation for details about the names of the placeholders. The
   changes in 1.6 particularly affect :class:`~django.forms.DecimalField` and
   :class:`~django.forms.ModelMultipleChoiceField`.
+
+* Some :attr:`~django.forms.Field.error_messages` for
+  :class:`~django.forms.IntegerField`,
+  :class:`~django.forms.EmailField`,
+  :class:`~django.forms.IPAddressField`,
+  :class:`~django.forms.GenericIPAddressField`, and
+  :class:`~django.forms.SlugField` have been suppressed because they
+  duplicated error messages already provided by validators tied to the fields.
 
 * There have been changes in the way timeouts are handled in cache backends.
   Explicitly passing in ``timeout=None`` no longer results in using the
@@ -913,6 +908,16 @@ Miscellaneous
 * The :djadminopt:`--keep-pot` option was added to :djadmin:`makemessages`
   to prevent django from deleting the temporary .pot file it generates before
   creating the .po file.
+
+* The undocumented ``django.core.servers.basehttp.WSGIServerException`` has
+  been removed. Use ``socket.error`` provided by the standard library instead.
+  This change was also released in Django 1.5.5.
+
+* The signature of :meth:`django.views.generic.base.RedirectView.get_redirect_url`
+  has changed and now accepts positional arguments as well (``*args, **kwargs``).
+  Any unnamed captured group will now be passed to ``get_redirect_url()``
+  which may result in a ``TypeError`` if you don't update the signature of your
+  custom method.
 
 Features deprecated in 1.6
 ==========================

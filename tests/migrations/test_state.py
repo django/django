@@ -20,6 +20,7 @@ class StateTests(TestCase):
             name = models.CharField(max_length=255)
             bio = models.TextField()
             age = models.IntegerField(blank=True, null=True)
+
             class Meta:
                 app_label = "migrations"
                 app_cache = new_app_cache
@@ -35,6 +36,7 @@ class StateTests(TestCase):
         class Book(models.Model):
             title = models.CharField(max_length=1000)
             author = models.ForeignKey(Author)
+
             class Meta:
                 app_label = "migrations"
                 app_cache = new_app_cache
@@ -45,7 +47,7 @@ class StateTests(TestCase):
         author_state = project_state.models['migrations', 'author']
         author_proxy_state = project_state.models['migrations', 'authorproxy']
         book_state = project_state.models['migrations', 'book']
-        
+
         self.assertEqual(author_state.app_label, "migrations")
         self.assertEqual(author_state.name, "Author")
         self.assertEqual([x for x, y in author_state.fields], ["id", "name", "bio", "age"])
@@ -54,7 +56,7 @@ class StateTests(TestCase):
         self.assertEqual(author_state.fields[3][1].null, True)
         self.assertEqual(author_state.options, {"unique_together": set(("name", "bio"))})
         self.assertEqual(author_state.bases, (models.Model, ))
-        
+
         self.assertEqual(book_state.app_label, "migrations")
         self.assertEqual(book_state.name, "Book")
         self.assertEqual([x for x, y in book_state.fields], ["id", "title", "author"])
@@ -62,7 +64,7 @@ class StateTests(TestCase):
         self.assertEqual(book_state.fields[2][1].null, False)
         self.assertEqual(book_state.options, {"verbose_name": "tome", "db_table": "test_tome"})
         self.assertEqual(book_state.bases, (models.Model, ))
-        
+
         self.assertEqual(author_proxy_state.app_label, "migrations")
         self.assertEqual(author_proxy_state.name, "AuthorProxy")
         self.assertEqual(author_proxy_state.fields, [])

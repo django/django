@@ -31,7 +31,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
     RelatedPrepopulated, UndeletableObject, UnchangeableObject, UserMessenger, Simple, Choice,
     ShortMessage, Telegram, FilteredManager, EmptyModelHidden,
-    EmptyModelVisible, EmptyModelMixin)
+    EmptyModelVisible, EmptyModelMixin, State, City, Restaurant, Worker)
 
 
 def callable_year(dt_value):
@@ -45,9 +45,9 @@ callable_year.admin_order_field = 'date'
 class ArticleInline(admin.TabularInline):
     model = Article
     prepopulated_fields = {
-        'title' : ('content',)
+        'title': ('content',)
     }
-    fieldsets=(
+    fieldsets = (
         ('Some fields', {
             'classes': ('collapse',),
             'fields': ('title', 'content')
@@ -57,6 +57,7 @@ class ArticleInline(admin.TabularInline):
             'fields': ('date', 'section')
         })
     )
+
 
 class ChapterInline(admin.TabularInline):
     model = Chapter
@@ -74,7 +75,8 @@ class ChapterXtra1Admin(admin.ModelAdmin):
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('content', 'date', callable_year, 'model_year', 'modeladmin_year')
     list_filter = ('date', 'section')
-    fieldsets=(
+    view_on_site = False
+    fieldsets = (
         ('Some fields', {
             'classes': ('collapse',),
             'fields': ('title', 'content')
@@ -261,7 +263,7 @@ class Podcast(Media):
     release_date = models.DateField()
 
     class Meta:
-        ordering = ('release_date',) # overridden in PodcastAdmin
+        ordering = ('release_date',)  # overridden in PodcastAdmin
 
 
 class PodcastAdmin(admin.ModelAdmin):
@@ -382,7 +384,7 @@ class SubPostInline(admin.TabularInline):
     model = PrePopulatedSubPost
 
     prepopulated_fields = {
-        'subslug' : ('subtitle',)
+        'subslug': ('subtitle',)
     }
 
     def get_readonly_fields(self, request, obj=None):
@@ -399,7 +401,7 @@ class SubPostInline(admin.TabularInline):
 class PrePopulatedPostAdmin(admin.ModelAdmin):
     list_display = ['title', 'slug']
     prepopulated_fields = {
-        'slug' : ('title',)
+        'slug': ('title',)
     }
 
     inlines = [SubPostInline]
@@ -443,7 +445,7 @@ class PostAdmin(admin.ModelAdmin):
 
 class CustomChangeList(ChangeList):
     def get_queryset(self, request):
-        return self.root_queryset.filter(pk=9999) # Does not exist
+        return self.root_queryset.filter(pk=9999)  # Does not exist
 
 
 class GadgetAdmin(admin.ModelAdmin):
@@ -465,7 +467,7 @@ class WorkHourAdmin(admin.ModelAdmin):
 
 
 class FoodDeliveryAdmin(admin.ModelAdmin):
-    list_display=('reference', 'driver', 'restaurant')
+    list_display = ('reference', 'driver', 'restaurant')
     list_editable = ('driver', 'restaurant')
 
 
@@ -526,7 +528,7 @@ class StoryForm(forms.ModelForm):
 
 class StoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'content')
-    list_display_links = ('title',) # 'id' not in list_display_links
+    list_display_links = ('title',)  # 'id' not in list_display_links
     list_editable = ('content', )
     form = StoryForm
     ordering = ["-pk"]
@@ -534,7 +536,7 @@ class StoryAdmin(admin.ModelAdmin):
 
 class OtherStoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'content')
-    list_display_links = ('title', 'id') # 'id' in list_display_links
+    list_display_links = ('title', 'id')  # 'id' in list_display_links
     list_editable = ('content', )
     ordering = ["-pk"]
 
@@ -567,14 +569,9 @@ class AlbumAdmin(admin.ModelAdmin):
     list_filter = ['title']
 
 
-class WorkHourAdmin(admin.ModelAdmin):
-    list_display = ('datum', 'employee')
-    list_filter = ('employee',)
-
-
 class PrePopulatedPostLargeSlugAdmin(admin.ModelAdmin):
     prepopulated_fields = {
-        'slug' : ('title',)
+        'slug': ('title',)
     }
 
 
@@ -582,9 +579,11 @@ class AdminOrderedFieldAdmin(admin.ModelAdmin):
     ordering = ('order',)
     list_display = ('stuff', 'order')
 
+
 class AdminOrderedModelMethodAdmin(admin.ModelAdmin):
     ordering = ('order',)
     list_display = ('stuff', 'some_order')
+
 
 class AdminOrderedAdminMethodAdmin(admin.ModelAdmin):
     def some_admin_order(self, obj):
@@ -593,12 +592,16 @@ class AdminOrderedAdminMethodAdmin(admin.ModelAdmin):
     ordering = ('order',)
     list_display = ('stuff', 'some_admin_order')
 
+
 def admin_ordered_callable(obj):
     return obj.order
 admin_ordered_callable.admin_order_field = 'order'
+
+
 class AdminOrderedCallableAdmin(admin.ModelAdmin):
     ordering = ('order',)
     list_display = ('stuff', admin_ordered_callable)
+
 
 class ReportAdmin(admin.ModelAdmin):
     def extra(self, request):
@@ -616,6 +619,7 @@ class ReportAdmin(admin.ModelAdmin):
 class CustomTemplateBooleanFieldListFilter(BooleanFieldListFilter):
     template = 'custom_filter_template.html'
 
+
 class CustomTemplateFilterColorAdmin(admin.ModelAdmin):
     list_filter = (('warm', CustomTemplateBooleanFieldListFilter),)
 
@@ -632,11 +636,13 @@ class RelatedPrepopulatedInline1(admin.StackedInline):
     prepopulated_fields = {'slug1': ['name', 'pubdate'],
                            'slug2': ['status', 'name']}
 
+
 class RelatedPrepopulatedInline2(admin.TabularInline):
     model = RelatedPrepopulated
     extra = 1
     prepopulated_fields = {'slug1': ['name', 'pubdate'],
                            'slug2': ['status', 'name']}
+
 
 class MainPrepopulatedAdmin(admin.ModelAdmin):
     inlines = [RelatedPrepopulatedInline1, RelatedPrepopulatedInline2]
@@ -716,29 +722,70 @@ class FormWithoutHiddenField(forms.ModelForm):
     first = forms.CharField()
     second = forms.CharField()
 
+
 class FormWithoutVisibleField(forms.ModelForm):
     first = forms.CharField(widget=forms.HiddenInput)
     second = forms.CharField(widget=forms.HiddenInput)
+
 
 class FormWithVisibleAndHiddenField(forms.ModelForm):
     first = forms.CharField(widget=forms.HiddenInput)
     second = forms.CharField()
 
+
 class EmptyModelVisibleAdmin(admin.ModelAdmin):
     form = FormWithoutHiddenField
     fieldsets = (
         (None, {
-            'fields':(('first', 'second'),),
+            'fields': (('first', 'second'),),
         }),
     )
+
 
 class EmptyModelHiddenAdmin(admin.ModelAdmin):
     form = FormWithoutVisibleField
     fieldsets = EmptyModelVisibleAdmin.fieldsets
 
+
 class EmptyModelMixinAdmin(admin.ModelAdmin):
     form = FormWithVisibleAndHiddenField
     fieldsets = EmptyModelVisibleAdmin.fieldsets
+
+
+class CityInlineAdmin(admin.TabularInline):
+    model = City
+    view_on_site = False
+
+
+class StateAdmin(admin.ModelAdmin):
+    inlines = [CityInlineAdmin]
+
+
+class RestaurantInlineAdmin(admin.TabularInline):
+    model = Restaurant
+    view_on_site = True
+
+
+class CityAdmin(admin.ModelAdmin):
+    inlines = [RestaurantInlineAdmin]
+    view_on_site = True
+
+
+class WorkerAdmin(admin.ModelAdmin):
+    def view_on_site(self, obj):
+        return '/worker/%s/%s/' % (obj.surname, obj.name)
+
+
+class WorkerInlineAdmin(admin.TabularInline):
+    model = Worker
+
+    def view_on_site(self, obj):
+        return '/worker_inline/%s/%s/' % (obj.surname, obj.name)
+
+
+class RestaurantAdmin(admin.ModelAdmin):
+    inlines = [WorkerInlineAdmin]
+    view_on_site = False
 
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
@@ -790,6 +837,10 @@ site.register(MainPrepopulated, MainPrepopulatedAdmin)
 site.register(UnorderedObject, UnorderedObjectAdmin)
 site.register(UndeletableObject, UndeletableObjectAdmin)
 site.register(UnchangeableObject, UnchangeableObjectAdmin)
+site.register(State, StateAdmin)
+site.register(City, CityAdmin)
+site.register(Restaurant, RestaurantAdmin)
+site.register(Worker, WorkerAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:

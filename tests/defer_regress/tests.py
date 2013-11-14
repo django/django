@@ -245,6 +245,7 @@ class DeferRegressionTest(TestCase):
             new_class.__name__,
             'Item_Deferred_this_is_some_very_long_attribute_nac34b1f495507dad6b02e2cb235c875e')
 
+
 class DeferAnnotateSelectRelatedTest(TestCase):
     def test_defer_annotate_select_related(self):
         location = Location.objects.create()

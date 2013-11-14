@@ -5,7 +5,7 @@ from ctypes import c_char_p
 from django.core.validators import ipv4_re
 from django.contrib.gis.geoip.libgeoip import GEOIP_SETTINGS
 from django.contrib.gis.geoip.prototypes import (
-    GeoIPRecord, GeoIPTag, GeoIP_open, GeoIP_delete, GeoIP_database_info,
+    GeoIP_open, GeoIP_delete, GeoIP_database_info,
     GeoIP_lib_version, GeoIP_record_by_addr, GeoIP_record_by_name,
     GeoIP_country_code_by_addr, GeoIP_country_code_by_name,
     GeoIP_country_name_by_addr, GeoIP_country_name_by_name)
@@ -17,9 +17,11 @@ from django.utils.encoding import force_bytes
 free_regex = re.compile(r'^GEO-\d{3}FREE')
 lite_regex = re.compile(r'^GEO-\d{3}LITE')
 
+
 #### GeoIP classes ####
 class GeoIPException(Exception):
     pass
+
 
 class GeoIP(object):
     # The flags for GeoIP memory caching.
@@ -41,11 +43,11 @@ class GeoIP(object):
     #
     # GEOIP_MMAP_CACHE - load database into mmap shared memory ( not available
     #       on Windows).
-    GEOIP_STANDARD     = 0
+    GEOIP_STANDARD = 0
     GEOIP_MEMORY_CACHE = 1
-    GEOIP_CHECK_CACHE  = 2
-    GEOIP_INDEX_CACHE  = 4
-    GEOIP_MMAP_CACHE   = 8
+    GEOIP_CHECK_CACHE = 2
+    GEOIP_INDEX_CACHE = 4
+    GEOIP_MMAP_CACHE = 8
     cache_options = dict((opt, None) for opt in (0, 1, 2, 4, 8))
 
     # Paths to the city & country binary databases.
@@ -89,7 +91,8 @@ class GeoIP(object):
         # Getting the GeoIP data path.
         if not path:
             path = GEOIP_SETTINGS.get('GEOIP_PATH', None)
-            if not path: raise GeoIPException('GeoIP path must be provided via parameter or the GEOIP_PATH setting.')
+            if not path:
+                raise GeoIPException('GeoIP path must be provided via parameter or the GEOIP_PATH setting.')
         if not isinstance(path, six.string_types):
             raise TypeError('Invalid path type: %s' % type(path).__name__)
 
@@ -129,8 +132,10 @@ class GeoIP(object):
         # Cleaning any GeoIP file handles lying around.
         if GeoIP_delete is None:
             return
-        if self._country: GeoIP_delete(self._country)
-        if self._city: GeoIP_delete(self._city)
+        if self._country:
+            GeoIP_delete(self._country)
+        if self._city:
+            GeoIP_delete(self._city)
 
     def _check_query(self, query, country=False, city=False, city_or_country=False):
         "Helper routine for checking the query and database availability."
@@ -192,15 +197,17 @@ class GeoIP(object):
         '24.124.1.80' and 'djangoproject.com' are valid parameters.
         """
         # Returning the country code and name
-        return {'country_code' : self.country_code(query),
-                'country_name' : self.country_name(query),
+        return {'country_code': self.country_code(query),
+                'country_name': self.country_name(query),
                 }
 
     #### Coordinate retrieval routines ####
     def coords(self, query, ordering=('longitude', 'latitude')):
         cdict = self.city(query)
-        if cdict is None: return None
-        else: return tuple(cdict[o] for o in ordering)
+        if cdict is None:
+            return None
+        else:
+            return tuple(cdict[o] for o in ordering)
 
     def lon_lat(self, query):
         "Returns a tuple of the (longitude, latitude) for the given query."

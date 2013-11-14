@@ -11,15 +11,19 @@ from django.core.files.uploadedfile import TemporaryUploadedFile, InMemoryUpload
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.module_loading import import_by_path
 
-__all__ = ['UploadFileException','StopUpload', 'SkipFile', 'FileUploadHandler',
-           'TemporaryFileUploadHandler', 'MemoryFileUploadHandler',
-           'load_handler', 'StopFutureHandlers']
+__all__ = [
+    'UploadFileException', 'StopUpload', 'SkipFile', 'FileUploadHandler',
+    'TemporaryFileUploadHandler', 'MemoryFileUploadHandler', 'load_handler',
+    'StopFutureHandlers'
+]
+
 
 class UploadFileException(Exception):
     """
     Any error having to do with uploading files.
     """
     pass
+
 
 @python_2_unicode_compatible
 class StopUpload(UploadFileException):
@@ -40,11 +44,13 @@ class StopUpload(UploadFileException):
         else:
             return 'StopUpload: Consume request data, then halt.'
 
+
 class SkipFile(UploadFileException):
     """
     This exception is raised by an upload handler that wants to skip a given file.
     """
     pass
+
 
 class StopFutureHandlers(UploadFileException):
     """
@@ -53,11 +59,12 @@ class StopFutureHandlers(UploadFileException):
     """
     pass
 
+
 class FileUploadHandler(object):
     """
     Base class for streaming upload handlers.
     """
-    chunk_size = 64 * 2 ** 10 #: The default chunk size is 64 KB.
+    chunk_size = 64 * 2 ** 10  # : The default chunk size is 64 KB.
 
     def __init__(self, request=None):
         self.file_name = None
@@ -122,6 +129,7 @@ class FileUploadHandler(object):
         """
         pass
 
+
 class TemporaryFileUploadHandler(FileUploadHandler):
     """
     Upload handler that streams data into a temporary file.
@@ -143,6 +151,7 @@ class TemporaryFileUploadHandler(FileUploadHandler):
         self.file.seek(0)
         self.file.size = file_size
         return self.file
+
 
 class MemoryFileUploadHandler(FileUploadHandler):
     """
@@ -184,13 +193,13 @@ class MemoryFileUploadHandler(FileUploadHandler):
 
         self.file.seek(0)
         return InMemoryUploadedFile(
-            file = self.file,
-            field_name = self.field_name,
-            name = self.file_name,
-            content_type = self.content_type,
-            size = file_size,
-            charset = self.charset,
-            content_type_extra = self.content_type_extra
+            file=self.file,
+            field_name=self.field_name,
+            name=self.file_name,
+            content_type=self.content_type,
+            size=file_size,
+            charset=self.charset,
+            content_type_extra=self.content_type_extra
         )
 
 
@@ -199,6 +208,8 @@ def load_handler(path, *args, **kwargs):
     Given a path to a handler, return an instance of that handler.
 
     E.g.::
+        >>> from django.http import HttpRequest
+        >>> request = HttpRequest()
         >>> load_handler('django.core.files.uploadhandler.TemporaryFileUploadHandler', request)
         <TemporaryFileUploadHandler object at 0x...>
 

@@ -674,6 +674,30 @@ markers<contextual-markers>` using the ``context`` keyword:
 
     {% blocktrans with name=user.username context "greeting" %}Hi {{ name }}{% endblocktrans %}
 
+Another feature ``{% blocktrans %}`` supports is the ``trimmed`` option. This
+option will remove newline characters from the beginning and the end of the
+content of the ``{% blocktrans %}`` tag, replace any whitespace at the beginning
+and end of a line and merge all lines into one using a space character to
+separate them. This is quite useful for indenting the content of a ``{%
+blocktrans %}`` tag without having the indentation characters end up in the
+corresponding entry in the PO file, which makes the translation process easier.
+
+For instance, the following ``{% blocktrans %}`` tag::
+
+    {% blocktrans trimmed %}
+      First sentence.
+      Second paragraph.
+    {% endblocktrans %}
+
+will result in the entry ``"First sentence. Second paragraph."`` in the PO file,
+compared to ``"\n  First sentence.\n  Second sentence.\n"``, if the ``trimmed``
+option had not been specified.
+
+.. versionchanged:: 1.7
+
+    The ``trimmed`` option was added.
+
+
 String literals passed to tags and filters
 ------------------------------------------
 
@@ -991,8 +1015,8 @@ for a given version of a site — it's a good candidate for caching.
 
 Server-side caching will reduce CPU load. It's easily implemented with the
 :func:`~django.views.decorators.cache.cache_page` decorator. To trigger cache
-invalidation when your translations change, provide a version-dependant key
-prefix, as shown in the example below, or map the view at a version-dependant
+invalidation when your translations change, provide a version-dependent key
+prefix, as shown in the example below, or map the view at a version-dependent
 URL.
 
 .. code-block:: python
@@ -1190,21 +1214,6 @@ Localization: how to create language files
 Once the string literals of an application have been tagged for later
 translation, the translation themselves need to be written (or obtained). Here's
 how that works.
-
-.. _locale-restrictions:
-
-.. admonition:: Locale restrictions
-
-    Django does not support localizing your application into a locale for which
-    Django itself has not been translated. In this case, it will ignore your
-    translation files. If you were to try this and Django supported it, you
-    would inevitably see a mixture of translated strings (from your application)
-    and English strings (from Django itself). If you want to support a locale
-    for your application that is not already part of Django, you'll need to make
-    at least a minimal translation of the Django core.
-
-    A good starting point is to copy the Django English ``.po`` file and to
-    translate at least some :term:`translation strings <translation string>`.
 
 Message files
 -------------
@@ -1594,8 +1603,13 @@ following this algorithm:
   root URLconf. See :ref:`url-internationalization` for more information
   about the language prefix and how to internationalize URL patterns.
 
-* Failing that, it looks for a ``django_language`` key in the current
-  user's session.
+* Failing that, it looks for a ``_language`` key in the current user's session.
+
+  .. versionchanged:: 1.7
+
+      In previous versions, the key was named ``django_language`` but it was
+      renamed to start with an underscore to denote a Django reserved session
+      key.
 
 * Failing that, it looks for a cookie.
 
@@ -1637,35 +1651,18 @@ Notes:
   en-us).
 
 * If you define a custom :setting:`LANGUAGES` setting, as explained in the
-  previous bullet, it's OK to mark the languages as translation strings
-  -- but use a "dummy" ``ugettext()`` function, not the one in
-  ``django.utils.translation``. You should *never* import
-  ``django.utils.translation`` from within your settings file, because that
-  module in itself depends on the settings, and that would cause a circular
-  import.
+  previous bullet, you can mark the language names as translation strings
+  -- but use :func:`~django.utils.translation.ugettext_lazy` instead of
+  :func:`~django.utils.translation.ugettext` to avoid a circular import.
 
-  The solution is to use a "dummy" ``ugettext()`` function. Here's a sample
-  settings file::
+  Here's a sample settings file::
 
-      ugettext = lambda s: s
+      from django.utils.translation import ugettext_lazy as _
 
       LANGUAGES = (
-          ('de', ugettext('German')),
-          ('en', ugettext('English')),
+          ('de', _('German')),
+          ('en', _('English')),
       )
-
-  With this arrangement, :djadmin:`django-admin.py makemessages <makemessages>`
-  will still find and mark these strings for translation, but the translation
-  won't happen at runtime -- so you'll have to remember to wrap the languages in
-  the *real* ``ugettext()`` in any code that uses :setting:`LANGUAGES` at
-  runtime.
-
-* The ``LocaleMiddleware`` can only select languages for which there is a
-  Django-provided base translation. If you want to provide translations
-  for your application that aren't already in the set of translations
-  in Django's source tree, you'll want to provide at least a basic
-  one as described in the :ref:`Locale restrictions<locale-restrictions>`
-  note.
 
 Once ``LocaleMiddleware`` determines the user's preference, it makes this
 preference available as ``request.LANGUAGE_CODE`` for each

@@ -9,6 +9,7 @@ from django.utils.functional import Promise
 from django.utils import six
 from django.utils.six.moves.urllib.parse import quote
 
+
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __init__(self, obj, *args):
         self.obj = obj
@@ -19,6 +20,7 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
         return '%s. You passed in %r (%s)' % (original, self.obj,
                 type(self.obj))
 
+
 def python_2_unicode_compatible(klass):
     """
     A decorator that defines __unicode__ and __str__ methods under Python 2.
@@ -28,9 +30,14 @@ def python_2_unicode_compatible(klass):
     returning text and apply this decorator to the class.
     """
     if six.PY2:
+        if '__str__' not in klass.__dict__:
+            raise ValueError("@python_2_unicode_compatible cannot be applied "
+                             "to %s because it doesn't define __str__()." %
+                             klass.__name__)
         klass.__unicode__ = klass.__str__
         klass.__str__ = lambda self: self.__unicode__().encode('utf-8')
     return klass
+
 
 def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
@@ -44,6 +51,7 @@ def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
         return s
     return force_text(s, encoding, strings_only, errors)
 
+
 def is_protected_type(obj):
     """Determine if the object instance is of a protected type.
 
@@ -52,6 +60,7 @@ def is_protected_type(obj):
     """
     return isinstance(obj, six.integer_types + (type(None), float, Decimal,
         datetime.datetime, datetime.date, datetime.time))
+
 
 def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
@@ -93,6 +102,7 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
             s = ' '.join([force_text(arg, encoding, strings_only,
                     errors) for arg in s])
     return s
+
 
 def smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
@@ -162,6 +172,7 @@ force_str.__doc__ = """
 Apply force_text in Python 3 and force_bytes in Python 2.
 """
 
+
 def iri_to_uri(iri):
     """
     Convert an Internationalized Resource Identifier (IRI) portion to a URI
@@ -189,6 +200,7 @@ def iri_to_uri(iri):
         return iri
     return quote(force_bytes(iri), safe=b"/#%[]=:;$&()+,!?*@'~")
 
+
 def filepath_to_uri(path):
     """Convert a file system path to a URI portion that is suitable for
     inclusion in a URL.
@@ -207,6 +219,7 @@ def filepath_to_uri(path):
     # I know about `os.sep` and `os.altsep` but I want to leave
     # some flexibility for hardcoding separators.
     return quote(force_bytes(path).replace(b"\\", b"/"), safe=b"/~!*()'")
+
 
 def get_system_encoding():
     """

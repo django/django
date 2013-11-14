@@ -284,7 +284,6 @@ class SessionTestsMixin(object):
             self.assertEqual(len(calls), 1)
             self.assertTrue('corrupted' in calls[0])
 
-
     def test_actual_expiry(self):
         # this doesn't work with JSONSerializer (serializing timedelta)
         with override_settings(SESSION_SERIALIZER='django.contrib.sessions.serializers.PickleSerializer'):
@@ -389,7 +388,7 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
 
     @override_settings(SESSION_CACHE_ALIAS='sessions')
     def test_non_default_cache(self):
-        #21000 - CacheDB backend should respect SESSION_CACHE_ALIAS.
+        # 21000 - CacheDB backend should respect SESSION_CACHE_ALIAS.
         self.assertRaises(InvalidCacheBackendError, self.backend)
 
 

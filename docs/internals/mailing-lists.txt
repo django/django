@@ -22,6 +22,7 @@ This is the right place if you are looking to ask any question regarding the
 installation, usage, or debugging of Django.
 
 .. note::
+
     If it's the first time you send an email to this list, your email must be
     accepted first so don't worry if :ref:`your message does not appear
     <message-does-not-appear-on-django-users>` instantly.
@@ -59,6 +60,7 @@ Django development.
 The discussion about the development of Django itself takes place here.
 
 .. note::
+
     Please make use of
     :ref:`django-users mailing list <django-users-mailing-list>` if you want
     to ask for tech support, doing so in this list is inappropriate.

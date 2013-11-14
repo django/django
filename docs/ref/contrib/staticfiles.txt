@@ -32,8 +32,6 @@ following settings:
 Management Commands
 ===================
 
-.. highlight:: console
-
 ``django.contrib.staticfiles`` exposes three management commands.
 
 collectstatic
@@ -60,6 +58,30 @@ a list of paths that have been found by the management command. It also
 receives all command line options of :djadmin:`collectstatic`. This is used
 by the :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
 by default.
+
+By default, collected files receive permissions from
+:setting:`FILE_UPLOAD_PERMISSIONS`. If you would like different permissions for
+these files, you can subclass either of the :ref:`static files storage
+classes <staticfiles-storages>` and specify the ``file_permissions_mode``
+parameter. For example::
+
+    from django.contrib.staticfiles import storage
+
+    class MyStaticFilesStorage(storage.StaticFilesStorage):
+        def __init__(self, *args, **kwargs):
+            kwargs['file_permissions_mode'] = 0o640
+            super(CustomStaticFilesStorage, self).__init__(*args, **kwargs)
+
+Then set the :setting:`STATICFILES_STORAGE` setting to
+``'path.to.MyStaticFilesStorage'``.
+
+.. versionadded:: 1.7
+
+    The ability to override ``file_permissions_mode`` is new in Django 1.7.
+    Previously the file permissions always used
+    :setting:`FILE_UPLOAD_PERMISSIONS`.
+
+.. highlight:: console
 
 Some commonly used options are:
 
@@ -173,6 +195,8 @@ in your project's :setting:`INSTALLED_APPS` setting. :djadmin:`runserver`
 Example usage::
 
     django-admin.py runserver --insecure
+
+.. _staticfiles-storages:
 
 Storages
 ========

@@ -28,11 +28,11 @@ class NullQueriesTests(TestCase):
 
         # Excluding the previous result returns everything.
         self.assertQuerysetEqual(
-                Choice.objects.exclude(choice=None).order_by('id'),
-                [
-                    '<Choice: Choice: Because. in poll Q: Why? >',
-                    '<Choice: Choice: Why Not? in poll Q: Why? >'
-                ]
+            Choice.objects.exclude(choice=None).order_by('id'),
+            [
+                '<Choice: Choice: Because. in poll Q: Why? >',
+                '<Choice: Choice: Why Not? in poll Q: Why? >'
+            ]
         )
 
         # Valid query, but fails because foo isn't a keyword
@@ -63,7 +63,7 @@ class NullQueriesTests(TestCase):
             ['<OuterA: OuterA object>']
         )
 
-        inner_obj = Inner.objects.create(first=obj)
+        Inner.objects.create(first=obj)
         self.assertQuerysetEqual(
             Inner.objects.filter(first__inner__third=None),
             ['<Inner: Inner object>']
@@ -71,7 +71,7 @@ class NullQueriesTests(TestCase):
 
         # Ticket #13815: check if <reverse>_isnull=False does not produce
         # faulty empty lists
-        objB = OuterB.objects.create(data="reverse")
+        OuterB.objects.create(data="reverse")
         self.assertQuerysetEqual(
             OuterB.objects.filter(inner__isnull=False),
             []

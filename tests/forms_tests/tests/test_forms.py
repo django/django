@@ -3,10 +3,17 @@ from __future__ import unicode_literals
 
 import copy
 import datetime
+import warnings
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import RegexValidator
-from django.forms import *
+from django.forms import (
+    BooleanField, CharField, CheckboxSelectMultiple, ChoiceField, DateField,
+    EmailField, FileField, FloatField, Form, forms, HiddenInput, IntegerField,
+    MultipleChoiceField, MultipleHiddenInput, MultiValueField,
+    NullBooleanField, PasswordInput, RadioSelect, Select, SplitDateTimeField,
+    Textarea, TextInput, ValidationError, widgets,
+)
 from django.http import QueryDict
 from django.template import Template, Context
 from django.test import TestCase
@@ -560,9 +567,12 @@ class FormsTestCase(TestCase):
         f = SongForm(data)
         self.assertEqual(f.errors, {})
 
-        data = MergeDict(MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P'])))
-        f = SongForm(data)
-        self.assertEqual(f.errors, {})
+        # MergeDict is deprecated, but is supported until removed.
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            data = MergeDict(MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P'])))
+            f = SongForm(data)
+            self.assertEqual(f.errors, {})
 
     def test_multiple_hidden(self):
         class SongForm(Form):
@@ -814,6 +824,7 @@ class FormsTestCase(TestCase):
         """ Test that we are able to modify a form field validators list without polluting
             other forms """
         from django.core.validators import MaxValueValidator
+
         class MyForm(Form):
             myfield = CharField(max_length=25)
 
@@ -927,7 +938,7 @@ class FormsTestCase(TestCase):
         class UserRegistration(Form):
             username = CharField(max_length=10)                   # uses TextInput by default
             password = CharField(max_length=10, widget=PasswordInput)
-            realname = CharField(max_length=10, widget=TextInput) # redundantly define widget, just to test
+            realname = CharField(max_length=10, widget=TextInput)  # redundantly define widget, just to test
             address = CharField()                                 # no max_length defined here
 
         p = UserRegistration(auto_id=False)
@@ -1113,7 +1124,7 @@ class FormsTestCase(TestCase):
         class UserRegistration(Form):
             username = CharField(max_length=10)
             password = CharField(widget=PasswordInput)
-            options = MultipleChoiceField(choices=[('f','foo'),('b','bar'),('w','whiz')])
+            options = MultipleChoiceField(choices=[('f', 'foo'), ('b', 'bar'), ('w', 'whiz')])
 
         # We need to define functions that get called later.)
         def initial_django():
@@ -1123,10 +1134,10 @@ class FormsTestCase(TestCase):
             return 'stephane'
 
         def initial_options():
-            return ['f','b']
+            return ['f', 'b']
 
         def initial_other_options():
-            return ['b','w']
+            return ['b', 'w']
 
         # Here, we're not submitting any data, so the initial value will be displayed.)
         p = UserRegistration(initial={'username': initial_django, 'options': initial_options}, auto_id=False)
@@ -1155,7 +1166,7 @@ class FormsTestCase(TestCase):
 <option value="b">bar</option>
 <option value="w">whiz</option>
 </select></li>""")
-        p = UserRegistration({'username': 'foo', 'options':['f','b']}, initial={'username': initial_django}, auto_id=False)
+        p = UserRegistration({'username': 'foo', 'options': ['f', 'b']}, initial={'username': initial_django}, auto_id=False)
         self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="foo" maxlength="10" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
 <li>Options: <select multiple="multiple" name="options">
@@ -1176,7 +1187,7 @@ class FormsTestCase(TestCase):
         class UserRegistration(Form):
             username = CharField(max_length=10, initial=initial_django)
             password = CharField(widget=PasswordInput)
-            options = MultipleChoiceField(choices=[('f','foo'),('b','bar'),('w','whiz')], initial=initial_other_options)
+            options = MultipleChoiceField(choices=[('f', 'foo'), ('b', 'bar'), ('w', 'whiz')], initial=initial_other_options)
 
         p = UserRegistration(auto_id=False)
         self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
@@ -1302,10 +1313,10 @@ class FormsTestCase(TestCase):
             haircut_type = CharField()
 
         b = Beatle(auto_id=False)
-        self.assertHTMLEqual(b.as_ul(), """<li>First name: <input type="text" name="first_name" /></li>
+        self.assertHTMLEqual(b.as_ul(), """<li>Instrument: <input type="text" name="instrument" /></li>
+<li>First name: <input type="text" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" /></li>
-<li>Instrument: <input type="text" name="instrument" /></li>
 <li>Haircut type: <input type="text" name="haircut_type" /></li>""")
 
     def test_forms_with_prefixes(self):
@@ -1782,17 +1793,17 @@ class FormsTestCase(TestCase):
         class NameForm(Form):
             name = NameField(validators=[bad_names])
 
-        form = NameForm(data={'name' : ['bad', 'value']})
+        form = NameForm(data={'name': ['bad', 'value']})
         form.full_clean()
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors, {'name': ['bad value not allowed']})
-        form = NameForm(data={'name' : ['should be overly', 'long for the field names']})
+        form = NameForm(data={'name': ['should be overly', 'long for the field names']})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors, {'name': ['Ensure this value has at most 10 characters (it has 16).',
                                                 'Ensure this value has at most 10 characters (it has 24).']})
-        form = NameForm(data={'name' : ['fname', 'lname']})
+        form = NameForm(data={'name': ['fname', 'lname']})
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data, {'name' : 'fname lname'})
+        self.assertEqual(form.cleaned_data, {'name': 'fname lname'})
 
     def test_multivalue_deep_copy(self):
         """
@@ -1802,10 +1813,9 @@ class FormsTestCase(TestCase):
         class ChoicesField(MultiValueField):
             def __init__(self, fields=(), *args, **kwargs):
                 fields = (ChoiceField(label='Rank',
-                           choices=((1,1),(2,2))),
+                           choices=((1, 1), (2, 2))),
                           CharField(label='Name', max_length=10))
                 super(ChoicesField, self).__init__(fields=fields, *args, **kwargs)
-
 
         field = ChoicesField()
         field2 = copy.deepcopy(field)
@@ -1890,6 +1900,7 @@ class FormsTestCase(TestCase):
         """
         class CustomJSONField(CharField):
             empty_values = [None, '']
+
             def to_python(self, value):
                 # Fake json.loads
                 if value == '{}':
@@ -1899,9 +1910,9 @@ class FormsTestCase(TestCase):
         class JSONForm(forms.Form):
             json = CustomJSONField()
 
-        form = JSONForm(data={'json': '{}'});
+        form = JSONForm(data={'json': '{}'})
         form.full_clean()
-        self.assertEqual(form.cleaned_data, {'json' : {}})
+        self.assertEqual(form.cleaned_data, {'json': {}})
 
     def test_boundfield_label_tag(self):
         class SomeForm(Form):

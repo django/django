@@ -1,5 +1,6 @@
 from functools import wraps
 from unittest import TestCase
+import warnings
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
@@ -22,6 +23,7 @@ fully_decorated.anything = "Expected __dict__"
 def compose(*functions):
     # compose(f, g)(*args, **kwargs) == f(g(*args, **kwargs))
     functions = list(reversed(functions))
+
     def _inner(*args, **kwargs):
         result = functions[0](*args, **kwargs)
         for f in functions[1:]:
@@ -43,13 +45,13 @@ full_decorator = compose(
     vary_on_cookie,
 
     # django.views.decorators.cache
-    cache_page(60*15),
+    cache_page(60 * 15),
     cache_control(private=True),
     never_cache,
 
     # django.contrib.auth.decorators
     # Apply user_passes_test twice to check #9474
-    user_passes_test(lambda u:True),
+    user_passes_test(lambda u: True),
     login_required,
     permission_required('change_world'),
 
@@ -57,12 +59,16 @@ full_decorator = compose(
     staff_member_required,
 
     # django.utils.functional
-    lambda f: memoize(f, {}, 1),
     allow_lazy,
     lazy,
 )
 
+# suppress the deprecation warning of memoize
+with warnings.catch_warnings(record=True):
+    fully_decorated = memoize(fully_decorated, {}, 1)
+
 fully_decorated = full_decorator(fully_decorated)
+
 
 class DecoratorsTest(TestCase):
 
@@ -94,8 +100,11 @@ class DecoratorsTest(TestCase):
         callback = user_passes_test(test1)(callback)
         callback = user_passes_test(test2)(callback)
 
-        class DummyUser(object): pass
-        class DummyRequest(object): pass
+        class DummyUser(object):
+            pass
+
+        class DummyRequest(object):
+            pass
 
         request = DummyRequest()
         request.user = DummyUser()

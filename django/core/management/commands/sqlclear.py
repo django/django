@@ -6,6 +6,7 @@ from django.core.management.base import AppCommand
 from django.core.management.sql import sql_delete
 from django.db import connections, DEFAULT_DB_ALIAS
 
+
 class Command(AppCommand):
     help = "Prints the DROP TABLE SQL statements for the given app name(s)."
 

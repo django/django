@@ -262,7 +262,7 @@ class DateTimeQuery(DateQuery):
 
     def _check_field(self, field):
         assert isinstance(field, DateTimeField), \
-                "%r isn't a DateTimeField." % field.name
+            "%r isn't a DateTimeField." % field.name
 
     def _get_select(self, col, lookup_type):
         if self.tzinfo is None:

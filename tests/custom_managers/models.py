@@ -17,17 +17,20 @@ from django.utils.encoding import python_2_unicode_compatible
 
 # An example of a custom manager called "objects".
 
+
 class PersonManager(models.Manager):
     def get_fun_people(self):
         return self.filter(fun=True)
 
 # An example of a custom manager that sets get_queryset().
 
+
 class PublishedBookManager(models.Manager):
     def get_queryset(self):
         return super(PublishedBookManager, self).get_queryset().filter(is_published=True)
 
 # An example of a custom queryset that copies its methods onto the manager.
+
 
 class CustomQuerySet(models.QuerySet):
     def filter(self, *args, **kwargs):
@@ -49,6 +52,7 @@ class CustomQuerySet(models.QuerySet):
         return self.all()
     _optin_private_method.queryset_only = False
 
+
 class BaseCustomManager(models.Manager):
     def __init__(self, arg):
         super(BaseCustomManager, self).__init__()
@@ -64,13 +68,16 @@ class BaseCustomManager(models.Manager):
 
 CustomManager = BaseCustomManager.from_queryset(CustomQuerySet)
 
+
 class FunPeopleManager(models.Manager):
     def get_queryset(self):
         return super(FunPeopleManager, self).get_queryset().filter(fun=True)
 
+
 class BoringPeopleManager(models.Manager):
     def get_queryset(self):
         return super(BoringPeopleManager, self).get_queryset().filter(fun=False)
+
 
 @python_2_unicode_compatible
 class Person(models.Model):
@@ -93,6 +100,7 @@ class Person(models.Model):
     def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
+
 @python_2_unicode_compatible
 class Book(models.Model):
     title = models.CharField(max_length=50)
@@ -109,9 +117,11 @@ class Book(models.Model):
 
 # An example of providing multiple custom managers.
 
+
 class FastCarManager(models.Manager):
     def get_queryset(self):
         return super(FastCarManager, self).get_queryset().filter(top_speed__gt=150)
+
 
 @python_2_unicode_compatible
 class Car(models.Model):

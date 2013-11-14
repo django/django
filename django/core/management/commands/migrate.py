@@ -76,7 +76,7 @@ class Command(BaseCommand):
                 except AmbiguityError:
                     raise CommandError("More than one migration matches '%s' in app '%s'. Please be more specific." % (app_label, migration_name))
                 except KeyError:
-                    raise CommandError("Cannot find a migration matching '%s' from app '%s'. Is it in INSTALLED_APPS?" % (app_label, migration_name))
+                    raise CommandError("Cannot find a migration matching '%s' from app '%s'." % (app_label, migration_name))
                 targets = [(app_label, migration.name)]
             target_app_labels_only = False
         elif len(args) == 1:
@@ -127,18 +127,24 @@ class Command(BaseCommand):
         # to do at this point.
         emit_post_migrate_signal(created_models, self.verbosity, self.interactive, connection.alias)
 
-    def migration_progress_callback(self, action, migration):
+    def migration_progress_callback(self, action, migration, fake=False):
         if self.verbosity >= 1:
             if action == "apply_start":
                 self.stdout.write("  Applying %s..." % migration, ending="")
                 self.stdout.flush()
             elif action == "apply_success":
-                self.stdout.write(self.style.MIGRATE_SUCCESS(" OK"))
+                if fake:
+                    self.stdout.write(self.style.MIGRATE_SUCCESS(" FAKED"))
+                else:
+                    self.stdout.write(self.style.MIGRATE_SUCCESS(" OK"))
             elif action == "unapply_start":
                 self.stdout.write("  Unapplying %s..." % migration, ending="")
                 self.stdout.flush()
             elif action == "unapply_success":
-                self.stdout.write(self.style.MIGRATE_SUCCESS(" OK"))
+                if fake:
+                    self.stdout.write(self.style.MIGRATE_SUCCESS(" FAKED"))
+                else:
+                    self.stdout.write(self.style.MIGRATE_SUCCESS(" OK"))
 
     def sync_apps(self, connection, apps):
         "Runs the old syncdb-style operation on a list of apps."
@@ -153,10 +159,7 @@ class Command(BaseCommand):
         # Build the manifest of apps and models that are to be synchronized
         all_models = [
             (app.__name__.split('.')[-2],
-                [
-                    m for m in models.get_models(app, include_auto_created=True)
-                    if router.allow_migrate(connection.alias, m)
-                ])
+                router.get_migratable_models(app, connection.alias, include_auto_created=True))
             for app in models.get_apps() if app.__name__.split('.')[-2] in apps
         ]
 
@@ -279,10 +282,15 @@ class Command(BaseCommand):
             for node in graph.leaf_nodes(app):
                 for plan_node in graph.forwards_plan(node):
                     if plan_node not in shown and plan_node[0] == app:
+                        # Give it a nice title if it's a squashed one
+                        title = plan_node[1]
+                        if graph.nodes[plan_node].replaces:
+                            title += " (%s squashed migrations)" % len(graph.nodes[plan_node].replaces)
+                        # Mark it as applied/unapplied
                         if plan_node in loader.applied_migrations:
-                            self.stdout.write(" [X] %s" % plan_node[1])
+                            self.stdout.write(" [X] %s" % title)
                         else:
-                            self.stdout.write(" [ ] %s" % plan_node[1])
+                            self.stdout.write(" [ ] %s" % title)
                         shown.add(plan_node)
             # If we didn't print anything, then a small message
             if not shown:

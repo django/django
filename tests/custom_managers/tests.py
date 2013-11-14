@@ -68,7 +68,6 @@ class CustomManagerTests(TestCase):
         # manager
         self.assertIsInstance(self.p2.books, PublishedBookManager)
 
-
         # The default manager, "objects", doesn't exist, because a custom one
         # was provided.
         self.assertRaises(AttributeError, lambda: Book.objects)

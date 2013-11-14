@@ -66,9 +66,9 @@ class Command(NoArgsCommand):
                 indexes = connection.introspection.get_indexes(cursor, table_name)
             except NotImplementedError:
                 indexes = {}
-            used_column_names = [] # Holds column names used in the table so far
+            used_column_names = []  # Holds column names used in the table so far
             for i, row in enumerate(connection.introspection.get_table_description(cursor, table_name)):
-                comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
+                comment_notes = []  # Holds Field notes, to be displayed in a Python comment.
                 extra_params = OrderedDict()  # Holds Field parameters such as 'db_column'.
                 column_name = row[0]
                 is_relation = i in relations
@@ -112,7 +112,7 @@ class Command(NoArgsCommand):
 
                 # Add 'null' and 'blank', if the 'null_ok' flag was present in the
                 # table description.
-                if row[6]: # If it's NULL...
+                if row[6]:  # If it's NULL...
                     if field_type == 'BooleanField(':
                         field_type = 'NullBooleanField('
                     else:

@@ -1,5 +1,4 @@
 from django.conf.urls import patterns, url
-from django.views.generic.edit import UpdateView
 
 from .views import ArticleFormView
 

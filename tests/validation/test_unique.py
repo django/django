@@ -43,7 +43,7 @@ class GetUniqueCheckTests(unittest.TestCase):
             [(UniqueForDateModel, 'date', 'count', 'start_date'),
              (UniqueForDateModel, 'year', 'count', 'end_date'),
              (UniqueForDateModel, 'month', 'order', 'end_date')]
-            ), m._get_unique_checks()
+        ), m._get_unique_checks()
         )
 
     def test_unique_for_date_exclusion(self):
@@ -52,8 +52,9 @@ class GetUniqueCheckTests(unittest.TestCase):
             [(UniqueForDateModel, ('id',))],
             [(UniqueForDateModel, 'year', 'count', 'end_date'),
              (UniqueForDateModel, 'month', 'order', 'end_date')]
-            ), m._get_unique_checks(exclude='start_date')
+        ), m._get_unique_checks(exclude='start_date')
         )
+
 
 class PerformUniqueChecksTest(TestCase):
     def test_primary_key_unique_check_not_performed_when_adding_and_pk_not_specified(self):
@@ -77,7 +78,7 @@ class PerformUniqueChecksTest(TestCase):
             mtv.full_clean()
 
     def test_unique_for_date(self):
-        p1 = Post.objects.create(title="Django 1.0 is released",
+        Post.objects.create(title="Django 1.0 is released",
             slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
 
         p = Post(title="Django 1.0 is released", posted=datetime.date(2008, 9, 3))
@@ -90,7 +91,7 @@ class PerformUniqueChecksTest(TestCase):
         p.full_clean()
 
         # Should work without errors
-        p = Post(title="Django 1.0 is released", posted=datetime.datetime(2008, 9,4))
+        p = Post(title="Django 1.0 is released", posted=datetime.datetime(2008, 9, 4))
         p.full_clean()
 
         p = Post(slug="Django 1.0", posted=datetime.datetime(2008, 1, 1))
@@ -109,7 +110,7 @@ class PerformUniqueChecksTest(TestCase):
         self.assertEqual(cm.exception.message_dict, {'posted': ['This field cannot be null.']})
 
     def test_unique_for_date_with_nullable_date(self):
-        p1 = FlexibleDatePost.objects.create(title="Django 1.0 is released",
+        FlexibleDatePost.objects.create(title="Django 1.0 is released",
             slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
 
         p = FlexibleDatePost(title="Django 1.0 is released")
@@ -131,7 +132,7 @@ class PerformUniqueChecksTest(TestCase):
             self.fail("unique_for_month checks shouldn't trigger when the associated DateField is None.")
 
     def test_unique_errors(self):
-        m1 = UniqueErrorsModel.objects.create(name='Some Name', no=10)
+        UniqueErrorsModel.objects.create(name='Some Name', no=10)
         m = UniqueErrorsModel(name='Some Name', no=11)
         with self.assertRaises(ValidationError) as cm:
             m.full_clean()
@@ -141,4 +142,3 @@ class PerformUniqueChecksTest(TestCase):
         with self.assertRaises(ValidationError) as cm:
             m.full_clean()
         self.assertEqual(cm.exception.message_dict, {'no': ['Custom unique number message.']})
-

@@ -11,6 +11,7 @@ from django.utils._os import upath
 class Person(models.Model):
     name = models.CharField(max_length=100)
 
+
 class Triple(models.Model):
     left = models.IntegerField()
     middle = models.IntegerField()
@@ -19,8 +20,10 @@ class Triple(models.Model):
     class Meta:
         unique_together = (('left', 'middle'), ('middle', 'right'))
 
+
 class FilePathModel(models.Model):
     path = models.FilePathField(path=os.path.dirname(upath(__file__)), match=".*\.py$", blank=True)
+
 
 @python_2_unicode_compatible
 class Publication(models.Model):
@@ -30,6 +33,7 @@ class Publication(models.Model):
     def __str__(self):
         return self.title
 
+
 @python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
@@ -38,14 +42,17 @@ class Article(models.Model):
     def __str__(self):
         return self.headline
 
+
 class CustomFileField(models.FileField):
     def save_form_data(self, instance, data):
         been_here = getattr(self, 'been_saved', False)
         assert not been_here, "save_form_data called more than once"
         setattr(self, 'been_saved', True)
 
+
 class CustomFF(models.Model):
     f = CustomFileField(upload_to='unused', blank=True)
+
 
 class RealPerson(models.Model):
     name = models.CharField(max_length=100)
@@ -54,19 +61,24 @@ class RealPerson(models.Model):
         if self.name.lower() == 'anonymous':
             raise ValidationError("Please specify a real name.")
 
+
 class Author(models.Model):
     publication = models.OneToOneField(Publication, null=True, blank=True)
     full_name = models.CharField(max_length=255)
+
 
 class Author1(models.Model):
     publication = models.OneToOneField(Publication, null=False)
     full_name = models.CharField(max_length=255)
 
+
 class Homepage(models.Model):
     url = models.URLField()
 
+
 class Document(models.Model):
     myfile = models.FileField(upload_to='unused', blank=True)
+
 
 class Edition(models.Model):
     author = models.ForeignKey(Person)

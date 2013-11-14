@@ -18,6 +18,7 @@ class PostDeleteHandler(object):
             (instance, instance.id is None)
         )
 
+
 class MyReceiver(object):
     def __init__(self, param):
         self.param = param
@@ -26,6 +27,7 @@ class MyReceiver(object):
     def __call__(self, signal, sender, **kwargs):
         self._run = True
         signal.disconnect(receiver=self, sender=sender)
+
 
 class SignalTests(TestCase):
     def test_basic(self):
@@ -172,7 +174,7 @@ class SignalTests(TestCase):
         a, b = MyReceiver(1), MyReceiver(2)
         signals.post_save.connect(sender=Person, receiver=a)
         signals.post_save.connect(sender=Person, receiver=b)
-        p = Person.objects.create(first_name='John', last_name='Smith')
+        Person.objects.create(first_name='John', last_name='Smith')
 
         self.assertTrue(a._run)
         self.assertTrue(b._run)

@@ -100,6 +100,30 @@ class OperationTests(MigrationTestBase):
             operation.database_backwards("test_dlmo", editor, new_state, project_state)
         self.assertTableExists("test_dlmo_pony")
 
+    def test_rename_model(self):
+        """
+        Tests the RenameModel operation.
+        """
+        project_state = self.set_up_test_model("test_rnmo")
+        # Test the state alteration
+        operation = migrations.RenameModel("Pony", "Horse")
+        new_state = project_state.clone()
+        operation.state_forwards("test_rnmo", new_state)
+        self.assertNotIn(("test_rnmo", "pony"), new_state.models)
+        self.assertIn(("test_rnmo", "horse"), new_state.models)
+        # Test the database alteration
+        self.assertTableExists("test_rnmo_pony")
+        self.assertTableNotExists("test_rnmo_horse")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_rnmo", editor, project_state, new_state)
+        self.assertTableNotExists("test_rnmo_pony")
+        self.assertTableExists("test_rnmo_horse")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_rnmo", editor, new_state, project_state)
+        self.assertTableExists("test_dlmo_pony")
+        self.assertTableNotExists("test_rnmo_horse")
+
     def test_add_field(self):
         """
         Tests the AddField operation.
@@ -303,7 +327,7 @@ class OperationTests(MigrationTestBase):
         operation = migrations.RunSQL(
             "CREATE TABLE i_love_ponies (id int, special_thing int)",
             "DROP TABLE i_love_ponies",
-            state_operations = [migrations.CreateModel("SomethingElse", [("id", models.AutoField(primary_key=True))])],
+            state_operations=[migrations.CreateModel("SomethingElse", [("id", models.AutoField(primary_key=True))])],
         )
         # Test the state alteration
         new_state = project_state.clone()
@@ -347,6 +371,7 @@ class OperationTests(MigrationTestBase):
         with self.assertRaises(NotImplementedError):
             operation.database_backwards("test_runpython", None, new_state, project_state)
         # Now test we can do it with a callable
+
         def inner_method(models, schema_editor):
             Pony = models.get_model("test_runpython", "Pony")
             Pony.objects.create(pink=1, weight=3.55)

@@ -49,7 +49,8 @@ class FormsUtilTestCase(TestCase):
 
         @python_2_unicode_compatible
         class VeryBadError:
-            def __str__(self): return "A very bad error."
+            def __str__(self):
+                return "A very bad error."
 
         # Can take a non-string.
         self.assertHTMLEqual(str(ErrorList(ValidationError(VeryBadError()).messages)),
