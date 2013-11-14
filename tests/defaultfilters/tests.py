@@ -13,7 +13,7 @@ from django.template.defaultfilters import (
     linebreaks_filter, linenumbers, ljust, lower, make_list,
     phone2numeric_filter, pluralize, removetags, rjust, slice_filter, slugify,
     stringformat, striptags, time, timesince_filter, timeuntil_filter, title,
-    truncatewords, truncatewords_html, truncatechars_html, unordered_list,
+    truncatechars_html, truncatewords, truncatewords_html, unordered_list,
     upper, urlencode, urlize, urlizetrunc, wordcount, wordwrap, yesno,
 )
 from django.test import TestCase
