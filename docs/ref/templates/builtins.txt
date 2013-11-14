@@ -2141,12 +2141,12 @@ For example::
 
 If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel i..."``.
 
-.. templatefilter:: truncatewords
-
 .. templatefilter:: truncatechars_html
 
 truncatechars_html
 ^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 1.7
 
 Similar to :tfilter:`truncatechars`, except that it is aware of HTML tags. Any
 tags that are opened in the string and not closed before the truncation point,

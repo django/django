@@ -352,11 +352,16 @@ Templates
   * :func:`django.shortcuts.render()`
   * :func:`django.shortcuts.render_to_response()`
 
-* The :tfilter:`time` filter now accepts timzone-related :ref:`format
+* The :tfilter:`time` filter now accepts timezone-related :ref:`format
   specifiers <date-and-time-formatting-specifiers>` ``'e'``, ``'O'`` , ``'T'``
   and ``'Z'`` and is able to digest :ref:`time-zone-aware
   <naive_vs_aware_datetimes>` ``datetime`` instances performing the expected
   rendering.
+
+* A new filter, ``truncatechars_html``, has been added. It truncates a string
+  to be no longer than the specified number of characters, taking HTML into
+  account. Truncated strings end with a translatable ellipsis sequence ("...").
+  See the documentation for :tfilter:`truncatechars_html` for more details.
 
 Tests
 ^^^^^
