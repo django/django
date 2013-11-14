@@ -62,8 +62,8 @@ class ModelBackend(object):
         return False
 
     def get_user(self, user_id):
+        UserModel = get_user_model()
         try:
-            UserModel = get_user_model()
             return UserModel._default_manager.get(pk=user_id)
         except UserModel.DoesNotExist:
             return None
