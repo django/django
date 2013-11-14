@@ -8,7 +8,8 @@ try:
 except ImportError:
     pytz = None
 
-from django.test import TestCase, override_settings
+from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils import timezone
 
 
