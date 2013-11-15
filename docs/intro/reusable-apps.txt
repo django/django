@@ -100,14 +100,14 @@ Installing some prerequisites
 =============================
 
 The current state of Python packaging is a bit muddled with various tools. For
-this tutorial, we're going to use distribute_ to build our package. It's a
-community-maintained fork of the older ``setuptools`` project. We'll also be
+this tutorial, we're going to use setuptools_ to build our package. It's the
+recommended packaging tool (merged with the ``distribute`` fork). We'll also be
 using `pip`_ to install and uninstall it. You should install these
 two packages now. If you need help, you can refer to :ref:`how to install
-Django with pip<installing-official-release>`. You can install ``distribute``
+Django with pip<installing-official-release>`. You can install ``setuptools``
 the same way.
 
-.. _distribute: http://pypi.python.org/pypi/distribute
+.. _setuptools: https://pypi.python.org/pypi/setuptools
 .. _pip: http://pypi.python.org/pypi/pip
 
 Packaging your app
@@ -163,17 +163,18 @@ this. For a small app like polls, this process isn't too difficult.
     5. Visit http://127.0.0.1:8000/polls/ to participate in the poll.
 
 4. Create a ``django-polls/LICENSE`` file. Choosing a license is beyond the
-scope of this tutorial, but suffice it to say that code released publicly
-without a license is *useless*. Django and many Django-compatible apps are
-distributed under the BSD license; however, you're free to pick your own
-license. Just be aware that your licensing choice will affect who is able
-to use your code.
+   scope of this tutorial, but suffice it to say that code released publicly
+   without a license is *useless*. Django and many Django-compatible apps are
+   distributed under the BSD license; however, you're free to pick your own
+   license. Just be aware that your licensing choice will affect who is able
+   to use your code.
 
 5. Next we'll create a ``setup.py`` file which provides details about how to
-build and install the app.  A full explanation of this file is beyond the
-scope of this tutorial, but the `distribute docs
-<http://packages.python.org/distribute/setuptools.html>`_ have a good explanation.
-Create a file ``django-polls/setup.py`` with the following contents::
+   build and install the app. A full explanation of this file is beyond the
+   scope of this tutorial, but the `setuptools docs
+   <http://packages.python.org/setuptools/setuptools.html>`_ have a good
+   explanation. Create a file ``django-polls/setup.py`` with the following
+   contents::
 
     import os
     from setuptools import setup
@@ -208,15 +209,9 @@ Create a file ``django-polls/setup.py`` with the following contents::
         ],
     )
 
-.. admonition:: I thought you said we were going to use ``distribute``?
-
-    Distribute is a drop-in replacement for ``setuptools``. Even though we
-    appear to import from ``setuptools``, since we have ``distribute``
-    installed, it will override the import.
-
 6. Only Python modules and packages are included in the package by default. To
    include additional files, we'll need to create a ``MANIFEST.in`` file. The
-   distribute docs referred to in the previous step discuss this file in more
+   setuptools docs referred to in the previous step discuss this file in more
    details. To include the templates, the ``README.rst`` and our ``LICENSE``
    file, create a file ``django-polls/MANIFEST.in`` with the following
    contents::
