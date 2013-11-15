@@ -85,7 +85,7 @@ This example is equivalent to::
 
     def my_view(request):
         # View code here...
-        t = loader.get_template('myapp/template.html')
+        t = loader.get_template('myapp/index.html')
         c = RequestContext(request, {'foo': 'bar'})
         return HttpResponse(t.render(c),
             content_type="application/xhtml+xml")
