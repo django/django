@@ -42,6 +42,22 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(build_request_repr(request, path_override='/otherpath/', GET_override={'a': 'b'}, POST_override={'c': 'd'}, COOKIES_override={'e': 'f'}, META_override={'g': 'h'}),
                          str_prefix("<HttpRequest\npath:/otherpath/,\nGET:{%(_)s'a': %(_)s'b'},\nPOST:{%(_)s'c': %(_)s'd'},\nCOOKIES:{%(_)s'e': %(_)s'f'},\nMETA:{%(_)s'g': %(_)s'h'}>"))
 
+    def test_bad_httprequest_repr(self):
+        """
+        If an exception occurs when parsing GET, POST, COOKIES, or META, the
+        repr of the request should show it.
+        """
+        class Bomb(object):
+            """An object that raises an exception when printed out."""
+            def __repr__(self):
+                raise Exception('boom!')
+
+        bomb = Bomb()
+        for attr in ['GET', 'POST', 'COOKIES', 'META']:
+            request = HttpRequest()
+            setattr(request, attr, {'bomb': bomb})
+            self.assertIn('%s:<could not parse>' % attr, repr(request))
+
     def test_wsgirequest(self):
         request = WSGIRequest({'PATH_INFO': 'bogus', 'REQUEST_METHOD': 'bogus', 'wsgi.input': BytesIO(b'')})
         self.assertEqual(list(request.GET.keys()), [])
