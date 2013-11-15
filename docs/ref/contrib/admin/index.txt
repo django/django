@@ -1870,6 +1870,12 @@ The ``InlineModelAdmin`` class adds:
     through to :func:`~django.forms.models.inlineformset_factory` when
     creating the formset for this inline.
 
+.. warning::
+    When writing custom validation for ``InlineModelAdmin`` forms, be cautious
+    of writing validation that relies on features of the parent model. If the
+    parent model fails to validate, it may be left in an inconsistent state as
+    described in the warning in :ref:`validation-on-modelform`.
+
 .. attribute:: InlineModelAdmin.extra
 
     This controls the number of extra forms the formset will display in
