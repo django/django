@@ -300,9 +300,8 @@ MySQL Connector/Python
 ~~~~~~~~~~~~~~~~~~~~~~
 
 MySQL Connector/Python is available through two `release branches`_: Generally
-Available (GA, currently 1.0.x) and Development (Dev, currently 1.1.x).
-The Django adapter is currently available in the Dev branch and is described
-as Alpha.
+Available (GA, currently 1.0.x) and Development (Dev, currently 1.1.x, labelled
+as Alpha). The Django adapter is currently only available in the Dev branch.
 
 .. _release branches: http://dev.mysql.com/downloads/connector/python/
 
