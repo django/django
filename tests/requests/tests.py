@@ -101,6 +101,11 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(build_request_repr(request, path_override='/otherpath/', GET_override={'a': 'b'}, POST_override={'c': 'd'}, COOKIES_override={'e': 'f'}, META_override={'g': 'h'}),
                          str_prefix("<WSGIRequest\npath:/otherpath/,\nGET:{%(_)s'a': %(_)s'b'},\nPOST:{%(_)s'c': %(_)s'd'},\nCOOKIES:{%(_)s'e': %(_)s'f'},\nMETA:{%(_)s'g': %(_)s'h'}>"))
 
+    def test_wsgirequest_parse_error_repr(self):
+        content = b'foobar'
+        request = WSGIRequest({'PATH_INFO': '/somepath/', 'REQUEST_METHOD': 'post', 'CONTENT_LENGTH': len(content), 'CONTENT_TYPE': 'multipart/form-data; boundaryfoobar', 'wsgi.input': BytesIO(content)})
+        self.assertIn("POST:<could not parse>", repr(request))
+
     def test_wsgirequest_path_info(self):
         def wsgi_str(path_info):
             path_info = path_info.encode('utf-8')           # Actual URL sent by the browser (bytestring)
