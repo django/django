@@ -230,16 +230,16 @@ class Command(NoArgsCommand):
             raise CommandError("Type '%s help %s' for usage information." % (
                 os.path.basename(sys.argv[0]), sys.argv[1]))
 
-        if self.verbosity > 1:
-            self.stdout.write('examining files with the extensions: %s\n'
-                             % get_text_list(list(self.extensions), 'and'))
-
         # Need to ensure that the i18n framework is enabled
         from django.conf import settings
         if settings.configured:
             settings.USE_I18N = True
         else:
             settings.configure(USE_I18N=True)
+
+        if self.verbosity > 1:
+            self.stdout.write('examining files with the extensions: %s\n'
+                             % get_text_list(list(self.extensions), 'and'))
 
         self.invoked_for_django = False
         if os.path.isdir(os.path.join('conf', 'locale')):
