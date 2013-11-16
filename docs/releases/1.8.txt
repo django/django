@@ -278,6 +278,9 @@ Requests and Responses
   This brings this class into line with the documentation and with
   ``WSGIRequest``.
 
+* The :attr:`HttpResponse.charset <django.http.HttpResponse.charset>` attribute
+  was added.
+
 Tests
 ^^^^^
 

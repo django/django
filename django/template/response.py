@@ -10,7 +10,8 @@ class ContentNotRenderedError(Exception):
 class SimpleTemplateResponse(HttpResponse):
     rendering_attrs = ['template_name', 'context_data', '_post_render_callbacks']
 
-    def __init__(self, template, context=None, content_type=None, status=None):
+    def __init__(self, template, context=None, content_type=None, status=None,
+                 charset=None):
         # It would seem obvious to call these next two members 'template' and
         # 'context', but those names are reserved as part of the test Client
         # API. To avoid the name collision, we use tricky-to-debug problems
@@ -22,7 +23,7 @@ class SimpleTemplateResponse(HttpResponse):
         # content argument doesn't make sense here because it will be replaced
         # with rendered template so we always pass empty string in order to
         # prevent errors and provide shorter signature.
-        super(SimpleTemplateResponse, self).__init__('', content_type, status)
+        super(SimpleTemplateResponse, self).__init__('', content_type, status, charset)
 
         # _is_rendered tracks whether the template and context has been baked
         # into a final response.
@@ -136,7 +137,7 @@ class TemplateResponse(SimpleTemplateResponse):
     rendering_attrs = SimpleTemplateResponse.rendering_attrs + ['_request', '_current_app']
 
     def __init__(self, request, template, context=None, content_type=None,
-            status=None, current_app=None):
+            status=None, current_app=None, charset=None):
         # self.request gets over-written by django.test.client.Client - and
         # unlike context_data and template_name the _request should not
         # be considered part of the public API.
@@ -145,7 +146,7 @@ class TemplateResponse(SimpleTemplateResponse):
         # having to avoid needing to create the RequestContext directly
         self._current_app = current_app
         super(TemplateResponse, self).__init__(
-            template, context, content_type, status)
+            template, context, content_type, status, charset)
 
     def resolve_context(self, context):
         """Convert context data into a full RequestContext object
