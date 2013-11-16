@@ -627,6 +627,15 @@ Attributes
     A bytestring representing the content, encoded from a Unicode
     object if necessary.
 
+.. attribute:: HttpResponse.charset
+
+    .. versionadded:: 1.8
+
+    A string denoting the charset in which the response will be encoded. If not
+    given at ``HttpResponse`` instantiation time, it will be extracted from
+    ``content_type`` and if that is unsuccessful, the
+    :setting:`DEFAULT_CHARSET` setting will be used.
+
 .. attribute:: HttpResponse.status_code
 
     The `HTTP status code`_ for the response.
@@ -645,7 +654,7 @@ Attributes
 Methods
 -------
 
-.. method:: HttpResponse.__init__(content='', content_type=None, status=200, reason=None)
+.. method:: HttpResponse.__init__(content='', content_type=None, status=200, reason=None, charset=None)
 
     Instantiates an ``HttpResponse`` object with the given page content and
     content type.
@@ -665,6 +674,14 @@ Methods
 
     ``reason`` is the HTTP response phrase. If not provided, a default phrase
     will be used.
+
+    ``charset`` is the charset in which the response will be encoded. If not
+    given it will be extracted from ``content_type``, and if that
+    is unsuccessful, the :setting:`DEFAULT_CHARSET` setting will be used.
+
+    .. versionadded:: 1.8
+
+        The ``charset`` parameter was added.
 
 .. method:: HttpResponse.__setitem__(header, value)
 

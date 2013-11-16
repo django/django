@@ -56,7 +56,7 @@ Attributes
 Methods
 -------
 
-.. method:: SimpleTemplateResponse.__init__(template, context=None, content_type=None, status=None)
+.. method:: SimpleTemplateResponse.__init__(template, context=None, content_type=None, status=None, charset=None)
 
     Instantiates a
     :class:`~django.template.response.SimpleTemplateResponse` object
@@ -79,6 +79,15 @@ Methods
         MIME type specification and the character set encoding. If
         ``content_type`` is specified, then its value is used. Otherwise,
         :setting:`DEFAULT_CONTENT_TYPE` is used.
+
+    ``charset``
+        The charset in which the response will be encoded. If not given it will
+        be extracted from ``content_type``, and if that is unsuccessful, the
+        :setting:`DEFAULT_CHARSET` setting will be used.
+
+    .. versionadded:: 1.8
+
+        The ``charset`` parameter was added.
 
 .. method:: SimpleTemplateResponse.resolve_context(context)
 
@@ -140,7 +149,7 @@ TemplateResponse objects
 Methods
 -------
 
-.. method:: TemplateResponse.__init__(request, template, context=None, content_type=None, status=None, current_app=None)
+.. method:: TemplateResponse.__init__(request, template, context=None, content_type=None, status=None, current_app=None, charset=None)
 
     Instantiates an ``TemplateResponse`` object with the given
     template, context, MIME type and HTTP status.
@@ -173,6 +182,14 @@ Methods
         :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`
         for more information.
 
+    ``charset``
+        The charset in which the response will be encoded. If not given it will
+        be extracted from ``content_type``, and if that is unsuccessful, the
+        :setting:`DEFAULT_CHARSET` setting will be used.
+
+    .. versionadded:: 1.8
+
+        The ``charset`` parameter was added.
 
 The rendering process
 =====================
