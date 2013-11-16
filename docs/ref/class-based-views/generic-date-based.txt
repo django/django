@@ -619,8 +619,11 @@ DateDetailView
 .. note::
 
     All of the generic views listed above have matching ``Base`` views that
-    only differ in that the they do not include the
-    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`:
+    only differ in that they do not include the
+    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    (for the archive views) or
+    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    (for the :class:`DateDetailView`):
 
     .. class:: BaseArchiveIndexView
 
