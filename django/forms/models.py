@@ -179,7 +179,11 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
     field_list = []
     ignored = []
     opts = model._meta
-    for f in sorted(opts.concrete_fields + opts.virtual_fields + opts.many_to_many):
+    # Avoid circular import
+    from django.db.models.fields import Field as ModelField
+    sortable_virtual_fields = [f for f in opts.virtual_fields
+                               if isinstance(f, ModelField)]
+    for f in sorted(opts.concrete_fields + sortable_virtual_fields + opts.many_to_many):
         if not getattr(f, 'editable', False):
             continue
         if fields is not None and not f.name in fields:
