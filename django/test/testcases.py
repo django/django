@@ -327,8 +327,8 @@ class SimpleTestCase(unittest.TestCase):
         else:
             content = response.content
         if not isinstance(text, bytes) or html:
-            text = force_text(text, encoding=response._charset)
-            content = content.decode(response._charset)
+            text = force_text(text, encoding=response.charset)
+            content = content.decode(response.charset)
             text_repr = "'%s'" % text
         else:
             text_repr = repr(text)
