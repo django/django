@@ -1051,6 +1051,10 @@ Miscellaneous
   which does allow primary keys with value 0. It only forbids *autoincrement*
   primary keys with value 0.
 
+* :djadmin:`findstatic` now accepts verbosity flag level 2, meaning it will
+  show the directories on which it searched the relative paths. See
+  :djadmin:`findstatic` for example output.
+
 .. _deprecated-features-1.7:
 
 Features deprecated in 1.7

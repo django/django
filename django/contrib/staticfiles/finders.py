@@ -12,11 +12,15 @@ from django.utils import six, lru_cache
 
 from django.contrib.staticfiles import utils
 
+# To keep track on which directories the finder has searched the static files.
+searched_locations = []
+
 
 class BaseFinder(object):
     """
     A base file finder to be used for custom staticfiles finder classes.
     """
+
     def find(self, path, all=False):
         """
         Given a relative file path this ought to find an
@@ -75,6 +79,8 @@ class FileSystemFinder(BaseFinder):
         """
         matches = []
         for prefix, root in self.locations:
+            if root not in searched_locations:
+                searched_locations.append(root)
             matched_path = self.find_location(root, path, prefix)
             if matched_path:
                 if not all:
@@ -147,6 +153,9 @@ class AppDirectoriesFinder(BaseFinder):
         """
         matches = []
         for app in self.apps:
+            app_location = self.storages[app].location
+            if app_location not in searched_locations:
+                searched_locations.append(app_location)
             match = self.find_in_app(app, path)
             if match:
                 if not all:
@@ -195,6 +204,8 @@ class BaseStorageFinder(BaseFinder):
         except NotImplementedError:
             pass
         else:
+            if self.storage.location not in searched_locations:
+                searched_locations.append(self.storage.location)
             if self.storage.exists(path):
                 match = self.storage.path(path)
                 if all:
@@ -232,6 +243,7 @@ def find(path, all=False):
     If ``all`` is ``False`` (default), return the first matching
     absolute path (or ``None`` if no match). Otherwise return a list.
     """
+    searched_locations[:] = []
     matches = []
     for finder in get_finders():
         result = finder.find(path, all=all)

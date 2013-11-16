@@ -223,6 +223,35 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
         self.assertIn('project', force_text(lines[0]))
         self.assertIn('apps', force_text(lines[1]))
 
+    def test_all_files_more_verbose(self):
+        """
+        Test that findstatic returns all candidate files if run without --first and -v2.
+        Also, test that findstatic returns the searched locations with -v2.
+        """
+        out = six.StringIO()
+        call_command('findstatic', 'test/file.txt', verbosity=2, stdout=out)
+        out.seek(0)
+        lines = [l.strip() for l in out.readlines()]
+        self.assertIn('project', force_text(lines[1]))
+        self.assertIn('apps', force_text(lines[2]))
+        self.assertIn("Looking in the following locations:", force_text(lines[3]))
+        searched_locations = ', '.join(lines[4:])
+        #AppDirectoriesFinder searched locations
+        self.assertIn(os.path.join('staticfiles_tests', 'apps', 'test', 'static'),
+                      searched_locations)
+        self.assertIn(os.path.join('staticfiles_tests', 'apps', 'no_label', 'static'),
+                      searched_locations)
+        self.assertIn(os.path.join('django', 'contrib', 'admin', 'static'),
+                      searched_locations)
+        self.assertIn(os.path.join('django', 'tests', 'servers', 'another_app', 'static'),
+                      searched_locations)
+        #FileSystemFinder searched locations
+        self.assertIn(TEST_SETTINGS['STATICFILES_DIRS'][1][1], searched_locations)
+        self.assertIn(TEST_SETTINGS['STATICFILES_DIRS'][0], searched_locations)
+        #DefaultStorageFinder searched locations
+        self.assertIn(os.path.join('staticfiles_tests', 'project', 'site_media', 'media'),
+                      searched_locations)
+
 
 class TestConfiguration(StaticFilesTestCase):
     def test_location_empty(self):
@@ -779,6 +808,9 @@ class TestDefaultStorageFinder(StaticFilesTestCase, FinderTestCase):
         self.find_all = ('media-file.txt', [test_file_path])
 
 
+@override_settings(STATICFILES_FINDERS=
+                   ('django.contrib.staticfiles.finders.FileSystemFinder',),
+                   STATICFILES_DIRS=[os.path.join(TEST_ROOT, 'project', 'documents')])
 class TestMiscFinder(TestCase):
     """
     A few misc finder tests.
@@ -804,6 +836,11 @@ class TestMiscFinder(TestCase):
         cache_info = finders.get_finder.cache_info()
         self.assertEqual(cache_info.hits, 9)
         self.assertEqual(cache_info.currsize, 1)
+
+    def test_searched_locations(self):
+        finders.find('spam')
+        self.assertEqual(finders.searched_locations,
+                         [os.path.join(TEST_ROOT, 'project', 'documents')])
 
     @override_settings(STATICFILES_DIRS='a string')
     def test_non_tuple_raises_exception(self):
