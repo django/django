@@ -167,7 +167,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         }
         response = self.client.post('/test_admin/%s/admin_views/article/add/' % self.urlbit, post_data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'dismissAddAnotherPopup')
+        self.assertContains(response, 'dismissAddRelatedObjectPopup')
         self.assertContains(response, 'title with a new\\u000Aline')
 
     # Post data for edit inline
@@ -1194,27 +1194,71 @@ class AdminViewPermissionsTest(TestCase):
 
             self.client.get('/test_admin/admin/logout/')
 
-    def testConditionallyShowAddSectionLink(self):
+    def testConditionallyShowAddLink(self):
         """
         The foreign key widget should only show the "add related" button if the
         user has permission to add that related item.
         """
-        # Set up and log in user.
-        url = '/test_admin/admin/admin_views/article/add/'
-        add_link_text = ' class="add-another"'
+        # Log in user.
         self.client.get('/test_admin/admin/')
         self.client.post('/test_admin/admin/', self.adduser_login)
-        # The add user can't add sections yet, so they shouldn't see the "add
+        # The user can't add sections yet, so they shouldn't see the "add
         # section" link.
+        url = '/test_admin/admin/admin_views/article/add/'
+        link_text = 'add_id_section'
         response = self.client.get(url)
-        self.assertNotContains(response, add_link_text)
-        # Allow the add user to add sections too. Now they can see the "add
+        self.assertNotContains(response, link_text)
+        # Allow the user to add sections too. Now they can see the "add
         # section" link.
-        add_user = User.objects.get(username='adduser')
+        user = User.objects.get(username='adduser')
         perm = get_perm(Section, get_permission_codename('add', Section._meta))
-        add_user.user_permissions.add(perm)
+        user.user_permissions.add(perm)
         response = self.client.get(url)
-        self.assertContains(response, add_link_text)
+        self.assertContains(response, link_text)
+
+    def testConditionallyShowChangeLink(self):
+        """
+        The foreign key widget should only show the "change related" button if
+        the user has permission to change that related item.
+        """
+        # Log in user.
+        self.client.get('/test_admin/admin/')
+        self.client.post('/test_admin/admin/', self.adduser_login)
+        # The user can't change sections yet, so they shouldn't see the
+        # "change section" link.
+        url = '/test_admin/admin/admin_views/article/add/'
+        link_text = 'change_id_section'
+        response = self.client.get(url)
+        self.assertNotContains(response, link_text)
+        # Allow the user to change sections. Now they can see the "change
+        # section" link.
+        user = User.objects.get(username='adduser')
+        perm = get_perm(Section, get_permission_codename('change', Section._meta))
+        user.user_permissions.add(perm)
+        response = self.client.get(url)
+        self.assertContains(response, link_text)
+
+    def testConditionallyShowDeleteLink(self):
+        """
+        The foreign key widget should only show the "delete related" button if
+        the user has permission to delete that related item.
+        """
+        # Log in user.
+        self.client.get('/test_admin/admin/')
+        self.client.post('/test_admin/admin/', self.adduser_login)
+        # The user can't delete sections yet, so they shouldn't see the
+        # "delete section" link.
+        url = '/test_admin/admin/admin_views/article/add/'
+        link_text = 'delete_id_section'
+        response = self.client.get(url)
+        self.assertNotContains(response, link_text)
+        # Allow the user to delete sections. Now they can see the "delete
+        # section" link.
+        user = User.objects.get(username='adduser')
+        perm = get_perm(Section, get_permission_codename('delete', Section._meta))
+        user.user_permissions.add(perm)
+        response = self.client.get(url)
+        self.assertContains(response, link_text)
 
     def testCustomModelAdminTemplates(self):
         self.client.get('/test_admin/admin/')
@@ -3838,12 +3882,12 @@ class UserAdminTest(TestCase):
         self.assertEqual(adminform.form.errors['password2'],
             ["The two password fields didn't match."])
 
-    def test_user_fk_popup(self):
+    def test_user_fk_add_popup(self):
         """Quick user addition in a FK popup shouldn't invoke view for further user customization"""
         response = self.client.get('/test_admin/admin/admin_views/album/add/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '/test_admin/admin/auth/user/add')
-        self.assertContains(response, 'class="add-another" id="add_id_owner" onclick="return showAddAnotherPopup(this);"')
+        self.assertContains(response, 'class="related-widget-wrapper-link add-related" id="add_id_owner"')
         response = self.client.get('/test_admin/admin/auth/user/add/?_popup=1')
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'name="_continue"')
@@ -3857,7 +3901,52 @@ class UserAdminTest(TestCase):
         }
         response = self.client.post('/test_admin/admin/auth/user/add/?_popup=1', data, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'dismissAddAnotherPopup')
+        self.assertContains(response, 'dismissAddRelatedObjectPopup')
+
+    def test_user_fk_change_popup(self):
+        """Quick user change in a FK popup shouldn't invoke view for further user customization"""
+        response = self.client.get('/test_admin/admin/admin_views/album/add/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '/test_admin/admin/auth/user/__pk__/')
+        self.assertContains(response, 'class="related-widget-wrapper-link change-related" id="change_id_owner"')
+        user = User.objects.get(username='changeuser')
+        url = "/test_admin/admin/auth/user/%s/?_popup=1" % user.pk
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'name="_continue"')
+        self.assertNotContains(response, 'name="_addanother"')
+        data = {
+            'username': 'newuser',
+            'password1': 'newpassword',
+            'password2': 'newpassword',
+            'last_login_0': '2007-05-30',
+            'last_login_1': '13:20:10',
+            'date_joined_0': '2007-05-30',
+            'date_joined_1': '13:20:10',
+            '_popup': '1',
+            '_save': '1',
+        }
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'dismissChangeRelatedObjectPopup')
+
+    def test_user_fk_delete_popup(self):
+        """Quick user deletion in a FK popup shouldn't invoke view for further user customization"""
+        response = self.client.get('/test_admin/admin/admin_views/album/add/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '/test_admin/admin/auth/user/__pk__/delete/')
+        self.assertContains(response, 'class="related-widget-wrapper-link change-related" id="change_id_owner"')
+        user = User.objects.get(username='changeuser')
+        url = "/test_admin/admin/auth/user/%s/delete/?_popup=1" % user.pk
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = {
+            'post': 'yes',
+            '_popup': '1',
+        }
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'dismissDeleteRelatedObjectPopup')
 
     def test_save_add_another_button(self):
         user_count = User.objects.count()

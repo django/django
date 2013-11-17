@@ -53,7 +53,7 @@ class AdminCustomUrlsTest(TestCase):
         }
         response = self.client.post('/custom_urls/admin/admin_custom_urls/action/!add/', post_data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'dismissAddAnotherPopup')
+        self.assertContains(response, 'dismissAddRelatedObjectPopup')
         self.assertContains(response, 'Action added through a popup')
 
     def testAdminUrlsNoClash(self):
