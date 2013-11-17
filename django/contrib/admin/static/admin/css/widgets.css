@@ -576,3 +576,13 @@ ul.orderer li.deleted:hover, ul.orderer li.deleted a.selector:hover {
     font-size: 11px;
     border-top: 1px solid #ddd;
 }
+
+/* RELATED WIDGET WRAPPER */
+
+.related-widget-wrapper-link {
+    opacity: 0.3;
+}
+
+.related-widget-wrapper-link:link {
+    opacity: 1;
+}

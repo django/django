@@ -8,8 +8,10 @@ import copy
 from django import forms
 from django.contrib.admin.templatetags.admin_static import static
 from django.core.urlresolvers import reverse
-from django.forms.widgets import RadioFieldRenderer
+from django.db.models.deletion import CASCADE
+from django.forms.widgets import Media, RadioFieldRenderer
 from django.forms.utils import flatatt
+from django.template.loader import render_to_string
 from django.utils.html import escape, format_html, format_html_join, smart_urlquote
 from django.utils.text import Truncator
 from django.utils.translation import ugettext as _
@@ -232,7 +234,10 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     This class is a wrapper to a given widget to add the add icon for the
     admin interface.
     """
-    def __init__(self, widget, rel, admin_site, can_add_related=None):
+    template = 'admin/related_widget_wrapper.html'
+
+    def __init__(self, widget, rel, admin_site, can_add_related=None,
+                 can_change_related=False, can_delete_related=False):
         self.needs_multipart_form = widget.needs_multipart_form
         self.attrs = widget.attrs
         self.choices = widget.choices
@@ -243,6 +248,12 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         if can_add_related is None:
             can_add_related = rel.to in admin_site._registry
         self.can_add_related = can_add_related
+        # XXX: The UX does not support multiple selected values.
+        multiple = getattr(widget, 'allow_multiple_selected', False)
+        self.can_change_related = not multiple and can_change_related
+        # XXX: The deletion UX can be confusing when dealing with cascading deletion.
+        cascade = getattr(rel, 'on_delete', None) is CASCADE
+        self.can_delete_related = not multiple and not cascade and can_delete_related
         # so we can check if the related object is registered with this AdminSite
         self.admin_site = admin_site
 
@@ -259,22 +270,47 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
     @property
     def media(self):
-        return self.widget.media
+        media = Media(js=['admin/js/related-widget-wrapper.js'])
+        return self.widget.media + media
+
+    def get_related_url(self, info, action, *args):
+        return reverse("admin:%s_%s_%s" % (info + (action,)),
+                       current_app=self.admin_site.name, args=args)
 
     def render(self, name, value, *args, **kwargs):
-        from django.contrib.admin.views.main import TO_FIELD_VAR
+        from django.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR
+        rel_opts = self.rel.to._meta
+        info = (rel_opts.app_label, rel_opts.model_name)
         self.widget.choices = self.choices
-        output = [self.widget.render(name, value, *args, **kwargs)]
+        url_params = '&'.join("%s=%s" % param for param in [
+            (TO_FIELD_VAR, self.rel.get_related_field().name),
+            (IS_POPUP_VAR, 1),
+        ])
+        context = {
+            'widget': self.widget.render(name, value, *args, **kwargs),
+            'name': name,
+            'url_params': url_params,
+            'model': rel_opts.verbose_name,
+        }
+        if self.can_change_related:
+            change_related_template_url = self.get_related_url(info, 'change', '__fk__')
+            context.update(
+                can_change_related=True,
+                change_related_template_url=change_related_template_url,
+            )
         if self.can_add_related:
-            rel_to = self.rel.to
-            info = (rel_to._meta.app_label, rel_to._meta.model_name)
-            related_url = reverse('admin:%s_%s_add' % info, current_app=self.admin_site.name)
-            url_params = '?%s=%s' % (TO_FIELD_VAR, self.rel.get_related_field().name)
-            # TODO: "add_id_" is hard-coded here. This should instead use the
-            # correct API to determine the ID dynamically.
-            output.append('<a href="%s%s" class="add-another" id="add_id_%s" title="%s"></a>'
-                          % (related_url, url_params, name, _('Add Another')))
-        return mark_safe(''.join(output))
+            add_related_url = self.get_related_url(info, 'add')
+            context.update(
+                can_add_related=True,
+                add_related_url=add_related_url,
+            )
+        if self.can_delete_related:
+            delete_related_template_url = self.get_related_url(info, 'delete', '__fk__')
+            context.update(
+                can_delete_related=True,
+                delete_related_template_url=delete_related_template_url,
+            )
+        return mark_safe(render_to_string(self.template, context))
 
     def build_attrs(self, extra_attrs=None, **kwargs):
         "Helper function for building an attribute dictionary."
