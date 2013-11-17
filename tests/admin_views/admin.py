@@ -53,6 +53,7 @@ callable_year.admin_order_field = 'date'
 
 class ArticleInline(admin.TabularInline):
     model = Article
+    fk_name = 'section'
     prepopulated_fields = {
         'title': ('content',)
     }
@@ -93,7 +94,7 @@ class ArticleAdmin(admin.ModelAdmin):
         }),
         ('Some other fields', {
             'classes': ('wide',),
-            'fields': ('date', 'section')
+            'fields': ('date', 'section', 'sub_section')
         })
     )
 

@@ -1736,7 +1736,7 @@ templates used by the :class:`ModelAdmin` views:
     been saved. You can override it to change the default
     behavior after the object has been changed.
 
-.. method:: ModelAdmin.response_delete(request, obj_display)
+.. method:: ModelAdmin.response_delete(request, obj_display, obj_id)
 
     .. versionadded:: 1.7
 
@@ -1749,6 +1749,13 @@ templates used by the :class:`ModelAdmin` views:
 
     ``obj_display`` is a string with the name of the deleted
     object.
+
+    ``obj_id`` is the serialized identifier used to retrieve the object to be
+    deleted.
+
+    .. versionadded:: 1.8
+
+        The ``obj_id`` parameter was added.
 
 .. method:: ModelAdmin.get_changeform_initial_data(request)
 

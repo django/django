@@ -161,6 +161,9 @@ Minor features
   its value from :meth:`~django.contrib.admin.AdminSite.has_permission`,
   indicates whether the user may access the site.
 
+* Foreign key dropdowns now have buttons for changing or deleting related
+  objects using a popup.
+
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -913,6 +916,23 @@ those writing third-party backends in updating their code:
   ``data_type_check_constraints`` attributes have moved from the
   ``DatabaseCreation`` class to ``DatabaseWrapper``.
 
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ``AdminSite`` no longer takes an ``app_name`` argument and its ``app_name``
+  attribute has been removed. The application name is always ``admin`` (as
+  opposed to the instance name which you can still customize using
+  ``AdminSite(name="...")``.
+
+* The ``ModelAdmin.get_object()`` method (private API) now takes a third
+  argument named ``from_field`` in order to specify which field should match
+  the provided ``object_id``.
+
+* The :meth:`ModelAdmin.response_delete()
+  <django.contrib.admin.ModelAdmin.response_delete>` method
+  now takes a second argument named ``obj_id`` which is the serialized
+  identifier used to retrieve the object before deletion.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -944,11 +964,6 @@ Miscellaneous
   ``Meta.errors_messages['username']`` or, if you have a custom form field for
   ``'username'``, using the the ``'unique'`` key in its
   :attr:`~django.forms.Field.error_messages` argument.
-
-* ``AdminSite`` no longer takes an ``app_name`` argument and its ``app_name``
-  attribute has been removed. The application name is always ``admin`` (as
-  opposed to the instance name which you can still customize using
-  ``AdminSite(name="...")``.
 
 * The block ``usertools`` in the ``base.html`` template of
   :mod:`django.contrib.admin` now requires the ``has_permission`` context
