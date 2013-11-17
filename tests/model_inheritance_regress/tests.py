@@ -441,3 +441,9 @@ class ModelInheritanceTest(TestCase):
         # used in the qs and top contains direct pointer to the bottom model.
         qs = ItalianRestaurant.objects.values_list('serves_gnocchi').filter(name='foo')
         self.assertEqual(str(qs.query).count('JOIN'), 1)
+
+    def test_inheritance_resolve_columns(self):
+        Restaurant.objects.create(name='Bobs Cafe', address="Somewhere",
+                                  serves_pizza=True, serves_hot_dogs=True)
+        p = Place.objects.all().select_related('restaurant')[0]
+        self.assertIsInstance(p.restaurant.serves_pizza, bool)
