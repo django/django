@@ -22,3 +22,5 @@ Bug fixes
   raised an error (#21439).
 * Fixed a regression that prevented editable ``GenericRelation`` subclasses
   from working in ``ModelForms``.
+* Fixed ``django.contrib.humanize`` translations where the unicode sequence
+  for the non-breaking space was returned verbatim (#21415).
