@@ -355,30 +355,30 @@ class ModelAdminTests(TestCase):
         form = ma.get_form(request)()
 
         self.assertHTMLEqual(str(form["main_band"]),
-            '<select name="main_band" id="id_main_band">\n'
-            '<option value="" selected="selected">---------</option>\n'
-            '<option value="%d">The Beatles</option>\n'
-            '<option value="%d">The Doors</option>\n'
-            '</select>' % (band2.id, self.band.id))
+            '<div class="related-widget-wrapper">'
+            '<select name="main_band" id="id_main_band">'
+            '<option value="" selected="selected">---------</option>'
+            '<option value="%d">The Beatles</option>'
+            '<option value="%d">The Doors</option>'
+            '</select></div>' % (band2.id, self.band.id))
 
         class AdminConcertForm(forms.ModelForm):
-            pass
-
             def __init__(self, *args, **kwargs):
                 super(AdminConcertForm, self).__init__(*args, **kwargs)
                 self.fields["main_band"].queryset = Band.objects.filter(name='The Doors')
 
-        class ConcertAdmin(ModelAdmin):
+        class ConcertAdminWithForm(ModelAdmin):
             form = AdminConcertForm
 
-        ma = ConcertAdmin(Concert, self.site)
+        ma = ConcertAdminWithForm(Concert, self.site)
         form = ma.get_form(request)()
 
         self.assertHTMLEqual(str(form["main_band"]),
-            '<select name="main_band" id="id_main_band">\n'
-            '<option value="" selected="selected">---------</option>\n'
-            '<option value="%d">The Doors</option>\n'
-            '</select>' % self.band.id)
+            '<div class="related-widget-wrapper">'
+            '<select name="main_band" id="id_main_band">'
+            '<option value="" selected="selected">---------</option>'
+            '<option value="%d">The Doors</option>'
+            '</select></div>' % self.band.id)
 
     def test_regression_for_ticket_15820(self):
         """

@@ -510,6 +510,32 @@ class RelatedFieldWidgetWrapperTests(DjangoTestCase):
         w = widgets.RelatedFieldWidgetWrapper(w, rel, widget_admin_site)
         self.assertFalse(w.can_add_related)
 
+    def test_select_multiple_widget_cant_change_delete_related(self):
+        rel = models.Individual._meta.get_field('parent').rel
+        widget = forms.SelectMultiple()
+        wrapper = widgets.RelatedFieldWidgetWrapper(
+            widget, rel, widget_admin_site,
+            can_add_related=True,
+            can_change_related=True,
+            can_delete_related=True,
+        )
+        self.assertTrue(wrapper.can_add_related)
+        self.assertFalse(wrapper.can_change_related)
+        self.assertFalse(wrapper.can_delete_related)
+
+    def test_on_delete_cascade_rel_cant_delete_related(self):
+        rel = models.Individual._meta.get_field('soulmate').rel
+        widget = forms.Select()
+        wrapper = widgets.RelatedFieldWidgetWrapper(
+            widget, rel, widget_admin_site,
+            can_add_related=True,
+            can_change_related=True,
+            can_delete_related=True,
+        )
+        self.assertTrue(wrapper.can_add_related)
+        self.assertTrue(wrapper.can_change_related)
+        self.assertFalse(wrapper.can_delete_related)
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF='admin_widgets.urls')
@@ -1134,9 +1160,27 @@ class RelatedFieldWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         # The field now contains the new user
         self.wait_for('#id_user option[value="newuser"]')
 
+        # Click the Change User button to change it
+        self.selenium.find_element_by_id('change_id_user').click()
+        self.selenium.switch_to_window('id_user')
+        self.wait_page_loaded()
+
+        username_field = self.selenium.find_element_by_id('id_username')
+        username_value = 'changednewuser'
+        username_field.clear()
+        username_field.send_keys(username_value)
+
+        save_button_css_selector = '.submit-row > input[type=submit]'
+        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.selenium.switch_to_window(main_window)
+        # Wait up to 2 seconds for the new option to show up after clicking save in the popup.
+        self.selenium.implicitly_wait(2)
+        self.selenium.find_element_by_css_selector('#id_user option[value=changednewuser]')
+        self.selenium.implicitly_wait(0)
+
         # Go ahead and submit the form to make sure it works
         self.selenium.find_element_by_css_selector(save_button_css_selector).click()
-        self.wait_for_text('li.success', 'The profile "newuser" was added successfully.')
+        self.wait_for_text('li.success', 'The profile "changednewuser" was added successfully.')
         profiles = models.Profile.objects.all()
         self.assertEqual(len(profiles), 1)
         self.assertEqual(profiles[0].user.username, username_value)
