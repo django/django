@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-18 23:10+0200\n"
-"PO-Revision-Date: 2013-08-18 23:28+0000\n"
-"Last-Translator: Primož Verdnik <primoz.verdnik@gmail.com>\n"
+"POT-Creation-Date: 2013-11-15 15:36+0100\n"
+"PO-Revision-Date: 2013-11-17 21:10+0000\n"
+"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: Slovenian (http://www.transifex.com/projects/p/django/"
 "language/sl/)\n"
 "MIME-Version: 1.0\n"
@@ -293,35 +293,38 @@ msgstr "Pred %(delta)s"
 msgid "now"
 msgstr "zdaj"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:198
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:201
 #, python-format
 msgid "a second ago"
-msgid_plural "%(count)s\\u00a0seconds ago"
-msgstr[0] "pred %(count)s\\u00a0sekundo"
-msgstr[1] "pred %(count)s\\u00a0sekundama"
-msgstr[2] "pred %(count)s\\u00a0sekundami"
-msgstr[3] "pred %(count)s\\u00a0sekundami"
+msgid_plural "%(count)s seconds ago"
+msgstr[0] "pred %(count)s sekundo"
+msgstr[1] "pred %(count)s sekundama"
+msgstr[2] "pred %(count)s sekundami"
+msgstr[3] "pred %(count)s sekundami"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:204
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:208
 #, python-format
 msgid "a minute ago"
-msgid_plural "%(count)s\\u00a0minutes ago"
-msgstr[0] "pred %(count)s\\u00a0minuto"
-msgstr[1] "pred %(count)s\\u00a0minutama"
-msgstr[2] "pred %(count)s\\u00a0minutami"
-msgstr[3] "pred %(count)s\\u00a0minutami"
+msgid_plural "%(count)s minutes ago"
+msgstr[0] "pred %(count)s minuto"
+msgstr[1] "pred %(count)s minutama"
+msgstr[2] "pred %(count)s minutami"
+msgstr[3] "pred %(count)s minutami"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:210
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:215
 #, python-format
 msgid "an hour ago"
-msgid_plural "%(count)s\\u00a0hours ago"
-msgstr[0] "pred %(count)s\\u00a0uro"
-msgstr[1] "pred %(count)s\\u00a0urama"
-msgstr[2] "pred %(count)s\\u00a0urami"
-msgstr[3] "pred %(count)s\\u00a0urami"
+msgid_plural "%(count)s hours ago"
+msgstr[0] "pred %(count)s uro"
+msgstr[1] "pred %(count)s urama"
+msgstr[2] "pred %(count)s urami"
+msgstr[3] "pred %(count)s urami"
 
 #: templatetags/humanize.py:216
 #, python-format
@@ -329,32 +332,35 @@ msgctxt "naturaltime"
 msgid "%(delta)s from now"
 msgstr "čez %(delta)s"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:223
-#, python-format
-msgid "a second from now"
-msgid_plural "%(count)s\\u00a0seconds from now"
-msgstr[0] "čez %(count)s\\u00a0sekundo"
-msgstr[1] "čez %(count)s\\u00a0sekundi"
-msgstr[2] "čez %(count)s\\u00a0sekunde"
-msgstr[3] "čez %(count)s\\u00a0sekund"
-
-#. Translators: \\u00a0 is non-breaking space
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
 #: templatetags/humanize.py:229
 #, python-format
-msgid "a minute from now"
-msgid_plural "%(count)s\\u00a0minutes from now"
-msgstr[0] "čez %(count)s\\u00a0minuto"
-msgstr[1] "čez %(count)s\\u00a0minuti"
-msgstr[2] "čez %(count)s\\u00a0minute"
-msgstr[3] "čez %(count)s\\u00a0minut"
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] "čez %(count)s sekundo"
+msgstr[1] "čez %(count)s sekundi"
+msgstr[2] "čez %(count)s sekunde"
+msgstr[3] "čez %(count)s sekund"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:235
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:236
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s minutes from now"
+msgstr[0] "čez %(count)s minuto"
+msgstr[1] "čez %(count)s minuti"
+msgstr[2] "čez %(count)s minute"
+msgstr[3] "čez %(count)s minut"
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:243
 #, python-format
 msgid "an hour from now"
-msgid_plural "%(count)s\\u00a0hours from now"
-msgstr[0] "čez %(count)s\\u00a0uro"
-msgstr[1] "čez %(count)s\\u00a0uri"
-msgstr[2] "čez %(count)s\\u00a0ure"
-msgstr[3] "čez %(count)s\\u00a0ur"
+msgid_plural "%(count)s hours from now"
+msgstr[0] "čez %(count)s uro"
+msgstr[1] "čez %(count)s uri"
+msgstr[2] "čez %(count)s ure"
+msgstr[3] "čez %(count)s ur"

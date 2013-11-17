@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-18 23:10+0200\n"
-"PO-Revision-Date: 2013-05-19 08:23+0000\n"
-"Last-Translator: claudep <claude@2xlibre.net>\n"
+"POT-Creation-Date: 2013-11-15 15:36+0100\n"
+"PO-Revision-Date: 2013-11-16 09:36+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Burmese (http://www.transifex.com/projects/p/django/language/"
 "my/)\n"
 "MIME-Version: 1.0\n"
@@ -223,25 +223,28 @@ msgstr "%(delta)s အခါက"
 msgid "now"
 msgstr "ယခု"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:198
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:201
 #, python-format
 msgid "a second ago"
-msgid_plural "%(count)s\\u00a0seconds ago"
+msgid_plural "%(count)s seconds ago"
 msgstr[0] "%(count)s စက္ကန့်များအခါက"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:204
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:208
 #, python-format
 msgid "a minute ago"
-msgid_plural "%(count)s\\u00a0minutes ago"
+msgid_plural "%(count)s minutes ago"
 msgstr[0] "%(count)s မိနစ်များအခါက"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:210
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:215
 #, python-format
 msgid "an hour ago"
-msgid_plural "%(count)s\\u00a0hours ago"
+msgid_plural "%(count)s hours ago"
 msgstr[0] "%(count)s နာရီများအခါက"
 
 #: templatetags/humanize.py:216
@@ -250,23 +253,26 @@ msgctxt "naturaltime"
 msgid "%(delta)s from now"
 msgstr "%(delta)s ယခုမှ"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:223
-#, python-format
-msgid "a second from now"
-msgid_plural "%(count)s\\u00a0seconds from now"
-msgstr[0] "ယခုမှ %(count)s စက္ကန့်များ"
-
-#. Translators: \\u00a0 is non-breaking space
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
 #: templatetags/humanize.py:229
 #, python-format
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] "ယခုမှ %(count)s စက္ကန့်များ"
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:236
+#, python-format
 msgid "a minute from now"
-msgid_plural "%(count)s\\u00a0minutes from now"
+msgid_plural "%(count)s minutes from now"
 msgstr[0] "ယခုမှ %(count)s မိနစ်များ"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:235
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:243
 #, python-format
 msgid "an hour from now"
-msgid_plural "%(count)s\\u00a0hours from now"
+msgid_plural "%(count)s hours from now"
 msgstr[0] "ယခုမှ %(count)s နာရီများ"

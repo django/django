@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-18 23:10+0200\n"
-"PO-Revision-Date: 2013-10-23 16:20+0000\n"
-"Last-Translator: Simonas Kazlauskas <simonas@kazlauskas.me>\n"
+"POT-Creation-Date: 2013-11-15 15:36+0100\n"
+"PO-Revision-Date: 2013-11-17 20:50+0000\n"
+"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/projects/p/django/"
 "language/lt/)\n"
 "MIME-Version: 1.0\n"
@@ -268,32 +268,35 @@ msgstr "prieš %(delta)s"
 msgid "now"
 msgstr "dabar"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:198
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:201
 #, python-format
 msgid "a second ago"
-msgid_plural "%(count)s\\u00a0seconds ago"
-msgstr[0] "prieš\\u00a0%(count)s\\u00a0sekundę"
-msgstr[1] "prieš\\u00a0%(count)s\\u00a0sekundes"
-msgstr[2] "prieš\\u00a0%(count)s\\u00a0sekundžių"
+msgid_plural "%(count)s seconds ago"
+msgstr[0] "prieš %(count)s sekundę"
+msgstr[1] "prieš %(count)s sekundes"
+msgstr[2] "prieš %(count)s sekundžių"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:204
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:208
 #, python-format
 msgid "a minute ago"
-msgid_plural "%(count)s\\u00a0minutes ago"
-msgstr[0] "prieš\\u00a0%(count)s\\u00a0minutę"
-msgstr[1] "prieš\\u00a0%(count)s\\u00a0minutes"
-msgstr[2] "prieš\\u00a0%(count)s\\u00a0minučių"
+msgid_plural "%(count)s minutes ago"
+msgstr[0] "prieš %(count)s minutę"
+msgstr[1] "prieš %(count)s minutes"
+msgstr[2] "prieš %(count)s minučių"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:210
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:215
 #, python-format
 msgid "an hour ago"
-msgid_plural "%(count)s\\u00a0hours ago"
-msgstr[0] "prieš\\u00a0%(count)s\\u00a0valandą"
-msgstr[1] "prieš\\u00a0%(count)s\\u00a0valandas"
-msgstr[2] "prieš\\u00a0%(count)s\\u00a0valandų"
+msgid_plural "%(count)s hours ago"
+msgstr[0] "prieš %(count)s valandą"
+msgstr[1] "prieš %(count)s valandas"
+msgstr[2] "prieš %(count)s valandų"
 
 #: templatetags/humanize.py:216
 #, python-format
@@ -301,29 +304,32 @@ msgctxt "naturaltime"
 msgid "%(delta)s from now"
 msgstr "%(delta)s nuo dabar"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:223
-#, python-format
-msgid "a second from now"
-msgid_plural "%(count)s\\u00a0seconds from now"
-msgstr[0] "%(count)s\\u00a0sekundė nuo dabar"
-msgstr[1] "%(count)s\\u00a0sekundės nuo dabar"
-msgstr[2] "%(count)s\\u00a0sekundžių nuo dabar"
-
-#. Translators: \\u00a0 is non-breaking space
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
 #: templatetags/humanize.py:229
 #, python-format
-msgid "a minute from now"
-msgid_plural "%(count)s\\u00a0minutes from now"
-msgstr[0] "%(count)s\\u00a0minutė nuo dabar"
-msgstr[1] "%(count)s\\u00a0minutės nuo dabar"
-msgstr[2] "%(count)s\\u00a0minučių nuo dabar"
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] "%(count)s sekundė nuo dabar"
+msgstr[1] "%(count)s sekundės nuo dabar"
+msgstr[2] "%(count)s sekundžių nuo dabar"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:235
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:236
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s minutes from now"
+msgstr[0] "%(count)s minutė nuo dabar"
+msgstr[1] "%(count)s minutės nuo dabar"
+msgstr[2] "%(count)s minučių nuo dabar"
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:243
 #, python-format
 msgid "an hour from now"
-msgid_plural "%(count)s\\u00a0hours from now"
-msgstr[0] "%(count)s\\u00a0valanda nuo dabar"
-msgstr[1] "%(count)s\\u00a0valandos nuo dabar"
-msgstr[2] "%(count)s\\u00a0valandų nuo dabar"
+msgid_plural "%(count)s hours from now"
+msgstr[0] "%(count)s valanda nuo dabar"
+msgstr[1] "%(count)s valandos nuo dabar"
+msgstr[2] "%(count)s valandų nuo dabar"

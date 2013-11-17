@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# claudep <claude@2xlibre.net>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Marian Andre <marian@andre.sk>, 2012-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-18 23:10+0200\n"
-"PO-Revision-Date: 2013-06-16 12:42+0000\n"
-"Last-Translator: Marian Andre <marian@andre.sk>\n"
+"POT-Creation-Date: 2013-11-15 15:36+0100\n"
+"PO-Revision-Date: 2013-11-17 20:08+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
 "Language-Team: Slovak (http://www.transifex.com/projects/p/django/language/"
 "sk/)\n"
 "MIME-Version: 1.0\n"
@@ -268,32 +269,35 @@ msgstr "pred %(delta)s"
 msgid "now"
 msgstr "teraz"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:198
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:201
 #, python-format
 msgid "a second ago"
-msgid_plural "%(count)s\\u00a0seconds ago"
+msgid_plural "%(count)s seconds ago"
 msgstr[0] "pred sekundou"
-msgstr[1] "pred %(count)s sekundami"
-msgstr[2] "pred %(count)s sekundami"
+msgstr[1] "pred %(count)s sekundami"
+msgstr[2] "pred %(count)s sekundami"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:204
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:208
 #, python-format
 msgid "a minute ago"
-msgid_plural "%(count)s\\u00a0minutes ago"
+msgid_plural "%(count)s minutes ago"
 msgstr[0] "pred minútou"
-msgstr[1] "pred %(count)s minútami"
-msgstr[2] "pred %(count)s minútami"
+msgstr[1] "pred %(count)s minútami"
+msgstr[2] "pred %(count)s minútami"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:210
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:215
 #, python-format
 msgid "an hour ago"
-msgid_plural "%(count)s\\u00a0hours ago"
+msgid_plural "%(count)s hours ago"
 msgstr[0] "pred hodinou"
-msgstr[1] "pred %(count)s hodinami"
-msgstr[2] "pred %(count)s hodinami"
+msgstr[1] "pred %(count)s hodinami"
+msgstr[2] "pred %(count)s hodinami"
 
 #: templatetags/humanize.py:216
 #, python-format
@@ -301,29 +305,32 @@ msgctxt "naturaltime"
 msgid "%(delta)s from now"
 msgstr "%(delta)s odteraz"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:223
-#, python-format
-msgid "a second from now"
-msgid_plural "%(count)s\\u00a0seconds from now"
-msgstr[0] "sekundu odteraz"
-msgstr[1] "%(count)s sekundy odteraz"
-msgstr[2] "%(count)s sekúnd odteraz"
-
-#. Translators: \\u00a0 is non-breaking space
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
 #: templatetags/humanize.py:229
 #, python-format
-msgid "a minute from now"
-msgid_plural "%(count)s\\u00a0minutes from now"
-msgstr[0] "minútu odteraz"
-msgstr[1] "%(count)s minúty odteraz"
-msgstr[2] "%(count)s minút odteraz"
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] "sekundu odteraz"
+msgstr[1] "%(count)s sekundy odteraz"
+msgstr[2] "%(count)s sekúnd odteraz"
 
-#. Translators: \\u00a0 is non-breaking space
-#: templatetags/humanize.py:235
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:236
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s minutes from now"
+msgstr[0] "minútu odteraz"
+msgstr[1] "%(count)s minúty odteraz"
+msgstr[2] "%(count)s minút odteraz"
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: templatetags/humanize.py:243
 #, python-format
 msgid "an hour from now"
-msgid_plural "%(count)s\\u00a0hours from now"
+msgid_plural "%(count)s hours from now"
 msgstr[0] "hodinu odteraz"
-msgstr[1] "%(count)s hodiny odteraz"
-msgstr[2] "%(count)s hodín odteraz"
+msgstr[1] "%(count)s\\u00a0hodiny odteraz"
+msgstr[2] "%(count)s hodín odteraz"
