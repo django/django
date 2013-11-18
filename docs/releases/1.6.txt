@@ -807,10 +807,18 @@ For backwards compatibility, this setting defaulted to using :mod:`pickle`
 in Django 1.5.3, but we've changed the default to JSON in 1.6. If you upgrade
 and switch from pickle to JSON, sessions created before the upgrade will be
 lost. While JSON serialization does not support all Python objects like
-:mod:`pickle` does, we highly recommend using JSON-serialized sessions. Also,
-as JSON requires string keys, you will likely run into problems if you are
-using non-string keys in ``request.session``. See the
-:ref:`session_serialization` documentation for more details.
+:mod:`pickle` does, we highly recommend using JSON-serialized sessions. Be
+aware of the following when checking your code to determine if JSON
+serialization will work for your application:
+
+* JSON requires string keys, so you will likely run into problems if you are
+  using non-string keys in ``request.session``.
+* Setting session expiration by passing ``datetime`` values to
+  :meth:`~django.contrib.sessions.backends.base.SessionBase.set_expiry` will
+  not work as ``datetime`` values are not serializable in JSON. You can use
+  integer values instead.
+
+See the :ref:`session_serialization` documentation for more details.
 
 Object Relational Mapper changes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
