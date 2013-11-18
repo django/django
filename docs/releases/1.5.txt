@@ -709,6 +709,10 @@ Miscellaneous
   escapes its ``contents`` argument. To avoid the HTML escaping, use
   :func:`django.utils.safestring.mark_safe` on the argument before passing it.
 
+* Accessing reverse one-to-one relations fetched via
+  :meth:`~django.db.models.query.QuerySet.select_related` now raises
+  :exc:`~django.core.exceptions.DoesNotExist` instead of returning ``None``.
+
 Features deprecated in 1.5
 ==========================
 
