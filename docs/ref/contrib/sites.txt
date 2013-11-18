@@ -377,6 +377,23 @@ your admin site to have access to all objects (not just site-specific
 ones), put ``objects = models.Manager()`` in your model, before you
 define :class:`~django.contrib.sites.managers.CurrentSiteManager`.
 
+Site middleware
+===============
+
+If you often use this pattern::
+
+    from django.contrib.sites.models import Site
+
+    def my_view(request):
+        site = Site.objects.get_current()
+        ...
+
+there is simple way to avoid repetitions. Add
+:mod:`django.contrib.site.middleware.SiteMiddleware` to
+:setting:`MIDDLEWARE_CLASSES`. The middleware sets ``site`` attribute to every
+incoming request object, so you can just type ``request.site`` to get the
+site.
+
 How Django uses the sites framework
 ===================================
 

@@ -179,6 +179,20 @@ Session middleware
 Enables session support. See the :doc:`session documentation
 </topics/http/sessions>`.
 
+Site middleware
+---------------
+
+.. module:: django.contrib.site.middleware
+  :synopsis: Site middleware.
+
+.. class:: SiteMiddleware
+
+.. versionadded:: 1.7
+
+Adds the ``site`` attribute representing the current site to every incoming
+``HttpRequest`` object. See the :doc:`sites documentation
+</ref/contrib/sites>`.
+
 Authentication middleware
 -------------------------
 
