@@ -358,6 +358,12 @@ Minor features
   :class:`~django.middleware.http.ConditionalGetMiddleware` to handle
   conditional ``GET`` requests for sitemaps which set ``lastmod``.
 
+:mod:`django.contrib.sites`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The new :class:`django.contrib.site.middleware.CurrentSiteMiddleware` allows
+  setting the current site on each request.
+
 :mod:`django.contrib.staticfiles`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
