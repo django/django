@@ -3,7 +3,7 @@
 
 {% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/login.css" %}" />{% endblock %}
 
-{% block bodyclass %}login{% endblock %}
+{% block bodyclass %}login {{ block.super }}{% endblock %}
 
 {% block nav-global %}{% endblock %}
 
