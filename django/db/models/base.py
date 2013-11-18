@@ -265,6 +265,7 @@ class ModelBase(type):
             # little differently from normal models.
             attr_meta.abstract = False
             new_class.Meta = attr_meta
+            signals.class_prepared.send(sender=new_class)
             return new_class
 
         new_class._prepare()

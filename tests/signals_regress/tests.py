@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.test import TestCase
 
-from .models import Author, Book
+from .models import Author, Book, SomethingAbstract, NotAbstract
 
 
 class SignalsRegressTests(TestCase):
@@ -93,3 +93,7 @@ class SignalsRegressTests(TestCase):
         self.get_signal_output(a1.save)
         self.assertEqual(self.get_signal_output(setattr, b1, 'authors', [a1]), [])
         self.assertEqual(self.get_signal_output(setattr, b1, 'authors', []), [])
+
+    def test_class_prepared_signal(self):
+        self.assertTrue(SomethingAbstract._meta.class_prepared_signal_fired)
+        self.assertTrue(NotAbstract._meta.class_prepared_signal_fired)
