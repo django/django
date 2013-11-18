@@ -175,12 +175,6 @@ class Command(BaseCommand):
         cmp_fmts = list(self.compression_formats.keys()) if cmp_fmt is None else [cmp_fmt]
         ser_fmts = serializers.get_public_serializer_formats() if ser_fmt is None else [ser_fmt]
 
-        # Check kept for backwards-compatibility; it doesn't look very useful.
-        if '.' in os.path.basename(fixture_name):
-            raise CommandError(
-                "Problem installing fixture '%s': %s is not a known "
-                "serialization format." % tuple(fixture_name.rsplit('.')))
-
         if self.verbosity >= 2:
             self.stdout.write("Loading '%s' fixtures..." % fixture_name)
 
@@ -253,9 +247,14 @@ class Command(BaseCommand):
         else:
             cmp_fmt = None
 
-        if len(parts) > 1 and parts[-1] in self.serialization_formats:
-            ser_fmt = parts[-1]
-            parts = parts[:-1]
+        if len(parts) > 1:
+            if parts[-1] in self.serialization_formats:
+                ser_fmt = parts[-1]
+                parts = parts[:-1]
+            else:
+                raise CommandError(
+                    "Problem installing fixture '%s': %s is not a known "
+                    "serialization format." % (''.join(parts[:-1]), parts[-1]))
         else:
             ser_fmt = None
 

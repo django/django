@@ -24,3 +24,5 @@ Bug fixes
   from working in ``ModelForms``.
 * Fixed ``django.contrib.humanize`` translations where the unicode sequence
   for the non-breaking space was returned verbatim (#21415).
+* Fixed :djadmin:`loaddata` error when fixture file name contained any dots
+  non related to file extensions (#21457).
