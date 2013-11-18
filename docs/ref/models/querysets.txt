@@ -1923,6 +1923,12 @@ update a bunch of records for a model that has a custom
         e.comments_on = False
         e.save()
 
+.. versionadded:: 1.7
+
+The ``update()`` method emits the
+:data:`~django.db.models.signals.pre_update` and
+:data:`~django.db.models.signals.post_update` signals.
+
 delete
 ~~~~~~
 

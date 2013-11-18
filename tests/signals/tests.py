@@ -18,6 +18,8 @@ class SignalTests(TestCase):
             len(signals.post_save.receivers),
             len(signals.pre_delete.receivers),
             len(signals.post_delete.receivers),
+            len(signals.pre_update.receivers),
+            len(signals.post_update.receivers),
         )
 
     def tearDown(self):
@@ -27,6 +29,8 @@ class SignalTests(TestCase):
             len(signals.post_save.receivers),
             len(signals.pre_delete.receivers),
             len(signals.post_delete.receivers),
+            len(signals.pre_update.receivers),
+            len(signals.post_update.receivers),
         )
         self.assertEqual(self.pre_signals, post_signals)
 
@@ -139,6 +143,32 @@ class SignalTests(TestCase):
         finally:
             signals.pre_delete.disconnect(pre_delete_handler)
             signals.post_delete.disconnect(post_delete_handler)
+
+    def test_update_signals(self):
+        data = []
+
+        def pre_update_handler(signal, sender, queryset, using, update_fields):
+            data.append((list(queryset.values_list('pk', 'first_name', 'last_name')), update_fields))
+
+        def post_update_handler(signal, sender, pk_set, using, update_fields):
+            data.append((pk_set, update_fields))
+
+        p1 = Person.objects.create(first_name="John", last_name="Smith")
+        p2 = Person.objects.create(first_name="James", last_name="Jones")
+        Person.objects.create(first_name="Someone", last_name="Else")
+
+        signals.pre_update.connect(pre_update_handler, weak=False)
+        signals.post_update.connect(post_update_handler, weak=False)
+        try:
+            Person.objects.filter(first_name__startswith='J').order_by('last_name').update(first_name='Joe')
+
+            self.assertEqual(data, [
+                ([(p2.pk, 'James', 'Jones'), (p1.pk, 'John', 'Smith')], {'first_name': 'Joe'}),
+                ({p1.pk, p2.pk}, {'first_name': 'Joe'}),
+            ])
+        finally:
+            signals.pre_update.disconnect(pre_update_handler)
+            signals.post_update.disconnect(post_update_handler)
 
     def test_decorators(self):
         data = []

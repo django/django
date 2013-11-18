@@ -28,6 +28,12 @@ notifications:
   method or queryset's :meth:`~django.db.models.query.QuerySet.delete`
   method is called.
 
+* :data:`django.db.models.signals.pre_update` &
+  :data:`django.db.models.signals.post_update`
+
+  Sent before or after a queryset's :meth:`~django.db.models.query.QuerySet.update`
+  method is called.
+
 * :data:`django.db.models.signals.m2m_changed`
 
   Sent when a :class:`~django.db.models.ManyToManyField` on a model is changed.
