@@ -479,6 +479,41 @@ class RequestsTests(SimpleTestCase):
         with self.assertRaises(UnreadablePostError):
             request.FILES
 
+    def test_accessing_cookies_sets_cookies_accessed_flag(self):
+        request = HttpRequest()
+        request.COOKIES.get("testing")
+        self.assertTrue(request._cookies_accessed)
+
+    def test_set_cookie_sets_cookies_accessed_flag(self):
+        request = HttpRequest()
+        request.COOKIES["testing"] = "Testing"
+        self.assertTrue(request._cookies_accessed)
+
+    def test_response_set_cookie_sets_cookies_accessed_flag(self):
+        response = HttpResponse()
+        response.set_cookie('example')
+        self.assertTrue(response._cookies_accessed)
+
+    def test_accessing_cookies_with_wsgi_request(self):
+        payload = FakePayload('name=value')
+        request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+                               'CONTENT_LENGTH': len(payload),
+                               'wsgi.input': payload})
+        request.COOKIES.get("testing")
+        self.assertTrue(request._cookies_accessed)
+
+    def test_set_cookie_with_wsgi_request(self):
+        payload = FakePayload('name=value')
+        request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+                               'CONTENT_LENGTH': len(payload),
+                               'wsgi.input': payload})
+        request.COOKIES["testing"] = "Testing"
+        self.assertTrue(request._cookies_accessed)
+
+
+
 
 class HostValidationTests(SimpleTestCase):
     poisoned_hosts = [
