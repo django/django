@@ -277,9 +277,9 @@ msgstr "сейчас"
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
-msgstr[0] "%(count)s секунду назад"
-msgstr[1] "%(count)s секунды назад"
-msgstr[2] "%(count)s секунд назад"
+msgstr[0] "%(count)s секунду назад"
+msgstr[1] "%(count)s секунды назад"
+msgstr[2] "%(count)s секунд назад"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -287,9 +287,9 @@ msgstr[2] "%(count)s секунд назад"
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] "%(count)s минуту назад"
-msgstr[1] "%(count)s минуты назад"
-msgstr[2] "%(count)s минут назад"
+msgstr[0] "%(count)s минуту назад"
+msgstr[1] "%(count)s минуты назад"
+msgstr[2] "%(count)s минут назад"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -297,9 +297,9 @@ msgstr[2] "%(count)s минут назад"
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
-msgstr[0] "%(count)s час назад"
-msgstr[1] "%(count)s часа назад"
-msgstr[2] "%(count)s часов назад"
+msgstr[0] "%(count)s час назад"
+msgstr[1] "%(count)s часа назад"
+msgstr[2] "%(count)s часов назад"
 
 #: templatetags/humanize.py:216
 #, python-format
@@ -313,9 +313,9 @@ msgstr "через %(delta)s"
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
-msgstr[0] "через %(count)s секунду"
-msgstr[1] "через %(count)s секунды"
-msgstr[2] "через %(count)s секунд"
+msgstr[0] "через %(count)s секунду"
+msgstr[1] "через %(count)s секунды"
+msgstr[2] "через %(count)s секунд"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -323,9 +323,9 @@ msgstr[2] "через %(count)s секунд"
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
-msgstr[0] "через %(count)s минуту"
-msgstr[1] "через %(count)s минуты"
-msgstr[2] "через %(count)s минут"
+msgstr[0] "через %(count)s минуту"
+msgstr[1] "через %(count)s минуты"
+msgstr[2] "через %(count)s минут"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -333,6 +333,6 @@ msgstr[2] "через %(count)s минут"
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
-msgstr[0] "через %(count)s час"
-msgstr[1] "через %(count)s часа"
-msgstr[2] "через %(count)s часов"
+msgstr[0] "через %(count)s час"
+msgstr[1] "через %(count)s часа"
+msgstr[2] "через %(count)s часов"
