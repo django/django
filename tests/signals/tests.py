@@ -43,8 +43,8 @@ class SignalTests(TestCase):
                 (instance, kwargs.get("created"), kwargs.get("raw", False))
             )
 
-        signals.pre_save.connect(pre_save_handler)
-        signals.post_save.connect(post_save_handler)
+        signals.pre_save.connect(pre_save_handler, weak=False)
+        signals.post_save.connect(post_save_handler, weak=False)
         try:
             p1 = Person.objects.create(first_name="John", last_name="Smith")
 
@@ -85,8 +85,8 @@ class SignalTests(TestCase):
                 (p2, True, False),
             ])
         finally:
-            signals.post_delete.disconnect(pre_save_handler)
-            signals.pre_delete.disconnect(post_save_handler)
+            signals.pre_save.disconnect(pre_save_handler)
+            signals.post_save.disconnect(post_save_handler)
 
     def test_delete_signals(self):
         data = []
@@ -107,8 +107,8 @@ class SignalTests(TestCase):
                 )
         post_delete_handler = PostDeleteHandler(data)
 
-        signals.pre_delete.connect(pre_delete_handler)
-        signals.post_delete.connect(post_delete_handler)
+        signals.pre_delete.connect(pre_delete_handler, weak=False)
+        signals.post_delete.connect(post_delete_handler, weak=False)
         try:
             p1 = Person.objects.create(first_name="John", last_name="Smith")
             p1.delete()
@@ -137,17 +137,17 @@ class SignalTests(TestCase):
                 six.text_type
             )
         finally:
-            signals.post_delete.disconnect(pre_delete_handler)
-            signals.pre_delete.disconnect(post_delete_handler)
+            signals.pre_delete.disconnect(pre_delete_handler)
+            signals.post_delete.disconnect(post_delete_handler)
 
     def test_decorators(self):
         data = []
 
-        @receiver(signals.pre_save)
+        @receiver(signals.pre_save, weak=False)
         def decorated_handler(signal, sender, instance, **kwargs):
             data.append(instance)
 
-        @receiver(signals.pre_save, sender=Car)
+        @receiver(signals.pre_save, sender=Car, weak=False)
         def decorated_handler_with_sender_arg(signal, sender, instance, **kwargs):
             data.append(instance)
 
@@ -155,8 +155,8 @@ class SignalTests(TestCase):
             c1 = Car.objects.create(make="Volkswagon", model="Passat")
             self.assertEqual(data, [c1, c1])
         finally:
-            signals.post_delete.disconnect(decorated_handler)
-            signals.pre_delete.disconnect(decorated_handler_with_sender_arg, sender=Car)
+            signals.pre_save.disconnect(decorated_handler)
+            signals.pre_save.disconnect(decorated_handler_with_sender_arg, sender=Car)
 
     def test_save_and_delete_signals_with_m2m(self):
         data = []
@@ -177,17 +177,17 @@ class SignalTests(TestCase):
                 data.append('Is raw')
 
         def pre_delete_handler(signal, sender, instance, **kwargs):
-            data.append('pre_save signal, %s' % instance)
+            data.append('pre_delete signal, %s' % instance)
             data.append('instance.id is not None: %s' % (instance.id is not None))
 
         def post_delete_handler(signal, sender, instance, **kwargs):
             data.append('post_delete signal, %s' % instance)
             data.append('instance.id is not None: %s' % (instance.id is not None))
 
-        signals.pre_save.connect(pre_save_handler)
-        signals.post_save.connect(post_save_handler)
-        signals.pre_delete.connect(pre_delete_handler)
-        signals.post_delete.connect(post_delete_handler)
+        signals.pre_save.connect(pre_save_handler, weak=False)
+        signals.post_save.connect(post_save_handler, weak=False)
+        signals.pre_delete.connect(pre_delete_handler, weak=False)
+        signals.post_delete.connect(post_delete_handler, weak=False)
         try:
             a1 = Author.objects.create(name='Neal Stephenson')
             self.assertEqual(data, [
@@ -211,10 +211,10 @@ class SignalTests(TestCase):
             b1.authors = []
             self.assertEqual(data, [])
         finally:
-            signals.post_delete.disconnect(pre_save_handler)
-            signals.pre_delete.disconnect(post_save_handler)
-            signals.post_save.disconnect(pre_delete_handler)
-            signals.pre_save.disconnect(post_delete_handler)
+            signals.pre_save.disconnect(pre_save_handler)
+            signals.post_save.disconnect(post_save_handler)
+            signals.pre_delete.disconnect(pre_delete_handler)
+            signals.post_delete.disconnect(post_delete_handler)
 
     def test_disconnect_in_dispatch(self):
         """
@@ -232,8 +232,8 @@ class SignalTests(TestCase):
                 signal.disconnect(receiver=self, sender=sender)
 
         a, b = Handler(1), Handler(2)
-        signals.post_save.connect(sender=Person, receiver=a)
-        signals.post_save.connect(sender=Person, receiver=b)
+        signals.post_save.connect(a, sender=Person, weak=False)
+        signals.post_save.connect(b, sender=Person, weak=False)
         Person.objects.create(first_name='John', last_name='Smith')
 
         self.assertTrue(a._run)
