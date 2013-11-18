@@ -1,9 +1,46 @@
 import os
 
-from django.test import LiveServerTestCase
+from django.contrib import admin
+from django.contrib.admin.validation import ModelAdminValidator
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
+from django.core.exceptions import ImproperlyConfigured
+from django.db import models
+from django.test import LiveServerTestCase, TestCase
 from django.utils.module_loading import import_by_path
 from django.utils.unittest import SkipTest
 from django.utils.translation import ugettext as _
+
+
+class AdminGenericRelationTestCase(TestCase):
+
+    def test_generic_relation_fk_list_filter(self):
+        """
+        Validates a model with a generic relation to a model with
+        a foreign key can specify the generic+fk relationship
+        path as a list_filter. See trac #21428.
+        """
+
+        class FK(models.Model):
+            pass
+
+        class GenericWithFK(models.Model):
+            content_type = models.ForeignKey(ContentType)
+            object_id = models.PositiveIntegerField()
+            content_object = generic.GenericForeignKey('content_type', 'object_id')
+            fk_field = models.ForeignKey(FK)
+
+        class HasGeneric(models.Model):
+            generic = generic.GenericRelation(GenericWithFK)
+
+        class GenericFKAdmin(admin.ModelAdmin):
+            list_filter = ('generic__fk_field',)
+
+        validator = ModelAdminValidator()
+        try:
+            validator.validate_list_filter(GenericFKAdmin, HasGeneric)
+        except ImproperlyConfigured:
+            self.fail("Couldn't validate a GenericRelation -> FK path in ModelAdmin.list_filter")
 
 
 class AdminSeleniumWebDriverTestCase(LiveServerTestCase):
