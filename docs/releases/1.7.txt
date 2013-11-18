@@ -317,6 +317,10 @@ Forms
   return ``self.cleaned_data``. If it does return a changed dictionary then
   that will still be used.
 
+* After a temporary regression in Django 1.6, it's now possible again to make
+  :class:`~django.forms.TypedChoiceField` ``coerce`` method return an arbitrary
+  value.
+
 * :attr:`SelectDateWidget.months
   <django.forms.extras.widgets.SelectDateWidget.months>` can be used to
   customize the wording of the months displayed in the select widget.

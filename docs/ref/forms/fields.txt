@@ -375,7 +375,9 @@ For each field, we describe the default widget used if you don't specify
 
         A function that takes one argument and returns a coerced value. Examples
         include the built-in ``int``, ``float``, ``bool`` and other types. Defaults
-        to an identity function.
+        to an identity function. Note that coercion happens after input
+        validation, so it is possible to coerce to a value not present in
+        ``choices``.
 
     .. attribute:: empty_value
 
