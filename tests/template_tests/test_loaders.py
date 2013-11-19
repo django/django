@@ -189,3 +189,33 @@ class TemplateDirsOverrideTest(unittest.TestCase):
         for dirs in self.dirs_iter:
             template = loader.select_template(['test_dirs.html'], dirs=dirs)
             self.assertEqual(template.render(Context({})), 'spam eggs\n')
+
+
+@override_settings(
+    TEMPLATE_LOADERS=(
+        ('django.template.loaders.cached.Loader', (
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader',
+        )),
+    )
+)
+class PriorityCacheLoader(TestCase):
+    def test_basic(self):
+        """
+        Check that the order of template loader works. Refs #21460.
+        """
+        t1, name = loader.find_template('priority/foo.html')
+        self.assertEqual(t1.render(Context({})), 'priority\n')
+
+
+@override_settings(
+    TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',
+                      'django.template.loaders.app_directories.Loader',),
+)
+class PriorityLoader(TestCase):
+    def test_basic(self):
+        """
+        Check that the order of template loader works. Refs #21460.
+        """
+        t1, name = loader.find_template('priority/foo.html')
+        self.assertEqual(t1.render(Context({})), 'priority\n')
