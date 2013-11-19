@@ -53,6 +53,7 @@ class Loader(BaseLoader):
                     pass
                 else:
                     result = (template, make_origin(display_name, loader, name, dirs))
+                    break
         self.find_template_cache[key] = result
         if result:
             return result
