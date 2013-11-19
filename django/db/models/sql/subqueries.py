@@ -115,12 +115,14 @@ class UpdateQuery(Query):
     def update_batch(self, pk_list, values, using):
         pk_field = self.get_meta().pk
         self.add_update_values(values)
+        rows = 0
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
             self.where.add((Constraint(None, pk_field.column, pk_field), 'in',
                             pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]),
                            AND)
-            self.get_compiler(using).execute_sql(None)
+            rows += self.get_compiler(using).execute_sql(None)
+        return rows
 
     def add_update_values(self, values):
         """

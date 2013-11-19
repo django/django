@@ -570,25 +570,28 @@ class QuerySet(object):
         """
         assert self.query.can_filter(), \
                 "Cannot update a query once a slice has been taken."
+
         self._for_write = True
-
-        if signals.pre_update.has_listeners(self.model):
-            signals.pre_update.send(sender=self.model, queryset=self._clone(), using=self.db, update_fields=kwargs)
-
-        if signals.post_update.has_listeners(self.model):
-            pk_set = set(self.values_list('pk', flat=True))
-        else:
-            pk_set = None
-
-        query = self.query.clone(sql.UpdateQuery)
-        query.add_update_values(kwargs)
         with transaction.commit_on_success_unless_managed(using=self.db):
-            rows = query.get_compiler(self.db).execute_sql(None)
+            if signals.pre_update.has_listeners(self.model):
+                signals.pre_update.send(sender=self.model, queryset=self._clone(), using=self.db, update_fields=kwargs)
+            if signals.post_update.has_listeners(self.model):
+                pk_set = set(self.values_list('pk', flat=True))
+                if connections[self.db].features.query_parameter_limit is None:
+                    query = self.filter(pk__in=pk_set).query.clone(sql.UpdateQuery)
+                    query.add_update_values(kwargs)
+                    rows = query.get_compiler(self.db).execute_sql(None)
+                else:
+                    # Chunked update for SQLite.
+                    query = self.query.clone(sql.UpdateQuery)
+                    rows = query.update_batch(list(pk_set), kwargs, self.db)
+                signals.post_update.send(sender=self.model, pk_set=pk_set, using=self.db, update_fields=kwargs)
+            else:
+                query = self.query.clone(sql.UpdateQuery)
+                query.add_update_values(kwargs)
+                rows = query.get_compiler(self.db).execute_sql(None)
+
         self._result_cache = None
-
-        if pk_set is not None:
-            signals.post_update.send(sender=self.model, pk_set=pk_set, using=self.db, update_fields=kwargs)
-
         return rows
     update.alters_data = True
 

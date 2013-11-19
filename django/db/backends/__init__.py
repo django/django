@@ -608,7 +608,11 @@ class BaseDatabaseFeatures(object):
     nulls_order_largest = False
 
     # Is there a 1000 item limit on query parameters?
-    supports_1000_query_parameters = True
+    query_parameter_limit = None
+
+    @property
+    def supports_1000_query_parameters(self):
+        return self.query_parameter_limit is None
 
     # Can an object have a primary key of 0? MySQL says No.
     allows_primary_key_0 = True
