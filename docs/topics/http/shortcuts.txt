@@ -261,9 +261,10 @@ Required arguments
 ------------------
 
 ``klass``
-    A :class:`~django.db.models.Model`, :class:`~django.db.models.Manager` or
-    :class:`~django.db.models.query.QuerySet` instance from which to get the
-    object.
+    A :class:`~django.db.models.Model` class,
+    a :class:`~django.db.models.Manager`,
+    or a :class:`~django.db.models.query.QuerySet` instance from which to get
+    the object.
 
 ``**kwargs``
     Lookup parameters, which should be in the format accepted by ``get()`` and
@@ -289,6 +290,32 @@ This example is equivalent to::
             my_object = MyModel.objects.get(pk=1)
         except MyModel.DoesNotExist:
             raise Http404
+
+The most common use case is to pass a :class:`~django.db.models.Model`, as
+shown above. However, you can also pass a
+:class:`~django.db.models.query.QuerySet` instance::
+
+    queryset = Book.objects.filter(title__startswith='M')
+    get_object_or_404(queryset, pk=1)
+
+The above example is a bit contrived since it's equivalent to doing::
+
+    get_object_or_404(Book, title__startswith='M', pk=1)
+
+but it can be useful if you are passed the ``queryset`` variable from somewhere
+else.
+
+Finally, you can also use a :class:`~django.db.models.Manager`. This is useful
+for example if you have a
+:ref:`custom manager<custom-managers>`::
+
+    get_object_or_404(Book.dahl_objects, title='Matilda')
+
+You can also use
+:class:`related managers<django.db.models.fields.related.RelatedManager>`::
+
+    author = Author.objects.get(name='Roald Dahl')
+    get_object_or_404(author.book_set, title='Matilda')
 
 Note: As with ``get()``, a
 :class:`~django.core.exceptions.MultipleObjectsReturned` exception
