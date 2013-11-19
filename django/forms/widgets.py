@@ -166,7 +166,7 @@ class SubWidget(object):
 
 
 class Widget(six.with_metaclass(MediaDefiningClass)):
-    is_hidden = False             # Determines whether this corresponds to an <input type="hidden">.
+    is_hidden = False  # Determines whether this corresponds to an <input type="hidden">.
     needs_multipart_form = False  # Determines does this widget need multipart form
     is_localized = False
     is_required = False
@@ -430,10 +430,12 @@ class DateTimeBaseInput(TextInput):
 
 class DateInput(DateTimeBaseInput):
     format_key = 'DATE_INPUT_FORMATS'
+    input_type = 'date'
 
 
 class DateTimeInput(DateTimeBaseInput):
     format_key = 'DATETIME_INPUT_FORMATS'
+    input_type = 'datetime'
 
 
 class TimeInput(DateTimeBaseInput):
