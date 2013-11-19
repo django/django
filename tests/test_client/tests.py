@@ -84,6 +84,20 @@ class ClientTest(TestCase):
 
         self.assertEqual(response['X-DJANGO-TEST'], 'Slartibartfast')
 
+    def test_response_attached_request(self):
+        """
+        Check that the returned response has a ``request`` attribute with the
+        originating environ dict and a ``wsgi_request`` with the originating
+        ``WSGIRequest`` instance.
+        """
+        response = self.client.get("/test_client/header_view/")
+
+        self.assertTrue(hasattr(response, 'request'))
+        self.assertTrue(hasattr(response, 'wsgi_request'))
+        for key, value in response.request.items():
+            self.assertIn(key, response.wsgi_request.environ)
+            self.assertEqual(response.wsgi_request.environ[key], value)
+
     def test_raw_post(self):
         "POST raw data (with a content type) to a view"
         test_doc = """<?xml version="1.0" encoding="utf-8"?><library><book><title>Blink</title><author>Malcolm Gladwell</author></book></library>"""
