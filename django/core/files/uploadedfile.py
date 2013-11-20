@@ -117,6 +117,7 @@ class SimpleUploadedFile(InMemoryUploadedFile):
         super(SimpleUploadedFile, self).__init__(BytesIO(content), None, name,
                                                  content_type, len(content), None, None)
 
+    @classmethod
     def from_dict(cls, file_dict):
         """
         Creates a SimpleUploadedFile object from
@@ -128,4 +129,3 @@ class SimpleUploadedFile(InMemoryUploadedFile):
         return cls(file_dict['filename'],
                    file_dict['content'],
                    file_dict.get('content-type', 'text/plain'))
-    from_dict = classmethod(from_dict)

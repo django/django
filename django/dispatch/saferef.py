@@ -135,6 +135,7 @@ class BoundMethodWeakref(object):
         self.selfName = str(target.__self__)
         self.funcName = str(target.__func__.__name__)
 
+    @classmethod
     def calculateKey(cls, target):
         """Calculate the reference key for this reference
 
@@ -142,7 +143,6 @@ class BoundMethodWeakref(object):
         target object and the target function respectively.
         """
         return (id(target.__self__), id(target.__func__))
-    calculateKey = classmethod(calculateKey)
 
     def __str__(self):
         """Give a friendly representation of the object"""
