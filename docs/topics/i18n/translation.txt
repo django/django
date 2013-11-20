@@ -354,7 +354,7 @@ Model verbose names values
 It is recommended to always provide explicit
 :attr:`~django.db.models.Options.verbose_name` and
 :attr:`~django.db.models.Options.verbose_name_plural` options rather than
-relying on the fallback English-centric and somewhat naïve determination of
+relying on the fallback English-centric and somewhat naive determination of
 verbose names Django performs by looking at the model's class name::
 
     from django.db import models
@@ -366,6 +366,20 @@ verbose names Django performs by looking at the model's class name::
         class Meta:
             verbose_name = _('my thing')
             verbose_name_plural = _('my things')
+
+If you want to support languages with multiple plural forms (like Hungarian or
+Polish), you should also provide the explicit
+:attr:`~django.db.models.Options.verbose_name_count` options rather than
+relying on the fallback which uses
+:attr:`~django.db.models.Options.verbose_name_plural` for all plurals. This
+allows translators to provide multiple plural forms::
+
+    from django.utils.translation import ngettext_lazy
+
+    class Bike(models.Model):
+        class Meta:
+            verbose_name_count = ngettext_lazy('%d bike', '%d bikes', None)
+
 
 Model methods ``short_description`` attribute values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
