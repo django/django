@@ -4,6 +4,8 @@ import datetime
 import unittest
 
 from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models.loading import BaseAppCache
 from django.test import TestCase
 
 from .models import (CustomPKModel, UniqueTogetherModel, UniqueFieldsModel,
@@ -25,12 +27,44 @@ class GetUniqueCheckTests(unittest.TestCase):
     def test_unique_together_gets_picked_up_and_converted_to_tuple(self):
         m = UniqueTogetherModel()
         self.assertEqual(
-            ([(UniqueTogetherModel, ('ifield', 'cfield',)),
+            ([(UniqueTogetherModel, ('ifield', 'cfield')),
               (UniqueTogetherModel, ('ifield', 'efield')),
               (UniqueTogetherModel, ('id',)), ],
              []),
             m._get_unique_checks()
         )
+
+    def test_unique_together_normalization(self):
+        """
+        Test the Meta.unique_together normalization with different sorts of
+        objects.
+        """
+        data = {
+            '2-tuple': (('foo', 'bar'),
+                        (('foo', 'bar'),)),
+            'list': (['foo', 'bar'],
+                     (('foo', 'bar'),)),
+            'already normalized': ((('foo', 'bar'), ('bar', 'baz')),
+                                   (('foo', 'bar'), ('bar', 'baz'))),
+            'set': ({('foo', 'bar'), ('bar', 'baz')},  # Ref #21469
+                    (('foo', 'bar'), ('bar', 'baz'))),
+        }
+
+        for test_name, (unique_together, normalized) in data.items():
+            class M(models.Model):
+                foo = models.IntegerField()
+                bar = models.IntegerField()
+                baz = models.IntegerField()
+
+                Meta = type(str('Meta'), (), {
+                    'unique_together': unique_together,
+                    'app_cache': BaseAppCache()
+                })
+
+            checks, _ = M()._get_unique_checks()
+            for t in normalized:
+                check = (M, t)
+                self.assertIn(check, checks)
 
     def test_primary_key_is_considered_unique(self):
         m = CustomPKModel()
