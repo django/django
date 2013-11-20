@@ -732,3 +732,24 @@ class SelectOnlyTests(test.TestCase):
         m = SelectModel.objects.all()[0]
         m.f  # Access f to force its evaluation.
         self.assertNumQueries(2)
+
+
+class PrimaryKeysUseOnInsertUpdateTestCase(unittest.TestCase):
+
+    def test_pk_and_not_use_on_insert_raises_exception(self):
+        self.assertRaises(
+            ValueError, models.Field, primary_key=True, use_on_insert=False
+        )
+
+    def test_pk_and_not_use_on_update_raises_exception(self):
+        self.assertRaises(
+            ValueError, models.Field, primary_key=True, use_on_update=False
+        )
+
+    def test_autofield_always_sets_use_on_insert(self):
+        f = models.AutoField(primary_key=True, use_on_insert=False)
+        self.assertTrue(f.use_on_insert)
+
+    def test_autofield_always_sets_use_on_update(self):
+        f = models.AutoField(primary_key=True, use_on_update=False)
+        self.assertTrue(f.use_on_update)

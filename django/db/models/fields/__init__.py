@@ -139,6 +139,10 @@ class Field(object):
         self.use_on_insert = use_on_insert
         self.use_on_update = use_on_update
 
+        normal_field = self.use_on_insert and self.use_on_update
+        if self.primary_key and not normal_field:
+            raise ValueError("A primary key cannot be set as ")
+
         # Set db_index to True if the field has a relationship and doesn't
         # explicitly set db_index.
         self.db_index = db_index
@@ -211,6 +215,8 @@ class Field(object):
             "auto_created": False,
             "validators": [],
             "error_messages": None,
+            "use_on_insert": True,
+            "use_on_update": True,
         }
         attr_overrides = {
             "unique": "_unique",
@@ -722,6 +728,8 @@ class AutoField(Field):
         assert kwargs.get('primary_key', False) is True, \
             "%ss must have primary_key=True." % self.__class__.__name__
         kwargs['blank'] = True
+        kwargs['use_on_insert'] = True
+        kwargs['use_on_update'] = True
         Field.__init__(self, *args, **kwargs)
 
     def deconstruct(self):
