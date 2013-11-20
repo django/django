@@ -1318,6 +1318,8 @@ class CountrySpecificLanguageTests(TransRealMixin, TestCase):
         self.assertTrue(check_for_language('en'))
         self.assertTrue(check_for_language('en-us'))
         self.assertTrue(check_for_language('en-US'))
+        self.assertFalse(check_for_language('en-ü'))
+        self.assertFalse(check_for_language('en\x00'))
 
     def test_get_language_from_request(self):
         # issue 19919

@@ -44,6 +44,8 @@ accept_language_re = re.compile(r'''
         (?:\s*,\s*|$)                                 # Multiple accepts per header.
         ''', re.VERBOSE)
 
+language_code_re = re.compile(r'^[a-z]{1,8}(?:-[a-z0-9]{1,8})*$', re.IGNORECASE)
+
 language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
 
 # some browsers use deprecated locales. refs #18419
@@ -393,9 +395,11 @@ def check_for_language(lang_code):
     """
     Checks whether there is a global language file for the given language
     code. This is used to decide whether a user-provided language is
-    available. This is only used for language codes from either the cookies
-    or session and during format localization.
+    available.
     """
+    # First, a quick check to make sure lang_code is well-formed (#21458)
+    if not language_code_re.search(lang_code):
+        return False
     for path in all_locale_paths():
         if gettext_module.find('django', path, [to_locale(lang_code)]) is not None:
             return True
