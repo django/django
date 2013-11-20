@@ -93,6 +93,7 @@ def lazy(func, *resultclasses):
                 (func, self.__args, self.__kw) + resultclasses
             )
 
+        @classmethod
         def __prepare_class__(cls):
             cls.__dispatch = {}
             for resultclass in resultclasses:
@@ -119,8 +120,8 @@ def lazy(func, *resultclasses):
                     cls.__bytes__ = cls.__bytes_cast
                 else:
                     cls.__str__ = cls.__bytes_cast
-        __prepare_class__ = classmethod(__prepare_class__)
 
+        @classmethod
         def __promise__(cls, klass, funcname, method):
             # Builds a wrapper around some magic method and registers that
             # magic method for the given type and method name.
@@ -137,7 +138,6 @@ def lazy(func, *resultclasses):
                 cls.__dispatch[klass] = {}
             cls.__dispatch[klass][funcname] = method
             return __wrapper__
-        __promise__ = classmethod(__promise__)
 
         def __text_cast(self):
             return func(*self.__args, **self.__kw)
