@@ -14,9 +14,6 @@ from django.db import models
 from django.db.models.fields.files import ImageFieldFile, ImageField
 
 
-from .fields import UpdateOnlyField, SelectOnlyField
-
-
 class Foo(models.Model):
     a = models.CharField(max_length=10)
     d = models.DecimalField(max_digits=5, decimal_places=3)
@@ -234,9 +231,10 @@ if Image:
 
 class UpdateModel(models.Model):
 
-    f = UpdateOnlyField(max_length=20, null=True)
+    f = models.CharField(max_length=20, null=True, use_on_insert=False)
 
 
 class SelectModel(models.Model):
 
-    f = SelectOnlyField(max_length=20, null=True)
+    f = models.CharField(max_length=20, null=True, use_on_update=False,
+                         use_on_insert=False)

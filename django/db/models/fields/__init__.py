@@ -102,13 +102,6 @@ class Field(object):
                     'already exists.'),
     }
 
-    # Flag to indicate, whether the field shoud be used in an
-    # INSERT statement.
-    use_on_insert = True
-    # Flag to indicate, whether the field should be used in an
-    # UPDATE statement.
-    use_on_update = True
-
     # Generic field type description, usually overridden by subclasses
     def _description(self):
         return _('Field of type: %(field_type)s') % {
@@ -122,7 +115,7 @@ class Field(object):
             serialize=True, unique_for_date=None, unique_for_month=None,
             unique_for_year=None, choices=None, help_text='', db_column=None,
             db_tablespace=None, auto_created=False, validators=[],
-            error_messages=None):
+                 error_messages=None, use_on_insert=True, use_on_update=True):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
         self._verbose_name = verbose_name  # Store original for deconstruction
@@ -141,6 +134,10 @@ class Field(object):
         self.db_column = db_column
         self.db_tablespace = db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
         self.auto_created = auto_created
+        # Flags to indicate, whether the field shoud be used in an
+        # INSERT and UDPATE statement.
+        self.use_on_insert = use_on_insert
+        self.use_on_update = use_on_update
 
         # Set db_index to True if the field has a relationship and doesn't
         # explicitly set db_index.
