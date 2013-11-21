@@ -147,3 +147,25 @@ class TestRelatedFieldsAdminOrdering(TestCase):
 
         # should be ordered by rank (defined by the ModelAdmin)
         self.check_ordering_of_field_choices([self.b1, self.b2])
+
+    def test_custom_queryset_still_wins(self):
+        """Test that custom queryset has still precedence (#21405)"""
+        class SongAdmin(admin.ModelAdmin):
+            # Exclude one of the two Bands from the querysets
+            def formfield_for_foreignkey(self, db_field, **kwargs):
+                if db_field.name == 'band':
+                    kwargs["queryset"] = Band.objects.filter(rank__gt=2)
+                return super(SongAdmin, self).formfield_for_foreignkey(db_field, **kwargs)
+            def formfield_for_manytomany(self, db_field, **kwargs):
+                if db_field.name == 'other_interpreters':
+                    kwargs["queryset"] = Band.objects.filter(rank__gt=2)
+                return super(SongAdmin, self).formfield_for_foreignkey(db_field, **kwargs)
+
+        class StaticOrderingBandAdmin(admin.ModelAdmin):
+            ordering = ('rank',)
+
+        admin.site.unregister(Song)
+        admin.site.register(Song, SongAdmin)
+        admin.site.register(Band, StaticOrderingBandAdmin)
+
+        self.check_ordering_of_field_choices([self.b2])
