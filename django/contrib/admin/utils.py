@@ -7,7 +7,6 @@ from django.contrib.auth import get_permission_codename
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
-from django.db.models.related import RelatedObject
 from django.forms.forms import pretty_name
 from django.utils import formats
 from django.utils.html import format_html
@@ -25,10 +24,7 @@ def lookup_needs_distinct(opts, lookup_path):
     """
     field_name = lookup_path.split('__', 1)[0]
     field = opts.get_field_by_name(field_name)[0]
-    if ((hasattr(field, 'rel') and
-         isinstance(field.rel, models.ManyToManyRel)) or
-        (isinstance(field, models.related.RelatedObject) and
-         not field.field.unique)):
+    if hasattr(field, 'get_path_info') and any(path.m2m for path in field.get_path_info()):
         return True
     return False
 
@@ -286,10 +282,11 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
     attr = None
     try:
         field = model._meta.get_field_by_name(name)[0]
-        if isinstance(field, RelatedObject):
-            label = field.opts.verbose_name
-        else:
+        try:
             label = field.verbose_name
+        except AttributeError:
+            # field is likely a RelatedObject
+            label = field.opts.verbose_name
     except models.FieldDoesNotExist:
         if name == "__unicode__":
             label = force_text(model._meta.verbose_name)
@@ -337,7 +334,7 @@ def help_text_for_field(name, model):
         pass
     else:
         field = field_data[0]
-        if not isinstance(field, RelatedObject):
+        if hasattr(field, 'help_text'):
             help_text = field.help_text
     return smart_text(help_text)
 
