@@ -273,6 +273,13 @@ The functions defined in this module share the following properties:
 
     Returns an ASCII string containing the encoded result.
 
+.. function:: escape_uri_path(path)
+
+    .. versionadded:: 1.7
+
+    Escape the unsafe characters from the path portion of a Uniform Resource
+    Identifier (URI).
+
 .. function:: filepath_to_uri(path)
 
     Convert a file system path to a URI portion that is suitable for inclusion
