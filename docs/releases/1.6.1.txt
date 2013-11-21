@@ -28,3 +28,5 @@ Bug fixes
   non related to file extensions (#21457).
 * Fixed display of inline instances in formsets when parent has 0 for primary
   key (#21472).
+* Fixed a regression where custom querysets for foreign keys were overwritten
+  if ``ModelAdmin`` had ordering set (#21405).
