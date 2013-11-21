@@ -430,6 +430,11 @@ Models
 * :class:`F expressions <django.db.models.F>` support the power operator
   (``**``).
 
+* The ``remove()`` and ``clear()`` methods of the related managers created by
+  ``ForeignKey`` and ``GenericForeignKey`` now accept the ``bulk`` keyword
+  argument to control whether or not to perform operations in bulk
+  (i.e. using ``QuerySet.update()``). Defaults to ``True``.
+
 Signals
 ^^^^^^^
 
@@ -589,11 +594,13 @@ Fixing the issues introduced some backward incompatible changes:
 - The default implementation of ``remove()`` for ``ForeignKey`` related managers
   changed from a series of ``Model.save()`` calls to a single
   ``QuerySet.update()`` call. The change means that ``pre_save`` and
-  ``post_save`` signals aren't sent anymore.
+  ``post_save`` signals aren't sent anymore. You can use the ``bulk=False``
+  keyword argument to revert to the previous behavior.
 
 - The ``remove()`` and ``clear()`` methods for ``GenericForeignKey`` related
   managers now perform bulk delete. The ``Model.delete()`` method isn't called
-  on each instance anymore.
+  on each instance anymore. You can use the ``bulk=False`` keyword argument to
+  revert to the previous behavior.
 
 - The ``remove()`` and ``clear()`` methods for ``ManyToManyField`` related
   managers perform nested queries when filtering is involved, which may or

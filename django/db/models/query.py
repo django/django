@@ -1030,7 +1030,7 @@ class QuerySet(object):
         """
         Checks if this QuerySet has any filtering going on. Note that this
         isn't equivalent for checking if all objects are present in results,
-        for example qs[1:]._has_filters() -> True.
+        for example qs[1:]._has_filters() -> False.
         """
         return self.query.has_filters()
 

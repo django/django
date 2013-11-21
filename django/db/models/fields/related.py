@@ -463,13 +463,11 @@ def create_foreign_related_manager(superclass, rel_field, rel_model):
 
         # remove() and clear() are only provided if the ForeignKey can have a value of null.
         if rel_field.null:
-            def remove(self, *objs):
-                # If there aren't any objects, there is nothing to do.
+            def remove(self, *objs, **kwargs):
                 if not objs:
                     return
-
+                bulk = kwargs.pop('bulk', True)
                 val = rel_field.get_foreign_related_value(self.instance)
-
                 old_ids = set()
                 for obj in objs:
                     # Is obj actually part of this descriptor set?
@@ -477,13 +475,25 @@ def create_foreign_related_manager(superclass, rel_field, rel_model):
                         old_ids.add(obj.pk)
                     else:
                         raise rel_field.rel.to.DoesNotExist("%r is not related to %r." % (obj, self.instance))
-
-                self.filter(pk__in=old_ids).update(**{rel_field.name: None})
+                self._clear(self.filter(pk__in=old_ids), bulk)
             remove.alters_data = True
 
-            def clear(self):
-                self.update(**{rel_field.name: None})
+            def clear(self, **kwargs):
+                bulk = kwargs.pop('bulk', True)
+                self._clear(self, bulk)
             clear.alters_data = True
+
+            def _clear(self, queryset, bulk):
+                db = router.db_for_write(self.model, instance=self.instance)
+                queryset = queryset.using(db)
+                if bulk:
+                    queryset.update(**{rel_field.name: None})
+                else:
+                    with transaction.commit_on_success_unless_managed(using=db, savepoint=False):
+                        for obj in queryset:
+                            setattr(obj, rel_field.name, None)
+                            obj.save()
+            _clear.alters_data = True
 
     return RelatedManager
 
@@ -657,6 +667,7 @@ def create_many_related_manager(superclass, rel):
             signals.m2m_changed.send(sender=self.through, action="pre_clear",
                 instance=self.instance, reverse=self.reverse,
                 model=self.model, pk_set=None, using=db)
+
             filters = self._build_remove_filters(super(ManyRelatedManager, self).get_queryset().using(db))
             self.through._default_manager.using(db).filter(filters).delete()
 
@@ -746,8 +757,6 @@ def create_many_related_manager(superclass, rel):
             # source_field_name: the PK colname in join table for the source object
             # target_field_name: the PK colname in join table for the target object
             # *objs - objects to remove
-
-            # If there aren't any objects, there is nothing to do.
             if not objs:
                 return
 
