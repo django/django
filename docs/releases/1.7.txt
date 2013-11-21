@@ -261,6 +261,11 @@ Minor features
   :attr:`~django.core.files.storage.FileSystemStorage.file_permissions_mode`
   parameter. See :djadmin:`collectstatic` for example usage.
 
+* The limitation on :djadmin:`collectstatic` with symlink option is removed
+  in Windows platform. Now we can `collectstatic` with symlink option in
+  Windows platform if we have the capability to do so (for example,
+  administrator in Windows Vista).
+
 :mod:`django.contrib.syndication`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
