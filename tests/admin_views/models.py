@@ -745,10 +745,16 @@ class City(models.Model):
     state = models.ForeignKey(State)
     name = models.CharField(max_length=100)
 
+    def get_absolute_url(self):
+        return '/dummy/%s/' % self.pk
+
 
 class Restaurant(models.Model):
     city = models.ForeignKey(City)
     name = models.CharField(max_length=100)
+
+    def get_absolute_url(self):
+        return '/dummy/%s/' % self.pk
 
 
 class Worker(models.Model):

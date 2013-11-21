@@ -13,6 +13,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, NoReverseMatch
 # Register auth models with the admin.
 from django.contrib.auth import get_permission_codename
+from django.contrib.admin import ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import LogEntry, DELETION
 from django.contrib.admin.sites import LOGIN_FORM_KEY
@@ -4640,6 +4641,11 @@ class AdminViewOnSiteTest(TestCase):
         self.assertContains(response,
                             '"/worker/%s/%s/"' % (worker.surname, worker.name),
                             )
+
+    def test_missing_get_absolute_url(self):
+        "Ensure None is returned if model doesn't have get_absolute_url"
+        model_admin = ModelAdmin(Worker, None)
+        self.assertIsNone(model_admin.get_view_on_site_url(Worker()))
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))

@@ -250,7 +250,7 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
 
         if callable(self.view_on_site):
             return self.view_on_site(obj)
-        elif self.view_on_site:
+        elif self.view_on_site and hasattr(obj, 'get_absolute_url'):
             # use the ContentType lookup if view_on_site is True
             return reverse('admin:view_on_site', kwargs={
                 'content_type_id': ContentType.objects.get_for_model(obj).pk,
