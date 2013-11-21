@@ -98,7 +98,7 @@ class ClientHandler(BaseHandler):
             self.load_middleware()
 
         request_started.disconnect(close_old_connections)
-        request_started.send(sender=self.__class__)
+        request_started.send(sender=self.__class__, environ=environ)
         request_started.connect(close_old_connections)
         request = WSGIRequest(environ)
         # sneaky little hack so that we can easily get round

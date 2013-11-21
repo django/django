@@ -107,6 +107,7 @@ class SignalsTests(TestCase):
 
     def register_started(self, **kwargs):
         self.signals.append('started')
+        self.assert_('environ' in kwargs)
 
     def register_finished(self, **kwargs):
         self.signals.append('finished')
