@@ -226,11 +226,11 @@ class CustomManagerTests(TestCase):
             ordered=False,
         )
 
-    def test_removal_through_default_fk_related_manager(self):
+    def test_removal_through_default_fk_related_manager(self, bulk=True):
         bugs = FunPerson.objects.create(first_name="Bugs", last_name="Bunny", fun=True, favorite_book=self.b1)
         droopy = FunPerson.objects.create(first_name="Droopy", last_name="Dog", fun=False, favorite_book=self.b1)
 
-        self.b1.fun_people_favorite_books.remove(droopy)
+        self.b1.fun_people_favorite_books.remove(droopy, bulk=bulk)
         self.assertQuerysetEqual(
             FunPerson._base_manager.filter(favorite_book=self.b1), [
                 "Bugs",
@@ -240,7 +240,7 @@ class CustomManagerTests(TestCase):
             ordered=False,
         )
 
-        self.b1.fun_people_favorite_books.remove(bugs)
+        self.b1.fun_people_favorite_books.remove(bugs, bulk=bulk)
         self.assertQuerysetEqual(
             FunPerson._base_manager.filter(favorite_book=self.b1), [
                 "Droopy",
@@ -251,7 +251,7 @@ class CustomManagerTests(TestCase):
         bugs.favorite_book = self.b1
         bugs.save()
 
-        self.b1.fun_people_favorite_books.clear()
+        self.b1.fun_people_favorite_books.clear(bulk=bulk)
         self.assertQuerysetEqual(
             FunPerson._base_manager.filter(favorite_book=self.b1), [
                 "Droopy",
@@ -260,12 +260,15 @@ class CustomManagerTests(TestCase):
             ordered=False,
         )
 
-    def test_removal_through_specified_fk_related_manager(self):
+    def test_slow_removal_through_default_fk_related_manager(self):
+        self.test_removal_through_default_fk_related_manager(bulk=False)
+
+    def test_removal_through_specified_fk_related_manager(self, bulk=True):
         Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True, favorite_book=self.b1)
         droopy = Person.objects.create(first_name="Droopy", last_name="Dog", fun=False, favorite_book=self.b1)
 
         # Check that the fun manager DOESN'T remove boring people.
-        self.b1.favorite_books(manager='fun_people').remove(droopy)
+        self.b1.favorite_books(manager='fun_people').remove(droopy, bulk=bulk)
         self.assertQuerysetEqual(
             self.b1.favorite_books(manager='boring_people').all(), [
                 "Droopy",
@@ -274,7 +277,7 @@ class CustomManagerTests(TestCase):
             ordered=False,
         )
         # Check that the boring manager DOES remove boring people.
-        self.b1.favorite_books(manager='boring_people').remove(droopy)
+        self.b1.favorite_books(manager='boring_people').remove(droopy, bulk=bulk)
         self.assertQuerysetEqual(
             self.b1.favorite_books(manager='boring_people').all(), [
             ],
@@ -285,7 +288,7 @@ class CustomManagerTests(TestCase):
         droopy.save()
 
         # Check that the fun manager ONLY clears fun people.
-        self.b1.favorite_books(manager='fun_people').clear()
+        self.b1.favorite_books(manager='fun_people').clear(bulk=bulk)
         self.assertQuerysetEqual(
             self.b1.favorite_books(manager='boring_people').all(), [
                 "Droopy",
@@ -300,11 +303,14 @@ class CustomManagerTests(TestCase):
             ordered=False,
         )
 
-    def test_removal_through_default_gfk_related_manager(self):
+    def test_slow_removal_through_specified_fk_related_manager(self):
+        self.test_removal_through_specified_fk_related_manager(bulk=False)
+
+    def test_removal_through_default_gfk_related_manager(self, bulk=True):
         bugs = FunPerson.objects.create(first_name="Bugs", last_name="Bunny", fun=True, favorite_thing=self.b1)
         droopy = FunPerson.objects.create(first_name="Droopy", last_name="Dog", fun=False, favorite_thing=self.b1)
 
-        self.b1.fun_people_favorite_things.remove(droopy)
+        self.b1.fun_people_favorite_things.remove(droopy, bulk=bulk)
         self.assertQuerysetEqual(
             FunPerson._base_manager.order_by('first_name').filter(favorite_thing_id=self.b1.pk), [
                 "Bugs",
@@ -314,7 +320,7 @@ class CustomManagerTests(TestCase):
             ordered=False,
         )
 
-        self.b1.fun_people_favorite_things.remove(bugs)
+        self.b1.fun_people_favorite_things.remove(bugs, bulk=bulk)
         self.assertQuerysetEqual(
             FunPerson._base_manager.order_by('first_name').filter(favorite_thing_id=self.b1.pk), [
                 "Droopy",
@@ -325,7 +331,7 @@ class CustomManagerTests(TestCase):
         bugs.favorite_book = self.b1
         bugs.save()
 
-        self.b1.fun_people_favorite_things.clear()
+        self.b1.fun_people_favorite_things.clear(bulk=bulk)
         self.assertQuerysetEqual(
             FunPerson._base_manager.order_by('first_name').filter(favorite_thing_id=self.b1.pk), [
                 "Droopy",
@@ -334,12 +340,15 @@ class CustomManagerTests(TestCase):
             ordered=False,
         )
 
-    def test_removal_through_specified_gfk_related_manager(self):
+    def test_slow_removal_through_default_gfk_related_manager(self):
+        self.test_removal_through_default_gfk_related_manager(bulk=False)
+
+    def test_removal_through_specified_gfk_related_manager(self, bulk=True):
         Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True, favorite_thing=self.b1)
         droopy = Person.objects.create(first_name="Droopy", last_name="Dog", fun=False, favorite_thing=self.b1)
 
         # Check that the fun manager DOESN'T remove boring people.
-        self.b1.favorite_things(manager='fun_people').remove(droopy)
+        self.b1.favorite_things(manager='fun_people').remove(droopy, bulk=bulk)
         self.assertQuerysetEqual(
             self.b1.favorite_things(manager='boring_people').all(), [
                 "Droopy",
@@ -349,7 +358,7 @@ class CustomManagerTests(TestCase):
         )
 
         # Check that the boring manager DOES remove boring people.
-        self.b1.favorite_things(manager='boring_people').remove(droopy)
+        self.b1.favorite_things(manager='boring_people').remove(droopy, bulk=bulk)
         self.assertQuerysetEqual(
             self.b1.favorite_things(manager='boring_people').all(), [
             ],
@@ -360,7 +369,7 @@ class CustomManagerTests(TestCase):
         droopy.save()
 
         # Check that the fun manager ONLY clears fun people.
-        self.b1.favorite_things(manager='fun_people').clear()
+        self.b1.favorite_things(manager='fun_people').clear(bulk=bulk)
         self.assertQuerysetEqual(
             self.b1.favorite_things(manager='boring_people').all(), [
                 "Droopy",
@@ -374,6 +383,9 @@ class CustomManagerTests(TestCase):
             lambda c: c.first_name,
             ordered=False,
         )
+
+    def test_slow_removal_through_specified_gfk_related_manager(self):
+        self.test_removal_through_specified_gfk_related_manager(bulk=False)
 
     def test_removal_through_default_m2m_related_manager(self):
         bugs = FunPerson.objects.create(first_name="Bugs", last_name="Bunny", fun=True)
