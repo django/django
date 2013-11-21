@@ -372,16 +372,16 @@ Then, you can help out by:
   any activity in a long time, it's possible that the problem has been
   fixed but the ticket hasn't yet been closed.
 
-* Identifying trends and themes in the tickets. If there a lot of bug
+* Identifying trends and themes in the tickets. If there are a lot of bug
   reports about a particular part of Django, it may indicate we should
   consider refactoring that part of the code. If a trend is emerging,
   you should raise it for discussion (referencing the relevant tickets)
   on |django-developers|.
 
-* Verify if patches submitted by other users are correct. If they do and
-  also contain appropriate documentation and tests then move them to the
-  "Ready for Checkin" stage. If they don't then leave a comment to explain
-  why and set the corresponding flags ("Patch needs improvement",
+* Verify if patches submitted by other users are correct. If they are correct
+  and also contain appropriate documentation and tests then move them to the
+  "Ready for Checkin" stage. If they are not correct then leave a comment to
+  explain why and set the corresponding flags ("Patch needs improvement",
   "Needs tests" etc.).
 
 .. note::
