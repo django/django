@@ -256,6 +256,10 @@ Signals
   :meth:`Signal.send_robust() <django.dispatch.Signal.send_robust>` now have
   their traceback attached as a ``__traceback__`` attribute.
 
+* The ``environ`` argument, which contains the WSGI environment structure from
+  the request, was added to the :data:`~django.core.signals.request_started`
+  signal.
+
 Templates
 ^^^^^^^^^
 
