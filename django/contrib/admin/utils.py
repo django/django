@@ -389,10 +389,8 @@ class NotRelationField(Exception):
 
 
 def get_model_from_relation(field):
-    if isinstance(field, models.related.RelatedObject):
-        return field.model
-    elif getattr(field, 'rel'):  # or isinstance?
-        return field.rel.to
+    if hasattr(field, 'get_path_info'):
+        return field.get_path_info()[-1].to_opts.model
     else:
         raise NotRelationField
 
