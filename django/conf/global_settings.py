@@ -556,6 +556,9 @@ CSRF_COOKIE_PATH = '/'
 CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_HTTPONLY = False
 
+# Settings for CSRF header.
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+
 ############
 # MESSAGES #
 ############
