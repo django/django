@@ -114,6 +114,7 @@ class SignalsTests(TestCase):
 
     def setUp(self):
         self.signals = []
+        self.signaled_environ = None
         request_started.connect(self.register_started)
         request_finished.connect(self.register_finished)
 
@@ -123,6 +124,7 @@ class SignalsTests(TestCase):
 
     def register_started(self, **kwargs):
         self.signals.append('started')
+        self.signaled_environ = kwargs.get('environ')
 
     def register_finished(self, **kwargs):
         self.signals.append('finished')
@@ -131,6 +133,7 @@ class SignalsTests(TestCase):
         response = self.client.get('/regular/')
         self.assertEqual(self.signals, ['started', 'finished'])
         self.assertEqual(response.content, b"regular content")
+        self.assertEqual(self.signaled_environ, response.wsgi_request.environ)
 
     def test_request_signals_streaming_response(self):
         response = self.client.get('/streaming/')
