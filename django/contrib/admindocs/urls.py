@@ -3,39 +3,39 @@ from django.contrib.admindocs import views
 
 urlpatterns = patterns('',
     url('^$',
-        views.doc_index,
+        views.BaseAdminDocsView.as_view(template_name='admin_doc/index.html'),
         name='django-admindocs-docroot'
     ),
     url('^bookmarklets/$',
-        views.bookmarklets,
+        views.BookmarkletsView.as_view(),
         name='django-admindocs-bookmarklets'
     ),
     url('^tags/$',
-        views.template_tag_index,
+        views.TemplateTagIndexView.as_view(),
         name='django-admindocs-tags'
     ),
     url('^filters/$',
-        views.template_filter_index,
+        views.TemplateFilterIndexView.as_view(),
         name='django-admindocs-filters'
     ),
     url('^views/$',
-        views.view_index,
+        views.ViewIndexView.as_view(),
         name='django-admindocs-views-index'
     ),
     url('^views/(?P<view>[^/]+)/$',
-        views.view_detail,
+        views.ViewDetailView.as_view(),
         name='django-admindocs-views-detail'
     ),
     url('^models/$',
-        views.model_index,
+        views.ModelIndexView.as_view(),
         name='django-admindocs-models-index'
     ),
     url('^models/(?P<app_label>[^\.]+)\.(?P<model_name>[^/]+)/$',
-        views.model_detail,
+        views.ModelDetailView.as_view(),
         name='django-admindocs-models-detail'
     ),
     url('^templates/(?P<template>.*)/$',
-        views.template_detail,
+        views.TemplateDetailView.as_view(),
         name='django-admindocs-templates'
     ),
 )

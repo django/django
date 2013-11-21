@@ -1,3 +1,4 @@
+import os
 import unittest
 
 try:
@@ -7,8 +8,74 @@ except ImportError:
 
 from django.contrib.admindocs import utils
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class AdminDocViewTests(TestCase):
+    fixtures = ['data.xml']
+    urls = 'admin_docs.urls'
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def test_index(self):
+        self.client.logout()
+        response = self.client.get(reverse('django-admindocs-docroot'))
+        # Should display the login screen
+        self.assertContains(response,
+            '<input type="hidden" name="next" value="/admindocs/" />', html=True)
+        self.client.login(username='super', password='secret')
+        response = self.client.get(reverse('django-admindocs-docroot'))
+        self.assertContains(response, '<h1>Documentation</h1>', html=True)
+
+    def test_bookmarklets(self):
+        response = self.client.get(reverse('django-admindocs-bookmarklets'))
+        self.assertContains(response, 'http://testserver/admin/doc/views/')
+
+    def test_templatetag_index(self):
+        response = self.client.get(reverse('django-admindocs-tags'))
+        self.assertContains(response, '<h3 id="built_in-extends">extends</h3>', html=True)
+
+    def test_templatefilter_index(self):
+        response = self.client.get(reverse('django-admindocs-filters'))
+        self.assertContains(response, '<h3 id="built_in-first">first</h3>', html=True)
+
+    def test_view_index(self):
+        response = self.client.get(reverse('django-admindocs-views-index'))
+        self.assertContains(response,
+            '<h3><a href="/admindocs/views/django.contrib.admindocs.views.BaseAdminDocsView/">/admindocs/</a></h3>',
+            html=True)
+
+    def test_view_detail(self):
+        response = self.client.get(
+            reverse('django-admindocs-views-detail',
+                    args=['django.contrib.admindocs.views.BaseAdminDocsView']))
+        # View docstring
+        self.assertContains(response, 'Base view for admindocs views.')
+
+    def test_model_index(self):
+        response = self.client.get(reverse('django-admindocs-models-index'))
+        self.assertContains(response, '<h2 id="app-auth">Auth</h2>', html=True)
+
+    def test_model_detail(self):
+        response = self.client.get(reverse('django-admindocs-models-detail',
+            args=['auth', 'user']))
+        # Check for attribute, many-to-many field
+        self.assertContains(response,
+            '<tr><td>email</td><td>Email address</td><td>email address</td></tr>', html=True)
+        self.assertContains(response,
+            '<tr><td>user_permissions.all</td><td>List</td><td>'
+            '<p>all related <a class="reference external" href="/admindocs/models/auth.permission/">'
+            'auth.Permission</a> objects</p></td></tr>', html=True)
+
+    def test_template_detail(self):
+        response = self.client.get(reverse('django-admindocs-templates',
+            args=['admin_doc/template_detail.html']))
+        self.assertContains(response,
+            '<h1>Template: "admin_doc/template_detail.html"</h1>', html=True)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
