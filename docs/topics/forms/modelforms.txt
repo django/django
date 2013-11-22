@@ -943,6 +943,24 @@ class's ``clean`` method::
                 # your custom formset validation
                 ...
 
+Also note that by the time you reach this step, individual model instances
+have already been created for each ``Form``. Modifying a value in
+``form.cleaned_data`` is not sufficient to affect the saved value. If you wish
+to modify a value in ``ModelFormSet.clean()`` you must modify
+``form.instance``::
+
+    from django.forms.models import BaseModelFormSet
+
+    class MyModelFormSet(BaseModelFormSet):
+        def clean(self):
+            super(MyModelFormSet, self).clean()
+
+            for form in self.forms:
+                name = form.cleaned_data['name'].upper()
+                form.cleaned_data['name'] = name
+                # update the instance value.
+                form.instance.name = name
+
 Using a custom queryset
 -----------------------
 
