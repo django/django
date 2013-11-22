@@ -497,7 +497,6 @@ Using sessions out of views
 An API is available to manipulate session data outside of a view::
 
     >>> from django.contrib.sessions.backends.db import SessionStore
-    >>> import datetime
     >>> s = SessionStore()
     >>> # stored as seconds since epoch since datetimes are not serializable in JSON.
     >>> s['last_login'] = 1376587691
