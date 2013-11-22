@@ -21,8 +21,7 @@ from django.core.cache.backends.base import (CacheKeyWarning,
     InvalidCacheBackendError)
 from django.db import connection, router, transaction
 from django.core.cache.utils import make_template_fragment_key
-from django.http import (HttpResponse, HttpRequest, StreamingHttpResponse,
-    QueryDict)
+from django.http import HttpResponse, StreamingHttpResponse
 from django.middleware.cache import (FetchFromCacheMiddleware,
     UpdateCacheMiddleware, CacheMiddleware)
 from django.template import Template
