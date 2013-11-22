@@ -13,7 +13,7 @@ from django.utils.six.moves import xrange
 from django.utils.translation import ungettext, ugettext as _
 
 
-__all__ = ('BaseFormSet', 'all_valid')
+__all__ = ('BaseFormSet', 'formset_factory', 'all_valid')
 
 # special field names
 TOTAL_FORM_COUNT = 'TOTAL_FORMS'

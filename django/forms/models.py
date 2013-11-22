@@ -24,7 +24,8 @@ from django.utils.translation import ugettext_lazy as _, ugettext, string_concat
 __all__ = (
     'ModelForm', 'BaseModelForm', 'model_to_dict', 'fields_for_model',
     'save_instance', 'ModelChoiceField', 'ModelMultipleChoiceField',
-    'ALL_FIELDS',
+    'ALL_FIELDS', 'BaseModelFormSet', 'modelformset_factory',
+    'BaseInlineFormSet', 'inlineformset_factory',
 )
 
 ALL_FIELDS = '__all__'
