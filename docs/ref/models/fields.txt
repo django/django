@@ -1230,13 +1230,6 @@ that control how the relationship functions.
 
     Same as :attr:`ForeignKey.related_name`.
 
-    If you have more than one ``ManyToManyField`` pointing to the same model
-    and want to suppress the backwards relations, set each ``related_name``
-    to a unique value ending with ``'+'``::
-
-        users = models.ManyToManyField(User, related_name='u+')
-        referents = models.ManyToManyField(User, related_name='ref+')
-
 .. attribute:: ForeignKey.related_query_name
 
     .. versionadded:: 1.6
