@@ -185,16 +185,8 @@ class DummyCacheTests(unittest.TestCase):
 class BaseCacheTests(object):
     # A common set of tests to apply to all cache backends
 
-    def _get_request_cache(self, path):
-        request = HttpRequest()
-        request.META = {
-            'SERVER_NAME': 'testserver',
-            'SERVER_PORT': 80,
-        }
-        request.path = request.path_info = path
-        request._cache_update_cache = True
-        request.method = 'GET'
-        return request
+    def setUp(self):
+        self.factory = RequestFactory()
 
     def test_simple(self):
         # Simple cache set/get works
@@ -802,7 +794,8 @@ class BaseCacheTests(object):
         fetch_middleware = FetchFromCacheMiddleware()
         fetch_middleware.cache = self.cache
 
-        request = self._get_request_cache('/cache/test')
+        request = self.factory.get('/cache/test')
+        request._cache_update_cache = True
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertEqual(get_cache_data, None)
 
@@ -844,6 +837,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
     backend_name = 'django.core.cache.backends.db.DatabaseCache'
 
     def setUp(self):
+        self.factory = RequestFactory()
         # Spaces are used in the table name to ensure quoting/escaping is working
         self._table_name = 'test cache table'
         management.call_command('createcachetable', verbosity=0, interactive=False)
@@ -956,6 +950,7 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
     backend_name = 'django.core.cache.backends.locmem.LocMemCache'
 
     def setUp(self):
+        self.factory = RequestFactory()
         self.cache = get_cache(self.backend_name, OPTIONS={'MAX_ENTRIES': 30})
         self.prefix_cache = get_cache(self.backend_name, KEY_PREFIX='cacheprefix')
         self.v2_cache = get_cache(self.backend_name, VERSION=2)
@@ -1018,6 +1013,7 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
 class MemcachedCacheTests(unittest.TestCase, BaseCacheTests):
 
     def setUp(self):
+        self.factory = RequestFactory()
         for cache_key, cache in settings.CACHES.items():
             if cache['BACKEND'].startswith('django.core.cache.backends.memcached.'):
                 break
@@ -1066,6 +1062,7 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
     backend_name = 'django.core.cache.backends.filebased.FileBasedCache'
 
     def setUp(self):
+        self.factory = RequestFactory()
         self.dirname = tempfile.mkdtemp()
         self.cache = get_cache(self.backend_name, LOCATION=self.dirname, OPTIONS={'MAX_ENTRIES': 30})
         self.prefix_cache = get_cache(self.backend_name, LOCATION=self.dirname, KEY_PREFIX='cacheprefix')
@@ -1158,19 +1155,10 @@ class CacheUtils(TestCase):
     def setUp(self):
         self.path = '/cache/test/'
         self.cache = get_cache('default')
+        self.factory = RequestFactory()
 
     def tearDown(self):
         self.cache.clear()
-
-    def _get_request(self, path, method='GET'):
-        request = HttpRequest()
-        request.META = {
-            'SERVER_NAME': 'testserver',
-            'SERVER_PORT': 80,
-        }
-        request.method = method
-        request.path = request.path_info = "/cache/%s" % path
-        return request
 
     def test_patch_vary_headers(self):
         headers = (
@@ -1193,35 +1181,35 @@ class CacheUtils(TestCase):
             self.assertEqual(response['Vary'], resulting_vary)
 
     def test_get_cache_key(self):
-        request = self._get_request(self.path)
+        request = self.factory.get(self.path)
         response = HttpResponse()
         key_prefix = 'localprefix'
         # Expect None if no headers have been set yet.
         self.assertEqual(get_cache_key(request), None)
         # Set headers to an empty list.
         learn_cache_key(request, response)
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.9fa0fd092afb73bdce204bb4f94d5804.d41d8cd98f00b204e9800998ecf8427e')
         # Verify that a specified key_prefix is taken into account.
         learn_cache_key(request, response, key_prefix=key_prefix)
-        self.assertEqual(get_cache_key(request, key_prefix=key_prefix), 'views.decorators.cache.cache_page.localprefix.GET.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(get_cache_key(request, key_prefix=key_prefix), 'views.decorators.cache.cache_page.localprefix.GET.9fa0fd092afb73bdce204bb4f94d5804.d41d8cd98f00b204e9800998ecf8427e')
 
     def test_get_cache_key_with_query(self):
-        request = self._get_request(self.path + '?test=1')
+        request = self.factory.get(self.path, {'test': 1})
         response = HttpResponse()
         # Expect None if no headers have been set yet.
         self.assertEqual(get_cache_key(request), None)
         # Set headers to an empty list.
         learn_cache_key(request, response)
         # Verify that the querystring is taken into account.
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.bd889c5a59603af44333ed21504db3cd.d41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.d11198ba31883732b0de5786a80cc12b.d41d8cd98f00b204e9800998ecf8427e')
 
     def test_learn_cache_key(self):
-        request = self._get_request(self.path, 'HEAD')
+        request = self.factory.head(self.path)
         response = HttpResponse()
         response['Vary'] = 'Pony'
         # Make sure that the Vary header is added to the key hash
         learn_cache_key(request, response)
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.9fa0fd092afb73bdce204bb4f94d5804.d41d8cd98f00b204e9800998ecf8427e')
 
     def test_patch_cache_control(self):
         tests = (
@@ -1275,24 +1263,10 @@ class CacheHEADTest(TestCase):
     def setUp(self):
         self.path = '/cache/test/'
         self.cache = get_cache('default')
+        self.factory = RequestFactory()
 
     def tearDown(self):
         self.cache.clear()
-
-    def _get_request(self, method):
-        request = HttpRequest()
-        request.META = {
-            'SERVER_NAME': 'testserver',
-            'SERVER_PORT': 80,
-        }
-        request.method = method
-        request.path = request.path_info = self.path
-        return request
-
-    def _get_request_cache(self, method):
-        request = self._get_request(method)
-        request._cache_update_cache = True
-        return request
 
     def _set_cache(self, request, msg):
         response = HttpResponse()
@@ -1302,10 +1276,12 @@ class CacheHEADTest(TestCase):
     def test_head_caches_correctly(self):
         test_content = 'test content'
 
-        request = self._get_request_cache('HEAD')
+        request = self.factory.head(self.path)
+        request._cache_update_cache = True
         self._set_cache(request, test_content)
 
-        request = self._get_request('HEAD')
+        request = self.factory.head(self.path)
+        request._cache_update_cache = True
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertNotEqual(get_cache_data, None)
         self.assertEqual(test_content.encode(), get_cache_data.content)
@@ -1313,10 +1289,11 @@ class CacheHEADTest(TestCase):
     def test_head_with_cached_get(self):
         test_content = 'test content'
 
-        request = self._get_request_cache('GET')
+        request = self.factory.get(self.path)
+        request._cache_update_cache = True
         self._set_cache(request, test_content)
 
-        request = self._get_request('HEAD')
+        request = self.factory.head(self.path)
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertNotEqual(get_cache_data, None)
         self.assertEqual(test_content.encode(), get_cache_data.content)
@@ -1339,38 +1316,14 @@ class CacheI18nTest(TestCase):
     def setUp(self):
         self.path = '/cache/test/'
         self.cache = get_cache('default')
+        self.factory = RequestFactory()
 
     def tearDown(self):
         self.cache.clear()
 
-    def _get_request(self, method='GET'):
-        request = HttpRequest()
-        request.META = {
-            'SERVER_NAME': 'testserver',
-            'SERVER_PORT': 80,
-        }
-        request.method = method
-        request.path = request.path_info = self.path
-        return request
-
-    def _get_request_cache(self, query_string=None):
-        request = HttpRequest()
-        request.META = {
-            'SERVER_NAME': 'testserver',
-            'SERVER_PORT': 80,
-        }
-        if query_string:
-            request.META['QUERY_STRING'] = query_string
-            request.GET = QueryDict(query_string)
-        request.path = request.path_info = self.path
-        request._cache_update_cache = True
-        request.method = 'GET'
-        request.session = {}
-        return request
-
     @override_settings(USE_I18N=True, USE_L10N=False, USE_TZ=False)
     def test_cache_key_i18n_translation(self):
-        request = self._get_request()
+        request = self.factory.get(self.path)
         lang = translation.get_language()
         response = HttpResponse()
         key = learn_cache_key(request, response)
@@ -1379,7 +1332,7 @@ class CacheI18nTest(TestCase):
         self.assertEqual(key, key2)
 
     def check_accept_language_vary(self, accept_language, vary, reference_key):
-        request = self._get_request()
+        request = self.factory.get(self.path)
         request.META['HTTP_ACCEPT_LANGUAGE'] = accept_language
         request.META['HTTP_ACCEPT_ENCODING'] = 'gzip;q=1.0, identity; q=0.5, *;q=0'
         response = HttpResponse()
@@ -1393,7 +1346,7 @@ class CacheI18nTest(TestCase):
     def test_cache_key_i18n_translation_accept_language(self):
         lang = translation.get_language()
         self.assertEqual(lang, 'en')
-        request = self._get_request()
+        request = self.factory.get(self.path)
         request.META['HTTP_ACCEPT_ENCODING'] = 'gzip;q=1.0, identity; q=0.5, *;q=0'
         response = HttpResponse()
         response['Vary'] = 'accept-encoding'
@@ -1447,7 +1400,7 @@ class CacheI18nTest(TestCase):
 
     @override_settings(USE_I18N=False, USE_L10N=True, USE_TZ=False)
     def test_cache_key_i18n_formatting(self):
-        request = self._get_request()
+        request = self.factory.get(self.path)
         lang = translation.get_language()
         response = HttpResponse()
         key = learn_cache_key(request, response)
@@ -1457,7 +1410,7 @@ class CacheI18nTest(TestCase):
 
     @override_settings(USE_I18N=False, USE_L10N=False, USE_TZ=True)
     def test_cache_key_i18n_timezone(self):
-        request = self._get_request()
+        request = self.factory.get(self.path)
         # This is tightly coupled to the implementation,
         # but it's the most straightforward way to test the key.
         tz = force_text(timezone.get_current_timezone_name(), errors='ignore')
@@ -1470,7 +1423,7 @@ class CacheI18nTest(TestCase):
 
     @override_settings(USE_I18N=False, USE_L10N=False)
     def test_cache_key_no_i18n(self):
-        request = self._get_request()
+        request = self.factory.get(self.path)
         lang = translation.get_language()
         tz = force_text(timezone.get_current_timezone_name(), errors='ignore')
         tz = tz.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
@@ -1488,7 +1441,7 @@ class CacheI18nTest(TestCase):
             def tzname(self, dt):
                 return self.name
 
-        request = self._get_request()
+        request = self.factory.get(self.path)
         response = HttpResponse()
         with timezone.override(CustomTzName()):
             CustomTzName.name = 'Hora estándar de Argentina'.encode('UTF-8')  # UTF-8 string
@@ -1515,7 +1468,9 @@ class CacheI18nTest(TestCase):
             return UpdateCacheMiddleware().process_response(request, response)
 
         # cache with non empty request.GET
-        request = self._get_request_cache(query_string='foo=bar&other=true')
+        request = self.factory.get(self.path, {'foo': 'bar', 'other': 'true'})
+        request._cache_update_cache = True
+
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         # first access, cache must return None
         self.assertEqual(get_cache_data, None)
@@ -1528,7 +1483,8 @@ class CacheI18nTest(TestCase):
         self.assertNotEqual(get_cache_data, None)
         self.assertEqual(get_cache_data.content, content.encode())
         # different QUERY_STRING, cache must be empty
-        request = self._get_request_cache(query_string='foo=bar&somethingelse=true')
+        request = self.factory.get(self.path, {'foo': 'bar', 'somethingelse': 'true'})
+        request._cache_update_cache = True
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertEqual(get_cache_data, None)
 
@@ -1536,7 +1492,8 @@ class CacheI18nTest(TestCase):
         en_message = "Hello world!"
         es_message = "Hola mundo!"
 
-        request = self._get_request_cache()
+        request = self.factory.get(self.path)
+        request._cache_update_cache = True
         set_cache(request, 'en', en_message)
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         # Check that we can recover the cache
@@ -1551,7 +1508,8 @@ class CacheI18nTest(TestCase):
             get_cache_data = FetchFromCacheMiddleware().process_request(request)
             self.assertFalse(get_cache_data.has_header('ETag'))
         # change the session language and set content
-        request = self._get_request_cache()
+        request = self.factory.get(self.path)
+        request._cache_update_cache = True
         set_cache(request, 'es', es_message)
         # change again the language
         translation.activate('en')
@@ -1571,7 +1529,7 @@ class CacheI18nTest(TestCase):
         USE_ETAGS=True,
     )
     def test_middleware_doesnt_cache_streaming_response(self):
-        request = self._get_request()
+        request = self.factory.get(self.path)
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertIsNone(get_cache_data)
 
@@ -1845,19 +1803,10 @@ class TestWithTemplateResponse(TestCase):
     def setUp(self):
         self.path = '/cache/test/'
         self.cache = get_cache('default')
+        self.factory = RequestFactory()
 
     def tearDown(self):
         self.cache.clear()
-
-    def _get_request(self, path, method='GET'):
-        request = HttpRequest()
-        request.META = {
-            'SERVER_NAME': 'testserver',
-            'SERVER_PORT': 80,
-        }
-        request.method = method
-        request.path = request.path_info = "/cache/%s" % path
-        return request
 
     def test_patch_vary_headers(self):
         headers = (
@@ -1880,27 +1829,27 @@ class TestWithTemplateResponse(TestCase):
             self.assertEqual(response['Vary'], resulting_vary)
 
     def test_get_cache_key(self):
-        request = self._get_request(self.path)
+        request = self.factory.get(self.path)
         response = TemplateResponse(HttpResponse(), Template("This is a test"))
         key_prefix = 'localprefix'
         # Expect None if no headers have been set yet.
         self.assertEqual(get_cache_key(request), None)
         # Set headers to an empty list.
         learn_cache_key(request, response)
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.9fa0fd092afb73bdce204bb4f94d5804.d41d8cd98f00b204e9800998ecf8427e')
         # Verify that a specified key_prefix is taken into account.
         learn_cache_key(request, response, key_prefix=key_prefix)
-        self.assertEqual(get_cache_key(request, key_prefix=key_prefix), 'views.decorators.cache.cache_page.localprefix.GET.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(get_cache_key(request, key_prefix=key_prefix), 'views.decorators.cache.cache_page.localprefix.GET.9fa0fd092afb73bdce204bb4f94d5804.d41d8cd98f00b204e9800998ecf8427e')
 
     def test_get_cache_key_with_query(self):
-        request = self._get_request(self.path + '?test=1')
+        request = self.factory.get(self.path, {'test': 1})
         response = TemplateResponse(HttpResponse(), Template("This is a test"))
         # Expect None if no headers have been set yet.
         self.assertEqual(get_cache_key(request), None)
         # Set headers to an empty list.
         learn_cache_key(request, response)
         # Verify that the querystring is taken into account.
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.bd889c5a59603af44333ed21504db3cd.d41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.d11198ba31883732b0de5786a80cc12b.d41d8cd98f00b204e9800998ecf8427e')
 
     @override_settings(USE_ETAGS=False)
     def test_without_etag(self):

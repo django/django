@@ -1,6 +1,7 @@
 from django.db.models import Q, Sum
 from django.db.utils import IntegrityError
 from django.test import TestCase, skipIfDBFeature
+from django.forms.models import modelform_factory
 
 from .models import (
     Address, Place, Restaurant, Link, CharLink, TextLink,
@@ -236,3 +237,13 @@ class GenericRelationTests(TestCase):
         # Finally test that filtering works.
         self.assertEqual(qs.filter(links__sum__isnull=True).count(), 1)
         self.assertEqual(qs.filter(links__sum__isnull=False).count(), 0)
+
+    def test_editable_generic_rel(self):
+        GenericRelationForm = modelform_factory(HasLinkThing, fields='__all__')
+        form = GenericRelationForm()
+        self.assertIn('links', form.fields)
+        form = GenericRelationForm({'links': None})
+        self.assertTrue(form.is_valid())
+        form.save()
+        links = HasLinkThing._meta.get_field_by_name('links')[0].field
+        self.assertEqual(links.save_form_data_calls, 1)

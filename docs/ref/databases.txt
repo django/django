@@ -300,9 +300,8 @@ MySQL Connector/Python
 ~~~~~~~~~~~~~~~~~~~~~~
 
 MySQL Connector/Python is available through two `release branches`_: Generally
-Available (GA, currently 1.0.x) and Development (Dev, currently 1.1.x).
-The Django adapter is currently available in the Dev branch and is described
-as Alpha.
+Available (GA, currently 1.0.x) and Development (Dev, currently 1.1.x beta).
+The Django adapter is currently only available in the Dev branch.
 
 .. _release branches: http://dev.mysql.com/downloads/connector/python/
 
@@ -805,7 +804,7 @@ a quoted name as the value for ``db_table``::
         class Meta:
        	    db_table = '"OTHER_USER"."NAME_ONLY_SEEMS_OVER_30"'
 
-Quoted names can also be used with Django's other supported database 
+Quoted names can also be used with Django's other supported database
 backends; except for Oracle, however, the quotes have no effect.
 
 When running ``migrate``, an ``ORA-06552`` error may be encountered if

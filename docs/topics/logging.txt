@@ -178,11 +178,11 @@ Making logging calls
 The logger instance contains an entry method for each of the default
 log levels:
 
-* ``logger.critical()``
-* ``logger.error()``
-* ``logger.warning()``
-* ``logger.info()``
 * ``logger.debug()``
+* ``logger.info()``
+* ``logger.warning()``
+* ``logger.error()``
+* ``logger.critical()``
 
 There are two other logging calls available:
 

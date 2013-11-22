@@ -662,7 +662,7 @@ controlled by trusted users (or, are at least unable to set cookies).
 For example, an attacker could log into ``good.example.com`` and get a valid
 session for his account. If the attacker has control over ``bad.example.com``,
 he can use it to send his session key to you since a subdomain is permitted
-to set cookies on `*.example.com``. When you visit ``good.example.com``,
+to set cookies on ``*.example.com``. When you visit ``good.example.com``,
 you'll be logged in as the attacker and might inadvertently enter your
 sensitive personal data (e.g. credit card info) into the attackers account.
 

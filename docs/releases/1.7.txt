@@ -317,6 +317,10 @@ Forms
   return ``self.cleaned_data``. If it does return a changed dictionary then
   that will still be used.
 
+* After a temporary regression in Django 1.6, it's now possible again to make
+  :class:`~django.forms.TypedChoiceField` ``coerce`` method return an arbitrary
+  value.
+
 * :attr:`SelectDateWidget.months
   <django.forms.extras.widgets.SelectDateWidget.months>` can be used to
   customize the wording of the months displayed in the select widget.
@@ -491,6 +495,11 @@ Tests
 * The ``secure`` argument was added to all the request methods of
   :class:`~django.test.Client`. If ``True``, the request will be made
   through HTTPS.
+
+* Requests made with :meth:`Client.login() <django.test.Client.login>` and
+  :meth:`Client.logout() <django.test.Client.logout>` respect defaults defined
+  in :class:`~django.test.Client` instantiation and are processed through
+  middleware.
 
 Backwards incompatible changes in 1.7
 =====================================

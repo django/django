@@ -243,7 +243,7 @@ class QuerySet(object):
 
         skip = None
         if load_fields and not fill_cache:
-            # Some fields have been deferred, so we have to initialise
+            # Some fields have been deferred, so we have to initialize
             # via keyword arguments.
             skip = set()
             init_list = []

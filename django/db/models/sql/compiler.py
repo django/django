@@ -1083,8 +1083,8 @@ class SQLDateTimeCompiler(SQLCompiler):
                 if settings.USE_TZ:
                     if datetime is None:
                         raise ValueError("Database returned an invalid value "
-                                         "in QuerySet.dates(). Are time zone "
-                                         "definitions and pytz installed?")
+                                         "in QuerySet.datetimes(). Are time zone "
+                                         "definitions for your database and pytz installed?")
                     datetime = datetime.replace(tzinfo=None)
                     datetime = timezone.make_aware(datetime, self.query.tzinfo)
                 yield datetime

@@ -822,12 +822,10 @@ class TypedChoiceField(ChoiceField):
         self.empty_value = kwargs.pop('empty_value', '')
         super(TypedChoiceField, self).__init__(*args, **kwargs)
 
-    def to_python(self, value):
+    def _coerce(self, value):
         """
-        Validates that the value is in self.choices and can be coerced to the
-        right type.
+        Validate that the value can be coerced to the right type (if not empty).
         """
-        value = super(TypedChoiceField, self).to_python(value)
         if value == self.empty_value or value in self.empty_values:
             return self.empty_value
         try:
@@ -839,6 +837,10 @@ class TypedChoiceField(ChoiceField):
                 params={'value': value},
             )
         return value
+
+    def clean(self, value):
+        value = super(TypedChoiceField, self).clean(value)
+        return self._coerce(value)
 
 
 class MultipleChoiceField(ChoiceField):
@@ -889,12 +891,11 @@ class TypedMultipleChoiceField(MultipleChoiceField):
         self.empty_value = kwargs.pop('empty_value', [])
         super(TypedMultipleChoiceField, self).__init__(*args, **kwargs)
 
-    def to_python(self, value):
+    def _coerce(self, value):
         """
         Validates that the values are in self.choices and can be coerced to the
         right type.
         """
-        value = super(TypedMultipleChoiceField, self).to_python(value)
         if value == self.empty_value or value in self.empty_values:
             return self.empty_value
         new_value = []
@@ -908,6 +909,10 @@ class TypedMultipleChoiceField(MultipleChoiceField):
                     params={'value': choice},
                 )
         return new_value
+
+    def clean(self, value):
+        value = super(TypedMultipleChoiceField, self).clean(value)
+        return self._coerce(value)
 
     def validate(self, value):
         if value != self.empty_value:

@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.forms.models import inlineformset_factory
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
 from .models import Poet, Poem, School, Parent, Child
@@ -157,3 +157,12 @@ class InlineFormsetFactoryTest(TestCase):
         inlineformset_factory(
             Parent, Child, exclude=('school',), fk_name='mother'
         )
+
+    @skipUnlessDBFeature('allows_primary_key_0')
+    def test_zero_primary_key(self):
+        # Regression test for #21472
+        poet = Poet.objects.create(id=0, name='test')
+        poem = poet.poem_set.create(name='test poem')
+        PoemFormSet = inlineformset_factory(Poet, Poem, fields="__all__", extra=0)
+        formset = PoemFormSet(None, instance=poet)
+        self.assertEqual(len(formset.forms), 1)

@@ -32,6 +32,7 @@ def normalize_unique_together(unique_together):
     tuple of two strings. Normalize it to a tuple of tuples, so that
     calling code can uniformly expect that.
     """
+    unique_together = tuple(unique_together)
     if unique_together and not isinstance(unique_together[0], (tuple, list)):
         unique_together = (unique_together,)
     return unique_together

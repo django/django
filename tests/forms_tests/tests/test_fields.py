@@ -956,6 +956,22 @@ class FieldsTests(SimpleTestCase):
         f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=True)
         self.assertFalse(f._has_changed(None, ''))
 
+    def test_typedchoicefield_special_coerce(self):
+        """
+        Test a coerce function which results in a value not present in choices.
+        Refs #21397.
+        """
+        def coerce_func(val):
+            return Decimal('1.%s' % val)
+
+        f = TypedChoiceField(choices=[(1, "1"), (2, "2")], coerce=coerce_func, required=True)
+        self.assertEqual(Decimal('1.2'), f.clean('2'))
+        self.assertRaisesMessage(ValidationError,
+            "'This field is required.'", f.clean, '')
+        self.assertRaisesMessage(ValidationError,
+            "'Select a valid choice. 3 is not one of the available choices.'",
+            f.clean, '3')
+
     # NullBooleanField ############################################################
 
     def test_nullbooleanfield_1(self):
@@ -1109,6 +1125,23 @@ class FieldsTests(SimpleTestCase):
         # has_changed should not trigger required validation
         f = TypedMultipleChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=True)
         self.assertFalse(f._has_changed(None, ''))
+
+    def test_typedmultiplechoicefield_special_coerce(self):
+        """
+        Test a coerce function which results in a value not present in choices.
+        Refs #21397.
+        """
+        def coerce_func(val):
+            return Decimal('1.%s' % val)
+
+        f = TypedMultipleChoiceField(
+            choices=[(1, "1"), (2, "2")], coerce=coerce_func, required=True)
+        self.assertEqual([Decimal('1.2')], f.clean(['2']))
+        self.assertRaisesMessage(ValidationError,
+            "'This field is required.'", f.clean, [])
+        self.assertRaisesMessage(ValidationError,
+            "'Select a valid choice. 3 is not one of the available choices.'",
+            f.clean, ['3'])
 
    # ComboField ##################################################################
 

@@ -383,7 +383,7 @@ displayed if the given array is empty or could not be found::
     {% empty %}
         <li>Sorry, no athletes in this list.</li>
     {% endfor %}
-    <ul>
+    </ul>
 
 The above is equivalent to -- but shorter, cleaner, and possibly faster
 than -- the following::
