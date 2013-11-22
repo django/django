@@ -7,7 +7,9 @@ from django.db import connection, DatabaseError, IntegrityError
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.transaction import atomic
-from .models import Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest
+from .models import (Author, AuthorWithM2M, Book, BookWithLongName,
+    BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
+    UniqueTest)
 
 
 class SchemaTests(TransactionTestCase):
@@ -21,7 +23,10 @@ class SchemaTests(TransactionTestCase):
 
     available_apps = []
 
-    models = [Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest]
+    models = [
+        Author, AuthorWithM2M, Book, BookWithLongName, BookWithSlug,
+        BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest,
+    ]
 
     # Utility functions
 
@@ -659,3 +664,18 @@ class SchemaTests(TransactionTestCase):
                 raise SomeError
         except SomeError:
             self.assertFalse(connection.in_atomic_block)
+
+    def test_foreign_key_index_long_names_regression(self):
+        """
+        Regression test for #21497. Only affects databases that supports
+        foreign keys.
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(BookWithLongName)
+        # Ensure the table is there and has the right index
+        self.assertIn(
+            "author_foreign_key_with_really_long_field_name_id",
+            connection.introspection.get_indexes(connection.cursor(), BookWithLongName._meta.db_table),
+        )
