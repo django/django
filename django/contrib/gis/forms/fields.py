@@ -45,9 +45,24 @@ class GeometryField(forms.Field):
             try:
                 value = GEOSGeometry(value)
                 if not value.srid:
-                    value.srid = self.widget.map_srid
+                    try:
+                        value.srid = self.widget.map_srid
+                    except AttributeError:
+                        pass
             except (GEOSException, ValueError, TypeError):
                 raise forms.ValidationError(self.error_messages['invalid_geom'], code='invalid_geom')
+
+        # Transforming the geometry if the SRID was set.
+        if self.srid:
+            if not value.srid:
+                # Should match that of the field if not given.
+                value.srid = self.srid
+            elif self.srid != -1 and self.srid != value.srid:
+                try:
+                    value.transform(self.srid)
+                except GEOSException:
+                    raise forms.ValidationError(self.error_messages['transform_error'], code='transform_error')
+
         return value
 
     def clean(self, value):
@@ -64,17 +79,6 @@ class GeometryField(forms.Field):
         # using the OGC string label).
         if str(geom.geom_type).upper() != self.geom_type and not self.geom_type == 'GEOMETRY':
             raise forms.ValidationError(self.error_messages['invalid_geom_type'], code='invalid_geom_type')
-
-        # Transforming the geometry if the SRID was set.
-        if self.srid:
-            if not geom.srid:
-                # Should match that of the field if not given.
-                geom.srid = self.srid
-            elif self.srid != -1 and self.srid != geom.srid:
-                try:
-                    geom.transform(self.srid)
-                except GEOSException:
-                    raise forms.ValidationError(self.error_messages['transform_error'], code='transform_error')
 
         return geom
 

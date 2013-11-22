@@ -1,6 +1,6 @@
 from unittest import skipUnless
 
-from django.forms import ValidationError
+from django.forms import widgets, ValidationError
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.tests.utils import HAS_SPATIALREFSYS
 from django.test import SimpleTestCase
@@ -25,7 +25,7 @@ class GeometryFieldTest(SimpleTestCase):
         "Testing GeometryField with a SRID set."
         # Input that doesn't specify the SRID is assumed to be in the SRID
         # of the input field.
-        fld = forms.GeometryField(srid=4326)
+        fld = forms.GeometryField(srid=4326, widget=widgets.TextInput)
         geom = fld.clean('POINT(5 23)')
         self.assertEqual(4326, geom.srid)
         # Making the field in a different SRID from that of the geometry, and
