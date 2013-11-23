@@ -24,8 +24,8 @@ from django.utils.module_loading import import_by_path
 
 
 __all__ = [
-    'create_cache', 'get_cache', 'cache', 'DEFAULT_CACHE_ALIAS',
-    'InvalidCacheBackendError', 'CacheKeyWarning', 'BaseCache',
+    'get_cache', 'cache', 'DEFAULT_CACHE_ALIAS', 'InvalidCacheBackendError',
+    'CacheKeyWarning', 'BaseCache',
 ]
 
 DEFAULT_CACHE_ALIAS = 'default'
@@ -36,61 +36,49 @@ if DEFAULT_CACHE_ALIAS not in settings.CACHES:
 
 def get_cache(backend, **kwargs):
     """
-    Function to retrieve a configure cache, or create a new one.
-
-    This wrapper is for backward compatibility.
-
-    Use either create_cache or caches directly.
-
-    """
-    warnings.warn("'get_cache' is deprecated.  Use either caches or create_cache.",
-        PendingDeprecationWarning, stacklevel=2)
-
-    # If it's just an alias with no options, use the new API
-    if backend in settings.CACHES and not kwargs:
-        return caches[backend]
-
-    return create_cache(backend, **kwargs)
-
-
-def create_cache(backend, **params):
-    """
-    Function to create a cache backend dynamically.  This is flexible by design
+    Function to create a cache backend dynamically. This is flexible by design
     to allow different use cases:
 
-    To load a backend with its dotted import path, including options::
+    To load a backend that is pre-defined in the settings::
 
-        cache = get_cache('django.core.cache.backends.memcached.MemcachedCache',
-            LOCATION='127.0.0.1:11211', TIMEOUT=30,
+        cache = get_cache('default')
+
+    To create a backend with its dotted import path,
+    including arbitrary options::
+
+        cache = get_cache('django.core.cache.backends.memcached.MemcachedCache', **{
+            'LOCATION': '127.0.0.1:11211', 'TIMEOUT': 30,
         })
 
-    To create a new instance of a cache in settings.CACHES, pass the alias::
-
-        cache = create_cache('default')
-
-    You can also pass extra parameters to override those in settings.CACHES::
-
-        cache = create_cache('default', LOCATION='bar')
-
     """
+    warnings.warn("'get_cache' is deprecated in favor of 'caches'.",
+                  PendingDeprecationWarning, stacklevel=2)
+    return _create_cache(backend, **kwargs)
 
-    # We can name a cache from settings.CACHES and update its params
-    try:
-        conf = settings.CACHES[backend]
-    except KeyError:
-        pass
-    else:
-        params = conf.copy()
-        params.update(params)
-        backend = params.pop('BACKEND')
 
+def _create_cache(backend, **kwargs):
     try:
+        # Try to get the CACHES entry for the given backend name first
+        try:
+            conf = settings.CACHES[backend]
+        except KeyError:
+            try:
+                # Trying to import the given backend, in case it's a dotted path
+                import_by_path(backend)
+            except ImproperlyConfigured as e:
+                raise InvalidCacheBackendError("Could not find backend '%s': %s" % (
+                    backend, e))
+            location = kwargs.pop('LOCATION', '')
+            params = kwargs
+        else:
+            params = conf.copy()
+            params.update(kwargs)
+            backend = params.pop('BACKEND')
+            location = params.pop('LOCATION', '')
         backend_cls = import_by_path(backend)
-    except ImproperlyConfigured as e:
-        raise InvalidCacheBackendError("Could not find backend '%s': %s" % (
-            backend, e
-        ))
-    location = params.pop('LOCATION', '')
+    except (AttributeError, ImportError, ImproperlyConfigured) as e:
+        raise InvalidCacheBackendError(
+            "Could not find backend '%s': %s" % (backend, e))
     cache = backend_cls(location, params)
     # Some caches -- python-memcached in particular -- need to do a cleanup at the
     # end of a request cycle. If not implemented in a particular backend
@@ -119,7 +107,7 @@ class CacheHandler(object):
                 "Could not find config for '%s' in settings.CACHES" % alias
             )
 
-        cache = create_cache(alias)
+        cache = _create_cache(alias)
         setattr(self._caches, alias, cache)
 
         return cache
@@ -141,6 +129,9 @@ class DefaultCacheProxy(object):
 
     def __delattr__(self, name):
         return delattr(caches[DEFAULT_CACHE_ALIAS], name)
+
+    def __contains__(self, key):
+        return key in caches[DEFAULT_CACHE_ALIAS]
 
     def __eq__(self, other):
         return caches[DEFAULT_CACHE_ALIAS] == other
