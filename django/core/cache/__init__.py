@@ -114,6 +114,7 @@ class CacheHandler(object):
 
 caches = CacheHandler()
 
+
 class DefaultCacheProxy(object):
     """
     Proxy access to the default Cache object's attributes.

@@ -6,10 +6,8 @@ from __future__ import unicode_literals
 
 import os
 import pickle
-import random
 import re
 import shutil
-import string
 import tempfile
 import threading
 import time
@@ -1039,8 +1037,8 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
 
     # Explicitly display a skipped test if no configured cache uses MemcachedCache
     @unittest.skipUnless(
-        any(cache['BACKEND'] == 'django.core.cache.backends.memcached.MemcachedCache'
-            for cache in settings.CACHES.values()),
+        any(c['BACKEND'] == 'django.core.cache.backends.memcached.MemcachedCache'
+            for c in settings.CACHES.values()),
         "cache with python-memcached library not available")
     def test_memcached_uses_highest_pickle_version(self):
         # Regression test for #19810
@@ -1158,7 +1156,6 @@ class CacheUtils(TestCase):
     def setUp(self):
         self.path = '/cache/test/'
         self.factory = RequestFactory()
-
 
     def test_patch_vary_headers(self):
         headers = (
@@ -1903,6 +1900,7 @@ class TestMakeTemplateFragmentKey(TestCase):
         self.assertEqual(key,
             'template.cache.spam.f27688177baec990cdf3fbd9d9c3f469')
 
+
 class CacheHandlerTest(TestCase):
     def test_same_instance(self):
         """
@@ -1919,6 +1917,7 @@ class CacheHandlerTest(TestCase):
         instances.
         """
         c = []
+
         def runner():
             c.append(caches['default'])
 
