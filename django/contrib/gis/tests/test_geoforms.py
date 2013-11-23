@@ -76,6 +76,19 @@ class GeometryFieldTest(SimpleTestCase):
         for wkt in ('POINT(5)', 'MULTI   POLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'BLAH(0 0, 1 1)'):
             self.assertRaises(forms.ValidationError, fld.to_python, wkt)
 
+    def test_field_with_text_widget(self):
+        class PointForm(forms.Form):
+            pt = forms.PointField(srid=4326, widget=forms.TextInput)
+
+        form = PointForm()
+        cleaned_pt = form.fields['pt'].clean('POINT(5 23)')
+        self.assertEqual(cleaned_pt, GEOSGeometry('POINT(5 23)'))
+        self.assertEqual(4326, cleaned_pt.srid)
+
+        point = GEOSGeometry('SRID=4326;POINT(5 23)')
+        form = PointForm(data={'pt': 'POINT(5 23)'}, initial={'pt': point})
+        self.assertFalse(form.has_changed())
+
 
 @skipUnless(HAS_GDAL and HAS_SPATIALREFSYS,
     "SpecializedFieldTest needs gdal support and a spatial database")
