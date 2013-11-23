@@ -600,6 +600,7 @@ class Client(RequestFactory):
         else:
             request.session = engine.SessionStore()
         logout(request)
+        self.cookies = SimpleCookie()
 
     def _handle_redirects(self, response, **extra):
         "Follows any redirects by requesting responses from the server using GET."
