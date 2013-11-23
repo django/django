@@ -1012,13 +1012,13 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
 # To check the memcached backend, the test settings file will
 # need to contain at least one cache backend setting that points at
 # your memcache server.
-memcached_params = None
+memcached_params = {}
 for _cache_params in settings.CACHES.values():
     if _cache_params['BACKEND'].startswith('django.core.cache.backends.memcached.'):
         memcached_params = _cache_params
 
 
-@unittest.skipIf(memcached_params is None, "memcached not available")
+@unittest.skipUnless(memcached_params, "memcached not available")
 @override_settings(CACHES=caches_setting_for_tests(**memcached_params))
 class MemcachedCacheTests(BaseCacheTests, TestCase):
 
