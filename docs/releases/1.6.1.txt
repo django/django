@@ -35,3 +35,5 @@ Bug fixes
   promised: Support of multiple locale names separated by commas. It's still
   possible to specify multiplle locales in one run by suing the option
   multiple times (#21488, #17181).
+* Fixed a regression that unnecessarily triggered settings configuration when
+  importing ``get_wsgi_application`` (#21486).

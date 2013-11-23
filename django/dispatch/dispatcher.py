@@ -85,7 +85,7 @@ class Signal(object):
         from django.conf import settings
 
         # If DEBUG is on, check that we got a good receiver
-        if settings.DEBUG:
+        if settings.configured and settings.DEBUG:
             import inspect
             assert callable(receiver), "Signal receivers must be callable."
 
