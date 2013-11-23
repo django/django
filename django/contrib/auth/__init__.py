@@ -105,7 +105,15 @@ def logout(request):
         user = None
     user_logged_out.send(sender=user.__class__, request=request, user=user)
 
+    # remember language choice saved to session
+    # for backwards compatibility django_language is also checked (remove in 1.8)
+    language = request.session.get('_language', request.session.get('django_language'))
+
     request.session.flush()
+
+    if language is not None:
+        request.session['_language'] = language
+
     if hasattr(request, 'user'):
         from django.contrib.auth.models import AnonymousUser
         request.user = AnonymousUser()
