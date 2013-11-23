@@ -2971,7 +2971,7 @@ class AdminInlineFileUploadTest(TestCase):
             "pictures-1-image": "",
         }
         response = self.client.post('/test_admin/%s/admin_views/gallery/%d/' % (self.urlbit, self.gallery.id), post_data)
-        self.assertTrue(response._container[0].find("Currently:") > -1)
+        self.assertContains(response, b"Currently")
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
