@@ -356,10 +356,10 @@ class HttpResponseTests(unittest.TestCase):
         r = HttpResponse(iter(['hello', 'world']))
         self.assertEqual(r.content, r.content)
         self.assertEqual(r.content, b'helloworld')
-        # accessing the iterator works (once) after accessing .content
+        # __iter__ can safely be called multiple times (#20187).
         self.assertEqual(b''.join(r), b'helloworld')
-        self.assertEqual(b''.join(r), b'')
-        # accessing .content still works
+        self.assertEqual(b''.join(r), b'helloworld')
+        # Accessing .content still works.
         self.assertEqual(r.content, b'helloworld')
 
         # Accessing .content also works if the response was iterated first.
