@@ -39,3 +39,4 @@ Bug fixes
   importing ``get_wsgi_application`` (#21486).
 * Fixed test client ``logout()`` method when using the cookie-based session
   backend (#21448).
+* Fixed a crash when a ``GeometryField`` uses a non-geometric widget (#21496).
