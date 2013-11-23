@@ -37,3 +37,5 @@ Bug fixes
   multiple times (#21488, #17181).
 * Fixed a regression that unnecessarily triggered settings configuration when
   importing ``get_wsgi_application`` (#21486).
+* Fixed test client ``logout()`` method when using the cookie-based session
+  backend (#21448).
