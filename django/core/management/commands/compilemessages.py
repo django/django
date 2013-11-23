@@ -35,7 +35,7 @@ def compile_messages(stdout, locale=None):
 
     for basedir in basedirs:
         if locale:
-            dirs = [os.path.join(basedir, l, 'LC_MESSAGES') for l in (locale if isinstance(locale, list) else [locale])]
+            dirs = [os.path.join(basedir, l, 'LC_MESSAGES') for l in locale]
         else:
             dirs = [basedir]
         for ldir in dirs:
@@ -61,7 +61,7 @@ def compile_messages(stdout, locale=None):
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--locale', '-l', dest='locale', action='append',
-                    help='locale(s) to process (e.g. de_AT). Default is to process all. Can be used multiple times, accepts a comma-separated list of locale names.'),
+                    help='locale(s) to process (e.g. de_AT). Default is to process all. Can be used multiple times.'),
     )
     help = 'Compiles .po files to .mo files for use with builtin gettext support.'
 
