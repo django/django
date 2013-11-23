@@ -6,11 +6,9 @@ In a nutshell, a cache is a set of values -- which can be any object that
 may be pickled -- identified by string keys.  For the complete API, see
 the abstract BaseCache class in django.core.cache.backends.base.
 
-Client code should not access a cache backend directly; instead it should
-either use the "cache" variable made available here, or it should use the
-get_cache() function made available here. get_cache() takes a CACHES alias or a
-backend path and config parameters, and returns an instance of a backend cache
-class.
+Client code should use the `cache` variable defined here to access the default
+cache backend and look up non-default cache backends in the `caches` dict-like
+object.
 
 See docs/topics/cache.txt for information on the public API.
 """

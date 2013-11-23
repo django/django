@@ -703,67 +703,50 @@ pickling.)
 Accessing the cache
 -------------------
 
-.. versionadded:: 1.7
+.. data:: django.core.cache.caches
 
-You can access the caches configured in ``settings.CACHES`` through the
-dict-like ``django.core.cache.caches`` object. Repeated requests for the same
-alias will return the same object.
+    .. versionadded:: 1.7
 
-    >>> from django.core.cache import caches
-    >>> cache1 = caches['myalias']
-    >>> cache2 = caches['myalias']
-    >>> cache1 is cache2
-    True
+    You can access the caches configured in the :setting:`CACHES` setting
+    through a dict-like object: ``django.core.cache.caches``. Repeated
+    requests for the same alias in the same thread will return the same
+    object.
 
-If the named key does not exist, ``InvalidCacheBackendError`` will be raised.
+        >>> from django.core.cache import caches
+        >>> cache1 = caches['myalias']
+        >>> cache2 = caches['myalias']
+        >>> cache1 is cache2
+        True
 
-The ``caches`` dict is thread aware, so a different instance of each alias will
-be returned for each thread.
+    If the named key does not exist, ``InvalidCacheBackendError`` will be
+    raised.
 
-The cache module, ``django.core.cache``, has a ``cache`` object that's
-automatically created from the ``'default'`` entry in the :setting:`CACHES`
-setting::
+    To provide thread-safety, a different instance of the cache backend will
+    be returned for each thread.
 
-    >>> from django.core.cache import cache
+.. data:: django.core.cache.cache
 
-This is a proxy object to caches['default']. It is provided for backward
-compatiblity.
+    As a shortcut, the default cache is available as
+    ``django.core.cache.cache``::
 
-.. function:: django.core.cache.create_cache(backend, **kwargs)
+        >>> from django.core.cache import cache
 
-You can create caches from ad-hoc configurations using ``create_cache``.
-
-    >>> from django.core.cache import create_cache
-    # Create an instance of a specific backend
-    >>> cache = create_cache(
-        'django.core.cache.backends.memcached.MemcachedCache',
-        LOCATION='/tmp/memcached.sock'
-    )
-    # Create a separate copy of the 'default' cache:
-    >>> new_default = create_cache('default')
-    # Create a cache with the same config as 'default', but a different timeout
-    >>> cache2 = create_cache('default', TIMEOUT=1)
-
-This is guaranteed to always create a new instance.
+    This object is equivalent to ``caches['default']``.
 
 .. function:: django.core.cache.get_cache(backend, **kwargs)
 
-.. deprecated:: 1.7
-    This function has been deprecated in favour of ``caches`` and
-    ``create_cache``.
+    .. deprecated:: 1.7
+        This function has been deprecated in favour of
+        :data:`~django.core.cache.caches`.
 
-Before Django 1.7 this was the only way to get a cache instance.  Now it acts
-as a wrapper to ``create_cache``, except in the case where it is passed only a
-configured alias, where it will return the cache from ``caches``::
+    Before Django 1.7 this function was the canonical way to obtain a cache
+    instance. It could also be used to create a new cache instance with a
+    different configuration.
 
-    >>> from django.core.cache import get_cache
-    # Passes call to create_cache
-    >>> cache = get_cache('django.core.cache.backends.memcached.MemcachedCache', LOCATION='127.0.0.2')
-    # Creates a new cache based on the config in settings.CACHES['default']
-    >>> cache = get_cache('default', TIMEOUT=300)
-    # Returns instance from caches object
-    >>> cache = get_cache('default')
-
+        >>> from django.core.cache import get_cache
+        >>> get_cache('default')
+        >>> get_cache('django.core.cache.backends.memcached.MemcachedCache', LOCATION='127.0.0.2')
+        >>> get_cache('default', TIMEOUT=300)
 
 Basic usage
 -----------
