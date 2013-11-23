@@ -30,3 +30,6 @@ Bug fixes
   key (#21472).
 * Fixed a regression where custom querysets for foreign keys were overwritten
   if ``ModelAdmin`` had ordering set (#21405).
+* Actually implemented support of multiple locale names separated by commas
+  in the ``--locale``/``-l`` option of ``makemessages`` and
+  ``compilemessages`` commands (#21488, #17181).

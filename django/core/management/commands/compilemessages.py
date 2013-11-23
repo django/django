@@ -33,7 +33,10 @@ def compile_messages(stdout, locale=None):
 
     for basedir in basedirs:
         if locale:
-            dirs = [os.path.join(basedir, l, 'LC_MESSAGES') for l in (locale if isinstance(locale, list) else [locale])]
+            locales = []
+            for l in locale:
+                locales.extend(l.split(','))
+            dirs = [os.path.join(basedir, l, 'LC_MESSAGES') for l in locales]
         else:
             dirs = [basedir]
         for ldir in dirs:

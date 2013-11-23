@@ -264,7 +264,8 @@ class Command(NoArgsCommand):
         # Build po files for each selected locale
         locales = []
         if locale is not None:
-            locales += locale.split(',') if not isinstance(locale, list) else locale
+            for l in locale:
+                locales.extend(l.split(','))
         elif process_all:
             locale_dirs = filter(os.path.isdir, glob.glob('%s/*' % localedir))
             locales = [os.path.basename(l) for l in locale_dirs]
