@@ -7,20 +7,6 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
-1.3
----
-
-See the :doc:`Django 1.1 release notes</releases/1.1>` for more details on
-these changes.
-
-* ``AdminSite.root()``.  This method of hooking up the admin URLs will be
-  removed in favor of including ``admin.site.urls``.
-
-* Authentication backends need to define the boolean attributes
-  ``supports_object_permissions`` and ``supports_anonymous_user`` until
-  version 1.4, at which point it will be assumed that all backends will
-  support these options.
-
 1.4
 ---
 
