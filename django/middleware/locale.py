@@ -53,10 +53,6 @@ class LocaleMiddleware(object):
                     request.get_host(), language, request.get_full_path())
                 return HttpResponseRedirect(language_url)
 
-        # Store language back into session if it is not present
-        if hasattr(request, 'session'):
-            request.session.setdefault('django_language', language)
-
         if not (self.is_language_prefix_patterns_used()
                 and language_from_path):
             patch_vary_headers(response, ('Accept-Language',))

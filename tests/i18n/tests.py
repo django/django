@@ -1191,29 +1191,12 @@ class LocaleMiddlewareTests(TransRealMixin, TestCase):
             'django.middleware.common.CommonMiddleware',
         ),
     )
-    def test_session_language(self):
-        """
-        Check that language is stored in session if missing.
-        """
-        # Create an empty session
-        engine = import_module(settings.SESSION_ENGINE)
-        session = engine.SessionStore()
-        session.save()
-        self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
-
-        # Clear the session data before request
-        session.save()
-        response = self.client.get('/en/simple/')
-        self.assertEqual(self.client.session['django_language'], 'en')
-
-        # Clear the session data before request
-        session.save()
-        response = self.client.get('/fr/simple/')
-        self.assertEqual(self.client.session['django_language'], 'fr')
-
-        # Check that language is not changed in session
-        response = self.client.get('/en/simple/')
-        self.assertEqual(self.client.session['django_language'], 'fr')
+    def test_language_not_saved_to_session(self):
+        """Checks that current language is not automatically saved to
+        session on every request."""
+        # Regression test for #21473
+        self.client.get('/fr/simple/')
+        self.assertNotIn('django_language', self.client.session)
 
 
 @override_settings(

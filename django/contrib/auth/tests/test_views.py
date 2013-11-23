@@ -12,6 +12,7 @@ from django.http import QueryDict, HttpRequest
 from django.utils.encoding import force_text
 from django.utils.http import int_to_base36, urlsafe_base64_decode, urlquote
 from django.utils.six.moves.urllib.parse import urlparse, ParseResult
+from django.utils.importlib import import_module
 from django.utils._os import upath
 from django.test import TestCase
 from django.test.utils import override_settings, patch_logger
@@ -695,6 +696,19 @@ class LogoutTest(AuthViewsTestCase):
             self.assertTrue(good_url in response.url,
                             "%s should be allowed" % good_url)
             self.confirm_logged_out()
+
+    def test_logout_preserve_language(self):
+        """Check that language stored in session is preserved after logout"""
+        # Create a new session with language
+        engine = import_module(settings.SESSION_ENGINE)
+        session = engine.SessionStore()
+        session['django_language'] = 'pl'
+        session.save()
+        self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
+
+        self.client.get('/logout/')
+        self.assertEqual(self.client.session['django_language'], 'pl')
+
 
 @skipIfCustomUser
 @override_settings(
