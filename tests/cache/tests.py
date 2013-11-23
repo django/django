@@ -31,9 +31,13 @@ from django.utils import timezone
 from django.utils import translation
 from django.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
-from django.utils.six.moves import cPickle as pickle
 from django.utils.encoding import force_text
 from django.views.decorators.cache import cache_page
+
+try:    # Use the same idiom as in cache backends
+    from django.utils.six.moves import cPickle as pickle
+except ImportError:
+    import pickle
 
 from .models import Poll, expensive_calculation
 
