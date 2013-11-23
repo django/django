@@ -536,6 +536,18 @@ For apps with migrations, ``allow_migrate`` will now get passed
 without custom attributes, methods or managers. Make sure your ``allow_migrate``
 methods are only referring to fields or other items in ``model._meta``.
 
+Behavior of ``LocMemCache`` regarding pickle errors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An inconsistency existed in previous versions of Django regarding how pickle
+errors are handled by different cache backends.
+``django.core.cache.backends.locmem.LocMemCache`` used to fail silently when
+such an error occurs, which is inconsistent with other backends and leads to
+cache-specific errors. This has been fixed in Django 1.7, see
+`Ticket #21200`_ for more details.
+
+.. _Ticket #21200: https://code.djangoproject.com/ticket/21200
+
 Passing ``None`` to ``Manager.db_manager()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

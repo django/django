@@ -48,6 +48,11 @@ class C:
         return 24
 
 
+class Unpickable(object):
+    def __getstate__(self):
+        raise pickle.PickleError()
+
+
 @override_settings(CACHES={
     'default': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
@@ -846,6 +851,16 @@ class BaseCacheTests(object):
         self.assertNotEqual(get_cache_data, None)
         self.assertEqual(get_cache_data.content, content.encode('utf-8'))
         self.assertEqual(get_cache_data.cookies, response.cookies)
+
+    def test_add_fail_on_pickleerror(self):
+         "See https://code.djangoproject.com/ticket/21200"
+         with self.assertRaises(pickle.PickleError):
+             cache.add('unpickable', Unpickable())
+
+    def test_set_fail_on_pickleerror(self):
+        "See https://code.djangoproject.com/ticket/21200"
+        with self.assertRaises(pickle.PickleError):
+            cache.set('unpickable', Unpickable())
 
 
 @override_settings(CACHES=caches_setting_for_tests(
