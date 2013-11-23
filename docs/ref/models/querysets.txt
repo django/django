@@ -956,14 +956,14 @@ This allows prefetching the same relation multiple times with a different
     >>> vegetarian_pizzas = Pizza.objects.filter(vegetarian=True)
     >>> Restaurant.objects.prefetch_related(
     ...     Prefetch('pizzas', to_attr('menu')),
-    ...     Prefetch('pizzas', queryset=vegetarian_pizzas to_attr='vegetarian_menu'))
+    ...     Prefetch('pizzas', queryset=vegetarian_pizzas, to_attr='vegetarian_menu'))
 
 Lookups created with custom ``to_attr`` can still be traversed as usual by other
 lookups:
 
     >>> vegetarian_pizzas = Pizza.objects.filter(vegetarian=True)
     >>> Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas', queryset=vegetarian_pizzas to_attr='vegetarian_menu'),
+    ...     Prefetch('pizzas', queryset=vegetarian_pizzas, to_attr='vegetarian_menu'),
     ...     'vegetarian_menu__toppings')
 
 Using ``to_attr`` is recommended when filtering down the prefetch result as it is
