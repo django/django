@@ -46,7 +46,7 @@ More details about how the caching works:
 import warnings
 
 from django.conf import settings
-from django.core.cache import create_cache, caches, DEFAULT_CACHE_ALIAS
+from django.core.cache import caches, DEFAULT_CACHE_ALIAS
 from django.utils.cache import get_cache_key, learn_cache_key, patch_response_headers, get_max_age
 
 
@@ -196,4 +196,4 @@ class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
             msg = "CACHE_MIDDLEWARE_ANONYMOUS_ONLY has been deprecated and will be removed in Django 1.8."
             warnings.warn(msg, DeprecationWarning, stacklevel=1)
 
-        self.cache = create_cache(self.cache_alias)
+        self.cache = caches[self.cache_alias]
