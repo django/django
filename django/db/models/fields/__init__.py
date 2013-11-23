@@ -1491,7 +1491,6 @@ class PositiveSmallIntegerField(IntegerField):
 
 
 class SlugField(CharField):
-    default_validators = [validators.validate_slug]
     description = _("Slug (up to %(max_length)s)")
 
     def __init__(self, *args, **kwargs):
@@ -1499,6 +1498,11 @@ class SlugField(CharField):
         # Set db_index=True unless it's been set manually.
         if 'db_index' not in kwargs:
             kwargs['db_index'] = True
+        if kwargs.pop('unicode', False):
+            self.default_validators = [validators.validate_unicode_slug]
+        else:
+            self.default_validators = [validators.validate_slug]
+
         super(SlugField, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
