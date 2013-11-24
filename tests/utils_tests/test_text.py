@@ -127,3 +127,7 @@ class TestUtilsText(SimpleTestCase):
         ]
         for value, output in items:
             self.assertEqual(text.unescape_entities(value), output)
+
+    def test_get_valid_filename(self):
+        filename = "^&'@{}[],$=!-#()%+~_123.txt"
+        self.assertEqual(text.get_valid_filename(filename), "-_123.txt")
