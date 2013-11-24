@@ -9,7 +9,7 @@ from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql_psycopg2.base import DatabaseOperations
-from django.db.utils import DatabaseError
+from django.db.utils import ProgrammingError
 from django.utils import six
 from django.utils.functional import cached_property
 
@@ -258,7 +258,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         else:
             try:
                 vtup = self.postgis_version_tuple()
-            except DatabaseError:
+            except ProgrammingError:
                 raise ImproperlyConfigured(
                     'Cannot determine PostGIS version for database "%s". '
                     'GeoDjango requires at least PostGIS version 1.3. '
