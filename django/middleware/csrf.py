@@ -83,6 +83,10 @@ class CsrfViewMiddleware(object):
     This middleware should be used in conjunction with the csrf_token template
     tag.
     """
+
+    def __init__(self, CSRF_HEADER_NAME=None):
+        self.CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+
     # The _accept and _reject methods currently only exist for the sake of the
     # requires_csrf_token decorator.
     def _accept(self, request):
@@ -172,7 +176,7 @@ class CsrfViewMiddleware(object):
             if request_csrf_token == "":
                 # Fall back to X-CSRFToken, to make things easier for AJAX,
                 # and possible for PUT/DELETE.
-                request_csrf_token = request.META.get('HTTP_X_CSRFTOKEN', '')
+                request_csrf_token = request.META.get(self.CSRF_HEADER_NAME, '')
 
             if not constant_time_compare(request_csrf_token, csrf_token):
                 return self._reject(request, REASON_BAD_TOKEN)
