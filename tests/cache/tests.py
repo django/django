@@ -197,7 +197,7 @@ def custom_key_func(key, key_prefix, version):
 
 _caches_setting_base = {
     'default': {},
-    'prefix': {'KEY_PREFIX': 'cacheprefix'},
+    'prefix': {'KEY_PREFIX': 'cacheprefix{}'.format(os.getpid())},
     'v2': {'VERSION': 2},
     'custom_key': {'KEY_FUNCTION': custom_key_func},
     'custom_key2': {'KEY_FUNCTION': 'cache.tests.custom_key_func'},
