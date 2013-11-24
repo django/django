@@ -2522,7 +2522,8 @@ that instance as a ``current_app`` hint to the reverse call. For example,
 if you specifically wanted the admin view from the admin instance named
 ``custom``, you would need to call::
 
-    >>> change_url = urlresolvers.reverse('custom:polls_choice_change', args=(c.id,))
+    >>> change_url = urlresolvers.reverse('custom:polls_choice_change',
+    ...                                   args=(c.id,), current_app='custom')
 
 For more details, see the documentation on :ref:`reversing namespaced URLs
 <topics-http-reversing-url-namespaces>`.
