@@ -797,13 +797,12 @@ For each field, we describe the default widget used if you don't specify
 
     Takes one optional argument:
 
+        .. attribute:: unicode
+
         .. versionadded:: 1.7
 
         A boolean iinstructing the field to accept unicode letters.
         Defaults to ``False``.
-
-
-    .. attribute:: unicode
 
 ``TimeField``
 ~~~~~~~~~~~~~

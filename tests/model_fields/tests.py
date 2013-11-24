@@ -323,7 +323,7 @@ class SlugFieldTests(test.TestCase):
 
     def test_slugfield_unicode(self):
         """
-        Make sure SlugField honors max_length (#9706)
+        Make sure SlugField  with unicode=True honors max_length (#9706)
         """
         bs = BigUnicodeS.objects.create(s='你好你好' * 50)
         bs = BigUnicodeS.objects.get(pk=bs.pk)
