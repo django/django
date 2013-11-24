@@ -81,7 +81,7 @@ def record_output(func):
     return func
 GeoIP_record_by_addr = record_output(lgeoip.GeoIP_record_by_addr)
 GeoIP_record_by_name = record_output(lgeoip.GeoIP_record_by_name)
-
+GeoIP_record_by_addr_v6 = record_output(lgeoip.GeoIP_record_by_addr_v6)
 
 # For opening & closing GeoIP database files.
 GeoIP_open = lgeoip.GeoIP_open
@@ -122,4 +122,6 @@ def string_output(func):
 GeoIP_country_code_by_addr = string_output(lgeoip.GeoIP_country_code_by_addr)
 GeoIP_country_code_by_name = string_output(lgeoip.GeoIP_country_code_by_name)
 GeoIP_country_name_by_addr = string_output(lgeoip.GeoIP_country_name_by_addr)
+GeoIP_country_code_by_addr_v6 = string_output(lgeoip.GeoIP_country_code_by_addr_v6)
+GeoIP_country_name_by_addr_v6 = string_output(lgeoip.GeoIP_country_name_by_addr_v6)
 GeoIP_country_name_by_name = string_output(lgeoip.GeoIP_country_name_by_name)

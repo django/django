@@ -895,6 +895,9 @@ Miscellaneous
   whitespace by default. This can be disabled by setting the new
   :attr:`~django.forms.CharField.strip` argument to ``False``.
 
+* The ``django.contrib.gis.geoip`` connection to C database from GeoIP now
+  supports IPv6.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9
