@@ -59,13 +59,13 @@ def _check_permission_clashing(custom, builtin, ctype):
         pool.add(codename)
 
 
-def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kwargs):
+def create_permissions(app, created_models, verbosity, using=DEFAULT_DB_ALIAS, **kwargs):
     try:
         get_model('auth', 'Permission')
     except UnavailableApp:
         return
 
-    if not router.allow_migrate(db, auth_app.Permission):
+    if not router.allow_migrate(using, auth_app.Permission):
         return
 
     from django.contrib.contenttypes.models import ContentType
@@ -80,7 +80,7 @@ def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kw
     for klass in app_models:
         # Force looking up the content types in the current database
         # before creating foreign keys to them.
-        ctype = ContentType.objects.db_manager(db).get_for_model(klass)
+        ctype = ContentType.objects.db_manager(using).get_for_model(klass)
         ctypes.add(ctype)
         for perm in _get_all_permissions(klass._meta, ctype):
             searched_perms.append((ctype, perm))
@@ -88,7 +88,7 @@ def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kw
     # Find all the Permissions that have a content_type for a model we're
     # looking for.  We don't need to check for codenames since we already have
     # a list of the ones we're going to create.
-    all_perms = set(auth_app.Permission.objects.using(db).filter(
+    all_perms = set(auth_app.Permission.objects.using(using).filter(
         content_type__in=ctypes,
     ).values_list(
         "content_type", "codename"
@@ -111,13 +111,13 @@ def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kw
                     verbose_name_max_length,
                 )
             )
-    auth_app.Permission.objects.using(db).bulk_create(perms)
+    auth_app.Permission.objects.using(using).bulk_create(perms)
     if verbosity >= 2:
         for perm in perms:
             print("Adding permission '%s'" % perm)
 
 
-def create_superuser(app, created_models, verbosity, db, **kwargs):
+def create_superuser(app, created_models, verbosity, using, **kwargs):
     try:
         get_model('auth', 'Permission')
         UserModel = get_user_model()
@@ -136,7 +136,7 @@ def create_superuser(app, created_models, verbosity, db, **kwargs):
                 confirm = input('Please enter either "yes" or "no": ')
                 continue
             if confirm == 'yes':
-                call_command("createsuperuser", interactive=True, database=db)
+                call_command("createsuperuser", interactive=True, database=using)
             break
 
 

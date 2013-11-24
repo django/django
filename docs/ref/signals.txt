@@ -396,7 +396,7 @@ Arguments sent with this signal:
     For example, the :mod:`django.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
 
-``db``
+``using``
     The alias of database on which a command will operate.
 
 pre_syncdb
@@ -407,14 +407,19 @@ pre_syncdb
 
 .. deprecated:: 1.7
 
-    This signal has been renamed to :data:`~django.db.models.signals.pre_migrate`.
+    This signal has been replaced by :data:`~django.db.models.signals.pre_migrate`
+    and will be removed in Django 1.9.
 
-Alias of :data:`django.db.models.signals.pre_migrate`. As long as this alias
-is present, for backwards-compatibility this signal has an extra argument it sends:
+Handlers for this signal receives the same arguments as
+:data:`~django.db.models.signals.pre_migrate` with the following exceptions:
 
 ``create_models``
     A list of the model classes from any app which :djadmin:`migrate` is
     going to create, **only if the app has no migrations**.
+
+``db``
+    The database alias used for synchronization. Defaults to the ``default``
+    database. Renamed to ``using`` in :data:`~django.db.models.signals.pre_migrate`.
 
 post_migrate
 ------------
@@ -458,7 +463,7 @@ Arguments sent with this signal:
     For example, the :mod:`django.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
 
-``db``
+``using``
     The database alias used for synchronization. Defaults to the ``default``
     database.
 
@@ -481,14 +486,19 @@ post_syncdb
 
 .. deprecated:: 1.7
 
-    This signal has been renamed to :data:`~django.db.models.signals.post_migrate`.
+    This signal has been replaced by :data:`~django.db.models.signals.post_migrate`
+    and will be removed in Django 1.9.
 
-Alias of :data:`django.db.models.signals.post_migrate`. As long as this alias
-is present, for backwards-compatibility this signal has an extra argument it sends:
+Handlers for this signal receives the same arguments as
+:data:`~django.db.models.signals.post_migrate` with the following exceptions:
 
 ``created_models``
     A list of the model classes from any app which :djadmin:`migrate` has
     created, **only if the app has no migrations**.
+
+``db``
+    The database alias used for synchronization. Defaults to the ``default``
+    database. Renamed to ``using`` in :data:`~django.db.models.signals.post_migrate`.
 
 Request/response signals
 ========================
