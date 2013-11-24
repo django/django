@@ -864,9 +864,9 @@ class BaseCacheTests(object):
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
     def test_add_fail_on_pickleerror(self):
-         "See https://code.djangoproject.com/ticket/21200"
-         with self.assertRaises(pickle.PickleError):
-             cache.add('unpickable', Unpickable())
+        "See https://code.djangoproject.com/ticket/21200"
+        with self.assertRaises(pickle.PickleError):
+            cache.add('unpickable', Unpickable())
 
     def test_set_fail_on_pickleerror(self):
         "See https://code.djangoproject.com/ticket/21200"
