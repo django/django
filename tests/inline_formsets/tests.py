@@ -162,7 +162,7 @@ class InlineFormsetFactoryTest(TestCase):
             Parent, Child, exclude=('school',), fk_name='mother'
         )
 
-    @skipUnlessDBFeature('allows_primary_key_0')
+    @skipUnlessDBFeature('allows_auto_pk_0')
     def test_zero_primary_key(self):
         # Regression test for #21472
         poet = Poet.objects.create(id=0, name='test')

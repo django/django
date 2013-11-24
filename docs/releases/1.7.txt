@@ -1010,6 +1010,12 @@ Miscellaneous
   to ``False``). If you maintain a custom database backend, you should check
   that method.
 
+* The ``django.db.backends.BaseDatabaseFeatures.allows_primary_key_0``
+  attribute has been renamed to ``allows_auto_pk_0`` to better describe it.
+  It's ``True`` for all database backends included with Django except MySQL
+  which does allow primary keys with value 0. It only forbids *autoincrement*
+  primary keys with value 0.
+
 .. _deprecated-features-1.7:
 
 Features deprecated in 1.7

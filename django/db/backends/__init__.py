@@ -613,8 +613,8 @@ class BaseDatabaseFeatures(object):
     # Is there a 1000 item limit on query parameters?
     supports_1000_query_parameters = True
 
-    # Can an object have a primary key of 0? MySQL says No.
-    allows_primary_key_0 = True
+    # Can an object have an autoincrement primary key of 0? MySQL says No.
+    allows_auto_pk_0 = True
 
     # Do we need to NULL a ForeignKey out, or can the constraint check be
     # deferred

@@ -177,7 +177,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_date_lookup_using_string = False
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
-    allows_primary_key_0 = False
+    allows_auto_pk_0 = False
     uses_savepoints = True
     atomic_transactions = False
     supports_check_constraints = False
