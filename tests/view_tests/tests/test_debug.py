@@ -3,6 +3,7 @@
 # files to search for such a header to decode the source file content
 from __future__ import unicode_literals
 
+import importlib
 import inspect
 import os
 import re
@@ -19,7 +20,7 @@ from django.test import TestCase, RequestFactory
 from django.test.utils import (override_settings, setup_test_template_loader,
     restore_template_loaders)
 from django.utils.encoding import force_text, force_bytes
-from django.utils import importlib, six
+from django.utils import six
 from django.views.debug import ExceptionReporter
 
 from .. import BrokenException, except_args
