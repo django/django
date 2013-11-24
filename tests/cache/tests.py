@@ -1063,7 +1063,7 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
 
     # Explicitly display a skipped test if no configured cache uses MemcachedCache
     @unittest.skipUnless(
-        memcached_params['BACKEND'] == 'django.core.cache.backends.memcached.MemcachedCache',
+        memcached_params.get('BACKEND') == 'django.core.cache.backends.memcached.MemcachedCache',
         "cache with python-memcached library not available")
     def test_memcached_uses_highest_pickle_version(self):
         # Regression test for #19810
