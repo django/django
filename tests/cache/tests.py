@@ -207,9 +207,16 @@ _caches_setting_base = {
 }
 
 
-def caches_setting_for_tests(**params):
-    setting = dict((k, v.copy()) for k, v in _caches_setting_base.items())
-    for cache_params in setting.values():
+def caches_setting_for_tests(base=None, **params):
+    # `base` is used to pull in the memcached config from the original settings,
+    # `params` are test specific overrides and `_caches_settings_base` is the
+    # base config for the tests.
+    # This results in the following search order:
+    # params -> _caches_setting_base -> base
+    base = base or {}
+    setting = dict((k, base.copy()) for k in _caches_setting_base.keys())
+    for key, cache_params in setting.items():
+        cache_params.update(_caches_setting_base[key])
         cache_params.update(params)
     return setting
 
@@ -1036,7 +1043,7 @@ for _cache_params in settings.CACHES.values():
 
 
 @unittest.skipUnless(memcached_params, "memcached not available")
-@override_settings(CACHES=caches_setting_for_tests(**memcached_params))
+@override_settings(CACHES=caches_setting_for_tests(base=memcached_params))
 class MemcachedCacheTests(BaseCacheTests, TestCase):
 
     def test_invalid_keys(self):
@@ -1056,8 +1063,7 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
 
     # Explicitly display a skipped test if no configured cache uses MemcachedCache
     @unittest.skipUnless(
-        any(c['BACKEND'] == 'django.core.cache.backends.memcached.MemcachedCache'
-            for c in settings.CACHES.values()),
+        memcached_params['BACKEND'] == 'django.core.cache.backends.memcached.MemcachedCache',
         "cache with python-memcached library not available")
     def test_memcached_uses_highest_pickle_version(self):
         # Regression test for #19810
