@@ -22,8 +22,8 @@ from django.utils import six
 from django.utils.functional import lazy
 
 from .models import (
-    Foo, Bar, Whiz, BigD, BigS, BigUnicodeS, BigInt, Post, NullBooleanModel,
-    BooleanModel, DataModel, Document, RenamedField,
+    Foo, Bar, Whiz, BigD, BigS, UnicodeSlugField, BigInt, Post,
+    NullBooleanModel, BooleanModel, DataModel, Document, RenamedField,
     VerboseNameField, FksToBooleans)
 
 
@@ -325,8 +325,8 @@ class SlugFieldTests(test.TestCase):
         """
         Make sure SlugField  with unicode=True honors max_length (#9706)
         """
-        bs = BigUnicodeS.objects.create(s='你好你好' * 50)
-        bs = BigUnicodeS.objects.get(pk=bs.pk)
+        bs = UnicodeSlugField.objects.create(s='你好你好' * 50)
+        bs = UnicodeSlugField.objects.get(pk=bs.pk)
         self.assertEqual(bs.s, '你好你好' * 50)
 
 
