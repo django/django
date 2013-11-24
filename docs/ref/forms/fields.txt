@@ -795,6 +795,23 @@ For each field, we describe the default widget used if you don't specify
    This field is intended for use in representing a model
    :class:`~django.db.models.SlugField` in forms.
 
+``UnicodeSlugField``
+~~~~~~~~~~~~~
+
+.. versionadded:: 1.7
+
+.. class:: UnicodeSlugField(**kwargs)
+
+   * Default widget: :class:`TextInput`
+   * Empty value: ``''`` (an empty string)
+   * Normalizes to: A Unicode object.
+   * Validates that the given value contains only letters, numbers,
+     underscores, and hyphens.
+   * Error messages: ``required``, ``invalid``
+
+   A subclass of :class:`~django.forms.SlugField` that accepts unicode
+   letters.
+
 ``TimeField``
 ~~~~~~~~~~~~~
 

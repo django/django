@@ -40,7 +40,8 @@ __all__ = (
     'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
     'SplitDateTimeField', 'IPAddressField', 'GenericIPAddressField', 'FilePathField',
-    'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField'
+    'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
+    'UnicodeSlugField'
 )
 
 
@@ -1182,3 +1183,7 @@ class SlugField(CharField):
     def clean(self, value):
         value = self.to_python(value).strip()
         return super(SlugField, self).clean(value)
+
+
+class UnicodeSlugField(SlugField):
+    default_validators = [validators.validate_unicode_slug]
