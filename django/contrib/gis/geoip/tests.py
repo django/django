@@ -20,8 +20,8 @@ if HAS_GEOS:
 
 # Note: Requires use of both the GeoIP country and city datasets.
 # The GEOIP_DATA path should be the only setting set (the directory
-# should contain links or the actual database files 'GeoIP.dat' and
-# 'GeoLiteCity.dat'.
+# should contain links or the actual database files 'GeoIP.dat',
+# 'GeoIPv6.dat', 'GeoLiteCity.dat' and 'GeoLiteCityv6.dat'.
 
 
 @skipUnless(HAS_GEOIP and getattr(settings, "GEOIP_PATH", None),
@@ -114,8 +114,8 @@ class GeoIPTest(unittest.TestCase):
                 self.assertAlmostEqual(lon, tup[0], 4)
                 self.assertAlmostEqual(lat, tup[1], 4)
 
-    def test05_unicode_response(self):
-        "Testing that GeoIP strings are properly encoded, see #16553."
+    def test05_ipv6_query(self):
+        "Testing that GeoIP can lookup ipv6 addresses."
         g = GeoIP()
-        d = g.city("www.osnabrueck.de")
-        self.assertEqual('Osnabrück', d['city'])
+        d = g.city('2a03:2880:2110:3f01:face:b00c::')
+        self.assertNotEqual(d, None)
