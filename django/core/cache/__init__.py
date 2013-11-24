@@ -53,7 +53,12 @@ def get_cache(backend, **kwargs):
     """
     warnings.warn("'get_cache' is deprecated in favor of 'caches'.",
                   PendingDeprecationWarning, stacklevel=2)
-    return _create_cache(backend, **kwargs)
+    cache = _create_cache(backend, **kwargs)
+    # Some caches -- python-memcached in particular -- need to do a cleanup at the
+    # end of a request cycle. If not implemented in a particular backend
+    # cache.close is a no-op
+    signals.request_finished.connect(cache.close)
+    return cache
 
 
 def _create_cache(backend, **kwargs):
@@ -79,12 +84,7 @@ def _create_cache(backend, **kwargs):
     except (AttributeError, ImportError, ImproperlyConfigured) as e:
         raise InvalidCacheBackendError(
             "Could not find backend '%s': %s" % (backend, e))
-    cache = backend_cls(location, params)
-    # Some caches -- python-memcached in particular -- need to do a cleanup at the
-    # end of a request cycle. If not implemented in a particular backend
-    # cache.close is a no-op
-    signals.request_finished.connect(cache.close)
-    return cache
+    return backend_cls(location, params)
 
 
 class CacheHandler(object):
@@ -98,8 +98,10 @@ class CacheHandler(object):
 
     def __getitem__(self, alias):
         try:
-            return getattr(self._caches, alias)
+            return self._caches.caches[alias]
         except AttributeError:
+            self._caches.caches = {}
+        except KeyError:
             pass
 
         if alias not in settings.CACHES:
@@ -108,9 +110,11 @@ class CacheHandler(object):
             )
 
         cache = _create_cache(alias)
-        setattr(self._caches, alias, cache)
-
+        self._caches.caches[alias] = cache
         return cache
+
+    def all(self):
+        return getattr(self._caches, 'caches', {}).values()
 
 caches = CacheHandler()
 
@@ -141,3 +145,11 @@ class DefaultCacheProxy(object):
         return caches[DEFAULT_CACHE_ALIAS] != other
 
 cache = DefaultCacheProxy()
+
+def close_caches(**kwargs):
+    # Some caches -- python-memcached in particular -- need to do a cleanup at the
+    # end of a request cycle. If not implemented in a particular backend
+    # cache.close is a no-op
+    for cache in caches.all():
+        cache.close()
+signals.request_finished.connect(close_caches)

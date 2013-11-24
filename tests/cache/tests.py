@@ -203,7 +203,6 @@ _caches_setting_base = {
     'custom_key2': {'KEY_FUNCTION': 'cache.tests.custom_key_func'},
     'cull': {'OPTIONS': {'MAX_ENTRIES': 30}},
     'zero_cull': {'OPTIONS': {'CULL_FREQUENCY': 0, 'MAX_ENTRIES': 30}},
-    'other': {'LOCATION': 'other'},
 }
 
 
@@ -1014,6 +1013,13 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         caches['custom_key2']._cache = cache._cache
         caches['custom_key2']._expire_info = cache._expire_info
 
+    @override_settings(CACHES={
+        'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'},
+        'other': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'other'
+        },
+    })
     def test_multiple_caches(self):
         "Check that multiple locmem caches are isolated"
         cache.set('value', 42)
@@ -1139,6 +1145,12 @@ class CustomCacheKeyValidationTests(TestCase):
         self.assertEqual(cache.get(key), val)
 
 
+@override_settings(
+    CACHES={
+            'default': {
+                'BACKEND': 'cache.closeable_cache.CacheClass',
+            }
+        },)
 class GetCacheTests(IgnorePendingDeprecationWarningsMixin, TestCase):
 
     def test_simple(self):
@@ -1157,6 +1169,12 @@ class GetCacheTests(IgnorePendingDeprecationWarningsMixin, TestCase):
         self.assertRaises(InvalidCacheBackendError, get_cache, 'does_not_exist')
 
     def test_close(self):
+        from django.core import signals
+        self.assertFalse(cache.closed)
+        signals.request_finished.send(self.__class__)
+        self.assertTrue(cache.closed)
+
+    def test_close_deprecated(self):
         from django.core.cache import get_cache
         from django.core import signals
         cache = get_cache('cache.closeable_cache.CacheClass')
