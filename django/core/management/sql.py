@@ -211,10 +211,15 @@ def emit_pre_migrate_signal(create_models, verbosity, interactive, db):
         if verbosity >= 2:
             print("Running pre-migrate handlers for application %s" % app_name)
         models.signals.pre_migrate.send(sender=app, app=app,
+                                        create_models=create_models,
+                                        verbosity=verbosity,
+                                        interactive=interactive, using=db)
+
+        # PendingDeprecationWarning
+        models.signals.pre_syncdb.send(sender=app, app=app,
                                        create_models=create_models,
                                        verbosity=verbosity,
-                                       interactive=interactive,
-                                       db=db)
+                                       interactive=interactive, db=db)
 
 
 def emit_post_migrate_signal(created_models, verbosity, interactive, db):
@@ -224,5 +229,11 @@ def emit_post_migrate_signal(created_models, verbosity, interactive, db):
         if verbosity >= 2:
             print("Running post-migrate handlers for application %s" % app_name)
         models.signals.post_migrate.send(sender=app, app=app,
-            created_models=created_models, verbosity=verbosity,
-            interactive=interactive, db=db)
+                                         created_models=created_models,
+                                         verbosity=verbosity,
+                                         interactive=interactive, using=db)
+        # PendingDeprecationWarning
+        models.signals.post_syncdb.send(sender=app, app=app,
+                                        created_models=created_models,
+                                        verbosity=verbosity,
+                                        interactive=interactive, db=db)
