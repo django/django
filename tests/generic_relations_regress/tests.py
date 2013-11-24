@@ -1,8 +1,8 @@
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q, Sum
 from django.db.utils import IntegrityError
 from django.test import TestCase, skipIfDBFeature
 from django.forms.models import modelform_factory
-from django.contrib.contenttypes.models import ContentType
 
 from .models import (
     Address, Place, Restaurant, Link, CharLink, TextLink,
