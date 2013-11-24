@@ -183,8 +183,6 @@ The cache backend to use. The built-in cache backends are:
 You can use a cache backend that doesn't ship with Django by setting
 :setting:`BACKEND <CACHES-BACKEND>` to a fully-qualified path of a cache
 backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
-Writing a whole new cache backend from scratch is left as an exercise
-to the reader; see the other backends for examples.
 
 .. setting:: CACHES-KEY_FUNCTION
 
@@ -486,9 +484,7 @@ The database backend to use. The built-in database backends are:
 
 You can use a database backend that doesn't ship with Django by setting
 ``ENGINE`` to a fully-qualified path (i.e.
-``mypackage.backends.whatever``). Writing a whole new database backend from
-scratch is left as an exercise to the reader; see the other backends for
-examples.
+``mypackage.backends.whatever``).
 
 .. setting:: HOST
 
