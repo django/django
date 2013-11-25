@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import unittest
 import datetime
 import os
 from decimal import Decimal
@@ -22,7 +23,8 @@ from .models import (Article, ArticleStatus, BetterWriter, BigInt, Book,
     DerivedPost, ExplicitPK, FlexibleDatePost, ImprovedArticle,
     ImprovedArticleWithParentLink, Inventory, Post, Price,
     Product, TextFile, Writer, WriterProfile, Colour, ColourfulItem,
-    ArticleStatusNote, DateTimePost, CustomErrorMessage, test_images)
+    ArticleStatusNote, DateTimePost, CustomErrorMessage, test_images,
+    DbDefaultModel)
 
 if test_images:
     from .models import ImageFile, OptionalImageFile
@@ -255,6 +257,20 @@ class CustomErrorMessageForm(forms.ModelForm):
     class Meta:
         fields = '__all__'
         model = CustomErrorMessage
+
+
+class DbDefaultNoExplicitFieldsForm(forms.ModelForm):
+
+    class Meta:
+        fields = '__all__'
+        model = DbDefaultModel
+
+
+class DbDefaultExplicitFieldsForm(forms.ModelForm):
+
+    class Meta:
+        fields = ('name1', 'name2', 'name3', )
+        model = DbDefaultModel
 
 
 class ModelFormBaseTest(TestCase):
@@ -1877,3 +1893,20 @@ class ModelFormInheritanceTests(TestCase):
         self.assertEqual(list(type(str('NewForm'), (ModelForm, Mixin, Form), {})().fields.keys()), ['name'])
         self.assertEqual(list(type(str('NewForm'), (ModelForm, Form, Mixin), {})().fields.keys()), ['name', 'age'])
         self.assertEqual(list(type(str('NewForm'), (ModelForm, Form), {'age': None})().fields.keys()), ['name'])
+
+
+class DbDefaultTestCase(unittest.TestCase):
+
+    def test_not_in_explicit_fields_db_default_fields_are_ignored(self):
+        f = DbDefaultNoExplicitFieldsForm()
+        field_names = f.fields.keys()
+        self.assertEqual(len(field_names), 1)
+        self.assertIn('name1', field_names)
+
+    def test_included_in_explicit_fields_db_defaults_are_kept(self):
+        f = DbDefaultExplicitFieldsForm()
+        field_names = f.fields.keys()
+        self.assertEqual(len(field_names), 3)
+        self.assertIn('name1', field_names)
+        self.assertIn('name2', field_names)
+        self.assertIn('name3', field_names)

@@ -182,6 +182,10 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
         if exclude and f.name in exclude:
             continue
 
+        if fields is None:
+            if not (f.use_on_insert and f.use_on_update):
+                continue
+
         kwargs = {}
         if widgets and f.name in widgets:
             kwargs['widget'] = widgets[f.name]

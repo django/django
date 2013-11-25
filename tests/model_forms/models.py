@@ -329,3 +329,10 @@ class CustomErrorMessage(models.Model):
     def clean(self):
         if self.name1 == 'FORBIDDEN_VALUE':
             raise ValidationError({'name1': [ValidationError('Model.clean() error messages.')]})
+
+
+class DbDefaultModel(models.Model):
+
+    name1 = models.CharField(max_length=50)
+    name2 = models.CharField(max_length=50, use_on_insert=False)
+    name3 = models.CharField(max_length=50, use_on_update=False)
