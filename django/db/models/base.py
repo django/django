@@ -648,12 +648,17 @@ class Model(six.with_metaclass(ModelBase)):
         """
         Does the heavy-lifting involved in saving. Updates or inserts the data
         for a single table.
+
+        This also respects ``use_on_update`` and ``use_on_insert`` flags on
+        fields except for the case of fixture loading (``raw == True``).
+
         """
         meta = cls._meta
         non_pks = [
-            f for f in meta.local_concrete_fields
-            if not f.primary_key and f.use_on_update
+            f for f in meta.local_concrete_fields if not f.primary_key
         ]
+        if not raw:
+            non_pks = [f for f in non_pks if f.use_on_update]
 
         if update_fields:
             non_pks = [f for f in non_pks
@@ -685,7 +690,9 @@ class Model(six.with_metaclass(ModelBase)):
                     **{field.name: getattr(self, field.attname)}).count()
                 self._order = order_value
 
-            fields = (f for f in meta.local_concrete_fields if f.use_on_insert)
+            fields = meta.local_concrete_fields
+            if not raw:
+                fields = (f for f in fields if f.use_on_insert)
             if not pk_set:
                 fields = (f for f in fields if not isinstance(f, AutoField))
 

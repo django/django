@@ -714,6 +714,13 @@ class UpdateOnlyTests(test.TestCase):
         m.f  # Access f to force its evaluation.
         self.assertNumQueries(2)
 
+    def test_db_default_fields_are_always_updated_on_raw_queries(self):
+        m = SelectModel.objects.create()
+        m.f = 'text'
+        m.save_base(raw=True)
+        m = SelectModel.objects.all()[0]
+        self.assertEqual(m.f, 'text')
+
 
 class SelectOnlyTests(test.TestCase):
     """Tests for select-only fields."""
@@ -738,6 +745,13 @@ class SelectOnlyTests(test.TestCase):
         SelectModel.objects.update(f='text2')
         m = SelectModel.objects.all()[0]
         self.assertEqual(m.f, 'text2')
+
+    def test_db_default_fields_are_always_inserted_on_raw_queries(self):
+        # Fixture loading depends on raw == True
+        m = SelectModel(f='text')
+        m.save_base(raw=True)
+        m = SelectModel.objects.all()[0]
+        self.assertEqual(m.f, 'text')
 
 
 class PrimaryKeysUseOnInsertUpdateTestCase(unittest.TestCase):
