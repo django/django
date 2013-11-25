@@ -1147,10 +1147,11 @@ class CustomCacheKeyValidationTests(TestCase):
 
 @override_settings(
     CACHES={
-            'default': {
-                'BACKEND': 'cache.closeable_cache.CacheClass',
-            }
-        },)
+        'default': {
+            'BACKEND': 'cache.closeable_cache.CacheClass',
+        }
+    }
+)
 class GetCacheTests(IgnorePendingDeprecationWarningsMixin, TestCase):
 
     def test_simple(self):

@@ -146,6 +146,7 @@ class DefaultCacheProxy(object):
 
 cache = DefaultCacheProxy()
 
+
 def close_caches(**kwargs):
     # Some caches -- python-memcached in particular -- need to do a cleanup at the
     # end of a request cycle. If not implemented in a particular backend
