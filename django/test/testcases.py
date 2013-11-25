@@ -175,8 +175,6 @@ class SimpleTestCase(unittest.TestCase):
         if not skipped:
             try:
                 self._pre_setup()
-            except (KeyboardInterrupt, SystemExit):
-                raise
             except Exception:
                 result.addError(self, sys.exc_info())
                 return
@@ -184,8 +182,6 @@ class SimpleTestCase(unittest.TestCase):
         if not skipped:
             try:
                 self._post_teardown()
-            except (KeyboardInterrupt, SystemExit):
-                raise
             except Exception:
                 result.addError(self, sys.exc_info())
                 return
