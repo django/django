@@ -596,7 +596,8 @@ Has two optional arguments:
     A storage object, which handles the storage and retrieval of your
     files. See :doc:`/topics/files` for details on how to provide this object.
 
-The default form widget for this field is a :class:`~django.forms.FileInput`.
+The default form widget for this field is a
+:class:`~django.forms.ClearableFileInput`.
 
 Using a :class:`FileField` or an :class:`ImageField` (see below) in a model
 takes a few steps:
@@ -838,6 +839,9 @@ Requires the `Python Imaging Library`_.
 By default, :class:`ImageField` instances are created as ``varchar(100)``
 columns in your database. As with other fields, you can change the maximum
 length using the :attr:`~CharField.max_length` argument.
+
+The default form widget for this field is a
+:class:`~django.forms.ClearableFileInput`.
 
 ``IntegerField``
 ----------------
