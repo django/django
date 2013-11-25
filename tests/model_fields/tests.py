@@ -733,6 +733,12 @@ class SelectOnlyTests(test.TestCase):
         m.f  # Access f to force its evaluation.
         self.assertNumQueries(2)
 
+    def test_update_method_does_update_the_field(self):
+        SelectModel.objects.create(f='text')
+        SelectModel.objects.update(f='text2')
+        m = SelectModel.objects.all()[0]
+        self.assertEqual(m.f, 'text2')
+
 
 class PrimaryKeysUseOnInsertUpdateTestCase(unittest.TestCase):
 
