@@ -207,6 +207,62 @@ Arguments sent with this signal:
 ``using``
     The database alias being used.
 
+pre_update
+----------
+
+.. data:: django.db.models.signals.pre_update
+   :module:
+
+.. versionadded 1.7::
+
+Sent at the beginning of a queryset's
+:meth:`~django.db.models.query.QuerySet.update` method
+
+Arguments sent with this signal:
+
+``sender``
+    The model class.
+
+``queryset``
+    A clone of the queryset on which ``update()`` is being called.
+
+    Note that this queryset is not yet evaluated. Also there is no guarantee
+    that this queryset will fetch the same rows that will ultimately be affected,
+    as the data may change in the database before the actual update happens.
+
+``using``
+    The database alias being used.
+
+``update_fields``
+    A dict that maps the fields and values given as ``**kwargs`` to
+    ``QuerySet.update()``.
+
+post_update
+-----------
+
+.. data:: django.db.models.signals.post_update
+   :module:
+
+.. versionadded 1.7::
+
+Like :data:`pre_update`, but sent at the end of a queryset's
+:meth:`~django.db.models.query.QuerySet.update` method.
+
+Arguments sent with this signal:
+
+``sender``
+    The model class.
+
+``pk_set``
+    A set of primary key values of the objects that have been updated.
+
+``using``
+    The database alias being used.
+
+``update_fields``
+    A dict that maps the fields and values given as ``**kwargs`` to
+    ``QuerySet.update()``.
+
 m2m_changed
 -----------
 

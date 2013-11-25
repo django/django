@@ -64,6 +64,11 @@ post_delete = ModelSignal(providing_args=["instance", "using"], use_caching=True
 
 m2m_changed = ModelSignal(providing_args=["action", "instance", "reverse", "model", "pk_set", "using"], use_caching=True)
 
+pre_update = Signal(providing_args=["model", "queryset", "using", "update_fields"], use_caching=True)
+post_update = Signal(providing_args=["model", "pk_set", "using", "update_fields"], use_caching=True)
+
+m2m_changed = Signal(providing_args=["action", "instance", "reverse", "model", "pk_set", "using"], use_caching=True)
+
 pre_migrate = Signal(providing_args=["app", "create_models", "verbosity", "interactive", "db"])
 pre_syncdb = pre_migrate
 post_migrate = Signal(providing_args=["class", "app", "created_models", "verbosity", "interactive", "db"])

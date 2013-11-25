@@ -14,7 +14,7 @@ from django.db.models.fields import AutoField, Empty
 from django.db.models.query_utils import (Q, select_related_descend,
     deferred_class_factory, InvalidQuery)
 from django.db.models.deletion import Collector
-from django.db.models import sql
+from django.db.models import sql, signals
 from django.utils.functional import partition
 from django.utils import six
 from django.utils import timezone
@@ -570,11 +570,27 @@ class QuerySet(object):
         """
         assert self.query.can_filter(), \
                 "Cannot update a query once a slice has been taken."
+
         self._for_write = True
-        query = self.query.clone(sql.UpdateQuery)
-        query.add_update_values(kwargs)
         with transaction.commit_on_success_unless_managed(using=self.db):
-            rows = query.get_compiler(self.db).execute_sql(None)
+            if signals.pre_update.has_listeners(self.model):
+                signals.pre_update.send(sender=self.model, queryset=self._clone(), using=self.db, update_fields=kwargs)
+            if signals.post_update.has_listeners(self.model):
+                pk_set = set(self.values_list('pk', flat=True))
+                if connections[self.db].features.query_parameter_limit is None:
+                    query = self.filter(pk__in=pk_set).query.clone(sql.UpdateQuery)
+                    query.add_update_values(kwargs)
+                    rows = query.get_compiler(self.db).execute_sql(None)
+                else:
+                    # Chunked update for SQLite.
+                    query = self.query.clone(sql.UpdateQuery)
+                    rows = query.update_batch(list(pk_set), kwargs, self.db)
+                signals.post_update.send(sender=self.model, pk_set=pk_set, using=self.db, update_fields=kwargs)
+            else:
+                query = self.query.clone(sql.UpdateQuery)
+                query.add_update_values(kwargs)
+                rows = query.get_compiler(self.db).execute_sql(None)
+
         self._result_cache = None
         return rows
     update.alters_data = True
