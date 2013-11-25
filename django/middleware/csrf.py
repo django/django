@@ -27,13 +27,6 @@ REASON_BAD_TOKEN = "CSRF token missing or incorrect."
 CSRF_KEY_LENGTH = 32
 
 
-def _get_failure_view():
-    """
-    Returns the view to be used for CSRF rejections
-    """
-    return get_callable(settings.CSRF_FAILURE_VIEW)
-
-
 def _get_new_csrf_key():
     return get_random_string(CSRF_KEY_LENGTH)
 
@@ -82,7 +75,35 @@ class CsrfViewMiddleware(object):
 
     This middleware should be used in conjunction with the csrf_token template
     tag.
+
+    To change the associated settings, override them in your own subclass and
+    use that in your settings' MIDDLEWARE_CLASSES in place of this one.
     """
+    # TODO(wesalvaro): This is a work-around until the settings have been
+    #   deprecated. The default values from settings should be set here after
+    #   that occurs and the __new__ function should be removed.
+    #   Until then, these attributes cannot be used before __new__ is called.
+    COOKIE_NAME = None
+    COOKIE_DOMAIN = None
+    COOKIE_PATH = None
+    COOKIE_SECURE = None
+    COOKIE_HTTPONLY = None
+    FAILURE_VIEW = None
+    HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+
+    # TODO(wesalvaro): This is a work-around until the settings have been
+    #   deprecated. This lazily grabs the settings, preferring class values.
+    def __new__(cls, *args, **kwargs):
+        cls.COOKIE_NAME = cls.COOKIE_NAME or settings.CSRF_COOKIE_NAME
+        cls.COOKIE_DOMAIN = cls.COOKIE_DOMAIN or settings.CSRF_COOKIE_DOMAIN
+        cls.COOKIE_PATH = cls.COOKIE_PATH or settings.CSRF_COOKIE_PATH
+        cls.COOKIE_SECURE = (settings.CSRF_COOKIE_SECURE
+                             if cls.COOKIE_SECURE is None else cls.COOKIE_SECURE)
+        cls.COOKIE_HTTPONLY = (settings.CSRF_COOKIE_HTTPONLY
+                               if cls.COOKIE_HTTPONLY is None else cls.COOKIE_HTTPONLY)
+        cls.FAILURE_VIEW = cls.FAILURE_VIEW or settings.CSRF_FAILURE_VIEW
+        return super(CsrfViewMiddleware, cls).__new__(cls, *args, **kwargs)
+
     # The _accept and _reject methods currently only exist for the sake of the
     # requires_csrf_token decorator.
     def _accept(self, request):
@@ -99,7 +120,7 @@ class CsrfViewMiddleware(object):
                 'request': request,
             }
         )
-        return _get_failure_view()(request, reason=reason)
+        return get_callable(self.FAILURE_VIEW)(request, reason=reason)
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
 
@@ -108,7 +129,7 @@ class CsrfViewMiddleware(object):
 
         try:
             csrf_token = _sanitize_token(
-                request.COOKIES[settings.CSRF_COOKIE_NAME])
+                request.COOKIES[self.COOKIE_NAME])
             # Use same token next time
             request.META['CSRF_COOKIE'] = csrf_token
         except KeyError:
@@ -172,7 +193,7 @@ class CsrfViewMiddleware(object):
             if request_csrf_token == "":
                 # Fall back to X-CSRFToken, to make things easier for AJAX,
                 # and possible for PUT/DELETE.
-                request_csrf_token = request.META.get('HTTP_X_CSRFTOKEN', '')
+                request_csrf_token = request.META.get(self.HEADER_NAME, '')
 
             if not constant_time_compare(request_csrf_token, csrf_token):
                 return self._reject(request, REASON_BAD_TOKEN)
@@ -194,13 +215,13 @@ class CsrfViewMiddleware(object):
 
         # Set the CSRF cookie even if it's already set, so we renew
         # the expiry timer.
-        response.set_cookie(settings.CSRF_COOKIE_NAME,
+        response.set_cookie(self.COOKIE_NAME,
                             request.META["CSRF_COOKIE"],
                             max_age=60 * 60 * 24 * 7 * 52,
-                            domain=settings.CSRF_COOKIE_DOMAIN,
-                            path=settings.CSRF_COOKIE_PATH,
-                            secure=settings.CSRF_COOKIE_SECURE,
-                            httponly=settings.CSRF_COOKIE_HTTPONLY
+                            domain=self.COOKIE_DOMAIN,
+                            path=self.COOKIE_PATH,
+                            secure=self.COOKIE_SECURE,
+                            httponly=self.COOKIE_HTTPONLY
                             )
         # Content varies with the CSRF cookie, so set the Vary header.
         patch_vary_headers(response, ('Cookie',))
