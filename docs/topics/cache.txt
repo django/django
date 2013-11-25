@@ -1027,8 +1027,8 @@ expose incorrect or sensitive data to subsequent visitors to those pages.
 For example, say you operate a Web email system, and the contents of the
 "inbox" page obviously depend on which user is logged in. If an ISP blindly
 cached your site, then the first user who logged in through that ISP would have
-his user-specific inbox page cached for subsequent visitors to the site. That's
-not cool.
+their user-specific inbox page cached for subsequent visitors to the site.
+That's not cool.
 
 Fortunately, HTTP provides a solution to this problem. A number of HTTP headers
 exist to instruct upstream caches to differ their cache contents depending on

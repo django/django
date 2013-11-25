@@ -330,7 +330,7 @@ Before version 1.6, Django defaulted to using :mod:`pickle` to serialize
 session data before storing it in the backend. If you're using the :ref:`signed
 cookie session backend<cookie-session-backend>` and :setting:`SECRET_KEY` is
 known by an attacker (there isn't an inherent vulnerability in Django that
-would cause it to leak), the attacker could insert a string into his session
+would cause it to leak), the attacker could insert a string into their session
 which, when unpickled, executes arbitrary code on the server. The technique for
 doing so is simple and easily available on the internet. Although the cookie
 session storage signs the cookie-stored data to prevent tampering, a
@@ -659,8 +659,8 @@ domain. This makes session fixation possible if all subdomains are not
 controlled by trusted users (or, are at least unable to set cookies).
 
 For example, an attacker could log into ``good.example.com`` and get a valid
-session for his account. If the attacker has control over ``bad.example.com``,
-he can use it to send his session key to you since a subdomain is permitted
+session for their account. If the attacker has control over ``bad.example.com``,
+they can use it to send their session key to you since a subdomain is permitted
 to set cookies on ``*.example.com``. When you visit ``good.example.com``,
 you'll be logged in as the attacker and might inadvertently enter your
 sensitive personal data (e.g. credit card info) into the attackers account.
