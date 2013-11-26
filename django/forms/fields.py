@@ -1102,8 +1102,8 @@ class FilePathField(ChoiceField):
                         continue
                     full_file = os.path.join(self.path, f)
                     if (((self.allow_files and os.path.isfile(full_file)) or
-                        (self.allow_folders and os.path.isdir(full_file))) and
-                        (self.match is None or self.match_re.search(f))):
+                            (self.allow_folders and os.path.isdir(full_file))) and
+                            (self.match is None or self.match_re.search(f))):
                         self.choices.append((full_file, f))
             except OSError:
                 pass

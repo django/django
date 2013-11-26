@@ -40,7 +40,7 @@ def stringfilter(func):
             args = list(args)
             args[0] = force_text(args[0])
             if (isinstance(args[0], SafeData) and
-                getattr(_dec._decorated_function, 'is_safe', False)):
+                    getattr(_dec._decorated_function, 'is_safe', False)):
                 return mark_safe(func(*args, **kwargs))
         return func(*args, **kwargs)
 

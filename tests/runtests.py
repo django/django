@@ -69,11 +69,11 @@ def get_test_modules():
     for modpath, dirpath in discovery_paths:
         for f in os.listdir(dirpath):
             if ('.' in f or
-                # Python 3 byte code dirs (PEP 3147)
-                f == '__pycache__' or
-                f.startswith('sql') or
-                os.path.basename(f) in SUBDIRS_TO_SKIP or
-                os.path.isfile(f)):
+                    # Python 3 byte code dirs (PEP 3147)
+                    f == '__pycache__' or
+                    f.startswith('sql') or
+                    os.path.basename(f) in SUBDIRS_TO_SKIP or
+                    os.path.isfile(f)):
                 continue
             modules.append((modpath, f))
     return modules

@@ -93,15 +93,15 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
     @override_settings(WSGI_APPLICATION="wsgi.noexist.app")
     def test_bad_module(self):
         with six.assertRaisesRegex(self,
-            ImproperlyConfigured,
-            r"^WSGI application 'wsgi.noexist.app' could not be loaded; Error importing.*"):
+                ImproperlyConfigured,
+                r"^WSGI application 'wsgi.noexist.app' could not be loaded; Error importing.*"):
 
             get_internal_wsgi_application()
 
     @override_settings(WSGI_APPLICATION="wsgi.wsgi.noexist")
     def test_bad_name(self):
         with six.assertRaisesRegex(self,
-            ImproperlyConfigured,
-            r"^WSGI application 'wsgi.wsgi.noexist' could not be loaded; Module.*"):
+                ImproperlyConfigured,
+                r"^WSGI application 'wsgi.wsgi.noexist' could not be loaded; Module.*"):
 
             get_internal_wsgi_application()

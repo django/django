@@ -1281,7 +1281,7 @@ class IntegerField(Field):
 
     def get_prep_lookup(self, lookup_type, value):
         if ((lookup_type == 'gte' or lookup_type == 'lt')
-            and isinstance(value, float)):
+                and isinstance(value, float)):
             value = math.ceil(value)
         return super(IntegerField, self).get_prep_lookup(lookup_type, value)
 

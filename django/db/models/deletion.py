@@ -135,7 +135,7 @@ class Collector(object):
         # Foreign keys pointing to this model, both from m2m and other
         # models.
         for related in opts.get_all_related_objects(
-            include_hidden=True, include_proxy_eq=True):
+                include_hidden=True, include_proxy_eq=True):
             if related.field.rel.on_delete is not DO_NOTHING:
                 return False
         # GFK deletes
@@ -145,7 +145,7 @@ class Collector(object):
         return True
 
     def collect(self, objs, source=None, nullable=False, collect_related=True,
-        source_attr=None, reverse_dependency=False):
+            source_attr=None, reverse_dependency=False):
         """
         Adds 'objs' to the collection of objects to be deleted as well as all
         parent instances.  'objs' must be a homogenous iterable collection of
