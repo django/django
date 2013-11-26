@@ -331,6 +331,16 @@ The :ttag:`extends` tag is the key here. It tells the template engine that
 this template "extends" another template. When the template system evaluates
 this template, first it locates the parent -- in this case, "base.html".
 
+.. versionadded:: 1.7
+
+    When extending a template, the currently used template is skipped. This
+    allows to extend a template that has the same path as the currently used
+    template. This could be useful when you want to inherit the templates of a
+    third party app and just change the contents of some of its blocks.
+
+    Simply copy the template to the same path in your template dir, extend it to
+    itself and replace the blocks you want.
+
 At that point, the template engine will notice the three :ttag:`block` tags
 in ``base.html`` and replace those blocks with the contents of the child
 template. Depending on the value of ``blog_entries``, the output might look

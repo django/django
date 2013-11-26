@@ -127,7 +127,7 @@ class Template(object):
         except UnicodeDecodeError:
             raise TemplateEncodingError("Templates can only be constructed "
                                         "from unicode or UTF-8 strings.")
-        if settings.TEMPLATE_DEBUG and origin is None:
+        if origin is None:
             origin = StringOrigin(template_string)
         self.nodelist = compile_string(template_string, origin)
         self.name = name
@@ -238,6 +238,10 @@ class Lexer(object):
         else:
             token = Token(TOKEN_TEXT, token_string)
         token.lineno = self.lineno
+        # token.source is a tuple, this contains origin object and
+        # the range of the columns where is this token.
+        # If TEMPLATE_DEBUG = False we don't need it, therefore we set with (-1, -1)
+        token.source = self.origin, (-1, -1)
         self.lineno += token_string.count('\n')
         return token
 
@@ -320,6 +324,8 @@ class Parser(object):
                                           "in the template." % node)
         if isinstance(nodelist, NodeList) and not isinstance(node, TextNode):
             nodelist.contains_nontext = True
+        # save token's source so that it can be retrieved later
+        node.source = token.source
         nodelist.append(node)
 
     def enter_command(self, command, token):

@@ -9,6 +9,8 @@ if __name__ == '__main__':
     settings.configure()
 
 from datetime import date, datetime
+from functools import wraps
+import imp
 import os
 import sys
 import traceback
@@ -25,7 +27,7 @@ from django.test.utils import (setup_test_template_loader,
     restore_template_loaders, override_settings, TransRealMixin)
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
-from django.utils._os import upath
+from django.utils._os import upath, safe_join
 from django.utils.translation import activate, deactivate
 from django.utils.safestring import mark_safe
 from django.utils import six
@@ -213,9 +215,6 @@ class TemplateLoaderTests(TestCase):
             test_template_sources('/DIR1/index.HTML', template_dirs,
                                   ['/DIR1/index.HTML'])
 
-    # Turn TEMPLATE_DEBUG on, so that the origin file name will be kept with
-    # the compiled templates.
-    @override_settings(TEMPLATE_DEBUG=True)
     def test_loader_debug_origin(self):
         old_loaders = loader.template_source_loaders
 
@@ -251,18 +250,12 @@ class TemplateLoaderTests(TestCase):
             loader.template_source_loaders = old_loaders
 
     def test_loader_origin(self):
-        with self.settings(TEMPLATE_DEBUG=True):
-            template = loader.get_template('login.html')
-            self.assertEqual(template.origin.loadname, 'login.html')
+        template = loader.get_template('login.html')
+        self.assertEqual(template.origin.loadname, 'login.html')
 
     def test_string_origin(self):
-        with self.settings(TEMPLATE_DEBUG=True):
-            template = Template('string template')
-            self.assertEqual(template.origin.source, 'string template')
-
-    def test_debug_false_origin(self):
-        template = loader.get_template('login.html')
-        self.assertEqual(template.origin, None)
+        template = Template('string template')
+        self.assertEqual(template.origin.source, 'string template')
 
     # TEMPLATE_DEBUG must be true, otherwise the exception raised
     # during {% include %} processing will be suppressed.
@@ -1968,3 +1961,122 @@ class SSITests(TestCase):
         with override_settings(ALLOWED_INCLUDE_ROOTS=(self.ssi_dir,)):
             for path in disallowed_paths:
                 self.assertEqual(self.render_ssi(path), '')
+
+
+class override_template_loaders(object):
+    def __init__(self, *loaders):
+        self.loaders = loaders
+        self.old_loaders = []
+
+    def __enter__(self):
+        self.old_loaders = loader.template_source_loaders
+        loader.template_source_loaders = self.loaders
+
+    def __exit__(self, type, value, traceback):
+        loader.template_source_loaders = self.old_loaders
+
+    def __call__(self, test_func):
+        @wraps(test_func)
+        def inner(*args, **kwargs):
+            with self:
+                return test_func(*args, **kwargs)
+        return inner
+
+
+class FilesystemDirectoryLoader(filesystem.Loader):
+    def __init__(self, template_dir):
+        if not os.path.isabs(template_dir):
+            basedir = os.path.dirname(os.path.abspath(upath(__file__)))
+            template_dir = safe_join(basedir, template_dir)
+        self.template_dir = template_dir
+
+    def get_template_sources(self, template_name, template_dirs=None):
+        """
+        Returns the absolute paths to "template_name", when appended to each
+        directory in "template_dirs". Any paths that don't lie inside one of the
+        template dirs are excluded from the result set, for security reasons.
+        """
+        if not template_dirs:
+            template_dirs = [self.template_dir]
+        for template_dir in template_dirs:
+            try:
+                yield safe_join(template_dir, template_name)
+            except UnicodeDecodeError:
+                # The template dir name was a bytestring that wasn't valid UTF-8.
+                raise
+            except ValueError:
+                # The joined path was located outside of this particular
+                # template_dir (it might be inside another one, so this isn't
+                # fatal).
+                pass
+
+
+class ExtendsTests(TestCase):
+    def setUp(self):
+        self.name = 'test_extends_autoreference.html'
+        self.loaders = {
+                'base': FilesystemDirectoryLoader('templates'),
+                'one': FilesystemDirectoryLoader(
+                    'other_templates/test_extends_autoreference/test_extends_one/'),
+                'two': FilesystemDirectoryLoader(
+                    'other_templates/test_extends_autoreference/test_extends_two/'),
+                'three': FilesystemDirectoryLoader(
+                    'other_templates/test_extends_autoreference/test_extends_three/'),
+                }
+
+    def test_template_found_in_all_loaders(self):
+        """
+        Test that all the loaders can load the template to test.
+        """
+        for loader in self.loaders.values():
+            self.assertEqual(len(list(loader.get_template_sources(self.name))), 1)
+
+    def test_extends_existent_autoreference(self):
+        """
+        Test that a template extends an other one with the same name if this
+        other template is loaded through an other loader.
+        """
+        with override_template_loaders(self.loaders['one'],
+                                       self.loaders['base']):
+            tmpl = loader.select_template([self.name])
+            r = tmpl.render(template.Context({}))
+            self.assertEqual(r, 'one\n\n\n')
+
+    def test_extends_inexistent_autoreference(self):
+        """
+        Test that a template can extends itself. If there isn't an other
+        template with the same name but loaded through a different loader,
+        recursion must be avoided and an exception raised.
+        """
+        with override_template_loaders(self.loaders['one']):
+            tmpl = loader.select_template([self.name])
+            with self.assertRaises(template.TemplateDoesNotExist):
+                r = tmpl.render(template.Context({}))
+
+    def test_extends_three_autoreferences(self):
+        """
+        Test that several templates with the same name but in different loaders
+        can extend on an autorreference.
+        """
+        loaders = [
+                self.loaders['one'],
+                self.loaders['two'],
+                self.loaders['three'],
+                self.loaders['base'],
+                ]
+        with override_template_loaders(*loaders):
+            tmpl = loader.select_template([self.name])
+            r = tmpl.render(template.Context({}))
+            self.assertEqual(r, 'one\ntwo\nthree\n')
+
+    def test_extends_cache_loader(self):
+        """
+        Test that the cache loader handles autorreferenced extensions correctly.
+        """
+        cache_loader = cached.Loader([])
+        cache_loader._cached_loaders = [self.loaders['one'],
+                                        self.loaders['base']]
+        with override_template_loaders(cache_loader):
+            tmpl = loader.select_template([self.name])
+            r = tmpl.render(template.Context({}))
+            self.assertEqual(r, 'one\n\n\n')

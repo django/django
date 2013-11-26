@@ -83,7 +83,7 @@ class LoaderOrigin(Origin):
 
 
 def make_origin(display_name, loader, name, dirs):
-    if settings.TEMPLATE_DEBUG and display_name:
+    if display_name:
         return LoaderOrigin(display_name, loader, name, dirs)
     else:
         return None
@@ -115,7 +115,12 @@ def find_template_loader(loader):
         raise ImproperlyConfigured('Loader does not define a "load_template" callable template source loader')
 
 
-def find_template(name, dirs=None):
+def find_template(name, dirs=None, skip_template=None):
+    """
+    Returns a tuple with a compiled Template object for the given template name,
+    and a origin object skipping the current template. ``skip_template``
+    contains the absolute path of the template.
+    """
     # Calculate template_source_loaders the first time the function is executed
     # because putting this logic in the module-level namespace may cause
     # circular import errors. See Django ticket #1292.
@@ -127,7 +132,14 @@ def find_template(name, dirs=None):
             if loader is not None:
                 loaders.append(loader)
         template_source_loaders = tuple(loaders)
-    for loader in template_source_loaders:
+    # If there is a template to skip with the same name as the current template,
+    # skip all the loaders until the loader of template to skip is found (and skip
+    # that one too)
+    loaders = template_source_loaders
+    if skip_template is not None and skip_template.loadname == name:
+        loaders = skip_loaders(loaders, skip_template)
+    # Iterate through the loaders until a match is foun
+    for loader in loaders:
         try:
             source, display_name = loader(name, dirs)
             return (source, make_origin(display_name, loader, name, dirs))
@@ -136,12 +148,31 @@ def find_template(name, dirs=None):
     raise TemplateDoesNotExist(name)
 
 
-def get_template(template_name, dirs=None):
+def skip_loaders(loaders, skip_template):
+    """
+    Skips all the loaders until the loader of `skip_template` has been skiped
+    too.
+    """
+    # Get the loader object to skip
+    loader_to_skip = getattr(skip_template, 'loader', None)
+    loader_to_skip = getattr(loader_to_skip, '__self__', loader_to_skip)
+    has_been_skiped = False
+    for loader in loaders:
+        # Get the current loader object
+        loader = getattr(loader, '__self__', loader)
+        if has_been_skiped:
+            yield loader
+        if loader == loader_to_skip:
+            has_been_skiped = True
+
+
+def get_template(template_name, dirs=None, skip_template=None):
     """
     Returns a compiled Template object for the given template name,
     handling template inheritance recursively.
     """
-    template, origin = find_template(template_name, dirs)
+    template, origin = find_template(template_name, dirs,
+                                     skip_template=skip_template)
     if not hasattr(template, 'render'):
         # template needs to be compiled
         template = get_template_from_string(template, origin, template_name)
