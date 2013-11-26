@@ -244,6 +244,15 @@ it's entirely possible to write them manually if you need to. Some of the
 more complex operations are not autodetectable and are only available via
 a hand-written migration, so don't be scared about editing them if you have to.
 
+Custom fields
+~~~~~~~~~~~~~
+
+You can't modify the number of positional arguments in an already migrated
+custom field without raising a TypeError. The old migration will call the
+modified ``__init__`` method with the old signature. So if you need a new
+argument, please create a keyword argument and use e.g.
+``assert kwargs.get('argument_name') is not None`` in the constructor.
+
 Adding migrations to apps
 -------------------------
 
