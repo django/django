@@ -298,7 +298,7 @@ class SimpleTestCase(unittest.TestCase):
         # If the response supports deferred rendering and hasn't been rendered
         # yet, then ensure that it does get rendered before proceeding further.
         if (hasattr(response, 'render') and callable(response.render)
-            and not response.is_rendered):
+                and not response.is_rendered):
             response.render()
 
         if msg_prefix:
@@ -1043,7 +1043,7 @@ class LiveServerThread(threading.Thread):
                         (self.host, port), QuietWSGIRequestHandler)
                 except socket.error as e:
                     if (index + 1 < len(self.possible_ports) and
-                        e.errno == errno.EADDRINUSE):
+                            e.errno == errno.EADDRINUSE):
                         # This port is already in use, so we go on and try with
                         # the next one in the list.
                         continue
@@ -1097,7 +1097,7 @@ class LiveServerTestCase(TransactionTestCase):
             # If using in-memory sqlite databases, pass the connections to
             # the server thread.
             if (conn.vendor == 'sqlite'
-                and conn.settings_dict['NAME'] == ':memory:'):
+                    and conn.settings_dict['NAME'] == ':memory:'):
                 # Explicitly enable thread-shareability for this connection
                 conn.allow_thread_sharing = True
                 connections_override[conn.alias] = conn
@@ -1154,7 +1154,7 @@ class LiveServerTestCase(TransactionTestCase):
         # Restore sqlite connections' non-sharability
         for conn in connections.all():
             if (conn.vendor == 'sqlite'
-                and conn.settings_dict['NAME'] == ':memory:'):
+                    and conn.settings_dict['NAME'] == ':memory:'):
                 conn.allow_thread_sharing = False
 
     @classmethod

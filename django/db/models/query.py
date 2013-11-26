@@ -392,7 +392,7 @@ class QuerySet(object):
         fields = self.model._meta.local_fields
         with transaction.commit_on_success_unless_managed(using=self.db):
             if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk
-                and self.model._meta.has_auto_field):
+                    and self.model._meta.has_auto_field):
                 self._batched_insert(objs, fields, batch_size)
             else:
                 objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
@@ -1494,7 +1494,7 @@ class RawQuerySet(object):
     annotated model instances.
     """
     def __init__(self, raw_query, model=None, query=None, params=None,
-        translations=None, using=None, hints=None):
+            translations=None, using=None, hints=None):
         self.raw_query = raw_query
         self.model = model
         self._db = using

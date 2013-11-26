@@ -524,7 +524,7 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
     # be difficult to debug for code that needs updating, so we produce the
     # warning here too.
     if (getattr(Meta, 'fields', None) is None and
-        getattr(Meta, 'exclude', None) is None):
+            getattr(Meta, 'exclude', None) is None):
         warnings.warn("Calling modelform_factory without defining 'fields' or "
                       "'exclude' explicitly is deprecated",
                       DeprecationWarning, stacklevel=2)
@@ -675,7 +675,7 @@ class BaseModelFormSet(BaseFormSet):
             for form in valid_forms:
                 # see if we have data for both fields
                 if (form.cleaned_data and form.cleaned_data[field] is not None
-                    and form.cleaned_data[unique_for] is not None):
+                        and form.cleaned_data[unique_for] is not None):
                     # if it's a date lookup we need to get the data for all the fields
                     if lookup == 'date':
                         date = form.cleaned_data[unique_for]
@@ -815,7 +815,7 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
     if meta is None:
         meta = type(str('Meta'), (object,), {})
     if (getattr(meta, 'fields', fields) is None and
-        getattr(meta, 'exclude', exclude) is None):
+            getattr(meta, 'exclude', exclude) is None):
         warnings.warn("Calling modelformset_factory without defining 'fields' or "
                       "'exclude' explicitly is deprecated",
                       DeprecationWarning, stacklevel=2)

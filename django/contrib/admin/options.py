@@ -613,7 +613,7 @@ class ModelAdmin(BaseModelAdmin):
         }
         defaults.update(kwargs)
         if (defaults.get('fields') is None
-            and not modelform_defines_fields(defaults.get('form'))):
+                and not modelform_defines_fields(defaults.get('form'))):
             defaults['fields'] = forms.ALL_FIELDS
 
         return modelform_factory(self.model, **defaults)

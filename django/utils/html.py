@@ -238,7 +238,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                     lead = lead + opening
                 # Keep parentheses at the end only if they're balanced.
                 if (middle.endswith(closing)
-                    and middle.count(closing) == middle.count(opening) + 1):
+                        and middle.count(closing) == middle.count(opening) + 1):
                     middle = middle[:-len(closing)]
                     trail = closing + trail
 

@@ -39,7 +39,7 @@ class GeoWhereNode(WhereNode):
         if isinstance(data, (list, tuple)):
             obj, lookup_type, value = data
             if (isinstance(obj, Constraint) and
-                isinstance(obj.field, GeometryField)):
+                    isinstance(obj.field, GeometryField)):
                 data = (GeoConstraint(obj), lookup_type, value)
         return super(GeoWhereNode, self)._prepare_data(data)
 
