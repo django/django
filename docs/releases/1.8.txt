@@ -145,6 +145,10 @@ Management Commands
   :djadminopt:`--exclude` which allows exclusion of specific locales from
   processing.
 
+* The :djadmin:`runserver` will reuse the same socket across automatic reloads
+  which ensures that requests will not fail if the browser is reloaded too
+  quickly. For Windows, this feature is only supported with Python 3.x.
+
 Models
 ^^^^^^
 
