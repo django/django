@@ -231,7 +231,6 @@ class ExpressionsTests(TestCase):
         queryset = Employee.objects.filter(firstname__iexact=F('lastname'))
         self.assertQuerysetEqual(queryset, ["<Employee: Test test>"])
 
-
     def test_ticket_18375_join_reuse(self):
         # Test that reverse multijoin F() references and the lookup target
         # the same join. Pre #18375 the F() join was generated first, and the
