@@ -10,6 +10,8 @@ been reviewed for security issues. DON'T USE IT FOR PRODUCTION USE!
 from __future__ import unicode_literals
 
 from io import BytesIO
+import errno
+import os
 import socket
 import sys
 import traceback
@@ -114,11 +116,46 @@ class WSGIServer(simple_server.WSGIServer, object):
     def __init__(self, *args, **kwargs):
         if kwargs.pop('ipv6', False):
             self.address_family = socket.AF_INET6
-        super(WSGIServer, self).__init__(*args, **kwargs)
+
+        fd = os.environ.get('DJANGO_SERVER_FD')
+        if fd:
+            # super() will not work here because TCPServer will setup a socket
+            # when we need to setup or own socket
+            socketserver.BaseServer.__init__(self, *args, **kwargs)
+            self.socket = socket.fromfd(
+                int(fd), self.address_family, self.socket_type
+            )
+            try:
+                self.server_bind()
+            except socket.error as e:
+                if e.errno == errno.EINVAL:
+                    # handle socket that is already bound
+
+                    # mimic SocketServer.TCPServer.server_bind
+                    self.server_address = self.socket.getsockname()
+                    # mimic BaseHTTPServer.HTTPServer.server_bind
+                    host, port = self.socket.getsockname()[:2]
+                    self.server_name = socket.getfqdn(host)
+                    self.server_port = port
+                    # mimic wsgiref.simple_server.WSGIServer
+                    # mimic this classes implementation of server_bind
+                    self.setup_environ()
+
+                else:
+                    raise
+            self.server_activate()
+
+        else:
+            super(WSGIServer, self).__init__(*args, **kwargs)
 
     def server_bind(self):
         """Override server_bind to store the server name."""
-        super(WSGIServer, self).server_bind()
+        try:
+            super(WSGIServer, self).server_bind()
+        except Exception as e:
+            if isinstance(e, socket.error) and e.errno == errno.EINVAL:
+                raise
+            raise socket.error(e)
         self.setup_environ()
 
 

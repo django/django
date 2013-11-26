@@ -888,6 +888,16 @@ Example usage::
 The development server is multithreaded by default. Use the ``--nothreading``
 option to disable the use of threading in the development server.
 
+.. django-admin-option:: --nopersistsock
+
+.. versionadded:: 1.7
+
+The development server will persist the listening socket while reloading code
+by default.  To disable this behavior, use the ``--nopersistsock`` option.
+The caveat is that some platforms do not support the methods needed for this
+feature (``socket.fromfd``).  In particular, Python 2 on Windows will not have
+support for this, but Python 3 does.
+
 .. django-admin-option:: --ipv6, -6
 
 Use the ``--ipv6`` (or shorter ``-6``) option to tell Django to use IPv6 for
