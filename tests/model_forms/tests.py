@@ -1541,7 +1541,7 @@ class OldFormForXTests(TestCase):
         self.assertEqual(bif.is_valid(), False)
         self.assertEqual(bif.errors, {'biggie': ['Ensure this value is less than or equal to 9223372036854775807.']})
 
-    @skipUnless(test_images, "PIL not installed")
+    @skipUnless(test_images, "Pillow/PIL not installed")
     def test_image_field(self):
         # ImageField and FileField are nearly identical, but they differ slighty when
         # it comes to validation. This specifically tests that #6302 is fixed for
