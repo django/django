@@ -75,6 +75,8 @@ for dirpath, dirnames, filenames in os.walk(django_dir):
         package_files = package_data.setdefault('.'.join(parts), [])
         package_files.extend([os.path.join(path, f) for f in filenames])
 
+# Adding the extras package so that we can get the django_bash_completion script
+packages.append('extras')
 
 # Dynamically calculate the version based on django.VERSION.
 version = __import__('django').get_version()
@@ -91,7 +93,7 @@ setup(
     license='BSD',
     packages=packages,
     package_data=package_data,
-    scripts=['django/bin/django-admin.py'],
+    scripts=['django/bin/django-admin.py', 'extras/django_bash_completion'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
