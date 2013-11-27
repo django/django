@@ -448,7 +448,6 @@ class CustomManagerTests(TestCase):
         )
         self.b1.authors.add(droopy)
 
-
         # Check that the fun manager ONLY clears fun people.
         self.b1.authors(manager='fun_people').clear()
         self.assertQuerysetEqual(
