@@ -171,6 +171,8 @@ class MigrationLoader(object):
                     # the usage pattern here is to delete things after a while.
                     del normal[replaced]
                 for child_key in reverse_dependencies.get(replaced, set()):
+                    if child_key in migration.replaces:
+                        continue
                     normal[child_key].dependencies.remove(replaced)
                     normal[child_key].dependencies.append(key)
             normal[key] = migration
