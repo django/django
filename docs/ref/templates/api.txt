@@ -310,10 +310,12 @@ If you ``pop()`` too much, it'll raise
     >>> c = Context()
     >>> c['foo'] = 'first level'
     >>> c.push()
+    {}
     >>> c['foo'] = 'second level'
     >>> c['foo']
     'second level'
     >>> c.pop()
+    {'foo': 'second level'}
     >>> c['foo']
     'first level'
     >>> c['foo'] = 'overwritten'
