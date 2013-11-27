@@ -100,6 +100,10 @@ class ModelState(object):
             name, path, args, kwargs = field.deconstruct()
             field_class = import_by_path(path)
             fields.append((name, field_class(*args, **kwargs)))
+        for field in model._meta.local_many_to_many:
+            name, path, args, kwargs = field.deconstruct()
+            field_class = import_by_path(path)
+            fields.append((name, field_class(*args, **kwargs)))
         # Extract the options
         options = {}
         for name in DEFAULT_NAMES:
