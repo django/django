@@ -102,7 +102,6 @@ def complex_setting_changed(**kwargs):
 @receiver(setting_changed)
 def root_urlconf_changed(**kwargs):
     if kwargs['setting'] in ('ROOT_URLCONF',):
-        from django.core import urlresolvers
-        urlresolvers.get_resolver.cache_clear()
-        urlresolvers.get_ns_resolver.cache_clear()
+        from django.core.urlresolvers import clear_url_caches
+        clear_url_caches()
 
