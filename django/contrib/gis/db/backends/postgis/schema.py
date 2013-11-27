@@ -1,6 +1,4 @@
-from django.conf import settings
 from django.db.backends.postgresql_psycopg2.schema import DatabaseSchemaEditor
-from django.utils.functional import cached_property
 
 
 class PostGISSchemaEditor(DatabaseSchemaEditor):

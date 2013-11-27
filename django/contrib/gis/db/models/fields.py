@@ -112,9 +112,9 @@ class GeometryField(Field):
         kwargs['srid'] = self.srid
         if self.dim != 2:
             kwargs['dim'] = self.dim
-        if self.spatial_index != True:
+        if self.spatial_index is not True:
             kwargs['spatial_index'] = self.spatial_index
-        if self.geography != False:
+        if self.geography is not False:
             kwargs['geography'] = self.geography
         return name, path, args, kwargs
 
