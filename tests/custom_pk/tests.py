@@ -153,6 +153,13 @@ class CustomPKTests(TestCase):
             with transaction.atomic():
                 Employee.objects.create(employee_code=123, first_name="Fred", last_name="Jones")
 
+    def test_zero_non_autoincrement_pk(self):
+        Employee.objects.create(
+            employee_code=0, first_name="Frank", last_name="Jones"
+        )
+        employee = Employee.objects.get(pk=0)
+        self.assertEqual(employee.employee_code, 0)
+
     def test_custom_field_pk(self):
         # Regression for #10785 -- Custom fields can be used for primary keys.
         new_bar = Bar.objects.create()
