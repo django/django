@@ -267,8 +267,9 @@ that, run the following command:
 
 The :djadmin:`migrate` command looks at the :setting:`INSTALLED_APPS` setting
 and creates any necessary database tables according to the database settings
-in your :file:`mysite/settings.py` file. You'll see a message for each
-database table it creates, and you'll get a prompt asking you if you'd like to
+in your :file:`mysite/settings.py` file and the database migrations shipped
+with the app (we'll cover those later). You'll see a message for each
+migration it applies, and you'll get a prompt asking you if you'd like to
 create a superuser account for the authentication system. Go ahead and do
 that.
 
@@ -282,7 +283,7 @@ display the tables Django created.
     case, but not everybody needs them. If you don't need any or all of them,
     feel free to comment-out or delete the appropriate line(s) from
     :setting:`INSTALLED_APPS` before running :djadmin:`migrate`. The
-    :djadmin:`migrate` command will only create tables for apps in
+    :djadmin:`migrate` command will only run migrations for apps in
     :setting:`INSTALLED_APPS`.
 
 .. _creating-models:
@@ -322,6 +323,8 @@ That'll create a directory :file:`polls`, which is laid out like this::
     polls/
         __init__.py
         admin.py
+        migrations/
+            __init__.py
         models.py
         tests.py
         views.py
@@ -337,6 +340,11 @@ The first step in writing a database Web app in Django is to define your models
    the essential fields and behaviors of the data you're storing. Django follows
    the :ref:`DRY Principle <dry>`. The goal is to define your data model in one
    place and automatically derive things from it.
+
+   This includes the migrations - unlike in Ruby On Rails, for example, migrations
+   are entirely derived from your models file, and are essentially just a
+   history that Django can roll through to update your database schema to
+   match your current models.
 
 In our simple poll app, we'll create two models: ``Question`` and ``Choice``.
 A ``Question`` has a question and a publication date. A ``Choice`` has two fields:
@@ -437,31 +445,69 @@ Now Django knows to include the ``polls`` app. Let's run another command:
 
 .. code-block:: bash
 
-    $ python manage.py sql polls
+    $ python manage.py makemigrations polls
 
-You should see something similar to the following (the ``CREATE TABLE`` SQL
-statements for the polls app):
+You should see something similar to the following:
+
+.. code-block:: text
+
+    Migrations for 'polls':
+      0001_initial.py:
+        - Create model Question
+        - Create model Choice
+
+By running ``makemigrations``, you're telling Django that you've made
+some changes to your models (in this case, you've made new ones) and that
+you'd like the changes to be stored as a *migration*.
+
+Migrations are how Django stores changes to your models (and thus your
+database schema) - they're just files on disk. You can read the migration
+for your new model if you like; it's the file
+``polls/migrations/0001_initial.py``. Don't worry, you're not expected to read
+them every time Django makes one, but they're designed to be human-editable
+in case you want to manually tweak how Django changes things.
+
+There's a command that will run the migrations for you and manage your database
+schema automatically - that's called :djadmin:`migrate`, and we'll come to it in a
+moment - but first, let's see what SQL that migration would run. The
+:djadmin:`sqlmigrate` command takes migration names and returns their SQL:
+
+.. code-block:: bash
+
+    $ python manage.py sqlmigrate polls 0001
+
+
+You should see something similar to the following (we've reformatted it for
+readability):
 
 .. code-block:: sql
 
-    BEGIN;
-    CREATE TABLE "polls_question" (
-        "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    CREATE TABLE polls_question (
+        "id" serial NOT NULL PRIMARY KEY,
         "question_text" varchar(200) NOT NULL,
-        "pub_date" datetime NOT NULL
+        "pub_date" timestamp with time zone NOT NULL
     );
-    CREATE TABLE "polls_choice" (
-        "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-        "question_id" integer NOT NULL REFERENCES "polls_poll" ("id"),
+
+    CREATE TABLE polls_choice (
+        "id" serial NOT NULL PRIMARY KEY,
+        "question_id" integer NOT NULL,
         "choice_text" varchar(200) NOT NULL,
         "votes" integer NOT NULL
     );
-    COMMIT;
+
+    CREATE INDEX polls_choice_7aa0f6ee ON "polls_choice" ("question_id");
+
+    ALTER TABLE "polls_choice"
+      ADD CONSTRAINT polls_choice_question_id_246c99a640fbbd72_fk_polls_question_id
+        FOREIGN KEY ("question_id")
+        REFERENCES "polls_question" ("id")
+        DEFERRABLE INITIALLY DEFERRED;
+
 
 Note the following:
 
 * The exact output will vary depending on the database you are using. The
-  example above is generated for SQLite.
+  example above is generated for PostgreSQL.
 
 * Table names are automatically generated by combining the name of the app
   (``polls``) and the lowercase name of the model -- ``question`` and
@@ -472,8 +518,9 @@ Note the following:
 * By convention, Django appends ``"_id"`` to the foreign key field name.
   (Yes, you can override this, as well.)
 
-* The foreign key relationship is made explicit by a ``REFERENCES``
-  statement.
+* The foreign key relationship is made explicit by a ``FOREIGN KEY``
+  constraint. Don't worry about the ``DEFERRABLE`` parts; that's just telling
+  PostgreSQL to not enforce the foreign key until the end of the transaction.
 
 * It's tailored to the database you're using, so database-specific field types
   such as ``auto_increment`` (MySQL), ``serial`` (PostgreSQL), or ``integer
@@ -481,34 +528,15 @@ Note the following:
   goes for quoting of field names -- e.g., using double quotes or single
   quotes.
 
-* The :djadmin:`sql` command doesn't actually run the SQL in your database -
-  it just prints it to the screen so that you can see what SQL Django thinks
-  is required. If you wanted to, you could copy and paste this SQL into your
-  database prompt. However, as we will see shortly, Django provides an
-  easier way of committing the SQL to the database.
+* The :djadmin:`sqlmigrate` command doesn't actually run the migration on your
+  database - it just prints it to the screen so that you can see what SQL
+  Django thinks is required. It's useful for checking what Django is going to
+  do or if you have database administrators who require SQL scripts for
+  changes.
 
-If you're interested, also run the following commands:
-
-* :djadmin:`python manage.py validate <validate>` -- Checks for any errors
-  in the construction of your models.
-
-* :djadmin:`python manage.py sqlcustom polls <sqlcustom>` -- Outputs any
-  :ref:`custom SQL statements <initial-sql>` (such as table modifications or
-  constraints) that are defined for the application.
-
-* :djadmin:`python manage.py sqlclear polls <sqlclear>` -- Outputs the
-  necessary ``DROP TABLE`` statements for this app, according to which
-  tables already exist in your database (if any).
-
-* :djadmin:`python manage.py sqlindexes polls <sqlindexes>` -- Outputs the
-  ``CREATE INDEX`` statements for this app.
-
-* :djadmin:`python manage.py sqlall polls <sqlall>` -- A combination of all
-  the SQL from the :djadmin:`sql`, :djadmin:`sqlcustom`, and
-  :djadmin:`sqlindexes` commands.
-
-Looking at the output of those commands can help you understand what's actually
-happening under the hood.
+If you're interested, you can also run
+:djadmin:`python manage.py validate <validate>`; this checks for any errors in
+your models without making migrations or touching the database.
 
 Now, run :djadmin:`migrate` again to create those model tables in your database:
 
@@ -516,12 +544,38 @@ Now, run :djadmin:`migrate` again to create those model tables in your database:
 
     $ python manage.py migrate
 
-The :djadmin:`migrate` command runs the SQL from :djadmin:`sqlall` on your
-database for all apps in :setting:`INSTALLED_APPS` that don't already exist in
-your database. This creates all the tables, initial data and indexes for any
-apps you've added to your project since the last time you ran :djadmin:`migrate`.
-:djadmin:`migrate` can be called as often as you like, and it will only ever
-create the tables that don't exist.
+    Operations to perform:
+      Synchronize unmigrated apps: sessions, admin, messages, auth, staticfiles, contenttypes
+      Apply all migrations: polls
+    Synchronizing apps without migrations:
+      Creating tables...
+      Installing custom SQL...
+      Installing indexes...
+    Installed 0 object(s) from 0 fixture(s)
+    Running migrations:
+      Applying polls.0001_initial... OK
+
+
+The :djadmin:`migrate` command takes all the migrations that haven't been
+applied (Django tracks which ones are applied using a special table in your
+database called ``django_migrations``) and runs them against your database -
+essentially, synchronising the changes you made to your models with the schema
+in the database.
+
+Migrations are very powerful and let you change your models over time, as you
+develop your project, without the need to delete your database or tables and
+make new ones - it specialises in upgrading your database live, without
+losing data. We'll cover them in more depth in a later part of the tutorial,
+but for now, remember the three-step guide to making model changes:
+
+* Change your models (in models.py)
+* Run ``python manage.py makemigrations`` to create migrations for those changes
+* Run ``python manage.py migrate`` to apply those changes to the database.
+
+The reason there's separate commands to make and apply migrations is because
+you'll commit migrations to your version control system and ship them with
+your app; they not only make your development easier, they're also useable by
+other developers and in production.
 
 Read the :doc:`django-admin.py documentation </ref/django-admin>` for full
 information on what the ``manage.py`` utility can do.
