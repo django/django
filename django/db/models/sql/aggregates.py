@@ -93,6 +93,13 @@ class Aggregate(object):
 
         return self.sql_template % substitutions, params
 
+    def get_cols(self):
+        return []
+
+    @property
+    def output_type(self):
+        return self.field
+
 
 class Avg(Aggregate):
     is_computed = True

@@ -17,8 +17,8 @@ def refs_aggregate(lookup_parts, aggregates):
     """
     for i in range(len(lookup_parts) + 1):
         if LOOKUP_SEP.join(lookup_parts[0:i]) in aggregates:
-            return True
-    return False
+            return aggregates[LOOKUP_SEP.join(lookup_parts[0:i])], lookup_parts[i:]
+    return False, ()
 
 
 class Aggregate(object):

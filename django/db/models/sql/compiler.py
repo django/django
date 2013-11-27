@@ -45,7 +45,7 @@ class SQLCompiler(object):
         if self.query.select_related and not self.query.related_select_cols:
             self.fill_related_selections()
 
-    def quote_name_unless_alias(self, name):
+    def __call__(self, name):
         """
         A wrapper around connection.ops.quote_name that doesn't quote aliases
         for table names. This avoids problems with some SQL dialects that treat
@@ -60,6 +60,20 @@ class SQLCompiler(object):
         r = self.connection.ops.quote_name(name)
         self.quote_cache[name] = r
         return r
+
+    def quote_name_unless_alias(self, name):
+        """
+        A wrapper around connection.ops.quote_name that doesn't quote aliases
+        for table names. This avoids problems with some SQL dialects that treat
+        quoted strings specially (e.g. PostgreSQL).
+        """
+        return self(name)
+
+    def compile(self, node):
+        if node.__class__ in self.connection.compile_implementations:
+            return self.connection.compile_implementations[node.__class__](node, self)
+        else:
+            return node.as_sql(self, self.connection)
 
     def as_sql(self, with_limits=True, with_col_aliases=False):
         """
@@ -88,10 +102,8 @@ class SQLCompiler(object):
         # docstring of get_from_clause() for details.
         from_, f_params = self.get_from_clause()
 
-        qn = self.quote_name_unless_alias
-
-        where, w_params = self.query.where.as_sql(qn=qn, connection=self.connection)
-        having, h_params = self.query.having.as_sql(qn=qn, connection=self.connection)
+        where, w_params = self.compile(self.query.where)
+        having, h_params = self.compile(self.query.having)
         having_group_by = self.query.having.get_cols()
         params = []
         for val in six.itervalues(self.query.extra_select):
@@ -180,7 +192,7 @@ class SQLCompiler(object):
         (without the table names) are given unique aliases. This is needed in
         some cases to avoid ambiguity with nested queries.
         """
-        qn = self.quote_name_unless_alias
+        qn = self
         qn2 = self.connection.ops.quote_name
         result = ['(%s) AS %s' % (col[0], qn2(alias)) for alias, col in six.iteritems(self.query.extra_select)]
         params = []
@@ -213,7 +225,7 @@ class SQLCompiler(object):
                         aliases.add(r)
                         col_aliases.add(col[1])
                 else:
-                    col_sql, col_params = col.as_sql(qn, self.connection)
+                    col_sql, col_params = self.compile(col)
                     result.append(col_sql)
                     params.extend(col_params)
 
@@ -229,7 +241,7 @@ class SQLCompiler(object):
 
         max_name_length = self.connection.ops.max_name_length()
         for alias, aggregate in self.query.aggregate_select.items():
-            agg_sql, agg_params = aggregate.as_sql(qn, self.connection)
+            agg_sql, agg_params = self.compile(aggregate)
             if alias is None:
                 result.append(agg_sql)
             else:
@@ -267,7 +279,7 @@ class SQLCompiler(object):
         result = []
         if opts is None:
             opts = self.query.get_meta()
-        qn = self.quote_name_unless_alias
+        qn = self
         qn2 = self.connection.ops.quote_name
         aliases = set()
         only_load = self.deferred_to_columns()
@@ -312,7 +324,7 @@ class SQLCompiler(object):
         Note that this method can alter the tables in the query, and thus it
         must be called before get_from_clause().
         """
-        qn = self.quote_name_unless_alias
+        qn = self
         qn2 = self.connection.ops.quote_name
         result = []
         opts = self.query.get_meta()
@@ -345,7 +357,7 @@ class SQLCompiler(object):
             ordering = (self.query.order_by
                         or self.query.get_meta().ordering
                         or [])
-        qn = self.quote_name_unless_alias
+        qn = self
         qn2 = self.connection.ops.quote_name
         distinct = self.query.distinct
         select_aliases = self._select_aliases
@@ -483,7 +495,7 @@ class SQLCompiler(object):
         ordering and distinct must be done first.
         """
         result = []
-        qn = self.quote_name_unless_alias
+        qn = self
         qn2 = self.connection.ops.quote_name
         first = True
         from_params = []
@@ -501,8 +513,7 @@ class SQLCompiler(object):
                 extra_cond = join_field.get_extra_restriction(
                     self.query.where_class, alias, lhs)
                 if extra_cond:
-                    extra_sql, extra_params = extra_cond.as_sql(
-                        qn, self.connection)
+                    extra_sql, extra_params = self.compile(extra_cond)
                     extra_sql = 'AND (%s)' % extra_sql
                     from_params.extend(extra_params)
                 else:
@@ -534,7 +545,7 @@ class SQLCompiler(object):
         """
         Returns a tuple representing the SQL elements in the "group by" clause.
         """
-        qn = self.quote_name_unless_alias
+        qn = self
         result, params = [], []
         if self.query.group_by is not None:
             select_cols = self.query.select + self.query.related_select_cols
@@ -553,7 +564,7 @@ class SQLCompiler(object):
                 if isinstance(col, (list, tuple)):
                     sql = '%s.%s' % (qn(col[0]), qn(col[1]))
                 elif hasattr(col, 'as_sql'):
-                    sql, col_params = col.as_sql(qn, self.connection)
+                    self.compile(col)
                 else:
                     sql = '(%s)' % str(col)
                 if sql not in seen:
@@ -776,7 +787,7 @@ class SQLCompiler(object):
         return result
 
     def as_subquery_condition(self, alias, columns, qn):
-        inner_qn = self.quote_name_unless_alias
+        inner_qn = self
         qn2 = self.connection.ops.quote_name
         if len(columns) == 1:
             sql, params = self.as_sql()
@@ -887,9 +898,9 @@ class SQLDeleteCompiler(SQLCompiler):
         """
         assert len(self.query.tables) == 1, \
                 "Can only delete from one table at a time."
-        qn = self.quote_name_unless_alias
+        qn = self
         result = ['DELETE FROM %s' % qn(self.query.tables[0])]
-        where, params = self.query.where.as_sql(qn=qn, connection=self.connection)
+        where, params = self.compile(self.query.where)
         if where:
             result.append('WHERE %s' % where)
         return ' '.join(result), tuple(params)
@@ -905,7 +916,7 @@ class SQLUpdateCompiler(SQLCompiler):
         if not self.query.values:
             return '', ()
         table = self.query.tables[0]
-        qn = self.quote_name_unless_alias
+        qn = self
         result = ['UPDATE %s' % qn(table)]
         result.append('SET')
         values, update_params = [], []
@@ -925,7 +936,7 @@ class SQLUpdateCompiler(SQLCompiler):
                 val = SQLEvaluator(val, self.query, allow_joins=False)
             name = field.column
             if hasattr(val, 'as_sql'):
-                sql, params = val.as_sql(qn, self.connection)
+                sql, params = self.compile(val)
                 values.append('%s = %s' % (qn(name), sql))
                 update_params.extend(params)
             elif val is not None:
@@ -936,7 +947,7 @@ class SQLUpdateCompiler(SQLCompiler):
         if not values:
             return '', ()
         result.append(', '.join(values))
-        where, params = self.query.where.as_sql(qn=qn, connection=self.connection)
+        where, params = self.compile(self.query.where)
         if where:
             result.append('WHERE %s' % where)
         return ' '.join(result), tuple(update_params + params)
@@ -1016,11 +1027,11 @@ class SQLAggregateCompiler(SQLCompiler):
         parameters.
         """
         if qn is None:
-            qn = self.quote_name_unless_alias
+            qn = self
 
         sql, params = [], []
         for aggregate in self.query.aggregate_select.values():
-            agg_sql, agg_params = aggregate.as_sql(qn, self.connection)
+            agg_sql, agg_params = self.compile(aggregate)
             sql.append(agg_sql)
             params.extend(agg_params)
         sql = ', '.join(sql)

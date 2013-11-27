@@ -101,7 +101,7 @@ class WhereNode(tree.Node):
         for child in self.children:
             try:
                 if hasattr(child, 'as_sql'):
-                    sql, params = child.as_sql(qn=qn, connection=connection)
+                    sql, params = qn.compile(child)
                 else:
                     # A leaf node in the tree.
                     sql, params = self.make_atom(child, qn, connection)
@@ -193,13 +193,13 @@ class WhereNode(tree.Node):
             field_sql, field_params = self.sql_for_columns(lvalue, qn, connection, field_internal_type), []
         else:
             # A smart object with an as_sql() method.
-            field_sql, field_params = lvalue.as_sql(qn, connection)
+            field_sql, field_params = qn.compile(lvalue)
 
         is_datetime_field = value_annotation is datetime.datetime
         cast_sql = connection.ops.datetime_cast_sql() if is_datetime_field else '%s'
 
         if hasattr(params, 'as_sql'):
-            extra, params = params.as_sql(qn, connection)
+            extra, params = qn.compile(params)
             cast_sql = ''
         else:
             extra = ''
@@ -282,6 +282,8 @@ class WhereNode(tree.Node):
             if hasattr(child, 'relabel_aliases'):
                 # For example another WhereNode
                 child.relabel_aliases(change_map)
+            elif hasattr(child, 'relabeled_clone'):
+                self.children[pos] = child.relabeled_clone(change_map)
             elif isinstance(child, (list, tuple)):
                 # tuple starting with Constraint
                 child = (child[0].relabeled_clone(change_map),) + child[1:]
@@ -350,7 +352,7 @@ class Constraint(object):
         self.alias, self.col, self.field = alias, col, field
 
     def prepare(self, lookup_type, value):
-        if self.field:
+        if self.field and not hasattr(value, 'as_sql'):
             return self.field.get_prep_lookup(lookup_type, value)
         return value
 

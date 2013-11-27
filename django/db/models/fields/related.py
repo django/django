@@ -934,6 +934,11 @@ class ForeignObjectRel(object):
         # example custom multicolumn joins currently have no remote field).
         self.field_name = None
 
+    def get_lookup_constraint(self, constraint_class, alias, targets, sources, lookup_type,
+                              raw_value):
+        return self.field.get_lookup_constraint(constraint_class, alias, targets, sources,
+                                                lookup_type, raw_value)
+
 
 class ManyToOneRel(ForeignObjectRel):
     def __init__(self, field, to, field_name, related_name=None, limit_choices_to=None,

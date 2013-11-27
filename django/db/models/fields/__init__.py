@@ -4,6 +4,7 @@ import collections
 import copy
 import datetime
 import decimal
+import inspect
 import math
 import warnings
 from base64 import b64decode, b64encode
@@ -11,6 +12,7 @@ from itertools import tee
 
 from django.db import connection
 from django.db.models.loading import get_model
+from django.db.models.lookups import default_lookups
 from django.db.models.query_utils import QueryWrapper
 from django.conf import settings
 from django import forms
@@ -101,6 +103,7 @@ class Field(object):
         'unique': _('%(model_name)s with this %(field_label)s '
                     'already exists.'),
     }
+    class_lookups = default_lookups.copy()
 
     # Generic field type description, usually overridden by subclasses
     def _description(self):
@@ -446,6 +449,30 @@ class Field(object):
     def get_internal_type(self):
         return self.__class__.__name__
 
+    def get_lookup(self, lookup_name):
+        try:
+            return self.class_lookups[lookup_name]
+        except KeyError:
+            for parent in inspect.getmro(self.__class__):
+                if not 'class_lookups' in parent.__dict__:
+                    continue
+                if lookup_name in parent.class_lookups:
+                    return parent.class_lookups[lookup_name]
+
+    @classmethod
+    def register_lookup(cls, lookup):
+        if not 'class_lookups' in cls.__dict__:
+            cls.class_lookups = {}
+        cls.class_lookups[lookup.lookup_name] = lookup
+
+    @classmethod
+    def _unregister_lookup(cls, lookup):
+        """
+        Removes given lookup from cls lookups. Meant to be used in
+        tests only.
+        """
+        del cls.class_lookups[lookup.lookup_name]
+
     def pre_save(self, model_instance, add):
         """
         Returns field's value just before saving.
@@ -504,8 +531,7 @@ class Field(object):
             except ValueError:
                 raise ValueError("The __year lookup type requires an integer "
                                  "argument")
-
-        raise TypeError("Field has invalid lookup: %s" % lookup_type)
+        return self.get_prep_value(value)
 
     def get_db_prep_lookup(self, lookup_type, value, connection,
                            prepared=False):
@@ -554,6 +580,8 @@ class Field(object):
                 return connection.ops.year_lookup_bounds_for_date_field(value)
             else:
                 return [value]          # this isn't supposed to happen
+        else:
+            return [value]
 
     def has_default(self):
         """

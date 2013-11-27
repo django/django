@@ -1030,6 +1030,12 @@ class Query(object):
     def prepare_lookup_value(self, value, lookup_type, can_reuse):
         # Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
         # uses of None as a query value.
+        if len(lookup_type) > 1:
+            raise FieldError('Nested lookups not allowed')
+        elif len(lookup_type) == 0:
+            lookup_type = 'exact'
+        else:
+            lookup_type = lookup_type[0]
         if value is None:
             if lookup_type != 'exact':
                 raise ValueError("Cannot use None as a query value")
@@ -1060,31 +1066,39 @@ class Query(object):
         """
         Solve the lookup type from the lookup (eg: 'foobar__id__icontains')
         """
-        lookup_type = 'exact'  # Default lookup type
-        lookup_parts = lookup.split(LOOKUP_SEP)
-        num_parts = len(lookup_parts)
-        if (len(lookup_parts) > 1 and lookup_parts[-1] in self.query_terms
-                and (not self._aggregates or lookup not in self._aggregates)):
-            # Traverse the lookup query to distinguish related fields from
-            # lookup types.
-            lookup_model = self.model
-            for counter, field_name in enumerate(lookup_parts):
-                try:
-                    lookup_field = lookup_model._meta.get_field(field_name)
-                except FieldDoesNotExist:
-                    # Not a field. Bail out.
-                    lookup_type = lookup_parts.pop()
-                    break
-                # Unless we're at the end of the list of lookups, let's attempt
-                # to continue traversing relations.
-                if (counter + 1) < num_parts:
-                    try:
-                        lookup_model = lookup_field.rel.to
-                    except AttributeError:
-                        # Not a related field. Bail out.
-                        lookup_type = lookup_parts.pop()
-                        break
-        return lookup_type, lookup_parts
+        lookup_splitted = lookup.split(LOOKUP_SEP)
+        aggregate, aggregate_lookups = refs_aggregate(lookup_splitted, self.aggregates)
+        if aggregate:
+            if len(aggregate_lookups) > 1:
+                raise FieldError("Nested lookups not allowed.")
+            return aggregate_lookups, (), aggregate
+        _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+        field_parts = lookup_splitted[0:len(lookup_splitted) - len(lookup_parts)]
+        if len(lookup_parts) == 0:
+            lookup_parts = ['exact']
+        elif len(lookup_parts) > 1:
+            if field_parts:
+                raise FieldError(
+                    'Only one lookup part allowed (found path "%s" from "%s").' %
+                    (LOOKUP_SEP.join(field_parts), lookup))
+            else:
+                raise FieldError(
+                    'Invalid lookup "%s" for model %s".' %
+                    (lookup, self.get_meta().model.__name__))
+        else:
+            if not hasattr(field, 'get_lookup_constraint'):
+                lookup_class = field.get_lookup(lookup_parts[0])
+                if lookup_class is None and lookup_parts[0] not in self.query_terms:
+                    raise FieldError(
+                        'Invalid lookup name %s' % lookup_parts[0])
+        return lookup_parts, field_parts, False
+
+    def build_lookup(self, lookup_type, lhs, rhs):
+        if hasattr(lhs.output_type, 'get_lookup'):
+            lookup = lhs.output_type.get_lookup(lookup_type)
+            if lookup:
+                return lookup(self.where_class, lhs, rhs)
+        return None
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
                      can_reuse=None, connector=AND):
@@ -1114,9 +1128,9 @@ class Query(object):
         is responsible for unreffing the joins used.
         """
         arg, value = filter_expr
-        lookup_type, parts = self.solve_lookup_type(arg)
-        if not parts:
+        if not arg:
             raise FieldError("Cannot parse keyword query %r" % arg)
+        lookup_type, parts, reffed_aggregate = self.solve_lookup_type(arg)
 
         # Work out the lookup type and remove it from the end of 'parts',
         # if necessary.
@@ -1124,11 +1138,13 @@ class Query(object):
         used_joins = getattr(value, '_used_joins', [])
 
         clause = self.where_class()
-        if self._aggregates:
-            for alias, aggregate in self.aggregates.items():
-                if alias in (parts[0], LOOKUP_SEP.join(parts)):
-                    clause.add((aggregate, lookup_type, value), AND)
-                    return clause, []
+        if reffed_aggregate:
+            condition = self.build_lookup(lookup_type, reffed_aggregate, value)
+            if not condition:
+                # Backwards compat for custom lookups
+                condition = (reffed_aggregate, lookup_type, value)
+            clause.add(condition, AND)
+            return clause, []
 
         opts = self.get_meta()
         alias = self.get_initial_alias()
@@ -1150,11 +1166,18 @@ class Query(object):
         targets, alias, join_list = self.trim_joins(sources, join_list, path)
 
         if hasattr(field, 'get_lookup_constraint'):
-            constraint = field.get_lookup_constraint(self.where_class, alias, targets, sources,
-                                                     lookup_type, value)
+            # For now foreign keys get special treatment. This should be
+            # refactored when composite fields lands.
+            condition = field.get_lookup_constraint(self.where_class, alias, targets, sources,
+                                                    lookup_type, value)
         else:
-            constraint = (Constraint(alias, targets[0].column, field), lookup_type, value)
-        clause.add(constraint, AND)
+            assert(len(targets) == 1)
+            col = Col(alias, targets[0], field)
+            condition = self.build_lookup(lookup_type, col, value)
+            if not condition:
+                # Backwards compat for custom lookups
+                condition = (Constraint(alias, targets[0].column, field), lookup_type, value)
+        clause.add(condition, AND)
 
         require_outer = lookup_type == 'isnull' and value is True and not current_negated
         if current_negated and (lookup_type != 'isnull' or value is False):
@@ -1185,7 +1208,7 @@ class Query(object):
         if not self._aggregates:
             return False
         if not isinstance(obj, Node):
-            return (refs_aggregate(obj[0].split(LOOKUP_SEP), self.aggregates)
+            return (refs_aggregate(obj[0].split(LOOKUP_SEP), self.aggregates)[0]
                     or (hasattr(obj[1], 'contains_aggregate')
                         and obj[1].contains_aggregate(self.aggregates)))
         return any(self.need_having(c) for c in obj.children)
@@ -1273,7 +1296,7 @@ class Query(object):
         needed_inner = joinpromoter.update_join_types(self)
         return target_clause, needed_inner
 
-    def names_to_path(self, names, opts, allow_many):
+    def names_to_path(self, names, opts, allow_many=True):
         """
         Walks the names path and turns them PathInfo tuples. Note that a
         single name in 'names' can generate multiple PathInfos (m2m for
@@ -1293,9 +1316,10 @@ class Query(object):
             try:
                 field, model, direct, m2m = opts.get_field_by_name(name)
             except FieldDoesNotExist:
-                available = opts.get_all_field_names() + list(self.aggregate_select)
-                raise FieldError("Cannot resolve keyword %r into field. "
-                                 "Choices are: %s" % (name, ", ".join(available)))
+                # We didn't found the current field, so move position back
+                # one step.
+                pos -= 1
+                break
             # Check if we need any joins for concrete inheritance cases (the
             # field lives in parent, but we are currently in one of its
             # children)
@@ -1330,15 +1354,9 @@ class Query(object):
                 final_field = field
                 targets = (field,)
                 break
-
-        if pos != len(names) - 1:
-            if pos == len(names) - 2:
-                raise FieldError(
-                    "Join on field %r not permitted. Did you misspell %r for "
-                    "the lookup type?" % (name, names[pos + 1]))
-            else:
-                raise FieldError("Join on field %r not permitted." % name)
-        return path, final_field, targets
+        if pos == -1:
+            raise FieldError('Whazaa')
+        return path, final_field, targets, names[pos + 1:]
 
     def setup_joins(self, names, opts, alias, can_reuse=None, allow_many=True):
         """
@@ -1367,8 +1385,10 @@ class Query(object):
         """
         joins = [alias]
         # First, generate the path for the names
-        path, final_field, targets = self.names_to_path(
+        path, final_field, targets, rest = self.names_to_path(
             names, opts, allow_many)
+        if rest:
+            raise FieldError('Invalid lookup')
         # Then, add the path to the query's joins. Note that we can't trim
         # joins at this stage - we will need the information about join type
         # of the trimmed joins.
@@ -1383,8 +1403,6 @@ class Query(object):
             alias = self.join(
                 connection, reuse=reuse, nullable=nullable, join_field=join.join_field)
             joins.append(alias)
-        if hasattr(final_field, 'field'):
-            final_field = final_field.field
         return final_field, targets, opts, joins, path
 
     def trim_joins(self, targets, joins, path):
@@ -1455,7 +1473,7 @@ class Query(object):
             query.bump_prefix(self)
             query.where.add(
                 (Constraint(query.select[0].col[0], pk.column, pk),
-                 'exact', Col(alias, pk.column)),
+                 'exact', Col(alias, pk, pk)),
                 AND
             )
 
