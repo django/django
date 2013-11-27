@@ -430,6 +430,9 @@ class Query(object):
 
         return number
 
+    def has_filters(self):
+        return self.where or self.having
+
     def has_results(self, using):
         q = self.clone()
         if not q.distinct:

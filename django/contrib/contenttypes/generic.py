@@ -8,7 +8,7 @@ from functools import partial
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
-from django.db import models, router, DEFAULT_DB_ALIAS
+from django.db import models, router, transaction, DEFAULT_DB_ALIAS
 from django.db.models import signals
 from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.related import PathInfo
@@ -382,15 +382,28 @@ def create_generic_related_manager(superclass):
                 obj.save()
         add.alters_data = True
 
-        def remove(self, *objs):
-            db = router.db_for_write(self.model, instance=self.instance)
-            self.using(db).filter(pk__in=[o.pk for o in objs]).delete()
+        def remove(self, *objs, **kwargs):
+            if not objs:
+                return
+            bulk = kwargs.pop('bulk', True)
+            self._clear(self.filter(pk__in=[o.pk for o in objs]), bulk)
         remove.alters_data = True
 
-        def clear(self):
-            db = router.db_for_write(self.model, instance=self.instance)
-            self.using(db).delete()
+        def clear(self, **kwargs):
+            bulk = kwargs.pop('bulk', True)
+            self._clear(self, bulk)
         clear.alters_data = True
+
+        def _clear(self, queryset, bulk):
+            db = router.db_for_write(self.model, instance=self.instance)
+            queryset = queryset.using(db)
+            if bulk:
+                queryset.delete()
+            else:
+                with transaction.commit_on_success_unless_managed(using=db, savepoint=False):
+                    for obj in queryset:
+                        obj.delete()
+        _clear.alters_data = True
 
         def create(self, **kwargs):
             kwargs[self.content_type_field_name] = self.content_type
