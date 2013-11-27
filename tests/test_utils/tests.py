@@ -3,13 +3,16 @@ from __future__ import unicode_literals
 
 import unittest
 
+from django.conf.urls import patterns, url
+from django.core.urlresolvers import reverse
 from django.db import connection
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.html import HTMLParseError, parse_html
-from django.test.utils import CaptureQueriesContext, IgnoreAllDeprecationWarningsMixin
+from django.test.utils import (CaptureQueriesContext,
+    IgnoreAllDeprecationWarningsMixin, override_settings)
 from django.utils import six
 
 from .models import Person
@@ -627,3 +630,32 @@ class DoctestNormalizerTest(IgnoreAllDeprecationWarningsMixin, SimpleTestCase):
         suite = make_doctest("test_utils.doctest_output")
         failures = unittest.TextTestRunner(stream=six.StringIO()).run(suite)
         self.assertEqual(failures.failures, [])
+
+
+# for OverrideSettingsTests
+def fake_view(request):
+    pass
+
+
+class FirstUrls:
+    urlpatterns = patterns('', url(r'first/$', fake_view, name='first'))
+
+
+class SecondUrls:
+    urlpatterns = patterns('', url(r'second/$', fake_view, name='second'))
+
+
+class OverrideSettingsTests(TestCase):
+    """
+    #21518 -- If neither override_settings nor a settings_changed receiver
+    clears the URL cache between tests, then one of these two test methods will
+    fail.
+    """
+
+    @override_settings(ROOT_URLCONF=FirstUrls)
+    def test_first(self):
+        reverse('first')
+
+    @override_settings(ROOT_URLCONF=SecondUrls)
+    def test_second(self):
+        reverse('second')

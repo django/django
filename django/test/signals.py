@@ -124,3 +124,10 @@ def complex_setting_changed(**kwargs):
         # stacklevel=5 shows the line containing the override_settings call.
         warnings.warn("Overriding setting %s can lead to unexpected behaviour."
                       % kwargs['setting'], stacklevel=5)
+
+
+@receiver(setting_changed)
+def root_urlconf_changed(**kwargs):
+    if kwargs['setting'] == 'ROOT_URLCONF':
+        from django.core.urlresolvers import clear_url_caches
+        clear_url_caches()
