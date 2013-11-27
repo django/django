@@ -110,7 +110,7 @@ class BaseDatabaseSchemaEditor(object):
         params = []
         # Check for fields that aren't actually columns (e.g. M2M)
         if sql is None:
-            return None
+            return None, None
         # Work out nullability
         null = field.null
         # If we were told to include a default value, do so

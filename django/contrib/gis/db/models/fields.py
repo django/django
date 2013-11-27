@@ -105,6 +105,19 @@ class GeometryField(Field):
 
         super(GeometryField, self).__init__(**kwargs)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(GeometryField, self).deconstruct()
+        # Always include SRID for less fragility; include others if they're
+        # not the default values.
+        kwargs['srid'] = self.srid
+        if self.dim != 2:
+            kwargs['dim'] = self.dim
+        if self.spatial_index != True:
+            kwargs['spatial_index'] = self.spatial_index
+        if self.geography != False:
+            kwargs['geography'] = self.geography
+        return name, path, args, kwargs
+
     # The following functions are used to get the units, their name, and
     # the spheroid corresponding to the SRID of the GeometryField.
     def _get_srid_info(self, connection):
