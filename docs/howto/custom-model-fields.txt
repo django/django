@@ -230,6 +230,95 @@ All of the options without an explanation in the above list have the same
 meaning they do for normal Django fields. See the :doc:`field documentation
 </ref/models/fields>` for examples and details.
 
+Field deconstruction
+--------------------
+
+.. versionadded:: 1.7
+
+    ``deconstruct()`` is part of the migrations framework in Django 1.7 and
+    above. If you have custom fields from previous versions they will
+    need this method added before you can use them with migrations.
+
+The counterpoint to writing your ``__init__`` method is writing the
+``deconstruct`` method. This method tells Django how to take an instance
+of your new field and reduce it to a serialized form - in particular, what
+arguments to pass to ``__init__`` to re-create it.
+
+If you haven't added any extra options on top of the field you inherited from,
+then there's no need to write a new ``deconstruct`` method. If, however, you're
+changing the arguments passed in ``__init__`` (like we are in ``HandField``),
+you'll need to supplement the values being passed.
+
+The contract of ``deconstruct`` is simple; it returns a tuple of four items:
+the field's attribute name, the full import path of the field class, the
+position arguments (as a list), and the keyword arguments (as a dict).
+
+As a custom field author, you don't need to care about the first two values;
+the base ``Field`` class has all the code to work out the field's attribute
+name and import path. You do, however, have to care about the positional
+and keyword arguments, as these are likely the things you are changing.
+
+For example, in our ``HandField`` class we're always forcibly setting
+max_length in ``__init__``. The ``deconstruct`` method on the base ``Field``
+class will see this and try to return it in the keyword arguments; thus,
+we can drop it from the keyword arguments for readability::
+
+    from django.db import models
+
+    class HandField(models.Field):
+
+        def __init__(self, *args, **kwargs):
+            kwargs['max_length'] = 104
+            super(HandField, self).__init__(*args, **kwargs)
+
+        def deconstruct(self):
+            name, path, args, kwargs = super(HandField, self).deconstruct()
+            del kwargs["max_length"]
+            return name, path, args, kwargs
+
+If you add a new keyword argument, you need to write code to put its value
+into ``kwargs`` yourself::
+
+    from django.db import models
+
+    class CommaSepField(models.Field):
+        "Implements comma-separated storage of lists"
+
+        def __init__(self, separator=",", *args, **kwargs):
+            self.separator = ","
+            super(CommaSepField, self).__init__(*args, **kwargs)
+
+        def deconstruct(self):
+            name, path, args, kwargs = super(CommaSepField, self).deconstruct()
+            # Only include kwarg if it's not the default
+            if self.separator != ",":
+                kwargs['separator'] = self.separator
+            return name, path, args, kwargs
+
+More complex examples are beyond the scope of this document, but remember -
+for any configuration of your Field instance, ``deconstruct`` must return
+arguments that you can pass to ``__init__`` to reconstruct that state.
+
+Pay extra attention if you set new default values for arguments in the
+``Field`` superclass; you want to make sure they're always included, rather
+than disappearing if they take on the old default value.
+
+In addition, try to avoid returning values as positional arguments; where
+possible, return values as keyword arguments for maximum future compatability.
+Of course, if you change the names of things more often than their position
+in the constructor's argument list, you might prefer positional, but bear in
+mind that people will be reconstructing your field from the serialized version
+for quite a while (possibly years), depending how long your migrations live for.
+
+You can see the results of deconstruction by looking in migrations that include
+the field, and you can test deconstruction in unit tests by just deconstructing
+and reconstructing the field::
+
+    name, path, args, kwargs = my_field_instance.deconstruct()
+    new_instance = MyField(*args, **kwargs)
+    self.assertEqual(my_field_instance.some_attribute, new_instance.some_attribute)
+
+
 The ``SubfieldBase`` metaclass
 ------------------------------
 
