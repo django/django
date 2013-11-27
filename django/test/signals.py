@@ -98,3 +98,11 @@ def file_storage_changed(**kwargs):
 def complex_setting_changed(**kwargs):
     if kwargs['enter'] and kwargs['setting'] in COMPLEX_OVERRIDE_SETTINGS:
         warnings.warn("Overriding setting %s can lead to unexpected behaviour." % kwargs['setting'])
+
+@receiver(setting_changed)
+def root_urlconf_changed(**kwargs):
+    if kwargs['setting'] in ('ROOT_URLCONF',):
+        from django.core import urlresolvers
+        urlresolvers.get_resolver.cache_clear()
+        urlresolvers.get_ns_resolver.cache_clear()
+
