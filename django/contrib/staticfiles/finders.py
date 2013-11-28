@@ -12,11 +12,15 @@ from django.utils import six, lru_cache
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.storage import AppStaticStorage
 
+# To keep track on which directories the finder has searched the static files.
+searched_locations = set()
+
 
 class BaseFinder(object):
     """
     A base file finder to be used for custom staticfiles finder classes.
     """
+
     def find(self, path, all=False):
         """
         Given a relative file path this ought to find an
@@ -73,8 +77,10 @@ class FileSystemFinder(BaseFinder):
         Looks for files in the extra locations
         as defined in ``STATICFILES_DIRS``.
         """
+        global searched_locations
         matches = []
         for prefix, root in self.locations:
+            searched_locations.add(root)
             matched_path = self.find_location(root, path, prefix)
             if matched_path:
                 if not all:
@@ -141,8 +147,10 @@ class AppDirectoriesFinder(BaseFinder):
         """
         Looks for files in the app directories.
         """
+        global searched_locations
         matches = []
         for app in self.apps:
+            searched_locations.add(self.storages[app].location)
             match = self.find_in_app(app, path)
             if match:
                 if not all:
@@ -191,11 +199,13 @@ class BaseStorageFinder(BaseFinder):
         """
         Looks for files in the default file storage, if it's local.
         """
+        global searched_locations
         try:
             self.storage.path('')
         except NotImplementedError:
             pass
         else:
+            searched_locations.add(self.storage.location)
             if self.storage.exists(path):
                 match = self.storage.path(path)
                 if all:
@@ -233,6 +243,8 @@ def find(path, all=False):
     If ``all`` is ``False`` (default), return the first matching
     absolute path (or ``None`` if no match). Otherwise return a list.
     """
+    global searched_locations
+    searched_locations = set()
     matches = []
     for finder in get_finders():
         result = finder.find(path, all=all)
@@ -245,6 +257,11 @@ def find(path, all=False):
         return matches
     # No match.
     return [] if all else None
+
+
+def get_searched_locations():
+    global searched_locations
+    return searched_locations
 
 
 def get_finders():

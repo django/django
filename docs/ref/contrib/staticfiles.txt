@@ -158,6 +158,25 @@ output and just get the path names::
    /home/special.polls.com/core/static/css/base.css
    /home/polls.com/core/static/css/base.css
 
+On the other hand, by setting the :djadminopt:`--verbosity` flag to 2, you can
+get all the directories on which it searched the relative paths::
+
+   $ python manage.py findstatic css/base.css --verbosity 2
+   Found 'css/base.css' here:
+     /home/special.polls.com/core/static/css/base.css
+     /home/polls.com/core/static/css/base.css
+   Looking in the following locations:
+     /home/special.polls.com/core/static
+     /home/polls.com/core/static
+     /opt/project/site_media/media
+     /opt/project/site_media/static
+
+.. versionadded:: 1.7
+
+   The additional message of on which directories it searched the relative
+   paths is new in Django 1.7.
+
+
 .. _staticfiles-runserver:
 
 runserver
@@ -345,6 +364,24 @@ files:
   :ttag:`get_static_prefix` but uses :setting:`MEDIA_URL`.
 
 .. _staticfiles-development-view:
+
+Finders Module
+==============
+
+``staticfiles`` finders has ``get_searched_locations`` function which returns
+a list of directories on which the ``staticfiles`` finders searched the
+relative paths. Example usage::
+
+    from django.contrib.staticfiles import finders
+
+    result = finders.find('css/base.css')
+    searched_locations = finders.get_searched_locations()
+
+.. versionadded:: 1.7
+
+The ``get_searched_locations`` function is new in Django 1.7. Previously, we
+have to check the locations of our :setting:`STATICFILES_FINDERS` manually
+one by one.
 
 Static file development view
 ----------------------------
