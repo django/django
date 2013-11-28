@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
+from django.contrib.sites.middleware import SiteMiddleware
 from django.contrib.sites.models import Site, RequestSite, get_current_site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpRequest
@@ -81,3 +82,14 @@ class SitesFrameworkTests(TestCase):
         self.assertRaises(ValidationError, site.full_clean)
         site.domain = "test\ntest"
         self.assertRaises(ValidationError, site.full_clean)
+
+
+class MiddlewareTest(TestCase):
+
+    def test_request(self):
+        """ Makes sure that the request has correct `site` attribute. """
+
+        middleware = SiteMiddleware()
+        request = HttpRequest()
+        middleware.process_request(request)
+        self.assertEqual(request.site.id, settings.SITE_ID)
