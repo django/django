@@ -492,7 +492,7 @@ def create_foreign_related_manager(superclass, rel_field, rel_model):
                     with transaction.commit_on_success_unless_managed(using=db, savepoint=False):
                         for obj in queryset:
                             setattr(obj, rel_field.name, None)
-                            obj.save()
+                            obj.save(update_fields=[rel_field.name])
             _clear.alters_data = True
 
     return RelatedManager
