@@ -544,7 +544,11 @@ class TemplateRegressionTests(TestCase):
             t.render(Context({}))
 
 
-@override_settings(MEDIA_URL="/media/", STATIC_URL="/static/")
+# Set ALLOWED_INCLUDE_ROOTS so that ssi works.
+@override_settings(MEDIA_URL="/media/", STATIC_URL="/static/",
+                   TEMPLATE_DEBUG=False, ALLOWED_INCLUDE_ROOTS=(
+                       os.path.dirname(os.path.abspath(upath(__file__))),),
+                   )
 class TemplateTests(TransRealMixin, TestCase):
     def test_templates(self):
         template_tests = self.get_template_tests()
@@ -565,18 +569,8 @@ class TemplateTests(TransRealMixin, TestCase):
         failures = []
         tests = sorted(template_tests.items())
 
-        # Turn TEMPLATE_DEBUG off, because tests assume that.
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, False
-
         # Set TEMPLATE_STRING_IF_INVALID to a known string.
-        old_invalid = settings.TEMPLATE_STRING_IF_INVALID
         expected_invalid_str = 'INVALID'
-
-        # Set ALLOWED_INCLUDE_ROOTS so that ssi works.
-        old_allowed_include_roots = settings.ALLOWED_INCLUDE_ROOTS
-        settings.ALLOWED_INCLUDE_ROOTS = (
-            os.path.dirname(os.path.abspath(upath(__file__))),
-        )
 
         # Warm the URL reversing cache. This ensures we don't pay the cost
         # warming the cache during one of the tests.
@@ -613,34 +607,34 @@ class TemplateTests(TransRealMixin, TestCase):
                     (expected_invalid_str, False, invalid_string_result),
                     ('', True, template_debug_result)
             ]:
-                settings.TEMPLATE_STRING_IF_INVALID = invalid_str
-                settings.TEMPLATE_DEBUG = template_debug
-                for is_cached in (False, True):
-                    try:
+                with override_settings(TEMPLATE_STRING_IF_INVALID=invalid_str,
+                                       TEMPLATE_DEBUG=template_debug):
+                    for is_cached in (False, True):
                         try:
-                            with warnings.catch_warnings():
-                                # Ignore pending deprecations of the old syntax of the 'cycle' and 'firstof' tags.
-                                warnings.filterwarnings("ignore", category=DeprecationWarning, module='django.template.base')
-                                test_template = loader.get_template(name)
-                        except ShouldNotExecuteException:
-                            failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template loading invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
+                            try:
+                                with warnings.catch_warnings():
+                                    # Ignore pending deprecations of the old syntax of the 'cycle' and 'firstof' tags.
+                                    warnings.filterwarnings("ignore", category=DeprecationWarning, module='django.template.base')
+                                    test_template = loader.get_template(name)
+                            except ShouldNotExecuteException:
+                                failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template loading invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
 
-                        try:
-                            output = self.render(test_template, vals)
-                        except ShouldNotExecuteException:
-                            failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template rendering invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
-                    except ContextStackException:
-                        failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Context stack was left imbalanced" % (is_cached, invalid_str, template_debug, name))
-                        continue
-                    except Exception:
-                        exc_type, exc_value, exc_tb = sys.exc_info()
-                        if exc_type != result:
-                            tb = '\n'.join(traceback.format_exception(exc_type, exc_value, exc_tb))
-                            failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Got %s, exception: %s\n%s" % (is_cached, invalid_str, template_debug, name, exc_type, exc_value, tb))
-                        continue
-                    if output != result:
-                        failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Expected %r, got %r" % (is_cached, invalid_str, template_debug, name, result, output))
-                cache_loader.reset()
+                            try:
+                                output = self.render(test_template, vals)
+                            except ShouldNotExecuteException:
+                                failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template rendering invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
+                        except ContextStackException:
+                            failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Context stack was left imbalanced" % (is_cached, invalid_str, template_debug, name))
+                            continue
+                        except Exception:
+                            exc_type, exc_value, exc_tb = sys.exc_info()
+                            if exc_type != result:
+                                tb = '\n'.join(traceback.format_exception(exc_type, exc_value, exc_tb))
+                                failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Got %s, exception: %s\n%s" % (is_cached, invalid_str, template_debug, name, exc_type, exc_value, tb))
+                            continue
+                        if output != result:
+                            failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Expected %r, got %r" % (is_cached, invalid_str, template_debug, name, result, output))
+                    cache_loader.reset()
 
             if 'LANGUAGE_CODE' in vals[1]:
                 deactivate()
@@ -651,9 +645,6 @@ class TemplateTests(TransRealMixin, TestCase):
 
         restore_template_loaders()
         deactivate()
-        settings.TEMPLATE_DEBUG = old_td
-        settings.TEMPLATE_STRING_IF_INVALID = old_invalid
-        settings.ALLOWED_INCLUDE_ROOTS = old_allowed_include_roots
 
         self.assertEqual(failures, [], "Tests failed:\n%s\n%s" %
             ('-' * 70, ("\n%s\n" % ('-' * 70)).join(failures)))
