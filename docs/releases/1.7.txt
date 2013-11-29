@@ -372,6 +372,9 @@ Internationalization
   in the corresponding entry in the PO file, which makes the translation
   process easier.
 
+* :func:`django.views.i18n.set_language` now returns 204 status code for AJAX
+  requests when there is no ``next`` parameter in ``POST`` or ``GET``.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
@@ -701,6 +704,9 @@ Miscellaneous
   ``select_related('foo', 'bar')`` is equivalent to
   ``select_related('foo').select_related('bar')``. Previously the latter would
   have been equivalent to ``select_related('bar')``.
+
+* :func:`django.views.i18n.set_language` may now return 204 status code for
+  AJAX requests.
 
 Features deprecated in 1.7
 ==========================
