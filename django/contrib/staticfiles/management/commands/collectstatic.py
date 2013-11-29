@@ -82,12 +82,8 @@ class Command(NoArgsCommand):
 
         Split off from handle_noargs() to facilitate testing.
         """
-        if self.symlink:
-            if sys.platform == 'win32':
-                raise CommandError("Symlinking is not supported by this "
-                                   "platform (%s)." % sys.platform)
-            if not self.local:
-                raise CommandError("Can't symlink to a remote destination.")
+        if self.symlink and not self.local:
+            raise CommandError("Can't symlink to a remote destination.")
 
         if self.clear:
             self.clear_dir('')
