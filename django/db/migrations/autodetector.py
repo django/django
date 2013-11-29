@@ -1,11 +1,13 @@
-import re
+import importlib
 import os
+import re
 import sys
-from django.utils import datetime_safe, importlib
-from django.utils.six.moves import input
+
 from django.db.migrations import operations
 from django.db.migrations.migration import Migration
 from django.db.models.loading import cache
+from django.utils import datetime_safe
+from django.utils.six.moves import input
 
 
 class MigrationAutodetector(object):
