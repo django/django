@@ -117,6 +117,27 @@ The validation routines will only get called once, regardless of how many times
 you access :attr:`~Form.errors` or call :meth:`~Form.is_valid`. This means that
 if validation has side effects, those side effects will only be triggered once.
 
+.. method:: Form.errors.as_data()
+
+.. versionadded:: 1.7
+
+Returns a ``dict`` that maps fields to their original ``ValidationError``
+instances.
+
+    >>> f.errors.as_data()
+    {'sender': [ValidationError(['Enter a valid email address.'])],
+    'subject': [ValidationError(['This field is required.'])]}
+
+.. method:: Form.errors.as_json()
+
+.. versionadded:: 1.7
+
+Returns the errors serialized as JSON.
+
+    >>> f.errors.as_json()
+    {"sender": [{"message": "Enter a valid email address.", "code": "invalid"}],
+    "subject": [{"message": "This field is required.", "code": "required"}]}
+
 .. method:: Form.add_error(field, error)
 
 .. versionadded:: 1.7

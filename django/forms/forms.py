@@ -321,9 +321,9 @@ class BaseForm(object):
                     "argument contains errors for multiple fields."
                 )
             else:
-                error = dict(error)
+                error = error.error_dict
         else:
-            error = {field or NON_FIELD_ERRORS: list(error)}
+            error = {field or NON_FIELD_ERRORS: error.error_list}
 
         for field, error_list in error.items():
             if field not in self.errors:

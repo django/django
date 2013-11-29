@@ -15,7 +15,7 @@ from io import BytesIO
 
 from django.core import validators
 from django.core.exceptions import ValidationError
-from django.forms.utils import ErrorList, from_current_timezone, to_current_timezone
+from django.forms.utils import from_current_timezone, to_current_timezone
 from django.forms.widgets import (
     TextInput, NumberInput, EmailInput, URLInput, HiddenInput,
     MultipleHiddenInput, ClearableFileInput, CheckboxInput, Select,
@@ -998,7 +998,7 @@ class MultiValueField(Field):
         DateField.clean(value[0]) and TimeField.clean(value[1]).
         """
         clean_data = []
-        errors = ErrorList()
+        errors = []
         if not value or isinstance(value, (list, tuple)):
             if not value or not [v for v in value if v not in self.empty_values]:
                 if self.required:
