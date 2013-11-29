@@ -98,7 +98,7 @@ def logout(request, next_page=None,
 
 def logout_then_login(request, login_url=None, current_app=None, extra_context=None):
     """
-    Logs out the user if he is logged in. Then redirects to the log-in page.
+    Logs out the user if they are logged in. Then redirects to the log-in page.
     """
     if not login_url:
         login_url = settings.LOGIN_URL
