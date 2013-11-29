@@ -26,11 +26,14 @@ def set_language(request):
     any state.
     """
     next = request.POST.get('next', request.GET.get('next'))
-    if not is_safe_url(url=next, host=request.get_host()):
+    if (next or not request.is_ajax()) and not is_safe_url(url=next, host=request.get_host()):
         next = request.META.get('HTTP_REFERER')
         if not is_safe_url(url=next, host=request.get_host()):
             next = '/'
-    response = http.HttpResponseRedirect(next)
+    if next:
+        response = http.HttpResponseRedirect(next)
+    else:
+        response = http.HttpResponse(status=204)
     if request.method == 'POST':
         lang_code = request.POST.get('language', None)
         if lang_code and check_for_language(lang_code):

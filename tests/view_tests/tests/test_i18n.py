@@ -10,7 +10,7 @@ from django.test import LiveServerTestCase, TestCase
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils._os import upath
-from django.utils.translation import override
+from django.utils.translation import get_language, override
 from django.utils.text import javascript_quote
 
 try:
@@ -24,26 +24,119 @@ from ..urls import locale_dir
 class I18NTests(TestCase):
     """ Tests django views in django/views/i18n.py """
 
+    def _get_inactive_language_code(self):
+        """Return language code for some language which is not activated."""
+        current_language = get_language()
+        return [code for code, name in settings.LANGUAGES if not code == current_language][0]
+
     def test_setlang(self):
         """
         The set_language view can be used to change the session language.
 
         The user is redirected to the 'next' argument if provided.
         """
-        for lang_code, lang_name in settings.LANGUAGES:
-            post_data = dict(language=lang_code, next='/views/')
-            response = self.client.post('/views/i18n/setlang/', data=post_data)
-            self.assertRedirects(response, 'http://testserver/views/')
-            self.assertEqual(self.client.session['_language'], lang_code)
+        lang_code = self._get_inactive_language_code()
+        post_data = dict(language=lang_code, next='/views/')
+        response = self.client.post(
+            '/views/i18n/setlang/',
+            data=post_data,
+            HTTP_REFERER='/i_should_not_be_used/',
+        )
+        self.assertRedirects(response, 'http://testserver/views/')
+        self.assertEqual(self.client.session['_language'], lang_code)
 
     def test_setlang_unsafe_next(self):
         """
         The set_language view only redirects to the 'next' argument if it is
         "safe".
         """
-        lang_code, lang_name = settings.LANGUAGES[0]
+        lang_code = self._get_inactive_language_code()
         post_data = dict(language=lang_code, next='//unsafe/redirection/')
         response = self.client.post('/views/i18n/setlang/', data=post_data)
+        self.assertEqual(response.url, 'http://testserver/')
+        self.assertEqual(self.client.session['_language'], lang_code)
+
+    def test_setlang_redirect_to_referer(self):
+        """
+        The set_language view redirects to referer when there is no “next” parameter.
+        """
+        lang_code = self._get_inactive_language_code()
+        post_data = dict(language=lang_code)
+        response = self.client.post(
+            '/views/i18n/setlang/',
+            data=post_data,
+            HTTP_REFERER='/views/',
+        )
+        self.assertRedirects(response, 'http://testserver/views/')
+        self.assertEqual(self.client.session['_language'], lang_code)
+
+    def test_setlang_default_redirect(self):
+        """
+        The set_language view redirects to root when there is no referer and “next” parameter.
+        """
+        lang_code = self._get_inactive_language_code()
+        post_data = dict(language=lang_code)
+        response = self.client.post(
+            '/views/i18n/setlang/',
+            data=post_data,
+        )
+        self.assertRedirects(response, 'http://testserver/', fetch_redirect_response=False)
+        self.assertEqual(self.client.session['_language'], lang_code)
+
+    def test_setlang_performs_redirect_for_ajax_if_explicitly_requested(self):
+        """
+        The set_language view redirects to “next” parameter for AJAX calls.
+        """
+        lang_code = self._get_inactive_language_code()
+        post_data = dict(language=lang_code, next='/views/')
+        response = self.client.post(
+            '/views/i18n/setlang/',
+            data=post_data,
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+        self.assertRedirects(response, 'http://testserver/views/')
+        self.assertEqual(self.client.session['_language'], lang_code)
+
+    def test_setlang_doesnt_perform_a_redirect_to_referer_for_ajax(self):
+        """
+        The set_language view doesn’t redirect to referer for AJAX calls.
+        """
+        lang_code = self._get_inactive_language_code()
+        post_data = dict(language=lang_code)
+        response = self.client.post(
+            '/views/i18n/setlang/',
+            data=post_data,
+            HTTP_REFERER='/views/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(self.client.session['_language'], lang_code)
+
+    def test_setlang_doesnt_perform_a_default_redirect_for_ajax(self):
+        """
+        The set_language view by default returns 204 for AJAX calls.
+        """
+        lang_code = self._get_inactive_language_code()
+        post_data = dict(language=lang_code)
+        response = self.client.post(
+            '/views/i18n/setlang/',
+            data=post_data,
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(self.client.session['_language'], lang_code)
+
+    def test_setlang_unsafe_next_for_ajax(self):
+        """
+        The fallback to root URL for the set_language view works for AJAX calls.
+        """
+        lang_code = self._get_inactive_language_code()
+        post_data = dict(language=lang_code, next='//unsafe/redirection/')
+        response = self.client.post(
+            '/views/i18n/setlang/',
+            data=post_data,
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
         self.assertEqual(response.url, 'http://testserver/')
         self.assertEqual(self.client.session['_language'], lang_code)
 
