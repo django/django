@@ -479,11 +479,7 @@ def technical_404_response(request, exception):
     except (IndexError, TypeError, KeyError):
         tried = []
     else:
-        if (not tried                           # empty URLconf
-            or (request.path == '/'
-                and len(tried) == 1             # default URLconf
-                and len(tried[0]) == 1
-                and tried[0][0].app_name == tried[0][0].namespace == 'admin')):
+        if not tried:
             return default_urlconf(request)
 
     urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
