@@ -823,6 +823,7 @@ class CustomStaticFilesStorage(storage.StaticFilesStorage):
     """
     def __init__(self, *args, **kwargs):
         kwargs['file_permissions_mode'] = 0o640
+        kwargs['directory_permissions_mode'] = 0o740
         super(CustomStaticFilesStorage, self).__init__(*args, **kwargs)
 
 
@@ -839,21 +840,49 @@ class TestStaticFilePermissions(BaseCollectionTestCase, StaticFilesTestCase):
                       'link': False,
                       'dry_run': False}
 
+    def setUp(self):
+        self.umask = 0o027
+        self.old_umask = os.umask(self.umask)
+        super(TestStaticFilePermissions, self).setUp()
+
+    def tearDown(self):
+        os.umask(self.old_umask)
+        super(TestStaticFilePermissions, self).tearDown()
+
     # Don't run collectstatic command in this test class.
     def run_collectstatic(self, **kwargs):
         pass
 
-    @override_settings(FILE_UPLOAD_PERMISSIONS=0o655)
+    @override_settings(FILE_UPLOAD_PERMISSIONS=0o655,
+                       FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o765)
+    def test_collect_static_files_permissions(self):
+        collectstatic.Command().execute(**self.command_params)
+        test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
+        test_dir = os.path.join(settings.STATIC_ROOT, "subdir")
+        file_mode = os.stat(test_file)[0] & 0o777
+        dir_mode = os.stat(test_dir)[0] & 0o777
+        self.assertEqual(file_mode, 0o655)
+        self.assertEqual(dir_mode, 0o765)
+
+    @override_settings(FILE_UPLOAD_PERMISSIONS=None,
+                       FILE_UPLOAD_DIRECTORY_PERMISSIONS=None)
     def test_collect_static_files_default_permissions(self):
         collectstatic.Command().execute(**self.command_params)
         test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
+        test_dir = os.path.join(settings.STATIC_ROOT, "subdir")
         file_mode = os.stat(test_file)[0] & 0o777
-        self.assertEqual(file_mode, 0o655)
+        dir_mode = os.stat(test_dir)[0] & 0o777
+        self.assertEqual(file_mode, 0o666 & ~self.umask)
+        self.assertEqual(dir_mode, 0o777 & ~self.umask)
 
     @override_settings(FILE_UPLOAD_PERMISSIONS=0o655,
+                       FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o765,
                        STATICFILES_STORAGE='staticfiles_tests.tests.CustomStaticFilesStorage')
     def test_collect_static_files_subclass_of_static_storage(self):
         collectstatic.Command().execute(**self.command_params)
         test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
+        test_dir = os.path.join(settings.STATIC_ROOT, "subdir")
         file_mode = os.stat(test_file)[0] & 0o777
+        dir_mode = os.stat(test_dir)[0] & 0o777
         self.assertEqual(file_mode, 0o640)
+        self.assertEqual(dir_mode, 0o740)
