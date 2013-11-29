@@ -353,6 +353,12 @@ Forms
 * The new :meth:`~django.forms.Form.add_error()` method allows adding errors
   to specific form fields.
 
+* The dict-like attribute :attr:`~django.forms.Form.errors` now has two new
+  methods :meth:`~django.forms.Form.errors.as_data()` and
+  :meth:`~django.forms.Form.errors.as_json()`. The former returns a ``dict``
+  that maps fields to their original errors, complete with all metadata
+  (error code and params), the latter returns the errors serialized as json.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
