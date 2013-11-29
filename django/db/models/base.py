@@ -987,7 +987,7 @@ class Model(six.with_metaclass(ModelBase)):
 
     def clean_fields(self, exclude=None):
         """
-        Cleans all fields and raises a ValidationError containing message_dict
+        Cleans all fields and raises a ValidationError containing a dict
         of all validation errors if any occur.
         """
         if exclude is None:
