@@ -166,7 +166,7 @@ and the :setting:`SECRET_KEY` setting.
     cookie backend might open you up to `replay attacks`_. Unlike other session
     backends which keep a server-side record of each session and invalidate it
     when a user logs out, cookie-based sessions are not invalidated when a user
-    logs out. Thus if an attacker steals a user's cookie, he or she can use that
+    logs out. Thus if an attacker steals a user's cookie, they can use that
     cookie to login as that user even if the user logs out. Cookies will only
     be detected as 'stale' if they are older than your
     :setting:`SESSION_COOKIE_AGE`.
@@ -590,8 +590,8 @@ log in every time they open a browser.
 
 If :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` is set to ``True``, Django will
 use browser-length cookies -- cookies that expire as soon as the user closes
-his or her browser. Use this if you want people to have to log in every time
-they open a browser.
+their browser. Use this if you want people to have to log in every time they
+open a browser.
 
 This setting is a global default and can be overwritten at a per-session level
 by explicitly calling the :meth:`~backends.base.SessionBase.set_expiry` method

@@ -73,8 +73,7 @@ The Django admin has long had an undocumented "feature" allowing savvy
 users to manipulate the query string of changelist pages to filter the
 list of objects displayed. However, this also creates a security
 issue, as a staff user with sufficient knowledge of model structure
-could use this "feature" to gain access to information he or she would
-not normally have.
+could use this "feature" to gain access to information not normally accessible.
 
 As a result, changelist filtering now explicitly validates all lookup
 arguments in the query string, and permits only fields which are

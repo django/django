@@ -19,7 +19,7 @@ The security checks for these redirects (namely
 ``django.util.http.is_safe_url()``) didn't check if the scheme is ``http(s)``
 and as such allowed ``javascript:...`` URLs to be entered. If a developer
 relied on ``is_safe_url()`` to provide safe redirect targets and put such a
-URL into a link, he or she could suffer from a XSS attack. This bug doesn't affect
+URL into a link, they could suffer from a XSS attack. This bug doesn't affect
 Django currently, since we only put this URL into the ``Location`` response
 header and browsers seem to ignore JavaScript there.
 

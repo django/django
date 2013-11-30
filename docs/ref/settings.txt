@@ -2468,7 +2468,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE
 
 Default: ``False``
 
-Whether to expire the session when the user closes his or her browser. See
+Whether to expire the session when the user closes their browser. See
 :ref:`browser-length-vs-persistent-sessions`.
 
 .. setting:: SESSION_FILE_PATH

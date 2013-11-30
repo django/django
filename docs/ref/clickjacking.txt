@@ -20,8 +20,8 @@ purchase an item. A user has chosen to stay logged into the store all the time
 for convenience. An attacker site might create an "I Like Ponies" button on one
 of their own pages, and load the store's page in a transparent iframe such that
 the "Buy Now" button is invisibly overlaid on the "I Like Ponies" button. If the
-user visits the attacker site and clicks "I Like Ponies" he or she will inadvertently
-click on the online store's "Buy Now" button and unknowingly purchase the item.
+user visits the attacker's site, clicking "I Like Ponies" will cause an
+inadvertent click on the "Buy Now" button and an unknowing purchase of the item.
 
 .. _clickjacking-prevention:
 
