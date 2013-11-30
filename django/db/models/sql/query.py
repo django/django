@@ -1232,7 +1232,7 @@ class Query(object):
                 q_object.clone(), q_object.negated)
         # For join promotion this case is doing an AND for the added q_object
         # and existing conditions. So, any existing inner join forces the join
-        # type to remain inner. Exsting outer joins can however be demoted.
+        # type to remain inner. Existing outer joins can however be demoted.
         # (Consider case where rel_a is LOUTER and rel_a__col=1 is added - if
         # rel_a doesn't produce any rows, then the whole condition must fail.
         # So, demotion is OK.
