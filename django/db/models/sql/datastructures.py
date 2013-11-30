@@ -25,6 +25,9 @@ class Col(object):
     def get_cols(self):
         return [(self.alias, self.target.column)]
 
+    def get_lookup(self, name):
+        return self.output_type.get_lookup(name)
+
 
 class EmptyResultSet(Exception):
     pass

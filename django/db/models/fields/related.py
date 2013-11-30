@@ -1136,11 +1136,14 @@ class ForeignObject(RelatedField):
         pathinfos = [PathInfo(from_opts, opts, (opts.pk,), self.rel, not self.unique, False)]
         return pathinfos
 
-    def get_lookup_constraint(self, constraint_class, alias, targets, sources, lookup_type,
+    def get_lookup_constraint(self, constraint_class, alias, targets, sources, lookups,
                               raw_value):
         from django.db.models.sql.where import SubqueryConstraint, Constraint, AND, OR
         root_constraint = constraint_class()
         assert len(targets) == len(sources)
+        if len(lookups) > 1:
+            raise exceptions.FieldError('Relation fields do not support nested lookups')
+        lookup_type = lookups[0]
 
         def get_normalized_value(value):
 

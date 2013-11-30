@@ -1,27 +1,58 @@
 from copy import copy
 
+from django.core.exceptions import FieldError
 from django.conf import settings
 from django.utils import timezone
+from django.utils.functional import cached_property
+
+
+class Extract(object):
+    def __init__(self, constraint_class, lhs):
+        self.constraint_class, self.lhs = constraint_class, lhs
+
+    def get_lookup(self, lookup):
+        return self.output_type.get_lookup(lookup)
+
+    def as_sql(self, qn, connection):
+        raise NotImplementedError
+
+    @cached_property
+    def output_type(self):
+        return self.lhs.output_type
+
+    def relabeled_clone(self, relabels):
+        return self.__class__(self.constraint_class, self.lhs.relabeled_clone(relabels))
 
 
 class Lookup(object):
+    lookup_name = None
+    extract_class = None
+
     def __init__(self, constraint_class, lhs, rhs):
         self.constraint_class, self.lhs, self.rhs = constraint_class, lhs, rhs
-        self.rhs = self.get_prep_lookup()
+        if rhs is None:
+            if not self.extract_class:
+                raise FieldError("Lookup '%s' doesn't support nesting." % self.lookup_name)
+        else:
+            self.rhs = self.get_prep_lookup()
+
+    def get_extract(self):
+        return self.extract_class(self.constraint_class, self.lhs)
+
+    def get_prep_lookup(self):
+        return self.lhs.output_type.get_prep_lookup(self.lookup_name, self.rhs)
 
     def get_db_prep_lookup(self, value, connection):
         return (
             '%s', self.lhs.output_type.get_db_prep_lookup(
                 self.lookup_name, value, connection, prepared=True))
 
-    def get_prep_lookup(self):
-        return self.lhs.output_type.get_prep_lookup(self.lookup_name, self.rhs)
+    def process_lhs(self, qn, connection, lhs=None):
+        lhs = lhs or self.lhs
+        return qn.compile(lhs)
 
-    def process_lhs(self, qn, connection):
-        return qn.compile(self.lhs)
-
-    def process_rhs(self, qn, connection):
-        value = self.rhs
+    def process_rhs(self, qn, connection, rhs=None):
+        value = rhs or self.rhs
         # Due to historical reasons there are a couple of different
         # ways to produce sql here. get_compiler is likely a Query
         # instance, _as_sql QuerySet and as_sql just something with
@@ -118,7 +149,7 @@ class In(DjangoLookup):
     lookup_name = 'in'
 
     def get_db_prep_lookup(self, value, connection):
-        params = self.lhs.field.get_db_prep_lookup(
+        params = self.lhs.output_type.get_db_prep_lookup(
             self.lookup_name, value, connection, prepared=True)
         if not params:
             # TODO: check why this leads to circular import

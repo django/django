@@ -100,6 +100,9 @@ class Aggregate(object):
     def output_type(self):
         return self.field
 
+    def get_lookup(self, lookup):
+        return self.output_type.get_lookup(lookup)
+
 
 class Avg(Aggregate):
     is_computed = True

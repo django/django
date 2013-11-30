@@ -1027,19 +1027,16 @@ class Query(object):
         # Add the aggregate to the query
         aggregate.add_to_query(self, alias, col=col, source=source, is_summary=is_summary)
 
-    def prepare_lookup_value(self, value, lookup_type, can_reuse):
+    def prepare_lookup_value(self, value, lookups, can_reuse):
+        # Default lookup if none given is exact.
+        if len(lookups) == 0:
+            lookups = ['exact']
         # Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
         # uses of None as a query value.
-        if len(lookup_type) > 1:
-            raise FieldError('Nested lookups not allowed')
-        elif len(lookup_type) == 0:
-            lookup_type = 'exact'
-        else:
-            lookup_type = lookup_type[0]
         if value is None:
-            if lookup_type != 'exact':
+            if lookups[-1] != 'exact':
                 raise ValueError("Cannot use None as a query value")
-            lookup_type = 'isnull'
+            lookups[-1] = 'isnull'
             value = True
         elif callable(value):
             value = value()
@@ -1057,10 +1054,10 @@ class Query(object):
         # stage. Using DEFAULT_DB_ALIAS isn't nice, but it is the best we
         # can do here. Similar thing is done in is_nullable(), too.
         if (connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls and
-                lookup_type == 'exact' and value == ''):
+                lookups[-1] == 'exact' and value == ''):
             value = True
-            lookup_type = 'isnull'
-        return value, lookup_type
+            lookups[-1] = ['isnull']
+        return value, lookups
 
     def solve_lookup_type(self, lookup):
         """
@@ -1069,36 +1066,37 @@ class Query(object):
         lookup_splitted = lookup.split(LOOKUP_SEP)
         aggregate, aggregate_lookups = refs_aggregate(lookup_splitted, self.aggregates)
         if aggregate:
-            if len(aggregate_lookups) > 1:
-                raise FieldError("Nested lookups not allowed.")
             return aggregate_lookups, (), aggregate
         _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
         field_parts = lookup_splitted[0:len(lookup_splitted) - len(lookup_parts)]
         if len(lookup_parts) == 0:
             lookup_parts = ['exact']
         elif len(lookup_parts) > 1:
-            if field_parts:
-                raise FieldError(
-                    'Only one lookup part allowed (found path "%s" from "%s").' %
-                    (LOOKUP_SEP.join(field_parts), lookup))
-            else:
+            if not field_parts:
                 raise FieldError(
                     'Invalid lookup "%s" for model %s".' %
                     (lookup, self.get_meta().model.__name__))
-        else:
-            if not hasattr(field, 'get_lookup_constraint'):
-                lookup_class = field.get_lookup(lookup_parts[0])
-                if lookup_class is None and lookup_parts[0] not in self.query_terms:
-                    raise FieldError(
-                        'Invalid lookup name %s' % lookup_parts[0])
         return lookup_parts, field_parts, False
 
-    def build_lookup(self, lookup_type, lhs, rhs):
-        if hasattr(lhs.output_type, 'get_lookup'):
-            lookup = lhs.output_type.get_lookup(lookup_type)
-            if lookup:
-                return lookup(self.where_class, lhs, rhs)
-        return None
+    def build_lookup(self, lookups, lhs, rhs):
+        lookups = lookups[:]
+        lookups.reverse()
+        while lookups:
+            lookup = lookups.pop()
+            next = lhs.get_lookup(lookup)
+            if next:
+                if not lookups:
+                    # This was the last lookup, so return value lookup.
+                    return next(self.where_class, lhs, rhs)
+                else:
+                    lhs = next(self.where_class, lhs, None).get_extract()
+            # A field's get_lookup() can return None to opt for backwards
+            # compatibility path.
+            elif len(lookups) > 1:
+                raise FieldError(
+                    "Unsupported lookup for field '%s'" % lhs.output_type.name)
+            else:
+                return None
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
                      can_reuse=None, connector=AND):
@@ -1130,19 +1128,20 @@ class Query(object):
         arg, value = filter_expr
         if not arg:
             raise FieldError("Cannot parse keyword query %r" % arg)
-        lookup_type, parts, reffed_aggregate = self.solve_lookup_type(arg)
+        lookups, parts, reffed_aggregate = self.solve_lookup_type(arg)
 
         # Work out the lookup type and remove it from the end of 'parts',
         # if necessary.
-        value, lookup_type = self.prepare_lookup_value(value, lookup_type, can_reuse)
+        value, lookups = self.prepare_lookup_value(value, lookups, can_reuse)
         used_joins = getattr(value, '_used_joins', [])
 
         clause = self.where_class()
         if reffed_aggregate:
-            condition = self.build_lookup(lookup_type, reffed_aggregate, value)
+            condition = self.build_lookup(lookups, reffed_aggregate, value)
             if not condition:
                 # Backwards compat for custom lookups
-                condition = (reffed_aggregate, lookup_type, value)
+                assert len(lookups) == 1
+                condition = (reffed_aggregate, lookups[0], value)
             clause.add(condition, AND)
             return clause, []
 
@@ -1169,14 +1168,27 @@ class Query(object):
             # For now foreign keys get special treatment. This should be
             # refactored when composite fields lands.
             condition = field.get_lookup_constraint(self.where_class, alias, targets, sources,
-                                                    lookup_type, value)
+                                                    lookups, value)
+            lookup_type = lookups[-1]
         else:
             assert(len(targets) == 1)
             col = Col(alias, targets[0], field)
-            condition = self.build_lookup(lookup_type, col, value)
+            condition = self.build_lookup(lookups, col, value)
             if not condition:
                 # Backwards compat for custom lookups
-                condition = (Constraint(alias, targets[0].column, field), lookup_type, value)
+                if lookups[0] not in self.query_terms:
+                    raise FieldError(
+                        "Join on field '%s' not permitted. Did you "
+                        "misspell '%s' for the lookup type?" %
+                        (col.output_type.name, lookups[0]))
+                if len(lookups) > 1:
+                    raise FieldError("Nested lookup '%s' not supported." %
+                                     LOOKUP_SEP.join(lookups))
+                condition = (Constraint(alias, targets[0].column, field), lookups[0], value)
+                lookup_type = lookups[-1]
+            else:
+                lookup_type = condition.lookup_name
+
         clause.add(condition, AND)
 
         require_outer = lookup_type == 'isnull' and value is True and not current_negated
@@ -1296,7 +1308,7 @@ class Query(object):
         needed_inner = joinpromoter.update_join_types(self)
         return target_clause, needed_inner
 
-    def names_to_path(self, names, opts, allow_many=True):
+    def names_to_path(self, names, opts, allow_many=True, fail_on_missing=False):
         """
         Walks the names path and turns them PathInfo tuples. Note that a
         single name in 'names' can generate multiple PathInfos (m2m for
@@ -1354,9 +1366,14 @@ class Query(object):
                 final_field = field
                 targets = (field,)
                 break
-        if pos == -1:
-            raise FieldError('Whazaa')
+        if pos == -1 or (fail_on_missing and pos + 1 != len(names)):
+            self.raise_field_error(opts, name)
         return path, final_field, targets, names[pos + 1:]
+
+    def raise_field_error(self, opts, name):
+        available = opts.get_all_field_names() + list(self.aggregate_select)
+        raise FieldError("Cannot resolve keyword %r into field. "
+                         "Choices are: %s" % (name, ", ".join(available)))
 
     def setup_joins(self, names, opts, alias, can_reuse=None, allow_many=True):
         """
@@ -1386,9 +1403,8 @@ class Query(object):
         joins = [alias]
         # First, generate the path for the names
         path, final_field, targets, rest = self.names_to_path(
-            names, opts, allow_many)
-        if rest:
-            raise FieldError('Invalid lookup')
+            names, opts, allow_many, fail_on_missing=True)
+
         # Then, add the path to the query's joins. Note that we can't trim
         # joins at this stage - we will need the information about join type
         # of the trimmed joins.
