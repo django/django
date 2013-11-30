@@ -69,7 +69,7 @@ Writing style
 -------------
 
 When using pronouns in reference to a hypothetical person, such as "a user with
-a session cookie", gender neutral pronouns (they/their/ them) should be used.
+a session cookie", gender neutral pronouns (they/their/them) should be used.
 
 Commonly used terms
 -------------------
