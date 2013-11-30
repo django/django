@@ -375,6 +375,11 @@ Internationalization
   in the corresponding entry in the PO file, which makes the translation
   process easier.
 
+* When you run :djadmin:`makemessages` from the root directory of your project,
+  any extracted strings will now be automatically distributed to the proper
+  app or project message file. See :ref:`how-to-create-language-files` for
+  details.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 

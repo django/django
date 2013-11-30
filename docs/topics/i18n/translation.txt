@@ -1256,6 +1256,17 @@ is configured correctly). It creates (or updates) a message file in the
 directory ``locale/LANG/LC_MESSAGES``. In the ``de`` example, the file will be
 ``locale/de/LC_MESSAGES/django.po``.
 
+.. versionchanged:: 1.7
+
+    When you run ``makemessages`` from the root directory of your project, the
+    extracted strings will be automatically distributed to the proper message
+    files. That is, a string extracted from a file of an app containing a
+    ``locale`` directory will go in a message file under that directory.
+    A string extracted from a file of an app without any ``locale`` directory
+    will either go in a message file under the directory listed first in
+    :setting:`LOCALE_PATHS` or will generate an error if :setting:`LOCALE_PATHS`
+    is empty.
+
 By default :djadmin:`django-admin.py makemessages <makemessages>` examines every
 file that has the ``.html`` or ``.txt`` file extension. In case you want to
 override that default, use the ``--extension`` or ``-e`` option to specify the
@@ -1730,24 +1741,9 @@ All message file repositories are structured the same way. They are:
 * ``$PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/django.(po|mo)``
 
 To create message files, you use the :djadmin:`django-admin.py makemessages <makemessages>`
-tool. You only need to be in the same directory where the ``locale/`` directory
-is located. And you use :djadmin:`django-admin.py compilemessages <compilemessages>`
+tool. And you use :djadmin:`django-admin.py compilemessages <compilemessages>`
 to produce the binary ``.mo`` files that are used by ``gettext``.
 
 You can also run :djadmin:`django-admin.py compilemessages
 --settings=path.to.settings <compilemessages>` to make the compiler process all
 the directories in your :setting:`LOCALE_PATHS` setting.
-
-Finally, you should give some thought to the structure of your translation
-files. If your applications need to be delivered to other users and will be used
-in other projects, you might want to use app-specific translations. But using
-app-specific translations and project-specific translations could produce weird
-problems with :djadmin:`makemessages`: it will traverse all directories below
-the current path and so might put message IDs into a unified, common message
-file for the current project that are already in application message files.
-
-The easiest way out is to store applications that are not part of the project
-(and so carry their own translations) outside the project tree. That way,
-:djadmin:`django-admin.py makemessages <makemessages>`, when ran on a project
-level will only extract strings that are connected to your explicit project and
-not strings that are distributed independently.

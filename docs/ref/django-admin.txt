@@ -557,7 +557,7 @@ Example usage::
 Use the ``--ignore`` or ``-i`` option to ignore files or directories matching
 the given :mod:`glob`-style pattern. Use multiple times to ignore more.
 
-These patterns are used by default: ``'CVS'``, ``'.*'``, ``'*~'``
+These patterns are used by default: ``'CVS'``, ``'.*'``, ``'*~'``, ``'*.pyc'``
 
 Example usage::
 
@@ -584,7 +584,7 @@ for technically skilled translators to understand each message's context.
 .. versionadded:: 1.6
 
 Use the ``--keep-pot`` option to prevent Django from deleting the temporary
-.pot file it generates before creating the .po file. This is useful for
+.pot files it generates before creating the .po file. This is useful for
 debugging errors which may prevent the final language files from being created.
 
 makemigrations [<appname>]
