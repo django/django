@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from optparse import make_option
 from datetime import datetime
 import errno
@@ -9,6 +11,7 @@ import socket
 from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import run, get_internal_wsgi_application
 from django.utils import autoreload
+from django.utils import six
 
 naiveip_re = re.compile(r"""^(?:
 (?P<addr>
@@ -96,13 +99,17 @@ class Command(BaseCommand):
 
         self.stdout.write("Validating models...\n\n")
         self.validate(display_num_errors=True)
+        now = datetime.now().strftime('%B %d, %Y - %X')
+        if six.PY2:
+            now = now.decode('utf-8')
+
         self.stdout.write((
             "%(started_at)s\n"
             "Django version %(version)s, using settings %(settings)r\n"
             "Starting development server at http://%(addr)s:%(port)s/\n"
             "Quit the server with %(quit_command)s.\n"
         ) % {
-            "started_at": datetime.now().strftime('%B %d, %Y - %X'),
+            "started_at": now,
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
             "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
