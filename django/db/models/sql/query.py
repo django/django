@@ -1279,7 +1279,7 @@ class Query(object):
         single name in 'names' can generate multiple PathInfos (m2m for
         example).
 
-        'names' is the path of names to travle, 'opts' is the model Options we
+        'names' is the path of names to travel, 'opts' is the model Options we
         start the name resolving from, 'allow_many' is as for setup_joins().
 
         Returns a list of PathInfo tuples. In addition returns the final field
