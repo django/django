@@ -40,3 +40,4 @@ Bug fixes
 * Fixed test client ``logout()`` method when using the cookie-based session
   backend (#21448).
 * Fixed a crash when a ``GeometryField`` uses a non-geometric widget (#21496).
+* Fixed password hash upgrade when changing the iteration count (#21535).
