@@ -402,7 +402,8 @@ class Command(NoArgsCommand):
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
         else:
-            msgs = open(potfile, 'r').read()
+            with open(potfile, 'r') as fp:
+                msgs = fp.read()
             if not self.invoked_for_django:
                 msgs = self.copy_plural_forms(msgs, locale)
         msgs = msgs.replace(
