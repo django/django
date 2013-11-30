@@ -1064,9 +1064,10 @@ class Query(object):
         Solve the lookup type from the lookup (eg: 'foobar__id__icontains')
         """
         lookup_splitted = lookup.split(LOOKUP_SEP)
-        aggregate, aggregate_lookups = refs_aggregate(lookup_splitted, self.aggregates)
-        if aggregate:
-            return aggregate_lookups, (), aggregate
+        if self._aggregates:
+            aggregate, aggregate_lookups = refs_aggregate(lookup_splitted, self.aggregates)
+            if aggregate:
+                return aggregate_lookups, (), aggregate
         _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
         field_parts = lookup_splitted[0:len(lookup_splitted) - len(lookup_parts)]
         if len(lookup_parts) == 0:
