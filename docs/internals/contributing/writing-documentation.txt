@@ -65,6 +65,19 @@ Primer <sphinx:rst-primer>`. After that, you'll want to read about the
 :ref:`Sphinx-specific markup <sphinx:sphinxmarkup>` that's used to manage
 metadata, indexing, and cross-references.
 
+Writing style
+-------------
+
+When using pronouns in reference to a hypothetical person, such as "a user with
+a session cookie", gender neutral pronouns (they/their/them) should be used.
+Instead of:
+
+* he or she... use they.
+* him or her... use them.
+* his or her... use their.
+* his or hers... use theirs.
+* himself or herself... use themselves.
+
 Commonly used terms
 -------------------
 
