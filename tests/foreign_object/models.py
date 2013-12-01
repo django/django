@@ -162,7 +162,7 @@ class NewsArticle(Article):
 
 class ArticleTranslation(models.Model):
     article = models.ForeignKey(Article)
-    lang = models.CharField(max_length='2')
+    lang = models.CharField(max_length=2)
     title = models.CharField(max_length=100)
     body = models.TextField()
     abstract = models.CharField(max_length=400, null=True)
