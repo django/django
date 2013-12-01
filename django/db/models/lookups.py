@@ -1,6 +1,5 @@
 from copy import copy
 
-from django.core.exceptions import FieldError
 from django.conf import settings
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -29,18 +28,10 @@ class Extract(object):
 
 class Lookup(object):
     lookup_name = None
-    extract_class = None
 
     def __init__(self, lhs, rhs):
         self.lhs, self.rhs = lhs, rhs
-        if rhs is None:
-            if not self.extract_class:
-                raise FieldError("Lookup '%s' doesn't support nesting." % self.lookup_name)
-        else:
-            self.rhs = self.get_prep_lookup()
-
-    def get_extract(self):
-        return self.extract_class(self.lhs)
+        self.rhs = self.get_prep_lookup()
 
     def get_prep_lookup(self):
         return self.lhs.output_type.get_prep_lookup(self.lookup_name, self.rhs)

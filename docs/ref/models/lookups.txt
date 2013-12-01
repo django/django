@@ -93,16 +93,9 @@ The process_rhs method is used to convert the right hand side into query string.
 The rhs is the value given in the filter clause. It can be a raw value to
 compare agains, a F() reference to another field or even a QuerySet.
 
-.. method:: get_extract()
-
-The get_extract method is used in nested lookups. It must return an Extract instance.
-
-.. classattribute:: Lookup.extract_class
-
-The default implementation of get_extract() will return an instance of extract_class.
-
-In addition there are some private methods - that is, implementing just the above
-mentioned attributes and methods is not enough, you must subclass Lookup instead.
+In addition the Lookup class has some private methods - that is, implementing
+just the above mentioned attributes and methods is not enough, instead you
+should subclass Lookup.
 
 The Extract class
 ~~~~~~~~~~~~~~~~~
@@ -112,7 +105,7 @@ For example you could have an Extract that procudes modulo 3 of the given value.
 In SQL this would be something like "author"."age" % 3.
 
 Extracts are used in nested lookups. The Extract class must implement the query
-part interface.
+part interface. In addition the Extract should must lookup_name attribute.
 
 A simple Lookup example
 ~~~~~~~~~~~~~~~~~~~~~~~
