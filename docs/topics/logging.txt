@@ -457,6 +457,13 @@ specific logger following this example::
                 'propagate': False,
             },
 
+.. versionadded:: 1.7
+
+Invalid username/passwords will be logged to ``django.security.FailedLogin`` as
+a warning. This logger will have the following extra context:
+
+* ``username``: the provided username which failed.
+
 Handlers
 --------
 

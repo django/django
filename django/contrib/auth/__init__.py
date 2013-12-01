@@ -1,5 +1,6 @@
 import inspect
 import re
+import logging
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
@@ -63,9 +64,13 @@ def authenticate(**credentials):
         user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
         return user
 
-    # The credentials supplied are invalid to all backends, fire signal
-    user_login_failed.send(sender=__name__,
-            credentials=_clean_credentials(credentials))
+    # The credentials supplied are invalid to all backends, fire signal and log error 
+    credentials=_clean_credentials(credentials)
+    credentials.setdefault('username', None)
+    user_login_failed.send(sender=__name__, credentials=credentials)
+
+    logger = logging.getLogger('django.security.FailedLogin')    
+    logger.warning("user login failed", extra=credentials)
 
 
 def login(request, user):
