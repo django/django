@@ -324,10 +324,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         [a tuple of (alias, column, db_type)], lookup type, lookup
         value, the model field, and the quoting function.
         """
-        alias, col, db_type = lvalue
-
-        # Getting the quoted field as `geo_col`.
-        geo_col = '%s.%s' % (qn(alias), qn(col))
+        geo_col, db_type = lvalue
 
         if lookup_type in self.geometry_functions:
             # See if a SpatiaLite geometry function matches the lookup type.

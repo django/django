@@ -2,6 +2,8 @@ from django.db.models.fields import Field
 from django.db.models.sql.expressions import SQLEvaluator
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.gis import forms
+from django.contrib.gis.db.models.constants import GIS_LOOKUPS
+from django.contrib.gis.db.models.lookups import GISLookup
 from django.contrib.gis.db.models.proxy import GeometryProxy
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
 from django.utils import six
@@ -283,6 +285,10 @@ class GeometryField(Field):
         given value.
         """
         return connection.ops.get_geom_placeholder(self, value)
+
+for lookup_name in GIS_LOOKUPS:
+    lookup = type(lookup_name, (GISLookup,), {'lookup_name': lookup_name})
+    GeometryField.register_lookup(lookup)
 
 
 # The OpenGIS Geometry Type Fields

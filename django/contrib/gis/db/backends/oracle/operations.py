@@ -231,10 +231,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
 
     def spatial_lookup_sql(self, lvalue, lookup_type, value, field, qn):
         "Returns the SQL WHERE clause for use in Oracle spatial SQL construction."
-        alias, col, db_type = lvalue
-
-        # Getting the quoted table name as `geo_col`.
-        geo_col = '%s.%s' % (qn(alias), qn(col))
+        geo_col, db_type = lvalue
 
         # See if a Oracle Geometry function matches the lookup type next
         lookup_info = self.geometry_functions.get(lookup_type, False)
