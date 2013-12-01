@@ -1211,7 +1211,8 @@ class Query(object):
                 # (col IS NULL OR col != someval)
                 #   <=>
                 # NOT (col IS NOT NULL AND col = someval).
-                clause.add((Constraint(alias, targets[0].column, None), 'isnull', False), AND)
+                lookup_class = targets[0].get_lookup('isnull')
+                clause.add(lookup_class(Col(alias, targets[0], sources[0]), False), AND)
         return clause, used_joins if not require_outer else ()
 
     def add_filter(self, filter_clause):
@@ -1486,17 +1487,19 @@ class Query(object):
         # nothing
         alias, col = query.select[0].col
         if self.is_nullable(query.select[0].field):
-            query.where.add((Constraint(alias, col, query.select[0].field), 'isnull', False), AND)
+            lookup_class = query.select[0].field.get_lookup('isnull')
+            lookup = lookup_class(Col(alias, query.select[0].field, query.select[0].field), False)
+            query.where.add(lookup, AND)
         if alias in can_reuse:
-            pk = query.select[0].field.model._meta.pk
+            select_field = query.select[0].field
+            pk = select_field.model._meta.pk
             # Need to add a restriction so that outer query's filters are in effect for
             # the subquery, too.
             query.bump_prefix(self)
-            query.where.add(
-                (Constraint(query.select[0].col[0], pk.column, pk),
-                 'exact', Col(alias, pk, pk)),
-                AND
-            )
+            lookup_class = select_field.get_lookup('exact')
+            lookup = lookup_class(Col(query.select[0].col[0], pk, pk),
+                                  Col(alias, pk, pk))
+            query.where.add(lookup, AND)
 
         condition, needed_inner = self.build_filter(
             ('%s__in' % trimmed_prefix, query),

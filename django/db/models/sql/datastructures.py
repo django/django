@@ -28,6 +28,9 @@ class Col(object):
     def get_lookup(self, name):
         return self.output_type.get_lookup(name)
 
+    def prepare(self):
+        return self
+
 
 class EmptyResultSet(Exception):
     pass

@@ -5,6 +5,7 @@ Code to manage the creation and SQL rendering of 'where' constraints.
 import collections
 import datetime
 from itertools import repeat
+import warnings
 
 from django.conf import settings
 from django.db.models.fields import DateTimeField, Field
@@ -174,6 +175,9 @@ class WhereNode(tree.Node):
         Returns the string for the SQL fragment and the parameters to use for
         it.
         """
+        warnings.warn(
+            "The make_atom() method will be removed in Django 1.9. Use Lookup class instead.",
+            PendingDeprecationWarning)
         lvalue, lookup_type, value_annotation, params_or_value = child
         field_internal_type = lvalue.field.get_internal_type() if lvalue.field else None
 
@@ -349,6 +353,10 @@ class Constraint(object):
     pre-process itself prior to including in the WhereNode.
     """
     def __init__(self, alias, col, field):
+        warnings.warn(
+            "The Constraint class will be removed in Django 1.9. Use Lookup class instead.",
+            PendingDeprecationWarning)
+        import ipdb; ipdb.set_trace()
         self.alias, self.col, self.field = alias, col, field
 
     def prepare(self, lookup_type, value):

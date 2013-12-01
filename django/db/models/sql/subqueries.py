@@ -5,12 +5,12 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import connections
+from django.db.models.query_utils import Q
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import DateField, DateTimeField, FieldDoesNotExist
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, SelectInfo
 from django.db.models.sql.datastructures import Date, DateTime
 from django.db.models.sql.query import Query
-from django.db.models.sql.where import AND, Constraint
 from django.utils import six
 from django.utils import timezone
 
@@ -42,10 +42,10 @@ class DeleteQuery(Query):
         if not field:
             field = self.get_meta().pk
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-            where = self.where_class()
-            where.add((Constraint(None, field.column, field), 'in',
-                       pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]), AND)
-            self.do_query(self.get_meta().db_table, where, using=using)
+            self.where = self.where_class()
+            self.add_q(Q(
+                **{field.attname + '__in': pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]}))
+            self.do_query(self.get_meta().db_table, self.where, using=using)
 
     def delete_qs(self, query, using):
         """
@@ -80,9 +80,8 @@ class DeleteQuery(Query):
                     SelectInfo((self.get_initial_alias(), pk.column), None)
                 ]
                 values = innerq
-            where = self.where_class()
-            where.add((Constraint(None, pk.column, pk), 'in', values), AND)
-            self.where = where
+            self.where = self.where_class()
+            self.add_q(Q(pk__in=values))
         self.get_compiler(using).execute_sql(None)
 
 
@@ -113,13 +112,10 @@ class UpdateQuery(Query):
                 related_updates=self.related_updates.copy(), **kwargs)
 
     def update_batch(self, pk_list, values, using):
-        pk_field = self.get_meta().pk
         self.add_update_values(values)
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
-            self.where.add((Constraint(None, pk_field.column, pk_field), 'in',
-                            pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]),
-                           AND)
+            self.add_q(Q(pk__in=pk_list[offset: offset + GET_ITERATOR_CHUNK_SIZE]))
             self.get_compiler(using).execute_sql(None)
 
     def add_update_values(self, values):
