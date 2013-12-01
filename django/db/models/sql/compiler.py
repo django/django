@@ -71,7 +71,8 @@ class SQLCompiler(object):
 
     def compile(self, node):
         if node.__class__ in self.connection.compile_implementations:
-            return self.connection.compile_implementations[node.__class__](node, self)
+            return self.connection.compile_implementations[node.__class__](
+                node, self, self.connection)
         else:
             return node.as_sql(self, self.connection)
 

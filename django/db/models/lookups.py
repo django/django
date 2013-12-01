@@ -7,8 +7,8 @@ from django.utils.functional import cached_property
 
 
 class Extract(object):
-    def __init__(self, constraint_class, lhs):
-        self.constraint_class, self.lhs = constraint_class, lhs
+    def __init__(self, lhs):
+        self.lhs = lhs
 
     def get_lookup(self, lookup):
         return self.output_type.get_lookup(lookup)
@@ -21,15 +21,18 @@ class Extract(object):
         return self.lhs.output_type
 
     def relabeled_clone(self, relabels):
-        return self.__class__(self.constraint_class, self.lhs.relabeled_clone(relabels))
+        return self.__class__(self.lhs.relabeled_clone(relabels))
+
+    def get_cols(self):
+        return self.lhs.get_cols()
 
 
 class Lookup(object):
     lookup_name = None
     extract_class = None
 
-    def __init__(self, constraint_class, lhs, rhs):
-        self.constraint_class, self.lhs, self.rhs = constraint_class, lhs, rhs
+    def __init__(self, lhs, rhs):
+        self.lhs, self.rhs = lhs, rhs
         if rhs is None:
             if not self.extract_class:
                 raise FieldError("Lookup '%s' doesn't support nesting." % self.lookup_name)
@@ -37,7 +40,7 @@ class Lookup(object):
             self.rhs = self.get_prep_lookup()
 
     def get_extract(self):
-        return self.extract_class(self.constraint_class, self.lhs)
+        return self.extract_class(self.lhs)
 
     def get_prep_lookup(self):
         return self.lhs.output_type.get_prep_lookup(self.lookup_name, self.rhs)

@@ -18,6 +18,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.aggregates import refs_aggregate
 from django.db.models.expressions import ExpressionNode
 from django.db.models.fields import FieldDoesNotExist
+from django.db.models.lookups import Extract
 from django.db.models.query_utils import Q
 from django.db.models.related import PathInfo
 from django.db.models.sql import aggregates as base_aggregates_module
@@ -1088,9 +1089,12 @@ class Query(object):
             if next:
                 if not lookups:
                     # This was the last lookup, so return value lookup.
-                    return next(self.where_class, lhs, rhs)
+                    if issubclass(next, Extract):
+                        lhs = next(lhs)
+                        next = lhs.get_lookup('exact')
+                    return next(lhs, rhs)
                 else:
-                    lhs = next(self.where_class, lhs, None).get_extract()
+                    lhs = next(lhs)
             # A field's get_lookup() can return None to opt for backwards
             # compatibility path.
             elif len(lookups) > 1:

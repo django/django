@@ -1,0 +1,243 @@
+==============
+Custom lookups
+==============
+
+.. module:: django.db.models.lookups
+   :synopsis: Custom lookups
+
+.. currentmodule:: django.db.models
+
+(This documentation is candidate for complete rewrite, but contains
+useful information of how to test the current implementation.)
+
+This documentation constains instructions of how to create custom lookups
+for model fields.
+
+Django's ORM works using lookup paths when building query filters and other
+query structures. For example in the query Book.filter(author__age__lte=30)
+the author__age__lte is the lookup path.
+
+The lookup path consist of three different part. First is the related lookups,
+above part author refers to Book's related model Author. Second part of the
+lookup path is the final field, above this is Author's field age. Finally the
+lte part is commonly called just lookup (TODO: this nomenclature is confusing,
+can we invent something better).
+
+This documentation concentrates on writing custom lookups, that is custom
+implementations for lte or any other lookup you wish to use.
+
+Django will fetch a ``Lookup`` class from the final field using the field's
+method get_lookup(lookup_name). This method can do three things:
+
+  1. Return a Lookup class
+  2. Raise a FieldError
+  3. Return None
+
+Above return None is only available during backwards compatibility period and
+returning None will not be allowed in Django 1.9 or later. The interpretation
+is to use the old way of lookup hadling inside the ORM.
+
+The returned Lookup will be used to build the query.
+
+The Lookup class
+~~~~~~~~~~~~~~~~
+
+The API is as follows:
+
+.. attribute:: lookup_name
+
+A string used by Django to distinguish different lookups.
+
+.. method:: __init__(lhs, rhs)
+
+The lhs and rhs are the field reference (reference to field age in the
+author__age__lte=30 example), and rhs is the value (30 in the example).
+
+.. attribute:: Lookup.lhs
+
+The left hand side part of this lookup. You can assume it implements the
+query part interface (TODO: write interface definition...).
+
+.. method:: Lookup.as_sql(qn, connection)
+
+This method is used to produce the query string of the Lookup. A typical
+implementation is usually something like::
+
+    def as_sql(self, qn, connection):
+        lhs, params = self.process_lhs(qn, connection)
+        rhs, rhs_params = self.process_rhs(qn, connection)
+        params = lhs_params.extend(rhs_params)
+        return '%s <OPERATOR> %s', (lhs, rhs), params
+
+where the <OPERATOR> is some query operator. The qn is a callable that
+can be used to convert strings to quoted variants (that is, colname to
+"colname"). Note that the quotation is *not* safe against SQL injection.
+
+In addition the qn implements method compile() which can be used to turn
+anything with as_sql() method to query string. You should always call
+qn.compile(part) instead of part.as_sql(qn, connection) so that 3rd party
+backends have ability to customize the produced query string. More of this
+later on.
+
+The connection is the used connection.
+
+.. method:: Lookup.process_lhs(qn, connection, lhs=None)
+
+This method is used to convert the left hand side of the lookup into query
+string. The left hand side can be a field reference or a nested lookup. The
+lhs kwarg can be used to convert something else than self.lhs to query string.
+
+.. method:: Lookup.process_rhs(qn, connection, rhs=None)
+
+The process_rhs method is used to convert the right hand side into query string.
+The rhs is the value given in the filter clause. It can be a raw value to
+compare agains, a F() reference to another field or even a QuerySet.
+
+.. method:: get_extract()
+
+The get_extract method is used in nested lookups. It must return an Extract instance.
+
+.. classattribute:: Lookup.extract_class
+
+The default implementation of get_extract() will return an instance of extract_class.
+
+In addition there are some private methods - that is, implementing just the above
+mentioned attributes and methods is not enough, you must subclass Lookup instead.
+
+The Extract class
+~~~~~~~~~~~~~~~~~
+
+An Extract is something that converts a value to another value in the query string.
+For example you could have an Extract that procudes modulo 3 of the given value.
+In SQL this would be something like "author"."age" % 3.
+
+Extracts are used in nested lookups. The Extract class must implement the query
+part interface.
+
+A simple Lookup example
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This is how to write a simple div3 lookup for IntegerField::
+
+    from django.db.models import Lookup, IntegerField
+    class Div3(Lookup):
+        lookup_name = 'div3'
+
+        def as_sql(self, qn, connection):
+            lhs_sql, params = self.process_lhs(qn, connection)
+            rhs_sql, rhs_params = self.process_rhs(qn, connection)
+            params.extend(rhs_params)
+            # We need doulbe-escaping for the %%%% operator.
+            return '%s %%%% %s' % (lhs_sql, rhs_sql), params
+
+    IntegerField.register_lookup(Div3)
+
+Now all IntegerFields or subclasses of IntegerField will have
+a div3 lookup. For example you could do Author.objects.filter(age__div3=2).
+This query would return every author whose age % 3 == 2.
+
+A simple nested lookup example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here is how to write an Extract and a Lookup for IntegerField. The example
+lookup can be used similarly as the above div3 lookup, and in addition it
+support nesting lookups::
+
+    class Div3Extract(Extract):
+        lookup_name = 'div3'
+
+        def as_sql(self, qn, connection):
+            lhs, lhs_params = qn.compile(self.lhs)
+            return '%s %%%% 3' % (lhs,), lhs_params
+
+    IntegerField.register_lookup(Div3Extract)
+
+Note that if you already added Div3 for IntegerField in the above
+example, now Div3LookupWithExtract will override that lookup.
+
+This lookup can be used like Div3 lookup, but in addition it supports
+nesting, too. The default output type for Extracts is the same type as the
+lhs' output_type. So, the Div3Extract supports all the same lookups as
+IntegerField. For example Author.objects.filter(age__div3__in=[1, 2])
+returns all authors for which age % 3 in (1, 2). 
+
+A more complex nested lookup
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We will write a Year lookup that extracts year from date field. This
+field will convert the output type of the field - the lhs (or "input")
+field is DateField, but output is of type IntegerField.::
+
+    from django.db.models import IntegerField, DateField
+    from django.db.models.lookups import Extract
+
+    class YearExtract(Extract):
+        lookup_name = 'year'
+
+        def as_sql(self, qn, connection):
+            lhs_sql, params = qn.compile(self.lhs)
+            # hmmh - this is internal API...
+            return connection.ops.date_extract_sql('year', lhs_sql), params
+
+        @property
+        def output_type(self):
+            return IntegerField()
+
+    DateField.register_lookup(YearExtract)
+
+Now you could write Author.objects.filter(birthdate__year=1981). This will
+produce SQL like 'EXTRACT('year' from "author"."birthdate") = 1981'. The
+produces SQL depends on used backend. In addtition you can use any lookup
+defined for IntegerField, even div3 if you added that. So,
+Authos.objects.filter(birthdate__year__div3=2) will return every author
+with birthdate.year % 3 == 2.
+
+We could go further and add an optimized implementation for exact lookups::
+
+    from django.db.models.lookups import Lookup
+
+    class YearExtractOptimized(YearExtract):
+        def get_lookup(self, lookup):
+            if lookup == 'exact':
+                return YearExact
+            return super(YearExtractOptimized, self).get_lookup()
+
+    class YearExact(Lookup):
+        def as_sql(self, qn, connection):
+            # We will need to skip the extract part, and instead go
+            # directly with the originating field, that is self.lhs.lhs
+            lhs_sql, lhs_params = self.process_lhs(qn, connection, self.lhs.lhs)
+            rhs_sql, rhs_params = self.process_rhs(qn, connection)
+            # Note that we must be careful so that we have params in the
+            # same order as we have the parts in the SQL.
+            params = []
+            params.extend(lhs_params)
+            params.extend(rhs_params)
+            params.extend(lhs_params)
+            params.extend(rhs_params)
+            # We use PostgreSQL specific SQL here. Note that we must do the
+            # conversions in SQL instead of in Python to support F() references.
+            return ("%(lhs)s >= (%(rhs)s || '-01-01')::date "
+                    "AND %(lhs)s <= (%(rhs)s || '-12-31')::date" %
+                    {'lhs': lhs_sql, 'rhs': rhs_sql}, params)
+
+Note that we used PostgreSQL specific SQL above. What if we want to support
+MySQL, too? This can be done by registering a different compiling implementation
+for MySQL::
+
+    from django.db.backends.utils import add_implementation
+    @add_implementation(YearExact, 'mysql')
+    def mysql_year_exact(node, qn, connection):
+        lhs_sql, lhs_params = node.process_lhs(qn, connection, node.lhs.lhs)
+        rhs_sql, rhs_params = node.process_rhs(qn, connection)
+        params = []
+        params.extend(lhs_params)
+        params.extend(rhs_params)
+        params.extend(lhs_params)
+        params.extend(rhs_params)
+        return ("%(lhs)s >= str_to_date(concat(%(rhs)s, '-01-01'), '%%%%Y-%%%%m-%%%%d') "
+                "AND %(lhs)s <= str_to_date(concat(%(rhs)s, '-12-31'), '%%%%Y-%%%%m-%%%%d')" %
+                {'lhs': lhs_sql, 'rhs': rhs_sql}, params)
+
+Now, on MySQL instead of calling as_sql() of the YearExact Django will use the
+above compile implementation.
