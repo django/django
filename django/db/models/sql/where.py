@@ -356,7 +356,6 @@ class Constraint(object):
         warnings.warn(
             "The Constraint class will be removed in Django 1.9. Use Lookup class instead.",
             PendingDeprecationWarning)
-        import ipdb; ipdb.set_trace()
         self.alias, self.col, self.field = alias, col, field
 
     def prepare(self, lookup_type, value):
