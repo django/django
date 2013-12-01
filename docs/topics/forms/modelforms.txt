@@ -760,6 +760,30 @@ instances of the model, you can specify an empty QuerySet::
 
    >>> AuthorFormSet(queryset=Author.objects.none())
 
+Changing the ``form``
+---------------------
+
+By default, when you use ``modelformset_factory``, a model form will
+be created using :func:`~django.forms.models.modelform_factory`.
+Often, it can be useful to specify a custom model form. For example,
+you can create a custom model form that has custom validation::
+
+    class AuthorForm(forms.ModelForm):
+        class Meta:
+            model = Author
+            fields = ('name', 'title')
+
+        def clean_name(self):
+            # custom validation for the name field
+            ...
+
+Then, pass your model form to the factory function::
+
+    AuthorFormSet = modelformset_factory(Author, form=AuthorForm)
+
+It is not always necessary to define a custom model form. The
+``modelformset_factory`` function has several arguments which are
+passed through to ``modelform_factory``, which are described below.
 
 .. _controlling-fields-with-fields-and-exclude:
 
