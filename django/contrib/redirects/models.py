@@ -3,6 +3,7 @@ from django.contrib.sites.models import Site
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import python_2_unicode_compatible
 
+
 @python_2_unicode_compatible
 class Redirect(models.Model):
     site = models.ForeignKey(Site)
@@ -15,7 +16,7 @@ class Redirect(models.Model):
         verbose_name = _('redirect')
         verbose_name_plural = _('redirects')
         db_table = 'django_redirect'
-        unique_together=(('site', 'old_path'),)
+        unique_together = (('site', 'old_path'),)
         ordering = ('old_path',)
 
     def __str__(self):

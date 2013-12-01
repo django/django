@@ -82,4 +82,3 @@ class CommentTestCase(TestCase):
         d = self.getData()
         d.update(f.initial)
         return d
-

@@ -7,6 +7,7 @@ from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 # This is the return type used by binary output (WKB, HEX) routines.
 c_uchar_p = POINTER(c_ubyte)
 
+
 # We create a simple subclass of c_char_p here because when the response
 # type is set to c_char_p, you get a _Python_ string and there's no way
 # to access the string's address inside the error checking function.
@@ -17,6 +18,7 @@ c_uchar_p = POINTER(c_ubyte)
 class geos_char_p(c_char_p):
     pass
 
+
 ### ctypes generation functions ###
 def bin_constructor(func):
     "Generates a prototype for binary construction (HEX, WKB) GEOS routines."
@@ -24,6 +26,7 @@ def bin_constructor(func):
     func.restype = GEOM_PTR
     func.errcheck = check_geom
     return func
+
 
 # HEX & WKB output
 def bin_output(func):
@@ -33,16 +36,20 @@ def bin_output(func):
     func.restype = c_uchar_p
     return func
 
+
 def geom_output(func, argtypes):
     "For GEOS routines that return a geometry."
-    if argtypes: func.argtypes = argtypes
+    if argtypes:
+        func.argtypes = argtypes
     func.restype = GEOM_PTR
     func.errcheck = check_geom
     return func
 
+
 def geom_index(func):
     "For GEOS routines that return geometries from an index."
     return geom_output(func, [GEOM_PTR, c_int])
+
 
 def int_from_geom(func, zero=False):
     "Argument is a geometry, return type is an integer."
@@ -53,6 +60,7 @@ def int_from_geom(func, zero=False):
     else:
         func.errcheck = check_minus_one
     return func
+
 
 def string_from_geom(func):
     "Argument is a Geometry, return type is a string."

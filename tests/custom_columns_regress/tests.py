@@ -10,6 +10,7 @@ def pks(objects):
     """ Return pks to be able to compare lists"""
     return [o.pk for o in objects]
 
+
 class CustomColumnRegression(TestCase):
 
     def setUp(self):

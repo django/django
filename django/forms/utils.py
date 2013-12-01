@@ -14,6 +14,7 @@ import sys
 # module to maintain backwards compatibility.
 from django.core.exceptions import ValidationError
 
+
 def flatatt(attrs):
     """
     Convert a dictionary of attributes to a single string.
@@ -37,6 +38,7 @@ def flatatt(attrs):
             )
     return format_html_join('', ' {0}="{1}"', sorted(attrs.items()))
 
+
 @python_2_unicode_compatible
 class ErrorDict(dict):
     """
@@ -48,7 +50,8 @@ class ErrorDict(dict):
         return self.as_ul()
 
     def as_ul(self):
-        if not self: return ''
+        if not self:
+            return ''
         return format_html('<ul class="errorlist">{0}</ul>',
                            format_html_join('', '<li>{0}{1}</li>',
                                             ((k, force_text(v))
@@ -57,6 +60,7 @@ class ErrorDict(dict):
 
     def as_text(self):
         return '\n'.join('* %s\n%s' % (k, '\n'.join('  * %s' % force_text(i) for i in v)) for k, v in self.items())
+
 
 @python_2_unicode_compatible
 class ErrorList(list):
@@ -67,7 +71,8 @@ class ErrorList(list):
         return self.as_ul()
 
     def as_ul(self):
-        if not self: return ''
+        if not self:
+            return ''
         return format_html('<ul class="errorlist">{0}</ul>',
                            format_html_join('', '<li>{0}</li>',
                                             ((force_text(e),) for e in self)
@@ -75,11 +80,13 @@ class ErrorList(list):
                            )
 
     def as_text(self):
-        if not self: return ''
+        if not self:
+            return ''
         return '\n'.join('* %s' % force_text(e) for e in self)
 
     def __repr__(self):
         return repr([force_text(e) for e in self])
+
 
 # Utilities for time zone support in DateTimeField et al.
 
@@ -105,6 +112,7 @@ def from_current_timezone(value):
                 params=params,
             ), sys.exc_info()[2])
     return value
+
 
 def to_current_timezone(value):
     """

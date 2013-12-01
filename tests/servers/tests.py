@@ -107,6 +107,7 @@ class LiveServerAddress(LiveServerBase):
         # test runner and the overridden setUpClass() method is executed.
         pass
 
+
 class LiveServerViews(LiveServerBase):
     def test_404(self):
         """

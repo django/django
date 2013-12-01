@@ -410,6 +410,9 @@ these changes.
 * The ``Model._meta.get_(add|change|delete)_permission`` methods will
   be removed.
 
+* The session key ``django_language`` will no longer be read for backwards
+  compatibility.
+
 1.9
 ---
 
@@ -448,7 +451,7 @@ these changes.
 
 * Instances of ``util.py`` in the Django codebase have been renamed to
   ``utils.py`` in an effort to unify all util and utils references.
-  The modules that provided backwards compatability will be removed:
+  The modules that provided backwards compatibility will be removed:
 
   * ``django.contrib.admin.util``
   * ``django.contrib.gis.db.backends.util``
@@ -460,6 +463,23 @@ these changes.
 * Remove the backward compatible shims introduced to rename the
   ``BaseMemcachedCache._get_memcache_timeout()`` method to
   ``get_backend_timeout()``.
+
+* The ``--natural`` and ``-n`` options for :djadmin:`dumpdata` will be removed.
+  Use :djadminopt:`--natural-foreign` instead.
+
+* The ``use_natural_keys`` argument for ``serializers.serialize()`` will be
+  removed. Use ``use_natural_foreign_keys`` instead.
+
+* ``django.forms.get_declared_fields`` will be removed.
+
+* The ``WSGIRequest.REQUEST`` property will be removed.
+
+* The class ``django.utils.datastructures.MergeDict`` will be removed.
+
+* The ``zh-cn`` and ``zh-tw`` language codes will be removed and have been
+  replaced by the ``zh-hans`` and ``zh-hant`` language code respectively.
+
+* The internal ``django.utils.functional.memoize`` will be removed.
 
 2.0
 ---

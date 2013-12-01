@@ -164,7 +164,7 @@ class SQLCompiler(object):
         Used when nesting this query inside another.
         """
         obj = self.query.clone()
-        if obj.low_mark == 0 and obj.high_mark is None:
+        if obj.low_mark == 0 and obj.high_mark is None and not self.query.distinct_fields:
             # If there is no slicing in use, then we can safely drop all ordering
             obj.clear_ordering(True)
         return obj.get_compiler(connection=self.connection).as_sql()
@@ -364,6 +364,10 @@ class SQLCompiler(object):
 
         params = []
         ordering_params = []
+        # For plain DISTINCT queries any ORDER BY clause must appear
+        # in SELECT clause.
+        # http://www.postgresql.org/message-id/27009.1171559417@sss.pgh.pa.us
+        must_append_to_select = distinct and not self.query.distinct_fields
         for pos, field in enumerate(ordering):
             if field == '?':
                 result.append(self.connection.ops.random_function_sql())
@@ -388,7 +392,7 @@ class SQLCompiler(object):
                 if (table, col) not in processed_pairs:
                     elt = '%s.%s' % (qn(table), col)
                     processed_pairs.add((table, col))
-                    if not distinct or elt in select_aliases:
+                    if not must_append_to_select or elt in select_aliases:
                         result.append('%s %s' % (elt, order))
                         group_by.append((elt, []))
             elif not self.query._extra or get_order_dir(field)[0] not in self.query._extra:
@@ -400,21 +404,23 @@ class SQLCompiler(object):
                         if (table, col) not in processed_pairs:
                             elt = '%s.%s' % (qn(table), qn2(col))
                             processed_pairs.add((table, col))
-                            if distinct and elt not in select_aliases:
+                            if must_append_to_select and elt not in select_aliases:
                                 ordering_aliases.append(elt)
                             result.append('%s %s' % (elt, order))
                             group_by.append((elt, []))
             else:
                 elt = qn2(col)
                 if col not in self.query.extra_select:
-                    sql = "(%s) AS %s" % (self.query.extra[col][0], elt)
-                    ordering_aliases.append(sql)
-                    ordering_params.extend(self.query.extra[col][1])
+                    if must_append_to_select:
+                        sql = "(%s) AS %s" % (self.query.extra[col][0], elt)
+                        ordering_aliases.append(sql)
+                        ordering_params.extend(self.query.extra[col][1])
+                        result.append('%s %s' % (elt, order))
+                    else:
+                        result.append("(%s) %s" % (self.query.extra[col][0], order))
+                        params.extend(self.query.extra[col][1])
                 else:
-                    if distinct and col not in select_aliases:
-                        ordering_aliases.append(elt)
-                        ordering_params.extend(params)
-                result.append('%s %s' % (elt, order))
+                    result.append('%s %s' % (elt, order))
                 group_by.append(self.query.extra[col])
         self.ordering_aliases = ordering_aliases
         self.ordering_params = ordering_params
@@ -452,8 +458,7 @@ class SQLCompiler(object):
 
     def _setup_joins(self, pieces, opts, alias):
         """
-        A helper method for get_ordering and get_distinct. This method will
-        call query.setup_joins, handle refcounts and then promote the joins.
+        A helper method for get_ordering and get_distinct.
 
         Note that get_ordering and get_distinct must produce same target
         columns on same input, as the prefixes of get_ordering and get_distinct
@@ -463,20 +468,7 @@ class SQLCompiler(object):
             alias = self.query.get_initial_alias()
         field, targets, opts, joins, path = self.query.setup_joins(
             pieces, opts, alias)
-        # We will later on need to promote those joins that were added to the
-        # query afresh above.
-        joins_to_promote = [j for j in joins if self.query.alias_refcount[j] < 2]
         alias = joins[-1]
-        if not field.rel:
-            # To avoid inadvertent trimming of a necessary alias, use the
-            # refcount to show that we are referencing a non-relation field on
-            # the model.
-            self.query.ref_alias(alias)
-
-        # Must use left outer joins for nullable fields and their relations.
-        # Ordering or distinct must not affect the returned set, and INNER
-        # JOINS for nullable fields could do this.
-        self.query.promote_joins(joins_to_promote)
         return field, targets, alias, joins, path, opts
 
     def get_from_clause(self):
@@ -575,7 +567,7 @@ class SQLCompiler(object):
                 for order, order_params in ordering_group_by:
                     # Even if we have seen the same SQL string, it might have
                     # different params, so, we add same SQL in "has params" case.
-                    if order not in seen or params:
+                    if order not in seen or order_params:
                         result.append(order)
                         params.extend(order_params)
                         seen.add(order)
@@ -589,7 +581,7 @@ class SQLCompiler(object):
         return result, params
 
     def fill_related_selections(self, opts=None, root_alias=None, cur_depth=1,
-            requested=None, restricted=None, nullable=None):
+            requested=None, restricted=None):
         """
         Fill in the information needed for a select_related query. The current
         depth is measured as the number of connections away from the root model
@@ -623,9 +615,8 @@ class SQLCompiler(object):
             if not select_related_descend(f, restricted, requested,
                                           only_load.get(field_model)):
                 continue
-            promote = nullable or f.null
             _, _, _, joins, _ = self.query.setup_joins(
-                [f.name], opts, root_alias, outer_if_first=promote)
+                [f.name], opts, root_alias)
             alias = joins[-1]
             columns, aliases = self.get_default_columns(start_alias=alias,
                     opts=f.rel.to._meta, as_pairs=True)
@@ -635,9 +626,8 @@ class SQLCompiler(object):
                 next = requested.get(f.name, {})
             else:
                 next = False
-            new_nullable = f.null or promote
             self.fill_related_selections(f.rel.to._meta, alias, cur_depth + 1,
-                    next, restricted, new_nullable)
+                    next, restricted)
 
         if restricted:
             related_fields = [
@@ -651,7 +641,7 @@ class SQLCompiler(object):
                     continue
 
                 _, _, _, joins, _ = self.query.setup_joins(
-                    [f.related_query_name()], opts, root_alias, outer_if_first=True)
+                    [f.related_query_name()], opts, root_alias)
                 alias = joins[-1]
                 from_parent = (opts.model if issubclass(model, opts.model)
                                else None)
@@ -661,11 +651,8 @@ class SQLCompiler(object):
                     SelectInfo(col, field) for col, field
                     in zip(columns, model._meta.concrete_fields))
                 next = requested.get(f.related_query_name(), {})
-                # Use True here because we are looking at the _reverse_ side of
-                # the relation, which is always nullable.
-                new_nullable = True
                 self.fill_related_selections(model._meta, alias, cur_depth + 1,
-                                             next, restricted, new_nullable)
+                                             next, restricted)
 
     def deferred_to_columns(self):
         """
@@ -1102,8 +1089,8 @@ class SQLDateTimeCompiler(SQLCompiler):
                 if settings.USE_TZ:
                     if datetime is None:
                         raise ValueError("Database returned an invalid value "
-                                         "in QuerySet.dates(). Are time zone "
-                                         "definitions and pytz installed?")
+                                         "in QuerySet.datetimes(). Are time zone "
+                                         "definitions for your database and pytz installed?")
                     datetime = datetime.replace(tzinfo=None)
                     datetime = timezone.make_aware(datetime, self.query.tzinfo)
                 yield datetime

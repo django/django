@@ -75,7 +75,7 @@ LANGUAGES = (
     ('fa', gettext_noop('Persian')),
     ('fi', gettext_noop('Finnish')),
     ('fr', gettext_noop('French')),
-    ('fy-nl', gettext_noop('Frisian')),
+    ('fy', gettext_noop('Frisian')),
     ('ga', gettext_noop('Irish')),
     ('gl', gettext_noop('Galician')),
     ('he', gettext_noop('Hebrew')),
@@ -127,6 +127,8 @@ LANGUAGES = (
     ('ur', gettext_noop('Urdu')),
     ('vi', gettext_noop('Vietnamese')),
     ('zh-cn', gettext_noop('Simplified Chinese')),
+    ('zh-hans', gettext_noop('Simplified Chinese')),
+    ('zh-hant', gettext_noop('Traditional Chinese')),
     ('zh-tw', gettext_noop('Traditional Chinese')),
 )
 
@@ -198,7 +200,7 @@ TEMPLATE_DIRS = ()
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    # 'django.template.loaders.eggs.Loader',
 )
 
 # List of processors used by RequestContext to populate the context.
@@ -211,7 +213,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
     'django.core.context_processors.static',
     'django.core.context_processors.tz',
-#    'django.core.context_processors.request',
+    # 'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
 )
 
@@ -302,7 +304,7 @@ FILE_UPLOAD_HANDLERS = (
 
 # Maximum size, in bytes, of a request before it will be streamed to the
 # file system instead of into memory.
-FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440 # i.e. 2.5 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440  # i.e. 2.5 MB
 
 # Directory in which upload streamed files will be temporarily saved. A value of
 # `None` will make Django use the operating system's default temporary directory
@@ -360,11 +362,11 @@ SHORT_DATETIME_FORMAT = 'm/d/Y P'
 # http://docs.python.org/library/datetime.html#strftime-behavior
 # * Note that these format strings are different from the ones to display dates
 DATE_INPUT_FORMATS = (
-    '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', # '2006-10-25', '10/25/2006', '10/25/06'
-    '%b %d %Y', '%b %d, %Y',            # 'Oct 25 2006', 'Oct 25, 2006'
-    '%d %b %Y', '%d %b, %Y',            # '25 Oct 2006', '25 Oct, 2006'
-    '%B %d %Y', '%B %d, %Y',            # 'October 25 2006', 'October 25, 2006'
-    '%d %B %Y', '%d %B, %Y',            # '25 October 2006', '25 October, 2006'
+    '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y',  # '2006-10-25', '10/25/2006', '10/25/06'
+    '%b %d %Y', '%b %d, %Y',             # 'Oct 25 2006', 'Oct 25, 2006'
+    '%d %b %Y', '%d %b, %Y',             # '25 Oct 2006', '25 Oct, 2006'
+    '%B %d %Y', '%B %d, %Y',             # 'October 25 2006', 'October 25, 2006'
+    '%d %B %Y', '%d %B, %Y',             # '25 October 2006', '25 October, 2006'
 )
 
 # Default formats to be used when parsing times from input boxes, in order
@@ -456,8 +458,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-#     'django.middleware.http.ConditionalGetMiddleware',
-#     'django.middleware.gzip.GZipMiddleware',
+    # 'django.middleware.http.ConditionalGetMiddleware',
+    # 'django.middleware.gzip.GZipMiddleware',
 )
 
 ############
@@ -607,7 +609,7 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 ##############

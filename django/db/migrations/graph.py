@@ -93,6 +93,7 @@ class MigrationGraph(object):
         Dynamic programming based depth first search, for finding dependencies.
         """
         cache = {}
+
         def _dfs(start, get_children, path):
             # If we already computed this, use that (dynamic programming)
             if (start, get_children) in cache:

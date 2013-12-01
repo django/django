@@ -3,6 +3,7 @@ import time
 from django.conf import settings
 from django.contrib.comments.forms import CommentForm
 from django.contrib.comments.models import Comment
+from django.test.utils import override_settings
 
 from . import CommentTestCase
 from ..models import Article
@@ -58,26 +59,18 @@ class CommentFormTests(CommentTestCase):
         c.save()
         self.assertEqual(Comment.objects.count(), 1)
 
+    @override_settings(PROFANITIES_LIST=["rooster"])
     def testProfanities(self):
         """Test COMMENTS_ALLOW_PROFANITIES and PROFANITIES_LIST settings"""
         a = Article.objects.get(pk=1)
         d = self.getValidData(a)
 
-        # Save settings in case other tests need 'em
-        saved = settings.PROFANITIES_LIST, settings.COMMENTS_ALLOW_PROFANITIES
-
-        # Don't wanna swear in the unit tests if we don't have to...
-        settings.PROFANITIES_LIST = ["rooster"]
-
         # Try with COMMENTS_ALLOW_PROFANITIES off
-        settings.COMMENTS_ALLOW_PROFANITIES = False
-        f = CommentForm(a, data=dict(d, comment="What a rooster!"))
-        self.assertFalse(f.is_valid())
+        with self.settings(COMMENTS_ALLOW_PROFANITIES=False):
+            f = CommentForm(a, data=dict(d, comment="What a rooster!"))
+            self.assertFalse(f.is_valid())
 
         # Now with COMMENTS_ALLOW_PROFANITIES on
-        settings.COMMENTS_ALLOW_PROFANITIES = True
-        f = CommentForm(a, data=dict(d, comment="What a rooster!"))
-        self.assertTrue(f.is_valid())
-
-        # Restore settings
-        settings.PROFANITIES_LIST, settings.COMMENTS_ALLOW_PROFANITIES = saved
+        with self.settings(COMMENTS_ALLOW_PROFANITIES=True):
+            f = CommentForm(a, data=dict(d, comment="What a rooster!"))
+            self.assertTrue(f.is_valid())

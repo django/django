@@ -44,13 +44,14 @@ class DefaultLoader(unittest.TestCase):
         self.assertRaises(ImportError, import_module, 'utils_tests.test_module.django')
 
         # Don't be confused by caching of import misses
-        import types  # causes attempted import of utils_tests.types
+        import types  # NOQA: causes attempted import of utils_tests.types
         self.assertFalse(module_has_submodule(sys.modules['utils_tests'], 'types'))
 
         # A module which doesn't have a __path__ (so no submodules)
         self.assertFalse(module_has_submodule(test_no_submodule, 'anything'))
         self.assertRaises(ImportError, import_module,
             'utils_tests.test_no_submodule.anything')
+
 
 class EggLoader(unittest.TestCase):
     def setUp(self):
@@ -133,6 +134,7 @@ class ModuleImportTestCase(unittest.TestCase):
         self.assertIsNotNone(traceback.tb_next.tb_next,
             'Should have more than the calling frame in the traceback.')
 
+
 @override_settings(INSTALLED_APPS=('utils_tests.test_module',))
 class AutodiscoverModulesTestCase(SimpleTestCase):
 
@@ -188,6 +190,7 @@ class ProxyFinder(object):
             if fd:
                 fd.close()
 
+
 class TestFinder(object):
     def __init__(self, *args, **kwargs):
         self.importer = zipimporter(*args, **kwargs)
@@ -198,6 +201,7 @@ class TestFinder(object):
             return
         return TestLoader(importer)
 
+
 class TestLoader(object):
     def __init__(self, importer):
         self.importer = importer
@@ -206,6 +210,7 @@ class TestLoader(object):
         mod = self.importer.load_module(name)
         mod.__loader__ = self
         return mod
+
 
 class CustomLoader(EggLoader):
     """The Custom Loader test is exactly the same as the EggLoader, but

@@ -6,7 +6,8 @@ _standard_context_processors = None
 # We need the CSRF processor no matter what the user has in their settings,
 # because otherwise it is a security vulnerability, and we can't afford to leave
 # this to human error or failure to read migration instructions.
-_builtin_context_processors =  ('django.core.context_processors.csrf',)
+_builtin_context_processors = ('django.core.context_processors.csrf',)
+
 
 class ContextPopException(Exception):
     "pop() has been called more times than push()"
@@ -149,6 +150,7 @@ class RenderContext(BaseContext):
             return d[key]
         return otherwise
 
+
 # This is a function rather than module-level procedural code because we only
 # want it to execute if somebody uses RequestContext.
 def get_standard_processors():
@@ -164,6 +166,7 @@ def get_standard_processors():
             processors.append(func)
         _standard_context_processors = tuple(processors)
     return _standard_context_processors
+
 
 class RequestContext(Context):
     """

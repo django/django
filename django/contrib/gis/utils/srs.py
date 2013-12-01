@@ -1,5 +1,6 @@
 from django.contrib.gis.gdal import SpatialReference
 
+
 def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
                   database=None):
     """
@@ -56,10 +57,10 @@ def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
 
     # Initializing the keyword arguments dictionary for both PostGIS
     # and SpatiaLite.
-    kwargs = {'srid' : srs.srid,
-              'auth_name' : auth_name,
-              'auth_srid' : auth_srid or srs.srid,
-              'proj4text' : srs.proj4,
+    kwargs = {'srid': srs.srid,
+              'auth_name': auth_name,
+              'auth_srid': auth_srid or srs.srid,
+              'proj4text': srs.proj4,
               }
 
     # Backend-specific fields for the SpatialRefSys model.

@@ -5,14 +5,14 @@ from __future__ import unicode_literals
 
 # The *_FORMAT strings use the Django date format syntax,
 # see http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
-DATE_FORMAT = 'd F Y' # 25 Ottobre 2006
-TIME_FORMAT = 'H:i:s' # 14:30:59
-DATETIME_FORMAT = 'l d F Y H:i:s' # Mercoledì 25 Ottobre 2006 14:30:59
-YEAR_MONTH_FORMAT = 'F Y' # Ottobre 2006
-MONTH_DAY_FORMAT = 'j/F' # 10/2006
-SHORT_DATE_FORMAT = 'd/m/Y' # 25/12/2009
-SHORT_DATETIME_FORMAT = 'd/m/Y H:i:s' # 25/10/2009 14:30:59
-FIRST_DAY_OF_WEEK = 1 # Lunedì
+DATE_FORMAT = 'd F Y'  # 25 Ottobre 2006
+TIME_FORMAT = 'H:i:s'  # 14:30:59
+DATETIME_FORMAT = 'l d F Y H:i:s'  # Mercoledì 25 Ottobre 2006 14:30:59
+YEAR_MONTH_FORMAT = 'F Y'  # Ottobre 2006
+MONTH_DAY_FORMAT = 'j/F'  # 10/2006
+SHORT_DATE_FORMAT = 'd/m/Y'  # 25/12/2009
+SHORT_DATETIME_FORMAT = 'd/m/Y H:i:s'  # 25/10/2009 14:30:59
+FIRST_DAY_OF_WEEK = 1  # Lunedì
 
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
 # see http://docs.python.org/library/datetime.html#strftime-strptime-behavior

@@ -142,11 +142,14 @@ class FileDescriptor(object):
     The descriptor for the file attribute on the model instance. Returns a
     FieldFile when accessed so you can do stuff like::
 
+        >>> from myapp.models import MyModel
+        >>> instance = MyModel.objects.get(pk=1)
         >>> instance.file.size
 
     Assigns a file object on assignment so you can do::
 
-        >>> instance.file = File(...)
+        >>> with open('/tmp/hello.world', 'r') as f:
+        ...     instance.file = File(f)
 
     """
     def __init__(self, field):

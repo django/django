@@ -26,7 +26,7 @@ class InspectDbTests(TestCase):
         """
         out = StringIO()
         call_command('inspectdb',
-                 table_name_filter=lambda tn:tn.startswith('inspectapp_'),
+                 table_name_filter=lambda tn: tn.startswith('inspectapp_'),
                  stdout=out)
         output = out.getvalue()
         self.assertIn('geom = models.PolygonField()', output)
@@ -148,6 +148,7 @@ def get_ogr_db_string():
 
     # Build the params of the OGR database connection string
     params = [db_str % {'db_name': db['NAME']}]
+
     def add(key, template):
         value = db.get(key, None)
         # Don't add the parameter if it is not in django's settings

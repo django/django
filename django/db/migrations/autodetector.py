@@ -81,10 +81,10 @@ class MigrationAutodetector(object):
                 self.add_to_migration(
                     app_label,
                     operations.CreateModel(
-                        name = model_state.name,
-                        fields = model_state.fields,
-                        options = model_state.options,
-                        bases = model_state.bases,
+                        name=model_state.name,
+                        fields=model_state.fields,
+                        options=model_state.options,
+                        bases=model_state.bases,
                     )
                 )
         # Phase 2 is progressively adding pending models, splitting up into two
@@ -99,10 +99,10 @@ class MigrationAutodetector(object):
                 self.add_to_migration(
                     app_label,
                     operations.CreateModel(
-                        name = model_state.name,
-                        fields = model_state.fields,
-                        options = model_state.options,
-                        bases = model_state.bases,
+                        name=model_state.name,
+                        fields=model_state.fields,
+                        options=model_state.options,
+                        bases=model_state.bases,
                     )
                 )
                 for field_name, other_app_label, other_model_name in related_fields:
@@ -119,10 +119,10 @@ class MigrationAutodetector(object):
                 self.add_to_migration(
                     app_label,
                     operations.CreateModel(
-                        name = model_state.name,
-                        fields = [(n, f) for n, f in model_state.fields if n not in bad_fields],
-                        options = model_state.options,
-                        bases = model_state.bases,
+                        name=model_state.name,
+                        fields=[(n, f) for n, f in model_state.fields if n not in bad_fields],
+                        options=model_state.options,
+                        bases=model_state.bases,
                     )
                 )
                 # Add the bad fields to be made in a phase 3
@@ -135,11 +135,11 @@ class MigrationAutodetector(object):
             self.add_to_migration(
                 app_label,
                 operations.AddField(
-                    model_name = model_name,
-                    name = field_name,
-                    field = model_state.get_field_by_name(field_name),
+                    model_name=model_name,
+                    name=field_name,
+                    field=model_state.get_field_by_name(field_name),
                 ),
-                new = True,
+                new=True,
             )
             if app_label != other_app_label:
                 self.add_dependency(app_label, other_app_label)
@@ -172,9 +172,9 @@ class MigrationAutodetector(object):
                             self.add_to_migration(
                                 app_label,
                                 operations.RenameField(
-                                    model_name = model_name,
-                                    old_name = removed_field_name,
-                                    new_name = field_name,
+                                    model_name=model_name,
+                                    old_name=removed_field_name,
+                                    new_name=field_name,
                                 )
                             )
                             old_field_names.remove(removed_field_name)
@@ -189,9 +189,9 @@ class MigrationAutodetector(object):
                 self.add_to_migration(
                     app_label,
                     operations.AddField(
-                        model_name = model_name,
-                        name = field_name,
-                        field = field,
+                        model_name=model_name,
+                        name=field_name,
+                        field=field,
                     )
                 )
             # Old fields
@@ -199,8 +199,8 @@ class MigrationAutodetector(object):
                 self.add_to_migration(
                     app_label,
                     operations.RemoveField(
-                        model_name = model_name,
-                        name = field_name,
+                        model_name=model_name,
+                        name=field_name,
                     )
                 )
             # The same fields
@@ -212,9 +212,9 @@ class MigrationAutodetector(object):
                     self.add_to_migration(
                         app_label,
                         operations.AlterField(
-                            model_name = model_name,
-                            name = field_name,
-                            field = new_model_state.get_field_by_name(field_name),
+                            model_name=model_name,
+                            name=field_name,
+                            field=new_model_state.get_field_by_name(field_name),
                         )
                     )
             # unique_together changes
@@ -222,8 +222,8 @@ class MigrationAutodetector(object):
                 self.add_to_migration(
                     app_label,
                     operations.AlterUniqueTogether(
-                        name = model_name,
-                        unique_together = new_model_state.options.get("unique_together", set()),
+                        name=model_name,
+                        unique_together=new_model_state.options.get("unique_together", set()),
                     )
                 )
         # Alright, now add internal dependencies

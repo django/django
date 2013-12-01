@@ -1,18 +1,17 @@
 from __future__ import unicode_literals
 
-from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.test.utils import (setup_test_template_loader,
     restore_template_loaders, override_settings)
 
-from ..models import Author, Article, UrlArticle
+from ..models import UrlArticle
 
 
 class DefaultsTests(TestCase):
     """Test django views in django/views/defaults.py"""
     fixtures = ['testdata.json']
-    non_existing_urls = ['/views/non_existing_url/', # this is in urls.py
-                         '/views/other_non_existing_url/'] # this NOT in urls.py
+    non_existing_urls = ['/views/non_existing_url/',  # this is in urls.py
+                         '/views/other_non_existing_url/']  # this NOT in urls.py
 
     def test_page_not_found(self):
         "A 404 status is returned by the page_not_found view"

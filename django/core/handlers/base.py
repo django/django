@@ -30,7 +30,6 @@ class BaseHandler(object):
     def __init__(self):
         self._request_middleware = self._view_middleware = self._template_response_middleware = self._response_middleware = self._exception_middleware = None
 
-
     def load_middleware(self):
         """
         Populate middleware lists from settings.MIDDLEWARE_CLASSES.
@@ -166,31 +165,36 @@ class BaseHandler(object):
                 response = callback(request, **param_dict)
             except:
                 signals.got_request_exception.send(
-                        sender=self.__class__, request=request)
+                    sender=self.__class__, request=request)
                 response = self.handle_uncaught_exception(request,
-                        resolver, sys.exc_info())
+                    resolver, sys.exc_info())
 
         except SuspiciousOperation as e:
             # The request logger receives events for any problematic request
             # The security logger receives events for all SuspiciousOperations
             security_logger = logging.getLogger('django.security.%s' %
                             e.__class__.__name__)
-            security_logger.error(force_text(e))
+            security_logger.error(
+                force_text(e),
+                extra={
+                    'status_code': 400,
+                    'request': request
+                })
 
             try:
                 callback, param_dict = resolver.resolve400()
                 response = callback(request, **param_dict)
             except:
                 signals.got_request_exception.send(
-                        sender=self.__class__, request=request)
+                    sender=self.__class__, request=request)
                 response = self.handle_uncaught_exception(request,
-                        resolver, sys.exc_info())
+                    resolver, sys.exc_info())
 
         except SystemExit:
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701
             raise
 
-        except: # Handle everything else.
+        except:  # Handle everything else.
             # Get the exception info now, in case another exception is thrown later.
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
@@ -200,7 +204,7 @@ class BaseHandler(object):
             for middleware_method in self._response_middleware:
                 response = middleware_method(request, response)
             response = self.apply_response_fixes(request, response)
-        except: # Any exception should be gathered and handled
+        except:  # Any exception should be gathered and handled
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
 

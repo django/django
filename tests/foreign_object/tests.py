@@ -12,6 +12,7 @@ from django import forms
 # Note that these tests are testing internal implementation details.
 # ForeignObject is not part of public API.
 
+
 class MultiColumnFKTests(TestCase):
     def setUp(self):
         # Creating countries
@@ -378,6 +379,7 @@ class MultiColumnFKTests(TestCase):
                 NewsArticle.objects.select_related(
                     'active_translation')[0].active_translation.title,
                 "foo")
+
 
 class FormsTests(TestCase):
     # ForeignObjects should not have any form fields, currently the user needs

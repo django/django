@@ -39,6 +39,7 @@ def parse_date(value):
         kw = dict((k, int(v)) for k, v in six.iteritems(match.groupdict()))
         return datetime.date(**kw)
 
+
 def parse_time(value):
     """Parses a string and return a datetime.time.
 
@@ -55,6 +56,7 @@ def parse_time(value):
             kw['microsecond'] = kw['microsecond'].ljust(6, '0')
         kw = dict((k, int(v)) for k, v in six.iteritems(kw) if v is not None)
         return datetime.time(**kw)
+
 
 def parse_datetime(value):
     """Parses a string and return a datetime.datetime.

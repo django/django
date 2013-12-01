@@ -2,6 +2,7 @@ import copy
 import operator
 from functools import wraps
 import sys
+import warnings
 
 from django.utils import six
 from django.utils.six.moves import copyreg
@@ -24,6 +25,10 @@ def memoize(func, cache, num_args):
 
     Only the first num_args are considered when creating the key.
     """
+    warnings.warn("memoize wrapper is deprecated and will be removed in "
+                  "Django 1.9. Use django.utils.lru_cache instead.",
+                  PendingDeprecationWarning, stacklevel=2)
+
     @wraps(func)
     def wrapper(*args):
         mem_args = args[:num_args]
@@ -88,6 +93,7 @@ def lazy(func, *resultclasses):
                 (func, self.__args, self.__kw) + resultclasses
             )
 
+        @classmethod
         def __prepare_class__(cls):
             cls.__dispatch = {}
             for resultclass in resultclasses:
@@ -114,8 +120,8 @@ def lazy(func, *resultclasses):
                     cls.__bytes__ = cls.__bytes_cast
                 else:
                     cls.__str__ = cls.__bytes_cast
-        __prepare_class__ = classmethod(__prepare_class__)
 
+        @classmethod
         def __promise__(cls, klass, funcname, method):
             # Builds a wrapper around some magic method and registers that
             # magic method for the given type and method name.
@@ -132,7 +138,6 @@ def lazy(func, *resultclasses):
                 cls.__dispatch[klass] = {}
             cls.__dispatch[klass][funcname] = method
             return __wrapper__
-        __promise__ = classmethod(__promise__)
 
         def __text_cast(self):
             return func(*self.__args, **self.__kw)
@@ -255,7 +260,7 @@ class LazyObject(object):
 
     def _setup(self):
         """
-        Must be implemented by subclasses to initialise the wrapped object.
+        Must be implemented by subclasses to initialize the wrapped object.
         """
         raise NotImplementedError('subclasses of LazyObject must provide a _setup() method')
 

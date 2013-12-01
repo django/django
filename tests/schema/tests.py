@@ -107,9 +107,9 @@ class SchemaTests(TransactionTestCase):
         # Make sure the FK constraint is present
         with self.assertRaises(IntegrityError):
             Book.objects.create(
-                author_id = 1,
-                title = "Much Ado About Foreign Keys",
-                pub_date = datetime.datetime.now(),
+                author_id=1,
+                title="Much Ado About Foreign Keys",
+                pub_date=datetime.datetime.now(),
             )
         # Repoint the FK constraint
         new_field = ForeignKey(DummyTarget)
@@ -212,7 +212,7 @@ class SchemaTests(TransactionTestCase):
                 Author,
                 Author._meta.get_field_by_name("name")[0],
                 new_field,
-                strict = True,
+                strict=True,
             )
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
@@ -338,7 +338,7 @@ class SchemaTests(TransactionTestCase):
                 Author,
                 Author._meta.get_field_by_name("height")[0],
                 new_field,
-                strict = True,
+                strict=True,
             )
         constraints = connection.introspection.get_constraints(connection.cursor(), Author._meta.db_table)
         for name, details in constraints.items():
@@ -350,7 +350,7 @@ class SchemaTests(TransactionTestCase):
                 Author,
                 new_field,
                 Author._meta.get_field_by_name("height")[0],
-                strict = True,
+                strict=True,
             )
         constraints = connection.introspection.get_constraints(connection.cursor(), Author._meta.db_table)
         for name, details in constraints.items():
@@ -378,7 +378,7 @@ class SchemaTests(TransactionTestCase):
                 Tag,
                 Tag._meta.get_field_by_name("slug")[0],
                 new_field,
-                strict = True,
+                strict=True,
             )
         # Ensure the field is no longer unique
         Tag.objects.create(title="foo", slug="foo")
@@ -392,7 +392,7 @@ class SchemaTests(TransactionTestCase):
                 Tag,
                 new_field,
                 new_new_field,
-                strict = True,
+                strict=True,
             )
         # Ensure the field is unique again
         Tag.objects.create(title="foo", slug="foo")
@@ -406,7 +406,7 @@ class SchemaTests(TransactionTestCase):
                 Tag,
                 Tag._meta.get_field_by_name("slug")[0],
                 TagUniqueRename._meta.get_field_by_name("slug2")[0],
-                strict = True,
+                strict=True,
             )
         # Ensure the field is still unique
         TagUniqueRename.objects.create(title="foo", slug2="foo")
@@ -573,7 +573,7 @@ class SchemaTests(TransactionTestCase):
                 Book,
                 Book._meta.get_field_by_name("title")[0],
                 new_field,
-                strict = True,
+                strict=True,
             )
         # Ensure the table is there and has no index
         self.assertNotIn(
@@ -586,7 +586,7 @@ class SchemaTests(TransactionTestCase):
                 Book,
                 new_field,
                 Book._meta.get_field_by_name("title")[0],
-                strict = True,
+                strict=True,
             )
         # Ensure the table is there and has the index again
         self.assertIn(
@@ -611,7 +611,7 @@ class SchemaTests(TransactionTestCase):
                 BookWithSlug,
                 BookWithSlug._meta.get_field_by_name("slug")[0],
                 new_field2,
-                strict = True,
+                strict=True,
             )
         self.assertNotIn(
             "slug",
@@ -656,7 +656,7 @@ class SchemaTests(TransactionTestCase):
         class SomeError(Exception):
             pass
         try:
-            with connection.schema_editor() as editor:
+            with connection.schema_editor():
                 raise SomeError
         except SomeError:
             self.assertFalse(connection.in_atomic_block)

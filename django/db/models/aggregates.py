@@ -3,6 +3,10 @@ Classes to represent the definitions of aggregate functions.
 """
 from django.db.models.constants import LOOKUP_SEP
 
+__all__ = [
+    'Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance',
+]
+
 
 def refs_aggregate(lookup_parts, aggregates):
     """

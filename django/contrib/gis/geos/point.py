@@ -5,6 +5,7 @@ from django.contrib.gis.geos import prototypes as capi
 from django.utils import six
 from django.utils.six.moves import xrange
 
+
 class Point(GEOSGeometry):
     _minlength = 2
     _maxlength = 3
@@ -50,7 +51,8 @@ class Point(GEOSGeometry):
         i = iter(coords)
         capi.cs_setx(cs, 0, next(i))
         capi.cs_sety(cs, 0, next(i))
-        if ndim == 3: capi.cs_setz(cs, 0, next(i))
+        if ndim == 3:
+            capi.cs_setz(cs, 0, next(i))
 
         return capi.create_point(cs)
 
@@ -74,9 +76,12 @@ class Point(GEOSGeometry):
 
     def __len__(self):
         "Returns the number of dimensions for this Point (either 0, 2 or 3)."
-        if self.empty: return 0
-        if self.hasz: return 3
-        else: return 2
+        if self.empty:
+            return 0
+        if self.hasz:
+            return 3
+        else:
+            return 2
 
     def _get_single_external(self, index):
         if index == 0:

@@ -1,21 +1,26 @@
 """
 Module for abstract serializer/unserializer base classes.
 """
+import warnings
 
 from django.db import models
 from django.utils import six
+
 
 class SerializerDoesNotExist(KeyError):
     """The requested serializer was not found."""
     pass
 
+
 class SerializationError(Exception):
     """Something bad happened during serialization."""
     pass
 
+
 class DeserializationError(Exception):
     """Something bad happened during deserialization."""
     pass
+
 
 class Serializer(object):
     """
@@ -35,6 +40,11 @@ class Serializer(object):
         self.stream = options.pop("stream", six.StringIO())
         self.selected_fields = options.pop("fields", None)
         self.use_natural_keys = options.pop("use_natural_keys", False)
+        if self.use_natural_keys:
+            warnings.warn("``use_natural_keys`` is deprecated; use ``use_natural_foreign_keys`` instead.",
+                PendingDeprecationWarning)
+        self.use_natural_foreign_keys = options.pop('use_natural_foreign_keys', False) or self.use_natural_keys
+        self.use_natural_primary_keys = options.pop('use_natural_primary_keys', False)
 
         self.start_serialization()
         self.first = True
@@ -111,6 +121,7 @@ class Serializer(object):
         if callable(getattr(self.stream, 'getvalue', None)):
             return self.stream.getvalue()
 
+
 class Deserializer(six.Iterator):
     """
     Abstract base deserializer class.
@@ -136,6 +147,7 @@ class Deserializer(six.Iterator):
     def __next__(self):
         """Iteration iterface -- return the next item in the stream"""
         raise NotImplementedError('subclasses of Deserializer must provide a __next__() method')
+
 
 class DeserializedObject(object):
     """
@@ -169,3 +181,21 @@ class DeserializedObject(object):
         # prevent a second (possibly accidental) call to save() from saving
         # the m2m data twice.
         self.m2m_data = None
+
+
+def build_instance(Model, data, db):
+    """
+    Build a model instance.
+
+    If the model instance doesn't have a primary key and the model supports
+    natural keys, try to retrieve it from the database.
+    """
+    obj = Model(**data)
+    if (obj.pk is None and hasattr(Model, 'natural_key') and
+            hasattr(Model._default_manager, 'get_by_natural_key')):
+        natural_key = obj.natural_key()
+        try:
+            obj.pk = Model._default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
+        except Model.DoesNotExist:
+            pass
+    return obj

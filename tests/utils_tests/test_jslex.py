@@ -5,6 +5,7 @@
 from django.test import TestCase
 from django.utils.jslex import JsLexer, prepare_js_for_gettext
 
+
 class JsTokensTest(TestCase):
     LEX_CASES = [
         # ids
@@ -103,7 +104,8 @@ class JsTokensTest(TestCase):
           "id value", "punct .", "id replace", "punct (", r"regex /\\/g", "punct ,", r'string "\\\\"', "punct )",
           "punct .", "id replace", "punct (", r'regex /"/g', "punct ,", r'string "\\\""', "punct )", "punct +",
           r'string "\")"', "punct ;"]),
-        ]
+    ]
+
 
 def make_function(input, toks):
     def test_func(self):
@@ -206,6 +208,7 @@ GETTEXT_CASES = (
 
 class JsToCForGettextTest(TestCase):
     pass
+
 
 def make_function(js, c):
     def test_func(self):

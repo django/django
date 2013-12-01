@@ -1,6 +1,6 @@
-============================================
-Django 1.6 release notes - UNDER DEVELOPMENT
-============================================
+=========================
+ Django 1.6 release notes
+=========================
 
 .. note::
 
@@ -19,6 +19,8 @@ Django 1.6 release notes - UNDER DEVELOPMENT
     This release of Django is for Malcolm.
 
     -- The Django Developers
+
+*November 6, 2013*
 
 Welcome to Django 1.6!
 
@@ -368,9 +370,9 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher has been
   increased by 20%. This backwards compatible change will not affect
   existing passwords or users who have subclassed
-  `django.contrib.auth.hashers.PBKDF2PasswordHasher`` to change the
-  default value.
-
+  ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` to change the
+  default value. Passwords :ref:`will be upgraded <password-upgrades>` to use
+  the new iteration count as necessary.
 
 Backwards incompatible changes in 1.6
 =====================================
@@ -805,26 +807,43 @@ For backwards compatibility, this setting defaulted to using :mod:`pickle`
 in Django 1.5.3, but we've changed the default to JSON in 1.6. If you upgrade
 and switch from pickle to JSON, sessions created before the upgrade will be
 lost. While JSON serialization does not support all Python objects like
-:mod:`pickle` does, we highly recommend using JSON-serialized sessions. Also,
-as JSON requires string keys, you will likely run into problems if you are
-using non-string keys in ``request.session``. See the
-:ref:`session_serialization` documentation for more details.
+:mod:`pickle` does, we highly recommend using JSON-serialized sessions. Be
+aware of the following when checking your code to determine if JSON
+serialization will work for your application:
 
-4096-byte limit on passwords
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* JSON requires string keys, so you will likely run into problems if you are
+  using non-string keys in ``request.session``.
+* Setting session expiration by passing ``datetime`` values to
+  :meth:`~django.contrib.sessions.backends.base.SessionBase.set_expiry` will
+  not work as ``datetime`` values are not serializable in JSON. You can use
+  integer values instead.
 
-.. note::
-    This behavior was also added in the Django 1.5.4 and 1.4.8 security
-    releases.
+See the :ref:`session_serialization` documentation for more details.
 
-Historically, Django has imposed no length limit on plaintext
-passwords. This enables a denial-of-service attack through submission
-of bogus but extremely large passwords, tying up server resources
-performing the (expensive, and increasingly expensive with the length
-of the password) calculation of the corresponding hash.
+Object Relational Mapper changes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django now imposes a 4096-byte limit on password length, and will fail
-authentication with any submitted password of greater length.
+Django 1.6 contains many changes to the ORM. These changes fall mostly in
+three categories:
+
+  1. Bug fixes (e.g. proper join clauses for generic relations, query
+     combining, join promotion, and join trimming fixes)
+  2. Preparation for new features. For example the ORM is now internally ready
+     for multicolumn foreign keys.
+  3. General cleanup.
+
+These changes can result in some compatibility problems. For example, some
+queries will now generate different table aliases. This can affect
+:meth:`QuerySet.extra() <django.db.models.query.QuerySet.extra>`. In addition
+some queries will now produce different results. An example is
+:meth:`exclude(condition) <django.db.models.query.QuerySet.exclude>`
+where the condition is a complex one (referencing multijoins inside
+:class:`Q objects <django.db.models.Q>`). In many cases the affected
+queries didn't produce correct results in Django 1.5 but do now.
+Unfortunately there are also cases that produce different results, but
+neither Django 1.5 nor 1.6 produce correct results.
+
+Finally, there have been many changes to the ORM internal APIs.
 
 Miscellaneous
 ~~~~~~~~~~~~~
@@ -845,6 +864,19 @@ Miscellaneous
   field documentation for details about the names of the placeholders. The
   changes in 1.6 particularly affect :class:`~django.forms.DecimalField` and
   :class:`~django.forms.ModelMultipleChoiceField`.
+
+* Some :attr:`~django.forms.Field.error_messages` for
+  :class:`~django.forms.IntegerField`,
+  :class:`~django.forms.EmailField`,
+  :class:`~django.forms.IPAddressField`,
+  :class:`~django.forms.GenericIPAddressField`, and
+  :class:`~django.forms.SlugField` have been suppressed because they
+  duplicated error messages already provided by validators tied to the fields.
+
+* Due to a change in the form validation workflow,
+  :class:`~django.forms.TypedChoiceField` ``coerce`` method should always
+  return a value present in the ``choices`` field attribute. That limitation
+  should be lift again in Django 1.7.
 
 * There have been changes in the way timeouts are handled in cache backends.
   Explicitly passing in ``timeout=None`` no longer results in using the
@@ -914,6 +946,16 @@ Miscellaneous
 * The :djadminopt:`--keep-pot` option was added to :djadmin:`makemessages`
   to prevent django from deleting the temporary .pot file it generates before
   creating the .po file.
+
+* The undocumented ``django.core.servers.basehttp.WSGIServerException`` has
+  been removed. Use ``socket.error`` provided by the standard library instead.
+  This change was also released in Django 1.5.5.
+
+* The signature of :meth:`django.views.generic.base.RedirectView.get_redirect_url`
+  has changed and now accepts positional arguments as well (``*args, **kwargs``).
+  Any unnamed captured group will now be passed to ``get_redirect_url()``
+  which may result in a ``TypeError`` if you don't update the signature of your
+  custom method.
 
 Features deprecated in 1.6
 ==========================

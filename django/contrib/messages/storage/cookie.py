@@ -46,6 +46,7 @@ class MessageDecoder(json.JSONDecoder):
         decoded = super(MessageDecoder, self).decode(s, **kwargs)
         return self.process_messages(decoded)
 
+
 class CookieStorage(BaseStorage):
     """
     Stores messages in a cookie.
@@ -100,7 +101,8 @@ class CookieStorage(BaseStorage):
         if self.max_cookie_size:
             # data is going to be stored eventually by SimpleCookie, which
             # adds it's own overhead, which we must account for.
-            cookie = SimpleCookie() # create outside the loop
+            cookie = SimpleCookie()  # create outside the loop
+
             def stored_length(val):
                 return len(cookie.value_encode(val)[1])
 

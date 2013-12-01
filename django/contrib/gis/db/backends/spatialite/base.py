@@ -11,6 +11,7 @@ from django.contrib.gis.db.backends.spatialite.introspection import SpatiaLiteIn
 from django.contrib.gis.db.backends.spatialite.operations import SpatiaLiteOperations
 from django.utils import six
 
+
 class DatabaseWrapper(SQLiteDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         # Before we get too far, make sure pysqlite 2.5+ is installed.

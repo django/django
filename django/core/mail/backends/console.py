@@ -6,6 +6,7 @@ import threading
 
 from django.core.mail.backends.base import BaseEmailBackend
 
+
 class EmailBackend(BaseEmailBackend):
     def __init__(self, *args, **kwargs):
         self.stream = kwargs.pop('stream', sys.stdout)

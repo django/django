@@ -410,7 +410,7 @@ pre_syncdb
     This signal has been renamed to :data:`~django.db.models.signals.pre_migrate`.
 
 Alias of :data:`django.db.models.signals.pre_migrate`. As long as this alias
-is present, for backwards-compatability this signal has an extra argument it sends:
+is present, for backwards-compatibility this signal has an extra argument it sends:
 
 ``create_models``
     A list of the model classes from any app which :djadmin:`migrate` is
@@ -484,7 +484,7 @@ post_syncdb
     This signal has been renamed to :data:`~django.db.models.signals.post_migrate`.
 
 Alias of :data:`django.db.models.signals.post_migrate`. As long as this alias
-is present, for backwards-compatability this signal has an extra argument it sends:
+is present, for backwards-compatibility this signal has an extra argument it sends:
 
 ``created_models``
     A list of the model classes from any app which :djadmin:`migrate` has

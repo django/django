@@ -4,7 +4,6 @@ import pickle
 import unittest
 
 from django.test.utils import override_settings
-from django.utils import six
 from django.utils import timezone
 
 

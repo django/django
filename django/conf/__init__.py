@@ -36,7 +36,7 @@ class LazySettings(LazyObject):
         """
         try:
             settings_module = os.environ[ENVIRONMENT_VARIABLE]
-            if not settings_module: # If it's set but is an empty string.
+            if not settings_module:  # If it's set but is an empty string.
                 raise KeyError
         except KeyError:
             desc = ("setting %s" % name) if name else "settings"

@@ -4,6 +4,7 @@ from django.template import VariableNode, Context
 from django.template.loader import get_template_from_string
 from django.test.utils import override_settings
 
+
 class NodelistTest(TestCase):
 
     def test_for(self):
@@ -36,7 +37,7 @@ class ErrorIndexTest(TestCase):
     Checks whether index of error is calculated correctly in
     template debugger in for loops. Refs ticket #5831
     """
-    @override_settings(DEBUG=True, TEMPLATE_DEBUG = True)
+    @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
     def test_correct_exception_index(self):
         tests = [
             ('{% load bad_tag %}{% for i in range %}{% badsimpletag %}{% endfor %}', (38, 56)),

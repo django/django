@@ -1,9 +1,10 @@
 from ctypes import c_char_p, c_double, c_int, c_void_p, POINTER
 from django.contrib.gis.gdal.envelope import OGREnvelope
 from django.contrib.gis.gdal.libgdal import lgdal
-from django.contrib.gis.gdal.prototypes.errcheck import check_bool, check_envelope
+from django.contrib.gis.gdal.prototypes.errcheck import check_envelope
 from django.contrib.gis.gdal.prototypes.generation import (const_string_output,
     double_output, geom_output, int_output, srs_output, string_output, void_output)
+
 
 ### Generation routines specific to this module ###
 def env_func(f, argtypes):
@@ -13,14 +14,16 @@ def env_func(f, argtypes):
     f.errcheck = check_envelope
     return f
 
+
 def pnt_func(f):
     "For accessing point information."
     return double_output(f, [c_void_p, c_int])
 
+
 def topology_func(f):
     f.argtypes = [c_void_p, c_void_p]
     f.restype = c_int
-    f.errchck = check_bool
+    f.errchck = bool
     return f
 
 ### OGR_G ctypes function prototypes ###
@@ -34,7 +37,7 @@ to_kml = string_output(lgdal.OGR_G_ExportToKML, [c_void_p, c_char_p], str_result
 getx = pnt_func(lgdal.OGR_G_GetX)
 gety = pnt_func(lgdal.OGR_G_GetY)
 getz = pnt_func(lgdal.OGR_G_GetZ)
-    
+
 # Geometry creation routines.
 from_wkb = geom_output(lgdal.OGR_G_CreateFromWkb, [c_char_p, c_void_p, POINTER(c_void_p), c_int], offset=-2)
 from_wkt = geom_output(lgdal.OGR_G_CreateFromWkt, [POINTER(c_char_p), c_void_p, POINTER(c_void_p)], offset=-1)
@@ -56,7 +59,7 @@ import_wkt = void_output(lgdal.OGR_G_ImportFromWkt, [c_void_p, POINTER(c_char_p)
 destroy_geom = void_output(lgdal.OGR_G_DestroyGeometry, [c_void_p], errcheck=False)
 
 # Geometry export routines.
-to_wkb = void_output(lgdal.OGR_G_ExportToWkb, None, errcheck=True) # special handling for WKB.
+to_wkb = void_output(lgdal.OGR_G_ExportToWkb, None, errcheck=True)  # special handling for WKB.
 to_wkt = string_output(lgdal.OGR_G_ExportToWkt, [c_void_p, POINTER(c_char_p)], decoding='ascii')
 to_gml = string_output(lgdal.OGR_G_ExportToGML, [c_void_p], str_result=True, decoding='ascii')
 get_wkbsize = int_output(lgdal.OGR_G_WkbSize, [c_void_p])
@@ -95,4 +98,3 @@ geom_transform_to = void_output(lgdal.OGR_G_TransformTo, [c_void_p, c_void_p])
 
 # For retrieving the envelope of the geometry.
 get_envelope = env_func(lgdal.OGR_G_GetEnvelope, [c_void_p, POINTER(OGREnvelope)])
-

@@ -40,6 +40,7 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods,
         self.ct_field = ct_field
         self.fk_field = fk_field
         self.for_concrete_model = for_concrete_model
+        self.editable = False
         super(GenericForeignKey, self).__init__(**kwargs)
 
     def contribute_to_class(self, cls, name):
@@ -56,7 +57,10 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods,
             # This should never happen. I love comments like this, don't you?
             raise Exception("Impossible arguments to GFK.get_content_type!")
 
-    def get_prefetch_queryset(self, instances):
+    def get_prefetch_queryset(self, instances, queryset=None):
+        if queryset is not None:
+            raise ValueError("Custom queryset can't be used for this lookup.")
+
         # For efficiency, group the instances by content type and then do one
         # query per model
         fk_dict = defaultdict(set)
@@ -133,6 +137,7 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods,
         setattr(instance, self.ct_field, ct)
         setattr(instance, self.fk_field, fk)
         setattr(instance, self.cache_attr, value)
+
 
 class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
@@ -232,12 +237,10 @@ class GenericRelation(ForeignObject):
 
         """
         return self.rel.to._base_manager.db_manager(using).filter(**{
-                "%s__pk" % self.content_type_field_name:
-                    ContentType.objects.db_manager(using).get_for_model(
-                        self.model, for_concrete_model=self.for_concrete_model).pk,
-                "%s__in" % self.object_id_field_name:
-                    [obj.pk for obj in objs]
-                })
+            "%s__pk" % self.content_type_field_name: ContentType.objects.db_manager(using).get_for_model(
+                self.model, for_concrete_model=self.for_concrete_model).pk,
+            "%s__in" % self.object_id_field_name: [obj.pk for obj in objs]
+        })
 
 
 class ReverseGenericRelatedObjectsDescriptor(object):
@@ -269,14 +272,14 @@ class ReverseGenericRelatedObjectsDescriptor(object):
 
         join_cols = self.field.get_joining_columns(reverse_join=True)[0]
         manager = RelatedManager(
-            model = rel_model,
-            instance = instance,
-            source_col_name = qn(join_cols[0]),
-            target_col_name = qn(join_cols[1]),
-            content_type = content_type,
-            content_type_field_name = self.field.content_type_field_name,
-            object_id_field_name = self.field.object_id_field_name,
-            prefetch_cache_name = self.field.attname,
+            model=rel_model,
+            instance=instance,
+            source_col_name=qn(join_cols[0]),
+            target_col_name=qn(join_cols[1]),
+            content_type=content_type,
+            content_type_field_name=self.field.content_type_field_name,
+            object_id_field_name=self.field.object_id_field_name,
+            prefetch_cache_name=self.field.attname,
         )
 
         return manager
@@ -286,6 +289,7 @@ class ReverseGenericRelatedObjectsDescriptor(object):
         manager.clear()
         for obj in value:
             manager.add(obj)
+
 
 def create_generic_related_manager(superclass):
     """
@@ -321,15 +325,15 @@ def create_generic_related_manager(superclass):
             manager = getattr(self.model, kwargs.pop('manager'))
             manager_class = create_generic_related_manager(manager.__class__)
             return manager_class(
-                model = self.model,
-                instance = self.instance,
-                symmetrical = self.symmetrical,
-                source_col_name = self.source_col_name,
-                target_col_name = self.target_col_name,
-                content_type = self.content_type,
-                content_type_field_name = self.content_type_field_name,
-                object_id_field_name = self.object_id_field_name,
-                prefetch_cache_name = self.prefetch_cache_name,
+                model=self.model,
+                instance=self.instance,
+                symmetrical=self.symmetrical,
+                source_col_name=self.source_col_name,
+                target_col_name=self.target_col_name,
+                content_type=self.content_type,
+                content_type_field_name=self.content_type_field_name,
+                object_id_field_name=self.object_id_field_name,
+                prefetch_cache_name=self.prefetch_cache_name,
             )
         do_not_call_in_templates = True
 
@@ -340,18 +344,22 @@ def create_generic_related_manager(superclass):
                 db = self._db or router.db_for_read(self.model, instance=self.instance)
                 return super(GenericRelatedObjectManager, self).get_queryset().using(db).filter(**self.core_filters)
 
-        def get_prefetch_queryset(self, instances):
-            db = self._db or router.db_for_read(self.model, instance=instances[0])
+        def get_prefetch_queryset(self, instances, queryset=None):
+            if queryset is None:
+                queryset = super(GenericRelatedObjectManager, self).get_queryset()
+
+            queryset._add_hints(instance=instances[0])
+            queryset = queryset.using(queryset._db or self._db)
+
             query = {
                 '%s__pk' % self.content_type_field_name: self.content_type.id,
-                '%s__in' % self.object_id_field_name:
-                    set(obj._get_pk_val() for obj in instances)
-                }
-            qs = super(GenericRelatedObjectManager, self).get_queryset().using(db).filter(**query)
+                '%s__in' % self.object_id_field_name: set(obj._get_pk_val() for obj in instances)
+            }
+
             # We (possibly) need to convert object IDs to the type of the
             # instances' PK in order to match up instances:
             object_id_converter = instances[0]._meta.pk.to_python
-            return (qs,
+            return (queryset.filter(**query),
                     lambda relobj: object_id_converter(getattr(relobj, self.object_id_field_name)),
                     lambda obj: obj._get_pk_val(),
                     False,
@@ -385,10 +393,11 @@ def create_generic_related_manager(superclass):
 
     return GenericRelatedObjectManager
 
-class GenericRel(ForeignObjectRel):
 
+class GenericRel(ForeignObjectRel):
     def __init__(self, field, to, related_name=None, limit_choices_to=None):
         super(GenericRel, self).__init__(field, to, related_name, limit_choices_to)
+
 
 class BaseGenericInlineFormSet(BaseModelFormSet):
     """
@@ -453,7 +462,7 @@ def generic_inlineformset_factory(model, form=ModelForm,
     ct_field = opts.get_field(ct_field)
     if not isinstance(ct_field, models.ForeignKey) or ct_field.rel.to != ContentType:
         raise Exception("fk_name '%s' is not a ForeignKey to ContentType" % ct_field)
-    fk_field = opts.get_field(fk_field) # let the exception propagate
+    fk_field = opts.get_field(fk_field)  # let the exception propagate
     if exclude is not None:
         exclude = list(exclude)
         exclude.extend([ct_field.name, fk_field.name])
@@ -469,6 +478,7 @@ def generic_inlineformset_factory(model, form=ModelForm,
     FormSet.ct_fk_field = fk_field
     FormSet.for_concrete_model = for_concrete_model
     return FormSet
+
 
 class GenericInlineModelAdmin(InlineModelAdmin):
     ct_field = "content_type"
@@ -511,8 +521,10 @@ class GenericInlineModelAdmin(InlineModelAdmin):
 
         return generic_inlineformset_factory(self.model, **defaults)
 
+
 class GenericStackedInline(GenericInlineModelAdmin):
     template = 'admin/edit_inline/stacked.html'
+
 
 class GenericTabularInline(GenericInlineModelAdmin):
     template = 'admin/edit_inline/tabular.html'

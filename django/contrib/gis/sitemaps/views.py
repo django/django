@@ -14,6 +14,7 @@ from django.utils.translation import ugettext as _
 
 from django.contrib.gis.shortcuts import render_to_kml, render_to_kmz
 
+
 def index(request, sitemaps):
     """
     This view generates a sitemap index that uses the proper view
@@ -21,7 +22,7 @@ def index(request, sitemaps):
     """
     current_site = get_current_site(request)
     sites = []
-    protocol = 'https' if request.is_secure() else 'http'
+    protocol = request.scheme
     for section, site in sitemaps.items():
         if callable(site):
             pages = site().paginator.num_pages
@@ -31,10 +32,11 @@ def index(request, sitemaps):
         sites.append('%s://%s%s' % (protocol, current_site.domain, sitemap_url))
 
         if pages > 1:
-            for page in range(2, pages+1):
+            for page in range(2, pages + 1):
                 sites.append('%s://%s%s?p=%s' % (protocol, current_site.domain, sitemap_url, page))
     xml = loader.render_to_string('sitemap_index.xml', {'sitemaps': sites})
     return HttpResponse(xml, content_type='application/xml')
+
 
 def sitemap(request, sitemaps, section=None):
     """
@@ -63,6 +65,7 @@ def sitemap(request, sitemaps, section=None):
             raise Http404(_("No page '%s'") % page)
     xml = loader.render_to_string('gis/sitemaps/geo_sitemap.xml', {'urlset': urls})
     return HttpResponse(xml, content_type='application/xml')
+
 
 def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB_ALIAS):
     """
@@ -106,7 +109,8 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
         render = render_to_kmz
     else:
         render = render_to_kml
-    return render('gis/kml/placemarks.kml', {'places' : placemarks})
+    return render('gis/kml/placemarks.kml', {'places': placemarks})
+
 
 def kmz(request, label, model, field_name=None, using=DEFAULT_DB_ALIAS):
     """

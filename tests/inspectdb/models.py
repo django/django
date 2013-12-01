@@ -9,21 +9,26 @@ class People(models.Model):
     name = models.CharField(max_length=255)
     parent = models.ForeignKey('self')
 
+
 class Message(models.Model):
     from_field = models.ForeignKey(People, db_column='from_id')
+
 
 class PeopleData(models.Model):
     people_pk = models.ForeignKey(People, primary_key=True)
     ssn = models.CharField(max_length=11)
 
+
 class PeopleMoreData(models.Model):
     people_unique = models.ForeignKey(People, unique=True)
     license = models.CharField(max_length=255)
+
 
 class DigitsInColumnName(models.Model):
     all_digits = models.CharField(max_length=11, db_column='123')
     leading_digit = models.CharField(max_length=11, db_column='4extra')
     leading_digits = models.CharField(max_length=11, db_column='45extra')
+
 
 class SpecialColumnName(models.Model):
     field = models.IntegerField(db_column='field')
@@ -34,6 +39,7 @@ class SpecialColumnName(models.Model):
     # Other chars
     prc_x = models.IntegerField(db_column='prc(%) x')
     non_ascii = models.IntegerField(db_column='tamaño')
+
 
 class ColumnTypes(models.Model):
     id = models.AutoField(primary_key=True)

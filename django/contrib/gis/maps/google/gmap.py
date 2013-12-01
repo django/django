@@ -6,22 +6,23 @@ from django.utils.six.moves import xrange
 
 from django.contrib.gis.maps.google.overlays import GPolygon, GPolyline, GMarker
 
+
 class GoogleMapException(Exception):
     pass
 
 
 # The default Google Maps URL (for the API javascript)
 # TODO: Internationalize for Japan, UK, etc.
-GOOGLE_MAPS_URL='http://maps.google.com/maps?file=api&v=%s&key='
+GOOGLE_MAPS_URL = 'http://maps.google.com/maps?file=api&v=%s&key='
 
 
 class GoogleMap(object):
     "A class for generating Google Maps JavaScript."
 
     # String constants
-    onunload = mark_safe('onunload="GUnload()"') # Cleans up after Google Maps
-    vml_css  = mark_safe('v\:* {behavior:url(#default#VML);}') # CSS for IE VML
-    xmlns    = mark_safe('xmlns:v="urn:schemas-microsoft-com:vml"') # XML Namespace (for IE VML).
+    onunload = mark_safe('onunload="GUnload()"')  # Cleans up after Google Maps
+    vml_css = mark_safe('v\:* {behavior:url(#default#VML);}')  # CSS for IE VML
+    xmlns = mark_safe('xmlns:v="urn:schemas-microsoft-com:vml"')  # XML Namespace (for IE VML).
 
     def __init__(self, key=None, api_url=None, version=None,
                  center=None, zoom=None, dom_id='map',
@@ -81,31 +82,33 @@ class GoogleMap(object):
         # level and a center coordinate are provided with polygons/polylines,
         # no automatic determination will occur.
         self.calc_zoom = False
-        if self.polygons or self.polylines  or self.markers:
+        if self.polygons or self.polylines or self.markers:
             if center is None or zoom is None:
                 self.calc_zoom = True
 
         # Defaults for the zoom level and center coordinates if the zoom
         # is not automatically calculated.
-        if zoom is None: zoom = 4
+        if zoom is None:
+            zoom = 4
         self.zoom = zoom
-        if center is None: center = (0, 0)
+        if center is None:
+            center = (0, 0)
         self.center = center
 
     def render(self):
         """
         Generates the JavaScript necessary for displaying this Google Map.
         """
-        params = {'calc_zoom' : self.calc_zoom,
-                  'center' : self.center,
-                  'dom_id' : self.dom_id,
-                  'js_module' : self.js_module,
-                  'kml_urls' : self.kml_urls,
-                  'zoom' : self.zoom,
-                  'polygons' : self.polygons,
-                  'polylines' : self.polylines,
+        params = {'calc_zoom': self.calc_zoom,
+                  'center': self.center,
+                  'dom_id': self.dom_id,
+                  'js_module': self.js_module,
+                  'kml_urls': self.kml_urls,
+                  'zoom': self.zoom,
+                  'polygons': self.polygons,
+                  'polylines': self.polylines,
                   'icons': self.icons,
-                  'markers' : self.markers,
+                  'markers': self.markers,
                   }
         params.update(self.extra_context)
         return render_to_string(self.template, params)
@@ -151,6 +154,7 @@ class GoogleMap(object):
     def icons(self):
         "Returns a sequence of GIcon objects in this map."
         return set(marker.icon for marker in self.markers if marker.icon)
+
 
 class GoogleMapSet(GoogleMap):
 
@@ -209,10 +213,10 @@ class GoogleMapSet(GoogleMap):
         Generates the JavaScript for the collection of Google Maps in
         this set.
         """
-        params = {'js_module' : self.js_module,
-                  'dom_ids' : self.dom_ids,
-                  'load_map_js' : self.load_map_js(),
-                  'icons' : self.icons,
+        params = {'js_module': self.js_module,
+                  'dom_ids': self.dom_ids,
+                  'load_map_js': self.load_map_js(),
+                  'icons': self.icons,
                   }
         params.update(self.extra_context)
         return render_to_string(self.template, params)
@@ -229,5 +233,6 @@ class GoogleMapSet(GoogleMap):
     def icons(self):
         "Returns a sequence of all icons in each map of the set."
         icons = set()
-        for map in self.maps: icons |= map.icons
+        for map in self.maps:
+            icons |= map.icons
         return icons

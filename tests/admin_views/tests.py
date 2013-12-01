@@ -9,6 +9,7 @@ import unittest
 from django.conf import settings, global_settings
 from django.core import mail
 from django.core.files import temp as tempfile
+from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, NoReverseMatch
 # Register auth models with the admin.
 from django.contrib.auth import get_permission_codename
@@ -48,15 +49,16 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
     Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage,
-    Telegram, Pizza, Topping, FilteredManager)
-from .admin import site, site2
+    Telegram, Pizza, Topping, FilteredManager, City, Restaurant, Worker)
+from .admin import site, site2, CityAdmin
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \
 for a staff account. Note that both fields may be case-sensitive."
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   USE_I18N=True, USE_L10N=False, LANGUAGE_CODE='en')
 class AdminViewBasicTestCase(TestCase):
     fixtures = ['admin-views-users.xml', 'admin-views-colors.xml',
                 'admin-views-fabrics.xml', 'admin-views-books.xml']
@@ -69,16 +71,9 @@ class AdminViewBasicTestCase(TestCase):
     urls = "admin_views.urls"
 
     def setUp(self):
-        self.old_USE_I18N = settings.USE_I18N
-        self.old_USE_L10N = settings.USE_L10N
-        self.old_LANGUAGE_CODE = settings.LANGUAGE_CODE
         self.client.login(username='super', password='secret')
-        settings.USE_I18N = True
 
     def tearDown(self):
-        settings.USE_I18N = self.old_USE_I18N
-        settings.USE_L10N = self.old_USE_L10N
-        settings.LANGUAGE_CODE = self.old_LANGUAGE_CODE
         self.client.logout()
         formats.reset_format_cache()
 
@@ -89,8 +84,8 @@ class AdminViewBasicTestCase(TestCase):
         """
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.content.index(force_bytes(text1)) < response.content.index(force_bytes(text2)),
-            failing_msg
-        )
+            failing_msg)
+
 
 class AdminViewBasicTest(AdminViewBasicTestCase):
     def testTrailingSlashRequired(self):
@@ -99,8 +94,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         """
         response = self.client.get('/test_admin/%s/admin_views/article/add' % self.urlbit)
         self.assertRedirects(response,
-            '/test_admin/%s/admin_views/article/add/' % self.urlbit, status_code=301
-        )
+            '/test_admin/%s/admin_views/article/add/' % self.urlbit,
+            status_code=301)
 
     def testBasicAddGet(self):
         """
@@ -114,8 +109,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get('/test_admin/%s/admin_views/section/add/' % self.urlbit, {'name': 'My Section'})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'value="My Section"',
-            msg_prefix="Couldn't find an input with the right value in the response"
-        )
+            msg_prefix="Couldn't find an input with the right value in the response")
 
     def testBasicEditGet(self):
         """
@@ -399,11 +393,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get('/test_admin/%s/admin_views/thing/' % self.urlbit)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<div id="changelist-filter">',
-            msg_prefix="Expected filter not found in changelist view"
-        )
+            msg_prefix="Expected filter not found in changelist view")
         self.assertNotContains(response, '<a href="?color__id__exact=3">Blue</a>',
-            msg_prefix="Changelist filter not correctly limited by limit_choices_to"
-        )
+            msg_prefix="Changelist filter not correctly limited by limit_choices_to")
 
     def testRelationSpanningFilters(self):
         response = self.client.get('/test_admin/%s/admin_views/chapterxtra1/' %
@@ -425,13 +417,11 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                 test=lambda obj, value: obj.chap.book.name == value),
             'chap__book__promo__id__exact': dict(
                 values=[p.id for p in Promo.objects.all()],
-                test=lambda obj, value:
-                    obj.chap.book.promo_set.filter(id=value).exists()),
+                test=lambda obj, value: obj.chap.book.promo_set.filter(id=value).exists()),
             'chap__book__promo__name': dict(
                 values=[p.name for p in Promo.objects.all()],
-                test=lambda obj, value:
-                    obj.chap.book.promo_set.filter(name=value).exists()),
-            }
+                test=lambda obj, value: obj.chap.book.promo_set.filter(name=value).exists()),
+        }
         for filter_path, params in filters.items():
             for value in params['values']:
                 query_string = urlencode({filter_path: value})
@@ -1253,10 +1243,10 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/customarticle/%d/delete/' % article_pk)
         self.assertTemplateUsed(response, 'custom_admin/delete_confirmation.html')
         response = self.client.post('/test_admin/admin/admin_views/customarticle/', data={
-                'index': 0,
-                'action': ['delete_selected'],
-                '_selected_action': ['1'],
-            })
+            'index': 0,
+            'action': ['delete_selected'],
+            '_selected_action': ['1'],
+        })
         self.assertTemplateUsed(response, 'custom_admin/delete_selected_confirmation.html')
         response = self.client.get('/test_admin/admin/admin_views/customarticle/%d/history/' % article_pk)
         self.assertTemplateUsed(response, 'custom_admin/object_history.html')
@@ -1474,7 +1464,7 @@ class AdminViewDeletedObjectsTest(TestCase):
             """<li>Super villain: <a href="/test_admin/admin/admin_views/supervillain/3/">Bob</a>""",
             """<li>Secret hideout: floating castle""",
             """<li>Super secret hideout: super floating castle!"""
-            ]
+        ]
         response = self.client.get('/test_admin/admin/admin_views/villain/%s/delete/' % quote(3))
         for should in should_contain:
             self.assertContains(response, should, 1)
@@ -1564,7 +1554,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         response = self.client.get('/test_admin/admin/')
         counted_presence_after = response.content.count(force_bytes(should_contain))
         self.assertEqual(counted_presence_before - 1,
-                          counted_presence_after)
+            counted_presence_after)
 
     def test_logentry_get_admin_url(self):
         "LogEntry.get_admin_url returns a URL to edit the entry's object or None for non-existent (possibly deleted) models"
@@ -1619,13 +1609,13 @@ class AdminViewStringPrimaryKeyTest(TestCase):
     def test_change_view_history_link(self):
         """Object history button link should work and contain the pk value quoted."""
         url = reverse('admin:%s_modelwithstringprimarykey_change' %
-                          ModelWithStringPrimaryKey._meta.app_label,
-                      args=(quote(self.pk),))
+            ModelWithStringPrimaryKey._meta.app_label,
+            args=(quote(self.pk),))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         expected_link = reverse('admin:%s_modelwithstringprimarykey_history' %
-                                    ModelWithStringPrimaryKey._meta.app_label,
-                                args=(quote(self.pk),))
+            ModelWithStringPrimaryKey._meta.app_label,
+            args=(quote(self.pk),))
         self.assertContains(response, '<a href="%s" class="historylink"' % expected_link)
 
 
@@ -2412,15 +2402,12 @@ class AdminActionsTest(TestCase):
         self.client.post('/test_admin/admin/admin_views/subscriber/', delete_confirmation_data)
         self.assertEqual(Subscriber.objects.count(), 0)
 
+    @override_settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
     def test_non_localized_pk(self):
         """If USE_THOUSAND_SEPARATOR is set, make sure that the ids for
         the objects selected for deletion are rendered without separators.
         Refs #14895.
         """
-        self.old_USE_THOUSAND_SEPARATOR = settings.USE_THOUSAND_SEPARATOR
-        self.old_USE_L10N = settings.USE_L10N
-        settings.USE_THOUSAND_SEPARATOR = True
-        settings.USE_L10N = True
         subscriber = Subscriber.objects.get(id=1)
         subscriber.id = 9999
         subscriber.save()
@@ -2433,8 +2420,6 @@ class AdminActionsTest(TestCase):
         self.assertTemplateUsed(response, 'admin/delete_selected_confirmation.html')
         self.assertContains(response, 'value="9999"')  # Instead of 9,999
         self.assertContains(response, 'value="2"')
-        settings.USE_THOUSAND_SEPARATOR = self.old_USE_THOUSAND_SEPARATOR
-        settings.USE_L10N = self.old_USE_L10N
 
     def test_model_admin_default_delete_action_protected(self):
         """
@@ -2565,8 +2550,7 @@ action)</option>
         response = self.client.get('/test_admin/admin/admin_views/oldsubscriber/')
         self.assertEqual(response.context["action_form"], None)
         self.assertContains(response, 'jquery.min.js',
-            msg_prefix="jQuery missing from admin pages for model with no admin actions"
-        )
+            msg_prefix="jQuery missing from admin pages for model with no admin actions")
 
     def test_action_column_class(self):
         "Tests that the checkbox column class is present in the response"
@@ -3431,7 +3415,6 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         main form and with stacked and tabular inlines.
         Refs #13068, #9264, #9983, #9784.
         """
-        from selenium.common.exceptions import TimeoutException
         self.admin_login(username='super', password='secret', login_url='/test_admin/admin/')
         self.selenium.get('%s%s' % (self.live_server_url,
             '/test_admin/admin/admin_views/mainprepopulated/add/'))
@@ -3456,7 +3439,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.assertEqual(slug2, 'option-one-here-stacked-inline')
 
         # Add an inline
-        self.selenium.find_elements_by_link_text('Add another Related Prepopulated')[0].click()
+        self.selenium.find_elements_by_link_text('Add another Related prepopulated')[0].click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-pubdate').send_keys('1999-01-25')
         self.get_select_option('#id_relatedprepopulated_set-1-status', 'option two').click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-name').send_keys(' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog text... ')
@@ -3476,7 +3459,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.assertEqual(slug2, 'option-two-and-now-tabular-inline')
 
         # Add an inline
-        self.selenium.find_elements_by_link_text('Add another Related Prepopulated')[1].click()
+        self.selenium.find_elements_by_link_text('Add another Related prepopulated')[1].click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-pubdate').send_keys('1981-08-22')
         self.get_select_option('#id_relatedprepopulated_set-2-1-status', 'option one').click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-name').send_keys('a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters')
@@ -3644,8 +3627,7 @@ class ReadonlyTest(TestCase):
         self.assertContains(response, "InlineMultiline<br />test<br />string")
 
         self.assertContains(response,
-            formats.localize(datetime.date.today() - datetime.timedelta(days=7))
-        )
+            formats.localize(datetime.date.today() - datetime.timedelta(days=7)))
 
         self.assertContains(response, '<div class="form-row field-coolness">')
         self.assertContains(response, '<div class="form-row field-awesomeness_level">')
@@ -3842,7 +3824,7 @@ class UserAdminTest(TestCase):
         adminform = response.context['adminform']
         self.assertTrue('password' not in adminform.form.errors)
         self.assertEqual(adminform.form.errors['password2'],
-                          ["The two password fields didn't match."])
+            ["The two password fields didn't match."])
 
     def test_user_fk_popup(self):
         """Quick user addition in a FK popup shouldn't invoke view for further user customization"""
@@ -4129,21 +4111,16 @@ class ValidXHTMLTests(TestCase):
         self.assertNotContains(response, ' xml:lang=""')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
 class DateHierarchyTests(TestCase):
     urls = "admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
         self.client.login(username='super', password='secret')
-        self.old_USE_THOUSAND_SEPARATOR = settings.USE_THOUSAND_SEPARATOR
-        self.old_USE_L10N = settings.USE_L10N
-        settings.USE_THOUSAND_SEPARATOR = True
-        settings.USE_L10N = True
 
     def tearDown(self):
-        settings.USE_THOUSAND_SEPARATOR = self.old_USE_THOUSAND_SEPARATOR
-        settings.USE_L10N = self.old_USE_L10N
         formats.reset_format_cache()
 
     def assert_non_localized_year(self, response, year):
@@ -4615,3 +4592,87 @@ class TestLabelVisibility(TestCase):
 
     def assert_fieldline_hidden(self, response):
         self.assertContains(response, '<div class="form-row hidden')
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class AdminViewOnSiteTest(TestCase):
+    urls = "admin_views.urls"
+    fixtures = ['admin-views-users.xml', 'admin-views-restaurants.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_validate(self):
+        "Ensure that the view_on_site value is either a boolean or a callable"
+        CityAdmin.view_on_site = True
+        CityAdmin.validate(City)
+        CityAdmin.view_on_site = False
+        CityAdmin.validate(City)
+        CityAdmin.view_on_site = lambda obj: obj.get_absolute_url()
+        CityAdmin.validate(City)
+        CityAdmin.view_on_site = []
+        with self.assertRaisesMessage(ImproperlyConfigured, 'CityAdmin.view_on_site is not a callable or a boolean value.'):
+            CityAdmin.validate(City)
+
+    def test_false(self):
+        "Ensure that the 'View on site' button is not displayed if view_on_site is False"
+        response = self.client.get('/test_admin/admin/admin_views/restaurant/1/')
+        content_type_pk = ContentType.objects.get_for_model(Restaurant).pk
+        self.assertNotContains(response,
+                               '"/test_admin/admin/r/%s/1/"' % content_type_pk,
+                               )
+
+    def test_true(self):
+        "Ensure that the default behaviour is followed if view_on_site is True"
+        response = self.client.get('/test_admin/admin/admin_views/city/1/')
+        content_type_pk = ContentType.objects.get_for_model(City).pk
+        self.assertContains(response,
+                            '"/test_admin/admin/r/%s/1/"' % content_type_pk,
+                            )
+
+    def test_callable(self):
+        "Ensure that the right link is displayed if view_on_site is a callable"
+        response = self.client.get('/test_admin/admin/admin_views/worker/1/')
+        worker = Worker.objects.get(pk=1)
+        self.assertContains(response,
+                            '"/worker/%s/%s/"' % (worker.surname, worker.name),
+                            )
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class InlineAdminViewOnSiteTest(TestCase):
+    urls = "admin_views.urls"
+    fixtures = ['admin-views-users.xml', 'admin-views-restaurants.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_false(self):
+        "Ensure that the 'View on site' button is not displayed if view_on_site is False"
+        response = self.client.get('/test_admin/admin/admin_views/state/1/')
+        content_type_pk = ContentType.objects.get_for_model(City).pk
+        self.assertNotContains(response,
+                               '/test_admin/admin/r/%s/1/' % content_type_pk,
+                               )
+
+    def test_true(self):
+        "Ensure that the 'View on site' button is displayed if view_on_site is True"
+        response = self.client.get('/test_admin/admin/admin_views/city/1/')
+        content_type_pk = ContentType.objects.get_for_model(Restaurant).pk
+        self.assertContains(response,
+                            '/test_admin/admin/r/%s/1/' % content_type_pk,
+                            )
+
+    def test_callable(self):
+        "Ensure that the right link is displayed if view_on_site is a callable"
+        response = self.client.get('/test_admin/admin/admin_views/restaurant/1/')
+        worker = Worker.objects.get(pk=1)
+        self.assertContains(response,
+                            '"/worker_inline/%s/%s/"' % (worker.surname, worker.name),
+                            )

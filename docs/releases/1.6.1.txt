@@ -1,0 +1,30 @@
+==========================
+Django 1.6.1 release notes
+==========================
+
+*Under development*
+
+This is Django 1.6.1, a bugfix release for Django 1.6.
+
+...
+
+Bug fixes
+=========
+
+* Fixed ``BCryptSHA256PasswordHasher`` with py-bcrypt and Python 3 (#21398).
+* Fixed a regression that prevented a ``ForeignKey`` with a hidden reverse
+  manager (``related_name`` ending with '+') from being used as a lookup for
+  ``prefetch_related`` (#21410).
+* Fixed :meth:`Queryset.datetimes<django.db.models.query.QuerySet.datetimes>`
+  raising ``AttributeError`` in some situations (#21432).
+* Fixed :class:`~django.contrib.auth.backends.ModelBackend` raising
+  ``UnboundLocalError`` if :func:`~django.contrib.auth.get_user_model`
+  raised an error (#21439).
+* Fixed a regression that prevented editable ``GenericRelation`` subclasses
+  from working in ``ModelForms``.
+* Fixed ``django.contrib.humanize`` translations where the unicode sequence
+  for the non-breaking space was returned verbatim (#21415).
+* Fixed :djadmin:`loaddata` error when fixture file name contained any dots
+  non related to file extensions (#21457).
+* Fixed display of inline instances in formsets when parent has 0 for primary
+  key (#21472).

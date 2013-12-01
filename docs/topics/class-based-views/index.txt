@@ -69,9 +69,10 @@ and override the template name::
         template_name = "about.html"
 
 Then we just need to add this new view into our URLconf.
-`~django.views.generic.base.TemplateView` is a class, not a function, so we
-point the URL to the :meth:`~django.views.generic.base.View.as_view` class
-method instead, which provides a function-like entry to class-based views::
+:class:`~django.views.generic.base.TemplateView` is a class, not a function,
+so we point the URL to the :meth:`~django.views.generic.base.View.as_view`
+class method instead, which provides a function-like entry to class-based
+views::
 
     # urls.py
     from django.conf.urls import patterns

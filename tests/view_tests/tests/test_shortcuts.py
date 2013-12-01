@@ -1,6 +1,6 @@
-from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
+
 
 @override_settings(
     TEMPLATE_CONTEXT_PROCESSORS=('django.core.context_processors.static',),

@@ -3,10 +3,8 @@ from __future__ import unicode_literals
 import copy
 import os
 import sys
-import time
 from unittest import TestCase
 
-from django.conf import Settings
 from django.db.models.loading import cache, load_app, get_model, get_models, AppCache
 from django.test.utils import override_settings
 from django.utils._os import upath
@@ -96,11 +94,9 @@ class GetModelsTest(TestCase):
         from .not_installed import models
         self.not_installed_module = models
 
-
     def test_get_model_only_returns_installed_models(self):
         self.assertEqual(
             get_model("not_installed", "NotInstalledModel"), None)
-
 
     def test_get_model_with_not_installed(self):
         self.assertEqual(
@@ -108,16 +104,13 @@ class GetModelsTest(TestCase):
                 "not_installed", "NotInstalledModel", only_installed=False),
             self.not_installed_module.NotInstalledModel)
 
-
     def test_get_models_only_returns_installed_models(self):
         self.assertFalse(
             "NotInstalledModel" in
             [m.__name__ for m in get_models()])
 
-
     def test_get_models_with_app_label_only_returns_installed_models(self):
         self.assertEqual(get_models(self.not_installed_module), [])
-
 
     def test_get_models_with_not_installed(self):
         self.assertTrue(

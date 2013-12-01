@@ -61,7 +61,7 @@ class DecadeListFilterWithNoneReturningLookups(DecadeListFilterWithTitleAndParam
 class DecadeListFilterWithFailingQueryset(DecadeListFilterWithTitleAndParameter):
 
     def queryset(self, request, queryset):
-        raise 1/0
+        raise 1 / 0
 
 
 class DecadeListFilterWithQuerysetBasedLookups(DecadeListFilterWithTitleAndParameter):
@@ -78,12 +78,12 @@ class DecadeListFilterWithQuerysetBasedLookups(DecadeListFilterWithTitleAndParam
 
 class DecadeListFilterParameterEndsWith__In(DecadeListFilter):
     title = 'publication decade'
-    parameter_name = 'decade__in' # Ends with '__in"
+    parameter_name = 'decade__in'  # Ends with '__in"
 
 
 class DecadeListFilterParameterEndsWith__Isnull(DecadeListFilter):
     title = 'publication decade'
-    parameter_name = 'decade__isnull' # Ends with '__isnull"
+    parameter_name = 'decade__isnull'  # Ends with '__isnull"
 
 
 class DepartmentListFilterLookupWithNonStringValue(SimpleListFilter):
@@ -104,6 +104,17 @@ class DepartmentListFilterLookupWithNonStringValue(SimpleListFilter):
 
 class DepartmentListFilterLookupWithUnderscoredParameter(DepartmentListFilterLookupWithNonStringValue):
     parameter_name = 'department__whatever'
+
+
+class DepartmentListFilterLookupWithDynamicValue(DecadeListFilterWithTitleAndParameter):
+
+    def lookups(self, request, model_admin):
+        if self.value() == 'the 80s':
+            return (('the 90s', "the 1990's"),)
+        elif self.value() == 'the 90s':
+            return (('the 80s', "the 1980's"),)
+        else:
+            return (('the 80s', "the 1980's"), ('the 90s', "the 1990's"),)
 
 
 class CustomUserAdmin(UserAdmin):
@@ -167,6 +178,10 @@ class DepartmentFilterEmployeeAdmin(EmployeeAdmin):
 
 class DepartmentFilterUnderscoredEmployeeAdmin(EmployeeAdmin):
     list_filter = [DepartmentListFilterLookupWithUnderscoredParameter, ]
+
+
+class DepartmentFilterDynamicValueBookAdmin(EmployeeAdmin):
+    list_filter = [DepartmentListFilterLookupWithDynamicValue, ]
 
 
 class ListFiltersTests(TestCase):
@@ -816,3 +831,25 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choices[2]['display'], 'Design')
         self.assertEqual(choices[2]['selected'], False)
         self.assertEqual(choices[2]['query_string'], '?department__code__exact=DSN')
+
+    def test_lookup_with_dynamic_value(self):
+        """
+        Ensure SimpleListFilter can access self.value() inside the lookup.
+        """
+        modeladmin = DepartmentFilterDynamicValueBookAdmin(Book, site)
+
+        def _test_choices(request, expected_displays):
+            changelist = self.get_changelist(request, Book, modeladmin)
+            filterspec = changelist.get_filters(request)[0][0]
+            self.assertEqual(force_text(filterspec.title), 'publication decade')
+            choices = tuple(c['display'] for c in filterspec.choices(changelist))
+            self.assertEqual(choices, expected_displays)
+
+        _test_choices(self.request_factory.get('/', {}),
+                      ("All", "the 1980's", "the 1990's"))
+
+        _test_choices(self.request_factory.get('/', {'publication-decade': 'the 80s'}),
+                      ("All", "the 1990's"))
+
+        _test_choices(self.request_factory.get('/', {'publication-decade': 'the 90s'}),
+                      ("All", "the 1980's"))

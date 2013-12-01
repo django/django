@@ -102,18 +102,23 @@ class ParserTests(TestCase):
     def test_filter_args_count(self):
         p = Parser("")
         l = Library()
+
         @l.filter
         def no_arguments(value):
             pass
+
         @l.filter
         def one_argument(value, arg):
             pass
+
         @l.filter
         def one_opt_argument(value, arg=False):
             pass
+
         @l.filter
         def two_arguments(value, arg, arg2):
             pass
+
         @l.filter
         def two_one_opt_arg(value, arg, arg2=False):
             pass
@@ -123,7 +128,7 @@ class ParserTests(TestCase):
                 '1|two_arguments',
                 '1|two_arguments:"1"',
                 '1|two_one_opt_arg',
-            ):
+        ):
             with self.assertRaises(TemplateSyntaxError):
                 FilterExpression(expr, p)
         for expr in (
@@ -135,5 +140,5 @@ class ParserTests(TestCase):
                 '1|one_opt_argument:"1"',
                 # Not supplying all
                 '1|two_one_opt_arg:"1"',
-            ):
+        ):
             FilterExpression(expr, p)

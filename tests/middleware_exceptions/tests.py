@@ -6,12 +6,14 @@ from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from django.template import Template
 from django.test import TestCase
+from django.test.utils import override_settings
+
 
 class TestException(Exception):
     pass
 
-# A middleware base class that tracks which methods have been called
 
+# A middleware base class that tracks which methods have been called
 class TestMiddleware(object):
     def __init__(self):
         self.process_request_called = False
@@ -37,27 +39,31 @@ class TestMiddleware(object):
     def process_exception(self, request, exception):
         self.process_exception_called = True
 
-# Middleware examples that do the right thing
 
+# Middleware examples that do the right thing
 class RequestMiddleware(TestMiddleware):
     def process_request(self, request):
         super(RequestMiddleware, self).process_request(request)
         return HttpResponse('Request Middleware')
+
 
 class ViewMiddleware(TestMiddleware):
     def process_view(self, request, view_func, view_args, view_kwargs):
         super(ViewMiddleware, self).process_view(request, view_func, view_args, view_kwargs)
         return HttpResponse('View Middleware')
 
+
 class ResponseMiddleware(TestMiddleware):
     def process_response(self, request, response):
         super(ResponseMiddleware, self).process_response(request, response)
         return HttpResponse('Response Middleware')
 
+
 class TemplateResponseMiddleware(TestMiddleware):
     def process_template_response(self, request, response):
         super(TemplateResponseMiddleware, self).process_template_response(request, response)
         return TemplateResponse(request, Template('Template Response Middleware'))
+
 
 class ExceptionMiddleware(TestMiddleware):
     def process_exception(self, request, exception):
@@ -66,26 +72,29 @@ class ExceptionMiddleware(TestMiddleware):
 
 
 # Sample middlewares that raise exceptions
-
 class BadRequestMiddleware(TestMiddleware):
     def process_request(self, request):
         super(BadRequestMiddleware, self).process_request(request)
         raise TestException('Test Request Exception')
+
 
 class BadViewMiddleware(TestMiddleware):
     def process_view(self, request, view_func, view_args, view_kwargs):
         super(BadViewMiddleware, self).process_view(request, view_func, view_args, view_kwargs)
         raise TestException('Test View Exception')
 
+
 class BadTemplateResponseMiddleware(TestMiddleware):
     def process_template_response(self, request, response):
         super(BadTemplateResponseMiddleware, self).process_template_response(request, response)
         raise TestException('Test Template Response Exception')
 
+
 class BadResponseMiddleware(TestMiddleware):
     def process_response(self, request, response):
         super(BadResponseMiddleware, self).process_response(request, response)
         raise TestException('Test Response Exception')
+
 
 class BadExceptionMiddleware(TestMiddleware):
     def process_exception(self, request, exception):
@@ -117,7 +126,7 @@ class BaseMiddlewareExceptionTest(TestCase):
 
     def assert_exceptions_handled(self, url, errors, extra_error=None):
         try:
-            response = self.client.get(url)
+            self.client.get(url)
         except TestException:
             # Test client intentionally re-raises any exceptions being raised
             # during request handling. Hence actual testing that exception was
@@ -152,8 +161,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/view/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True,  False, False, True, False)
-        self.assert_middleware_usage(middleware,      True,  False, False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, False, False, True, False)
+        self.assert_middleware_usage(middleware, True, False, False, True, False)
         self.assert_middleware_usage(post_middleware, False, False, False, True, False)
 
     def test_process_view_middleware(self):
@@ -166,8 +175,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/view/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True,  False, True, False)
-        self.assert_middleware_usage(middleware,      True, True,  False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(middleware, True, True, False, True, False)
         self.assert_middleware_usage(post_middleware, True, False, False, True, False)
 
     def test_process_response_middleware(self):
@@ -180,8 +189,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/view/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, True, False)
-        self.assert_middleware_usage(middleware,      True, True, False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(middleware, True, True, False, True, False)
         self.assert_middleware_usage(post_middleware, True, True, False, True, False)
 
     def test_process_template_response_middleware(self):
@@ -194,8 +203,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/template_response/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, True, True, False)
-        self.assert_middleware_usage(middleware,      True, True, True, True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, True, True, False)
+        self.assert_middleware_usage(middleware, True, True, True, True, False)
         self.assert_middleware_usage(post_middleware, True, True, True, True, False)
 
     def test_process_exception_middleware(self):
@@ -208,8 +217,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/view/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, True, False)
-        self.assert_middleware_usage(middleware,      True, True, False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(middleware, True, True, False, True, False)
         self.assert_middleware_usage(post_middleware, True, True, False, True, False)
 
     def test_process_request_middleware_not_found(self):
@@ -222,8 +231,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/not_found/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True,  False, False, True, False)
-        self.assert_middleware_usage(middleware,      True,  False, False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, False, False, True, False)
+        self.assert_middleware_usage(middleware, True, False, False, True, False)
         self.assert_middleware_usage(post_middleware, False, False, False, True, False)
 
     def test_process_view_middleware_not_found(self):
@@ -236,8 +245,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/not_found/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True,  False, True, False)
-        self.assert_middleware_usage(middleware,      True, True,  False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(middleware, True, True, False, True, False)
         self.assert_middleware_usage(post_middleware, True, False, False, True, False)
 
     def test_process_template_response_middleware_not_found(self):
@@ -250,8 +259,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/not_found/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, True, True)
-        self.assert_middleware_usage(middleware,      True, True, False, True, True)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, True)
+        self.assert_middleware_usage(middleware, True, True, False, True, True)
         self.assert_middleware_usage(post_middleware, True, True, False, True, True)
 
     def test_process_response_middleware_not_found(self):
@@ -264,8 +273,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/not_found/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, True, True)
-        self.assert_middleware_usage(middleware,      True, True, False, True, True)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, True)
+        self.assert_middleware_usage(middleware, True, True, False, True, True)
         self.assert_middleware_usage(post_middleware, True, True, False, True, True)
 
     def test_process_exception_middleware_not_found(self):
@@ -278,8 +287,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/not_found/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, True, False)
-        self.assert_middleware_usage(middleware,      True, True, False, True, True)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(middleware, True, True, False, True, True)
         self.assert_middleware_usage(post_middleware, True, True, False, True, True)
 
     def test_process_request_middleware_exception(self):
@@ -292,8 +301,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/error/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True,  False, False, True, False)
-        self.assert_middleware_usage(middleware,      True,  False, False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, False, False, True, False)
+        self.assert_middleware_usage(middleware, True, False, False, True, False)
         self.assert_middleware_usage(post_middleware, False, False, False, True, False)
 
     def test_process_view_middleware_exception(self):
@@ -306,8 +315,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/error/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True,  False, True, False)
-        self.assert_middleware_usage(middleware,      True, True,  False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(middleware, True, True, False, True, False)
         self.assert_middleware_usage(post_middleware, True, False, False, True, False)
 
     def test_process_response_middleware_exception(self):
@@ -320,8 +329,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/error/', ['Error in view'], Exception())
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, True, True)
-        self.assert_middleware_usage(middleware,      True, True, False, True, True)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, True)
+        self.assert_middleware_usage(middleware, True, True, False, True, True)
         self.assert_middleware_usage(post_middleware, True, True, False, True, True)
 
     def test_process_exception_middleware_exception(self):
@@ -334,8 +343,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/error/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, True, False)
-        self.assert_middleware_usage(middleware,      True, True, False, True, True)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(middleware, True, True, False, True, True)
         self.assert_middleware_usage(post_middleware, True, True, False, True, True)
 
     def test_process_request_middleware_null_view(self):
@@ -348,8 +357,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True,  False, False, True, False)
-        self.assert_middleware_usage(middleware,      True,  False, False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, False, False, True, False)
+        self.assert_middleware_usage(middleware, True, False, False, True, False)
         self.assert_middleware_usage(post_middleware, False, False, False, True, False)
 
     def test_process_view_middleware_null_view(self):
@@ -362,8 +371,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True,  False, True, False)
-        self.assert_middleware_usage(middleware,      True, True,  False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(middleware, True, True, False, True, False)
         self.assert_middleware_usage(post_middleware, True, False, False, True, False)
 
     def test_process_response_middleware_null_view(self):
@@ -374,13 +383,13 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self._add_middleware(middleware)
         self._add_middleware(pre_middleware)
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [
-                "The view middleware_exceptions.views.null_view didn't return an HttpResponse object.",
-            ],
+            "The view middleware_exceptions.views.null_view didn't return an HttpResponse object.",
+        ],
             ValueError())
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, True, False)
-        self.assert_middleware_usage(middleware,      True, True, False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(middleware, True, True, False, True, False)
         self.assert_middleware_usage(post_middleware, True, True, False, True, False)
 
     def test_process_exception_middleware_null_view(self):
@@ -391,13 +400,13 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self._add_middleware(middleware)
         self._add_middleware(pre_middleware)
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [
-                "The view middleware_exceptions.views.null_view didn't return an HttpResponse object."
-            ],
+            "The view middleware_exceptions.views.null_view didn't return an HttpResponse object."
+        ],
             ValueError())
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, True, False)
-        self.assert_middleware_usage(middleware,      True, True, False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(middleware, True, True, False, True, False)
         self.assert_middleware_usage(post_middleware, True, True, False, True, False)
 
     def test_process_request_middleware_permission_denied(self):
@@ -410,8 +419,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/permission_denied/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True,  False, False, True, False)
-        self.assert_middleware_usage(middleware,      True,  False, False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, False, False, True, False)
+        self.assert_middleware_usage(middleware, True, False, False, True, False)
         self.assert_middleware_usage(post_middleware, False, False, False, True, False)
 
     def test_process_view_middleware_permission_denied(self):
@@ -424,8 +433,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/permission_denied/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True,  False, True, False)
-        self.assert_middleware_usage(middleware,      True, True,  False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(middleware, True, True, False, True, False)
         self.assert_middleware_usage(post_middleware, True, False, False, True, False)
 
     def test_process_response_middleware_permission_denied(self):
@@ -438,8 +447,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/permission_denied/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, True, True)
-        self.assert_middleware_usage(middleware,      True, True, False, True, True)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, True)
+        self.assert_middleware_usage(middleware, True, True, False, True, True)
         self.assert_middleware_usage(post_middleware, True, True, False, True, True)
 
     def test_process_exception_middleware_permission_denied(self):
@@ -452,8 +461,8 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/permission_denied/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, True, False)
-        self.assert_middleware_usage(middleware,      True, True, False, True, True)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(middleware, True, True, False, True, True)
         self.assert_middleware_usage(post_middleware, True, True, False, True, True)
 
     def test_process_template_response_error(self):
@@ -477,8 +486,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/view/', ['Test Request Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True,  False, False, True, False)
-        self.assert_middleware_usage(bad_middleware,  True,  False, False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, False, False, True, False)
+        self.assert_middleware_usage(bad_middleware, True, False, False, True, False)
         self.assert_middleware_usage(post_middleware, False, False, False, True, False)
 
     def test_process_view_bad_middleware(self):
@@ -491,8 +500,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/view/', ['Test View Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True,  False, True, False)
-        self.assert_middleware_usage(bad_middleware,  True, True,  False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(bad_middleware, True, True, False, True, False)
         self.assert_middleware_usage(post_middleware, True, False, False, True, False)
 
     def test_process_template_response_bad_middleware(self):
@@ -505,9 +514,9 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/template_response/', ['Test Template Response Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, True, False)
-        self.assert_middleware_usage(bad_middleware,  True, True, True,  True, False)
-        self.assert_middleware_usage(post_middleware, True, True, True,  True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(bad_middleware, True, True, True, True, False)
+        self.assert_middleware_usage(post_middleware, True, True, True, True, False)
 
     def test_process_response_bad_middleware(self):
         pre_middleware = TestMiddleware()
@@ -519,9 +528,9 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/view/', ['Test Response Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, False, False)
-        self.assert_middleware_usage(bad_middleware,  True, True, False, True,  False)
-        self.assert_middleware_usage(post_middleware, True, True, False, True,  False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, False, False)
+        self.assert_middleware_usage(bad_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(post_middleware, True, True, False, True, False)
 
     def test_process_exception_bad_middleware(self):
         pre_middleware = TestMiddleware()
@@ -533,8 +542,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/view/', [])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, True, False)
-        self.assert_middleware_usage(bad_middleware,  True, True, False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(bad_middleware, True, True, False, True, False)
         self.assert_middleware_usage(post_middleware, True, True, False, True, False)
 
     def test_process_request_bad_middleware_not_found(self):
@@ -547,8 +556,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/not_found/', ['Test Request Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True,  False, False, True, False)
-        self.assert_middleware_usage(bad_middleware,  True,  False, False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, False, False, True, False)
+        self.assert_middleware_usage(bad_middleware, True, False, False, True, False)
         self.assert_middleware_usage(post_middleware, False, False, False, True, False)
 
     def test_process_view_bad_middleware_not_found(self):
@@ -561,8 +570,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/not_found/', ['Test View Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True,  False, True, False)
-        self.assert_middleware_usage(bad_middleware,  True, True,  False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(bad_middleware, True, True, False, True, False)
         self.assert_middleware_usage(post_middleware, True, False, False, True, False)
 
     def test_process_response_bad_middleware_not_found(self):
@@ -575,9 +584,9 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/not_found/', ['Test Response Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, False, True)
-        self.assert_middleware_usage(bad_middleware,  True, True, False, True,  True)
-        self.assert_middleware_usage(post_middleware, True, True, False, True,  True)
+        self.assert_middleware_usage(pre_middleware, True, True, False, False, True)
+        self.assert_middleware_usage(bad_middleware, True, True, False, True, True)
+        self.assert_middleware_usage(post_middleware, True, True, False, True, True)
 
     def test_process_exception_bad_middleware_not_found(self):
         pre_middleware = TestMiddleware()
@@ -589,8 +598,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/not_found/', ['Test Exception Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, True, False)
-        self.assert_middleware_usage(bad_middleware,  True, True, False, True, True)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(bad_middleware, True, True, False, True, True)
         self.assert_middleware_usage(post_middleware, True, True, False, True, True)
 
     def test_process_request_bad_middleware_exception(self):
@@ -603,8 +612,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/error/', ['Test Request Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True,  False, False, True, False)
-        self.assert_middleware_usage(bad_middleware,  True,  False, False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, False, False, True, False)
+        self.assert_middleware_usage(bad_middleware, True, False, False, True, False)
         self.assert_middleware_usage(post_middleware, False, False, False, True, False)
 
     def test_process_view_bad_middleware_exception(self):
@@ -617,8 +626,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/error/', ['Test View Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True,  False, True, False)
-        self.assert_middleware_usage(bad_middleware,  True, True,  False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(bad_middleware, True, True, False, True, False)
         self.assert_middleware_usage(post_middleware, True, False, False, True, False)
 
     def test_process_response_bad_middleware_exception(self):
@@ -631,9 +640,9 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/error/', ['Error in view', 'Test Response Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, False, True)
-        self.assert_middleware_usage(bad_middleware,  True, True, False, True,  True)
-        self.assert_middleware_usage(post_middleware, True, True, False, True,  True)
+        self.assert_middleware_usage(pre_middleware, True, True, False, False, True)
+        self.assert_middleware_usage(bad_middleware, True, True, False, True, True)
+        self.assert_middleware_usage(post_middleware, True, True, False, True, True)
 
     def test_process_exception_bad_middleware_exception(self):
         pre_middleware = TestMiddleware()
@@ -645,8 +654,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/error/', ['Test Exception Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, True, False)
-        self.assert_middleware_usage(bad_middleware,  True, True, False, True, True)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(bad_middleware, True, True, False, True, True)
         self.assert_middleware_usage(post_middleware, True, True, False, True, True)
 
     def test_process_request_bad_middleware_null_view(self):
@@ -659,8 +668,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', ['Test Request Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True,  False, False, True, False)
-        self.assert_middleware_usage(bad_middleware,  True,  False, False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, False, False, True, False)
+        self.assert_middleware_usage(bad_middleware, True, False, False, True, False)
         self.assert_middleware_usage(post_middleware, False, False, False, True, False)
 
     def test_process_view_bad_middleware_null_view(self):
@@ -673,8 +682,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', ['Test View Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True,  False, True, False)
-        self.assert_middleware_usage(bad_middleware,  True, True,  False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(bad_middleware, True, True, False, True, False)
         self.assert_middleware_usage(post_middleware, True, False, False, True, False)
 
     def test_process_response_bad_middleware_null_view(self):
@@ -685,14 +694,14 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self._add_middleware(bad_middleware)
         self._add_middleware(pre_middleware)
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [
-                "The view middleware_exceptions.views.null_view didn't return an HttpResponse object.",
-                'Test Response Exception'
-            ])
+            "The view middleware_exceptions.views.null_view didn't return an HttpResponse object.",
+            'Test Response Exception'
+        ])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, False, False)
-        self.assert_middleware_usage(bad_middleware,  True, True, False, True,  False)
-        self.assert_middleware_usage(post_middleware, True, True, False, True,  False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, False, False)
+        self.assert_middleware_usage(bad_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(post_middleware, True, True, False, True, False)
 
     def test_process_exception_bad_middleware_null_view(self):
         pre_middleware = TestMiddleware()
@@ -702,13 +711,13 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self._add_middleware(bad_middleware)
         self._add_middleware(pre_middleware)
         self.assert_exceptions_handled('/middleware_exceptions/null_view/', [
-                "The view middleware_exceptions.views.null_view didn't return an HttpResponse object."
-            ],
+            "The view middleware_exceptions.views.null_view didn't return an HttpResponse object."
+        ],
             ValueError())
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, True, False)
-        self.assert_middleware_usage(bad_middleware,  True, True, False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(bad_middleware, True, True, False, True, False)
         self.assert_middleware_usage(post_middleware, True, True, False, True, False)
 
     def test_process_request_bad_middleware_permission_denied(self):
@@ -721,8 +730,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/permission_denied/', ['Test Request Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True,  False, False, True, False)
-        self.assert_middleware_usage(bad_middleware,  True,  False, False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, False, False, True, False)
+        self.assert_middleware_usage(bad_middleware, True, False, False, True, False)
         self.assert_middleware_usage(post_middleware, False, False, False, True, False)
 
     def test_process_view_bad_middleware_permission_denied(self):
@@ -735,8 +744,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/permission_denied/', ['Test View Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True,  False, True, False)
-        self.assert_middleware_usage(bad_middleware,  True, True,  False, True, False)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(bad_middleware, True, True, False, True, False)
         self.assert_middleware_usage(post_middleware, True, False, False, True, False)
 
     def test_process_response_bad_middleware_permission_denied(self):
@@ -749,9 +758,9 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/permission_denied/', ['Test Response Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, False, True)
-        self.assert_middleware_usage(bad_middleware,  True, True, False, True,  True)
-        self.assert_middleware_usage(post_middleware, True, True, False, True,  True)
+        self.assert_middleware_usage(pre_middleware, True, True, False, False, True)
+        self.assert_middleware_usage(bad_middleware, True, True, False, True, True)
+        self.assert_middleware_usage(post_middleware, True, True, False, True, True)
 
     def test_process_exception_bad_middleware_permission_denied(self):
         pre_middleware = TestMiddleware()
@@ -763,24 +772,22 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/permission_denied/', ['Test Exception Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, True, False)
-        self.assert_middleware_usage(bad_middleware,  True, True, False, True, True)
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(bad_middleware, True, True, False, True, True)
         self.assert_middleware_usage(post_middleware, True, True, False, True, True)
 
 
 _missing = object()
+
+
 class RootUrlconfTests(TestCase):
     urls = 'middleware_exceptions.urls'
 
+    @override_settings(ROOT_URLCONF=None)
     def test_missing_root_urlconf(self):
-        try:
-            original_ROOT_URLCONF = settings.ROOT_URLCONF
-            del settings.ROOT_URLCONF
-        except AttributeError:
-            original_ROOT_URLCONF = _missing
+        # Removing ROOT_URLCONF is safe, as override_settings will restore
+        # the previously defined settings.
+        del settings.ROOT_URLCONF
         self.assertRaises(AttributeError,
             self.client.get, "/middleware_exceptions/view/"
         )
-
-        if original_ROOT_URLCONF is not _missing:
-            settings.ROOT_URLCONF = original_ROOT_URLCONF

@@ -2,11 +2,11 @@ from __future__ import unicode_literals
 
 import string
 
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.db.models.signals import pre_save, pre_delete
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import python_2_unicode_compatible
-from django.core.exceptions import ValidationError
 
 
 SITE_CACHE = {}
@@ -39,8 +39,10 @@ class SiteManager(models.Manager):
         try:
             sid = settings.SITE_ID
         except AttributeError:
-            from django.core.exceptions import ImproperlyConfigured
-            raise ImproperlyConfigured("You're using the Django \"sites framework\" without having set the SITE_ID setting. Create a site in your database and set the SITE_ID setting to fix this error.")
+            raise ImproperlyConfigured(
+                "You're using the Django \"sites framework\" without having "
+                "set the SITE_ID setting. Create a site in your database and "
+                "set the SITE_ID setting to fix this error.")
         try:
             current_site = SITE_CACHE[sid]
         except KeyError:

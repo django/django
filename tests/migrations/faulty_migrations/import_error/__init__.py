@@ -1,1 +1,1 @@
-import fake_python_module
+import fake_python_module  # NOQA

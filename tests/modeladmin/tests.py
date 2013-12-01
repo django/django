@@ -4,7 +4,6 @@ from datetime import date
 import unittest
 
 from django import forms
-from django.conf import settings
 from django.contrib.admin.options import (ModelAdmin, TabularInline,
      HORIZONTAL, VERTICAL)
 from django.contrib.admin.sites import AdminSite
@@ -15,7 +14,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
 from django.test import TestCase
-from django.test.utils import str_prefix
+from django.test.utils import str_prefix, override_settings
 from django.utils import six
 
 from .models import Band, Concert, ValidationTestModel, ValidationTestInlineModel
@@ -405,7 +404,7 @@ class ModelAdminTests(TestCase):
                 ConcertInline
             ]
 
-        concert = Concert.objects.create(main_band=self.band, opening_band=self.band, day=1)
+        Concert.objects.create(main_band=self.band, opening_band=self.band, day=1)
         ma = BandAdmin(Band, self.site)
         inline_instances = ma.get_inline_instances(request)
         fieldsets = list(inline_instances[0].get_fieldsets(request))
@@ -540,9 +539,7 @@ class ModelAdminTests(TestCase):
 class ValidationTests(unittest.TestCase):
     def test_validation_only_runs_in_debug(self):
         # Ensure validation only runs when DEBUG = True
-        try:
-            settings.DEBUG = True
-
+        with override_settings(DEBUG=True):
             class ValidationTestModelAdmin(ModelAdmin):
                 raw_id_fields = 10
 
@@ -555,11 +552,10 @@ class ValidationTests(unittest.TestCase):
                 ValidationTestModel,
                 ValidationTestModelAdmin,
             )
-        finally:
-            settings.DEBUG = False
 
-        site = AdminSite()
-        site.register(ValidationTestModel, ValidationTestModelAdmin)
+        with override_settings(DEBUG=False):
+            site = AdminSite()
+            site.register(ValidationTestModel, ValidationTestModelAdmin)
 
     def test_raw_id_fields_validation(self):
 
@@ -657,7 +653,7 @@ class ValidationTests(unittest.TestCase):
 
         class ValidationTestModelAdmin(ModelAdmin):
             fieldsets = (("General", {"fields": ("name",)}),)
-            fields = ["name",]
+            fields = ["name"]
 
         six.assertRaisesRegex(self,
             ImproperlyConfigured,
@@ -1032,8 +1028,10 @@ class ValidationTests(unittest.TestCase):
         class AwesomeFilter(SimpleListFilter):
             def get_title(self):
                 return 'awesomeness'
+
             def get_choices(self, request):
                 return (('bit', 'A bit awesome'), ('very', 'Very awesome'), )
+
             def get_queryset(self, cl, qs):
                 return qs
 

@@ -51,6 +51,7 @@ require_POST.__doc__ = "Decorator to require that a view only accept the POST me
 require_safe = require_http_methods(["GET", "HEAD"])
 require_safe.__doc__ = "Decorator to require that a view only accept safe methods: GET and HEAD."
 
+
 def condition(etag_func=None, last_modified_func=None):
     """
     Decorator to support conditional retrieval (or change) for a view
@@ -157,10 +158,11 @@ def condition(etag_func=None, last_modified_func=None):
         return inner
     return decorator
 
+
 # Shortcut decorators for common cases based on ETag or Last-Modified only
 def etag(etag_func):
     return condition(etag_func=etag_func)
 
+
 def last_modified(last_modified_func):
     return condition(last_modified_func=last_modified_func)
-

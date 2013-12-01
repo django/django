@@ -30,7 +30,7 @@ from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
 # Provide this import for backwards compatibility.
-from django.core.validators import EMPTY_VALUES
+from django.core.validators import EMPTY_VALUES  # NOQA
 
 
 __all__ = (
@@ -45,9 +45,9 @@ __all__ = (
 
 
 class Field(object):
-    widget = TextInput # Default widget to use when rendering this type of Field.
-    hidden_widget = HiddenInput # Default widget to use when rendering this as "hidden".
-    default_validators = [] # Default set of validators
+    widget = TextInput  # Default widget to use when rendering this type of Field.
+    hidden_widget = HiddenInput  # Default widget to use when rendering this as "hidden".
+    default_validators = []  # Default set of validators
     # Add an 'invalid' entry to default_error_message if you want a specific
     # field error message not raised by the field validators.
     default_error_messages = {
@@ -567,7 +567,7 @@ class FileField(Field):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
 
         if self.max_length is not None and len(file_name) > self.max_length:
-            params =  {'max': self.max_length, 'length': len(file_name)}
+            params = {'max': self.max_length, 'length': len(file_name)}
             raise ValidationError(self.error_messages['max_length'], code='max_length', params=params)
         if not file_name:
             raise ValidationError(self.error_messages['invalid'], code='invalid')
@@ -822,12 +822,10 @@ class TypedChoiceField(ChoiceField):
         self.empty_value = kwargs.pop('empty_value', '')
         super(TypedChoiceField, self).__init__(*args, **kwargs)
 
-    def to_python(self, value):
+    def _coerce(self, value):
         """
-        Validates that the value is in self.choices and can be coerced to the
-        right type.
+        Validate that the value can be coerced to the right type (if not empty).
         """
-        value = super(TypedChoiceField, self).to_python(value)
         if value == self.empty_value or value in self.empty_values:
             return self.empty_value
         try:
@@ -839,6 +837,10 @@ class TypedChoiceField(ChoiceField):
                 params={'value': value},
             )
         return value
+
+    def clean(self, value):
+        value = super(TypedChoiceField, self).clean(value)
+        return self._coerce(value)
 
 
 class MultipleChoiceField(ChoiceField):
@@ -889,12 +891,11 @@ class TypedMultipleChoiceField(MultipleChoiceField):
         self.empty_value = kwargs.pop('empty_value', [])
         super(TypedMultipleChoiceField, self).__init__(*args, **kwargs)
 
-    def to_python(self, value):
+    def _coerce(self, value):
         """
         Validates that the values are in self.choices and can be coerced to the
         right type.
         """
-        value = super(TypedMultipleChoiceField, self).to_python(value)
         if value == self.empty_value or value in self.empty_values:
             return self.empty_value
         new_value = []
@@ -908,6 +909,10 @@ class TypedMultipleChoiceField(MultipleChoiceField):
                     params={'value': choice},
                 )
         return new_value
+
+    def clean(self, value):
+        value = super(TypedMultipleChoiceField, self).clean(value)
+        return self._coerce(value)
 
     def validate(self, value):
         if value != self.empty_value:

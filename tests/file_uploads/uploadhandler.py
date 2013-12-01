@@ -11,7 +11,7 @@ class QuotaUploadHandler(FileUploadHandler):
     (5MB) is uploaded.
     """
 
-    QUOTA = 5 * 2**20 # 5 MB
+    QUOTA = 5 * 2 ** 20  # 5 MB
 
     def __init__(self, request=None):
         super(QuotaUploadHandler, self).__init__(request)
@@ -26,8 +26,10 @@ class QuotaUploadHandler(FileUploadHandler):
     def file_complete(self, file_size):
         return None
 
+
 class CustomUploadError(Exception):
     pass
+
 
 class ErroringUploadHandler(FileUploadHandler):
     """A handler that raises an exception."""

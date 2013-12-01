@@ -432,7 +432,9 @@ Atom1Feed
 
     Consider a typical case, where a view might need to call a model's method
     to perform some computation, before placing the model instance into the
-    context, where the template might invoke the method once more::
+    context, where the template might invoke the method once more:
+
+    .. code-block:: python
 
         # the model
         class Person(models.Model):
@@ -762,6 +764,17 @@ appropriate entities.
 
     Can be called multiple times on a single string.
 
+    String marked safe will become unsafe again if modified. For example::
+
+        >>> mystr = '<b>Hello World</b>   '
+        >>> mystr = mark_safe(mystr)
+        >>> type(mystr)
+        <class 'django.utils.safestring.SafeBytes'>
+
+        >>> mystr = mystr.strip()  # removing whitespace
+        >>> type(mystr)
+        <type 'str'>
+
 .. function:: mark_for_escaping(s)
 
     Explicitly mark a string as requiring HTML escaping upon output. Has no
@@ -845,7 +858,7 @@ For a complete discussion on the usage of the following see the
 
 .. function:: ngettext_lazy(singular, plural, number)
 .. function:: ungettext_lazy(singular, plural, number)
-.. function:: npgettext_lazy(singular, plural, number)
+.. function:: npgettext_lazy(context, singular, plural, number)
 
     Same as the non-lazy versions above, but using lazy execution.
 

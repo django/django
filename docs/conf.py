@@ -117,7 +117,7 @@ intersphinx_mapping = {
 }
 
 # Python's docs don't change every week.
-intersphinx_cache_limit = 90 # days
+intersphinx_cache_limit = 90  # days
 
 # -- Options for HTML output ---------------------------------------------------
 
@@ -226,8 +226,8 @@ latex_elements = {
 # (source start file, target name, title, author, document class [howto/manual]).
 #latex_documents = []
 latex_documents = [
-  ('contents', 'django.tex', 'Django Documentation',
-   'Django Software Foundation', 'manual'),
+    ('contents', 'django.tex', 'Django Documentation',
+     'Django Software Foundation', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -264,7 +264,7 @@ man_pages = [
 
 # List of tuples (startdocname, targetname, title, author, dir_entry,
 # description, category, toctree_only)
-texinfo_documents=[(
+texinfo_documents = [(
     master_doc, "django", "", "", "Django",
     "Documentation of the Django framework", "Web development", False
 )]

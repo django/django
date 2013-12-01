@@ -20,6 +20,6 @@ class MyModel(six.with_metaclass(CustomBaseModel, models.Model)):
 # still does not fail to create the model.
 
 if six.PY2:
-    class MyModel(models.Model):
+    class MyPython2Model(models.Model):
         """Model subclass with a custom base using __metaclass__."""
         __metaclass__ = CustomBaseModel

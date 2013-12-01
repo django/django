@@ -3,6 +3,8 @@ Base classes for writing management commands (named commands which can
 be executed through ``django-admin.py`` or ``manage.py``).
 
 """
+from __future__ import unicode_literals
+
 import os
 import sys
 
@@ -263,7 +265,7 @@ class BaseCommand(object):
             self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
 
         if self.can_import_settings:
-            from django.conf import settings
+            from django.conf import settings  # NOQA
 
         saved_locale = None
         if not self.leave_locale_alone:

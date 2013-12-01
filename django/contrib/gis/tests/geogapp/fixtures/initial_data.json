@@ -1,65 +1,65 @@
-[  
+[
   {
-    "pk": 1, 
-    "model": "geogapp.city", 
+    "pk": 1,
+    "model": "geogapp.city",
     "fields": {
-      "name": "Houston", 
+      "name": "Houston",
       "point": "POINT (-95.363151 29.763374)"
     }
-  }, 
+  },
   {
-    "pk": 2, 
-    "model": "geogapp.city", 
+    "pk": 2,
+    "model": "geogapp.city",
     "fields": {
-      "name": "Dallas", 
+      "name": "Dallas",
       "point": "POINT (-96.801611 32.782057)"
     }
-  }, 
+  },
   {
-    "pk": 3, 
-    "model": "geogapp.city", 
+    "pk": 3,
+    "model": "geogapp.city",
     "fields": {
       "name": "Oklahoma City",
       "point": "POINT (-97.521157 34.464642)"
     }
-  }, 
+  },
   {
-    "pk": 4, 
-    "model": "geogapp.city", 
+    "pk": 4,
+    "model": "geogapp.city",
     "fields": {
       "name": "Wellington",
       "point": "POINT (174.783117 -41.315268)"
     }
-  }, 
+  },
   {
-    "pk": 5, 
-    "model": "geogapp.city", 
+    "pk": 5,
+    "model": "geogapp.city",
     "fields": {
-      "name": "Pueblo", 
+      "name": "Pueblo",
       "point": "POINT (-104.609252 38.255001)"
     }
-  }, 
+  },
   {
-    "pk": 6, 
-    "model": "geogapp.city", 
+    "pk": 6,
+    "model": "geogapp.city",
     "fields": {
-      "name": "Lawrence", 
+      "name": "Lawrence",
       "point": "POINT (-95.235060 38.971823)"
     }
-  }, 
+  },
   {
-    "pk": 7, 
-    "model": "geogapp.city", 
+    "pk": 7,
+    "model": "geogapp.city",
     "fields": {
-      "name": "Chicago", 
+      "name": "Chicago",
       "point": "POINT (-87.650175 41.850385)"
     }
-  }, 
+  },
   {
-    "pk": 8, 
-    "model": "geogapp.city", 
+    "pk": 8,
+    "model": "geogapp.city",
     "fields": {
-      "name": "Victoria", 
+      "name": "Victoria",
       "point": "POINT (-123.305196 48.462611)"
     }
   },

@@ -267,7 +267,7 @@ All parameters are optional and can be set at any time prior to calling the
 * ``headers``: A dictionary of extra headers to put on the message. The
   keys are the header name, values are the header values. It's up to the
   caller to ensure header names and values are in the correct format for
-  an email message.
+  an email message. The corresponding attribute is ``extra_headers``.
 
 * ``cc``: A list or tuple of recipient addresses used in the "Cc" header
   when sending the email.
@@ -424,16 +424,38 @@ can :ref:`write your own email backend <topic-custom-email-backend>`.
 SMTP backend
 ~~~~~~~~~~~~
 
-This is the default backend. Email will be sent through a SMTP server.
-The server address and authentication credentials are set in the
-:setting:`EMAIL_HOST`, :setting:`EMAIL_PORT`, :setting:`EMAIL_HOST_USER`,
-:setting:`EMAIL_HOST_PASSWORD`, :setting:`EMAIL_USE_TLS` and
-:setting:`EMAIL_USE_SSL` settings in your settings file.
+.. class:: backends.smtp.EmailBackend([host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, **kwargs])
 
-The SMTP backend is the default configuration inherited by Django. If you
-want to specify it explicitly, put the following in your settings::
+    This is the default backend. Email will be sent through a SMTP server.
+    The server address and authentication credentials are set in the
+    :setting:`EMAIL_HOST`, :setting:`EMAIL_PORT`, :setting:`EMAIL_HOST_USER`,
+    :setting:`EMAIL_HOST_PASSWORD`, :setting:`EMAIL_USE_TLS` and
+    :setting:`EMAIL_USE_SSL` settings in your settings file.
 
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    The SMTP backend is the default configuration inherited by Django. If you
+    want to specify it explicitly, put the following in your settings::
+
+        EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+    Here is an attribute which doesn't have a corresponding setting like the
+    others described above:
+
+    .. attribute:: timeout
+
+        .. versionadded:: 1.7
+
+        This backend contains a ``timeout`` parameter, which can be set with
+        the following sample code::
+
+            from django.core.mail.backends import smtp
+
+            class MyEmailBackend(smtp.EmailBackend):
+              def __init__(self, *args, **kwargs):
+                  kwargs.setdefault('timeout', 42)
+                  super(MyEmailBackend, self).__init__(*args, **kwargs)
+
+        Then point the :setting:`EMAIL_BACKEND` setting at your custom backend as
+        described above.
 
 .. _topic-email-console-backend:
 
@@ -441,7 +463,7 @@ Console backend
 ~~~~~~~~~~~~~~~
 
 Instead of sending out real emails the console backend just writes the
-emails that would be send to the standard output. By default, the console
+emails that would be sent to the standard output. By default, the console
 backend writes to ``stdout``. You can use a different stream-like object by
 providing the ``stream`` keyword argument when constructing the connection.
 
@@ -480,7 +502,7 @@ The ``'locmem'`` backend stores messages in a special attribute of the
 ``django.core.mail`` module. The ``outbox`` attribute is created when the
 first message is sent. It's a list with an
 :class:`~django.core.mail.EmailMessage` instance for each message that would
-be send.
+be sent.
 
 To specify this backend, put the following in your settings::
 

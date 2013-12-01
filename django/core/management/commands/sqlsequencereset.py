@@ -5,6 +5,7 @@ from optparse import make_option
 from django.core.management.base import AppCommand
 from django.db import connections, models, DEFAULT_DB_ALIAS
 
+
 class Command(AppCommand):
     help = 'Prints the SQL statements for resetting sequences for the given app name(s).'
 

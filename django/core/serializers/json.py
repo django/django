@@ -17,6 +17,7 @@ from django.core.serializers.python import Deserializer as PythonDeserializer
 from django.utils import six
 from django.utils.timezone import is_aware
 
+
 class Serializer(PythonSerializer):
     """
     Convert a queryset to JSON.
@@ -109,4 +110,3 @@ class DjangoJSONEncoder(json.JSONEncoder):
 
 # Older, deprecated class name (for backwards compatibility purposes).
 DateTimeAwareJSONEncoder = DjangoJSONEncoder
-

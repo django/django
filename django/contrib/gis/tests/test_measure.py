@@ -32,7 +32,6 @@ class DistanceTest(unittest.TestCase):
             self.assertEqual(d.m, 1.0)
             self.assertEqual(d.mm, 1000.0)
 
-
     def testInitInvalid(self):
         "Testing initialisation from invalid units"
         self.assertRaises(AttributeError, D, banana=100)
@@ -95,7 +94,7 @@ class DistanceTest(unittest.TestCase):
 
         a5 = d1 * D(m=10)
         self.assertTrue(isinstance(a5, Area))
-        self.assertEqual(a5.sq_m, 100*10)
+        self.assertEqual(a5.sq_m, 100 * 10)
 
         with self.assertRaises(TypeError):
             d1 *= D(m=1)
@@ -144,6 +143,7 @@ class DistanceTest(unittest.TestCase):
                       ('Indian yard', 'indian_yd'), ('Chain (Sears)', 'chain_sears'), ('Chain', 'chain')]
         for nm, att in unit_tuple:
             self.assertEqual(att, D.unit_attname(nm))
+
 
 class AreaTest(unittest.TestCase):
     "Testing the Area object"
@@ -264,14 +264,16 @@ class AreaTest(unittest.TestCase):
         self.assertEqual(repr(a1), 'Area(sq_m=100.0)')
         self.assertEqual(repr(a2), 'Area(sq_km=3.5)')
 
+
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(DistanceTest))
     s.addTest(unittest.makeSuite(AreaTest))
     return s
 
+
 def run(verbosity=2):
     unittest.TextTestRunner(verbosity=verbosity).run(suite())
 
-if __name__=="__main__":
+if __name__ == "__main__":
     run()

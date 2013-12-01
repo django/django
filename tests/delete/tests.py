@@ -4,7 +4,7 @@ from django.db import models, IntegrityError, connection
 from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
 from django.utils.six.moves import xrange
 
-from .models import (R, RChild, S, T, U, A, M, MR, MRNull,
+from .models import (R, RChild, S, T, A, M, MR, MRNull,
     create_a, get_default_r, User, Avatar, HiddenUser, HiddenUserProfile,
     M2MTo, M2MFrom, Parent, Child, Base)
 
@@ -65,6 +65,7 @@ class OnDeleteTests(TestCase):
         # Testing DO_NOTHING is a bit harder: It would raise IntegrityError for a normal model,
         # so we connect to pre_delete and set the fk to a known value.
         replacement_r = R.objects.create()
+
         def check_do_nothing(sender, **kwargs):
             obj = kwargs['instance']
             obj.donothing_set.update(donothing=replacement_r)
@@ -166,7 +167,7 @@ class DeletionTests(TestCase):
     def test_bulk(self):
         from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
         s = S.objects.create(r=R.objects.create())
-        for i in xrange(2*GET_ITERATOR_CHUNK_SIZE):
+        for i in xrange(2 * GET_ITERATOR_CHUNK_SIZE):
             T.objects.create(s=s)
         #   1 (select related `T` instances)
         # + 1 (select related `U` instances)
@@ -178,6 +179,7 @@ class DeletionTests(TestCase):
     def test_instance_update(self):
         deleted = []
         related_setnull_sets = []
+
         def pre_delete(sender, **kwargs):
             obj = kwargs['instance']
             deleted.append(obj)
@@ -264,6 +266,7 @@ class DeletionTests(TestCase):
 
         # Attach a signal to make sure we will not do fast_deletes.
         calls = []
+
         def noop(*args, **kwargs):
             calls.append('')
         models.signals.post_delete.connect(noop, sender=User)
@@ -281,6 +284,7 @@ class DeletionTests(TestCase):
         )
         # Attach a signal to make sure we will not do fast_deletes.
         calls = []
+
         def noop(*args, **kwargs):
             calls.append('')
         models.signals.post_delete.connect(noop, sender=User)
@@ -306,6 +310,7 @@ class DeletionTests(TestCase):
 
         r.delete()
         self.assertEqual(HiddenUserProfile.objects.count(), 0)
+
 
 class FastDeleteTests(TestCase):
 

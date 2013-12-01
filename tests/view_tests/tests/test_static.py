@@ -59,7 +59,7 @@ class StaticTests(SimpleTestCase):
             HTTP_IF_MODIFIED_SINCE='Mon, 18 Jan 2038 05:14:07 GMT'
             # This is 24h before max Unix time. Remember to fix Django and
             # update this test well before 2038 :)
-            )
+        )
         self.assertIsInstance(response, HttpResponseNotModified)
 
     def test_invalid_if_modified_since(self):

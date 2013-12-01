@@ -8,6 +8,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 #  All of these models are created in the database by Django.
 
+
 @python_2_unicode_compatible
 class A01(models.Model):
     f_a = models.CharField(max_length=10, db_index=True)
@@ -18,6 +19,7 @@ class A01(models.Model):
 
     def __str__(self):
         return self.f_a
+
 
 @python_2_unicode_compatible
 class B01(models.Model):
@@ -32,6 +34,7 @@ class B01(models.Model):
 
     def __str__(self):
         return self.f_a
+
 
 @python_2_unicode_compatible
 class C01(models.Model):
@@ -49,6 +52,7 @@ class C01(models.Model):
 # of possibly a subset of the columns). There should be no creation errors,
 # since we have told Django they aren't managed by Django.
 
+
 @python_2_unicode_compatible
 class A02(models.Model):
     f_a = models.CharField(max_length=10, db_index=True)
@@ -59,6 +63,7 @@ class A02(models.Model):
 
     def __str__(self):
         return self.f_a
+
 
 @python_2_unicode_compatible
 class B02(models.Model):
@@ -72,6 +77,7 @@ class B02(models.Model):
 
     def __str__(self):
         return self.f_a
+
 
 # To re-use the many-to-many intermediate table, we need to manually set up
 # things up.
@@ -88,6 +94,7 @@ class C02(models.Model):
     def __str__(self):
         return self.f_a
 
+
 class Intermediate(models.Model):
     a02 = models.ForeignKey(A02, db_column="a01_id")
     c02 = models.ForeignKey(C02, db_column="c01_id")
@@ -96,7 +103,7 @@ class Intermediate(models.Model):
         db_table = 'd01'
         managed = False
 
-#
+
 # These next models test the creation (or not) of many to many join tables
 # between managed and unmanaged models. A join table between two unmanaged
 # models shouldn't be automatically created (see #10647).
@@ -109,14 +116,17 @@ class Proxy1(models.Model):
     class Meta:
         db_table = "unmanaged_models_proxy1"
 
+
 class Proxy2(models.Model):
     class Meta:
         db_table = "unmanaged_models_proxy2"
+
 
 class Unmanaged1(models.Model):
     class Meta:
         managed = False
         db_table = "unmanaged_models_proxy1"
+
 
 # Unmanged with an m2m to unmanaged: the intermediary table won't be created.
 class Unmanaged2(models.Model):
@@ -125,6 +135,7 @@ class Unmanaged2(models.Model):
     class Meta:
         managed = False
         db_table = "unmanaged_models_proxy2"
+
 
 # Here's an unmanaged model with an m2m to a managed one; the intermediary
 # table *will* be created (unless given a custom `through` as for C02 above).

@@ -16,7 +16,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         700: 'FloatField',
         701: 'FloatField',
         869: 'GenericIPAddressField',
-        1042: 'CharField', # blank-padded
+        1042: 'CharField',  # blank-padded
         1043: 'CharField',
         1082: 'DateField',
         1083: 'TimeField',

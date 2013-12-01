@@ -22,7 +22,7 @@ from django.template import (base as template_base, loader, Context,
 from django.template.loaders import app_directories, filesystem, cached
 from django.test import RequestFactory, TestCase
 from django.test.utils import (setup_test_template_loader,
-    restore_template_loaders, override_settings)
+    restore_template_loaders, override_settings, TransRealMixin)
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
 from django.utils._os import upath
@@ -30,8 +30,6 @@ from django.utils.translation import activate, deactivate
 from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.six.moves.urllib.parse import urljoin
-
-from i18n import TransRealMixin
 
 # NumPy installed?
 try:
@@ -47,6 +45,7 @@ from . import filters
 
 register = template.Library()
 
+
 class EchoNode(template.Node):
     def __init__(self, contents):
         self.contents = contents
@@ -54,8 +53,10 @@ class EchoNode(template.Node):
     def render(self, context):
         return " ".join(self.contents)
 
+
 def do_echo(parser, token):
     return EchoNode(token.contents.split()[1:])
+
 
 def do_upper(value):
     return value.upper()
@@ -70,17 +71,22 @@ template.libraries['testtags'] = register
 # Helper objects for template tests #
 #####################################
 
+
 class SomeException(Exception):
     silent_variable_failure = True
+
 
 class SomeOtherException(Exception):
     pass
 
+
 class ContextStackException(Exception):
     pass
 
+
 class ShouldNotExecuteException(Exception):
     pass
+
 
 class SomeClass:
     def __init__(self):
@@ -116,9 +122,11 @@ class SomeClass:
         raise SomeOtherException
     noisy_fail_attribute = property(noisy_fail_attribute)
 
+
 class OtherClass:
     def method(self):
         return "OtherClass.method"
+
 
 class TestObj(object):
     def is_true(self):
@@ -130,14 +138,17 @@ class TestObj(object):
     def is_bad(self):
         raise ShouldNotExecuteException()
 
+
 class SilentGetItemClass(object):
     def __getitem__(self, key):
         raise SomeException
+
 
 class SilentAttrClass(object):
     def b(self):
         raise SomeException
     b = property(b)
+
 
 @python_2_unicode_compatible
 class UTF8Class:
@@ -151,6 +162,7 @@ class TemplateLoaderTests(TestCase):
     def test_loaders_security(self):
         ad_loader = app_directories.Loader()
         fs_loader = filesystem.Loader()
+
         def test_template_sources(path, template_dirs, expected_sources):
             if isinstance(expected_sources, list):
                 # Fix expected sources so they are abspathed
@@ -201,10 +213,10 @@ class TemplateLoaderTests(TestCase):
             test_template_sources('/DIR1/index.HTML', template_dirs,
                                   ['/DIR1/index.HTML'])
 
+    # Turn TEMPLATE_DEBUG on, so that the origin file name will be kept with
+    # the compiled templates.
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_loader_debug_origin(self):
-        # Turn TEMPLATE_DEBUG on, so that the origin file name will be kept with
-        # the compiled templates.
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, True
         old_loaders = loader.template_source_loaders
 
         try:
@@ -237,7 +249,6 @@ class TemplateLoaderTests(TestCase):
                 'Cached template loaded through cached loader has incorrect name for debug page: %s' % template_name)
         finally:
             loader.template_source_loaders = old_loaders
-            settings.TEMPLATE_DEBUG = old_td
 
     def test_loader_origin(self):
         with self.settings(TEMPLATE_DEBUG=True):
@@ -253,15 +264,14 @@ class TemplateLoaderTests(TestCase):
         template = loader.get_template('login.html')
         self.assertEqual(template.origin, None)
 
+    # TEMPLATE_DEBUG must be true, otherwise the exception raised
+    # during {% include %} processing will be suppressed.
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_include_missing_template(self):
         """
         Tests that the correct template is identified as not existing
         when {% include %} specifies a template that does not exist.
         """
-
-        # TEMPLATE_DEBUG must be true, otherwise the exception raised
-        # during {% include %} processing will be suppressed.
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, True
         old_loaders = loader.template_source_loaders
 
         try:
@@ -276,14 +286,14 @@ class TemplateLoaderTests(TestCase):
                 tmpl = loader.select_template([load_name])
                 r = tmpl.render(template.Context({}))
             except template.TemplateDoesNotExist as e:
-                settings.TEMPLATE_DEBUG = old_td
                 self.assertEqual(e.args[0], 'missing.html')
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
         finally:
             loader.template_source_loaders = old_loaders
-            settings.TEMPLATE_DEBUG = old_td
 
-
+    # TEMPLATE_DEBUG must be true, otherwise the exception raised
+    # during {% include %} processing will be suppressed.
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_extends_include_missing_baseloader(self):
         """
         Tests that the correct template is identified as not existing
@@ -291,10 +301,6 @@ class TemplateLoaderTests(TestCase):
         that template has an {% include %} of something that does not
         exist. See #12787.
         """
-
-        # TEMPLATE_DEBUG must be true, otherwise the exception raised
-        # during {% include %} processing will be suppressed.
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, True
         old_loaders = loader.template_source_loaders
 
         try:
@@ -309,20 +315,18 @@ class TemplateLoaderTests(TestCase):
             try:
                 r = tmpl.render(template.Context({}))
             except template.TemplateDoesNotExist as e:
-                settings.TEMPLATE_DEBUG = old_td
                 self.assertEqual(e.args[0], 'missing.html')
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
         finally:
             loader.template_source_loaders = old_loaders
-            settings.TEMPLATE_DEBUG = old_td
 
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_extends_include_missing_cachedloader(self):
         """
         Same as test_extends_include_missing_baseloader, only tests
         behavior of the cached loader instead of BaseLoader.
         """
 
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, True
         old_loaders = loader.template_source_loaders
 
         try:
@@ -349,7 +353,6 @@ class TemplateLoaderTests(TestCase):
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
         finally:
             loader.template_source_loaders = old_loaders
-            settings.TEMPLATE_DEBUG = old_td
 
     def test_include_template_argument(self):
         """
@@ -371,7 +374,6 @@ class TemplateLoaderTests(TestCase):
         template that does not exist does not raise an exception at parse
         time.
         """
-        ctx = Context()
         tmpl = Template('{% include "this_does_not_exist.html" %}')
         self.assertIsInstance(tmpl, Template)
 
@@ -441,7 +443,7 @@ class TemplateRegressionTests(TestCase):
         # Regression test for #19392
         with six.assertRaisesRegex(self, template.TemplateSyntaxError,
                 "The syntax of 'url' changed in Django 1.5, see the docs."):
-            t = Template('{% url my-view %}')      # not a variable = old syntax
+            Template('{% url my-view %}')      # not a variable = old syntax
 
     @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
     def test_no_wrapped_exception(self):
@@ -459,7 +461,7 @@ class TemplateRegressionTests(TestCase):
     def test_invalid_block_suggestion(self):
         # See #7876
         try:
-            t = Template("{% if 1 %}lala{% endblock %}{% endif %}")
+            Template("{% if 1 %}lala{% endblock %}{% endif %}")
         except TemplateSyntaxError as e:
             self.assertEqual(e.args[0], "Invalid block tag: 'endblock', expected 'elif', 'else' or 'endif'")
 
@@ -488,6 +490,42 @@ class TemplateRegressionTests(TestCase):
         t = Template('{% load cache %}{% cache 1 regression_20130 %}foo{% endcache %}')
         cachenode = t.nodelist[1]
         self.assertEqual(cachenode.fragment_name, 'regression_20130')
+
+    @override_settings(CACHES={
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'default',
+        },
+        'template_fragments': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'fragments',
+        },
+    })
+    def test_cache_fragment_cache(self):
+        """
+        When a cache called "template_fragments" is present, the cache tag
+        will use it in preference to 'default'
+        """
+        t1 = Template('{% load cache %}{% cache 1 fragment %}foo{% endcache %}')
+        t2 = Template('{% load cache %}{% cache 1 fragment using="default" %}bar{% endcache %}')
+
+        ctx = Context()
+        o1 = t1.render(ctx)
+        o2 = t2.render(ctx)
+
+        self.assertEqual(o1, 'foo')
+        self.assertNotEqual(o1, o2)
+
+    def test_cache_missing_backend(self):
+        """
+        When a cache that doesn't exist is specified, the cache tag will
+        raise a TemplateSyntaxError
+        '"""
+        t = Template('{% load cache %}{% cache 1 backend using="unknown" %}bar{% endcache %}')
+
+        ctx = Context()
+        with self.assertRaises(TemplateSyntaxError):
+            t.render(ctx)
 
     def test_ifchanged_render_once(self):
         """ Test for ticket #19890. The content of ifchanged template tag was
@@ -543,7 +581,7 @@ class TemplateTests(TransRealMixin, TestCase):
         # Warm the URL reversing cache. This ensures we don't pay the cost
         # warming the cache during one of the tests.
         urlresolvers.reverse('template_tests.views.client_action',
-                             kwargs={'id':0,'action':"update"})
+                             kwargs={'id': 0, 'action': "update"})
 
         for name, vals in tests:
             if isinstance(vals[2], tuple):
@@ -574,7 +612,7 @@ class TemplateTests(TransRealMixin, TestCase):
                     ('', False, normal_string_result),
                     (expected_invalid_str, False, invalid_string_result),
                     ('', True, template_debug_result)
-                ]:
+            ]:
                 settings.TEMPLATE_STRING_IF_INVALID = invalid_str
                 settings.TEMPLATE_DEBUG = template_debug
                 for is_cached in (False, True):
@@ -618,7 +656,7 @@ class TemplateTests(TransRealMixin, TestCase):
         settings.ALLOWED_INCLUDE_ROOTS = old_allowed_include_roots
 
         self.assertEqual(failures, [], "Tests failed:\n%s\n%s" %
-            ('-'*70, ("\n%s\n" % ('-'*70)).join(failures)))
+            ('-' * 70, ("\n%s\n" % ('-' * 70)).join(failures)))
 
     def render(self, test_template, vals):
         context = template.Context(vals[1])
@@ -640,19 +678,19 @@ class TemplateTests(TransRealMixin, TestCase):
 
             # Variables should be replaced with their value in the current
             # context
-            'basic-syntax02': ("{{ headline }}", {'headline':'Success'}, "Success"),
+            'basic-syntax02': ("{{ headline }}", {'headline': 'Success'}, "Success"),
 
             # More than one replacement variable is allowed in a template
-            'basic-syntax03': ("{{ first }} --- {{ second }}", {"first" : 1, "second" : 2}, "1 --- 2"),
+            'basic-syntax03': ("{{ first }} --- {{ second }}", {"first": 1, "second": 2}, "1 --- 2"),
 
             # Fail silently when a variable is not found in the current context
-            'basic-syntax04': ("as{{ missing }}df", {}, ("asdf","asINVALIDdf")),
+            'basic-syntax04': ("as{{ missing }}df", {}, ("asdf", "asINVALIDdf")),
 
             # A variable may not contain more than one word
             'basic-syntax06': ("{{ multi word variable }}", {}, template.TemplateSyntaxError),
 
             # Raise TemplateSyntaxError for empty variable tags
-            'basic-syntax07': ("{{ }}",        {}, template.TemplateSyntaxError),
+            'basic-syntax07': ("{{ }}", {}, template.TemplateSyntaxError),
             'basic-syntax08': ("{{        }}", {}, template.TemplateSyntaxError),
 
             # Attribute syntax allows a template to call an object's attribute
@@ -662,7 +700,7 @@ class TemplateTests(TransRealMixin, TestCase):
             'basic-syntax10': ("{{ var.otherclass.method }}", {"var": SomeClass()}, "OtherClass.method"),
 
             # Fail silently when a variable's attribute isn't found
-            'basic-syntax11': ("{{ var.blech }}", {"var": SomeClass()}, ("","INVALID")),
+            'basic-syntax11': ("{{ var.blech }}", {"var": SomeClass()}, ("", "INVALID")),
 
             # Raise TemplateSyntaxError when trying to access a variable beginning with an underscore
             'basic-syntax12': ("{{ var.__dict__ }}", {"var": SomeClass()}, template.TemplateSyntaxError),
@@ -675,13 +713,13 @@ class TemplateTests(TransRealMixin, TestCase):
             'basic-syntax17': ("{{ moo? }}", {}, template.TemplateSyntaxError),
 
             # Attribute syntax allows a template to call a dictionary key's value
-            'basic-syntax18': ("{{ foo.bar }}", {"foo" : {"bar" : "baz"}}, "baz"),
+            'basic-syntax18': ("{{ foo.bar }}", {"foo": {"bar": "baz"}}, "baz"),
 
             # Fail silently when a variable's dictionary key isn't found
-            'basic-syntax19': ("{{ foo.spam }}", {"foo" : {"bar" : "baz"}}, ("","INVALID")),
+            'basic-syntax19': ("{{ foo.spam }}", {"foo": {"bar": "baz"}}, ("", "INVALID")),
 
             # Fail silently when accessing a non-simple method
-            'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, ("","INVALID")),
+            'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, ("", "INVALID")),
 
             # Don't silence a TypeError if it was raised inside a callable
             'basic-syntax20b': ("{{ var.method5 }}", {"var": SomeClass()}, TypeError),
@@ -815,7 +853,7 @@ class TemplateTests(TransRealMixin, TestCase):
             # Numbers as filter arguments should work
             'filter-syntax19': ('{{ var|truncatewords:1 }}', {"var": "hello world"}, "hello ..."),
 
-            #filters should accept empty string constants
+            # filters should accept empty string constants
             'filter-syntax20': ('{{ ""|default_if_none:"was none" }}', {}, ""),
 
             # Fail silently for non-callable attribute and dict lookups which
@@ -868,18 +906,18 @@ class TemplateTests(TransRealMixin, TestCase):
             'cycle11': ("{% cycle 'a' 'b' 'c' as abc %}{% cycle abc %}{% cycle abc %}", {}, 'abc'),
             'cycle12': ("{% cycle 'a' 'b' 'c' as abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}", {}, 'abca'),
             'cycle13': ("{% for i in test %}{% cycle 'a' 'b' %}{{ i }},{% endfor %}", {'test': range(5)}, 'a0,b1,a2,b3,a4,'),
-            'cycle14': ("{% cycle one two as foo %}{% cycle foo %}", {'one': '1','two': '2'}, '12'),
+            'cycle14': ("{% cycle one two as foo %}{% cycle foo %}", {'one': '1', 'two': '2'}, '12'),
             'cycle15': ("{% for i in test %}{% cycle aye bee %}{{ i }},{% endfor %}", {'test': range(5), 'aye': 'a', 'bee': 'b'}, 'a0,b1,a2,b3,a4,'),
-            'cycle16': ("{% cycle one|lower two as foo %}{% cycle foo %}", {'one': 'A','two': '2'}, 'a2'),
+            'cycle16': ("{% cycle one|lower two as foo %}{% cycle foo %}", {'one': 'A', 'two': '2'}, 'a2'),
             'cycle17': ("{% cycle 'a' 'b' 'c' as abc silent %}{% cycle abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}", {}, ""),
             'cycle18': ("{% cycle 'a' 'b' 'c' as foo invalid_flag %}", {}, template.TemplateSyntaxError),
             'cycle19': ("{% cycle 'a' 'b' as silent %}{% cycle silent %}", {}, "ab"),
-            'cycle20': ("{% cycle one two as foo %} &amp; {% cycle foo %}", {'one' : 'A & B', 'two' : 'C & D'}, "A & B &amp; C & D"),
-            'cycle21': ("{% filter force_escape %}{% cycle one two as foo %} & {% cycle foo %}{% endfilter %}", {'one' : 'A & B', 'two' : 'C & D'}, "A &amp; B &amp; C &amp; D"),
-            'cycle22': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ x }}{% endfor %}", {'values': [1,2,3,4]}, "1234"),
-            'cycle23': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ abc }}{{ x }}{% endfor %}", {'values': [1,2,3,4]}, "a1b2c3a4"),
+            'cycle20': ("{% cycle one two as foo %} &amp; {% cycle foo %}", {'one': 'A & B', 'two': 'C & D'}, "A & B &amp; C & D"),
+            'cycle21': ("{% filter force_escape %}{% cycle one two as foo %} & {% cycle foo %}{% endfilter %}", {'one': 'A & B', 'two': 'C & D'}, "A &amp; B &amp; C &amp; D"),
+            'cycle22': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ x }}{% endfor %}", {'values': [1, 2, 3, 4]}, "1234"),
+            'cycle23': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ abc }}{{ x }}{% endfor %}", {'values': [1, 2, 3, 4]}, "a1b2c3a4"),
             'included-cycle': ('{{ abc }}', {'abc': 'xxx'}, 'xxx'),
-            'cycle24': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{% include 'included-cycle' %}{% endfor %}", {'values': [1,2,3,4]}, "abca"),
+            'cycle24': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{% include 'included-cycle' %}{% endfor %}", {'values': [1, 2, 3, 4]}, "abca"),
             'cycle25': ('{% cycle a as abc %}', {'a': '<'}, '<'),
 
             'cycle26': ('{% load cycle from future %}{% cycle a b as ab %}{% cycle ab %}', {'a': '<', 'b': '>'}, '&lt;&gt;'),
@@ -911,14 +949,14 @@ class TemplateTests(TransRealMixin, TestCase):
             'filter06bis': ('{% filter upper|escape %}fail{% endfilter %}', {}, template.TemplateSyntaxError),
 
             ### FIRSTOF TAG ###########################################################
-            'firstof01': ('{% firstof a b c %}', {'a':0,'b':0,'c':0}, ''),
-            'firstof02': ('{% firstof a b c %}', {'a':1,'b':0,'c':0}, '1'),
-            'firstof03': ('{% firstof a b c %}', {'a':0,'b':2,'c':0}, '2'),
-            'firstof04': ('{% firstof a b c %}', {'a':0,'b':0,'c':3}, '3'),
-            'firstof05': ('{% firstof a b c %}', {'a':1,'b':2,'c':3}, '1'),
-            'firstof06': ('{% firstof a b c %}', {'b':0,'c':3}, '3'),
-            'firstof07': ('{% firstof a b "c" %}', {'a':0}, 'c'),
-            'firstof08': ('{% firstof a b "c and d" %}', {'a':0,'b':0}, 'c and d'),
+            'firstof01': ('{% firstof a b c %}', {'a': 0, 'b': 0, 'c': 0}, ''),
+            'firstof02': ('{% firstof a b c %}', {'a': 1, 'b': 0, 'c': 0}, '1'),
+            'firstof03': ('{% firstof a b c %}', {'a': 0, 'b': 2, 'c': 0}, '2'),
+            'firstof04': ('{% firstof a b c %}', {'a': 0, 'b': 0, 'c': 3}, '3'),
+            'firstof05': ('{% firstof a b c %}', {'a': 1, 'b': 2, 'c': 3}, '1'),
+            'firstof06': ('{% firstof a b c %}', {'b': 0, 'c': 3}, '3'),
+            'firstof07': ('{% firstof a b "c" %}', {'a': 0}, 'c'),
+            'firstof08': ('{% firstof a b "c and d" %}', {'a': 0, 'b': 0}, 'c and d'),
             'firstof09': ('{% firstof %}', {}, template.TemplateSyntaxError),
             'firstof10': ('{% firstof a %}', {'a': '<'}, '<'),
 
@@ -995,10 +1033,10 @@ class TemplateTests(TransRealMixin, TestCase):
             'if-tag-lte-02': ("{% if 2 <= 1 %}yes{% else %}no{% endif %}", {}, "no"),
 
             # Contains
-            'if-tag-in-01': ("{% if 1 in x %}yes{% else %}no{% endif %}", {'x':[1]}, "yes"),
-            'if-tag-in-02': ("{% if 2 in x %}yes{% else %}no{% endif %}", {'x':[1]}, "no"),
-            'if-tag-not-in-01': ("{% if 1 not in x %}yes{% else %}no{% endif %}", {'x':[1]}, "no"),
-            'if-tag-not-in-02': ("{% if 2 not in x %}yes{% else %}no{% endif %}", {'x':[1]}, "yes"),
+            'if-tag-in-01': ("{% if 1 in x %}yes{% else %}no{% endif %}", {'x': [1]}, "yes"),
+            'if-tag-in-02': ("{% if 2 in x %}yes{% else %}no{% endif %}", {'x': [1]}, "no"),
+            'if-tag-not-in-01': ("{% if 1 not in x %}yes{% else %}no{% endif %}", {'x': [1]}, "no"),
+            'if-tag-not-in-02': ("{% if 2 not in x %}yes{% else %}no{% endif %}", {'x': [1]}, "yes"),
 
             # AND
             'if-tag-and01': ("{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': True}, 'yes'),
@@ -1084,17 +1122,17 @@ class TemplateTests(TransRealMixin, TestCase):
             'if-tag-shortcircuit02': ('{% if x.is_false and x.is_bad %}yes{% else %}no{% endif %}', {'x': TestObj()}, "no"),
 
             # Non-existent args
-            'if-tag-badarg01':("{% if x|default_if_none:y %}yes{% endif %}", {}, ''),
-            'if-tag-badarg02':("{% if x|default_if_none:y %}yes{% endif %}", {'y': 0}, ''),
-            'if-tag-badarg03':("{% if x|default_if_none:y %}yes{% endif %}", {'y': 1}, 'yes'),
-            'if-tag-badarg04':("{% if x|default_if_none:y %}yes{% else %}no{% endif %}", {}, 'no'),
+            'if-tag-badarg01': ("{% if x|default_if_none:y %}yes{% endif %}", {}, ''),
+            'if-tag-badarg02': ("{% if x|default_if_none:y %}yes{% endif %}", {'y': 0}, ''),
+            'if-tag-badarg03': ("{% if x|default_if_none:y %}yes{% endif %}", {'y': 1}, 'yes'),
+            'if-tag-badarg04': ("{% if x|default_if_none:y %}yes{% else %}no{% endif %}", {}, 'no'),
 
             # Additional, more precise parsing tests are in SmartIfTests
 
             ### IFCHANGED TAG #########################################################
-            'ifchanged01': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': (1,2,3)}, '123'),
-            'ifchanged02': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': (1,1,3)}, '13'),
-            'ifchanged03': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': (1,1,1)}, '1'),
+            'ifchanged01': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': (1, 2, 3)}, '123'),
+            'ifchanged02': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': (1, 1, 3)}, '13'),
+            'ifchanged03': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': (1, 1, 1)}, '1'),
             'ifchanged04': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': (1, 2, 3), 'numx': (2, 2, 2)}, '122232'),
             'ifchanged05': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': (1, 1, 1), 'numx': (1, 2, 3)}, '1123123123'),
             'ifchanged06': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': (1, 1, 1), 'numx': (2, 2, 2)}, '1222'),
@@ -1102,30 +1140,30 @@ class TemplateTests(TransRealMixin, TestCase):
             'ifchanged08': ('{% for data in datalist %}{% for c,d in data %}{% if c %}{% ifchanged %}{{ d }}{% endifchanged %}{% endif %}{% endfor %}{% endfor %}', {'datalist': [[(1, 'a'), (1, 'a'), (0, 'b'), (1, 'c')], [(0, 'a'), (1, 'c'), (1, 'd'), (1, 'd'), (0, 'e')]]}, 'accd'),
 
             # Test one parameter given to ifchanged.
-            'ifchanged-param01': ('{% for n in num %}{% ifchanged n %}..{% endifchanged %}{{ n }}{% endfor %}', { 'num': (1,2,3) }, '..1..2..3'),
-            'ifchanged-param02': ('{% for n in num %}{% for x in numx %}{% ifchanged n %}..{% endifchanged %}{{ x }}{% endfor %}{% endfor %}', { 'num': (1,2,3), 'numx': (5,6,7) }, '..567..567..567'),
+            'ifchanged-param01': ('{% for n in num %}{% ifchanged n %}..{% endifchanged %}{{ n }}{% endfor %}', {'num': (1, 2, 3)}, '..1..2..3'),
+            'ifchanged-param02': ('{% for n in num %}{% for x in numx %}{% ifchanged n %}..{% endifchanged %}{{ x }}{% endfor %}{% endfor %}', {'num': (1, 2, 3), 'numx': (5, 6, 7)}, '..567..567..567'),
 
             # Test multiple parameters to ifchanged.
-            'ifchanged-param03': ('{% for n in num %}{{ n }}{% for x in numx %}{% ifchanged x n %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', { 'num': (1,1,2), 'numx': (5,6,6) }, '156156256'),
+            'ifchanged-param03': ('{% for n in num %}{{ n }}{% for x in numx %}{% ifchanged x n %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': (1, 1, 2), 'numx': (5, 6, 6)}, '156156256'),
 
             # Test a date+hour like construct, where the hour of the last day
             # is the same but the date had changed, so print the hour anyway.
-            'ifchanged-param04': ('{% for d in days %}{% ifchanged %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},] }, '112323'),
+            'ifchanged-param04': ('{% for d in days %}{% ifchanged %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days': [{'day': 1, 'hours': [1, 2, 3]}, {'day': 2, 'hours': [3]}]}, '112323'),
 
             # Logically the same as above, just written with explicit
             # ifchanged for the day.
-            'ifchanged-param05': ('{% for d in days %}{% ifchanged d.day %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d.day h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},] }, '112323'),
+            'ifchanged-param05': ('{% for d in days %}{% ifchanged d.day %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d.day h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days': [{'day': 1, 'hours': [1, 2, 3]}, {'day': 2, 'hours': [3]}]}, '112323'),
 
             # Test the else clause of ifchanged.
-            'ifchanged-else01': ('{% for id in ids %}{{ id }}{% ifchanged id %}-first{% else %}-other{% endifchanged %},{% endfor %}', {'ids': [1,1,2,2,2,3]}, '1-first,1-other,2-first,2-other,2-other,3-first,'),
+            'ifchanged-else01': ('{% for id in ids %}{{ id }}{% ifchanged id %}-first{% else %}-other{% endifchanged %},{% endfor %}', {'ids': [1, 1, 2, 2, 2, 3]}, '1-first,1-other,2-first,2-other,2-other,3-first,'),
 
-            'ifchanged-else02': ('{% for id in ids %}{{ id }}-{% ifchanged id %}{% cycle red,blue %}{% else %}grey{% endifchanged %},{% endfor %}', {'ids': [1,1,2,2,2,3]}, '1-red,1-grey,2-blue,2-grey,2-grey,3-red,'),
-            'ifchanged-else03': ('{% for id in ids %}{{ id }}{% ifchanged id %}-{% cycle red,blue %}{% else %}{% endifchanged %},{% endfor %}', {'ids': [1,1,2,2,2,3]}, '1-red,1,2-blue,2,2,3-red,'),
+            'ifchanged-else02': ('{% for id in ids %}{{ id }}-{% ifchanged id %}{% cycle red,blue %}{% else %}grey{% endifchanged %},{% endfor %}', {'ids': [1, 1, 2, 2, 2, 3]}, '1-red,1-grey,2-blue,2-grey,2-grey,3-red,'),
+            'ifchanged-else03': ('{% for id in ids %}{{ id }}{% ifchanged id %}-{% cycle red,blue %}{% else %}{% endifchanged %},{% endfor %}', {'ids': [1, 1, 2, 2, 2, 3]}, '1-red,1,2-blue,2,2,3-red,'),
 
-            'ifchanged-else04': ('{% for id in ids %}{% ifchanged %}***{{ id }}*{% else %}...{% endifchanged %}{{ forloop.counter }}{% endfor %}', {'ids': [1,1,2,2,2,3,4]}, '***1*1...2***2*3...4...5***3*6***4*7'),
+            'ifchanged-else04': ('{% for id in ids %}{% ifchanged %}***{{ id }}*{% else %}...{% endifchanged %}{{ forloop.counter }}{% endfor %}', {'ids': [1, 1, 2, 2, 2, 3, 4]}, '***1*1...2***2*3...4...5***3*6***4*7'),
 
             # Test whitespace in filter arguments
-            'ifchanged-filter-ws': ('{% load custom %}{% for n in num %}{% ifchanged n|noop:"x y" %}..{% endifchanged %}{{ n }}{% endfor %}', {'num': (1,2,3)}, '..1..2..3'),
+            'ifchanged-filter-ws': ('{% load custom %}{% for n in num %}{% ifchanged n|noop:"x y" %}..{% endifchanged %}{{ n }}{% endfor %}', {'num': (1, 2, 3)}, '..1..2..3'),
 
             ### IFEQUAL TAG ###########################################################
             'ifequal01': ("{% ifequal a b %}yes{% endifequal %}", {"a": 1, "b": 2}, ""),
@@ -1373,9 +1411,9 @@ class TemplateTests(TransRealMixin, TestCase):
             'spaceless01': ("{% spaceless %} <b>    <i> text </i>    </b> {% endspaceless %}", {}, "<b><i> text </i></b>"),
             'spaceless02': ("{% spaceless %} <b> \n <i> text </i> \n </b> {% endspaceless %}", {}, "<b><i> text </i></b>"),
             'spaceless03': ("{% spaceless %}<b><i>text</i></b>{% endspaceless %}", {}, "<b><i>text</i></b>"),
-            'spaceless04': ("{% spaceless %}<b>   <i>{{ text }}</i>  </b>{% endspaceless %}", {'text' : 'This & that'}, "<b><i>This &amp; that</i></b>"),
-            'spaceless05': ("{% autoescape off %}{% spaceless %}<b>   <i>{{ text }}</i>  </b>{% endspaceless %}{% endautoescape %}", {'text' : 'This & that'}, "<b><i>This & that</i></b>"),
-            'spaceless06': ("{% spaceless %}<b>   <i>{{ text|safe }}</i>  </b>{% endspaceless %}", {'text' : 'This & that'}, "<b><i>This & that</i></b>"),
+            'spaceless04': ("{% spaceless %}<b>   <i>{{ text }}</i>  </b>{% endspaceless %}", {'text': 'This & that'}, "<b><i>This &amp; that</i></b>"),
+            'spaceless05': ("{% autoescape off %}{% spaceless %}<b>   <i>{{ text }}</i>  </b>{% endspaceless %}{% endautoescape %}", {'text': 'This & that'}, "<b><i>This & that</i></b>"),
+            'spaceless06': ("{% spaceless %}<b>   <i>{{ text|safe }}</i>  </b>{% endspaceless %}", {'text': 'This & that'}, "<b><i>This & that</i></b>"),
 
             # simple translation of a string delimited by '
             'i18n01': ("{% load i18n %}{% trans 'xxxyyyxxx' %}", {}, "xxxyyyxxx"),
@@ -1476,8 +1514,8 @@ class TemplateTests(TransRealMixin, TestCase):
 
             ### HANDLING OF TEMPLATE_STRING_IF_INVALID ###################################
 
-            'invalidstr01': ('{{ var|default:"Foo" }}', {}, ('Foo','INVALID')),
-            'invalidstr02': ('{{ var|default_if_none:"Foo" }}', {}, ('','INVALID')),
+            'invalidstr01': ('{{ var|default:"Foo" }}', {}, ('Foo', 'INVALID')),
+            'invalidstr02': ('{{ var|default_if_none:"Foo" }}', {}, ('', 'INVALID')),
             'invalidstr03': ('{% for v in var %}({{ v }}){% endfor %}', {}, ''),
             'invalidstr04': ('{% if var %}Yes{% else %}No{% endif %}', {}, 'No'),
             'invalidstr04_2': ('{% if var|default:"Foo" %}Yes{% else %}No{% endif %}', {}, 'Yes'),
@@ -1512,11 +1550,11 @@ class TemplateTests(TransRealMixin, TestCase):
                           '{{ item.foo }}'
                           '{% endfor %},'
                           '{% endfor %}',
-                          {'data': [ {'foo':'c', 'bar':1},
-                                     {'foo':'d', 'bar':1},
-                                     {'foo':'a', 'bar':2},
-                                     {'foo':'b', 'bar':2},
-                                     {'foo':'x', 'bar':3}  ]},
+                          {'data': [{'foo': 'c', 'bar': 1},
+                                    {'foo': 'd', 'bar': 1},
+                                    {'foo': 'a', 'bar': 2},
+                                    {'foo': 'b', 'bar': 2},
+                                    {'foo': 'x', 'bar': 3}]},
                           '1:cd,2:ab,3:x,'),
 
             # Test for silent failure when target variable isn't found
@@ -1557,13 +1595,13 @@ class TemplateTests(TransRealMixin, TestCase):
 
             # Test syntax
             'regroup05': ('{% regroup data by bar as %}', {},
-                           template.TemplateSyntaxError),
+                template.TemplateSyntaxError),
             'regroup06': ('{% regroup data by bar thisaintright grouped %}', {},
-                           template.TemplateSyntaxError),
+                template.TemplateSyntaxError),
             'regroup07': ('{% regroup data thisaintright bar as grouped %}', {},
-                           template.TemplateSyntaxError),
+                template.TemplateSyntaxError),
             'regroup08': ('{% regroup data by bar as grouped toomanyargs %}', {},
-                           template.TemplateSyntaxError),
+                template.TemplateSyntaxError),
 
             ### SSI TAG ########################################################
 
@@ -1604,44 +1642,44 @@ class TemplateTests(TransRealMixin, TestCase):
             'simpletag-renamed03': ('{% load custom %}{% minustwo_overridden_name 7 %}', {}, template.TemplateSyntaxError),
 
             ### WIDTHRATIO TAG ########################################################
-            'widthratio01': ('{% widthratio a b 0 %}', {'a':50,'b':100}, '0'),
-            'widthratio02': ('{% widthratio a b 100 %}', {'a':0,'b':0}, '0'),
-            'widthratio03': ('{% widthratio a b 100 %}', {'a':0,'b':100}, '0'),
-            'widthratio04': ('{% widthratio a b 100 %}', {'a':50,'b':100}, '50'),
-            'widthratio05': ('{% widthratio a b 100 %}', {'a':100,'b':100}, '100'),
+            'widthratio01': ('{% widthratio a b 0 %}', {'a': 50, 'b': 100}, '0'),
+            'widthratio02': ('{% widthratio a b 100 %}', {'a': 0, 'b': 0}, '0'),
+            'widthratio03': ('{% widthratio a b 100 %}', {'a': 0, 'b': 100}, '0'),
+            'widthratio04': ('{% widthratio a b 100 %}', {'a': 50, 'b': 100}, '50'),
+            'widthratio05': ('{% widthratio a b 100 %}', {'a': 100, 'b': 100}, '100'),
 
             # 62.5 should round to 63 on Python 2 and 62 on Python 3
             # See http://docs.python.org/py3k/whatsnew/3.0.html
-            'widthratio06': ('{% widthratio a b 100 %}', {'a':50,'b':80}, '62' if six.PY3 else '63'),
+            'widthratio06': ('{% widthratio a b 100 %}', {'a': 50, 'b': 80}, '62' if six.PY3 else '63'),
 
             # 71.4 should round to 71
-            'widthratio07': ('{% widthratio a b 100 %}', {'a':50,'b':70}, '71'),
+            'widthratio07': ('{% widthratio a b 100 %}', {'a': 50, 'b': 70}, '71'),
 
             # Raise exception if we don't have 3 args, last one an integer
             'widthratio08': ('{% widthratio %}', {}, template.TemplateSyntaxError),
-            'widthratio09': ('{% widthratio a b %}', {'a':50,'b':100}, template.TemplateSyntaxError),
-            'widthratio10': ('{% widthratio a b 100.0 %}', {'a':50,'b':100}, '50'),
+            'widthratio09': ('{% widthratio a b %}', {'a': 50, 'b': 100}, template.TemplateSyntaxError),
+            'widthratio10': ('{% widthratio a b 100.0 %}', {'a': 50, 'b': 100}, '50'),
 
             # #10043: widthratio should allow max_width to be a variable
-            'widthratio11': ('{% widthratio a b c %}', {'a':50,'b':100, 'c': 100}, '50'),
+            'widthratio11': ('{% widthratio a b c %}', {'a': 50, 'b': 100, 'c': 100}, '50'),
 
             # #18739: widthratio should handle None args consistently with non-numerics
-            'widthratio12a': ('{% widthratio a b c %}', {'a':'a','b':100,'c':100}, ''),
-            'widthratio12b': ('{% widthratio a b c %}', {'a':None,'b':100,'c':100}, ''),
-            'widthratio13a': ('{% widthratio a b c %}', {'a':0,'b':'b','c':100}, ''),
-            'widthratio13b': ('{% widthratio a b c %}', {'a':0,'b':None,'c':100}, ''),
-            'widthratio14a': ('{% widthratio a b c %}', {'a':0,'b':100,'c':'c'}, template.TemplateSyntaxError),
-            'widthratio14b': ('{% widthratio a b c %}', {'a':0,'b':100,'c':None}, template.TemplateSyntaxError),
+            'widthratio12a': ('{% widthratio a b c %}', {'a': 'a', 'b': 100, 'c': 100}, ''),
+            'widthratio12b': ('{% widthratio a b c %}', {'a': None, 'b': 100, 'c': 100}, ''),
+            'widthratio13a': ('{% widthratio a b c %}', {'a': 0, 'b': 'b', 'c': 100}, ''),
+            'widthratio13b': ('{% widthratio a b c %}', {'a': 0, 'b': None, 'c': 100}, ''),
+            'widthratio14a': ('{% widthratio a b c %}', {'a': 0, 'b': 100, 'c': 'c'}, template.TemplateSyntaxError),
+            'widthratio14b': ('{% widthratio a b c %}', {'a': 0, 'b': 100, 'c': None}, template.TemplateSyntaxError),
 
             # Test whitespace in filter argument
-            'widthratio15': ('{% load custom %}{% widthratio a|noop:"x y" b 0 %}', {'a':50,'b':100}, '0'),
+            'widthratio15': ('{% load custom %}{% widthratio a|noop:"x y" b 0 %}', {'a': 50, 'b': 100}, '0'),
 
             # Widthratio with variable assignment
-            'widthratio16': ('{% widthratio a b 100 as variable %}-{{ variable }}-', {'a':50,'b':100}, '-50-'),
-            'widthratio17': ('{% widthratio a b 100 as variable %}-{{ variable }}-', {'a':100,'b':100}, '-100-'),
+            'widthratio16': ('{% widthratio a b 100 as variable %}-{{ variable }}-', {'a': 50, 'b': 100}, '-50-'),
+            'widthratio17': ('{% widthratio a b 100 as variable %}-{{ variable }}-', {'a': 100, 'b': 100}, '-100-'),
 
-            'widthratio18': ('{% widthratio a b 100 as %}', { }, template.TemplateSyntaxError),
-            'widthratio19': ('{% widthratio a b 100 not_as variable %}', { }, template.TemplateSyntaxError),
+            'widthratio18': ('{% widthratio a b 100 as %}', {}, template.TemplateSyntaxError),
+            'widthratio19': ('{% widthratio a b 100 not_as variable %}', {}, template.TemplateSyntaxError),
 
             ### WITH TAG ########################################################
             'with01': ('{% with key=dict.key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, '50'),
@@ -1660,11 +1698,11 @@ class TemplateTests(TransRealMixin, TestCase):
             'now01': ('{% now "j n Y" %}', {}, "%d %d %d" % (
                 datetime.now().day, datetime.now().month, datetime.now().year)),
             # Check parsing of locale strings
-            'now02': ('{% now "DATE_FORMAT" %}', {},  date_format(datetime.now())),
+            'now02': ('{% now "DATE_FORMAT" %}', {}, date_format(datetime.now())),
             # Also accept simple quotes - #15092
             'now03': ("{% now 'j n Y' %}", {}, "%d %d %d" % (
                 datetime.now().day, datetime.now().month, datetime.now().year)),
-            'now04': ("{% now 'DATE_FORMAT' %}", {},  date_format(datetime.now())),
+            'now04': ("{% now 'DATE_FORMAT' %}", {}, date_format(datetime.now())),
             'now05': ('''{% now 'j "n" Y'%}''', {}, '''%d "%d" %d''' % (
                 datetime.now().day, datetime.now().month, datetime.now().year)),
             'now06': ('''{% now "j 'n' Y"%}''', {}, '''%d '%d' %d''' % (
@@ -1687,8 +1725,8 @@ class TemplateTests(TransRealMixin, TestCase):
             'url10': ('{% url "template_tests.views.client_action" id=client.id action="two words" %}', {'client': {'id': 1}}, '/url_tag/client/1/two%20words/'),
             'url11': ('{% url "template_tests.views.client_action" id=client.id action="==" %}', {'client': {'id': 1}}, '/url_tag/client/1/%3D%3D/'),
             'url12': ('{% url "template_tests.views.client_action" id=client.id action="," %}', {'client': {'id': 1}}, '/url_tag/client/1/%2C/'),
-            'url13': ('{% url "template_tests.views.client_action" id=client.id action=arg|join:"-" %}', {'client': {'id': 1}, 'arg':['a','b']}, '/url_tag/client/1/a-b/'),
-            'url14': ('{% url "template_tests.views.client_action" client.id arg|join:"-" %}', {'client': {'id': 1}, 'arg':['a','b']}, '/url_tag/client/1/a-b/'),
+            'url13': ('{% url "template_tests.views.client_action" id=client.id action=arg|join:"-" %}', {'client': {'id': 1}, 'arg': ['a', 'b']}, '/url_tag/client/1/a-b/'),
+            'url14': ('{% url "template_tests.views.client_action" client.id arg|join:"-" %}', {'client': {'id': 1}, 'arg': ['a', 'b']}, '/url_tag/client/1/a-b/'),
             'url15': ('{% url "template_tests.views.client_action" 12 "test" %}', {}, '/url_tag/client/12/test/'),
             'url18': ('{% url "template_tests.views.client" "1,2" %}', {}, '/url_tag/client/1%2C2/'),
 
@@ -1747,7 +1785,6 @@ class TemplateTests(TransRealMixin, TestCase):
             # Test whitespace in filter arguments
             'cache18': ('{% load cache custom %}{% cache 2|noop:"x y" cache18 %}cache18{% endcache %}', {}, 'cache18'),
 
-
             ### AUTOESCAPE TAG ##############################################
             'autoescape-tag01': ("{% autoescape off %}hello{% endautoescape %}", {}, "hello"),
             'autoescape-tag02': ("{% autoescape off %}{{ first }}{% endautoescape %}", {"first": "<b>hello</b>"}, "<b>hello</b>"),
@@ -1778,20 +1815,20 @@ class TemplateTests(TransRealMixin, TestCase):
             'autoescape-filtertag01': ("{{ first }}{% filter safe %}{{ first }} x<y{% endfilter %}", {"first": "<a>"}, template.TemplateSyntaxError),
 
             # ifqeual compares unescaped vales.
-            'autoescape-ifequal01': ('{% ifequal var "this & that" %}yes{% endifequal %}', { "var": "this & that" }, "yes"),
+            'autoescape-ifequal01': ('{% ifequal var "this & that" %}yes{% endifequal %}', {"var": "this & that"}, "yes"),
 
             # Arguments to filters are 'safe' and manipulate their input unescaped.
-            'autoescape-filters01': ('{{ var|cut:"&" }}', { "var": "this & that" }, "this  that" ),
-            'autoescape-filters02': ('{{ var|join:" & \" }}', { "var": ("Tom", "Dick", "Harry") }, "Tom & Dick & Harry"),
+            'autoescape-filters01': ('{{ var|cut:"&" }}', {"var": "this & that"}, "this  that"),
+            'autoescape-filters02': ('{{ var|join:" & \" }}', {"var": ("Tom", "Dick", "Harry")}, "Tom & Dick & Harry"),
 
             # Literal strings are safe.
-            'autoescape-literals01': ('{{ "this & that" }}',{}, "this & that"),
+            'autoescape-literals01': ('{{ "this & that" }}', {}, "this & that"),
 
             # Iterating over strings outputs safe characters.
             'autoescape-stringiterations01': ('{% for l in var %}{{ l }},{% endfor %}', {'var': 'K&R'}, "K,&amp;,R,"),
 
             # Escape requirement survives lookup.
-            'autoescape-lookup01': ('{{ var.key }}', { "var": {"key": "this & that" }}, "this &amp; that"),
+            'autoescape-lookup01': ('{{ var.key }}', {"var": {"key": "this & that"}}, "this &amp; that"),
 
             # Static template tags
             'static-prefixtag01': ('{% load static %}{% get_static_prefix %}', {}, settings.STATIC_URL),
@@ -1821,20 +1858,18 @@ class TemplateTests(TransRealMixin, TestCase):
                 'numpy-array-index02': ("{{ var.5 }}", {"var": numpy.array(["first item", "second item"])}, ("", "INVALID")),
             })
 
-
         return tests
 
-class TemplateTagLoading(unittest.TestCase):
+
+class TemplateTagLoading(TestCase):
 
     def setUp(self):
         self.old_path = sys.path[:]
-        self.old_apps = settings.INSTALLED_APPS
         self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
         self.old_tag_modules = template_base.templatetags_modules
         template_base.templatetags_modules = []
 
     def tearDown(self):
-        settings.INSTALLED_APPS = self.old_apps
         sys.path = self.old_path
         template_base.templatetags_modules = self.old_tag_modules
 
@@ -1847,11 +1882,11 @@ class TemplateTagLoading(unittest.TestCase):
             self.assertTrue('ImportError' in e.args[0])
             self.assertTrue('Xtemplate' in e.args[0])
 
+    @override_settings(INSTALLED_APPS=('tagsegg',))
     def test_load_error_egg(self):
         ttext = "{% load broken_egg %}"
         egg_name = '%s/tagsegg.egg' % self.egg_dir
         sys.path.append(egg_name)
-        settings.INSTALLED_APPS = ('tagsegg',)
         self.assertRaises(template.TemplateSyntaxError, template.Template, ttext)
         try:
             template.Template(ttext)
@@ -1859,12 +1894,12 @@ class TemplateTagLoading(unittest.TestCase):
             self.assertTrue('ImportError' in e.args[0])
             self.assertTrue('Xtemplate' in e.args[0])
 
+    @override_settings(INSTALLED_APPS=('tagsegg',))
     def test_load_working_egg(self):
         ttext = "{% load working_egg %}"
         egg_name = '%s/tagsegg.egg' % self.egg_dir
         sys.path.append(egg_name)
-        settings.INSTALLED_APPS = ('tagsegg',)
-        t = template.Template(ttext)
+        template.Template(ttext)
 
 
 class RequestContextTests(unittest.TestCase):

@@ -1,8 +1,16 @@
 from __future__ import unicode_literals
 
 import datetime
+from unittest import skipIf
 
-from django.test import TestCase
+try:
+    import pytz
+except ImportError:
+    pytz = None
+
+from django.test import TestCase, override_settings
+from django.utils import timezone
+
 
 from .models import Article, Comment, Category
 
@@ -81,3 +89,11 @@ class DateTimesTests(TestCase):
             ],
             lambda d: d,
         )
+
+    @skipIf(pytz is None, "this test requires pytz")
+    @override_settings(USE_TZ=True)
+    def test_21432(self):
+        now = timezone.localtime(timezone.now().replace(microsecond=0))
+        Article.objects.create(title="First one", pub_date=now)
+        qs = Article.objects.datetimes('pub_date', 'second')
+        self.assertEqual(qs[0], now)

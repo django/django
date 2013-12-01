@@ -20,12 +20,14 @@ from django.contrib.sessions.exceptions import SuspiciousSession
 # on case insensitive file systems.
 VALID_KEY_CHARS = string.ascii_lowercase + string.digits
 
+
 class CreateError(Exception):
     """
     Used internally as a consistent exception type to catch from save (see the
     docstring for SessionBase.save() for details).
     """
     pass
+
 
 class SessionBase(object):
     """

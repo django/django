@@ -12,7 +12,7 @@ import socket
 import sys
 import threading
 import unittest
-from unittest import skipIf         # Imported here for backward compatibility
+from unittest import skipIf         # NOQA: Imported here for backward compatibility
 from unittest.util import safe_repr
 
 from django.conf import settings
@@ -61,8 +61,10 @@ real_enter_transaction_management = transaction.enter_transaction_management
 real_leave_transaction_management = transaction.leave_transaction_management
 real_abort = transaction.abort
 
+
 def nop(*args, **kwargs):
     return
+
 
 def disable_transaction_methods():
     transaction.commit = nop
@@ -70,6 +72,7 @@ def disable_transaction_methods():
     transaction.enter_transaction_management = nop
     transaction.leave_transaction_management = nop
     transaction.abort = nop
+
 
 def restore_transaction_methods():
     transaction.commit = real_commit
@@ -157,6 +160,7 @@ class SimpleTestCase(unittest.TestCase):
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
+    _custom_settings = None
 
     def __call__(self, result=None):
         """
@@ -193,6 +197,9 @@ class SimpleTestCase(unittest.TestCase):
         * If the class has a 'urls' attribute, replace ROOT_URLCONF with it.
         * Clearing the mail test outbox.
         """
+        if self._custom_settings:
+            self._overridden = override_settings(**self._custom_settings)
+            self._overridden.enable()
         self.client = self.client_class()
         self._urlconf_setup()
         mail.outbox = []
@@ -210,6 +217,8 @@ class SimpleTestCase(unittest.TestCase):
         * Putting back the original ROOT_URLCONF if it was changed.
         """
         self._urlconf_teardown()
+        if self._custom_settings:
+            self._overridden.disable()
 
     def _urlconf_teardown(self):
         set_urlconf(None)
@@ -237,6 +246,8 @@ class SimpleTestCase(unittest.TestCase):
         if msg_prefix:
             msg_prefix += ": "
 
+        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(expected_url)
+
         if hasattr(response, 'redirect_chain'):
             # The request was a followed redirect
             self.assertTrue(len(response.redirect_chain) > 0,
@@ -250,6 +261,7 @@ class SimpleTestCase(unittest.TestCase):
                     (response.redirect_chain[0][1], status_code))
 
             url, status_code = response.redirect_chain[-1]
+            scheme, netloc, path, query, fragment = urlsplit(url)
 
             self.assertEqual(response.status_code, target_status_code,
                 msg_prefix + "Response didn't redirect as expected: Final"
@@ -267,7 +279,8 @@ class SimpleTestCase(unittest.TestCase):
             scheme, netloc, path, query, fragment = urlsplit(url)
 
             if fetch_redirect_response:
-                redirect_response = response.client.get(path, QueryDict(query))
+                redirect_response = response.client.get(path, QueryDict(query),
+                                                        secure=(scheme == 'https'))
 
                 # Get the redirection page, using the same client that was used
                 # to obtain the original response.
@@ -276,11 +289,10 @@ class SimpleTestCase(unittest.TestCase):
                     " response code was %d (expected %d)" %
                         (path, redirect_response.status_code, target_status_code))
 
-        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(
-                                                              expected_url)
-        if not (e_scheme or e_netloc):
-            expected_url = urlunsplit(('http', host or 'testserver', e_path,
-                e_query, e_fragment))
+        e_scheme = e_scheme if e_scheme else scheme or 'http'
+        e_netloc = e_netloc if e_netloc else host or 'testserver'
+        expected_url = urlunsplit((e_scheme, e_netloc, e_path, e_query,
+            e_fragment))
 
         self.assertEqual(url, expected_url,
             msg_prefix + "Response redirected to '%s', expected '%s'" %
@@ -370,7 +382,7 @@ class SimpleTestCase(unittest.TestCase):
 
         # Search all contexts for the error.
         found_form = False
-        for i,context in enumerate(contexts):
+        for i, context in enumerate(contexts):
             if form not in context:
                 continue
             found_form = True
@@ -494,7 +506,8 @@ class SimpleTestCase(unittest.TestCase):
             # use this template with context manager
             return template_name, None, msg_prefix
 
-        template_names = [t.name for t in response.templates]
+        template_names = [t.name for t in response.templates if t.name is not
+                          None]
         return None, template_names, msg_prefix
 
     def assertTemplateUsed(self, response=None, template_name=None, msg_prefix=''):
@@ -595,7 +608,7 @@ class SimpleTestCase(unittest.TestCase):
             self.assertEqual(optional.clean(e), empty_value)
         # test that max_length and min_length are always accepted
         if issubclass(fieldclass, CharField):
-            field_kwargs.update({'min_length':2, 'max_length':20})
+            field_kwargs.update({'min_length': 2, 'max_length': 20})
             self.assertTrue(isinstance(fieldclass(*field_args, **field_kwargs),
                                        fieldclass))
 
@@ -735,7 +748,7 @@ class TransactionTestCase(SimpleTestCase):
         conn = connections[db_name]
         if conn.features.supports_sequence_reset:
             sql_list = conn.ops.sequence_reset_by_name_sql(
-                    no_style(), conn.introspection.sequence_list())
+                no_style(), conn.introspection.sequence_list())
             if sql_list:
                 with transaction.commit_on_success_unless_managed(using=db_name):
                     cursor = conn.cursor()
@@ -844,10 +857,10 @@ class TestCase(TransactionTestCase):
                 try:
                     call_command('loaddata', *self.fixtures,
                                  **{
-                                    'verbosity': 0,
-                                    'commit': False,
-                                    'database': db_name,
-                                    'skip_validation': True,
+                                     'verbosity': 0,
+                                     'commit': False,
+                                     'database': db_name,
+                                     'skip_validation': True,
                                  })
                 except Exception:
                     self._fixture_teardown()
@@ -1055,12 +1068,11 @@ class LiveServerThread(threading.Thread):
             self.error = e
             self.is_ready.set()
 
-    def join(self, timeout=None):
+    def terminate(self):
         if hasattr(self, 'httpd'):
             # Stop the WSGI server
             self.httpd.shutdown()
             self.httpd.server_close()
-        super(LiveServerThread, self).join(timeout)
 
 
 class LiveServerTestCase(TransactionTestCase):
@@ -1140,6 +1152,7 @@ class LiveServerTestCase(TransactionTestCase):
         # reasons has raised an exception.
         if hasattr(cls, 'server_thread'):
             # Terminate the live server's thread
+            cls.server_thread.terminate()
             cls.server_thread.join()
 
         # Restore sqlite connections' non-sharability

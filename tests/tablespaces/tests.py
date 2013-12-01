@@ -4,9 +4,8 @@ import copy
 
 from django.conf import settings
 from django.db import connection
-from django.db import models
 from django.db.models.loading import cache
-from django.core.management.color import no_style 
+from django.core.management.color import no_style
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import Article, ArticleRef, Authors, Reviewers, Scientist, ScientistRef
@@ -15,8 +14,10 @@ from .models import Article, ArticleRef, Authors, Reviewers, Scientist, Scientis
 # because they're evaluated when the model class is defined. As a consequence,
 # @override_settings doesn't work, and the tests depend
 
+
 def sql_for_table(model):
     return '\n'.join(connection.creation.sql_create_model(model, no_style())[0])
+
 
 def sql_for_index(model):
     return '\n'.join(connection.creation.sql_indexes_for_model(model, no_style()))

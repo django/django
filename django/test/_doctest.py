@@ -613,10 +613,10 @@ class DocTestParser:
                      self._parse_example(m, name, lineno)
             # Create an Example, and add it to the list.
             if not self._IS_BLANK_OR_COMMENT(source):
-                output.append( Example(source, want, exc_msg,
+                output.append(Example(source, want, exc_msg,
                                     lineno=lineno,
                                     indent=min_indent+len(m.group('indent')),
-                                    options=options) )
+                                    options=options))
             # Update lineno (lines inside this example)
             lineno += string.count('\n', m.start(), m.end())
             # Update charno.
@@ -898,7 +898,7 @@ class DocTestFinder:
         elif hasattr(object, '__module__'):
             return module.__name__ == object.__module__
         elif isinstance(object, property):
-            return True # [XX] no way not be sure.
+            return True  # [XX] no way not be sure.
         else:
             raise ValueError("object must be a class or function")
 
@@ -1221,7 +1221,7 @@ class DocTestRunner:
         # to modify them).
         original_optionflags = self.optionflags
 
-        SUCCESS, FAILURE, BOOM = range(3) # `outcome` state
+        SUCCESS, FAILURE, BOOM = range(3)  # `outcome` state
 
         check = self._checker.check_output
 
@@ -1274,7 +1274,7 @@ class DocTestRunner:
                     # Strip b"" and u"" prefixes from the repr and expected output
                     # TODO: better way of stripping the prefixes?
                     expected = example.want
-                    expected = expected.strip() # be wary of newlines
+                    expected = expected.strip()  # be wary of newlines
                     s = s.replace("u", "")
                     s = s.replace("b", "")
                     expected = expected.replace("u", "")
@@ -1288,7 +1288,7 @@ class DocTestRunner:
                     lines.append(s)
 
                     # let them match
-                    if s == expected: # be wary of false positives here
+                    if s == expected:  # be wary of false positives here
                         # they should be the same, print expected value
                         sys.stdout.write("%s\n" % example.want.strip())
 
@@ -1314,13 +1314,13 @@ class DocTestRunner:
                 # Don't blink!  This is where the user's code gets run.
                 six.exec_(compile(example.source, filename, "single",
                              compileflags, 1), test.globs)
-                self.debugger.set_continue() # ==== Example Finished ====
+                self.debugger.set_continue()  # ==== Example Finished ====
                 exception = None
             except KeyboardInterrupt:
                 raise
             except:
                 exception = sys.exc_info()
-                self.debugger.set_continue() # ==== Example Finished ====
+                self.debugger.set_continue()  # ==== Example Finished ====
             finally:
                 # restore the original displayhook
                 sys.displayhook = original_displayhook
@@ -1345,7 +1345,7 @@ class DocTestRunner:
                     # exception message will be in group(2)
                     m = re.match(r'(.*)\.(\w+:.+\s)', exc_msg)
                     # make sure there's a match
-                    if m != None:
+                    if m is not None:
                         f_name = m.group(1)
                         # check to see if m.group(1) contains the module name
                         if f_name == exception[0].__module__:
@@ -1498,7 +1498,7 @@ class DocTestRunner:
             if t == 0:
                 notests.append(name)
             elif f == 0:
-                passed.append( (name, t) )
+                passed.append((name, t))
             else:
                 failed.append(x)
         if verbose:
@@ -1647,11 +1647,11 @@ class OutputChecker:
             # Use difflib to find their differences.
             if optionflags & REPORT_UDIFF:
                 diff = difflib.unified_diff(want_lines, got_lines, n=2)
-                diff = list(diff)[2:] # strip the diff header
+                diff = list(diff)[2:]  # strip the diff header
                 kind = 'unified diff with -expected +actual'
             elif optionflags & REPORT_CDIFF:
                 diff = difflib.context_diff(want_lines, got_lines, n=2)
-                diff = list(diff)[2:] # strip the diff header
+                diff = list(diff)[2:]  # strip the diff header
                 kind = 'context diff with expected followed by actual'
             elif optionflags & REPORT_NDIFF:
                 engine = difflib.Differ(charjunk=difflib.IS_CHARACTER_JUNK)

@@ -7,6 +7,7 @@ from django.contrib.gis.gdal.prototypes import ds as capi
 from django.utils import six
 from django.utils.encoding import force_bytes
 
+
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
 #
@@ -15,11 +16,11 @@ class Driver(GDALBase):
     "Wraps an OGR Data Source Driver."
 
     # Case-insensitive aliases for OGR Drivers.
-    _alias = {'esri' : 'ESRI Shapefile',
-              'shp' : 'ESRI Shapefile',
-              'shape' : 'ESRI Shapefile',
-              'tiger' : 'TIGER',
-              'tiger/line' : 'TIGER',
+    _alias = {'esri': 'ESRI Shapefile',
+              'shp': 'ESRI Shapefile',
+              'shape': 'ESRI Shapefile',
+              'tiger': 'TIGER',
+              'tiger/line': 'TIGER',
               }
 
     def __init__(self, dr_input):
@@ -59,7 +60,8 @@ class Driver(GDALBase):
         "Attempts to register all the data source drivers."
         # Only register all if the driver count is 0 (or else all drivers
         # will be registered over and over again)
-        if not self.driver_count: capi.register_all()
+        if not self.driver_count:
+            capi.register_all()
 
     # Driver properties
     @property

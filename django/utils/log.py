@@ -1,5 +1,4 @@
 import logging
-import traceback
 
 from django.conf import settings
 from django.core import mail
@@ -7,8 +6,8 @@ from django.core.mail import get_connection
 from django.views.debug import ExceptionReporter, get_exception_reporter_filter
 
 # Imports kept for backwards-compatibility in Django 1.7.
-from logging import NullHandler
-from logging.config import dictConfig
+from logging import NullHandler  # NOQA
+from logging.config import dictConfig  # NOQA
 
 getLogger = logging.getLogger
 

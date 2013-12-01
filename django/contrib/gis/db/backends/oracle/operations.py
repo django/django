@@ -28,6 +28,7 @@ class SDOOperation(SpatialFunction):
         kwargs.setdefault('result', 'TRUE')
         super(SDOOperation, self).__init__(func, **kwargs)
 
+
 class SDODistance(SpatialFunction):
     "Class for Distance queries."
     sql_template = ('%(function)s(%(geo_col)s, %(geometry)s, %(tolerance)s) '
@@ -39,12 +40,14 @@ class SDODistance(SpatialFunction):
                                           tolerance=tolerance,
                                           operator=op, result='%s')
 
+
 class SDODWithin(SpatialFunction):
     dwithin_func = 'SDO_WITHIN_DISTANCE'
     sql_template = "%(function)s(%(geo_col)s, %(geometry)s, %%s) = 'TRUE'"
 
     def __init__(self):
         super(SDODWithin, self).__init__(self.dwithin_func)
+
 
 class SDOGeomRelate(SpatialFunction):
     "Class for using SDO_GEOM.RELATE."
@@ -57,6 +60,7 @@ class SDOGeomRelate(SpatialFunction):
         # Moreover, the runction result is the mask (e.g., 'DISJOINT' instead of 'TRUE').
         super(SDOGeomRelate, self).__init__(self.relate_func, operator='=',
                                             mask=mask, tolerance=tolerance)
+
 
 class SDORelate(SpatialFunction):
     "Class for using SDO_RELATE."
@@ -73,6 +77,7 @@ class SDORelate(SpatialFunction):
 # Valid distance types and substitutions
 dtypes = (Decimal, Distance, float) + six.integer_types
 
+
 class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     compiler_module = "django.contrib.gis.db.backends.oracle.compiler"
 
@@ -81,7 +86,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     valid_aggregates = {'Union', 'Extent'}
 
     Adapter = OracleSpatialAdapter
-    Adaptor = Adapter # Backwards-compatibility alias.
+    Adaptor = Adapter  # Backwards-compatibility alias.
 
     area = 'SDO_GEOM.SDO_AREA'
     gml = 'SDO_UTIL.TO_GMLGEOMETRY'
@@ -109,33 +114,33 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     select = 'SDO_UTIL.TO_WKTGEOMETRY(%s)'
 
     distance_functions = {
-        'distance_gt' : (SDODistance('>'), dtypes),
-        'distance_gte' : (SDODistance('>='), dtypes),
-        'distance_lt' : (SDODistance('<'), dtypes),
-        'distance_lte' : (SDODistance('<='), dtypes),
-        'dwithin' : (SDODWithin(), dtypes),
-        }
+        'distance_gt': (SDODistance('>'), dtypes),
+        'distance_gte': (SDODistance('>='), dtypes),
+        'distance_lt': (SDODistance('<'), dtypes),
+        'distance_lte': (SDODistance('<='), dtypes),
+        'dwithin': (SDODWithin(), dtypes),
+    }
 
     geometry_functions = {
-        'contains' : SDOOperation('SDO_CONTAINS'),
-        'coveredby' : SDOOperation('SDO_COVEREDBY'),
-        'covers' : SDOOperation('SDO_COVERS'),
-        'disjoint' : SDOGeomRelate('DISJOINT'),
-        'intersects' : SDOOperation('SDO_OVERLAPBDYINTERSECT'), # TODO: Is this really the same as ST_Intersects()?
-        'equals' : SDOOperation('SDO_EQUAL'),
-        'exact' : SDOOperation('SDO_EQUAL'),
-        'overlaps' : SDOOperation('SDO_OVERLAPS'),
-        'same_as' : SDOOperation('SDO_EQUAL'),
-        'relate' : (SDORelate, six.string_types), # Oracle uses a different syntax, e.g., 'mask=inside+touch'
-        'touches' : SDOOperation('SDO_TOUCH'),
-        'within' : SDOOperation('SDO_INSIDE'),
-        }
+        'contains': SDOOperation('SDO_CONTAINS'),
+        'coveredby': SDOOperation('SDO_COVEREDBY'),
+        'covers': SDOOperation('SDO_COVERS'),
+        'disjoint': SDOGeomRelate('DISJOINT'),
+        'intersects': SDOOperation('SDO_OVERLAPBDYINTERSECT'),  # TODO: Is this really the same as ST_Intersects()?
+        'equals': SDOOperation('SDO_EQUAL'),
+        'exact': SDOOperation('SDO_EQUAL'),
+        'overlaps': SDOOperation('SDO_OVERLAPS'),
+        'same_as': SDOOperation('SDO_EQUAL'),
+        'relate': (SDORelate, six.string_types),  # Oracle uses a different syntax, e.g., 'mask=inside+touch'
+        'touches': SDOOperation('SDO_TOUCH'),
+        'within': SDOOperation('SDO_INSIDE'),
+    }
     geometry_functions.update(distance_functions)
 
     gis_terms = set(['isnull'])
     gis_terms.update(geometry_functions)
 
-    truncate_params = {'relate' : None}
+    truncate_params = {'relate': None}
 
     def convert_extent(self, clob):
         if clob:

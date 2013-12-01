@@ -13,6 +13,7 @@ handler403 = 'django.views.defaults.permission_denied'
 handler404 = 'django.views.defaults.page_not_found'
 handler500 = 'django.views.defaults.server_error'
 
+
 def include(arg, namespace=None, app_name=None):
     if isinstance(arg, tuple):
         # callable returning a namespace hint
@@ -39,6 +40,7 @@ def include(arg, namespace=None, app_name=None):
 
     return (urlconf_module, app_name, namespace)
 
+
 def patterns(prefix, *args):
     pattern_list = []
     for t in args:
@@ -49,8 +51,9 @@ def patterns(prefix, *args):
         pattern_list.append(t)
     return pattern_list
 
+
 def url(regex, view, kwargs=None, name=None, prefix=''):
-    if isinstance(view, (list,tuple)):
+    if isinstance(view, (list, tuple)):
         # For include(...) processing.
         urlconf_module, app_name, namespace = view
         return RegexURLResolver(regex, urlconf_module, kwargs, app_name=app_name, namespace=namespace)
@@ -61,4 +64,3 @@ def url(regex, view, kwargs=None, name=None, prefix=''):
             if prefix:
                 view = prefix + '.' + view
         return RegexURLPattern(regex, view, kwargs, name)
-

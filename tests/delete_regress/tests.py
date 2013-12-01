@@ -146,8 +146,9 @@ class LargeDeleteTests(TestCase):
     def test_large_deletes(self):
         "Regression for #13309 -- if the number of objects > chunk size, deletion still occurs"
         for x in range(300):
-            Book.objects.create(pagecount=x+100)
+            Book.objects.create(pagecount=x + 100)
         # attach a signal to make sure we will not fast-delete
+
         def noop(*args, **kwargs):
             pass
         models.signals.post_delete.connect(noop, sender=Book)
@@ -178,7 +179,6 @@ class ProxyDeleteTest(TestCase):
 
         return test_image
 
-
     def test_delete_proxy(self):
         """
         Deleting the *proxy* instance bubbles through to its non-proxy and
@@ -196,7 +196,6 @@ class ProxyDeleteTest(TestCase):
         # The Image deletion cascaded and *all* references to it are deleted.
         self.assertEqual(len(FooImage.objects.all()), 0)
         self.assertEqual(len(FooFile.objects.all()), 0)
-
 
     def test_delete_proxy_of_proxy(self):
         """
@@ -224,7 +223,6 @@ class ProxyDeleteTest(TestCase):
         self.assertEqual(len(FooFile.objects.all()), 0)
         self.assertEqual(len(FooImage.objects.all()), 0)
 
-
     def test_delete_concrete_parent(self):
         """
         Deleting an instance of a concrete model should also delete objects
@@ -243,7 +241,6 @@ class ProxyDeleteTest(TestCase):
         # to it.
         self.assertEqual(len(FooFile.objects.all()), 0)
         self.assertEqual(len(FooImage.objects.all()), 0)
-
 
     def test_delete_proxy_pair(self):
         """
@@ -270,6 +267,7 @@ class ProxyDeleteTest(TestCase):
             Image.objects.values().delete()
         with self.assertRaises(TypeError):
             Image.objects.values_list().delete()
+
 
 class Ticket19102Tests(TestCase):
     """
@@ -306,7 +304,7 @@ class Ticket19102Tests(TestCase):
             Login.objects.order_by('description').filter(
                 orgunit__name__isnull=False
             ).extra(
-                select={'extraf':'1'}
+                select={'extraf': '1'}
             ).filter(
                 pk=self.l1.pk
             ).delete()

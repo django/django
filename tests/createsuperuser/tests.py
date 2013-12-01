@@ -53,4 +53,3 @@ class MultiDBCreatesuperuserTestCase(TestCase):
         self.assertEqual(u.email, 'joe@somewhere.org')
 
         new_io.close()
-

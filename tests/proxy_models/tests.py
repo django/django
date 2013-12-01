@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 import copy
 
-from django.conf import settings
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
@@ -17,7 +16,7 @@ from .models import (MyPerson, Person, StatusPerson, LowerStatusPerson,
     MyPersonProxy, Abstract, OtherPerson, User, UserProxy, UserProxyProxy,
     Country, State, StateProxy, TrackerUser, BaseUser, Bug, ProxyTrackerUser,
     Improvement, ProxyProxyBug, ProxyBug, ProxyImprovement, Issue)
-from .admin import admin as force_admin_model_registration
+from .admin import admin as force_admin_model_registration  # NOQA
 
 
 class ProxyModelTests(TestCase):
@@ -105,8 +104,8 @@ class ProxyModelTests(TestCase):
             name='Zathras'
         )
 
-        sp1 = StatusPerson.objects.create(name='Bazza Jr.')
-        sp2 = StatusPerson.objects.create(name='Foo Jr.')
+        StatusPerson.objects.create(name='Bazza Jr.')
+        StatusPerson.objects.create(name='Foo Jr.')
         max_id = Person.objects.aggregate(max_id=models.Max('id'))['max_id']
 
         self.assertRaises(Person.MultipleObjectsReturned,
@@ -150,6 +149,7 @@ class ProxyModelTests(TestCase):
                     proxy = True
         self.assertRaises(FieldError, build_new_fields)
 
+    @override_settings(TEST_SWAPPABLE_MODEL='proxy_models.AlternateModel')
     def test_swappable(self):
         try:
             # This test adds dummy applications to the app cache. These
@@ -157,8 +157,6 @@ class ProxyModelTests(TestCase):
             # with the flush operation in other tests.
             old_app_models = copy.deepcopy(cache.app_models)
             old_app_store = copy.deepcopy(cache.app_store)
-
-            settings.TEST_SWAPPABLE_MODEL = 'proxy_models.AlternateModel'
 
             class SwappableModel(models.Model):
 
@@ -175,7 +173,6 @@ class ProxyModelTests(TestCase):
                     class Meta:
                         proxy = True
         finally:
-            del settings.TEST_SWAPPABLE_MODEL
             cache.app_models = old_app_models
             cache.app_store = old_app_store
 
@@ -232,7 +229,7 @@ class ProxyModelTests(TestCase):
         signals.pre_save.connect(h3, sender=Person)
         signals.post_save.connect(h4, sender=Person)
 
-        dino = MyPerson.objects.create(name="dino")
+        MyPerson.objects.create(name="dino")
         self.assertEqual(output, [
             'MyPerson pre save',
             'MyPerson post save'
@@ -246,7 +243,7 @@ class ProxyModelTests(TestCase):
         signals.pre_save.connect(h5, sender=MyPersonProxy)
         signals.post_save.connect(h6, sender=MyPersonProxy)
 
-        dino = MyPersonProxy.objects.create(name="pebbles")
+        MyPersonProxy.objects.create(name="pebbles")
 
         self.assertEqual(output, [
             'MyPersonProxy pre save',
@@ -303,7 +300,7 @@ class ProxyModelTests(TestCase):
         querysets.
         """
         country = Country.objects.create(name='Australia')
-        state = State.objects.create(name='New South Wales', country=country)
+        State.objects.create(name='New South Wales', country=country)
 
         resp = [s.name for s in State.objects.select_related()]
         self.assertEqual(resp, ['New South Wales'])

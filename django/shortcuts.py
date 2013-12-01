@@ -11,6 +11,7 @@ from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.core import urlresolvers
 
+
 def render_to_response(*args, **kwargs):
     """
     Returns a HttpResponse whose content is filled with the result of calling
@@ -19,6 +20,7 @@ def render_to_response(*args, **kwargs):
     httpresponse_kwargs = {'content_type': kwargs.pop('content_type', None)}
 
     return HttpResponse(loader.render_to_string(*args, **kwargs), **httpresponse_kwargs)
+
 
 def render(request, *args, **kwargs):
     """
@@ -45,6 +47,7 @@ def render(request, *args, **kwargs):
     return HttpResponse(loader.render_to_string(*args, **kwargs),
                         **httpresponse_kwargs)
 
+
 def redirect(to, *args, **kwargs):
     """
     Returns an HttpResponseRedirect to the appropriate URL for the arguments
@@ -69,6 +72,7 @@ def redirect(to, *args, **kwargs):
 
     return redirect_class(resolve_url(to, *args, **kwargs))
 
+
 def _get_queryset(klass):
     """
     Returns a QuerySet from a Model, Manager, or QuerySet. Created to make
@@ -91,6 +95,7 @@ def _get_queryset(klass):
                          "Manager, or QuerySet" % klass__name)
     return manager.all()
 
+
 def get_object_or_404(klass, *args, **kwargs):
     """
     Uses get() to return an object, or raises a Http404 exception if the object
@@ -108,6 +113,7 @@ def get_object_or_404(klass, *args, **kwargs):
     except queryset.model.DoesNotExist:
         raise Http404('No %s matches the given query.' % queryset.model._meta.object_name)
 
+
 def get_list_or_404(klass, *args, **kwargs):
     """
     Uses filter() to return a list of objects, or raise a Http404 exception if
@@ -121,6 +127,7 @@ def get_list_or_404(klass, *args, **kwargs):
     if not obj_list:
         raise Http404('No %s matches the given query.' % queryset.model._meta.object_name)
     return obj_list
+
 
 def resolve_url(to, *args, **kwargs):
     """

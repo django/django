@@ -2,7 +2,12 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
-from unittest import TestCase
+from unittest import TestCase, skipIf
+
+try:
+    import pytz
+except ImportError:
+    pytz = None
 
 from django import forms
 from django.conf import settings
@@ -24,6 +29,7 @@ from .widgetadmin import site as widget_admin_site
 admin_static_prefix = lambda: {
     'ADMIN_STATIC_PREFIX': "%sadmin/" % settings.STATIC_URL,
 }
+
 
 class AdminFormfieldForDBFieldTests(TestCase):
     """
@@ -54,8 +60,12 @@ class AdminFormfieldForDBFieldTests(TestCase):
         # Check that we got a field of the right type
         self.assertTrue(
             isinstance(widget, widgetclass),
-            "Wrong widget for %s.%s: expected %s, got %s" % \
-                (model.__class__.__name__, fieldname, widgetclass, type(widget))
+            "Wrong widget for %s.%s: expected %s, got %s" % (
+                model.__class__.__name__,
+                fieldname,
+                widgetclass,
+                type(widget),
+            )
         )
 
         # Return the formfield so that other tests can continue
@@ -97,7 +107,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
 
     def testRadioFieldsForeignKey(self):
         ff = self.assertFormfield(models.Event, 'main_band', widgets.AdminRadioSelect,
-                                  radio_fields={'main_band':admin.VERTICAL})
+                                  radio_fields={'main_band': admin.VERTICAL})
         self.assertEqual(ff.empty_label, None)
 
     def testManyToMany(self):
@@ -122,7 +132,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
         """
         class BandAdmin(admin.ModelAdmin):
             formfield_overrides = {
-                CharField: {'widget': forms.TextInput(attrs={'size':'10'})}
+                CharField: {'widget': forms.TextInput(attrs={'size': '10'})}
             }
         ma = BandAdmin(models.Band, admin.site)
         f1 = ma.formfield_for_dbfield(models.Band._meta.get_field('name'), request=None)
@@ -154,7 +164,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
 
     def testChoicesWithRadioFields(self):
         self.assertFormfield(models.Member, 'gender', widgets.AdminRadioSelect,
-                             radio_fields={'gender':admin.VERTICAL})
+                             radio_fields={'gender': admin.VERTICAL})
 
     def testInheritance(self):
         self.assertFormfield(models.Album, 'backside_art', widgets.AdminFileWidget)
@@ -162,7 +172,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
     def test_m2m_widgets(self):
         """m2m fields help text as it applies to admin app (#9321)."""
         class AdvisorAdmin(admin.ModelAdmin):
-            filter_vertical=['companies']
+            filter_vertical = ['companies']
 
         self.assertFormfield(models.Advisor, 'companies', widgets.FilteredSelectMultiple,
                              filter_vertical=['companies'])
@@ -265,6 +275,7 @@ class FilteredSelectMultipleWidgetTest(DjangoTestCase):
             '<select multiple="multiple" name="test" class="selectfilterstacked">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 1, "%(ADMIN_STATIC_PREFIX)s"); });</script>\n' % admin_static_prefix()
         )
 
+
 class AdminDateWidgetTest(DjangoTestCase):
     def test_attrs(self):
         """
@@ -283,6 +294,7 @@ class AdminDateWidgetTest(DjangoTestCase):
             '<input value="2007-12-01" type="text" class="myDateField" name="test" size="20" />',
         )
 
+
 class AdminTimeWidgetTest(DjangoTestCase):
     def test_attrs(self):
         """
@@ -300,6 +312,7 @@ class AdminTimeWidgetTest(DjangoTestCase):
             w.render('test', datetime(2007, 12, 1, 9, 30)),
             '<input value="09:30:00" type="text" class="myTimeField" name="test" size="20" />',
         )
+
 
 class AdminSplitDateTimeWidgetTest(DjangoTestCase):
     def test_render(self):
@@ -367,7 +380,9 @@ class AdminFileWidgetTest(DjangoTestCase):
         w = widgets.AdminFileWidget()
         self.assertHTMLEqual(
             w.render('test', album.cover_art),
-            '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/hybrid_theory.jpg">albums\hybrid_theory.jpg</a> <span class="clearable-file-input"><input type="checkbox" name="test-clear" id="test-clear_id" /> <label for="test-clear_id">Clear</label></span><br />Change: <input type="file" name="test" /></p>' % { 'STORAGE_URL': default_storage.url('') },
+            '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/hybrid_theory.jpg">albums\hybrid_theory.jpg</a> <span class="clearable-file-input"><input type="checkbox" name="test-clear" id="test-clear_id" /> <label for="test-clear_id">Clear</label></span><br />Change: <input type="file" name="test" /></p>' % {
+                'STORAGE_URL': default_storage.url('')
+            },
         )
 
         self.assertHTMLEqual(
@@ -488,6 +503,7 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
             w.render('company_widget2', [c1.pk]),
             '<input type="text" name="company_widget2" value="%(c1pk)s" />' % {'c1pk': c1.pk}
         )
+
 
 class RelatedFieldWidgetWrapperTests(DjangoTestCase):
     def test_no_can_add_related(self):
@@ -625,10 +641,12 @@ class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 class DateTimePickerSeleniumChromeTests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
 
+
 class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
+@skipIf(pytz is None, "this test requires pytz")
 @override_settings(TIME_ZONE='Asia/Singapore')
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class DateTimePickerShortcutsSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
@@ -648,8 +666,17 @@ class DateTimePickerShortcutsSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase
         """
         self.admin_login(username='super', password='secret', login_url='/')
 
-        now = datetime.now()
         error_margin = timedelta(seconds=10)
+
+        # If we are neighbouring a DST, we add an hour of error margin.
+        tz = pytz.timezone('America/Chicago')
+        utc_now = datetime.now(pytz.utc)
+        tz_yesterday = (utc_now - timedelta(days=1)).astimezone(tz).tzname()
+        tz_tomorrow = (utc_now + timedelta(days=1)).astimezone(tz).tzname()
+        if tz_yesterday != tz_tomorrow:
+            error_margin += timedelta(hours=1)
+
+        now = datetime.now()
 
         self.selenium.get('%s%s' % (self.live_server_url,
             '/admin_widgets/member/add/'))
@@ -680,8 +707,10 @@ class DateTimePickerShortcutsSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase
         self.assertGreater(member.birthdate, now - error_margin)
         self.assertLess(member.birthdate, now + error_margin)
 
+
 class DateTimePickerShortcutsSeleniumChromeTests(DateTimePickerShortcutsSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
 
 class DateTimePickerShortcutsSeleniumIETests(DateTimePickerShortcutsSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
@@ -708,7 +737,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         super(HorizontalVerticalFilterSeleniumFirefoxTests, self).setUp()
 
     def assertActiveButtons(self, mode, field_name, choose, remove,
-                             choose_all=None, remove_all=None):
+            choose_all=None, remove_all=None):
         choose_link = '#id_%s_add_link' % field_name
         choose_all_link = '#id_%s_add_all_link' % field_name
         remove_link = '#id_%s_remove_link' % field_name
@@ -858,7 +887,6 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         self.selenium.get(
             '%s%s' % (self.live_server_url, '/admin_widgets/school/%s/' % self.school.id))
 
-
         for field_name in ['students', 'alumni']:
             from_box = '#id_%s_from' % field_name
             to_box = '#id_%s_to' % field_name
@@ -906,7 +934,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
             self.assertSelectOptions(to_box,
                         [str(self.peter.id), str(self.jason.id)])
 
-            input.send_keys([Keys.BACK_SPACE]) # Clear text box
+            input.send_keys([Keys.BACK_SPACE])  # Clear text box
             self.assertSelectOptions(from_box,
                         [str(self.arthur.id), str(self.bob.id),
                          str(self.cliff.id), str(self.jenny.id),
@@ -917,14 +945,16 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         # Save and check that everything is properly stored in the database ---
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         self.wait_page_loaded()
-        self.school = models.School.objects.get(id=self.school.id) # Reload from database
+        self.school = models.School.objects.get(id=self.school.id)  # Reload from database
         self.assertEqual(list(self.school.students.all()),
                          [self.jason, self.peter])
         self.assertEqual(list(self.school.alumni.all()),
                          [self.jason, self.peter])
 
+
 class HorizontalVerticalFilterSeleniumChromeTests(HorizontalVerticalFilterSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
 
 class HorizontalVerticalFilterSeleniumIETests(HorizontalVerticalFilterSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
@@ -1020,8 +1050,10 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
             self.selenium.find_element_by_id('id_supporting_bands').get_attribute('value'),
             '42,98')
 
+
 class AdminRawIdWidgetSeleniumChromeTests(AdminRawIdWidgetSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
 
 class AdminRawIdWidgetSeleniumIETests(AdminRawIdWidgetSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
@@ -1067,8 +1099,10 @@ class RelatedFieldWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.assertEqual(len(profiles), 1)
         self.assertEqual(profiles[0].user.username, username_value)
 
+
 class RelatedFieldWidgetSeleniumChromeTests(RelatedFieldWidgetSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
 
 class RelatedFieldWidgetSeleniumIETests(RelatedFieldWidgetSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'

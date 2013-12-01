@@ -74,7 +74,7 @@ class ExpressionsTests(TestCase):
 
         # We can perform arithmetic operations in expressions
         # Make sure we have 2 spare chairs
-        company_query.update(num_chairs=F("num_employees")+2)
+        company_query.update(num_chairs=F("num_employees") + 2)
         self.assertQuerysetEqual(
             company_query, [
                 {
@@ -205,6 +205,7 @@ class ExpressionsTests(TestCase):
         test_gmbh.point_of_contact = None
         test_gmbh.save()
         self.assertTrue(test_gmbh.point_of_contact is None)
+
         def test():
             test_gmbh.point_of_contact = F("ceo")
         self.assertRaises(ValueError, test)

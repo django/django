@@ -6,6 +6,7 @@ from django.test.utils import override_settings
 
 from .base import SitemapTestsBase
 
+
 class HTTPSSitemapTests(SitemapTestsBase):
     protocol = 'https'
     urls = 'django.contrib.sitemaps.tests.urls.https'

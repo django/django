@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_text, force_text
 from django.utils.encoding import python_2_unicode_compatible
 
+
 class ContentTypeManager(models.Manager):
 
     # Cache to avoid re-looking up ContentType objects all over the place.
@@ -42,9 +43,9 @@ class ContentTypeManager(models.Manager):
             # needed around opts.verbose_name_raw because name_raw might be a
             # django.utils.functional.__proxy__ object.
             ct, created = self.get_or_create(
-                app_label = opts.app_label,
-                model = opts.model_name,
-                defaults = {'name': smart_text(opts.verbose_name_raw)},
+                app_label=opts.app_label,
+                model=opts.model_name,
+                defaults={'name': smart_text(opts.verbose_name_raw)},
             )
             self._add_to_cache(self.db, ct)
 

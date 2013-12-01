@@ -5,6 +5,7 @@ from django.utils.cache import patch_vary_headers
 
 re_accepts_gzip = re.compile(r'\bgzip\b')
 
+
 class GZipMiddleware(object):
     """
     This middleware compresses content if the browser allows gzip compression.

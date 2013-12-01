@@ -191,7 +191,7 @@ def build_test(label):
 
     try:
         if issubclass(TestClass, (unittest.TestCase, real_unittest.TestCase)):
-            if len(parts) == 2: # label is app.TestClass
+            if len(parts) == 2:  # label is app.TestClass
                 try:
                     return unittest.TestLoader().loadTestsFromTestCase(
                         TestClass)
@@ -199,7 +199,7 @@ def build_test(label):
                     raise ValueError(
                         "Test label '%s' does not refer to a test class"
                         % label)
-            else: # label is app.TestClass.test_method
+            else:  # label is app.TestClass.test_method
                 return TestClass(parts[2])
     except TypeError:
         # TestClass isn't a TestClass - it must be a method or normal class

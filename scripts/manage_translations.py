@@ -27,6 +27,7 @@ from django.core.management import call_command
 
 HAVE_JS = ['admin']
 
+
 def _get_locale_dirs(include_core=True):
     """
     Return a tuple (contrib name, absolute path) for all locale directories,
@@ -44,12 +45,14 @@ def _get_locale_dirs(include_core=True):
         dirs.insert(0, ('core', os.path.join(os.getcwd(), 'django', 'conf', 'locale')))
     return dirs
 
+
 def _tx_resource_for_name(name):
     """ Return the Transifex resource name """
     if name == 'core':
         return "django-core.core"
     else:
         return "django-core.contrib-%s" % name
+
 
 def _check_diff(cat_name, base_path):
     """
@@ -101,7 +104,7 @@ def lang_stats(resources=None, languages=None):
     for name, dir_ in locale_dirs:
         if resources and not name in resources:
             continue
-        print("\nShowing translations stats for '%s':" % name) 
+        print("\nShowing translations stats for '%s':" % name)
         langs = sorted([d for d in os.listdir(dir_) if not d.startswith('_')])
         for lang in langs:
             if languages and not lang in languages:

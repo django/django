@@ -121,17 +121,17 @@ class ModelTests(TestCase):
 
         # Regression test for #18969
         self.assertQuerysetEqual(
-                Party.objects.filter(when__year=1), [
-                        datetime.date(1, 3, 3),
-                    ],
-                attrgetter("when")
+            Party.objects.filter(when__year=1), [
+                datetime.date(1, 3, 3),
+            ],
+            attrgetter("when")
         )
         self.assertQuerysetEqual(
-                Party.objects.filter(when__year='1'), [
-                        datetime.date(1, 3, 3),
-                    ],
-                attrgetter("when")
-       )
+            Party.objects.filter(when__year='1'), [
+                datetime.date(1, 3, 3),
+            ],
+            attrgetter("when")
+        )
 
     if (3,) <= sys.version_info < (3, 3) and connection.vendor == 'mysql':
         # In Python < 3.3, datetime.strftime raises an exception for years
@@ -217,7 +217,7 @@ class ModelTests(TestCase):
 
 class ModelValidationTest(TestCase):
     def test_pk_validation(self):
-        one = NonAutoPK.objects.create(name="one")
+        NonAutoPK.objects.create(name="one")
         again = NonAutoPK(name="one")
         self.assertRaises(ValidationError, again.validate_unique)
 

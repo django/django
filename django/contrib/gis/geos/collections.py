@@ -12,6 +12,7 @@ from django.contrib.gis.geos.polygon import Polygon
 from django.contrib.gis.geos import prototypes as capi
 from django.utils.six.moves import xrange
 
+
 class GeometryCollection(GEOSGeometry):
     _typeid = 7
 
@@ -73,7 +74,8 @@ class GeometryCollection(GEOSGeometry):
         prev_ptr = self.ptr
         srid = self.srid
         self.ptr = self._create_collection(length, items)
-        if srid: self.srid = srid
+        if srid:
+            self.srid = srid
         capi.destroy_geom(prev_ptr)
 
     _set_single = GEOSGeometry._set_single_rebuild
@@ -90,10 +92,12 @@ class GeometryCollection(GEOSGeometry):
         return tuple(g.tuple for g in self)
     coords = tuple
 
+
 # MultiPoint, MultiLineString, and MultiPolygon class definitions.
 class MultiPoint(GeometryCollection):
     _allowed = Point
     _typeid = 4
+
 
 class MultiLineString(GeometryCollection):
     _allowed = (LineString, LinearRing)
@@ -106,6 +110,7 @@ class MultiLineString(GeometryCollection):
         MultiLineString.
         """
         return self._topology(capi.geos_linemerge(self.ptr))
+
 
 class MultiPolygon(GeometryCollection):
     _allowed = Polygon

@@ -28,6 +28,7 @@ class FunctionalTestCase(unittest.TestCase):
 
             def _get_do(self):
                 raise NotImplementedError
+
             def _set_do(self, value):
                 raise NotImplementedError
             do = lazy_property(_get_do, _set_do)

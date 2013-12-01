@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.test import TestCase
-from django.utils import six
 
 from .models import (
     First, Third, Parent, Child, Category, Record, Relation, Car, Driver)
@@ -87,11 +86,11 @@ class ManyToOneRegressionTests(TestCase):
         r3 = Record.objects.create(category=c2)
         r4 = Record.objects.create(category=c2)
         r5 = Record.objects.create(category=c3)
-        r = Relation.objects.create(left=r1, right=r2)
-        r = Relation.objects.create(left=r3, right=r4)
-        r = Relation.objects.create(left=r1, right=r3)
-        r = Relation.objects.create(left=r5, right=r2)
-        r = Relation.objects.create(left=r3, right=r2)
+        Relation.objects.create(left=r1, right=r2)
+        Relation.objects.create(left=r3, right=r4)
+        Relation.objects.create(left=r1, right=r3)
+        Relation.objects.create(left=r5, right=r2)
+        Relation.objects.create(left=r3, right=r2)
 
         q1 = Relation.objects.filter(left__category__name__in=['First'], right__category__name__in=['Second'])
         self.assertQuerysetEqual(q1, ["<Relation: First - Second>"])
@@ -125,7 +124,6 @@ class ManyToOneRegressionTests(TestCase):
 
     def test_related_null_to_field(self):
         c1 = Car.objects.create()
-        c2 = Car.objects.create()
         d1 = Driver.objects.create()
         self.assertIs(d1.car, None)
         with self.assertNumQueries(0):
