@@ -923,6 +923,11 @@ the ``load_template_source()`` method, which takes a ``template_name`` argument,
 loads the template from disk (or elsewhere), and returns a tuple:
 ``(template_string, template_origin)``.
 
+.. versionchanged:: 1.7
+
+    ``load_template_source()`` now takes two parameters: ``template_name`` and
+    ``template_dir``.
+
 The ``load_template()`` method of the ``Loader`` class retrieves the template
 string by calling ``load_template_source()``, instantiates a ``Template`` from
 the template source, and returns a tuple: ``(template, template_origin)``. Since
@@ -935,10 +940,20 @@ of the ``load_template_source()`` method implemented there::
     class Loader(app_directories.Loader):
         is_usable = True
 
-        def load_template(self, template_name, template_dirs=None):
+        def load_template(self, template_name, template_dirs=None,
+                          skip_template=None):
             source, origin = self.load_template_source(template_name, template_dirs)
             template = Template(source)
             return template, origin
+
+.. versionchanged:: 1.7
+
+    ``skip_template`` was added to the parameters that ``load_template`` takes.
+
+.. versionadded:: 1.7
+
+    If you want your loader never to be skipped because of extending itself, set
+    the ``never_skip`` loader attribute to ``True``.
 
 Finally, we need to modify our project settings, telling Django to use our custom
 loader. Now we can write all of our templates in our alternative template

@@ -529,6 +529,7 @@ Templates
 
   * :func:`django.template.loader.get_template()`
   * :func:`django.template.loader.select_template()`
+  * :func:`django.template.loader.Loader.load_template()`
 
 * The :tfilter:`time` filter now accepts timzone-related :ref:`format
   specifiers <date-and-time-formatting-specifiers>` ``'e'``, ``'O'`` , ``'T'``

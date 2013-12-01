@@ -154,18 +154,25 @@ def setup_test_template_loader(templates_dict, use_cached_loader=False):
     if hasattr(loader, RESTORE_LOADERS_ATTR):
         raise Exception("loader.%s already exists" % RESTORE_LOADERS_ATTR)
 
-    def test_template_loader(template_name, template_dirs=None):
-        "A custom template loader that loads templates from a dictionary."
-        try:
-            return (templates_dict[template_name], "test:%s" % template_name)
-        except KeyError:
-            raise TemplateDoesNotExist(template_name)
+    class TestTemplateLoader(loader.BaseLoader):
+        def load_template_source(self, template_name, template_dirs=None, skip_template=None):
+            "A custom template loader that loads templates from a dictionary."
+            try:
+                return (templates_dict[template_name], "test:%s" % template_name)
+            except KeyError:
+                raise TemplateDoesNotExist(template_name)
+
+        def load_template(self, template_name, template_dirs=None, skip_template=None):
+            args = (template_name, template_dirs)
+            if self.use_skip_template:
+                args += (skip_template,)
+            return self.load_template_source(*args)
 
     if use_cached_loader:
-        template_loader = cached.Loader(('test_template_loader',))
-        template_loader._cached_loaders = (test_template_loader,)
+        template_loader = cached.Loader(('TestTemplateLoader',))
+        template_loader._cached_loaders = (TestTemplateLoader().load_template_source,)
     else:
-        template_loader = test_template_loader
+        template_loader = TestTemplateLoader().load_template_source
 
     setattr(loader, RESTORE_LOADERS_ATTR, loader.template_source_loaders)
     loader.template_source_loaders = (template_loader,)

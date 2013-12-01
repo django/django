@@ -24,6 +24,7 @@
 # For example, the eggs loader (which is capable of loading templates from
 # Python eggs) sets is_usable to False if the "pkg_resources" module isn't
 # installed, because pkg_resources is necessary to read eggs.
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.template.base import Origin, Template, Context, TemplateDoesNotExist, add_to_builtins
@@ -32,6 +33,8 @@ from django.utils.module_loading import import_by_path
 from django.utils import six
 
 template_source_loaders = None
+
+
 def get_template_source_loaders():
     """
     Calculate template_source_loaders the first time the function is executed
@@ -51,14 +54,15 @@ def get_template_source_loaders():
 
 class BaseLoader(object):
     is_usable = False
+    never_skip = False
 
     def __init__(self, *args, **kwargs):
         pass
 
-    def __call__(self, template_name, template_dirs=None):
-        return self.load_template(template_name, template_dirs)
+    def __call__(self, template_name, template_dirs=None, skip_template=None):
+        return self.load_template(template_name, template_dirs, skip_template)
 
-    def load_template(self, template_name, template_dirs=None):
+    def load_template(self, template_name, template_dirs=None, skip_template=None):
         source, display_name = self.load_template_source(template_name, template_dirs)
         origin = make_origin(display_name, self.load_template_source, template_name, template_dirs)
         try:
@@ -124,7 +128,6 @@ def find_template_loader(loader):
             func = TemplateLoader
 
         if not func.is_usable:
-            import warnings
             warnings.warn("Your TEMPLATE_LOADERS setting includes %r, but your "
                           "Python installation doesn't support that type of "
                           "template loading. Consider removing that line from "
@@ -137,13 +140,14 @@ def find_template_loader(loader):
                                    'callable template source loader')
 
 
-def find_template(name, dirs=None, skip_template=None):
+def find_template(name, dirs=None, skip_template=None, loaders=None):
     """
     Returns a tuple with a compiled Template object for the given template name
-    and an origin object skipping the ``skip_template`` loader if its
-    ``never_skip`` attribute is False.
+    and an origin object. If ``loaders`` is given, only the specified loaders will be
+    tried. If ``skip_template`` is given, the loader of the specified template will be
+    skipped (provided that it doesn't have a ``never_skip`` attribute set to True).
     """
-    loaders = get_template_source_loaders()
+    loaders = get_template_source_loaders() if loaders is None else loaders
     # If there is a template to skip with the same name as the current template,
     # skip all the loaders until and including the loader of the template to
     # be skipped
@@ -151,7 +155,7 @@ def find_template(name, dirs=None, skip_template=None):
         loaders = skip_loaders(loaders, skip_template)
     for loader in loaders:
         try:
-            source, display_name = loader(name, dirs)
+            source, display_name = loader(name, dirs, skip_template)
             return (source, make_origin(display_name, loader, name, dirs))
         except TemplateDoesNotExist:
             pass
@@ -169,7 +173,7 @@ def skip_loaders(loaders, skip_template):
     for loader in loaders:
         # Get the current loader object
         loader = getattr(loader, '__self__', loader)
-        if has_been_skiped:
+        if has_been_skiped or loader.never_skip:
             yield loader
         if loader == loader_to_skip:
             has_been_skiped = True
