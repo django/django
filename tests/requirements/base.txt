@@ -1,5 +1,6 @@
 docutils
 Markdown
+numpy
 PIL
 py-bcrypt
 python-memcached
