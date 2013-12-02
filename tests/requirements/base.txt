@@ -1,5 +1,6 @@
 bcrypt
 docutils
+numpy
 Pillow
 PyYAML
 pytz > dev
