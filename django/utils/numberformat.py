@@ -14,7 +14,7 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
     * grouping: Number of digits in every group limited by thousand separator
     * thousand_sep: Thousand separator symbol (for example ",")
     """
-    use_grouping = settings.USE_L10N and settings.USE_THOUSAND_SEPARATOR
+    use_grouping = settings.USE_THOUSAND_SEPARATOR
     use_grouping = use_grouping or force_grouping
     use_grouping = use_grouping and grouping > 0
     # Make the common case fast
