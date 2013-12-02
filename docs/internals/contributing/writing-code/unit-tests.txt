@@ -138,6 +138,7 @@ dependencies:
 
 *  bcrypt_
 *  docutils_
+*  numpy_
 *  Pillow_
 *  PyYAML_
 *  pytz_
@@ -166,6 +167,7 @@ associated tests will be skipped.
 
 .. _bcrypt: https://pypi.python.org/pypi/bcrypt
 .. _docutils: https://pypi.python.org/pypi/docutils
+.. _numpy: https://pypi.python.org/pypi/numpy
 .. _Pillow: https://pypi.python.org/pypi/Pillow/
 .. _PyYAML: http://pyyaml.org/wiki/PyYAML
 .. _pytz: https://pypi.python.org/pypi/pytz/
