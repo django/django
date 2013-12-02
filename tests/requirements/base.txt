@@ -1,5 +1,6 @@
 docutils
 Markdown
+numpy
 PyYAML
 pytz
 selenium
