@@ -471,7 +471,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def testLogoutAndPasswordChangeURLs(self):
         response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit)
-        self.assertContains(response, '<a href="/test_admin/%s/logout/">' % self.urlbit)
+        self.assertContains(response, '<form action="/test_admin/%s/logout/" method="post">' % self.urlbit)
         self.assertContains(response, '<a href="/test_admin/%s/password_change/">' % self.urlbit)
 
     def testNamedGroupFieldChoicesChangeList(self):
@@ -783,8 +783,14 @@ class CustomModelAdminTest(AdminViewBasicTestCase):
         self.assertTemplateUsed(response, 'custom_admin/login.html')
         self.assertContains(response, 'Hello from a custom login template')
 
-    def testCustomAdminSiteLogoutTemplate(self):
+    def testCustomAdminSiteLogoutConfirmationTemplate(self):
         response = self.client.get('/test_admin/admin2/logout/')
+        self.assertIsInstance(response, TemplateResponse)
+        self.assertTemplateUsed(response, 'custom_admin/logout_confirmation.html')
+        self.assertContains(response, 'Hello from a custom logout confirmation template')
+
+    def testCustomAdminSiteLogoutTemplate(self):
+        response = self.client.post('/test_admin/admin2/logout/')
         self.assertIsInstance(response, TemplateResponse)
         self.assertTemplateUsed(response, 'custom_admin/logout.html')
         self.assertContains(response, 'Hello from a custom logout template')
@@ -933,7 +939,7 @@ class AdminViewPermissionsTest(TestCase):
         login = self.client.post('/test_admin/admin/', self.super_login)
         self.assertRedirects(login, '/test_admin/admin/')
         self.assertFalse(login.context)
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
 
         # Test if user enters email address
         response = self.client.get('/test_admin/admin/')
@@ -955,7 +961,7 @@ class AdminViewPermissionsTest(TestCase):
         login = self.client.post('/test_admin/admin/', self.adduser_login)
         self.assertRedirects(login, '/test_admin/admin/')
         self.assertFalse(login.context)
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
 
         # Change User
         response = self.client.get('/test_admin/admin/')
@@ -963,7 +969,7 @@ class AdminViewPermissionsTest(TestCase):
         login = self.client.post('/test_admin/admin/', self.changeuser_login)
         self.assertRedirects(login, '/test_admin/admin/')
         self.assertFalse(login.context)
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
 
         # Delete User
         response = self.client.get('/test_admin/admin/')
@@ -971,7 +977,7 @@ class AdminViewPermissionsTest(TestCase):
         login = self.client.post('/test_admin/admin/', self.deleteuser_login)
         self.assertRedirects(login, '/test_admin/admin/')
         self.assertFalse(login.context)
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
 
         # Regular User should not be able to login.
         response = self.client.get('/test_admin/admin/')
@@ -1042,7 +1048,7 @@ class AdminViewPermissionsTest(TestCase):
         post = self.client.post('/test_admin/admin/admin_views/article/add/', add_dict)
         self.assertEqual(post.status_code, 403)
         self.assertEqual(Article.objects.all().count(), 3)
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
 
         # Add user may login and POST to add view, then redirect to admin root
         self.client.get('/test_admin/admin/')
@@ -1056,7 +1062,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(Article.objects.all().count(), 4)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Greetings from a created object')
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
 
         # Super can add too, but is redirected to the change list view
         self.client.get('/test_admin/admin/')
@@ -1067,7 +1073,7 @@ class AdminViewPermissionsTest(TestCase):
         post = self.client.post('/test_admin/admin/admin_views/article/add/', add_dict)
         self.assertRedirects(post, '/test_admin/admin/admin_views/article/')
         self.assertEqual(Article.objects.all().count(), 5)
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
 
         # 8509 - if a normal user is already logged in, it is possible
         # to change user into the superuser without error
@@ -1095,7 +1101,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.status_code, 403)
         post = self.client.post('/test_admin/admin/admin_views/article/1/', change_dict)
         self.assertEqual(post.status_code, 403)
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
 
         # change user can view all items and edit them
         self.client.get('/test_admin/admin/')
@@ -1118,7 +1124,7 @@ class AdminViewPermissionsTest(TestCase):
         post = self.client.post('/test_admin/admin/admin_views/article/1/', change_dict)
         self.assertContains(post, 'Please correct the errors below.',
             msg_prefix='Plural error message not found in response to post with multiple errors')
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
 
         # Test redirection when using row-level change permissions. Refs #11513.
         RowLevelChangePermissionModel.objects.create(id=1, name="odd id")
@@ -1135,7 +1141,7 @@ class AdminViewPermissionsTest(TestCase):
             response = self.client.post('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/2/', {'name': 'changed'})
             self.assertEqual(RowLevelChangePermissionModel.objects.get(id=2).name, 'changed')
             self.assertRedirects(response, '/test_admin/admin/')
-            self.client.get('/test_admin/admin/logout/')
+            self.client.post('/test_admin/admin/logout/')
         for login_dict in [self.joepublic_login, self.no_username_login]:
             self.client.post('/test_admin/admin/', login_dict)
             response = self.client.get('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/1/')
@@ -1152,7 +1158,7 @@ class AdminViewPermissionsTest(TestCase):
             self.assertEqual(RowLevelChangePermissionModel.objects.get(id=2).name, 'changed')
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'login-form')
-            self.client.get('/test_admin/admin/logout/')
+            self.client.post('/test_admin/admin/logout/')
 
     def testHistoryView(self):
         """History view should restrict access."""
@@ -1162,7 +1168,7 @@ class AdminViewPermissionsTest(TestCase):
         self.client.post('/test_admin/admin/', self.adduser_login)
         response = self.client.get('/test_admin/admin/admin_views/article/1/history/')
         self.assertEqual(response.status_code, 403)
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
 
         # change user can view all items and edit them
         self.client.get('/test_admin/admin/')
@@ -1181,7 +1187,7 @@ class AdminViewPermissionsTest(TestCase):
             response = self.client.get('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/2/history/')
             self.assertEqual(response.status_code, 200)
 
-            self.client.get('/test_admin/admin/logout/')
+            self.client.post('/test_admin/admin/logout/')
 
         for login_dict in [self.joepublic_login, self.no_username_login]:
             self.client.post('/test_admin/admin/', login_dict)
@@ -1192,7 +1198,7 @@ class AdminViewPermissionsTest(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'login-form')
 
-            self.client.get('/test_admin/admin/logout/')
+            self.client.post('/test_admin/admin/logout/')
 
     def testConditionallyShowAddSectionLink(self):
         """
@@ -1254,7 +1260,7 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/customarticle/%d/history/' % article_pk)
         self.assertTemplateUsed(response, 'custom_admin/object_history.html')
 
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
 
     def testDeleteView(self):
         """Delete view should restrict access and actually delete items."""
@@ -1269,7 +1275,7 @@ class AdminViewPermissionsTest(TestCase):
         post = self.client.post('/test_admin/admin/admin_views/article/1/delete/', delete_dict)
         self.assertEqual(post.status_code, 403)
         self.assertEqual(Article.objects.all().count(), 3)
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
 
         # Delete user can delete
         self.client.get('/test_admin/admin/')
@@ -1288,7 +1294,7 @@ class AdminViewPermissionsTest(TestCase):
         article_ct = ContentType.objects.get_for_model(Article)
         logged = LogEntry.objects.get(content_type=article_ct, action_flag=DELETION)
         self.assertEqual(logged.object_id, '1')
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
 
     def testDisabledPermissionsWhenLoggedIn(self):
         self.client.login(username='super', password='secret')
@@ -1367,7 +1373,7 @@ class AdminViewsNoUrlTest(TestCase):
         r = self.client.get('/test_admin/admin/')
         # we shouldn' get an 500 error caused by a NoReverseMatch
         self.assertEqual(r.status_code, 200)
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -1703,7 +1709,7 @@ class SecureViewTests(TestCase):
         login = self.client.post('/test_admin/admin/secure-view/', self.super_login)
         self.assertRedirects(login, '/test_admin/admin/secure-view/')
         self.assertFalse(login.context)
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
         # make sure the view removes test cookie
         self.assertEqual(self.client.session.test_cookie_worked(), False)
 
@@ -1727,7 +1733,7 @@ class SecureViewTests(TestCase):
         login = self.client.post('/test_admin/admin/secure-view/', self.adduser_login)
         self.assertRedirects(login, '/test_admin/admin/secure-view/')
         self.assertFalse(login.context)
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
 
         # Change User
         response = self.client.get('/test_admin/admin/secure-view/')
@@ -1735,7 +1741,7 @@ class SecureViewTests(TestCase):
         login = self.client.post('/test_admin/admin/secure-view/', self.changeuser_login)
         self.assertRedirects(login, '/test_admin/admin/secure-view/')
         self.assertFalse(login.context)
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
 
         # Delete User
         response = self.client.get('/test_admin/admin/secure-view/')
@@ -1743,7 +1749,7 @@ class SecureViewTests(TestCase):
         login = self.client.post('/test_admin/admin/secure-view/', self.deleteuser_login)
         self.assertRedirects(login, '/test_admin/admin/secure-view/')
         self.assertFalse(login.context)
-        self.client.get('/test_admin/admin/logout/')
+        self.client.post('/test_admin/admin/logout/')
 
         # Regular User should not be able to login.
         response = self.client.get('/test_admin/admin/secure-view/')
@@ -1873,8 +1879,9 @@ class AdminViewListEditable(TestCase):
         # search field and search submit button = 2
         # CSRF field = 1
         # field to track 'select all' across paginated views = 1
-        # 6 + 4 + 4 + 1 + 2 + 1 + 1 = 19 inputs
-        self.assertContains(response, "<input", count=19)
+        # Logout form = 2
+        # 6 + 4 + 4 + 1 + 2 + 1 + 1 + 2 = 21 inputs
+        self.assertContains(response, "<input", count=21)
         # 1 select per object = 3 selects
         self.assertContains(response, "<select", count=4)
 
@@ -3617,7 +3624,8 @@ class ReadonlyTest(TestCase):
         self.assertNotContains(response, 'name="posted"')
         # 3 fields + 2 submit buttons + 5 inline management form fields, + 2
         # hidden fields for inlines + 1 field for the inline + 2 empty form
-        self.assertContains(response, "<input", count=15)
+        # + 2 inputs for logout form
+        self.assertContains(response, "<input", count=17)
         self.assertContains(response, formats.localize(datetime.date.today()))
         self.assertContains(response,
             "<label>Awesomeness level:</label>")
@@ -4318,7 +4326,7 @@ class AdminViewLogoutTest(TestCase):
         self.client.logout()
 
     def test_client_logout_url_can_be_used_to_login(self):
-        response = self.client.get('/test_admin/admin/logout/')
+        response = self.client.post('/test_admin/admin/logout/')
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'registration/logged_out.html')
         self.assertEqual(response.request['PATH_INFO'], '/test_admin/admin/logout/')

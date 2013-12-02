@@ -49,6 +49,7 @@ class AdminSite(object):
     app_index_template = None
     login_template = None
     logout_template = None
+    logout_confirmation_template = None
     password_change_template = None
     password_change_done_template = None
 
@@ -322,6 +323,9 @@ class AdminSite(object):
         }
         if self.logout_template is not None:
             defaults['template_name'] = self.logout_template
+        if self.logout_confirmation_template is not None:
+            defaults['confirmation_template_name'] = self.logout_confirmation_template
+
         return logout(request, **defaults)
 
     @never_cache

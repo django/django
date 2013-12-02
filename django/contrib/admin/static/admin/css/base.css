@@ -788,12 +788,25 @@ table#change-history tbody th {
     overflow: hidden;
 }
 
-#header a:link, #header a:visited {
+#header form{
+    display: inline;
+}
+
+#header a:link, #header a:visited, #header input[type="submit"] {
     color: #fff;
 }
 
-#header a:hover {
+#header a:hover, #header input[type="submit"]:hover{
     text-decoration: underline;
+    cursor: pointer;
+}
+
+#header input[type="submit"] {
+    background: none;
+    border: none;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
 }
 
 #branding h1 {

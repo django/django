@@ -60,13 +60,19 @@ def login(request, template_name='registration/login.html',
                             current_app=current_app)
 
 
+@csrf_protect
 def logout(request, next_page=None,
            template_name='registration/logged_out.html',
+           confirmation_template_name='registration/logout_confirmation.html',
            redirect_field_name=REDIRECT_FIELD_NAME,
            current_app=None, extra_context=None):
     """
     Logs out the user and displays 'You are logged out' message.
     """
+    if request.method != 'POST':
+        return TemplateResponse(request, confirmation_template_name, extra_context,
+            current_app=current_app)
+
     auth_logout(request)
 
     if next_page is not None:

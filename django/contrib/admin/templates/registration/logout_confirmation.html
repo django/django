@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="../">{% trans "Home" %}</a> &rsaquo;
+    </div>
+{% endblock %}
+
+{% block content %}
+    <p>{% trans "Are you sure you want to log out?" %}</p>
+    <form action="" method="post">
+        {% csrf_token %}
+        <div>
+            <input type="submit" value="{% trans 'Yes, I’m sure' %}">
+        </div>
+    </form>
+{% endblock %}

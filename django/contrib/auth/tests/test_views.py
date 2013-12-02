@@ -53,7 +53,7 @@ class AuthViewsTestCase(TestCase):
         return response
 
     def logout(self):
-        response = self.client.get('/admin/logout/')
+        response = self.client.post('/admin/logout/')
         self.assertEqual(response.status_code, 200)
         self.assertTrue(SESSION_KEY not in self.client.session)
 
@@ -361,7 +361,7 @@ class ChangePasswordTest(AuthViewsTestCase):
         })
 
     def logout(self):
-        self.client.get('/logout/')
+        self.client.post('/logout/')
 
     def test_password_change_fails_with_invalid_old_password(self):
         self.login()
@@ -606,67 +606,74 @@ class LoginRedirectUrlTest(AuthViewsTestCase):
 
 @skipIfCustomUser
 class LogoutTest(AuthViewsTestCase):
+    def client_is_logged_in(self):
+        """Tell whether some user is logged in test client."""
+        return SESSION_KEY in self.client.session
 
-    def confirm_logged_out(self):
-        self.assertTrue(SESSION_KEY not in self.client.session)
-
-    def test_logout_default(self):
-        "Logout without next_page option renders the default template"
+    def test_logout_via_get(self):
+        """Logout attempt via GET renders confirmation template."""
         self.login()
         response = self.client.get('/logout/')
+        self.assertContains(response, 'Are you sure you want to logout?')
+        self.assertTrue(self.client_is_logged_in())
+
+    def test_logout_default(self):
+        """"Logout without next_page option renders the default template"""
+        self.login()
+        response = self.client.post('/logout/')
         self.assertContains(response, 'Logged out')
-        self.confirm_logged_out()
+        self.assertFalse(self.client_is_logged_in())
 
     def test_14377(self):
         # Bug 14377
         self.login()
-        response = self.client.get('/logout/')
+        response = self.client.post('/logout/')
         self.assertTrue('site' in response.context)
 
     def test_logout_with_overridden_redirect_url(self):
         # Bug 11223
         self.login()
-        response = self.client.get('/logout/next_page/')
+        response = self.client.post('/logout/next_page/')
         self.assertEqual(response.status_code, 302)
         self.assertURLEqual(response.url, '/somewhere/')
 
-        response = self.client.get('/logout/next_page/?next=/login/')
+        response = self.client.post('/logout/next_page/?next=/login/')
         self.assertEqual(response.status_code, 302)
         self.assertURLEqual(response.url, '/login/')
 
-        self.confirm_logged_out()
+        self.assertFalse(self.client_is_logged_in())
 
     def test_logout_with_next_page_specified(self):
         "Logout with next_page option given redirects to specified resource"
         self.login()
-        response = self.client.get('/logout/next_page/')
+        response = self.client.post('/logout/next_page/')
         self.assertEqual(response.status_code, 302)
         self.assertURLEqual(response.url, '/somewhere/')
-        self.confirm_logged_out()
+        self.assertFalse(self.client_is_logged_in())
 
     def test_logout_with_redirect_argument(self):
         "Logout with query string redirects to specified resource"
         self.login()
-        response = self.client.get('/logout/?next=/login/')
+        response = self.client.post('/logout/?next=/login/')
         self.assertEqual(response.status_code, 302)
         self.assertURLEqual(response.url, '/login/')
-        self.confirm_logged_out()
+        self.assertFalse(self.client_is_logged_in())
 
     def test_logout_with_custom_redirect_argument(self):
         "Logout with custom query string redirects to specified resource"
         self.login()
-        response = self.client.get('/logout/custom_query/?follow=/somewhere/')
+        response = self.client.post('/logout/custom_query/?follow=/somewhere/')
         self.assertEqual(response.status_code, 302)
         self.assertURLEqual(response.url, '/somewhere/')
-        self.confirm_logged_out()
+        self.assertFalse(self.client_is_logged_in())
 
     def test_logout_with_named_redirect(self):
         "Logout resolves names or URLs passed as next_page."
         self.login()
-        response = self.client.get('/logout/next_page/named/')
+        response = self.client.post('/logout/next_page/named/')
         self.assertEqual(response.status_code, 302)
         self.assertURLEqual(response.url, '/password_reset/')
-        self.confirm_logged_out()
+        self.assertFalse(self.client_is_logged_in())
 
     def test_security_check(self, password='password'):
         logout_url = reverse('logout')
@@ -683,11 +690,11 @@ class LogoutTest(AuthViewsTestCase):
                 'bad_url': urlquote(bad_url),
             }
             self.login()
-            response = self.client.get(nasty_url)
+            response = self.client.post(nasty_url)
             self.assertEqual(response.status_code, 302)
             self.assertFalse(bad_url in response.url,
                              "%s should be blocked" % bad_url)
-            self.confirm_logged_out()
+            self.assertFalse(self.client_is_logged_in())
 
         # These URLs *should* still pass the security check
         for good_url in ('/view/?param=http://example.com',
@@ -704,11 +711,11 @@ class LogoutTest(AuthViewsTestCase):
                 'good_url': urlquote(good_url),
             }
             self.login()
-            response = self.client.get(safe_url)
+            response = self.client.post(safe_url)
             self.assertEqual(response.status_code, 302)
             self.assertTrue(good_url in response.url,
                             "%s should be allowed" % good_url)
-            self.confirm_logged_out()
+            self.assertFalse(self.client_is_logged_in())
 
 
 @skipIfCustomUser

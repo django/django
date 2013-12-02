@@ -710,6 +710,10 @@ Miscellaneous
   ``select_related('foo').select_related('bar')``. Previously the latter would
   have been equivalent to ``select_related('bar')``.
 
+* :func:`~django.contrib.auth.views.logout` is now CSRF protected and should be
+  called via ``POST``. If called via ``GET``, a confirmation page containing
+  a logout form is displayed.
+
 Features deprecated in 1.7
 ==========================
 
