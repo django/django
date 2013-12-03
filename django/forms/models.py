@@ -49,6 +49,9 @@ def construct_instance(form, instance, fields=None, exclude=None):
             continue
         if exclude and f.name in exclude:
             continue
+        # If the field is supposed to be saved later as M2M, skip it now.
+        if hasattr(f, 'save_m2m_form_data'):
+            continue
         # Defer saving file-type fields until after the other fields, so a
         # callable upload_to can use the values from other fields.
         if isinstance(f, models.FileField):
@@ -84,17 +87,17 @@ def save_instance(form, instance, fields=None, fail_message='saved',
     def save_m2m():
         cleaned_data = form.cleaned_data
         # Note that for historical reasons we want to include also
-        # virtual_fields here. (GenericRelation was previously a fake
+        # regular fields here. (GenericRelation was previously a fake
         # m2m field).
-        for f in opts.many_to_many + opts.virtual_fields:
-            if not hasattr(f, 'save_form_data'):
+        for f in opts.many_to_many + opts.fields:
+            if not hasattr(f, 'save_m2m_form_data'):
                 continue
             if fields and f.name not in fields:
                 continue
             if exclude and f.name in exclude:
                 continue
             if f.name in cleaned_data:
-                f.save_form_data(instance, cleaned_data[f.name])
+                f.save_m2m_form_data(instance, cleaned_data[f.name])
     if commit:
         # If we are committing, save the instance and the m2m data immediately.
         instance.save()

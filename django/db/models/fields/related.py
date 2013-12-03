@@ -1711,7 +1711,7 @@ class ManyToManyField(RelatedField):
         "Returns the value of this field in the given model instance."
         return getattr(obj, self.attname).all()
 
-    def save_form_data(self, instance, data):
+    def save_m2m_form_data(self, instance, data):
         setattr(instance, self.attname, data)
 
     def formfield(self, **kwargs):

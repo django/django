@@ -1022,7 +1022,7 @@ class Model(six.with_metaclass(ModelBase)):
 
         errors = {}
         for f in self._meta.fields:
-            if f.name in exclude:
+            if f.name in exclude or f.skip_validation:
                 continue
             # Skip validation for empty fields with blank=True. The developer
             # is responsible for making sure they have a valid value.

@@ -146,6 +146,7 @@ class GenericRelation(ForeignObject):
     # already.
     generate_reverse_relation = False
     clone_in_subclasses = True
+    skip_validation = True
 
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
@@ -241,6 +242,9 @@ class GenericRelation(ForeignObject):
                 self.model, for_concrete_model=self.for_concrete_model).pk,
             "%s__in" % self.object_id_field_name: [obj.pk for obj in objs]
         })
+
+    def save_m2m_form_data(self, instance, data):
+        return self.save_form_data(instance, data)
 
 
 class ReverseGenericRelatedObjectsDescriptor(object):

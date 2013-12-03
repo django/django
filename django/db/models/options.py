@@ -232,6 +232,10 @@ class Options(object):
                 del self.local_concrete_fields
             except AttributeError:
                 pass
+            try:
+                del self.virtual_fields
+            except AttributeError:
+                pass
         self.clear_global_field_caches(recurse_subclasses=False)
         for submodel in self.model.__subclasses__():
             submodel._meta.clear_field_caches()
@@ -334,6 +338,10 @@ class Options(object):
     @cached_property
     def local_concrete_fields(self):
         return [f for f in self.local_fields if f.column is not None]
+
+    @cached_property
+    def virtual_fields(self):
+        return [f for f in self.fields if f.column is None]
 
     def get_fields_with_model(self):
         """

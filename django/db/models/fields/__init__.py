@@ -101,6 +101,12 @@ class Field(object):
     # to call the "prepare" method on their own.
     prepare_after_contribute_to_class = True
 
+    # Set this to true in field classes that are never supposed to be
+    # validated in model.clean_fields. This may be the case for certain
+    # virtual fields (such as GenericRelation) where the way this
+    # validation works does not make any sense.
+    skip_validation = False
+
     # These track each time a Field instance is created. Used to retain order.
     # The auto_creation_counter is used for fields that Django implicitly
     # creates, creation_counter is used for all user-specified fields.
