@@ -450,6 +450,9 @@ Models
   argument to control whether or not to perform operations in bulk
   (i.e. using ``QuerySet.update()``). Defaults to ``True``.
 
+* It is now possible to use ``None`` as a query value for the :lookup:`iexact`
+  lookup.
+
 Signals
 ^^^^^^^
 
