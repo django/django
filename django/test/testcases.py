@@ -37,6 +37,7 @@ from django.utils.encoding import force_text
 from django.utils import six
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit, urlparse, unquote
 from django.utils.six.moves.urllib.request import url2pathname
+from django.utils._threading import from_local, to_local
 from django.views.static import serve
 
 
@@ -80,6 +81,16 @@ def restore_transaction_methods():
     transaction.enter_transaction_management = real_enter_transaction_management
     transaction.leave_transaction_management = real_leave_transaction_management
     transaction.abort = real_abort
+
+
+def unthread_active_language():
+    from django.utils.translation import trans_real
+    trans_real._active = from_local(trans_real._active)
+
+
+def rethread_active_language():
+    from django.utils.translation import trans_real
+    trans_real._active = to_local(trans_real._active)
 
 
 def assert_and_parse_html(self, html, user_msg, msg):
@@ -1030,6 +1041,7 @@ class LiveServerThread(threading.Thread):
         Sets up the live server and databases, and then loops over handling
         http requests.
         """
+        unthread_active_language()
         if self.connections_override:
             # Override this thread's database connections with the ones
             # provided by the main thread.
@@ -1073,6 +1085,7 @@ class LiveServerThread(threading.Thread):
             # Stop the WSGI server
             self.httpd.shutdown()
             self.httpd.server_close()
+        rethread_active_language()
 
 
 class LiveServerTestCase(TransactionTestCase):
@@ -1096,6 +1109,7 @@ class LiveServerTestCase(TransactionTestCase):
 
     @classmethod
     def setUpClass(cls):
+        unthread_active_language()
         connections_override = {}
         for conn in connections.all():
             # If using in-memory sqlite databases, pass the connections to
@@ -1148,6 +1162,7 @@ class LiveServerTestCase(TransactionTestCase):
 
     @classmethod
     def _tearDownClassInternal(cls):
+        rethread_active_language()
         # There may not be a 'server_thread' attribute if setUpClass() for some
         # reasons has raised an exception.
         if hasattr(cls, 'server_thread'):

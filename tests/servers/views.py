@@ -1,4 +1,6 @@
 from django.http import HttpResponse
+from django.utils import translation
+
 from .models import Person
 
 
@@ -19,3 +21,7 @@ def create_model_instance(request):
 
 def environ_view(request):
     return HttpResponse("\n".join("%s: %r" % (k, v) for k, v in request.environ.items()))
+
+
+def active_language_view(request):
+    return HttpResponse(translation.get_language())

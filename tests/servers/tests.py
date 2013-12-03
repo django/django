@@ -13,6 +13,7 @@ from django.test.utils import override_settings
 from django.utils.http import urlencode
 from django.utils.six.moves.urllib.error import HTTPError
 from django.utils.six.moves.urllib.request import urlopen
+from django.utils import translation
 from django.utils._os import upath
 
 from .models import Person
@@ -161,6 +162,17 @@ class LiveServerViews(LiveServerBase):
     def test_environ(self):
         f = self.urlopen('/environ_view/?%s' % urlencode({'q': 'тест'}))
         self.assertIn(b"QUERY_STRING: 'q=%D1%82%D0%B5%D1%81%D1%82'", f.read())
+
+    def test_active_language(self):
+        original = translation.get_language()
+        alternative = 'eu'
+        with translation.override(alternative):
+            self.assertEqual(translation.get_language(), alternative)
+            f = self.urlopen('/active_language_view/')
+            self.assertEqual(f.read(), alternative)
+        self.assertEqual(translation.get_language(), original)
+        f = self.urlopen('/active_language_view/')
+        self.assertEqual(f.read(), original)
 
 
 class LiveServerDatabase(LiveServerBase):
