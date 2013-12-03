@@ -1031,7 +1031,7 @@ class Query(object):
         # Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
         # uses of None as a query value.
         if value is None:
-            if lookup_type != 'exact':
+            if lookup_type not in ('exact', 'iexact'):
                 raise ValueError("Cannot use None as a query value")
             lookup_type = 'isnull'
             value = True
