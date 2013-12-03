@@ -133,6 +133,10 @@ class BasicExtractorTests(ExtractorTests):
             self.assertNotMsgId('Text with a few line breaks.', po_contents)
             # should be trimmed
             self.assertMsgId("Again some text with a few line breaks, this time should be trimmed.", po_contents)
+            # should adjust for eaten line numbers
+            self.assertIn(
+                "#: templates/test.html:97\nmsgid \"I'm on line 97\"",
+                po_contents)
 
     def test_force_en_us_locale(self):
         """Value of locale-munging option used by the command is the right one"""
