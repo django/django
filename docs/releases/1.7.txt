@@ -415,6 +415,9 @@ Management Commands
   * All HTTP requests are logged to the console, including requests for static
     files or ``favicon.ico`` that used to be filtered out.
 
+* Management commands can now produce syntax colored output under Windows if
+  the ANSICON third-party tool is installed and active.
+
 Models
 ^^^^^^
 

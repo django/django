@@ -1552,6 +1552,11 @@ color-coded output if your terminal supports ANSI-colored output. It
 won't use the color codes if you're piping the command's output to
 another program.
 
+Under Windows, the native console doesn't support ANSI escape sequences so by
+default there is no color output. But you can install the `ANSICON`_
+third-party tool, the Django commands will detect its presence and will make
+use of its services to color output just like on Unix-based platforms.
+
 The colors used for syntax highlighting can be customized. Django
 ships with three color palettes:
 
@@ -1635,6 +1640,14 @@ palette will be loaded. So::
 would specify the use of all the colors in the light color palette,
 *except* for the colors for errors and notices which would be
 overridden as specified.
+
+.. versionadded:: 1.7
+
+Support for color-coded output from ``django-admin.py`` / ``manage.py``
+utilities on Windows by relying on the ANSICON application was added in Django
+1.7.
+
+.. _ANSICON: http://adoxa.hostmyway.net/ansicon/
 
 Bash completion
 ---------------
