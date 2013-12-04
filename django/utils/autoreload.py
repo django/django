@@ -82,7 +82,7 @@ try:
     import subprocess
     command = ["sysctl", "-n", "kern.maxfilesperproc"]
     NOFILES_KERN = int(subprocess.check_output(command).strip())
-except (AttributeError, OSError):
+except Exception:
     USE_KQUEUE = False
 
 RUN_RELOADER = True
