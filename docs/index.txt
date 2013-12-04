@@ -229,7 +229,8 @@ regions:
 
 * :doc:`Overview <topics/i18n/index>` |
   :doc:`Internationalization <topics/i18n/translation>` |
-  :ref:`Localization <how-to-create-language-files>`
+  :ref:`Localization <how-to-create-language-files>` |
+  :doc:`Localized Web UI formatting and form input <topics/i18n/formatting>`
 * :doc:`"Local flavor" <topics/localflavor>`
 * :doc:`Time zones </topics/i18n/timezones>`
 
