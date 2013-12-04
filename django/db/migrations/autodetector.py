@@ -188,15 +188,26 @@ class MigrationAutodetector(object):
                     continue
                 # You can't just add NOT NULL fields with no default
                 if not field.null and not field.has_default():
+                    field = field.clone()
                     field.default = self.questioner.ask_not_null_addition(field_name, model_name)
-                self.add_to_migration(
-                    app_label,
-                    operations.AddField(
-                        model_name=model_name,
-                        name=field_name,
-                        field=field,
+                    self.add_to_migration(
+                        app_label,
+                        operations.AddField(
+                            model_name=model_name,
+                            name=field_name,
+                            field=field,
+                            preserve_default=False,
+                        )
                     )
-                )
+                else:
+                    self.add_to_migration(
+                        app_label,
+                        operations.AddField(
+                            model_name=model_name,
+                            name=field_name,
+                            field=field,
+                        )
+                    )
             # Old fields
             for field_name in old_field_names - new_field_names:
                 self.add_to_migration(
@@ -434,7 +445,8 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         "Adding a NOT NULL field to a model"
         choice = self._choice_input(
             "You are trying to add a non-nullable field '%s' to %s without a default;\n" % (field_name, model_name) +
-            "this is not possible. Please select a fix:",
+            "we can't do that (the database needs something to populate existing rows).\n" +
+            "Please select a fix:",
             [
                 "Provide a one-off default now (will be set on all existing rows)",
                 "Quit, and let me add a default in models.py",

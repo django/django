@@ -1,4 +1,5 @@
 from django.db import connection, models, migrations, router
+from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
 from django.db.utils import IntegrityError
 from django.db.migrations.state import ProjectState
@@ -130,10 +131,19 @@ class OperationTests(MigrationTestBase):
         """
         project_state = self.set_up_test_model("test_adfl")
         # Test the state alteration
-        operation = migrations.AddField("Pony", "height", models.FloatField(null=True))
+        operation = migrations.AddField(
+            "Pony",
+            "height",
+            models.FloatField(null=True, default=5),
+        )
         new_state = project_state.clone()
         operation.state_forwards("test_adfl", new_state)
         self.assertEqual(len(new_state.models["test_adfl", "pony"].fields), 4)
+        field = [
+            f for n, f in new_state.models["test_adfl", "pony"].fields
+            if n == "height"
+        ][0]
+        self.assertEqual(field.default, 5)
         # Test the database alteration
         self.assertColumnNotExists("test_adfl_pony", "height")
         with connection.schema_editor() as editor:
@@ -143,6 +153,28 @@ class OperationTests(MigrationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_adfl", editor, new_state, project_state)
         self.assertColumnNotExists("test_adfl_pony", "height")
+
+    def test_add_field_preserve_default(self):
+        """
+        Tests the AddField operation's state alteration
+        when preserve_default = False.
+        """
+        project_state = self.set_up_test_model("test_adflpd")
+        # Test the state alteration
+        operation = migrations.AddField(
+            "Pony",
+            "height",
+            models.FloatField(null=True, default=4),
+            preserve_default = False,
+        )
+        new_state = project_state.clone()
+        operation.state_forwards("test_adflpd", new_state)
+        self.assertEqual(len(new_state.models["test_adflpd", "pony"].fields), 4)
+        field = [
+            f for n, f in new_state.models["test_adflpd", "pony"].fields
+            if n == "height"
+        ][0]
+        self.assertEqual(field.default, NOT_PROVIDED)
 
     def test_add_field_m2m(self):
         """
