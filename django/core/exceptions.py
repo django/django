@@ -4,6 +4,7 @@ Global Django exception and warning classes.
 from functools import reduce
 import operator
 
+from django.utils import six
 from django.utils.encoding import force_text
 
 
@@ -84,10 +85,17 @@ class ValidationError(Exception):
         list or dictionary can be an actual `list` or `dict` or an instance
         of ValidationError with its `error_list` or `error_dict` attribute set.
         """
+
+        # PY2 can't pickle naive exception: http://bugs.python.org/issue1692335.
+        super(ValidationError, self).__init__(message, code, params)
+
         if isinstance(message, ValidationError):
             if hasattr(message, 'error_dict'):
                 message = message.error_dict
-            elif not hasattr(message, 'message'):
+            # PY2 has a `message` property which is always there so we can't
+            # duck-type on it. It was introduced in Python 2.5 and already
+            # deprecated in Python 2.6.
+            elif not hasattr(message, 'message' if six.PY3 else 'code'):
                 message = message.error_list
             else:
                 message, code, params = message.message, message.code, message.params
