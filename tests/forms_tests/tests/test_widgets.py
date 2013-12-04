@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import copy
 import datetime
+import warnings
 
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -1092,18 +1093,22 @@ class WidgetTests(TestCase):
         class SplitDateForm(Form):
             field = DateTimeField(widget=SplitDateTimeWidget, required=False)
 
-        form = SplitDateForm({'field': ''})
-        self.assertTrue(form.is_valid())
-        form = SplitDateForm({'field': ['', '']})
-        self.assertTrue(form.is_valid())
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+            form = SplitDateForm({'field': ''})
+            self.assertTrue(form.is_valid())
+            form = SplitDateForm({'field': ['', '']})
+            self.assertTrue(form.is_valid())
 
         class SplitDateRequiredForm(Form):
             field = DateTimeField(widget=SplitDateTimeWidget, required=True)
 
-        form = SplitDateRequiredForm({'field': ''})
-        self.assertFalse(form.is_valid())
-        form = SplitDateRequiredForm({'field': ['', '']})
-        self.assertFalse(form.is_valid())
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+            form = SplitDateRequiredForm({'field': ''})
+            self.assertFalse(form.is_valid())
+            form = SplitDateRequiredForm({'field': ['', '']})
+            self.assertFalse(form.is_valid())
 
 
 class LiveWidgetTests(AdminSeleniumWebDriverTestCase):

@@ -1063,3 +1063,10 @@ the arguments may have been evaluated at query time.
 
 The ``ADMIN_FOR`` feature, part of the admindocs, has been removed. You can
 remove the setting from your configuration at your convenience.
+
+``SplitDateTimeWidget`` with ``DateTimeField``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``SplitDateTimeWidget`` support in :class:`~django.forms.DateTimeField` is
+deprecated, use ``SplitDateTimeWidget`` with
+:class:`~django.forms.SplitDateTimeField` instead.
