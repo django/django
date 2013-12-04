@@ -14,17 +14,18 @@ from django.db.models.loading import cache
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
-        make_option('--empty', action='store_true', dest='empty', default=False,
-            help='Make a blank migration.'),
+        make_option('--dry-run', action='store_true', dest='dry_run', default=False,
+            help="Just show what migrations would be made; don't actually write them."),
     )
 
     help = "Creates new migration(s) for apps."
-    usage_str = "Usage: ./manage.py makemigrations [--empty] [app [app ...]]"
+    usage_str = "Usage: ./manage.py makemigrations [--dry-run] [app [app ...]]"
 
     def handle(self, *app_labels, **options):
 
         self.verbosity = int(options.get('verbosity'))
         self.interactive = options.get('interactive')
+        self.dry_run = options.get('dry_run', False)
 
         # Make sure the app they asked for exists
         app_labels = set(app_labels)
@@ -73,15 +74,16 @@ class Command(BaseCommand):
                     for operation in migration.operations:
                         self.stdout.write("    - %s\n" % operation.describe())
                 # Write it
-                migrations_directory = os.path.dirname(writer.path)
-                if not directory_created.get(app_label, False):
-                    if not os.path.isdir(migrations_directory):
-                        os.mkdir(migrations_directory)
-                    init_path = os.path.join(migrations_directory, "__init__.py")
-                    if not os.path.isfile(init_path):
-                        open(init_path, "w").close()
-                    # We just do this once per app
-                    directory_created[app_label] = True
-                migration_string = writer.as_string()
-                with open(writer.path, "wb") as fh:
-                    fh.write(migration_string)
+                if not self.dry_run:
+                    migrations_directory = os.path.dirname(writer.path)
+                    if not directory_created.get(app_label, False):
+                        if not os.path.isdir(migrations_directory):
+                            os.mkdir(migrations_directory)
+                        init_path = os.path.join(migrations_directory, "__init__.py")
+                        if not os.path.isfile(init_path):
+                            open(init_path, "w").close()
+                        # We just do this once per app
+                        directory_created[app_label] = True
+                    migration_string = writer.as_string()
+                    with open(writer.path, "wb") as fh:
+                        fh.write(migration_string)
