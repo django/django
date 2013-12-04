@@ -486,6 +486,10 @@ class DateTimeField(BaseTemporalField):
         if isinstance(value, list):
             # Input comes from a SplitDateTimeWidget, for example. So, it's two
             # components: date and time.
+            warnings.warn(
+                'Using SplitDateTimeWidget with DateTimeField is deprecated. '
+                'Use SplitDateTimeField instead.',
+                PendingDeprecationWarning, stacklevel=2)
             if len(value) != 2:
                 raise ValidationError(self.error_messages['invalid'], code='invalid')
             if value[0] in self.empty_values and value[1] in self.empty_values:
