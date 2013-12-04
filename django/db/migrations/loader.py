@@ -187,6 +187,20 @@ class MigrationLoader(object):
             for parent in migration.dependencies:
                 self.graph.add_dependency(key, parent)
 
+    def detect_conflicts(self):
+        """
+        Looks through the loaded graph and detects any conflicts - apps
+        with more than one leaf migration. Returns a dict of the app labels
+        that conflict with the migration names that conflict.
+        """
+        seen_apps = {}
+        conflicting_apps = set()
+        for app_label, migration_name in self.graph.leaf_nodes():
+            if app_label in seen_apps:
+                conflicting_apps.add(app_label)
+            seen_apps.setdefault(app_label, set()).add(migration_name)
+        return dict((app_label, seen_apps[app_label]) for app_label in conflicting_apps)
+
 
 class BadMigrationError(Exception):
     """

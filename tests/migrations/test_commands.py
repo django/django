@@ -6,7 +6,7 @@ import copy
 import os
 import shutil
 
-from django.core.management import call_command
+from django.core.management import call_command, CommandError
 from django.db.models.loading import cache
 from django.test.utils import override_settings
 from django.utils import six
@@ -71,6 +71,34 @@ class MigrateTests(MigrationTestBase):
         self.assertIn("[ ] 0002_second", stdout.getvalue().lower())
         # Cleanup by unmigrating everything
         call_command("migrate", "migrations", "zero", verbosity=0)
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
+    def test_migrate_conflict_exit(self):
+        """
+        Makes sure that migrate exits if it detects a conflict.
+        """
+        with self.assertRaises(CommandError):
+            call_command("migrate", "migrations")
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
+    def test_makemigrations_conflict_exit(self):
+        """
+        Makes sure that makemigrations exits if it detects a conflict.
+        """
+        with self.assertRaises(CommandError):
+            call_command("makemigrations")
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
+    def test_makemigrations_merge_basic(self):
+        """
+        Makes sure that makemigrations doesn't error if you ask for
+        merge mode with a conflict present. Doesn't test writing of the merge
+        file, as that requires temp directories.
+        """
+        try:
+            call_command("makemigrations", merge=True, verbosity=0)
+        except CommandError:
+            self.fail("Makemigrations errored in merge mode with conflicts")
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_sqlmigrate(self):

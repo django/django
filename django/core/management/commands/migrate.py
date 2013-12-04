@@ -62,6 +62,16 @@ class Command(BaseCommand):
         # Work out which apps have migrations and which do not
         executor = MigrationExecutor(connection, self.migration_progress_callback)
 
+        # Before anything else, see if there's conflicting apps and drop out
+        # hard if there are any
+        conflicts = executor.loader.detect_conflicts()
+        if conflicts:
+            name_str = "; ".join(
+                "%s in %s" % (", ".join(names), app)
+                for app, names in conflicts.items()
+            )
+            raise CommandError("Conflicting migrations detected (%s).\nTo fix them run 'python manage.py makemigrations --merge'" % name_str)
+
         # If they supplied command line arguments, work out what they mean.
         run_syncdb = False
         target_app_labels_only = True

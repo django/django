@@ -1,6 +1,7 @@
 # encoding: utf8
 from django.test import TestCase
-from django.db.migrations.autodetector import MigrationAutodetector, MigrationQuestioner
+from django.db.migrations.autodetector import MigrationAutodetector
+from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ProjectState, ModelState
 from django.db.migrations.graph import MigrationGraph
 from django.db import models
@@ -63,7 +64,7 @@ class AutodetectorTests(TestCase):
         # Use project state to make a new migration change set
         before = self.make_project_state([])
         after = self.make_project_state([self.author_empty, self.other_pony, self.other_stable, self.third_thing])
-        autodetector = MigrationAutodetector(before, after, MigrationQuestioner({"ask_initial": True}))
+        autodetector = MigrationAutodetector(before, after, MigrationQuestioner(defaults={"ask_initial": True}))
         changes = autodetector._detect_changes()
         # Run through arrange_for_graph
         graph = MigrationGraph()
