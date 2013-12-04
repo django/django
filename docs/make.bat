@@ -84,7 +84,7 @@ if "%1" == "json" (
 )
 
 if "%1" == "htmlhelp" (
-	%SPHINXBUILD% -b htmlhelp -A DISABLE_JQUERY=1 %ALLSPHINXOPTS% %BUILDDIR%/htmlhelp
+	%SPHINXBUILD% -b htmlhelp %ALLSPHINXOPTS% %BUILDDIR%/htmlhelp
 	if errorlevel 1 exit /b 1
 	"%ProgramFiles(x86)%\HTML Help Workshop\hhc.exe" %BUILDDIR%\htmlhelp\Djangodoc.hhp	
 	if errorlevel 9009 if not errorlevel 9010 echo "Please download Microsoft HTML Help Workshop from http://www.microsoft.com/en-us/download/details.aspx?id=21138"

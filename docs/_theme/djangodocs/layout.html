@@ -17,10 +17,9 @@
 {%- endmacro %}
 
 {% block extrahead %}
-{# DISABLE_JQUERY is used when building htmlhelp file (CHM format)  #}
-{# it is used to disable JQuery inclusion, as it causes problems in #}
-{# compiled CHM files. #}
-{% if DISABLE_JQUERY != 1 %}
+{# When building htmlhelp (CHM format)  disable JQuery inclusion,  #}
+{# as it causes problems in compiled CHM files.                    #}
+{% if builder != "htmlhelp" %}
 {{ super() }}
 <script type="text/javascript" src="{{ pathto('templatebuiltins.js', 1) }}"></script>
 <script type="text/javascript">
