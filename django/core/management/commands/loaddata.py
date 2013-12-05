@@ -178,11 +178,15 @@ class Command(BaseCommand):
         if self.verbosity >= 2:
             self.stdout.write("Loading '%s' fixtures..." % fixture_name)
 
-        if os.path.sep in fixture_name:
+        if os.path.isabs(fixture_name):
             fixture_dirs = [os.path.dirname(fixture_name)]
             fixture_name = os.path.basename(fixture_name)
         else:
             fixture_dirs = self.fixture_dirs
+            if os.path.sep in fixture_name:
+                fixture_dirs = [os.path.join(dir_, os.path.dirname(fixture_name))
+                                for dir_ in fixture_dirs]
+                fixture_name = os.path.basename(fixture_name)
 
         suffixes = ('.'.join(ext for ext in combo if ext)
                 for combo in product(databases, ser_fmts, cmp_fmts))
