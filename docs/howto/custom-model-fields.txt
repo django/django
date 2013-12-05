@@ -251,7 +251,7 @@ you'll need to supplement the values being passed.
 
 The contract of ``deconstruct`` is simple; it returns a tuple of four items:
 the field's attribute name, the full import path of the field class, the
-position arguments (as a list), and the keyword arguments (as a dict).
+positional arguments (as a list), and the keyword arguments (as a dict).
 
 As a custom field author, you don't need to care about the first two values;
 the base ``Field`` class has all the code to work out the field's attribute
