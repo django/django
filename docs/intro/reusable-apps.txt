@@ -128,6 +128,13 @@ this. For a small app like polls, this process isn't too difficult.
        This helps others looking for Django apps identify your app as Django
        specific.
 
+       The application names (that is, the final dotted part of the
+       path to the module containing ``models.py``) defined in
+       :setting:`INSTALLED_APPS` *must* be unique. Avoid using the
+       same name as any of the Django :doc:`contrib packages
+       </ref/contrib/index>`, for example ``auth``, ``admin`` or
+       ``messages``.
+
 2. Move the ``polls`` directory into the ``django-polls`` directory.
 
 3. Create a file ``django-polls/README.rst`` with the following contents:
