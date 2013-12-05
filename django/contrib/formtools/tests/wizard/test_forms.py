@@ -47,7 +47,7 @@ class CustomKwargsStep1(Step1):
 
     def __init__(self, test=None, *args, **kwargs):
         self.test = test
-        return super(CustomKwargsStep1, self).__init__(*args, **kwargs)
+        super(CustomKwargsStep1, self).__init__(*args, **kwargs)
 
 
 class TestModel(models.Model):
