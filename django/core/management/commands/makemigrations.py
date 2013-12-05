@@ -89,10 +89,10 @@ class Command(BaseCommand):
             return
 
         directory_created = {}
-        for app_label, migrations in changes.items():
+        for app_label, app_migrations in changes.items():
             if self.verbosity >= 1:
                 self.stdout.write(self.style.MIGRATE_HEADING("Migrations for '%s':" % app_label) + "\n")
-            for migration in migrations:
+            for migration in app_migrations:
                 # Describe the migration
                 writer = MigrationWriter(migration)
                 if self.verbosity >= 1:
