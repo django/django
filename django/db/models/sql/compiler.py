@@ -284,25 +284,32 @@ class SQLCompiler(object):
                 continue
             alias = self.query.join_parent_model(opts, model, start_alias,
                                                  seen_models)
+            column = field.column
+            reverse_lookup = dict([(v,k) for k,v in seen_models.items()])
+            target_model = reverse_lookup.get(alias)
+            if target_model is not None:
+                ancestor_link = target_model._meta.get_ancestor_link(model)
+                if ancestor_link:
+                    column = ancestor_link.column
             table = self.query.alias_map[alias].table_name
-            if table in only_load and field.column not in only_load[table]:
+            if table in only_load and column not in only_load[table]:
                 continue
             if as_pairs:
-                result.append((alias, field.column))
+                result.append((alias, column))
                 aliases.add(alias)
                 continue
-            if with_aliases and field.column in col_aliases:
+            if with_aliases and column in col_aliases:
                 c_alias = 'Col%d' % len(col_aliases)
                 result.append('%s.%s AS %s' % (qn(alias),
-                    qn2(field.column), c_alias))
+                    qn2(column), c_alias))
                 col_aliases.add(c_alias)
                 aliases.add(c_alias)
             else:
-                r = '%s.%s' % (qn(alias), qn2(field.column))
+                r = '%s.%s' % (qn(alias), qn2(column))
                 result.append(r)
                 aliases.add(r)
                 if with_aliases:
-                    col_aliases.add(field.column)
+                    col_aliases.add(column)
         return result, aliases
 
     def get_distinct(self):
