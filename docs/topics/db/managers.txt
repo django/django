@@ -219,7 +219,7 @@ custom ``QuerySet`` if you also implement them on the ``Manager``::
 
     class PersonManager(models.Manager):
         def get_queryset(self):
-            return PersonQuerySet()
+            return PersonQuerySet(self.model, using=self._db)
 
         def male(self):
             return self.get_queryset().male()
