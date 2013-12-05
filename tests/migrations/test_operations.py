@@ -165,7 +165,7 @@ class OperationTests(MigrationTestBase):
             "Pony",
             "height",
             models.FloatField(null=True, default=4),
-            preserve_default = False,
+            preserve_default=False,
         )
         new_state = project_state.clone()
         operation.state_forwards("test_adflpd", new_state)
