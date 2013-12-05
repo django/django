@@ -10,7 +10,7 @@ from django.db.models.base import ModelBase
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.core import urlresolvers
-
+fgfg
 
 def render_to_response(*args, **kwargs):
     """
