@@ -99,11 +99,25 @@ class ModelState(object):
         for field in model._meta.local_fields:
             name, path, args, kwargs = field.deconstruct()
             field_class = import_by_path(path)
-            fields.append((name, field_class(*args, **kwargs)))
+            try:
+                fields.append((name, field_class(*args, **kwargs)))
+            except TypeError as e:
+                raise TypeError("Couldn't reconstruct field %s on %s: %s" % (
+                    name,
+                    model._meta.object_name,
+                    e,
+                ))
         for field in model._meta.local_many_to_many:
             name, path, args, kwargs = field.deconstruct()
             field_class = import_by_path(path)
-            fields.append((name, field_class(*args, **kwargs)))
+            try:
+                fields.append((name, field_class(*args, **kwargs)))
+            except TypeError as e:
+                raise TypeError("Couldn't reconstruct m2m field %s on %s: %s" % (
+                    name,
+                    model._meta.object_name,
+                    e,
+                ))
         # Extract the options
         options = {}
         for name in DEFAULT_NAMES:
