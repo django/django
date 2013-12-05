@@ -176,7 +176,7 @@ class ModelState(object):
             for base in self.bases
         )
         if None in bases:
-            raise InvalidBasesError("Cannot resolve one or more bases from %r" % self.bases)
+            raise InvalidBasesError("Cannot resolve one or more bases from %r" % (self.bases,))
         # Turn fields into a dict for the body, add other bits
         body = dict(self.fields)
         body['Meta'] = meta

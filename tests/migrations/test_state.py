@@ -94,32 +94,58 @@ class StateTests(TestCase):
         self.assertEqual(new_app_cache.get_model("migrations", "Tag")._meta.get_field_by_name("name")[0].max_length, 100)
         self.assertEqual(new_app_cache.get_model("migrations", "Tag")._meta.get_field_by_name("hidden")[0].null, False)
 
-    def test_render_multiple_inheritance(self):
-        # Use a custom app cache to avoid polluting the global one.
-        new_app_cache = BaseAppCache()
-
+    def test_render_model_inheritance(self):
         class Book(models.Model):
             title = models.CharField(max_length=1000)
 
             class Meta:
                 app_label = "migrations"
-                app_cache = new_app_cache
+                app_cache = BaseAppCache()
 
         class Novel(Book):
             class Meta:
                 app_label = "migrations"
-                app_cache = new_app_cache
+                app_cache = BaseAppCache()
 
         # First, test rendering individually
-        yet_another_app_cache = BaseAppCache()
+        app_cache = BaseAppCache()
 
         # We shouldn't be able to render yet
-        with self.assertRaises(ValueError):
-            ModelState.from_model(Novel).render(yet_another_app_cache)
+        ms = ModelState.from_model(Novel)
+        with self.assertRaises(InvalidBasesError):
+            ms.render(app_cache)
 
         # Once the parent model is in the app cache, it should be fine
-        ModelState.from_model(Book).render(yet_another_app_cache)
-        ModelState.from_model(Novel).render(yet_another_app_cache)
+        ModelState.from_model(Book).render(app_cache)
+        ModelState.from_model(Novel).render(app_cache)
+
+    def test_render_model_with_multiple_inheritance(self):
+        class Foo(models.Model):
+            class Meta:
+                app_label = "migrations"
+                app_cache = BaseAppCache()
+
+        class Bar(models.Model):
+            class Meta:
+                app_label = "migrations"
+                app_cache = BaseAppCache()
+
+        class FooBar(Foo, Bar):
+            class Meta:
+                app_label = "migrations"
+                app_cache = BaseAppCache()
+
+        app_cache = BaseAppCache()
+
+        # We shouldn't be able to render yet
+        ms = ModelState.from_model(FooBar)
+        with self.assertRaises(InvalidBasesError):
+            ms.render(app_cache)
+
+        # Once the parent models are in the app cache, it should be fine
+        ModelState.from_model(Foo).render(app_cache)
+        ModelState.from_model(Bar).render(app_cache)
+        ModelState.from_model(FooBar).render(app_cache)
 
     def test_render_project_dependencies(self):
         """
