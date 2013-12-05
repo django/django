@@ -15,7 +15,7 @@ from .models import (Place, Restaurant, ItalianRestaurant, ParkingLot,
     SelfRefChild, ArticleWithAuthor, M2MChild, QualityControl, DerivedM,
     Person, BirthdayParty, BachelorParty, MessyBachelorParty,
     InternalCertificationAudit, BusStation, TrainStation, User, Profile,
-    ParkingLot4A, ParkingLot4B)
+    ParkingLot4A, ParkingLot4B, Senator)
 
 
 class ModelInheritanceTest(TestCase):
@@ -455,3 +455,10 @@ class ModelInheritanceTest(TestCase):
         # used in the qs and top contains direct pointer to the bottom model.
         qs = ItalianRestaurant.objects.values_list('serves_gnocchi').filter(name='foo')
         self.assertEqual(str(qs.query).count('JOIN'), 1)
+
+    def test_issue_21554(self):
+        senator = Senator.objects.create(
+            name='John Doe', title='X', state='Y'
+        )
+
+        Senator.objects.get(pk=senator.pk)
