@@ -28,7 +28,8 @@ Bug fixes
 * Fixed ``django.contrib.humanize`` translations where the unicode sequence
   for the non-breaking space was returned verbatim (#21415).
 * Fixed :djadmin:`loaddata` error when fixture file name contained any dots
-  non related to file extensions (#21457).
+  non related to file extensions (#21457) or when fixture path was relative
+  but located in a subdirectory (#21551).
 * Fixed display of inline instances in formsets when parent has 0 for primary
   key (#21472).
 * Fixed a regression where custom querysets for foreign keys were overwritten
