@@ -304,7 +304,7 @@ Pay extra attention if you set new default values for arguments in the
 than disappearing if they take on the old default value.
 
 In addition, try to avoid returning values as positional arguments; where
-possible, return values as keyword arguments for maximum future compatability.
+possible, return values as keyword arguments for maximum future compatibility.
 Of course, if you change the names of things more often than their position
 in the constructor's argument list, you might prefer positional, but bear in
 mind that people will be reconstructing your field from the serialized version
