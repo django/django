@@ -106,8 +106,6 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                         return eval(code, {}, {"datetime": datetime_safe})
                     except (SyntaxError, NameError) as e:
                         print("Invalid input: %s" % e)
-                    else:
-                        break
 
     def ask_rename(self, model_name, old_name, new_name, field_instance):
         "Was this field really renamed?"
