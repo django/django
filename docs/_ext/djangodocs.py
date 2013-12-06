@@ -179,7 +179,7 @@ class SnippetWithFilename(Directive):
     option_spec = {'filename': directives.unchanged_required}
 
     def run(self):
-        code = u'\n'.join(self.content)
+        code = '\n'.join(self.content)
 
         literal = snippet_with_filename(code, code)
         if self.arguments:
