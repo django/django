@@ -1175,6 +1175,12 @@ class ModelMultipleChoiceField(ModelChoiceField):
             msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
             self.help_text = string_concat(self.help_text, ' ', msg)
 
+    def to_python(self, value):
+        if not value:
+            return []
+        to_py = super(ModelMultipleChoiceField, self).to_python
+        return [to_py(val) for val in value]
+
     def clean(self, value):
         if self.required and not value:
             raise ValidationError(self.error_messages['required'], code='required')
