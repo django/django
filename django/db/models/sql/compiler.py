@@ -285,12 +285,12 @@ class SQLCompiler(object):
             alias = self.query.join_parent_model(opts, model, start_alias,
                                                  seen_models)
             column = field.column
-            reverse_lookup = dict([(v,k) for k,v in seen_models.items()])
-            target_model = reverse_lookup.get(alias)
-            if target_model is not None:
-                ancestor_link = target_model._meta.get_ancestor_link(model)
-                if ancestor_link:
-                    column = ancestor_link.column
+            for seen_model, seen_alias in seen_models.items():
+                if seen_model and seen_alias == alias:
+                    ancestor_link = seen_model._meta.get_ancestor_link(model)
+                    if ancestor_link:
+                        column = ancestor_link.column
+                    break
             table = self.query.alias_map[alias].table_name
             if table in only_load and column not in only_load[table]:
                 continue

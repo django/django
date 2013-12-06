@@ -460,6 +460,5 @@ class ModelInheritanceTest(TestCase):
         senator = Senator.objects.create(name='John Doe',
                                          title='X',
                                          state='Y')
-        
         Senator.objects.get(pk=senator.pk)
 
