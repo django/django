@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models.loading import BaseAppCache
-from django.db.models.options import DEFAULT_NAMES
+from django.db.models.options import DEFAULT_NAMES, normalize_unique_together
 from django.utils import six
 from django.utils.module_loading import import_by_path
 
@@ -102,8 +102,9 @@ class ModelState(object):
             try:
                 fields.append((name, field_class(*args, **kwargs)))
             except TypeError as e:
-                raise TypeError("Couldn't reconstruct field %s on %s: %s" % (
+                raise TypeError("Couldn't reconstruct field %s on %s.%s: %s" % (
                     name,
+                    model._meta.app_label,
                     model._meta.object_name,
                     e,
                 ))
@@ -126,7 +127,8 @@ class ModelState(object):
                 continue
             elif name in model._meta.original_attrs:
                 if name == "unique_together":
-                    options[name] = set(model._meta.original_attrs["unique_together"])
+                    ut = model._meta.original_attrs["unique_together"]
+                    options[name] = set(normalize_unique_together(ut))
                 else:
                     options[name] = model._meta.original_attrs[name]
         # Make our record

@@ -115,6 +115,11 @@ class TeamField(six.with_metaclass(models.SubfieldBase, models.CharField)):
     def value_to_string(self, obj):
         return self._get_val_from_obj(obj).to_string()
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(TeamField, self).deconstruct()
+        del kwargs['max_length']
+        return name, path, args, kwargs
+
 
 @python_2_unicode_compatible
 class Player(models.Model):

@@ -67,7 +67,7 @@ class MigrationAutodetector(object):
             model_state = self.to_state.models[app_label, model_name]
             # Are there any relationships out from this model? if so, punt it to the next phase.
             related_fields = []
-            for field in new_app_cache.get_model(app_label, model_name)._meta.fields:
+            for field in new_app_cache.get_model(app_label, model_name)._meta.local_fields:
                 if field.rel:
                     if field.rel.to:
                         related_fields.append((field.name, field.rel.to._meta.app_label.lower(), field.rel.to._meta.object_name.lower()))
