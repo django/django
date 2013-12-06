@@ -1019,6 +1019,16 @@ class ForeignObject(RelatedField):
 
         super(ForeignObject, self).__init__(**kwargs)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(ForeignObject, self).deconstruct()
+        kwargs['from_fields'] = self.from_fields
+        kwargs['to_fields'] = self.to_fields
+        if isinstance(self.rel.to, six.string_types):
+            kwargs['to'] = self.rel.to
+        else:
+            kwargs['to'] = "%s.%s" % (self.rel.to._meta.app_label, self.rel.to._meta.object_name)
+        return name, path, args, kwargs
+
     def resolve_related_fields(self):
         if len(self.from_fields) < 1 or len(self.from_fields) != len(self.to_fields):
             raise ValueError('Foreign Object from and to fields must be the same non-zero length')
@@ -1243,6 +1253,8 @@ class ForeignKey(ForeignObject):
 
     def deconstruct(self):
         name, path, args, kwargs = super(ForeignKey, self).deconstruct()
+        del kwargs['to_fields']
+        del kwargs['from_fields']
         # Handle the simpler arguments
         if self.db_index:
             del kwargs['db_index']
@@ -1255,10 +1267,6 @@ class ForeignKey(ForeignObject):
         # Rel needs more work.
         if self.rel.field_name:
             kwargs['to_field'] = self.rel.field_name
-        if isinstance(self.rel.to, six.string_types):
-            kwargs['to'] = self.rel.to
-        else:
-            kwargs['to'] = "%s.%s" % (self.rel.to._meta.app_label, self.rel.to._meta.object_name)
         return name, path, args, kwargs
 
     @property
