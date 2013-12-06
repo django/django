@@ -1476,7 +1476,7 @@ class ManyToManyField(RelatedField):
         name, path, args, kwargs = super(ManyToManyField, self).deconstruct()
         # Handle the simpler arguments
         if self.rel.db_constraint is not True:
-            kwargs['db_constraint'] = self.db_constraint
+            kwargs['db_constraint'] = self.rel.db_constraint
         if "help_text" in kwargs:
             del kwargs['help_text']
         # Rel needs more work.
