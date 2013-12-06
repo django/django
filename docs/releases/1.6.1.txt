@@ -22,6 +22,9 @@ Bug fixes
   raised an error (#21439).
 * Fixed a regression that prevented editable ``GenericRelation`` subclasses
   from working in ``ModelForms``.
+* Added missing ``to_python`` method for ``ModelMultipleChoiceField`` which
+  is required in Django 1.6 to properly detect changes from initial values
+  (#21568).
 * Fixed ``django.contrib.humanize`` translations where the unicode sequence
   for the non-breaking space was returned verbatim (#21415).
 * Fixed :djadmin:`loaddata` error when fixture file name contained any dots
