@@ -102,8 +102,9 @@ class ModelState(object):
             try:
                 fields.append((name, field_class(*args, **kwargs)))
             except TypeError as e:
-                raise TypeError("Couldn't reconstruct field %s on %s: %s" % (
+                raise TypeError("Couldn't reconstruct field %s on %s.%s: %s" % (
                     name,
+                    model._meta.app_label,
                     model._meta.object_name,
                     e,
                 ))
