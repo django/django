@@ -9,7 +9,7 @@ from django.db import models
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.http import urlencode
 
@@ -142,14 +142,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         lookup_params = self.get_filters_params()
         use_distinct = False
 
-        # Normalize the types of keys
         for key, value in lookup_params.items():
-            if not isinstance(key, str):
-                # 'key' will be used as a keyword argument later, so Python
-                # requires it to be a string.
-                del lookup_params[key]
-                lookup_params[force_str(key)] = value
-
             if not self.model_admin.lookup_allowed(key, value):
                 raise DisallowedModelAdminLookup("Filtering by %s not allowed" % key)
 
