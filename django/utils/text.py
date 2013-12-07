@@ -248,8 +248,9 @@ def get_text_list(list_, last_word=ugettext_lazy('or')):
 get_text_list = allow_lazy(get_text_list, six.text_type)
 
 
+_newlines_re = re.compile(r'\r\n|\r')
 def normalize_newlines(text):
-    return force_text(re.sub(r'\r\n|\r|\n', '\n', text))
+    return force_text(_newlines_re.sub('\n', text))
 normalize_newlines = allow_lazy(normalize_newlines, six.text_type)
 
 
