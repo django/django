@@ -24,6 +24,7 @@ capfirst = allow_lazy(capfirst, six.text_type)
 # Set up regular expressions
 re_words = re.compile(r'<.*?>|((?:\w[-\w]*|&.*?;)+)', re.U | re.S)
 re_tag = re.compile(r'<(/)?([^ ]+?)(?:(\s*/)| .*?)?>', re.S)
+re_newlines = re.compile(r'\r\n|\r')  # Used in normalize_newlines
 
 
 def wrap(text, width):
@@ -249,7 +250,7 @@ get_text_list = allow_lazy(get_text_list, six.text_type)
 
 
 def normalize_newlines(text):
-    return force_text(re.sub(r'\r\n|\r|\n', '\n', text))
+    return force_text(re_newlines.sub('\n', text))
 normalize_newlines = allow_lazy(normalize_newlines, six.text_type)
 
 
