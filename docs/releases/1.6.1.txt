@@ -47,3 +47,5 @@ Bug fixes
 * Fixed password hash upgrade when changing the iteration count (#21535).
 * Fixed a bug in the debug view when the urlconf only contains one element
   (#21530).
+* Re-added missing search result count and reset link in changelist admin view
+  (#21510).

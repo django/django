@@ -223,7 +223,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         # Perform a slight optimization:
         # full_result_count is equal to paginator.count if no filters
         # were applied
-        if self.get_filters_params():
+        if self.get_filters_params() or self.params.get(SEARCH_VAR):
             full_result_count = self.root_queryset.count()
         else:
             full_result_count = result_count
