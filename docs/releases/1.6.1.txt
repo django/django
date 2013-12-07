@@ -41,3 +41,5 @@ Bug fixes
   backend (#21448).
 * Fixed a crash when a ``GeometryField`` uses a non-geometric widget (#21496).
 * Fixed password hash upgrade when changing the iteration count (#21535).
+* Fixed a bug in the debug view when the urlconf only contains one element
+  (#21530).
