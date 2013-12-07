@@ -15,7 +15,7 @@ from django.core.cache.backends.base import BaseCache
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.test import TestCase
-from django.test.utils import override_settings
+from django.test.utils import override_settings, can_symlink
 from django.utils.encoding import force_text
 from django.utils.functional import empty
 from django.utils._os import rmtree_errorhandler, upath
@@ -606,24 +606,25 @@ class TestCollectionSimpleCachedStorage(BaseCollectionTestCase,
             self.assertNotIn(b"cached/other.css", content)
             self.assertIn(b"other.deploy12345.css", content)
 
-if sys.platform != 'win32':
 
-    class TestCollectionLinks(CollectionTestCase, TestDefaults):
+@unittest.skipUnless(can_symlink(),
+                     "Must be able to symlink to run this test.")
+class TestCollectionLinks(CollectionTestCase, TestDefaults):
+    """
+    Test ``--link`` option for ``collectstatic`` management command.
+
+    Note that by inheriting ``TestDefaults`` we repeat all
+    the standard file resolving tests here, to make sure using
+    ``--link`` does not change the file-selection semantics.
+    """
+    def run_collectstatic(self):
+        super(TestCollectionLinks, self).run_collectstatic(link=True)
+
+    def test_links_created(self):
         """
-        Test ``--link`` option for ``collectstatic`` management command.
-
-        Note that by inheriting ``TestDefaults`` we repeat all
-        the standard file resolving tests here, to make sure using
-        ``--link`` does not change the file-selection semantics.
+        With ``--link``, symbolic links are created.
         """
-        def run_collectstatic(self):
-            super(TestCollectionLinks, self).run_collectstatic(link=True)
-
-        def test_links_created(self):
-            """
-            With ``--link``, symbolic links are created.
-            """
-            self.assertTrue(os.path.islink(os.path.join(settings.STATIC_ROOT, 'test.txt')))
+        self.assertTrue(os.path.islink(os.path.join(settings.STATIC_ROOT, 'test.txt')))
 
 
 class TestServeStatic(StaticFilesTestCase):

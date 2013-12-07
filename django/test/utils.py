@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 import logging
 import re
+import os
 import sys
 from threading import local
 import time
@@ -442,3 +443,20 @@ class TransRealMixin(object):
 requires_tz_support = skipUnless(TZ_SUPPORT,
         "This test relies on the ability to run a program in an arbitrary "
         "time zone, but your operating system isn't able to do that.")
+
+_can_symlink = None
+def can_symlink():
+    global _can_symlink
+    if _can_symlink is not None:
+        return _can_symlink
+    testfn = "test_{}_tmp".format(os.getpid())
+    symlink_path = testfn + "can_symlink"
+    try:
+        os.symlink(testfn, symlink_path)
+        can = True
+    except (OSError, NotImplementedError, AttributeError):
+        can = False
+    else:
+        os.remove(symlink_path)
+    _can_symlink = can
+    return can
