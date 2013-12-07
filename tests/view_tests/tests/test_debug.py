@@ -169,6 +169,7 @@ class DebugViewTests(TestCase):
             status_code=404
         )
 
+
 class ExceptionReporterTests(TestCase):
     rf = RequestFactory()
 
