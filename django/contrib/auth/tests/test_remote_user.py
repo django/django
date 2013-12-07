@@ -3,6 +3,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.backends import RemoteUserBackend
+from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TestCase
@@ -15,6 +16,7 @@ class RemoteUserTest(TestCase):
     urls = 'django.contrib.auth.tests.urls'
     middleware = 'django.contrib.auth.middleware.RemoteUserMiddleware'
     backend = 'django.contrib.auth.backends.RemoteUserBackend'
+    header = 'REMOTE_USER'
 
     # Usernames to be passed in REMOTE_USER for the test_known_user test case.
     known_user = 'knownuser'
@@ -37,11 +39,11 @@ class RemoteUserTest(TestCase):
         self.assertTrue(response.context['user'].is_anonymous())
         self.assertEqual(User.objects.count(), num_users)
 
-        response = self.client.get('/remote_user/', REMOTE_USER=None)
+        response = self.client.get('/remote_user/', **{self.header: None})
         self.assertTrue(response.context['user'].is_anonymous())
         self.assertEqual(User.objects.count(), num_users)
 
-        response = self.client.get('/remote_user/', REMOTE_USER='')
+        response = self.client.get('/remote_user/', **{self.header: ''})
         self.assertTrue(response.context['user'].is_anonymous())
         self.assertEqual(User.objects.count(), num_users)
 
@@ -51,13 +53,13 @@ class RemoteUserTest(TestCase):
         as a User.
         """
         num_users = User.objects.count()
-        response = self.client.get('/remote_user/', REMOTE_USER='newuser')
+        response = self.client.get('/remote_user/', **{self.header: 'newuser'})
         self.assertEqual(response.context['user'].username, 'newuser')
         self.assertEqual(User.objects.count(), num_users + 1)
         User.objects.get(username='newuser')
 
         # Another request with same user should not create any new users.
-        response = self.client.get('/remote_user/', REMOTE_USER='newuser')
+        response = self.client.get('/remote_user/', **{self.header: 'newuser'})
         self.assertEqual(User.objects.count(), num_users + 1)
 
     def test_known_user(self):
@@ -67,12 +69,14 @@ class RemoteUserTest(TestCase):
         User.objects.create(username='knownuser')
         User.objects.create(username='knownuser2')
         num_users = User.objects.count()
-        response = self.client.get('/remote_user/', REMOTE_USER=self.known_user)
+        response = self.client.get('/remote_user/',
+                                   **{self.header: self.known_user})
         self.assertEqual(response.context['user'].username, 'knownuser')
         self.assertEqual(User.objects.count(), num_users)
         # Test that a different user passed in the headers causes the new user
         # to be logged in.
-        response = self.client.get('/remote_user/', REMOTE_USER=self.known_user2)
+        response = self.client.get('/remote_user/',
+                                   **{self.header: self.known_user2})
         self.assertEqual(response.context['user'].username, 'knownuser2')
         self.assertEqual(User.objects.count(), num_users)
 
@@ -89,13 +93,15 @@ class RemoteUserTest(TestCase):
         user.last_login = default_login
         user.save()
 
-        response = self.client.get('/remote_user/', REMOTE_USER=self.known_user)
+        response = self.client.get('/remote_user/',
+                                   **{self.header: self.known_user})
         self.assertNotEqual(default_login, response.context['user'].last_login)
 
         user = User.objects.get(username='knownuser')
         user.last_login = default_login
         user.save()
-        response = self.client.get('/remote_user/', REMOTE_USER=self.known_user)
+        response = self.client.get('/remote_user/',
+                                   **{self.header: self.known_user})
         self.assertEqual(default_login, response.context['user'].last_login)
 
     def test_header_disappears(self):
@@ -105,7 +111,8 @@ class RemoteUserTest(TestCase):
         """
         User.objects.create(username='knownuser')
         # Known user authenticates
-        response = self.client.get('/remote_user/', REMOTE_USER=self.known_user)
+        response = self.client.get('/remote_user/',
+                                   **{self.header: self.known_user})
         self.assertEqual(response.context['user'].username, 'knownuser')
         # During the session, the REMOTE_USER header disappears. Should trigger logout.
         response = self.client.get('/remote_user/')
@@ -140,7 +147,7 @@ class RemoteUserNoCreateTest(RemoteUserTest):
 
     def test_unknown_user(self):
         num_users = User.objects.count()
-        response = self.client.get('/remote_user/', REMOTE_USER='newuser')
+        response = self.client.get('/remote_user/', **{self.header: 'newuser'})
         self.assertTrue(response.context['user'].is_anonymous())
         self.assertEqual(User.objects.count(), num_users)
 
@@ -194,3 +201,22 @@ class RemoteUserCustomTest(RemoteUserTest):
         super(RemoteUserCustomTest, self).test_unknown_user()
         newuser = User.objects.get(username='newuser')
         self.assertEqual(newuser.email, 'user@example.com')
+
+
+class CustomHeaderMiddleware(RemoteUserMiddleware):
+    """
+    Middleware that overrides custom HTTP auth user header.
+    """
+    header = 'HTTP_AUTHUSER'
+
+
+@skipIfCustomUser
+class CustomHeaderRemoteUserTest(RemoteUserTest):
+    """
+    Tests a custom RemoteUserMiddleware subclass with custom HTTP auth user
+    header.
+    """
+    middleware = (
+        'django.contrib.auth.tests.test_remote_user.CustomHeaderMiddleware'
+    )
+    header = 'HTTP_AUTHUSER'
