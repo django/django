@@ -147,6 +147,10 @@ these changes.
 * The session key ``django_language`` will no longer be read for backwards
   compatibility.
 
+* Geographic Sitemaps will be removed
+  (``django.contrib.gis.sitemaps.views.index`` and
+  ``django.contrib.gis.sitemaps.views.sitemap``).
+
 1.9
 ---
 

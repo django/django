@@ -854,3 +854,9 @@ The function ``memoize`` is deprecated and should be replaced by the
 Django ships a backport of this decorator for older Python versions and it's
 available at ``django.utils.lru_cache.lru_cache``. The deprecated function will
 be removed in Django 1.9.
+
+Geo Sitemaps
+~~~~~~~~~~~~
+
+Google has retired support for the Geo Sitemaps format. Hence Django support
+for Geo Sitemaps is deprecated and will be removed in Django 1.8.

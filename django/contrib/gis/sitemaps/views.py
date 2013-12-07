@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from django.http import HttpResponse, Http404
 from django.template import loader
 from django.contrib.sites.models import get_current_site
@@ -20,6 +22,8 @@ def index(request, sitemaps):
     This view generates a sitemap index that uses the proper view
     for resolving geographic section sitemap URLs.
     """
+    warnings.warn("Geo Sitemaps are deprecated. Use plain sitemaps from "
+        "django.contrib.sitemaps instead", DeprecationWarning, stacklevel=2)
     current_site = get_current_site(request)
     sites = []
     protocol = request.scheme
@@ -43,6 +47,8 @@ def sitemap(request, sitemaps, section=None):
     This view generates a sitemap with additional geographic
     elements defined by Google.
     """
+    warnings.warn("Geo Sitemaps are deprecated. Use plain sitemaps from "
+        "django.contrib.sitemaps instead", DeprecationWarning, stacklevel=2)
     maps, urls = [], []
     if section is not None:
         if section not in sitemaps:
