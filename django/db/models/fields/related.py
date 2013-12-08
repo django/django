@@ -156,6 +156,16 @@ class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescri
         self.related = related
         self.cache_name = related.get_cache_name()
 
+    @cached_property
+    def RelatedObjectDoesNotExist(self):
+        # The exception isn't created at initialization time for the sake of
+        # consistency with `ReverseSingleRelatedObjectDescriptor`.
+        return type(
+            str('RelatedObjectDoesNotExist'),
+            (self.related.model.DoesNotExist, AttributeError),
+            {}
+        )
+
     def is_cached(self, instance):
         return hasattr(instance, self.cache_name)
 
@@ -200,9 +210,12 @@ class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescri
                     setattr(rel_obj, self.related.field.get_cache_name(), instance)
             setattr(instance, self.cache_name, rel_obj)
         if rel_obj is None:
-            raise self.related.model.DoesNotExist("%s has no %s." % (
-                                                  instance.__class__.__name__,
-                                                  self.related.get_accessor_name()))
+            raise self.RelatedObjectDoesNotExist(
+                "%s has no %s." % (
+                    instance.__class__.__name__,
+                    self.related.get_accessor_name()
+                )
+            )
         else:
             return rel_obj
 
@@ -254,6 +267,17 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
     def __init__(self, field_with_rel):
         self.field = field_with_rel
         self.cache_name = self.field.get_cache_name()
+
+    @cached_property
+    def RelatedObjectDoesNotExist(self):
+        # The exception can't be created at initialization time since the
+        # related model might not be resolved yet; `rel.to` might still be
+        # a string model reference.
+        return type(
+            str('RelatedObjectDoesNotExist'),
+            (self.field.rel.to.DoesNotExist, AttributeError),
+            {}
+        )
 
     def is_cached(self, instance):
         return hasattr(instance, self.cache_name)
@@ -321,8 +345,9 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
                     setattr(rel_obj, self.field.related.get_cache_name(), instance)
             setattr(instance, self.cache_name, rel_obj)
         if rel_obj is None and not self.field.null:
-            raise self.field.rel.to.DoesNotExist(
-                "%s has no %s." % (self.field.model.__name__, self.field.name))
+            raise self.RelatedObjectDoesNotExist(
+                "%s has no %s." % (self.field.model.__name__, self.field.name)
+            )
         else:
             return rel_obj
 
