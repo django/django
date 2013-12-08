@@ -61,6 +61,6 @@ Django source tree, as for any code change:
   ``Translations``, and attach the patch to it.
 
 .. _Transifex: https://www.transifex.com/
-.. _Django i18n mailing list: /https://groups.google.com/d/forum/django-i18n
+.. _Django i18n mailing list: https://groups.google.com/d/forum/django-i18n
 .. _Django project page: https://www.transifex.com/projects/p/django-core/
 .. _Transifex User Guide: http://support.transifex.com/
