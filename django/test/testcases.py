@@ -103,8 +103,12 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
             return
         executed = len(self)
         self.test_case.assertEqual(
-            executed, self.num, "%d queries executed, %d expected" % (
-                executed, self.num
+            executed, self.num,
+            "%d queries executed, %d expected\nCaptured queries were:\n%s" % (
+                executed, self.num,
+                '\n'.join(
+                    query['sql'] for query in self.captured_queries
+                )
             )
         )
 
