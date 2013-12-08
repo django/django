@@ -159,7 +159,7 @@ Django has special conveniences for building "CMS-y" apps, that doesn't mean
 it's not just as appropriate for building "non-CMS-y" apps (whatever that
 means!).
 
-.. _Drupal: http://drupal.org/
+.. _Drupal: https://drupal.org/
 
 How can I download the Django documentation to read it offline?
 ---------------------------------------------------------------
@@ -183,7 +183,7 @@ Where can I find Django developers for hire?
 Consult our `developers for hire page`_ for a list of Django developers who
 would be happy to help you.
 
-You might also be interested in posting a job to http://djangogigs.com/ .
+You might also be interested in posting a job to https://djangogigs.com/ .
 If you want to find Django-capable people in your local area, try
 https://people.djangoproject.com/ .
 
@@ -198,7 +198,7 @@ software are still a matter of some debate.
 
 For example, `APA style`_,  would dictate something like::
 
-    Django (Version 1.5) [Computer Software]. (2013). Retrieved from http://djangoproject.com.
+    Django (Version 1.5) [Computer Software]. (2013). Retrieved from https://djangoproject.com.
 
 However, the only true guide is what your publisher will accept, so get a copy
 of those guidelines and fill in the gaps as best you can.
@@ -208,7 +208,7 @@ Foundation".
 
 If you need a publishing location, use "Lawrence, Kansas".
 
-If you need a web address, use http://djangoproject.com.
+If you need a web address, use https://djangoproject.com.
 
 If you need a name, just use "Django", without any tagline.
 

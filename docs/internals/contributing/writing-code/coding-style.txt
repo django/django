@@ -211,6 +211,6 @@ Miscellaneous
   change to the ``AUTHORS`` file in your patch if you make more than a
   single trivial change.
 
-.. _pep8: http://pypi.python.org/pypi/pep8
-.. _pyflakes: http://pypi.python.org/pypi/pyflakes
-.. _pylint: http://pypi.python.org/pypi/pylint
+.. _pep8: https://pypi.python.org/pypi/pep8
+.. _pyflakes: https://pypi.python.org/pypi/pyflakes
+.. _pylint: https://pypi.python.org/pypi/pylint

@@ -14,7 +14,7 @@ display and edit geolocalized data on a map. By default, they use
 `OpenLayers`_-powered maps, with a base WMS layer provided by `Metacarta`_.
 
 .. _OpenLayers: http://openlayers.org/
-.. _Metacarta: http://metacarta.com/
+.. _Metacarta: http://www.metacarta.com/
 
 Field arguments
 ===============

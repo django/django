@@ -32,7 +32,7 @@ command. For example:
     # Or install LTS (long term support).
     $ sudo pip install http://projects.unbit.it/downloads/uwsgi-lts.tar.gz
 
-.. _installation procedures: http://projects.unbit.it/uwsgi/wiki/Install
+.. _installation procedures: http://uwsgi-docs.readthedocs.org/en/latest/Install.html
 
 .. warning::
 
@@ -58,7 +58,7 @@ Configuring and starting the uWSGI server for Django
 uWSGI supports multiple ways to configure the process. See uWSGI's
 `configuration documentation`_ and `examples`_
 
-.. _configuration documentation: http://projects.unbit.it/uwsgi/wiki/Doc
+.. _configuration documentation: https://uwsgi.readthedocs.org/en/latest/Configuration.html
 .. _examples: http://projects.unbit.it/uwsgi/wiki/Example
 
 Here's an example command to start a uWSGI server::
@@ -111,4 +111,4 @@ Example ini configuration file usage::
 See the uWSGI docs on `managing the uWSGI process`_ for information on
 starting, stopping and reloading the uWSGI workers.
 
-.. _managing the uWSGI process: http://projects.unbit.it/uwsgi/wiki/Management
+.. _managing the uWSGI process: http://uwsgi-docs.readthedocs.org/en/latest/Management.html

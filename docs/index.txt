@@ -25,8 +25,8 @@ Having trouble? We'd like to help!
 
 * Report bugs with Django in our `ticket tracker`_.
 
-.. _archives of the django-users mailing list: http://groups.google.com/group/django-users/
-.. _post a question: http://groups.google.com/group/django-users/
+.. _archives of the django-users mailing list: https://groups.google.com/d/forum/django-users
+.. _post a question: https://groups.google.com/d/forum/django-users
 .. _#django IRC channel: irc://irc.freenode.net/django
 .. _IRC logs: http://django-irc-logs.com/
 .. _ticket tracker: https://code.djangoproject.com/

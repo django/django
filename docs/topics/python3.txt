@@ -6,7 +6,7 @@ Django 1.5 is the first version of Django to support Python 3. The same code
 runs both on Python 2 (≥ 2.6.5) and Python 3 (≥ 3.2), thanks to the six_
 compatibility layer.
 
-.. _six: http://packages.python.org/six/
+.. _six: http://pythonhosted.org/six/
 
 This document is primarily targeted at authors of pluggable application
 who want to support both Python 2 and 3. It also describes guidelines that
@@ -42,7 +42,7 @@ developers are used to dealing with such constraints.
 Porting tools provided by Django are inspired by this philosophy, and it's
 reflected throughout this guide.
 
-.. _Python's official porting guide: http://docs.python.org/py3k/howto/pyporting.html
+.. _Python's official porting guide: http://docs.python.org/3/howto/pyporting.html
 .. _Pragmatic Unicode: http://nedbatchelder.com/text/unipain.html
 
 Porting tips
@@ -246,7 +246,7 @@ consequence, the following pattern is sometimes necessary::
 
 Be cautious if you have to `index bytestrings`_.
 
-.. _index bytestrings: http://docs.python.org/py3k/howto/pyporting.html#bytes-literals
+.. _index bytestrings: http://docs.python.org/3/howto/pyporting.html#bytes-literals
 
 Exceptions
 ~~~~~~~~~~
