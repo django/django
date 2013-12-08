@@ -25,6 +25,10 @@ class OneToOneTests(TestCase):
         # p2 doesn't have an associated restaurant.
         with self.assertRaisesMessage(Restaurant.DoesNotExist, 'Place has no restaurant'):
             self.p2.restaurant
+        # The exception raised on attribute access when a related object
+        # doesn't exist should be an instance of a subclass of `AttributeError`
+        # refs #21563
+        self.assertFalse(hasattr(self.p2, 'restaurant'))
 
     def test_setter(self):
         # Set the place using assignment notation. Because place is the primary
