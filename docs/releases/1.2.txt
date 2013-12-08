@@ -50,7 +50,7 @@ be found below`_.
     `Django Advent`_ covered the release of Django 1.2 with a series of
     articles and tutorials that cover some of the new features in depth.
 
-.. _django advent: http://djangoadvent.com/
+.. _django advent: https://github.com/djangoadvent/djangoadvent-articles
 
 Wherever possible these features have been introduced in a backwards-compatible
 manner per :doc:`our API stability policy </misc/api-stability>` policy.

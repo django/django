@@ -19,7 +19,7 @@ could save some of this repeated work?
 Reusability is the way of life in Python. `The Python Package Index (PyPI)
 <http://guide.python-distribute.org/contributing.html#pypi-info>`_ has a vast
 range of packages you can use in your own Python programs. Check out `Django
-Packages <http://www.djangopackages.com>`_ for existing reusable apps you could
+Packages <https://www.djangopackages.com>`_ for existing reusable apps you could
 incorporate in your project. Django itself is also just a Python package. This
 means that you can take existing Python packages or Django apps and compose
 them into your own web project. You only need to write the parts that make
@@ -108,7 +108,7 @@ Django with pip<installing-official-release>`. You can install ``setuptools``
 the same way.
 
 .. _setuptools: https://pypi.python.org/pypi/setuptools
-.. _pip: http://pypi.python.org/pypi/pip
+.. _pip: https://pypi.python.org/pypi/pip
 
 Packaging your app
 ==================
@@ -182,7 +182,7 @@ this. For a small app like polls, this process isn't too difficult.
 5. Next we'll create a ``setup.py`` file which provides details about how to
    build and install the app.  A full explanation of this file is beyond the
    scope of this tutorial, but the `setuptools docs
-   <http://packages.python.org/setuptools/setuptools.html>`_ have a good
+   <http://pythonhosted.org/setuptools/setuptools.html>`_ have a good
    explanation. Create a file ``django-polls/setup.py`` with the following
    contents:
 
@@ -246,7 +246,7 @@ this. For a small app like polls, this process isn't too difficult.
 
    Note that the ``docs`` directory won't be included in your package unless
    you add some files to it. Many Django apps also provide their documentation
-   online through sites like `readthedocs.org <http://readthedocs.org>`_.
+   online through sites like `readthedocs.org <https://readthedocs.org>`_.
 
 8. Try building your package with ``python setup.py sdist`` (run from inside
    ``django-polls``). This creates a directory called ``dist`` and builds your
@@ -285,7 +285,7 @@ working. We'll now fix this by installing our new ``django-polls`` package.
 
     pip uninstall django-polls
 
-.. _pip: http://pypi.python.org/pypi/pip
+.. _pip: https://pypi.python.org/pypi/pip
 
 Publishing your app
 ===================

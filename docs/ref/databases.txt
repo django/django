@@ -866,5 +866,5 @@ the support channels provided by each 3rd party project.
 .. _IBM DB2: http://code.google.com/p/ibm-db/
 .. _Microsoft SQL Server 2005: http://code.google.com/p/django-mssql/
 .. _Firebird: http://code.google.com/p/django-firebird/
-.. _ODBC: https://github.com/aurorasoftware/django-pyodbc/
+.. _ODBC: https://github.com/lionheart/django-pyodbc/
 .. _ADSDB: http://code.google.com/p/adsdb-django/

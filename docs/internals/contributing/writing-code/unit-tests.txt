@@ -187,11 +187,11 @@ associated tests will be skipped.
 .. _Pillow: https://pypi.python.org/pypi/Pillow/
 .. _PyYAML: http://pyyaml.org/wiki/PyYAML
 .. _pytz: https://pypi.python.org/pypi/pytz/
-.. _setuptools: http://pypi.python.org/pypi/setuptools/
+.. _setuptools: https://pypi.python.org/pypi/setuptools/
 .. _memcached: http://memcached.org/
 .. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
-.. _selenium: http://pypi.python.org/pypi/selenium
-.. _pip requirements files: http://www.pip-installer.org/en/latest/requirements.html
+.. _selenium: https://pypi.python.org/pypi/selenium
+.. _pip requirements files: http://www.pip-installer.org/en/latest/cookbook.html#requirements-files
 
 Code coverage
 ~~~~~~~~~~~~~

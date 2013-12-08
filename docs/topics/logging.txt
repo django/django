@@ -516,7 +516,7 @@ Python logging module.
     By default, an instance of the email backend specified in
     :setting:`EMAIL_BACKEND` will be used.
 
-.. _Sentry: http://pypi.python.org/pypi/sentry
+.. _Sentry: https://pypi.python.org/pypi/sentry
 
 
 Filters

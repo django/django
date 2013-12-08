@@ -15,7 +15,7 @@ might also need additional libraries, see `PostGIS requirements`_.
     when using GeoDjango with PostGIS.
 
 .. _psycopg2: http://initd.org/psycopg/
-.. _PostGIS requirements: http://www.postgis.org/documentation/manual-2.0/postgis_installation.html#id2711662
+.. _PostGIS requirements: http://www.postgis.org/documentation/manual-2.0/postgis_installation.html#id554707
 
 On Debian/Ubuntu, you are advised to install the following packages:
 postgresql-x.x, postgresql-x.x-postgis, postgresql-server-dev-x.x,

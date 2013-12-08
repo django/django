@@ -31,7 +31,7 @@ module defines tests using a class-based approach.
     Since Django no longer supports Python versions older than 2.7,
     ``django.utils.unittest`` is deprecated. Simply use ``unittest``.
 
-.. _unittest2: http://pypi.python.org/pypi/unittest2
+.. _unittest2: https://pypi.python.org/pypi/unittest2
 
 Here is an example which subclasses from :class:`django.test.TestCase`,
 which is a subclass of :class:`unittest.TestCase` that runs each test inside a
@@ -1053,7 +1053,7 @@ example above is just a tiny fraction of what the Selenium client can do; check
 out the `full reference`_ for more details.
 
 .. _Selenium: http://seleniumhq.org/
-.. _selenium package: http://pypi.python.org/pypi/selenium
+.. _selenium package: https://pypi.python.org/pypi/selenium
 .. _full reference: http://selenium-python.readthedocs.org/en/latest/api.html
 .. _Firefox: http://www.mozilla.com/firefox/
 
