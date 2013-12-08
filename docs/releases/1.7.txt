@@ -713,6 +713,9 @@ Miscellaneous
   ``select_related('foo').select_related('bar')``. Previously the latter would
   have been equivalent to ``select_related('bar')``.
 
+* :meth:`~django.test.TransactionTestCase.assertNumQueries` now prints
+  out the list of executed queries if the assertion fails.
+
 Features deprecated in 1.7
 ==========================
 
