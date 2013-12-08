@@ -37,7 +37,8 @@ class Command(BaseCommand):
         # multiple times.
         shutdown_message = '\nServer stopped.\nNote that the test database, %r, has not been deleted. You can explore it on your own.' % db_name
         use_threading = connection.features.test_db_allows_multiple_connections
-        call_command('runserver',
+        call_command(
+            'runserver',
             addrport=addrport,
             shutdown_message=shutdown_message,
             use_reloader=False,

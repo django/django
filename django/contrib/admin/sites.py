@@ -398,7 +398,8 @@ class AdminSite(object):
         for app in app_list:
             app['models'].sort(key=lambda x: x['name'])
 
-        context = dict(self.each_context(),
+        context = dict(
+            self.each_context(),
             title=self.index_title,
             app_list=app_list,
         )

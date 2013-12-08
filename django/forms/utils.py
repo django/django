@@ -52,11 +52,10 @@ class ErrorDict(dict):
     def as_ul(self):
         if not self:
             return ''
-        return format_html('<ul class="errorlist">{0}</ul>',
-                           format_html_join('', '<li>{0}{1}</li>',
-                                            ((k, force_text(v))
-                                             for k, v in self.items())
-                           ))
+        return format_html(
+            '<ul class="errorlist">{0}</ul>',
+            format_html_join('', '<li>{0}{1}</li>', ((k, force_text(v)) for k, v in self.items()))
+        )
 
     def as_text(self):
         return '\n'.join('* %s\n%s' % (k, '\n'.join('  * %s' % force_text(i) for i in v)) for k, v in self.items())
@@ -73,11 +72,10 @@ class ErrorList(list):
     def as_ul(self):
         if not self:
             return ''
-        return format_html('<ul class="errorlist">{0}</ul>',
-                           format_html_join('', '<li>{0}</li>',
-                                            ((force_text(e),) for e in self)
-                                            )
-                           )
+        return format_html(
+            '<ul class="errorlist">{0}</ul>',
+            format_html_join('', '<li>{0}</li>', ((force_text(e),) for e in self))
+        )
 
     def as_text(self):
         if not self:

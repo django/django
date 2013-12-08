@@ -34,7 +34,8 @@ class CustomPKTests(TestCase):
         self.assertEqual(Employee.objects.get(pk=123), dan)
         self.assertEqual(Employee.objects.get(pk=456), fran)
 
-        self.assertRaises(Employee.DoesNotExist,
+        self.assertRaises(
+            Employee.DoesNotExist,
             lambda: Employee.objects.get(pk=42)
         )
 

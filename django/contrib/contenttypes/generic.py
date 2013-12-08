@@ -452,9 +452,10 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
     @classmethod
     def get_default_prefix(cls):
         opts = cls.model._meta
-        return '-'.join((opts.app_label, opts.model_name,
-                        cls.ct_field.name, cls.ct_fk_field.name,
-        ))
+        return '-'.join(
+            (opts.app_label, opts.model_name,
+            cls.ct_field.name, cls.ct_fk_field.name)
+        )
 
     def save_new(self, form, commit=True):
         setattr(form.instance, self.ct_field.get_attname(),

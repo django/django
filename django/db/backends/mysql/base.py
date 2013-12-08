@@ -332,13 +332,15 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Truncate already resets the AUTO_INCREMENT field from
         # MySQL version 5.0.13 onwards. Refs #16961.
         if self.connection.mysql_version < (5, 0, 13):
-            return ["%s %s %s %s %s;" %
-                    (style.SQL_KEYWORD('ALTER'),
+            return [
+                "%s %s %s %s %s;" % (
+                    style.SQL_KEYWORD('ALTER'),
                     style.SQL_KEYWORD('TABLE'),
                     style.SQL_TABLE(self.quote_name(sequence['table'])),
                     style.SQL_KEYWORD('AUTO_INCREMENT'),
                     style.SQL_FIELD('= 1'),
-                    ) for sequence in sequences]
+                ) for sequence in sequences
+            ]
         else:
             return []
 
