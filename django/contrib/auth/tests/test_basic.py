@@ -130,7 +130,8 @@ class BasicTestCase(TestCase):
         "Check the operation of the createsuperuser management command"
         # We can use the management command to create a superuser
         new_io = StringIO()
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe",
             email="joe@somewhere.org",
@@ -146,7 +147,8 @@ class BasicTestCase(TestCase):
 
         # We can supress output on the management command
         new_io = StringIO()
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe2",
             email="joe2@somewhere.org",
@@ -159,7 +161,8 @@ class BasicTestCase(TestCase):
         self.assertEqual(u.email, 'joe2@somewhere.org')
         self.assertFalse(u.has_usable_password())
 
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe+admin@somewhere.org",
             email="joe@somewhere.org",
@@ -182,7 +185,8 @@ class BasicTestCase(TestCase):
             locale.getdefaultlocale = lambda: (None, None)
 
             # Call the command in this new environment
-            call_command("createsuperuser",
+            call_command(
+                "createsuperuser",
                 interactive=True,
                 username="nolocale@somewhere.org",
                 email="nolocale@somewhere.org",
@@ -212,7 +216,8 @@ class BasicTestCase(TestCase):
         username_field.verbose_name = ulazy('uživatel')
         new_io = StringIO()
         try:
-            call_command("createsuperuser",
+            call_command(
+                "createsuperuser",
                 interactive=True,
                 stdout=new_io
             )

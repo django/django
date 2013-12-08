@@ -963,8 +963,7 @@ class OneToOneRel(ManyToOneRel):
                  parent_link=False, on_delete=None, related_query_name=None):
         super(OneToOneRel, self).__init__(field, to, field_name,
                 related_name=related_name, limit_choices_to=limit_choices_to,
-                parent_link=parent_link, on_delete=on_delete, related_query_name=related_query_name,
-        )
+                parent_link=parent_link, on_delete=on_delete, related_query_name=related_query_name)
         self.multiple = False
 
 

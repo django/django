@@ -270,8 +270,7 @@ def get_validation_errors(outfile, app=None):
                                 seen_to = True
                 if f.rel.through not in models.get_models(include_auto_created=True):
                     e.add(opts, "'%s' specifies an m2m relation through model "
-                        "%s, which has not been installed." % (f.name, f.rel.through)
-                    )
+                        "%s, which has not been installed." % (f.name, f.rel.through))
                 signature = (f.rel.to, cls, f.rel.through)
                 if signature in seen_intermediary_signatures:
                     e.add(opts, "The model %s has two manually-defined m2m "
@@ -295,13 +294,14 @@ def get_validation_errors(outfile, app=None):
                     if not seen_related_fk or not seen_this_fk:
                         e.add(opts, "'%s' is a manually-defined m2m relation "
                             "through model %s, which does not have foreign keys "
-                            "to %s and %s" % (f.name, f.rel.through._meta.object_name,
-                                f.rel.to._meta.object_name, cls._meta.object_name)
+                            "to %s and %s" % (
+                                f.name, f.rel.through._meta.object_name,
+                                f.rel.to._meta.object_name, cls._meta.object_name
+                            )
                         )
             elif isinstance(f.rel.through, six.string_types):
                 e.add(opts, "'%s' specifies an m2m relation through model %s, "
-                    "which has not been installed" % (f.name, f.rel.through)
-                )
+                    "which has not been installed" % (f.name, f.rel.through))
 
             rel_opts = f.rel.to._meta
             rel_name = f.related.get_accessor_name()

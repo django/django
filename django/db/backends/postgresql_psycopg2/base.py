@@ -168,7 +168,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # notification. If we don't set self.connection to None, the error
             # will occur a every request.
             self.connection = None
-            logger.warning('psycopg2 error while closing the connection.',
+            logger.warning(
+                'psycopg2 error while closing the connection.',
                 exc_info=sys.exc_info()
             )
             raise

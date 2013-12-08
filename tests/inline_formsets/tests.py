@@ -123,7 +123,8 @@ class InlineFormsetFactoryTest(TestCase):
         Child has two ForeignKeys to Parent, so if we don't specify which one
         to use for the inline formset, we should get an exception.
         """
-        six.assertRaisesRegex(self, Exception,
+        six.assertRaisesRegex(
+            self, Exception,
             "<class 'inline_formsets.models.Child'> has more than 1 ForeignKey to <class 'inline_formsets.models.Parent'>",
             inlineformset_factory, Parent, Child
         )
@@ -133,7 +134,8 @@ class InlineFormsetFactoryTest(TestCase):
         If we specify fk_name, but it isn't a ForeignKey from the child model
         to the parent model, we should get an exception.
         """
-        self.assertRaises(Exception,
+        self.assertRaises(
+            Exception,
             "fk_name 'school' is not a ForeignKey to <class 'inline_formsets.models.Parent'>",
             inlineformset_factory, Parent, Child, fk_name='school'
         )
@@ -143,7 +145,8 @@ class InlineFormsetFactoryTest(TestCase):
         If the field specified in fk_name is not a ForeignKey, we should get an
         exception.
         """
-        six.assertRaisesRegex(self, Exception,
+        six.assertRaisesRegex(
+            self, Exception,
             "<class 'inline_formsets.models.Child'> has no field named 'test'",
             inlineformset_factory, Parent, Child, fk_name='test'
         )

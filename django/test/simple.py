@@ -123,8 +123,7 @@ def get_tests(app_module):
 def make_doctest(module):
     return doctest.DocTestSuite(module,
        checker=doctestOutputChecker,
-       runner=DocTestRunner,
-    )
+       runner=DocTestRunner)
 
 
 def build_suite(app_module):

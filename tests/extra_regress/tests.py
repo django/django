@@ -91,14 +91,18 @@ class ExtraRegressTests(TestCase):
         internal dictionary must remain sorted.
         """
         self.assertEqual(
-            User.objects.extra(select={"alpha": "%s"}, select_params=(1,)
-                       ).extra(select={"beta": "%s"}, select_params=(2,))[0].alpha,
-            1)
+            (User.objects
+                .extra(select={"alpha": "%s"}, select_params=(1,))
+                .extra(select={"beta": "%s"}, select_params=(2,))[0].alpha),
+            1
+        )
 
         self.assertEqual(
-            User.objects.extra(select={"beta": "%s"}, select_params=(1,)
-                       ).extra(select={"alpha": "%s"}, select_params=(2,))[0].alpha,
-            2)
+            (User.objects
+                .extra(select={"beta": "%s"}, select_params=(1,))
+                .extra(select={"alpha": "%s"}, select_params=(2,))[0].alpha),
+            2
+        )
 
     def test_regression_7961(self):
         """
@@ -107,8 +111,10 @@ class ExtraRegressTests(TestCase):
         query as well.
         """
         self.assertEqual(
-            list(User.objects.extra(select={"alpha": "%s"}, select_params=(-6,)
-                    ).filter(id=self.u.id).values_list('id', flat=True)),
+            list(User.objects
+                .extra(select={"alpha": "%s"}, select_params=(-6,))
+                .filter(id=self.u.id)
+                .values_list('id', flat=True)),
             [self.u.id]
         )
 
@@ -129,10 +135,9 @@ class ExtraRegressTests(TestCase):
         should still be present because of the extra() call.
         """
         self.assertQuerysetEqual(
-            Order.objects.extra(where=["username=%s"],
-                                params=["fred"],
-                                tables=["auth_user"]
-            ).order_by('created_by'),
+            (Order.objects
+                .extra(where=["username=%s"], params=["fred"], tables=["auth_user"])
+                .order_by('created_by')),
             []
         )
 

@@ -32,16 +32,18 @@ class ModelValidationTest(TestCase):
         post_init.connect(OnPostInit(), sender='missing-app.Model')
         e = ModelErrorCollection(six.StringIO())
         validate_model_signals(e)
-        self.assertSetEqual(set(e.errors), {
-            ('model_validation.tests',
+        self.assertSetEqual(
+            set(e.errors),
+            {(
+                'model_validation.tests',
                 "The `on_post_init` function was connected to the `post_init` "
                 "signal with a lazy reference to the 'missing-app.Model' "
                 "sender, which has not been installed."
-            ),
-            ('model_validation.tests',
+            ), (
+                'model_validation.tests',
                 "An instance of the `OnPostInit` class was connected to "
                 "the `post_init` signal with a lazy reference to the "
                 "'missing-app.Model' sender, which has not been installed."
-            )
-        })
+            )}
+        )
         post_init.unresolved_references = unresolved_references

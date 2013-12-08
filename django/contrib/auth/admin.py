@@ -48,8 +48,8 @@ class UserAdmin(admin.ModelAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'password1', 'password2')}
-        ),
+            'fields': ('username', 'password1', 'password2'),
+        }),
     )
     form = UserChangeForm
     add_form = UserCreationForm

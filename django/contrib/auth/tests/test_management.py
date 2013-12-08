@@ -91,7 +91,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         "Check the operation of the createsuperuser management command"
         # We can use the management command to create a superuser
         new_io = StringIO()
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe",
             email="joe@somewhere.org",
@@ -108,7 +109,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
     def test_verbosity_zero(self):
         # We can supress output on the management command
         new_io = StringIO()
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe2",
             email="joe2@somewhere.org",
@@ -123,7 +125,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
     def test_email_in_username(self):
         new_io = StringIO()
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe+admin@somewhere.org",
             email="joe@somewhere.org",
@@ -140,7 +143,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # We skip validation because the temporary substitution of the
         # swappable User model messes with validation.
         new_io = StringIO()
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             email="joe@somewhere.org",
             date_of_birth="1976-04-01",
@@ -163,7 +167,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # swappable User model messes with validation.
         new_io = StringIO()
         with self.assertRaises(CommandError):
-            call_command("createsuperuser",
+            call_command(
+                "createsuperuser",
                 interactive=False,
                 username="joe@somewhere.org",
                 stdout=new_io,

@@ -362,7 +362,8 @@ class TestCollectionNonLocalStorage(CollectionTestCase, TestNoFilesCreated):
 
 
 # we set DEBUG to False here since the template tag wouldn't work otherwise
-@override_settings(**dict(TEST_SETTINGS,
+@override_settings(**dict(
+    TEST_SETTINGS,
     STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage',
     DEBUG=False,
 ))
@@ -569,7 +570,8 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
 
 
 # we set DEBUG to False here since the template tag wouldn't work otherwise
-@override_settings(**dict(TEST_SETTINGS,
+@override_settings(**dict(
+    TEST_SETTINGS,
     STATICFILES_STORAGE='staticfiles_tests.storage.SimpleCachedStaticFilesStorage',
     DEBUG=False,
 ))

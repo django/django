@@ -56,9 +56,7 @@ class AssertNumQueriesTests(TestCase):
         def test_func():
             raise ValueError
 
-        self.assertRaises(ValueError,
-            self.assertNumQueries, 2, test_func
-        )
+        self.assertRaises(ValueError, self.assertNumQueries, 2, test_func)
 
     def test_assert_num_queries_with_client(self):
         person = Person.objects.create(name='test')

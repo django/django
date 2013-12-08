@@ -66,7 +66,8 @@ class BaseGeometryWidget(Widget):
                             value.srid, self.map_srid, err)
                     )
 
-        context = self.build_attrs(attrs,
+        context = self.build_attrs(
+            attrs,
             name=name,
             module='geodjango_%s' % name.replace('-', '_'),  # JS-safe
             serialized=self.serialize(value),
