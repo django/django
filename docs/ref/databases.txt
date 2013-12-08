@@ -604,9 +604,8 @@ version of SQLite.
 Using newer versions of the SQLite DB-API 2.0 driver
 ----------------------------------------------------
 
-For versions of Python 2.5 or newer that include ``sqlite3`` in the standard
-library Django will now use a ``pysqlite2`` interface in preference to
-``sqlite3`` if it finds one is available.
+Django will use a ``pysqlite2`` module in preference to ``sqlite3`` as shipped
+with the Python standard library if it finds one is available.
 
 This provides the ability to upgrade both the DB-API 2.0 interface or SQLite 3
 itself to versions newer than the ones included with your particular Python
