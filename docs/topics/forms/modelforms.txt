@@ -528,7 +528,7 @@ field, you could do the following::
 
         class Meta:
             model = Article
-            fields = ['pub_date', 'headline', 'content', 'reporter']
+            fields = ['pub_date', 'headline', 'content', 'reporter', 'slug']
 
 
 If you want to specify a field's validators, you can do so by defining
