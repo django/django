@@ -32,16 +32,13 @@ class StaticFilesStorage(FileSystemStorage):
             location = settings.STATIC_ROOT
         if base_url is None:
             base_url = settings.STATIC_URL
-        check_settings(base_url)
-        super(StaticFilesStorage, self).__init__(location, base_url,
-                                                 *args, **kwargs)
-
-    def path(self, name):
-        if not self.location:
+        if not location:
             raise ImproperlyConfigured("You're using the staticfiles app "
                                        "without having set the STATIC_ROOT "
                                        "setting to a filesystem path.")
-        return super(StaticFilesStorage, self).path(name)
+        check_settings(base_url)
+        super(StaticFilesStorage, self).__init__(location, base_url,
+                                                 *args, **kwargs)
 
 
 class CachedFilesMixin(object):

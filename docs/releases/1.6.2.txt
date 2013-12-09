@@ -14,3 +14,8 @@ Bug fixes
 
 * Fixed a crash when executing the :djadmin:`changepassword` command when the
   user object representation contained non-ASCII characters (#21627).
+
+* The :djadmin:`collectstatic` command will raise an error rather than
+  default to using the current working directory if :setting:`STATIC_ROOT` is
+  not set. Combined with the ``--clear`` option, the previous behavior could
+  wipe anything below the current working directory.
