@@ -2535,7 +2535,7 @@ Settings for :mod:`django.contrib.staticfiles`.
 STATIC_ROOT
 -----------
 
-Default: ``''`` (Empty string)
+Default: ``None``
 
 The absolute path to the directory where :djadmin:`collectstatic` will collect
 static files for deployment.

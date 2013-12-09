@@ -137,32 +137,38 @@ class Command(NoArgsCommand):
 
     def handle_noargs(self, **options):
         self.set_options(**options)
-        # Warn before doing anything more.
-        if (isinstance(self.storage, FileSystemStorage) and
+
+        message = ['\n']
+        if self.dry_run:
+            message.append(
+                'You have activated the --dry-run option so no files will be modified.\n\n'
+            )
+
+        message.append(
+            'You have requested to collect static files at the destination\n'
+            'location as specified in your settings'
+        )
+
+        if (isinstance(self.storage._wrapped, FileSystemStorage) and
                 self.storage.location):
             destination_path = self.storage.location
-            destination_display = ':\n\n    %s' % destination_path
+            message.append(':\n\n    %s\n\n' % destination_path)
         else:
             destination_path = None
-            destination_display = '.'
+            message.append('.\n\n')
 
         if self.clear:
-            clear_display = 'This will DELETE EXISTING FILES!'
+            message.append('This will DELETE EXISTING FILES!\n')
         else:
-            clear_display = 'This will overwrite existing files!'
+            message.append('This will overwrite existing files!\n')
 
-        if self.interactive:
-            confirm = input("""
-You have requested to collect static files at the destination
-location as specified in your settings%s
+        message.append(
+            'Are you sure you want to do this?\n\n'
+            "Type 'yes' to continue, or 'no' to cancel: "
+        )
 
-%s
-Are you sure you want to do this?
-
-Type 'yes' to continue, or 'no' to cancel: """
-% (destination_display, clear_display))
-            if confirm != 'yes':
-                raise CommandError("Collecting static files cancelled.")
+        if self.interactive and input(''.join(message)) != 'yes':
+            raise CommandError("Collecting static files cancelled.")
 
         collected = self.collect()
         modified_count = len(collected['modified'])
