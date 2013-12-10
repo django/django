@@ -13,14 +13,15 @@ from django.utils import formats
 from django.utils.dateformat import format, time_format
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.html import (conditional_escape, escapejs, fix_ampersands,
-    escape, urlize as urlize_impl, linebreaks, strip_tags, avoid_wrapping)
+    escape, urlize as _urlize, linebreaks, strip_tags, avoid_wrapping,
+    remove_tags)
 from django.utils.http import urlquote
 from django.utils.text import Truncator, wrap, phone2numeric
 from django.utils.safestring import mark_safe, SafeData, mark_for_escaping
 from django.utils import six
 from django.utils.timesince import timesince, timeuntil
 from django.utils.translation import ugettext, ungettext
-from django.utils.text import normalize_newlines
+from django.utils.text import normalize_newlines, slugify as _slugify
 
 register = Library()
 
@@ -235,8 +236,7 @@ def slugify(value):
     underscores) and converts spaces to hyphens. Also strips leading and
     trailing whitespace.
     """
-    from django.utils.text import slugify
-    return slugify(value)
+    return _slugify(value)
 
 
 @register.filter(is_safe=True)
@@ -341,7 +341,7 @@ def urlencode(value, safe=None):
 @stringfilter
 def urlize(value, autoescape=None):
     """Converts URLs in plain text into clickable links."""
-    return mark_safe(urlize_impl(value, nofollow=True, autoescape=autoescape))
+    return mark_safe(_urlize(value, nofollow=True, autoescape=autoescape))
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
@@ -353,7 +353,7 @@ def urlizetrunc(value, limit, autoescape=None):
 
     Argument: Length to truncate URLs to.
     """
-    return mark_safe(urlize_impl(value, trim_url_limit=int(limit), nofollow=True,
+    return mark_safe(_urlize(value, trim_url_limit=int(limit), nofollow=True,
                             autoescape=autoescape))
 
 
@@ -490,7 +490,6 @@ def safeseq(value):
 @stringfilter
 def removetags(value, tags):
     """Removes a space separated list of [X]HTML tags from the output."""
-    from django.utils.html import remove_tags
     return remove_tags(value, tags)
 
 
