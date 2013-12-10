@@ -461,4 +461,7 @@ class ModelInheritanceTest(TestCase):
             name='John Doe', title='X', state='Y'
         )
 
-        Senator.objects.get(pk=senator.pk)
+        senator = Senator.objects.get(pk=senator.pk)
+        self.assertEqual(senator.name, 'John Doe')
+        self.assertEqual(senator.title, 'X')
+        self.assertEqual(senator.state, 'Y')
