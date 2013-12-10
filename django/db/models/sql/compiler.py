@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db.backends.utils import truncate_name
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.fields.related import RelatedField
 from django.db.models.query_utils import select_related_descend, QueryWrapper
 from django.db.models.sql.constants import (SINGLE, MULTI, ORDER_DIR,
         GET_ITERATOR_CHUNK_SIZE, SelectInfo)
@@ -289,8 +290,11 @@ class SQLCompiler(object):
                 if seen_model and seen_alias == alias:
                     ancestor_link = seen_model._meta.get_ancestor_link(model)
                     if ancestor_link:
-                        column = ancestor_link.column
-                    break
+                        related_fields = dict(ancestor_link.related_fields)
+                        related_field = related_fields.get(ancestor_link, None)
+                        if related_field == field:
+                            column = ancestor_link.column
+                        break
             table = self.query.alias_map[alias].table_name
             if table in only_load and column not in only_load[table]:
                 continue
