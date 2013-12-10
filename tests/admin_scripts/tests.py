@@ -13,6 +13,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import stat
 import unittest
 
 import django
@@ -106,7 +107,7 @@ class AdminScriptTestCase(unittest.TestCase):
                 paths.append(os.path.dirname(backend_dir))
         return paths
 
-    def run_test(self, script, args, settings_file=None, apps=None):
+    def run_test(self, script, args, settings_file=None, apps=None, umask=None):
         base_dir = os.path.dirname(test_dir)
         # The base dir for Django's tests is one level up.
         tests_dir = os.path.dirname(os.path.dirname(__file__))
@@ -137,6 +138,11 @@ class AdminScriptTestCase(unittest.TestCase):
 
         # Move to the test directory and run
         os.chdir(test_dir)
+
+        # Set a umask and store the old_umask
+        old_umask = None
+        if umask is not None and hasattr(os, 'umask'):
+            old_umask = os.umask(umask)
         out, err = subprocess.Popen([sys.executable, script] + args,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 universal_newlines=True).communicate()
@@ -145,14 +151,16 @@ class AdminScriptTestCase(unittest.TestCase):
             os.environ['DJANGO_SETTINGS_MODULE'] = old_django_settings_module
         if old_python_path:
             os.environ[python_path_var_name] = old_python_path
+        if old_umask and hasattr(os, 'umask'):
+            os.umask(old_umask)
         # Move back to the old working directory
         os.chdir(old_cwd)
 
         return out, err
 
-    def run_django_admin(self, args, settings_file=None):
+    def run_django_admin(self, args, settings_file=None, umask=None):
         script_dir = os.path.abspath(os.path.join(os.path.dirname(upath(django.__file__)), 'bin'))
-        return self.run_test(os.path.join(script_dir, 'django-admin.py'), args, settings_file)
+        return self.run_test(os.path.join(script_dir, 'django-admin.py'), args, settings_file, umask=umask)
 
     def run_manage(self, args, settings_file=None):
         def safe_remove(path):
@@ -1554,6 +1562,63 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "already exists")
+
+    @unittest.skipUnless(hasattr(os, 'umask'), "platform doesn't support umask")
+    def test_umask_077_project(self):
+        args = ['startproject', 'testproject']
+        testproject_dir = os.path.join(test_dir, 'testproject')
+        testprojectapp_dir = os.path.join(testproject_dir, 'testproject')
+        setting_py = os.path.join(testprojectapp_dir, 'settings.py')
+        manage_py = os.path.join(testproject_dir, 'manage.py')
+        self.addCleanup(shutil.rmtree, testproject_dir, True)
+
+        out, err = self.run_django_admin(args, umask=0o077)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.isdir(testproject_dir))
+        # Check if the directory has the umask 0700
+        self.assertEqual(stat.S_IMODE(os.stat(testproject_dir).st_mode), 0o700)
+        # Check if the manage.py file has the umask 0700
+        self.assertEqual(stat.S_IMODE(os.stat(manage_py).st_mode), 0o700)
+        # Chef if the settings.py file has the umask 0600
+        self.assertEqual(stat.S_IMODE(os.stat(setting_py).st_mode), 0o600)
+
+    @unittest.skipUnless(hasattr(os, 'umask'), "platform doesn't support umask")
+    def test_umask_011_project(self):
+        args = ['startproject', 'testproject']
+        testproject_dir = os.path.join(test_dir, 'testproject')
+        testprojectapp_dir = os.path.join(testproject_dir, 'testproject')
+        setting_py = os.path.join(testprojectapp_dir, 'settings.py')
+        manage_py = os.path.join(testproject_dir, 'manage.py')
+        self.addCleanup(shutil.rmtree, testproject_dir, True)
+
+        out, err = self.run_django_admin(args, umask=0o11)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.isdir(testproject_dir))
+        # Check if the directory has the umask 0766 directories getting created not copied
+        self.assertEqual(stat.S_IMODE(os.stat(testproject_dir).st_mode), 0o766)
+        # Check if the manage.py file has the umask 0744
+        self.assertEqual(stat.S_IMODE(os.stat(manage_py).st_mode), 0o744)
+        # Chef if the settings.py file has the umask 0644
+        self.assertEqual(stat.S_IMODE(os.stat(setting_py).st_mode), 0o644)
+
+    @unittest.skipUnless(hasattr(os, 'umask'), "platform doesn't support umask")
+    def test_umask_033_project(self):
+        args = ['startproject', 'testproject']
+        testproject_dir = os.path.join(test_dir, 'testproject')
+        testprojectapp_dir = os.path.join(testproject_dir, 'testproject')
+        setting_py = os.path.join(testprojectapp_dir, 'settings.py')
+        manage_py = os.path.join(testproject_dir, 'manage.py')
+        self.addCleanup(shutil.rmtree, testproject_dir, True)
+
+        out, err = self.run_django_admin(args, umask=0o033)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.isdir(testproject_dir))
+        # Check if the directory has the umask 0744
+        self.assertEqual(stat.S_IMODE(os.stat(testproject_dir).st_mode), 0o744)
+        # Check if the manage.py file has the umask 0744
+        self.assertEqual(stat.S_IMODE(os.stat(manage_py).st_mode), 0o744)
+        # Chef if the settings.py file has the umask 0644
+        self.assertEqual(stat.S_IMODE(os.stat(setting_py).st_mode), 0o644)
 
     def test_invalid_project_name(self):
         "Make sure the startproject management command validates a project name"

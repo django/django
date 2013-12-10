@@ -163,7 +163,15 @@ class TemplateCommand(BaseCommand):
                 if self.verbosity >= 2:
                     self.stdout.write("Creating %s\n" % new_path)
                 try:
-                    shutil.copymode(old_path, new_path)
+                    # Copy umask if the operating system supports it
+                    if hasattr(os, 'umask'):
+                        st = os.stat(old_path)
+                        mode = stat.S_IMODE(st.st_mode)
+                        # Get the current umask
+                        current_umask = os.umask(0)
+                        os.umask(current_umask)
+                        new_mode = (mode ^ current_umask) & mode
+                        os.chmod(new_path, new_mode)
                     self.make_writeable(new_path)
                 except OSError:
                     self.stderr.write(
