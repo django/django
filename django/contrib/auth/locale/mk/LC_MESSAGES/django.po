@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-10-09 20:17+0200\n"
-"PO-Revision-Date: 2013-10-10 08:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-12-06 10:54+0000\n"
+"Last-Translator: vvangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/projects/p/django/"
 "language/mk/)\n"
 "MIME-Version: 1.0\n"
@@ -214,7 +214,7 @@ msgstr "кориснички привилегии"
 
 #: models.py:301
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Конкретни привилегии за овој корисник."
 
 #: models.py:368
 msgid "username"

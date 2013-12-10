@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-25 14:19+0200\n"
-"PO-Revision-Date: 2013-05-27 16:36+0000\n"
+"PO-Revision-Date: 2013-11-06 12:57+0000\n"
 "Last-Translator: jannolii <jannolii@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/projects/p/django/language/"
 "et/)\n"
@@ -31,8 +31,8 @@ msgstr "Meta-andmed"
 #, python-format
 msgid "%d comment was successfully flagged"
 msgid_plural "%d comments were successfully flagged"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d kommentaar on edukalt märgistatud."
+msgstr[1] "%d kommentaari on edukalt märgistatud."
 
 #: admin.py:57
 msgid "Flag selected comments"
@@ -42,8 +42,8 @@ msgstr "Märgista valitud kommentaarid"
 #, python-format
 msgid "%d comment was successfully approved"
 msgid_plural "%d comments were successfully approved"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d kommentaar on edukalt kinnitatud"
+msgstr[1] "%d kommentaari on edukalt kinnitatud"
 
 #: admin.py:63
 msgid "Approve selected comments"
@@ -53,8 +53,8 @@ msgstr "Kiida heaks valitud kommentaarid"
 #, python-format
 msgid "%d comment was successfully removed"
 msgid_plural "%d comments were successfully removed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d kommentaar on edukalt eemaldatud"
+msgstr[1] "%d kommentaari on edukalt eemaldatud"
 
 #: admin.py:69
 msgid "Remove selected comments"

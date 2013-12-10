@@ -251,8 +251,8 @@ msgstr "сега"
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
-msgstr[0] ""
-msgstr[1] "пред %(count)s секунди"
+msgstr[0] "пред секунда"
+msgstr[1] "пред %(count)s\\u00a0секунди"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -260,8 +260,8 @@ msgstr[1] "пред %(count)s секунди"
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] ""
-msgstr[1] "пред %(count)s минути"
+msgstr[0] "пред минута"
+msgstr[1] "пред %(count)s\\u00a0минути"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -269,8 +269,8 @@ msgstr[1] "пред %(count)s минути"
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
-msgstr[0] ""
-msgstr[1] "пред %(count)s часа"
+msgstr[0] "пред час"
+msgstr[1] "пред %(count)s\\u00a0часа"
 
 #: templatetags/humanize.py:216
 #, python-format
@@ -284,8 +284,8 @@ msgstr "%(delta)s од сега"
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
-msgstr[0] ""
-msgstr[1] "%(count)s секунди од сега"
+msgstr[0] "за една секунда"
+msgstr[1] "%(count)s\\u00a0секунди од сега"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -293,8 +293,8 @@ msgstr[1] "%(count)s секунди од сега"
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
-msgstr[0] ""
-msgstr[1] "%(count)s минути од сега"
+msgstr[0] "за една минута"
+msgstr[1] "%(count)s\\u00a0минути од сега"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -302,5 +302,5 @@ msgstr[1] "%(count)s минути од сега"
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
-msgstr[0] ""
-msgstr[1] "%(count)s часа од сега"
+msgstr[0] "за еден час"
+msgstr[1] "%(count)s\\u00a0часа од сега"

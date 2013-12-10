@@ -288,7 +288,8 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
-""
+"Xóa %(object_name)s '%(escaped_object)s', các đối tượng liên quan sau đây "
+"cũng bị xóa theo:"
 
 #: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19

@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-08-22 09:54+0200\n"
-"PO-Revision-Date: 2013-10-26 21:40+0000\n"
+"PO-Revision-Date: 2013-11-06 09:55+0000\n"
 "Last-Translator: jannolii <jannolii@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/projects/p/django/language/"
 "et/)\n"
@@ -488,6 +488,8 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"'%(value)s' väärtusel on vale kuupäevaformaat. See peab olema kujul AAAA-KK-"
+"PP."
 
 #: db/models/fields/__init__.py:723 db/models/fields/__init__.py:817
 #, python-format
@@ -495,6 +497,7 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"'%(value)s' väärtusel on õige formaat (AAAA-KK-PP), kuid kuupäev on vale."
 
 #: db/models/fields/__init__.py:726
 msgid "Date (without time)"
@@ -506,6 +509,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"'%(value)s' väärtusel on vale formaat. Peab olema formaadis AAAA-KK-PP HH:MM"
+"[:ss[.uuuuuu]][TZ]."
 
 #: db/models/fields/__init__.py:819
 #, python-format
@@ -513,6 +518,8 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"'%(value)s' väärtusel on õige formaat (AAAA-KK-PP HH:MM[:ss[.uuuuuu]][TZ]), "
+"kuid kuupäev/kellaaeg on vale."
 
 #: db/models/fields/__init__.py:823
 msgid "Date (with time)"
@@ -559,7 +566,7 @@ msgstr "IP aadress"
 #: db/models/fields/__init__.py:1175
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "'%(value)s' väärtus peab olema kas Puudub, Tõene või Väär."
 
 #: db/models/fields/__init__.py:1177
 msgid "Boolean (Either True, False or None)"
@@ -592,6 +599,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"'%(value)s' väärtusel on vale formaat. Peab olema formaadis HH:MM[:ss[."
+"uuuuuu]]."
 
 #: db/models/fields/__init__.py:1296
 #, python-format
@@ -599,6 +608,8 @@ msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"'%(value)s' väärtusel on õige formaat (HH:MM[:ss[.uuuuuu]]), kuid kellaaeg "
+"on vale."
 
 #: db/models/fields/__init__.py:1299
 msgid "Time"

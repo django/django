@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Abraham Estrada <abraham.estrada@gmail.com>, 2011
+# Abraham Estrada <abraham.estrada@gmail.com>, 2011,2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-25 14:19+0200\n"
-"PO-Revision-Date: 2013-05-26 08:39+0000\n"
-"Last-Translator: claudep <claude@2xlibre.net>\n"
+"PO-Revision-Date: 2013-11-06 21:09+0000\n"
+"Last-Translator: Abraham Estrada <abraham.estrada@gmail.com>\n"
 "Language-Team: Spanish (Mexico) (http://www.transifex.com/projects/p/django/"
 "language/es_MX/)\n"
 "MIME-Version: 1.0\n"
@@ -29,8 +29,8 @@ msgstr "Metadatos"
 #, python-format
 msgid "%d comment was successfully flagged"
 msgid_plural "%d comments were successfully flagged"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d comentario fue marcado exitosamente"
+msgstr[1] "%d comentarios fueron marcados exitosamente"
 
 #: admin.py:57
 msgid "Flag selected comments"
@@ -40,8 +40,8 @@ msgstr "Marcar comentarios seleccionados"
 #, python-format
 msgid "%d comment was successfully approved"
 msgid_plural "%d comments were successfully approved"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d comentario se aprobó con éxito"
+msgstr[1] "%d comentarios se aprobaron con éxito"
 
 #: admin.py:63
 msgid "Approve selected comments"
@@ -51,8 +51,8 @@ msgstr "Aprobar comentario seleccionado"
 #, python-format
 msgid "%d comment was successfully removed"
 msgid_plural "%d comments were successfully removed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d comentario ha sido eliminado correctamente"
+msgstr[1] "%d comentarios han sido eliminados correctamente"
 
 #: admin.py:69
 msgid "Remove selected comments"
@@ -290,7 +290,7 @@ msgstr "Por favor corrija los errores"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the errors below"
-msgstr ""
+msgstr "Por favor, corrija los siguientes errores"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

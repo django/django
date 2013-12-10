@@ -3,14 +3,14 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Juraj Bubniak <translations@jbub.eu>, 2012-2013
-# Marian Andre <marian@andre.sk>, 2012
+# Marian Andre <marian@andre.sk>, 2012-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-06-02 00:30-0400\n"
-"PO-Revision-Date: 2013-10-30 16:00+0000\n"
-"Last-Translator: Juraj Bubniak <translations@jbub.eu>\n"
+"PO-Revision-Date: 2013-11-10 11:47+0000\n"
+"Last-Translator: Marian Andre <marian@andre.sk>\n"
 "Language-Team: Slovak (http://www.transifex.com/projects/p/django/language/"
 "sk/)\n"
 "MIME-Version: 1.0\n"
@@ -39,7 +39,7 @@ msgstr "Aplikácia %r nenájdená"
 #: views.py:196
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr "Model %(model_name)r sa nenachádza v aplikácii %(app_label)r"
+msgstr "Model %(model_name)r sa v aplikácii %(app_label)r nenachádza"
 
 #: views.py:208
 #, python-format
@@ -174,11 +174,11 @@ msgstr "Ako predtým, ale otvorí stránku správy v novom okne."
 #: templates/admin_doc/index.html:17
 #: templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
-msgstr "Tagy"
+msgstr "Značky"
 
 #: templates/admin_doc/index.html:18
 msgid "List of all the template tags and their functions."
-msgstr ""
+msgstr "Zoznam všetkých šablónových značiek a ich funkcií ."
 
 #: templates/admin_doc/index.html:20
 #: templates/admin_doc/template_filter_index.html:9
@@ -237,6 +237,7 @@ msgstr ""
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
 msgstr ""
+"Požiadajte administrátorov o inštaláciu <a href=\"%(link)s\">docutils</a>."
 
 #: templates/admin_doc/model_detail.html:21
 #, python-format
@@ -257,11 +258,11 @@ msgstr "Popis"
 
 #: templates/admin_doc/model_detail.html:52
 msgid "Back to Models Documentation"
-msgstr "Späť na Dokumentáciu Modelov"
+msgstr "Späť na Dokumentáciu modelov"
 
 #: templates/admin_doc/model_index.html:18
 msgid "Model documentation"
-msgstr "Dokumentácia Modelu"
+msgstr "Dokumentácia modelu"
 
 #: templates/admin_doc/model_index.html:43
 msgid "Model groups"
@@ -316,16 +317,16 @@ msgstr ""
 
 #: templates/admin_doc/template_tag_index.html:12
 msgid "Template tags"
-msgstr "Šablónové tagy"
+msgstr "Šablónové značky"
 
 #: templates/admin_doc/template_tag_index.html:16
 msgid "Template tag documentation"
-msgstr "Dokumentácia šablónových tagov"
+msgstr "Dokumentácia šablónových značiek"
 
 #: templates/admin_doc/template_tag_index.html:22
 #: templates/admin_doc/template_tag_index.html:43
 msgid "Built-in tags"
-msgstr "Vstavané tagy"
+msgstr "Vstavané značky"
 
 #: templates/admin_doc/template_tag_index.html:23
 #, python-format

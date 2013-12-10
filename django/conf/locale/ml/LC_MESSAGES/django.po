@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# anivar <anivar.aravind@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffy <jeffymj@gmail.com>, 2012
 # Rajeesh Nair <rajeeshrnair@gmail.com>, 2011-2012
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-08-22 09:54+0200\n"
-"PO-Revision-Date: 2013-08-17 08:48+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-11-19 15:38+0000\n"
+"Last-Translator: anivar <anivar.aravind@gmail.com>\n"
 "Language-Team: Malayalam (http://www.transifex.com/projects/p/django/"
 "language/ml/)\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +22,7 @@ msgstr ""
 
 #: conf/global_settings.py:51
 msgid "Afrikaans"
-msgstr ""
+msgstr "ആഫ്രിക്കാന്‍സ്"
 
 #: conf/global_settings.py:52
 msgid "Arabic"
@@ -37,7 +38,7 @@ msgstr "ബള്‍ഗേറിയന്‍"
 
 #: conf/global_settings.py:55
 msgid "Belarusian"
-msgstr ""
+msgstr "ബെലറൂഷ്യന്‍"
 
 #: conf/global_settings.py:56
 msgid "Bengali"
@@ -45,7 +46,7 @@ msgstr "ബംഗാളി"
 
 #: conf/global_settings.py:57
 msgid "Breton"
-msgstr ""
+msgstr "ബ്രെട്ടണ്‍"
 
 #: conf/global_settings.py:58
 msgid "Bosnian"
@@ -105,7 +106,7 @@ msgstr "നിക്കരാഗ്വന്‍ സ്പാനിഷ്"
 
 #: conf/global_settings.py:72
 msgid "Venezuelan Spanish"
-msgstr ""
+msgstr "വെനിസ്വലന്‍ സ്പാനിഷ്"
 
 #: conf/global_settings.py:73
 msgid "Estonian"
@@ -157,7 +158,7 @@ msgstr "ഹംഗേറിയന്‍"
 
 #: conf/global_settings.py:85
 msgid "Interlingua"
-msgstr ""
+msgstr "ഇന്റര്‍ലിംഗ്വാ"
 
 #: conf/global_settings.py:86
 msgid "Indonesian"
@@ -197,7 +198,7 @@ msgstr "കൊറിയന്‍"
 
 #: conf/global_settings.py:95
 msgid "Luxembourgish"
-msgstr ""
+msgstr "ലക്സംബര്‍ഗിഷ് "
 
 #: conf/global_settings.py:96
 msgid "Lithuanian"
@@ -221,7 +222,7 @@ msgstr "മംഗോളിയന്‍"
 
 #: conf/global_settings.py:101
 msgid "Burmese"
-msgstr ""
+msgstr "ബര്‍മീസ്"
 
 #: conf/global_settings.py:102
 msgid "Norwegian Bokmal"
@@ -241,7 +242,7 @@ msgstr "നോര്‍വീജിയന്‍ നിനോഷ്ക്"
 
 #: conf/global_settings.py:106
 msgid "Ossetic"
-msgstr ""
+msgstr "ഒസ്സെറ്റിക്"
 
 #: conf/global_settings.py:107
 msgid "Punjabi"
@@ -317,7 +318,7 @@ msgstr "തൊതാര്‍"
 
 #: conf/global_settings.py:125
 msgid "Udmurt"
-msgstr ""
+msgstr "ഉദ്മര്‍ത്"
 
 #: conf/global_settings.py:126
 msgid "Ukrainian"
@@ -341,11 +342,11 @@ msgstr "പരമ്പരാഗത ചൈനീസ്"
 
 #: core/validators.py:21
 msgid "Enter a valid value."
-msgstr "ശരിയായ മൂല്യം നല്കണം."
+msgstr "സാധുതയുള്ള മൂല്യം നല്‍കുക."
 
 #: core/validators.py:53 forms/fields.py:650
 msgid "Enter a valid URL."
-msgstr "ശരിയായ URL നല്കണം."
+msgstr "സാധുതയുള്ള URL നല്‍കുക"
 
 #: core/validators.py:79
 msgid "Enter a valid integer."
@@ -353,12 +354,14 @@ msgstr ""
 
 #: core/validators.py:83
 msgid "Enter a valid email address."
-msgstr ""
+msgstr "സാധുതയുള്ള ഇമെയില്‍ വിലാസം നല്‍കുക"
 
 #: core/validators.py:131
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr "ശരിയായ സ്ളഗ് നല്കുക (അക്ഷരങ്ങള്‍, അക്കങ്ങള്‍, അണ്ടര്‍സ്കോര്‍, ഹൈഫന്‍ എന്നിവ മാത്രം ചേര്‍ന്നത്)."
+msgstr ""
+"അക്ഷരങ്ങള്‍, അക്കങ്ങള്‍, അണ്ടര്‍സ്കോര്‍, ഹൈഫന്‍ എന്നിവ മാത്രം അടങ്ങിയ സാധുതയുള്ള ഒരുവാക്ക് "
+"ചുരുക്കവാക്കായി നല്‍കുക "
 
 #: core/validators.py:134 core/validators.py:153
 msgid "Enter a valid IPv4 address."

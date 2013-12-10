@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-02 16:18+0200\n"
-"PO-Revision-Date: 2013-04-29 08:23+0000\n"
-"Last-Translator: claudep <claude@2xlibre.net>\n"
+"PO-Revision-Date: 2013-11-20 09:15+0000\n"
+"Last-Translator: Marian Andre <marian@andre.sk>\n"
 "Language-Team: Slovak (http://www.transifex.com/projects/p/django/language/"
 "sk/)\n"
 "MIME-Version: 1.0\n"
@@ -32,8 +32,8 @@ msgstr "zobrazené meno"
 
 #: models.py:65
 msgid "site"
-msgstr "stránka"
+msgstr "sídlo"
 
 #: models.py:66
 msgid "sites"
-msgstr "weby"
+msgstr "sídla"

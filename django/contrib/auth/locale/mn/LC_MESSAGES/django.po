@@ -3,13 +3,14 @@
 # Translators:
 # delgermurun <pdelgermurun@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
+# zorig <zorig_ezd@yahoo.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-10-09 20:17+0200\n"
-"PO-Revision-Date: 2013-10-10 08:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-11-30 18:29+0000\n"
+"Last-Translator: zorig <zorig_ezd@yahoo.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
 "MIME-Version: 1.0\n"
@@ -211,7 +212,7 @@ msgstr "хэрэглэгчийн эрхүүд"
 
 #: models.py:301
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Хэрэглэгчид тодорхойлж өгсөн эрх"
 
 #: models.py:368
 msgid "username"

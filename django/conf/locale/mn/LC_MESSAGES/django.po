@@ -6,6 +6,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jargalan <jargalanch@gmail.com>, 2011
 # Tsolmon <mnts26@gmail.com>, 2011
+# zorig <zorig_ezd@yahoo.com>, 2013
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011
 # Ганзориг БП <ganzo.bp@gmail.com>, 2011
@@ -14,8 +15,8 @@ msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-08-22 09:54+0200\n"
-"PO-Revision-Date: 2013-09-30 09:47+0000\n"
-"Last-Translator: ankhaa1002 <ankhaa1002@gmail.com>\n"
+"PO-Revision-Date: 2013-11-30 18:45+0000\n"
+"Last-Translator: zorig <zorig_ezd@yahoo.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
 "MIME-Version: 1.0\n"
@@ -226,7 +227,7 @@ msgstr "Монгол"
 
 #: conf/global_settings.py:101
 msgid "Burmese"
-msgstr ""
+msgstr "Бирм"
 
 #: conf/global_settings.py:102
 msgid "Norwegian Bokmal"
@@ -469,12 +470,12 @@ msgstr "Бүхэл тоо"
 #: db/models/fields/__init__.py:574 db/models/fields/__init__.py:1061
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "'%(value)s' заавал бүхэл тоо байна"
 
 #: db/models/fields/__init__.py:625
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "'%(value)s' заавал True эсвэл False утга авах."
 
 #: db/models/fields/__init__.py:627
 msgid "Boolean (Either True or False)"
@@ -495,6 +496,7 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"'%(value)s' утга буруу форматтай байна. Формат нь YYYY-MM-DD байх хэрэгтэй."
 
 #: db/models/fields/__init__.py:723 db/models/fields/__init__.py:817
 #, python-format
@@ -502,6 +504,8 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"'%(value)s' утга зөв форматтай байна. Гэвч огнооны хэсэгийн формат буруу "
+"байна. Формат нь (YYYY-MM-DD) байх хэрэгтэй."
 
 #: db/models/fields/__init__.py:726
 msgid "Date (without time)"
@@ -513,6 +517,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"'%(value)s' утга буруу форматтай байна. Формат нь заавал YYYY-MM-DD HH:MM[:ss"
+"[.uuuuuu]][TZ] байх хэрэгтэй."
 
 #: db/models/fields/__init__.py:819
 #, python-format
@@ -520,6 +526,8 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"'%(value)s' утга зөв форматтай байна(YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
+"гэвч буруу огноо/цаг байна. "
 
 #: db/models/fields/__init__.py:823
 msgid "Date (with time)"
@@ -528,7 +536,7 @@ msgstr "Огноо (цагтай)"
 #: db/models/fields/__init__.py:921
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr ""
+msgstr "'%(value)s' заавал decimal утга байх."
 
 #: db/models/fields/__init__.py:923
 msgid "Decimal number"
@@ -545,7 +553,7 @@ msgstr "Файлын зам "
 #: db/models/fields/__init__.py:1029
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr ""
+msgstr "'%(value)s' заавал float утга байх."
 
 #: db/models/fields/__init__.py:1031
 msgid "Floating point number"
@@ -566,7 +574,7 @@ msgstr "IP хаяг"
 #: db/models/fields/__init__.py:1175
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "'%(value)s' заавал  None, True эсвэл False утга авах."
 
 #: db/models/fields/__init__.py:1177
 msgid "Boolean (Either True, False or None)"
@@ -599,6 +607,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"'%(value)s' утга буруу форматтай байна. Формат нь заавал HH:MM[:ss[.uuuuuu]] "
+"байх хэрэгтэй."
 
 #: db/models/fields/__init__.py:1296
 #, python-format
@@ -606,6 +616,8 @@ msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"'%(value)s' утгын формат нь зөв байна гэвч цагийн формат нь буруу байна. "
+"Цагийн формат заавал (HH:MM[:ss[.uuuuuu]]) байна."
 
 #: db/models/fields/__init__.py:1299
 msgid "Time"
@@ -630,7 +642,7 @@ msgstr "Зураг"
 #: db/models/fields/related.py:1128
 #, python-format
 msgid "%(model)s instance with pk %(pk)r does not exist."
-msgstr ""
+msgstr "%(pk)r пк-тэй %(model)s модель байхгүй байна"
 
 #: db/models/fields/related.py:1130
 msgid "Foreign Key (type determined by related field)"
@@ -660,15 +672,15 @@ msgstr "Тоон утга оруулна уу."
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(max)s -ээс ихгүй утга оруулна уу "
+msgstr[1] "%(max)s -ээс ихгүй утга оруулна уу "
 
 #: forms/fields.py:300
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Энд %(max)s -аас олонгүй бутархайн орон байх ёстой. "
+msgstr[1] "Энд %(max)s -аас олонгүй бутархайн орон байх ёстой. "
 
 #: forms/fields.py:304
 #, python-format
@@ -676,8 +688,8 @@ msgid ""
 "Ensure that there are no more than %(max)s digit before the decimal point."
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Энд бутархайн таслалаас өмнө %(max)s-аас олонгүй цифр байх ёстой."
+msgstr[1] "Энд бутархайн таслалаас өмнө %(max)s-аас олонгүй цифр байх ёстой."
 
 #: forms/fields.py:415 forms/fields.py:1088
 msgid "Enter a valid date."
@@ -755,14 +767,14 @@ msgstr ":?.!"
 
 #: forms/formsets.py:88
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr ""
+msgstr "УдирдахФормын мэдээлэл олдсонгүй эсвэл өөрчлөгдсөн байна"
 
 #: forms/formsets.py:321
 #, python-format
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d ихгүй форм илгээн үү"
+msgstr[1] "%d ихгүй форм илгээн үү"
 
 #: forms/formsets.py:350 forms/formsets.py:352
 msgid "Order"
@@ -809,7 +821,7 @@ msgstr "Зөв сонголт хийнэ үү. Энэ утга сонголто�
 #: forms/models.py:1147
 #, python-format
 msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr ""
+msgstr "\"%(pk)s\" нь primary key талбарт тохирохгүй утга байна."
 
 #: forms/models.py:1158
 msgid ""
@@ -1185,16 +1197,16 @@ msgstr "Гахай"
 #: utils/image.py:105
 #, python-format
 msgid "Neither Pillow nor PIL could be imported: %s"
-msgstr ""
+msgstr "Пиллов, Пил аль аль нь дуудах боломжгүй: %s"
 
 #: utils/image.py:127
 #, python-format
 msgid "The '_imaging' module for the PIL could not be imported: %s"
-msgstr ""
+msgstr "_imaging -н модель ПИЛ %s дуудагдах боломжгүй "
 
 #: utils/ipv6.py:9
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "Зөв IPv6  хаяг оруулна уу."
 
 #: utils/text.py:69
 #, python-format

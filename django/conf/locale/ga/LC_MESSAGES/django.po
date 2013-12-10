@@ -2,6 +2,7 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# John Moylan <john@8t8.eu>, 2013
 # jstafford_rte <John.Stafford@rte.ie>, 2013
 # leftmostcat <leftmostcat@gmail.com>, 2011
 # Michael Thornhill <michael@maithu.com>, 2011-2012
@@ -11,8 +12,8 @@ msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-08-22 09:54+0200\n"
-"PO-Revision-Date: 2013-08-17 08:48+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-11-29 15:41+0000\n"
+"Last-Translator: John Moylan <john@8t8.eu>\n"
 "Language-Team: Irish (http://www.transifex.com/projects/p/django/language/"
 "ga/)\n"
 "MIME-Version: 1.0\n"
@@ -955,31 +956,31 @@ msgstr "Dé Domhnaigh"
 
 #: utils/dates.py:10
 msgid "Mon"
-msgstr "Luan"
+msgstr "L"
 
 #: utils/dates.py:10
 msgid "Tue"
-msgstr "Máirt"
+msgstr "M"
 
 #: utils/dates.py:10
 msgid "Wed"
-msgstr "Céad"
+msgstr "C"
 
 #: utils/dates.py:10
 msgid "Thu"
-msgstr "Déar"
+msgstr "D"
 
 #: utils/dates.py:10
 msgid "Fri"
-msgstr "Aoine"
+msgstr "A"
 
 #: utils/dates.py:11
 msgid "Sat"
-msgstr "Sath"
+msgstr "S"
 
 #: utils/dates.py:11
 msgid "Sun"
-msgstr "Domh"
+msgstr "D"
 
 #: utils/dates.py:18
 msgid "January"

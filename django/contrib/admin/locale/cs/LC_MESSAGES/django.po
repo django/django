@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-25 14:19+0200\n"
-"PO-Revision-Date: 2013-09-13 10:48+0000\n"
+"PO-Revision-Date: 2013-11-06 13:32+0000\n"
 "Last-Translator: Vlada Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/projects/p/django/language/"
 "cs/)\n"
@@ -290,7 +290,8 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
-""
+"Odstranění položky \"%(instance)s\" typu %(class_name)s by vyžadovalo "
+"odstranění těchto souvisejících chráněných položek: %(related_objects)s"
 
 #: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19

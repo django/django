@@ -292,7 +292,8 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
-""
+"Brisanje %(object_name)s '%(escaped_object)s' bi zahtevalo brisanje "
+"naslednjih zaščitenih povezanih objektov:"
 
 #: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19

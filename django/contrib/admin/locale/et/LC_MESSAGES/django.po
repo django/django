@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-25 14:19+0200\n"
-"PO-Revision-Date: 2013-10-26 21:29+0000\n"
+"PO-Revision-Date: 2013-11-06 11:45+0000\n"
 "Last-Translator: jannolii <jannolii@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/projects/p/django/language/"
 "et/)\n"
@@ -22,7 +22,7 @@ msgstr ""
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr "%(count)d %(items)s kustutamine õnnestus"
+msgstr "%(count)d %(items)s kustutamine õnnestus."
 
 #: actions.py:61 options.py:1418
 #, python-format
@@ -283,7 +283,8 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
-""
+"Et kustutada %(class_name)s %(instance)s, on vaja kustutada järgmised "
+"kaitstud seotud objektid: %(related_objects)s"
 
 #: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19

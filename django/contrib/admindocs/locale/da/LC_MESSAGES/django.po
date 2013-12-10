@@ -2,14 +2,15 @@
 #
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
+# Erik Wognsen <r4mses@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-06-02 00:30-0400\n"
-"PO-Revision-Date: 2013-08-17 08:36+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-11-10 11:04+0000\n"
+"Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/projects/p/django/language/"
 "da/)\n"
 "MIME-Version: 1.0\n"
@@ -222,7 +223,7 @@ msgstr ""
 
 #: templates/admin_doc/missing_docutils.html:10
 msgid "Please install docutils"
-msgstr ""
+msgstr "Installer venligst docutils"
 
 #: templates/admin_doc/missing_docutils.html:17
 #, python-format

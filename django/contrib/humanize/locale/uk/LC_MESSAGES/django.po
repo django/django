@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-11-15 15:36+0100\n"
-"PO-Revision-Date: 2013-11-16 09:37+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-11-21 12:46+0000\n"
+"Last-Translator: Alex Bolotov <oleksandr.bolotov@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
 "language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -240,7 +240,7 @@ msgstr "чотири"
 
 #: templatetags/humanize.py:145
 msgid "five"
-msgstr ""
+msgstr "п'ять"
 
 #: templatetags/humanize.py:145
 msgid "six"
@@ -256,7 +256,7 @@ msgstr "вісім"
 
 #: templatetags/humanize.py:145
 msgid "nine"
-msgstr ""
+msgstr "дев'ять"
 
 #: templatetags/humanize.py:191
 #, python-format
@@ -274,9 +274,9 @@ msgstr "зараз"
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "секунду назад"
+msgstr[1] "%(count)s секунди тому"
+msgstr[2] "%(count)s секунд тому"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -284,9 +284,9 @@ msgstr[2] ""
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "хвилину тому"
+msgstr[1] "%(count)s хвилини тому"
+msgstr[2] "%(count)s хвилин тому"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -294,9 +294,9 @@ msgstr[2] ""
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "годину тому"
+msgstr[1] "%(count)s години тому"
+msgstr[2] "%(count)s годин тому"
 
 #: templatetags/humanize.py:216
 #, python-format

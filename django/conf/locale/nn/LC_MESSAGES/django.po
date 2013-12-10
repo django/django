@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-08-22 09:54+0200\n"
-"PO-Revision-Date: 2013-10-31 11:50+0000\n"
+"PO-Revision-Date: 2013-11-06 15:25+0000\n"
 "Last-Translator: jensadne <jensadne@pvv.ntnu.no>\n"
 "Language-Team: Norwegian Nynorsk (http://www.transifex.com/projects/p/django/"
 "language/nn/)\n"
@@ -351,7 +351,7 @@ msgstr "Oppgje ei gyldig nettadresse."
 
 #: core/validators.py:79
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Oppgje eit gyldig heiltal"
 
 #: core/validators.py:83
 msgid "Enter a valid email address."
@@ -456,12 +456,12 @@ msgstr "Heiltal"
 #: db/models/fields/__init__.py:574 db/models/fields/__init__.py:1061
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "Verdien '%(value)s' må vere eit heiltal."
 
 #: db/models/fields/__init__.py:625
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "Verdien '%(value)s' må vere anten True eller False."
 
 #: db/models/fields/__init__.py:627
 msgid "Boolean (Either True or False)"
@@ -1198,29 +1198,29 @@ msgstr ", "
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d år"
+msgstr[1] "%d år"
 
 #: utils/timesince.py:25
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d månad"
+msgstr[1] "%d månader"
 
 #: utils/timesince.py:26
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d veke"
+msgstr[1] "%d veker"
 
 #: utils/timesince.py:27
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d dag"
+msgstr[1] "%d dagar"
 
 #: utils/timesince.py:28
 #, python-format

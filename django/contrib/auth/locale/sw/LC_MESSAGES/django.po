@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# machaku <bmachaku@gmail.com>, 2012
+# machaku <bmachaku@gmail.com>, 2012-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-10-09 20:17+0200\n"
-"PO-Revision-Date: 2013-10-10 08:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-11-12 07:49+0000\n"
+"Last-Translator: machaku <bmachaku@gmail.com>\n"
 "Language-Team: Swahili (http://www.transifex.com/projects/p/django/language/"
 "sw/)\n"
 "MIME-Version: 1.0\n"
@@ -36,7 +36,7 @@ msgstr "Nenosiri limebadilishwa kwa mafanikio"
 #: admin.py:142
 #, python-format
 msgid "Change password: %s"
-msgstr "Badilish nenosiri: %s"
+msgstr "Badilisha nenosiri: %s"
 
 #: forms.py:33 tests/test_forms.py:261 tests/test_forms.py:266
 #: tests/test_forms.py:407
@@ -49,7 +49,7 @@ msgstr "Muundo batili wa nenosiri au algorithm ya kuhash isiyojulikana"
 
 #: forms.py:72
 msgid "A user with that username already exists."
-msgstr "Mtumiaji mwenye jina la mtumiaji hilo tayari yupo."
+msgstr "Tayari kuna anayetumia hilo jina la mtumiaji."
 
 #: forms.py:73 forms.py:254 forms.py:314
 msgid "The two password fields didn't match."
@@ -95,6 +95,8 @@ msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
+"Tafadhali sahihisha %(username)s na nenosiri. Kumbuka sehemu zote mbili "
+"zinaweza kuwa zinazingatia herufi kubwa na ndogo."
 
 #: forms.py:158
 msgid "This account is inactive."
@@ -207,7 +209,7 @@ msgstr "ruhusa za mtumiaji"
 
 #: models.py:301
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Ruhusa maalum kwa mtumiaji huyu."
 
 #: models.py:368
 msgid "username"
@@ -276,4 +278,4 @@ msgstr "Kuseti upya nenosiri katika %(site_name)s"
 
 #: tests/test_forms.py:325
 msgid "Enter a valid email address."
-msgstr ""
+msgstr "ingiza anuani halali ya barua pepe."

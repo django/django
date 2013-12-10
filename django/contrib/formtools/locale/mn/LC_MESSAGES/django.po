@@ -2,14 +2,15 @@
 #
 # Translators:
 # Jacara <baskhuujacara@gmail.com>, 2011
+# zorig <zorig_ezd@yahoo.com>, 2013
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-08-16 15:07+0200\n"
-"PO-Revision-Date: 2013-08-17 09:27+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-11-30 18:06+0000\n"
+"Last-Translator: zorig <zorig_ezd@yahoo.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
 "MIME-Version: 1.0\n"
@@ -32,4 +33,4 @@ msgstr "илгээх"
 
 #: wizard/views.py:275
 msgid "ManagementForm data is missing or has been tampered."
-msgstr ""
+msgstr "УдирдахФормын мэдээлэл олдсонгүй эсвэл өөрчлөгдсөн байна"

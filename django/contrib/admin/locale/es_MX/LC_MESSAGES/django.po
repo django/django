@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Abraham Estrada <abraham.estrada@gmail.com>, 2011-2012
+# Abraham Estrada <abraham.estrada@gmail.com>, 2011-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-25 14:19+0200\n"
-"PO-Revision-Date: 2013-08-17 08:29+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-11-06 21:49+0000\n"
+"Last-Translator: Abraham Estrada <abraham.estrada@gmail.com>\n"
 "Language-Team: Spanish (Mexico) (http://www.transifex.com/projects/p/django/"
 "language/es_MX/)\n"
 "MIME-Version: 1.0\n"
@@ -78,6 +78,9 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
+"Por favor introduza %(username)s y contraseña correctos de una cuenta de "
+"staff. Note que puede que ambos campos sean estrictos en relación a "
+"diferencias entre mayúsculas y minúsculas."
 
 #: forms.py:19
 msgid "Please log in again, because your session has expired."
@@ -180,6 +183,7 @@ msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
 "%(name)s below."
 msgstr ""
+"Se agregó con éxito %(name)s \"%(obj)s\". Puede agregar otro %(name)s  abajo."
 
 #: options.py:906
 #, python-format
@@ -192,6 +196,8 @@ msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
 msgstr ""
+"Se modificó con éxito %(name)s \"%(obj)s\". Puede modificarlo/a nuevamente "
+"abajo."
 
 #: options.py:934
 #, python-format
@@ -199,6 +205,8 @@ msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
 "%(name)s below."
 msgstr ""
+"Se modificó con éxito %(name)s \"%(obj)s\". Puede agregar otro %(name)s "
+"abajo."
 
 #: options.py:940
 #, python-format
@@ -270,7 +278,7 @@ msgstr "Historia de modificaciones: %s"
 #: options.py:1564
 #, python-format
 msgid "%(class_name)s %(instance)s"
-msgstr ""
+msgstr "%(class_name)s %(instance)s"
 
 #: options.py:1571
 #, python-format
@@ -278,6 +286,8 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
+"La eliminación de %(class_name)s %(instance)s provocaría la eliminación de "
+"los siguientes objetos relacionados protegidos: %(related_objects)s"
 
 #: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19
@@ -312,11 +322,11 @@ msgstr "Agregar otro/a"
 
 #: widgets.py:302
 msgid "Currently:"
-msgstr ""
+msgstr "Actualmente:"
 
 #: widgets.py:303
 msgid "Change:"
-msgstr ""
+msgstr "Modificar:"
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -360,6 +370,8 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"Ha habido un error. Se ha informado a los administradores del sitio a través "
+"de correo electrónico y debe ser reparado en breve. Gracias por su paciencia."
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
@@ -445,7 +457,7 @@ msgstr "Por favor, corrija los siguientes errores."
 #: templates/admin/auth/user/change_password.html:27
 #: templates/registration/password_change_form.html:20
 msgid "Please correct the errors below."
-msgstr ""
+msgstr "Por favor, corrija los siguientes errores."
 
 #: templates/admin/change_list.html:58
 #, python-format
@@ -549,7 +561,7 @@ msgstr "Por %(filter_title)s"
 #: templates/admin/index.html:20
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr ""
+msgstr "Modelos en la aplicación %(name)s"
 
 #: templates/admin/index.html:39
 msgid "Change"
@@ -807,12 +819,16 @@ msgid ""
 "We've emailed you instructions for setting your password. You should be "
 "receiving them shortly."
 msgstr ""
+"Le hemos enviado un correo electrónico con las instrucciones para configurar "
+"la contraseña. Usted debe recibirlo en cualquier momento."
 
 #: templates/registration/password_reset_done.html:19
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+"Si usted no recibe un correo electrónico, por favor, asegúrese de que ha "
+"introducido la dirección con la que se registró, y revise su carpeta de spam."
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
@@ -820,6 +836,8 @@ msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"Usted está recibiendo este correo electrónico porque ha solicitado un "
+"restablecimiento de contraseña para la cuenta de usuario en %(site_name)s."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -845,10 +863,12 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
+"¿Olvidó su contraseña? Ingrese su dirección de correo electrónico, y le "
+"enviaremos las instrucciones para establecer una nueva."
 
 #: templates/registration/password_reset_form.html:21
 msgid "Email address:"
-msgstr ""
+msgstr "Correo electrónico:"
 
 #: templates/registration/password_reset_form.html:21
 msgid "Reset my password"

@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Aitzol Naberan <anaberan@codesyntax.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # julen <julenx@gmail.com>, 2012-2013
 # julen <julenx@gmail.com>, 2013
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-25 14:19+0200\n"
-"PO-Revision-Date: 2013-08-17 08:29+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-11-06 12:05+0000\n"
+"Last-Translator: Aitzol Naberan <anaberan@codesyntax.com>\n"
 "Language-Team: Basque (http://www.transifex.com/projects/p/django/language/"
 "eu/)\n"
 "MIME-Version: 1.0\n"
@@ -286,7 +287,9 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
-""
+"%(class_name)s klaseko %(instance)s instantziak ezabatzeak erlazionatutako  "
+"objektu hauek ezabatzea eragingo du:\n"
+"%(related_objects)s"
 
 #: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19

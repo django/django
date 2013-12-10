@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Abraham Estrada <abraham.estrada@gmail.com>, 2011-2012
+# Abraham Estrada <abraham.estrada@gmail.com>, 2011-2013
 # zodman <zodman@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-08-22 09:54+0200\n"
-"PO-Revision-Date: 2013-08-17 08:48+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-11-07 00:27+0000\n"
+"Last-Translator: Abraham Estrada <abraham.estrada@gmail.com>\n"
 "Language-Team: Spanish (Mexico) (http://www.transifex.com/projects/p/django/"
 "language/es_MX/)\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #: conf/global_settings.py:51
 msgid "Afrikaans"
-msgstr ""
+msgstr "afrikáans"
 
 #: conf/global_settings.py:52
 msgid "Arabic"
@@ -36,7 +36,7 @@ msgstr "Búlgaro"
 
 #: conf/global_settings.py:55
 msgid "Belarusian"
-msgstr ""
+msgstr "bielorruso"
 
 #: conf/global_settings.py:56
 msgid "Bengali"
@@ -44,7 +44,7 @@ msgstr "Bengalí"
 
 #: conf/global_settings.py:57
 msgid "Breton"
-msgstr ""
+msgstr "bretón"
 
 #: conf/global_settings.py:58
 msgid "Bosnian"
@@ -104,7 +104,7 @@ msgstr "Español de nicaragua"
 
 #: conf/global_settings.py:72
 msgid "Venezuelan Spanish"
-msgstr ""
+msgstr "español de Venezuela"
 
 #: conf/global_settings.py:73
 msgid "Estonian"
@@ -156,7 +156,7 @@ msgstr "Húngaro"
 
 #: conf/global_settings.py:85
 msgid "Interlingua"
-msgstr ""
+msgstr "Interlingua"
 
 #: conf/global_settings.py:86
 msgid "Indonesian"
@@ -196,7 +196,7 @@ msgstr "Coreano"
 
 #: conf/global_settings.py:95
 msgid "Luxembourgish"
-msgstr ""
+msgstr "luxemburgués"
 
 #: conf/global_settings.py:96
 msgid "Lithuanian"
@@ -220,7 +220,7 @@ msgstr "Mongol"
 
 #: conf/global_settings.py:101
 msgid "Burmese"
-msgstr ""
+msgstr "burmés"
 
 #: conf/global_settings.py:102
 msgid "Norwegian Bokmal"
@@ -240,7 +240,7 @@ msgstr "Noruego Nynorsk"
 
 #: conf/global_settings.py:106
 msgid "Ossetic"
-msgstr ""
+msgstr "osetio"
 
 #: conf/global_settings.py:107
 msgid "Punjabi"
@@ -316,7 +316,7 @@ msgstr "Tatar"
 
 #: conf/global_settings.py:125
 msgid "Udmurt"
-msgstr ""
+msgstr "udmurto"
 
 #: conf/global_settings.py:126
 msgid "Ukrainian"
@@ -348,11 +348,11 @@ msgstr "Ingrese una URL válida."
 
 #: core/validators.py:79
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Introduzca un número entero válido."
 
 #: core/validators.py:83
 msgid "Enter a valid email address."
-msgstr ""
+msgstr "Introduzca una dirección de correo electrónico válida."
 
 #: core/validators.py:131
 msgid ""
@@ -401,7 +401,11 @@ msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+"Asegúrese de que este valor tenga como mínimo %(limit_value)d caracter "
+"(tiene %(show_value)d)."
 msgstr[1] ""
+"Asegúrese de que este valor tenga como mínimo %(limit_value)d caracteres "
+"(tiene %(show_value)d)."
 
 #: core/validators.py:220
 #, python-format
@@ -617,6 +621,7 @@ msgstr "Imagen"
 #, python-format
 msgid "%(model)s instance with pk %(pk)r does not exist."
 msgstr ""
+"No existe una instancia del modelo %(model)s con una clave primaria %(pk)r."
 
 #: db/models/fields/related.py:1130
 msgid "Foreign Key (type determined by related field)"
@@ -724,7 +729,7 @@ msgstr "Introduzca una lista de valores."
 #. Translators: This is the default suffix added to form field labels
 #: forms/forms.py:90
 msgid ":"
-msgstr ""
+msgstr ":"
 
 #: forms/forms.py:159
 #, python-format
@@ -736,11 +741,13 @@ msgstr ""
 #. label
 #: forms/forms.py:527
 msgid ":?.!"
-msgstr ""
+msgstr ":?.!"
 
 #: forms/formsets.py:88
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr ""
+"Los datos correspondientes al ManagementForm no existen o han sido "
+"modificados"
 
 #: forms/formsets.py:321
 #, python-format
@@ -1182,7 +1189,7 @@ msgstr ""
 
 #: utils/ipv6.py:9
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "Esta no es una dirección IPv6 válida."
 
 #: utils/text.py:69
 #, python-format
@@ -1203,47 +1210,47 @@ msgstr ","
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d año"
+msgstr[1] "%d años"
 
 #: utils/timesince.py:25
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d mes"
+msgstr[1] "%d meses"
 
 #: utils/timesince.py:26
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d semana"
+msgstr[1] "%d semanas"
 
 #: utils/timesince.py:27
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d día"
+msgstr[1] "%d días"
 
 #: utils/timesince.py:28
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d hora"
+msgstr[1] "%d horas"
 
 #: utils/timesince.py:29
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d minuto"
+msgstr[1] "%d minutos"
 
 #: utils/timesince.py:45
 msgid "0 minutes"
-msgstr ""
+msgstr "0 minutos"
 
 #: views/static.py:56
 msgid "Directory indexes are not allowed here."
@@ -1306,7 +1313,7 @@ msgstr "La página no es \"last\", ni puede ser convertido a un int."
 #: views/generic/list.py:59
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr ""
+msgstr "Página inválida (%(page_number)s): %(message)s"
 
 #: views/generic/list.py:150
 #, python-format

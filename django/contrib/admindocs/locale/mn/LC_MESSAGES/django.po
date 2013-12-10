@@ -2,13 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# zorig <zorig_ezd@yahoo.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-06-02 00:30-0400\n"
-"PO-Revision-Date: 2013-08-17 08:36+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-11-30 19:00+0000\n"
+"Last-Translator: zorig <zorig_ezd@yahoo.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
 "MIME-Version: 1.0\n"
@@ -68,7 +69,7 @@ msgstr "%s-ийн тоо"
 #: views.py:271
 #, python-format
 msgid "Attributes on %s objects"
-msgstr ""
+msgstr " %s объектийн нэмэлт утга"
 
 #: views.py:363
 #, python-format
@@ -175,7 +176,7 @@ msgstr "Таг-ууд"
 
 #: templates/admin_doc/index.html:18
 msgid "List of all the template tags and their functions."
-msgstr ""
+msgstr "Бүх загваруудын шошго мөн тэдний функц"
 
 #: templates/admin_doc/index.html:20
 #: templates/admin_doc/template_filter_index.html:9
@@ -238,27 +239,27 @@ msgstr ""
 #: templates/admin_doc/model_detail.html:21
 #, python-format
 msgid "Model: %(name)s"
-msgstr ""
+msgstr "Модель: %(name)s"
 
 #: templates/admin_doc/model_detail.html:35
 msgid "Field"
-msgstr ""
+msgstr "Талбар"
 
 #: templates/admin_doc/model_detail.html:36
 msgid "Type"
-msgstr ""
+msgstr "Төрөл"
 
 #: templates/admin_doc/model_detail.html:37
 msgid "Description"
-msgstr ""
+msgstr "Товчхон"
 
 #: templates/admin_doc/model_detail.html:52
 msgid "Back to Models Documentation"
-msgstr ""
+msgstr "Моделийн баримтруу буцах"
 
 #: templates/admin_doc/model_index.html:18
 msgid "Model documentation"
-msgstr ""
+msgstr "Моделийн баримт"
 
 #: templates/admin_doc/model_index.html:43
 msgid "Model groups"
@@ -271,12 +272,12 @@ msgstr "Загварууд"
 #: templates/admin_doc/template_detail.html:13
 #, python-format
 msgid "Template: %(name)s"
-msgstr ""
+msgstr "Загвар: %(name)s"
 
 #: templates/admin_doc/template_detail.html:16
 #, python-format
 msgid "Template: \"%(name)s\""
-msgstr ""
+msgstr "Загвар: \"%(name)s\""
 
 #: templates/admin_doc/template_detail.html:20
 #, python-format
@@ -285,19 +286,19 @@ msgstr ""
 
 #: templates/admin_doc/template_detail.html:23
 msgid "(does not exist)"
-msgstr ""
+msgstr "(Оршдоггүй)"
 
 #: templates/admin_doc/template_detail.html:28
 msgid "Back to Documentation"
-msgstr ""
+msgstr "Баримтруу буцах"
 
 #: templates/admin_doc/template_filter_index.html:12
 msgid "Template filters"
-msgstr ""
+msgstr "Загвар шүүлт"
 
 #: templates/admin_doc/template_filter_index.html:16
 msgid "Template filter documentation"
-msgstr ""
+msgstr "Загвар шүүлтийн баримт"
 
 #: templates/admin_doc/template_filter_index.html:22
 #: templates/admin_doc/template_filter_index.html:43
@@ -313,7 +314,7 @@ msgstr ""
 
 #: templates/admin_doc/template_tag_index.html:12
 msgid "Template tags"
-msgstr ""
+msgstr "Загвар шошго"
 
 #: templates/admin_doc/template_tag_index.html:16
 msgid "Template tag documentation"
@@ -330,41 +331,43 @@ msgid ""
 "To use these tags, put <code>%(code)s</code> in your template before using "
 "the tag."
 msgstr ""
+"Энэ шошгыг ашиглахын тулд үүнийг <code>%(code)s</code> шошгоны өмнө загвар "
+"дотроо бич"
 
 #: templates/admin_doc/view_detail.html:12
 #, python-format
 msgid "View: %(name)s"
-msgstr ""
+msgstr "Харагдац: %(name)s"
 
 #: templates/admin_doc/view_detail.html:23
 msgid "Context:"
-msgstr ""
+msgstr "Уул үг: "
 
 #: templates/admin_doc/view_detail.html:28
 msgid "Templates:"
-msgstr ""
+msgstr "Загварууд:"
 
 #: templates/admin_doc/view_detail.html:32
 msgid "Back to Views Documentation"
-msgstr ""
+msgstr "Харагдац баримтруу буцах"
 
 #: templates/admin_doc/view_index.html:16
 msgid "View documentation"
-msgstr ""
+msgstr "Харагдац баримт"
 
 #: templates/admin_doc/view_index.html:22
 msgid "Jump to site"
-msgstr ""
+msgstr "Сайтруу "
 
 #: templates/admin_doc/view_index.html:35
 #, python-format
 msgid "Views by URL on %(name)s"
-msgstr ""
+msgstr "%(name)s холбоос харагдац"
 
 #: templates/admin_doc/view_index.html:40
 #, python-format
 msgid "View function: %(name)s"
-msgstr ""
+msgstr "Харагдац функц: %(name)s"
 
 #: tests/test_fields.py:29
 msgid "Boolean (Either True or False)"

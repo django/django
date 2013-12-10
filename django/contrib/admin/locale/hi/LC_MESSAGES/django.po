@@ -286,7 +286,8 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
-""
+"%(object_name)s को हटाने के लिए '%(escaped_object)s' को निम्नलिखित संरक्षित संबंधित "
+"वस्तुओं को हटाने की आवश्यकता होगी:"
 
 #: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19

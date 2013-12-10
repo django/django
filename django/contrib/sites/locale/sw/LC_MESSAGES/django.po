@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# machaku <bmachaku@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-02 16:18+0200\n"
-"PO-Revision-Date: 2013-04-29 08:23+0000\n"
-"Last-Translator: claudep <claude@2xlibre.net>\n"
+"PO-Revision-Date: 2013-11-20 09:15+0000\n"
+"Last-Translator: machaku <bmachaku@gmail.com>\n"
 "Language-Team: Swahili (http://www.transifex.com/projects/p/django/language/"
 "sw/)\n"
 "MIME-Version: 1.0\n"
@@ -18,15 +19,15 @@ msgstr ""
 
 #: models.py:25
 msgid "The domain name cannot contain any spaces or tabs."
-msgstr ""
+msgstr "Jina la kikoa haliwezi kuwa na nafasi yeyote kati yake."
 
 #: models.py:58
 msgid "domain name"
-msgstr "jina la domeini"
+msgstr "jina la kikoa"
 
 #: models.py:60
 msgid "display name"
-msgstr "jina la kujionesha"
+msgstr "jina"
 
 #: models.py:65
 msgid "site"

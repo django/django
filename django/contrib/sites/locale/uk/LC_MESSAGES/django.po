@@ -2,13 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Alex Bolotov <oleksandr.bolotov@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-02 16:18+0200\n"
-"PO-Revision-Date: 2013-04-29 08:23+0000\n"
-"Last-Translator: claudep <claude@2xlibre.net>\n"
+"PO-Revision-Date: 2013-11-20 13:57+0000\n"
+"Last-Translator: Alex Bolotov <oleksandr.bolotov@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
 "language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +21,7 @@ msgstr ""
 
 #: models.py:25
 msgid "The domain name cannot contain any spaces or tabs."
-msgstr ""
+msgstr "Доменне ім'я не може містити пробіли або символи табуляції."
 
 #: models.py:58
 msgid "domain name"

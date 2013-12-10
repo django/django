@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-08-22 09:54+0200\n"
-"PO-Revision-Date: 2013-09-13 11:46+0000\n"
+"PO-Revision-Date: 2013-11-18 11:33+0000\n"
 "Last-Translator: Vlada Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/projects/p/django/language/"
 "cs/)\n"
@@ -651,7 +651,7 @@ msgstr "Vazba mnoho-mnoho"
 
 #: forms/fields.py:56
 msgid "This field is required."
-msgstr "Pole je povinné."
+msgstr "Toto pole je třeba vyplnit."
 
 #: forms/fields.py:225
 msgid "Enter a whole number."

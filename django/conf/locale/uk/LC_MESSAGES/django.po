@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-08-22 09:54+0200\n"
-"PO-Revision-Date: 2013-11-03 22:05+0000\n"
+"PO-Revision-Date: 2013-11-12 23:00+0000\n"
 "Last-Translator: Alex Bolotov <oleksandr.bolotov@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
 "language/uk/)\n"
@@ -425,8 +425,14 @@ msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+"Переконайтеся, що це значення містить не більше ніж %(limit_value)d символ "
+"(зараз %(show_value)d)."
 msgstr[1] ""
+"Переконайтеся, що це значення містить не більше ніж %(limit_value)d символи "
+"(зараз %(show_value)d)."
 msgstr[2] ""
+"Переконайтеся, що це значення містить не більше ніж %(limit_value)d символів "
+"(зараз %(show_value)d)."
 
 #: db/models/base.py:884
 #, python-format
@@ -472,7 +478,7 @@ msgstr "'%(value)s' значення має бути цілим числом."
 #: db/models/fields/__init__.py:625
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "Значення '%(value)s' має True або False."
 
 #: db/models/fields/__init__.py:627
 msgid "Boolean (Either True or False)"
@@ -493,6 +499,8 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"Значеня '%(value)s' має невірний формат дати. Воно має бути у форматі YYYY-"
+"MM-DD."
 
 #: db/models/fields/__init__.py:723 db/models/fields/__init__.py:817
 #, python-format
@@ -500,6 +508,7 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"Значення '%(value)s' має коректний формат (YYYY-MM-DD), але це недійсна дата."
 
 #: db/models/fields/__init__.py:726
 msgid "Date (without time)"
@@ -511,6 +520,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"Значення '%(value)s' має невірний формат. Воно повинне бути у форматі YYYY-"
+"MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
 
 #: db/models/fields/__init__.py:819
 #, python-format
@@ -518,6 +529,8 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"Значення '%(value)s' має вірний формат (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]), "
+"але це не дійсна дата/час."
 
 #: db/models/fields/__init__.py:823
 msgid "Date (with time)"
@@ -606,6 +619,8 @@ msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"Значення '%(value)s' має вірний формат (HH:MM[:ss[.uuuuuu]]), але це не "
+"дійсний час."
 
 #: db/models/fields/__init__.py:1299
 msgid "Time"
@@ -669,8 +684,11 @@ msgstr[2] "Переконайтеся, що загалом тут не біль�
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] ""
+"Переконайтеся, що тут не більше ніж %(max)s цифра після десяткової коми."
 msgstr[1] ""
+"Переконайтеся, що тут не більше ніж %(max)s цифри після десяткової коми."
 msgstr[2] ""
+"Переконайтеся, що тут не більше ніж %(max)s цифер після десяткової коми."
 
 #: forms/fields.py:304
 #, python-format
@@ -679,8 +697,11 @@ msgid ""
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
+"Переконайтеся, що тут не більше ніж %(max)s цифра до десяткової коми."
 msgstr[1] ""
+"Переконайтеся, що тут не більше ніж %(max)s цифри до десяткової коми."
 msgstr[2] ""
+"Переконайтеся, що тут не більше ніж %(max)s цифер до десяткової коми."
 
 #: forms/fields.py:415 forms/fields.py:1088
 msgid "Enter a valid date."
@@ -712,8 +733,14 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
+"Переконайтеся, що це ім'я файлу містить не більше ніж з %(max)d символ "
+"(зараз %(length)d)."
 msgstr[1] ""
+"Переконайтеся, що це ім'я файлу містить не більше ніж з %(max)d символи "
+"(зараз %(length)d)."
 msgstr[2] ""
+"Переконайтеся, що це ім'я файлу містить не більше ніж з %(max)d символів "
+"(зараз %(length)d)."
 
 #: forms/fields.py:546
 msgid "Please either submit a file or check the clear checkbox, not both."
@@ -763,9 +790,9 @@ msgstr "ManagementForm даних відсутній або був підроб�
 #, python-format
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Будь ласка, відправте %d або менше форм."
+msgstr[1] "Будь ласка, відправте %d або менше форм."
+msgstr[2] "Будь ласка, відправте %d або менше форм."
 
 #: forms/formsets.py:350 forms/formsets.py:352
 msgid "Order"
@@ -1196,7 +1223,7 @@ msgstr "Ні Pillow ні PIL не можуть бути імпортовані: 
 #: utils/image.py:127
 #, python-format
 msgid "The '_imaging' module for the PIL could not be imported: %s"
-msgstr ""
+msgstr "Модуль '_imaging' для PIL не вдалося імпортувати: %s"
 
 #: utils/ipv6.py:9
 msgid "This is not a valid IPv6 address."

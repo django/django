@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-06-02 00:30-0400\n"
-"PO-Revision-Date: 2013-08-17 08:36+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-11-06 12:52+0000\n"
+"Last-Translator: jannolii <jannolii@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/projects/p/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -69,7 +69,7 @@ msgstr "%s arv"
 #: views.py:271
 #, python-format
 msgid "Attributes on %s objects"
-msgstr ""
+msgstr "Objekti %s atribuudid"
 
 #: views.py:363
 #, python-format
@@ -178,7 +178,7 @@ msgstr "Lipikud"
 
 #: templates/admin_doc/index.html:18
 msgid "List of all the template tags and their functions."
-msgstr ""
+msgstr "Nimekiri kõikidest malli märgistustest ja nende funktsioonidest."
 
 #: templates/admin_doc/index.html:20
 #: templates/admin_doc/template_filter_index.html:9
@@ -190,6 +190,8 @@ msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
 msgstr ""
+"Filtrid on tegevused, mida saab mallides külge panna muutujatele muutmaks "
+"viimaste väljundit."
 
 #: templates/admin_doc/index.html:23 templates/admin_doc/model_detail.html:16
 #: templates/admin_doc/model_index.html:10
@@ -203,6 +205,9 @@ msgid ""
 "associated fields. Each model has a list of fields which can be accessed as "
 "template variables"
 msgstr ""
+"Mudelid on süsteemi kõikide objektide ja nende väljade omavaheliste seoste "
+"kirjeldused. Igal mudelil on hulk väljasid, mida saab mallide muutujatena "
+"kasutada"
 
 #: templates/admin_doc/index.html:26 templates/admin_doc/view_detail.html:8
 #: templates/admin_doc/view_index.html:9
@@ -216,14 +221,18 @@ msgid ""
 "template is used to generate the page and which objects are available to "
 "that template."
 msgstr ""
+"Avaliku saidi iga leht on genereeritud vaate poolt. Vaade defineerib lehe "
+"genereerimiseks kasutatava malli ning objektid mida mall kasutada saab."
 
 #: templates/admin_doc/index.html:30
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
+"Töövahendid sinu brauserile pääsemaks kiiresti ligi administraatori "
+"funktsioonidele. "
 
 #: templates/admin_doc/missing_docutils.html:10
 msgid "Please install docutils"
-msgstr ""
+msgstr "Palun paigaldage docutils"
 
 #: templates/admin_doc/missing_docutils.html:17
 #, python-format
@@ -231,41 +240,43 @@ msgid ""
 "The admin documentation system requires Python's <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
+"Administreerimise dokumentatsioon vajab Python'i <a href=\"%(link)s"
+"\">docutils</a> teeki."
 
 #: templates/admin_doc/missing_docutils.html:19
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
-msgstr ""
+msgstr "Palu administraatoril paigaldada <a href=\"%(link)s\">docutils</a>."
 
 #: templates/admin_doc/model_detail.html:21
 #, python-format
 msgid "Model: %(name)s"
-msgstr ""
+msgstr "Mudel: %(name)s"
 
 #: templates/admin_doc/model_detail.html:35
 msgid "Field"
-msgstr ""
+msgstr "Väli"
 
 #: templates/admin_doc/model_detail.html:36
 msgid "Type"
-msgstr ""
+msgstr "Tüüp"
 
 #: templates/admin_doc/model_detail.html:37
 msgid "Description"
-msgstr ""
+msgstr "Kirjeldus"
 
 #: templates/admin_doc/model_detail.html:52
 msgid "Back to Models Documentation"
-msgstr ""
+msgstr "Tagasi Mudeli dokumentatsiooni"
 
 #: templates/admin_doc/model_index.html:18
 msgid "Model documentation"
-msgstr ""
+msgstr "Mudeli dokumentatsioon"
 
 #: templates/admin_doc/model_index.html:43
 msgid "Model groups"
-msgstr ""
+msgstr "Mudeligrupid"
 
 #: templates/admin_doc/template_detail.html:8
 msgid "Templates"
@@ -274,38 +285,38 @@ msgstr "Mallid"
 #: templates/admin_doc/template_detail.html:13
 #, python-format
 msgid "Template: %(name)s"
-msgstr ""
+msgstr "Mall: %(name)s"
 
 #: templates/admin_doc/template_detail.html:16
 #, python-format
 msgid "Template: \"%(name)s\""
-msgstr ""
+msgstr "Mall: \"%(name)s\""
 
 #: templates/admin_doc/template_detail.html:20
 #, python-format
 msgid "Search path for template \"%(name)s\" on %(grouper)s:"
-msgstr ""
+msgstr "Otsi failiteest malli \"%(name)s\" jaotusest %(grouper)s:"
 
 #: templates/admin_doc/template_detail.html:23
 msgid "(does not exist)"
-msgstr ""
+msgstr "(pole olemas)"
 
 #: templates/admin_doc/template_detail.html:28
 msgid "Back to Documentation"
-msgstr ""
+msgstr "Tagasi Dokumentatsiooni"
 
 #: templates/admin_doc/template_filter_index.html:12
 msgid "Template filters"
-msgstr ""
+msgstr "Mallifiltrid"
 
 #: templates/admin_doc/template_filter_index.html:16
 msgid "Template filter documentation"
-msgstr ""
+msgstr "Mallifiltrite dokumentatsioon"
 
 #: templates/admin_doc/template_filter_index.html:22
 #: templates/admin_doc/template_filter_index.html:43
 msgid "Built-in filters"
-msgstr ""
+msgstr "Sisseehitatud filtrid"
 
 #: templates/admin_doc/template_filter_index.html:23
 #, python-format
@@ -313,19 +324,21 @@ msgid ""
 "To use these filters, put <code>%(code)s</code> in your template before "
 "using the filter."
 msgstr ""
+"Et kasutada neid filtreid, pane malli sisse <code>%(code)s</code> enne kui "
+"kasutad filtrit."
 
 #: templates/admin_doc/template_tag_index.html:12
 msgid "Template tags"
-msgstr ""
+msgstr "Malli märgendid"
 
 #: templates/admin_doc/template_tag_index.html:16
 msgid "Template tag documentation"
-msgstr ""
+msgstr "Malli märgendite dokumentatsioon"
 
 #: templates/admin_doc/template_tag_index.html:22
 #: templates/admin_doc/template_tag_index.html:43
 msgid "Built-in tags"
-msgstr ""
+msgstr "Sisseehitatud märgendid"
 
 #: templates/admin_doc/template_tag_index.html:23
 #, python-format
@@ -333,41 +346,43 @@ msgid ""
 "To use these tags, put <code>%(code)s</code> in your template before using "
 "the tag."
 msgstr ""
+"Et kasutada neid märgendeid pane malli <code>%(code)s</code> enne kui "
+"kasutad märgendit."
 
 #: templates/admin_doc/view_detail.html:12
 #, python-format
 msgid "View: %(name)s"
-msgstr ""
+msgstr "Vaade: %(name)s"
 
 #: templates/admin_doc/view_detail.html:23
 msgid "Context:"
-msgstr ""
+msgstr "Kontekst:"
 
 #: templates/admin_doc/view_detail.html:28
 msgid "Templates:"
-msgstr ""
+msgstr "Mallid:"
 
 #: templates/admin_doc/view_detail.html:32
 msgid "Back to Views Documentation"
-msgstr ""
+msgstr "Tagasi Vaadete dokumentatsiooni"
 
 #: templates/admin_doc/view_index.html:16
 msgid "View documentation"
-msgstr ""
+msgstr "Vaata dokumentatsiooni"
 
 #: templates/admin_doc/view_index.html:22
 msgid "Jump to site"
-msgstr ""
+msgstr "Mine saidile"
 
 #: templates/admin_doc/view_index.html:35
 #, python-format
 msgid "Views by URL on %(name)s"
-msgstr ""
+msgstr "Vaated URL kaupa %(name)s"
 
 #: templates/admin_doc/view_index.html:40
 #, python-format
 msgid "View function: %(name)s"
-msgstr ""
+msgstr "Vaate funktsioon: %(name)s"
 
 #: tests/test_fields.py:29
 msgid "Boolean (Either True or False)"

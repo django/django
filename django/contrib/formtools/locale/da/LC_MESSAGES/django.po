@@ -2,14 +2,15 @@
 #
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
+# Erik Wognsen <r4mses@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-08-16 15:07+0200\n"
-"PO-Revision-Date: 2013-08-17 09:27+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-11-10 11:08+0000\n"
+"Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/projects/p/django/language/"
 "da/)\n"
 "MIME-Version: 1.0\n"
@@ -32,4 +33,4 @@ msgstr "send"
 
 #: wizard/views.py:275
 msgid "ManagementForm data is missing or has been tampered."
-msgstr ""
+msgstr "ManagementForm-data mangler eller er blevet manipuleret."

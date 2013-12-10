@@ -3,13 +3,14 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # michael <qotsaman@gmail.com>, 2012
+# Alex Bolotov <oleksandr.bolotov@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-10-09 20:17+0200\n"
-"PO-Revision-Date: 2013-10-10 08:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-11-13 12:16+0000\n"
+"Last-Translator: Alex Bolotov <oleksandr.bolotov@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
 "language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -215,7 +216,7 @@ msgstr "дозволи користувача"
 
 #: models.py:301
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Специфічні права доступу для цього користувача."
 
 #: models.py:368
 msgid "username"

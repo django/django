@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# machaku <bmachaku@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-25 14:19+0200\n"
-"PO-Revision-Date: 2013-08-17 08:29+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-11-12 08:35+0000\n"
+"Last-Translator: machaku <bmachaku@gmail.com>\n"
 "Language-Team: Swahili (http://www.transifex.com/projects/p/django/language/"
 "sw/)\n"
 "MIME-Version: 1.0\n"
@@ -77,6 +78,8 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
+"Tafadhali sahihisha %(username)s na nenosiri kwa akaunti ya mfanyakazi. "
+"Kumbuka sehemu zote mbili zinaweza kuwa zinazingatia herufi kubwa na ndogo."
 
 #: forms.py:19
 msgid "Please log in again, because your session has expired."
@@ -179,6 +182,8 @@ msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
 "%(name)s below."
 msgstr ""
+"Ingizo la \"%(obj)s\" %(name)s limefanyika kwa mafanikio. Unaweza tena "
+"kuongeza %(name)s hapo chini."
 
 #: options.py:906
 #, python-format
@@ -191,6 +196,8 @@ msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
 msgstr ""
+"Ingizo la \"%(obj)s\" %(name)s limebadilishwa kwa mafanikio. Unaweza tena "
+"kulihariri hapo chini."
 
 #: options.py:934
 #, python-format
@@ -198,6 +205,8 @@ msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
 "%(name)s below."
 msgstr ""
+"Ingizo la \"%(obj)s\" %(name)s limebadilishwa kwa mafanikio. Unaweza  "
+"kuongeza %(name)s hapo chini."
 
 #: options.py:940
 #, python-format
@@ -269,7 +278,7 @@ msgstr "Badilisha historia: %s"
 #: options.py:1564
 #, python-format
 msgid "%(class_name)s %(instance)s"
-msgstr ""
+msgstr "%(instance)s %(class_name)s"
 
 #: options.py:1571
 #, python-format
@@ -277,6 +286,8 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
+"Kufutwa kwa ingizo la %(instance)s %(class_name)s kutahitaji kufutwa kwa "
+"vitu vifuatavyo vyenye mahusiano vilivyokingwa: %(related_objects)s"
 
 #: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19
@@ -311,11 +322,11 @@ msgstr "Ongeza"
 
 #: widgets.py:302
 msgid "Currently:"
-msgstr ""
+msgstr "Kwa sasa:"
 
 #: widgets.py:303
 msgid "Change:"
-msgstr ""
+msgstr "Badilisha:"
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -359,6 +370,8 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"Kumekuwa na hitilafu. Imeripotiwa kwa watawala kupitia barua pepe na "
+"inatakiwa kurekebishwa mapema."
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
@@ -444,7 +457,7 @@ msgstr "Tafadhali sahihisha makosa yafuatayo "
 #: templates/admin/auth/user/change_password.html:27
 #: templates/registration/password_change_form.html:20
 msgid "Please correct the errors below."
-msgstr ""
+msgstr "Tafadhali sahihisha makosa yafuatayo."
 
 #: templates/admin/change_list.html:58
 #, python-format
@@ -548,7 +561,7 @@ msgstr " Kwa %(filter_title)s"
 #: templates/admin/index.html:20
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr ""
+msgstr "Models katika application %(name)s"
 
 #: templates/admin/index.html:39
 msgid "Change"
@@ -803,12 +816,16 @@ msgid ""
 "We've emailed you instructions for setting your password. You should be "
 "receiving them shortly."
 msgstr ""
+"Tumekutumia maelekezo ya kuseti nenosiri lako. Unapaswa kuyapata ndani ya "
+"muda mfupi."
 
 #: templates/registration/password_reset_done.html:19
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+"Ikiwa hujapata barua pepe, tafadhali hakikisha umeingiza anuani ya barua "
+"pepe uliyoitumia kujisajili na angalia katika folda la spam"
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
@@ -816,6 +833,8 @@ msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"Umepata barua pepe hii kwa sababu ulihitaji ku seti upya nenosiri la akaunti "
+"yako ya %(site_name)s."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -839,10 +858,12 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
+"Umesahau nenosiri? Ingiza anuani ya barua pepe hapo chini, nasi tutakutumia "
+"maelekezo ya kuseti nenosiri jipya. "
 
 #: templates/registration/password_reset_form.html:21
 msgid "Email address:"
-msgstr ""
+msgstr "Anuani ya barua pepe:"
 
 #: templates/registration/password_reset_form.html:21
 msgid "Reset my password"

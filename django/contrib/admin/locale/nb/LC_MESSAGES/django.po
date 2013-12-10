@@ -2,6 +2,7 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# jensadne <jensadne@pvv.ntnu.no>, 2013
 # jonklo <jonklo@gmail.com>, 2013
 # jonklo <jonklo@gmail.com>, 2011,2013
 # Sigurd Gartmann <sigurdga-transifex@sigurdga.no>, 2012
@@ -11,8 +12,8 @@ msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-25 14:19+0200\n"
-"PO-Revision-Date: 2013-09-02 16:42+0000\n"
-"Last-Translator: jonklo <jonklo@gmail.com>\n"
+"PO-Revision-Date: 2013-11-06 12:00+0000\n"
+"Last-Translator: jensadne <jensadne@pvv.ntnu.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/projects/p/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -285,7 +286,8 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
-""
+"Sletting av %(class_name)s «%(instance)s» krever sletting av følgende "
+"beskyttede relaterte objekter: %(related_objects)s"
 
 #: sites.py:318 tests.py:71 templates/admin/login.html:48
 #: templates/registration/password_reset_complete.html:19

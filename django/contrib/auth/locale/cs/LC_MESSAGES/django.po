@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Mokys <jan.munclinger@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Vlada Macek <macek@sandbox.cz>, 2013
 msgid ""
@@ -8,7 +9,7 @@ msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-10-09 20:17+0200\n"
-"PO-Revision-Date: 2013-10-26 22:50+0000\n"
+"PO-Revision-Date: 2013-11-09 15:20+0000\n"
 "Last-Translator: Vlada Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/projects/p/django/language/"
 "cs/)\n"
@@ -285,4 +286,4 @@ msgstr "Obnovení hesla na webu %(site_name)s"
 
 #: tests/test_forms.py:325
 msgid "Enter a valid email address."
-msgstr "Zadejte platné uživatelské jméno."
+msgstr "Zadejte platnou e-mailovou adresu."

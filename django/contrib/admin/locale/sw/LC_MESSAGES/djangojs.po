@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# machaku <bmachaku@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-02 16:18+0200\n"
-"PO-Revision-Date: 2013-04-29 08:25+0000\n"
-"Last-Translator: claudep <claude@2xlibre.net>\n"
+"PO-Revision-Date: 2013-11-12 06:43+0000\n"
+"Last-Translator: machaku <bmachaku@gmail.com>\n"
 "Language-Team: Swahili (http://www.transifex.com/projects/p/django/language/"
 "sw/)\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +20,7 @@ msgstr ""
 #: static/admin/js/SelectFilter2.js:45
 #, c-format
 msgid "Available %s"
-msgstr "vilivyomo: %s"
+msgstr "Yaliyomo: %s"
 
 #: static/admin/js/SelectFilter2.js:46
 #, c-format
@@ -27,6 +28,9 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"Hii ni orodha ya %s uliyochagua. Unaweza kuchagua baadhi vitu kwa kuvichagua "
+"katika kisanduku hapo chini kisha kubofya mshale wa \"Chagua\" kati ya "
+"visanduku viwili."
 
 #: static/admin/js/SelectFilter2.js:53
 #, c-format
@@ -39,12 +43,12 @@ msgstr "Chuja"
 
 #: static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
-msgstr "Chagua kila kitu"
+msgstr "Chagua vyote"
 
 #: static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr "Bofya kuchagua kila %s kwa pamoja."
+msgstr "Bofya kuchagua %s kwa pamoja."
 
 #: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
@@ -71,7 +75,7 @@ msgstr ""
 
 #: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
-msgstr "Ondoa yote"
+msgstr "Ondoa vyote"
 
 #: static/admin/js/SelectFilter2.js:80
 #, c-format
