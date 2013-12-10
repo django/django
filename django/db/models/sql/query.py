@@ -952,9 +952,11 @@ class Query(object):
         if chain is None:
             return alias
         curr_opts = opts
+
+        if chain[-1] in seen:
+            return seen[chain[-1]]
+
         for int_model in chain:
-            if int_model in seen:
-                return seen[int_model]
             # Proxy model have elements in base chain
             # with no parents, assign the new options
             # object and skip to the next base in that
