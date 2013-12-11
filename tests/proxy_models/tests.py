@@ -160,7 +160,6 @@ class ProxyModelTests(TestCase):
             # need to be removed in order to prevent bad interactions
             # with the flush operation in other tests.
             old_app_models = copy.deepcopy(cache.app_models)
-            old_app_store = copy.deepcopy(cache.app_store)
 
             class SwappableModel(models.Model):
 
@@ -178,7 +177,6 @@ class ProxyModelTests(TestCase):
                         proxy = True
         finally:
             cache.app_models = old_app_models
-            cache.app_store = old_app_store
 
     def test_myperson_manager(self):
         Person.objects.create(name="fred")

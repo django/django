@@ -115,7 +115,6 @@ class ManagersRegressionTests(TestCase):
             # need to be removed in order to prevent bad interactions
             # with the flush operation in other tests.
             old_app_models = copy.deepcopy(cache.app_models)
-            old_app_store = copy.deepcopy(cache.app_store)
 
             class SwappableModel(models.Model):
                 class Meta:
@@ -131,7 +130,6 @@ class ManagersRegressionTests(TestCase):
 
         finally:
             cache.app_models = old_app_models
-            cache.app_store = old_app_store
 
     @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
     def test_custom_swappable_manager(self):
@@ -140,7 +138,6 @@ class ManagersRegressionTests(TestCase):
             # need to be removed in order to prevent bad interactions
             # with the flush operation in other tests.
             old_app_models = copy.deepcopy(cache.app_models)
-            old_app_store = copy.deepcopy(cache.app_store)
 
             class SwappableModel(models.Model):
 
@@ -160,7 +157,6 @@ class ManagersRegressionTests(TestCase):
 
         finally:
             cache.app_models = old_app_models
-            cache.app_store = old_app_store
 
     @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
     def test_explicit_swappable_manager(self):
@@ -169,7 +165,6 @@ class ManagersRegressionTests(TestCase):
             # need to be removed in order to prevent bad interactions
             # with the flush operation in other tests.
             old_app_models = copy.deepcopy(cache.app_models)
-            old_app_store = copy.deepcopy(cache.app_store)
 
             class SwappableModel(models.Model):
 
@@ -189,7 +184,6 @@ class ManagersRegressionTests(TestCase):
 
         finally:
             cache.app_models = old_app_models
-            cache.app_store = old_app_store
 
     def test_regress_3871(self):
         related = RelatedModel.objects.create()

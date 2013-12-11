@@ -20,12 +20,10 @@ class EggLoadingTest(TestCase):
         # need to be removed in order to prevent bad interactions
         # with the flush operation in other tests.
         self.old_app_models = copy.deepcopy(cache.app_models)
-        self.old_app_store = copy.deepcopy(cache.app_store)
 
     def tearDown(self):
         sys.path = self.old_path
         cache.app_models = self.old_app_models
-        cache.app_store = self.old_app_store
 
     def test_egg1(self):
         """Models module can be loaded from an app in an egg"""

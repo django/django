@@ -133,11 +133,9 @@ class MakeMigrationsTests(MigrationTestBase):
         self.migration_dir = os.path.join(self.test_dir, 'migrations_%d' % self.creation_counter)
         self.migration_pkg = "migrations.migrations_%d" % self.creation_counter
         self._old_app_models = copy.deepcopy(cache.app_models)
-        self._old_app_store = copy.deepcopy(cache.app_store)
 
     def tearDown(self):
         cache.app_models = self._old_app_models
-        cache.app_store = self._old_app_store
         cache._get_models_cache = {}
 
         os.chdir(self.test_dir)
