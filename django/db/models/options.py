@@ -5,7 +5,7 @@ import re
 from bisect import bisect
 import warnings
 
-from django.apps.cache import app_cache_ready, cache
+from django.apps import app_cache
 from django.conf import settings
 from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
@@ -89,7 +89,7 @@ class Options(object):
         self.related_fkey_lookups = []
 
         # A custom AppCache to use, if you're making a separate model set.
-        self.app_cache = cache
+        self.app_cache = app_cache
 
     def contribute_to_class(self, cls, name):
         from django.db import connection
@@ -432,7 +432,7 @@ class Options(object):
             if hasattr(f, 'related'):
                 cache[f.name] = cache[f.attname] = (
                     f.related, None if f.model == self.model else f.model, True, False)
-        if app_cache_ready():
+        if app_cache.app_cache_ready():
             self._name_map = cache
         return cache
 
@@ -558,7 +558,7 @@ class Options(object):
                             and not isinstance(f.rel.to, six.string_types)
                             and self == f.rel.to._meta):
                         cache[f.related] = None
-        if app_cache_ready():
+        if app_cache.app_cache_ready():
             self._related_many_to_many_cache = cache
         return cache
 

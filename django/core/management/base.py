@@ -342,11 +342,11 @@ class AppCommand(BaseCommand):
     args = '<appname appname ...>'
 
     def handle(self, *app_labels, **options):
-        from django.db import models
+        from django.apps import app_cache
         if not app_labels:
             raise CommandError('Enter at least one appname.')
         try:
-            app_list = [models.get_app(app_label) for app_label in app_labels]
+            app_list = [app_cache.get_app(app_label) for app_label in app_labels]
         except (ImproperlyConfigured, ImportError) as e:
             raise CommandError("%s. Are you sure your INSTALLED_APPS setting is correct?" % e)
         output = []

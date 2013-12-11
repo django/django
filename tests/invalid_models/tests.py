@@ -2,7 +2,7 @@ import copy
 import sys
 import unittest
 
-from django.apps.cache import cache, load_app
+from django.apps import app_cache
 from django.core.management.validation import get_validation_errors
 from django.test.utils import override_settings
 from django.utils.six import StringIO
@@ -22,11 +22,11 @@ class InvalidModelTestCase(unittest.TestCase):
         # This test adds dummy applications to the app cache. These
         # need to be removed in order to prevent bad interactions
         # with the flush operation in other tests.
-        self.old_app_models = copy.deepcopy(cache.app_models)
+        self.old_app_models = copy.deepcopy(app_cache.app_models)
 
     def tearDown(self):
-        cache.app_models = self.old_app_models
-        cache._get_models_cache = {}
+        app_cache.app_models = self.old_app_models
+        app_cache._get_models_cache = {}
         sys.stdout = self.old_stdout
 
     # Technically, this isn't an override -- TEST_SWAPPED_MODEL must be
@@ -40,7 +40,7 @@ class InvalidModelTestCase(unittest.TestCase):
     )
     def test_invalid_models(self):
         try:
-            module = load_app("invalid_models.invalid_models")
+            module = app_cache.load_app("invalid_models.invalid_models")
         except Exception:
             self.fail('Unable to load invalid model module')
 

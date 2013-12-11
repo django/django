@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
+
 import datetime
-import types
-import os
 from importlib import import_module
-from django.apps.cache import cache
+import os
+import types
+
+from django.apps import app_cache
 from django.db import models
 from django.db.migrations.loader import MigrationLoader
 from django.utils.encoding import force_text
@@ -67,9 +69,9 @@ class MigrationWriter(object):
             migrations_module = import_module(migrations_package_name)
             basedir = os.path.dirname(migrations_module.__file__)
         except ImportError:
-            app = cache.get_app(self.migration.app_label)
-            app_path = cache._get_app_path(app)
-            app_package_name = cache._get_app_package(app)
+            app = app_cache.get_app(self.migration.app_label)
+            app_path = app_cache._get_app_path(app)
+            app_package_name = app_cache._get_app_package(app)
             migrations_package_basename = migrations_package_name.split(".")[-1]
 
             # Alright, see if it's a direct submodule of the app

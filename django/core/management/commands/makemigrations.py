@@ -3,7 +3,7 @@ import os
 import operator
 from optparse import make_option
 
-from django.apps.cache import cache
+from django.apps import app_cache
 from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connections, DEFAULT_DB_ALIAS, migrations
@@ -38,7 +38,7 @@ class Command(BaseCommand):
         bad_app_labels = set()
         for app_label in app_labels:
             try:
-                cache.get_app(app_label)
+                app_cache.get_app(app_label)
             except ImproperlyConfigured:
                 bad_app_labels.add(app_label)
         if bad_app_labels:
@@ -73,7 +73,7 @@ class Command(BaseCommand):
         # Detect changes
         autodetector = MigrationAutodetector(
             loader.graph.project_state(),
-            ProjectState.from_app_cache(cache),
+            ProjectState.from_app_cache(app_cache),
             InteractiveMigrationQuestioner(specified_apps=app_labels),
         )
         changes = autodetector.changes(graph=loader.graph, trim_to_apps=app_labels or None)

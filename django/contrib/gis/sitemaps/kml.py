@@ -1,3 +1,4 @@
+from django.apps import app_cache
 from django.core import urlresolvers
 from django.contrib.sitemaps import Sitemap
 from django.contrib.gis.db.models.fields import GeometryField
@@ -25,7 +26,7 @@ class KMLSitemap(Sitemap):
         """
         kml_sources = []
         if sources is None:
-            sources = models.get_models()
+            sources = app_cache.get_models()
         for source in sources:
             if isinstance(source, models.base.ModelBase):
                 for field in source._meta.fields:

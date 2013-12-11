@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 import datetime
 import os
 
-from django.apps.cache import cache
+from django.apps import app_cache
 from django.core.validators import RegexValidator, EmailValidator
 from django.db import models, migrations
 from django.db.migrations.writer import MigrationWriter
@@ -124,7 +124,7 @@ class WriterTests(TestCase):
 
         with override_settings(INSTALLED_APPS=test_apps):
             for app in test_apps:
-                cache.load_app(app)
+                app_cache.load_app(app)
                 migration = migrations.Migration('0001_initial', app.split('.')[-1])
                 expected_path = os.path.join(base_dir, *(app.split('.') + ['migrations', '0001_initial.py']))
                 writer = MigrationWriter(migration)

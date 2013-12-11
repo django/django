@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import os
 import sys
 
-from django.apps.cache import cache, load_app
+from django.apps import app_cache
 from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase, TransactionTestCase
@@ -28,21 +28,21 @@ class ProxyModelInheritanceTests(TransactionTestCase):
         self.old_sys_path = sys.path[:]
         sys.path.append(os.path.dirname(os.path.abspath(upath(__file__))))
         for app in settings.INSTALLED_APPS:
-            load_app(app)
+            app_cache.load_app(app)
 
     def tearDown(self):
         sys.path = self.old_sys_path
-        del cache.app_labels['app1']
-        del cache.app_labels['app2']
-        del cache.app_models['app1']
-        del cache.app_models['app2']
+        del app_cache.app_labels['app1']
+        del app_cache.app_labels['app2']
+        del app_cache.app_models['app1']
+        del app_cache.app_models['app2']
 
     def test_table_exists(self):
         try:
-            cache.set_available_apps(settings.INSTALLED_APPS)
+            app_cache.set_available_apps(settings.INSTALLED_APPS)
             call_command('migrate', verbosity=0)
         finally:
-            cache.unset_available_apps()
+            app_cache.unset_available_apps()
         from .app1.models import ProxyModel
         from .app2.models import NiceModel
         self.assertEqual(NiceModel.objects.all().count(), 0)

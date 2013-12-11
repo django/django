@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
-from django.apps.cache import cache
+from django.apps import app_cache
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.backends.db import SessionStore
 from django.db.models import Count
@@ -103,7 +103,7 @@ class DeferRegressionTest(TestCase):
         klasses = set(
             map(
                 attrgetter("__name__"),
-                cache.get_models(cache.get_app("defer_regress"))
+                app_cache.get_models(app_cache.get_app("defer_regress"))
             )
         )
         self.assertIn("Child", klasses)
@@ -111,13 +111,13 @@ class DeferRegressionTest(TestCase):
         self.assertNotIn("Child_Deferred_value", klasses)
         self.assertNotIn("Item_Deferred_name", klasses)
         self.assertFalse(any(
-            k._deferred for k in cache.get_models(cache.get_app("defer_regress"))))
+            k._deferred for k in app_cache.get_models(app_cache.get_app("defer_regress"))))
 
         klasses_with_deferred = set(
             map(
                 attrgetter("__name__"),
-                cache.get_models(
-                    cache.get_app("defer_regress"), include_deferred=True
+                app_cache.get_models(
+                    app_cache.get_app("defer_regress"), include_deferred=True
                 ),
             )
         )
@@ -126,8 +126,8 @@ class DeferRegressionTest(TestCase):
         self.assertIn("Child_Deferred_value", klasses_with_deferred)
         self.assertIn("Item_Deferred_name", klasses_with_deferred)
         self.assertTrue(any(
-            k._deferred for k in cache.get_models(
-                cache.get_app("defer_regress"), include_deferred=True))
+            k._deferred for k in app_cache.get_models(
+                app_cache.get_app("defer_regress"), include_deferred=True))
         )
 
     @override_settings(SESSION_SERIALIZER='django.contrib.sessions.serializers.PickleSerializer')

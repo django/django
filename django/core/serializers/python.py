@@ -5,6 +5,7 @@ other serializers.
 """
 from __future__ import unicode_literals
 
+from django.apps import app_cache
 from django.conf import settings
 from django.core.serializers import base
 from django.db import models, DEFAULT_DB_ALIAS
@@ -87,7 +88,7 @@ def Deserializer(object_list, **options):
     db = options.pop('using', DEFAULT_DB_ALIAS)
     ignore = options.pop('ignorenonexistent', False)
 
-    models.get_apps()
+    app_cache.get_apps()
     for d in object_list:
         # Look up the model and starting build a dict of data for it.
         Model = _get_model(d["model"])
@@ -153,7 +154,7 @@ def _get_model(model_identifier):
     Helper to look up a model from an "app_label.model_name" string.
     """
     try:
-        Model = models.get_model(*model_identifier.split("."))
+        Model = app_cache.get_model(*model_identifier.split("."))
     except TypeError:
         Model = None
     if Model is None:

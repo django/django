@@ -5,7 +5,8 @@ import sys
 from functools import update_wrapper
 from django.utils.six.moves import zip
 
-from django.apps.cache import get_model, MODELS_MODULE_NAME
+from django.apps import app_cache
+from django.apps.cache import MODELS_MODULE_NAME
 import django.db.models.manager  # NOQA: Imported to register signal handler.
 from django.conf import settings
 from django.core.exceptions import (ObjectDoesNotExist,
@@ -1066,7 +1067,7 @@ def model_unpickle(model_id, attrs, factory):
     Used to unpickle Model subclasses with deferred fields.
     """
     if isinstance(model_id, tuple):
-        model = get_model(*model_id)
+        model = app_cache.get_model(*model_id)
     else:
         # Backwards compat - the model was cached directly in earlier versions.
         model = model_id

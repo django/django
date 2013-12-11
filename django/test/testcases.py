@@ -15,7 +15,7 @@ import unittest
 from unittest import skipIf         # NOQA: Imported here for backward compatibility
 from unittest.util import safe_repr
 
-from django.apps.cache import cache
+from django.apps import app_cache
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ValidationError, ImproperlyConfigured
@@ -725,14 +725,14 @@ class TransactionTestCase(SimpleTestCase):
         """
         super(TransactionTestCase, self)._pre_setup()
         if self.available_apps is not None:
-            cache.set_available_apps(self.available_apps)
+            app_cache.set_available_apps(self.available_apps)
             for db_name in self._databases_names(include_mirrors=False):
                 flush.Command.emit_post_migrate(verbosity=0, interactive=False, database=db_name)
         try:
             self._fixture_setup()
         except Exception:
             if self.available_apps is not None:
-                cache.unset_available_apps()
+                app_cache.unset_available_apps()
             raise
 
     def _databases_names(self, include_mirrors=True):
@@ -786,7 +786,7 @@ class TransactionTestCase(SimpleTestCase):
             for conn in connections.all():
                 conn.close()
         finally:
-            cache.unset_available_apps()
+            app_cache.unset_available_apps()
 
     def _fixture_teardown(self):
         # Allow TRUNCATE ... CASCADE and don't emit the post_migrate signal

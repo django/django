@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 import copy
 
-from django.apps.cache import cache
+from django.apps import app_cache
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
@@ -159,7 +159,7 @@ class ProxyModelTests(TestCase):
             # This test adds dummy applications to the app cache. These
             # need to be removed in order to prevent bad interactions
             # with the flush operation in other tests.
-            old_app_models = copy.deepcopy(cache.app_models)
+            old_app_models = copy.deepcopy(app_cache.app_models)
 
             class SwappableModel(models.Model):
 
@@ -176,7 +176,7 @@ class ProxyModelTests(TestCase):
                     class Meta:
                         proxy = True
         finally:
-            cache.app_models = old_app_models
+            app_cache.app_models = old_app_models
 
     def test_myperson_manager(self):
         Person.objects.create(name="fred")
