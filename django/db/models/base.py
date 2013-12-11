@@ -5,6 +5,7 @@ import sys
 from functools import update_wrapper
 from django.utils.six.moves import zip
 
+from django.apps.cache import get_model, MODELS_MODULE_NAME
 import django.db.models.manager  # NOQA: Imported to register signal handler.
 from django.conf import settings
 from django.core.exceptions import (ObjectDoesNotExist,
@@ -19,7 +20,6 @@ from django.db.models.query_utils import DeferredAttribute, deferred_class_facto
 from django.db.models.deletion import Collector
 from django.db.models.options import Options
 from django.db.models import signals
-from django.db.models.loading import get_model, MODELS_MODULE_NAME
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
 from django.utils.encoding import force_str, force_text

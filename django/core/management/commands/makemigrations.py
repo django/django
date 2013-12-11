@@ -3,6 +3,7 @@ import os
 import operator
 from optparse import make_option
 
+from django.apps.cache import cache
 from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connections, DEFAULT_DB_ALIAS, migrations
@@ -11,7 +12,6 @@ from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.questioner import MigrationQuestioner, InteractiveMigrationQuestioner
 from django.db.migrations.state import ProjectState
 from django.db.migrations.writer import MigrationWriter
-from django.db.models.loading import cache
 from django.utils.six.moves import reduce
 
 

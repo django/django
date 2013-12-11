@@ -5,7 +5,7 @@ import os
 import sys
 from unittest import TestCase
 
-from django.db.models.loading import cache, load_app, get_model, get_models, AppCache
+from django.apps.cache import cache, load_app, get_model, get_models, AppCache
 from django.test.utils import override_settings
 from django.utils._os import upath
 

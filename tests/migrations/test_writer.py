@@ -6,10 +6,10 @@ import copy
 import datetime
 import os
 
+from django.apps.cache import cache
 from django.core.validators import RegexValidator, EmailValidator
 from django.db import models, migrations
 from django.db.migrations.writer import MigrationWriter
-from django.db.models.loading import cache
 from django.test import TestCase, override_settings
 from django.utils import six
 from django.utils.deconstruct import deconstructible

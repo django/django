@@ -1,6 +1,6 @@
+from django.apps.cache import BaseAppCache
 from django.db.backends.schema import BaseDatabaseSchemaEditor
 from django.db.models.fields.related import ManyToManyField
-from django.db.models.loading import BaseAppCache
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):

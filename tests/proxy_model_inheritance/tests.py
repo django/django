@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 import os
 import sys
 
+from django.apps.cache import cache, load_app
 from django.conf import settings
 from django.core.management import call_command
-from django.db.models.loading import cache, load_app
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
 from django.utils._os import upath

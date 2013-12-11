@@ -1,5 +1,5 @@
+from django.apps.cache import BaseAppCache
 from django.db import models
-from django.db.models.loading import BaseAppCache
 
 # We're testing app cache presence on load, so this is handy.
 

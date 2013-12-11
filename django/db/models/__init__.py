@@ -1,9 +1,9 @@
 from functools import wraps
 
-from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured  # NOQA
-from django.db.models.loading import (  # NOQA
+from django.apps.cache import (  # NOQA
     get_apps, get_app_path, get_app_paths, get_app, get_models, get_model,
     register_models, UnavailableApp)
+from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured  # NOQA
 from django.db.models.query import Q, QuerySet, Prefetch  # NOQA
 from django.db.models.expressions import F  # NOQA
 from django.db.models.manager import Manager  # NOQA

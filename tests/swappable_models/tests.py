@@ -2,10 +2,10 @@ from __future__ import unicode_literals
 
 from django.utils.six import StringIO
 
+from django.apps.cache import cache
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
-from django.db.models.loading import cache
 from django.test import TestCase
 from django.test.utils import override_settings
 

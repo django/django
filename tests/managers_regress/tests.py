@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 import copy
 
+from django.apps.cache import cache
 from django.db import models
-from django.db.models.loading import cache
 from django.template import Context, Template
 from django.test import TestCase
 from django.test.utils import override_settings

@@ -6,8 +6,8 @@ import copy
 import os
 import shutil
 
+from django.apps.cache import cache
 from django.core.management import call_command, CommandError
-from django.db.models.loading import cache
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils._os import upath

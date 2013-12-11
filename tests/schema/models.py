@@ -1,5 +1,5 @@
+from django.apps.cache import BaseAppCache
 from django.db import models
-from django.db.models.loading import BaseAppCache
 
 # Because we want to test creation and deletion of these as separate things,
 # these models are all inserted into a separate AppCache so the main test

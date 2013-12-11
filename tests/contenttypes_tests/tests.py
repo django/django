@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
+from django.apps.cache import BaseAppCache
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.db.models.loading import BaseAppCache
 from django.test import TestCase
 
 from .models import Author, Article

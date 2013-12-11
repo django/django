@@ -1,7 +1,7 @@
 import os
 import sys
 from importlib import import_module
-from django.db.models.loading import cache
+from django.apps.cache import cache
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.graph import MigrationGraph
 from django.utils import six

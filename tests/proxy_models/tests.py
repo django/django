@@ -1,13 +1,13 @@
 from __future__ import unicode_literals
 import copy
 
+from django.apps.cache import cache
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
 from django.core.exceptions import FieldError
 from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models import signals
-from django.db.models.loading import cache
 from django.test import TestCase
 from django.test.utils import override_settings
 

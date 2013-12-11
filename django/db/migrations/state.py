@@ -1,5 +1,5 @@
+from django.apps.cache import BaseAppCache
 from django.db import models
-from django.db.models.loading import BaseAppCache
 from django.db.models.options import DEFAULT_NAMES, normalize_unique_together
 from django.utils import six
 from django.utils.module_loading import import_by_path
