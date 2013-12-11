@@ -24,9 +24,9 @@ introduce controlled coupling for convenience's sake.
    :func:`render_to_response()` with a ``context_instance`` argument that
    forces the use of a :class:`~django.template.RequestContext`.
 
-   If you wish to use a :class:`~django.template.response.TemplateResponse`
-   instead of an :class:`~django.http.HttpResponse` you can't use a shortcut
-   function. However, the constructor of
+   Django does not provide a shortcut function which returns a
+   :class:`~django.template.response.TemplateResponse` instead of an
+   :class:`~django.http.HttpResponse`. However, the constructor of
    :class:`~django.template.response.TemplateResponse` offers the same level
    of convenience as :func:`render()`.
 
