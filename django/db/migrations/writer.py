@@ -3,12 +3,12 @@ import datetime
 import types
 import os
 from importlib import import_module
-from django.utils import six
+from django.apps.cache import cache
 from django.db import models
-from django.db.models.loading import cache
 from django.db.migrations.loader import MigrationLoader
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
+from django.utils import six
 
 
 class MigrationWriter(object):

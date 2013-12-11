@@ -80,14 +80,14 @@ def get_test_modules():
 
 
 def get_installed():
-    from django.db.models.loading import get_apps
+    from django.apps.cache import get_apps
     return [app.__name__.rsplit('.', 1)[0] for app in get_apps()]
 
 
 def setup(verbosity, test_labels):
     import django
+    from django.apps.cache import get_apps, load_app
     from django.conf import settings
-    from django.db.models.loading import get_apps, load_app
     from django.test import TransactionTestCase, TestCase
 
     print("Testing against Django installed in '%s'" % os.path.dirname(django.__file__))

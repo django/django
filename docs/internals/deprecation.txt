@@ -222,6 +222,9 @@ these changes.
 * ``django.core.cache.get_cache`` will be removed. Add suitable entries
   to :setting:`CACHES` and use :data:`django.core.cache.caches` instead.
 
+* ``django.db.models.loading`` will be removed. Use the new application
+  loading APIs instead.
+
 2.0
 ---
 

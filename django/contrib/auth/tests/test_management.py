@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from datetime import date
 
+from django.apps.cache import get_app
 from django.contrib.auth import models, management
 from django.contrib.auth.management import create_permissions
 from django.contrib.auth.management.commands import changepassword
@@ -12,7 +13,6 @@ from django.core import exceptions
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.core.management.validation import get_validation_errors
-from django.db.models.loading import get_app
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import six

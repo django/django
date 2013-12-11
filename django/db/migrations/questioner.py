@@ -2,7 +2,7 @@ import importlib
 import os
 import sys
 
-from django.db.models.loading import cache
+from django.apps.cache import cache
 from django.utils import datetime_safe
 from django.utils.six.moves import input
 from django.core.exceptions import ImproperlyConfigured

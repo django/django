@@ -6,6 +6,7 @@ from importlib import import_module
 import itertools
 import traceback
 
+from django.apps.cache import cache
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
@@ -16,7 +17,6 @@ from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import MigrationLoader, AmbiguityError
 from django.db.migrations.state import ProjectState
 from django.db.migrations.autodetector import MigrationAutodetector
-from django.db.models.loading import cache
 from django.utils.module_loading import module_has_submodule
 
 

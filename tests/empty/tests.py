@@ -1,5 +1,5 @@
+from django.apps.cache import get_app
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models.loading import get_app
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import six

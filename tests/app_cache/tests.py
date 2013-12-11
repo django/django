@@ -1,7 +1,9 @@
 from __future__ import absolute_import
-from django.test import TestCase
-from django.db.models.loading import cache, BaseAppCache
+
+from django.apps.cache import cache, BaseAppCache
 from django.db import models
+from django.test import TestCase
+
 from .models import TotallyNormal, SoAlternative, new_app_cache
 
 
