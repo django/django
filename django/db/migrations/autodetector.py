@@ -153,86 +153,97 @@ class MigrationAutodetector(object):
             )
         # Changes within models
         kept_models = set(old_model_keys).intersection(new_model_keys)
+        old_fields = set()
+        new_fields = set()
         for app_label, model_name in kept_models:
             old_model_state = self.from_state.models[app_label, model_name]
             new_model_state = self.to_state.models[app_label, model_name]
-            # New fields
-            old_field_names = set(x for x, y in old_model_state.fields)
-            new_field_names = set(x for x, y in new_model_state.fields)
-            for field_name in new_field_names - old_field_names:
-                field = new_model_state.get_field_by_name(field_name)
-                # Scan to see if this is actually a rename!
-                field_dec = field.deconstruct()[1:]
-                found_rename = False
-                for removed_field_name in (old_field_names - new_field_names):
-                    if old_model_state.get_field_by_name(removed_field_name).deconstruct()[1:] == field_dec:
-                        if self.questioner.ask_rename(model_name, removed_field_name, field_name, field):
-                            self.add_to_migration(
-                                app_label,
-                                operations.RenameField(
-                                    model_name=model_name,
-                                    old_name=removed_field_name,
-                                    new_name=field_name,
-                                )
-                            )
-                            old_field_names.remove(removed_field_name)
-                            new_field_names.remove(field_name)
-                            found_rename = True
-                            break
-                if found_rename:
-                    continue
-                # You can't just add NOT NULL fields with no default
-                if not field.null and not field.has_default():
-                    field = field.clone()
-                    field.default = self.questioner.ask_not_null_addition(field_name, model_name)
-                    self.add_to_migration(
-                        app_label,
-                        operations.AddField(
-                            model_name=model_name,
-                            name=field_name,
-                            field=field,
-                            preserve_default=False,
-                        )
-                    )
-                else:
-                    self.add_to_migration(
-                        app_label,
-                        operations.AddField(
-                            model_name=model_name,
-                            name=field_name,
-                            field=field,
-                        )
-                    )
-            # Old fields
-            for field_name in old_field_names - new_field_names:
-                self.add_to_migration(
-                    app_label,
-                    operations.RemoveField(
-                        model_name=model_name,
-                        name=field_name,
-                    )
-                )
-            # The same fields
-            for field_name in old_field_names.intersection(new_field_names):
-                # Did the field change?
-                old_field_dec = old_model_state.get_field_by_name(field_name).deconstruct()
-                new_field_dec = new_model_state.get_field_by_name(field_name).deconstruct()
-                if old_field_dec != new_field_dec:
-                    self.add_to_migration(
-                        app_label,
-                        operations.AlterField(
-                            model_name=model_name,
-                            name=field_name,
-                            field=new_model_state.get_field_by_name(field_name),
-                        )
-                    )
-            # unique_together changes
+            # Collect field changes for later global dealing with (so AddFields
+            # always come before AlterFields even on separate models)
+            old_fields.update((app_label, model_name, x) for x, y in old_model_state.fields)
+            new_fields.update((app_label, model_name, x) for x, y in new_model_state.fields)
+            # Unique_together changes
             if old_model_state.options.get("unique_together", set()) != new_model_state.options.get("unique_together", set()):
                 self.add_to_migration(
                     app_label,
                     operations.AlterUniqueTogether(
                         name=model_name,
                         unique_together=new_model_state.options.get("unique_together", set()),
+                    )
+                )
+        # New fields
+        for app_label, model_name, field_name in new_fields - old_fields:
+            old_model_state = self.from_state.models[app_label, model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+            field = new_model_state.get_field_by_name(field_name)
+            # Scan to see if this is actually a rename!
+            field_dec = field.deconstruct()[1:]
+            found_rename = False
+            for rem_app_label, rem_model_name, rem_field_name in (old_fields - new_fields):
+                if rem_app_label == app_label and rem_model_name == model_name:
+                    if old_model_state.get_field_by_name(rem_field_name).deconstruct()[1:] == field_dec:
+                        if self.questioner.ask_rename(model_name, rem_field_name, field_name, field):
+                            self.add_to_migration(
+                                app_label,
+                                operations.RenameField(
+                                    model_name=model_name,
+                                    old_name=rem_field_name,
+                                    new_name=field_name,
+                                )
+                            )
+                            old_fields.remove((rem_app_label, rem_model_name, rem_field_name))
+                            new_fields.remove((app_label, model_name, field_name))
+                            found_rename = True
+                            break
+            if found_rename:
+                continue
+            # You can't just add NOT NULL fields with no default
+            if not field.null and not field.has_default():
+                field = field.clone()
+                field.default = self.questioner.ask_not_null_addition(field_name, model_name)
+                self.add_to_migration(
+                    app_label,
+                    operations.AddField(
+                        model_name=model_name,
+                        name=field_name,
+                        field=field,
+                        preserve_default=False,
+                    )
+                )
+            else:
+                self.add_to_migration(
+                    app_label,
+                    operations.AddField(
+                        model_name=model_name,
+                        name=field_name,
+                        field=field,
+                    )
+                )
+        # Old fields
+        for app_label, model_name, field_name in old_fields - new_fields:
+            old_model_state = self.from_state.models[app_label, model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+            self.add_to_migration(
+                app_label,
+                operations.RemoveField(
+                    model_name=model_name,
+                    name=field_name,
+                )
+            )
+        # The same fields
+        for app_label, model_name, field_name in old_fields.intersection(new_fields):
+            # Did the field change?
+            old_model_state = self.from_state.models[app_label, model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+            old_field_dec = old_model_state.get_field_by_name(field_name).deconstruct()
+            new_field_dec = new_model_state.get_field_by_name(field_name).deconstruct()
+            if old_field_dec != new_field_dec:
+                self.add_to_migration(
+                    app_label,
+                    operations.AlterField(
+                        model_name=model_name,
+                        name=field_name,
+                        field=new_model_state.get_field_by_name(field_name),
                     )
                 )
         # Alright, now add internal dependencies

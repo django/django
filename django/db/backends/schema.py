@@ -615,6 +615,11 @@ class BaseDatabaseSchemaEditor(object):
                     "extra": "",
                 }
             )
+        # Type alteration on primary key? Then we need to alter the column
+        # referring to us.
+        rels_to_update = []
+        if old_field.primary_key and new_field.primary_key and old_type != new_type:
+            rels_to_update.extend(model._meta.get_all_related_objects())
         # Changed to become primary key?
         # Note that we don't detect unsetting of a PK, as we assume another field
         # will always come along and replace it.
@@ -639,6 +644,21 @@ class BaseDatabaseSchemaEditor(object):
                     "table": self.quote_name(model._meta.db_table),
                     "name": self._create_index_name(model, [new_field.column], suffix="_pk"),
                     "columns": self.quote_name(new_field.column),
+                }
+            )
+            # Update all referencing columns
+            rels_to_update.extend(model._meta.get_all_related_objects())
+        # Handle out type alters on the other end of rels from the PK stuff above
+        for rel in rels_to_update:
+            rel_db_params = rel.field.db_parameters(connection=self.connection)
+            rel_type = rel_db_params['type']
+            self.execute(
+                self.sql_alter_column % {
+                    "table": self.quote_name(rel.model._meta.db_table),
+                    "changes": self.sql_alter_column_type % {
+                        "column": self.quote_name(rel.field.column),
+                        "type": rel_type,
+                    }
                 }
             )
         # Does it have a foreign key?
