@@ -1,3 +1,4 @@
+import unittest
 from django.db import connection, models, migrations, router
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
@@ -13,7 +14,7 @@ class OperationTests(MigrationTestBase):
     both forwards and backwards.
     """
 
-    def set_up_test_model(self, app_label, second_model=False):
+    def set_up_test_model(self, app_label, second_model=False, related_model=False):
         """
         Creates a test model state and database table.
         """
@@ -38,6 +39,14 @@ class OperationTests(MigrationTestBase):
         )]
         if second_model:
             operations.append(migrations.CreateModel("Stable", [("id", models.AutoField(primary_key=True))]))
+        if related_model:
+            operations.append(migrations.CreateModel(
+                "Rider",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("pony", models.ForeignKey("Pony")),
+                ],
+            ))
         project_state = ProjectState()
         for operation in operations:
             operation.state_forwards(app_label, project_state)
@@ -268,6 +277,52 @@ class OperationTests(MigrationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_alfl", editor, new_state, project_state)
         self.assertColumnNotNull("test_alfl_pony", "pink")
+
+    def test_alter_field_pk(self):
+        """
+        Tests the AlterField operation on primary keys (for things like PostgreSQL's SERIAL weirdness)
+        """
+        project_state = self.set_up_test_model("test_alflpk")
+        # Test the state alteration
+        operation = migrations.AlterField("Pony", "id", models.IntegerField(primary_key=True))
+        new_state = project_state.clone()
+        operation.state_forwards("test_alflpk", new_state)
+        self.assertIsInstance(project_state.models["test_alflpk", "pony"].get_field_by_name("id"), models.AutoField)
+        self.assertIsInstance(new_state.models["test_alflpk", "pony"].get_field_by_name("id"), models.IntegerField)
+        # Test the database alteration
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_alflpk", editor, project_state, new_state)
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_alflpk", editor, new_state, project_state)
+
+    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    def test_alter_field_pk_fk(self):
+        """
+        Tests the AlterField operation on primary keys changes any FKs pointing to it.
+        """
+        project_state = self.set_up_test_model("test_alflpkfk", related_model=True)
+        # Test the state alteration
+        operation = migrations.AlterField("Pony", "id", models.FloatField(primary_key=True))
+        new_state = project_state.clone()
+        operation.state_forwards("test_alflpkfk", new_state)
+        self.assertIsInstance(project_state.models["test_alflpkfk", "pony"].get_field_by_name("id"), models.AutoField)
+        self.assertIsInstance(new_state.models["test_alflpkfk", "pony"].get_field_by_name("id"), models.FloatField)
+        # Test the database alteration
+        id_type = [c.type_code for c in connection.introspection.get_table_description(connection.cursor(), "test_alflpkfk_pony") if c.name == "id"][0]
+        fk_type = [c.type_code for c in connection.introspection.get_table_description(connection.cursor(), "test_alflpkfk_rider") if c.name == "pony_id"][0]
+        self.assertEqual(id_type, fk_type)
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_alflpkfk", editor, project_state, new_state)
+        id_type = [c.type_code for c in connection.introspection.get_table_description(connection.cursor(), "test_alflpkfk_pony") if c.name == "id"][0]
+        fk_type = [c.type_code for c in connection.introspection.get_table_description(connection.cursor(), "test_alflpkfk_rider") if c.name == "pony_id"][0]
+        self.assertEqual(id_type, fk_type)
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_alflpkfk", editor, new_state, project_state)
+        id_type = [c.type_code for c in connection.introspection.get_table_description(connection.cursor(), "test_alflpkfk_pony") if c.name == "id"][0]
+        fk_type = [c.type_code for c in connection.introspection.get_table_description(connection.cursor(), "test_alflpkfk_rider") if c.name == "pony_id"][0]
+        self.assertEqual(id_type, fk_type)
 
     def test_rename_field(self):
         """

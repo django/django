@@ -24,9 +24,10 @@ class AddField(Operation):
         state.models[app_label, self.model_name.lower()].fields.append((self.name, field))
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
         if router.allow_migrate(schema_editor.connection.alias, to_model):
-            schema_editor.add_field(to_model, to_model._meta.get_field_by_name(self.name)[0])
+            schema_editor.add_field(from_model, to_model._meta.get_field_by_name(self.name)[0])
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.render().get_model(app_label, self.model_name)
@@ -73,9 +74,10 @@ class RemoveField(Operation):
             schema_editor.remove_field(from_model, from_model._meta.get_field_by_name(self.name)[0])
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
         if router.allow_migrate(schema_editor.connection.alias, to_model):
-            schema_editor.add_field(to_model, to_model._meta.get_field_by_name(self.name)[0])
+            schema_editor.add_field(from_model, to_model._meta.get_field_by_name(self.name)[0])
 
     def describe(self):
         return "Remove field %s from %s" % (self.name, self.model_name)
@@ -107,7 +109,7 @@ class AlterField(Operation):
         to_model = to_state.render().get_model(app_label, self.model_name)
         if router.allow_migrate(schema_editor.connection.alias, to_model):
             schema_editor.alter_field(
-                to_model,
+                from_model,
                 from_model._meta.get_field_by_name(self.name)[0],
                 to_model._meta.get_field_by_name(self.name)[0],
             )
@@ -153,7 +155,7 @@ class RenameField(Operation):
         to_model = to_state.render().get_model(app_label, self.model_name)
         if router.allow_migrate(schema_editor.connection.alias, to_model):
             schema_editor.alter_field(
-                to_model,
+                from_model,
                 from_model._meta.get_field_by_name(self.old_name)[0],
                 to_model._meta.get_field_by_name(self.new_name)[0],
             )
@@ -163,7 +165,7 @@ class RenameField(Operation):
         to_model = to_state.render().get_model(app_label, self.model_name)
         if router.allow_migrate(schema_editor.connection.alias, to_model):
             schema_editor.alter_field(
-                to_model,
+                from_model,
                 from_model._meta.get_field_by_name(self.new_name)[0],
                 to_model._meta.get_field_by_name(self.old_name)[0],
             )

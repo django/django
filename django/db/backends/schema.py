@@ -498,6 +498,18 @@ class BaseDatabaseSchemaEditor(object):
                         "name": fk_name,
                     }
                 )
+        # Drop incoming FK constraints if we're a primary key and things are going
+        # to change.
+        if old_field.primary_key and new_field.primary_key and old_type != new_type:
+            for rel in new_field.model._meta.get_all_related_objects():
+                rel_fk_names = self._constraint_names(rel.model, [rel.field.column], foreign_key=True)
+                for fk_name in rel_fk_names:
+                    self.execute(
+                        self.sql_delete_fk % {
+                            "table": self.quote_name(rel.model._meta.db_table),
+                            "name": fk_name,
+                        }
+                    )
         # Change check constraints?
         if old_db_params['check'] != new_db_params['check'] and old_db_params['check']:
             constraint_names = self._constraint_names(model, [old_field.column], check=True)
@@ -524,15 +536,12 @@ class BaseDatabaseSchemaEditor(object):
             })
         # Next, start accumulating actions to do
         actions = []
+        post_actions = []
         # Type change?
         if old_type != new_type:
-            actions.append((
-                self.sql_alter_column_type % {
-                    "column": self.quote_name(new_field.column),
-                    "type": new_type,
-                },
-                [],
-            ))
+            fragment, other_actions = self._alter_column_type_sql(model._meta.db_table, new_field.column, new_type)
+            actions.append(fragment)
+            post_actions.extend(other_actions)
         # Default change?
         old_default = self.effective_default(old_field)
         new_default = self.effective_default(new_field)
@@ -596,6 +605,9 @@ class BaseDatabaseSchemaEditor(object):
                     },
                     params,
                 )
+        if post_actions:
+            for sql, params in post_actions:
+                self.execute(sql, params)
         # Added a unique?
         if not old_field.unique and new_field.unique:
             self.execute(
@@ -619,7 +631,7 @@ class BaseDatabaseSchemaEditor(object):
         # referring to us.
         rels_to_update = []
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
-            rels_to_update.extend(model._meta.get_all_related_objects())
+            rels_to_update.extend(new_field.model._meta.get_all_related_objects())
         # Changed to become primary key?
         # Note that we don't detect unsetting of a PK, as we assume another field
         # will always come along and replace it.
@@ -647,8 +659,8 @@ class BaseDatabaseSchemaEditor(object):
                 }
             )
             # Update all referencing columns
-            rels_to_update.extend(model._meta.get_all_related_objects())
-        # Handle out type alters on the other end of rels from the PK stuff above
+            rels_to_update.extend(new_field.model._meta.get_all_related_objects())
+        # Handle our type alters on the other end of rels from the PK stuff above
         for rel in rels_to_update:
             rel_db_params = rel.field.db_parameters(connection=self.connection)
             rel_type = rel_db_params['type']
@@ -672,6 +684,18 @@ class BaseDatabaseSchemaEditor(object):
                     "to_column": self.quote_name(new_field.rel.get_related_field().column),
                 }
             )
+        # Rebuild FKs that pointed to us if we previously had to drop them
+        if old_field.primary_key and new_field.primary_key and old_type != new_type:
+            for rel in new_field.model._meta.get_all_related_objects():
+                self.execute(
+                    self.sql_create_fk % {
+                        "table": self.quote_name(rel.model._meta.db_table),
+                        "name": self._create_index_name(rel.model, [rel.field.column], suffix="_fk"),
+                        "column": self.quote_name(rel.field.column),
+                        "to_table": self.quote_name(model._meta.db_table),
+                        "to_column": self.quote_name(new_field.column),
+                    }
+                )
         # Does it have check constraints we need to add?
         if old_db_params['check'] != new_db_params['check'] and new_db_params['check']:
             self.execute(
@@ -685,6 +709,27 @@ class BaseDatabaseSchemaEditor(object):
         # Reset connection if required
         if self.connection.features.connection_persists_old_columns:
             self.connection.close()
+
+    def _alter_column_type_sql(self, table, column, type):
+        """
+        Hook to specialise column type alteration for different backends,
+        for cases when a creation type is different to an alteration type
+        (e.g. SERIAL in PostgreSQL, PostGIS fields).
+
+        Should return two things; an SQL fragment of (sql, params) to insert
+        into an ALTER TABLE statement, and a list of extra (sql, params) tuples
+        to run once the field is altered.
+        """
+        return (
+            (
+                self.sql_alter_column_type % {
+                    "column": self.quote_name(column),
+                    "type": type,
+                },
+                [],
+            ),
+            [],
+        )
 
     def _alter_many_to_many(self, model, old_field, new_field, strict):
         """

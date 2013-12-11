@@ -636,6 +636,7 @@ class SchemaTests(TransactionTestCase):
         # Alter to change the PK
         new_field = SlugField(primary_key=True)
         new_field.set_attributes_from_name("slug")
+        new_field.model = Tag
         with connection.schema_editor() as editor:
             editor.remove_field(Tag, Tag._meta.get_field_by_name("id")[0])
             editor.alter_field(
