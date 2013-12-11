@@ -1,4 +1,5 @@
 import re
+import datetime
 
 from django.db.migrations import operations
 from django.db.migrations.migration import Migration
@@ -350,8 +351,9 @@ class MigrationAutodetector(object):
     def suggest_name(cls, ops):
         """
         Given a set of operations, suggests a name for the migration
-        they might represent. Names not guaranteed to be unique; they
-        must be prefixed by a number or date.
+        they might represent. Names are not guaranteed to be unique,
+        but we put some effort in to the fallback name to avoid VCS conflicts
+        if we can.
         """
         if len(ops) == 1:
             if isinstance(ops[0], operations.CreateModel):
@@ -364,7 +366,7 @@ class MigrationAutodetector(object):
                 return "remove_%s_%s" % (ops[0].model_name.lower(), ops[0].name.lower())
         elif all(isinstance(o, operations.CreateModel) for o in ops):
             return "_".join(sorted(o.name.lower() for o in ops))
-        return "auto"
+        return "auto_%s" % datetime.datetime.now().strftime("%Y%m%d_%H%M")
 
     @classmethod
     def parse_number(cls, name):
