@@ -1,7 +1,6 @@
 "Utilities for loading models and the modules that contain them."
 
 from collections import OrderedDict
-import copy
 import imp
 from importlib import import_module
 import os
@@ -19,16 +18,6 @@ __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
 MODELS_MODULE_NAME = 'models'
 
 
-class ModelDict(OrderedDict):
-    """
-    We need to special-case the deepcopy for this, as the keys are modules,
-    which can't be deep copied.
-    """
-    def __deepcopy__(self, memo):
-        return self.__class__([(key, copy.deepcopy(value, memo))
-                               for key, value in self.items()])
-
-
 class UnavailableApp(Exception):
     pass
 
@@ -44,7 +33,7 @@ def _initialize():
 
         # Mapping of app_labels to a dictionary of model names to model code.
         # May contain apps that are not installed.
-        app_models=ModelDict(),
+        app_models=OrderedDict(),
 
         # Mapping of app_labels to errors raised when trying to import the app.
         app_errors={},
@@ -277,12 +266,12 @@ class BaseAppCache(object):
         if app_mod:
             app_label = self._label_for(app_mod)
             if app_label in self.app_labels:
-                app_list = [self.app_models.get(app_label, ModelDict())]
+                app_list = [self.app_models.get(app_label, OrderedDict())]
             else:
                 app_list = []
         else:
             if only_installed:
-                app_list = [self.app_models.get(app_label, ModelDict())
+                app_list = [self.app_models.get(app_label, OrderedDict())
                             for app_label in six.iterkeys(self.app_labels)]
             else:
                 app_list = six.itervalues(self.app_models)
@@ -332,7 +321,7 @@ class BaseAppCache(object):
             # Store as 'name: model' pair in a dictionary
             # in the app_models dictionary
             model_name = model._meta.model_name
-            model_dict = self.app_models.setdefault(app_label, ModelDict())
+            model_dict = self.app_models.setdefault(app_label, OrderedDict())
             if model_name in model_dict:
                 # The same model may be imported via different paths (e.g.
                 # appname.models and project.appname.models). We use the source
