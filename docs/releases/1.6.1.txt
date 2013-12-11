@@ -51,3 +51,5 @@ Bug fixes
   (#21510).
 * The current language is no longer saved to the session by ``LocaleMiddleware``
   on every response, but rather only after a logout (#21473).
+* Fixed a crash when executing ``runserver`` on non-English systems and when the
+  formatted date in its output contained non-ASCII characters (#21358).
