@@ -49,3 +49,5 @@ Bug fixes
   (#21530).
 * Re-added missing search result count and reset link in changelist admin view
   (#21510).
+* The current language is no longer saved to the session by ``LocaleMiddleware``
+  on every response, but rather only after a logout (#21473).
