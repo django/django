@@ -711,6 +711,12 @@ to the database. If your formset contains a ``ManyToManyField``, you'll also
 need to call ``formset.save_m2m()`` to ensure the many-to-many relationships
 are saved properly.
 
+.. note::
+
+    While calling ``formset.save(commit=False)`` does not save new or changed
+    objects to the database, it *does* delete objects that have been marked for
+    deletion. This behavior will be corrected in Django 1.7.
+
 .. _model-formsets-max-num:
 
 Limiting the number of editable objects
