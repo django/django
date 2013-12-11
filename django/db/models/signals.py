@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from django.apps.cache import get_model
+from django.apps import app_cache
 from django.dispatch import Signal
 from django.utils import six
 
@@ -41,7 +41,7 @@ class ModelSignal(Signal):
                     "Specified sender must either be a model or a "
                     "model name of the 'app_label.ModelName' form."
                 )
-            sender = get_model(app_label, object_name, only_installed=False)
+            sender = app_cache.get_model(app_label, object_name, only_installed=False)
             if sender is None:
                 reference = (app_label, object_name)
                 self.unresolved_references[reference].append(

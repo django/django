@@ -2,7 +2,7 @@ import importlib
 import os
 import sys
 
-from django.apps.cache import cache
+from django.apps import app_cache
 from django.utils import datetime_safe
 from django.utils.six.moves import input
 from django.core.exceptions import ImproperlyConfigured
@@ -29,7 +29,7 @@ class MigrationQuestioner(object):
         # Apps from the new app template will have these; the python
         # file check will ensure we skip South ones.
         try:
-            models_module = cache.get_app(app_label)
+            models_module = app_cache.get_app(app_label)
         except ImproperlyConfigured:  # It's a fake app
             return self.defaults.get("ask_initial", False)
         migrations_import_path = "%s.migrations" % models_module.__package__

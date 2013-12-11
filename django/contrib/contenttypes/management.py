@@ -1,6 +1,7 @@
+from django.apps import app_cache, UnavailableApp
 from django.contrib.contenttypes.models import ContentType
 from django.db import DEFAULT_DB_ALIAS, router
-from django.db.models import get_apps, get_model, get_models, signals, UnavailableApp
+from django.db.models import signals
 from django.utils.encoding import smart_text
 from django.utils import six
 from django.utils.six.moves import input
@@ -12,7 +13,7 @@ def update_contenttypes(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, *
     entries that no longer have a matching model class.
     """
     try:
-        get_model('contenttypes', 'ContentType')
+        app_cache.get_model('contenttypes', 'ContentType')
     except UnavailableApp:
         return
 
@@ -20,7 +21,7 @@ def update_contenttypes(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, *
         return
 
     ContentType.objects.clear_cache()
-    app_models = get_models(app)
+    app_models = app_cache.get_models(app)
     if not app_models:
         return
     # They all have the same app_label, get the first one.
@@ -85,7 +86,7 @@ If you're unsure, answer 'no'.
 
 
 def update_all_contenttypes(verbosity=2, **kwargs):
-    for app in get_apps():
+    for app in app_cache.get_apps():
         update_contenttypes(app, None, verbosity, **kwargs)
 
 signals.post_migrate.connect(update_contenttypes)

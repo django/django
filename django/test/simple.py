@@ -9,7 +9,7 @@ import re
 import unittest as real_unittest
 import warnings
 
-from django.db.models import get_app, get_apps
+from django.apps import app_cache
 from django.test import _doctest as doctest
 from django.test import runner
 from django.test.utils import compare_xml, strip_quotes
@@ -179,7 +179,7 @@ def build_test(label):
     #
     # First, look for TestCase instances with a name that matches
     #
-    app_module = get_app(parts[0])
+    app_module = app_cache.get_app(parts[0])
     test_module = get_tests(app_module)
     TestClass = getattr(app_module, parts[1], None)
 
@@ -241,10 +241,10 @@ class DjangoTestSuiteRunner(runner.DiscoverRunner):
                 if '.' in label:
                     suite.addTest(build_test(label))
                 else:
-                    app = get_app(label)
+                    app = app_cache.get_app(label)
                     suite.addTest(build_suite(app))
         else:
-            for app in get_apps():
+            for app in app_cache.get_apps():
                 suite.addTest(build_suite(app))
 
         if extra_tests:

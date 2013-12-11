@@ -38,7 +38,7 @@ class Command(BaseCommand):
     args = '[appname appname.ModelName ...]'
 
     def handle(self, *app_labels, **options):
-        from django.db.models import get_app, get_apps, get_model
+        from django.apps import app_cache
 
         format = options.get('format')
         indent = options.get('indent')
@@ -64,13 +64,13 @@ class Command(BaseCommand):
         for exclude in excludes:
             if '.' in exclude:
                 app_label, model_name = exclude.split('.', 1)
-                model_obj = get_model(app_label, model_name)
+                model_obj = app_cache.get_model(app_label, model_name)
                 if not model_obj:
                     raise CommandError('Unknown model in excludes: %s' % exclude)
                 excluded_models.add(model_obj)
             else:
                 try:
-                    app_obj = get_app(exclude)
+                    app_obj = app_cache.get_app(exclude)
                     excluded_apps.add(app_obj)
                 except ImproperlyConfigured:
                     raise CommandError('Unknown app in excludes: %s' % exclude)
@@ -78,7 +78,7 @@ class Command(BaseCommand):
         if len(app_labels) == 0:
             if primary_keys:
                 raise CommandError("You can only use --pks option with one model")
-            app_list = OrderedDict((app, None) for app in get_apps() if app not in excluded_apps)
+            app_list = OrderedDict((app, None) for app in app_cache.get_apps() if app not in excluded_apps)
         else:
             if len(app_labels) > 1 and primary_keys:
                 raise CommandError("You can only use --pks option with one model")
@@ -87,12 +87,12 @@ class Command(BaseCommand):
                 try:
                     app_label, model_label = label.split('.')
                     try:
-                        app = get_app(app_label)
+                        app = app_cache.get_app(app_label)
                     except ImproperlyConfigured:
                         raise CommandError("Unknown application: %s" % app_label)
                     if app in excluded_apps:
                         continue
-                    model = get_model(app_label, model_label)
+                    model = app_cache.get_model(app_label, model_label)
                     if model is None:
                         raise CommandError("Unknown model: %s.%s" % (app_label, model_label))
 
@@ -107,7 +107,7 @@ class Command(BaseCommand):
                     # This is just an app - no model qualifier
                     app_label = label
                     try:
-                        app = get_app(app_label)
+                        app = app_cache.get_app(app_label)
                     except ImproperlyConfigured:
                         raise CommandError("Unknown application: %s" % app_label)
                     if app in excluded_apps:
@@ -160,13 +160,13 @@ def sort_dependencies(app_list):
     is serialized before a normal model, and any model with a natural key
     dependency has it's dependencies serialized first.
     """
-    from django.db.models import get_model, get_models
+    from django.apps import app_cache
     # Process the list of models, and get the list of dependencies
     model_dependencies = []
     models = set()
     for app, model_list in app_list:
         if model_list is None:
-            model_list = get_models(app)
+            model_list = app_cache.get_models(app)
 
         for model in model_list:
             models.add(model)
@@ -174,7 +174,7 @@ def sort_dependencies(app_list):
             if hasattr(model, 'natural_key'):
                 deps = getattr(model.natural_key, 'dependencies', [])
                 if deps:
-                    deps = [get_model(*d.split('.')) for d in deps]
+                    deps = [app_cache.get_model(*d.split('.')) for d in deps]
             else:
                 deps = []
 

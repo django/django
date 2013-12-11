@@ -80,13 +80,13 @@ def get_test_modules():
 
 
 def get_installed():
-    from django.apps.cache import get_apps
-    return [app.__name__.rsplit('.', 1)[0] for app in get_apps()]
+    from django.apps import app_cache
+    return [app.__name__.rsplit('.', 1)[0] for app in app_cache.get_apps()]
 
 
 def setup(verbosity, test_labels):
     import django
-    from django.apps.cache import get_apps, load_app
+    from django.apps import app_cache
     from django.conf import settings
     from django.test import TransactionTestCase, TestCase
 
@@ -128,7 +128,7 @@ def setup(verbosity, test_labels):
     # Load all the ALWAYS_INSTALLED_APPS.
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', 'django.contrib.comments is deprecated and will be removed before Django 1.8.', DeprecationWarning)
-        get_apps()
+        app_cache.get_apps()
 
     # Load all the test model apps.
     test_modules = get_test_modules()
@@ -164,7 +164,7 @@ def setup(verbosity, test_labels):
         if module_found_in_labels:
             if verbosity >= 2:
                 print("Importing application %s" % module_name)
-            mod = load_app(module_label)
+            mod = app_cache.load_app(module_label)
             if mod:
                 if module_label not in settings.INSTALLED_APPS:
                     settings.INSTALLED_APPS.append(module_label)

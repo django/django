@@ -1,4 +1,4 @@
-from django.apps.cache import get_app
+from django.apps import app_cache
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -33,4 +33,4 @@ class NoModelTests(TestCase):
     def test_no_models(self):
         with six.assertRaisesRegex(self, ImproperlyConfigured,
                     'App with label no_models is missing a models.py module.'):
-            get_app('no_models')
+            app_cache.get_app('no_models')

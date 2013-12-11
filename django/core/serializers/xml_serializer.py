@@ -4,6 +4,7 @@ XML serializer.
 
 from __future__ import unicode_literals
 
+from django.apps import app_cache
 from django.conf import settings
 from django.core.serializers import base
 from django.db import models, DEFAULT_DB_ALIAS
@@ -276,7 +277,7 @@ class Deserializer(base.Deserializer):
                 "<%s> node is missing the required '%s' attribute"
                 % (node.nodeName, attr))
         try:
-            Model = models.get_model(*model_identifier.split("."))
+            Model = app_cache.get_model(*model_identifier.split("."))
         except TypeError:
             Model = None
         if Model is None:

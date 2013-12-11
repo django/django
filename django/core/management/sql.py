@@ -5,6 +5,7 @@ import os
 import re
 import warnings
 
+from django.apps import app_cache
 from django.conf import settings
 from django.core.management.base import CommandError
 from django.db import models, router
@@ -24,7 +25,7 @@ def sql_create(app, style, connection):
     # We trim models from the current app so that the sqlreset command does not
     # generate invalid SQL (leaving models out of known_models is harmless, so
     # we can be conservative).
-    app_models = models.get_models(app, include_auto_created=True)
+    app_models = app_cache.get_models(app, include_auto_created=True)
     final_output = []
     tables = connection.introspection.table_names()
     known_models = set(model for model in connection.introspection.installed_models(tables) if model not in app_models)
@@ -168,7 +169,7 @@ def _split_statements(content):
 def custom_sql_for_model(model, style, connection):
     opts = model._meta
     app_dirs = []
-    app_dir = models.get_app_path(model._meta.app_label)
+    app_dir = app_cache.get_app_path(model._meta.app_label)
     app_dirs.append(os.path.normpath(os.path.join(app_dir, 'sql')))
 
     # Deprecated location -- remove in Django 1.9
@@ -206,7 +207,7 @@ def custom_sql_for_model(model, style, connection):
 
 def emit_pre_migrate_signal(create_models, verbosity, interactive, db):
     # Emit the pre_migrate signal for every application.
-    for app in models.get_apps():
+    for app in app_cache.get_apps():
         app_name = app.__name__.split('.')[-2]
         if verbosity >= 2:
             print("Running pre-migrate handlers for application %s" % app_name)
@@ -219,7 +220,7 @@ def emit_pre_migrate_signal(create_models, verbosity, interactive, db):
 
 def emit_post_migrate_signal(created_models, verbosity, interactive, db):
     # Emit the post_migrate signal for every application.
-    for app in models.get_apps():
+    for app in app_cache.get_apps():
         app_name = app.__name__.split('.')[-2]
         if verbosity >= 2:
             print("Running post-migrate handlers for application %s" % app_name)

@@ -2,8 +2,9 @@ from __future__ import unicode_literals
 
 from optparse import make_option
 
+from django.apps import app_cache
 from django.core.management.base import AppCommand
-from django.db import connections, models, DEFAULT_DB_ALIAS
+from django.db import connections, DEFAULT_DB_ALIAS
 
 
 class Command(AppCommand):
@@ -20,4 +21,4 @@ class Command(AppCommand):
 
     def handle_app(self, app, **options):
         connection = connections[options.get('database')]
-        return '\n'.join(connection.ops.sequence_reset_sql(self.style, models.get_models(app, include_auto_created=True)))
+        return '\n'.join(connection.ops.sequence_reset_sql(self.style, app_cache.get_models(app, include_auto_created=True)))

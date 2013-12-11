@@ -6,7 +6,7 @@ import copy
 import os
 import shutil
 
-from django.apps.cache import cache
+from django.apps import app_cache
 from django.core.management import call_command, CommandError
 from django.test.utils import override_settings
 from django.utils import six
@@ -132,11 +132,11 @@ class MakeMigrationsTests(MigrationTestBase):
         self.test_dir = os.path.abspath(os.path.dirname(upath(__file__)))
         self.migration_dir = os.path.join(self.test_dir, 'migrations_%d' % self.creation_counter)
         self.migration_pkg = "migrations.migrations_%d" % self.creation_counter
-        self._old_app_models = copy.deepcopy(cache.app_models)
+        self._old_app_models = copy.deepcopy(app_cache.app_models)
 
     def tearDown(self):
-        cache.app_models = self._old_app_models
-        cache._get_models_cache = {}
+        app_cache.app_models = self._old_app_models
+        app_cache._get_models_cache = {}
 
         os.chdir(self.test_dir)
         try:
@@ -152,7 +152,7 @@ class MakeMigrationsTests(MigrationTestBase):
 
     def test_files_content(self):
         self.assertTableNotExists("migrations_unicodemodel")
-        cache.register_models('migrations', UnicodeModel)
+        app_cache.register_models('migrations', UnicodeModel)
         with override_settings(MIGRATION_MODULES={"migrations": self.migration_pkg}):
             call_command("makemigrations", "migrations", verbosity=0)
 
@@ -188,7 +188,7 @@ class MakeMigrationsTests(MigrationTestBase):
 
     def test_failing_migration(self):
         #21280 - If a migration fails to serialize, it shouldn't generate an empty file.
-        cache.register_models('migrations', UnserializableModel)
+        app_cache.register_models('migrations', UnserializableModel)
 
         with six.assertRaisesRegex(self, ValueError, r'Cannot serialize'):
             with override_settings(MIGRATION_MODULES={"migrations": self.migration_pkg}):

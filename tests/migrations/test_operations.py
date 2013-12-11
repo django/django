@@ -1,4 +1,5 @@
 import unittest
+from django.apps import app_cache
 from django.db import connection, models, migrations, router
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
@@ -203,8 +204,8 @@ class OperationTests(MigrationTestBase):
         self.assertColumnNotExists("test_adflmm_pony", "stables")
         # Make sure the M2M field actually works
         with atomic():
-            app_cache = new_state.render()
-            Pony = app_cache.get_model("test_adflmm", "Pony")
+            new_app_cache = new_state.render()
+            Pony = new_app_cache.get_model("test_adflmm", "Pony")
             p = Pony.objects.create(pink=False, weight=4.55)
             p.stables.create()
             self.assertEqual(p.stables.count(), 1)

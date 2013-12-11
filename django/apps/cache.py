@@ -12,8 +12,6 @@ from django.utils.module_loading import module_has_submodule
 from django.utils._os import upath
 from django.utils import six
 
-__all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
-        'load_app', 'app_cache_ready')
 
 MODELS_MODULE_NAME = 'models'
 
@@ -361,19 +359,4 @@ class AppCache(BaseAppCache):
         self.__dict__ = self.__shared_state
 
 
-cache = AppCache()
-
-
-# These methods were always module level, so are kept that way for backwards
-# compatibility.
-get_apps = cache.get_apps
-get_app_package = cache.get_app_package
-get_app_path = cache.get_app_path
-get_app_paths = cache.get_app_paths
-get_app = cache.get_app
-get_app_errors = cache.get_app_errors
-get_models = cache.get_models
-get_model = cache.get_model
-register_models = cache.register_models
-load_app = cache.load_app
-app_cache_ready = cache.app_cache_ready
+app_cache = AppCache()

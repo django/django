@@ -4,6 +4,7 @@ import os
 import re
 
 from django import template
+from django.apps import app_cache
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
@@ -182,7 +183,7 @@ class ModelIndexView(BaseAdminDocsView):
     template_name = 'admin_doc/model_index.html'
 
     def get_context_data(self, **kwargs):
-        m_list = [m._meta for m in models.get_models()]
+        m_list = [m._meta for m in app_cache.get_models()]
         kwargs.update({'models': m_list})
         return super(ModelIndexView, self).get_context_data(**kwargs)
 
@@ -193,11 +194,11 @@ class ModelDetailView(BaseAdminDocsView):
     def get_context_data(self, **kwargs):
         # Get the model class.
         try:
-            app_mod = models.get_app(self.kwargs['app_label'])
+            app_mod = app_cache.get_app(self.kwargs['app_label'])
         except ImproperlyConfigured:
             raise Http404(_("App %r not found") % self.kwargs['app_label'])
         model = None
-        for m in models.get_models(app_mod):
+        for m in app_cache.get_models(app_mod):
             if m._meta.model_name == self.kwargs['model_name']:
                 model = m
                 break
