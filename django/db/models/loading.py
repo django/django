@@ -55,6 +55,10 @@ def _initialize():
         # Pending lookups for lazy relations
         pending_lookups={},
 
+        # List of app_labels that allows restricting the set of apps.
+        # Used by TransactionTestCase.available_apps for performance reasons.
+        available_apps=None,
+
         # -- Everything below here is only used when populating the cache --
         loads_installed=True,
         loaded=False,
@@ -62,7 +66,6 @@ def _initialize():
         postponed=[],
         nesting_level=0,
         _get_models_cache={},
-        available_apps=None,
     )
 
 
@@ -72,8 +75,7 @@ class BaseAppCache(object):
     provide reverse-relations and for app introspection (e.g. admin).
 
     This provides the base (non-Borg) AppCache class - the AppCache
-    subclass adds borg-like behaviour for the few cases where it's needed,
-    and adds the code that auto-loads from INSTALLED_APPS.
+    subclass adds borg-like behaviour for the few cases where it's needed.
     """
 
     def __init__(self):
@@ -83,9 +85,6 @@ class BaseAppCache(object):
         self.loads_installed = False
 
     def _populate(self):
-        """
-        Stub method - this base class does no auto-loading.
-        """
         """
         Fill in all the cache information. This method is threadsafe, in the
         sense that every caller will see the same state upon return, and if the
