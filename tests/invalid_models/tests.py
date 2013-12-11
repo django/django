@@ -23,11 +23,9 @@ class InvalidModelTestCase(unittest.TestCase):
         # need to be removed in order to prevent bad interactions
         # with the flush operation in other tests.
         self.old_app_models = copy.deepcopy(cache.app_models)
-        self.old_app_store = copy.deepcopy(cache.app_store)
 
     def tearDown(self):
         cache.app_models = self.old_app_models
-        cache.app_store = self.old_app_store
         cache._get_models_cache = {}
         sys.stdout = self.old_stdout
 

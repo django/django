@@ -29,7 +29,6 @@ class TablespacesTests(TestCase):
         # The unmanaged models need to be removed after the test in order to
         # prevent bad interactions with the flush operation in other tests.
         self.old_app_models = copy.deepcopy(cache.app_models)
-        self.old_app_store = copy.deepcopy(cache.app_store)
 
         for model in Article, Authors, Reviewers, Scientist:
             model._meta.managed = True
@@ -39,7 +38,6 @@ class TablespacesTests(TestCase):
             model._meta.managed = False
 
         cache.app_models = self.old_app_models
-        cache.app_store = self.old_app_store
         cache._get_models_cache = {}
 
     def assertNumContains(self, haystack, needle, count):

@@ -2,7 +2,6 @@
 
 from __future__ import unicode_literals
 
-import copy
 import datetime
 import os
 
@@ -116,8 +115,6 @@ class WriterTests(TestCase):
         self.assertIn("Migration", result)
 
     def test_migration_path(self):
-        _old_app_store = copy.deepcopy(cache.app_store)
-
         test_apps = [
             'migrations.migrations_test_apps.normal',
             'migrations.migrations_test_apps.with_package_model',
@@ -125,13 +122,10 @@ class WriterTests(TestCase):
 
         base_dir = os.path.dirname(os.path.dirname(__file__))
 
-        try:
-            with override_settings(INSTALLED_APPS=test_apps):
-                for app in test_apps:
-                    cache.load_app(app)
-                    migration = migrations.Migration('0001_initial', app.split('.')[-1])
-                    expected_path = os.path.join(base_dir, *(app.split('.') + ['migrations', '0001_initial.py']))
-                    writer = MigrationWriter(migration)
-                    self.assertEqual(writer.path, expected_path)
-        finally:
-            cache.app_store = _old_app_store
+        with override_settings(INSTALLED_APPS=test_apps):
+            for app in test_apps:
+                cache.load_app(app)
+                migration = migrations.Migration('0001_initial', app.split('.')[-1])
+                expected_path = os.path.join(base_dir, *(app.split('.') + ['migrations', '0001_initial.py']))
+                writer = MigrationWriter(migration)
+                self.assertEqual(writer.path, expected_path)

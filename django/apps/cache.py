@@ -39,11 +39,8 @@ def _initialize():
     [shared] state of the app cache.
     """
     return dict(
-        # Keys of app_store are the model modules for each application.
-        app_store=ModelDict(),
-
         # Mapping of installed app_labels to model modules for that app.
-        app_labels={},
+        app_labels=OrderedDict(),
 
         # Mapping of app_labels to a dictionary of model names to model code.
         # May contain apps that are not installed.
@@ -154,9 +151,9 @@ class BaseAppCache(object):
                     raise
 
         self.nesting_level -= 1
-        if models not in self.app_store:
-            self.app_store[models] = len(self.app_store)
-            self.app_labels[self._label_for(models)] = models
+        label = self._label_for(models)
+        if label not in self.app_labels:
+            self.app_labels[label] = models
         return models
 
     def app_cache_ready(self):
@@ -174,17 +171,13 @@ class BaseAppCache(object):
         """
         self._populate()
 
-        apps = self.app_store.items()
+        # app_labels is an OrderedDict, which ensures that the returned list
+        # is always in the same order (with new apps added at the end). This
+        # avoids unstable ordering on the admin app list page, for example.
+        apps = self.app_labels.items()
         if self.available_apps is not None:
-            apps = [elt for elt in apps
-                    if self._label_for(elt[0]) in self.available_apps]
-
-        # Ensure the returned list is always in the same order (with new apps
-        # added at the end). This avoids unstable ordering on the admin app
-        # list page, for example.
-        apps = sorted(apps, key=lambda elt: elt[1])
-
-        return [elt[0] for elt in apps]
+            apps = [app for app in apps if app[0] in self.available_apps]
+        return [app[1] for app in apps]
 
     def _get_app_package(self, app):
         return '.'.join(app.__name__.split('.')[:-1])
@@ -282,8 +275,9 @@ class BaseAppCache(object):
             pass
         self._populate()
         if app_mod:
-            if app_mod in self.app_store:
-                app_list = [self.app_models.get(self._label_for(app_mod), ModelDict())]
+            app_label = self._label_for(app_mod)
+            if app_label in self.app_labels:
+                app_list = [self.app_models.get(app_label, ModelDict())]
             else:
                 app_list = []
         else:
