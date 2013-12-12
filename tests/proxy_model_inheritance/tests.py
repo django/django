@@ -34,8 +34,6 @@ class ProxyModelInheritanceTests(TransactionTestCase):
         sys.path = self.old_sys_path
         del app_cache.app_configs['app1']
         del app_cache.app_configs['app2']
-        del app_cache.app_models['app1']
-        del app_cache.app_models['app2']
 
     def test_table_exists(self):
         try:

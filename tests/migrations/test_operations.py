@@ -1,5 +1,4 @@
 import unittest
-from django.apps import app_cache
 from django.db import connection, models, migrations, router
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic

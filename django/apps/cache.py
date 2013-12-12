@@ -31,10 +31,6 @@ def _initialize():
         # Mapping of labels to AppConfig instances for installed apps.
         app_configs=OrderedDict(),
 
-        # Mapping of app_labels to a dictionary of model names to model code.
-        # May contain apps that are not installed.
-        app_models=OrderedDict(),
-
         # Pending lookups for lazy relations
         pending_lookups={},
 
@@ -138,9 +134,15 @@ class BaseAppCache(object):
 
         self.nesting_level -= 1
         label = self._label_for(models_module)
-        if label not in self.app_configs:
+        try:
+            app_config = self.app_configs[label]
+        except KeyError:
             self.app_configs[label] = AppConfig(
                 label=label, models_module=models_module)
+        else:
+            if not app_config.installed:
+                app_config.models_module = models_module
+                app_config.installed = True
         return models_module
 
     def app_cache_ready(self):
@@ -161,7 +163,7 @@ class BaseAppCache(object):
         # app_configs is an OrderedDict, which ensures that the returned list
         # is always in the same order (with new apps added at the end). This
         # avoids unstable ordering on the admin app list page, for example.
-        apps = self.app_configs.items()
+        apps = [app for app in self.app_configs.items() if app[1].installed]
         if self.available_apps is not None:
             apps = [app for app in apps if app[0] in self.available_apps]
         return [app[1].models_module for app in apps]
@@ -258,20 +260,20 @@ class BaseAppCache(object):
         self._populate()
         if app_mod:
             app_label = self._label_for(app_mod)
-            if app_label in self.app_configs:
-                app_list = [self.app_models.get(app_label, OrderedDict())]
-            else:
+            try:
+                app_config = self.app_configs[app_label]
+            except KeyError:
                 app_list = []
-        else:
-            if only_installed:
-                app_list = [self.app_models.get(app_label, OrderedDict())
-                            for app_label in self.app_configs]
             else:
-                app_list = six.itervalues(self.app_models)
+                app_list = [app_config] if app_config.installed else []
+        else:
+            app_list = six.itervalues(self.app_configs)
+            if only_installed:
+                app_list = (app for app in app_list if app.installed)
         model_list = []
         for app in app_list:
             model_list.extend(
-                model for model in app.values()
+                model for model in app.models.values()
                 if ((not model._deferred or include_deferred) and
                     (not model._meta.auto_created or include_auto_created) and
                     (not model._meta.swapped or include_swapped))
@@ -296,13 +298,15 @@ class BaseAppCache(object):
             only_installed = False
         if seed_cache:
             self._populate()
-        if only_installed and app_label not in self.app_configs:
-            return None
-        if (self.available_apps is not None and only_installed
-                and app_label not in self.available_apps):
-            raise UnavailableApp("App with label %s isn't available." % app_label)
+        if only_installed:
+            app_config = self.app_configs.get(app_label)
+            if app_config is not None and not app_config.installed:
+                return None
+            if (self.available_apps is not None
+                    and app_label not in self.available_apps):
+                raise UnavailableApp("App with label %s isn't available." % app_label)
         try:
-            return self.app_models[app_label][model_name.lower()]
+            return self.app_configs[app_label].models[model_name.lower()]
         except KeyError:
             return None
 
@@ -310,11 +314,17 @@ class BaseAppCache(object):
         """
         Register a set of models as belonging to an app.
         """
+        if models:
+            try:
+                app_config = self.app_configs[app_label]
+            except KeyError:
+                app_config = AppConfig(
+                    label=app_label, installed=False)
+                self.app_configs[app_label] = app_config
         for model in models:
-            # Store as 'name: model' pair in a dictionary
-            # in the app_models dictionary
+            # Add the model to the app_config's models dictionary.
             model_name = model._meta.model_name
-            model_dict = self.app_models.setdefault(app_label, OrderedDict())
+            model_dict = app_config.models
             if model_name in model_dict:
                 # The same model may be imported via different paths (e.g.
                 # appname.models and project.appname.models). We use the source

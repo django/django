@@ -1,4 +1,3 @@
-import copy
 import sys
 import unittest
 
@@ -19,13 +18,12 @@ class InvalidModelTestCase(unittest.TestCase):
         self.stdout = StringIO()
         sys.stdout = self.stdout
 
-        # This test adds dummy applications to the app cache. These
-        # need to be removed in order to prevent bad interactions
-        # with the flush operation in other tests.
-        self.old_app_models = copy.deepcopy(app_cache.app_models)
+        # The models need to be removed after the test in order to prevent bad
+        # interactions with the flush operation in other tests.
+        self._old_models = app_cache.app_configs['invalid_models'].models.copy()
 
     def tearDown(self):
-        app_cache.app_models = self.old_app_models
+        app_cache.app_configs['invalid_models'].models = self._old_models
         app_cache._get_models_cache = {}
         sys.stdout = self.old_stdout
 

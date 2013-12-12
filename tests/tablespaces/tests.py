@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-import copy
-
 from django.apps import app_cache
 from django.conf import settings
 from django.db import connection
@@ -28,7 +26,7 @@ class TablespacesTests(TestCase):
     def setUp(self):
         # The unmanaged models need to be removed after the test in order to
         # prevent bad interactions with the flush operation in other tests.
-        self.old_app_models = copy.deepcopy(app_cache.app_models)
+        self._old_models = app_cache.app_configs['tablespaces'].models.copy()
 
         for model in Article, Authors, Reviewers, Scientist:
             model._meta.managed = True
@@ -37,7 +35,7 @@ class TablespacesTests(TestCase):
         for model in Article, Authors, Reviewers, Scientist:
             model._meta.managed = False
 
-        app_cache.app_models = self.old_app_models
+        app_cache.app_configs['tablespaces'].models = self._old_models
         app_cache._get_models_cache = {}
 
     def assertNumContains(self, haystack, needle, count):
