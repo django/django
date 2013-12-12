@@ -603,7 +603,7 @@ class Field(object):
         rel_model = self.rel.to
         if hasattr(self.rel, 'get_related_field'):
             lst = [(getattr(x, self.rel.get_related_field().attname),
-                        smart_text(x))
+                   smart_text(x))
                    for x in rel_model._default_manager.complex_filter(
                        self.rel.limit_choices_to)]
         else:

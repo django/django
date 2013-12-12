@@ -80,7 +80,7 @@ class BaseStaticFilesTestCase(object):
 
     def assertFileContains(self, filepath, text):
         self.assertIn(text, self._get_file(force_text(filepath)),
-                        "'%s' not in '%s'" % (text, filepath))
+                      "'%s' not in '%s'" % (text, filepath))
 
     def assertFileNotFound(self, filepath):
         self.assertRaises(IOError, self._get_file, filepath)
@@ -783,8 +783,7 @@ class TestMiscFinder(TestCase):
 class TestTemplateTag(StaticFilesTestCase):
 
     def test_template_tag(self):
-        self.assertStaticRenders("does/not/exist.png",
-                                   "/static/does/not/exist.png")
+        self.assertStaticRenders("does/not/exist.png", "/static/does/not/exist.png")
         self.assertStaticRenders("testfile.txt", "/static/testfile.txt")
 
 

@@ -430,7 +430,7 @@ class URLNode(Node):
         from django.core.urlresolvers import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
         kwargs = dict((smart_text(k, 'ascii'), v.resolve(context))
-                       for k, v in self.kwargs.items())
+                      for k, v in self.kwargs.items())
 
         view_name = self.view_name.resolve(context)
 
@@ -525,7 +525,7 @@ class WithNode(Node):
 
     def render(self, context):
         values = dict((key, val.resolve(context)) for key, val in
-                       six.iteritems(self.extra_context))
+                      six.iteritems(self.extra_context))
         with context.push(**values):
             return self.nodelist.render(context)
 

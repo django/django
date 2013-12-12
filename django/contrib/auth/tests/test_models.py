@@ -69,9 +69,11 @@ class UserManagerTestCase(TestCase):
         self.assertEqual(returned, 'email\ with_whitespace@d.com')
 
     def test_empty_username(self):
-        self.assertRaisesMessage(ValueError,
-                                 'The given username must be set',
-                                  User.objects.create_user, username='')
+        self.assertRaisesMessage(
+            ValueError,
+            'The given username must be set',
+            User.objects.create_user, username=''
+        )
 
 
 class AbstractUserTestCase(TestCase):

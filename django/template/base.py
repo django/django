@@ -92,8 +92,7 @@ class VariableDoesNotExist(Exception):
         self.params = params
 
     def __str__(self):
-        return self.msg % tuple(force_text(p, errors='replace')
-                                 for p in self.params)
+        return self.msg % tuple(force_text(p, errors='replace') for p in self.params)
 
 
 class InvalidTemplateLibrary(Exception):
@@ -1055,8 +1054,7 @@ class TagHelperNode(Node):
         resolved_args = [var.resolve(context) for var in self.args]
         if self.takes_context:
             resolved_args = [context] + resolved_args
-        resolved_kwargs = dict((k, v.resolve(context))
-                                for k, v in self.kwargs.items())
+        resolved_kwargs = dict((k, v.resolve(context)) for k, v in self.kwargs.items())
         return resolved_args, resolved_kwargs
 
 

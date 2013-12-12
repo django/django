@@ -446,7 +446,7 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
 
         def count_sessions():
             return len([session_file for session_file in os.listdir(storage_path)
-                                     if session_file.startswith(file_prefix)])
+                if session_file.startswith(file_prefix)])
 
         self.assertEqual(0, count_sessions())
 

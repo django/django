@@ -171,5 +171,5 @@ class Polygon(GEOSGeometry):
     def kml(self):
         "Returns the KML representation of this Polygon."
         inner_kml = ''.join("<innerBoundaryIs>%s</innerBoundaryIs>" % self[i + 1].kml
-                             for i in xrange(self.num_interior_rings))
+            for i in xrange(self.num_interior_rings))
         return "<Polygon><outerBoundaryIs>%s</outerBoundaryIs>%s</Polygon>" % (self[0].kml, inner_kml)

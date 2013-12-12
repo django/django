@@ -893,7 +893,7 @@ class SQLDeleteCompiler(SQLCompiler):
         parameters.
         """
         assert len(self.query.tables) == 1, \
-                "Can only delete from one table at a time."
+            "Can only delete from one table at a time."
         qn = self.quote_name_unless_alias
         result = ['DELETE FROM %s' % qn(self.query.tables[0])]
         where, params = self.query.where.as_sql(qn=qn, connection=self.connection)
