@@ -101,8 +101,8 @@ class SelectRelatedTests(TestCase):
 
     def test_select_related_with_extra(self):
         s = (Species.objects.all()
-                .select_related()
-                .extra(select={'a': 'select_related_species.id + 10'})[0])
+             .select_related()
+             .extra(select={'a': 'select_related_species.id + 10'})[0])
         self.assertEqual(s.id + 10, s.a)
 
     def test_certain_fields(self):
@@ -133,8 +133,8 @@ class SelectRelatedTests(TestCase):
     def test_field_traversal(self):
         with self.assertNumQueries(1):
             s = (Species.objects.all()
-                    .select_related('genus__family__order')
-                    .order_by('id')[0:1].get().genus.family.order.name)
+                 .select_related('genus__family__order')
+                 .order_by('id')[0:1].get().genus.family.order.name)
             self.assertEqual(s, 'Diptera')
 
     def test_depth_fields_fails(self):

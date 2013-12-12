@@ -104,7 +104,7 @@ def string_output(func, argtypes, offset=-1, str_result=False, decoding=None):
     # given offset.
     def _check_str(result, func, cargs):
         res = check_string(result, func, cargs,
-                            offset=offset, str_result=str_result)
+            offset=offset, str_result=str_result)
         if res and decoding:
             res = res.decode(decoding)
         return res

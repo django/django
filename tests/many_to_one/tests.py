@@ -338,7 +338,7 @@ class ManyToOneTests(TestCase):
 
     def test_delete(self):
         self.r.article_set.create(headline="John's second story",
-                                                pub_date=datetime.date(2005, 7, 29))
+                                  pub_date=datetime.date(2005, 7, 29))
         self.r2.article_set.create(headline="Paul's story",
                                    pub_date=datetime.date(2006, 1, 17))
         Article.objects.create(id=None, headline="Third article",

@@ -23,7 +23,7 @@ class GeometryField(forms.Field):
         'invalid_geom': _('Invalid geometry value.'),
         'invalid_geom_type': _('Invalid geometry type.'),
         'transform_error': _('An error occurred when transforming the geometry '
-                              'to the SRID of the geometry form field.'),
+                             'to the SRID of the geometry form field.'),
     }
 
     def __init__(self, **kwargs):

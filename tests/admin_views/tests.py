@@ -4643,7 +4643,7 @@ class AdminViewOnSiteTests(TestCase):
         # actual regression test
         for error_set in response.context['inline_admin_formset'].formset.errors:
             self.assertEqual(['Children must share a family name with their parents in this contrived test case'],
-                              error_set.get('__all__'))
+                             error_set.get('__all__'))
 
     def test_change_view_form_and_formsets_run_validation(self):
         """
@@ -4673,7 +4673,7 @@ class AdminViewOnSiteTests(TestCase):
         # actual regression test
         for error_set in response.context['inline_admin_formset'].formset.errors:
             self.assertEqual(['Children must share a family name with their parents in this contrived test case'],
-                              error_set.get('__all__'))
+                             error_set.get('__all__'))
 
     def test_validate(self):
         "Ensure that the view_on_site value is either a boolean or a callable"
