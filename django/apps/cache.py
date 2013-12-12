@@ -35,9 +35,6 @@ def _initialize():
         # May contain apps that are not installed.
         app_models=OrderedDict(),
 
-        # Mapping of app_labels to errors raised when trying to import the app.
-        app_errors={},
-
         # Pending lookups for lazy relations
         pending_lookups={},
 
@@ -222,11 +219,6 @@ class BaseAppCache(object):
             raise ImproperlyConfigured("App with label %s could not be found" % app_label)
         finally:
             imp.release_lock()
-
-    def get_app_errors(self):
-        "Returns the map of known problems with the INSTALLED_APPS."
-        self._populate()
-        return self.app_errors
 
     def get_models(self, app_mod=None,
                    include_auto_created=False, include_deferred=False,
