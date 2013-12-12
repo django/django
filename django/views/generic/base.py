@@ -159,7 +159,7 @@ class RedirectView(View):
     """
     A view that provides a redirect on any GET request.
     """
-    permanent = True
+    permanent = False
     url = None
     pattern_name = None
     query_string = False

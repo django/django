@@ -317,34 +317,34 @@ class AssertRedirectsTests(TestCase):
         "You can follow a redirect chain of multiple redirects"
         response = self.client.get('/test_client_regress/redirects/further/more/', {}, follow=True)
         self.assertRedirects(response, '/test_client_regress/no_template_view/',
-            status_code=301, target_status_code=200)
+            status_code=302, target_status_code=200)
 
         self.assertEqual(len(response.redirect_chain), 1)
-        self.assertEqual(response.redirect_chain[0], ('http://testserver/test_client_regress/no_template_view/', 301))
+        self.assertEqual(response.redirect_chain[0], ('http://testserver/test_client_regress/no_template_view/', 302))
 
     def test_multiple_redirect_chain(self):
         "You can follow a redirect chain of multiple redirects"
         response = self.client.get('/test_client_regress/redirects/', {}, follow=True)
         self.assertRedirects(response, '/test_client_regress/no_template_view/',
-            status_code=301, target_status_code=200)
+            status_code=302, target_status_code=200)
 
         self.assertEqual(len(response.redirect_chain), 3)
-        self.assertEqual(response.redirect_chain[0], ('http://testserver/test_client_regress/redirects/further/', 301))
-        self.assertEqual(response.redirect_chain[1], ('http://testserver/test_client_regress/redirects/further/more/', 301))
-        self.assertEqual(response.redirect_chain[2], ('http://testserver/test_client_regress/no_template_view/', 301))
+        self.assertEqual(response.redirect_chain[0], ('http://testserver/test_client_regress/redirects/further/', 302))
+        self.assertEqual(response.redirect_chain[1], ('http://testserver/test_client_regress/redirects/further/more/', 302))
+        self.assertEqual(response.redirect_chain[2], ('http://testserver/test_client_regress/no_template_view/', 302))
 
     def test_redirect_chain_to_non_existent(self):
         "You can follow a chain to a non-existent view"
         response = self.client.get('/test_client_regress/redirect_to_non_existent_view2/', {}, follow=True)
         self.assertRedirects(response, '/test_client_regress/non_existent_view/',
-            status_code=301, target_status_code=404)
+            status_code=302, target_status_code=404)
 
     def test_redirect_chain_to_self(self):
         "Redirections to self are caught and escaped"
         response = self.client.get('/test_client_regress/redirect_to_self/', {}, follow=True)
         # The chain of redirects stops once the cycle is detected.
         self.assertRedirects(response, '/test_client_regress/redirect_to_self/',
-            status_code=301, target_status_code=301)
+            status_code=302, target_status_code=302)
         self.assertEqual(len(response.redirect_chain), 2)
 
     def test_circular_redirect(self):
@@ -352,7 +352,7 @@ class AssertRedirectsTests(TestCase):
         response = self.client.get('/test_client_regress/circular_redirect_1/', {}, follow=True)
         # The chain of redirects will get back to the starting point, but stop there.
         self.assertRedirects(response, '/test_client_regress/circular_redirect_2/',
-            status_code=301, target_status_code=301)
+            status_code=302, target_status_code=302)
         self.assertEqual(len(response.redirect_chain), 4)
 
     def test_redirect_chain_post(self):
@@ -360,7 +360,7 @@ class AssertRedirectsTests(TestCase):
         response = self.client.post('/test_client_regress/redirects/',
             {'nothing': 'to_send'}, follow=True)
         self.assertRedirects(response,
-            '/test_client_regress/no_template_view/', 301, 200)
+            '/test_client_regress/no_template_view/', 302, 200)
         self.assertEqual(len(response.redirect_chain), 3)
 
     def test_redirect_chain_head(self):
@@ -368,7 +368,7 @@ class AssertRedirectsTests(TestCase):
         response = self.client.head('/test_client_regress/redirects/',
             {'nothing': 'to_send'}, follow=True)
         self.assertRedirects(response,
-            '/test_client_regress/no_template_view/', 301, 200)
+            '/test_client_regress/no_template_view/', 302, 200)
         self.assertEqual(len(response.redirect_chain), 3)
 
     def test_redirect_chain_options(self):
@@ -376,7 +376,7 @@ class AssertRedirectsTests(TestCase):
         response = self.client.options('/test_client_regress/redirects/',
             follow=True)
         self.assertRedirects(response,
-            '/test_client_regress/no_template_view/', 301, 200)
+            '/test_client_regress/no_template_view/', 302, 200)
         self.assertEqual(len(response.redirect_chain), 3)
 
     def test_redirect_chain_put(self):
@@ -384,7 +384,7 @@ class AssertRedirectsTests(TestCase):
         response = self.client.put('/test_client_regress/redirects/',
             follow=True)
         self.assertRedirects(response,
-            '/test_client_regress/no_template_view/', 301, 200)
+            '/test_client_regress/no_template_view/', 302, 200)
         self.assertEqual(len(response.redirect_chain), 3)
 
     def test_redirect_chain_delete(self):
@@ -392,7 +392,7 @@ class AssertRedirectsTests(TestCase):
         response = self.client.delete('/test_client_regress/redirects/',
             follow=True)
         self.assertRedirects(response,
-            '/test_client_regress/no_template_view/', 301, 200)
+            '/test_client_regress/no_template_view/', 302, 200)
         self.assertEqual(len(response.redirect_chain), 3)
 
     def test_redirect_to_different_host(self):
@@ -400,7 +400,7 @@ class AssertRedirectsTests(TestCase):
         response = self.client.get('/test_client_regress/redirect_other_host/', follow=True)
         self.assertRedirects(response,
             'https://otherserver:8443/test_client_regress/no_template_view/',
-            status_code=301, target_status_code=200)
+            status_code=302, target_status_code=200)
         # We can't use is_secure() or get_host()
         # because response.request is a dictionary, not an HttpRequest
         self.assertEqual(response.request.get('wsgi.url_scheme'), 'https')
@@ -447,9 +447,9 @@ class AssertRedirectsTests(TestCase):
             # always redirects to https
             response = self.client.get('/test_client/https_redirect_view/', follow=follow, secure=secure)
             # no scheme to compare too, always succeeds
-            self.assertRedirects(response, '/test_client/secure_view/', status_code=301)
+            self.assertRedirects(response, '/test_client/secure_view/', status_code=302)
             # the goal scheme is https
-            self.assertRedirects(response, 'https://testserver/test_client/secure_view/', status_code=301)
+            self.assertRedirects(response, 'https://testserver/test_client/secure_view/', status_code=302)
             with self.assertRaises(AssertionError):
                 self.assertRedirects(response, 'http://testserver/test_client/secure_view/', status_code=301)
 
@@ -1315,7 +1315,7 @@ class RequestHeadersTest(TestCase):
         response = self.client.get("/test_client_regress/check_headers_redirect/", follow=True, HTTP_X_ARG_CHECK='Testing 123')
         self.assertEqual(response.content, b"HTTP_X_ARG_CHECK: Testing 123")
         self.assertRedirects(response, '/test_client_regress/check_headers/',
-            status_code=301, target_status_code=200)
+            status_code=302, target_status_code=200)
 
 
 class ReadLimitedStreamTest(TestCase):
