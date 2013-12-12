@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import copy
 import os
 import sys
 from unittest import TestCase
@@ -17,14 +16,15 @@ class EggLoadingTest(TestCase):
         self.old_path = sys.path[:]
         self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
 
-        # This test adds dummy applications to the app cache. These
-        # need to be removed in order to prevent bad interactions
-        # with the flush operation in other tests.
-        self.old_app_models = copy.deepcopy(app_cache.app_models)
+        # The models need to be removed after the test in order to prevent bad
+        # interactions with the flush operation in other tests.
+        self._old_models = app_cache.app_configs['app_loading'].models.copy()
 
     def tearDown(self):
+        app_cache.app_configs['app_loading'].models = self._old_models
+        app_cache._get_models_cache = {}
+
         sys.path = self.old_path
-        app_cache.app_models = self.old_app_models
 
     def test_egg1(self):
         """Models module can be loaded from an app in an egg"""

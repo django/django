@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 import codecs
-import copy
 import os
 import shutil
 
@@ -132,10 +131,10 @@ class MakeMigrationsTests(MigrationTestBase):
         self.test_dir = os.path.abspath(os.path.dirname(upath(__file__)))
         self.migration_dir = os.path.join(self.test_dir, 'migrations_%d' % self.creation_counter)
         self.migration_pkg = "migrations.migrations_%d" % self.creation_counter
-        self._old_app_models = copy.deepcopy(app_cache.app_models)
+        self._old_models = app_cache.app_configs['migrations'].models.copy()
 
     def tearDown(self):
-        app_cache.app_models = self._old_app_models
+        app_cache.app_configs['migrations'].models = self._old_models
         app_cache._get_models_cache = {}
 
         os.chdir(self.test_dir)

@@ -1,5 +1,4 @@
 from __future__ import unicode_literals
-import copy
 
 from django.apps import app_cache
 from django.contrib import admin
@@ -155,12 +154,11 @@ class ProxyModelTests(TestCase):
 
     @override_settings(TEST_SWAPPABLE_MODEL='proxy_models.AlternateModel')
     def test_swappable(self):
-        try:
-            # This test adds dummy applications to the app cache. These
-            # need to be removed in order to prevent bad interactions
-            # with the flush operation in other tests.
-            old_app_models = copy.deepcopy(app_cache.app_models)
+        # The models need to be removed after the test in order to prevent bad
+        # interactions with the flush operation in other tests.
+        _old_models = app_cache.app_configs['proxy_models'].models.copy()
 
+        try:
             class SwappableModel(models.Model):
 
                 class Meta:
@@ -176,7 +174,8 @@ class ProxyModelTests(TestCase):
                     class Meta:
                         proxy = True
         finally:
-            app_cache.app_models = old_app_models
+            app_cache.app_configs['proxy_models'].models = _old_models
+            app_cache._get_models_cache = {}
 
     def test_myperson_manager(self):
         Person.objects.create(name="fred")
