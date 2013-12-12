@@ -237,6 +237,12 @@ This tag can be used in two ways:
   parent template. If the variable evaluates to a ``Template`` object,
   Django will use that object as the parent template.
 
+.. versionadded:: 1.7
+
+    If the template is extended to a path equal to the current template, it will
+    avoid recursion and will skip itself. This allows extending third party app
+    templates without having to copy the entire template all over again.
+
 See :ref:`template-inheritance` for more information.
 
 .. templatetag:: filter

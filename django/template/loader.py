@@ -24,6 +24,7 @@
 # For example, the eggs loader (which is capable of loading templates from
 # Python eggs) sets is_usable to False if the "pkg_resources" module isn't
 # installed, because pkg_resources is necessary to read eggs.
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.template.base import Origin, Template, Context, TemplateDoesNotExist, add_to_builtins
@@ -34,16 +35,34 @@ from django.utils import six
 template_source_loaders = None
 
 
+def get_template_source_loaders():
+    """
+    Calculate template_source_loaders the first time the function is executed
+    because putting this logic in the module-level namespace may cause
+    circular import errors. See Django ticket #1292.
+    """
+    global template_source_loaders
+    if template_source_loaders is None:
+        loaders = []
+        for loader_name in settings.TEMPLATE_LOADERS:
+            loader = find_template_loader(loader_name)
+            if loader is not None:
+                loaders.append(loader)
+        template_source_loaders = tuple(loaders)
+    return template_source_loaders
+
+
 class BaseLoader(object):
     is_usable = False
+    never_skip = False
 
     def __init__(self, *args, **kwargs):
         pass
 
-    def __call__(self, template_name, template_dirs=None):
-        return self.load_template(template_name, template_dirs)
+    def __call__(self, template_name, template_dirs=None, skip_template=None):
+        return self.load_template(template_name, template_dirs, skip_template)
 
-    def load_template(self, template_name, template_dirs=None):
+    def load_template(self, template_name, template_dirs=None, skip_template=None):
         source, display_name = self.load_template_source(template_name, template_dirs)
         origin = make_origin(display_name, self.load_template_source, template_name, template_dirs)
         try:
@@ -62,7 +81,8 @@ class BaseLoader(object):
         name.
 
         """
-        raise NotImplementedError('subclasses of BaseLoader must provide a load_template_source() method')
+        raise NotImplementedError('subclasses of BaseLoader must provide a '
+                                  'load_template_source() method')
 
     def reset(self):
         """
@@ -83,7 +103,7 @@ class LoaderOrigin(Origin):
 
 
 def make_origin(display_name, loader, name, dirs):
-    if settings.TEMPLATE_DEBUG and display_name:
+    if display_name:
         return LoaderOrigin(display_name, loader, name, dirs)
     else:
         return None
@@ -102,46 +122,69 @@ def find_template_loader(loader):
         else:
             # Try loading module the old way - string is full path to callable
             if args:
-                raise ImproperlyConfigured("Error importing template source loader %s - can't pass arguments to function-based loader." % loader)
+                raise ImproperlyConfigured("Error importing template source "
+                                           "loader %s - can't pass arguments "
+                                           "to function-based loader." % loader)
             func = TemplateLoader
 
         if not func.is_usable:
-            import warnings
-            warnings.warn("Your TEMPLATE_LOADERS setting includes %r, but your Python installation doesn't support that type of template loading. Consider removing that line from TEMPLATE_LOADERS." % loader)
+            warnings.warn("Your TEMPLATE_LOADERS setting includes %r, but your "
+                          "Python installation doesn't support that type of "
+                          "template loading. Consider removing that line from "
+                          "TEMPLATE_LOADERS." % loader)
             return None
         else:
             return func
     else:
-        raise ImproperlyConfigured('Loader does not define a "load_template" callable template source loader')
+        raise ImproperlyConfigured('Loader does not define a "load_template" '
+                                   'callable template source loader')
 
 
-def find_template(name, dirs=None):
-    # Calculate template_source_loaders the first time the function is executed
-    # because putting this logic in the module-level namespace may cause
-    # circular import errors. See Django ticket #1292.
-    global template_source_loaders
-    if template_source_loaders is None:
-        loaders = []
-        for loader_name in settings.TEMPLATE_LOADERS:
-            loader = find_template_loader(loader_name)
-            if loader is not None:
-                loaders.append(loader)
-        template_source_loaders = tuple(loaders)
-    for loader in template_source_loaders:
+def find_template(name, dirs=None, skip_template=None, loaders=None):
+    """
+    Returns a tuple with a compiled Template object for the given template name
+    and an origin object. If ``loaders`` is given, only the specified loaders will be
+    tried. If ``skip_template`` is given, the loader of the specified template will be
+    skipped (provided that it doesn't have a ``never_skip`` attribute set to True).
+    """
+    loaders = get_template_source_loaders() if loaders is None else loaders
+    # If there is a template to skip with the same name as the current template,
+    # skip all the loaders until and including the loader of the template to
+    # be skipped
+    if getattr(skip_template, 'loadname', None) == name:
+        loaders = skip_loaders(loaders, skip_template)
+    for loader in loaders:
         try:
-            source, display_name = loader(name, dirs)
+            source, display_name = loader(name, dirs, skip_template)
             return (source, make_origin(display_name, loader, name, dirs))
         except TemplateDoesNotExist:
             pass
     raise TemplateDoesNotExist(name)
 
 
-def get_template(template_name, dirs=None):
+def skip_loaders(loaders, skip_template):
     """
-    Returns a compiled Template object for the given template name,
-    handling template inheritance recursively.
+    Skips all the loaders until and including the loader of `skip_template`.
     """
-    template, origin = find_template(template_name, dirs)
+    # Get the loader object to skip
+    loader_to_skip = getattr(skip_template, 'loader', None)
+    loader_to_skip = getattr(loader_to_skip, '__self__', loader_to_skip)
+    has_been_skiped = False
+    for loader in loaders:
+        # Get the current loader object
+        loader = getattr(loader, '__self__', loader)
+        if has_been_skiped or loader.never_skip:
+            yield loader
+        if loader == loader_to_skip:
+            has_been_skiped = True
+
+
+def get_template(template_name, dirs=None, skip_template=None):
+    """
+    Returns a compiled Template object for the given template name, handling
+    template inheritance recursively.
+    """
+    template, origin = find_template(template_name, dirs, skip_template)
     if not hasattr(template, 'render'):
         # template needs to be compiled
         template = get_template_from_string(template, origin, template_name)
@@ -177,14 +220,14 @@ def render_to_string(template_name, dictionary=None, context_instance=None,
         return t.render(context_instance)
 
 
-def select_template(template_name_list, dirs=None):
+def select_template(template_name_list, dirs=None, skip_template=None):
     "Given a list of template names, returns the first that can be loaded."
     if not template_name_list:
         raise TemplateDoesNotExist("No template names provided")
     not_found = []
     for template_name in template_name_list:
         try:
-            return get_template(template_name, dirs)
+            return get_template(template_name, dirs, skip_template)
         except TemplateDoesNotExist as e:
             if e.args[0] not in not_found:
                 not_found.append(e.args[0])
