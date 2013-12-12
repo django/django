@@ -2,7 +2,7 @@
 Django 1.6.1 release notes
 ==========================
 
-*Under development*
+*December 12, 2013*
 
 This is Django 1.6.1, a bugfix release for Django 1.6. In addition to the bug
 fixes listed below, translations submitted since the 1.6 release are also
