@@ -32,8 +32,8 @@ class ProxyModelInheritanceTests(TransactionTestCase):
 
     def tearDown(self):
         sys.path = self.old_sys_path
-        del app_cache.app_labels['app1']
-        del app_cache.app_labels['app2']
+        del app_cache.app_configs['app1']
+        del app_cache.app_configs['app2']
         del app_cache.app_models['app1']
         del app_cache.app_models['app2']
 

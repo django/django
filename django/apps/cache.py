@@ -12,6 +12,8 @@ from django.utils.module_loading import module_has_submodule
 from django.utils._os import upath
 from django.utils import six
 
+from .base import AppConfig
+
 
 MODELS_MODULE_NAME = 'models'
 
@@ -26,8 +28,8 @@ def _initialize():
     [shared] state of the app cache.
     """
     return dict(
-        # Mapping of installed app_labels to model modules for that app.
-        app_labels=OrderedDict(),
+        # Mapping of labels to AppConfig instances for installed apps.
+        app_configs=OrderedDict(),
 
         # Mapping of app_labels to a dictionary of model names to model code.
         # May contain apps that are not installed.
@@ -116,7 +118,7 @@ class BaseAppCache(object):
         self.handled.add(app_name)
         self.nesting_level += 1
         try:
-            models = import_module('%s.%s' % (app_name, MODELS_MODULE_NAME))
+            models_module = import_module('%s.%s' % (app_name, MODELS_MODULE_NAME))
         except ImportError:
             self.nesting_level -= 1
             # If the app doesn't have a models module, we can just ignore the
@@ -138,10 +140,11 @@ class BaseAppCache(object):
                     raise
 
         self.nesting_level -= 1
-        label = self._label_for(models)
-        if label not in self.app_labels:
-            self.app_labels[label] = models
-        return models
+        label = self._label_for(models_module)
+        if label not in self.app_configs:
+            self.app_configs[label] = AppConfig(
+                label=label, models_module=models_module)
+        return models_module
 
     def app_cache_ready(self):
         """
@@ -158,13 +161,13 @@ class BaseAppCache(object):
         """
         self._populate()
 
-        # app_labels is an OrderedDict, which ensures that the returned list
+        # app_configs is an OrderedDict, which ensures that the returned list
         # is always in the same order (with new apps added at the end). This
         # avoids unstable ordering on the admin app list page, for example.
-        apps = self.app_labels.items()
+        apps = self.app_configs.items()
         if self.available_apps is not None:
             apps = [app for app in apps if app[0] in self.available_apps]
-        return [app[1] for app in apps]
+        return [app[1].models_module for app in apps]
 
     def _get_app_package(self, app):
         return '.'.join(app.__name__.split('.')[:-1])
@@ -263,14 +266,14 @@ class BaseAppCache(object):
         self._populate()
         if app_mod:
             app_label = self._label_for(app_mod)
-            if app_label in self.app_labels:
+            if app_label in self.app_configs:
                 app_list = [self.app_models.get(app_label, OrderedDict())]
             else:
                 app_list = []
         else:
             if only_installed:
                 app_list = [self.app_models.get(app_label, OrderedDict())
-                            for app_label in six.iterkeys(self.app_labels)]
+                            for app_label in self.app_configs]
             else:
                 app_list = six.itervalues(self.app_models)
         model_list = []
@@ -301,7 +304,7 @@ class BaseAppCache(object):
             only_installed = False
         if seed_cache:
             self._populate()
-        if only_installed and app_label not in self.app_labels:
+        if only_installed and app_label not in self.app_configs:
             return None
         if (self.available_apps is not None and only_installed
                 and app_label not in self.available_apps):
