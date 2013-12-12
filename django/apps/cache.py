@@ -133,16 +133,15 @@ class BaseAppCache(object):
                     raise
 
         self.nesting_level -= 1
-        label = self._label_for(models_module)
-        try:
-            app_config = self.app_configs[label]
-        except KeyError:
-            self.app_configs[label] = AppConfig(
-                label=label, models_module=models_module)
-        else:
-            if not app_config.installed:
-                app_config.models_module = models_module
-                app_config.installed = True
+
+        app_config = AppConfig(
+            name=app_name, app_module=app_module, models_module=models_module)
+        # If a stub config existed for this app, preserve models registry.
+        old_app_config = self.app_configs.get(app_config.label)
+        if old_app_config is not None:
+            app_config.models = old_app_config.models
+        self.app_configs[app_config.label] = app_config
+
         return models_module
 
     def app_cache_ready(self):
@@ -318,8 +317,7 @@ class BaseAppCache(object):
             try:
                 app_config = self.app_configs[app_label]
             except KeyError:
-                app_config = AppConfig(
-                    label=app_label, installed=False)
+                app_config = AppConfig._stub(app_label)
                 self.app_configs[app_label] = app_config
         for model in models:
             # Add the model to the app_config's models dictionary.
