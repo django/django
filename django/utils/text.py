@@ -255,7 +255,7 @@ normalize_newlines = allow_lazy(normalize_newlines, six.text_type)
 
 
 def recapitalize(text):
-    "Recapitalizes text, placing caps after end-of-sentence punctuation."
+    """Recapitalizes text, placing caps after end-of-sentence punctuation."""
     text = force_text(text).lower()
     capsRE = re.compile(r'(?:^|(?<=[\.\?\!] ))([a-z])')
     text = capsRE.sub(lambda x: x.group(1).upper(), text)
@@ -264,7 +264,7 @@ recapitalize = allow_lazy(recapitalize)
 
 
 def phone2numeric(phone):
-    "Converts a phone number with letters into its numeric equivalent."
+    """Converts a phone number with letters into its numeric equivalent."""
     char2number = {'a': '2', 'b': '2', 'c': '2', 'd': '3', 'e': '3', 'f': '3',
          'g': '4', 'h': '4', 'i': '4', 'j': '5', 'k': '5', 'l': '5', 'm': '6',
          'n': '6', 'o': '6', 'p': '7', 'q': '7', 'r': '7', 's': '7', 't': '8',
