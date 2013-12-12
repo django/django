@@ -250,7 +250,9 @@ get_text_list = allow_lazy(get_text_list, six.text_type)
 
 
 def normalize_newlines(text):
-    return force_text(re_newlines.sub('\n', text))
+    """Normalizes CRLF and CR newlines to just LF."""
+    text = force_text(text)
+    return re_newlines.sub('\n', text)
 normalize_newlines = allow_lazy(normalize_newlines, six.text_type)
 
 
