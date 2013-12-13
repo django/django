@@ -153,6 +153,26 @@ class BaseAppCache(object):
         """
         return self.loaded
 
+    def get_app_config(self, app_label, only_installed=True):
+        """
+        Returns the application configuration for the given app_label.
+
+        Raises LookupError if no application exists with this app_label.
+
+        Raises UnavailableApp when set_available_apps() disables the
+        application with this app_label.
+
+        If only_installed is True (default), only applications explicitly
+        listed in INSTALLED_APPS are considered.
+        """
+        self._populate()
+        app_config = self.app_configs.get(app_label)
+        if app_config is None or (only_installed and not app_config.installed):
+            raise LookupError("No app with label %r." % app_label)
+        if self.available_apps is not None and app_config.label not in self.available_apps:
+            raise UnavailableApp("App with label %r isn't available." % app_label)
+        return app_config
+
     def get_apps(self):
         """
         Returns a list of all installed modules that contain models.
@@ -197,29 +217,18 @@ class BaseAppCache(object):
             app_paths.append(self._get_app_path(app))
         return app_paths
 
-    def get_app(self, app_label, emptyOK=False):
+    def get_app(self, app_label):
         """
         Returns the module containing the models for the given app_label.
-
-        Returns None if the app has no models in it and emptyOK is True.
 
         Raises UnavailableApp when set_available_apps() in in effect and
         doesn't include app_label.
         """
-        self._populate()
-        imp.acquire_lock()
         try:
-            for app_name in settings.INSTALLED_APPS:
-                if app_label == app_name.split('.')[-1]:
-                    mod = self.load_app(app_name, False)
-                    if mod is None and not emptyOK:
-                        raise ImproperlyConfigured("App with label %s is missing a models.py module." % app_label)
-                    if self.available_apps is not None and app_label not in self.available_apps:
-                        raise UnavailableApp("App with label %s isn't available." % app_label)
-                    return mod
-            raise ImproperlyConfigured("App with label %s could not be found" % app_label)
-        finally:
-            imp.release_lock()
+            return self.get_app_config(app_label).models_module
+        except LookupError as exc:
+            # Change the exception type for backwards compatibility.
+            raise ImproperlyConfigured(*exc.args)
 
     def get_models(self, app_mod=None,
                    include_auto_created=False, include_deferred=False,

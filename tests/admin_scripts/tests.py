@@ -379,14 +379,14 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         args = ['sqlall', '--settings=test_project.settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'App with label admin_scripts could not be found')
+        self.assertOutput(err, "No app with label 'admin_scripts'.")
 
     def test_builtin_with_environment(self):
         "minimal: django-admin builtin commands fail if settings are provided in the environment"
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_django_admin(args, 'test_project.settings')
         self.assertNoOutput(out)
-        self.assertOutput(err, 'App with label admin_scripts could not be found')
+        self.assertOutput(err, "No app with label 'admin_scripts'.")
 
     def test_builtin_with_bad_settings(self):
         "minimal: django-admin builtin commands fail if settings file (from argument) doesn't exist"
@@ -815,21 +815,21 @@ class ManageMinimalSettings(AdminScriptTestCase):
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'App with label admin_scripts could not be found')
+        self.assertOutput(err, "No app with label 'admin_scripts'.")
 
     def test_builtin_with_settings(self):
         "minimal: manage.py builtin commands fail if settings are provided as argument"
         args = ['sqlall', '--settings=test_project.settings', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'App with label admin_scripts could not be found')
+        self.assertOutput(err, "No app with label 'admin_scripts'.")
 
     def test_builtin_with_environment(self):
         "minimal: manage.py builtin commands fail if settings are provided in the environment"
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_manage(args, 'test_project.settings')
         self.assertNoOutput(out)
-        self.assertOutput(err, 'App with label admin_scripts could not be found')
+        self.assertOutput(err, "No app with label 'admin_scripts'.")
 
     def test_builtin_with_bad_settings(self):
         "minimal: manage.py builtin commands fail if settings file (from argument) doesn't exist"
@@ -964,7 +964,7 @@ class ManageMultipleSettings(AdminScriptTestCase):
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'App with label admin_scripts could not be found.')
+        self.assertOutput(err, "No app with label 'admin_scripts'.")
 
     def test_builtin_with_settings(self):
         "multiple: manage.py builtin commands succeed if settings are provided as argument"
@@ -1442,13 +1442,13 @@ class CommandTypes(AdminScriptTestCase):
         "User AppCommands can execute when a single app name is provided"
         args = ['app_command', 'NOT_AN_APP']
         out, err = self.run_manage(args)
-        self.assertOutput(err, "App with label NOT_AN_APP could not be found")
+        self.assertOutput(err, "No app with label 'NOT_AN_APP'.")
 
     def test_app_command_some_invalid_appnames(self):
         "User AppCommands can execute when some of the provided app names are invalid"
         args = ['app_command', 'auth', 'NOT_AN_APP']
         out, err = self.run_manage(args)
-        self.assertOutput(err, "App with label NOT_AN_APP could not be found")
+        self.assertOutput(err, "No app with label 'NOT_AN_APP'.")
 
     def test_label_command(self):
         "User LabelCommands can execute when a label is provided"
