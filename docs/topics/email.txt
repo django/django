@@ -600,8 +600,8 @@ manually open the connection, you can control when it is closed. For example::
     connection.close()
 
 
-Testing email sending
-=====================
+Configuring email for development
+=================================
 
 There are times when you do not want Django to send emails at
 all. For example, while developing a Web site, you probably don't want
@@ -609,13 +609,13 @@ to send out thousands of emails -- but you may want to validate that
 emails will be sent to the right people under the right conditions,
 and that those emails will contain the correct content.
 
-The easiest way to test your project's use of email is to use the ``console``
-email backend. This backend redirects all email to stdout, allowing you to
-inspect the content of mail.
+The easiest way to configure email for local development is to use the
+:ref:`console <topic-email-console-backend>` email backend. This backend
+redirects all email to stdout, allowing you to inspect the content of mail.
 
-The ``file`` email backend can also be useful during development -- this backend
-dumps the contents of every SMTP connection to a file that can be inspected
-at your leisure.
+The :ref:`file <topic-email-file-backend>` email backend can also be useful
+during development -- this backend dumps the contents of every SMTP connection
+to a file that can be inspected at your leisure.
 
 Another approach is to use a "dumb" SMTP server that receives the emails
 locally and displays them to the terminal, but does not actually send
@@ -626,7 +626,9 @@ anything. Python has a built-in way to accomplish this with a single command::
 This command will start a simple SMTP server listening on port 1025 of
 localhost. This server simply prints to standard output all email headers and
 the email body. You then only need to set the :setting:`EMAIL_HOST` and
-:setting:`EMAIL_PORT` accordingly, and you are set.
+:setting:`EMAIL_PORT` accordingly. For a more detailed discussion of SMTP
+server options, see the Python documentation for the :mod:`smtpd` module.
 
-For a more detailed discussion of testing and processing of emails locally,
-see the Python documentation for the :mod:`smtpd` module.
+For information about unit-testing the sending of emails in your
+application, see the :ref:`topics-testing-email` section of :doc:`Testing
+Django applications </topics/testing/overview>`.
