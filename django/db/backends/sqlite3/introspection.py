@@ -68,6 +68,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return [FieldInfo(info['name'], info['type'], None, info['size'], None, None,
                  info['null_ok']) for info in self._table_info(cursor, table_name)]
 
+    def column_name_converter(self, name):
+        """
+        SQLite will in some cases, e.g. when returning columns from views and
+        subselects, return column names in 'alias."column"' format instead of
+        simply 'column'.
+        """
+        return name.split('.')[-1].strip('"')
+
     def get_relations(self, cursor, table_name):
         """
         Returns a dictionary of {field_index: (field_index_other_table, other_table)}
