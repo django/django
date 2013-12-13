@@ -273,8 +273,37 @@ class OSMWidgetTest(SimpleTestCase):
         geom = self.geometries['point']
         form = PointForm(data={'p': geom})
         rendered = form.as_p()
+
         self.assertIn("OpenStreetMap (Mapnik)", rendered)
         self.assertIn("id: 'id_p',", rendered)
+
+    def test_default_lon(self):
+        class PointForm(forms.Form):
+            p = forms.PointField(
+                widget=forms.OSMWidget(attrs={'default_lon': 20}),
+            )
+
+        form = PointForm()
+        rendered = form.as_p()
+
+        self.assertIn("options['default_lon'] = 20;", rendered)
+        self.assertNotIn(
+            "options['default_lon'] = %d;" % forms.OSMWidget.default_lon,
+            rendered)
+
+    def test_default_lat(self):
+        class PointForm(forms.Form):
+            p = forms.PointField(
+                widget=forms.OSMWidget(attrs={'default_lat': 30}),
+            )
+
+        form = PointForm()
+        rendered = form.as_p()
+
+        self.assertIn("options['default_lat'] = 30;", rendered)
+        self.assertNotIn(
+            "options['default_lon'] = %d;" % forms.OSMWidget.default_lat,
+            rendered)
 
 
 @skipUnless(HAS_GDAL and HAS_SPATIALREFSYS,
