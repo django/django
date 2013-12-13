@@ -35,7 +35,7 @@ def _initialize():
         # Pending lookups for lazy relations
         pending_lookups={},
 
-        # List of app_labels that allows restricting the set of apps.
+        # Set of app names. Allows restricting the set of installed apps.
         # Used by TransactionTestCase.available_apps for performance reasons.
         available_apps=None,
 
@@ -165,7 +165,7 @@ class BaseAppCache(object):
         for app_config in self.app_configs.values():
             if only_installed and not app_config.installed:
                 continue
-            if self.available_apps is not None and app_config.label not in self.available_apps:
+            if self.available_apps is not None and app_config.name not in self.available_apps:
                 continue
             yield app_config
 
@@ -185,7 +185,7 @@ class BaseAppCache(object):
         app_config = self.app_configs.get(app_label)
         if app_config is None or (only_installed and not app_config.installed):
             raise LookupError("No app with label %r." % app_label)
-        if self.available_apps is not None and app_config.label not in self.available_apps:
+        if self.available_apps is not None and app_config.name not in self.available_apps:
             raise UnavailableApp("App with label %r isn't available." % app_label)
         return app_config
 
@@ -239,7 +239,10 @@ class BaseAppCache(object):
         try:
             model_list = self._get_models_cache[cache_key]
             if self.available_apps is not None and only_installed:
-                model_list = [m for m in model_list if m._meta.app_label in self.available_apps]
+                model_list = [
+                    m for m in model_list
+                    if self.app_configs[m._meta.app_label].name in self.available_apps
+                ]
             return model_list
         except KeyError:
             pass
@@ -266,7 +269,10 @@ class BaseAppCache(object):
             )
         self._get_models_cache[cache_key] = model_list
         if self.available_apps is not None and only_installed:
-            model_list = [m for m in model_list if m._meta.app_label in self.available_apps]
+            model_list = [
+                m for m in model_list
+                if self.app_configs[m._meta.app_label].name in self.available_apps
+            ]
         return model_list
 
     def get_model(self, app_label, model_name,
@@ -289,7 +295,7 @@ class BaseAppCache(object):
             if app_config is not None and not app_config.installed:
                 return None
             if (self.available_apps is not None
-                    and app_label not in self.available_apps):
+                    and app_config.name not in self.available_apps):
                 raise UnavailableApp("App with label %s isn't available." % app_label)
         try:
             return self.app_configs[app_label].models[model_name.lower()]
@@ -325,11 +331,12 @@ class BaseAppCache(object):
         self._get_models_cache.clear()
 
     def set_available_apps(self, available):
-        if not set(available).issubset(set(settings.INSTALLED_APPS)):
-            extra = set(available) - set(settings.INSTALLED_APPS)
+        available = set(available)
+        installed = set(settings.INSTALLED_APPS)
+        if not available.issubset(installed):
             raise ValueError("Available apps isn't a subset of installed "
-                "apps, extra apps: " + ", ".join(extra))
-        self.available_apps = set(app.rsplit('.', 1)[-1] for app in available)
+                "apps, extra apps: %s" % ", ".join(available - installed))
+        self.available_apps = available
 
     def unset_available_apps(self):
         self.available_apps = None
