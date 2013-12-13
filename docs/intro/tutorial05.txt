@@ -677,7 +677,7 @@ a piece of code, it usually means that code should be refactored or removed.
 Coverage will help to identify dead code. See
 :ref:`topics-testing-code-coverage` for details.
 
-:doc:`Testing Django applications </topics/testing/index>` has comprehensive
+:doc:`Testing in Django </topics/testing/index>` has comprehensive
 information about testing.
 
 .. _Selenium: http://seleniumhq.org/
