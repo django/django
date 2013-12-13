@@ -153,6 +153,21 @@ class BaseAppCache(object):
         """
         return self.loaded
 
+    def get_app_configs(self, only_installed=True):
+        """
+        Return an iterable of application configurations.
+
+        If only_installed is True (default), only applications explicitly
+        listed in INSTALLED_APPS are considered.
+        """
+        self._populate()
+        for app_config in self.app_configs.values():
+            if only_installed and not app_config.installed:
+                continue
+            if self.available_apps is not None and app_config.label not in self.available_apps:
+                continue
+            yield app_config
+
     def get_app_config(self, app_label, only_installed=True):
         """
         Returns the application configuration for the given app_label.
@@ -177,15 +192,7 @@ class BaseAppCache(object):
         """
         Returns a list of all installed modules that contain models.
         """
-        self._populate()
-
-        # app_configs is an OrderedDict, which ensures that the returned list
-        # is always in the same order (with new apps added at the end). This
-        # avoids unstable ordering on the admin app list page, for example.
-        apps = [app for app in self.app_configs.items() if app[1].installed]
-        if self.available_apps is not None:
-            apps = [app for app in apps if app[0] in self.available_apps]
-        return [app[1].models_module for app in apps]
+        return [app_config.models_module for app_config in self.get_app_configs()]
 
     def _get_app_package(self, app):
         return '.'.join(app.__name__.split('.')[:-1])
