@@ -257,6 +257,15 @@ class SpecializedFieldTest(SimpleTestCase):
         for invalid in [geo for key, geo in self.geometries.items() if key != 'geometrycollection']:
             self.assertFalse(GeometryForm(data={'g': invalid.wkt}).is_valid())
 
+
+@skipUnless(HAS_GDAL and HAS_SPATIALREFSYS,
+    "OSMWidgetTest needs gdal support and a spatial database")
+class OSMWidgetTest(SimpleTestCase):
+    def setUp(self):
+        self.geometries = {
+            'point': GEOSGeometry("SRID=4326;POINT(9.052734375 42.451171875)"),
+        }
+
     def test_osm_widget(self):
         class PointForm(forms.Form):
             p = forms.PointField(widget=forms.OSMWidget)
