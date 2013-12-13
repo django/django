@@ -274,7 +274,7 @@ class ModelBase(type):
 
         new_class._prepare()
 
-        new_class._meta.app_cache.register_models(new_class._meta.app_label, new_class)
+        new_class._meta.app_cache.register_model(new_class._meta.app_label, new_class)
         # Because of the way imports happen (recursively), we may or may not be
         # the first time this model tries to register with the framework. There
         # should only be one class for each model, so we always return the

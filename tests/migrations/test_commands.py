@@ -151,7 +151,7 @@ class MakeMigrationsTests(MigrationTestBase):
 
     def test_files_content(self):
         self.assertTableNotExists("migrations_unicodemodel")
-        app_cache.register_models('migrations', UnicodeModel)
+        app_cache.register_model('migrations', UnicodeModel)
         with override_settings(MIGRATION_MODULES={"migrations": self.migration_pkg}):
             call_command("makemigrations", "migrations", verbosity=0)
 
@@ -187,7 +187,7 @@ class MakeMigrationsTests(MigrationTestBase):
 
     def test_failing_migration(self):
         #21280 - If a migration fails to serialize, it shouldn't generate an empty file.
-        app_cache.register_models('migrations', UnserializableModel)
+        app_cache.register_model('migrations', UnserializableModel)
 
         with six.assertRaisesRegex(self, ValueError, r'Cannot serialize'):
             with override_settings(MIGRATION_MODULES={"migrations": self.migration_pkg}):
