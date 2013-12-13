@@ -3,7 +3,7 @@
 # Translators:
 # André Hagenbruch <ahagenbruch@googlemail.com>, 2011
 # apollo13 <florian@apolloner.eu>, 2012
-# Jannis , 2013
+# Jannis , 2013
 # Markus Holtermann <inyoka@markusholtermann.eu>, 2013
 msgid ""
 msgstr ""
@@ -11,7 +11,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-10-09 20:17+0200\n"
 "PO-Revision-Date: 2013-10-21 17:42+0000\n"
-"Last-Translator: Jannis \n"
+"Last-Translator: Jannis \n"
 "Language-Team: German (http://www.transifex.com/projects/p/django/language/"
 "de/)\n"
 "MIME-Version: 1.0\n"

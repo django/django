@@ -2,7 +2,7 @@
 #
 # Translators:
 # André Hagenbruch <ahagenbruch@googlemail.com>, 2012
-# Jannis , 2013
+# Jannis , 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""

@@ -3,7 +3,7 @@
 # Translators:
 # André Hagenbruch <ahagenbruch@googlemail.com>, 2011-2012
 # apollo13 <florian@apolloner.eu>, 2011
-# Jannis , 2011,2013
+# Jannis , 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2013
 # Markus Holtermann <inyoka@markusholtermann.eu>, 2013
 msgid ""

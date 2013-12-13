@@ -4,7 +4,7 @@
 # André Hagenbruch <ahagenbruch@googlemail.com>, 2012
 # apollo13 <florian@apolloner.eu>, 2011
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Jannis , 2013
+# Jannis , 2013
 # Jannis Leidel <jannis@leidel.info>, 2013
 # Markus Holtermann <inyoka@markusholtermann.eu>, 2013
 msgid ""
