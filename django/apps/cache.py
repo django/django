@@ -5,6 +5,7 @@ import imp
 from importlib import import_module
 import os
 import sys
+import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -194,36 +195,6 @@ class BaseAppCache(object):
         """
         return [app_config.models_module for app_config in self.get_app_configs()]
 
-    def _get_app_package(self, app):
-        return '.'.join(app.__name__.split('.')[:-1])
-
-    def get_app_package(self, app_label):
-        return self._get_app_package(self.get_app(app_label))
-
-    def _get_app_path(self, app):
-        if hasattr(app, '__path__'):        # models/__init__.py package
-            app_path = app.__path__[0]
-        else:                               # models.py module
-            app_path = app.__file__
-        return os.path.dirname(upath(app_path))
-
-    def get_app_path(self, app_label):
-        return self._get_app_path(self.get_app(app_label))
-
-    def get_app_paths(self):
-        """
-        Returns a list of paths to all installed apps.
-
-        Useful for discovering files at conventional locations inside apps
-        (static files, templates, etc.)
-        """
-        self._populate()
-
-        app_paths = []
-        for app in self.get_apps():
-            app_paths.append(self._get_app_path(app))
-        return app_paths
-
     def get_app(self, app_label):
         """
         Returns the module containing the models for the given app_label.
@@ -362,6 +333,48 @@ class BaseAppCache(object):
 
     def unset_available_apps(self):
         self.available_apps = None
+
+    ### DEPRECATED METHODS GO BELOW THIS LINE ###
+
+    def _get_app_package(self, app):
+        return '.'.join(app.__name__.split('.')[:-1])
+
+    def get_app_package(self, app_label):
+        warnings.warn(
+            "get_app_config(label).name supersedes get_app_package(label).",
+            PendingDeprecationWarning, stacklevel=2)
+        return self._get_app_package(self.get_app(app_label))
+
+    def _get_app_path(self, app):
+        if hasattr(app, '__path__'):        # models/__init__.py package
+            app_path = app.__path__[0]
+        else:                               # models.py module
+            app_path = app.__file__
+        return os.path.dirname(upath(app_path))
+
+    def get_app_path(self, app_label):
+        warnings.warn(
+            "get_app_config(label).path supersedes get_app_path(label).",
+            PendingDeprecationWarning, stacklevel=2)
+        return self._get_app_path(self.get_app(app_label))
+
+    def get_app_paths(self):
+        """
+        Returns a list of paths to all installed apps.
+
+        Useful for discovering files at conventional locations inside apps
+        (static files, templates, etc.)
+        """
+        warnings.warn(
+            "[a.path for a in get_app_configs()] supersedes get_app_paths().",
+            PendingDeprecationWarning, stacklevel=2)
+
+        self._populate()
+
+        app_paths = []
+        for app in self.get_apps():
+            app_paths.append(self._get_app_path(app))
+        return app_paths
 
 
 class AppCache(BaseAppCache):

@@ -169,7 +169,7 @@ def _split_statements(content):
 def custom_sql_for_model(model, style, connection):
     opts = model._meta
     app_dirs = []
-    app_dir = app_cache.get_app_path(model._meta.app_label)
+    app_dir = app_cache.get_app_config(model._meta.app_label).path
     app_dirs.append(os.path.normpath(os.path.join(app_dir, 'sql')))
 
     # Deprecated location -- remove in Django 1.9
