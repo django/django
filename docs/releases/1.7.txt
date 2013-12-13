@@ -534,6 +534,9 @@ Tests
   in :class:`~django.test.Client` instantiation and are processed through
   middleware.
 
+* :meth:`~django.test.TransactionTestCase.assertNumQueries` now prints
+  out the list of executed queries if the assertion fails.
+
 Backwards incompatible changes in 1.7
 =====================================
 
@@ -712,9 +715,6 @@ Miscellaneous
   ``select_related('foo', 'bar')`` is equivalent to
   ``select_related('foo').select_related('bar')``. Previously the latter would
   have been equivalent to ``select_related('bar')``.
-
-* :meth:`~django.test.TransactionTestCase.assertNumQueries` now prints
-  out the list of executed queries if the assertion fails.
 
 Features deprecated in 1.7
 ==========================
