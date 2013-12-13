@@ -302,32 +302,27 @@ class BaseAppCache(object):
         except KeyError:
             return None
 
-    def register_models(self, app_label, *models):
-        """
-        Register a set of models as belonging to an app.
-        """
-        if models:
-            try:
-                app_config = self.app_configs[app_label]
-            except KeyError:
-                app_config = AppConfig._stub(app_label)
-                self.app_configs[app_label] = app_config
-        for model in models:
-            # Add the model to the app_config's models dictionary.
-            model_name = model._meta.model_name
-            model_dict = app_config.models
-            if model_name in model_dict:
-                # The same model may be imported via different paths (e.g.
-                # appname.models and project.appname.models). We use the source
-                # filename as a means to detect identity.
-                fname1 = os.path.abspath(upath(sys.modules[model.__module__].__file__))
-                fname2 = os.path.abspath(upath(sys.modules[model_dict[model_name].__module__].__file__))
-                # Since the filename extension could be .py the first time and
-                # .pyc or .pyo the second time, ignore the extension when
-                # comparing.
-                if os.path.splitext(fname1)[0] == os.path.splitext(fname2)[0]:
-                    continue
-            model_dict[model_name] = model
+    def register_model(self, app_label, model):
+        try:
+            app_config = self.app_configs[app_label]
+        except KeyError:
+            app_config = AppConfig._stub(app_label)
+            self.app_configs[app_label] = app_config
+        # Add the model to the app_config's models dictionary.
+        model_name = model._meta.model_name
+        model_dict = app_config.models
+        if model_name in model_dict:
+            # The same model may be imported via different paths (e.g.
+            # appname.models and project.appname.models). We use the source
+            # filename as a means to detect identity.
+            fname1 = os.path.abspath(upath(sys.modules[model.__module__].__file__))
+            fname2 = os.path.abspath(upath(sys.modules[model_dict[model_name].__module__].__file__))
+            # Since the filename extension could be .py the first time and
+            # .pyc or .pyo the second time, ignore the extension when
+            # comparing.
+            if os.path.splitext(fname1)[0] == os.path.splitext(fname2)[0]:
+                return
+        model_dict[model_name] = model
         self._get_models_cache.clear()
 
     def set_available_apps(self, available):
@@ -382,6 +377,16 @@ class BaseAppCache(object):
         for app in self.get_apps():
             app_paths.append(self._get_app_path(app))
         return app_paths
+
+    def register_models(self, app_label, *models):
+        """
+        Register a set of models as belonging to an app.
+        """
+        warnings.warn(
+            "register_models(app_label, models) is deprecated.",
+            PendingDeprecationWarning, stacklevel=2)
+        for model in models:
+            self.register_model(app_label, model)
 
 
 class AppCache(BaseAppCache):

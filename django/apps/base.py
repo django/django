@@ -26,7 +26,7 @@ class AppConfig(object):
         self.models_module = models_module
 
         # Mapping of lower case model names to model classes.
-        # Populated by AppCache.register_models().
+        # Populated by calls to AppCache.register_model().
         self.models = OrderedDict()
 
         # Whether the app is in INSTALLED_APPS or was automatically created
