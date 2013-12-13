@@ -230,8 +230,8 @@ class Command(BaseCommand):
         current directory.
         """
         dirs = []
-        for path in app_cache.get_app_paths():
-            d = os.path.join(path, 'fixtures')
+        for app_config in app_cache.get_app_configs():
+            d = os.path.join(app_config.path, 'fixtures')
             if os.path.isdir(d):
                 dirs.append(d)
         dirs.extend(list(settings.FIXTURE_DIRS))

@@ -223,7 +223,8 @@ these changes.
   to :setting:`CACHES` and use :data:`django.core.cache.caches` instead.
 
 * ``django.db.models.loading`` will be removed. Use the new application
-  loading APIs instead.
+  loading APIs instead. Several undocumented methods of the ``AppCache`` class
+  will also be removed.
 
 2.0
 ---

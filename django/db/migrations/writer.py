@@ -69,14 +69,12 @@ class MigrationWriter(object):
             migrations_module = import_module(migrations_package_name)
             basedir = os.path.dirname(migrations_module.__file__)
         except ImportError:
-            app = app_cache.get_app(self.migration.app_label)
-            app_path = app_cache._get_app_path(app)
-            app_package_name = app_cache._get_app_package(app)
+            app_config = app_cache.get_app_config(self.migration.app_label)
             migrations_package_basename = migrations_package_name.split(".")[-1]
 
             # Alright, see if it's a direct submodule of the app
-            if '%s.%s' % (app_package_name, migrations_package_basename) == migrations_package_name:
-                basedir = os.path.join(app_path, migrations_package_basename)
+            if '%s.%s' % (app_config.name, migrations_package_basename) == migrations_package_name:
+                basedir = os.path.join(app_config.path, migrations_package_basename)
             else:
                 raise ImportError("Cannot open migrations module %s for app %s" % (migrations_package_name, self.migration.app_label))
         return os.path.join(basedir, self.filename)
