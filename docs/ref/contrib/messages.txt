@@ -398,6 +398,40 @@ method.
             return self.success_message % dict(cleaned_data,
                                                calculated_field=self.object.calculated_field)
 
+.. versionadded:: 1.7
+
+.. class:: views.MessageMixin
+
+    Adds a ``messages`` attribute on the view that wraps the complete messages
+    API and automatically passes the request object.
+
+**Examples**::
+
+    from django.contrib import messages
+    from django.contrib.messages.views import MessageMixin
+    from django.views.generic import TemplateView
+
+    class MyView(MessageMixin, TemplateView):
+        """
+        This view will add a debug message which can then be displayed in the
+        template.
+        """
+        template_name = "my_template.html"
+
+        def get(self, request, *args, **kwargs):
+            self.messages.debug("This is a debug message.")
+            return super(MyView, self).get(request, *args, **kwargs)
+
+    class OnlyWarningView(MessageMixin, TemplateView):
+        """
+        This view will only show messages that have a level above `warning`.
+        """
+        template_name = "my_template.html"
+
+        def dispatch(self, request, *args, **kwargs):
+            self.messages.set_level(messages.WARNING)
+            return super(OnlyWarningView, self).dispatch(request, *args, **kwargs)
+
 Expiration of messages
 ======================
 
