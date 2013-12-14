@@ -88,7 +88,8 @@ def Deserializer(object_list, **options):
     db = options.pop('using', DEFAULT_DB_ALIAS)
     ignore = options.pop('ignorenonexistent', False)
 
-    app_cache.get_apps()
+    app_cache.populate()
+
     for d in object_list:
         # Look up the model and starting build a dict of data for it.
         Model = _get_model(d["model"])
