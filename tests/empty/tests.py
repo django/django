@@ -1,7 +1,4 @@
-from django.apps import app_cache
 from django.test import TestCase
-from django.test.utils import override_settings
-from django.utils import six
 
 from .models import Empty
 
@@ -16,20 +13,3 @@ class EmptyModelTests(TestCase):
         self.assertTrue(m.id is not None)
         existing = Empty(m.id)
         existing.save()
-
-
-class NoModelTests(TestCase):
-    """
-    Test for #7198 to ensure that the proper error message is raised
-    when attempting to load an app with no models.py file.
-
-    Because the test runner won't currently load a test module with no
-    models.py file, this TestCase instead lives in this module.
-
-    It seemed like an appropriate home for it.
-    """
-    @override_settings(INSTALLED_APPS=("empty.no_models",))
-    def test_no_models(self):
-        with six.assertRaisesRegex(self, LookupError,
-                    "No app with label 'no_models'."):
-            app_cache.get_app_config('no_models')

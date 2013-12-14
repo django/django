@@ -22,7 +22,8 @@ class AppConfig(object):
         self.app_module = app_module
 
         # Module containing models eg. <module 'django.contrib.admin.models'
-        # from 'django/contrib/admin/models.pyc'>.
+        # from 'django/contrib/admin/models.pyc'>. None if the application
+        # doesn't have a models module.
         self.models_module = models_module
 
         # Mapping of lower case model names to model classes.
