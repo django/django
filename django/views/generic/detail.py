@@ -50,7 +50,7 @@ class SingleObjectMixin(ContextMixin):
         try:
             # Get the single item from the filtered queryset
             obj = queryset.get()
-        except ObjectDoesNotExist:
+        except queryset.model.DoesNotExist:
             raise Http404(_("No %(verbose_name)s found matching the query") %
                           {'verbose_name': queryset.model._meta.verbose_name})
         return obj

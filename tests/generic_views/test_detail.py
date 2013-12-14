@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.core.exceptions import ImproperlyConfigured
+from django.http import Http404
 from django.test import TestCase
 from django.views.generic.base import View
 
@@ -24,6 +25,10 @@ class DetailViewTest(TestCase):
         self.assertEqual(res.context['object'], Author.objects.get(pk=1))
         self.assertEqual(res.context['author'], Author.objects.get(pk=1))
         self.assertTemplateUsed(res, 'generic_views/author_detail.html')
+
+    def test_detail_missing_object(self):
+        res = self.client.get('/detail/author/500/')
+        self.assertEqual(res.status_code, 404)
 
     def test_detail_by_custom_pk(self):
         res = self.client.get('/detail/author/bycustompk/1/')
