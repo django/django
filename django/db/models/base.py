@@ -523,7 +523,7 @@ class Model(six.with_metaclass(ModelBase)):
         return getattr(self, field.attname)
 
     def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
+             update_fields=None, force_fetch=False):
         """
         Saves the current instance. Override this in a subclass if you want to
         control the saving process.
@@ -531,6 +531,11 @@ class Model(six.with_metaclass(ModelBase)):
         The 'force_insert' and 'force_update' parameters can be used to insist
         that the "save" must be an SQL insert or update (or equivalent for
         non-SQL backends), respectively. Normally, they should not be set.
+
+        The 'force_fetch' command is only applicable for db-default values; it
+        populates the db-default fields with the values given by the
+        database.
+
         """
         using = using or router.db_for_write(self.__class__, instance=self)
         if force_insert and (force_update or update_fields):
@@ -553,7 +558,7 @@ class Model(six.with_metaclass(ModelBase)):
                     if field.name != field.attname:
                         field_names.add(field.attname)
 
-            non_model_fields = update_fields.difference(field_names)
+                        non_model_fields = update_fields.difference(field_names)
 
             if non_model_fields:
                 raise ValueError("The following fields do not exist in this "
@@ -578,11 +583,13 @@ class Model(six.with_metaclass(ModelBase)):
                 update_fields = frozenset(loaded_fields)
 
         self.save_base(using=using, force_insert=force_insert,
-                       force_update=force_update, update_fields=update_fields)
+                       force_update=force_update, update_fields=update_fields,
+                       force_fetch=force_fetch)
     save.alters_data = True
 
     def save_base(self, raw=False, force_insert=False,
-                  force_update=False, using=None, update_fields=None):
+                  force_update=False, using=None, update_fields=None,
+                  force_fetch=False):
         """
         Handles the parts of saving which should be done only once per save,
         yet need to be done in raw saves, too. This includes some sanity
@@ -606,7 +613,7 @@ class Model(six.with_metaclass(ModelBase)):
         with transaction.commit_on_success_unless_managed(using=using, savepoint=False):
             if not raw:
                 self._save_parents(cls, using, update_fields)
-            updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
+            updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields, force_fetch)
         # Store the database on which the object was saved
         self._state.db = using
         # Once saved, this is no longer a to-be-added instance.
@@ -644,7 +651,8 @@ class Model(six.with_metaclass(ModelBase)):
                     delattr(self, cache_name)
 
     def _save_table(self, raw=False, cls=None, force_insert=False,
-                    force_update=False, using=None, update_fields=None):
+                    force_update=False, using=None, update_fields=None,
+                    force_fetch=False):
         """
         Does the heavy-lifting involved in saving. Updates or inserts the data
         for a single table.
@@ -675,13 +683,37 @@ class Model(six.with_metaclass(ModelBase)):
             values = [(f, None, (getattr(self, f.attname) if raw else f.pre_save(self, False)))
                       for f in non_pks]
             forced_update = update_fields or force_update
-            updated = self._do_update(base_qs, using, pk_val, values, update_fields,
-                                      forced_update)
+            if force_fetch:
+                # Fields to read from the database.
+                returning_fields = [
+                    f.db_column or f.column
+                    for f in meta.local_concrete_fields
+                    if not f.use_on_update
+                ]
+            else:
+                returning_fields = []
+            updated, returning_values = self._do_update(
+                base_qs, using, pk_val, values, update_fields,
+                forced_update, returning_fields=returning_fields
+            )
             if force_update and not updated:
                 raise DatabaseError("Forced update did not affect any rows.")
             if update_fields and not updated:
                 raise DatabaseError("Save with update_fields did not affect any rows.")
-        if not updated:
+        if updated:
+            # Do not refresh the instance unless the user asked to and
+            # there were actual values to update.
+            if force_fetch and values:
+                if returning_values:
+                    for f, value in zip(returning_fields, returning_values):
+                        setattr(self, f, value)
+                else:
+                    res = self.__class__.objects.values(
+                        *list(returning_fields)
+                    ).get(pk=self.pk)
+                    for k, v in six.iteritems(res):
+                        setattr(self, k, v)
+        else:
             if meta.order_with_respect_to:
                 # If this is a model with an order_with_respect_to
                 # autopopulate the _order field
@@ -691,24 +723,48 @@ class Model(six.with_metaclass(ModelBase)):
                 self._order = order_value
 
             fields = meta.local_concrete_fields
+            returning_fields = []
             if not raw:
                 fields = (f for f in fields if f.use_on_insert)
+                if force_fetch:
+                    returning_fields = [
+                        f.db_column or f.column
+                        for f in meta.local_concrete_fields
+                        if not f.use_on_insert
+                    ]
             if not pk_set:
                 fields = (f for f in fields if not isinstance(f, AutoField))
 
             update_pk = bool(meta.has_auto_field and not pk_set)
             result = self._do_insert(
-                cls._base_manager, using, list(fields), update_pk, raw
+                cls._base_manager, using, list(fields), update_pk, raw,
+                returning_fields
             )
             if update_pk:
-                setattr(self, meta.pk.attname, result)
+                setattr(self, meta.pk.attname, result[0])
+                if force_fetch:
+                    if result[1:]:
+                        for f, value in zip(returning_fields, result[1:]):
+                            setattr(self, f, value)
+                    else:
+                        res = self.__class__.objects.values(
+                            *list(returning_fields)
+                        ).get(pk=self.pk)
+                        for k, v in six.iteritems(res):
+                            setattr(self, k, v)
         return updated
 
-    def _do_update(self, base_qs, using, pk_val, values, update_fields, forced_update):
+    def _do_update(self, base_qs, using, pk_val, values, update_fields,
+                   forced_update, returning_fields=None):
         """
-        This method will try to update the model. If the model was updated (in
-        the sense that an update query was done and a matching row was found
-        from the DB) the method will return True.
+        This method will try to update the model. The method returns two
+        arguments.
+
+        If the model was updated (in the sense that an update query was done
+        and a matching row was found from the DB) the first value will be True.
+
+        The second argument has the (if any) values for the db-default fields.
+
         """
         filtered = base_qs.filter(pk=pk_val)
         if not values:
@@ -717,22 +773,25 @@ class Model(six.with_metaclass(ModelBase)):
             # case we just say the update succeeded. Another case ending up here
             # is a model with just PK - in that case check that the PK still
             # exists.
-            return update_fields is not None or filtered.exists()
+            return (update_fields is not None or filtered.exists(), [])
         if self._meta.select_on_save and not forced_update:
             if filtered.exists():
-                filtered._update(values)
-                return True
+                res = filtered._update(values, returning_fields)
+                return (True, res[1])
             else:
-                return False
-        return filtered._update(values) > 0
+                return (False, [])
+        res = filtered._update(values, returning_fields)
+        return (res[0] > 0, res[1])
 
-    def _do_insert(self, manager, using, fields, update_pk, raw):
+    def _do_insert(self, manager, using, fields, update_pk, raw,
+                   returning_fields):
         """
         Do an INSERT. If update_pk is defined then this method should return
         the new pk for the model.
         """
         return manager._insert([self], fields=fields, return_id=update_pk,
-                               using=using, raw=raw)
+                               using=using, raw=raw,
+                               returning_fields=returning_fields)
 
     def delete(self, using=None):
         using = using or router.db_for_write(self.__class__, instance=self)

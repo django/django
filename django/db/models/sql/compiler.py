@@ -1,3 +1,4 @@
+import itertools
 import datetime
 
 from django.conf import settings
@@ -845,15 +846,22 @@ class SQLInsertCompiler(SQLCompiler):
             ]
             # Oracle Spatial needs to remove some values due to #10888
             params = self.connection.ops.modify_insert_params(placeholders, params)
-        if self.return_id and self.connection.features.can_return_id_from_insert:
+        if self.return_id and self.connection.features.supports_returning_clause:
             params = params[0]
             col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
             result.append("VALUES (%s)" % ", ".join(placeholders[0]))
-            r_fmt, r_params = self.connection.ops.return_insert_id()
+            r_fmt, r_params = self.connection.ops.return_values(
+                nvars=len(self.returning_fields) + 1
+            )
             # Skip empty r_fmt to allow subclasses to customize behaviour for
             # 3rd party backends. Refs #19096.
             if r_fmt:
-                result.append(r_fmt % col)
+                extra_fields = []
+                for f in self.returning_fields:
+                    extra_fields += ["%s.%s" % (qn(opts.db_table), qn(f))]
+                result.append(
+                    r_fmt % tuple(itertools.chain([col], extra_fields))
+                )
                 params += r_params
             return [(" ".join(result), tuple(params))]
         if can_bulk:
@@ -865,18 +873,20 @@ class SQLInsertCompiler(SQLCompiler):
                 for p, vals in zip(placeholders, params)
             ]
 
-    def execute_sql(self, return_id=False):
+    def execute_sql(self, return_id=False, returning_fields=[]):
         assert not (return_id and len(self.query.objs) != 1)
         self.return_id = return_id
+        self.returning_fields = returning_fields
         cursor = self.connection.cursor()
         for sql, params in self.as_sql():
             cursor.execute(sql, params)
         if not (return_id and cursor):
             return
-        if self.connection.features.can_return_id_from_insert:
-            return self.connection.ops.fetch_returned_insert_id(cursor)
-        return self.connection.ops.last_insert_id(cursor,
-                self.query.get_meta().db_table, self.query.get_meta().pk.column)
+        if self.connection.features.supports_returning_clause:
+            return self.connection.ops.fetch_returned_values(cursor)
+        return (self.connection.ops.last_insert_id(
+            cursor, self.query.get_meta().db_table,
+            self.query.get_meta().pk.column), )
 
 
 class SQLDeleteCompiler(SQLCompiler):
@@ -939,17 +949,36 @@ class SQLUpdateCompiler(SQLCompiler):
         where, params = self.query.where.as_sql(qn=qn, connection=self.connection)
         if where:
             result.append('WHERE %s' % where)
+        if self.connection.features.supports_returning_clause and self.returning_fields:
+            r_fmt, r_params = self.connection.ops.return_values(
+                nvars=len(self.returning_fields)
+            )
+            if r_fmt:
+                extra_fields = []
+                opts = self.query.get_meta()
+                for f in self.returning_fields:
+                    extra_fields += ["%s.%s" % (qn(opts.db_table), qn(f))]
+                result.append(r_fmt % tuple(extra_fields))
+                params += r_params
         return ' '.join(result), tuple(update_params + params)
 
-    def execute_sql(self, result_type):
+    def execute_sql(self, result_type, returning_fields=None):
         """
         Execute the specified update. Returns the number of rows affected by
-        the primary update query. The "primary update query" is the first
-        non-empty query that is executed. Row counts for any subsequent,
-        related queries are not available.
+        the primary update query and any values from a returning clause.
+
+        The "primary update query" is the first non-empty query that is
+        executed. Row counts for any subsequent, related queries are not
+        available.
+
         """
+        self.returning_fields = returning_fields
         cursor = super(SQLUpdateCompiler, self).execute_sql(result_type)
         rows = cursor.rowcount if cursor else 0
+        if returning_fields:
+            returning_values = cursor.fetchone()
+        else:
+            returning_values = []
         is_empty = cursor is None
         del cursor
         for query in self.query.get_related_updates():
@@ -957,7 +986,7 @@ class SQLUpdateCompiler(SQLCompiler):
             if is_empty:
                 rows = aux_rows
                 is_empty = False
-        return rows
+        return (rows, returning_values)
 
     def pre_sql_setup(self):
         """

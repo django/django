@@ -238,3 +238,10 @@ class SelectModel(models.Model):
 
     f = models.CharField(max_length=20, null=True, use_on_update=False,
                          use_on_insert=False)
+
+
+class RefreshModel(models.Model):
+
+    f = models.CharField(max_length=20, null=True, use_on_update=False,
+                         use_on_insert=False)
+    normal = models.CharField(max_length=20, null=True)

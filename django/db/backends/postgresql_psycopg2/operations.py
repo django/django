@@ -219,8 +219,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             return cursor.query.decode('utf-8')
         return None
 
-    def return_insert_id(self):
-        return "RETURNING %s", ()
+    def return_values(self, nvars=1):
+        assert nvars > 0
+        vars_string = ", ".join(["%s"] * nvars)
+        return "RETURNING " + vars_string, ()
 
     def bulk_insert_sql(self, fields, num_values):
         items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
