@@ -17,7 +17,7 @@ class SQLCommandsTestCase(TestCase):
         return len([o for o in output if o.startswith(cmd)])
 
     def test_sql_create(self):
-        app = app_cache.get_app('commands_sql')
+        app = app_cache.get_app_config('commands_sql').models_module
         output = sql_create(app, no_style(), connections[DEFAULT_DB_ALIAS])
         create_tables = [o for o in output if o.startswith('CREATE TABLE')]
         self.assertEqual(len(create_tables), 3)
@@ -26,7 +26,7 @@ class SQLCommandsTestCase(TestCase):
         six.assertRegex(self, sql, r'^create table .commands_sql_book.*')
 
     def test_sql_delete(self):
-        app = app_cache.get_app('commands_sql')
+        app = app_cache.get_app_config('commands_sql').models_module
         output = sql_delete(app, no_style(), connections[DEFAULT_DB_ALIAS])
         drop_tables = [o for o in output if o.startswith('DROP TABLE')]
         self.assertEqual(len(drop_tables), 3)
@@ -35,19 +35,19 @@ class SQLCommandsTestCase(TestCase):
         six.assertRegex(self, sql, r'^drop table .commands_sql_comment.*')
 
     def test_sql_indexes(self):
-        app = app_cache.get_app('commands_sql')
+        app = app_cache.get_app_config('commands_sql').models_module
         output = sql_indexes(app, no_style(), connections[DEFAULT_DB_ALIAS])
         # PostgreSQL creates one additional index for CharField
         self.assertIn(self.count_ddl(output, 'CREATE INDEX'), [3, 4])
 
     def test_sql_destroy_indexes(self):
-        app = app_cache.get_app('commands_sql')
+        app = app_cache.get_app_config('commands_sql').models_module
         output = sql_destroy_indexes(app, no_style(), connections[DEFAULT_DB_ALIAS])
         # PostgreSQL creates one additional index for CharField
         self.assertIn(self.count_ddl(output, 'DROP INDEX'), [3, 4])
 
     def test_sql_all(self):
-        app = app_cache.get_app('commands_sql')
+        app = app_cache.get_app_config('commands_sql').models_module
         output = sql_all(app, no_style(), connections[DEFAULT_DB_ALIAS])
 
         self.assertEqual(self.count_ddl(output, 'CREATE TABLE'), 3)
@@ -69,7 +69,7 @@ class SQLCommandsRouterTestCase(TestCase):
         router.routers = self._old_routers
 
     def test_router_honored(self):
-        app = app_cache.get_app('commands_sql')
+        app = app_cache.get_app_config('commands_sql').models_module
         for sql_command in (sql_all, sql_create, sql_delete, sql_indexes, sql_destroy_indexes):
             output = sql_command(app, no_style(), connections[DEFAULT_DB_ALIAS])
             self.assertEqual(len(output), 0,

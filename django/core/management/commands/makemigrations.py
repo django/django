@@ -5,7 +5,6 @@ from optparse import make_option
 
 from django.apps import app_cache
 from django.core.management.base import BaseCommand, CommandError
-from django.core.exceptions import ImproperlyConfigured
 from django.db import connections, DEFAULT_DB_ALIAS, migrations
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.autodetector import MigrationAutodetector
@@ -38,8 +37,8 @@ class Command(BaseCommand):
         bad_app_labels = set()
         for app_label in app_labels:
             try:
-                app_cache.get_app(app_label)
-            except ImproperlyConfigured:
+                app_cache.get_app_config(app_label)
+            except LookupError:
                 bad_app_labels.add(app_label)
         if bad_app_labels:
             for app_label in bad_app_labels:
