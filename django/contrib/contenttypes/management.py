@@ -86,8 +86,8 @@ If you're unsure, answer 'no'.
 
 
 def update_all_contenttypes(verbosity=2, **kwargs):
-    for app in app_cache.get_apps():
-        update_contenttypes(app, None, verbosity, **kwargs)
+    for app_config in app_cache.get_app_configs():
+        update_contenttypes(app_config.models_module, None, verbosity, **kwargs)
 
 signals.post_migrate.connect(update_contenttypes)
 

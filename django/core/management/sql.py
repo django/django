@@ -207,23 +207,27 @@ def custom_sql_for_model(model, style, connection):
 
 def emit_pre_migrate_signal(create_models, verbosity, interactive, db):
     # Emit the pre_migrate signal for every application.
-    for app in app_cache.get_apps():
-        app_name = app.__name__.split('.')[-2]
+    for app_config in app_cache.get_app_configs():
         if verbosity >= 2:
-            print("Running pre-migrate handlers for application %s" % app_name)
-        models.signals.pre_migrate.send(sender=app, app=app,
-                                       create_models=create_models,
-                                       verbosity=verbosity,
-                                       interactive=interactive,
-                                       db=db)
+            print("Running pre-migrate handlers for application %s" % app_config.label)
+        models.signals.pre_migrate.send(
+            sender=app_config.models_module,
+            app=app_config.models_module,
+            create_models=create_models,
+            verbosity=verbosity,
+            interactive=interactive,
+            db=db)
 
 
 def emit_post_migrate_signal(created_models, verbosity, interactive, db):
     # Emit the post_migrate signal for every application.
-    for app in app_cache.get_apps():
-        app_name = app.__name__.split('.')[-2]
+    for app_config in app_cache.get_app_configs():
         if verbosity >= 2:
-            print("Running post-migrate handlers for application %s" % app_name)
-        models.signals.post_migrate.send(sender=app, app=app,
-            created_models=created_models, verbosity=verbosity,
-            interactive=interactive, db=db)
+            print("Running post-migrate handlers for application %s" % app_config.label)
+        models.signals.post_migrate.send(
+            sender=app_config.models_module,
+            app=app_config.models_module,
+            created_models=created_models,
+            verbosity=verbosity,
+            interactive=interactive,
+            db=db)

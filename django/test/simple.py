@@ -244,8 +244,8 @@ class DjangoTestSuiteRunner(runner.DiscoverRunner):
                     app = app_cache.get_app(label)
                     suite.addTest(build_suite(app))
         else:
-            for app in app_cache.get_apps():
-                suite.addTest(build_suite(app))
+            for app_config in app_cache.get_app_configs():
+                suite.addTest(build_suite(app_config.models_module))
 
         if extra_tests:
             for test in extra_tests:

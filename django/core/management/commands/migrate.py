@@ -180,9 +180,10 @@ class Command(BaseCommand):
 
         # Build the manifest of apps and models that are to be synchronized
         all_models = [
-            (app.__name__.split('.')[-2],
-                router.get_migratable_models(app, connection.alias, include_auto_created=True))
-            for app in app_cache.get_apps() if app.__name__.split('.')[-2] in apps
+            (app_config.label,
+                router.get_migratable_models(app_config.models_module, connection.alias, include_auto_created=True))
+            for app_config in app_cache.get_app_configs()
+            if app_config.label in apps
         ]
 
         def model_installed(model):

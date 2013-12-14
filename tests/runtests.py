@@ -81,7 +81,7 @@ def get_test_modules():
 
 def get_installed():
     from django.apps import app_cache
-    return [app.__name__.rsplit('.', 1)[0] for app in app_cache.get_apps()]
+    return [app_config.name for app_config in app_cache.get_app_configs()]
 
 
 def setup(verbosity, test_labels):

@@ -189,12 +189,6 @@ class BaseAppCache(object):
             raise UnavailableApp("App with label %r isn't available." % app_label)
         return app_config
 
-    def get_apps(self):
-        """
-        Returns a list of all installed modules that contain models.
-        """
-        return [app_config.models_module for app_config in self.get_app_configs()]
-
     def get_app(self, app_label):
         """
         Returns the module containing the models for the given app_label.
@@ -337,6 +331,15 @@ class BaseAppCache(object):
         self.available_apps = None
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
+
+    def get_apps(self):
+        """
+        Returns a list of all installed modules that contain models.
+        """
+        warnings.warn(
+            "[a.models_module for a in get_app_configs()] supersedes get_apps().",
+            PendingDeprecationWarning, stacklevel=2)
+        return [app_config.models_module for app_config in self.get_app_configs()]
 
     def _get_app_package(self, app):
         return '.'.join(app.__name__.split('.')[:-1])
