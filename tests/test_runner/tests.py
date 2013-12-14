@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 from importlib import import_module
 from optparse import make_option
+import types
 import unittest
 
 from django.core.exceptions import ImproperlyConfigured
@@ -16,10 +17,6 @@ from django.test.utils import IgnoreAllDeprecationWarningsMixin
 
 from admin_scripts.tests import AdminScriptTestCase
 from .models import Person
-
-
-TEST_APP_OK = 'test_runner.valid_app.models'
-TEST_APP_ERROR = 'test_runner_invalid_app.models'
 
 
 class DependencyOrderingTests(unittest.TestCase):
@@ -228,16 +225,24 @@ class ModulesTestsPackages(IgnoreAllDeprecationWarningsMixin, unittest.TestCase)
 
     def test_get_tests(self):
         "Check that the get_tests helper function can find tests in a directory"
+        from django.apps.base import AppConfig
         from django.test.simple import get_tests
-        module = import_module(TEST_APP_OK)
-        tests = get_tests(module)
-        self.assertIsInstance(tests, type(module))
+        app_config = AppConfig(
+            'test_runner.valid_app',
+            import_module('test_runner.valid_app'),
+            import_module('test_runner.valid_app.models'))
+        tests = get_tests(app_config)
+        self.assertIsInstance(tests, types.ModuleType)
 
     def test_import_error(self):
         "Test for #12658 - Tests with ImportError's shouldn't fail silently"
+        from django.apps.base import AppConfig
         from django.test.simple import get_tests
-        module = import_module(TEST_APP_ERROR)
-        self.assertRaises(ImportError, get_tests, module)
+        app_config = AppConfig(
+            'test_runner_invalid_app',
+            import_module('test_runner_invalid_app'),
+            import_module('test_runner_invalid_app.models'))
+        self.assertRaises(ImportError, get_tests, app_config)
 
 
 class Sqlite3InMemoryTestDbs(TestCase):

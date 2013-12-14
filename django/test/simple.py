@@ -96,22 +96,13 @@ class DocTestRunner(doctest.DocTestRunner):
 doctestOutputChecker = OutputChecker()
 
 
-def get_tests(app_module):
-    parts = app_module.__name__.split('.')
-    prefix, last = parts[:-1], parts[-1]
+def get_tests(app_config):
     try:
-        test_module = import_module('.'.join(prefix + [TEST_MODULE]))
+        test_module = import_module('%s.%s' % (app_config.name, TEST_MODULE))
     except ImportError:
         # Couldn't import tests.py. Was it due to a missing file, or
         # due to an import error in a tests.py that actually exists?
-        # app_module either points to a models.py file, or models/__init__.py
-        # Tests are therefore either in same directory, or one level up
-        if last == 'models':
-            app_root = import_module('.'.join(prefix))
-        else:
-            app_root = app_module
-
-        if not module_has_submodule(app_root, TEST_MODULE):
+        if not module_has_submodule(app_config.app_module, TEST_MODULE):
             test_module = None
         else:
             # The module exists, so there must be an import error in the test
@@ -126,7 +117,7 @@ def make_doctest(module):
        runner=DocTestRunner)
 
 
-def build_suite(app_module):
+def build_suite(app_config):
     """
     Create a complete Django test suite for the provided application module.
     """
@@ -134,30 +125,32 @@ def build_suite(app_module):
 
     # Load unit and doctests in the models.py module. If module has
     # a suite() method, use it. Otherwise build the test suite ourselves.
-    if hasattr(app_module, 'suite'):
-        suite.addTest(app_module.suite())
-    else:
-        suite.addTest(unittest.defaultTestLoader.loadTestsFromModule(
-            app_module))
-        try:
-            suite.addTest(make_doctest(app_module))
-        except ValueError:
-            # No doc tests in models.py
-            pass
+    models_module = app_config.models_module
+    if models_module:
+        if hasattr(models_module, 'suite'):
+            suite.addTest(models_module.suite())
+        else:
+            suite.addTest(unittest.defaultTestLoader.loadTestsFromModule(
+                models_module))
+            try:
+                suite.addTest(make_doctest(models_module))
+            except ValueError:
+                # No doc tests in models.py
+                pass
 
     # Check to see if a separate 'tests' module exists parallel to the
     # models module
-    test_module = get_tests(app_module)
-    if test_module:
+    tests_module = get_tests(app_config)
+    if tests_module:
         # Load unit and doctests in the tests.py module. If module has
         # a suite() method, use it. Otherwise build the test suite ourselves.
-        if hasattr(test_module, 'suite'):
-            suite.addTest(test_module.suite())
+        if hasattr(tests_module, 'suite'):
+            suite.addTest(tests_module.suite())
         else:
             suite.addTest(unittest.defaultTestLoader.loadTestsFromModule(
-                test_module))
+                tests_module))
             try:
-                suite.addTest(make_doctest(test_module))
+                suite.addTest(make_doctest(tests_module))
             except ValueError:
                 # No doc tests in tests.py
                 pass
@@ -167,26 +160,29 @@ def build_suite(app_module):
 def build_test(label):
     """
     Construct a test case with the specified label. Label should be of the
-    form model.TestClass or model.TestClass.test_method. Returns an
+    form app_label.TestClass or app_label.TestClass.test_method. Returns an
     instantiated test or test suite corresponding to the label provided.
-
     """
     parts = label.split('.')
     if len(parts) < 2 or len(parts) > 3:
         raise ValueError("Test label '%s' should be of the form app.TestCase "
                          "or app.TestCase.test_method" % label)
 
-    #
-    # First, look for TestCase instances with a name that matches
-    #
-    app_module = app_cache.get_app_config(parts[0]).models_module
-    test_module = get_tests(app_module)
-    TestClass = getattr(app_module, parts[1], None)
+    app_config = app_cache.get_app_config(parts[0])
+    models_module = app_config.models_module
+    tests_module = get_tests(app_config)
 
-    # Couldn't find the test class in models.py; look in tests.py
-    if TestClass is None:
-        if test_module:
-            TestClass = getattr(test_module, parts[1], None)
+    test_modules = []
+    if models_module:
+        test_modules.append(models_module)
+    if tests_module:
+        test_modules.append(tests_module)
+
+    TestClass = None
+    for module in test_modules:
+        TestClass = getattr(models_module, parts[1], None)
+        if TestClass is not None:
+            break
 
     try:
         if issubclass(TestClass, (unittest.TestCase, real_unittest.TestCase)):
@@ -208,7 +204,7 @@ def build_test(label):
     # If there isn't a TestCase, look for a doctest that matches
     #
     tests = []
-    for module in app_module, test_module:
+    for module in test_modules:
         try:
             doctests = make_doctest(module)
             # Now iterate over the suite, looking for doctests whose name
@@ -241,11 +237,11 @@ class DjangoTestSuiteRunner(runner.DiscoverRunner):
                 if '.' in label:
                     suite.addTest(build_test(label))
                 else:
-                    app = app_cache.get_app_config(label).models_module
-                    suite.addTest(build_suite(app))
+                    app_config = app_cache.get_app_config(label)
+                    suite.addTest(build_suite(app_config))
         else:
             for app_config in app_cache.get_app_configs():
-                suite.addTest(build_suite(app_config.models_module))
+                suite.addTest(build_suite(app_config))
 
         if extra_tests:
             for test in extra_tests:
