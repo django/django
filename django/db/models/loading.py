@@ -30,6 +30,6 @@ def get_app_errors():
     try:
         return app_cache.app_errors
     except AttributeError:
-        app_cache._populate()
+        app_cache.populate()
         app_cache.app_errors = {}
         return app_cache.app_errors

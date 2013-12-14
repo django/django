@@ -60,11 +60,11 @@ class BaseAppCache(object):
 
     def __init__(self):
         self.__dict__ = _initialize()
-        # This stops _populate loading from INSTALLED_APPS and ignores the
+        # This stops populate loading from INSTALLED_APPS and ignores the
         # only_installed arguments to get_model[s]
         self.loads_installed = False
 
-    def _populate(self):
+    def populate(self):
         """
         Fill in all the cache information. This method is threadsafe, in the
         sense that every caller will see the same state upon return, and if the
@@ -161,7 +161,7 @@ class BaseAppCache(object):
         If only_installed is True (default), only applications explicitly
         listed in INSTALLED_APPS are considered.
         """
-        self._populate()
+        self.populate()
         for app_config in self.app_configs.values():
             if only_installed and not app_config.installed:
                 continue
@@ -181,7 +181,7 @@ class BaseAppCache(object):
         If only_installed is True (default), only applications explicitly
         listed in INSTALLED_APPS are considered.
         """
-        self._populate()
+        self.populate()
         app_config = self.app_configs.get(app_label)
         if app_config is None or (only_installed and not app_config.installed):
             raise LookupError("No app with label %r." % app_label)
@@ -246,7 +246,7 @@ class BaseAppCache(object):
             return model_list
         except KeyError:
             pass
-        self._populate()
+        self.populate()
         if app_mod:
             app_label = self._label_for(app_mod)
             try:
@@ -289,7 +289,7 @@ class BaseAppCache(object):
         if not self.loads_installed:
             only_installed = False
         if seed_cache:
-            self._populate()
+            self.populate()
         if only_installed:
             app_config = self.app_configs.get(app_label)
             if app_config is not None and not app_config.installed:
@@ -371,7 +371,7 @@ class BaseAppCache(object):
             "[a.path for a in get_app_configs()] supersedes get_app_paths().",
             PendingDeprecationWarning, stacklevel=2)
 
-        self._populate()
+        self.populate()
 
         app_paths = []
         for app in self.get_apps():
