@@ -179,7 +179,7 @@ def build_test(label):
     #
     # First, look for TestCase instances with a name that matches
     #
-    app_module = app_cache.get_app(parts[0])
+    app_module = app_cache.get_app_config(parts[0]).models_module
     test_module = get_tests(app_module)
     TestClass = getattr(app_module, parts[1], None)
 
@@ -241,7 +241,7 @@ class DjangoTestSuiteRunner(runner.DiscoverRunner):
                 if '.' in label:
                     suite.addTest(build_test(label))
                 else:
-                    app = app_cache.get_app(label)
+                    app = app_cache.get_app_config(label).models_module
                     suite.addTest(build_suite(app))
         else:
             for app_config in app_cache.get_app_configs():

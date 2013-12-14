@@ -3,7 +3,6 @@ import warnings
 from collections import OrderedDict
 from optparse import make_option
 
-from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
 from django.db import router, DEFAULT_DB_ALIAS
@@ -70,9 +69,9 @@ class Command(BaseCommand):
                 excluded_models.add(model_obj)
             else:
                 try:
-                    app_obj = app_cache.get_app(exclude)
+                    app_obj = app_cache.get_app_config(exclude).models_module
                     excluded_apps.add(app_obj)
-                except ImproperlyConfigured:
+                except LookupError:
                     raise CommandError('Unknown app in excludes: %s' % exclude)
 
         if len(app_labels) == 0:
@@ -89,8 +88,8 @@ class Command(BaseCommand):
                 try:
                     app_label, model_label = label.split('.')
                     try:
-                        app = app_cache.get_app(app_label)
-                    except ImproperlyConfigured:
+                        app = app_cache.get_app_config(app_label).models_module
+                    except LookupError:
                         raise CommandError("Unknown application: %s" % app_label)
                     if app in excluded_apps:
                         continue
@@ -109,8 +108,8 @@ class Command(BaseCommand):
                     # This is just an app - no model qualifier
                     app_label = label
                     try:
-                        app = app_cache.get_app(app_label)
-                    except ImproperlyConfigured:
+                        app = app_cache.get_app_config(app_label).models_module
+                    except LookupError:
                         raise CommandError("Unknown application: %s" % app_label)
                     if app in excluded_apps:
                         continue

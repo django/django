@@ -11,7 +11,6 @@ import sys
 from optparse import make_option, OptionParser
 
 import django
-from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.utils.encoding import force_str
 from django.utils.six import StringIO
@@ -346,8 +345,8 @@ class AppCommand(BaseCommand):
         if not app_labels:
             raise CommandError('Enter at least one appname.')
         try:
-            app_list = [app_cache.get_app(app_label) for app_label in app_labels]
-        except (ImproperlyConfigured, ImportError) as e:
+            app_list = [app_cache.get_app_config(app_label).models_module for app_label in app_labels]
+        except (LookupError, ImportError) as e:
             raise CommandError("%s. Are you sure your INSTALLED_APPS setting is correct?" % e)
         output = []
         for app in app_list:

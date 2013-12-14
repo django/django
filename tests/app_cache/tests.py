@@ -27,7 +27,7 @@ class AppCacheTests(TestCase):
         """
         Makes a new model at runtime and ensures it goes into the right place.
         """
-        old_models = app_cache.get_models(app_cache.get_app("app_cache"))
+        old_models = app_cache.get_models(app_cache.get_app_config("app_cache").models_module)
         # Construct a new model in a new app cache
         body = {}
         new_app_cache = BaseAppCache()
@@ -42,6 +42,6 @@ class AppCacheTests(TestCase):
         # Make sure it appeared in the right place!
         self.assertEqual(
             old_models,
-            app_cache.get_models(app_cache.get_app("app_cache")),
+            app_cache.get_models(app_cache.get_app_config("app_cache").models_module),
         )
         self.assertEqual(new_app_cache.get_model("app_cache", "SouthPonies"), temp_model)

@@ -103,7 +103,7 @@ class DeferRegressionTest(TestCase):
         klasses = set(
             map(
                 attrgetter("__name__"),
-                app_cache.get_models(app_cache.get_app("defer_regress"))
+                app_cache.get_models(app_cache.get_app_config("defer_regress").models_module)
             )
         )
         self.assertIn("Child", klasses)
@@ -111,13 +111,13 @@ class DeferRegressionTest(TestCase):
         self.assertNotIn("Child_Deferred_value", klasses)
         self.assertNotIn("Item_Deferred_name", klasses)
         self.assertFalse(any(
-            k._deferred for k in app_cache.get_models(app_cache.get_app("defer_regress"))))
+            k._deferred for k in app_cache.get_models(app_cache.get_app_config("defer_regress").models_module)))
 
         klasses_with_deferred = set(
             map(
                 attrgetter("__name__"),
                 app_cache.get_models(
-                    app_cache.get_app("defer_regress"), include_deferred=True
+                    app_cache.get_app_config("defer_regress").models_module, include_deferred=True
                 ),
             )
         )
@@ -127,7 +127,7 @@ class DeferRegressionTest(TestCase):
         self.assertIn("Item_Deferred_name", klasses_with_deferred)
         self.assertTrue(any(
             k._deferred for k in app_cache.get_models(
-                app_cache.get_app("defer_regress"), include_deferred=True))
+                app_cache.get_app_config("defer_regress").models_module, include_deferred=True))
         )
 
     @override_settings(SESSION_SERIALIZER='django.contrib.sessions.serializers.PickleSerializer')

@@ -20,7 +20,7 @@ class SuiteOverrideTest(IgnoreAllDeprecationWarningsMixin, unittest.TestCase):
         """
 
         from django.test.simple import build_suite
-        app = app_cache.get_app("test_suite_override")
+        app = app_cache.get_app_config("test_suite_override").models_module
         suite = build_suite(app)
         self.assertEqual(suite.countTestCases(), 1)
 

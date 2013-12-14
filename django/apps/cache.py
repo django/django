@@ -189,19 +189,6 @@ class BaseAppCache(object):
             raise UnavailableApp("App with label %r isn't available." % app_label)
         return app_config
 
-    def get_app(self, app_label):
-        """
-        Returns the module containing the models for the given app_label.
-
-        Raises UnavailableApp when set_available_apps() in in effect and
-        doesn't include app_label.
-        """
-        try:
-            return self.get_app_config(app_label).models_module
-        except LookupError as exc:
-            # Change the exception type for backwards compatibility.
-            raise ImproperlyConfigured(*exc.args)
-
     def get_models(self, app_mod=None,
                    include_auto_created=False, include_deferred=False,
                    only_installed=True, include_swapped=False):
@@ -331,6 +318,22 @@ class BaseAppCache(object):
         self.available_apps = None
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
+
+    def get_app(self, app_label):
+        """
+        Returns the module containing the models for the given app_label.
+
+        Raises UnavailableApp when set_available_apps() in in effect and
+        doesn't include app_label.
+        """
+        warnings.warn(
+            "get_app_config(app_label).models_module supersedes get_app(app_label).",
+            PendingDeprecationWarning, stacklevel=2)
+        try:
+            return self.get_app_config(app_label).models_module
+        except LookupError as exc:
+            # Change the exception type for backwards compatibility.
+            raise ImproperlyConfigured(*exc.args)
 
     def get_apps(self):
         """
