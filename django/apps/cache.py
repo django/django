@@ -88,7 +88,7 @@ class BaseAppCache(object):
             for app_name in settings.INSTALLED_APPS:
                 if app_name in self.handled:
                     continue
-                self.load_app(app_name, True)
+                self.load_app(app_name, can_postpone=True)
             if not self.nesting_level:
                 for app_name in self.postponed:
                     self.load_app(app_name)
@@ -115,10 +115,10 @@ class BaseAppCache(object):
             models_module = import_module('%s.%s' % (app_name, MODELS_MODULE_NAME))
         except ImportError:
             self.nesting_level -= 1
-            # If the app doesn't have a models module, we can just ignore the
-            # ImportError and return no models for it.
+            # If the app doesn't have a models module, we can just swallow the
+            # ImportError and return no models for this app.
             if not module_has_submodule(app_module, MODELS_MODULE_NAME):
-                return None
+                models_module = None
             # But if the app does have a models module, we need to figure out
             # whether to suppress or propagate the error. If can_postpone is
             # True then it may be that the package is still being imported by
@@ -129,7 +129,7 @@ class BaseAppCache(object):
             else:
                 if can_postpone:
                     self.postponed.append(app_name)
-                    return None
+                    return
                 else:
                     raise
 
@@ -154,22 +154,27 @@ class BaseAppCache(object):
         """
         return self.loaded
 
-    def get_app_configs(self, only_installed=True):
+    def get_app_configs(self, only_installed=True, only_with_models_module=False):
         """
         Return an iterable of application configurations.
 
         If only_installed is True (default), only applications explicitly
         listed in INSTALLED_APPS are considered.
+
+        If only_with_models_module in True (non-default), only applications
+        containing a models module are considered.
         """
         self.populate()
         for app_config in self.app_configs.values():
             if only_installed and not app_config.installed:
                 continue
+            if only_with_models_module and app_config.models_module is None:
+                continue
             if self.available_apps is not None and app_config.name not in self.available_apps:
                 continue
             yield app_config
 
-    def get_app_config(self, app_label, only_installed=True):
+    def get_app_config(self, app_label, only_installed=True, only_with_models_module=False):
         """
         Returns the application configuration for the given app_label.
 
@@ -180,11 +185,18 @@ class BaseAppCache(object):
 
         If only_installed is True (default), only applications explicitly
         listed in INSTALLED_APPS are considered.
+
+        If only_with_models_module in True (non-default), only applications
+        containing a models module are considered.
         """
         self.populate()
         app_config = self.app_configs.get(app_label)
-        if app_config is None or (only_installed and not app_config.installed):
+        if app_config is None:
             raise LookupError("No app with label %r." % app_label)
+        if only_installed and not app_config.installed:
+            raise LookupError("App with label %r isn't in INSTALLED_APPS." % app_label)
+        if only_with_models_module and app_config.models_module is None:
+            raise LookupError("App with label %r doesn't have a models module." % app_label)
         if self.available_apps is not None and app_config.name not in self.available_apps:
             raise UnavailableApp("App with label %r isn't available." % app_label)
         return app_config

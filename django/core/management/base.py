@@ -345,12 +345,16 @@ class AppCommand(BaseCommand):
         if not app_labels:
             raise CommandError('Enter at least one appname.')
         try:
-            app_list = [app_cache.get_app_config(app_label).models_module for app_label in app_labels]
+            app_configs = [app_cache.get_app_config(app_label) for app_label in app_labels]
         except (LookupError, ImportError) as e:
             raise CommandError("%s. Are you sure your INSTALLED_APPS setting is correct?" % e)
         output = []
-        for app in app_list:
-            app_output = self.handle_app(app, **options)
+        for app_config in app_configs:
+            if app_config.models_module is None:
+                raise CommandError(
+                    "AppCommand cannot handle app %r because it doesn't have "
+                    "a models module." % app_config.label)
+            app_output = self.handle_app(app_config.models_module, **options)
             if app_output:
                 output.append(app_output)
         return '\n'.join(output)

@@ -207,7 +207,7 @@ def custom_sql_for_model(model, style, connection):
 
 def emit_pre_migrate_signal(create_models, verbosity, interactive, db):
     # Emit the pre_migrate signal for every application.
-    for app_config in app_cache.get_app_configs():
+    for app_config in app_cache.get_app_configs(only_with_models_module=True):
         if verbosity >= 2:
             print("Running pre-migrate handlers for application %s" % app_config.label)
         models.signals.pre_migrate.send(
@@ -221,7 +221,7 @@ def emit_pre_migrate_signal(create_models, verbosity, interactive, db):
 
 def emit_post_migrate_signal(created_models, verbosity, interactive, db):
     # Emit the post_migrate signal for every application.
-    for app_config in app_cache.get_app_configs():
+    for app_config in app_cache.get_app_configs(only_with_models_module=True):
         if verbosity >= 2:
             print("Running post-migrate handlers for application %s" % app_config.label)
         models.signals.post_migrate.send(

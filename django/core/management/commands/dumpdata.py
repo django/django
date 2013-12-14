@@ -70,7 +70,8 @@ class Command(BaseCommand):
             else:
                 try:
                     app_obj = app_cache.get_app_config(exclude).models_module
-                    excluded_apps.add(app_obj)
+                    if app_obj is not None:
+                        excluded_apps.add(app_obj)
                 except LookupError:
                     raise CommandError('Unknown app in excludes: %s' % exclude)
 
@@ -78,7 +79,7 @@ class Command(BaseCommand):
             if primary_keys:
                 raise CommandError("You can only use --pks option with one model")
             app_list = OrderedDict((app_config.models_module, None)
-                for app_config in app_cache.get_app_configs()
+                for app_config in app_cache.get_app_configs(only_with_models_module=True)
                 if app_config.models_module not in excluded_apps)
         else:
             if len(app_labels) > 1 and primary_keys:
@@ -91,7 +92,7 @@ class Command(BaseCommand):
                         app = app_cache.get_app_config(app_label).models_module
                     except LookupError:
                         raise CommandError("Unknown application: %s" % app_label)
-                    if app in excluded_apps:
+                    if app is None or app in excluded_apps:
                         continue
                     model = app_cache.get_model(app_label, model_label)
                     if model is None:
@@ -111,7 +112,7 @@ class Command(BaseCommand):
                         app = app_cache.get_app_config(app_label).models_module
                     except LookupError:
                         raise CommandError("Unknown application: %s" % app_label)
-                    if app in excluded_apps:
+                    if app is None or app in excluded_apps:
                         continue
                     app_list[app] = None
 

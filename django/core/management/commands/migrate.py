@@ -182,7 +182,7 @@ class Command(BaseCommand):
         all_models = [
             (app_config.label,
                 router.get_migratable_models(app_config.models_module, connection.alias, include_auto_created=True))
-            for app_config in app_cache.get_app_configs()
+            for app_config in app_cache.get_app_configs(only_with_models_module=True)
             if app_config.label in apps
         ]
 
