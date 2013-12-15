@@ -96,13 +96,6 @@ class BaseAppCache(object):
         finally:
             imp.release_lock()
 
-    def _label_for(self, app_mod):
-        """
-        Return app_label for given models module.
-
-        """
-        return app_mod.__name__.split('.')[-2]
-
     def load_app(self, app_name, can_postpone=False):
         """
         Loads the app with the provided fully qualified name, and returns the
@@ -240,7 +233,7 @@ class BaseAppCache(object):
             pass
         self.populate()
         if app_mod:
-            app_label = self._label_for(app_mod)
+            app_label = app_mod.__name__.split('.')[-2]
             try:
                 app_config = self.app_configs[app_label]
             except KeyError:
