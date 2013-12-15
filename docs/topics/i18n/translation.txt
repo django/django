@@ -557,7 +557,7 @@ string in the message catalogs.
 
 It's not possible to mix a template variable inside a string within ``{% trans
 %}``. If your translations require strings with variables (placeholders), use
-``{% blocktrans %}`` instead.
+:ttag:`{% blocktrans %}<blocktrans>` instead.
 
 
 If you'd like to retrieve a translated string without displaying it, you can
