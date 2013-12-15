@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
-from django.core.exceptions import ImproperlyConfigured
-from django.http import Http404
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.test import TestCase
 from django.views.generic.base import View
 
@@ -29,6 +28,9 @@ class DetailViewTest(TestCase):
     def test_detail_missing_object(self):
         res = self.client.get('/detail/author/500/')
         self.assertEqual(res.status_code, 404)
+
+    def test_detail_object_does_not_exist(self):
+        self.assertRaises(ObjectDoesNotExist, self.client.get, '/detail/doesnotexist/1/')
 
     def test_detail_by_custom_pk(self):
         res = self.client.get('/detail/author/bycustompk/1/')

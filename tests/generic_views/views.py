@@ -300,3 +300,8 @@ class NonModelDetail(generic.DetailView):
 
     def get_object(self, queryset=None):
         return NonModel()
+
+
+class ObjectDoesNotExistDetail(generic.DetailView):
+    def get_queryset(self):
+        return Book.does_not_exist.all()
