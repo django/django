@@ -33,7 +33,6 @@ from __future__ import absolute_import  # Avoid importing `importlib` from this 
 import os
 import signal
 import sys
-import tempfile
 import time
 import traceback
 
@@ -41,7 +40,6 @@ from django.conf import settings
 from django.core.signals import request_finished
 from django.utils._os import upath
 from importlib import import_module
-from django.utils import six
 try:
     from django.utils.six.moves import _thread as thread
 except ImportError:
@@ -70,20 +68,6 @@ try:
         os.close(fd)
 except ImportError:
     pass
-
-try:
-    import select
-    select.kevent, select.kqueue
-    USE_KQUEUE = True
-
-    import resource
-    NOFILES_SOFT, NOFILES_HARD = resource.getrlimit(resource.RLIMIT_NOFILE)
-
-    import subprocess
-    command = ["sysctl", "-n", "kern.maxfilesperproc"]
-    NOFILES_KERN = int(subprocess.check_output(command).strip())
-except Exception:
-    USE_KQUEUE = False
 
 RUN_RELOADER = True
 
@@ -163,88 +147,6 @@ def inotify_code_changed():
     return True
 
 
-def kqueue_code_changed():
-    """
-    Checks for changed code using kqueue. After being called
-    it blocks until a change event has been fired.
-    """
-    kqueue = select.kqueue()
-
-    # Utility function to create kevents.
-    _filter = select.KQ_FILTER_VNODE
-    flags = select.KQ_EV_ADD | select.KQ_EV_CLEAR
-    fflags = select.KQ_NOTE_DELETE | select.KQ_NOTE_WRITE | select.KQ_NOTE_RENAME
-
-    def make_kevent(descriptor):
-        return select.kevent(descriptor, _filter, flags, fflags)
-
-    # New modules may get imported when a request is processed. We add a file
-    # descriptor to the kqueue to exit the kqueue.control after each request.
-    buf_kwargs = {'buffering' if six.PY3 else 'bufsize': 0}
-    watcher = tempfile.TemporaryFile(**buf_kwargs)
-    kqueue.control([make_kevent(watcher)], 0)
-
-    def update_watch(sender=None, **kwargs):
-        watcher.write(b'.')
-
-    request_finished.connect(update_watch)
-
-    # We have to manage a set of descriptors to avoid the overhead of opening
-    # and closing every files whenever we reload the set of files to watch.
-    filenames = set()
-    descriptors = set()
-
-    while True:
-        old_filenames = filenames
-        filenames = set(gen_filenames())
-        new_filenames = filenames - old_filenames
-
-        # If new files were added since the last time we went through the loop,
-        # add them to the kqueue.
-        if new_filenames:
-
-            # We must increase the maximum number of open file descriptors
-            # because each kevent uses one file descriptor and resource limits
-            # are too low by default.
-            #
-            # In fact there are two limits:
-            # - kernel limit: `sysctl kern.maxfilesperproc` -> 10240 on OS X.9
-            # - resource limit: `launchctl limit maxfiles` -> 256 on OS X.9
-            #
-            # The latter can be changed with Python's resource module, but it
-            # can never exceed the former. Unfortunately, getrlimit(3) -- used
-            # by both launchctl and the resource module -- reports no "hard
-            # limit", even though the kernel sets one.
-
-            # If project is too large or kernel limits are too tight, use polling.
-            if len(filenames) >= NOFILES_KERN:
-                return code_changed()
-
-            # Add the number of file descriptors we're going to use to the current
-            # resource limit, while staying within the kernel limit.
-            nofiles_target = min(len(filenames) + NOFILES_SOFT, NOFILES_KERN)
-            resource.setrlimit(resource.RLIMIT_NOFILE, (nofiles_target, NOFILES_HARD))
-
-            new_descriptors = set(open(filename) for filename in new_filenames)
-            descriptors |= new_descriptors
-
-            kqueue.control([make_kevent(descriptor) for descriptor in new_descriptors], 0)
-
-        events = kqueue.control([], 1)
-
-        # After a request, reload the set of watched files.
-        if len(events) == 1 and events[0].ident == watcher.fileno():
-            continue
-
-        # If the change affected another file, clean up and exit.
-        for descriptor in descriptors:
-            descriptor.close()
-        watcher.close()
-        kqueue.close()
-
-        return True
-
-
 def code_changed():
     global _mtimes, _win
     for filename in gen_filenames():
@@ -307,8 +209,6 @@ def reloader_thread():
     ensure_echo_on()
     if USE_INOTIFY:
         fn = inotify_code_changed
-    elif USE_KQUEUE:
-        fn = kqueue_code_changed
     else:
         fn = code_changed
     while RUN_RELOADER:
