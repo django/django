@@ -33,7 +33,7 @@ A quick rundown:
 * The above template displays a radio button for each question choice. The
   ``value`` of each radio button is the associated question choice's ID. The
   ``name`` of each radio button is ``"choice"``. That means, when somebody
-  selects one of the radio buttons and submits the form, it'll send the
+  selects the third radio button, for example, and submits the form, it will send the
   POST data ``choice=3``. This is the basic concept of HTML forms.
 
 * We set the form's ``action`` to ``{% url 'polls:vote' question.id %}``, and we
