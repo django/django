@@ -1234,7 +1234,7 @@ that control how the relationship functions.
 
     Same as :attr:`ForeignKey.related_name`.
 
-.. attribute:: ForeignKey.related_query_name
+.. attribute:: ManyToManyField.related_query_name
 
     .. versionadded:: 1.6
 
