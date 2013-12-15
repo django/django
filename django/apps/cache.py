@@ -114,7 +114,6 @@ class BaseAppCache(object):
         try:
             models_module = import_module('%s.%s' % (app_name, MODELS_MODULE_NAME))
         except ImportError:
-            self.nesting_level -= 1
             # If the app doesn't have a models module, we can just swallow the
             # ImportError and return no models for this app.
             if not module_has_submodule(app_module, MODELS_MODULE_NAME):
@@ -132,8 +131,8 @@ class BaseAppCache(object):
                     return
                 else:
                     raise
-
-        self.nesting_level -= 1
+        finally:
+            self.nesting_level -= 1
 
         app_config = AppConfig(
             name=app_name, app_module=app_module, models_module=models_module)
