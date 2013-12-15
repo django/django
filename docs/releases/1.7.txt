@@ -280,7 +280,7 @@ Cache
 
 * If you instanciate cache backends directly, be aware that they aren't
   thread-safe any more, as :data:`django.core.cache.caches` now yields
-  differend instances per thread.
+  different instances per thread.
 
 Email
 ^^^^^
