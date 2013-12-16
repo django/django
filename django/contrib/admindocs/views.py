@@ -7,8 +7,9 @@ from django import template
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
+from django.core.apps import app_cache
 from django.db import models
-from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from django.core.exceptions import ViewDoesNotExist
 from django.http import Http404
 from django.core import urlresolvers
 from django.contrib.admindocs import utils
@@ -182,7 +183,7 @@ class ModelIndexView(BaseAdminDocsView):
     template_name = 'admin_doc/model_index.html'
 
     def get_context_data(self, **kwargs):
-        m_list = [m._meta for m in models.get_models()]
+        m_list = [m._meta for m in app_cache.get_models()]
         kwargs.update({'models': m_list})
         return super(ModelIndexView, self).get_context_data(**kwargs)
 
@@ -193,17 +194,12 @@ class ModelDetailView(BaseAdminDocsView):
     def get_context_data(self, **kwargs):
         # Get the model class.
         try:
-            app_mod = models.get_app(self.kwargs['app_label'])
-        except ImproperlyConfigured:
-            raise Http404(_("App %r not found") % self.kwargs['app_label'])
-        model = None
-        for m in models.get_models(app_mod):
-            if m._meta.model_name == self.kwargs['model_name']:
-                model = m
-                break
+            app_cache.get_app_config(self.kwargs['app_label'])
+        except LookupError:
+            raise Http404(_("App %(app_label)r not found") % self.kwargs)
+        model = app_cache.get_model(self.kwargs['app_label'], self.kwargs['model_name'])
         if model is None:
-            raise Http404(_("Model %(model_name)r not found in app %(app_label)r") % {
-                'model_name': self.kwargs['model_name'], 'app_label': self.kwargs['app_label']})
+            raise Http404(_("Model %(model_name)r not found in app %(app_label)r") % self.kwargs)
 
         opts = model._meta
 

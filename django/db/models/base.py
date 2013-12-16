@@ -5,6 +5,8 @@ import sys
 from functools import update_wrapper
 from django.utils.six.moves import zip
 
+from django.core.apps import app_cache
+from django.core.apps.cache import MODELS_MODULE_NAME
 import django.db.models.manager  # NOQA: Imported to register signal handler.
 from django.conf import settings
 from django.core.exceptions import (ObjectDoesNotExist,
@@ -19,7 +21,6 @@ from django.db.models.query_utils import DeferredAttribute, deferred_class_facto
 from django.db.models.deletion import Collector
 from django.db.models.options import Options
 from django.db.models import signals
-from django.db.models.loading import get_model, MODELS_MODULE_NAME
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
 from django.utils.encoding import force_str, force_text
@@ -273,7 +274,7 @@ class ModelBase(type):
 
         new_class._prepare()
 
-        new_class._meta.app_cache.register_models(new_class._meta.app_label, new_class)
+        new_class._meta.app_cache.register_model(new_class._meta.app_label, new_class)
         # Because of the way imports happen (recursively), we may or may not be
         # the first time this model tries to register with the framework. There
         # should only be one class for each model, so we always return the
@@ -1066,7 +1067,7 @@ def model_unpickle(model_id, attrs, factory):
     Used to unpickle Model subclasses with deferred fields.
     """
     if isinstance(model_id, tuple):
-        model = get_model(*model_id)
+        model = app_cache.get_model(*model_id)
     else:
         # Backwards compat - the model was cached directly in earlier versions.
         model = model_id

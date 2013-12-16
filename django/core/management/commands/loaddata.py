@@ -8,12 +8,12 @@ import zipfile
 from optparse import make_option
 
 from django.conf import settings
+from django.core.apps import app_cache
 from django.core import serializers
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.db import (connections, router, transaction, DEFAULT_DB_ALIAS,
       IntegrityError, DatabaseError)
-from django.db.models import get_app_paths
 from django.utils import lru_cache
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
@@ -230,8 +230,8 @@ class Command(BaseCommand):
         current directory.
         """
         dirs = []
-        for path in get_app_paths():
-            d = os.path.join(path, 'fixtures')
+        for app_config in app_cache.get_app_configs():
+            d = os.path.join(app_config.path, 'fixtures')
             if os.path.isdir(d):
                 dirs.append(d)
         dirs.extend(list(settings.FIXTURE_DIRS))

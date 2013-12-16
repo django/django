@@ -3,7 +3,8 @@ from importlib import import_module
 from optparse import make_option
 
 from django.conf import settings
-from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
+from django.core.apps import app_cache
+from django.db import connections, router, transaction, DEFAULT_DB_ALIAS
 from django.core.management import call_command
 from django.core.management.base import NoArgsCommand, CommandError
 from django.core.management.color import no_style
@@ -93,6 +94,6 @@ Are you sure you want to do this?
         # Emit the post migrate signal. This allows individual applications to
         # respond as if the database had been migrated from scratch.
         all_models = []
-        for app in models.get_apps():
-            all_models.extend(router.get_migratable_models(app, database, include_auto_created=True))
+        for app_config in app_cache.get_app_configs(only_with_models_module=True):
+            all_models.extend(router.get_migratable_models(app_config.models_module, database, include_auto_created=True))
         emit_post_migrate_signal(set(all_models), verbosity, interactive, database)

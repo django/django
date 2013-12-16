@@ -17,6 +17,7 @@ from unittest.util import safe_repr
 
 from django.conf import settings
 from django.core import mail
+from django.core.apps import app_cache
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.core.handlers.wsgi import get_path_info, WSGIHandler
 from django.core.management import call_command
@@ -25,7 +26,6 @@ from django.core.management.commands import flush
 from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
 from django.core.urlresolvers import clear_url_caches, set_urlconf
 from django.db import connection, connections, DEFAULT_DB_ALIAS, transaction
-from django.db.models.loading import cache
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.test.client import Client
@@ -725,14 +725,14 @@ class TransactionTestCase(SimpleTestCase):
         """
         super(TransactionTestCase, self)._pre_setup()
         if self.available_apps is not None:
-            cache.set_available_apps(self.available_apps)
+            app_cache.set_available_apps(self.available_apps)
             for db_name in self._databases_names(include_mirrors=False):
                 flush.Command.emit_post_migrate(verbosity=0, interactive=False, database=db_name)
         try:
             self._fixture_setup()
         except Exception:
             if self.available_apps is not None:
-                cache.unset_available_apps()
+                app_cache.unset_available_apps()
             raise
 
     def _databases_names(self, include_mirrors=True):
@@ -786,7 +786,7 @@ class TransactionTestCase(SimpleTestCase):
             for conn in connections.all():
                 conn.close()
         finally:
-            cache.unset_available_apps()
+            app_cache.unset_available_apps()
 
     def _fixture_teardown(self):
         # Allow TRUNCATE ... CASCADE and don't emit the post_migrate signal

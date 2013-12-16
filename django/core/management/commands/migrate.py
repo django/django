@@ -7,16 +7,16 @@ import itertools
 import traceback
 
 from django.conf import settings
+from django.core.apps import app_cache
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.core.management.sql import custom_sql_for_model, emit_post_migrate_signal, emit_pre_migrate_signal
-from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
+from django.db import connections, router, transaction, DEFAULT_DB_ALIAS
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import MigrationLoader, AmbiguityError
 from django.db.migrations.state import ProjectState
 from django.db.migrations.autodetector import MigrationAutodetector
-from django.db.models.loading import cache
 from django.utils.module_loading import module_has_submodule
 
 
@@ -136,7 +136,7 @@ class Command(BaseCommand):
                 # If there's changes that aren't in migrations yet, tell them how to fix it.
                 autodetector = MigrationAutodetector(
                     executor.loader.graph.project_state(),
-                    ProjectState.from_app_cache(cache),
+                    ProjectState.from_app_cache(app_cache),
                 )
                 changes = autodetector.changes(graph=executor.loader.graph)
                 if changes:
@@ -180,9 +180,10 @@ class Command(BaseCommand):
 
         # Build the manifest of apps and models that are to be synchronized
         all_models = [
-            (app.__name__.split('.')[-2],
-                router.get_migratable_models(app, connection.alias, include_auto_created=True))
-            for app in models.get_apps() if app.__name__.split('.')[-2] in apps
+            (app_config.label,
+                router.get_migratable_models(app_config.models_module, connection.alias, include_auto_created=True))
+            for app_config in app_cache.get_app_configs(only_with_models_module=True)
+            if app_config.label in apps
         ]
 
         def model_installed(model):

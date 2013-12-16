@@ -1,3 +1,4 @@
+from django.core.apps import app_cache
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
@@ -15,9 +16,9 @@ __all__ = ['BaseValidator', 'InlineValidator']
 
 class BaseValidator(object):
     def __init__(self):
-        # Before we can introspect models, they need to be fully loaded so that
-        # inter-relations are set up correctly. We force that here.
-        models.get_apps()
+        # Before we can introspect models, they need the app cache to be fully
+        # loaded so that inter-relations are set up correctly.
+        app_cache.populate()
 
     def validate(self, cls, model):
         for m in dir(self):

@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib import comments
 from django.contrib.comments import signals
 from django.contrib.comments.views.utils import next_redirect, confirmation_view
+from django.core.apps import app_cache
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.shortcuts import render_to_response
@@ -48,7 +49,7 @@ def post_comment(request, next=None, using=None):
     if ctype is None or object_pk is None:
         return CommentPostBadRequest("Missing content_type or object_pk field.")
     try:
-        model = models.get_model(*ctype.split(".", 1))
+        model = app_cache.get_model(*ctype.split(".", 1))
         target = model._default_manager.using(using).get(pk=object_pk)
     except TypeError:
         return CommentPostBadRequest(

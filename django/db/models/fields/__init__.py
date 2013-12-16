@@ -9,8 +9,8 @@ import warnings
 from base64 import b64decode, b64encode
 from itertools import tee
 
+from django.core.apps import app_cache
 from django.db import connection
-from django.db.models.loading import get_model
 from django.db.models.query_utils import QueryWrapper
 from django.conf import settings
 from django import forms
@@ -51,7 +51,7 @@ BLANK_CHOICE_DASH = [("", "---------")]
 
 
 def _load_field(app_label, model_name, field_name):
-    return get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
+    return app_cache.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
 
 
 class FieldDoesNotExist(Exception):
