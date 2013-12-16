@@ -34,7 +34,7 @@ from django.core.validators import EMPTY_VALUES
 
 __all__ = (
     'Field', 'CharField', 'IntegerField',
-    'DateField', 'TimeField', 'DateTimeField', 'TimeField',
+    'DateField', 'TimeField', 'DateTimeField',
     'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
     'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
