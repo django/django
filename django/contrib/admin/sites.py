@@ -416,7 +416,10 @@ class AdminSite(object):
         app_dict = {}
         for model, model_admin in self._registry.items():
             if app_label == model._meta.app_label:
+                
+                # Use any potentially customized app_label with title() override. 
                 app_label = model._meta.app_label
+                
                 perms = model_admin.get_model_perms(request)
 
                 # Check whether user has any perm for this module.
