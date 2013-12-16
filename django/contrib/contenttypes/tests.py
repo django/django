@@ -52,12 +52,13 @@ class FooWithBrokenAbsoluteUrl(FooWithoutUrl):
 
 
 class ContentTypesTests(TestCase):
+
     def setUp(self):
-        self.old_Site_meta_installed = Site._meta.installed
+        self._old_installed = Site._meta.app_config.installed
         ContentType.objects.clear_cache()
 
     def tearDown(self):
-        Site._meta.installed = self.old_Site_meta_installed
+        Site._meta.app_config.installed = self._old_installed
         ContentType.objects.clear_cache()
 
     def test_lookup_cache(self):
@@ -222,12 +223,12 @@ class ContentTypesTests(TestCase):
         user_ct = ContentType.objects.get_for_model(FooWithUrl)
         obj = FooWithUrl.objects.create(name="john")
 
-        if Site._meta.installed:
-            response = shortcut(request, user_ct.id, obj.id)
-            self.assertEqual("http://%s/users/john/" % get_current_site(request).domain,
-                             response._headers.get("location")[1])
+        Site._meta.app_config.installed = True
+        response = shortcut(request, user_ct.id, obj.id)
+        self.assertEqual("http://%s/users/john/" % get_current_site(request).domain,
+                         response._headers.get("location")[1])
 
-        Site._meta.installed = False
+        Site._meta.app_config.installed = False
         response = shortcut(request, user_ct.id, obj.id)
         self.assertEqual("http://Example.com/users/john/",
                          response._headers.get("location")[1])
