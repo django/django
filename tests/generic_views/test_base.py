@@ -125,6 +125,15 @@ class ViewTest(unittest.TestCase):
         response = PostOnlyView.as_view()(self.rf.head('/'))
         self.assertEqual(response.status_code, 405)
 
+    def test_head_no_get_dispatch_direct(self):
+        """
+        Test calling a views dispatch directly to verify no member variable requirements.
+        Aides in unit testing of consumers to be able to call dispatch directly.
+        """
+        view = PostOnlyView()
+        response = view.dispatch(self.rf.head('/'))
+        self.assertEqual(response.status_code, 405)
+
     def test_get_and_post(self):
         """
         Test a view which only allows both GET and POST.
