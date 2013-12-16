@@ -1,4 +1,4 @@
-from django.apps.cache import BaseAppCache
+from django.core.apps.cache import BaseAppCache
 from django.db import models
 from django.db.migrations.state import ProjectState, ModelState, InvalidBasesError
 from django.test import TestCase

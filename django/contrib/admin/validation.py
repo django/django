@@ -1,4 +1,4 @@
-from django.apps import app_cache
+from django.core.apps import app_cache
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist

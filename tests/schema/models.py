@@ -1,4 +1,4 @@
-from django.apps.cache import BaseAppCache
+from django.core.apps.cache import BaseAppCache
 from django.db import models
 
 # Because we want to test creation and deletion of these as separate things,

@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
-from django.apps import app_cache
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
+from django.core.apps import app_cache
 from django.core.exceptions import FieldError
 from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models import signals

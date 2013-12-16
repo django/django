@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
-from django.apps import app_cache
-from django.apps.cache import BaseAppCache
+from django.core.apps import app_cache
+from django.core.apps.cache import BaseAppCache
 from django.db import models
 from django.test import TestCase
 

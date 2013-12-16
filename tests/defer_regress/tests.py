@@ -2,9 +2,9 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
-from django.apps import app_cache
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.backends.db import SessionStore
+from django.core.apps import app_cache
 from django.db.models import Count
 from django.test import TestCase
 from django.test.utils import override_settings

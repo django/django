@@ -5,8 +5,8 @@ import os
 import re
 import warnings
 
-from django.apps import app_cache
 from django.conf import settings
+from django.core.apps import app_cache
 from django.core.management.base import CommandError
 from django.db import models, router
 

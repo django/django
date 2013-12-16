@@ -123,7 +123,7 @@ def get_user_model():
     """
     Returns the User model that is active in this project.
     """
-    from django.apps import app_cache
+    from django.core.apps import app_cache
 
     try:
         app_label, model_name = settings.AUTH_USER_MODEL.split('.')

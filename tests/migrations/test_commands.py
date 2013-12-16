@@ -5,7 +5,7 @@ import codecs
 import os
 import shutil
 
-from django.apps import app_cache
+from django.core.apps import app_cache
 from django.core.management import call_command, CommandError
 from django.test.utils import override_settings
 from django.utils import six

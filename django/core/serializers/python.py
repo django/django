@@ -5,8 +5,8 @@ other serializers.
 """
 from __future__ import unicode_literals
 
-from django.apps import app_cache
 from django.conf import settings
+from django.core.apps import app_cache
 from django.core.serializers import base
 from django.db import models, DEFAULT_DB_ALIAS
 from django.utils.encoding import smart_text, is_protected_type

@@ -3,7 +3,7 @@ Module for abstract serializer/unserializer base classes.
 """
 import warnings
 
-from django.apps import app_cache
+from django.core.apps import app_cache
 from django.db import models
 from django.utils import six
 

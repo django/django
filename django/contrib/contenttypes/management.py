@@ -1,5 +1,5 @@
-from django.apps import app_cache, UnavailableApp
 from django.contrib.contenttypes.models import ContentType
+from django.core.apps import app_cache, UnavailableApp
 from django.db import DEFAULT_DB_ALIAS, router
 from django.db.models import signals
 from django.utils.encoding import smart_text

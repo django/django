@@ -1,4 +1,4 @@
-from django.apps.cache import BaseAppCache
+from django.core.apps.cache import BaseAppCache
 from django.db import models
 
 # We're testing app cache presence on load, so this is handy.

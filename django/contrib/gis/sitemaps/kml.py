@@ -1,4 +1,4 @@
-from django.apps import app_cache
+from django.core.apps import app_cache
 from django.core import urlresolvers
 from django.contrib.sitemaps import Sitemap
 from django.contrib.gis.db.models.fields import GeometryField

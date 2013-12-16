@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from django.apps.cache import BaseAppCache
 from django.contrib.contenttypes.models import ContentType
+from django.core.apps.cache import BaseAppCache
 from django.db import models
 from django.test import TestCase
 
