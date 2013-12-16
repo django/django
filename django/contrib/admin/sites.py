@@ -416,6 +416,10 @@ class AdminSite(object):
         app_dict = {}
         for model, model_admin in self._registry.items():
             if app_label == model._meta.app_label:
+                
+                # Use any potentially customized app_label with title() override. 
+                app_label = model._meta.app_label
+                
                 perms = model_admin.get_model_perms(request)
 
                 # Check whether user has any perm for this module.
@@ -455,7 +459,7 @@ class AdminSite(object):
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(key=lambda x: x['name'])
         context = dict(self.each_context(),
-            title=_('%s administration') % capfirst(app_label),
+            title=_('%s Administration') % app_label.title(),
             app_list=[app_dict],
             app_label=app_label,
         )
