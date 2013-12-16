@@ -91,13 +91,21 @@ class Options(object):
         # A custom AppCache to use, if you're making a separate model set.
         self.app_cache = app_cache
 
+    @property
+    def app_config(self):
+        # Don't go through get_app_config to avoid triggering populate().
+        return self.app_cache.app_configs[self.app_label]
+
+    @property
+    def installed(self):
+        return self.app_config.installed
+
     def contribute_to_class(self, cls, name):
         from django.db import connection
         from django.db.backends.utils import truncate_name
 
         cls._meta = self
         self.model = cls
-        self.installed = re.sub('\.models$', '', cls.__module__) in settings.INSTALLED_APPS
         # First, construct the default values for these options.
         self.object_name = cls.__name__
         self.model_name = self.object_name.lower()
