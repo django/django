@@ -68,6 +68,13 @@ class DiscoverRunnerTest(TestCase):
 
         self.assertEqual(count, 3)
 
+    def test_empty_test_case(self):
+        count = DiscoverRunner().build_suite(
+            ["test_discovery_sample.tests_sample.EmptyTestCase"],
+        ).countTestCases()
+
+        self.assertEqual(count, 0)
+
     def test_overrideable_test_suite(self):
         self.assertEqual(DiscoverRunner().test_suite, TestSuite)
 
