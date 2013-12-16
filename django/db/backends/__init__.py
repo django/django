@@ -1268,7 +1268,7 @@ class BaseDatabaseIntrospection(object):
         If only_existing is True, the resulting list will only include the tables
         that actually exist in the database.
         """
-        from django.apps import app_cache
+        from django.core.apps import app_cache
         from django.db import router
         tables = set()
         for app_config in app_cache.get_app_configs(only_with_models_module=True):
@@ -1289,7 +1289,7 @@ class BaseDatabaseIntrospection(object):
 
     def installed_models(self, tables):
         "Returns a set of all models represented by the provided list of table names."
-        from django.apps import app_cache
+        from django.core.apps import app_cache
         from django.db import router
         all_models = []
         for app_config in app_cache.get_app_configs(only_with_models_module=True):
@@ -1302,7 +1302,7 @@ class BaseDatabaseIntrospection(object):
 
     def sequence_list(self):
         "Returns a list of information about all DB sequences for all models in all apps."
-        from django.apps import app_cache
+        from django.core.apps import app_cache
         from django.db import models, router
 
         sequence_list = []

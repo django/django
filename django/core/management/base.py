@@ -341,7 +341,7 @@ class AppCommand(BaseCommand):
     args = '<appname appname ...>'
 
     def handle(self, *app_labels, **options):
-        from django.apps import app_cache
+        from django.core.apps import app_cache
         if not app_labels:
             raise CommandError('Enter at least one appname.')
         try:

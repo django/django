@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 import os
 import sys
 
-from django.apps import app_cache
 from django.conf import settings
+from django.core.apps import app_cache
 from django.core.management import call_command
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings

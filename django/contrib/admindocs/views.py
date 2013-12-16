@@ -4,10 +4,10 @@ import os
 import re
 
 from django import template
-from django.apps import app_cache
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
+from django.core.apps import app_cache
 from django.db import models
 from django.core.exceptions import ViewDoesNotExist
 from django.http import Http404

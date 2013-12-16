@@ -1,9 +1,9 @@
 from django import http
-from django.apps import app_cache
 from django.conf import settings
 from django.contrib import comments
 from django.contrib.comments import signals
 from django.contrib.comments.views.utils import next_redirect, confirmation_view
+from django.core.apps import app_cache
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.shortcuts import render_to_response

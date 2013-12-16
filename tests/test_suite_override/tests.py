@@ -1,6 +1,6 @@
 import unittest
 
-from django.apps import app_cache
+from django.core.apps import app_cache
 from django.test.utils import IgnoreAllDeprecationWarningsMixin
 
 

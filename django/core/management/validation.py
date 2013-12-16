@@ -26,7 +26,7 @@ def get_validation_errors(outfile, app=None):
     validates all models of all installed apps. Writes errors, if any, to outfile.
     Returns number of errors.
     """
-    from django.apps import app_cache
+    from django.core.apps import app_cache
     from django.db import connection, models
     from django.db.models.deletion import SET_NULL, SET_DEFAULT
 

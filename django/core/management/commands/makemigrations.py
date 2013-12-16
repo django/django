@@ -3,7 +3,7 @@ import os
 import operator
 from optparse import make_option
 
-from django.apps import app_cache
+from django.core.apps import app_cache
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections, DEFAULT_DB_ALIAS, migrations
 from django.db.migrations.loader import MigrationLoader

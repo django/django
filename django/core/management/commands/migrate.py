@@ -6,8 +6,8 @@ from importlib import import_module
 import itertools
 import traceback
 
-from django.apps import app_cache
 from django.conf import settings
+from django.core.apps import app_cache
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style

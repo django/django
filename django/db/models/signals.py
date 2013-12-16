@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from django.apps import app_cache
+from django.core.apps import app_cache
 from django.dispatch import Signal
 from django.utils import six
 

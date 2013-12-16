@@ -9,7 +9,7 @@ import warnings
 from base64 import b64decode, b64encode
 from itertools import tee
 
-from django.apps import app_cache
+from django.core.apps import app_cache
 from django.db import connection
 from django.db.models.query_utils import QueryWrapper
 from django.conf import settings

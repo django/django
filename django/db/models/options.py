@@ -5,8 +5,8 @@ import re
 from bisect import bisect
 import warnings
 
-from django.apps import app_cache
 from django.conf import settings
+from django.core.apps import app_cache
 from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
