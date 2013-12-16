@@ -377,21 +377,9 @@ Methods
 
     Run the test suite.
 
-    ``test_labels`` is a list of strings describing the tests to be run. A test
-    label can take one of four forms:
-
-    * ``path.to.test_module.TestCase.test_method`` -- Run a single test method
-      in a test case.
-    * ``path.to.test_module.TestCase`` -- Run all the test methods in a test
-      case.
-    * ``path.to.module`` -- Search for and run all tests in the named Python
-      package or module.
-    * ``path/to/directory`` -- Search for and run all tests below the named
-      directory.
-
-    If ``test_labels`` has a value of ``None``, the test runner will search for
-    tests in all files below the current directory whose names match its
-    ``pattern`` (see above).
+    ``test_labels`` allows you to specify which tests to run and supports
+    several formats (see :meth:`DiscoverRunner.build_suite` for a list of
+    supported formats).
 
     ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
     suite that is executed by the test runner. These extra tests are run
@@ -410,15 +398,20 @@ Methods
     Constructs a test suite that matches the test labels provided.
 
     ``test_labels`` is a list of strings describing the tests to be run. A test
-    label can take one of three forms:
+    label can take one of four forms:
 
-    * ``app.TestCase.test_method`` -- Run a single test method in a test
+    * ``path.to.test_module.TestCase.test_method`` -- Run a single test method
+      in a test case.
+    * ``path.to.test_module.TestCase`` -- Run all the test methods in a test
       case.
-    * ``app.TestCase`` -- Run all the test methods in a test case.
-    * ``app`` -- Search for and run all tests in the named application.
+    * ``path.to.module`` -- Search for and run all tests in the named Python
+      package or module.
+    * ``path/to/directory`` -- Search for and run all tests below the named
+      directory.
 
-    If ``test_labels`` has a value of ``None``, the test runner should run
-    search for tests in all the applications in :setting:`INSTALLED_APPS`.
+    If ``test_labels`` has a value of ``None``, the test runner will search for
+    tests in all files below the current directory whose names match its
+    ``pattern`` (see above).
 
     ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
     suite that is executed by the test runner. These extra tests are run
