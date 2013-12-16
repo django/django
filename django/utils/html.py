@@ -291,7 +291,7 @@ def clean_html(text):
           bottom of the text.
     """
     from django.utils.text import normalize_newlines
-    text = normalize_newlines(force_text(text))
+    text = normalize_newlines(text)
     text = re.sub(r'<(/?)\s*b\s*>', '<\\1strong>', text)
     text = re.sub(r'<(/?)\s*i\s*>', '<\\1em>', text)
     text = fix_ampersands(text)
