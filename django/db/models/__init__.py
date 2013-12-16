@@ -1,4 +1,6 @@
 from functools import wraps
+import sys
+import warnings
 
 from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured  # NOQA
 from django.db.models.query import Q, QuerySet, Prefetch  # NOQA
@@ -35,3 +37,26 @@ def permalink(func):
         bits = func(*args, **kwargs)
         return reverse(bits[0], None, *bits[1:3])
     return inner
+
+
+# Deprecated aliases for functions were exposed in this module.
+
+def make_alias(function_name):
+    # Close function_name.
+    def alias(*args, **kwargs):
+        warnings.warn(
+            "django.db.models.%s is deprecated." % function_name,
+            PendingDeprecationWarning, stacklevel=2)
+        # This raises a second warning.
+        from . import loading
+        return getattr(loading, function_name)(*args, **kwargs)
+    alias.__name__ = function_name
+    return alias
+
+this_module = sys.modules['django.db.models']
+
+for function_name in ('get_apps', 'get_app_path', 'get_app_paths', 'get_app',
+                      'get_models', 'get_model', 'register_models'):
+    setattr(this_module, function_name, make_alias(function_name))
+
+del this_module, make_alias, function_name
