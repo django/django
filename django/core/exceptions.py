@@ -71,6 +71,13 @@ class FieldError(Exception):
     pass
 
 
+class UnpickleException(Exception):
+    """
+    Tried to unpickle a QuerySet from incompatible version of django.
+    """
+    pass
+
+
 NON_FIELD_ERRORS = '__all__'
 
 

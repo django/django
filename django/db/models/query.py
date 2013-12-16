@@ -7,7 +7,7 @@ import itertools
 import sys
 
 from django.conf import settings
-from django.core import exceptions
+from django.core.exceptions import UnpickleException
 from django.db import connections, router, transaction, IntegrityError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import AutoField, Empty
@@ -18,6 +18,7 @@ from django.db.models import sql
 from django.utils.functional import partition
 from django.utils import six
 from django.utils import timezone
+from django.utils.version import get_major_version
 
 # The maximum number (one less than the max to be precise) of results to fetch
 # in a get() query
@@ -87,9 +88,28 @@ class QuerySet(object):
         Allows the QuerySet to be pickled.
         """
         # Force the cache to be fully populated.
+        # Please update the tests at tests/queryset_pickle/tests.py funtion
+        # test_unsupported_unpickle_exception when making changes.
         self._fetch_all()
-        obj_dict = self.__dict__.copy()
-        return obj_dict
+        obj_state = self.__dict__.copy()
+        obj_state['django_version'] = get_major_version()
+        return obj_state
+
+    def __setstate__(self, state):
+        """
+        Allows QuerySet to be unpickled with modification.
+        """
+        version = state.get('django_version')
+        if get_major_version() != version:
+            if version:
+                raise UnpickleException("Pickled QuerySet's django major version "
+                                 "%s does not match with current major version %s"
+                                 %(state['django_version'], get_major_version()))
+            else:
+                raise UnpickleException("Pickled QuerySet's django major version "
+                            "does not match with current major version %s" %version)
+
+        self.__dict__ = state
 
     def __reduce__(self):
         """

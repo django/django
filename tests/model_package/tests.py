@@ -1,8 +1,12 @@
 from __future__ import unicode_literals
 
+import pickle
+
 from django.contrib.sites.models import Site
+from django.core.exceptions import UnpickleException
 from django.db import models
 from django.test import TestCase
+from django.utils.version import get_major_version
 
 from .models.publication import Publication
 from .models.article import Article
@@ -69,3 +73,31 @@ class ModelPackageTests(TestCase):
             Article._meta.get_field('publications').m2m_reverse_name(),
             'publication_id'
         )
+
+    def test_missing_django_version_unpickling(self):
+        # test greaceful handling of unpickling of QuerySets pickled
+        # in Django version < 1.7
+        # See ticket 21430 and associated PR
+        class MissingDjangoVersionPublication(Publication):
+            def __reduce__(self):
+                reduce_list = super(MissingDjangoVersionPublication, self).__reduce__()
+                data = reduce_list[-1]
+                del data['django_version']
+                return reduce_list
+
+        p = MissingDjangoVersionPublication(title="FooBar")
+        # Unpickling should raise UnpickleException and not KeyError
+        self.assertRaises(UnpickleException, pickle.loads, pickle.dumps(p))
+
+    def test_unsupported_unpickle_exception(self):
+        # ticket 21430
+        class TestModel(models.Model):
+            title = models.CharField(max_length=10)
+            def __reduce__(self):
+                reduce_list = super(TestModel, self).__reduce__()
+                data = reduce_list[-1]
+                data['django_version'] = str(float(get_major_version()) - 0.1)
+                return reduce_list
+
+        p = TestModel(title="FooBar")
+        self.assertRaises(UnpickleException, pickle.loads, pickle.dumps(p))
