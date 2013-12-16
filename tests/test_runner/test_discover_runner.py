@@ -75,6 +75,28 @@ class DiscoverRunnerTest(TestCase):
 
         self.assertEqual(count, 0)
 
+    def test_discovery_on_package(self):
+        count = DiscoverRunner().build_suite(
+            ["test_discovery_sample.tests"],
+        ).countTestCases()
+
+        self.assertEqual(count, 1)
+
+    def test_ignore_adjacent(self):
+        """
+        When given a dotted path to a module, unittest discovery searches
+        not just the module, but also the directory containing the module.
+
+        This results in tests from adjacent modules being run when they
+        should not. The discover runner avoids this behavior.
+        """
+
+        count = DiscoverRunner().build_suite(
+            ["test_discovery_sample.empty"],
+        ).countTestCases()
+
+        self.assertEqual(count, 0)
+
     def test_overrideable_test_suite(self):
         self.assertEqual(DiscoverRunner().test_suite, TestSuite)
 
