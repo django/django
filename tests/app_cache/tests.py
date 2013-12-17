@@ -9,9 +9,6 @@ from .models import TotallyNormal, SoAlternative, new_app_cache
 
 
 class AppCacheTests(TestCase):
-    """
-    Tests the AppCache borg and non-borg versions
-    """
 
     def test_models_py(self):
         """
