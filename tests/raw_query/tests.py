@@ -242,7 +242,6 @@ class RawQueryTests(TestCase):
 
     def test_subquery_in_raw_sql(self):
         try:
-            raw_qs = Book.objects.raw('SELECT "id" FROM (SELECT * FROM raw_query_book WHERE paperback) sq')
-            list(raw_qs)
+            list(Book.objects.raw('SELECT "id" FROM (SELECT * FROM raw_query_book WHERE paperback) sq'))
         except InvalidQuery:
-            self.fail("Using a subquery in a RawQuerySet raied InvalidQuery")
+            self.fail("Using a subquery in a RawQuerySet raised InvalidQuery")
