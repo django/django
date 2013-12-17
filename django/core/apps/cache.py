@@ -41,22 +41,21 @@ class AppCache(object):
         self.master = master
 
         # Mapping of labels to AppConfig instances for installed apps.
-        self.app_configs=OrderedDict()
+        self.app_configs = OrderedDict()
 
         # Pending lookups for lazy relations
-        self.pending_lookups={}
+        self.pending_lookups = {}
 
         # Set of app names. Allows restricting the set of installed apps.
         # Used by TransactionTestCase.available_apps for performance reasons.
-        self.available_apps=None
+        self.available_apps = None
 
         # -- Everything below here is only used when populating the cache --
-        self.loaded=False
-        self.handled=set()
-        self.postponed=[]
-        self.nesting_level=0
-        self._get_models_cache={}
-
+        self.loaded = False
+        self.handled = set()
+        self.postponed = []
+        self.nesting_level = 0
+        self._get_models_cache = {}
 
     def populate(self):
         """
