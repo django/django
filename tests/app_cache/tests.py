@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from django.core.apps import app_cache
-from django.core.apps.cache import BaseAppCache
+from django.core.apps.cache import AppCache
 from django.db import models
 from django.test import TestCase
 
@@ -30,7 +30,7 @@ class AppCacheTests(TestCase):
         old_models = app_cache.get_models(app_cache.get_app_config("app_cache").models_module)
         # Construct a new model in a new app cache
         body = {}
-        new_app_cache = BaseAppCache()
+        new_app_cache = AppCache()
         meta_contents = {
             'app_label': "app_cache",
             'app_cache': new_app_cache,

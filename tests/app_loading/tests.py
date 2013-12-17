@@ -75,17 +75,14 @@ class EggLoadingTest(TestCase):
         Test that repeated app loading doesn't succeed in case there is an
         error. Refs #17667.
         """
-        # AppCache is a Borg, so we can instantiate one and change its
-        # loaded to False to force the following code to actually try to
-        # populate the cache.
-        a = AppCache()
-        a.loaded = False
-        try:
-            with override_settings(INSTALLED_APPS=('notexists',)):
-                self.assertRaises(ImportError, app_cache.get_model, 'notexists', 'nomodel', seed_cache=True)
-                self.assertRaises(ImportError, app_cache.get_model, 'notexists', 'nomodel', seed_cache=True)
-        finally:
-            a.loaded = True
+        app_cache = AppCache()
+        # Pretend we're the master app cache to test populate().
+        app_cache.master = True
+        with override_settings(INSTALLED_APPS=('notexists',)):
+            with self.assertRaises(ImportError):
+                app_cache.get_model('notexists', 'nomodel', seed_cache=True)
+            with self.assertRaises(ImportError):
+                app_cache.get_model('notexists', 'nomodel', seed_cache=True)
 
 
 class GetModelsTest(TestCase):

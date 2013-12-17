@@ -1,4 +1,4 @@
-from django.core.apps.cache import BaseAppCache
+from django.core.apps.cache import AppCache
 from django.db.backends.schema import BaseDatabaseSchemaEditor
 from django.db.models.fields.related import ManyToManyField
 
@@ -39,7 +39,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             del body[field.name]
             del mapping[field.column]
         # Work inside a new AppCache
-        app_cache = BaseAppCache()
+        app_cache = AppCache()
         # Construct a new model for the new state
         meta_contents = {
             'app_label': model._meta.app_label,

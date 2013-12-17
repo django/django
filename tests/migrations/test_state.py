@@ -1,4 +1,4 @@
-from django.core.apps.cache import BaseAppCache
+from django.core.apps.cache import AppCache
 from django.db import models
 from django.db.migrations.state import ProjectState, ModelState, InvalidBasesError
 from django.test import TestCase
@@ -14,7 +14,7 @@ class StateTests(TestCase):
         Tests making a ProjectState from an AppCache
         """
 
-        new_app_cache = BaseAppCache()
+        new_app_cache = AppCache()
 
         class Author(models.Model):
             name = models.CharField(max_length=255)
@@ -100,15 +100,15 @@ class StateTests(TestCase):
 
             class Meta:
                 app_label = "migrations"
-                app_cache = BaseAppCache()
+                app_cache = AppCache()
 
         class Novel(Book):
             class Meta:
                 app_label = "migrations"
-                app_cache = BaseAppCache()
+                app_cache = AppCache()
 
         # First, test rendering individually
-        app_cache = BaseAppCache()
+        app_cache = AppCache()
 
         # We shouldn't be able to render yet
         ms = ModelState.from_model(Novel)
@@ -123,19 +123,19 @@ class StateTests(TestCase):
         class Foo(models.Model):
             class Meta:
                 app_label = "migrations"
-                app_cache = BaseAppCache()
+                app_cache = AppCache()
 
         class Bar(models.Model):
             class Meta:
                 app_label = "migrations"
-                app_cache = BaseAppCache()
+                app_cache = AppCache()
 
         class FooBar(Foo, Bar):
             class Meta:
                 app_label = "migrations"
-                app_cache = BaseAppCache()
+                app_cache = AppCache()
 
-        app_cache = BaseAppCache()
+        app_cache = AppCache()
 
         # We shouldn't be able to render yet
         ms = ModelState.from_model(FooBar)
@@ -152,7 +152,7 @@ class StateTests(TestCase):
         Tests that the ProjectState render method correctly renders models
         to account for inter-model base dependencies.
         """
-        new_app_cache = BaseAppCache()
+        new_app_cache = AppCache()
 
         class A(models.Model):
             class Meta:
