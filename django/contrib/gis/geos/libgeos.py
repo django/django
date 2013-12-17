@@ -48,9 +48,11 @@ if lib_names:
 
 # No GEOS library could be found.
 if lib_path is None:
-    raise ImportError('Could not find the GEOS library (tried "%s"). '
-                        'Try setting GEOS_LIBRARY_PATH in your settings.' %
-                        '", "'.join(lib_names))
+    raise ImportError(
+        'Could not find the GEOS library (tried "%s"). '
+        'Try setting GEOS_LIBRARY_PATH in your settings.' %
+        '", "'.join(lib_names)
+    )
 
 # Getting the GEOS C library.  The C interface (CDLL) is used for
 # both *NIX and Windows.

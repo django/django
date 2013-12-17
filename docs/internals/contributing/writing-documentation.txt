@@ -263,23 +263,26 @@ example:
 
   .. code-block:: rst
 
-    .. setting:: ADMIN_FOR
+    .. setting:: ADMINS
 
-    ADMIN_FOR
-    ---------
+    ADMINS
+    ------
 
     Default: ``()`` (Empty tuple)
 
-    Used for admin-site settings modules, this should be a tuple of
-    settings modules (in the format ``'foo.bar.baz'``) for which this site
-    is an admin.
+    A tuple that lists people who get code error notifications. When
+    ``DEBUG=False`` and a view raises an exception, Django will email these people
+    with the full exception information. Each member of the tuple should be a tuple
+    of (Full name, email address). Example::
 
-    The admin site uses this in its automatically-introspected
-    documentation of models, views and template tags.
+        (('John', 'john@example.com'), ('Mary', 'mary@example.com'))
+
+    Note that Django will email *all* of these people whenever an error happens.
+    See :doc:`/howto/error-reporting` for more information.
 
   This marks up the following header as the "canonical" target for the
-  setting ``ADMIN_FOR`` This means any time I talk about ``ADMIN_FOR``,
-  I can reference it using ``:setting:`ADMIN_FOR```.
+  setting ``ADMINS``. This means any time I talk about ``ADMINS``,
+  I can reference it using ``:setting:`ADMINS```.
 
 That's basically how everything fits together.
 
@@ -320,8 +323,8 @@ look better:
 
   __ http://sphinx-doc.org/markup/desc.html#info-field-lists
 
-* Whenever possible, use links. So, use ``:setting:`ADMIN_FOR``` instead
-  of ````ADMIN_FOR````.
+* Whenever possible, use links. So, use ``:setting:`ADMINS``` instead
+  of ````ADMINS````.
 
 * Use directives where appropriate. Some directives
   (e.g. ``.. setting::``) are prefix-style directives; they go *before*

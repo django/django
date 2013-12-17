@@ -227,12 +227,21 @@ class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescri
         # If null=True, we can assign null here, but otherwise the value needs
         # to be an instance of the related class.
         if value is None and self.related.field.null is False:
-            raise ValueError('Cannot assign None: "%s.%s" does not allow null values.' %
-                                (instance._meta.object_name, self.related.get_accessor_name()))
+            raise ValueError(
+                'Cannot assign None: "%s.%s" does not allow null values.' % (
+                    instance._meta.object_name,
+                    self.related.get_accessor_name(),
+                )
+            )
         elif value is not None and not isinstance(value, self.related.model):
-            raise ValueError('Cannot assign "%r": "%s.%s" must be a "%s" instance.' %
-                                (value, instance._meta.object_name,
-                                 self.related.get_accessor_name(), self.related.opts.object_name))
+            raise ValueError(
+                'Cannot assign "%r": "%s.%s" must be a "%s" instance.' % (
+                    value,
+                    instance._meta.object_name,
+                    self.related.get_accessor_name(),
+                    self.related.opts.object_name,
+                )
+            )
         elif value is not None:
             if instance._state.db is None:
                 instance._state.db = router.db_for_write(instance.__class__, instance=value)
@@ -244,8 +253,10 @@ class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescri
 
         related_pk = tuple(getattr(instance, field.attname) for field in self.related.field.foreign_related_fields)
         if None in related_pk:
-            raise ValueError('Cannot assign "%r": "%s" instance isn\'t saved in the database.' %
-                                (value, instance._meta.object_name))
+            raise ValueError(
+                'Cannot assign "%r": "%s" instance isn\'t saved in the database.' %
+                (value, instance._meta.object_name)
+            )
 
         # Set the value of the related field to the value of the related object's related field
         for index, field in enumerate(self.related.field.local_related_fields):
@@ -355,12 +366,19 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
         # If null=True, we can assign null here, but otherwise the value needs
         # to be an instance of the related class.
         if value is None and self.field.null is False:
-            raise ValueError('Cannot assign None: "%s.%s" does not allow null values.' %
-                                (instance._meta.object_name, self.field.name))
+            raise ValueError(
+                'Cannot assign None: "%s.%s" does not allow null values.' %
+                (instance._meta.object_name, self.field.name)
+            )
         elif value is not None and not isinstance(value, self.field.rel.to):
-            raise ValueError('Cannot assign "%r": "%s.%s" must be a "%s" instance.' %
-                                (value, instance._meta.object_name,
-                                 self.field.name, self.field.rel.to._meta.object_name))
+            raise ValueError(
+                'Cannot assign "%r": "%s.%s" must be a "%s" instance.' % (
+                    value,
+                    instance._meta.object_name,
+                    self.field.name,
+                    self.field.rel.to._meta.object_name,
+                )
+            )
         elif value is not None:
             if instance._state.db is None:
                 instance._state.db = router.db_for_write(instance.__class__, instance=value)
@@ -706,7 +724,10 @@ def create_many_related_manager(superclass, rel):
             # from the method lookup table, as we do with add and remove.
             if not self.through._meta.auto_created:
                 opts = self.through._meta
-                raise AttributeError("Cannot use create() on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." % (opts.app_label, opts.object_name))
+                raise AttributeError(
+                    "Cannot use create() on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." %
+                    (opts.app_label, opts.object_name)
+                )
             db = router.db_for_write(self.instance.__class__, instance=self.instance)
             new_obj = super(ManyRelatedManager, self.db_manager(db)).create(**kwargs)
             self.add(new_obj)
@@ -736,16 +757,23 @@ def create_many_related_manager(superclass, rel):
                 for obj in objs:
                     if isinstance(obj, self.model):
                         if not router.allow_relation(obj, self.instance):
-                            raise ValueError('Cannot add "%r": instance is on database "%s", value is on database "%s"' %
-                                               (obj, self.instance._state.db, obj._state.db))
+                            raise ValueError(
+                                'Cannot add "%r": instance is on database "%s", value is on database "%s"' %
+                                (obj, self.instance._state.db, obj._state.db)
+                            )
                         fk_val = self.through._meta.get_field(
                             target_field_name).get_foreign_related_value(obj)[0]
                         if fk_val is None:
-                            raise ValueError('Cannot add "%r": the value for field "%s" is None' %
-                                             (obj, target_field_name))
+                            raise ValueError(
+                                'Cannot add "%r": the value for field "%s" is None' %
+                                (obj, target_field_name)
+                            )
                         new_ids.add(fk_val)
                     elif isinstance(obj, Model):
-                        raise TypeError("'%s' instance expected, got %r" % (self.model._meta.object_name, obj))
+                        raise TypeError(
+                            "'%s' instance expected, got %r" %
+                            (self.model._meta.object_name, obj)
+                        )
                     else:
                         new_ids.add(obj)
                 db = router.db_for_write(self.through, instance=self.instance)

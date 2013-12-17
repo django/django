@@ -221,7 +221,7 @@ class BoundNonDescriptorMethodWeakref(BoundMethodWeakref):
             which will be passed a pointer to this object.
         """
         assert getattr(target.__self__, target.__name__) == target, \
-               ("method %s isn't available as the attribute %s of %s" %
+            ("method %s isn't available as the attribute %s of %s" %
                 (target, target.__name__, target.__self__))
         super(BoundNonDescriptorMethodWeakref, self).__init__(target, onDelete)
 

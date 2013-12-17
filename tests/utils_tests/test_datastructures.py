@@ -179,14 +179,17 @@ class MergeDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
 
         self.assertTrue('value1' in six.itervalues(mm))
 
-        self.assertEqual(sorted(six.iteritems(mm), key=lambda k: k[0]),
-                          [('key1', 'value1'), ('key2', 'value3'),
-                           ('key4', 'value6')])
+        self.assertEqual(
+            sorted(six.iteritems(mm), key=lambda k: k[0]),
+            [('key1', 'value1'), ('key2', 'value3'), ('key4', 'value6')]
+        )
 
-        self.assertEqual([(k, mm.getlist(k)) for k in sorted(mm)],
-                          [('key1', ['value1']),
-                           ('key2', ['value2', 'value3']),
-                           ('key4', ['value5', 'value6'])])
+        self.assertEqual(
+            [(k, mm.getlist(k)) for k in sorted(mm)],
+            [('key1', ['value1']),
+             ('key2', ['value2', 'value3']),
+             ('key4', ['value5', 'value6'])]
+        )
 
     def test_bool_casting(self):
         empty = MergeDict({}, {}, {})
@@ -212,12 +215,15 @@ class MultiValueDictTests(SimpleTestCase):
         self.assertEqual(d['name'], 'Simon')
         self.assertEqual(d.get('name'), 'Simon')
         self.assertEqual(d.getlist('name'), ['Adrian', 'Simon'])
-        self.assertEqual(sorted(list(six.iteritems(d))),
-                          [('name', 'Simon'), ('position', 'Developer')])
+        self.assertEqual(
+            sorted(list(six.iteritems(d))),
+            [('name', 'Simon'), ('position', 'Developer')]
+        )
 
-        self.assertEqual(sorted(list(six.iterlists(d))),
-                          [('name', ['Adrian', 'Simon']),
-                           ('position', ['Developer'])])
+        self.assertEqual(
+            sorted(list(six.iterlists(d))),
+            [('name', ['Adrian', 'Simon']), ('position', ['Developer'])]
+        )
 
         six.assertRaisesRegex(self, MultiValueDictKeyError, 'lastname',
             d.__getitem__, 'lastname')
@@ -298,5 +304,7 @@ class DictWrapperTests(SimpleTestCase):
     def test_dictwrapper(self):
         f = lambda x: "*%s" % x
         d = DictWrapper({'a': 'a'}, f, 'xx_')
-        self.assertEqual("Normal: %(a)s. Modified: %(xx_a)s" % d,
-                          'Normal: a. Modified: *a')
+        self.assertEqual(
+            "Normal: %(a)s. Modified: %(xx_a)s" % d,
+            'Normal: a. Modified: *a'
+        )

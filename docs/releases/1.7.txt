@@ -280,7 +280,7 @@ Cache
 
 * If you instanciate cache backends directly, be aware that they aren't
   thread-safe any more, as :data:`django.core.cache.caches` now yields
-  differend instances per thread.
+  different instances per thread.
 
 Email
 ^^^^^
@@ -353,6 +353,12 @@ Forms
 * The new :meth:`~django.forms.Form.add_error()` method allows adding errors
   to specific form fields.
 
+* The dict-like attribute :attr:`~django.forms.Form.errors` now has two new
+  methods :meth:`~django.forms.Form.errors.as_data()` and
+  :meth:`~django.forms.Form.errors.as_json()`. The former returns a ``dict``
+  that maps fields to their original errors, complete with all metadata
+  (error code and params), the latter returns the errors serialized as json.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -398,13 +404,10 @@ Management Commands
 
 * The :djadmin:`runserver` command received several improvements:
 
-  * On BSD systems, including OS X, the development server will reload
-    immediately when a file is changed. Previously, it polled the filesystem
-    for changes every second. That caused a small delay before reloads and
-    reduced battery life on laptops.
-
-  * On Linux, the same improvements are available when pyinotify_ is
-    installed.
+  * On Linux systems, if pyinotify_ is installed, the development server will
+    reload immediately when a file is changed. Previously, it polled the
+    filesystem for changes every second. That caused a small delay before
+    reloads and reduced battery life on laptops.
 
     .. _pyinotify: https://pypi.python.org/pypi/pyinotify
 
@@ -533,6 +536,9 @@ Tests
   :meth:`Client.logout() <django.test.Client.logout>` respect defaults defined
   in :class:`~django.test.Client` instantiation and are processed through
   middleware.
+
+* :meth:`~django.test.TransactionTestCase.assertNumQueries` now prints
+  out the list of executed queries if the assertion fails.
 
 Backwards incompatible changes in 1.7
 =====================================
@@ -712,9 +718,6 @@ Miscellaneous
   ``select_related('foo', 'bar')`` is equivalent to
   ``select_related('foo').select_related('bar')``. Previously the latter would
   have been equivalent to ``select_related('bar')``.
-
-* :meth:`~django.test.TransactionTestCase.assertNumQueries` now prints
-  out the list of executed queries if the assertion fails.
 
 Features deprecated in 1.7
 ==========================

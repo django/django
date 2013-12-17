@@ -177,8 +177,9 @@ used tags (which are usually represented as HTML classes for the message)::
 
 Displaying messages
 -------------------
+.. function:: get_messages(request)
 
-In your template, use something like::
+**In your template**, use something like::
 
     {% if messages %}
     <ul class="messages">
@@ -211,6 +212,25 @@ is a mapping of the message level names to their numeric value::
         {% endfor %}
     </ul>
     {% endif %}
+
+
+
+**Outside of templates**, you can use
+:func:`~django.contrib.messages.get_messages`::
+
+    from django.contrib.messages import get_messages
+
+    storage = get_messages(request)
+    for message in storage:
+        do_something_with_the_message(message)
+
+For instance, you can fetch all the messages to return them in a
+:ref:`JSONResponseMixin <jsonresponsemixin-example>` instead of a
+:class:`~django.views.generic.base.TemplateResponseMixin`.
+
+:func:`~django.contrib.messages.get_messages` will return an
+instance of the configured storage backend.
+
 
 The ``Message`` class
 ---------------------

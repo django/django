@@ -412,13 +412,11 @@ class ModelInheritanceTest(TestCase):
         # when more than one model has a concrete->abstract->concrete
         # inheritance hierarchy.
         self.assertEqual(
-            len([field for field in BusStation._meta.local_fields
-                       if field.primary_key]),
+            len([field for field in BusStation._meta.local_fields if field.primary_key]),
             1
         )
         self.assertEqual(
-            len([field for field in TrainStation._meta.local_fields
-                       if field.primary_key]),
+            len([field for field in TrainStation._meta.local_fields if field.primary_key]),
             1
         )
         self.assertIs(BusStation._meta.pk.model, BusStation)

@@ -276,16 +276,15 @@ class BaseAppCache(object):
         try:
             model_list = self._get_models_cache[cache_key]
             if self.available_apps is not None and only_installed:
-                model_list = [m for m in model_list
-                                if m._meta.app_label in self.available_apps]
+                model_list = [m for m in model_list if m._meta.app_label in self.available_apps]
+
             return model_list
         except KeyError:
             pass
         self._populate()
         if app_mod:
             if app_mod in self.app_store:
-                app_list = [self.app_models.get(self._label_for(app_mod),
-                                                ModelDict())]
+                app_list = [self.app_models.get(self._label_for(app_mod), ModelDict())]
             else:
                 app_list = []
         else:
@@ -304,8 +303,7 @@ class BaseAppCache(object):
             )
         self._get_models_cache[cache_key] = model_list
         if self.available_apps is not None and only_installed:
-            model_list = [m for m in model_list
-                            if m._meta.app_label in self.available_apps]
+            model_list = [m for m in model_list if m._meta.app_label in self.available_apps]
         return model_list
 
     def get_model(self, app_label, model_name,

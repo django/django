@@ -452,9 +452,9 @@ class Query(object):
         'rhs' query.
         """
         assert self.model == rhs.model, \
-                "Cannot combine queries on two different base models."
+            "Cannot combine queries on two different base models."
         assert self.can_filter(), \
-                "Cannot combine queries once a slice has been taken."
+            "Cannot combine queries once a slice has been taken."
         assert self.distinct == rhs.distinct, \
             "Cannot combine a unique query with a non-unique query."
         assert self.distinct_fields == rhs.distinct_fields, \

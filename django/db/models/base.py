@@ -160,9 +160,11 @@ class ModelBase(type):
             new_class.add_to_class(obj_name, obj)
 
         # All the fields of any type declared on this model
-        new_fields = new_class._meta.local_fields + \
-                     new_class._meta.local_many_to_many + \
-                     new_class._meta.virtual_fields
+        new_fields = (
+            new_class._meta.local_fields +
+            new_class._meta.local_many_to_many +
+            new_class._meta.virtual_fields
+        )
         field_names = set(f.name for f in new_fields)
 
         # Basic setup for proxy models.
@@ -216,10 +218,11 @@ class ModelBase(type):
             # moment).
             for field in parent_fields:
                 if field.name in field_names:
-                    raise FieldError('Local field %r in class %r clashes '
-                                     'with field of similar name from '
-                                     'base class %r' %
-                                        (field.name, name, base.__name__))
+                    raise FieldError(
+                        'Local field %r in class %r clashes '
+                        'with field of similar name from '
+                        'base class %r' % (field.name, name, base.__name__)
+                    )
             if not base._meta.abstract:
                 # Concrete classes...
                 base = base._meta.concrete_model
@@ -253,10 +256,11 @@ class ModelBase(type):
             # class
             for field in base._meta.virtual_fields:
                 if base._meta.abstract and field.name in field_names:
-                    raise FieldError('Local field %r in class %r clashes '
-                                     'with field of similar name from '
-                                     'abstract base class %r' %
-                                        (field.name, name, base.__name__))
+                    raise FieldError(
+                        'Local field %r in class %r clashes '
+                        'with field of similar name from '
+                        'abstract base class %r' % (field.name, name, base.__name__)
+                    )
                 new_class.add_to_class(field.name, copy.deepcopy(field))
 
         if abstract:
