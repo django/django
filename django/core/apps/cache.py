@@ -23,46 +23,40 @@ class UnavailableApp(Exception):
     pass
 
 
-def _initialize():
+class AppCache(object):
     """
-    Returns a dictionary to be used as the initial value of the
-    [shared] state of the app cache.
+    A cache that stores installed applications and their models. Used to
+    provide reverse-relations and for app introspection.
     """
-    return dict(
+
+    def __init__(self, master=False):
+        # Only one master of the app-cache may exist at a given time, and it
+        # shall be the app_cache variable defined at the end of this module.
+        if master and hasattr(sys.modules[__name__], 'app_cache'):
+            raise RuntimeError("You may create only one master app cache.")
+
+        # When master is set to False, the app cache isn't populated from
+        # INSTALLED_APPS and ignores the only_installed arguments to
+        # get_model[s].
+        self.master = master
+
         # Mapping of labels to AppConfig instances for installed apps.
-        app_configs=OrderedDict(),
+        self.app_configs=OrderedDict()
 
         # Pending lookups for lazy relations
-        pending_lookups={},
+        self.pending_lookups={}
 
         # Set of app names. Allows restricting the set of installed apps.
         # Used by TransactionTestCase.available_apps for performance reasons.
-        available_apps=None,
+        self.available_apps=None
 
         # -- Everything below here is only used when populating the cache --
-        loads_installed=True,
-        loaded=False,
-        handled=set(),
-        postponed=[],
-        nesting_level=0,
-        _get_models_cache={},
-    )
+        self.loaded=False
+        self.handled=set()
+        self.postponed=[]
+        self.nesting_level=0
+        self._get_models_cache={}
 
-
-class BaseAppCache(object):
-    """
-    A cache that stores installed applications and their models. Used to
-    provide reverse-relations and for app introspection (e.g. admin).
-
-    This provides the base (non-Borg) AppCache class - the AppCache
-    subclass adds borg-like behaviour for the few cases where it's needed.
-    """
-
-    def __init__(self):
-        self.__dict__ = _initialize()
-        # This stops populate loading from INSTALLED_APPS and ignores the
-        # only_installed arguments to get_model[s]
-        self.loads_installed = False
 
     def populate(self):
         """
@@ -72,7 +66,7 @@ class BaseAppCache(object):
         """
         if self.loaded:
             return
-        if not self.loads_installed:
+        if not self.master:
             self.loaded = True
             return
         # Note that we want to use the import lock here - the app loading is
@@ -217,7 +211,7 @@ class BaseAppCache(object):
         included in the list of models. However, if you specify
         include_swapped, they will be.
         """
-        if not self.loads_installed:
+        if not self.master:
             only_installed = False
         cache_key = (app_mod, include_auto_created, include_deferred, only_installed, include_swapped)
         model_list = None
@@ -271,7 +265,7 @@ class BaseAppCache(object):
         Raises UnavailableApp when set_available_apps() in in effect and
         doesn't include app_label.
         """
-        if not self.loads_installed:
+        if not self.master:
             only_installed = False
         if seed_cache:
             self.populate()
@@ -399,18 +393,4 @@ class BaseAppCache(object):
             self.register_model(app_label, model)
 
 
-class AppCache(BaseAppCache):
-    """
-    A cache that stores installed applications and their models. Used to
-    provide reverse-relations and for app introspection (e.g. admin).
-
-    Borg version of the BaseAppCache class.
-    """
-
-    __shared_state = _initialize()
-
-    def __init__(self):
-        self.__dict__ = self.__shared_state
-
-
-app_cache = AppCache()
+app_cache = AppCache(master=True)

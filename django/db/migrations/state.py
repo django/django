@@ -1,4 +1,4 @@
-from django.core.apps.cache import BaseAppCache
+from django.core.apps.cache import AppCache
 from django.db import models
 from django.db.models.options import DEFAULT_NAMES, normalize_unique_together
 from django.utils import six
@@ -32,7 +32,7 @@ class ProjectState(object):
     def render(self):
         "Turns the project state into actual models in a new AppCache"
         if self.app_cache is None:
-            self.app_cache = BaseAppCache()
+            self.app_cache = AppCache()
             # We keep trying to render the models in a loop, ignoring invalid
             # base errors, until the size of the unrendered models doesn't
             # decrease by at least one, meaning there's a base dependency loop/
