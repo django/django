@@ -164,10 +164,9 @@ def setup(verbosity, test_labels):
         if module_found_in_labels:
             if verbosity >= 2:
                 print("Importing application %s" % module_name)
-            mod = app_cache.load_app(module_label)
-            if mod:
-                if module_label not in settings.INSTALLED_APPS:
-                    settings.INSTALLED_APPS.append(module_label)
+            app_cache.load_app(module_label)
+            if module_label not in settings.INSTALLED_APPS:
+                settings.INSTALLED_APPS.append(module_label)
 
     return state
 
