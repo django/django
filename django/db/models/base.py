@@ -6,7 +6,7 @@ from functools import update_wrapper
 from django.utils.six.moves import zip
 
 from django.core.apps import app_cache
-from django.core.apps.cache import MODELS_MODULE_NAME
+from django.core.apps.base import MODELS_MODULE_NAME
 import django.db.models.manager  # NOQA: Imported to register signal handler.
 from django.conf import settings
 from django.core.exceptions import (ObjectDoesNotExist,

@@ -139,7 +139,7 @@ class Deserializer(six.Iterator):
             self.stream = stream_or_string
         # Make sure the app cache is loaded before deserialization starts
         # (otherwise subclass calls to get_model() and friends might fail...)
-        app_cache.populate()
+        app_cache.populate_models()
 
     def __iter__(self):
         return self

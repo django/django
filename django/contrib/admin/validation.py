@@ -18,7 +18,7 @@ class BaseValidator(object):
     def __init__(self):
         # Before we can introspect models, they need the app cache to be fully
         # loaded so that inter-relations are set up correctly.
-        app_cache.populate()
+        app_cache.populate_models()
 
     def validate(self, cls, model):
         for m in dir(self):

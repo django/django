@@ -93,7 +93,7 @@ class Options(object):
 
     @property
     def app_config(self):
-        # Don't go through get_app_config to avoid triggering populate().
+        # Don't go through get_app_config to avoid triggering imports.
         return self.app_cache.app_configs.get(self.app_label)
 
     @property

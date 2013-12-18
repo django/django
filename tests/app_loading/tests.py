@@ -77,8 +77,9 @@ class EggLoadingTest(TestCase):
         error. Refs #17667.
         """
         app_cache = AppCache()
-        # Pretend we're the master app cache to test populate().
-        app_cache.master = True
+        # Pretend we're the master app cache to test the population process.
+        app_cache._apps_loaded = False
+        app_cache._models_loaded = False
         with override_settings(INSTALLED_APPS=('notexists',)):
             with self.assertRaises(ImportError):
                 app_cache.get_model('notexists', 'nomodel')
