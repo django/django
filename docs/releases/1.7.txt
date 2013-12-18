@@ -869,3 +869,9 @@ Geo Sitemaps
 
 Google has retired support for the Geo Sitemaps format. Hence Django support
 for Geo Sitemaps is deprecated and will be removed in Django 1.8.
+
+``ADMIN_FOR`` setting
+~~~~~~~~~~~~~~~~~~~~~
+
+The ``ADMIN_FOR`` feature, part of the admindocs, has been removed. You can
+remove the setting from your configuration at your convenience.

@@ -2,6 +2,7 @@ from importlib import import_module
 import inspect
 import os
 import re
+import warnings
 
 from django import template
 from django.conf import settings
@@ -13,7 +14,6 @@ from django.core.exceptions import ViewDoesNotExist
 from django.http import Http404
 from django.core import urlresolvers
 from django.contrib.admindocs import utils
-from django.contrib.sites.models import Site
 from django.utils.decorators import method_decorator
 from django.utils._os import upath
 from django.utils import six
@@ -23,10 +23,10 @@ from django.views.generic import TemplateView
 # Exclude methods starting with these strings from documentation
 MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
 
-
-class GenericSite(object):
-    domain = 'example.com'
-    name = 'my site'
+if getattr(settings, 'ADMIN_FOR', None):
+    warnings.warn('The ADMIN_FOR setting has been removed, you can remove '
+                  'this setting from your configuration.', DeprecationWarning,
+                  stacklevel=2)
 
 
 class BaseAdminDocsView(TemplateView):
@@ -129,26 +129,17 @@ class ViewIndexView(BaseAdminDocsView):
     template_name = 'admin_doc/view_index.html'
 
     def get_context_data(self, **kwargs):
-        if settings.ADMIN_FOR:
-            settings_modules = [import_module(m) for m in settings.ADMIN_FOR]
-        else:
-            settings_modules = [settings]
-
         views = []
-        for settings_mod in settings_modules:
-            urlconf = import_module(settings_mod.ROOT_URLCONF)
-            view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
-            if Site._meta.installed:
-                site_obj = Site.objects.get(pk=settings_mod.SITE_ID)
-            else:
-                site_obj = GenericSite()
-            for (func, regex) in view_functions:
-                views.append({
-                    'full_name': '%s.%s' % (func.__module__, getattr(func, '__name__', func.__class__.__name__)),
-                    'site_id': settings_mod.SITE_ID,
-                    'site': site_obj,
-                    'url': simplify_regex(regex),
-                })
+        urlconf = import_module(settings.ROOT_URLCONF)
+        view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
+        for (func, regex, namespace, name) in view_functions:
+            views.append({
+                'full_name': '%s.%s' % (func.__module__, getattr(func, '__name__', func.__class__.__name__)),
+                'url': simplify_regex(regex),
+                'url_name': ':'.join((namespace or []) + (name and [name] or [])),
+                'namespace': ':'.join((namespace or [])),
+                'name': name,
+            })
         kwargs.update({'views': views})
         return super(ViewIndexView, self).get_context_data(**kwargs)
 
@@ -292,22 +283,14 @@ class TemplateDetailView(BaseAdminDocsView):
     def get_context_data(self, **kwargs):
         template = self.kwargs['template']
         templates = []
-        for site_settings_module in settings.ADMIN_FOR:
-            settings_mod = import_module(site_settings_module)
-            if Site._meta.installed:
-                site_obj = Site.objects.get(pk=settings_mod.SITE_ID)
-            else:
-                site_obj = GenericSite()
-            for dir in settings_mod.TEMPLATE_DIRS:
-                template_file = os.path.join(dir, template)
-                templates.append({
-                    'file': template_file,
-                    'exists': os.path.exists(template_file),
-                    'contents': lambda: open(template_file).read() if os.path.exists(template_file) else '',
-                    'site_id': settings_mod.SITE_ID,
-                    'site': site_obj,
-                    'order': list(settings_mod.TEMPLATE_DIRS).index(dir),
-                })
+        for dir in settings.TEMPLATE_DIRS:
+            template_file = os.path.join(dir, template)
+            templates.append({
+                'file': template_file,
+                'exists': os.path.exists(template_file),
+                'contents': lambda: open(template_file).read() if os.path.exists(template_file) else '',
+                'order': list(settings.TEMPLATE_DIRS).index(dir),
+            })
         kwargs.update({
             'name': template,
             'templates': templates,
@@ -356,7 +339,7 @@ def get_readable_field_data_type(field):
     return field.description % field.__dict__
 
 
-def extract_views_from_urlpatterns(urlpatterns, base=''):
+def extract_views_from_urlpatterns(urlpatterns, base='', namespace=None):
     """
     Return a list of views from a list of urlpatterns.
 
@@ -369,10 +352,15 @@ def extract_views_from_urlpatterns(urlpatterns, base=''):
                 patterns = p.url_patterns
             except ImportError:
                 continue
-            views.extend(extract_views_from_urlpatterns(patterns, base + p.regex.pattern))
+            views.extend(extract_views_from_urlpatterns(
+                patterns,
+                base + p.regex.pattern,
+                (namespace or []) + (p.namespace and [p.namespace] or [])
+            ))
         elif hasattr(p, 'callback'):
             try:
-                views.append((p.callback, base + p.regex.pattern))
+                views.append((p.callback, base + p.regex.pattern,
+                              namespace, p.name))
             except ViewDoesNotExist:
                 continue
         else:
