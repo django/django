@@ -74,7 +74,7 @@ def add_lazy_relation(cls, field, relation, operation):
     else:
         key = (app_label, model_name)
         value = (cls, field, operation)
-        cls._meta.app_cache.pending_lookups.setdefault(key, []).append(value)
+        cls._meta.app_cache._pending_lookups.setdefault(key, []).append(value)
 
 
 def do_pending_lookups(sender, **kwargs):
@@ -82,7 +82,7 @@ def do_pending_lookups(sender, **kwargs):
     Handle any pending relations to the sending model. Sent from class_prepared.
     """
     key = (sender._meta.app_label, sender.__name__)
-    for cls, field, operation in sender._meta.app_cache.pending_lookups.pop(key, []):
+    for cls, field, operation in sender._meta.app_cache._pending_lookups.pop(key, []):
         operation(field, sender, cls)
 
 signals.class_prepared.connect(do_pending_lookups)

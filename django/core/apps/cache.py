@@ -43,9 +43,6 @@ class AppCache(object):
         # Mapping of labels to AppConfig instances for installed apps.
         self.app_configs = OrderedDict()
 
-        # Pending lookups for lazy relations
-        self.pending_lookups = {}
-
         # Set of app names. Allows restricting the set of installed apps.
         # Used by TransactionTestCase.available_apps for performance reasons.
         self.available_apps = None
@@ -53,6 +50,9 @@ class AppCache(object):
         # Internal flags used when populating the master cache.
         self._apps_loaded = not self.master
         self._models_loaded = not self.master
+
+        # Pending lookups for lazy relations.
+        self._pending_lookups = {}
 
         # Cache for get_models.
         self._get_models_cache = {}
