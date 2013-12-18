@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import getpass
 from optparse import make_option
 

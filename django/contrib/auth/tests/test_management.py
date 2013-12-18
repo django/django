@@ -83,6 +83,20 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         with self.assertRaises(CommandError):
             command.execute("joe", stdout=self.stdout, stderr=self.stderr)
 
+    def test_that_changepassword_command_works_with_nonascii_output(self):
+        """
+        Executing the changepassword management command should allow non-ASCII
+        characters from the User object representation.
+
+        Regression test for ticket #21627
+        """
+        # 'Julia' with accented 'u':
+        models.User.objects.create_user(username='J\xfalia', password='qwerty')
+
+        command = changepassword.Command()
+        command._get_pass = lambda *args: 'not qwerty'
+
+        command.execute("J\xfalia", stdout=self.stdout)
 
 @skipIfCustomUser
 class CreatesuperuserManagementCommandTestCase(TestCase):

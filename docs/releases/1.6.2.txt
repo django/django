@@ -9,4 +9,7 @@ This is Django 1.6.2, a bugfix release for Django 1.6.
 Bug fixes
 =========
 
+* Fixed a crash when executing ``changepassword`` command when the user object
+  representation contained non-ASCII characters (#21627).
+
 ...
