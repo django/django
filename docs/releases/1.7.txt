@@ -534,6 +534,9 @@ Tests
 * :meth:`~django.test.TransactionTestCase.assertNumQueries` now prints
   out the list of executed queries if the assertion fails.
 
+* The test command no longer raises a discovery error if given a path to
+  an empty test case.
+
 Backwards incompatible changes in 1.7
 =====================================
 
