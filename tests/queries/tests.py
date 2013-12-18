@@ -5,6 +5,7 @@ import datetime
 from operator import attrgetter
 import pickle
 import unittest
+import warnings
 
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, connection, connections, DEFAULT_DB_ALIAS
@@ -1138,6 +1139,17 @@ class Queries1Tests(BaseQuerysetTest):
             qs,
             ['<Author: a1>', '<Author: a2>', '<Author: a3>', '<Author: a4>']
         )
+
+    def test_callable_args(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            qs = Tag.objects.filter(name__startswith=lambda: 't')
+            self.assertQuerysetEqual(
+                qs,
+                ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>', '<Tag: t4>', '<Tag: t5>']
+            )
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, PendingDeprecationWarning))
 
 
 class Queries2Tests(TestCase):

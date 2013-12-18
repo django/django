@@ -9,6 +9,7 @@ all about the internals of models in order to get the information it needs.
 
 from collections import OrderedDict
 import copy
+import warnings
 
 from django.utils.encoding import force_text
 from django.utils.tree import Node
@@ -1036,6 +1037,9 @@ class Query(object):
             lookup_type = 'isnull'
             value = True
         elif callable(value):
+            warnings.warn(
+                "Passing callable arguments to queryset is deprecated.",
+                PendingDeprecationWarning, stacklevel=2)
             value = value()
         elif isinstance(value, ExpressionNode):
             # If value is a query expression, evaluate it

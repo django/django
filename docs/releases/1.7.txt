@@ -869,3 +869,14 @@ Geo Sitemaps
 
 Google has retired support for the Geo Sitemaps format. Hence Django support
 for Geo Sitemaps is deprecated and will be removed in Django 1.8.
+
+Passing callable arguments to queryset methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Callable arguments for querysets were an undocumented feature that was
+unreliable. It's been deprecated and will be removed in Django 1.9.
+
+Callable arguments were evaluated when a queryset was constructed rather than
+when it was evaluated, thus this feature didn't offer any benefit compared to
+evaluating arguments before passing them to queryset and created confusion that
+the arguments may have been evaluated at query time.
