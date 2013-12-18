@@ -79,7 +79,7 @@ class ErrorDict(dict):
 
 
 @python_2_unicode_compatible
-class ErrorList(UserList):
+class ErrorList(UserList, list):
     """
     A collection of errors that knows how to display itself in various formats.
     """
