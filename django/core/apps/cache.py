@@ -12,10 +12,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_lock, module_has_submodule
 from django.utils._os import upath
 
-from .base import AppConfig
-
-
-MODELS_MODULE_NAME = 'models'
+from .base import AppConfig, MODELS_MODULE_NAME
 
 
 class UnavailableApp(Exception):
@@ -54,12 +51,92 @@ class AppCache(object):
         # Used by TransactionTestCase.available_apps for performance reasons.
         self.available_apps = None
 
+        # Internal flags used when populating the cache.
+        self._apps_loaded = False
+        self._models_loaded = False
+
         # -- Everything below here is only used when populating the cache --
         self.loaded = False
         self.handled = set()
         self.postponed = []
         self.nesting_level = 0
         self._get_models_cache = {}
+
+    def populate_apps(self):
+        """
+        Populate app-related information.
+
+        This method imports each application module.
+
+        It is thread safe and idempotent, but not reentrant.
+        """
+        if self._apps_loaded:
+            return
+        # Since populate_apps() may be a side effect of imports, and since
+        # it will itself import modules, an ABBA deadlock between threads
+        # would be possible if we didn't take the import lock. See #18251.
+        with import_lock():
+            if self._apps_loaded:
+                return
+
+            # app_config should be pristine, otherwise the code below won't
+            # guarantee that the order matches the order in INSTALLED_APPS.
+            if self.app_configs:
+                raise RuntimeError("populate_apps() isn't reentrant")
+
+            # Application modules aren't expected to import anything, and
+            # especially not other application modules, even indirectly.
+            # Therefore we simply import them sequentially.
+            for app_name in settings.INSTALLED_APPS:
+                app_config = AppConfig(app_name)
+                self.app_configs[app_config.label] = app_config
+
+            self._apps_loaded = True
+
+    def populate_models(self):
+        """
+        Populate model-related information.
+
+        This method imports each models module.
+
+        It is thread safe, idempotent and reentrant.
+        """
+        if self._models_loaded:
+            return
+        # Since populate_models() may be a side effect of imports, and since
+        # it will itself import modules, an ABBA deadlock between threads
+        # would be possible if we didn't take the import lock. See #18251.
+        with import_lock():
+            if self._models_loaded:
+                return
+
+            self.populate_apps()
+
+            # Models modules are likely to import other models modules, for
+            # example to reference related objects. As a consequence:
+            # - we deal with import loops by postponing affected modules.
+            # - we provide reentrancy by making import_models() idempotent.
+
+            outermost = not hasattr(self, '_postponed')
+            if outermost:
+                self._postponed = []
+
+            for app_config in self.app_configs.values():
+
+                try:
+                    all_models = self.all_models[app_config.label]
+                    app_config.import_models(all_models)
+                except ImportError:
+                    self._postponed.append(app_config)
+
+            if outermost:
+                for app_config in self._postponed:
+                    all_models = self.all_models[app_config.label]
+                    app_config.import_models(all_models)
+
+                del self._postponed
+
+                self._models_loaded = True
 
     def populate(self):
         """
@@ -121,8 +198,8 @@ class AppCache(object):
         finally:
             self.nesting_level -= 1
 
-        app_config = AppConfig(app_name, app_module, models_module)
-        app_config.models = self.all_models[app_config.label]
+        app_config = AppConfig(app_name)
+        app_config.import_models(self.all_models[app_config.label])
         self.app_configs[app_config.label] = app_config
 
         return models_module
@@ -308,13 +385,11 @@ class AppCache(object):
 
     def _begin_with_app(self, app_name):
         # Returns an opaque value that can be passed to _end_with_app().
-        app_module = import_module(app_name)
-        models_module = import_module('%s.models' % app_name)
-        app_config = AppConfig(app_name, app_module, models_module)
+        app_config = AppConfig(app_name)
         if app_config.label in self.app_configs:
             return None
         else:
-            app_config.models = self.all_models[app_config.label]
+            app_config.import_models(self.all_models[app_config.label])
             self.app_configs[app_config.label] = app_config
             return app_config
 
