@@ -221,7 +221,7 @@ class BaseFormSet(object):
         Returns a list of form in the order specified by the incoming data.
         Raises an AttributeError if ordering is not allowed.
         """
-        if not self.is_valid() or not self.can_order:
+        if not self.can_order:
             raise AttributeError("'%s' object has no attribute 'ordered_forms'" % self.__class__.__name__)
         # Construct _ordering, which is a list of (form_index, order_field_value)
         # tuples. After constructing this list, we'll sort it by order_field_value
