@@ -226,6 +226,8 @@ these changes.
   loading APIs instead. Several undocumented methods of the ``AppCache`` class
   will also be removed.
 
+* Passing callable arguments to querysets will no longer be possible.
+
 2.0
 ---
 
