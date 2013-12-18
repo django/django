@@ -15,6 +15,7 @@ from django.forms import (
     NullBooleanField, PasswordInput, RadioSelect, Select, SplitDateTimeField,
     Textarea, TextInput, ValidationError, widgets,
 )
+from django.forms.utils import ErrorList
 from django.http import QueryDict
 from django.template import Template, Context
 from django.test import TestCase
@@ -2069,3 +2070,27 @@ class FormsTestCase(TestCase):
             '__all__': [{'code': 'secret', 'message': 'Non-field error.'}]
         }
         self.assertEqual(errors, control)
+
+    def test_error_list(self):
+        e = ErrorList()
+        e.append('Foo')
+        e.append(ValidationError('Foo%(bar)s', code='foobar', params={'bar': 'bar'}))
+
+        self.assertTrue(isinstance(e, list))
+        self.assertIn('Foo', e)
+        self.assertIn('Foo', forms.ValidationError(e))
+
+        self.assertEqual(
+            e.as_text(),
+            '* Foo\n* Foobar'
+        )
+
+        self.assertEqual(
+            e.as_ul(),
+            '<ul class="errorlist"><li>Foo</li><li>Foobar</li></ul>'
+        )
+
+        self.assertEqual(
+            json.loads(e.as_json()),
+            [{"message": "Foo", "code": ""}, {"message": "Foobar", "code": "foobar"}]
+        )
