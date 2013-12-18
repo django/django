@@ -14,6 +14,7 @@ import warnings
 from django.dispatch import receiver
 from django.test.signals import setting_changed
 from django.utils.encoding import force_str, force_text
+from django.utils.module_path import module_fs_path
 from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six, lru_cache
@@ -180,8 +181,7 @@ def translation(language):
             return res
 
         for appname in reversed(settings.INSTALLED_APPS):
-            app = import_module(appname)
-            apppath = os.path.join(os.path.dirname(upath(app.__file__)), 'locale')
+            apppath = os.path.join(upath(module_fs_path(appname)), 'locale')
 
             if os.path.isdir(apppath):
                 res = _merge(apppath)
