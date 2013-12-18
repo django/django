@@ -136,29 +136,22 @@ class AppCache(object):
         """
         return self.loaded
 
-    def get_app_configs(self, only_installed=True, only_with_models_module=False):
+    def get_app_configs(self, only_with_models_module=False):
         """
         Return an iterable of application configurations.
-
-        If only_installed is True (default), only applications explicitly
-        listed in INSTALLED_APPS are considered.
 
         If only_with_models_module in True (non-default), only applications
         containing a models module are considered.
         """
-        if not only_installed:
-            raise ValueError("only_installed=False isn't supported any more.")
         self.populate()
         for app_config in self.app_configs.values():
-            if only_installed and not app_config.installed:
-                continue
             if only_with_models_module and app_config.models_module is None:
                 continue
             if self.available_apps is not None and app_config.name not in self.available_apps:
                 continue
             yield app_config
 
-    def get_app_config(self, app_label, only_installed=True, only_with_models_module=False):
+    def get_app_config(self, app_label, only_with_models_module=False):
         """
         Returns the application configuration for the given app_label.
 
@@ -167,20 +160,13 @@ class AppCache(object):
         Raises UnavailableApp when set_available_apps() disables the
         application with this app_label.
 
-        If only_installed is True (default), only applications explicitly
-        listed in INSTALLED_APPS are considered.
-
         If only_with_models_module in True (non-default), only applications
         containing a models module are considered.
         """
-        if not only_installed:
-            raise ValueError("only_installed=False isn't supported any more.")
         self.populate()
         app_config = self.app_configs.get(app_label)
         if app_config is None:
-            raise LookupError("No app with label %r." % app_label)
-        if only_installed and not app_config.installed:
-            raise LookupError("App with label %r isn't in INSTALLED_APPS." % app_label)
+            raise LookupError("No installed app with label %r." % app_label)
         if only_with_models_module and app_config.models_module is None:
             raise LookupError("App with label %r doesn't have a models module." % app_label)
         if self.available_apps is not None and app_config.name not in self.available_apps:
