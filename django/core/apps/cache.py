@@ -1,6 +1,6 @@
 "Utilities for loading models and the modules that contain them."
 
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
 from importlib import import_module
 import os
 import sys
@@ -10,7 +10,6 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_lock, module_has_submodule
 from django.utils._os import upath
-from django.utils import six
 
 from .base import AppConfig
 
@@ -38,6 +37,11 @@ class AppCache(object):
         # INSTALLED_APPS and ignores the only_installed arguments to
         # get_model[s].
         self.master = master
+
+        # Mapping of app labels => model names => model classes. Used to
+        # register models before the app cache is populated and also for
+        # applications that aren't installed.
+        self.all_models = defaultdict(OrderedDict)
 
         # Mapping of labels to AppConfig instances for installed apps.
         self.app_configs = OrderedDict()
@@ -118,10 +122,7 @@ class AppCache(object):
 
         app_config = AppConfig(
             name=app_name, app_module=app_module, models_module=models_module)
-        # If a stub config existed for this app, preserve models registry.
-        old_app_config = self.app_configs.get(app_config.label)
-        if old_app_config is not None:
-            app_config.models = old_app_config.models
+        app_config.models = self.all_models[app_config.label]
         self.app_configs[app_config.label] = app_config
 
         return models_module
@@ -145,6 +146,8 @@ class AppCache(object):
         If only_with_models_module in True (non-default), only applications
         containing a models module are considered.
         """
+        if not only_installed:
+            raise ValueError("only_installed=False isn't supported any more.")
         self.populate()
         for app_config in self.app_configs.values():
             if only_installed and not app_config.installed:
@@ -170,6 +173,8 @@ class AppCache(object):
         If only_with_models_module in True (non-default), only applications
         containing a models module are considered.
         """
+        if not only_installed:
+            raise ValueError("only_installed=False isn't supported any more.")
         self.populate()
         app_config = self.app_configs.get(app_label)
         if app_config is None:
@@ -223,20 +228,22 @@ class AppCache(object):
         self.populate()
         if app_mod:
             app_label = app_mod.__name__.split('.')[-2]
-            try:
-                app_config = self.app_configs[app_label]
-            except KeyError:
-                app_list = []
-            else:
-                app_list = [app_config] if app_config.installed else []
-        else:
-            app_list = six.itervalues(self.app_configs)
             if only_installed:
-                app_list = (app for app in app_list if app.installed)
+                try:
+                    model_dicts = [self.app_configs[app_label].models]
+                except KeyError:
+                    model_dicts = []
+            else:
+                model_dicts = [self.all_models[app_label]]
+        else:
+            if only_installed:
+                model_dicts = [app_config.models for app_config in self.app_configs.values()]
+            else:
+                model_dicts = self.all_models.values()
         model_list = []
-        for app in app_list:
+        for model_dict in model_dicts:
             model_list.extend(
-                model for model in app.models.values()
+                model for model in model_dict.values()
                 if ((not model._deferred or include_deferred) and
                     (not model._meta.auto_created or include_auto_created) and
                     (not model._meta.swapped or include_swapped))
@@ -249,8 +256,7 @@ class AppCache(object):
             ]
         return model_list
 
-    def get_model(self, app_label, model_name,
-                  seed_cache=True, only_installed=True):
+    def get_model(self, app_label, model_name, only_installed=True):
         """
         Returns the model matching the given app_label and case-insensitive
         model_name.
@@ -262,42 +268,44 @@ class AppCache(object):
         """
         if not self.master:
             only_installed = False
-        if seed_cache:
-            self.populate()
+        self.populate()
         if only_installed:
             app_config = self.app_configs.get(app_label)
-            if app_config is not None and not app_config.installed:
+            if app_config is None or not app_config.installed:
                 return None
             if (self.available_apps is not None
                     and app_config.name not in self.available_apps):
                 raise UnavailableApp("App with label %s isn't available." % app_label)
-        try:
-            return self.app_configs[app_label].models[model_name.lower()]
-        except KeyError:
-            return None
+        return self.all_models[app_label].get(model_name.lower())
 
     def register_model(self, app_label, model):
-        try:
-            app_config = self.app_configs[app_label]
-        except KeyError:
-            app_config = AppConfig._stub(app_label)
-            self.app_configs[app_label] = app_config
-        # Add the model to the app_config's models dictionary.
+        # Since this method is called when models are imported, it cannot
+        # perform imports because of the risk of import loops. It mustn't
+        # call get_app_config().
         model_name = model._meta.model_name
-        model_dict = app_config.models
-        if model_name in model_dict:
+        models = self.all_models[app_label]
+        if model_name in models:
             # The same model may be imported via different paths (e.g.
             # appname.models and project.appname.models). We use the source
             # filename as a means to detect identity.
             fname1 = os.path.abspath(upath(sys.modules[model.__module__].__file__))
-            fname2 = os.path.abspath(upath(sys.modules[model_dict[model_name].__module__].__file__))
+            fname2 = os.path.abspath(upath(sys.modules[models[model_name].__module__].__file__))
             # Since the filename extension could be .py the first time and
             # .pyc or .pyo the second time, ignore the extension when
             # comparing.
             if os.path.splitext(fname1)[0] == os.path.splitext(fname2)[0]:
                 return
-        model_dict[model_name] = model
+        models[model_name] = model
         self._get_models_cache.clear()
+
+    def registered_model(self, app_label, model_name):
+        """
+        Test if a model is registered and return the model class or None.
+
+        It's safe to call this method at import time, even while the app cache
+        is being populated.
+        """
+        return self.all_models[app_label].get(model_name.lower())
 
     def set_available_apps(self, available):
         available = set(available)

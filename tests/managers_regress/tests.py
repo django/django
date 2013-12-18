@@ -128,6 +128,7 @@ class ManagersRegressionTests(TestCase):
 
         finally:
             app_cache.app_configs['managers_regress'].models = _old_models
+            app_cache.all_models['managers_regress'] = _old_models
             app_cache._get_models_cache = {}
 
     @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
@@ -155,6 +156,7 @@ class ManagersRegressionTests(TestCase):
 
         finally:
             app_cache.app_configs['managers_regress'].models = _old_models
+            app_cache.all_models['managers_regress'] = _old_models
             app_cache._get_models_cache = {}
 
     @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
@@ -182,6 +184,7 @@ class ManagersRegressionTests(TestCase):
 
         finally:
             app_cache.app_configs['managers_regress'].models = _old_models
+            app_cache.all_models['managers_regress'] = _old_models
             app_cache._get_models_cache = {}
 
     def test_regress_3871(self):

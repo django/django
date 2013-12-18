@@ -39,9 +39,5 @@ class AppConfig(object):
         # This is a unicode object on Python 2 and a str on Python 3.
         self.path = upath(app_module.__path__[0]) if app_module is not None else None
 
-    @classmethod
-    def _stub(cls, label):
-        return cls(label, None, None)
-
     def __repr__(self):
         return '<AppConfig: %s>' % self.label

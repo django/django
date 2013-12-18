@@ -24,6 +24,7 @@ class InvalidModelTestCase(unittest.TestCase):
 
     def tearDown(self):
         app_cache.app_configs['invalid_models'].models = self._old_models
+        app_cache.all_models['invalid_models'] = self._old_models
         app_cache._get_models_cache = {}
         sys.stdout = self.old_stdout
 

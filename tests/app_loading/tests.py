@@ -22,6 +22,7 @@ class EggLoadingTest(TestCase):
 
     def tearDown(self):
         app_cache.app_configs['app_loading'].models = self._old_models
+        app_cache.all_models['app_loading'] = self._old_models
         app_cache._get_models_cache = {}
 
         sys.path = self.old_path
@@ -80,9 +81,9 @@ class EggLoadingTest(TestCase):
         app_cache.master = True
         with override_settings(INSTALLED_APPS=('notexists',)):
             with self.assertRaises(ImportError):
-                app_cache.get_model('notexists', 'nomodel', seed_cache=True)
+                app_cache.get_model('notexists', 'nomodel')
             with self.assertRaises(ImportError):
-                app_cache.get_model('notexists', 'nomodel', seed_cache=True)
+                app_cache.get_model('notexists', 'nomodel')
 
 
 class GetModelsTest(TestCase):
@@ -101,17 +102,17 @@ class GetModelsTest(TestCase):
             self.not_installed_module.NotInstalledModel)
 
     def test_get_models_only_returns_installed_models(self):
-        self.assertFalse(
-            "NotInstalledModel" in
+        self.assertNotIn(
+            "NotInstalledModel",
             [m.__name__ for m in app_cache.get_models()])
 
     def test_get_models_with_app_label_only_returns_installed_models(self):
         self.assertEqual(app_cache.get_models(self.not_installed_module), [])
 
     def test_get_models_with_not_installed(self):
-        self.assertTrue(
-            "NotInstalledModel" in [
-                m.__name__ for m in app_cache.get_models(only_installed=False)])
+        self.assertIn(
+            "NotInstalledModel",
+            [m.__name__ for m in app_cache.get_models(only_installed=False)])
 
 
 class NotInstalledModelsTest(TestCase):
