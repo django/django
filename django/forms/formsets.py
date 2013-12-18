@@ -200,7 +200,7 @@ class BaseFormSet(object):
         """
         Returns a list of forms that have been marked for deletion.
         """
-        if not self.is_valid() or not self.can_delete:
+        if self.can_delete:
             return []
         # construct _deleted_form_indexes which is just a list of form indexes
         # that have had their deletion widget set to True
