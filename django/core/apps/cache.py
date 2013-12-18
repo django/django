@@ -1,7 +1,6 @@
 "Utilities for loading models and the modules that contain them."
 
 from collections import OrderedDict
-import imp
 from importlib import import_module
 import os
 import sys
@@ -9,7 +8,7 @@ import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.module_loading import module_has_submodule
+from django.utils.module_loading import import_lock, module_has_submodule
 from django.utils._os import upath
 from django.utils import six
 
@@ -74,8 +73,7 @@ class AppCache(object):
         # without holding the importer lock and another thread then tries to
         # import something which also launches the app loading. For details of
         # this situation see #18251.
-        imp.acquire_lock()
-        try:
+        with import_lock():
             if self.loaded:
                 return
             for app_name in settings.INSTALLED_APPS:
@@ -86,8 +84,6 @@ class AppCache(object):
                 for app_name in self.postponed:
                     self.load_app(app_name)
                 self.loaded = True
-        finally:
-            imp.release_lock()
 
     def load_app(self, app_name, can_postpone=False):
         """
