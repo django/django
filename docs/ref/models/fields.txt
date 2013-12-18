@@ -1068,14 +1068,13 @@ define the details of how the relation works.
 .. attribute:: ForeignKey.limit_choices_to
 
     A dictionary of lookup arguments and values (see :doc:`/topics/db/queries`)
-    that limit the available admin or ModelForm choices for this object. Use
-    this with functions from the Python ``datetime`` module to limit choices of
-    objects by date. For example::
+    that limit the available admin or :class:`ModelForm <django.forms.ModelForm>`
+    choices for this object. For example::
 
-        limit_choices_to = {'pub_date__lte': datetime.date.today}
+        staff_member = models.ForeignKey(User, limit_choices_to={'is_staff': True})
 
-    only allows the choice of related objects with a ``pub_date`` before the
-    current date to be chosen.
+    causes the corresponding field on the ``ModelForm`` to list only ``Users``
+    that have ``is_staff=True``.
 
     Instead of a dictionary this can also be a :class:`Q object
     <django.db.models.Q>` for more :ref:`complex queries
