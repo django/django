@@ -1094,7 +1094,7 @@ class ManageValidate(AdminScriptTestCase):
         self.assertOutput(err, 'ImportError')
 
     def test_complex_app(self):
-        "manage.py validate does not raise an ImportError validating a complex app with nested calls to load_app"
+        "manage.py validate does not raise an ImportError validating a complex app"
         self.write_settings('settings.py',
             apps=['admin_scripts.complex_app', 'admin_scripts.simple_app'],
             sdict={'DEBUG': True})

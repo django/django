@@ -124,8 +124,8 @@ class WriterTests(TestCase):
 
         with override_settings(INSTALLED_APPS=test_apps):
             for app in test_apps:
-                app_cache.load_app(app)
-                migration = migrations.Migration('0001_initial', app.split('.')[-1])
-                expected_path = os.path.join(base_dir, *(app.split('.') + ['migrations', '0001_initial.py']))
-                writer = MigrationWriter(migration)
-                self.assertEqual(writer.path, expected_path)
+                with app_cache._with_app(app):
+                    migration = migrations.Migration('0001_initial', app.split('.')[-1])
+                    expected_path = os.path.join(base_dir, *(app.split('.') + ['migrations', '0001_initial.py']))
+                    writer = MigrationWriter(migration)
+                    self.assertEqual(writer.path, expected_path)

@@ -133,16 +133,6 @@ class AppCache(object):
 
                 self._models_loaded = True
 
-    def load_app(self, app_name):
-        """
-        Loads the app with the provided fully qualified name, and returns the
-        model module.
-        """
-        app_config = AppConfig(app_name)
-        app_config.import_models(self.all_models[app_config.label])
-        self.app_configs[app_config.label] = app_config
-        return app_config.models_module
-
     def app_cache_ready(self):
         """
         Returns true if the model cache is fully populated.
@@ -377,6 +367,19 @@ class AppCache(object):
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
 
+    def load_app(self, app_name):
+        """
+        Loads the app with the provided fully qualified name, and returns the
+        model module.
+        """
+        warnings.warn(
+            "load_app(app_name) is deprecated.",
+            PendingDeprecationWarning, stacklevel=2)
+        app_config = AppConfig(app_name)
+        app_config.import_models(self.all_models[app_config.label])
+        self.app_configs[app_config.label] = app_config
+        return app_config.models_module
+
     def get_app(self, app_label):
         """
         Returns the module containing the models for the given app_label.
@@ -447,7 +450,7 @@ class AppCache(object):
         Register a set of models as belonging to an app.
         """
         warnings.warn(
-            "register_models(app_label, models) is deprecated.",
+            "register_models(app_label, *models) is deprecated.",
             PendingDeprecationWarning, stacklevel=2)
         for model in models:
             self.register_model(app_label, model)

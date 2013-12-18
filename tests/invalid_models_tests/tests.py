@@ -18,14 +18,7 @@ class InvalidModelTestCase(unittest.TestCase):
         self.stdout = StringIO()
         sys.stdout = self.stdout
 
-        # The models need to be removed after the test in order to prevent bad
-        # interactions with the flush operation in other tests.
-        self._old_models = app_cache.app_configs['invalid_models'].models.copy()
-
     def tearDown(self):
-        app_cache.app_configs['invalid_models'].models = self._old_models
-        app_cache.all_models['invalid_models'] = self._old_models
-        app_cache._get_models_cache = {}
         sys.stdout = self.old_stdout
 
     # Technically, this isn't an override -- TEST_SWAPPED_MODEL must be
@@ -38,12 +31,10 @@ class InvalidModelTestCase(unittest.TestCase):
         TEST_SWAPPED_MODEL_BAD_MODEL='not_an_app.Target',
     )
     def test_invalid_models(self):
-        try:
-            module = app_cache.load_app("invalid_models.invalid_models")
-        except Exception:
-            self.fail('Unable to load invalid model module')
+        with app_cache._with_app("invalid_models_tests.invalid_models"):
+            module = app_cache.get_app_config("invalid_models").models_module
+            get_validation_errors(self.stdout, module)
 
-        get_validation_errors(self.stdout, module)
         self.stdout.seek(0)
         error_log = self.stdout.read()
         actual = error_log.split('\n')
