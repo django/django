@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.contrib.sites.models import Site, RequestSite, get_current_site
+from django.core.apps import app_cache
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpRequest
 from django.test import TestCase
@@ -12,11 +13,10 @@ class SitesFrameworkTests(TestCase):
 
     def setUp(self):
         Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
-        self._old_installed = Site._meta.app_config.installed
-        Site._meta.app_config.installed = True
+        self._with_sites = app_cache._begin_with_app('django.contrib.sites')
 
     def tearDown(self):
-        Site._meta.app_config.installed = self._old_installed
+        app_cache._end_with_app(self._with_sites)
 
     def test_save_another(self):
         # Regression for #17415
@@ -67,10 +67,10 @@ class SitesFrameworkTests(TestCase):
         self.assertRaises(ObjectDoesNotExist, get_current_site, request)
 
         # A RequestSite is returned if the sites framework is not installed
-        Site._meta.app_config.installed = False
-        site = get_current_site(request)
-        self.assertTrue(isinstance(site, RequestSite))
-        self.assertEqual(site.name, "example.com")
+        with app_cache._without_app('django.contrib.sites'):
+            site = get_current_site(request)
+            self.assertTrue(isinstance(site, RequestSite))
+            self.assertEqual(site.name, "example.com")
 
     def test_domain_name_with_whitespaces(self):
         # Regression for #17320

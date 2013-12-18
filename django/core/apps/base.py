@@ -30,14 +30,10 @@ class AppConfig(object):
         # Populated by calls to AppCache.register_model().
         self.models = OrderedDict()
 
-        # Whether the app is in INSTALLED_APPS or was automatically created
-        # when one of its models was imported.
-        self.installed = app_module is not None
-
         # Filesystem path to the application directory eg.
         # u'/usr/lib/python2.7/dist-packages/django/contrib/admin'.
         # This is a unicode object on Python 2 and a str on Python 3.
-        self.path = upath(app_module.__path__[0]) if app_module is not None else None
+        self.path = upath(app_module.__path__[0])
 
     def __repr__(self):
         return '<AppConfig: %s>' % self.label

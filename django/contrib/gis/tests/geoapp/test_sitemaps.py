@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
 from django.contrib.sites.models import Site
+from django.core.apps import app_cache
 from django.test import TestCase
 from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils._os import upath
@@ -26,11 +27,10 @@ class GeoSitemapTest(IgnoreDeprecationWarningsMixin, TestCase):
     def setUp(self):
         super(GeoSitemapTest, self).setUp()
         Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
-        self._old_installed = Site._meta.app_config.installed
-        Site._meta.app_config.installed = True
+        self._with_sites = app_cache._begin_with_app('django.contrib.sites')
 
     def tearDown(self):
-        Site._meta.app_config.installed = self._old_installed
+        app_cache._end_with_app(self._with_sites)
         super(GeoSitemapTest, self).tearDown()
 
     def assertChildNodes(self, elem, expected):

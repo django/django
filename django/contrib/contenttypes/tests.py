@@ -1,9 +1,10 @@
 from __future__ import unicode_literals
 
-from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.views import shortcut
-from django.contrib.sites.models import Site, get_current_site
+from django.contrib.sites.models import get_current_site
+from django.core.apps import app_cache
+from django.db import models
 from django.http import HttpRequest, Http404
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -54,11 +55,9 @@ class FooWithBrokenAbsoluteUrl(FooWithoutUrl):
 class ContentTypesTests(TestCase):
 
     def setUp(self):
-        self._old_installed = Site._meta.app_config.installed
         ContentType.objects.clear_cache()
 
     def tearDown(self):
-        Site._meta.app_config.installed = self._old_installed
         ContentType.objects.clear_cache()
 
     def test_lookup_cache(self):
@@ -223,15 +222,15 @@ class ContentTypesTests(TestCase):
         user_ct = ContentType.objects.get_for_model(FooWithUrl)
         obj = FooWithUrl.objects.create(name="john")
 
-        Site._meta.app_config.installed = True
-        response = shortcut(request, user_ct.id, obj.id)
-        self.assertEqual("http://%s/users/john/" % get_current_site(request).domain,
-                         response._headers.get("location")[1])
+        with app_cache._with_app('django.contrib.sites'):
+            response = shortcut(request, user_ct.id, obj.id)
+            self.assertEqual("http://%s/users/john/" % get_current_site(request).domain,
+                             response._headers.get("location")[1])
 
-        Site._meta.app_config.installed = False
-        response = shortcut(request, user_ct.id, obj.id)
-        self.assertEqual("http://Example.com/users/john/",
-                         response._headers.get("location")[1])
+        with app_cache._without_app('django.contrib.sites'):
+            response = shortcut(request, user_ct.id, obj.id)
+            self.assertEqual("http://Example.com/users/john/",
+                             response._headers.get("location")[1])
 
     def test_shortcut_view_without_get_absolute_url(self):
         """
