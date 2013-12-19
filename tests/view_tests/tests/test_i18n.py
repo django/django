@@ -5,6 +5,7 @@ from os import path
 import unittest
 
 from django.conf import settings
+from django.core.apps import app_cache
 from django.core.urlresolvers import reverse
 from django.test import LiveServerTestCase, TestCase
 from django.test.utils import override_settings
@@ -115,9 +116,8 @@ class JsI18NTests(TestCase):
         available. The Javascript i18n view must return a NON empty language catalog
         with the proper English translations. See #13726 for more details.
         """
-        extended_apps = list(settings.INSTALLED_APPS) + ['view_tests.app0']
-        with self.settings(LANGUAGE_CODE='fr', INSTALLED_APPS=extended_apps):
-            with override('en-us'):
+        with app_cache._with_app('view_tests.app0'):
+            with self.settings(LANGUAGE_CODE='fr'), override('en-us'):
                 response = self.client.get('/views/jsi18n_english_translation/')
                 self.assertContains(response, javascript_quote('this app0 string is to be translated'))
 
@@ -144,9 +144,8 @@ class JsI18NTestsMultiPackage(TestCase):
         translations of multiple Python packages is requested. See #13388,
         #3594 and #13514 for more details.
         """
-        extended_apps = list(settings.INSTALLED_APPS) + ['view_tests.app1', 'view_tests.app2']
-        with self.settings(LANGUAGE_CODE='en-us', INSTALLED_APPS=extended_apps):
-            with override('fr'):
+        with app_cache._with_app('view_tests.app1'), app_cache._with_app('view_tests.app2'):
+            with self.settings(LANGUAGE_CODE='en-us'), override('fr'):
                 response = self.client.get('/views/jsi18n_multi_packages1/')
                 self.assertContains(response, javascript_quote('il faut traduire cette chaîne de caractères de app1'))
 
@@ -155,9 +154,8 @@ class JsI18NTestsMultiPackage(TestCase):
         Similar to above but with neither default or requested language being
         English.
         """
-        extended_apps = list(settings.INSTALLED_APPS) + ['view_tests.app3', 'view_tests.app4']
-        with self.settings(LANGUAGE_CODE='fr', INSTALLED_APPS=extended_apps):
-            with override('es-ar'):
+        with app_cache._with_app('view_tests.app3'), app_cache._with_app('view_tests.app4'):
+            with self.settings(LANGUAGE_CODE='fr'), override('es-ar'):
                 response = self.client.get('/views/jsi18n_multi_packages2/')
                 self.assertContains(response, javascript_quote('este texto de app3 debe ser traducido'))
 

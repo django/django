@@ -6,7 +6,6 @@ from importlib import import_module
 import itertools
 import traceback
 
-from django.conf import settings
 from django.core.apps import app_cache
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
@@ -47,9 +46,9 @@ class Command(BaseCommand):
 
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
-        for app_name in settings.INSTALLED_APPS:
-            if module_has_submodule(import_module(app_name), "management"):
-                import_module('.management', app_name)
+        for app_config in app_cache.get_app_configs():
+            if module_has_submodule(app_config.app_module, "management"):
+                import_module('.management', app_config.name)
 
         # Get the database we're operating from
         db = options.get('database')

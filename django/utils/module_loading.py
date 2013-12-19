@@ -58,18 +58,17 @@ def autodiscover_modules(*args, **kwargs):
     registry. This register_to object must have a _registry instance variable
     to access it.
     """
-    from django.conf import settings
+    from django.core.apps import app_cache
 
     register_to = kwargs.get('register_to')
-    for app in settings.INSTALLED_APPS:
-        mod = import_module(app)
+    for app_config in app_cache.get_app_configs():
         # Attempt to import the app's module.
         try:
             if register_to:
                 before_import_registry = copy.copy(register_to._registry)
 
             for module_to_search in args:
-                import_module('%s.%s' % (app, module_to_search))
+                import_module('%s.%s' % (app_config.name, module_to_search))
         except:
             # Reset the model registry to the state before the last import as
             # this import will have to reoccur on the next request and this
@@ -81,7 +80,7 @@ def autodiscover_modules(*args, **kwargs):
             # Decide whether to bubble up this error. If the app just
             # doesn't have an admin module, we can ignore the error
             # attempting to import it, otherwise we want it to bubble up.
-            if module_has_submodule(mod, module_to_search):
+            if module_has_submodule(app_config.app_module, module_to_search):
                 raise
 
 

@@ -37,9 +37,8 @@ import time
 import traceback
 
 from django.conf import settings
+from django.core.apps import app_cache
 from django.core.signals import request_finished
-from django.utils._os import upath
-from importlib import import_module
 try:
     from django.utils.six.moves import _thread as thread
 except ImportError:
@@ -91,10 +90,8 @@ def gen_filenames():
         basedirs = [os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                  'conf', 'locale'),
                     'locale']
-        for appname in reversed(settings.INSTALLED_APPS):
-            app = import_module(appname)
-            basedirs.append(os.path.join(os.path.dirname(upath(app.__file__)),
-                                         'locale'))
+        for app_config in reversed(list(app_cache.get_app_configs())):
+            basedirs.append(os.path.join(app_config.path, 'locale'))
         basedirs.extend(settings.LOCALE_PATHS)
         basedirs = [os.path.abspath(basedir) for basedir in basedirs
                     if os.path.isdir(basedir)]

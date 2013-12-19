@@ -2,6 +2,7 @@ from collections import OrderedDict
 import os
 
 from django.conf import settings
+from django.core.apps import app_cache
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import default_storage, Storage, FileSystemStorage
 from django.utils.functional import empty, LazyObject
@@ -116,10 +117,11 @@ class AppDirectoriesFinder(BaseFinder):
     def __init__(self, apps=None, *args, **kwargs):
         # The list of apps that are handled
         self.apps = []
-        # Mapping of app module paths to storage instances
+        # Mapping of app names to storage instances
         self.storages = OrderedDict()
         if apps is None:
-            apps = settings.INSTALLED_APPS
+            app_configs = app_cache.get_app_configs()
+            apps = [app_config.name for app_config in app_configs]
         for app in apps:
             app_storage = self.storage_class(app)
             if os.path.isdir(app_storage.location):

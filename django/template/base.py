@@ -6,6 +6,7 @@ from importlib import import_module
 from inspect import getargspec, getcallargs
 
 from django.conf import settings
+from django.core.apps import app_cache
 from django.template.context import (BaseContext, Context, RequestContext,  # NOQA: imported for backwards compatibility
     ContextPopException)
 from django.utils.itercompat import is_iterable
@@ -1302,9 +1303,12 @@ def get_templatetags_modules():
         # Populate list once per process. Mutate the local list first, and
         # then assign it to the global name to ensure there are no cases where
         # two threads try to populate it simultaneously.
-        for app_module in ['django'] + list(settings.INSTALLED_APPS):
+
+        templatetags_modules_candidates = ['django.templatetags']
+        templatetags_modules_candidates += ['%s.templatetags' % app_config.name
+            for app_config in app_cache.get_app_configs()]
+        for templatetag_module in templatetags_modules_candidates:
             try:
-                templatetag_module = '%s.templatetags' % app_module
                 import_module(templatetag_module)
                 _templatetags_modules.append(templatetag_module)
             except ImportError:
