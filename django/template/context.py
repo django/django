@@ -145,11 +145,10 @@ class RenderContext(BaseContext):
         return key in self.dicts[-1]
 
     def get(self, key, otherwise=None):
-        d = self.dicts[-1]
-        if key in d:
-            return d[key]
-        return otherwise
+        return self.dicts[-1].get(key, otherwise)
 
+    def __getitem__(self, key):
+        return self.dicts[-1][key]
 
 # This is a function rather than module-level procedural code because we only
 # want it to execute if somebody uses RequestContext.
