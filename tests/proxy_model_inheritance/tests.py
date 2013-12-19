@@ -13,7 +13,8 @@ from .models import (ConcreteModel, ConcreteModelSubclass,
     ConcreteModelSubclassProxy)
 
 
-@override_settings(INSTALLED_APPS=('app1', 'app2'))
+# Required for available_apps.
+@override_settings(INSTALLED_APPS=['app1', 'app2'])
 class ProxyModelInheritanceTests(TransactionTestCase):
     """
     Proxy model inheritance across apps can result in migrate not creating the table
@@ -25,20 +26,17 @@ class ProxyModelInheritanceTests(TransactionTestCase):
     def setUp(self):
         self.old_sys_path = sys.path[:]
         sys.path.append(os.path.dirname(os.path.abspath(upath(__file__))))
-        self._with_app1 = app_cache._begin_with_app('app1')
-        self._with_app2 = app_cache._begin_with_app('app2')
 
     def tearDown(self):
-        app_cache._end_with_app(self._with_app1)
-        app_cache._end_with_app(self._with_app2)
         sys.path = self.old_sys_path
 
     def test_table_exists(self):
-        call_command('migrate', verbosity=0)
-        from .app1.models import ProxyModel
-        from .app2.models import NiceModel
-        self.assertEqual(NiceModel.objects.all().count(), 0)
-        self.assertEqual(ProxyModel.objects.all().count(), 0)
+        with app_cache._with_app('app1'), app_cache._with_app('app2'):
+            call_command('migrate', verbosity=0)
+            from .app1.models import ProxyModel
+            from .app2.models import NiceModel
+            self.assertEqual(NiceModel.objects.all().count(), 0)
+            self.assertEqual(ProxyModel.objects.all().count(), 0)
 
 
 class MultiTableInheritanceProxyTest(TestCase):

@@ -6,6 +6,7 @@ from django.contrib.auth import logout as auth_logout, REDIRECT_FIELD_NAME
 from django.contrib.contenttypes import views as contenttype_views
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
+from django.core.apps import app_cache
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.response import TemplateResponse
@@ -156,20 +157,17 @@ class AdminSite(object):
         """
         Check that all things needed to run the admin have been correctly installed.
 
-        The default implementation checks that LogEntry, ContentType and the
-        auth context processor are installed.
+        The default implementation checks that admin and contenttypes apps are
+        installed, as well as the auth context processor.
         """
-        from django.contrib.admin.models import LogEntry
-        from django.contrib.contenttypes.models import ContentType
-
-        if not LogEntry._meta.installed:
+        app_cache.populate_apps()
+        if not app_cache.has_app('django.contrib.admin'):
             raise ImproperlyConfigured("Put 'django.contrib.admin' in your "
                 "INSTALLED_APPS setting in order to use the admin application.")
-        if not ContentType._meta.installed:
+        if not app_cache.has_app('django.contrib.contenttypes'):
             raise ImproperlyConfigured("Put 'django.contrib.contenttypes' in "
                 "your INSTALLED_APPS setting in order to use the admin application.")
-        if not ('django.contrib.auth.context_processors.auth' in settings.TEMPLATE_CONTEXT_PROCESSORS or
-                'django.core.context_processors.auth' in settings.TEMPLATE_CONTEXT_PROCESSORS):
+        if 'django.contrib.auth.context_processors.auth' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
             raise ImproperlyConfigured("Put 'django.contrib.auth.context_processors.auth' "
                 "in your TEMPLATE_CONTEXT_PROCESSORS setting in order to use the admin application.")
 
