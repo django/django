@@ -35,9 +35,13 @@ class AppConfig(object):
         self.models = None
 
         # Filesystem path to the application directory eg.
-        # u'/usr/lib/python2.7/dist-packages/django/contrib/admin'.
-        # This is a unicode object on Python 2 and a str on Python 3.
-        self.path = upath(self.app_module.__path__[0])
+        # u'/usr/lib/python2.7/dist-packages/django/contrib/admin'. May be
+        # None if the application isn't a bona fide package eg. if it's an
+        # egg. Otherwise it's a unicode on Python 2 and a str on Python 3.
+        try:
+            self.path = upath(self.app_module.__path__[0])
+        except AttributeError:
+            self.path = None
 
     def __repr__(self):
         return '<AppConfig: %s>' % self.label
