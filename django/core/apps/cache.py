@@ -144,12 +144,16 @@ class AppCache(object):
 
     def get_app_configs(self, only_with_models_module=False):
         """
-        Return an iterable of application configurations.
+        Imports applications and returns an iterable of app configs.
 
-        If only_with_models_module in True (non-default), only applications
-        containing a models module are considered.
+        If only_with_models_module in True (non-default), imports models and
+        considers only applications containing a models module.
         """
-        self.populate_models()
+        if only_with_models_module:
+            self.populate_models()
+        else:
+            self.populate_apps()
+
         for app_config in self.app_configs.values():
             if only_with_models_module and app_config.models_module is None:
                 continue
@@ -159,17 +163,21 @@ class AppCache(object):
 
     def get_app_config(self, app_label, only_with_models_module=False):
         """
-        Returns the application configuration for the given app_label.
+        Imports applications and returns an app config for the given label.
 
-        Raises LookupError if no application exists with this app_label.
+        Raises LookupError if no application exists with this label.
 
         Raises UnavailableApp when set_available_apps() disables the
-        application with this app_label.
+        application with this label.
 
-        If only_with_models_module in True (non-default), only applications
-        containing a models module are considered.
+        If only_with_models_module in True (non-default), imports models and
+        considers only applications containing a models module.
         """
-        self.populate_models()
+        if only_with_models_module:
+            self.populate_models()
+        else:
+            self.populate_apps()
+
         app_config = self.app_configs.get(app_label)
         if app_config is None:
             raise LookupError("No installed app with label %r." % app_label)
@@ -391,7 +399,8 @@ class AppCache(object):
             "get_app_config(app_label).models_module supersedes get_app(app_label).",
             PendingDeprecationWarning, stacklevel=2)
         try:
-            return self.get_app_config(app_label).models_module
+            return self.get_app_config(
+                app_label, only_with_models_module=True).models_module
         except LookupError as exc:
             # Change the exception type for backwards compatibility.
             raise ImproperlyConfigured(*exc.args)
@@ -403,7 +412,8 @@ class AppCache(object):
         warnings.warn(
             "[a.models_module for a in get_app_configs()] supersedes get_apps().",
             PendingDeprecationWarning, stacklevel=2)
-        return [app_config.models_module for app_config in self.get_app_configs()]
+        app_configs = self.get_app_configs(only_with_models_module=True)
+        return [app_config.models_module for app_config in app_configs]
 
     def _get_app_package(self, app):
         return '.'.join(app.__name__.split('.')[:-1])
