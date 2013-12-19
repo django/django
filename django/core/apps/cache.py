@@ -298,12 +298,12 @@ class AppCache(object):
         models[model_name] = model
         self._get_models_cache.clear()
 
-    def registered_model(self, app_label, model_name):
+    def has_model(self, app_label, model_name):
         """
-        Test if a model is registered and return the model class or None.
+        Returns the model class if one is registered and None otherwise.
 
         It's safe to call this method at import time, even while the app cache
-        is being populated.
+        is being populated. It returns None for models that aren't loaded yet.
         """
         return self.all_models[app_label].get(model_name.lower())
 
