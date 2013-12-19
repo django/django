@@ -1,9 +1,9 @@
-from django.conf import settings
+from django.core.apps import app_cache
 from django.template import Library
 
 register = Library()
 
-if 'django.contrib.staticfiles' in settings.INSTALLED_APPS:
+if app_cache.has_app('django.contrib.staticfiles'):
     from django.contrib.staticfiles.templatetags.staticfiles import static
 else:
     from django.templatetags.static import static

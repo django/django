@@ -3,13 +3,14 @@ from __future__ import unicode_literals
 from unittest import skipUnless
 
 from django.conf import settings
+from django.core.apps import app_cache
 
 from .base import SitemapTestsBase
 
 
 class FlatpagesSitemapTests(SitemapTestsBase):
 
-    @skipUnless("django.contrib.flatpages" in settings.INSTALLED_APPS,
+    @skipUnless(app_cache.has_app('django.contrib.flatpages'),
                 "django.contrib.flatpages app not installed.")
     def test_flatpage_sitemap(self):
         "Basic FlatPage sitemap test"

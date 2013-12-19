@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import comments
 from django.contrib.comments.models import Comment
 from django.contrib.comments.forms import CommentForm
+from django.core.apps import app_cache
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
 from django.utils import six
@@ -14,14 +15,6 @@ class CommentAppAPITests(CommentTestCase):
 
     def testGetCommentApp(self):
         self.assertEqual(comments.get_comment_app(), comments)
-
-    @override_settings(
-        COMMENTS_APP='missing_app',
-        INSTALLED_APPS=list(settings.INSTALLED_APPS) + ['missing_app'],
-    )
-    def testGetMissingCommentApp(self):
-        with six.assertRaisesRegex(self, ImproperlyConfigured, 'missing_app'):
-            comments.get_comment_app()
 
     def testGetForm(self):
         self.assertEqual(comments.get_form(), CommentForm)
@@ -42,13 +35,15 @@ class CommentAppAPITests(CommentTestCase):
         self.assertEqual(comments.get_approve_url(c), "/approve/12345/")
 
 
-@override_settings(
-    COMMENTS_APP='comment_tests.custom_comments',
-    INSTALLED_APPS=list(settings.INSTALLED_APPS) + [
-        'comment_tests.custom_comments'],
-)
+@override_settings(COMMENTS_APP='comment_tests.custom_comments')
 class CustomCommentTest(CommentTestCase):
     urls = 'comment_tests.urls'
+
+    def setUp(self):
+        self._with_custom_comments = app_cache._begin_with_app('comment_tests.custom_comments')
+
+    def tearDown(self):
+        app_cache._end_with_app(self._with_custom_comments)
 
     def testGetCommentApp(self):
         from comment_tests import custom_comments

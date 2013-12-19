@@ -298,6 +298,18 @@ class AppCache(object):
         models[model_name] = model
         self._get_models_cache.clear()
 
+    def has_app(self, app_name):
+        """
+        Returns the application config if one is registered and None otherwise.
+
+        It's safe to call this method at import time, even while the app cache
+        is being populated. It returns None for apps that aren't loaded yet.
+        """
+        app_config = self.app_configs.get(app_name.rpartition(".")[2])
+        if app_config is not None and app_config.name != app_name:
+            app_config = None
+        return app_config
+
     def has_model(self, app_label, model_name):
         """
         Returns the model class if one is registered and None otherwise.

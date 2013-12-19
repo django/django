@@ -1,6 +1,7 @@
 from django import http
 from django.conf import settings
 from django.contrib.sites.models import Site
+from django.core.apps import app_cache
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -56,12 +57,10 @@ class RedirectTests(TestCase):
         response = self.client.get('/initial')
         self.assertEqual(response.status_code, 410)
 
-    @override_settings(
-        INSTALLED_APPS=[app for app in settings.INSTALLED_APPS
-                        if app != 'django.contrib.sites'])
     def test_sites_not_installed(self):
-        with self.assertRaises(ImproperlyConfigured):
-            RedirectFallbackMiddleware()
+        with app_cache._without_app('django.contrib.sites'):
+            with self.assertRaises(ImproperlyConfigured):
+                RedirectFallbackMiddleware()
 
 
 class OverriddenRedirectFallbackMiddleware(RedirectFallbackMiddleware):

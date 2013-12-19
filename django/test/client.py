@@ -10,6 +10,7 @@ from io import BytesIO
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.core.apps import app_cache
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import (request_started, request_finished,
@@ -389,7 +390,7 @@ class Client(RequestFactory):
         """
         Obtains the current session variables.
         """
-        if 'django.contrib.sessions' in settings.INSTALLED_APPS:
+        if app_cache.has_app('django.contrib.sessions'):
             engine = import_module(settings.SESSION_ENGINE)
             cookie = self.cookies.get(settings.SESSION_COOKIE_NAME, None)
             if cookie:
@@ -550,7 +551,7 @@ class Client(RequestFactory):
         """
         user = authenticate(**credentials)
         if (user and user.is_active and
-                'django.contrib.sessions' in settings.INSTALLED_APPS):
+                app_cache.has_app('django.contrib.sessions')):
             engine = import_module(settings.SESSION_ENGINE)
 
             # Create a fake request that goes through request middleware

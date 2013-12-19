@@ -2,6 +2,7 @@ from importlib import import_module
 import warnings
 from django.conf import settings
 from django.core import urlresolvers
+from django.core.apps import app_cache
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.comments.models import Comment
 from django.contrib.comments.forms import CommentForm
@@ -14,20 +15,12 @@ def get_comment_app():
     """
     Get the comment app (i.e. "django.contrib.comments") as defined in the settings
     """
-    # Make sure the app's in INSTALLED_APPS
-    comments_app = get_comment_app_name()
-    if comments_app not in settings.INSTALLED_APPS:
-        raise ImproperlyConfigured("The COMMENTS_APP (%r) "\
-                                   "must be in INSTALLED_APPS" % settings.COMMENTS_APP)
-
-    # Try to import the package
     try:
-        package = import_module(comments_app)
-    except ImportError as e:
-        raise ImproperlyConfigured("The COMMENTS_APP setting refers to "\
-                                   "a non-existing package. (%s)" % e)
-
-    return package
+        app_config = app_cache.get_app_config(get_comment_app_name().rpartition(".")[2])
+    except LookupError:
+        raise ImproperlyConfigured("The COMMENTS_APP (%r) "
+                                   "must be in INSTALLED_APPS" % settings.COMMENTS_APP)
+    return app_config.app_module
 
 def get_comment_app_name():
     """

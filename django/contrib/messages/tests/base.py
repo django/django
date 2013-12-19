@@ -1,4 +1,4 @@
-from unittest import skipIf
+from unittest import skipUnless
 
 from django import http
 from django.conf import settings, global_settings
@@ -7,14 +7,15 @@ from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.constants import DEFAULT_LEVELS
 from django.contrib.messages.storage import default_storage, base
 from django.contrib.messages.storage.base import Message
+from django.core.apps import app_cache
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from django.utils.translation import ugettext_lazy
 
 
 def skipUnlessAuthIsInstalled(func):
-    return skipIf(
-        'django.contrib.auth' not in settings.INSTALLED_APPS,
+    return skipUnless(
+        app_cache.has_app('django.contrib.auth'),
         "django.contrib.auth isn't installed")(func)
 
 
@@ -219,8 +220,6 @@ class BaseTests(object):
             self.assertContains(response, msg)
 
     @override_settings(
-        INSTALLED_APPS=filter(
-            lambda app: app != 'django.contrib.messages', settings.INSTALLED_APPS),
         MIDDLEWARE_CLASSES=filter(
             lambda m: 'MessageMiddleware' not in m, settings.MIDDLEWARE_CLASSES),
         TEMPLATE_CONTEXT_PROCESSORS=filter(
@@ -233,19 +232,18 @@ class BaseTests(object):
         Tests that, when the middleware is disabled, an exception is raised
         when one attempts to store a message.
         """
-        data = {
-            'messages': ['Test message %d' % x for x in range(5)],
-        }
-        reverse('django.contrib.messages.tests.urls.show')
-        for level in ('debug', 'info', 'success', 'warning', 'error'):
-            add_url = reverse('django.contrib.messages.tests.urls.add',
-                              args=(level,))
-            self.assertRaises(MessageFailure, self.client.post, add_url,
-                              data, follow=True)
+        with app_cache._without_app('django.contrib.messages'):
+            data = {
+                'messages': ['Test message %d' % x for x in range(5)],
+            }
+            reverse('django.contrib.messages.tests.urls.show')
+            for level in ('debug', 'info', 'success', 'warning', 'error'):
+                add_url = reverse('django.contrib.messages.tests.urls.add',
+                                  args=(level,))
+                self.assertRaises(MessageFailure, self.client.post, add_url,
+                                  data, follow=True)
 
     @override_settings(
-        INSTALLED_APPS=filter(
-            lambda app: app != 'django.contrib.messages', settings.INSTALLED_APPS),
         MIDDLEWARE_CLASSES=filter(
             lambda m: 'MessageMiddleware' not in m, settings.MIDDLEWARE_CLASSES),
         TEMPLATE_CONTEXT_PROCESSORS=filter(
@@ -258,17 +256,18 @@ class BaseTests(object):
         Tests that, when the middleware is disabled, an exception is not
         raised if 'fail_silently' = True
         """
-        data = {
-            'messages': ['Test message %d' % x for x in range(5)],
-            'fail_silently': True,
-        }
-        show_url = reverse('django.contrib.messages.tests.urls.show')
-        for level in ('debug', 'info', 'success', 'warning', 'error'):
-            add_url = reverse('django.contrib.messages.tests.urls.add',
-                              args=(level,))
-            response = self.client.post(add_url, data, follow=True)
-            self.assertRedirects(response, show_url)
-            self.assertFalse('messages' in response.context)
+        with app_cache._without_app('django.contrib.messages'):
+            data = {
+                'messages': ['Test message %d' % x for x in range(5)],
+                'fail_silently': True,
+            }
+            show_url = reverse('django.contrib.messages.tests.urls.show')
+            for level in ('debug', 'info', 'success', 'warning', 'error'):
+                add_url = reverse('django.contrib.messages.tests.urls.add',
+                                  args=(level,))
+                response = self.client.post(add_url, data, follow=True)
+                self.assertRedirects(response, show_url)
+                self.assertFalse('messages' in response.context)
 
     def stored_messages_count(self, storage, response):
         """
