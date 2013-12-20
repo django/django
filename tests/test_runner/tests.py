@@ -226,7 +226,7 @@ class ModulesTestsPackages(IgnoreAllDeprecationWarningsMixin, unittest.TestCase)
         "Check that the get_tests helper function can find tests in a directory"
         from django.core.apps.base import AppConfig
         from django.test.simple import get_tests
-        app_config = AppConfig('test_runner.valid_app')
+        app_config = AppConfig.create('test_runner.valid_app')
         app_config.import_models({})
         tests = get_tests(app_config)
         self.assertIsInstance(tests, types.ModuleType)
@@ -235,7 +235,7 @@ class ModulesTestsPackages(IgnoreAllDeprecationWarningsMixin, unittest.TestCase)
         "Test for #12658 - Tests with ImportError's shouldn't fail silently"
         from django.core.apps.base import AppConfig
         from django.test.simple import get_tests
-        app_config = AppConfig('test_runner_invalid_app')
+        app_config = AppConfig.create('test_runner_invalid_app')
         app_config.import_models({})
         with self.assertRaises(ImportError):
             get_tests(app_config)

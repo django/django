@@ -83,7 +83,7 @@ class AppCache(object):
             # especially not other application modules, even indirectly.
             # Therefore we simply import them sequentially.
             for app_name in settings.INSTALLED_APPS:
-                app_config = AppConfig(app_name)
+                app_config = AppConfig.create(app_name)
                 self.app_configs[app_config.label] = app_config
 
             self._apps_loaded = True
@@ -347,7 +347,7 @@ class AppCache(object):
 
     def _begin_with_app(self, app_name):
         # Returns an opaque value that can be passed to _end_with_app().
-        app_config = AppConfig(app_name)
+        app_config = AppConfig.create(app_name)
         if app_config.label in self.app_configs:
             return None
         else:
@@ -412,7 +412,7 @@ class AppCache(object):
         warnings.warn(
             "load_app(app_name) is deprecated.",
             PendingDeprecationWarning, stacklevel=2)
-        app_config = AppConfig(app_name)
+        app_config = AppConfig.create(app_name)
         app_config.import_models(self.all_models[app_config.label])
         self.app_configs[app_config.label] = app_config
         return app_config.models_module
