@@ -536,7 +536,7 @@ class EmailField(CharField):
         # strip blanks and make canonical by lower-casing the domain part
         value = self.to_python(value).strip()
         value = super(EmailField, self).clean(value)
-        usr, dom = value.split('@', 1)
+        usr, dom = value.rsplit('@', 1)
         return "%s@%s" % (usr, dom.lower())
 
 
