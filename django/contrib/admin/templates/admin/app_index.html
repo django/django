@@ -9,7 +9,7 @@
 <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
 &rsaquo;
 {% for app in app_list %}
-{% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}
+{{ app.name }}
 {% endfor %}
 </div>
 {% endblock %}
