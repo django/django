@@ -44,7 +44,7 @@ class RegexValidator(object):
 @deconstructible
 class URLValidator(RegexValidator):
     regex = re.compile(
-        r'^(?:http|ftp)s?://'  # http:// or https://
+        r'^(?:[a-z0-9\.\-]*)://'  # scheme is validated separately
         r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
         r'localhost|'  # localhost...
         r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'  # ...or ipv4
@@ -52,14 +52,26 @@ class URLValidator(RegexValidator):
         r'(?::\d+)?'  # optional port
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
     message = _('Enter a valid URL.')
+    schemes = ['http', 'https', 'ftp', 'ftps']
+
+    def __init__(self, schemes=None, **kwargs):
+        super(URLValidator, self).__init__(**kwargs)
+        if schemes is not None:
+            self.schemes = schemes
 
     def __call__(self, value):
+        value = force_text(value)
+        # Check first if the scheme is valid
+        scheme = value.split('://')[0].lower()
+        if scheme not in self.schemes:
+            raise ValidationError(self.message, code=self.code)
+
+        # Then check full URL
         try:
             super(URLValidator, self).__call__(value)
         except ValidationError as e:
             # Trivial case failed. Try for possible IDN domain
             if value:
-                value = force_text(value)
                 scheme, netloc, path, query, fragment = urlsplit(value)
                 try:
                     netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE

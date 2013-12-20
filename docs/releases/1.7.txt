@@ -567,6 +567,13 @@ Tests
 * :meth:`~django.test.TransactionTestCase.assertNumQueries` now prints
   out the list of executed queries if the assertion fails.
 
+Validators
+^^^^^^^^^^
+
+* :class:`~django.core.validators.URLValidator` now accepts an optional
+  ``schemes`` argument which allows customization of the accepted URI schemes
+  (instead of the defaults ``http(s)`` and ``ftp(s)``).
+
 Backwards incompatible changes in 1.7
 =====================================
 
