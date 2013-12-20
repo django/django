@@ -56,3 +56,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             )
         else:
             return super(DatabaseSchemaEditor, self)._alter_column_type_sql(table, column, type)
+
+    def _quote_parameter(self, value):
+        # Inner import so backend fails nicely if it's not present
+        import psycopg2
+        return psycopg2.extensions.adapt(value)
+
