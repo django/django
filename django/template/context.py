@@ -150,6 +150,7 @@ class RenderContext(BaseContext):
     def __getitem__(self, key):
         return self.dicts[-1][key]
 
+
 # This is a function rather than module-level procedural code because we only
 # want it to execute if somebody uses RequestContext.
 def get_standard_processors():
