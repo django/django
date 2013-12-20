@@ -381,7 +381,7 @@ class AdminSite(object):
                         app_dict[app_label]['models'].append(model_dict)
                     else:
                         app_dict[app_label] = {
-                            'name': app_label.title(),
+                            'name': app_cache.get_app_config(app_label).verbose_name,
                             'app_label': app_label,
                             'app_url': reverse('admin:app_list', kwargs={'app_label': app_label}, current_app=self.name),
                             'has_module_perms': has_module_perms,
@@ -390,7 +390,7 @@ class AdminSite(object):
 
         # Sort the apps alphabetically.
         app_list = list(six.itervalues(app_dict))
-        app_list.sort(key=lambda x: x['name'])
+        app_list.sort(key=lambda x: x['name'].lower())
 
         # Sort the models alphabetically within each app.
         for app in app_list:
@@ -442,7 +442,7 @@ class AdminSite(object):
                         # something to display, add in the necessary meta
                         # information.
                         app_dict = {
-                            'name': app_label.title(),
+                            'name': app_cache.get_app_config(app_label).verbose_name,
                             'app_label': app_label,
                             'app_url': '',
                             'has_module_perms': has_module_perms,
