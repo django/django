@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import os
 import sys
 from unittest import TestCase
+import warnings
 
 from django.core.apps import app_cache
 from django.core.apps.cache import AppCache
@@ -77,11 +78,13 @@ class EggLoadingTest(TestCase):
         # Pretend we're the master app cache to test the population process.
         app_cache._apps_loaded = False
         app_cache._models_loaded = False
-        with override_settings(INSTALLED_APPS=('notexists',)):
-            with self.assertRaises(ImportError):
-                app_cache.get_model('notexists', 'nomodel')
-            with self.assertRaises(ImportError):
-                app_cache.get_model('notexists', 'nomodel')
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "Overriding setting INSTALLED_APPS")
+            with override_settings(INSTALLED_APPS=['notexists']):
+                with self.assertRaises(ImportError):
+                    app_cache.get_model('notexists', 'nomodel')
+                with self.assertRaises(ImportError):
+                    app_cache.get_model('notexists', 'nomodel')
 
 
 class GetModelsTest(TestCase):
