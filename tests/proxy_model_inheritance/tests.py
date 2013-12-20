@@ -6,22 +6,19 @@ import sys
 from django.core.apps import app_cache
 from django.core.management import call_command
 from django.test import TestCase, TransactionTestCase
-from django.test.utils import override_settings
 from django.utils._os import upath
 
 from .models import (ConcreteModel, ConcreteModelSubclass,
     ConcreteModelSubclassProxy)
 
 
-# Required for available_apps.
-@override_settings(INSTALLED_APPS=['app1', 'app2'])
 class ProxyModelInheritanceTests(TransactionTestCase):
     """
     Proxy model inheritance across apps can result in migrate not creating the table
     for the proxied model (as described in #12286).  This test creates two dummy
     apps and calls migrate, then verifies that the table has been created.
     """
-    available_apps = ['app1', 'app2']
+    available_apps = []
 
     def setUp(self):
         self.old_sys_path = sys.path[:]

@@ -320,14 +320,27 @@ class AppCache(object):
         return self.all_models[app_label].get(model_name.lower())
 
     def set_available_apps(self, available):
+        """
+        Restricts the set of installed apps used by get_app_config[s].
+
+        available must be an iterable of application names.
+
+        Primarily used for performance optimization in TransactionTestCase.
+        """
+        if self.available_apps is not None:
+            raise RuntimeError("set_available_apps() may be called only once "
+                "in a row; make sure it's paired with unset_available_apps()")
         available = set(available)
-        installed = set(settings.INSTALLED_APPS)
+        installed = set(app_config.name for app_config in self.get_app_configs())
         if not available.issubset(installed):
             raise ValueError("Available apps isn't a subset of installed "
                 "apps, extra apps: %s" % ", ".join(available - installed))
         self.available_apps = available
 
     def unset_available_apps(self):
+        """
+        Cancels a previous call to set_available_apps().
+        """
         self.available_apps = None
 
     ### DANGEROUS METHODS ### (only used to preserve existing tests)
@@ -340,11 +353,15 @@ class AppCache(object):
         else:
             app_config.import_models(self.all_models[app_config.label])
             self.app_configs[app_config.label] = app_config
+            if self.available_apps is not None:
+                self.available_apps.add(app_config.name)
             return app_config
 
     def _end_with_app(self, app_config):
         if app_config is not None:
             del self.app_configs[app_config.label]
+            if self.available_apps is not None:
+                self.available_apps.discard(app_config.name)
 
     @contextmanager
     def _with_app(self, app_name):
