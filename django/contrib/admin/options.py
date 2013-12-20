@@ -1308,7 +1308,6 @@ class ModelAdmin(BaseModelAdmin):
             media=media,
             inline_admin_formsets=inline_admin_formsets,
             errors=helpers.AdminErrorList(form, formsets),
-            app_label=opts.app_label,
             preserved_filters=self.get_preserved_filters(request),
         )
         context.update(extra_context or {})
@@ -1532,7 +1531,6 @@ class ModelAdmin(BaseModelAdmin):
             media=media,
             has_add_permission=self.has_add_permission(request),
             opts=cl.opts,
-            app_label=app_label,
             action_form=action_form,
             actions_on_top=self.actions_on_top,
             actions_on_bottom=self.actions_on_bottom,
@@ -1627,7 +1625,6 @@ class ModelAdmin(BaseModelAdmin):
             action_list=action_list,
             module_name=capfirst(force_text(opts.verbose_name_plural)),
             object=obj,
-            app_label=app_label,
             opts=opts,
             preserved_filters=self.get_preserved_filters(request),
         )
