@@ -602,7 +602,7 @@ patterns.
       defaults to ``/accounts/profile/``). If login isn't successful, it
       redisplays the login form.
 
-    It's your responsibility to provide the html for the login template
+    It's your responsibility to provide the HTML for the login template
     , called ``registration/login.html`` by default. This template gets passed
     four template context variables:
 
@@ -679,9 +679,9 @@ patterns.
     .. _site framework docs: ../sites/
 
 
-.. function:: logout(request, [next_page, template_name, redirect_field_name, current_app, extra_context])
+.. function:: logout(request, [next_page, template_name, confirmation_template_name, redirect_field_name, current_app, extra_context])
 
-    Logs a user out.
+    Logs a user out when called via ``POST``, displays a logout form otherwise.
 
     **URL name:** ``logout``
 
@@ -693,9 +693,13 @@ patterns.
       logging the user out. Defaults to
       :file:`registration/logged_out.html` if no argument is supplied.
 
-    * ``redirect_field_name``: The name of a ``GET`` field containing the
-      URL to redirect to after log out. Defaults to ``next``. Overrides the
-      ``next_page`` URL if the given ``GET`` parameter is passed.
+    * ``confirmation_template_name``: The full name of a template to display
+      when the view is called via ``GET``. Defaults to
+      :file:`registration/logout_confirmation.html` if no argument is supplied.
+
+    * ``redirect_field_name``: The name of a ``GET`` or ``POST`` field
+      containing the URL to redirect to after log out. Defaults to ``next``.
+      Overrides the ``next_page`` URL if the given parameter is passed.
 
     * ``current_app``: A hint indicating which application contains the current
       view. See the :ref:`namespaced URL resolution strategy

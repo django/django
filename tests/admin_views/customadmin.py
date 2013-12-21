@@ -17,6 +17,7 @@ class Admin2(admin.AdminSite):
     login_form = forms.CustomAdminAuthenticationForm
     login_template = 'custom_admin/login.html'
     logout_template = 'custom_admin/logout.html'
+    logout_confirmation_template = 'custom_admin/logout_confirmation.html'
     index_template = ['custom_admin/index.html']  # a list, to test fix for #18697
     password_change_template = 'custom_admin/password_change_form.html'
     password_change_done_template = 'custom_admin/password_change_done.html'
