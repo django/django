@@ -81,7 +81,7 @@ class Lookup(object):
         raise NotImplementedError
 
 
-class DjangoLookup(Lookup):
+class BuiltinLookup(Lookup):
     def as_sql(self, qn, connection):
         lhs_sql, params = self.process_lhs(qn, connection)
         field_internal_type = self.lhs.output_type.get_internal_type()
@@ -100,47 +100,47 @@ class DjangoLookup(Lookup):
 default_lookups = {}
 
 
-class Exact(DjangoLookup):
+class Exact(BuiltinLookup):
     lookup_name = 'exact'
 default_lookups['exact'] = Exact
 
 
-class IExact(DjangoLookup):
+class IExact(BuiltinLookup):
     lookup_name = 'iexact'
 default_lookups['iexact'] = IExact
 
 
-class Contains(DjangoLookup):
+class Contains(BuiltinLookup):
     lookup_name = 'contains'
 default_lookups['contains'] = Contains
 
 
-class IContains(DjangoLookup):
+class IContains(BuiltinLookup):
     lookup_name = 'icontains'
 default_lookups['icontains'] = IContains
 
 
-class GreaterThan(DjangoLookup):
+class GreaterThan(BuiltinLookup):
     lookup_name = 'gt'
 default_lookups['gt'] = GreaterThan
 
 
-class GreaterThanOrEqual(DjangoLookup):
+class GreaterThanOrEqual(BuiltinLookup):
     lookup_name = 'gte'
 default_lookups['gte'] = GreaterThanOrEqual
 
 
-class LessThan(DjangoLookup):
+class LessThan(BuiltinLookup):
     lookup_name = 'lt'
 default_lookups['lt'] = LessThan
 
 
-class LessThanOrEqual(DjangoLookup):
+class LessThanOrEqual(BuiltinLookup):
     lookup_name = 'lte'
 default_lookups['lte'] = LessThanOrEqual
 
 
-class In(DjangoLookup):
+class In(BuiltinLookup):
     lookup_name = 'in'
 
     def get_db_prep_lookup(self, value, connection):
@@ -158,27 +158,27 @@ class In(DjangoLookup):
 default_lookups['in'] = In
 
 
-class StartsWith(DjangoLookup):
+class StartsWith(BuiltinLookup):
     lookup_name = 'startswith'
 default_lookups['startswith'] = StartsWith
 
 
-class IStartsWith(DjangoLookup):
+class IStartsWith(BuiltinLookup):
     lookup_name = 'istartswith'
 default_lookups['istartswith'] = IStartsWith
 
 
-class EndsWith(DjangoLookup):
+class EndsWith(BuiltinLookup):
     lookup_name = 'endswith'
 default_lookups['endswith'] = EndsWith
 
 
-class IEndsWith(DjangoLookup):
+class IEndsWith(BuiltinLookup):
     lookup_name = 'iendswith'
 default_lookups['iendswith'] = IEndsWith
 
 
-class Between(DjangoLookup):
+class Between(BuiltinLookup):
     def get_rhs_op(self, connection, rhs):
         return "BETWEEN %s AND %s" % (rhs, rhs)
 
@@ -193,7 +193,7 @@ class Range(Between):
 default_lookups['range'] = Range
 
 
-class DateLookup(DjangoLookup):
+class DateLookup(BuiltinLookup):
 
     def process_lhs(self, qn, connection):
         lhs, params = super(DateLookup, self).process_lhs(qn, connection)
@@ -241,7 +241,7 @@ class Second(DateLookup):
 default_lookups['second'] = Second
 
 
-class IsNull(DjangoLookup):
+class IsNull(BuiltinLookup):
     lookup_name = 'isnull'
 
     def as_sql(self, qn, connection):
@@ -253,16 +253,16 @@ class IsNull(DjangoLookup):
 default_lookups['isnull'] = IsNull
 
 
-class Search(DjangoLookup):
+class Search(BuiltinLookup):
     lookup_name = 'search'
 default_lookups['search'] = Search
 
 
-class Regex(DjangoLookup):
+class Regex(BuiltinLookup):
     lookup_name = 'regex'
 default_lookups['regex'] = Regex
 
 
-class IRegex(DjangoLookup):
+class IRegex(BuiltinLookup):
     lookup_name = 'iregex'
 default_lookups['iregex'] = IRegex

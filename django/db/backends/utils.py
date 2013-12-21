@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from collections import defaultdict
 import datetime
 import decimal
 import hashlib
@@ -196,7 +197,7 @@ def format_number(value, max_digits, decimal_places):
         return "%.*f" % (decimal_places, value)
 
 # Map of vendor name -> map of query element class -> implementation function
-compile_implementations = {}
+compile_implementations = defaultdict(dict)
 
 
 def get_implementations(vendor):
