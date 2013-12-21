@@ -274,6 +274,13 @@ class FTimeDeltaTests(TestCase):
         self.days_long.append(e4.completed - e4.assigned)
         self.expnames = [e.name for e in Experiment.objects.all()]
 
+    def test_multiple_query_compilation(self):
+        # Ticket #21643
+        queryset = Experiment.objects.filter(end__lt=F('start') + datetime.timedelta(hours=1))
+        q1 = str(queryset.query)
+        q2 = str(queryset.query)
+        self.assertEqual(q1, q2)
+
     def test_delta_add(self):
         for i in range(len(self.deltas)):
             delta = self.deltas[i]
