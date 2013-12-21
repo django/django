@@ -38,7 +38,8 @@ class MultiDBCreatesuperuserTestCase(TestCase):
         " createsuperuser command should operate on specified DB"
         new_io = StringIO()
 
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe",
             email="joe@somewhere.org",

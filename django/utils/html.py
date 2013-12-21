@@ -80,8 +80,7 @@ def format_html(format_string, *args, **kwargs):
     of str.format or % interpolation to build up small HTML fragments.
     """
     args_safe = map(conditional_escape, args)
-    kwargs_safe = dict((k, conditional_escape(v)) for (k, v) in
-                        six.iteritems(kwargs))
+    kwargs_safe = dict((k, conditional_escape(v)) for (k, v) in six.iteritems(kwargs))
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
 
 
@@ -238,7 +237,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                     lead = lead + opening
                 # Keep parentheses at the end only if they're balanced.
                 if (middle.endswith(closing)
-                    and middle.count(closing) == middle.count(opening) + 1):
+                        and middle.count(closing) == middle.count(opening) + 1):
                     middle = middle[:-len(closing)]
                     trail = closing + trail
 
@@ -291,8 +290,7 @@ def clean_html(text):
         * Remove stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the
           bottom of the text.
     """
-    from django.utils.text import normalize_newlines
-    text = normalize_newlines(force_text(text))
+    text = normalize_newlines(text)
     text = re.sub(r'<(/?)\s*b\s*>', '<\\1strong>', text)
     text = re.sub(r'<(/?)\s*i\s*>', '<\\1em>', text)
     text = fix_ampersands(text)

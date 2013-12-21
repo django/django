@@ -362,12 +362,14 @@ class GeoQuerySet(QuerySet):
         relative = int(bool(relative))
         if not isinstance(precision, six.integer_types):
             raise TypeError('SVG precision keyword argument must be an integer.')
-        s = {'desc': 'SVG',
-             'procedure_fmt': '%(geo_col)s,%(rel)s,%(precision)s',
-             'procedure_args': {'rel': relative,
-                                 'precision': precision,
-                                 }
-             }
+        s = {
+            'desc': 'SVG',
+            'procedure_fmt': '%(geo_col)s,%(rel)s,%(precision)s',
+            'procedure_args': {
+                'rel': relative,
+                'precision': precision,
+            }
+        }
         return self._spatial_attribute('svg', s, **kwargs)
 
     def sym_difference(self, geom, **kwargs):
@@ -746,11 +748,12 @@ class GeoQuerySet(QuerySet):
         for geometry set-like operations (e.g., intersection, difference,
         union, sym_difference).
         """
-        s = {'geom_args': ('geom',),
-             'select_field': GeomField(),
-             'procedure_fmt': '%(geo_col)s,%(geom)s',
-             'procedure_args': {'geom': geom},
-            }
+        s = {
+            'geom_args': ('geom',),
+            'select_field': GeomField(),
+            'procedure_fmt': '%(geo_col)s,%(geom)s',
+            'procedure_args': {'geom': geom},
+        }
         if connections[self.db].ops.oracle:
             s['procedure_fmt'] += ',%(tolerance)s'
             s['procedure_args']['tolerance'] = tolerance

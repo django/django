@@ -70,7 +70,7 @@ class WhereNode(tree.Node):
         # and empty values need special handling. Other types could be used
         # here in the future (using Python types is suggested for consistency).
         if (isinstance(value, datetime.datetime)
-            or (isinstance(obj.field, DateTimeField) and lookup_type != 'isnull')):
+                or (isinstance(obj.field, DateTimeField) and lookup_type != 'isnull')):
             value_annotation = datetime.datetime
         elif hasattr(value, 'value_annotation'):
             value_annotation = value.value_annotation
@@ -211,7 +211,7 @@ class WhereNode(tree.Node):
         params = field_params + params
 
         if (len(params) == 1 and params[0] == '' and lookup_type == 'exact'
-            and connection.features.interprets_empty_strings_as_nulls):
+                and connection.features.interprets_empty_strings_as_nulls):
             lookup_type = 'isnull'
             value_annotation = True
 

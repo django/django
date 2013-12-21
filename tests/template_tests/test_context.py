@@ -3,6 +3,7 @@
 from unittest import TestCase
 
 from django.template import Context, Variable, VariableDoesNotExist
+from django.template.context import RenderContext
 
 
 class ContextTests(TestCase):
@@ -34,3 +35,17 @@ class ContextTests(TestCase):
         self.assertRaises(VariableDoesNotExist,
                 Variable('new').resolve, empty_context)
         self.assertEqual(Variable('new').resolve(Context({'new': 'foo'})), 'foo')
+
+    def test_render_context(self):
+        test_context = RenderContext({'fruit': 'papaya'})
+
+        # Test that push() limits access to the topmost dict
+        test_context.push()
+
+        test_context['vegetable'] = 'artichoke'
+        self.assertEqual(list(test_context), ['vegetable'])
+
+        self.assertNotIn('fruit', test_context)
+        with self.assertRaises(KeyError):
+            test_context['fruit']
+        self.assertIsNone(test_context.get('fruit'))

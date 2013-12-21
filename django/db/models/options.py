@@ -6,10 +6,10 @@ from bisect import bisect
 import warnings
 
 from django.conf import settings
+from django.core.apps import app_cache
 from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
-from django.db.models.loading import app_cache_ready, cache
 from django.utils import six
 from django.utils.functional import cached_property
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
@@ -32,10 +32,13 @@ def normalize_unique_together(unique_together):
     tuple of two strings. Normalize it to a tuple of tuples, so that
     calling code can uniformly expect that.
     """
-    unique_together = tuple(unique_together)
-    if unique_together and not isinstance(unique_together[0], (tuple, list)):
+    if not unique_together:
+        return ()
+    first_element = next(iter(unique_together))
+    if not isinstance(first_element, (tuple, list)):
         unique_together = (unique_together,)
-    return unique_together
+    # Normalize everything to tuples
+    return tuple(tuple(ut) for ut in unique_together)
 
 
 @python_2_unicode_compatible
@@ -86,7 +89,16 @@ class Options(object):
         self.related_fkey_lookups = []
 
         # A custom AppCache to use, if you're making a separate model set.
-        self.app_cache = cache
+        self.app_cache = app_cache
+
+    @property
+    def app_config(self):
+        # Don't go through get_app_config to avoid triggering populate().
+        return self.app_cache.app_configs[self.app_label]
+
+    @property
+    def installed(self):
+        return self.app_config.installed
 
     def contribute_to_class(self, cls, name):
         from django.db import connection
@@ -94,7 +106,6 @@ class Options(object):
 
         cls._meta = self
         self.model = cls
-        self.installed = re.sub('\.models$', '', cls.__module__) in settings.INSTALLED_APPS
         # First, construct the default values for these options.
         self.object_name = cls.__name__
         self.model_name = self.object_name.lower()
@@ -429,7 +440,7 @@ class Options(object):
             if hasattr(f, 'related'):
                 cache[f.name] = cache[f.attname] = (
                     f.related, None if f.model == self.model else f.model, True, False)
-        if app_cache_ready():
+        if app_cache.app_cache_ready():
             self._name_map = cache
         return cache
 
@@ -555,7 +566,7 @@ class Options(object):
                             and not isinstance(f.rel.to, six.string_types)
                             and self == f.rel.to._meta):
                         cache[f.related] = None
-        if app_cache_ready():
+        if app_cache.app_cache_ready():
             self._related_many_to_many_cache = cache
         return cache
 

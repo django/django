@@ -1135,9 +1135,15 @@ FILE_UPLOAD_DIRECTORY_PERMISSIONS
 
 Default: ``None``
 
-The numeric mode to apply to directories created in the process of
-uploading files. This value mirrors the functionality and caveats of
-the :setting:`FILE_UPLOAD_PERMISSIONS` setting.
+The numeric mode to apply to directories created in the process of uploading
+files.
+
+This setting also determines the default permissions for collected static
+directories when using the :djadmin:`collectstatic` management command. See
+:djadmin:`collectstatic` for details on overriding it.
+
+This value mirrors the functionality and caveats of the
+:setting:`FILE_UPLOAD_PERMISSIONS` setting.
 
 .. setting:: FILE_UPLOAD_PERMISSIONS
 
@@ -1157,7 +1163,7 @@ system's standard umask.
 
 This setting also determines the default permissions for collected static files
 when using the :djadmin:`collectstatic` management command. See
-:djadmin:`collectstatic` for details on overridding it.
+:djadmin:`collectstatic` for details on overriding it.
 
 .. warning::
 
@@ -1480,6 +1486,12 @@ for :doc:`managing stored files </topics/files>`. It must end in a slash if set
 to a non-empty value.
 
 Example: ``"http://media.example.com/"``
+
+.. warning::
+
+    There are security risks if you are accepting uploaded content from
+    untrusted users! See the security guide's topic on
+    :ref:`user-uploaded-content-security` for mitigation details.
 
 .. warning::
 
@@ -2085,25 +2097,6 @@ The default value for the X-Frame-Options header used by
 :doc:`clickjacking protection </ref/clickjacking/>` documentation.
 
 
-Admindocs
-=========
-
-Settings for :mod:`django.contrib.admindocs`.
-
-.. setting:: ADMIN_FOR
-
-ADMIN_FOR
----------
-
-Default: ``()`` (Empty tuple)
-
-Used for admin-site settings modules, this should be a tuple of settings
-modules (in the format ``'foo.bar.baz'``) for which this site is an admin.
-
-The admin site uses this in its automatically-introspected documentation of
-models, views and template tags.
-
-
 Auth
 ====
 
@@ -2456,7 +2449,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE
 
 Default: ``False``
 
-Whether to expire the session when the user closes his or her browser. See
+Whether to expire the session when the user closes their browser. See
 :ref:`browser-length-vs-persistent-sessions`.
 
 .. setting:: SESSION_FILE_PATH

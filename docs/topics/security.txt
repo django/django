@@ -203,6 +203,52 @@ be deployed such that untrusted users don't have access to any subdomains,
 :mod:`django.contrib.sessions` also has limitations. See :ref:`the session
 topic guide section on security <topics-session-security>` for details.
 
+.. _user-uploaded-content-security:
+
+User-uploaded content
+=====================
+
+.. note::
+    Consider :ref:`serving static files from a cloud service or CDN
+    <staticfiles-from-cdn>` to avoid some of these issues.
+
+* If your site accepts file uploads, it is strongly advised that you limit
+  these uploads in your Web server configuration to a reasonable
+  size in order to prevent denial of service (DOS) attacks. In Apache, this
+  can be easily set using the LimitRequestBody_ directive.
+
+* If you are serving your own static files, be sure that handlers like Apache's
+  ``mod_php``, which would execute static files as code, are disabled. You don't
+  want users to be able to execute arbitrary code by uploading and requesting a
+  specially crafted file.
+
+* Django's media upload handling poses some vulnerabilities when that media is
+  served in ways that do not follow security best practices. Specifically, an
+  HTML file can be uploaded as an image if that file contains a valid PNG
+  header followed by malicious HTML. This file will pass verification of the
+  libraries that Django uses for :class:`~django.db.models.ImageField` image
+  processing (PIL or Pillow). When this file is subsequently displayed to a
+  user, it may be displayed as HTML depending on the type and configuration of
+  your web server.
+
+  No bulletproof technical solution exists at the framework level to safely
+  validate all user uploaded file content, however, there are some other steps
+  you can take to mitigate these attacks:
+
+  1. One class of attacks can be prevented by always serving user uploaded
+     content from a distinct Top Level Domain (TLD). This prevents any
+     exploit blocked by `same-origin policy`_ protections such as cross site
+     scripting. For example, if your site runs on ``example.com``, you would
+     want to serve uploaded content (the :setting:`MEDIA_URL` setting) from
+     something like ``usercontent-example.com``. It's *not* sufficient to
+     serve content from a subdomain like ``usercontent.example.com``.
+
+  2. Beyond this, applications may choose to define a whitelist of allowable
+     file extensions for user uploaded files and configure the web server
+     to only serve such files.
+
+.. _same-origin policy: http://en.wikipedia.org/wiki/Same-origin_policy
+
 .. _additional-security-topics:
 
 Additional security topics
@@ -219,10 +265,6 @@ security protection of the Web server, operating system and other components.
 * Django does not throttle requests to authenticate users. To protect against
   brute-force attacks against the authentication system, you may consider
   deploying a Django plugin or Web server module to throttle these requests.
-* If your site accepts file uploads, it is strongly advised that you limit
-  these uploads in your Web server configuration to a reasonable
-  size in order to prevent denial of service (DOS) attacks. In Apache, this
-  can be easily set using the LimitRequestBody_ directive.
 * Keep your :setting:`SECRET_KEY` a secret.
 * It is a good idea to limit the accessibility of your caching system and
   database using a firewall.

@@ -133,7 +133,7 @@ class AuthenticationFormTest(TestCase):
                              [force_text(form.error_messages['inactive'])])
 
     def test_custom_login_allowed_policy(self):
-        # The user is inactive, but our custom form policy allows him to log in.
+        # The user is inactive, but our custom form policy allows them to log in.
         data = {
             'username': 'inactive',
             'password': 'password',

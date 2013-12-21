@@ -604,9 +604,8 @@ version of SQLite.
 Using newer versions of the SQLite DB-API 2.0 driver
 ----------------------------------------------------
 
-For versions of Python 2.5 or newer that include ``sqlite3`` in the standard
-library Django will now use a ``pysqlite2`` interface in preference to
-``sqlite3`` if it finds one is available.
+Django will use a ``pysqlite2`` module in preference to ``sqlite3`` as shipped
+with the Python standard library if it finds one is available.
 
 This provides the ability to upgrade both the DB-API 2.0 interface or SQLite 3
 itself to versions newer than the ones included with your particular Python
@@ -851,9 +850,9 @@ Using a 3rd-party database backend
 In addition to the officially supported databases, there are backends provided
 by 3rd parties that allow you to use other databases with Django:
 
-* `Sybase SQL Anywhere`_
+* `SAP SQL Anywhere`_
 * `IBM DB2`_
-* `Microsoft SQL Server 2005`_
+* `Microsoft SQL Server`_
 * Firebird_
 * ODBC_
 * ADSDB_
@@ -863,9 +862,9 @@ vary considerably. Queries regarding the specific capabilities of these
 unofficial backends, along with any support queries, should be directed to
 the support channels provided by each 3rd party project.
 
-.. _Sybase SQL Anywhere: http://code.google.com/p/sqlany-django/
+.. _SAP SQL Anywhere: https://github.com/sqlanywhere/sqlany-django
 .. _IBM DB2: http://code.google.com/p/ibm-db/
-.. _Microsoft SQL Server 2005: http://code.google.com/p/django-mssql/
-.. _Firebird: http://code.google.com/p/django-firebird/
-.. _ODBC: https://github.com/aurorasoftware/django-pyodbc/
+.. _Microsoft SQL Server: http://django-mssql.readthedocs.org/en/latest/
+.. _Firebird: https://github.com/maxirobaina/django-firebird
+.. _ODBC: https://github.com/lionheart/django-pyodbc/
 .. _ADSDB: http://code.google.com/p/adsdb-django/

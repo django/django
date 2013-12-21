@@ -1,9 +1,9 @@
+from django.core.apps.cache import AppCache
 from django.db import models
-from django.db.models.loading import BaseAppCache
 
 # We're testing app cache presence on load, so this is handy.
 
-new_app_cache = BaseAppCache()
+new_app_cache = AppCache()
 
 
 class TotallyNormal(models.Model):

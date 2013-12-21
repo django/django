@@ -564,6 +564,12 @@ def templatize(src, origin=None):
     lineno_comment_map = {}
     comment_lineno_cache = None
 
+    def join_tokens(tokens, trim=False):
+        message = ''.join(tokens)
+        if trim:
+            message = trim_whitespace(message)
+        return message
+
     for t in Lexer(src, origin).tokenize():
         if incomment:
             if t.token_type == TOKEN_BLOCK and t.contents == 'endcomment':
@@ -586,29 +592,28 @@ def templatize(src, origin=None):
                 endbmatch = endblock_re.match(t.contents)
                 pluralmatch = plural_re.match(t.contents)
                 if endbmatch:
-                    if trimmed:
-                        singular = trim_whitespace(''.join(singular))
-                    else:
-                        singular = ''.join(singular)
-
                     if inplural:
-                        if trimmed:
-                            plural = trim_whitespace(''.join(plural))
-                        else:
-                            plural = ''.join(plural)
                         if message_context:
-                            out.write(' npgettext(%r, %r, %r,count) ' % (message_context, singular, plural))
+                            out.write(' npgettext(%r, %r, %r,count) ' % (
+                                message_context,
+                                join_tokens(singular, trimmed),
+                                join_tokens(plural, trimmed)))
                         else:
-                            out.write(' ngettext(%r, %r, count) ' % (singular, plural))
+                            out.write(' ngettext(%r, %r, count) ' % (
+                                join_tokens(singular, trimmed),
+                                join_tokens(plural, trimmed)))
                         for part in singular:
                             out.write(blankout(part, 'S'))
                         for part in plural:
                             out.write(blankout(part, 'P'))
                     else:
                         if message_context:
-                            out.write(' pgettext(%r, %r) ' % (message_context, singular))
+                            out.write(' pgettext(%r, %r) ' % (
+                                message_context,
+                                join_tokens(singular, trimmed)))
                         else:
-                            out.write(' gettext(%r) ' % singular)
+                            out.write(' gettext(%r) ' % join_tokens(singular,
+                                                                    trimmed))
                         for part in singular:
                             out.write(blankout(part, 'S'))
                     message_context = None

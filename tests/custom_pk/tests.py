@@ -34,7 +34,8 @@ class CustomPKTests(TestCase):
         self.assertEqual(Employee.objects.get(pk=123), dan)
         self.assertEqual(Employee.objects.get(pk=456), fran)
 
-        self.assertRaises(Employee.DoesNotExist,
+        self.assertRaises(
+            Employee.DoesNotExist,
             lambda: Employee.objects.get(pk=42)
         )
 
@@ -152,6 +153,13 @@ class CustomPKTests(TestCase):
         with self.assertRaises(IntegrityError):
             with transaction.atomic():
                 Employee.objects.create(employee_code=123, first_name="Fred", last_name="Jones")
+
+    def test_zero_non_autoincrement_pk(self):
+        Employee.objects.create(
+            employee_code=0, first_name="Frank", last_name="Jones"
+        )
+        employee = Employee.objects.get(pk=0)
+        self.assertEqual(employee.employee_code, 0)
 
     def test_custom_field_pk(self):
         # Regression for #10785 -- Custom fields can be used for primary keys.

@@ -59,7 +59,7 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(floatformat(0, 7), '0.0000000')
         self.assertEqual(floatformat(0, 10), '0.0000000000')
         self.assertEqual(floatformat(0.000000000000000000015, 20),
-                                     '0.00000000000000000002')
+                         '0.00000000000000000002')
 
         pos_inf = float(1e30000)
         self.assertEqual(floatformat(pos_inf), six.text_type(pos_inf))
@@ -103,10 +103,10 @@ class DefaultFiltersTests(TestCase):
 
     def test_addslashes(self):
         self.assertEqual(addslashes('"double quotes" and \'single quotes\''),
-                          '\\"double quotes\\" and \\\'single quotes\\\'')
+                         '\\"double quotes\\" and \\\'single quotes\\\'')
 
         self.assertEqual(addslashes(r'\ : backslashes, too'),
-                          '\\\\ : backslashes, too')
+                         '\\\\ : backslashes, too')
 
     def test_capfirst(self):
         self.assertEqual(capfirst('hello world'), 'Hello world')
@@ -126,14 +126,14 @@ class DefaultFiltersTests(TestCase):
 
     def test_fix_ampersands(self):
         self.assertEqual(fix_ampersands_filter('Jack & Jill & Jeroboam'),
-                          'Jack &amp; Jill &amp; Jeroboam')
+                         'Jack &amp; Jill &amp; Jeroboam')
 
     def test_linenumbers(self):
         self.assertEqual(linenumbers('line 1\nline 2'),
-                          '1. line 1\n2. line 2')
+                         '1. line 1\n2. line 2')
         self.assertEqual(linenumbers('\n'.join(['x'] * 10)),
-                          '01. x\n02. x\n03. x\n04. x\n05. x\n06. x\n07. '
-                          'x\n08. x\n09. x\n10. x')
+                         '01. x\n02. x\n03. x\n04. x\n05. x\n06. x\n07. '
+                         'x\n08. x\n09. x\n10. x')
 
     def test_lower(self):
         self.assertEqual(lower('TEST'), 'test')
@@ -151,7 +151,7 @@ class DefaultFiltersTests(TestCase):
             'jack-jill-like-numbers-123-and-4-and-silly-characters')
 
         self.assertEqual(slugify("Un \xe9l\xe9phant \xe0 l'or\xe9e du bois"),
-                          'un-elephant-a-loree-du-bois')
+                         'un-elephant-a-loree-du-bois')
 
     def test_stringformat(self):
         self.assertEqual(stringformat(1, '03d'), '001')
@@ -159,7 +159,7 @@ class DefaultFiltersTests(TestCase):
 
     def test_title(self):
         self.assertEqual(title('a nice title, isn\'t it?'),
-                          "A Nice Title, Isn't It?")
+                         "A Nice Title, Isn't It?")
         self.assertEqual(title('discoth\xe8que'), 'Discoth\xe8que')
 
     def test_truncatewords(self):
@@ -203,14 +203,14 @@ class DefaultFiltersTests(TestCase):
 
     def test_urlencode(self):
         self.assertEqual(urlencode('fran\xe7ois & jill'),
-                          'fran%C3%A7ois%20%26%20jill')
+                         'fran%C3%A7ois%20%26%20jill')
         self.assertEqual(urlencode(1), '1')
 
     def test_iriencode(self):
         self.assertEqual(iriencode('S\xf8r-Tr\xf8ndelag'),
-                          'S%C3%B8r-Tr%C3%B8ndelag')
+                         'S%C3%B8r-Tr%C3%B8ndelag')
         self.assertEqual(iriencode(urlencode('fran\xe7ois & jill')),
-                          'fran%C3%A7ois%20%26%20jill')
+                         'fran%C3%A7ois%20%26%20jill')
 
     def test_urlizetrunc(self):
         self.assertEqual(urlizetrunc('http://short.com/', 20), '<a href='
@@ -383,11 +383,11 @@ class DefaultFiltersTests(TestCase):
 
     def test_cut(self):
         self.assertEqual(cut('a string to be mangled', 'a'),
-                          ' string to be mngled')
+                         ' string to be mngled')
         self.assertEqual(cut('a string to be mangled', 'ng'),
-                          'a stri to be maled')
+                         'a stri to be maled')
         self.assertEqual(cut('a string to be mangled', 'strings'),
-                          'a string to be mangled')
+                         'a string to be mangled')
 
     def test_force_escape(self):
         escaped = force_escape('<some html & special characters > here')
@@ -402,19 +402,19 @@ class DefaultFiltersTests(TestCase):
     def test_linebreaks(self):
         self.assertEqual(linebreaks_filter('line 1'), '<p>line 1</p>')
         self.assertEqual(linebreaks_filter('line 1\nline 2'),
-                          '<p>line 1<br />line 2</p>')
+                         '<p>line 1<br />line 2</p>')
         self.assertEqual(linebreaks_filter('line 1\rline 2'),
-                          '<p>line 1<br />line 2</p>')
+                         '<p>line 1<br />line 2</p>')
         self.assertEqual(linebreaks_filter('line 1\r\nline 2'),
-                          '<p>line 1<br />line 2</p>')
+                         '<p>line 1<br />line 2</p>')
 
     def test_linebreaksbr(self):
         self.assertEqual(linebreaksbr('line 1\nline 2'),
-                          'line 1<br />line 2')
+                         'line 1<br />line 2')
         self.assertEqual(linebreaksbr('line 1\rline 2'),
-                          'line 1<br />line 2')
+                         'line 1<br />line 2')
         self.assertEqual(linebreaksbr('line 1\r\nline 2'),
-                          'line 1<br />line 2')
+                         'line 1<br />line 2')
 
     def test_removetags(self):
         self.assertEqual(removetags('some <b>html</b> with <script>alert'
@@ -509,8 +509,7 @@ class DefaultFiltersTests(TestCase):
             '</li>\n\t</ul>\n\t</li>\n\t<li>item 2</li>')
 
         self.assertEqual(
-            unordered_list(['item 1', ['item 1.1', ['item 1.1.1',
-                                                      ['item 1.1.1.1']]]]),
+            unordered_list(['item 1', ['item 1.1', ['item 1.1.1', ['item 1.1.1.1']]]]),
             '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1\n\t\t<ul>\n\t\t\t<li>'
             'item 1.1.1\n\t\t\t<ul>\n\t\t\t\t<li>item 1.1.1.1</li>\n\t\t\t'
             '</ul>\n\t\t\t</li>\n\t\t</ul>\n\t\t</li>\n\t</ul>\n\t</li>')
@@ -531,8 +530,7 @@ class DefaultFiltersTests(TestCase):
 
         a = ULItem('a')
         b = ULItem('b')
-        self.assertEqual(unordered_list([a, b]),
-                          '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>')
+        self.assertEqual(unordered_list([a, b]), '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>')
 
         # Old format for unordered lists should still work
         self.assertEqual(unordered_list(['item 1', []]), '\t<li>item 1</li>')
@@ -564,9 +562,9 @@ class DefaultFiltersTests(TestCase):
     def test_date(self):
         # real testing of date() is in dateformat.py
         self.assertEqual(date(datetime.datetime(2005, 12, 29), "d F Y"),
-                          '29 December 2005')
+                         '29 December 2005')
         self.assertEqual(date(datetime.datetime(2005, 12, 29), r'jS \o\f F'),
-                          '29th of December')
+                         '29th of December')
 
     def test_time(self):
         # real testing of time() is done in dateformat.py
@@ -615,13 +613,13 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(yesno(False), 'no')
         self.assertEqual(yesno(None), 'maybe')
         self.assertEqual(yesno(True, 'certainly,get out of town,perhaps'),
-                          'certainly')
+                         'certainly')
         self.assertEqual(yesno(False, 'certainly,get out of town,perhaps'),
-                          'get out of town')
+                         'get out of town')
         self.assertEqual(yesno(None, 'certainly,get out of town,perhaps'),
-                          'perhaps')
+                         'perhaps')
         self.assertEqual(yesno(None, 'certainly,get out of town'),
-                          'get out of town')
+                         'get out of town')
 
     def test_filesizeformat(self):
         # NOTE: \xa0 avoids wrapping between value and unit
@@ -635,12 +633,10 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(filesizeformat(1024 * 1024 * 1024), '1.0\xa0GB')
         self.assertEqual(filesizeformat(1024 * 1024 * 1024 * 1024), '1.0\xa0TB')
         self.assertEqual(filesizeformat(1024 * 1024 * 1024 * 1024 * 1024), '1.0\xa0PB')
-        self.assertEqual(filesizeformat(1024 * 1024 * 1024 * 1024 * 1024 * 2000),
-                          '2000.0\xa0PB')
+        self.assertEqual(filesizeformat(1024 * 1024 * 1024 * 1024 * 1024 * 2000), '2000.0\xa0PB')
         self.assertEqual(filesizeformat(complex(1, -1)), '0\xa0bytes')
         self.assertEqual(filesizeformat(""), '0\xa0bytes')
-        self.assertEqual(filesizeformat("\N{GREEK SMALL LETTER ALPHA}"),
-                          '0\xa0bytes')
+        self.assertEqual(filesizeformat("\N{GREEK SMALL LETTER ALPHA}"), '0\xa0bytes')
 
     def test_pluralize(self):
         self.assertEqual(pluralize(1), '')
@@ -701,11 +697,8 @@ class DefaultFiltersI18NTests(TransRealMixin, TestCase):
             self.assertEqual(filesizeformat(1024 * 1024 * 1024 - 1), '1024,0\xa0MB')
             self.assertEqual(filesizeformat(1024 * 1024 * 1024), '1,0\xa0GB')
             self.assertEqual(filesizeformat(1024 * 1024 * 1024 * 1024), '1,0\xa0TB')
-            self.assertEqual(filesizeformat(1024 * 1024 * 1024 * 1024 * 1024),
-                              '1,0\xa0PB')
-            self.assertEqual(filesizeformat(1024 * 1024 * 1024 * 1024 * 1024 * 2000),
-                              '2000,0\xa0PB')
+            self.assertEqual(filesizeformat(1024 * 1024 * 1024 * 1024 * 1024), '1,0\xa0PB')
+            self.assertEqual(filesizeformat(1024 * 1024 * 1024 * 1024 * 1024 * 2000), '2000,0\xa0PB')
             self.assertEqual(filesizeformat(complex(1, -1)), '0\xa0Bytes')
             self.assertEqual(filesizeformat(""), '0\xa0Bytes')
-            self.assertEqual(filesizeformat("\N{GREEK SMALL LETTER ALPHA}"),
-                              '0\xa0Bytes')
+            self.assertEqual(filesizeformat("\N{GREEK SMALL LETTER ALPHA}"), '0\xa0Bytes')

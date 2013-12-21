@@ -1,3 +1,4 @@
+from django.core.apps import app_cache
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
@@ -15,9 +16,9 @@ __all__ = ['BaseValidator', 'InlineValidator']
 
 class BaseValidator(object):
     def __init__(self):
-        # Before we can introspect models, they need to be fully loaded so that
-        # inter-relations are set up correctly. We force that here.
-        models.get_apps()
+        # Before we can introspect models, they need the app cache to be fully
+        # loaded so that inter-relations are set up correctly.
+        app_cache.populate()
 
     def validate(self, cls, model):
         for m in dir(self):
@@ -155,7 +156,7 @@ class BaseValidator(object):
             for field, val in cls.prepopulated_fields.items():
                 f = get_field(cls, model, 'prepopulated_fields', field)
                 if isinstance(f, (models.DateTimeField, models.ForeignKey,
-                    models.ManyToManyField)):
+                        models.ManyToManyField)):
                     raise ImproperlyConfigured("'%s.prepopulated_fields['%s']' "
                             "is either a DateTimeField, ForeignKey or "
                             "ManyToManyField. This isn't allowed."

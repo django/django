@@ -2275,6 +2275,15 @@ class AdminSearchTest(TestCase):
         self.assertContains(response, "\n1 pluggable search person\n")
         self.assertContains(response, "Amy")
 
+    def test_reset_link(self):
+        """
+        Test presence of reset link in search bar ("1 result (_x total_)").
+        """
+        response = self.client.get('/test_admin/admin/admin_views/person/?q=Gui')
+        self.assertContains(response,
+            """<span class="small quiet">1 result (<a href="?">3 total</a>)</span>""",
+            html=True)
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminInheritedInlinesTest(TestCase):
@@ -2716,17 +2725,17 @@ class AdminCustomQuerysetTest(TestCase):
             resp = self.client.get('/test_admin/admin/admin_views/person/')
             self.assertEqual(resp.context['selection_note'], '0 of 2 selected')
             self.assertEqual(resp.context['selection_note_all'], 'All 2 selected')
-        with self.assertNumQueries(4):
+        # here one more count(*) query will run, because filters were applied
+        with self.assertNumQueries(5):
             extra = {'q': 'not_in_name'}
             resp = self.client.get('/test_admin/admin/admin_views/person/', extra)
             self.assertEqual(resp.context['selection_note'], '0 of 0 selected')
             self.assertEqual(resp.context['selection_note_all'], 'All 0 selected')
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(5):
             extra = {'q': 'person'}
             resp = self.client.get('/test_admin/admin/admin_views/person/', extra)
             self.assertEqual(resp.context['selection_note'], '0 of 2 selected')
             self.assertEqual(resp.context['selection_note_all'], 'All 2 selected')
-        # here one more count(*) query will run, because filters were applied
         with self.assertNumQueries(5):
             extra = {'gender__exact': '1'}
             resp = self.client.get('/test_admin/admin/admin_views/person/', extra)
@@ -4634,7 +4643,7 @@ class AdminViewOnSiteTests(TestCase):
         # actual regression test
         for error_set in response.context['inline_admin_formset'].formset.errors:
             self.assertEqual(['Children must share a family name with their parents in this contrived test case'],
-                              error_set.get('__all__'))
+                             error_set.get('__all__'))
 
     def test_change_view_form_and_formsets_run_validation(self):
         """
@@ -4664,7 +4673,7 @@ class AdminViewOnSiteTests(TestCase):
         # actual regression test
         for error_set in response.context['inline_admin_formset'].formset.errors:
             self.assertEqual(['Children must share a family name with their parents in this contrived test case'],
-                              error_set.get('__all__'))
+                             error_set.get('__all__'))
 
     def test_validate(self):
         "Ensure that the view_on_site value is either a boolean or a callable"

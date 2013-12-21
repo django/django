@@ -45,6 +45,29 @@ class ModelMultipleChoiceFieldTests(TestCase):
         f.clean([p.pk for p in Person.objects.all()[8:9]])
         self.assertTrue(self._validator_run)
 
+    def test_model_multiple_choice_show_hidden_initial(self):
+        """
+        Test support of show_hidden_initial by ModelMultipleChoiceField.
+        """
+        class PersonForm(forms.Form):
+            persons = forms.ModelMultipleChoiceField(show_hidden_initial=True,
+                                                     queryset=Person.objects.all())
+
+        person1 = Person.objects.create(name="Person 1")
+        person2 = Person.objects.create(name="Person 2")
+
+        form = PersonForm(initial={'persons': [person1, person2]},
+                          data={'initial-persons': [str(person1.pk), str(person2.pk)],
+                                'persons': [str(person1.pk), str(person2.pk)]})
+        self.assertTrue(form.is_valid())
+        self.assertFalse(form.has_changed())
+
+        form = PersonForm(initial={'persons': [person1, person2]},
+                          data={'initial-persons': [str(person1.pk), str(person2.pk)],
+                                'persons': [str(person2.pk)]})
+        self.assertTrue(form.is_valid())
+        self.assertTrue(form.has_changed())
+
 
 class TripleForm(forms.ModelForm):
     class Meta:

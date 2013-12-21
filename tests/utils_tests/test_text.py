@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.test import SimpleTestCase
-from django.utils import text
+from django.utils import six, text
 
 
 class TestUtilsText(SimpleTestCase):
@@ -106,6 +106,19 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(text.wrap(long_word, 20), long_word)
         self.assertEqual(text.wrap('a %s word' % long_word, 10),
                          'a\n%s\nword' % long_word)
+
+    def test_normalize_newlines(self):
+        self.assertEqual(text.normalize_newlines("abc\ndef\rghi\r\n"),
+                         "abc\ndef\nghi\n")
+        self.assertEqual(text.normalize_newlines("\n\r\r\n\r"), "\n\n\n\n")
+        self.assertEqual(text.normalize_newlines("abcdefghi"), "abcdefghi")
+        self.assertEqual(text.normalize_newlines(""), "")
+
+    def test_normalize_newlines_bytes(self):
+        """normalize_newlines should be able to handle bytes too"""
+        normalized = text.normalize_newlines(b"abc\ndef\rghi\r\n")
+        self.assertEqual(normalized, "abc\ndef\nghi\n")
+        self.assertIsInstance(normalized, six.text_type)
 
     def test_slugify(self):
         items = (

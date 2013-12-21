@@ -3,7 +3,6 @@ import warnings
 from collections import OrderedDict
 from optparse import make_option
 
-from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
 from django.db import router, DEFAULT_DB_ALIAS
@@ -38,7 +37,7 @@ class Command(BaseCommand):
     args = '[appname appname.ModelName ...]'
 
     def handle(self, *app_labels, **options):
-        from django.db.models import get_app, get_apps, get_model
+        from django.core.apps import app_cache
 
         format = options.get('format')
         indent = options.get('indent')
@@ -64,21 +63,24 @@ class Command(BaseCommand):
         for exclude in excludes:
             if '.' in exclude:
                 app_label, model_name = exclude.split('.', 1)
-                model_obj = get_model(app_label, model_name)
+                model_obj = app_cache.get_model(app_label, model_name)
                 if not model_obj:
                     raise CommandError('Unknown model in excludes: %s' % exclude)
                 excluded_models.add(model_obj)
             else:
                 try:
-                    app_obj = get_app(exclude)
-                    excluded_apps.add(app_obj)
-                except ImproperlyConfigured:
+                    app_obj = app_cache.get_app_config(exclude).models_module
+                    if app_obj is not None:
+                        excluded_apps.add(app_obj)
+                except LookupError:
                     raise CommandError('Unknown app in excludes: %s' % exclude)
 
         if len(app_labels) == 0:
             if primary_keys:
                 raise CommandError("You can only use --pks option with one model")
-            app_list = OrderedDict((app, None) for app in get_apps() if app not in excluded_apps)
+            app_list = OrderedDict((app_config.models_module, None)
+                for app_config in app_cache.get_app_configs(only_with_models_module=True)
+                if app_config.models_module not in excluded_apps)
         else:
             if len(app_labels) > 1 and primary_keys:
                 raise CommandError("You can only use --pks option with one model")
@@ -87,12 +89,12 @@ class Command(BaseCommand):
                 try:
                     app_label, model_label = label.split('.')
                     try:
-                        app = get_app(app_label)
-                    except ImproperlyConfigured:
+                        app = app_cache.get_app_config(app_label).models_module
+                    except LookupError:
                         raise CommandError("Unknown application: %s" % app_label)
-                    if app in excluded_apps:
+                    if app is None or app in excluded_apps:
                         continue
-                    model = get_model(app_label, model_label)
+                    model = app_cache.get_model(app_label, model_label)
                     if model is None:
                         raise CommandError("Unknown model: %s.%s" % (app_label, model_label))
 
@@ -107,10 +109,10 @@ class Command(BaseCommand):
                     # This is just an app - no model qualifier
                     app_label = label
                     try:
-                        app = get_app(app_label)
-                    except ImproperlyConfigured:
+                        app = app_cache.get_app_config(app_label).models_module
+                    except LookupError:
                         raise CommandError("Unknown application: %s" % app_label)
-                    if app in excluded_apps:
+                    if app is None or app in excluded_apps:
                         continue
                     app_list[app] = None
 
@@ -160,13 +162,13 @@ def sort_dependencies(app_list):
     is serialized before a normal model, and any model with a natural key
     dependency has it's dependencies serialized first.
     """
-    from django.db.models import get_model, get_models
+    from django.core.apps import app_cache
     # Process the list of models, and get the list of dependencies
     model_dependencies = []
     models = set()
     for app, model_list in app_list:
         if model_list is None:
-            model_list = get_models(app)
+            model_list = app_cache.get_models(app)
 
         for model in model_list:
             models.add(model)
@@ -174,7 +176,7 @@ def sort_dependencies(app_list):
             if hasattr(model, 'natural_key'):
                 deps = getattr(model.natural_key, 'dependencies', [])
                 if deps:
-                    deps = [get_model(*d.split('.')) for d in deps]
+                    deps = [app_cache.get_model(*d.split('.')) for d in deps]
             else:
                 deps = []
 

@@ -1247,51 +1247,12 @@ class LocaleMiddlewareTests(TransRealMixin, TestCase):
             'django.middleware.common.CommonMiddleware',
         ),
     )
-    def test_session_language(self):
-        """
-        Check that language is stored in session if missing.
-        """
-        # Create an empty session
-        engine = import_module(settings.SESSION_ENGINE)
-        session = engine.SessionStore()
-        session.save()
-        self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
-
-        # Clear the session data before request
-        session.save()
-        self.client.get('/en/simple/')
-        self.assertEqual(self.client.session['_language'], 'en')
-
-        # Clear the session data before request
-        session.save()
+    def test_language_not_saved_to_session(self):
+        """Checks that current language is not automatically saved to
+        session on every request."""
+        # Regression test for #21473
         self.client.get('/fr/simple/')
-        self.assertEqual(self.client.session['_language'], 'fr')
-
-        # Check that language is not changed in session
-        self.client.get('/en/simple/')
-        self.assertEqual(self.client.session['_language'], 'fr')
-
-    @override_settings(
-        MIDDLEWARE_CLASSES=(
-            'django.contrib.sessions.middleware.SessionMiddleware',
-            'django.middleware.locale.LocaleMiddleware',
-            'django.middleware.common.CommonMiddleware',
-        ),
-    )
-    def test_backwards_session_language(self):
-        """
-        Check that language is stored in session if missing.
-        """
-        # Create session with old language key name
-        engine = import_module(settings.SESSION_ENGINE)
-        session = engine.SessionStore()
-        session['django_language'] = 'en'
-        session.save()
-        self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
-
-        # request other language; should default to old language key value
-        self.client.get('/fr/simple/')
-        self.assertEqual(self.client.session['_language'], 'en')
+        self.assertNotIn('_language', self.client.session)
 
 
 @override_settings(

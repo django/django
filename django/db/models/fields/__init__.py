@@ -10,8 +10,8 @@ import warnings
 from base64 import b64decode, b64encode
 from itertools import tee
 
+from django.core.apps import app_cache
 from django.db import connection
-from django.db.models.loading import get_model
 from django.db.models.lookups import default_lookups
 from django.db.models.query_utils import QueryWrapper
 from django.conf import settings
@@ -53,7 +53,7 @@ BLANK_CHOICE_DASH = [("", "---------")]
 
 
 def _load_field(app_label, model_name, field_name):
-    return get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
+    return app_cache.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
 
 
 class FieldDoesNotExist(Exception):
@@ -233,6 +233,8 @@ class Field(object):
             path = path.replace("django.db.models.fields.related", "django.db.models")
         if path.startswith("django.db.models.fields.files"):
             path = path.replace("django.db.models.fields.files", "django.db.models")
+        if path.startswith("django.db.models.fields.proxy"):
+            path = path.replace("django.db.models.fields.proxy", "django.db.models")
         if path.startswith("django.db.models.fields"):
             path = path.replace("django.db.models.fields", "django.db.models")
         # Return basic info - other fields should override this.
@@ -242,6 +244,14 @@ class Field(object):
             [],
             keywords,
         )
+
+    def clone(self):
+        """
+        Uses deconstruct() to clone a new copy of this Field.
+        Will not preserve any class attachments/attribute names.
+        """
+        name, path, args, kwargs = self.deconstruct()
+        return self.__class__(*args, **kwargs)
 
     def __eq__(self, other):
         # Needed for @total_ordering
@@ -621,7 +631,7 @@ class Field(object):
         rel_model = self.rel.to
         if hasattr(self.rel, 'get_related_field'):
             lst = [(getattr(x, self.rel.get_related_field().attname),
-                        smart_text(x))
+                   smart_text(x))
                    for x in rel_model._default_manager.complex_filter(
                        self.rel.limit_choices_to)]
         else:
@@ -1309,7 +1319,7 @@ class IntegerField(Field):
 
     def get_prep_lookup(self, lookup_type, value):
         if ((lookup_type == 'gte' or lookup_type == 'lt')
-            and isinstance(value, float)):
+                and isinstance(value, float)):
             value = math.ceil(value)
         return super(IntegerField, self).get_prep_lookup(lookup_type, value)
 
@@ -1704,8 +1714,7 @@ class BinaryField(Field):
         return default
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        value = super(BinaryField, self
-            ).get_db_prep_value(value, connection, prepared)
+        value = super(BinaryField, self).get_db_prep_value(value, connection, prepared)
         if value is not None:
             return connection.Database.Binary(value)
         return value

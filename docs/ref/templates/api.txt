@@ -306,10 +306,12 @@ If you ``pop()`` too much, it'll raise
     >>> c = Context()
     >>> c['foo'] = 'first level'
     >>> c.push()
+    {}
     >>> c['foo'] = 'second level'
     >>> c['foo']
     'second level'
     >>> c.pop()
+    {'foo': 'second level'}
     >>> c['foo']
     'first level'
     >>> c['foo'] = 'overwritten'
@@ -833,9 +835,9 @@ dictionary
     positional argument.
 
 context_instance
-    An instance of ``Context`` or a subclass (e.g., an instance of
-    ``RequestContext``) to use as the template's context. This can
-    also be passed as the third positional argument.
+    An instance of :class:`~django.template.Context` or a subclass (e.g., an
+    instance of :class:`~django.template.RequestContext`) to use as the
+    template's context. This can also be passed as the third positional argument.
 
 See also the :func:`~django.shortcuts.render_to_response()` shortcut, which
 calls ``render_to_string`` and feeds the result into an :class:`~django.http.HttpResponse`

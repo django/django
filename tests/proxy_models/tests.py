@@ -1,13 +1,12 @@
 from __future__ import unicode_literals
-import copy
 
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
+from django.core.apps import app_cache
 from django.core.exceptions import FieldError
 from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models import signals
-from django.db.models.loading import cache
 from django.test import TestCase
 from django.test.utils import override_settings
 
@@ -91,15 +90,18 @@ class ProxyModelTests(TestCase):
         LowerStatusPerson.objects.create(status="low", name="homer")
         max_id = Person.objects.aggregate(max_id=models.Max('id'))['max_id']
 
-        self.assertRaises(Person.DoesNotExist,
+        self.assertRaises(
+            Person.DoesNotExist,
             MyPersonProxy.objects.get,
             name='Zathras'
         )
-        self.assertRaises(Person.MultipleObjectsReturned,
+        self.assertRaises(
+            Person.MultipleObjectsReturned,
             MyPersonProxy.objects.get,
             id__lt=max_id + 1
         )
-        self.assertRaises(Person.DoesNotExist,
+        self.assertRaises(
+            Person.DoesNotExist,
             StatusPerson.objects.get,
             name='Zathras'
         )
@@ -108,7 +110,8 @@ class ProxyModelTests(TestCase):
         StatusPerson.objects.create(name='Foo Jr.')
         max_id = Person.objects.aggregate(max_id=models.Max('id'))['max_id']
 
-        self.assertRaises(Person.MultipleObjectsReturned,
+        self.assertRaises(
+            Person.MultipleObjectsReturned,
             StatusPerson.objects.get,
             id__lt=max_id + 1
         )
@@ -151,13 +154,11 @@ class ProxyModelTests(TestCase):
 
     @override_settings(TEST_SWAPPABLE_MODEL='proxy_models.AlternateModel')
     def test_swappable(self):
-        try:
-            # This test adds dummy applications to the app cache. These
-            # need to be removed in order to prevent bad interactions
-            # with the flush operation in other tests.
-            old_app_models = copy.deepcopy(cache.app_models)
-            old_app_store = copy.deepcopy(cache.app_store)
+        # The models need to be removed after the test in order to prevent bad
+        # interactions with the flush operation in other tests.
+        _old_models = app_cache.app_configs['proxy_models'].models.copy()
 
+        try:
             class SwappableModel(models.Model):
 
                 class Meta:
@@ -173,8 +174,8 @@ class ProxyModelTests(TestCase):
                     class Meta:
                         proxy = True
         finally:
-            cache.app_models = old_app_models
-            cache.app_store = old_app_store
+            app_cache.app_configs['proxy_models'].models = _old_models
+            app_cache._get_models_cache = {}
 
     def test_myperson_manager(self):
         Person.objects.create(name="fred")
@@ -344,7 +345,8 @@ class ProxyModelTests(TestCase):
         resp = ProxyImprovement.objects.select_related().get(
             reporter__name__icontains='butor'
         )
-        self.assertEqual(repr(resp),
+        self.assertEqual(
+            repr(resp),
             '<ProxyImprovement: ProxyImprovement:improve that>'
         )
 
@@ -352,7 +354,8 @@ class ProxyModelTests(TestCase):
         resp = ProxyImprovement.objects.select_related().get(
             associated_bug__summary__icontains='fix'
         )
-        self.assertEqual(repr(resp),
+        self.assertEqual(
+            repr(resp),
             '<ProxyImprovement: ProxyImprovement:improve that>'
         )
 

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.core.apps.cache import AppCache
 from django.db import models
-from django.db.models.loading import BaseAppCache
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -12,7 +12,7 @@ class UnicodeModel(models.Model):
 
     class Meta:
         # Disable auto loading of this model as we load it on our own
-        app_cache = BaseAppCache()
+        app_cache = AppCache()
         verbose_name = 'úñí©óðé µóðéø'
         verbose_name_plural = 'úñí©óðé µóðéøß'
 
@@ -32,4 +32,4 @@ class UnserializableModel(models.Model):
 
     class Meta:
         # Disable auto loading of this model as we load it on our own
-        app_cache = BaseAppCache()
+        app_cache = AppCache()

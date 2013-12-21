@@ -105,7 +105,15 @@ def logout(request):
         user = None
     user_logged_out.send(sender=user.__class__, request=request, user=user)
 
+    # remember language choice saved to session
+    # for backwards compatibility django_language is also checked (remove in 1.8)
+    language = request.session.get('_language', request.session.get('django_language'))
+
     request.session.flush()
+
+    if language is not None:
+        request.session['_language'] = language
+
     if hasattr(request, 'user'):
         from django.contrib.auth.models import AnonymousUser
         request.user = AnonymousUser()
@@ -115,13 +123,13 @@ def get_user_model():
     """
     Returns the User model that is active in this project.
     """
-    from django.db.models import get_model
+    from django.core.apps import app_cache
 
     try:
         app_label, model_name = settings.AUTH_USER_MODEL.split('.')
     except ValueError:
         raise ImproperlyConfigured("AUTH_USER_MODEL must be of the form 'app_label.model_name'")
-    user_model = get_model(app_label, model_name)
+    user_model = app_cache.get_model(app_label, model_name)
     if user_model is None:
         raise ImproperlyConfigured("AUTH_USER_MODEL refers to model '%s' that has not been installed" % settings.AUTH_USER_MODEL)
     return user_model

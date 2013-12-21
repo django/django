@@ -17,6 +17,7 @@ from unittest.util import safe_repr
 
 from django.conf import settings
 from django.core import mail
+from django.core.apps import app_cache
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.core.handlers.wsgi import get_path_info, WSGIHandler
 from django.core.management import call_command
@@ -25,7 +26,6 @@ from django.core.management.commands import flush
 from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
 from django.core.urlresolvers import clear_url_caches, set_urlconf
 from django.db import connection, connections, DEFAULT_DB_ALIAS, transaction
-from django.db.models.loading import cache
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.test.client import Client
@@ -103,8 +103,12 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
             return
         executed = len(self)
         self.test_case.assertEqual(
-            executed, self.num, "%d queries executed, %d expected" % (
-                executed, self.num
+            executed, self.num,
+            "%d queries executed, %d expected\nCaptured queries were:\n%s" % (
+                executed, self.num,
+                '\n'.join(
+                    query['sql'] for query in self.captured_queries
+                )
             )
         )
 
@@ -298,7 +302,7 @@ class SimpleTestCase(unittest.TestCase):
         # If the response supports deferred rendering and hasn't been rendered
         # yet, then ensure that it does get rendered before proceeding further.
         if (hasattr(response, 'render') and callable(response.render)
-            and not response.is_rendered):
+                and not response.is_rendered):
             response.render()
 
         if msg_prefix:
@@ -390,15 +394,15 @@ class SimpleTestCase(unittest.TestCase):
                             msg_prefix + "The field '%s' on form '%s' in"
                             " context %d does not contain the error '%s'"
                             " (actual errors: %s)" %
-                                (field, form, i, err, repr(field_errors)))
+                            (field, form, i, err, repr(field_errors)))
                     elif field in context[form].fields:
                         self.fail(msg_prefix + "The field '%s' on form '%s'"
                                   " in context %d contains no errors" %
-                                      (field, form, i))
+                                  (field, form, i))
                     else:
                         self.fail(msg_prefix + "The form '%s' in context %d"
                                   " does not contain the field '%s'" %
-                                      (form, i, field))
+                                  (form, i, field))
                 else:
                     non_field_errors = context[form].non_field_errors()
                     self.assertTrue(err in non_field_errors,
@@ -448,30 +452,30 @@ class SimpleTestCase(unittest.TestCase):
                                 msg_prefix + "The field '%s' on formset '%s', "
                                 "form %d in context %d does not contain the "
                                 "error '%s' (actual errors: %s)" %
-                                        (field, formset, form_index, i, err,
-                                        repr(field_errors)))
+                                (field, formset, form_index, i, err,
+                                 repr(field_errors)))
                     elif field in context[formset].forms[form_index].fields:
                         self.fail(msg_prefix + "The field '%s' "
                                   "on formset '%s', form %d in "
                                   "context %d contains no errors" %
-                                        (field, formset, form_index, i))
+                                  (field, formset, form_index, i))
                     else:
                         self.fail(msg_prefix + "The formset '%s', form %d in "
-                                 "context %d does not contain the field '%s'" %
-                                        (formset, form_index, i, field))
+                                  "context %d does not contain the field '%s'" %
+                                  (formset, form_index, i, field))
                 elif form_index is not None:
                     non_field_errors = context[formset].forms[form_index].non_field_errors()
                     self.assertFalse(len(non_field_errors) == 0,
-                                msg_prefix + "The formset '%s', form %d in "
-                                "context %d does not contain any non-field "
-                                "errors." % (formset, form_index, i))
+                                     msg_prefix + "The formset '%s', form %d in "
+                                     "context %d does not contain any non-field "
+                                     "errors." % (formset, form_index, i))
                     self.assertTrue(err in non_field_errors,
                                     msg_prefix + "The formset '%s', form %d "
                                     "in context %d does not contain the "
                                     "non-field error '%s' "
                                     "(actual errors: %s)" %
-                                        (formset, form_index, i, err,
-                                         repr(non_field_errors)))
+                                    (formset, form_index, i, err,
+                                     repr(non_field_errors)))
                 else:
                     non_form_errors = context[formset].non_form_errors()
                     self.assertFalse(len(non_form_errors) == 0,
@@ -482,7 +486,7 @@ class SimpleTestCase(unittest.TestCase):
                                     msg_prefix + "The formset '%s' in context "
                                     "%d does not contain the "
                                     "non-form error '%s' (actual errors: %s)" %
-                                      (formset, i, err, repr(non_form_errors)))
+                                    (formset, i, err, repr(non_form_errors)))
         if not found_formset:
             self.fail(msg_prefix + "The formset '%s' was not used to render "
                       "the response" % formset)
@@ -721,14 +725,14 @@ class TransactionTestCase(SimpleTestCase):
         """
         super(TransactionTestCase, self)._pre_setup()
         if self.available_apps is not None:
-            cache.set_available_apps(self.available_apps)
+            app_cache.set_available_apps(self.available_apps)
             for db_name in self._databases_names(include_mirrors=False):
                 flush.Command.emit_post_migrate(verbosity=0, interactive=False, database=db_name)
         try:
             self._fixture_setup()
         except Exception:
             if self.available_apps is not None:
-                cache.unset_available_apps()
+                app_cache.unset_available_apps()
             raise
 
     def _databases_names(self, include_mirrors=True):
@@ -782,7 +786,7 @@ class TransactionTestCase(SimpleTestCase):
             for conn in connections.all():
                 conn.close()
         finally:
-            cache.unset_available_apps()
+            app_cache.unset_available_apps()
 
     def _fixture_teardown(self):
         # Allow TRUNCATE ... CASCADE and don't emit the post_migrate signal
@@ -1043,7 +1047,7 @@ class LiveServerThread(threading.Thread):
                         (self.host, port), QuietWSGIRequestHandler)
                 except socket.error as e:
                     if (index + 1 < len(self.possible_ports) and
-                        e.errno == errno.EADDRINUSE):
+                            e.errno == errno.EADDRINUSE):
                         # This port is already in use, so we go on and try with
                         # the next one in the list.
                         continue
@@ -1097,7 +1101,7 @@ class LiveServerTestCase(TransactionTestCase):
             # If using in-memory sqlite databases, pass the connections to
             # the server thread.
             if (conn.vendor == 'sqlite'
-                and conn.settings_dict['NAME'] == ':memory:'):
+                    and conn.settings_dict['NAME'] == ':memory:'):
                 # Explicitly enable thread-shareability for this connection
                 conn.allow_thread_sharing = True
                 connections_override[conn.alias] = conn
@@ -1154,7 +1158,7 @@ class LiveServerTestCase(TransactionTestCase):
         # Restore sqlite connections' non-sharability
         for conn in connections.all():
             if (conn.vendor == 'sqlite'
-                and conn.settings_dict['NAME'] == ':memory:'):
+                    and conn.settings_dict['NAME'] == ':memory:'):
                 conn.allow_thread_sharing = False
 
     @classmethod

@@ -1,7 +1,8 @@
+from importlib import import_module
 import os
 import sys
-from importlib import import_module
-from django.db.models.loading import cache
+
+from django.core.apps import app_cache
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.graph import MigrationGraph
 from django.utils import six
@@ -45,7 +46,7 @@ class MigrationLoader(object):
         if app_label in settings.MIGRATION_MODULES:
             return settings.MIGRATION_MODULES[app_label]
         else:
-            return '%s.migrations' % cache.get_app_package(app_label)
+            return '%s.migrations' % app_cache.get_app_config(app_label).name
 
     def load_disk(self):
         """
@@ -54,10 +55,9 @@ class MigrationLoader(object):
         self.disk_migrations = {}
         self.unmigrated_apps = set()
         self.migrated_apps = set()
-        for app in cache.get_apps():
+        for app_config in app_cache.get_app_configs(only_with_models_module=True):
             # Get the migrations module directory
-            app_label = app.__name__.split(".")[-2]
-            module_name = self.migrations_module(app_label)
+            module_name = self.migrations_module(app_config.label)
             was_loaded = module_name in sys.modules
             try:
                 module = import_module(module_name)
@@ -65,7 +65,7 @@ class MigrationLoader(object):
                 # I hate doing this, but I don't want to squash other import errors.
                 # Might be better to try a directory check directly.
                 if "No module named" in str(e) and "migrations" in str(e):
-                    self.unmigrated_apps.add(app_label)
+                    self.unmigrated_apps.add(app_config.label)
                     continue
                 raise
             else:
@@ -78,7 +78,7 @@ class MigrationLoader(object):
                 # Force a reload if it's already loaded (tests need this)
                 if was_loaded:
                     six.moves.reload_module(module)
-            self.migrated_apps.add(app_label)
+            self.migrated_apps.add(app_config.label)
             directory = os.path.dirname(module.__file__)
             # Scan for .py[c|o] files
             migration_names = set()
@@ -99,14 +99,14 @@ class MigrationLoader(object):
                         break
                     raise
                 if not hasattr(migration_module, "Migration"):
-                    raise BadMigrationError("Migration %s in app %s has no Migration class" % (migration_name, app_label))
+                    raise BadMigrationError("Migration %s in app %s has no Migration class" % (migration_name, app_config.label))
                 # Ignore South-style migrations
                 if hasattr(migration_module.Migration, "forwards"):
                     south_style_migrations = True
                     break
-                self.disk_migrations[app_label, migration_name] = migration_module.Migration(migration_name, app_label)
+                self.disk_migrations[app_config.label, migration_name] = migration_module.Migration(migration_name, app_config.label)
             if south_style_migrations:
-                self.unmigrated_apps.add(app_label)
+                self.unmigrated_apps.add(app_config.label)
 
     def get_migration(self, app_label, name_prefix):
         "Gets the migration exactly named, or raises KeyError"
@@ -186,6 +186,20 @@ class MigrationLoader(object):
         for key, migration in normal.items():
             for parent in migration.dependencies:
                 self.graph.add_dependency(key, parent)
+
+    def detect_conflicts(self):
+        """
+        Looks through the loaded graph and detects any conflicts - apps
+        with more than one leaf migration. Returns a dict of the app labels
+        that conflict with the migration names that conflict.
+        """
+        seen_apps = {}
+        conflicting_apps = set()
+        for app_label, migration_name in self.graph.leaf_nodes():
+            if app_label in seen_apps:
+                conflicting_apps.add(app_label)
+            seen_apps.setdefault(app_label, set()).add(migration_name)
+        return dict((app_label, seen_apps[app_label]) for app_label in conflicting_apps)
 
 
 class BadMigrationError(Exception):

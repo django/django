@@ -69,25 +69,25 @@ def get_test_modules():
     for modpath, dirpath in discovery_paths:
         for f in os.listdir(dirpath):
             if ('.' in f or
-                # Python 3 byte code dirs (PEP 3147)
-                f == '__pycache__' or
-                f.startswith('sql') or
-                os.path.basename(f) in SUBDIRS_TO_SKIP or
-                os.path.isfile(f)):
+                    # Python 3 byte code dirs (PEP 3147)
+                    f == '__pycache__' or
+                    f.startswith('sql') or
+                    os.path.basename(f) in SUBDIRS_TO_SKIP or
+                    os.path.isfile(f)):
                 continue
             modules.append((modpath, f))
     return modules
 
 
 def get_installed():
-    from django.db.models.loading import get_apps
-    return [app.__name__.rsplit('.', 1)[0] for app in get_apps()]
+    from django.core.apps import app_cache
+    return [app_config.name for app_config in app_cache.get_app_configs()]
 
 
 def setup(verbosity, test_labels):
     import django
     from django.conf import settings
-    from django.db.models.loading import get_apps, load_app
+    from django.core.apps import app_cache
     from django.test import TransactionTestCase, TestCase
 
     print("Testing against Django installed in '%s'" % os.path.dirname(django.__file__))
@@ -128,7 +128,7 @@ def setup(verbosity, test_labels):
     # Load all the ALWAYS_INSTALLED_APPS.
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', 'django.contrib.comments is deprecated and will be removed before Django 1.8.', DeprecationWarning)
-        get_apps()
+        app_cache.populate()
 
     # Load all the test model apps.
     test_modules = get_test_modules()
@@ -164,10 +164,9 @@ def setup(verbosity, test_labels):
         if module_found_in_labels:
             if verbosity >= 2:
                 print("Importing application %s" % module_name)
-            mod = load_app(module_label)
-            if mod:
-                if module_label not in settings.INSTALLED_APPS:
-                    settings.INSTALLED_APPS.append(module_label)
+            app_cache.load_app(module_label)
+            if module_label not in settings.INSTALLED_APPS:
+                settings.INSTALLED_APPS.append(module_label)
 
     return state
 

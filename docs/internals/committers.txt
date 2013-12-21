@@ -223,7 +223,7 @@ Karen Tracey
 
     Jannis lives in Berlin, Germany.
 
-    .. _Jannis Leidel: http://jezdez.com/
+    .. _Jannis Leidel: https://jezdez.com/
     .. _Bauhaus-University Weimar: http://www.uni-weimar.de/
     .. _virtualenv: http://www.virtualenv.org/
     .. _pip: http://www.pip-installer.org/
@@ -396,7 +396,7 @@ Tim Graham
 
     He works in a `management consulting company`_ in Paris, France.
 
-    .. _Aymeric Augustin: http://myks.org/
+    .. _Aymeric Augustin: https://myks.org/
     .. _management consulting company: http://www.polyconseil.fr/
 
 `Claude Paroz`_
@@ -410,7 +410,7 @@ Tim Graham
     Django-based `l10n.gnome.org`_.
 
     .. _Claude Paroz: http://www.2xlibre.net
-    .. _l10n.gnome.org: http://l10n.gnome.org
+    .. _l10n.gnome.org: https://l10n.gnome.org
 
 Anssi Kääriäinen
     Anssi works as a developer at Finnish National Institute for Health and

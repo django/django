@@ -57,7 +57,7 @@ def check_password(password, encoded, setter=None, preferred='default'):
 
     must_update = hasher.algorithm != preferred.algorithm
     if not must_update:
-        must_update = hasher.must_update(encoded)
+        must_update = preferred.must_update(encoded)
     is_correct = hasher.verify(password, encoded)
     if setter and is_correct and must_update:
         setter(password)

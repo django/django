@@ -15,7 +15,7 @@ from .models import (Place, Restaurant, ItalianRestaurant, ParkingLot,
     SelfRefChild, ArticleWithAuthor, M2MChild, QualityControl, DerivedM,
     Person, BirthdayParty, BachelorParty, MessyBachelorParty,
     InternalCertificationAudit, BusStation, TrainStation, User, Profile,
-    ParkingLot4A, ParkingLot4B)
+    ParkingLot4A, ParkingLot4B, Senator)
 
 
 class ModelInheritanceTest(TestCase):
@@ -412,13 +412,11 @@ class ModelInheritanceTest(TestCase):
         # when more than one model has a concrete->abstract->concrete
         # inheritance hierarchy.
         self.assertEqual(
-            len([field for field in BusStation._meta.local_fields
-                       if field.primary_key]),
+            len([field for field in BusStation._meta.local_fields if field.primary_key]),
             1
         )
         self.assertEqual(
-            len([field for field in TrainStation._meta.local_fields
-                       if field.primary_key]),
+            len([field for field in TrainStation._meta.local_fields if field.primary_key]),
             1
         )
         self.assertIs(BusStation._meta.pk.model, BusStation)
@@ -455,3 +453,10 @@ class ModelInheritanceTest(TestCase):
         # used in the qs and top contains direct pointer to the bottom model.
         qs = ItalianRestaurant.objects.values_list('serves_gnocchi').filter(name='foo')
         self.assertEqual(str(qs.query).count('JOIN'), 1)
+
+    def test_issue_21554(self):
+        senator = Senator.objects.create(
+            name='John Doe', title='X', state='Y'
+        )
+
+        Senator.objects.get(pk=senator.pk)

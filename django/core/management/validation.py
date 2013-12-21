@@ -26,16 +26,13 @@ def get_validation_errors(outfile, app=None):
     validates all models of all installed apps. Writes errors, if any, to outfile.
     Returns number of errors.
     """
+    from django.core.apps import app_cache
     from django.db import connection, models
-    from django.db.models.loading import get_app_errors
     from django.db.models.deletion import SET_NULL, SET_DEFAULT
 
     e = ModelErrorCollection(outfile)
 
-    for (app_name, error) in get_app_errors().items():
-        e.add(app_name, error)
-
-    for cls in models.get_models(app, include_swapped=True):
+    for cls in app_cache.get_models(app, include_swapped=True):
         opts = cls._meta
 
         # Check swappable attribute.
@@ -45,7 +42,7 @@ def get_validation_errors(outfile, app=None):
             except ValueError:
                 e.add(opts, "%s is not of the form 'app_label.app_name'." % opts.swappable)
                 continue
-            if not models.get_model(app_label, model_name):
+            if not app_cache.get_model(app_label, model_name):
                 e.add(opts, "Model has been swapped out for '%s' which has not been installed or is abstract." % opts.swapped)
             # No need to perform any other validation checks on a swapped model.
             continue
@@ -155,7 +152,7 @@ def get_validation_errors(outfile, app=None):
             # Check to see if the related field will clash with any existing
             # fields, m2m fields, m2m related objects or related objects
             if f.rel:
-                if f.rel.to not in models.get_models():
+                if f.rel.to not in app_cache.get_models():
                     # If the related model is swapped, provide a hint;
                     # otherwise, the model just hasn't been installed.
                     if not isinstance(f.rel.to, six.string_types) and f.rel.to._meta.swapped:
@@ -210,7 +207,7 @@ def get_validation_errors(outfile, app=None):
             # Check to see if the related m2m field will clash with any
             # existing fields, m2m fields, m2m related objects or related
             # objects
-            if f.rel.to not in models.get_models():
+            if f.rel.to not in app_cache.get_models():
                 # If the related model is swapped, provide a hint;
                 # otherwise, the model just hasn't been installed.
                 if not isinstance(f.rel.to, six.string_types) and f.rel.to._meta.swapped:
@@ -268,10 +265,9 @@ def get_validation_errors(outfile, app=None):
                                 )
                             else:
                                 seen_to = True
-                if f.rel.through not in models.get_models(include_auto_created=True):
+                if f.rel.through not in app_cache.get_models(include_auto_created=True):
                     e.add(opts, "'%s' specifies an m2m relation through model "
-                        "%s, which has not been installed." % (f.name, f.rel.through)
-                    )
+                        "%s, which has not been installed." % (f.name, f.rel.through))
                 signature = (f.rel.to, cls, f.rel.through)
                 if signature in seen_intermediary_signatures:
                     e.add(opts, "The model %s has two manually-defined m2m "
@@ -295,13 +291,14 @@ def get_validation_errors(outfile, app=None):
                     if not seen_related_fk or not seen_this_fk:
                         e.add(opts, "'%s' is a manually-defined m2m relation "
                             "through model %s, which does not have foreign keys "
-                            "to %s and %s" % (f.name, f.rel.through._meta.object_name,
-                                f.rel.to._meta.object_name, cls._meta.object_name)
+                            "to %s and %s" % (
+                                f.name, f.rel.through._meta.object_name,
+                                f.rel.to._meta.object_name, cls._meta.object_name
+                            )
                         )
             elif isinstance(f.rel.through, six.string_types):
                 e.add(opts, "'%s' specifies an m2m relation through model %s, "
-                    "which has not been installed" % (f.name, f.rel.through)
-                )
+                    "which has not been installed" % (f.name, f.rel.through))
 
             rel_opts = f.rel.to._meta
             rel_name = f.related.get_accessor_name()

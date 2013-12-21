@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from optparse import make_option
 from datetime import datetime
 import errno
@@ -8,7 +10,10 @@ import socket
 
 from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import run, get_internal_wsgi_application
+from django.db import connections, DEFAULT_DB_ALIAS
+from django.db.migrations.executor import MigrationExecutor
 from django.utils import autoreload
+from django.utils import six
 
 naiveip_re = re.compile(r"""^(?:
 (?P<addr>
@@ -96,13 +101,17 @@ class Command(BaseCommand):
 
         self.stdout.write("Validating models...\n\n")
         self.validate(display_num_errors=True)
+        self.check_migrations()
+        now = datetime.now().strftime('%B %d, %Y - %X')
+        if six.PY2:
+            now = now.decode('utf-8')
         self.stdout.write((
             "%(started_at)s\n"
             "Django version %(version)s, using settings %(settings)r\n"
             "Starting development server at http://%(addr)s:%(port)s/\n"
             "Quit the server with %(quit_command)s.\n"
         ) % {
-            "started_at": datetime.now().strftime('%B %d, %Y - %X'),
+            "started_at": now,
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
             "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
@@ -137,6 +146,16 @@ class Command(BaseCommand):
                 self.stdout.write(shutdown_message)
             sys.exit(0)
 
+    def check_migrations(self):
+        """
+        Checks to see if the set of migrations on disk matches the
+        migrations in the database. Prints a warning if they don't match.
+        """
+        executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
+        plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
+        if plan:
+            self.stdout.write(self.style.NOTICE("\nYou have unapplied migrations; your app may not work properly until they are applied."))
+            self.stdout.write(self.style.NOTICE("Run 'python manage.py migrate' to apply them.\n"))
 
 # Kept for backward compatibility
 BaseRunserverCommand = Command

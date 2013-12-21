@@ -4,8 +4,8 @@ from operator import attrgetter
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.backends.db import SessionStore
+from django.core.apps import app_cache
 from django.db.models import Count
-from django.db.models.loading import cache
 from django.test import TestCase
 from django.test.utils import override_settings
 
@@ -103,7 +103,7 @@ class DeferRegressionTest(TestCase):
         klasses = set(
             map(
                 attrgetter("__name__"),
-                cache.get_models(cache.get_app("defer_regress"))
+                app_cache.get_models(app_cache.get_app_config("defer_regress").models_module)
             )
         )
         self.assertIn("Child", klasses)
@@ -111,13 +111,13 @@ class DeferRegressionTest(TestCase):
         self.assertNotIn("Child_Deferred_value", klasses)
         self.assertNotIn("Item_Deferred_name", klasses)
         self.assertFalse(any(
-            k._deferred for k in cache.get_models(cache.get_app("defer_regress"))))
+            k._deferred for k in app_cache.get_models(app_cache.get_app_config("defer_regress").models_module)))
 
         klasses_with_deferred = set(
             map(
                 attrgetter("__name__"),
-                cache.get_models(
-                    cache.get_app("defer_regress"), include_deferred=True
+                app_cache.get_models(
+                    app_cache.get_app_config("defer_regress").models_module, include_deferred=True
                 ),
             )
         )
@@ -126,8 +126,8 @@ class DeferRegressionTest(TestCase):
         self.assertIn("Child_Deferred_value", klasses_with_deferred)
         self.assertIn("Item_Deferred_name", klasses_with_deferred)
         self.assertTrue(any(
-            k._deferred for k in cache.get_models(
-                cache.get_app("defer_regress"), include_deferred=True))
+            k._deferred for k in app_cache.get_models(
+                app_cache.get_app_config("defer_regress").models_module, include_deferred=True))
         )
 
     @override_settings(SESSION_SERIALIZER='django.contrib.sessions.serializers.PickleSerializer')

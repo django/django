@@ -30,7 +30,7 @@ or CheetahTemplate_, you should feel right at home with Django's templates.
     </howto/custom-template-tags>` to the template language as needed).
 
 .. _`The Django template language: For Python programmers`: ../templates_python/
-.. _Smarty: http://smarty.php.net/
+.. _Smarty: http://www.smarty.net/
 .. _CheetahTemplate: http://www.cheetahtemplate.org/
 
 Templates

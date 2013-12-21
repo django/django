@@ -140,7 +140,7 @@ community!  You can:
   sure to provide a complete description of the problem, versions used,
   and specify the component as "GIS".
 
-__ http://groups.google.com/group/geodjango
+__ https://groups.google.com/d/forum/geodjango
 __ https://code.djangoproject.com/newticket
 
 .. _libsettings:
@@ -273,7 +273,7 @@ Summary::
     $ brew install gdal
     $ brew install libgeoip
 
-__ http://mxcl.github.com/homebrew/
+__ http://brew.sh/
 .. _Apple Developer Tools: https://developer.apple.com/technologies/tools/
 
 .. _kyngchaos:
@@ -285,7 +285,7 @@ William Kyngesburye provides a number of `geospatial library binary packages`__
 that make it simple to get GeoDjango installed on OS X without compiling
 them from source.  However, the `Apple Developer Tools`_ are still necessary
 for compiling the Python database adapters :ref:`psycopg2_kyngchaos` (for PostGIS)
-and ``pysqlite2`` (for SpatiaLite).
+and :ref:`pysqlite2` (for SpatiaLite).
 
 .. note::
 

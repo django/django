@@ -8,12 +8,12 @@ import zipfile
 from optparse import make_option
 
 from django.conf import settings
+from django.core.apps import app_cache
 from django.core import serializers
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.db import (connections, router, transaction, DEFAULT_DB_ALIAS,
       IntegrityError, DatabaseError)
-from django.db.models import get_app_paths
 from django.utils import lru_cache
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
@@ -178,11 +178,15 @@ class Command(BaseCommand):
         if self.verbosity >= 2:
             self.stdout.write("Loading '%s' fixtures..." % fixture_name)
 
-        if os.path.sep in fixture_name:
+        if os.path.isabs(fixture_name):
             fixture_dirs = [os.path.dirname(fixture_name)]
             fixture_name = os.path.basename(fixture_name)
         else:
             fixture_dirs = self.fixture_dirs
+            if os.path.sep in fixture_name:
+                fixture_dirs = [os.path.join(dir_, os.path.dirname(fixture_name))
+                                for dir_ in fixture_dirs]
+                fixture_name = os.path.basename(fixture_name)
 
         suffixes = ('.'.join(ext for ext in combo if ext)
                 for combo in product(databases, ser_fmts, cmp_fmts))
@@ -226,8 +230,8 @@ class Command(BaseCommand):
         current directory.
         """
         dirs = []
-        for path in get_app_paths():
-            d = os.path.join(path, 'fixtures')
+        for app_config in app_cache.get_app_configs():
+            d = os.path.join(app_config.path, 'fixtures')
             if os.path.isdir(d):
                 dirs.append(d)
         dirs.extend(list(settings.FIXTURE_DIRS))

@@ -8,11 +8,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
+from django.core.apps import app_cache
 from django.core import exceptions
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.core.management.validation import get_validation_errors
-from django.db.models.loading import get_app
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import six
@@ -91,7 +91,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         "Check the operation of the createsuperuser management command"
         # We can use the management command to create a superuser
         new_io = StringIO()
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe",
             email="joe@somewhere.org",
@@ -108,7 +109,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
     def test_verbosity_zero(self):
         # We can supress output on the management command
         new_io = StringIO()
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe2",
             email="joe2@somewhere.org",
@@ -123,7 +125,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
     def test_email_in_username(self):
         new_io = StringIO()
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe+admin@somewhere.org",
             email="joe@somewhere.org",
@@ -140,7 +143,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # We skip validation because the temporary substitution of the
         # swappable User model messes with validation.
         new_io = StringIO()
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             email="joe@somewhere.org",
             date_of_birth="1976-04-01",
@@ -163,7 +167,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # swappable User model messes with validation.
         new_io = StringIO()
         with self.assertRaises(CommandError):
-            call_command("createsuperuser",
+            call_command(
+                "createsuperuser",
                 interactive=False,
                 username="joe@somewhere.org",
                 stdout=new_io,
@@ -179,21 +184,21 @@ class CustomUserModelValidationTestCase(TestCase):
     def test_required_fields_is_list(self):
         "REQUIRED_FIELDS should be a list."
         new_io = StringIO()
-        get_validation_errors(new_io, get_app('auth'))
+        get_validation_errors(new_io, app_cache.get_app_config('auth').models_module)
         self.assertIn("The REQUIRED_FIELDS must be a list or tuple.", new_io.getvalue())
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserBadRequiredFields')
     def test_username_not_in_required_fields(self):
         "USERNAME_FIELD should not appear in REQUIRED_FIELDS."
         new_io = StringIO()
-        get_validation_errors(new_io, get_app('auth'))
+        get_validation_errors(new_io, app_cache.get_app_config('auth').models_module)
         self.assertIn("The field named as the USERNAME_FIELD should not be included in REQUIRED_FIELDS on a swappable User model.", new_io.getvalue())
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonUniqueUsername')
     def test_username_non_unique(self):
         "A non-unique USERNAME_FIELD should raise a model validation error."
         new_io = StringIO()
-        get_validation_errors(new_io, get_app('auth'))
+        get_validation_errors(new_io, app_cache.get_app_config('auth').models_module)
         self.assertIn("The USERNAME_FIELD must be unique. Add unique=True to the field parameters.", new_io.getvalue())
 
 

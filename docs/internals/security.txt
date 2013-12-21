@@ -113,7 +113,7 @@ On the day of disclosure, we will take the following steps:
 4. Post a notice to the |django-announce| mailing list that links to the blog
    post.
 
-.. _the Python Package Index: http://pypi.python.org/pypi
+.. _the Python Package Index: https://pypi.python.org/pypi
 .. _the official Django development blog: https://www.djangoproject.com/weblog/
 
 If a reported issue is believed to be particularly time-sensitive --

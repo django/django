@@ -66,7 +66,8 @@ class BaseGeometryWidget(Widget):
                             value.srid, self.map_srid, err)
                     )
 
-        context = self.build_attrs(attrs,
+        context = self.build_attrs(
+            attrs,
             name=name,
             module='geodjango_%s' % name.replace('-', '_'),  # JS-safe
             serialized=self.serialize(value),
@@ -102,6 +103,13 @@ class OSMWidget(BaseGeometryWidget):
             'gis/js/OLMapWidget.js',
         )
 
+    def __init__(self, attrs=None):
+        super(OSMWidget, self).__init__()
+        for key in ('default_lon', 'default_lat'):
+            self.attrs[key] = getattr(self, key)
+        if attrs:
+            self.attrs.update(attrs)
+
     @property
     def map_srid(self):
         # Use the official spherical mercator projection SRID on versions
@@ -110,12 +118,3 @@ class OSMWidget(BaseGeometryWidget):
             return 3857
         else:
             return 900913
-
-    def render(self, name, value, attrs=None):
-        default_attrs = {
-            'default_lon': self.default_lon,
-            'default_lat': self.default_lat,
-        }
-        if attrs:
-            default_attrs.update(attrs)
-        return super(OSMWidget, self).render(name, value, default_attrs)

@@ -56,9 +56,7 @@ class AssertNumQueriesTests(TestCase):
         def test_func():
             raise ValueError
 
-        self.assertRaises(ValueError,
-            self.assertNumQueries, 2, test_func
-        )
+        self.assertRaises(ValueError, self.assertNumQueries, 2, test_func)
 
     def test_assert_num_queries_with_client(self):
         person = Person.objects.create(name='test')
@@ -194,6 +192,7 @@ class AssertNumQueriesContextManagerTests(TestCase):
             with self.assertNumQueries(2):
                 Person.objects.count()
         self.assertIn("1 queries executed, 2 expected", str(exc_info.exception))
+        self.assertIn("Captured queries were", str(exc_info.exception))
 
         with self.assertRaises(TypeError):
             with self.assertNumQueries(4000):

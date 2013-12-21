@@ -156,7 +156,7 @@ class BaseDatabaseWrapper(object):
         """
         self.validate_thread_sharing()
         if (self.use_debug_cursor or
-            (self.use_debug_cursor is None and settings.DEBUG)):
+                (self.use_debug_cursor is None and settings.DEBUG)):
             cursor = self.make_debug_cursor(self._cursor())
         else:
             cursor = utils.CursorWrapper(self._cursor(), self)
@@ -1218,8 +1218,7 @@ class BaseDatabaseOperations(object):
 
 # Structure returned by the DB-API cursor.description interface (PEP 249)
 FieldInfo = namedtuple('FieldInfo',
-    'name type_code display_size internal_size precision scale null_ok'
-)
+    'name type_code display_size internal_size precision scale null_ok')
 
 
 class BaseDatabaseIntrospection(object):
@@ -1272,10 +1271,11 @@ class BaseDatabaseIntrospection(object):
         If only_existing is True, the resulting list will only include the tables
         that actually exist in the database.
         """
-        from django.db import models, router
+        from django.core.apps import app_cache
+        from django.db import router
         tables = set()
-        for app in models.get_apps():
-            for model in router.get_migratable_models(app, self.connection.alias):
+        for app_config in app_cache.get_app_configs(only_with_models_module=True):
+            for model in router.get_migratable_models(app_config.models_module, self.connection.alias):
                 if not model._meta.managed:
                     continue
                 tables.add(model._meta.db_table)
@@ -1292,10 +1292,11 @@ class BaseDatabaseIntrospection(object):
 
     def installed_models(self, tables):
         "Returns a set of all models represented by the provided list of table names."
-        from django.db import models, router
+        from django.core.apps import app_cache
+        from django.db import router
         all_models = []
-        for app in models.get_apps():
-            all_models.extend(router.get_migratable_models(app, self.connection.alias))
+        for app_config in app_cache.get_app_configs(only_with_models_module=True):
+            all_models.extend(router.get_migratable_models(app_config.models_module, self.connection.alias))
         tables = list(map(self.table_name_converter, tables))
         return set([
             m for m in all_models
@@ -1304,13 +1305,13 @@ class BaseDatabaseIntrospection(object):
 
     def sequence_list(self):
         "Returns a list of information about all DB sequences for all models in all apps."
+        from django.core.apps import app_cache
         from django.db import models, router
 
-        apps = models.get_apps()
         sequence_list = []
 
-        for app in apps:
-            for model in router.get_migratable_models(app, self.connection.alias):
+        for app_config in app_cache.get_app_configs(only_with_models_module=True):
+            for model in router.get_migratable_models(app_config.models_module, self.connection.alias):
                 if not model._meta.managed:
                     continue
                 if model._meta.swapped:

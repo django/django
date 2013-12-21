@@ -1123,10 +1123,10 @@ Controlling cache: Using other headers
 Other problems with caching are the privacy of data and the question of where
 data should be stored in a cascade of caches.
 
-A user usually faces two kinds of caches: his or her own browser cache (a
-private cache) and his or her provider's cache (a public cache). A public cache
-is used by multiple users and controlled by someone else. This poses problems
-with sensitive data--you don't want, say, your bank account number stored in a
+A user usually faces two kinds of caches: their own browser cache (a private
+cache) and their provider's cache (a public cache). A public cache is used by
+multiple users and controlled by someone else. This poses problems with
+sensitive data--you don't want, say, your bank account number stored in a
 public cache. So Web applications need a way to tell caches which data is
 private and which is public.
 

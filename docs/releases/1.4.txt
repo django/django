@@ -811,7 +811,7 @@ instance:
 
   * Consequences: The user will see an error about the form having expired
     and will be sent back to the first page of the wizard, losing the data
-    he or she has entered so far.
+    entered so far.
 
   * Time period: The amount of time you expect users to take filling out the
     affected forms.

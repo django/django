@@ -213,4 +213,4 @@ Miscellaneous
   change to the ``AUTHORS`` file in your patch if you make more than a
   single trivial change.
 
-.. _flake8: http://pypi.python.org/pypi/flake8
+.. _flake8: https://pypi.python.org/pypi/flake8

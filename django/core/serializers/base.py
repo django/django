@@ -3,6 +3,7 @@ Module for abstract serializer/unserializer base classes.
 """
 import warnings
 
+from django.core.apps import app_cache
 from django.db import models
 from django.utils import six
 
@@ -136,10 +137,9 @@ class Deserializer(six.Iterator):
             self.stream = six.StringIO(stream_or_string)
         else:
             self.stream = stream_or_string
-        # hack to make sure that the models have all been loaded before
-        # deserialization starts (otherwise subclass calls to get_model()
-        # and friends might fail...)
-        models.get_apps()
+        # Make sure the app cache is loaded before deserialization starts
+        # (otherwise subclass calls to get_model() and friends might fail...)
+        app_cache.populate()
 
     def __iter__(self):
         return self

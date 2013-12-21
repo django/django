@@ -1,6 +1,6 @@
+from django.core.apps.cache import AppCache
 from django.db import models
-from django.db.models.loading import BaseAppCache
-from django.db.models.options import DEFAULT_NAMES
+from django.db.models.options import DEFAULT_NAMES, normalize_unique_together
 from django.utils import six
 from django.utils.module_loading import import_by_path
 
@@ -32,7 +32,7 @@ class ProjectState(object):
     def render(self):
         "Turns the project state into actual models in a new AppCache"
         if self.app_cache is None:
-            self.app_cache = BaseAppCache()
+            self.app_cache = AppCache()
             # We keep trying to render the models in a loop, ignoring invalid
             # base errors, until the size of the unrendered models doesn't
             # decrease by at least one, meaning there's a base dependency loop/
@@ -99,11 +99,26 @@ class ModelState(object):
         for field in model._meta.local_fields:
             name, path, args, kwargs = field.deconstruct()
             field_class = import_by_path(path)
-            fields.append((name, field_class(*args, **kwargs)))
+            try:
+                fields.append((name, field_class(*args, **kwargs)))
+            except TypeError as e:
+                raise TypeError("Couldn't reconstruct field %s on %s.%s: %s" % (
+                    name,
+                    model._meta.app_label,
+                    model._meta.object_name,
+                    e,
+                ))
         for field in model._meta.local_many_to_many:
             name, path, args, kwargs = field.deconstruct()
             field_class = import_by_path(path)
-            fields.append((name, field_class(*args, **kwargs)))
+            try:
+                fields.append((name, field_class(*args, **kwargs)))
+            except TypeError as e:
+                raise TypeError("Couldn't reconstruct m2m field %s on %s: %s" % (
+                    name,
+                    model._meta.object_name,
+                    e,
+                ))
         # Extract the options
         options = {}
         for name in DEFAULT_NAMES:
@@ -112,7 +127,8 @@ class ModelState(object):
                 continue
             elif name in model._meta.original_attrs:
                 if name == "unique_together":
-                    options[name] = set(model._meta.original_attrs["unique_together"])
+                    ut = model._meta.original_attrs["unique_together"]
+                    options[name] = set(normalize_unique_together(ut))
                 else:
                     options[name] = model._meta.original_attrs[name]
         # Make our record
@@ -162,7 +178,7 @@ class ModelState(object):
             for base in self.bases
         )
         if None in bases:
-            raise InvalidBasesError("Cannot resolve one or more bases from %r" % self.bases)
+            raise InvalidBasesError("Cannot resolve one or more bases from %r" % (self.bases,))
         # Turn fields into a dict for the body, add other bits
         body = dict(self.fields)
         body['Meta'] = meta

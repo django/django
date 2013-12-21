@@ -173,7 +173,7 @@ class PrefetchRelatedTests(TestCase):
         with self.assertNumQueries(3):
             author = Author.objects.prefetch_related('books__read_by').get(name="Charlotte")
             lists = [[six.text_type(r) for r in b.read_by.all()]
-                      for b in author.books.all()]
+                     for b in author.books.all()]
             self.assertEqual(lists, [["Amy"], ["Belinda"]])  # Poems, Jane Eyre
 
     def test_foreign_key_then_m2m(self):
@@ -793,8 +793,7 @@ class NullableTest(TestCase):
                         for e in qs]
 
         qs2 = Employee.objects.select_related('boss')
-        co_serfs2 = [list(e.boss.serfs.all()) if e.boss is not None else []
-                        for e in qs2]
+        co_serfs2 = [list(e.boss.serfs.all()) if e.boss is not None else [] for e in qs2]
 
         self.assertEqual(co_serfs, co_serfs2)
 
@@ -806,8 +805,7 @@ class NullableTest(TestCase):
                         for e in qs]
 
         qs2 = Employee.objects.all()
-        co_serfs2 = [list(e.boss.serfs.all()) if e.boss is not None else []
-                        for e in qs2]
+        co_serfs2 = [list(e.boss.serfs.all()) if e.boss is not None else [] for e in qs2]
 
         self.assertEqual(co_serfs, co_serfs2)
 
@@ -865,10 +863,10 @@ class MultiDbTests(TestCase):
                                (author.name, ", ".join(b.title for b in author.books.all()))
                                for author in qs2])
         self.assertEqual(authors,
-                          "Charlotte: Poems, Jane Eyre\n"
-                          "Anne: Poems\n"
-                          "Emily: Poems, Wuthering Heights\n"
-                          "Jane: Sense and Sensibility\n")
+                         "Charlotte: Poems, Jane Eyre\n"
+                         "Anne: Poems\n"
+                         "Emily: Poems, Wuthering Heights\n"
+                         "Jane: Sense and Sensibility\n")
 
     def test_using_is_honored_fkey(self):
         B = Book.objects.using('other')

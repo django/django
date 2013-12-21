@@ -417,7 +417,7 @@ With these caveats in mind, you should be aware of:
 performance gains, typically for heavyweight applications.
 
 A key aim of the PyPy project is `compatibility
-<http:://pypy.org/compat.html>`_ with existing Python APIs and libraries.
+<http://pypy.org/compat.html>`_ with existing Python APIs and libraries.
 Django is compatible, but you will need to check the compatibility of other
 libraries you rely on.
 

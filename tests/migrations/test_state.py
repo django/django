@@ -1,7 +1,7 @@
-from django.test import TestCase
+from django.core.apps.cache import AppCache
 from django.db import models
-from django.db.models.loading import BaseAppCache
 from django.db.migrations.state import ProjectState, ModelState, InvalidBasesError
+from django.test import TestCase
 
 
 class StateTests(TestCase):
@@ -14,7 +14,7 @@ class StateTests(TestCase):
         Tests making a ProjectState from an AppCache
         """
 
-        new_app_cache = BaseAppCache()
+        new_app_cache = AppCache()
 
         class Author(models.Model):
             name = models.CharField(max_length=255)
@@ -55,7 +55,7 @@ class StateTests(TestCase):
         self.assertEqual(author_state.fields[1][1].max_length, 255)
         self.assertEqual(author_state.fields[2][1].null, False)
         self.assertEqual(author_state.fields[3][1].null, True)
-        self.assertEqual(author_state.options, {"unique_together": set(("name", "bio"))})
+        self.assertEqual(author_state.options, {"unique_together": {("name", "bio")}})
         self.assertEqual(author_state.bases, (models.Model, ))
 
         self.assertEqual(book_state.app_label, "migrations")
@@ -94,39 +94,65 @@ class StateTests(TestCase):
         self.assertEqual(new_app_cache.get_model("migrations", "Tag")._meta.get_field_by_name("name")[0].max_length, 100)
         self.assertEqual(new_app_cache.get_model("migrations", "Tag")._meta.get_field_by_name("hidden")[0].null, False)
 
-    def test_render_multiple_inheritance(self):
-        # Use a custom app cache to avoid polluting the global one.
-        new_app_cache = BaseAppCache()
-
+    def test_render_model_inheritance(self):
         class Book(models.Model):
             title = models.CharField(max_length=1000)
 
             class Meta:
                 app_label = "migrations"
-                app_cache = new_app_cache
+                app_cache = AppCache()
 
         class Novel(Book):
             class Meta:
                 app_label = "migrations"
-                app_cache = new_app_cache
+                app_cache = AppCache()
 
         # First, test rendering individually
-        yet_another_app_cache = BaseAppCache()
+        app_cache = AppCache()
 
         # We shouldn't be able to render yet
-        with self.assertRaises(ValueError):
-            ModelState.from_model(Novel).render(yet_another_app_cache)
+        ms = ModelState.from_model(Novel)
+        with self.assertRaises(InvalidBasesError):
+            ms.render(app_cache)
 
         # Once the parent model is in the app cache, it should be fine
-        ModelState.from_model(Book).render(yet_another_app_cache)
-        ModelState.from_model(Novel).render(yet_another_app_cache)
+        ModelState.from_model(Book).render(app_cache)
+        ModelState.from_model(Novel).render(app_cache)
+
+    def test_render_model_with_multiple_inheritance(self):
+        class Foo(models.Model):
+            class Meta:
+                app_label = "migrations"
+                app_cache = AppCache()
+
+        class Bar(models.Model):
+            class Meta:
+                app_label = "migrations"
+                app_cache = AppCache()
+
+        class FooBar(Foo, Bar):
+            class Meta:
+                app_label = "migrations"
+                app_cache = AppCache()
+
+        app_cache = AppCache()
+
+        # We shouldn't be able to render yet
+        ms = ModelState.from_model(FooBar)
+        with self.assertRaises(InvalidBasesError):
+            ms.render(app_cache)
+
+        # Once the parent models are in the app cache, it should be fine
+        ModelState.from_model(Foo).render(app_cache)
+        ModelState.from_model(Bar).render(app_cache)
+        ModelState.from_model(FooBar).render(app_cache)
 
     def test_render_project_dependencies(self):
         """
         Tests that the ProjectState render method correctly renders models
         to account for inter-model base dependencies.
         """
-        new_app_cache = BaseAppCache()
+        new_app_cache = AppCache()
 
         class A(models.Model):
             class Meta:

@@ -36,7 +36,8 @@ class M2MRegressionTests(TestCase):
         # The secret internal related names for self-referential many-to-many
         # fields shouldn't appear in the list when an error is made.
 
-        six.assertRaisesRegex(self, FieldError,
+        six.assertRaisesRegex(
+            self, FieldError,
             "Choices are: id, name, references, related, selfreferchild, selfreferchildsibling$",
             lambda: SelfRefer.objects.filter(porcupine='fred')
         )

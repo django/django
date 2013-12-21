@@ -62,7 +62,7 @@ class BaseTests(object):
             TEMPLATE_CONTEXT_PROCESSORS=global_settings.TEMPLATE_CONTEXT_PROCESSORS,
             MESSAGE_TAGS='',
             MESSAGE_STORAGE='%s.%s' % (self.storage_class.__module__,
-                                         self.storage_class.__name__),
+                                       self.storage_class.__name__),
             SESSION_SERIALIZER='django.contrib.sessions.serializers.JSONSerializer',
         )
         self.settings_override.enable()
@@ -164,8 +164,7 @@ class BaseTests(object):
             response = self.client.post(add_url, data, follow=True)
             self.assertRedirects(response, show_url)
             self.assertTrue('messages' in response.context)
-            messages = [Message(self.levels[level], msg) for msg in
-                                                         data['messages']]
+            messages = [Message(self.levels[level], msg) for msg in data['messages']]
             self.assertEqual(list(response.context['messages']), messages)
             for msg in data['messages']:
                 self.assertContains(response, msg)
@@ -209,8 +208,7 @@ class BaseTests(object):
         show_url = reverse('django.contrib.messages.tests.urls.show')
         messages = []
         for level in ('debug', 'info', 'success', 'warning', 'error'):
-            messages.extend([Message(self.levels[level], msg) for msg in
-                                                             data['messages']])
+            messages.extend([Message(self.levels[level], msg) for msg in data['messages']])
             add_url = reverse('django.contrib.messages.tests.urls.add',
                               args=(level,))
             self.client.post(add_url, data)
@@ -285,7 +283,7 @@ class BaseTests(object):
     def get_existing_storage(self):
         return self.get_storage([Message(constants.INFO, 'Test message 1'),
                                  Message(constants.INFO, 'Test message 2',
-                                              extra_tags='tag')])
+                                 extra_tags='tag')])
 
     def test_existing_read(self):
         """

@@ -20,11 +20,11 @@ class GeoFeedTest(TestCase):
 
     def setUp(self):
         Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
-        self.old_Site_meta_installed = Site._meta.installed
-        Site._meta.installed = True
+        self._old_installed = Site._meta.app_config.installed
+        Site._meta.app_config.installed = True
 
     def tearDown(self):
-        Site._meta.installed = self.old_Site_meta_installed
+        Site._meta.app_config.installed = self._old_installed
 
     def assertChildNodes(self, elem, expected):
         "Taken from syndication/tests.py."

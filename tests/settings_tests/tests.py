@@ -227,13 +227,13 @@ class TestComplexSettingOverride(TestCase):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
 
-            override = override_settings(TEST_WARN='override')
-            override.enable()
-            self.assertEqual('override', settings.TEST_WARN)
-            override.disable()
+            with override_settings(TEST_WARN='override'):
+                self.assertEqual(settings.TEST_WARN, 'override')
 
             self.assertEqual(len(w), 1)
-            self.assertEqual('Overriding setting TEST_WARN can lead to unexpected behaviour.', str(w[-1].message))
+            self.assertEqual(w[0].filename, __file__)
+            self.assertEqual(str(w[0].message),
+                'Overriding setting TEST_WARN can lead to unexpected behaviour.')
 
 
 class UniqueSettingsTests(TestCase):

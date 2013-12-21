@@ -1,4 +1,5 @@
 from django.db import router
+from django.db.models.fields import NOT_PROVIDED
 from .base import Operation
 
 
@@ -7,13 +8,20 @@ class AddField(Operation):
     Adds a field to a model.
     """
 
-    def __init__(self, model_name, name, field):
+    def __init__(self, model_name, name, field, preserve_default=True):
         self.model_name = model_name
         self.name = name
         self.field = field
+        self.preserve_default = preserve_default
 
     def state_forwards(self, app_label, state):
-        state.models[app_label, self.model_name.lower()].fields.append((self.name, self.field))
+        # If preserve default is off, don't use the default for future state
+        if not self.preserve_default:
+            field = self.field.clone()
+            field.default = NOT_PROVIDED
+        else:
+            field = self.field
+        state.models[app_label, self.model_name.lower()].fields.append((self.name, field))
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.render().get_model(app_label, self.model_name)

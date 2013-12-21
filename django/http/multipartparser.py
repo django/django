@@ -259,10 +259,9 @@ class MultiPartParser(object):
             file_obj = handler.file_complete(counters[i])
             if file_obj:
                 # If it returns a file object, then set the files dict.
-                self._files.appendlist(force_text(old_field_name,
-                                                     self._encoding,
-                                                     errors='replace'),
-                                       file_obj)
+                self._files.appendlist(
+                    force_text(old_field_name, self._encoding, errors='replace'),
+                    file_obj)
                 break
 
     def IE_sanitize(self, filename):

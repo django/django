@@ -13,7 +13,7 @@ There are two ways to use Gunicorn with Django. One is to have Gunicorn treat
 Django as just another WSGI application. The second is to use Gunicorn's
 special `integration with Django`_.
 
-.. _integration with Django: http://gunicorn.org/run.html#django-manage-py
+.. _integration with Django: http://docs.gunicorn.org/en/latest/run.html#django-manage-py
 
 Installing Gunicorn
 ===================

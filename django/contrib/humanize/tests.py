@@ -28,7 +28,7 @@ now = datetime.datetime(2012, 3, 9, 22, 30)
 
 class MockDateTime(datetime.datetime):
     @classmethod
-    def now(self, tz=None):
+    def now(cls, tz=None):
         if tz is None or tz.utcoffset(now) is None:
             return now
         else:

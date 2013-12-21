@@ -1,8 +1,7 @@
 from __future__ import unicode_literals
-import copy
 
+from django.core.apps import app_cache
 from django.db import models
-from django.db.models.loading import cache
 from django.template import Context, Template
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -110,13 +109,11 @@ class ManagersRegressionTests(TestCase):
 
     @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
     def test_swappable_manager(self):
-        try:
-            # This test adds dummy models to the app cache. These
-            # need to be removed in order to prevent bad interactions
-            # with the flush operation in other tests.
-            old_app_models = copy.deepcopy(cache.app_models)
-            old_app_store = copy.deepcopy(cache.app_store)
+        # The models need to be removed after the test in order to prevent bad
+        # interactions with the flush operation in other tests.
+        _old_models = app_cache.app_configs['managers_regress'].models.copy()
 
+        try:
             class SwappableModel(models.Model):
                 class Meta:
                     swappable = 'TEST_SWAPPABLE_MODEL'
@@ -130,18 +127,16 @@ class ManagersRegressionTests(TestCase):
                 self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
 
         finally:
-            cache.app_models = old_app_models
-            cache.app_store = old_app_store
+            app_cache.app_configs['managers_regress'].models = _old_models
+            app_cache._get_models_cache = {}
 
     @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
     def test_custom_swappable_manager(self):
-        try:
-            # This test adds dummy models to the app cache. These
-            # need to be removed in order to prevent bad interactions
-            # with the flush operation in other tests.
-            old_app_models = copy.deepcopy(cache.app_models)
-            old_app_store = copy.deepcopy(cache.app_store)
+        # The models need to be removed after the test in order to prevent bad
+        # interactions with the flush operation in other tests.
+        _old_models = app_cache.app_configs['managers_regress'].models.copy()
 
+        try:
             class SwappableModel(models.Model):
 
                 stuff = models.Manager()
@@ -159,18 +154,16 @@ class ManagersRegressionTests(TestCase):
                 self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
 
         finally:
-            cache.app_models = old_app_models
-            cache.app_store = old_app_store
+            app_cache.app_configs['managers_regress'].models = _old_models
+            app_cache._get_models_cache = {}
 
     @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
     def test_explicit_swappable_manager(self):
-        try:
-            # This test adds dummy models to the app cache. These
-            # need to be removed in order to prevent bad interactions
-            # with the flush operation in other tests.
-            old_app_models = copy.deepcopy(cache.app_models)
-            old_app_store = copy.deepcopy(cache.app_store)
+        # The models need to be removed after the test in order to prevent bad
+        # interactions with the flush operation in other tests.
+        _old_models = app_cache.app_configs['managers_regress'].models.copy()
 
+        try:
             class SwappableModel(models.Model):
 
                 objects = models.Manager()
@@ -188,8 +181,8 @@ class ManagersRegressionTests(TestCase):
                 self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
 
         finally:
-            cache.app_models = old_app_models
-            cache.app_store = old_app_store
+            app_cache.app_configs['managers_regress'].models = _old_models
+            app_cache._get_models_cache = {}
 
     def test_regress_3871(self):
         related = RelatedModel.objects.create()

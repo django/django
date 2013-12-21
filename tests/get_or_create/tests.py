@@ -45,14 +45,16 @@ class GetOrCreateTests(TestCase):
 
         # If you don't specify a value or default value for all required
         # fields, you will get an error.
-        self.assertRaises(IntegrityError,
+        self.assertRaises(
+            IntegrityError,
             Person.objects.get_or_create, first_name="Tom", last_name="Smith"
         )
 
         # If you specify an existing primary key, but different other fields,
         # then you will get an error and data will not be updated.
         ManualPrimaryKeyTest.objects.create(id=1, data="Original")
-        self.assertRaises(IntegrityError,
+        self.assertRaises(
+            IntegrityError,
             ManualPrimaryKeyTest.objects.get_or_create, id=1, data="Different"
         )
         self.assertEqual(ManualPrimaryKeyTest.objects.get(id=1).data, "Original")
@@ -181,7 +183,8 @@ class UpdateOrCreateTests(TestCase):
         # If you specify an existing primary key, but different other fields,
         # then you will get an error and data will not be updated.
         ManualPrimaryKeyTest.objects.create(id=1, data="Original")
-        self.assertRaises(IntegrityError,
+        self.assertRaises(
+            IntegrityError,
             ManualPrimaryKeyTest.objects.update_or_create, id=1, data="Different"
         )
         self.assertEqual(ManualPrimaryKeyTest.objects.get(id=1).data, "Original")

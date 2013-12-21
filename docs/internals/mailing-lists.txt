@@ -31,7 +31,7 @@ installation, usage, or debugging of Django.
 * `django-users subscription email address`_
 * `django-users posting email`_
 
-.. _django-users mailing archive: http://groups.google.com/group/django-users/
+.. _django-users mailing archive: https://groups.google.com/d/forum/django-users
 .. _django-users subscription email address: mailto:django-users+subscribe@googlegroups.com
 .. _django-users posting email: mailto:django-users@googlegroups.com
 
@@ -48,7 +48,7 @@ Django development.
 * `django-core-mentorship subscription email address`_
 * `django-core-mentorship posting email`_
 
-.. _django-core-mentorship mailing archive: http://groups.google.com/group/django-core-mentorship/
+.. _django-core-mentorship mailing archive: https://groups.google.com/d/forum/django-core-mentorship
 .. _django-core-mentorship subscription email address: mailto:django-core-mentorship+subscribe@googlegroups.com
 .. _django-core-mentorship posting email: mailto:django-core-mentorship@googlegroups.com
 
@@ -69,7 +69,7 @@ The discussion about the development of Django itself takes place here.
 * `django-developers subscription email address`_
 * `django-developers posting email`_
 
-.. _django-developers mailing archive: http://groups.google.com/group/django-developers/
+.. _django-developers mailing archive: https://groups.google.com/d/forum/django-developers
 .. _django-developers subscription email address: mailto:django-developers+subscribe@googlegroups.com
 .. _django-developers posting email: mailto:django-developers@googlegroups.com
 
@@ -85,7 +85,7 @@ bugfixes.
 * `django-announce subscription email address`_
 * `django-announce posting email`_
 
-.. _django-announce mailing archive: http://groups.google.com/group/django-announce/
+.. _django-announce mailing archive: https://groups.google.com/d/forum/django-announce
 .. _django-announce subscription email address: mailto:django-announce+subscribe@googlegroups.com
 .. _django-announce posting email: mailto:django-announce@googlegroups.com
 
@@ -101,6 +101,6 @@ by developers and interested community members.
 * `django-updates subscription email address`_
 * `django-updates posting email`_
 
-.. _django-updates mailing archive: http://groups.google.com/group/django-updates/
+.. _django-updates mailing archive: https://groups.google.com/d/forum/django-updates
 .. _django-updates subscription email address: mailto:django-updates+subscribe@googlegroups.com
 .. _django-updates posting email: mailto:django-updates@googlegroups.com
