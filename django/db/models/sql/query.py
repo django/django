@@ -1082,26 +1082,27 @@ class Query(object):
 
     def build_lookup(self, lookups, lhs, rhs):
         lookups = lookups[:]
-        lookups.reverse()
         while lookups:
-            lookup = lookups.pop()
+            lookup = lookups[0]
             next = lhs.get_lookup(lookup)
             if next:
-                if not lookups:
+                if len(lookups) == 1:
                     # This was the last lookup, so return value lookup.
                     if issubclass(next, Extract):
-                        lhs = next(lhs)
-                        next = lhs.get_lookup('exact')
-                    return next(lhs, rhs)
+                        lookups.append('exact')
+                        lhs = next(lhs, lookups)
+                    else:
+                        return next(lhs, rhs)
                 else:
-                    lhs = next(lhs)
+                    lhs = next(lhs, lookups)
             # A field's get_lookup() can return None to opt for backwards
             # compatibility path.
-            elif len(lookups) > 1:
+            elif len(lookups) > 2:
                 raise FieldError(
                     "Unsupported lookup for field '%s'" % lhs.output_type.name)
             else:
                 return None
+            lookups = lookups[1:]
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
                      can_reuse=None, connector=AND):

@@ -6,8 +6,9 @@ from django.utils.functional import cached_property
 
 
 class Extract(object):
-    def __init__(self, lhs):
+    def __init__(self, lhs, lookups):
         self.lhs = lhs
+        self.init_lookups = lookups[:]
 
     def get_lookup(self, lookup):
         return self.output_type.get_lookup(lookup)
