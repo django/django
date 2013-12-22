@@ -1,3 +1,4 @@
+import os
 import unittest
 import warnings
 
@@ -231,7 +232,9 @@ class TestComplexSettingOverride(TestCase):
                 self.assertEqual(settings.TEST_WARN, 'override')
 
             self.assertEqual(len(w), 1)
-            self.assertEqual(w[0].filename, __file__)
+            # File extension may by .py, .pyc, etc. Compare only basename.
+            self.assertEqual(os.path.splitext(w[0].filename)[0],
+                             os.path.splitext(__file__)[0])
             self.assertEqual(str(w[0].message),
                 'Overriding setting TEST_WARN can lead to unexpected behaviour.')
 
