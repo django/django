@@ -181,7 +181,8 @@ skip_selenium = not os.environ.get('DJANGO_SELENIUM_TESTS', False)
 @unittest.skipUnless(firefox, 'Selenium not installed')
 class JavascriptI18nTests(LiveServerTestCase):
 
-    available_apps = []
+    # The test cases use translations from these apps.
+    available_apps = ['django.contrib.admin', 'view_tests']
     urls = 'view_tests.urls'
 
     @classmethod
