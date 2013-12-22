@@ -130,6 +130,10 @@ class JsI18NTests(TestCase):
             response = self.client.get('/views/jsi18n/')
             self.assertContains(response, 'Choisir une heure')
 
+    def test_escaping(self):
+        # Force a language via GET otherwise the gettext functions are a noop!
+        response = self.client.get('/views/jsi18n_admin/?language=de')
+        self.assertContains(response, '\\x04')
 
 class JsI18NTestsMultiPackage(TestCase):
     """
@@ -207,8 +211,3 @@ class JavascriptI18nTests(LiveServerTestCase):
         self.assertEqual(elem.text, "1 Resultat")
         elem = self.selenium.find_element_by_id("npgettext_plur")
         self.assertEqual(elem.text, "455 Resultate")
-
-    def test_escaping(self):
-        # Force a language via GET otherwise the gettext functions are a noop!
-        response = self.client.get('/jsi18n_admin/?language=de')
-        self.assertContains(response, '\\x04')
