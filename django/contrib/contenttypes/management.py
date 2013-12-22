@@ -1,4 +1,4 @@
-from django.apps import app_cache, UnavailableApp
+from django.apps import app_cache
 from django.contrib.contenttypes.models import ContentType
 from django.db import DEFAULT_DB_ALIAS, router
 from django.db.models import signals
@@ -12,9 +12,7 @@ def update_contenttypes(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, *
     Creates content types for models in the given app, removing any model
     entries that no longer have a matching model class.
     """
-    try:
-        app_cache.get_model('contenttypes', 'ContentType')
-    except UnavailableApp:
+    if app_cache.get_model('contenttypes', 'ContentType') is None:
         return
 
     if not router.allow_migrate(db, ContentType):

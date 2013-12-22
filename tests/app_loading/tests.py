@@ -3,11 +3,8 @@ from __future__ import unicode_literals
 import os
 import sys
 from unittest import TestCase
-import warnings
 
 from django.apps import app_cache
-from django.apps.cache import AppCache
-from django.test.utils import override_settings
 from django.utils._os import upath
 from django.utils import six
 
@@ -68,23 +65,6 @@ class EggLoadingTest(TestCase):
         with six.assertRaisesRegex(self, ImportError, 'modelz'):
             with app_cache._with_app('broken_app'):
                 app_cache.get_app_config('omelet.app_no_models').models_module
-
-    def test_missing_app(self):
-        """
-        Test that repeated app loading doesn't succeed in case there is an
-        error. Refs #17667.
-        """
-        app_cache = AppCache()
-        # Pretend we're the master app cache to test the population process.
-        app_cache._apps_loaded = False
-        app_cache._models_loaded = False
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", "Overriding setting INSTALLED_APPS")
-            with override_settings(INSTALLED_APPS=['notexists']):
-                with self.assertRaises(ImportError):
-                    app_cache.get_model('notexists', 'nomodel')
-                with self.assertRaises(ImportError):
-                    app_cache.get_model('notexists', 'nomodel')
 
 
 class GetModelsTest(TestCase):

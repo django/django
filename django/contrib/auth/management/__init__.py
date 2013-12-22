@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import getpass
 import unicodedata
 
-from django.apps import app_cache, UnavailableApp
+from django.apps import app_cache
 from django.contrib.auth import (models as auth_app, get_permission_codename,
     get_user_model)
 from django.core import exceptions
@@ -61,9 +61,7 @@ def _check_permission_clashing(custom, builtin, ctype):
 
 
 def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kwargs):
-    try:
-        app_cache.get_model('auth', 'Permission')
-    except UnavailableApp:
+    if app_cache.get_model('auth', 'Permission') is None:
         return
 
     if not router.allow_migrate(db, auth_app.Permission):
@@ -119,11 +117,10 @@ def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kw
 
 
 def create_superuser(app, created_models, verbosity, db, **kwargs):
-    try:
-        app_cache.get_model('auth', 'Permission')
-        UserModel = get_user_model()
-    except UnavailableApp:
+    if app_cache.get_model('auth', 'Permission') is None:
         return
+
+    UserModel = get_user_model()
 
     from django.core.management import call_command
 

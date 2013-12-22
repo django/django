@@ -9,6 +9,7 @@ import warnings
 from functools import wraps
 from xml.dom.minidom import parseString, Node
 
+from django.apps import app_cache
 from django.conf import settings, UserSettingsHolder
 from django.core import mail
 from django.core.signals import request_started
@@ -190,6 +191,8 @@ class override_settings(object):
     """
     def __init__(self, **kwargs):
         self.options = kwargs
+        # Special case that requires updating the app cache, a core feature.
+        self.installed_apps = self.options.get('INSTALLED_APPS')
 
     def __enter__(self):
         self.enable()
@@ -223,6 +226,8 @@ class override_settings(object):
             setattr(override, key, new_value)
         self.wrapped = settings._wrapped
         settings._wrapped = override
+        if self.installed_apps is not None:
+            app_cache.set_installed_apps(self.installed_apps)
         for key, new_value in self.options.items():
             setting_changed.send(sender=settings._wrapped.__class__,
                                  setting=key, value=new_value, enter=True)
@@ -230,6 +235,8 @@ class override_settings(object):
     def disable(self):
         settings._wrapped = self.wrapped
         del self.wrapped
+        if self.installed_apps is not None:
+            app_cache.unset_installed_apps()
         for key in self.options:
             new_value = getattr(settings, key, None)
             setting_changed.send(sender=settings._wrapped.__class__,

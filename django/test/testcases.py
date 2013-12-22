@@ -30,7 +30,7 @@ from django.forms.fields import CharField
 from django.http import QueryDict
 from django.test.client import Client
 from django.test.html import HTMLParseError, parse_html
-from django.test.signals import template_rendered
+from django.test.signals import setting_changed, template_rendered
 from django.test.utils import (CaptureQueriesContext, ContextList,
     override_settings, compare_xml)
 from django.utils.encoding import force_text
@@ -726,6 +726,10 @@ class TransactionTestCase(SimpleTestCase):
         super(TransactionTestCase, self)._pre_setup()
         if self.available_apps is not None:
             app_cache.set_available_apps(self.available_apps)
+            setting_changed.send(sender=settings._wrapped.__class__,
+                                 setting='INSTALLED_APPS',
+                                 value=self.available_apps,
+                                 enter=True)
             for db_name in self._databases_names(include_mirrors=False):
                 flush.Command.emit_post_migrate(verbosity=0, interactive=False, database=db_name)
         try:
@@ -733,6 +737,11 @@ class TransactionTestCase(SimpleTestCase):
         except Exception:
             if self.available_apps is not None:
                 app_cache.unset_available_apps()
+                setting_changed.send(sender=settings._wrapped.__class__,
+                                     setting='INSTALLED_APPS',
+                                     value=settings.INSTALLED_APPS,
+                                     enter=False)
+
             raise
 
     def _databases_names(self, include_mirrors=True):
@@ -786,7 +795,12 @@ class TransactionTestCase(SimpleTestCase):
             for conn in connections.all():
                 conn.close()
         finally:
-            app_cache.unset_available_apps()
+            if self.available_apps is not None:
+                app_cache.unset_available_apps()
+                setting_changed.send(sender=settings._wrapped.__class__,
+                                     setting='INSTALLED_APPS',
+                                     value=settings.INSTALLED_APPS,
+                                     enter=False)
 
     def _fixture_teardown(self):
         # Allow TRUNCATE ... CASCADE and don't emit the post_migrate signal
