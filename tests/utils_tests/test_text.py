@@ -120,6 +120,20 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(normalized, "abc\ndef\nghi\n")
         self.assertIsInstance(normalized, six.text_type)
 
+    def test_recapitalize(self):
+        self.assertEqual(text.recapitalize(
+                         "first sentence. SECOND SENTENCE? tHiRd SeNtEnCe, "
+                         "and it is still third sentence! FOURTH sentence."),
+                         "First sentence. Second sentence? Third sentence, "
+                         "and it is still third sentence! Fourth sentence.")
+        self.assertEqual(text.recapitalize(
+                         "\r\nfirst sentence.  second.sentence?\n"
+                         "tHiRd;SeNtEnCe, and it is still third sentence!"
+                         "\tFOURTH sentence."),
+                         "\r\nFirst sentence.  Second.sentence?\n"
+                         "Third;sentence, and it is still third sentence!"
+                         "\tFourth sentence.")
+
     def test_slugify(self):
         items = (
             ('Hello, World!', 'hello-world'),
