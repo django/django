@@ -227,7 +227,7 @@ class BaseDatabaseSchemaEditor(object):
             })
         # Make the table
         sql = self.sql_create_table % {
-            "table": model._meta.db_table,
+            "table": self.quote_name(model._meta.db_table),
             "definition": ", ".join(column_sqls)
         }
         self.execute(sql, params)

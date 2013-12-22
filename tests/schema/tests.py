@@ -3,13 +3,13 @@ import datetime
 import unittest
 
 from django.test import TransactionTestCase
-from django.db import connection, DatabaseError, IntegrityError
+from django.db import connection, DatabaseError, IntegrityError, OperationalError
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.transaction import atomic
 from .models import (Author, AuthorWithM2M, Book, BookWithLongName,
     BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
-    UniqueTest)
+    UniqueTest, Thing)
 
 
 class SchemaTests(TransactionTestCase):
@@ -26,6 +26,7 @@ class SchemaTests(TransactionTestCase):
     models = [
         Author, AuthorWithM2M, Book, BookWithLongName, BookWithSlug,
         BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest,
+        Thing
     ]
 
     # Utility functions
@@ -682,4 +683,27 @@ class SchemaTests(TransactionTestCase):
         self.assertIn(
             column_name,
             connection.introspection.get_indexes(connection.cursor(), BookWithLongName._meta.db_table),
+        )
+
+    def test_creation_deletion_reserved_names(self):
+        """
+        Tries creating a model's table, and then deleting it when it has a
+        SQL reserved name.
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            try:
+                editor.create_model(Thing)
+            except OperationalError as e:
+                self.fail("Errors when applying initial migration for a model "
+                          "with a table named after a SQL reserved word: %s" % e)
+        # Check that it's there
+        list(Thing.objects.all())
+        # Clean up that table
+        with connection.schema_editor() as editor:
+            editor.delete_model(Thing)
+        # Check that it's gone
+        self.assertRaises(
+            DatabaseError,
+            lambda: list(Thing.objects.all()),
         )
