@@ -308,7 +308,7 @@ class AppCache(object):
         is being populated. It returns None for apps that aren't loaded yet.
         """
         app_config = self.app_configs.get(app_name.rpartition(".")[2])
-        return app_config is not None and app_config.name == app_name:
+        return app_config is not None and app_config.name == app_name
 
     def get_registered_model(self, app_label, model_name):
         """
