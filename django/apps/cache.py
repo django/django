@@ -310,7 +310,7 @@ class AppCache(object):
         app_config = self.app_configs.get(app_name.rpartition(".")[2])
         return app_config is not None and app_config.name == app_name:
 
-    def has_model(self, app_label, model_name):
+    def get_registered_model(self, app_label, model_name):
         """
         Returns the model class if one is registered and None otherwise.
 

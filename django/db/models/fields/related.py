@@ -68,7 +68,7 @@ def add_lazy_relation(cls, field, relation, operation):
     # string right away. If get_model returns None, it means that the related
     # model isn't loaded yet, so we need to pend the relation until the class
     # is prepared.
-    model = cls._meta.app_cache.has_model(app_label, model_name)
+    model = cls._meta.app_cache.get_registered_model(app_label, model_name)
     if model:
         operation(field, model, cls)
     else:
