@@ -25,6 +25,7 @@ capfirst = allow_lazy(capfirst, six.text_type)
 re_words = re.compile(r'<.*?>|((?:\w[-\w]*|&.*?;)+)', re.U | re.S)
 re_tag = re.compile(r'<(/)?([^ ]+?)(?:(\s*/)| .*?)?>', re.S)
 re_newlines = re.compile(r'\r\n|\r')  # Used in normalize_newlines
+re_caps = re.compile(r'(?:^|(?<=[\.\?\!]))(^\s*|\s+)([a-z])')
 
 
 def wrap(text, width):
@@ -259,8 +260,7 @@ normalize_newlines = allow_lazy(normalize_newlines, six.text_type)
 def recapitalize(text):
     """Recapitalizes text, placing caps after end-of-sentence punctuation."""
     text = force_text(text).lower()
-    capsRE = re.compile(r'(?:^|(?<=[\.\?\!] ))([a-z])')
-    text = capsRE.sub(lambda x: x.group(1).upper(), text)
+    text = re_caps.sub(lambda x: x.group(1) + x.group(2).upper(), text)
     return text
 recapitalize = allow_lazy(recapitalize)
 
