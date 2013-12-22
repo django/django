@@ -15,9 +15,9 @@ import unittest
 from unittest import skipIf         # NOQA: Imported here for backward compatibility
 from unittest.util import safe_repr
 
+from django.apps import app_cache
 from django.conf import settings
 from django.core import mail
-from django.core.apps import app_cache
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.core.handlers.wsgi import get_path_info, WSGIHandler
 from django.core.management import call_command

@@ -5,8 +5,8 @@ import re
 from bisect import bisect
 import warnings
 
+from django.apps import app_cache
 from django.conf import settings
-from django.core.apps import app_cache
 from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
@@ -93,12 +93,12 @@ class Options(object):
 
     @property
     def app_config(self):
-        # Don't go through get_app_config to avoid triggering populate().
-        return self.app_cache.app_configs[self.app_label]
+        # Don't go through get_app_config to avoid triggering imports.
+        return self.app_cache.app_configs.get(self.app_label)
 
     @property
     def installed(self):
-        return self.app_config.installed
+        return self.app_config is not None
 
     def contribute_to_class(self, cls, name):
         from django.db import connection

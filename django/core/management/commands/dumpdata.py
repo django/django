@@ -37,7 +37,7 @@ class Command(BaseCommand):
     args = '[appname appname.ModelName ...]'
 
     def handle(self, *app_labels, **options):
-        from django.core.apps import app_cache
+        from django.apps import app_cache
 
         format = options.get('format')
         indent = options.get('indent')
@@ -162,7 +162,7 @@ def sort_dependencies(app_list):
     is serialized before a normal model, and any model with a natural key
     dependency has it's dependencies serialized first.
     """
-    from django.core.apps import app_cache
+    from django.apps import app_cache
     # Process the list of models, and get the list of dependencies
     model_dependencies = []
     models = set()

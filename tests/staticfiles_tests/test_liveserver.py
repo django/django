@@ -86,6 +86,9 @@ class StaticLiveServerChecks(LiveServerBase):
 
 class StaticLiveServerView(LiveServerBase):
 
+    # The test is going to access a static file stored in this application.
+    available_apps = ['staticfiles_tests.apps.test']
+
     def urlopen(self, url):
         return urlopen(self.live_server_url + url)
 

@@ -5,7 +5,7 @@ from importlib import import_module
 import os
 import types
 
-from django.core.apps import app_cache
+from django.apps import app_cache
 from django.db import models
 from django.db.migrations.loader import MigrationLoader
 from django.utils.encoding import force_text

@@ -3,11 +3,13 @@ from __future__ import unicode_literals
 import os
 import sys
 from unittest import TestCase
+import warnings
 
-from django.core.apps import app_cache
-from django.core.apps.cache import AppCache
+from django.apps import app_cache
+from django.apps.cache import AppCache
 from django.test.utils import override_settings
 from django.utils._os import upath
+from django.utils import six
 
 
 class EggLoadingTest(TestCase):
@@ -22,6 +24,7 @@ class EggLoadingTest(TestCase):
 
     def tearDown(self):
         app_cache.app_configs['app_loading'].models = self._old_models
+        app_cache.all_models['app_loading'] = self._old_models
         app_cache._get_models_cache = {}
 
         sys.path = self.old_path
@@ -30,45 +33,41 @@ class EggLoadingTest(TestCase):
         """Models module can be loaded from an app in an egg"""
         egg_name = '%s/modelapp.egg' % self.egg_dir
         sys.path.append(egg_name)
-        models = app_cache.load_app('app_with_models')
-        self.assertFalse(models is None)
+        with app_cache._with_app('app_with_models'):
+            models_module = app_cache.get_app_config('app_with_models').models_module
+            self.assertIsNotNone(models_module)
 
     def test_egg2(self):
         """Loading an app from an egg that has no models returns no models (and no error)"""
         egg_name = '%s/nomodelapp.egg' % self.egg_dir
         sys.path.append(egg_name)
-        models = app_cache.load_app('app_no_models')
-        self.assertTrue(models is None)
+        with app_cache._with_app('app_no_models'):
+            models_module = app_cache.get_app_config('app_no_models').models_module
+            self.assertIsNone(models_module)
 
     def test_egg3(self):
         """Models module can be loaded from an app located under an egg's top-level package"""
         egg_name = '%s/omelet.egg' % self.egg_dir
         sys.path.append(egg_name)
-        models = app_cache.load_app('omelet.app_with_models')
-        self.assertFalse(models is None)
+        with app_cache._with_app('omelet.app_with_models'):
+            models_module = app_cache.get_app_config('app_with_models').models_module
+            self.assertIsNotNone(models_module)
 
     def test_egg4(self):
         """Loading an app with no models from under the top-level egg package generates no error"""
         egg_name = '%s/omelet.egg' % self.egg_dir
         sys.path.append(egg_name)
-        models = app_cache.load_app('omelet.app_no_models')
-        self.assertTrue(models is None)
+        with app_cache._with_app('omelet.app_no_models'):
+            models_module = app_cache.get_app_config('app_no_models').models_module
+            self.assertIsNone(models_module)
 
     def test_egg5(self):
         """Loading an app from an egg that has an import error in its models module raises that error"""
         egg_name = '%s/brokenapp.egg' % self.egg_dir
         sys.path.append(egg_name)
-        self.assertRaises(ImportError, app_cache.load_app, 'broken_app')
-        raised = None
-        try:
-            app_cache.load_app('broken_app')
-        except ImportError as e:
-            raised = e
-
-        # Make sure the message is indicating the actual
-        # problem in the broken app.
-        self.assertTrue(raised is not None)
-        self.assertTrue("modelz" in raised.args[0])
+        with six.assertRaisesRegex(self, ImportError, 'modelz'):
+            with app_cache._with_app('broken_app'):
+                app_cache.get_app_config('omelet.app_no_models').models_module
 
     def test_missing_app(self):
         """
@@ -76,13 +75,16 @@ class EggLoadingTest(TestCase):
         error. Refs #17667.
         """
         app_cache = AppCache()
-        # Pretend we're the master app cache to test populate().
-        app_cache.master = True
-        with override_settings(INSTALLED_APPS=('notexists',)):
-            with self.assertRaises(ImportError):
-                app_cache.get_model('notexists', 'nomodel', seed_cache=True)
-            with self.assertRaises(ImportError):
-                app_cache.get_model('notexists', 'nomodel', seed_cache=True)
+        # Pretend we're the master app cache to test the population process.
+        app_cache._apps_loaded = False
+        app_cache._models_loaded = False
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "Overriding setting INSTALLED_APPS")
+            with override_settings(INSTALLED_APPS=['notexists']):
+                with self.assertRaises(ImportError):
+                    app_cache.get_model('notexists', 'nomodel')
+                with self.assertRaises(ImportError):
+                    app_cache.get_model('notexists', 'nomodel')
 
 
 class GetModelsTest(TestCase):
@@ -101,17 +103,17 @@ class GetModelsTest(TestCase):
             self.not_installed_module.NotInstalledModel)
 
     def test_get_models_only_returns_installed_models(self):
-        self.assertFalse(
-            "NotInstalledModel" in
+        self.assertNotIn(
+            "NotInstalledModel",
             [m.__name__ for m in app_cache.get_models()])
 
     def test_get_models_with_app_label_only_returns_installed_models(self):
         self.assertEqual(app_cache.get_models(self.not_installed_module), [])
 
     def test_get_models_with_not_installed(self):
-        self.assertTrue(
-            "NotInstalledModel" in [
-                m.__name__ for m in app_cache.get_models(only_installed=False)])
+        self.assertIn(
+            "NotInstalledModel",
+            [m.__name__ for m in app_cache.get_models(only_installed=False)])
 
 
 class NotInstalledModelsTest(TestCase):

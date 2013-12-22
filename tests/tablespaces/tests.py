@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
+from django.apps import app_cache
 from django.conf import settings
-from django.core.apps import app_cache
 from django.db import connection
 from django.core.management.color import no_style
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
@@ -36,6 +36,7 @@ class TablespacesTests(TestCase):
             model._meta.managed = False
 
         app_cache.app_configs['tablespaces'].models = self._old_models
+        app_cache.all_models['tablespaces'] = self._old_models
         app_cache._get_models_cache = {}
 
     def assertNumContains(self, haystack, needle, count):

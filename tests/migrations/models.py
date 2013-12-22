@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.core.apps.cache import AppCache
+from django.apps.cache import AppCache
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 

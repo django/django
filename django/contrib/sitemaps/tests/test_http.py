@@ -4,6 +4,7 @@ import os
 from datetime import date
 from unittest import skipUnless
 
+from django.apps import app_cache
 from django.conf import settings
 from django.contrib.sitemaps import Sitemap, GenericSitemap
 from django.contrib.sites.models import Site
@@ -108,17 +109,16 @@ class HTTPSitemapTests(SitemapTestsBase):
     def test_requestsite_sitemap(self):
         # Make sure hitting the flatpages sitemap without the sites framework
         # installed doesn't raise an exception.
-        # Reset by SitemapTestsBase.tearDown().
-        Site._meta.app_config.installed = False
-        response = self.client.get('/simple/sitemap.xml')
-        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
+        with app_cache._without_app('django.contrib.sites'):
+            response = self.client.get('/simple/sitemap.xml')
+            expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>http://testserver/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """ % date.today()
-        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+            self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
-    @skipUnless("django.contrib.sites" in settings.INSTALLED_APPS,
+    @skipUnless(app_cache.has_app('django.contrib.sites'),
                 "django.contrib.sites app not installed.")
     def test_sitemap_get_urls_no_site_1(self):
         """
@@ -134,9 +134,8 @@ class HTTPSitemapTests(SitemapTestsBase):
         Sitemap.get_urls if Site objects exists, but the sites framework is not
         actually installed.
         """
-        # Reset by SitemapTestsBase.tearDown().
-        Site._meta.app_config.installed = False
-        self.assertRaises(ImproperlyConfigured, Sitemap().get_urls)
+        with app_cache._without_app('django.contrib.sites'):
+            self.assertRaises(ImproperlyConfigured, Sitemap().get_urls)
 
     def test_sitemap_item(self):
         """

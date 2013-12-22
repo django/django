@@ -5,7 +5,7 @@ import codecs
 import os
 import shutil
 
-from django.core.apps import app_cache
+from django.apps import app_cache
 from django.core.management import call_command, CommandError
 from django.test.utils import override_settings
 from django.utils import six
@@ -135,6 +135,7 @@ class MakeMigrationsTests(MigrationTestBase):
 
     def tearDown(self):
         app_cache.app_configs['migrations'].models = self._old_models
+        app_cache.all_models['migrations'] = self._old_models
         app_cache._get_models_cache = {}
 
         os.chdir(self.test_dir)

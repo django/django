@@ -2,7 +2,7 @@ import importlib
 import os
 import sys
 
-from django.core.apps import app_cache
+from django.apps import app_cache
 from django.utils import datetime_safe
 from django.utils.six.moves import input
 

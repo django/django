@@ -5,8 +5,8 @@ import sys
 from functools import update_wrapper
 from django.utils.six.moves import zip
 
-from django.core.apps import app_cache
-from django.core.apps.cache import MODELS_MODULE_NAME
+from django.apps import app_cache
+from django.apps.base import MODELS_MODULE_NAME
 import django.db.models.manager  # NOQA: Imported to register signal handler.
 from django.conf import settings
 from django.core.exceptions import (ObjectDoesNotExist,
@@ -151,8 +151,7 @@ class ModelBase(type):
                 new_class._base_manager = new_class._base_manager._copy_to_model(new_class)
 
         # Bail out early if we have already created this class.
-        m = new_class._meta.app_cache.get_model(new_class._meta.app_label, name,
-                      seed_cache=False, only_installed=False)
+        m = new_class._meta.app_cache.has_model(new_class._meta.app_label, name)
         if m is not None:
             return m
 
@@ -279,8 +278,7 @@ class ModelBase(type):
         # the first time this model tries to register with the framework. There
         # should only be one class for each model, so we always return the
         # registered version.
-        return new_class._meta.app_cache.get_model(new_class._meta.app_label, name,
-                         seed_cache=False, only_installed=False)
+        return new_class._meta.app_cache.has_model(new_class._meta.app_label, name)
 
     def copy_managers(cls, base_managers):
         # This is in-place sorting of an Options attribute, but that's fine.

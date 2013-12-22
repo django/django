@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import datetime
 import unittest
 
-from django.core.apps.cache import AppCache
+from django.apps.cache import AppCache
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.test import TestCase

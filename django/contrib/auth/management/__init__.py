@@ -6,9 +6,9 @@ from __future__ import unicode_literals
 import getpass
 import unicodedata
 
+from django.apps import app_cache, UnavailableApp
 from django.contrib.auth import (models as auth_app, get_permission_codename,
     get_user_model)
-from django.core.apps import app_cache, UnavailableApp
 from django.core import exceptions
 from django.core.management.base import CommandError
 from django.db import DEFAULT_DB_ALIAS, router

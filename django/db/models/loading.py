@@ -1,6 +1,6 @@
 import warnings
 
-from django.core.apps import app_cache
+from django.apps import app_cache
 
 warnings.warn(
     "The utilities in django.db.models.loading are deprecated "
@@ -30,6 +30,6 @@ def get_app_errors():
     try:
         return app_cache.app_errors
     except AttributeError:
-        app_cache.populate()
+        app_cache.populate_models()
         app_cache.app_errors = {}
         return app_cache.app_errors
