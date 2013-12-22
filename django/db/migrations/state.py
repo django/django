@@ -1,4 +1,4 @@
-from django.core.apps.cache import AppCache
+from django.apps.cache import AppCache
 from django.db import models
 from django.db.models.options import DEFAULT_NAMES, normalize_unique_together
 from django.utils import six

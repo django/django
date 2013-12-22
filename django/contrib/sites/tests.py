@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
+from django.apps import app_cache
 from django.conf import settings
 from django.contrib.sites.models import Site, RequestSite, get_current_site
-from django.core.apps import app_cache
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpRequest
 from django.test import TestCase

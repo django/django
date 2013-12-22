@@ -10,7 +10,7 @@ import gettext as gettext_module
 from threading import local
 import warnings
 
-from django.core.apps import app_cache
+from django.apps import app_cache
 from django.dispatch import receiver
 from django.test.signals import setting_changed
 from django.utils.encoding import force_str, force_text

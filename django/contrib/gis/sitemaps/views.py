@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import warnings
 
-from django.core.apps import app_cache
+from django.apps import app_cache
 from django.http import HttpResponse, Http404
 from django.template import loader
 from django.contrib.sites.models import get_current_site

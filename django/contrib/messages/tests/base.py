@@ -1,13 +1,13 @@
 from unittest import skipUnless
 
 from django import http
+from django.apps import app_cache
 from django.conf import settings, global_settings
 from django.contrib.messages import constants, utils, get_level, set_level
 from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.constants import DEFAULT_LEVELS
 from django.contrib.messages.storage import default_storage, base
 from django.contrib.messages.storage.base import Message
-from django.core.apps import app_cache
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from django.utils.translation import ugettext_lazy

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.core.apps import app_cache
+from django.apps import app_cache
 from django.core.management.color import no_style
 from django.core.management.sql import (sql_create, sql_delete, sql_indexes,
     sql_destroy_indexes, sql_all)

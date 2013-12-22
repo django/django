@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 import datetime
 import os
 
-from django.core.apps import app_cache
+from django.apps import app_cache
 from django.core.validators import RegexValidator, EmailValidator
 from django.db import models, migrations
 from django.db.migrations.writer import MigrationWriter

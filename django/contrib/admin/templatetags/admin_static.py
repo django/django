@@ -1,4 +1,4 @@
-from django.core.apps import app_cache
+from django.apps import app_cache
 from django.template import Library
 
 register = Library()

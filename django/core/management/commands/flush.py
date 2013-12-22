@@ -2,7 +2,7 @@ import sys
 from importlib import import_module
 from optparse import make_option
 
-from django.core.apps import app_cache
+from django.apps import app_cache
 from django.db import connections, router, transaction, DEFAULT_DB_ALIAS
 from django.core.management import call_command
 from django.core.management.base import NoArgsCommand, CommandError

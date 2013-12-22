@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
+from django.apps import app_cache
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.models import get_current_site
-from django.core.apps import app_cache
 from django.db import models
 from django.http import HttpRequest, Http404
 from django.test import TestCase

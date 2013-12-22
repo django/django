@@ -117,7 +117,7 @@ def get_commands():
             # Populate the app cache outside of the try/except block to avoid
             # catching ImproperlyConfigured errors that aren't caused by the
             # absence of a settings module.
-            from django.core.apps import app_cache
+            from django.apps import app_cache
             app_configs = app_cache.get_app_configs()
             apps = [app_config.name for app_config in app_configs]
 
@@ -346,7 +346,7 @@ class ManagementUtility(object):
             elif cwords[0] in ('dumpdata', 'sql', 'sqlall', 'sqlclear',
                     'sqlcustom', 'sqlindexes', 'sqlsequencereset', 'test'):
                 try:
-                    from django.core.apps import app_cache
+                    from django.apps import app_cache
                     app_configs = app_cache.get_app_configs()
                     # Get the last part of the dotted path as the app name.
                     options += [(app_config.label, 0) for app_config in app_configs]

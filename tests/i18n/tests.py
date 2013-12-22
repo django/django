@@ -8,8 +8,8 @@ import os
 import pickle
 from threading import local
 
+from django.apps import app_cache
 from django.conf import settings
-from django.core.apps import app_cache
 from django.template import Template, Context
 from django.template.base import TemplateSyntaxError
 from django.test import TestCase, RequestFactory

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import os
 import sys
 
-from django.core.apps import app_cache
+from django.apps import app_cache
 from django.core.management import call_command
 from django.test import TestCase, TransactionTestCase
 from django.utils._os import upath

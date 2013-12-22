@@ -36,8 +36,8 @@ import sys
 import time
 import traceback
 
+from django.apps import app_cache
 from django.conf import settings
-from django.core.apps import app_cache
 from django.core.signals import request_finished
 try:
     from django.utils.six.moves import _thread as thread

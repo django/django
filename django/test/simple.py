@@ -9,7 +9,7 @@ import re
 import unittest as real_unittest
 import warnings
 
-from django.core.apps import app_cache
+from django.apps import app_cache
 from django.test import _doctest as doctest
 from django.test import runner
 from django.test.utils import compare_xml, strip_quotes

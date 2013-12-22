@@ -4,8 +4,8 @@ import os
 from os import path
 import unittest
 
+from django.apps import app_cache
 from django.conf import settings
-from django.core.apps import app_cache
 from django.core.urlresolvers import reverse
 from django.test import LiveServerTestCase, TestCase
 from django.test.utils import override_settings

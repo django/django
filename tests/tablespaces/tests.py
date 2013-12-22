@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
+from django.apps import app_cache
 from django.conf import settings
-from django.core.apps import app_cache
 from django.db import connection
 from django.core.management.color import no_style
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature

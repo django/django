@@ -1,8 +1,8 @@
 from importlib import import_module
 import warnings
+from django.apps import app_cache
 from django.conf import settings
 from django.core import urlresolvers
-from django.core.apps import app_cache
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.comments.models import Comment
 from django.contrib.comments.forms import CommentForm

@@ -1,4 +1,4 @@
-from django.core.apps.cache import AppCache
+from django.apps.cache import AppCache
 from django.db.backends.schema import BaseDatabaseSchemaEditor
 from django.db.models.fields.related import ManyToManyField
 

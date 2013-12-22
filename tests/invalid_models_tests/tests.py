@@ -1,7 +1,7 @@
 import sys
 import unittest
 
-from django.core.apps import app_cache
+from django.apps import app_cache
 from django.core.management.validation import get_validation_errors
 from django.test.utils import override_settings
 from django.utils.six import StringIO

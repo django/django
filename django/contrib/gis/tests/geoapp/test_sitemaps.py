@@ -6,11 +6,11 @@ from xml.dom import minidom
 import os
 import zipfile
 
+from django.apps import app_cache
 from django.conf import settings
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
 from django.contrib.sites.models import Site
-from django.core.apps import app_cache
 from django.test import TestCase
 from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils._os import upath

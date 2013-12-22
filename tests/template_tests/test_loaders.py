@@ -20,7 +20,7 @@ except ImportError:
     pkg_resources = None
 
 
-from django.core.apps import app_cache
+from django.apps import app_cache
 from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import Loader as EggLoader
 from django.template import loader

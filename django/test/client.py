@@ -8,9 +8,9 @@ from copy import copy
 from importlib import import_module
 from io import BytesIO
 
+from django.apps import app_cache
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout, get_user_model
-from django.core.apps import app_cache
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import (request_started, request_finished,

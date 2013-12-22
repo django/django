@@ -1,10 +1,10 @@
 import unittest
 
+from django.apps import app_cache
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.admindocs import utils
 from django.contrib.auth.models import User
-from django.core.apps import app_cache
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings

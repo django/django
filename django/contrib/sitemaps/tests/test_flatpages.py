@@ -2,8 +2,8 @@ from __future__ import unicode_literals
 
 from unittest import skipUnless
 
+from django.apps import app_cache
 from django.conf import settings
-from django.core.apps import app_cache
 
 from .base import SitemapTestsBase
 

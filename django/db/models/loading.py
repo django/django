@@ -1,6 +1,6 @@
 import warnings
 
-from django.core.apps import app_cache
+from django.apps import app_cache
 
 warnings.warn(
     "The utilities in django.db.models.loading are deprecated "

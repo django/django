@@ -1,4 +1,4 @@
-from django.core.apps.cache import AppCache
+from django.apps.cache import AppCache
 from django.db import models
 from django.utils.timezone import now
 

@@ -6,8 +6,8 @@ packages.
 import os
 import sys
 
+from django.apps import app_cache
 from django.conf import settings
-from django.core.apps import app_cache
 from django.template.base import TemplateDoesNotExist
 from django.template.loader import BaseLoader
 from django.utils._os import safe_join

@@ -6,8 +6,8 @@ try:
 except ImportError:
     resource_string = None
 
+from django.apps import app_cache
 from django.conf import settings
-from django.core.apps import app_cache
 from django.template.base import TemplateDoesNotExist
 from django.template.loader import BaseLoader
 from django.utils import six

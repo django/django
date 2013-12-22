@@ -4,8 +4,8 @@ import os
 import gettext as gettext_module
 
 from django import http
+from django.apps import app_cache
 from django.conf import settings
-from django.core.apps import app_cache
 from django.template import Context, Template
 from django.utils.translation import check_for_language, to_locale, get_language
 from django.utils.encoding import smart_text

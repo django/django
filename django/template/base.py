@@ -5,8 +5,8 @@ from functools import partial
 from importlib import import_module
 from inspect import getargspec, getcallargs
 
+from django.apps import app_cache
 from django.conf import settings
-from django.core.apps import app_cache
 from django.template.context import (BaseContext, Context, RequestContext,  # NOQA: imported for backwards compatibility
     ContextPopException)
 from django.utils.itercompat import is_iterable

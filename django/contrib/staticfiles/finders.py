@@ -1,8 +1,8 @@
 from collections import OrderedDict
 import os
 
+from django.apps import app_cache
 from django.conf import settings
-from django.core.apps import app_cache
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import default_storage, Storage, FileSystemStorage
 from django.utils.functional import empty, LazyObject

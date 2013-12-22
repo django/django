@@ -5,8 +5,8 @@ import sys
 from unittest import TestCase
 import warnings
 
-from django.core.apps import app_cache
-from django.core.apps.cache import AppCache
+from django.apps import app_cache
+from django.apps.cache import AppCache
 from django.test.utils import override_settings
 from django.utils._os import upath
 from django.utils import six

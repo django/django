@@ -5,7 +5,7 @@ import os
 import sys
 import unittest
 
-from django.core.apps import app_cache
+from django.apps import app_cache
 from django.core.management import ManagementUtility
 from django.utils.six import StringIO
 

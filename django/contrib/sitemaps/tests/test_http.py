@@ -4,10 +4,10 @@ import os
 from datetime import date
 from unittest import skipUnless
 
+from django.apps import app_cache
 from django.conf import settings
 from django.contrib.sitemaps import Sitemap, GenericSitemap
 from django.contrib.sites.models import Site
-from django.core.apps import app_cache
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
 from django.utils.formats import localize

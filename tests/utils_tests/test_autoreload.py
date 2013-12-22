@@ -1,8 +1,8 @@
 import os
 
 from django import conf
+from django.apps import app_cache
 from django.contrib import admin
-from django.core.apps import app_cache
 from django.test import TestCase, override_settings
 from django.utils.autoreload import gen_filenames
 

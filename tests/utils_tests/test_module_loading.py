@@ -5,7 +5,7 @@ import sys
 import unittest
 from zipimport import zipimporter
 
-from django.core.apps import app_cache
+from django.apps import app_cache
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
 from django.utils import six

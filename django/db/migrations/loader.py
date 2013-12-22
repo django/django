@@ -2,7 +2,7 @@ from importlib import import_module
 import os
 import sys
 
-from django.core.apps import app_cache
+from django.apps import app_cache
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.graph import MigrationGraph
 from django.utils import six

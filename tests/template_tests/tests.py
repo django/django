@@ -16,7 +16,7 @@ import unittest
 import warnings
 
 from django import template
-from django.core.apps import app_cache
+from django.apps import app_cache
 from django.core import urlresolvers
 from django.template import (base as template_base, loader, Context,
     RequestContext, Template, TemplateSyntaxError)
