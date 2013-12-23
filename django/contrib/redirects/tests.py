@@ -1,22 +1,18 @@
 from django import http
-from django.apps import app_cache
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
-from django.test.utils import override_settings
+from django.test.utils import modify_settings, override_settings
 from django.utils import six
 
 from .middleware import RedirectFallbackMiddleware
 from .models import Redirect
 
 
-@override_settings(
-    APPEND_SLASH=False,
-    MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) +
-    ['django.contrib.redirects.middleware.RedirectFallbackMiddleware'],
-    SITE_ID=1,
-)
+@modify_settings(MIDDLEWARE_CLASSES={'append':
+    'django.contrib.redirects.middleware.RedirectFallbackMiddleware'})
+@override_settings(APPEND_SLASH=False, SITE_ID=1)
 class RedirectTests(TestCase):
 
     def setUp(self):
@@ -57,10 +53,10 @@ class RedirectTests(TestCase):
         response = self.client.get('/initial')
         self.assertEqual(response.status_code, 410)
 
+    @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
     def test_sites_not_installed(self):
-        with app_cache._without_app('django.contrib.sites'):
-            with self.assertRaises(ImproperlyConfigured):
-                RedirectFallbackMiddleware()
+        with self.assertRaises(ImproperlyConfigured):
+            RedirectFallbackMiddleware()
 
 
 class OverriddenRedirectFallbackMiddleware(RedirectFallbackMiddleware):
@@ -69,11 +65,9 @@ class OverriddenRedirectFallbackMiddleware(RedirectFallbackMiddleware):
     response_redirect_class = http.HttpResponseRedirect
 
 
-@override_settings(
-    MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) +
-    ['django.contrib.redirects.tests.OverriddenRedirectFallbackMiddleware'],
-    SITE_ID=1,
-)
+@modify_settings(MIDDLEWARE_CLASSES={'append':
+    'django.contrib.redirects.tests.OverriddenRedirectFallbackMiddleware'})
+@override_settings(SITE_ID=1)
 class OverriddenRedirectMiddlewareTests(TestCase):
 
     def setUp(self):

@@ -4,11 +4,10 @@ import os
 from os import path
 import unittest
 
-from django.apps import app_cache
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test import LiveServerTestCase, TestCase
-from django.test.utils import override_settings
+from django.test import (
+    LiveServerTestCase, TestCase, modify_settings, override_settings)
 from django.utils import six
 from django.utils._os import upath
 from django.utils.translation import override
@@ -110,16 +109,16 @@ class JsI18NTests(TestCase):
             response = self.client.get('/views/jsi18n/')
             self.assertNotContains(response, 'Choisir une heure')
 
+    @modify_settings(INSTALLED_APPS={'append': 'view_tests.app0'})
     def test_nonenglish_default_english_userpref(self):
         """
         Same as above with the difference that there IS an 'en' translation
         available. The Javascript i18n view must return a NON empty language catalog
         with the proper English translations. See #13726 for more details.
         """
-        with app_cache._with_app('view_tests.app0'):
-            with self.settings(LANGUAGE_CODE='fr'), override('en-us'):
-                response = self.client.get('/views/jsi18n_english_translation/')
-                self.assertContains(response, javascript_quote('this app0 string is to be translated'))
+        with self.settings(LANGUAGE_CODE='fr'), override('en-us'):
+            response = self.client.get('/views/jsi18n_english_translation/')
+            self.assertContains(response, javascript_quote('this app0 string is to be translated'))
 
     def testI18NLanguageNonEnglishFallback(self):
         """
@@ -141,6 +140,7 @@ class JsI18NTestsMultiPackage(TestCase):
     Tests for django views in django/views/i18n.py that need to change
     settings.LANGUAGE_CODE and merge JS translation from several packages.
     """
+    @modify_settings(INSTALLED_APPS={'append': ['view_tests.app1', 'view_tests.app2']})
     def testI18NLanguageEnglishDefault(self):
         """
         Check if the JavaScript i18n view returns a complete language catalog
@@ -149,20 +149,19 @@ class JsI18NTestsMultiPackage(TestCase):
         translations of multiple Python packages is requested. See #13388,
         #3594 and #13514 for more details.
         """
-        with app_cache._with_app('view_tests.app1'), app_cache._with_app('view_tests.app2'):
-            with self.settings(LANGUAGE_CODE='en-us'), override('fr'):
-                response = self.client.get('/views/jsi18n_multi_packages1/')
-                self.assertContains(response, javascript_quote('il faut traduire cette chaîne de caractères de app1'))
+        with self.settings(LANGUAGE_CODE='en-us'), override('fr'):
+            response = self.client.get('/views/jsi18n_multi_packages1/')
+            self.assertContains(response, javascript_quote('il faut traduire cette chaîne de caractères de app1'))
 
+    @modify_settings(INSTALLED_APPS={'append': ['view_tests.app3', 'view_tests.app4']})
     def testI18NDifferentNonEnLangs(self):
         """
         Similar to above but with neither default or requested language being
         English.
         """
-        with app_cache._with_app('view_tests.app3'), app_cache._with_app('view_tests.app4'):
-            with self.settings(LANGUAGE_CODE='fr'), override('es-ar'):
-                response = self.client.get('/views/jsi18n_multi_packages2/')
-                self.assertContains(response, javascript_quote('este texto de app3 debe ser traducido'))
+        with self.settings(LANGUAGE_CODE='fr'), override('es-ar'):
+            response = self.client.get('/views/jsi18n_multi_packages2/')
+            self.assertContains(response, javascript_quote('este texto de app3 debe ser traducido'))
 
     def testI18NWithLocalePaths(self):
         extended_locale_paths = settings.LOCALE_PATHS + (

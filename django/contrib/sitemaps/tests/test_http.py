@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.sitemaps import Sitemap, GenericSitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
-from django.test.utils import override_settings
+from django.test import modify_settings, override_settings
 from django.utils.formats import localize
 from django.utils._os import upath
 from django.utils.translation import activate, deactivate
@@ -106,17 +106,17 @@ class HTTPSitemapTests(SitemapTestsBase):
         self.assertContains(response, '<lastmod>%s</lastmod>' % date.today())
         deactivate()
 
+    @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
     def test_requestsite_sitemap(self):
         # Make sure hitting the flatpages sitemap without the sites framework
         # installed doesn't raise an exception.
-        with app_cache._without_app('django.contrib.sites'):
-            response = self.client.get('/simple/sitemap.xml')
-            expected_content = """<?xml version="1.0" encoding="UTF-8"?>
+        response = self.client.get('/simple/sitemap.xml')
+        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>http://testserver/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """ % date.today()
-            self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     @skipUnless(app_cache.has_app('django.contrib.sites'),
                 "django.contrib.sites app not installed.")
@@ -128,14 +128,14 @@ class HTTPSitemapTests(SitemapTestsBase):
         Site.objects.all().delete()
         self.assertRaises(ImproperlyConfigured, Sitemap().get_urls)
 
+    @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
     def test_sitemap_get_urls_no_site_2(self):
         """
         Check we get ImproperlyConfigured when we don't pass a site object to
         Sitemap.get_urls if Site objects exists, but the sites framework is not
         actually installed.
         """
-        with app_cache._without_app('django.contrib.sites'):
-            self.assertRaises(ImproperlyConfigured, Sitemap().get_urls)
+        self.assertRaises(ImproperlyConfigured, Sitemap().get_urls)
 
     def test_sitemap_item(self):
         """

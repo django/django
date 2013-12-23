@@ -86,7 +86,7 @@ def get_installed():
 
 def setup(verbosity, test_labels):
     import django
-    from django.apps import app_cache
+    from django.apps import app_cache, AppConfig
     from django.conf import settings
     from django.test import TransactionTestCase, TestCase
 
@@ -165,9 +165,11 @@ def setup(verbosity, test_labels):
             if verbosity >= 2:
                 print("Importing application %s" % module_name)
             # HACK.
-            app_cache._begin_with_app(module_label)
             if module_label not in settings.INSTALLED_APPS:
                 settings.INSTALLED_APPS.append(module_label)
+            app_config = AppConfig.create(module_label)
+            app_config.import_models(app_cache.all_models[app_config.label])
+            app_cache.app_configs[app_config.label] = app_config
 
     return state
 

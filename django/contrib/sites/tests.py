@@ -1,22 +1,18 @@
 from __future__ import unicode_literals
 
-from django.apps import app_cache
 from django.conf import settings
 from django.contrib.sites.models import Site, RequestSite, get_current_site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpRequest
 from django.test import TestCase
-from django.test.utils import override_settings
+from django.test.utils import modify_settings, override_settings
 
 
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'})
 class SitesFrameworkTests(TestCase):
 
     def setUp(self):
         Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
-        self._with_sites = app_cache._begin_with_app('django.contrib.sites')
-
-    def tearDown(self):
-        app_cache._end_with_app(self._with_sites)
 
     def test_save_another(self):
         # Regression for #17415
@@ -67,7 +63,7 @@ class SitesFrameworkTests(TestCase):
         self.assertRaises(ObjectDoesNotExist, get_current_site, request)
 
         # A RequestSite is returned if the sites framework is not installed
-        with app_cache._without_app('django.contrib.sites'):
+        with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
             site = get_current_site(request)
             self.assertTrue(isinstance(site, RequestSite))
             self.assertEqual(site.name, "example.com")

@@ -3,7 +3,7 @@ import unittest
 
 from django.apps import app_cache
 from django.core.management.validation import get_validation_errors
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils.six import StringIO
 
 
@@ -26,14 +26,14 @@ class InvalidModelTestCase(unittest.TestCase):
     # easier to set this up as an override than to require every developer
     # to specify a value in their test settings.
     @override_settings(
+        INSTALLED_APPS=['invalid_models_tests.invalid_models'],
         TEST_SWAPPED_MODEL='invalid_models.ReplacementModel',
         TEST_SWAPPED_MODEL_BAD_VALUE='not-a-model',
         TEST_SWAPPED_MODEL_BAD_MODEL='not_an_app.Target',
     )
     def test_invalid_models(self):
-        with app_cache._with_app("invalid_models_tests.invalid_models"):
-            module = app_cache.get_app_config("invalid_models").models_module
-            get_validation_errors(self.stdout, module)
+        module = app_cache.get_app_config("invalid_models").models_module
+        get_validation_errors(self.stdout, module)
 
         self.stdout.seek(0)
         error_log = self.stdout.read()
