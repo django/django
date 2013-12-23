@@ -17,7 +17,6 @@ from django.template.defaultfilters import (
     urlize, urlizetrunc, wordcount, wordwrap, yesno,
 )
 from django.test import TestCase
-from django.test.utils import TransRealMixin
 from django.utils import six
 from django.utils import translation
 from django.utils.safestring import SafeData
@@ -683,7 +682,7 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(striptags(123), '123')
 
 
-class DefaultFiltersI18NTests(TransRealMixin, TestCase):
+class DefaultFiltersI18NTests(TestCase):
 
     def test_localized_filesizeformat(self):
         # NOTE: \xa0 avoids wrapping between value and unit

@@ -12,7 +12,6 @@ from django.conf import settings
 from django.contrib.humanize.templatetags import humanize
 from django.template import Template, Context, defaultfilters
 from django.test import TestCase, override_settings
-from django.test.utils import TransRealMixin
 from django.utils.html import escape
 from django.utils.timezone import utc, get_fixed_timezone
 from django.utils import translation
@@ -36,7 +35,7 @@ class MockDateTime(datetime.datetime):
             return now.replace(tzinfo=tz) + tz.utcoffset(now)
 
 
-class HumanizeTests(TransRealMixin, TestCase):
+class HumanizeTests(TestCase):
 
     def humanize_tester(self, test_list, result_list, method, normalize_result_func=escape):
         for test_content, result in zip(test_list, result_list):

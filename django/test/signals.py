@@ -17,7 +17,7 @@ setting_changed = Signal(providing_args=["setting", "value", "enter"])
 # except for cases where the receiver is related to a contrib app.
 
 # Settings that may not work well when using 'override_settings' (#19031)
-COMPLEX_OVERRIDE_SETTINGS = set(['DATABASES'])
+COMPLEX_OVERRIDE_SETTINGS = {'DATABASES'}
 
 
 @receiver(setting_changed)
@@ -25,14 +25,6 @@ def clear_cache_handlers(**kwargs):
     if kwargs['setting'] == 'CACHES':
         from django.core.cache import caches
         caches._caches = threading.local()
-
-
-@receiver(setting_changed)
-def update_installed_apps(**kwargs):
-    if kwargs['setting'] == 'INSTALLED_APPS':
-        # Rebuild any AppDirectoriesFinder instance.
-        from django.contrib.staticfiles.finders import get_finder
-        get_finder.cache_clear()
 
 
 @receiver(setting_changed)
@@ -66,17 +58,17 @@ def update_connections_time_zone(**kwargs):
 
 
 @receiver(setting_changed)
-def clear_context_processors_cache(**kwargs):
-    if kwargs['setting'] == 'TEMPLATE_CONTEXT_PROCESSORS':
-        from django.template import context
-        context._standard_context_processors = None
+def clear_loaddata_cache(**kwargs):
+    if kwargs['setting'] in {'FIXTURE_DIRS', 'INSTALLED_APPS', 'SERIALIZATION_MODULES'}:
+        from django.core.management.commands import loaddata
+        loaddata.Command.find_fixtures.cache_clear()
 
 
 @receiver(setting_changed)
-def clear_template_loaders_cache(**kwargs):
-    if kwargs['setting'] == 'TEMPLATE_LOADERS':
-        from django.template import loader
-        loader.template_source_loaders = None
+def clear_media_storage(**kwargs):
+    if kwargs['setting'] in {'MEDIA_ROOT', 'DEFAULT_FILE_STORAGE'}:
+        from django.core.files.storage import default_storage
+        default_storage._wrapped = empty
 
 
 @receiver(setting_changed)
@@ -87,19 +79,43 @@ def clear_serializers_cache(**kwargs):
 
 
 @receiver(setting_changed)
-def language_changed(**kwargs):
-    if kwargs['setting'] in ('LOCALE_PATHS', 'LANGUAGE_CODE'):
-        from django.utils.translation import trans_real
-        trans_real._default = None
-        if kwargs['setting'] == 'LOCALE_PATHS':
-            trans_real._translations = {}
+def clear_static_finders_cache(**kwargs):
+    if kwargs['setting'] in {'INSTALLED_DIRS', 'STATICFILES_DIRS'}:
+        from django.contrib.staticfiles.finders import get_finder
+        get_finder.cache_clear()
 
 
 @receiver(setting_changed)
-def file_storage_changed(**kwargs):
-    if kwargs['setting'] in ('MEDIA_ROOT', 'DEFAULT_FILE_STORAGE'):
-        from django.core.files.storage import default_storage
-        default_storage._wrapped = empty
+def clear_template_context_processors_cache(**kwargs):
+    if kwargs['setting'] == 'TEMPLATE_CONTEXT_PROCESSORS':
+        from django.template import context
+        context._standard_context_processors = None
+
+
+@receiver(setting_changed)
+def clear_template_loaders_cache(**kwargs):
+    if kwargs['setting'] in {'INSTALLED_APPS', 'TEMPLATE_LOADERS'}:
+        from django.template import loader
+        loader.template_source_loaders = None
+        from django.template.loaders import app_directories
+        app_directories.app_template_dirs = []
+
+
+@receiver(setting_changed)
+def clear_templatetags_cache(**kwargs):
+    if kwargs['setting'] == 'INSTALLED_APPS':
+        from django.template import base
+        base.templatetags_modules = []
+
+
+@receiver(setting_changed)
+def clear_i18n_caches(**kwargs):
+    if kwargs['setting'] in {'INSTALLED_APPS', 'LANGUAGE_CODE', 'LOCALE_PATHS'}:
+        from django.utils.translation import trans_real
+        trans_real._translations = {}
+        trans_real._active = threading.local()
+        trans_real._default = None
+        trans_real.check_for_language.cache_clear()
 
 
 @receiver(setting_changed)

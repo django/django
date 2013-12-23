@@ -22,7 +22,7 @@ from django.template import (base as template_base, loader, Context,
 from django.template.loaders import app_directories, filesystem, cached
 from django.test import RequestFactory, TestCase
 from django.test.utils import (setup_test_template_loader,
-    restore_template_loaders, override_settings, TransRealMixin)
+    restore_template_loaders, override_settings)
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
 from django.utils._os import upath
@@ -549,7 +549,7 @@ class TemplateRegressionTests(TestCase):
                    TEMPLATE_DEBUG=False, ALLOWED_INCLUDE_ROOTS=(
                        os.path.dirname(os.path.abspath(upath(__file__))),),
                    )
-class TemplateTests(TransRealMixin, TestCase):
+class TemplateTests(TestCase):
     def test_templates(self):
         template_tests = self.get_template_tests()
         filter_tests = filters.get_filter_tests()
