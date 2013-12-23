@@ -58,10 +58,10 @@ class CustomCommentTest(CommentTestCase):
         c = Comment(id=12345)
         self.assertEqual(comments.get_flag_url(c), "/flag/12345/")
 
-    def getGetDeleteURL(self):
+    def testGetDeleteURL(self):
         c = Comment(id=12345)
         self.assertEqual(comments.get_delete_url(c), "/delete/12345/")
 
-    def getGetApproveURL(self):
+    def testGetApproveURL(self):
         c = Comment(id=12345)
         self.assertEqual(comments.get_approve_url(c), "/approve/12345/")
