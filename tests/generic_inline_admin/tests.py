@@ -8,8 +8,7 @@ from django.contrib.contenttypes.generic import (
     generic_inlineformset_factory, GenericTabularInline)
 from django.forms.formsets import DEFAULT_MAX_NUM
 from django.forms.models import ModelForm
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 
 # local test models
 from .admin import MediaInline, MediaPermanentInline

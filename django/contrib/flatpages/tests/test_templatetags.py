@@ -2,8 +2,7 @@ import os
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.template import Template, Context, TemplateSyntaxError
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 
 
 @override_settings(

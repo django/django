@@ -3,8 +3,7 @@ from __future__ import unicode_literals
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection
 from django.db.models import Prefetch
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils import six
 
 from .models import (Author, Book, Reader, Qualification, Teacher, Department,

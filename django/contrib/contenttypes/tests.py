@@ -1,13 +1,11 @@
 from __future__ import unicode_literals
 
-from django.apps import app_cache
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.models import get_current_site
 from django.db import models
 from django.http import HttpRequest, Http404
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils.http import urlquote
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
@@ -222,12 +220,12 @@ class ContentTypesTests(TestCase):
         user_ct = ContentType.objects.get_for_model(FooWithUrl)
         obj = FooWithUrl.objects.create(name="john")
 
-        with app_cache._with_app('django.contrib.sites'):
+        with self.modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'}):
             response = shortcut(request, user_ct.id, obj.id)
             self.assertEqual("http://%s/users/john/" % get_current_site(request).domain,
                              response._headers.get("location")[1])
 
-        with app_cache._without_app('django.contrib.sites'):
+        with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
             response = shortcut(request, user_ct.id, obj.id)
             self.assertEqual("http://Example.com/users/john/",
                              response._headers.get("location")[1])

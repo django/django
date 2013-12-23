@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import os
 import sys
 
-from django.apps import app_cache
 from django.core.management import call_command
 from django.test import TestCase, TransactionTestCase
 from django.utils._os import upath
@@ -28,7 +27,7 @@ class ProxyModelInheritanceTests(TransactionTestCase):
         sys.path = self.old_sys_path
 
     def test_table_exists(self):
-        with app_cache._with_app('app1'), app_cache._with_app('app2'):
+        with self.modify_settings(INSTALLED_APPS={'append': ['app1', 'app2']}):
             call_command('migrate', verbosity=0)
             from .app1.models import ProxyModel
             from .app2.models import NiceModel

@@ -7,7 +7,7 @@ from unittest import TestCase
 
 from django.template import (TokenParser, FilterExpression, Parser, Variable,
     Template, TemplateSyntaxError, Library)
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils import six
 
 

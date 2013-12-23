@@ -7,7 +7,7 @@ django.test.LiveServerTestCase.
 import os
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils.six.moves.urllib.request import urlopen
 from django.utils._os import upath
 

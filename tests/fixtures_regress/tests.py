@@ -15,7 +15,7 @@ from django.db import transaction, IntegrityError
 from django.db.models import signals
 from django.test import (TestCase, TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils import six

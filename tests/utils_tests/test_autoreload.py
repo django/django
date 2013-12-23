@@ -1,7 +1,6 @@
 import os
 
 from django import conf
-from django.apps import app_cache
 from django.contrib import admin
 from django.test import TestCase, override_settings
 from django.utils.autoreload import gen_filenames
@@ -28,6 +27,7 @@ class TestFilenameGenerator(TestCase):
         self.assertIn(os.path.join(LOCALE_PATH, 'nl', 'LC_MESSAGES', 'django.mo'),
                       filenames)
 
+    @override_settings(INSTALLED_APPS=[])
     def test_project_root_locale(self):
         """
         Test that gen_filenames also yields from the current directory (project
@@ -36,22 +36,19 @@ class TestFilenameGenerator(TestCase):
         old_cwd = os.getcwd()
         os.chdir(os.path.dirname(__file__))
         try:
-            # Remove the current app from the app cache to guarantee that the
-            # files will be found thanks to the current working directory.
-            with app_cache._empty():
-                filenames = list(gen_filenames())
+            filenames = list(gen_filenames())
             self.assertIn(
                 os.path.join(LOCALE_PATH, 'nl', 'LC_MESSAGES', 'django.mo'),
                 filenames)
         finally:
             os.chdir(old_cwd)
 
+    @override_settings(INSTALLED_APPS=['django.contrib.admin'])
     def test_app_locales(self):
         """
         Test that gen_filenames also yields from locale dirs in installed apps.
         """
-        with app_cache._empty(), app_cache._with_app('django.contrib.admin'):
-            filenames = list(gen_filenames())
+        filenames = list(gen_filenames())
         self.assertIn(os.path.join(os.path.dirname(admin.__file__), 'locale',
                                    'nl', 'LC_MESSAGES', 'django.mo'),
                       filenames)

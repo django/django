@@ -7,7 +7,7 @@ import shutil
 
 from django.apps import app_cache
 from django.core.management import call_command, CommandError
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils import six
 from django.utils._os import upath
 from django.utils.encoding import force_text
