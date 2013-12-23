@@ -1335,7 +1335,7 @@ Overriding settings
 
 For testing purposes it's often useful to change a setting temporarily and
 revert to the original value after running the testing code. For this use case
-Django provides a standard Python context manager (see :pep:`343`)
+Django provides a standard Python context manager (see :pep:`343`) called
 :meth:`~django.test.SimpleTestCase.settings`, which can be used like this::
 
     from django.test import TestCase
@@ -1356,12 +1356,41 @@ Django provides a standard Python context manager (see :pep:`343`)
 This example will override the :setting:`LOGIN_URL` setting for the code
 in the ``with`` block and reset its value to the previous state afterwards.
 
+.. method:: SimpleTestCase.modify_settings
+
+.. versionadded:: 1.7
+
+It can prove unwieldy to redefine settings that contain a list of values. In
+practice, adding or removing values is often sufficient. The
+:meth:`~django.test.SimpleTestCase.modify_settings` context manager makes it
+easy::
+
+    from django.test import TestCase
+
+    class MiddlewareTestCase(TestCase):
+
+        def test_cache_middleware(self):
+            with self.modify_settings(MIDDLEWARE_CLASSES={
+                'append': 'django.middleware.cache.FetchFromCacheMiddleware',
+                'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
+                'remove': [
+                    'django.contrib.sessions.middleware.SessionMiddleware',
+                    'django.contrib.auth.middleware.AuthenticationMiddleware',
+                    'django.contrib.messages.middleware.MessageMiddleware',
+                ],
+            }):
+                response = self.client.get('/')
+                # ...
+
+For each action, you can supply either a list of values or a string. When the
+value already exists in the list, ``append`` and ``prepend`` have no effect;
+neither does ``remove`` when the value doesn't exist.
+
 .. function:: override_settings
 
-In case you want to override a setting for just one test method or even the
-whole :class:`~django.test.TestCase` class, Django provides the
-:func:`~django.test.override_settings` decorator (see :pep:`318`). It's
-used like this::
+In case you want to override a setting for a test method, Django provides the
+:func:`~django.test.override_settings` decorator (see :pep:`318`). It's used
+like this::
 
     from django.test import TestCase, override_settings
 
@@ -1372,7 +1401,7 @@ used like this::
             response = self.client.get('/sekrit/')
             self.assertRedirects(response, '/other/login/?next=/sekrit/')
 
-The decorator can also be applied to test case classes::
+The decorator can also be applied to :class:`~django.test.TestCase` classes::
 
     from django.test import TestCase, override_settings
 
@@ -1385,17 +1414,50 @@ The decorator can also be applied to test case classes::
 
 .. versionchanged:: 1.7
 
-    Previously, ``override_settings`` was imported from
-    ``django.test.utils``.
+    Previously, ``override_settings`` was imported from ``django.test.utils``.
+
+.. function:: modify_settings
+
+.. versionadded:: 1.7
+
+Likewise, Django provides the :func:`~django.test.modify_settings`
+decorator::
+
+    from django.test import TestCase, modify_settings
+
+    class MiddlewareTestCase(TestCase):
+
+        @modify_settings(MIDDLEWARE_CLASSES={
+            'append': 'django.middleware.cache.FetchFromCacheMiddleware',
+            'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
+        })
+        def test_cache_middleware(self):
+            response = self.client.get('/')
+            # ...
+
+The decorator can also be applied to test case classes::
+
+    from django.test import TestCase, modify_settings
+
+    @modify_settings(MIDDLEWARE_CLASSES={
+        'append': 'django.middleware.cache.FetchFromCacheMiddleware',
+        'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
+    })
+    class MiddlewareTestCase(TestCase):
+
+        def test_cache_middleware(self):
+            response = self.client.get('/')
+            # ...
 
 .. note::
 
-    When given a class, the decorator modifies the class directly and
-    returns it; it doesn't create and return a modified copy of it.  So if
-    you try to tweak the above example to assign the return value to a
-    different name than ``LoginTestCase``, you may be surprised to find that
-    the original ``LoginTestCase`` is still equally affected by the
-    decorator.
+    When given a class, these decorators modify the class directly and return
+    it; they don't create and return a modified copy of it. So if you try to
+    tweak the above examples to assign the return value to a different name
+    than ``LoginTestCase`` or ``MiddlewareTestCase``, you may be surprised to
+    find that the original test case classes are still equally affected by the
+    decorator. For a given class, :func:`~django.test.modify_settings` is
+    always applied after :func:`~django.test.override_settings`.
 
 .. warning::
 
@@ -1403,16 +1465,16 @@ The decorator can also be applied to test case classes::
     initialization of Django internals. If you change them with
     ``override_settings``, the setting is changed if you access it via the
     ``django.conf.settings`` module, however, Django's internals access it
-    differently. Effectively, using ``override_settings`` with these settings
-    is probably not going to do what you expect it to do.
+    differently. Effectively, using :func:`~django.test.override_settings` or
+    :func:`~django.test.modify_settings` with these settings is probably not
+    going to do what you expect it to do.
 
-    We do not recommend using ``override_settings`` with :setting:`DATABASES`.
-    Using ``override_settings`` with :setting:`CACHES` is possible, but a bit
-    tricky if you are using internals that make using of caching, like
+    We do not recommend altering the :setting:`DATABASES` setting. Altering
+    the :setting:`CACHES` setting is possible, but a bit tricky if you are
+    using internals that make using of caching, like
     :mod:`django.contrib.sessions`. For example, you will have to reinitialize
     the session backend in a test that uses cached sessions and overrides
     :setting:`CACHES`.
-
 
 You can also simulate the absence of a setting by deleting it after settings
 have been overridden, like this::
@@ -1423,10 +1485,10 @@ have been overridden, like this::
         ...
 
 When overriding settings, make sure to handle the cases in which your app's
-code uses a cache or similar feature that retains state even if the
-setting is changed. Django provides the
-:data:`django.test.signals.setting_changed` signal that lets you register
-callbacks to clean up and otherwise reset state when settings are changed.
+code uses a cache or similar feature that retains state even if the setting is
+changed. Django provides the :data:`django.test.signals.setting_changed`
+signal that lets you register callbacks to clean up and otherwise reset state
+when settings are changed.
 
 Django itself uses this signal to reset various data:
 
