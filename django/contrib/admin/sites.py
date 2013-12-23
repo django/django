@@ -454,7 +454,7 @@ class AdminSite(object):
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(key=lambda x: x['name'])
         context = dict(self.each_context(),
-            title=_('%s administration') % app_name,
+            title=_('%(app)s administration') % {'app': app_name},
             app_list=[app_dict],
             app_label=app_label,
         )
