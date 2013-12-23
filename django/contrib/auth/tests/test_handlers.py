@@ -5,7 +5,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TransactionTestCase
-from django.test.utils import override_settings
+from django.test import override_settings
 
 
 # This must be a TransactionTestCase because the WSGI auth handler performs

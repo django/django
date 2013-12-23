@@ -17,8 +17,8 @@ from django.core.urlresolvers import reverse
 from django.db.models import Min, Max
 from django.http import HttpRequest
 from django.template import Context, RequestContext, Template, TemplateSyntaxError
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.test.utils import override_settings, requires_tz_support
+from django.test import TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature
+from django.test.utils import requires_tz_support
 from django.utils import six
 from django.utils import timezone
 

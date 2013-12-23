@@ -11,8 +11,8 @@ from threading import local
 from django.conf import settings
 from django.template import Template, Context
 from django.template.base import TemplateSyntaxError
-from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings, TransRealMixin
+from django.test import TestCase, RequestFactory, override_settings
+from django.test.utils import TransRealMixin
 from django.utils import translation
 from django.utils.formats import (get_format, date_format, time_format,
     localize, localize_input, iter_format_modules, get_format_modules,

@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 import datetime
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import override_settings, requires_tz_support
+from django.test import TestCase, override_settings, skipUnlessDBFeature
+from django.test.utils import requires_tz_support
 from django.utils import timezone
 
 from .models import Book, BookSigning

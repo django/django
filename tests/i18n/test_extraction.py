@@ -12,7 +12,7 @@ from django.conf import settings
 from django.core import management
 from django.core.management.utils import find_command
 from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils import six

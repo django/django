@@ -12,9 +12,9 @@ from django.core.urlresolvers import reverse
 from django.template import (TemplateSyntaxError,
     Context, Template, loader)
 import django.template.context
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.test.client import encode_file, RequestFactory
-from django.test.utils import ContextList, override_settings, str_prefix
+from django.test.utils import ContextList, str_prefix
 from django.template.response import SimpleTemplateResponse
 from django.utils._os import upath
 from django.utils.translation import ugettext_lazy

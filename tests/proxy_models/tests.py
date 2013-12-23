@@ -7,8 +7,7 @@ from django.core import management
 from django.core.exceptions import FieldError
 from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models import signals
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 
 
 from .models import (MyPerson, Person, StatusPerson, LowerStatusPerson,

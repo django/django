@@ -4,8 +4,7 @@ from unittest import skipUnless
 
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 
 if HAS_GEOS and HAS_SPATIAL_DB:
     from django.contrib.gis import admin

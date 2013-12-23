@@ -1,8 +1,7 @@
 from __future__ import unicode_literals
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.views.generic.base import View
 from django.utils.encoding import force_str
 

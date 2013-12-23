@@ -20,9 +20,9 @@ from django.db.models import Sum, Avg, Variance, StdDev
 from django.db.models.fields import (AutoField, DateField, DateTimeField,
     DecimalField, IntegerField, TimeField)
 from django.db.utils import ConnectionHandler
-from django.test import (TestCase, skipUnlessDBFeature, skipIfDBFeature,
-    TransactionTestCase)
-from django.test.utils import override_settings, str_prefix
+from django.test import (TestCase, TransactionTestCase, override_settings,
+    skipUnlessDBFeature, skipIfDBFeature)
+from django.test.utils import str_prefix
 from django.utils import six
 from django.utils.six.moves import xrange
 

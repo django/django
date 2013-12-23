@@ -11,9 +11,8 @@ from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.dispatch import receiver
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.signals import setting_changed
-from django.test.utils import override_settings
 from django.utils import translation
 from django.utils.encoding import force_str
 from django.utils.six import binary_type, PY2, StringIO
