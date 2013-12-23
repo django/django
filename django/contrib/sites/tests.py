@@ -4,8 +4,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site, RequestSite, get_current_site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpRequest
-from django.test import TestCase
-from django.test.utils import modify_settings, override_settings
+from django.test import TestCase, modify_settings, override_settings
 
 
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'})

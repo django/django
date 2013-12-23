@@ -14,7 +14,7 @@ from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http.multipartparser import MultiPartParser
 from django.test import TestCase, client
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils.encoding import force_bytes
 from django.utils.six import StringIO
 

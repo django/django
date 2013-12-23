@@ -8,9 +8,9 @@ from django.contrib.admin.views.main import ChangeList
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings, six
+from django.test import TestCase, RequestFactory, override_settings
 from django.utils.encoding import force_text
+from django.utils import six
 
 from .models import Book, Department, Employee
 

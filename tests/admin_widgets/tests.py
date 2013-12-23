@@ -18,7 +18,7 @@ from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import CharField, DateField
 from django.test import TestCase as DjangoTestCase
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils import six
 from django.utils import translation
 

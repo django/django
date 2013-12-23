@@ -1,6 +1,7 @@
-from django.test.utils import override_settings
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
+from django.test import override_settings
+
 from .test_base import MigrationTestBase
 
 

@@ -10,7 +10,7 @@ from django.conf import settings
 from django.template import Template, Context
 from django.template.response import (TemplateResponse, SimpleTemplateResponse,
                                       ContentNotRenderedError)
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils._os import upath
 
 

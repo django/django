@@ -8,8 +8,7 @@ import warnings
 
 from django import http
 from django.contrib.formtools import preview, utils
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils._os import upath
 
 from django.contrib.formtools.tests.forms import (

@@ -6,8 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, clear_url_caches
 from django.http import HttpResponsePermanentRedirect
 from django.middleware.locale import LocaleMiddleware
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.template import Template, Context
 from django.utils._os import upath
 from django.utils import translation

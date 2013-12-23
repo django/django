@@ -19,7 +19,7 @@ from django.core.mail import (EmailMessage, mail_admins, mail_managers,
 from django.core.mail.backends import console, dummy, locmem, filebased, smtp
 from django.core.mail.message import BadHeaderError
 from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils.encoding import force_str, force_text
 from django.utils.six import PY3, StringIO, string_types
 from django.utils.translation import ugettext_lazy

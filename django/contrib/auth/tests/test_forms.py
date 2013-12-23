@@ -12,8 +12,7 @@ from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core import mail
 from django.forms.fields import Field, CharField
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils import translation

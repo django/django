@@ -5,8 +5,7 @@ from django.contrib.sites.models import Site
 from django.contrib.admindocs import utils
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.test import TestCase
-from django.test.utils import modify_settings, override_settings
+from django.test import TestCase, modify_settings, override_settings
 
 
 class MiscTests(TestCase):

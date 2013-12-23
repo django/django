@@ -3,8 +3,7 @@ from django.contrib.auth.models import AbstractUser, Group, User, UserManager
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core import mail
 from django.db.models.signals import post_save
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 
 
 @skipIfCustomUser

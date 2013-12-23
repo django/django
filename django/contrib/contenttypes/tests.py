@@ -5,8 +5,7 @@ from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.models import get_current_site
 from django.db import models
 from django.http import HttpRequest, Http404
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils.http import urlquote
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible

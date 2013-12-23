@@ -5,8 +5,8 @@ import warnings
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
-from django.test import SimpleTestCase, TransactionTestCase, TestCase, signals
-from django.test.utils import modify_settings, override_settings
+from django.test import (SimpleTestCase, TransactionTestCase, TestCase,
+    modify_settings, override_settings, signals)
 from django.utils import six
 
 

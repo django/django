@@ -24,7 +24,7 @@ from __future__ import unicode_literals
 
 from django.core import mail
 from django.test import Client, TestCase, RequestFactory
-from django.test.utils import override_settings
+from django.test import override_settings
 
 from .views import get_view
 
