@@ -1,7 +1,6 @@
 "Utilities for loading models and the modules that contain them."
 
 from collections import defaultdict, OrderedDict
-from contextlib import contextmanager
 import os
 import sys
 import warnings
@@ -349,61 +348,6 @@ class AppCache(object):
         Cancels a previous call to set_installed_apps().
         """
         self.app_configs = self.stored_app_configs.pop()
-
-    ### DANGEROUS METHODS ### (only used to preserve existing tests)
-
-    def _begin_with_app(self, app_name):
-        # Returns an opaque value that can be passed to _end_with_app().
-        app_config = AppConfig.create(app_name)
-        if app_config.label in self.app_configs:
-            return None
-        else:
-            app_config.import_models(self.all_models[app_config.label])
-            self.app_configs[app_config.label] = app_config
-            return app_config
-
-    def _end_with_app(self, app_config):
-        if app_config is not None:
-            del self.app_configs[app_config.label]
-
-    @contextmanager
-    def _with_app(self, app_name):
-        app_config = self._begin_with_app(app_name)
-        try:
-            yield
-        finally:
-            self._end_with_app(app_config)
-
-    def _begin_without_app(self, app_name):
-        # Returns an opaque value that can be passed to _end_without_app().
-        return self.app_configs.pop(app_name.rpartition(".")[2], None)
-
-    def _end_without_app(self, app_config):
-        if app_config is not None:
-            self.app_configs[app_config.label] = app_config
-
-    @contextmanager
-    def _without_app(self, app_name):
-        app_config = self._begin_without_app(app_name)
-        try:
-            yield
-        finally:
-            self._end_without_app(app_config)
-
-    def _begin_empty(self):
-        app_configs, self.app_configs = self.app_configs, OrderedDict()
-        return app_configs
-
-    def _end_empty(self, app_configs):
-        self.app_configs = app_configs
-
-    @contextmanager
-    def _empty(self):
-        app_configs = self._begin_empty()
-        try:
-            yield
-        finally:
-            self._end_empty(app_configs)
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
 

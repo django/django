@@ -20,12 +20,10 @@ except ImportError:
     pkg_resources = None
 
 
-from django.apps import app_cache
 from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import Loader as EggLoader
 from django.template import loader
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils import six
 from django.utils._os import upath
 from django.utils.six import StringIO
@@ -78,25 +76,25 @@ class EggLoaderTest(TestCase):
             os.path.normcase('templates/x.txt'): StringIO("x"),
         })
 
+    @override_settings(INSTALLED_APPS=['egg_empty'])
     def test_empty(self):
         "Loading any template on an empty egg should fail"
-        with app_cache._with_app('egg_empty'):
-            egg_loader = EggLoader()
-            self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "not-existing.html")
+        egg_loader = EggLoader()
+        self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "not-existing.html")
 
+    @override_settings(INSTALLED_APPS=['egg_1'])
     def test_non_existing(self):
         "Template loading fails if the template is not in the egg"
-        with app_cache._with_app('egg_1'):
-            egg_loader = EggLoader()
-            self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "not-existing.html")
+        egg_loader = EggLoader()
+        self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "not-existing.html")
 
+    @override_settings(INSTALLED_APPS=['egg_1'])
     def test_existing(self):
         "A template can be loaded from an egg"
-        with app_cache._with_app('egg_1'):
-            egg_loader = EggLoader()
-            contents, template_name = egg_loader.load_template_source("y.html")
-            self.assertEqual(contents, "y")
-            self.assertEqual(template_name, "egg:egg_1:templates/y.html")
+        egg_loader = EggLoader()
+        contents, template_name = egg_loader.load_template_source("y.html")
+        self.assertEqual(contents, "y")
+        self.assertEqual(template_name, "egg:egg_1:templates/y.html")
 
     def test_not_installed(self):
         "Loading an existent template from an egg not included in any app should fail"

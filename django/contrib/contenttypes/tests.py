@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-from django.apps import app_cache
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.models import get_current_site
@@ -222,12 +221,12 @@ class ContentTypesTests(TestCase):
         user_ct = ContentType.objects.get_for_model(FooWithUrl)
         obj = FooWithUrl.objects.create(name="john")
 
-        with app_cache._with_app('django.contrib.sites'):
+        with self.modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'}):
             response = shortcut(request, user_ct.id, obj.id)
             self.assertEqual("http://%s/users/john/" % get_current_site(request).domain,
                              response._headers.get("location")[1])
 
-        with app_cache._without_app('django.contrib.sites'):
+        with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
             response = shortcut(request, user_ct.id, obj.id)
             self.assertEqual("http://Example.com/users/john/",
                              response._headers.get("location")[1])

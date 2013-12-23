@@ -16,7 +16,6 @@ import unittest
 import warnings
 
 from django import template
-from django.apps import app_cache
 from django.core import urlresolvers
 from django.template import (base as template_base, loader, Context,
     RequestContext, Template, TemplateSyntaxError)
@@ -1879,10 +1878,10 @@ class TemplateTagLoading(TestCase):
         egg_name = '%s/tagsegg.egg' % self.egg_dir
         sys.path.append(egg_name)
         with self.assertRaises(template.TemplateSyntaxError):
-            with app_cache._with_app('tagsegg'):
+            with self.settings(INSTALLED_APPS=['tagsegg']):
                 template.Template(ttext)
         try:
-            with app_cache._with_app('tagsegg'):
+            with self.settings(INSTALLED_APPS=['tagsegg']):
                 template.Template(ttext)
         except template.TemplateSyntaxError as e:
             self.assertTrue('ImportError' in e.args[0])
@@ -1892,7 +1891,7 @@ class TemplateTagLoading(TestCase):
         ttext = "{% load working_egg %}"
         egg_name = '%s/tagsegg.egg' % self.egg_dir
         sys.path.append(egg_name)
-        with app_cache._with_app('tagsegg'):
+        with self.settings(INSTALLED_APPS=['tagsegg']):
             template.Template(ttext)
 
 

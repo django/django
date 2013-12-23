@@ -3,17 +3,17 @@ from __future__ import unicode_literals
 from unittest import skipUnless
 from xml.dom import minidom
 
-from django.apps import app_cache
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
-from django.test import TestCase
+from django.test import TestCase, modify_settings
 
 if HAS_GEOS:
     from .models import City
 
 
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'})
 @skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoFeedTest(TestCase):
 
@@ -21,10 +21,6 @@ class GeoFeedTest(TestCase):
 
     def setUp(self):
         Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
-        self._with_sites = app_cache._begin_with_app('django.contrib.sites')
-
-    def tearDown(self):
-        app_cache._end_with_app(self._with_sites)
 
     def assertChildNodes(self, elem, expected):
         "Taken from syndication/tests.py."

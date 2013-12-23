@@ -8,7 +8,6 @@ import os
 import pickle
 from threading import local
 
-from django.apps import app_cache
 from django.conf import settings
 from django.template import Template, Context
 from django.template.base import TemplateSyntaxError
@@ -1039,21 +1038,18 @@ class ResolutionOrderI18NTests(TransRealMixin, TestCase):
 class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
     def test_app_translation(self):
-        # This test relies on an implementation detail, namely the fact that
-        # _with_app adds the app at the list. Adjust the test if this changes.
-
         # Original translation.
         self.assertUgettext('Date/time', 'Datum/Zeit')
 
         # Different translation.
-        with app_cache._with_app('i18n.resolution'):
+        with self.modify_settings(INSTALLED_APPS={'append': 'i18n.resolution'}):
             self.flush_caches()
             activate('de')
 
             # Doesn't work because it's added later in the list.
             self.assertUgettext('Date/time', 'Datum/Zeit')
 
-            with app_cache._without_app('admin'):
+            with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.admin'}):
                 self.flush_caches()
                 activate('de')
 
@@ -1068,7 +1064,7 @@ class LocalePathsResolutionOrderI18NTests(ResolutionOrderI18NTests):
         self.assertUgettext('Time', 'LOCALE_PATHS')
 
     def test_locale_paths_override_app_translation(self):
-        with app_cache._with_app('i18n.resolution'):
+        with self.settings(INSTALLED_APPS=['i18n.resolution']):
             self.assertUgettext('Time', 'LOCALE_PATHS')
 
 
