@@ -52,7 +52,7 @@ class AppCache(object):
         # Cache for get_models.
         self._get_models_cache = {}
 
-    def populate_apps(self):
+    def populate_apps(self, installed_apps=None):
         """
         Populate app-related information.
 
@@ -77,7 +77,9 @@ class AppCache(object):
             # Application modules aren't expected to import anything, and
             # especially not other application modules, even indirectly.
             # Therefore we simply import them sequentially.
-            for app_name in settings.INSTALLED_APPS:
+            if installed_apps is None:
+                installed_apps = settings.INSTALLED_APPS
+            for app_name in installed_apps:
                 app_config = AppConfig.create(app_name)
                 self.app_configs[app_config.label] = app_config
 
@@ -299,6 +301,8 @@ class AppCache(object):
 
         available must be an iterable of application names.
 
+        set_available_apps() must be balanced with unset_available_apps().
+
         Primarily used for performance optimization in TransactionTestCase.
 
         This method is safe is the sense that it doesn't trigger any imports.
@@ -323,9 +327,12 @@ class AppCache(object):
 
     def set_installed_apps(self, installed):
         """
-        Enables a different set of installed_apps for get_app_config[s].
+        Enables a different set of installed apps for get_app_config[s].
 
         installed must be an iterable in the same format as INSTALLED_APPS.
+
+        set_installed_apps() must be balanced with unset_installed_apps(),
+        even if it exits with an exception.
 
         Primarily used as a receiver of the setting_changed signal in tests.
 
@@ -337,14 +344,10 @@ class AppCache(object):
         """
         self.stored_app_configs.append(self.app_configs)
         self.app_configs = OrderedDict()
-        try:
-            self._apps_loaded = False
-            self.populate_apps()
-            self._models_loaded = False
-            self.populate_models()
-        except Exception:
-            self.unset_installed_apps()
-            raise
+        self._apps_loaded = False
+        self.populate_apps(installed)
+        self._models_loaded = False
+        self.populate_models()
 
     def unset_installed_apps(self):
         """

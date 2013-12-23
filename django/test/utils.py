@@ -225,22 +225,28 @@ class override_settings(object):
                 test_func._overridden_settings, **self.options)
 
     def enable(self):
+        # Keep this code at the beginning to leave the settings unchanged
+        # in case it raises an exception because INSTALLED_APPS is invalid.
+        if 'INSTALLED_APPS' in self.options:
+            try:
+                app_cache.set_installed_apps(self.options['INSTALLED_APPS'])
+            except Exception:
+                app_cache.unset_installed_apps()
+                raise
         override = UserSettingsHolder(settings._wrapped)
         for key, new_value in self.options.items():
             setattr(override, key, new_value)
         self.wrapped = settings._wrapped
         settings._wrapped = override
-        if 'INSTALLED_APPS' in self.options:
-            app_cache.set_installed_apps(settings.INSTALLED_APPS)
         for key, new_value in self.options.items():
             setting_changed.send(sender=settings._wrapped.__class__,
                                  setting=key, value=new_value, enter=True)
 
     def disable(self):
-        settings._wrapped = self.wrapped
-        del self.wrapped
         if 'INSTALLED_APPS' in self.options:
             app_cache.unset_installed_apps()
+        settings._wrapped = self.wrapped
+        del self.wrapped
         for key in self.options:
             new_value = getattr(settings, key, None)
             setting_changed.send(sender=settings._wrapped.__class__,
