@@ -113,6 +113,9 @@ class AppCache(object):
 
             for app_config in self.app_configs.values():
 
+                if app_config.models is not None:
+                    continue
+
                 try:
                     all_models = self.all_models[app_config.label]
                     app_config.import_models(all_models)
