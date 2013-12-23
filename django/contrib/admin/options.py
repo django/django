@@ -11,6 +11,7 @@ from django.contrib.admin import widgets, helpers
 from django.contrib.admin.utils import (unquote, flatten_fieldsets, get_deleted_objects,
     model_format_dict, NestedObjects, lookup_needs_distinct)
 from django.contrib.admin import validation
+from django.contrib.admin.exceptions import DisallowedModelAdminLookup
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.auth import get_permission_codename
@@ -604,23 +605,33 @@ class ModelAdmin(BaseModelAdmin):
         """
         queryset = self.get_queryset(request)
         model = queryset.model
+        opts = model._meta
 
         if from_field is None:
-            field = model._meta.pk
+            field = opts.pk
         else:
+            # Since `from_field` can be user provided we make sure the field
+            # exists and at least one registered model references it.
             try:
-                field = model._meta.get_field(from_field)
+                field = opts.get_field(from_field)
             except FieldDoesNotExist:
-                return None
+                raise DisallowedModelAdminLookup(
+                    "Filtering by %s is not allowed" % from_field
+                )
+            for related_object in opts.get_all_related_objects():
+                # XXX: This will required adjustments once composite FK lands.
+                if (related_object.model in self.admin_site._registry and
+                    related_object.field.foreign_related_fields[0] is field):
+                    break
+            else:
+                raise DisallowedModelAdminLookup(
+                    "Filtering by %s is not allowed" % from_field
+                )
 
         try:
             value = field.to_python(object_id)
-        except (ValidationError, ValueError):
-            return None
-
-        try:
             return queryset.get(**{field.name: value})
-        except (model.DoesNotExist, model.MultipleObjectsReturned):
+        except (model.DoesNotExist, ValueError, ValidationError):
             return None
 
     def get_changelist_form(self, request, **kwargs):

@@ -564,6 +564,15 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get("/test_admin/admin/admin_views/workhour/?employee__person_ptr__exact=%d" % e1.pk)
         self.assertEqual(response.status_code, 200)
 
+        with patch_logger('django.security.DisallowedModelAdminLookup', 'error') as calls:
+            # Filtering by a invalid field field is not allowed.
+            response = self.client.get("/test_admin/admin/admin_views/workhour/invalid/?_to_field=invalid")
+            self.assertEqual(response.status_code, 400)
+            # Filtering by a non-referenced field is not allowed.
+            response = self.client.get("/test_admin/admin/admin_views/workhour/%s/?_to_field=employee" % e1.pk)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(len(calls), 2)
+
     def test_allowed_filtering_15103(self):
         """
         Regressions test for ticket 15103 - filtering on fields defined in a
