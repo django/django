@@ -135,6 +135,7 @@ class JsI18NTests(TestCase):
         response = self.client.get('/views/jsi18n_admin/?language=de')
         self.assertContains(response, '\\x04')
 
+
 class JsI18NTestsMultiPackage(TestCase):
     """
     Tests for django views in django/views/i18n.py that need to change

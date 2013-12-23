@@ -6,18 +6,56 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.test import SimpleTestCase, TransactionTestCase, TestCase, signals
-from django.test.utils import override_settings
+from django.test.utils import modify_settings, override_settings
 from django.utils import six
 
 
-@override_settings(TEST='override', TEST_OUTER='outer')
+@modify_settings(ITEMS={
+    'prepend': ['b'],
+    'append': ['d'],
+    'remove': ['a', 'e']
+})
+@override_settings(ITEMS=['a', 'c', 'e'], ITEMS_OUTER=[1, 2, 3],
+                   TEST='override', TEST_OUTER='outer')
 class FullyDecoratedTranTestCase(TransactionTestCase):
 
     available_apps = []
 
     def test_override(self):
+        self.assertListEqual(settings.ITEMS, ['b', 'c', 'd'])
+        self.assertListEqual(settings.ITEMS_OUTER, [1, 2, 3])
         self.assertEqual(settings.TEST, 'override')
         self.assertEqual(settings.TEST_OUTER, 'outer')
+
+    @modify_settings(ITEMS={
+        'append': ['e', 'f'],
+        'prepend': ['a'],
+        'remove': ['d', 'c'],
+    })
+    def test_method_list_override(self):
+        self.assertListEqual(settings.ITEMS, ['a', 'b', 'e', 'f'])
+        self.assertListEqual(settings.ITEMS_OUTER, [1, 2, 3])
+
+    @modify_settings(ITEMS={
+        'append': ['b'],
+        'prepend': ['d'],
+        'remove': ['a', 'c', 'e'],
+    })
+    def test_method_list_override_no_ops(self):
+        self.assertListEqual(settings.ITEMS, ['b', 'd'])
+
+    @modify_settings(ITEMS={
+        'append': 'e',
+        'prepend': 'a',
+        'remove': 'c',
+    })
+    def test_method_list_override_strings(self):
+        self.assertListEqual(settings.ITEMS, ['a', 'b', 'd', 'e'])
+
+    @modify_settings(ITEMS={'remove': ['b', 'd']})
+    @modify_settings(ITEMS={'append': ['b'], 'prepend': ['d']})
+    def test_method_list_override_nested_order(self):
+        self.assertListEqual(settings.ITEMS, ['d', 'c', 'b'])
 
     @override_settings(TEST='override2')
     def test_method_override(self):
@@ -31,14 +69,26 @@ class FullyDecoratedTranTestCase(TransactionTestCase):
         self.assertEqual(FullyDecoratedTranTestCase.__module__, __name__)
 
 
-@override_settings(TEST='override')
+@modify_settings(ITEMS={
+    'prepend': ['b'],
+    'append': ['d'],
+    'remove': ['a', 'e']
+})
+@override_settings(ITEMS=['a', 'c', 'e'], TEST='override')
 class FullyDecoratedTestCase(TestCase):
 
     def test_override(self):
+        self.assertListEqual(settings.ITEMS, ['b', 'c', 'd'])
         self.assertEqual(settings.TEST, 'override')
 
+    @modify_settings(ITEMS={
+        'append': 'e',
+        'prepend': 'a',
+        'remove': 'c',
+    })
     @override_settings(TEST='override2')
     def test_method_override(self):
+        self.assertListEqual(settings.ITEMS, ['a', 'b', 'd', 'e'])
         self.assertEqual(settings.TEST, 'override2')
 
 
@@ -73,14 +123,17 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
             self.fail()
 
 
-@override_settings(TEST='override-parent')
+@modify_settings(ITEMS={'append': 'mother'})
+@override_settings(ITEMS=['father'], TEST='override-parent')
 class ParentDecoratedTestCase(TestCase):
     pass
 
 
+@modify_settings(ITEMS={'append': ['child']})
 @override_settings(TEST='override-child')
 class ChildDecoratedTestCase(ParentDecoratedTestCase):
     def test_override_settings_inheritance(self):
+        self.assertEqual(settings.ITEMS, ['father', 'mother', 'child'])
         self.assertEqual(settings.TEST, 'override-child')
 
 

@@ -32,7 +32,7 @@ from django.test.client import Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import setting_changed, template_rendered
 from django.test.utils import (CaptureQueriesContext, ContextList,
-    override_settings, compare_xml)
+    override_settings, modify_settings, compare_xml)
 from django.utils.encoding import force_text
 from django.utils import six
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit, urlparse, unquote
@@ -164,7 +164,8 @@ class SimpleTestCase(unittest.TestCase):
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
-    _custom_settings = None
+    _overridden_settings = None
+    _modified_settings = None
 
     def __call__(self, result=None):
         """
@@ -197,9 +198,12 @@ class SimpleTestCase(unittest.TestCase):
         * If the class has a 'urls' attribute, replace ROOT_URLCONF with it.
         * Clearing the mail test outbox.
         """
-        if self._custom_settings:
-            self._overridden = override_settings(**self._custom_settings)
-            self._overridden.enable()
+        if self._overridden_settings:
+            self._overridden_context = override_settings(**self._overridden_settings)
+            self._overridden_context.enable()
+        if self._modified_settings:
+            self._modified_context = modify_settings(self._modified_settings)
+            self._modified_context.enable()
         self.client = self.client_class()
         self._urlconf_setup()
         mail.outbox = []
@@ -217,8 +221,10 @@ class SimpleTestCase(unittest.TestCase):
         * Putting back the original ROOT_URLCONF if it was changed.
         """
         self._urlconf_teardown()
-        if self._custom_settings:
-            self._overridden.disable()
+        if self._modified_settings:
+            self._modified_context.disable()
+        if self._overridden_settings:
+            self._overridden_context.disable()
 
     def _urlconf_teardown(self):
         set_urlconf(None)
@@ -232,6 +238,13 @@ class SimpleTestCase(unittest.TestCase):
         back to the original value when exiting the context.
         """
         return override_settings(**kwargs)
+
+    def modify_settings(self, **kwargs):
+        """
+        A context manager that temporarily applies changes a list setting and
+        reverts back to the original value when exiting the context.
+        """
+        return modify_settings(**kwargs)
 
     def assertRedirects(self, response, expected_url, status_code=302,
                         target_status_code=200, host=None, msg_prefix='',
