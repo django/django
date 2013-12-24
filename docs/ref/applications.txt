@@ -1,0 +1,191 @@
+============
+Applications
+============
+
+.. module:: django.apps
+
+.. versionadded:: 1.7
+
+Django contains a registry of installed applications that stores configuration
+and provides introspection. It also maintains a list of available :doc:`models
+</topics/db/models>`.
+
+This registry is simply called :attr:`~django.apps.apps` and it's available in
+:mod:`django.apps`::
+
+    >>> from django.apps import apps
+    >>> apps.get_app_config('admin').verbose_name
+    'Admin'
+
+Projects and applications
+=========================
+
+Django has historically used the term **project** to describe an installation
+of Django. A project is defined primarily by a settings module.
+
+The term **application** describes a Python package that provides some set of
+features. Applications may be reused in various projects.
+
+.. note::
+    This terminology is somewhat confusing these days as it became common to
+    use the phrase "web app" to describe what equates to a Django project.
+
+Applications include some combination of models, views, templates, template
+tags, static files, URLs, middleware, etc. They're generally wired into
+projects with the :setting:`INSTALLED_APPS` setting and optionally with other
+mechanisms such as URLconfs, the :setting:`MIDDLEWARE_CLASSES` setting, or
+template inheritance.
+
+It is important to understand that a Django application is just a set of code
+that interacts with various parts of the framework. There's no such thing as
+an ``Application`` object. However, there's a few places where Django needs to
+interact with installed applications, mainly for configuration and also for
+introspection. That's why the application registry maintains metadata in an
+:class:`~django.apps.AppConfig` instance for each installed application.
+
+Configuring applications
+========================
+
+To configure an application, subclass :class:`~django.apps.AppConfig` and put
+the dotted path to that subclass in :setting:`INSTALLED_APPS`.
+
+Django uses the default :class:`~django.apps.AppConfig` class when
+:setting:`INSTALLED_APPS` simply contains the dotted path to an application
+module.
+
+For application authors
+-----------------------
+
+If you're creating a pluggable app called "Rock ’n’ roll", here's how you
+would provide a proper name for the admin::
+
+    # rock_n_roll/app.py
+
+    from django.apps import AppConfig
+
+    class RockNRollConfig(AppConfig):
+        name = 'rock_n_roll'
+        verbose_name = "Rock ’n’ roll"
+
+You would then tell your users to add ``'rock_n_roll.app.RockNRollConfig'`` to
+their :setting:`INSTALLED_APPS`.
+
+The recommended convention is to put the configuration class in a submodule of
+the application called ``app``. However, this isn't enforced by Django.
+
+You must include the :attr:`~django.apps.AppConfig.name` attribute for Django
+to determine which application this configuration applies to. You can define
+any attributes documented in the :class:`~django.apps.AppConfig` API
+reference.
+
+For application users
+---------------------
+
+If you're using "Rock ’n’ roll" in a project called ``anthology``, but you
+want it to show up as "Gypsy jazz" instead, you can provide your own
+configuration::
+
+    # anthology/apps.py
+
+    from rock_n_roll.app import RockNRollConfig
+
+    class GypsyJazzConfig(RockNRollConfig):
+        verbose_name = "Gypsy jazz"
+
+    # anthology/settings.py
+
+    INSTALLED_APPS = [
+        'anthology.apps.GypsyJazzConfig',
+        # ...
+    ]
+
+Again, defining project-specific configuration classes in a submodule called
+``apps`` is a convention, not a requirement.
+
+Application registry
+====================
+
+.. data:: django.apps.apps
+
+    The application registry provides the following public API. Methods that
+    aren't listed below are considered private and may change without notice.
+
+.. method:: django.apps.apps.ready()
+
+    Returns ``True`` if the registry is fully populated.
+
+.. method:: django.apps.apps.get_app_configs(only_with_models_module=False)
+
+    Returns an iterable of :class:`~django.apps.AppConfig` instances.
+
+    If only applications containing a models module are of interest, this method
+    can be called with ``only_with_models_module=True``.
+
+.. method:: django.apps.apps.get_app_config(app_label, only_with_models_module=False)
+
+    Returns an :class:`~django.apps.AppConfig` for the application with the
+    given ``app_label``. Raises :exc:`LookupError` if no such application
+    exists.
+
+    If only applications containing a models module are of interest, this method
+    can be called with ``only_with_models_module=True``.
+
+.. method:: django.apps.apps.has_app(app_name)
+
+    Checks whether an application with the given name exists in the registry.
+    ``app_name`` is the full name of the app, e.g. 'django.contrib.admin'.
+
+    Unlike :meth:`~django.apps.apps.get_app_config`, this method can be called
+    safely at import time. If the registry is still being populated, it may
+    return ``False``, even though the app will become available later.
+
+Application configuration
+=========================
+
+.. class:: django.apps.AppConfig
+
+    Application configuration objects store metadata for an application. Some
+    attributes can be configured in :class:`~django.apps.AppConfig`
+    subclasses. Others are set by Django and read-only.
+
+Configurable attributes
+-----------------------
+
+.. data:: django.apps.AppConfig.verbose_name
+
+    Human-readable name for the application, e.g. "Admin".
+
+    If this isn't provided, Django uses ``label.title()``.
+
+Read-only attributes
+--------------------
+
+.. data:: django.apps.AppConfig.name
+
+    Full Python path to the application, e.g. ``'django.contrib.admin'``.
+
+.. data:: django.apps.AppConfig.label
+
+    Last component of the Python path to the application, e.g. ``'admin'``.
+
+    This value must be unique across a Django project.
+
+.. data:: django.apps.AppConfig.path
+
+    Filesystem path to the application directory, e.g.
+    ``'/usr/lib/python2.7/dist-packages/django/contrib/admin'``.
+
+    It may be ``None`` if the application isn't stored in a directory, for
+    instance if it's loaded from an egg.
+
+.. data:: django.apps.AppConfig.app_module
+
+    Root module for the application, e.g. ``<module 'django.contrib.admin' from
+    'django/contrib/admin/__init__.pyc'>``.
+
+.. data:: django.apps.AppConfig.models_module
+
+    Module containing the models, e.g. ``<module 'django.contrib.admin.models'
+    from 'django/contrib/admin/models.pyc'>``.
+
+    It may be ``None`` if the application doesn't contain a ``models`` module.

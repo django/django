@@ -179,6 +179,9 @@ testing of Django applications:
   :doc:`Overview <topics/settings>` |
   :doc:`Full list of settings <ref/settings>`
 
+* **Applications:**
+  :doc:`Overview <ref/applications>`
+
 * **Exceptions:**
   :doc:`Overview <ref/exceptions>`
 
