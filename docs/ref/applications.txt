@@ -124,8 +124,8 @@ Application registry
 .. method:: django.apps.apps.get_app_config(app_label, only_with_models_module=False)
 
     Returns an :class:`~django.apps.AppConfig` for the application with the
-    given ``app_label``. Raises :exc:`LookupError` if no such application
-    exists.
+    given ``app_label``. Raises :exc:`~exceptions.LookupError` if no such
+    application exists.
 
     If only applications containing a models module are of interest, this method
     can be called with ``only_with_models_module=True``.
