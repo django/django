@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 
 import os
 import sys
+import warnings
 
 from optparse import make_option, OptionParser
 
@@ -112,8 +113,8 @@ class BaseCommand(object):
     ``args``
         A string listing the arguments accepted by the command,
         suitable for use in help messages; e.g., a command which takes
-        a list of application names might set this to '<appname
-        appname ...>'.
+        a list of application names might set this to '<app_label
+        app_label ...>'.
 
     ``can_import_settings``
         A boolean indicating whether the command needs to be able to
@@ -331,19 +332,18 @@ class BaseCommand(object):
 
 class AppCommand(BaseCommand):
     """
-    A management command which takes one or more installed application
-    names as arguments, and does something with each of them.
+    A management command which takes one or more installed application labels
+    as arguments, and does something with each of them.
 
     Rather than implementing ``handle()``, subclasses must implement
-    ``handle_app()``, which will be called once for each application.
-
+    ``handle_app_config()``, which will be called once for each application.
     """
-    args = '<appname appname ...>'
+    args = '<app_label app_label ...>'
 
     def handle(self, *app_labels, **options):
         from django.apps import apps
         if not app_labels:
-            raise CommandError('Enter at least one appname.')
+            raise CommandError("Enter at least one application label.")
         # Populate models and don't use only_with_models_module=True when
         # calling get_app_config() to tell apart missing apps from apps
         # without a model module -- which can't be supported with the legacy
@@ -355,23 +355,36 @@ class AppCommand(BaseCommand):
             raise CommandError("%s. Are you sure your INSTALLED_APPS setting is correct?" % e)
         output = []
         for app_config in app_configs:
-            if app_config.models_module is None:
-                raise CommandError(
-                    "AppCommand cannot handle app %r because it doesn't have "
-                    "a models module." % app_config.label)
-            app_output = self.handle_app(app_config.models_module, **options)
+            app_output = self.handle_app_config(app_config, **options)
             if app_output:
                 output.append(app_output)
         return '\n'.join(output)
 
-    def handle_app(self, app, **options):
+    def handle_app_config(self, app_config, **options):
         """
-        Perform the command's actions for ``app``, which will be the
-        Python module corresponding to an application name given on
-        the command line.
-
+        Perform the command's actions for app_config, an AppConfig instance
+        corresponding to an application label given on the command line.
         """
-        raise NotImplementedError('subclasses of AppCommand must provide a handle_app() method')
+        try:
+            # During the deprecation path, keep delegating to handle_app if
+            # handle_app_config isn't implemented in a subclass.
+            handle_app = self.handle_app
+        except AttributeError:
+            # Keep only this exception when the deprecation completes.
+            raise NotImplementedError(
+                "Subclasses of AppCommand must provide"
+                "a handle_app_config() method.")
+        else:
+            warnings.warn(
+                "AppCommand.handle_app() is superseded by "
+                "AppCommand.handle_app_config().",
+                PendingDeprecationWarning, stacklevel=2)
+            if app_config.models_module is None:
+                raise CommandError(
+                    "AppCommand cannot handle app '%s' in legacy mode "
+                    "because it doesn't have a models module."
+                    % app_config.label)
+            return handle_app(app_config.models_module, **options)
 
 
 class LabelCommand(BaseCommand):
