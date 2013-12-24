@@ -314,12 +314,14 @@ class AppCache(object):
             (label, app_config)
             for label, app_config in self.app_configs.items()
             if app_config.name in available)
+        self.get_models.cache_clear()
 
     def unset_available_apps(self):
         """
         Cancels a previous call to set_available_apps().
         """
         self.app_configs = self.stored_app_configs.pop()
+        self.get_models.cache_clear()
 
     def set_installed_apps(self, installed):
         """
@@ -340,6 +342,7 @@ class AppCache(object):
         """
         self.stored_app_configs.append(self.app_configs)
         self.app_configs = OrderedDict()
+        self.get_models.cache_clear()
         self._apps_loaded = False
         self.populate_apps(installed)
         self._models_loaded = False
@@ -350,6 +353,7 @@ class AppCache(object):
         Cancels a previous call to set_installed_apps().
         """
         self.app_configs = self.stored_app_configs.pop()
+        self.get_models.cache_clear()
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
 
