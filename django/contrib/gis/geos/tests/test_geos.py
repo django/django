@@ -1043,6 +1043,10 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(mpoly.intersects(pnt), prep.intersects(pnt))
             self.assertEqual(c, prep.covers(pnt))
 
+        # Original geometry deletion should not crash the prepared one (#21662)
+        del mpoly
+        self.assertTrue(prep.covers(Point(5, 5)))
+
     def test_line_merge(self):
         "Testing line merge support"
         ref_geoms = (fromstr('LINESTRING(1 1, 1 1, 3 3)'),
