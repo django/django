@@ -278,7 +278,7 @@ class Apps(object):
         app_name is the full name of the app eg. 'django.contrib.admin'.
 
         It's safe to call this method at import time, even while the registry
-        is being populated. It returns None for apps that aren't loaded yet.
+        is being populated. It returns False for apps that aren't loaded yet.
         """
         app_config = self.app_configs.get(app_name.rpartition(".")[2])
         return app_config is not None and app_config.name == app_name
@@ -288,7 +288,7 @@ class Apps(object):
         Returns the model class if one is registered and None otherwise.
 
         It's safe to call this method at import time, even while the registry
-        is being populated. It returns None for models that aren't loaded yet.
+        is being populated. It returns False for models that aren't loaded yet.
         """
         return self.all_models[app_label].get(model_name.lower())
 
