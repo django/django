@@ -722,6 +722,8 @@ Miscellaneous
   ``select_related('foo').select_related('bar')``. Previously the latter would
   have been equivalent to ``select_related('bar')``.
 
+* GeoDjango dropped support for GEOS < 3.1.
+
 Features deprecated in 1.7
 ==========================
 

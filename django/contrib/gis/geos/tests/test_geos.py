@@ -22,8 +22,7 @@ from .. import HAS_GEOS
 if HAS_GEOS:
     from .. import (GEOSException, GEOSIndexError, GEOSGeometry,
         GeometryCollection, Point, MultiPoint, Polygon, MultiPolygon, LinearRing,
-        LineString, MultiLineString, fromfile, fromstr, geos_version_info,
-        GEOS_PREPARE)
+        LineString, MultiLineString, fromfile, fromstr, geos_version_info)
     from ..base import gdal, numpy, GEOSBase
 
 
@@ -121,20 +120,12 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # a bug in versions prior to 3.1 that puts the X coordinate in
         # place of Z; an exception should be raised on those versions.
         self.assertEqual(hexewkb_2d, pnt_2d.hexewkb)
-        if GEOS_PREPARE:
-            self.assertEqual(hexewkb_3d, pnt_3d.hexewkb)
-            self.assertEqual(True, GEOSGeometry(hexewkb_3d).hasz)
-        else:
-            with self.assertRaises(GEOSException):
-                pnt_3d.hexewkb
+        self.assertEqual(hexewkb_3d, pnt_3d.hexewkb)
+        self.assertEqual(True, GEOSGeometry(hexewkb_3d).hasz)
 
         # Same for EWKB.
         self.assertEqual(memoryview(a2b_hex(hexewkb_2d)), pnt_2d.ewkb)
-        if GEOS_PREPARE:
-            self.assertEqual(memoryview(a2b_hex(hexewkb_3d)), pnt_3d.ewkb)
-        else:
-            with self.assertRaises(GEOSException):
-                pnt_3d.ewkb
+        self.assertEqual(memoryview(a2b_hex(hexewkb_3d)), pnt_3d.ewkb)
 
         # Redundant sanity check.
         self.assertEqual(4326, GEOSGeometry(hexewkb_2d).srid)
@@ -869,10 +860,9 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertIsInstance(g1.ogr, gdal.OGRGeometry)
         self.assertIsNone(g1.srs)
 
-        if GEOS_PREPARE:
-            g1_3d = fromstr('POINT(5 23 8)')
-            self.assertIsInstance(g1_3d.ogr, gdal.OGRGeometry)
-            self.assertEqual(g1_3d.ogr.z, 8)
+        g1_3d = fromstr('POINT(5 23 8)')
+        self.assertIsInstance(g1_3d.ogr, gdal.OGRGeometry)
+        self.assertEqual(g1_3d.ogr.z, 8)
 
         g2 = fromstr('LINESTRING(0 0, 5 5, 23 23)', srid=4326)
         self.assertIsInstance(g2.ogr, gdal.OGRGeometry)
@@ -918,10 +908,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
     def test_transform_3d(self):
         p3d = GEOSGeometry('POINT (5 23 100)', 4326)
         p3d.transform(2774)
-        if GEOS_PREPARE:
-            self.assertEqual(p3d.z, 100)
-        else:
-            self.assertIsNone(p3d.z)
+        self.assertEqual(p3d.z, 100)
 
     @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_transform_noop(self):
@@ -1030,7 +1017,6 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 if not no_srid:
                     self.assertEqual(geom.srid, tmpg.srid)
 
-    @skipUnless(HAS_GEOS and GEOS_PREPARE, "geos >= 3.1.0 is required")
     def test_prepared(self):
         "Testing PreparedGeometry support."
         # Creating a simple multipolygon and getting a prepared version.
@@ -1061,7 +1047,6 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         for geom, merged in zip(ref_geoms, ref_merged):
             self.assertEqual(merged, geom.merged)
 
-    @skipUnless(HAS_GEOS and GEOS_PREPARE, "geos >= 3.1.0 is required")
     def test_valid_reason(self):
         "Testing IsValidReason support"
 

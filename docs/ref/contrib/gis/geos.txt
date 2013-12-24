@@ -282,10 +282,6 @@ Returns the EWKB of this Geometry in hexadecimal form.  This is an
 extension of the WKB specification that includes the SRID value
 that are a part of this geometry.
 
-.. note::
-
-   GEOS 3.1 is *required* if you want valid 3D HEXEWKB.
-
 .. attribute:: GEOSGeometry.json
 
 Returns the GeoJSON representation of the geometry.
@@ -328,10 +324,6 @@ as a Python buffer.  SRID value is not included, use the
 Return the EWKB representation of this Geometry as a Python buffer.
 This is an extension of the WKB specification that includes any SRID
 value that are a part of this geometry.
-
-.. note::
-
-   GEOS 3.1 is *required* if you want valid 3D EWKB.
 
 .. attribute:: GEOSGeometry.wkt
 
@@ -533,10 +525,6 @@ a :class:`Polygon`).
 
 .. attribute:: GEOSGeometry.prepared
 
-.. note::
-
-    Support for prepared geometries requires GEOS 3.1.
-
 Returns a GEOS ``PreparedGeometry`` for the contents of this geometry.
 ``PreparedGeometry`` objects are optimized for the contains, intersects,
 and covers operations.  Refer to the :ref:`prepared-geometries` documentation
@@ -710,10 +698,6 @@ Geometry Collections
    more efficient (faster) than trying to union the geometries together
    individually. [#fncascadedunion]_
 
-   .. note::
-
-       GEOS 3.1 is *required* to peform cascaded unions.
-
 ``GeometryCollection``
 ----------------------
 
@@ -739,10 +723,6 @@ may be used with other ``GEOSGeometry`` objects.  An operation with a prepared
 geometry can be orders of magnitude faster -- the more complex the geometry
 that is prepared, the larger the speedup in the operation.  For more information,
 please consult the `GEOS wiki page on prepared geometries <http://trac.osgeo.org/geos/wiki/PreparedGeometry>`_.
-
-.. note::
-
-   GEOS 3.1 is *required* in order to use prepared geometries.
 
 For example::
 
