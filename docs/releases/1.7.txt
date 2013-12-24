@@ -66,12 +66,11 @@ known as the "app cache" dealt with both installed applications and models.
 The models module was used as an identifier for applications in many APIs.
 
 As the concept of :doc:`Django applications </ref/applications>` matured, this
-code showed some shortcomings. It was refactored into an "app registry" where
-models modules no longer have a central role models and where it's possible to
+code showed some shortcomings. It has been refactored into an "app registry"
+where models modules no longer have a central role and where it's possible to
 attach configuration data to applications.
 
-Not only does this prepare the ground for further improvements, but it also
-brings some concrete improvements:
+Improvements thus far include:
 
 * It is possible to omit ``models.py`` entirely if an application doesn't
   have any models.

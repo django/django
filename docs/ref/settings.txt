@@ -1297,7 +1297,7 @@ application. :ref:` Learn more about applications </ref/applications>`.
 .. admonition:: Use the application registry for introspection
 
     Your code should never access :setting:`INSTALLED_APPS` directly. Use the
-    app registry, :attr:`~django.apps.apps`, instead.
+    app registry, :attr:`django.apps.apps`, instead.
 
 .. admonition:: Application labels must be unique
 
