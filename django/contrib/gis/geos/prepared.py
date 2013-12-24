@@ -1,4 +1,5 @@
 from .base import GEOSBase
+from .error import GEOSException
 from .geometry import GEOSGeometry
 from .libgeos import geos_version_info
 from .prototypes import prepared as capi
