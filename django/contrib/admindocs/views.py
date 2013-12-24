@@ -5,7 +5,7 @@ import re
 import warnings
 
 from django import template
-from django.apps import app_cache
+from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
@@ -174,7 +174,7 @@ class ModelIndexView(BaseAdminDocsView):
     template_name = 'admin_doc/model_index.html'
 
     def get_context_data(self, **kwargs):
-        m_list = [m._meta for m in app_cache.get_models()]
+        m_list = [m._meta for m in apps.get_models()]
         kwargs.update({'models': m_list})
         return super(ModelIndexView, self).get_context_data(**kwargs)
 
@@ -185,10 +185,10 @@ class ModelDetailView(BaseAdminDocsView):
     def get_context_data(self, **kwargs):
         # Get the model class.
         try:
-            app_cache.get_app_config(self.kwargs['app_label'])
+            apps.get_app_config(self.kwargs['app_label'])
         except LookupError:
             raise Http404(_("App %(app_label)r not found") % self.kwargs)
-        model = app_cache.get_model(self.kwargs['app_label'], self.kwargs['model_name'])
+        model = apps.get_model(self.kwargs['app_label'], self.kwargs['model_name'])
         if model is None:
             raise Http404(_("Model %(model_name)r not found in app %(app_label)r") % self.kwargs)
 

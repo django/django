@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import os
 
-from django.apps import app_cache
+from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import default_storage, Storage, FileSystemStorage
@@ -43,7 +43,7 @@ class FileSystemFinder(BaseFinder):
     A static files finder that uses the ``STATICFILES_DIRS`` setting
     to locate files.
     """
-    def __init__(self, apps=None, *args, **kwargs):
+    def __init__(self, app_names=None, *args, **kwargs):
         # List of locations with static files
         self.locations = []
         # Maps dir paths to an appropriate storage instance
@@ -114,15 +114,15 @@ class AppDirectoriesFinder(BaseFinder):
     """
     storage_class = AppStaticStorage
 
-    def __init__(self, apps=None, *args, **kwargs):
+    def __init__(self, app_names=None, *args, **kwargs):
         # The list of apps that are handled
         self.apps = []
         # Mapping of app names to storage instances
         self.storages = OrderedDict()
-        if apps is None:
-            app_configs = app_cache.get_app_configs()
-            apps = [app_config.name for app_config in app_configs]
-        for app in apps:
+        if app_names is None:
+            app_configs = apps.get_app_configs()
+            app_names = [app_config.name for app_config in app_configs]
+        for app in app_names:
             app_storage = self.storage_class(app)
             if os.path.isdir(app_storage.location):
                 self.storages[app] = app_storage

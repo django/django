@@ -9,7 +9,7 @@ import re
 import unittest as real_unittest
 import warnings
 
-from django.apps import app_cache
+from django.apps import apps
 from django.test import _doctest as doctest
 from django.test import runner
 from django.test.utils import compare_xml, strip_quotes
@@ -168,7 +168,7 @@ def build_test(label):
         raise ValueError("Test label '%s' should be of the form app.TestCase "
                          "or app.TestCase.test_method" % label)
 
-    app_config = app_cache.get_app_config(parts[0])
+    app_config = apps.get_app_config(parts[0])
     models_module = app_config.models_module
     tests_module = get_tests(app_config)
 
@@ -237,10 +237,10 @@ class DjangoTestSuiteRunner(runner.DiscoverRunner):
                 if '.' in label:
                     suite.addTest(build_test(label))
                 else:
-                    app_config = app_cache.get_app_config(label)
+                    app_config = apps.get_app_config(label)
                     suite.addTest(build_suite(app_config))
         else:
-            for app_config in app_cache.get_app_configs():
+            for app_config in apps.get_app_configs():
                 suite.addTest(build_suite(app_config))
 
         if extra_tests:

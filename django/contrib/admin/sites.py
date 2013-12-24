@@ -6,7 +6,7 @@ from django.contrib.auth import logout as auth_logout, REDIRECT_FIELD_NAME
 from django.contrib.contenttypes import views as contenttype_views
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
-from django.apps import app_cache
+from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.response import TemplateResponse
@@ -160,11 +160,11 @@ class AdminSite(object):
         The default implementation checks that admin and contenttypes apps are
         installed, as well as the auth context processor.
         """
-        app_cache.populate_apps()
-        if not app_cache.has_app('django.contrib.admin'):
+        apps.populate_apps()
+        if not apps.has_app('django.contrib.admin'):
             raise ImproperlyConfigured("Put 'django.contrib.admin' in your "
                 "INSTALLED_APPS setting in order to use the admin application.")
-        if not app_cache.has_app('django.contrib.contenttypes'):
+        if not apps.has_app('django.contrib.contenttypes'):
             raise ImproperlyConfigured("Put 'django.contrib.contenttypes' in "
                 "your INSTALLED_APPS setting in order to use the admin application.")
         if 'django.contrib.auth.context_processors.auth' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
@@ -381,7 +381,7 @@ class AdminSite(object):
                         app_dict[app_label]['models'].append(model_dict)
                     else:
                         app_dict[app_label] = {
-                            'name': app_cache.get_app_config(app_label).verbose_name,
+                            'name': apps.get_app_config(app_label).verbose_name,
                             'app_label': app_label,
                             'app_url': reverse('admin:app_list', kwargs={'app_label': app_label}, current_app=self.name),
                             'has_module_perms': has_module_perms,
@@ -408,7 +408,7 @@ class AdminSite(object):
 
     def app_index(self, request, app_label, extra_context=None):
         user = request.user
-        app_name = app_cache.get_app_config(app_label).verbose_name
+        app_name = apps.get_app_config(app_label).verbose_name
         has_module_perms = user.has_module_perms(app_label)
         if not has_module_perms:
             raise PermissionDenied

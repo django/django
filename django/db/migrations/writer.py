@@ -5,7 +5,7 @@ from importlib import import_module
 import os
 import types
 
-from django.apps import app_cache
+from django.apps import apps
 from django.db import models
 from django.db.migrations.loader import MigrationLoader
 from django.utils.encoding import force_text
@@ -69,7 +69,7 @@ class MigrationWriter(object):
             migrations_module = import_module(migrations_package_name)
             basedir = os.path.dirname(migrations_module.__file__)
         except ImportError:
-            app_config = app_cache.get_app_config(self.migration.app_label)
+            app_config = apps.get_app_config(self.migration.app_label)
             migrations_package_basename = migrations_package_name.split(".")[-1]
 
             # Alright, see if it's a direct submodule of the app

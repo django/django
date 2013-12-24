@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.apps import app_cache
+from django.apps import apps
 from django.db import models
 from django.template import Context, Template
 from django.test import TestCase, override_settings
@@ -110,7 +110,7 @@ class ManagersRegressionTests(TestCase):
     def test_swappable_manager(self):
         # The models need to be removed after the test in order to prevent bad
         # interactions with the flush operation in other tests.
-        _old_models = app_cache.app_configs['managers_regress'].models.copy()
+        _old_models = apps.app_configs['managers_regress'].models.copy()
 
         try:
             class SwappableModel(models.Model):
@@ -126,15 +126,15 @@ class ManagersRegressionTests(TestCase):
                 self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
 
         finally:
-            app_cache.app_configs['managers_regress'].models = _old_models
-            app_cache.all_models['managers_regress'] = _old_models
-            app_cache.get_models.cache_clear()
+            apps.app_configs['managers_regress'].models = _old_models
+            apps.all_models['managers_regress'] = _old_models
+            apps.get_models.cache_clear()
 
     @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
     def test_custom_swappable_manager(self):
         # The models need to be removed after the test in order to prevent bad
         # interactions with the flush operation in other tests.
-        _old_models = app_cache.app_configs['managers_regress'].models.copy()
+        _old_models = apps.app_configs['managers_regress'].models.copy()
 
         try:
             class SwappableModel(models.Model):
@@ -154,15 +154,15 @@ class ManagersRegressionTests(TestCase):
                 self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
 
         finally:
-            app_cache.app_configs['managers_regress'].models = _old_models
-            app_cache.all_models['managers_regress'] = _old_models
-            app_cache.get_models.cache_clear()
+            apps.app_configs['managers_regress'].models = _old_models
+            apps.all_models['managers_regress'] = _old_models
+            apps.get_models.cache_clear()
 
     @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
     def test_explicit_swappable_manager(self):
         # The models need to be removed after the test in order to prevent bad
         # interactions with the flush operation in other tests.
-        _old_models = app_cache.app_configs['managers_regress'].models.copy()
+        _old_models = apps.app_configs['managers_regress'].models.copy()
 
         try:
             class SwappableModel(models.Model):
@@ -182,9 +182,9 @@ class ManagersRegressionTests(TestCase):
                 self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
 
         finally:
-            app_cache.app_configs['managers_regress'].models = _old_models
-            app_cache.all_models['managers_regress'] = _old_models
-            app_cache.get_models.cache_clear()
+            apps.app_configs['managers_regress'].models = _old_models
+            apps.all_models['managers_regress'] = _old_models
+            apps.get_models.cache_clear()
 
     def test_regress_3871(self):
         related = RelatedModel.objects.create()

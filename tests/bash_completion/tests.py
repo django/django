@@ -5,7 +5,7 @@ import os
 import sys
 import unittest
 
-from django.apps import app_cache
+from django.apps import apps
 from django.core.management import ManagementUtility
 from django.utils.six import StringIO
 
@@ -85,6 +85,6 @@ class BashCompletionTests(unittest.TestCase):
         self._user_input('django-admin.py sqlall a')
         output = self._run_autocomplete()
         a_labels = sorted(app_config.label
-            for app_config in app_cache.get_app_configs()
+            for app_config in apps.get_app_configs()
             if app_config.label.startswith('a'))
         self.assertEqual(output, a_labels)

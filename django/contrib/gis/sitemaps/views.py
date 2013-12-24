@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import warnings
 
-from django.apps import app_cache
+from django.apps import apps
 from django.http import HttpResponse, Http404
 from django.template import loader
 from django.contrib.sites.models import get_current_site
@@ -81,7 +81,7 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
     must be that of a geographic field.
     """
     placemarks = []
-    klass = app_cache.get_model(label, model)
+    klass = apps.get_model(label, model)
     if not klass:
         raise Http404('You must supply a valid app label and module name.  Got "%s.%s"' % (label, model))
 

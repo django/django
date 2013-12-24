@@ -37,7 +37,7 @@ class Command(BaseCommand):
     args = '[appname appname.ModelName ...]'
 
     def handle(self, *app_labels, **options):
-        from django.apps import app_cache
+        from django.apps import apps
 
         format = options.get('format')
         indent = options.get('indent')
@@ -63,13 +63,13 @@ class Command(BaseCommand):
         for exclude in excludes:
             if '.' in exclude:
                 app_label, model_name = exclude.split('.', 1)
-                model_obj = app_cache.get_model(app_label, model_name)
+                model_obj = apps.get_model(app_label, model_name)
                 if not model_obj:
                     raise CommandError('Unknown model in excludes: %s' % exclude)
                 excluded_models.add(model_obj)
             else:
                 try:
-                    app_obj = app_cache.get_app_config(exclude).models_module
+                    app_obj = apps.get_app_config(exclude).models_module
                     if app_obj is not None:
                         excluded_apps.add(app_obj)
                 except LookupError:
@@ -79,7 +79,7 @@ class Command(BaseCommand):
             if primary_keys:
                 raise CommandError("You can only use --pks option with one model")
             app_list = OrderedDict((app_config.models_module, None)
-                for app_config in app_cache.get_app_configs(only_with_models_module=True)
+                for app_config in apps.get_app_configs(only_with_models_module=True)
                 if app_config.models_module not in excluded_apps)
         else:
             if len(app_labels) > 1 and primary_keys:
@@ -89,12 +89,12 @@ class Command(BaseCommand):
                 try:
                     app_label, model_label = label.split('.')
                     try:
-                        app = app_cache.get_app_config(app_label).models_module
+                        app = apps.get_app_config(app_label).models_module
                     except LookupError:
                         raise CommandError("Unknown application: %s" % app_label)
                     if app is None or app in excluded_apps:
                         continue
-                    model = app_cache.get_model(app_label, model_label)
+                    model = apps.get_model(app_label, model_label)
                     if model is None:
                         raise CommandError("Unknown model: %s.%s" % (app_label, model_label))
 
@@ -109,7 +109,7 @@ class Command(BaseCommand):
                     # This is just an app - no model qualifier
                     app_label = label
                     try:
-                        app = app_cache.get_app_config(app_label).models_module
+                        app = apps.get_app_config(app_label).models_module
                     except LookupError:
                         raise CommandError("Unknown application: %s" % app_label)
                     if app is None or app in excluded_apps:
@@ -162,13 +162,13 @@ def sort_dependencies(app_list):
     is serialized before a normal model, and any model with a natural key
     dependency has it's dependencies serialized first.
     """
-    from django.apps import app_cache
+    from django.apps import apps
     # Process the list of models, and get the list of dependencies
     model_dependencies = []
     models = set()
     for app, model_list in app_list:
         if model_list is None:
-            model_list = app_cache.get_models(app)
+            model_list = apps.get_models(app)
 
         for model in model_list:
             models.add(model)
@@ -176,7 +176,7 @@ def sort_dependencies(app_list):
             if hasattr(model, 'natural_key'):
                 deps = getattr(model.natural_key, 'dependencies', [])
                 if deps:
-                    deps = [app_cache.get_model(*d.split('.')) for d in deps]
+                    deps = [apps.get_model(*d.split('.')) for d in deps]
             else:
                 deps = []
 

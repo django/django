@@ -2,7 +2,7 @@ from importlib import import_module
 import os
 import sys
 
-from django.apps import app_cache
+from django.apps import apps
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.graph import MigrationGraph
 from django.utils import six
@@ -46,7 +46,7 @@ class MigrationLoader(object):
         if app_label in settings.MIGRATION_MODULES:
             return settings.MIGRATION_MODULES[app_label]
         else:
-            return '%s.migrations' % app_cache.get_app_config(app_label).name
+            return '%s.migrations' % apps.get_app_config(app_label).name
 
     def load_disk(self):
         """
@@ -55,7 +55,7 @@ class MigrationLoader(object):
         self.disk_migrations = {}
         self.unmigrated_apps = set()
         self.migrated_apps = set()
-        for app_config in app_cache.get_app_configs(only_with_models_module=True):
+        for app_config in apps.get_app_configs(only_with_models_module=True):
             # Get the migrations module directory
             module_name = self.migrations_module(app_config.label)
             was_loaded = module_name in sys.modules

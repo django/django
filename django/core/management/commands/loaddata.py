@@ -7,7 +7,7 @@ import warnings
 import zipfile
 from optparse import make_option
 
-from django.apps import app_cache
+from django.apps import apps
 from django.conf import settings
 from django.core import serializers
 from django.core.management.base import BaseCommand, CommandError
@@ -230,7 +230,7 @@ class Command(BaseCommand):
         current directory.
         """
         dirs = []
-        for app_config in app_cache.get_app_configs():
+        for app_config in apps.get_app_configs():
             d = os.path.join(app_config.path, 'fixtures')
             if os.path.isdir(d):
                 dirs.append(d)

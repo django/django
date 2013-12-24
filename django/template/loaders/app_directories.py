@@ -6,7 +6,7 @@ packages.
 import os
 import sys
 
-from django.apps import app_cache
+from django.apps import apps
 from django.conf import settings
 from django.template.base import TemplateDoesNotExist
 from django.template.loader import BaseLoader
@@ -17,7 +17,7 @@ from django.utils import six
 if six.PY2:
     fs_encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
 app_template_dirs = []
-for app_config in app_cache.get_app_configs():
+for app_config in apps.get_app_configs():
     template_dir = os.path.join(app_config.path, 'templates')
     if os.path.isdir(template_dir):
         if six.PY2:

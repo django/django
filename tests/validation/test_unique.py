@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import datetime
 import unittest
 
-from django.apps.cache import AppCache
+from django.apps.registry import Apps
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.test import TestCase
@@ -58,7 +58,7 @@ class GetUniqueCheckTests(unittest.TestCase):
 
                 Meta = type(str('Meta'), (), {
                     'unique_together': unique_together,
-                    'app_cache': AppCache()
+                    'apps': Apps()
                 })
 
             checks, _ = M()._get_unique_checks()

@@ -97,8 +97,8 @@ class AppConfig(object):
 
     def import_models(self, all_models):
         # Dictionary of models for this app, stored in the 'all_models'
-        # attribute of the AppCache this AppConfig is attached to. Injected as
-        # a parameter because it may get populated before this method has run.
+        # attribute of the Apps this AppConfig is attached to. Injected as a
+        # parameter because it may get populated before this method has run.
         self.models = all_models
 
         if module_has_submodule(self.app_module, MODELS_MODULE_NAME):

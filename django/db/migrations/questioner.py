@@ -2,7 +2,7 @@ import importlib
 import os
 import sys
 
-from django.apps import app_cache
+from django.apps import apps
 from django.utils import datetime_safe
 from django.utils.six.moves import input
 
@@ -28,7 +28,7 @@ class MigrationQuestioner(object):
         # Apps from the new app template will have these; the python
         # file check will ensure we skip South ones.
         try:
-            app_config = app_cache.get_app_config(app_label)
+            app_config = apps.get_app_config(app_label)
         except LookupError:         # It's a fake app.
             return self.defaults.get("ask_initial", False)
         migrations_import_path = "%s.migrations" % app_config.name

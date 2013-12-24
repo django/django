@@ -36,7 +36,7 @@ import sys
 import time
 import traceback
 
-from django.apps import app_cache
+from django.apps import apps
 from django.conf import settings
 from django.core.signals import request_finished
 try:
@@ -90,7 +90,7 @@ def gen_filenames():
         basedirs = [os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                  'conf', 'locale'),
                     'locale']
-        for app_config in reversed(list(app_cache.get_app_configs())):
+        for app_config in reversed(list(apps.get_app_configs())):
             basedirs.append(os.path.join(app_config.path, 'locale'))
         basedirs.extend(settings.LOCALE_PATHS)
         basedirs = [os.path.abspath(basedir) for basedir in basedirs

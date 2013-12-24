@@ -282,6 +282,6 @@ class ConnectionRouter(object):
         """
         Return app models allowed to be synchronized on provided db.
         """
-        from django.apps import app_cache
-        return [model for model in app_cache.get_models(app, include_auto_created=include_auto_created)
+        from django.apps import apps
+        return [model for model in apps.get_models(app, include_auto_created=include_auto_created)
                 if self.allow_migrate(db, model)]
