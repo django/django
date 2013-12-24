@@ -58,6 +58,27 @@ but a few of the key features are:
   will still work, but that method name is deprecated and you should change
   it as soon as possible (nothing more than renaming is required).
 
+App-loading refactor
+~~~~~~~~~~~~~~~~~~~~
+
+Historically, Django applications were tightly linked to models. A singleton
+known as the "app cache" dealt with both installed applications and models.
+The models module was used as an identifier for applications in many APIs.
+
+As the concept of :doc:`Django applications </ref/applications>` matured, this
+code showed some shortcomings. It was refactored into an "app registry" where
+models modules no longer have a central role models and where it's possible to
+attach configuration data to applications.
+
+Not only does this prepare the ground for further improvements, but it also
+brings some concrete improvements:
+
+* It is possible to omit ``models.py`` entirely if an application doesn't
+  have any models.
+
+* The name of applications can be customized in the admin with the
+  :attr:`~django.apps.AppConfig.verbose_name` of application configurations.
+
 New method on Field subclasses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -569,6 +590,22 @@ For apps with migrations, ``allow_migrate`` will now get passed
 :ref:`historical models <historical-models>`, which are special versioned models
 without custom attributes, methods or managers. Make sure your ``allow_migrate``
 methods are only referring to fields or other items in ``model._meta``.
+
+App-loading changes
+~~~~~~~~~~~~~~~~~~~
+
+Since :setting:`INSTALLED_APPS` now supports application configuration classes
+in addition to application modules, you should review code that accesses this
+setting directly and use the app registry (:attr:`django.apps.apps`) instead.
+
+The "app registry" that manages the list of installed applications doesn't
+have the same features as the old "app cache". However, even though the "app
+cache" was a private API, most of its methods were temporarily preserved and
+will go through a deprecation path.
+
+While the new implementation is believed to be more robust, regressions cannot
+be ruled out, especially during the import sequence. Circular imports that
+didn't happen with previous versions of Django might appear.
 
 Behavior of ``LocMemCache`` regarding pickle errors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

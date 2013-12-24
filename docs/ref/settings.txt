@@ -1290,6 +1290,15 @@ Django installation. Each string should be a full Python path to an
 application configuration class or to a Python package containing a
 application. :ref:` Learn more about applications </ref/applications>`.
 
+.. versionchanged:: 1.7
+
+    :setting:`INSTALLED_APPS` now supports application configurations.
+
+.. admonition:: Use the application registry for introspection
+
+    Your code should never access :setting:`INSTALLED_APPS` directly. Use the
+    app registry, :attr:`~django.apps.apps`, instead.
+
 .. admonition:: Application labels must be unique
 
     Application labels (that is, the final part of the dotted path to
