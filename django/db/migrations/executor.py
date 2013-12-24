@@ -129,10 +129,10 @@ class MigrationExecutor(object):
         on initial migrations (as it only looks for CreateModel).
         """
         project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=True)
-        app_cache = project_state.render()
+        apps = project_state.render()
         for operation in migration.operations:
             if isinstance(operation, migrations.CreateModel):
-                model = app_cache.get_model(migration.app_label, operation.name)
+                model = apps.get_model(migration.app_label, operation.name)
                 if model._meta.db_table not in self.connection.introspection.get_table_list(self.connection.cursor()):
                     return False
         return True

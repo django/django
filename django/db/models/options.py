@@ -5,7 +5,7 @@ import re
 from bisect import bisect
 import warnings
 
-from django.apps import app_cache
+from django.apps import apps
 from django.conf import settings
 from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
@@ -22,7 +22,7 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
-                 'index_together', 'app_cache', 'default_permissions',
+                 'index_together', 'apps', 'default_permissions',
                  'select_on_save')
 
 
@@ -88,13 +88,13 @@ class Options(object):
         # from *other* models. Needed for some admin checks. Internal use only.
         self.related_fkey_lookups = []
 
-        # A custom AppCache to use, if you're making a separate model set.
-        self.app_cache = app_cache
+        # A custom app registry to use, if you're making a separate model set.
+        self.apps = apps
 
     @property
     def app_config(self):
         # Don't go through get_app_config to avoid triggering imports.
-        return self.app_cache.app_configs.get(self.app_label)
+        return self.apps.app_configs.get(self.app_label)
 
     @property
     def installed(self):
@@ -440,7 +440,7 @@ class Options(object):
             if hasattr(f, 'related'):
                 cache[f.name] = cache[f.attname] = (
                     f.related, None if f.model == self.model else f.model, True, False)
-        if app_cache.app_cache_ready():
+        if apps.ready():
             self._name_map = cache
         return cache
 
@@ -516,7 +516,7 @@ class Options(object):
                     cache[obj] = model
         # Collect also objects which are in relation to some proxy child/parent of self.
         proxy_cache = cache.copy()
-        for klass in self.app_cache.get_models(include_auto_created=True, only_installed=False):
+        for klass in self.apps.get_models(include_auto_created=True, only_installed=False):
             if not klass._meta.swapped:
                 for f in klass._meta.local_fields:
                     if f.rel and not isinstance(f.rel.to, six.string_types) and f.generate_reverse_relation:
@@ -559,14 +559,14 @@ class Options(object):
                     cache[obj] = parent
                 else:
                     cache[obj] = model
-        for klass in self.app_cache.get_models(only_installed=False):
+        for klass in self.apps.get_models(only_installed=False):
             if not klass._meta.swapped:
                 for f in klass._meta.local_many_to_many:
                     if (f.rel
                             and not isinstance(f.rel.to, six.string_types)
                             and self == f.rel.to._meta):
                         cache[f.related] = None
-        if app_cache.app_cache_ready():
+        if apps.ready():
             self._related_many_to_many_cache = cache
         return cache
 

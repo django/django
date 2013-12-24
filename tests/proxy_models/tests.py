@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.apps import app_cache
+from django.apps import apps
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
@@ -155,7 +155,7 @@ class ProxyModelTests(TestCase):
     def test_swappable(self):
         # The models need to be removed after the test in order to prevent bad
         # interactions with the flush operation in other tests.
-        _old_models = app_cache.app_configs['proxy_models'].models.copy()
+        _old_models = apps.app_configs['proxy_models'].models.copy()
 
         try:
             class SwappableModel(models.Model):
@@ -173,9 +173,9 @@ class ProxyModelTests(TestCase):
                     class Meta:
                         proxy = True
         finally:
-            app_cache.app_configs['proxy_models'].models = _old_models
-            app_cache.all_models['proxy_models'] = _old_models
-            app_cache.get_models.cache_clear()
+            apps.app_configs['proxy_models'].models = _old_models
+            apps.all_models['proxy_models'] = _old_models
+            apps.get_models.cache_clear()
 
     def test_myperson_manager(self):
         Person.objects.create(name="fred")

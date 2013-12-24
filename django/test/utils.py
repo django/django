@@ -9,7 +9,7 @@ import warnings
 from functools import wraps
 from xml.dom.minidom import parseString, Node
 
-from django.apps import app_cache
+from django.apps import apps
 from django.conf import settings, UserSettingsHolder
 from django.core import mail
 from django.core.signals import request_started
@@ -229,9 +229,9 @@ class override_settings(object):
         # in case it raises an exception because INSTALLED_APPS is invalid.
         if 'INSTALLED_APPS' in self.options:
             try:
-                app_cache.set_installed_apps(self.options['INSTALLED_APPS'])
+                apps.set_installed_apps(self.options['INSTALLED_APPS'])
             except Exception:
-                app_cache.unset_installed_apps()
+                apps.unset_installed_apps()
                 raise
         override = UserSettingsHolder(settings._wrapped)
         for key, new_value in self.options.items():
@@ -244,7 +244,7 @@ class override_settings(object):
 
     def disable(self):
         if 'INSTALLED_APPS' in self.options:
-            app_cache.unset_installed_apps()
+            apps.unset_installed_apps()
         settings._wrapped = self.wrapped
         del self.wrapped
         for key in self.options:

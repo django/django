@@ -10,7 +10,7 @@ import gettext as gettext_module
 from threading import local
 import warnings
 
-from django.apps import app_cache
+from django.apps import apps
 from django.dispatch import receiver
 from django.test.signals import setting_changed
 from django.utils.encoding import force_str, force_text
@@ -179,7 +179,7 @@ def translation(language):
                     res.merge(t)
             return res
 
-        for app_config in reversed(list(app_cache.get_app_configs())):
+        for app_config in reversed(list(apps.get_app_configs())):
             apppath = os.path.join(app_config.path, 'locale')
             if os.path.isdir(apppath):
                 res = _merge(apppath)

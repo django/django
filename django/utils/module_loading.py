@@ -58,10 +58,10 @@ def autodiscover_modules(*args, **kwargs):
     registry. This register_to object must have a _registry instance variable
     to access it.
     """
-    from django.apps import app_cache
+    from django.apps import apps
 
     register_to = kwargs.get('register_to')
-    for app_config in app_cache.get_app_configs():
+    for app_config in apps.get_app_configs():
         # Attempt to import the app's module.
         try:
             if register_to:

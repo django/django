@@ -134,7 +134,7 @@ class RunPython(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         # We now execute the Python code in a context that contains a 'models'
-        # object, representing the versioned models as an AppCache.
+        # object, representing the versioned models as an app registry.
         # We could try to override the global cache, but then people will still
         # use direct imports, so we go with a documentation approach instead.
         if callable(self.code):

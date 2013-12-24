@@ -203,8 +203,8 @@ class OperationTests(MigrationTestBase):
         self.assertColumnNotExists("test_adflmm_pony", "stables")
         # Make sure the M2M field actually works
         with atomic():
-            new_app_cache = new_state.render()
-            Pony = new_app_cache.get_model("test_adflmm", "Pony")
+            new_apps = new_state.render()
+            Pony = new_apps.get_model("test_adflmm", "Pony")
             p = Pony.objects.create(pink=False, weight=4.55)
             p.stables.create()
             self.assertEqual(p.stables.count(), 1)

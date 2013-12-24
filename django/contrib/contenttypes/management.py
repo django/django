@@ -1,4 +1,4 @@
-from django.apps import app_cache
+from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.db import DEFAULT_DB_ALIAS, router
 from django.db.models import signals
@@ -12,14 +12,14 @@ def update_contenttypes(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, *
     Creates content types for models in the given app, removing any model
     entries that no longer have a matching model class.
     """
-    if app_cache.get_model('contenttypes', 'ContentType') is None:
+    if apps.get_model('contenttypes', 'ContentType') is None:
         return
 
     if not router.allow_migrate(db, ContentType):
         return
 
     ContentType.objects.clear_cache()
-    app_models = app_cache.get_models(app)
+    app_models = apps.get_models(app)
     if not app_models:
         return
     # They all have the same app_label, get the first one.
@@ -84,7 +84,7 @@ If you're unsure, answer 'no'.
 
 
 def update_all_contenttypes(verbosity=2, **kwargs):
-    for app_config in app_cache.get_app_configs(only_with_models_module=True):
+    for app_config in apps.get_app_configs(only_with_models_module=True):
         update_contenttypes(app_config.models_module, None, verbosity, **kwargs)
 
 signals.post_migrate.connect(update_contenttypes)

@@ -68,13 +68,13 @@ def add_lazy_relation(cls, field, relation, operation):
     # string right away. If get_model returns None, it means that the related
     # model isn't loaded yet, so we need to pend the relation until the class
     # is prepared.
-    model = cls._meta.app_cache.get_registered_model(app_label, model_name)
+    model = cls._meta.apps.get_registered_model(app_label, model_name)
     if model:
         operation(field, model, cls)
     else:
         key = (app_label, model_name)
         value = (cls, field, operation)
-        cls._meta.app_cache._pending_lookups.setdefault(key, []).append(value)
+        cls._meta.apps._pending_lookups.setdefault(key, []).append(value)
 
 
 def do_pending_lookups(sender, **kwargs):
@@ -82,7 +82,7 @@ def do_pending_lookups(sender, **kwargs):
     Handle any pending relations to the sending model. Sent from class_prepared.
     """
     key = (sender._meta.app_label, sender.__name__)
-    for cls, field, operation in sender._meta.app_cache._pending_lookups.pop(key, []):
+    for cls, field, operation in sender._meta.apps._pending_lookups.pop(key, []):
         operation(field, sender, cls)
 
 signals.class_prepared.connect(do_pending_lookups)
@@ -1493,7 +1493,7 @@ def create_many_to_many_intermediary_model(field, klass):
         'unique_together': (from_, to),
         'verbose_name': '%(from)s-%(to)s relationship' % {'from': from_, 'to': to},
         'verbose_name_plural': '%(from)s-%(to)s relationships' % {'from': from_, 'to': to},
-        'app_cache': field.model._meta.app_cache,
+        'apps': field.model._meta.apps,
     })
     # Construct and return the new class.
     return type(str(name), (models.Model,), {

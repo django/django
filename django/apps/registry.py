@@ -14,25 +14,26 @@ from django.utils._os import upath
 from .base import AppConfig
 
 
-class AppCache(object):
+class Apps(object):
     """
-    A cache that stores installed applications and their models. Used to
-    provide reverse-relations and for app introspection.
+    A registry that stores the configuration of installed applications.
+
+    It also keeps track of models eg. to provide reverse-relations.
     """
 
     def __init__(self, master=False):
-        # Only one master of the app-cache may exist at a given time, and it
-        # shall be the app_cache variable defined at the end of this module.
-        if master and hasattr(sys.modules[__name__], 'app_cache'):
-            raise RuntimeError("You may create only one master app cache.")
+        # Only one master registry may exist at a given time, and it shall be
+        # the apps variable defined at the end of this module.
+        if master and hasattr(sys.modules[__name__], 'apps'):
+            raise RuntimeError("You may create only one master registry.")
 
-        # When master is set to False, the app cache isn't populated from
+        # When master is set to False, the registry isn't populated from
         # INSTALLED_APPS and ignores the only_installed arguments to
         # get_model[s].
         self.master = master
 
         # Mapping of app labels => model names => model classes. Used to
-        # register models before the app cache is populated and also for
+        # register models before the registry is populated and also for
         # applications that aren't installed.
         self.all_models = defaultdict(OrderedDict)
 
@@ -43,7 +44,7 @@ class AppCache(object):
         # set_available_apps and set_installed_apps.
         self.stored_app_configs = []
 
-        # Internal flags used when populating the master cache.
+        # Internal flags used when populating the master registry.
         self._apps_loaded = not self.master
         self._models_loaded = not self.master
 
@@ -133,9 +134,9 @@ class AppCache(object):
                 self.get_models.cache_clear()
                 self._models_loaded = True
 
-    def app_cache_ready(self):
+    def ready(self):
         """
-        Returns true if the model cache is fully populated.
+        Returns True if the registry is fully populated.
 
         Useful for code that wants to cache the results of get_models() for
         themselves once it is safe to do so.
@@ -200,7 +201,7 @@ class AppCache(object):
         By default, models that aren't part of installed apps will *not*
         be included in the list of models. However, if you specify
         only_installed=False, they will be. If you're using a non-default
-        AppCache, this argument does nothing - all models will be included.
+        Apps, this argument does nothing - all models will be included.
 
         By default, models that have been swapped out will *not* be
         included in the list of models. However, if you specify
@@ -272,11 +273,11 @@ class AppCache(object):
 
     def has_app(self, app_name):
         """
-        Checks whether an application with this name exists in the app cache.
+        Checks whether an application with this name exists in the registry.
 
         app_name is the full name of the app eg. 'django.contrib.admin'.
 
-        It's safe to call this method at import time, even while the app cache
+        It's safe to call this method at import time, even while the registry
         is being populated. It returns None for apps that aren't loaded yet.
         """
         app_config = self.app_configs.get(app_name.rpartition(".")[2])
@@ -286,7 +287,7 @@ class AppCache(object):
         """
         Returns the model class if one is registered and None otherwise.
 
-        It's safe to call this method at import time, even while the app cache
+        It's safe to call this method at import time, even while the registry
         is being populated. It returns None for models that aren't loaded yet.
         """
         return self.all_models[app_label].get(model_name.lower())
@@ -371,6 +372,12 @@ class AppCache(object):
         self.get_models.cache_clear()
         return app_config.models_module
 
+    def app_cache_ready(self):
+        warnings.warn(
+            "app_cache_ready() is deprecated.",
+            PendingDeprecationWarning, stacklevel=2)
+        return self.ready()
+
     def get_app(self, app_label):
         """
         Returns the module containing the models for the given app_label.
@@ -446,4 +453,4 @@ class AppCache(object):
             self.register_model(app_label, model)
 
 
-app_cache = AppCache(master=True)
+apps = Apps(master=True)

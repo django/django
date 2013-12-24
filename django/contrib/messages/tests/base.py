@@ -1,7 +1,7 @@
 from unittest import skipUnless
 
 from django import http
-from django.apps import app_cache
+from django.apps import apps
 from django.conf import global_settings
 from django.contrib.messages import constants, utils, get_level, set_level
 from django.contrib.messages.api import MessageFailure
@@ -15,7 +15,7 @@ from django.utils.translation import ugettext_lazy
 
 def skipUnlessAuthIsInstalled(func):
     return skipUnless(
-        app_cache.has_app('django.contrib.auth'),
+        apps.has_app('django.contrib.auth'),
         "django.contrib.auth isn't installed")(func)
 
 

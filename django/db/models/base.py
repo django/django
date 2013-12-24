@@ -5,7 +5,7 @@ import sys
 from functools import update_wrapper
 from django.utils.six.moves import zip
 
-from django.apps import app_cache
+from django.apps import apps
 from django.apps.base import MODELS_MODULE_NAME
 import django.db.models.manager  # NOQA: Imported to register signal handler.
 from django.conf import settings
@@ -151,7 +151,7 @@ class ModelBase(type):
                 new_class._base_manager = new_class._base_manager._copy_to_model(new_class)
 
         # Bail out early if we have already created this class.
-        m = new_class._meta.app_cache.get_registered_model(new_class._meta.app_label, name)
+        m = new_class._meta.apps.get_registered_model(new_class._meta.app_label, name)
         if m is not None:
             return m
 
@@ -273,12 +273,12 @@ class ModelBase(type):
 
         new_class._prepare()
 
-        new_class._meta.app_cache.register_model(new_class._meta.app_label, new_class)
+        new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
         # Because of the way imports happen (recursively), we may or may not be
         # the first time this model tries to register with the framework. There
         # should only be one class for each model, so we always return the
         # registered version.
-        return new_class._meta.app_cache.get_registered_model(new_class._meta.app_label, name)
+        return new_class._meta.apps.get_registered_model(new_class._meta.app_label, name)
 
     def copy_managers(cls, base_managers):
         # This is in-place sorting of an Options attribute, but that's fine.
@@ -1065,7 +1065,7 @@ def model_unpickle(model_id, attrs, factory):
     Used to unpickle Model subclasses with deferred fields.
     """
     if isinstance(model_id, tuple):
-        model = app_cache.get_model(*model_id)
+        model = apps.get_model(*model_id)
     else:
         # Backwards compat - the model was cached directly in earlier versions.
         model = model_id

@@ -341,16 +341,16 @@ class AppCommand(BaseCommand):
     args = '<appname appname ...>'
 
     def handle(self, *app_labels, **options):
-        from django.apps import app_cache
+        from django.apps import apps
         if not app_labels:
             raise CommandError('Enter at least one appname.')
         # Populate models and don't use only_with_models_module=True when
         # calling get_app_config() to tell apart missing apps from apps
         # without a model module -- which can't be supported with the legacy
         # API since it passes the models module to handle_app().
-        app_cache.populate_models()
+        apps.populate_models()
         try:
-            app_configs = [app_cache.get_app_config(app_label) for app_label in app_labels]
+            app_configs = [apps.get_app_config(app_label) for app_label in app_labels]
         except (LookupError, ImportError) as e:
             raise CommandError("%s. Are you sure your INSTALLED_APPS setting is correct?" % e)
         output = []

@@ -1,7 +1,7 @@
 import sys
 import unittest
 
-from django.apps import app_cache
+from django.apps import apps
 from django.core.management.validation import get_validation_errors
 from django.test import override_settings
 from django.utils.six import StringIO
@@ -32,7 +32,7 @@ class InvalidModelTestCase(unittest.TestCase):
         TEST_SWAPPED_MODEL_BAD_MODEL='not_an_app.Target',
     )
     def test_invalid_models(self):
-        module = app_cache.get_app_config("invalid_models").models_module
+        module = apps.get_app_config("invalid_models").models_module
         get_validation_errors(self.stdout, module)
 
         self.stdout.seek(0)

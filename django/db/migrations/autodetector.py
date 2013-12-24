@@ -47,19 +47,19 @@ class MigrationAutodetector(object):
         """
         # We'll store migrations as lists by app names for now
         self.migrations = {}
-        old_app_cache = self.from_state.render()
-        new_app_cache = self.to_state.render()
+        old_apps = self.from_state.render()
+        new_apps = self.to_state.render()
         # Prepare lists of old/new model keys that we care about
         # (i.e. ignoring proxy ones)
         old_model_keys = [
             (al, mn)
             for al, mn in self.from_state.models.keys()
-            if not old_app_cache.get_model(al, mn)._meta.proxy
+            if not old_apps.get_model(al, mn)._meta.proxy
         ]
         new_model_keys = [
             (al, mn)
             for al, mn in self.to_state.models.keys()
-            if not new_app_cache.get_model(al, mn)._meta.proxy
+            if not new_apps.get_model(al, mn)._meta.proxy
         ]
         # Adding models. Phase 1 is adding models with no outward relationships.
         added_models = set(new_model_keys) - set(old_model_keys)
@@ -68,7 +68,7 @@ class MigrationAutodetector(object):
             model_state = self.to_state.models[app_label, model_name]
             # Are there any relationships out from this model? if so, punt it to the next phase.
             related_fields = []
-            for field in new_app_cache.get_model(app_label, model_name)._meta.local_fields:
+            for field in new_apps.get_model(app_label, model_name)._meta.local_fields:
                 if field.rel:
                     if field.rel.to:
                         related_fields.append((field.name, field.rel.to._meta.app_label.lower(), field.rel.to._meta.object_name.lower()))

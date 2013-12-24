@@ -6,7 +6,7 @@ try:
 except ImportError:
     resource_string = None
 
-from django.apps import app_cache
+from django.apps import apps
 from django.conf import settings
 from django.template.base import TemplateDoesNotExist
 from django.template.loader import BaseLoader
@@ -24,7 +24,7 @@ class Loader(BaseLoader):
         """
         if resource_string is not None:
             pkg_name = 'templates/' + template_name
-            for app_config in app_cache.get_app_configs():
+            for app_config in apps.get_app_configs():
                 try:
                     resource = resource_string(app_config.name, pkg_name)
                 except Exception:

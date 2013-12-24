@@ -112,17 +112,17 @@ def get_commands():
         except ImproperlyConfigured:
             # Still useful for commands that do not require functional
             # settings, like startproject or help.
-            apps = []
+            app_names = []
         else:
-            # Populate the app cache outside of the try/except block to avoid
-            # catching ImproperlyConfigured errors that aren't caused by the
-            # absence of a settings module.
-            from django.apps import app_cache
-            app_configs = app_cache.get_app_configs()
-            apps = [app_config.name for app_config in app_configs]
+            # Populate the app registry outside of the try/except block to
+            # avoid catching ImproperlyConfigured errors that aren't caused
+            # by the absence of a settings module.
+            from django.apps import apps
+            app_configs = apps.get_app_configs()
+            app_names = [app_config.name for app_config in app_configs]
 
         # Find and load the management module for each installed app.
-        for app_name in apps:
+        for app_name in app_names:
             try:
                 path = find_management_module(app_name)
                 _commands.update(dict((name, app_name) for name in find_commands(path)))
@@ -346,8 +346,8 @@ class ManagementUtility(object):
             elif cwords[0] in ('dumpdata', 'sql', 'sqlall', 'sqlclear',
                     'sqlcustom', 'sqlindexes', 'sqlsequencereset', 'test'):
                 try:
-                    from django.apps import app_cache
-                    app_configs = app_cache.get_app_configs()
+                    from django.apps import apps
+                    app_configs = apps.get_app_configs()
                     # Get the last part of the dotted path as the app name.
                     options += [(app_config.label, 0) for app_config in app_configs]
                 except ImportError:

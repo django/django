@@ -1,11 +1,11 @@
-from django.apps.cache import AppCache
+from django.apps.registry import Apps
 from django.db import models
 
 # Because we want to test creation and deletion of these as separate things,
-# these models are all inserted into a separate AppCache so the main test
+# these models are all inserted into a separate Apps so the main test
 # runner doesn't migrate them.
 
-new_app_cache = AppCache()
+new_apps = Apps()
 
 
 class Author(models.Model):
@@ -13,14 +13,14 @@ class Author(models.Model):
     height = models.PositiveIntegerField(null=True, blank=True)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
 
 
 class AuthorWithM2M(models.Model):
     name = models.CharField(max_length=255)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
 
 
 class Book(models.Model):
@@ -30,7 +30,7 @@ class Book(models.Model):
     # tags = models.ManyToManyField("Tag", related_name="books")
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
 
 
 class BookWithM2M(models.Model):
@@ -40,7 +40,7 @@ class BookWithM2M(models.Model):
     tags = models.ManyToManyField("TagM2MTest", related_name="books")
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
 
 
 class BookWithSlug(models.Model):
@@ -50,7 +50,7 @@ class BookWithSlug(models.Model):
     slug = models.CharField(max_length=20, unique=True)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
         db_table = "schema_book"
 
 
@@ -59,7 +59,7 @@ class Tag(models.Model):
     slug = models.SlugField(unique=True)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
 
 
 class TagM2MTest(models.Model):
@@ -67,7 +67,7 @@ class TagM2MTest(models.Model):
     slug = models.SlugField(unique=True)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
 
 
 class TagIndexed(models.Model):
@@ -75,7 +75,7 @@ class TagIndexed(models.Model):
     slug = models.SlugField(unique=True)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
         index_together = [["slug", "title"]]
 
 
@@ -84,7 +84,7 @@ class TagUniqueRename(models.Model):
     slug2 = models.SlugField(unique=True)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
         db_table = "schema_tag"
 
 
@@ -93,7 +93,7 @@ class UniqueTest(models.Model):
     slug = models.SlugField(unique=False)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
         unique_together = ["year", "slug"]
 
 
@@ -101,4 +101,4 @@ class BookWithLongName(models.Model):
     author_foreign_key_with_really_long_field_name = models.ForeignKey(Author)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps

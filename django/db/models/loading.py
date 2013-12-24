@@ -1,6 +1,6 @@
 import warnings
 
-from django.apps import app_cache
+from django.apps import apps
 
 warnings.warn(
     "The utilities in django.db.models.loading are deprecated "
@@ -12,24 +12,24 @@ __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
 
 # These methods were always module level, so are kept that way for backwards
 # compatibility.
-get_apps = app_cache.get_apps
-get_app_package = app_cache.get_app_package
-get_app_path = app_cache.get_app_path
-get_app_paths = app_cache.get_app_paths
-get_app = app_cache.get_app
-get_models = app_cache.get_models
-get_model = app_cache.get_model
-register_models = app_cache.register_models
-load_app = app_cache.load_app
-app_cache_ready = app_cache.app_cache_ready
+get_apps = apps.get_apps
+get_app_package = apps.get_app_package
+get_app_path = apps.get_app_path
+get_app_paths = apps.get_app_paths
+get_app = apps.get_app
+get_models = apps.get_models
+get_model = apps.get_model
+register_models = apps.register_models
+load_app = apps.load_app
+app_cache_ready = apps.ready
 
 
 # This method doesn't return anything interesting in Django 1.6. Maintain it
 # just for backwards compatibility until this module is deprecated.
 def get_app_errors():
     try:
-        return app_cache.app_errors
+        return apps.app_errors
     except AttributeError:
-        app_cache.populate_models()
-        app_cache.app_errors = {}
-        return app_cache.app_errors
+        apps.populate_models()
+        apps.app_errors = {}
+        return apps.app_errors

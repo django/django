@@ -1,9 +1,9 @@
-from django.apps import app_cache
+from django.apps import apps
 from django.template import Library
 
 register = Library()
 
-if app_cache.has_app('django.contrib.staticfiles'):
+if apps.has_app('django.contrib.staticfiles'):
     from django.contrib.staticfiles.templatetags.staticfiles import static
 else:
     from django.templatetags.static import static

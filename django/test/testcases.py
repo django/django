@@ -15,7 +15,7 @@ import unittest
 from unittest import skipIf         # NOQA: Imported here for backward compatibility
 from unittest.util import safe_repr
 
-from django.apps import app_cache
+from django.apps import apps
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ValidationError, ImproperlyConfigured
@@ -732,13 +732,13 @@ class TransactionTestCase(SimpleTestCase):
         """Performs any pre-test setup. This includes:
 
         * If the class has an 'available_apps' attribute, restricting the app
-          cache to these applications, then firing post_migrate -- it must run
-          with the correct set of applications for the test case.
+          registry to these applications, then firing post_migrate -- it must
+          run with the correct set of applications for the test case.
         * If the class has a 'fixtures' attribute, installing these fixtures.
         """
         super(TransactionTestCase, self)._pre_setup()
         if self.available_apps is not None:
-            app_cache.set_available_apps(self.available_apps)
+            apps.set_available_apps(self.available_apps)
             setting_changed.send(sender=settings._wrapped.__class__,
                                  setting='INSTALLED_APPS',
                                  value=self.available_apps,
@@ -749,7 +749,7 @@ class TransactionTestCase(SimpleTestCase):
             self._fixture_setup()
         except Exception:
             if self.available_apps is not None:
-                app_cache.unset_available_apps()
+                apps.unset_available_apps()
                 setting_changed.send(sender=settings._wrapped.__class__,
                                      setting='INSTALLED_APPS',
                                      value=settings.INSTALLED_APPS,
@@ -809,7 +809,7 @@ class TransactionTestCase(SimpleTestCase):
                 conn.close()
         finally:
             if self.available_apps is not None:
-                app_cache.unset_available_apps()
+                apps.unset_available_apps()
                 setting_changed.send(sender=settings._wrapped.__class__,
                                      setting='INSTALLED_APPS',
                                      value=settings.INSTALLED_APPS,

@@ -1,9 +1,9 @@
-from django.apps.cache import AppCache
+from django.apps.registry import Apps
 from django.db import models
 
-# We're testing app cache presence on load, so this is handy.
+# We're testing app registry presence on load, so this is handy.
 
-new_app_cache = AppCache()
+new_apps = Apps()
 
 
 class TotallyNormal(models.Model):
@@ -14,4 +14,4 @@ class SoAlternative(models.Model):
     name = models.CharField(max_length=255)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps

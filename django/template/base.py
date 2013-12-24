@@ -5,7 +5,7 @@ from functools import partial
 from importlib import import_module
 from inspect import getargspec, getcallargs
 
-from django.apps import app_cache
+from django.apps import apps
 from django.conf import settings
 from django.template.context import (BaseContext, Context, RequestContext,  # NOQA: imported for backwards compatibility
     ContextPopException)
@@ -1306,7 +1306,7 @@ def get_templatetags_modules():
 
         templatetags_modules_candidates = ['django.templatetags']
         templatetags_modules_candidates += ['%s.templatetags' % app_config.name
-            for app_config in app_cache.get_app_configs()]
+            for app_config in apps.get_app_configs()]
         for templatetag_module in templatetags_modules_candidates:
             try:
                 import_module(templatetag_module)

@@ -1,6 +1,6 @@
 from importlib import import_module
 import warnings
-from django.apps import app_cache
+from django.apps import apps
 from django.conf import settings
 from django.core import urlresolvers
 from django.core.exceptions import ImproperlyConfigured
@@ -16,7 +16,7 @@ def get_comment_app():
     Get the comment app (i.e. "django.contrib.comments") as defined in the settings
     """
     try:
-        app_config = app_cache.get_app_config(get_comment_app_name().rpartition(".")[2])
+        app_config = apps.get_app_config(get_comment_app_name().rpartition(".")[2])
     except LookupError:
         raise ImproperlyConfigured("The COMMENTS_APP (%r) "
                                    "must be in INSTALLED_APPS" % settings.COMMENTS_APP)

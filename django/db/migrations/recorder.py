@@ -1,4 +1,4 @@
-from django.apps.cache import AppCache
+from django.apps.registry import Apps
 from django.db import models
 from django.utils.timezone import now
 
@@ -22,7 +22,7 @@ class MigrationRecorder(object):
         applied = models.DateTimeField(default=now)
 
         class Meta:
-            app_cache = AppCache()
+            apps = Apps()
             app_label = "migrations"
             db_table = "django_migrations"
 

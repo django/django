@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.apps import app_cache
+from django.apps import apps
 from django.db import models
 
 
@@ -32,7 +32,7 @@ def check_boolean_field_default_value():
     warns the user that the default has changed from False to Null.
     """
     fields = []
-    for cls in app_cache.get_models():
+    for cls in apps.get_models():
         opts = cls._meta
         for f in opts.local_fields:
             if isinstance(f, models.BooleanField) and not f.has_default():

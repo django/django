@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import os
 import sys
 
-from django.apps import app_cache
+from django.apps import apps
 from django.test import TestCase
 from django.utils._os import upath
 from django.utils import six
@@ -17,11 +17,11 @@ class EggLoadingTest(TestCase):
 
         # The models need to be removed after the test in order to prevent bad
         # interactions with the flush operation in other tests.
-        self._old_models = app_cache.all_models['app_loading'].copy()
+        self._old_models = apps.all_models['app_loading'].copy()
 
     def tearDown(self):
-        app_cache.all_models['app_loading'] = self._old_models
-        app_cache.get_models.cache_clear()
+        apps.all_models['app_loading'] = self._old_models
+        apps.get_models.cache_clear()
 
         sys.path = self.old_path
 
@@ -30,7 +30,7 @@ class EggLoadingTest(TestCase):
         egg_name = '%s/modelapp.egg' % self.egg_dir
         sys.path.append(egg_name)
         with self.settings(INSTALLED_APPS=['app_with_models']):
-            models_module = app_cache.get_app_config('app_with_models').models_module
+            models_module = apps.get_app_config('app_with_models').models_module
             self.assertIsNotNone(models_module)
 
     def test_egg2(self):
@@ -38,7 +38,7 @@ class EggLoadingTest(TestCase):
         egg_name = '%s/nomodelapp.egg' % self.egg_dir
         sys.path.append(egg_name)
         with self.settings(INSTALLED_APPS=['app_no_models']):
-            models_module = app_cache.get_app_config('app_no_models').models_module
+            models_module = apps.get_app_config('app_no_models').models_module
             self.assertIsNone(models_module)
 
     def test_egg3(self):
@@ -46,7 +46,7 @@ class EggLoadingTest(TestCase):
         egg_name = '%s/omelet.egg' % self.egg_dir
         sys.path.append(egg_name)
         with self.settings(INSTALLED_APPS=['omelet.app_with_models']):
-            models_module = app_cache.get_app_config('app_with_models').models_module
+            models_module = apps.get_app_config('app_with_models').models_module
             self.assertIsNotNone(models_module)
 
     def test_egg4(self):
@@ -54,7 +54,7 @@ class EggLoadingTest(TestCase):
         egg_name = '%s/omelet.egg' % self.egg_dir
         sys.path.append(egg_name)
         with self.settings(INSTALLED_APPS=['omelet.app_no_models']):
-            models_module = app_cache.get_app_config('app_no_models').models_module
+            models_module = apps.get_app_config('app_no_models').models_module
             self.assertIsNone(models_module)
 
     def test_egg5(self):
@@ -73,26 +73,26 @@ class GetModelsTest(TestCase):
 
     def test_get_model_only_returns_installed_models(self):
         self.assertEqual(
-            app_cache.get_model("not_installed", "NotInstalledModel"), None)
+            apps.get_model("not_installed", "NotInstalledModel"), None)
 
     def test_get_model_with_not_installed(self):
         self.assertEqual(
-            app_cache.get_model(
+            apps.get_model(
                 "not_installed", "NotInstalledModel", only_installed=False),
             self.not_installed_module.NotInstalledModel)
 
     def test_get_models_only_returns_installed_models(self):
         self.assertNotIn(
             "NotInstalledModel",
-            [m.__name__ for m in app_cache.get_models()])
+            [m.__name__ for m in apps.get_models()])
 
     def test_get_models_with_app_label_only_returns_installed_models(self):
-        self.assertEqual(app_cache.get_models(self.not_installed_module), [])
+        self.assertEqual(apps.get_models(self.not_installed_module), [])
 
     def test_get_models_with_not_installed(self):
         self.assertIn(
             "NotInstalledModel",
-            [m.__name__ for m in app_cache.get_models(only_installed=False)])
+            [m.__name__ for m in apps.get_models(only_installed=False)])
 
 
 class NotInstalledModelsTest(TestCase):

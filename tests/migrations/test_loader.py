@@ -43,7 +43,7 @@ class LoaderTests(TestCase):
     def test_load(self):
         """
         Makes sure the loader can load the migrations for the test apps,
-        and then render them out to a new AppCache.
+        and then render them out to a new Apps.
         """
         # Load and test the plan
         migration_loader = MigrationLoader(connection)

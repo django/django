@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import getpass
 import unicodedata
 
-from django.apps import app_cache
+from django.apps import apps
 from django.contrib.auth import (models as auth_app, get_permission_codename,
     get_user_model)
 from django.core import exceptions
@@ -61,7 +61,7 @@ def _check_permission_clashing(custom, builtin, ctype):
 
 
 def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kwargs):
-    if app_cache.get_model('auth', 'Permission') is None:
+    if apps.get_model('auth', 'Permission') is None:
         return
 
     if not router.allow_migrate(db, auth_app.Permission):
@@ -69,7 +69,7 @@ def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kw
 
     from django.contrib.contenttypes.models import ContentType
 
-    app_models = app_cache.get_models(app)
+    app_models = apps.get_models(app)
 
     # This will hold the permissions we're looking for as
     # (content_type, (codename, name))
@@ -117,7 +117,7 @@ def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kw
 
 
 def create_superuser(app, created_models, verbosity, db, **kwargs):
-    if app_cache.get_model('auth', 'Permission') is None:
+    if apps.get_model('auth', 'Permission') is None:
         return
 
     UserModel = get_user_model()
