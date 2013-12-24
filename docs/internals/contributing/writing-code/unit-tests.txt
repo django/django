@@ -222,7 +222,6 @@ Tests for contrib apps go in their respective directories under
 ``django/contrib``, in a ``tests.py`` file. You can split the tests over
 multiple modules by using a ``tests`` directory in the normal Python way.
 
-For the tests to be found, a ``models.py`` file must exist, even if it's empty.
 If you have URLs that need to be mapped, put them in ``tests/urls.py``.
 
 To run tests for just one contrib app (e.g. ``auth``), use the same

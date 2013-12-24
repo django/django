@@ -42,9 +42,10 @@ projects and ready to publish for others to install and use.
     bar``. For a directory (like ``polls``) to form a package, it must contain
     a special file ``__init__.py``, even if this file is empty.
 
-    A Django *app* is just a Python package that is specifically intended for
-    use in a Django project. An app may also use common Django conventions,
-    such as having a ``models.py`` file.
+    A Django *application* is just a Python package that is specifically
+    intended for use in a Django project. An application may use common Django
+    conventions, such as having ``models``, ``tests``, ``urls``, and ``views``
+    submodules.
 
     Later on we use the term *packaging* to describe the process of making a
     Python package easy for others to install. It can be a little confusing, we
@@ -128,11 +129,10 @@ this. For a small app like polls, this process isn't too difficult.
        This helps others looking for Django apps identify your app as Django
        specific.
 
-       The application names (that is, the final dotted part of the
-       path to the module containing ``models.py``) defined in
-       :setting:`INSTALLED_APPS` *must* be unique. Avoid using the
-       same name as any of the Django :doc:`contrib packages
-       </ref/contrib/index>`, for example ``auth``, ``admin`` or
+       Application labels (that is, the final part of the dotted path to
+       application packages) *must* be unique in :setting:`INSTALLED_APPS`.
+       Avoid using the same label as any of the Django :doc:`contrib packages
+       </ref/contrib/index>`, for example ``auth``, ``admin``, or
        ``messages``.
 
 2. Move the ``polls`` directory into the ``django-polls`` directory.
