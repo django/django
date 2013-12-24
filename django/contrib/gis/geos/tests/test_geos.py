@@ -1032,6 +1032,16 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(mpoly.intersects(pnt), prep.intersects(pnt))
             self.assertEqual(c, prep.covers(pnt))
 
+        if geos_version_info()['version'] > '3.3.0':
+            self.assertTrue(prep.crosses(fromstr('LINESTRING(1 1, 15 15)')))
+            self.assertTrue(prep.disjoint(Point(-5, -5)))
+            poly = Polygon(((-1, -1), (1, 1), (1, 0), (-1, -1)))
+            self.assertTrue(prep.overlaps(poly))
+            poly = Polygon(((-5, 0), (-5, 5), (0, 5), (-5, 0)))
+            self.assertTrue(prep.touches(poly))
+            poly = Polygon(((-1, -1), (-1, 11), (11, 11), (11, -1), (-1, -1)))
+            self.assertTrue(prep.within(poly))
+
         # Original geometry deletion should not crash the prepared one (#21662)
         del mpoly
         self.assertTrue(prep.covers(Point(5, 5)))

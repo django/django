@@ -211,6 +211,10 @@ Minor features
 * The default OpenLayers library version included in widgets has been updated
   from 2.11 to 2.13.
 
+* Prepared geometries now also support the ``crosses``, ``disjoint``,
+  ``overlaps``, ``touches`` and ``within`` predicates, if GEOS 3.3 or later is
+  installed.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

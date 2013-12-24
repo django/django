@@ -527,8 +527,8 @@ a :class:`Polygon`).
 
 Returns a GEOS ``PreparedGeometry`` for the contents of this geometry.
 ``PreparedGeometry`` objects are optimized for the contains, intersects,
-and covers operations.  Refer to the :ref:`prepared-geometries` documentation
-for more information.
+covers, crosses, disjoint, overlaps, touches and within operations. Refer to
+the :ref:`prepared-geometries` documentation for more information.
 
 .. attribute:: GEOSGeometry.srs
 
@@ -746,7 +746,47 @@ For example::
 
   .. method:: covers(other)
 
+  .. method:: crosses(other)
+
+    .. versionadded:: 1.7
+
+    .. note::
+
+       GEOS 3.3 is *required* to use this predicate.
+
+  .. method:: disjoint(other)
+
+    .. versionadded:: 1.7
+
+    .. note::
+
+       GEOS 3.3 is *required* to use this predicate.
+
   .. method:: intersects(other)
+
+  .. method:: overlaps(other)
+
+    .. versionadded:: 1.7
+
+    .. note::
+
+       GEOS 3.3 is *required* to use this predicate.
+
+  .. method:: touches(other)
+
+    .. versionadded:: 1.7
+
+    .. note::
+
+       GEOS 3.3 is *required* to use this predicate.
+
+  .. method:: within(other)
+
+    .. versionadded:: 1.7
+
+    .. note::
+
+       GEOS 3.3 is *required* to use this predicate.
 
 Geometry Factories
 ==================
