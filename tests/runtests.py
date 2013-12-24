@@ -170,6 +170,7 @@ def setup(verbosity, test_labels):
             app_config = AppConfig.create(module_label)
             app_config.import_models(app_cache.all_models[app_config.label])
             app_cache.app_configs[app_config.label] = app_config
+            app_cache.get_models.cache_clear()
 
     return state
 

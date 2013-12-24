@@ -7,6 +7,7 @@ import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils import lru_cache
 from django.utils.module_loading import import_lock
 from django.utils._os import upath
 
@@ -49,9 +50,6 @@ class AppCache(object):
         # Pending lookups for lazy relations.
         self._pending_lookups = {}
 
-        # Cache for get_models.
-        self._get_models_cache = {}
-
     def populate_apps(self, installed_apps=None):
         """
         Populate app-related information.
@@ -83,6 +81,7 @@ class AppCache(object):
                 app_config = AppConfig.create(app_name)
                 self.app_configs[app_config.label] = app_config
 
+            self.get_models.cache_clear()
             self._apps_loaded = True
 
     def populate_models(self):
@@ -131,6 +130,7 @@ class AppCache(object):
 
                 del self._postponed
 
+                self.get_models.cache_clear()
                 self._models_loaded = True
 
     def app_cache_ready(self):
@@ -180,6 +180,8 @@ class AppCache(object):
             raise LookupError("App with label %r doesn't have a models module." % app_label)
         return app_config
 
+    # This method is performance-critical at least for Django's test suite.
+    @lru_cache.lru_cache(maxsize=None)
     def get_models(self, app_mod=None,
                    include_auto_created=False, include_deferred=False,
                    only_installed=True, include_swapped=False):
@@ -206,12 +208,7 @@ class AppCache(object):
         """
         if not self.master:
             only_installed = False
-        cache_key = (app_mod, include_auto_created, include_deferred, only_installed, include_swapped)
         model_list = None
-        try:
-            return self._get_models_cache[cache_key]
-        except KeyError:
-            pass
         self.populate_models()
         if app_mod:
             app_label = app_mod.__name__.split('.')[-2]
@@ -235,7 +232,6 @@ class AppCache(object):
                     (not model._meta.auto_created or include_auto_created) and
                     (not model._meta.swapped or include_swapped))
             )
-        self._get_models_cache[cache_key] = model_list
         return model_list
 
     def get_model(self, app_label, model_name, only_installed=True):
@@ -272,7 +268,7 @@ class AppCache(object):
             if os.path.splitext(fname1)[0] == os.path.splitext(fname2)[0]:
                 return
         models[model_name] = model
-        self._get_models_cache.clear()
+        self.get_models.cache_clear()
 
     def has_app(self, app_name):
         """
@@ -368,6 +364,7 @@ class AppCache(object):
         app_config = AppConfig.create(app_name)
         app_config.import_models(self.all_models[app_config.label])
         self.app_configs[app_config.label] = app_config
+        self.get_models.cache_clear()
         return app_config.models_module
 
     def get_app(self, app_label):

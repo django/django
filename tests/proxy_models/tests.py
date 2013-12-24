@@ -175,7 +175,7 @@ class ProxyModelTests(TestCase):
         finally:
             app_cache.app_configs['proxy_models'].models = _old_models
             app_cache.all_models['proxy_models'] = _old_models
-            app_cache._get_models_cache = {}
+            app_cache.get_models.cache_clear()
 
     def test_myperson_manager(self):
         Person.objects.create(name="fred")

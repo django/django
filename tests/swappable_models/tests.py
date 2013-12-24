@@ -19,16 +19,6 @@ class SwappableModelTests(TestCase):
         'django.contrib.contenttypes',
     ]
 
-    def setUp(self):
-        # This test modifies the installed apps, so we need to make sure
-        # we're not dealing with a cached app list.
-        app_cache._get_models_cache.clear()
-
-    def tearDown(self):
-        # By fiddling with swappable models, we alter the installed models
-        # cache, so flush it to make sure there are no side effects.
-        app_cache._get_models_cache.clear()
-
     @override_settings(TEST_ARTICLE_MODEL='swappable_models.AlternateArticle')
     def test_generated_data(self):
         "Permissions and content types are not created for a swapped model"

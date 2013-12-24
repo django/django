@@ -37,7 +37,7 @@ class TablespacesTests(TestCase):
 
         app_cache.app_configs['tablespaces'].models = self._old_models
         app_cache.all_models['tablespaces'] = self._old_models
-        app_cache._get_models_cache = {}
+        app_cache.get_models.cache_clear()
 
     def assertNumContains(self, haystack, needle, count):
         real_count = haystack.count(needle)

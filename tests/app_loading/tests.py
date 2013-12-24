@@ -21,7 +21,7 @@ class EggLoadingTest(TestCase):
 
     def tearDown(self):
         app_cache.all_models['app_loading'] = self._old_models
-        app_cache._get_models_cache = {}
+        app_cache.get_models.cache_clear()
 
         sys.path = self.old_path
 
