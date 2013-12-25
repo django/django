@@ -936,7 +936,7 @@ Slightly complex built-in ``Field`` classes
                                   required=False),
                     )
                     super(PhoneField, self).__init__(
-                        self, error_messages=error_messages, fields=fields,
+                        error_messages=error_messages, fields=fields,
                         require_all_fields=False, *args, **kwargs)
 
     .. attribute:: MultiValueField.widget
