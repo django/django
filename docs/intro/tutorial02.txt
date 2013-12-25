@@ -469,7 +469,7 @@ template directory in the source code of Django itself
 
     .. code-block:: bash
 
-        python -c "
+        $ python -c "
         import sys
         sys.path = sys.path[1:]
         import django
