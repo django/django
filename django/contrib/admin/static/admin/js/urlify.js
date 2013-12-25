@@ -69,7 +69,8 @@ var ARABIC_MAP = {
 }
 
 var AZERBAIJANI_MAP = {
-    'ə':'e', 'Ə':'E'
+    'ç':'c', 'Ç':'C', 'ə':'e', 'Ə':'E', 'ğ':'g', 'Ğ':'G', 'ı':'i', 'İ':'I',
+    'ö':'o', 'Ö':'O', 'ş':'s', 'Ş':'S', 'ü':'u', 'Ü':'U'
 }
 
 var ALL_DOWNCODE_MAPS=new Array()
