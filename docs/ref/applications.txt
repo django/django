@@ -102,47 +102,10 @@ configuration::
 Again, defining project-specific configuration classes in a submodule called
 ``apps`` is a convention, not a requirement.
 
-Application registry
-====================
-
-.. data:: django.apps.apps
-
-    The application registry provides the following public API. Methods that
-    aren't listed below are considered private and may change without notice.
-
-.. method:: django.apps.apps.ready()
-
-    Returns ``True`` if the registry is fully populated.
-
-.. method:: django.apps.apps.get_app_configs(only_with_models_module=False)
-
-    Returns an iterable of :class:`~django.apps.AppConfig` instances.
-
-    If only applications containing a models module are of interest, this method
-    can be called with ``only_with_models_module=True``.
-
-.. method:: django.apps.apps.get_app_config(app_label, only_with_models_module=False)
-
-    Returns an :class:`~django.apps.AppConfig` for the application with the
-    given ``app_label``. Raises :exc:`~exceptions.LookupError` if no such
-    application exists.
-
-    If only applications containing a models module are of interest, this method
-    can be called with ``only_with_models_module=True``.
-
-.. method:: django.apps.apps.has_app(app_name)
-
-    Checks whether an application with the given name exists in the registry.
-    ``app_name`` is the full name of the app, e.g. 'django.contrib.admin'.
-
-    Unlike :meth:`~django.apps.apps.get_app_config`, this method can be called
-    safely at import time. If the registry is still being populated, it may
-    return ``False``, even though the app will become available later.
-
 Application configuration
 =========================
 
-.. class:: django.apps.AppConfig
+.. class:: AppConfig
 
     Application configuration objects store metadata for an application. Some
     attributes can be configured in :class:`~django.apps.AppConfig`
@@ -151,7 +114,7 @@ Application configuration
 Configurable attributes
 -----------------------
 
-.. data:: django.apps.AppConfig.verbose_name
+.. attribute:: AppConfig.verbose_name
 
     Human-readable name for the application, e.g. "Admin".
 
@@ -160,17 +123,17 @@ Configurable attributes
 Read-only attributes
 --------------------
 
-.. data:: django.apps.AppConfig.name
+.. attribute:: AppConfig.name
 
     Full Python path to the application, e.g. ``'django.contrib.admin'``.
 
-.. data:: django.apps.AppConfig.label
+.. attribute:: AppConfig.label
 
     Last component of the Python path to the application, e.g. ``'admin'``.
 
     This value must be unique across a Django project.
 
-.. data:: django.apps.AppConfig.path
+.. attribute:: AppConfig.path
 
     Filesystem path to the application directory, e.g.
     ``'/usr/lib/python2.7/dist-packages/django/contrib/admin'``.
@@ -178,14 +141,51 @@ Read-only attributes
     It may be ``None`` if the application isn't stored in a directory, for
     instance if it's loaded from an egg.
 
-.. data:: django.apps.AppConfig.app_module
+.. attribute:: AppConfig.app_module
 
     Root module for the application, e.g. ``<module 'django.contrib.admin' from
     'django/contrib/admin/__init__.pyc'>``.
 
-.. data:: django.apps.AppConfig.models_module
+.. attribute:: AppConfig.models_module
 
     Module containing the models, e.g. ``<module 'django.contrib.admin.models'
     from 'django/contrib/admin/models.pyc'>``.
 
     It may be ``None`` if the application doesn't contain a ``models`` module.
+
+Application registry
+====================
+
+.. data:: apps
+
+    The application registry provides the following public API. Methods that
+    aren't listed below are considered private and may change without notice.
+
+.. method:: apps.ready()
+
+    Returns ``True`` if the registry is fully populated.
+
+.. method:: apps.get_app_configs(only_with_models_module=False)
+
+    Returns an iterable of :class:`~django.apps.AppConfig` instances.
+
+    If only applications containing a models module are of interest, this method
+    can be called with ``only_with_models_module=True``.
+
+.. method:: apps.get_app_config(app_label, only_with_models_module=False)
+
+    Returns an :class:`~django.apps.AppConfig` for the application with the
+    given ``app_label``. Raises :exc:`~exceptions.LookupError` if no such
+    application exists.
+
+    If only applications containing a models module are of interest, this method
+    can be called with ``only_with_models_module=True``.
+
+.. method:: apps.has_app(app_name)
+
+    Checks whether an application with the given name exists in the registry.
+    ``app_name`` is the full name of the app, e.g. 'django.contrib.admin'.
+
+    Unlike :meth:`~django.apps.apps.get_app_config`, this method can be called
+    safely at import time. If the registry is still being populated, it may
+    return ``False``, even though the app will become available later.

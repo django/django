@@ -1288,7 +1288,7 @@ Default: ``()`` (Empty tuple)
 A tuple of strings designating all applications that are enabled in this
 Django installation. Each string should be a full Python path to an
 application configuration class or to a Python package containing a
-application. :ref:` Learn more about applications </ref/applications>`.
+application. :doc:`Learn more about applications </ref/applications>`.
 
 .. versionchanged:: 1.7
 
