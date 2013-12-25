@@ -1,5 +1,5 @@
 from django.db.models.fields import Field
-from django.db.models.sql.expressions import SQLEvaluator
+from django.db.models.expressions import ExpressionNode
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.gis import forms
 from django.contrib.gis.db.models.constants import GIS_LOOKUPS
@@ -166,7 +166,7 @@ class GeometryField(Field):
         returning to the caller.
         """
         value = super(GeometryField, self).get_prep_value(value)
-        if isinstance(value, SQLEvaluator):
+        if isinstance(value, ExpressionNode):
             return value
         elif isinstance(value, (tuple, list)):
             geom = value[0]
@@ -256,7 +256,7 @@ class GeometryField(Field):
                     pass
                 else:
                     params += value[1:]
-            elif isinstance(value, SQLEvaluator):
+            elif isinstance(value, ExpressionNode):
                 params = []
             else:
                 params = [connection.ops.Adapter(value)]
@@ -279,12 +279,12 @@ class GeometryField(Field):
         else:
             return connection.ops.Adapter(self.get_prep_value(value))
 
-    def get_placeholder(self, value, connection):
+    def get_placeholder(self, value, qn, connection):
         """
         Returns the placeholder for the geometry column for the
         given value.
         """
-        return connection.ops.get_geom_placeholder(self, value)
+        return connection.ops.get_geom_placeholder(self, value, qn)
 
 for lookup_name in GIS_LOOKUPS:
     lookup = type(lookup_name, (GISLookup,), {'lookup_name': lookup_name})
