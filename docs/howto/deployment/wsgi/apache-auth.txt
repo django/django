@@ -38,6 +38,7 @@ only authenticated users to be able to view:
 .. code-block:: apache
 
     WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
+    WSGIPythonPath /path/to/mysite.com
 
     WSGIProcessGroup %{GLOBAL}
     WSGIApplicationGroup django
@@ -76,7 +77,6 @@ check_user function:
 .. code-block:: python
 
     import os
-    import sys
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
 
