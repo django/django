@@ -41,6 +41,17 @@ details on these changes.
   :class:`~django.core.management.BaseCommand` instead, which takes no arguments
   by default.
 
+* ``django.db.models.sql.aggregates`` module will be removed.
+
+* ``django.contrib.gis.db.models.sql.aggregates`` module will be removed.
+
+* The following methods and properties of ``django.db.sql.query.Query`` will
+  be removed:
+
+    * Properties: ``aggregates`` and ``aggregate_select``
+    * Methods: ``add_aggregate``, ``set_aggregate_mask``, and
+      ``append_aggregate_mask``.
+
 * ``django.template.resolve_variable`` will be removed.
 
 * The ``error_message`` argument of ``django.forms.RegexField`` will be removed.

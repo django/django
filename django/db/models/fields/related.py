@@ -13,7 +13,7 @@ from django.db.models.fields import (AutoField, Field, IntegerField,
 from django.db.models.lookups import IsNull
 from django.db.models.related import RelatedObject, PathInfo
 from django.db.models.query import QuerySet
-from django.db.models.sql.datastructures import Col
+from django.db.models.expressions import Col
 from django.utils.encoding import force_text, smart_text
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _

@@ -52,6 +52,15 @@ New data types
   <django.forms.UUIDField>`. It is stored as the native ``uuid`` data type on
   PostgreSQL and as a fixed length character field on other backends.
 
+Query Expressions
+~~~~~~~~~~~~~~~~~
+
+:doc:`Query Expressions </ref/models/expressions>` allow users to create,
+customize, and compose complex SQL expressions. This has enabled annotate
+to accept expressions other than aggregates. Aggregates are now able to
+reference multiple fields, as well as perform arithmetic, similar to ``F()``
+objects.
+
 Minor features
 ~~~~~~~~~~~~~~
 
@@ -856,6 +865,29 @@ Similarly for GIS sitemaps, add ``name='django.contrib.gis.sitemaps.views.kml'``
 or ``name='django.contrib.gis.sitemaps.views.kmz'``.
 
 .. _security issue: https://www.djangoproject.com/weblog/2014/apr/21/security/#s-issue-unexpected-code-execution-using-reverse
+
+Aggregate methods and modules
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``django.db.models.sql.aggregates`` and
+``django.contrib.gis.db.models.sql.aggregates`` modules (both private API), have
+been deprecated as ``django.db.models.aggregates`` and
+``django.contrib.gis.db.models.aggregates`` are now also responsible
+for SQL generation. The old modules will be removed in Django 2.0.
+
+If you were using the old modules, see :doc:`Query Expressions
+</ref/models/expressions>` for instructions on rewriting custom aggregates
+using the new stable API.
+
+The following methods and properties of ``django.db.models.sql.query.Query``
+have also been deprecated and the backwards compatibility shims will be removed
+in Django 2.0:
+
+* ``Query.aggregates``, replaced by ``annotations``.
+* ``Query.aggregate_select``, replaced by ``annotation_select``.
+* ``Query.add_aggregate()``, replaced by ``add_annotation()``.
+* ``Query.set_aggregate_mask()``, replaced by ``set_annotation_mask()``.
+* ``Query.append_aggregate_mask()``, replaced by ``append_annotation_mask()``.
 
 Extending management command arguments through ``Command.option_list``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

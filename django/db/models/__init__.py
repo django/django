@@ -4,7 +4,7 @@ import warnings
 
 from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured  # NOQA
 from django.db.models.query import Q, QuerySet, Prefetch  # NOQA
-from django.db.models.expressions import F  # NOQA
+from django.db.models.expressions import ExpressionNode, F, Value, Func  # NOQA
 from django.db.models.manager import Manager  # NOQA
 from django.db.models.base import Model  # NOQA
 from django.db.models.aggregates import *  # NOQA

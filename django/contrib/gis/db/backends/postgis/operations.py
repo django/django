@@ -22,7 +22,7 @@ class PostGISOperator(SpatialOperator):
         super(PostGISOperator, self).__init__(**kwargs)
 
     def as_sql(self, connection, lookup, *args):
-        if lookup.lhs.source.geography and not self.geography:
+        if lookup.lhs.output_field.geography and not self.geography:
             raise ValueError('PostGIS geography does not support the "%s" '
                              'function/operator.' % (self.func or self.op,))
         return super(PostGISOperator, self).as_sql(connection, lookup, *args)
@@ -32,7 +32,7 @@ class PostGISDistanceOperator(PostGISOperator):
     sql_template = '%(func)s(%(lhs)s, %(rhs)s) %(op)s %%s'
 
     def as_sql(self, connection, lookup, template_params, sql_params):
-        if not lookup.lhs.source.geography and lookup.lhs.source.geodetic(connection):
+        if not lookup.lhs.output_field.geography and lookup.lhs.output_field.geodetic(connection):
             sql_template = self.sql_template
             if len(lookup.rhs) == 3 and lookup.rhs[-1] == 'spheroid':
                 template_params.update({'op': self.op, 'func': 'ST_Distance_Spheroid'})
@@ -215,7 +215,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         Converts the geometry returned from PostGIS aggretates.
         """
         if hex:
-            return Geometry(hex)
+            return Geometry(hex, srid=geo_field.srid)
         else:
             return None
 
@@ -284,7 +284,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         else:
             return [dist_param]
 
-    def get_geom_placeholder(self, f, value):
+    def get_geom_placeholder(self, f, value, qn):
         """
         Provides a proper substitution value for Geometries that are not in the
         SRID of the field.  Specifically, this routine will substitute in the
@@ -296,11 +296,12 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             # Adding Transform() to the SQL placeholder.
             placeholder = '%s(%%s, %s)' % (self.transform, f.srid)
 
-        if hasattr(value, 'expression'):
+        if hasattr(value, 'as_sql'):
             # If this is an F expression, then we don't really want
             # a placeholder and instead substitute in the column
             # of the expression.
-            placeholder = placeholder % self.get_expression_column(value)
+            sql, _ = qn.compile(value)
+            placeholder = placeholder % sql
 
         return placeholder
 
@@ -375,7 +376,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         agg_name = agg_name.lower()
         if agg_name == 'union':
             agg_name += 'agg'
-        sql_template = '%(function)s(%(field)s)'
+        sql_template = '%(function)s(%(expressions)s)'
         sql_function = getattr(self, agg_name)
         return sql_template, sql_function
 

@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from django.apps import apps
 from django.db.backends import utils
+from django.db.models.constants import LOOKUP_SEP
 from django.utils import six
 from django.utils import tree
 
@@ -220,3 +221,17 @@ def deferred_class_factory(model, attrs):
 # The above function is also used to unpickle model instances with deferred
 # fields.
 deferred_class_factory.__safe_for_unpickling__ = True
+
+
+def refs_aggregate(lookup_parts, aggregates):
+    """
+    A little helper method to check if the lookup_parts contains references
+    to the given aggregates set. Because the LOOKUP_SEP is contained in the
+    default annotation names we must check each prefix of the lookup_parts
+    for a match.
+    """
+    for n in range(len(lookup_parts) + 1):
+        level_n_lookup = LOOKUP_SEP.join(lookup_parts[0:n])
+        if level_n_lookup in aggregates and aggregates[level_n_lookup].contains_aggregate:
+            return aggregates[level_n_lookup], lookup_parts[n:]
+    return False, ()
