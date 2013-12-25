@@ -6,12 +6,15 @@ from django.contrib.gis.db.models.fields import GeometryField
 __all__ = ['Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union'] + aggregates.__all__
 
 
+warnings.warn(
+    "django.contrib.gis.db.models.sql.aggregates is deprecated. Use "
+    "django.contrib.gis.db.models.aggregates instead.",
+    RemovedInDjango20Warning, stacklevel=2)
+
+
 class GeoAggregate(Aggregate):
     # Default SQL template for spatial aggregates.
-    sql_template = '%(function)s(%(field)s)'
-
-    # Conversion class, if necessary.
-    conversion_class = None
+    sql_template = '%(function)s(%(expressions)s)'
 
     # Flags for indicating the type of the aggregate.
     is_extent = False
@@ -45,7 +48,7 @@ class GeoAggregate(Aggregate):
 
         substitutions = {
             'function': sql_function,
-            'field': field_name
+            'expressions': field_name
         }
         substitutions.update(self.extra)
 

@@ -9,7 +9,7 @@
 """
 import re
 
-from django.db.backends.oracle.base import DatabaseOperations
+from django.db.backends.oracle.base import DatabaseOperations, Database
 from django.contrib.gis.db.backends.base import BaseSpatialOperations
 from django.contrib.gis.db.backends.oracle.adapter import OracleSpatialAdapter
 from django.contrib.gis.db.backends.utils import SpatialOperator
@@ -145,9 +145,11 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         else:
             return None
 
-    def convert_geom(self, clob, geo_field):
-        if clob:
-            return Geometry(clob.read(), geo_field.srid)
+    def convert_geom(self, value, geo_field):
+        if value:
+            if isinstance(value, Database.LOB):
+                value = value.read()
+            return Geometry(value, geo_field.srid)
         else:
             return None
 
@@ -184,7 +186,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
 
         return [dist_param]
 
-    def get_geom_placeholder(self, f, value):
+    def get_geom_placeholder(self, f, value, qn):
         """
         Provides a proper substitution value for Geometries that are not in the
         SRID of the field.  Specifically, this routine will substitute in the
@@ -196,14 +198,15 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         def transform_value(val, srid):
             return val.srid != srid
 
-        if hasattr(value, 'expression'):
+        if hasattr(value, 'as_sql'):
             if transform_value(value, f.srid):
                 placeholder = '%s(%%s, %s)' % (self.transform, f.srid)
             else:
                 placeholder = '%s'
             # No geometry value used for F expression, substitute in
             # the column name instead.
-            return placeholder % self.get_expression_column(value)
+            sql, _ = qn.compile(value)
+            return placeholder % sql
         else:
             if transform_value(value, f.srid):
                 return '%s(SDO_GEOMETRY(%%s, %s), %s)' % (self.transform, value.srid, f.srid)
@@ -219,9 +222,9 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         if agg_name == 'union':
             agg_name += 'agg'
         if agg.is_extent:
-            sql_template = '%(function)s(%(field)s)'
+            sql_template = '%(function)s(%(expressions)s)'
         else:
-            sql_template = '%(function)s(SDOAGGRTYPE(%(field)s,%(tolerance)s))'
+            sql_template = '%(function)s(SDOAGGRTYPE(%(expressions)s,%(tolerance)s))'
         sql_function = getattr(self, agg_name)
         return self.select % sql_template, sql_function
 
