@@ -68,7 +68,7 @@ var ARABIC_MAP = {
     'ن':'n', 'ه':'h', 'و':'o', 'ي':'y'
 }
 
-var AZERBAIJAN_MAP = {
+var AZERBAIJANI_MAP = {
     'ə':'e', 'Ə':'E'
 }
 
@@ -83,7 +83,7 @@ ALL_DOWNCODE_MAPS[6]=CZECH_MAP
 ALL_DOWNCODE_MAPS[7]=POLISH_MAP
 ALL_DOWNCODE_MAPS[8]=LATVIAN_MAP
 ALL_DOWNCODE_MAPS[9]=ARABIC_MAP
-ALL_DOWNCODE_MAPS[10]=AZERBAIJAN_MAP
+ALL_DOWNCODE_MAPS[10]=AZERBAIJANI_MAP
 
 var Downcoder = new Object();
 Downcoder.Initialize = function()
