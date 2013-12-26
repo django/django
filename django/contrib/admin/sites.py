@@ -6,6 +6,7 @@ from django.contrib.auth import logout as auth_logout, REDIRECT_FIELD_NAME
 from django.contrib.contenttypes import views as contenttype_views
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
+from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.response import TemplateResponse
@@ -156,20 +157,17 @@ class AdminSite(object):
         """
         Check that all things needed to run the admin have been correctly installed.
 
-        The default implementation checks that LogEntry, ContentType and the
-        auth context processor are installed.
+        The default implementation checks that admin and contenttypes apps are
+        installed, as well as the auth context processor.
         """
-        from django.contrib.admin.models import LogEntry
-        from django.contrib.contenttypes.models import ContentType
-
-        if not LogEntry._meta.installed:
+        apps.populate_apps()
+        if not apps.has_app('django.contrib.admin'):
             raise ImproperlyConfigured("Put 'django.contrib.admin' in your "
                 "INSTALLED_APPS setting in order to use the admin application.")
-        if not ContentType._meta.installed:
+        if not apps.has_app('django.contrib.contenttypes'):
             raise ImproperlyConfigured("Put 'django.contrib.contenttypes' in "
                 "your INSTALLED_APPS setting in order to use the admin application.")
-        if not ('django.contrib.auth.context_processors.auth' in settings.TEMPLATE_CONTEXT_PROCESSORS or
-                'django.core.context_processors.auth' in settings.TEMPLATE_CONTEXT_PROCESSORS):
+        if 'django.contrib.auth.context_processors.auth' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
             raise ImproperlyConfigured("Put 'django.contrib.auth.context_processors.auth' "
                 "in your TEMPLATE_CONTEXT_PROCESSORS setting in order to use the admin application.")
 
@@ -383,7 +381,7 @@ class AdminSite(object):
                         app_dict[app_label]['models'].append(model_dict)
                     else:
                         app_dict[app_label] = {
-                            'name': app_label.title(),
+                            'name': apps.get_app_config(app_label).verbose_name,
                             'app_label': app_label,
                             'app_url': reverse('admin:app_list', kwargs={'app_label': app_label}, current_app=self.name),
                             'has_module_perms': has_module_perms,
@@ -392,7 +390,7 @@ class AdminSite(object):
 
         # Sort the apps alphabetically.
         app_list = list(six.itervalues(app_dict))
-        app_list.sort(key=lambda x: x['name'])
+        app_list.sort(key=lambda x: x['name'].lower())
 
         # Sort the models alphabetically within each app.
         for app in app_list:
@@ -410,6 +408,7 @@ class AdminSite(object):
 
     def app_index(self, request, app_label, extra_context=None):
         user = request.user
+        app_name = apps.get_app_config(app_label).verbose_name
         has_module_perms = user.has_module_perms(app_label)
         if not has_module_perms:
             raise PermissionDenied
@@ -444,7 +443,7 @@ class AdminSite(object):
                         # something to display, add in the necessary meta
                         # information.
                         app_dict = {
-                            'name': app_label.title(),
+                            'name': app_name,
                             'app_label': app_label,
                             'app_url': '',
                             'has_module_perms': has_module_perms,
@@ -455,7 +454,7 @@ class AdminSite(object):
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(key=lambda x: x['name'])
         context = dict(self.each_context(),
-            title=_('%s administration') % capfirst(app_label),
+            title=_('%(app)s administration') % {'app': app_name},
             app_list=[app_dict],
             app_label=app_label,
         )

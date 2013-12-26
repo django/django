@@ -80,14 +80,14 @@ def get_test_modules():
 
 
 def get_installed():
-    from django.db.models.loading import get_apps
-    return [app.__name__.rsplit('.', 1)[0] for app in get_apps()]
+    from django.apps import apps
+    return [app_config.name for app_config in apps.get_app_configs()]
 
 
 def setup(verbosity, test_labels):
     import django
+    from django.apps import apps, AppConfig
     from django.conf import settings
-    from django.db.models.loading import get_apps, load_app
     from django.test import TransactionTestCase, TestCase
 
     print("Testing against Django installed in '%s'" % os.path.dirname(django.__file__))
@@ -128,7 +128,7 @@ def setup(verbosity, test_labels):
     # Load all the ALWAYS_INSTALLED_APPS.
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', 'django.contrib.comments is deprecated and will be removed before Django 1.8.', DeprecationWarning)
-        get_apps()
+        apps.populate_models()
 
     # Load all the test model apps.
     test_modules = get_test_modules()
@@ -154,20 +154,21 @@ def setup(verbosity, test_labels):
         if not test_labels:
             module_found_in_labels = True
         else:
-            match = lambda label: (
-                module_label == label or  # exact match
-                module_label.startswith(label + '.')  # ancestor match
-            )
-
-            module_found_in_labels = any(match(l) for l in test_labels_set)
+            module_found_in_labels = any(
+                # exact match or ancestor match
+                module_label == label or module_label.startswith(label + '.')
+                for label in test_labels_set)
 
         if module_found_in_labels:
             if verbosity >= 2:
                 print("Importing application %s" % module_name)
-            mod = load_app(module_label)
-            if mod:
-                if module_label not in settings.INSTALLED_APPS:
-                    settings.INSTALLED_APPS.append(module_label)
+            # HACK.
+            if module_label not in settings.INSTALLED_APPS:
+                settings.INSTALLED_APPS.append(module_label)
+            app_config = AppConfig.create(module_label)
+            app_config.import_models(apps.all_models[app_config.label])
+            apps.app_configs[app_config.label] = app_config
+            apps.get_models.cache_clear()
 
     return state
 

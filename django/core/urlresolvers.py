@@ -131,8 +131,7 @@ def get_ns_resolver(ns_pattern, resolver):
     # Build a namespaced resolver for the given parent urlconf pattern.
     # This makes it possible to have captured parameters in the parent
     # urlconf pattern.
-    ns_resolver = RegexURLResolver(ns_pattern,
-                                          resolver.url_patterns)
+    ns_resolver = RegexURLResolver(ns_pattern, resolver.url_patterns)
     return RegexURLResolver(r'^/', [ns_resolver])
 
 

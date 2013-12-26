@@ -341,7 +341,7 @@ class BaseFormSet(object):
             # Give self.clean() a chance to do cross-form validation.
             self.clean()
         except ValidationError as e:
-            self._non_form_errors = self.error_class(e.messages)
+            self._non_form_errors = self.error_class(e.error_list)
 
     def clean(self):
         """

@@ -55,8 +55,8 @@ class DeletionTests(TestCase):
             'form-0-name': 'test',
             'form-1-id': '',
             'form-1-name': 'x' * 1000,  # Too long
-            'form-1-id': six.text_type(poet.id),  # Violate unique constraint
-            'form-1-name': 'test2',
+            'form-2-id': six.text_type(poet.id),  # Violate unique constraint
+            'form-2-name': 'test2',
         }
         formset = PoetFormSet(data, queryset=Poet.objects.all())
         # Make sure this form doesn't pass validation.

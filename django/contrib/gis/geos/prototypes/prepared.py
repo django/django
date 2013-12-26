@@ -1,5 +1,5 @@
 from ctypes import c_char
-from django.contrib.gis.geos.libgeos import GEOM_PTR, PREPGEOM_PTR
+from django.contrib.gis.geos.libgeos import GEOM_PTR, PREPGEOM_PTR, geos_version_info
 from django.contrib.gis.geos.prototypes.errcheck import check_predicate
 from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 
@@ -24,3 +24,10 @@ prepared_contains = prepared_predicate(GEOSFunc('GEOSPreparedContains'))
 prepared_contains_properly = prepared_predicate(GEOSFunc('GEOSPreparedContainsProperly'))
 prepared_covers = prepared_predicate(GEOSFunc('GEOSPreparedCovers'))
 prepared_intersects = prepared_predicate(GEOSFunc('GEOSPreparedIntersects'))
+
+if geos_version_info()['version'] > '3.3.0':
+    prepared_crosses = prepared_predicate(GEOSFunc('GEOSPreparedCrosses'))
+    prepared_disjoint = prepared_predicate(GEOSFunc('GEOSPreparedDisjoint'))
+    prepared_overlaps = prepared_predicate(GEOSFunc('GEOSPreparedOverlaps'))
+    prepared_touches = prepared_predicate(GEOSFunc('GEOSPreparedTouches'))
+    prepared_within = prepared_predicate(GEOSFunc('GEOSPreparedWithin'))

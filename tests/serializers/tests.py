@@ -16,8 +16,8 @@ except ImportError:
 
 from django.core import management, serializers
 from django.db import transaction, connection
-from django.test import TestCase, TransactionTestCase
-from django.test.utils import Approximate, override_settings
+from django.test import TestCase, TransactionTestCase, override_settings
+from django.test.utils import Approximate
 from django.utils import six
 from django.utils.six import StringIO
 

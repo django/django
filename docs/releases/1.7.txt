@@ -58,6 +58,26 @@ but a few of the key features are:
   will still work, but that method name is deprecated and you should change
   it as soon as possible (nothing more than renaming is required).
 
+App-loading refactor
+~~~~~~~~~~~~~~~~~~~~
+
+Historically, Django applications were tightly linked to models. A singleton
+known as the "app cache" dealt with both installed applications and models.
+The models module was used as an identifier for applications in many APIs.
+
+As the concept of :doc:`Django applications </ref/applications>` matured, this
+code showed some shortcomings. It has been refactored into an "app registry"
+where models modules no longer have a central role and where it's possible to
+attach configuration data to applications.
+
+Improvements thus far include:
+
+* It is possible to omit ``models.py`` entirely if an application doesn't
+  have any models.
+
+* The name of applications can be customized in the admin with the
+  :attr:`~django.apps.AppConfig.verbose_name` of application configurations.
+
 New method on Field subclasses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -211,6 +231,10 @@ Minor features
 * The default OpenLayers library version included in widgets has been updated
   from 2.11 to 2.13.
 
+* Prepared geometries now also support the ``crosses``, ``disjoint``,
+  ``overlaps``, ``touches`` and ``within`` predicates, if GEOS 3.3 or later is
+  installed.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -280,7 +304,7 @@ Cache
 
 * If you instanciate cache backends directly, be aware that they aren't
   thread-safe any more, as :data:`django.core.cache.caches` now yields
-  differend instances per thread.
+  different instances per thread.
 
 Email
 ^^^^^
@@ -353,6 +377,12 @@ Forms
 * The new :meth:`~django.forms.Form.add_error()` method allows adding errors
   to specific form fields.
 
+* The dict-like attribute :attr:`~django.forms.Form.errors` now has two new
+  methods :meth:`~django.forms.Form.errors.as_data()` and
+  :meth:`~django.forms.Form.errors.as_json()`. The former returns a ``dict``
+  that maps fields to their original errors, complete with all metadata
+  (error code and params), the latter returns the errors serialized as json.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -398,13 +428,10 @@ Management Commands
 
 * The :djadmin:`runserver` command received several improvements:
 
-  * On BSD systems, including OS X, the development server will reload
-    immediately when a file is changed. Previously, it polled the filesystem
-    for changes every second. That caused a small delay before reloads and
-    reduced battery life on laptops.
-
-  * On Linux, the same improvements are available when pyinotify_ is
-    installed.
+  * On Linux systems, if pyinotify_ is installed, the development server will
+    reload immediately when a file is changed. Previously, it polled the
+    filesystem for changes every second. That caused a small delay before
+    reloads and reduced battery life on laptops.
 
     .. _pyinotify: https://pypi.python.org/pypi/pyinotify
 
@@ -446,6 +473,9 @@ Models
   ``ForeignKey`` and ``GenericForeignKey`` now accept the ``bulk`` keyword
   argument to control whether or not to perform operations in bulk
   (i.e. using ``QuerySet.update()``). Defaults to ``True``.
+
+* It is now possible to use ``None`` as a query value for the :lookup:`iexact`
+  lookup.
 
 Signals
 ^^^^^^^
@@ -534,6 +564,9 @@ Tests
   in :class:`~django.test.Client` instantiation and are processed through
   middleware.
 
+* :meth:`~django.test.TransactionTestCase.assertNumQueries` now prints
+  out the list of executed queries if the assertion fails.
+
 Backwards incompatible changes in 1.7
 =====================================
 
@@ -556,6 +589,22 @@ For apps with migrations, ``allow_migrate`` will now get passed
 :ref:`historical models <historical-models>`, which are special versioned models
 without custom attributes, methods or managers. Make sure your ``allow_migrate``
 methods are only referring to fields or other items in ``model._meta``.
+
+App-loading changes
+~~~~~~~~~~~~~~~~~~~
+
+Since :setting:`INSTALLED_APPS` now supports application configuration classes
+in addition to application modules, you should review code that accesses this
+setting directly and use the app registry (:attr:`django.apps.apps`) instead.
+
+The "app registry" that manages the list of installed applications doesn't
+have the same features as the old "app cache". However, even though the "app
+cache" was a private API, most of its methods were temporarily preserved and
+will go through a deprecation path.
+
+While the new implementation is believed to be more robust, regressions cannot
+be ruled out, especially during the import sequence. Circular imports that
+didn't happen with previous versions of Django might appear.
 
 Behavior of ``LocMemCache`` regarding pickle errors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -713,6 +762,8 @@ Miscellaneous
   ``select_related('foo').select_related('bar')``. Previously the latter would
   have been equivalent to ``select_related('bar')``.
 
+* GeoDjango dropped support for GEOS < 3.1.
+
 Features deprecated in 1.7
 ==========================
 
@@ -860,3 +911,20 @@ Geo Sitemaps
 
 Google has retired support for the Geo Sitemaps format. Hence Django support
 for Geo Sitemaps is deprecated and will be removed in Django 1.8.
+
+Passing callable arguments to queryset methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Callable arguments for querysets were an undocumented feature that was
+unreliable. It's been deprecated and will be removed in Django 1.9.
+
+Callable arguments were evaluated when a queryset was constructed rather than
+when it was evaluated, thus this feature didn't offer any benefit compared to
+evaluating arguments before passing them to queryset and created confusion that
+the arguments may have been evaluated at query time.
+
+``ADMIN_FOR`` setting
+~~~~~~~~~~~~~~~~~~~~~
+
+The ``ADMIN_FOR`` feature, part of the admindocs, has been removed. You can
+remove the setting from your configuration at your convenience.

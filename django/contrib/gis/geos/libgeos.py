@@ -48,9 +48,11 @@ if lib_names:
 
 # No GEOS library could be found.
 if lib_path is None:
-    raise ImportError('Could not find the GEOS library (tried "%s"). '
-                        'Try setting GEOS_LIBRARY_PATH in your settings.' %
-                        '", "'.join(lib_names))
+    raise ImportError(
+        'Could not find the GEOS library (tried "%s"). '
+        'Try setting GEOS_LIBRARY_PATH in your settings.' %
+        '", "'.join(lib_names)
+    )
 
 # Getting the GEOS C library.  The C interface (CDLL) is used for
 # both *NIX and Windows.
@@ -153,22 +155,10 @@ GEOS_MINOR_VERSION = int(_verinfo['minor'])
 GEOS_SUBMINOR_VERSION = int(_verinfo['subminor'])
 del _verinfo
 GEOS_VERSION = (GEOS_MAJOR_VERSION, GEOS_MINOR_VERSION, GEOS_SUBMINOR_VERSION)
-GEOS_PREPARE = GEOS_VERSION >= (3, 1, 0)
 
-if GEOS_PREPARE:
-    # Here we set up the prototypes for the initGEOS_r and finishGEOS_r
-    # routines.  These functions aren't actually called until they are
-    # attached to a GEOS context handle -- this actually occurs in
-    # geos/prototypes/threadsafe.py.
-    lgeos.initGEOS_r.restype = CONTEXT_PTR
-    lgeos.finishGEOS_r.argtypes = [CONTEXT_PTR]
-else:
-    # When thread-safety isn't available, the initGEOS routine must be called
-    # first.  This function takes the notice and error functions, defined
-    # as Python callbacks above, as parameters. Here is the C code that is
-    # wrapped:
-    #  extern void GEOS_DLL initGEOS(GEOSMessageHandler notice_function, GEOSMessageHandler error_function);
-    lgeos.initGEOS(notice_h, error_h)
-    # Calling finishGEOS() upon exit of the interpreter.
-    import atexit
-    atexit.register(lgeos.finishGEOS)
+# Here we set up the prototypes for the initGEOS_r and finishGEOS_r
+# routines.  These functions aren't actually called until they are
+# attached to a GEOS context handle -- this actually occurs in
+# geos/prototypes/threadsafe.py.
+lgeos.initGEOS_r.restype = CONTEXT_PTR
+lgeos.finishGEOS_r.argtypes = [CONTEXT_PTR]

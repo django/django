@@ -86,19 +86,9 @@ from other databases, so if you are working on something substantial, it's
 recommended to develop with the same database as you plan on using in
 production.
 
-In addition to the officially supported databases, there are backends provided
-by 3rd parties that allow you to use other databases with Django:
-
-* `Sybase SQL Anywhere`_
-* `IBM DB2`_
-* `Microsoft SQL Server 2005`_
-* Firebird_
-* ODBC_
-
-The Django versions and ORM features supported by these unofficial backends
-vary considerably. Queries regarding the specific capabilities of these
-unofficial backends, along with any support queries, should be directed to the
-support channels provided by each 3rd party project.
+In addition to the officially supported databases, there are :ref:`backends
+provided by 3rd parties <third-party-notes>` that allow you to use other
+databases with Django.
 
 In addition to a database backend, you'll need to make sure your Python
 database bindings are installed.

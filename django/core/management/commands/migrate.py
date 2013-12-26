@@ -6,17 +6,16 @@ from importlib import import_module
 import itertools
 import traceback
 
-from django.conf import settings
+from django.apps import apps
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.core.management.sql import custom_sql_for_model, emit_post_migrate_signal, emit_pre_migrate_signal
-from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
+from django.db import connections, router, transaction, DEFAULT_DB_ALIAS
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import MigrationLoader, AmbiguityError
 from django.db.migrations.state import ProjectState
 from django.db.migrations.autodetector import MigrationAutodetector
-from django.db.models.loading import cache
 from django.utils.module_loading import module_has_submodule
 
 
@@ -47,9 +46,9 @@ class Command(BaseCommand):
 
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
-        for app_name in settings.INSTALLED_APPS:
-            if module_has_submodule(import_module(app_name), "management"):
-                import_module('.management', app_name)
+        for app_config in apps.get_app_configs():
+            if module_has_submodule(app_config.module, "management"):
+                import_module('.management', app_config.name)
 
         # Get the database we're operating from
         db = options.get('database')
@@ -136,7 +135,7 @@ class Command(BaseCommand):
                 # If there's changes that aren't in migrations yet, tell them how to fix it.
                 autodetector = MigrationAutodetector(
                     executor.loader.graph.project_state(),
-                    ProjectState.from_app_cache(cache),
+                    ProjectState.from_apps(apps),
                 )
                 changes = autodetector.changes(graph=executor.loader.graph)
                 if changes:
@@ -168,8 +167,8 @@ class Command(BaseCommand):
                 else:
                     self.stdout.write(self.style.MIGRATE_SUCCESS(" OK"))
 
-    def sync_apps(self, connection, apps):
-        "Runs the old syncdb-style operation on a list of apps."
+    def sync_apps(self, connection, app_labels):
+        "Runs the old syncdb-style operation on a list of app_labels."
         cursor = connection.cursor()
 
         # Get a list of already installed *models* so that references work right.
@@ -180,9 +179,10 @@ class Command(BaseCommand):
 
         # Build the manifest of apps and models that are to be synchronized
         all_models = [
-            (app.__name__.split('.')[-2],
-                router.get_migratable_models(app, connection.alias, include_auto_created=True))
-            for app in models.get_apps() if app.__name__.split('.')[-2] in apps
+            (app_config.label,
+                router.get_migratable_models(app_config.models_module, connection.alias, include_auto_created=True))
+            for app_config in apps.get_app_configs(only_with_models_module=True)
+            if app_config.label in app_labels
         ]
 
         def model_installed(model):
@@ -277,7 +277,7 @@ class Command(BaseCommand):
 
         return created_models
 
-    def show_migration_list(self, connection, apps=None):
+    def show_migration_list(self, connection, app_names=None):
         """
         Shows a list of all migrations on the system, or only those of
         some named apps.
@@ -286,24 +286,24 @@ class Command(BaseCommand):
         loader = MigrationLoader(connection)
         graph = loader.graph
         # If we were passed a list of apps, validate it
-        if apps:
+        if app_names:
             invalid_apps = []
-            for app in apps:
-                if app not in loader.migrated_apps:
-                    invalid_apps.append(app)
+            for app_name in app_names:
+                if app_name not in loader.migrated_apps:
+                    invalid_apps.append(app_name)
             if invalid_apps:
                 raise CommandError("No migrations present for: %s" % (", ".join(invalid_apps)))
         # Otherwise, show all apps in alphabetic order
         else:
-            apps = sorted(loader.migrated_apps)
+            app_names = sorted(loader.migrated_apps)
         # For each app, print its migrations in order from oldest (roots) to
         # newest (leaves).
-        for app in apps:
-            self.stdout.write(app, self.style.MIGRATE_LABEL)
+        for app_name in app_names:
+            self.stdout.write(app_name, self.style.MIGRATE_LABEL)
             shown = set()
-            for node in graph.leaf_nodes(app):
+            for node in graph.leaf_nodes(app_name):
                 for plan_node in graph.forwards_plan(node):
-                    if plan_node not in shown and plan_node[0] == app:
+                    if plan_node not in shown and plan_node[0] == app_name:
                         # Give it a nice title if it's a squashed one
                         title = plan_node[1]
                         if graph.nodes[plan_node].replaces:

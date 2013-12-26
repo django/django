@@ -5,6 +5,7 @@ from optparse import OptionParser, NO_DEFAULT
 import os
 import sys
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError, handle_default_options
 from django.core.management.color import color_style
@@ -106,20 +107,25 @@ def get_commands():
         _commands = dict((name, 'django.core') for name in find_commands(__path__[0]))
 
         # Find the installed apps
-        from django.conf import settings
         try:
-            apps = settings.INSTALLED_APPS
+            settings.INSTALLED_APPS
         except ImproperlyConfigured:
-            # Still useful for commands that do not require functional settings,
-            # like startproject or help
-            apps = []
+            # Still useful for commands that do not require functional
+            # settings, like startproject or help.
+            app_names = []
+        else:
+            # Populate the app registry outside of the try/except block to
+            # avoid catching ImproperlyConfigured errors that aren't caused
+            # by the absence of a settings module.
+            from django.apps import apps
+            app_configs = apps.get_app_configs()
+            app_names = [app_config.name for app_config in app_configs]
 
         # Find and load the management module for each installed app.
-        for app_name in apps:
+        for app_name in app_names:
             try:
                 path = find_management_module(app_name)
-                _commands.update(dict((name, app_name)
-                                       for name in find_commands(path)))
+                _commands.update(dict((name, app_name) for name in find_commands(path)))
             except ImportError:
                 pass  # No management module - ignore this app
 
@@ -340,9 +346,10 @@ class ManagementUtility(object):
             elif cwords[0] in ('dumpdata', 'sql', 'sqlall', 'sqlclear',
                     'sqlcustom', 'sqlindexes', 'sqlsequencereset', 'test'):
                 try:
-                    from django.conf import settings
+                    from django.apps import apps
+                    app_configs = apps.get_app_configs()
                     # Get the last part of the dotted path as the app name.
-                    options += [(a.split('.')[-1], 0) for a in settings.INSTALLED_APPS]
+                    options += [(app_config.label, 0) for app_config in app_configs]
                 except ImportError:
                     # Fail silently if DJANGO_SETTINGS_MODULE isn't set. The
                     # user will find out once they execute the command.

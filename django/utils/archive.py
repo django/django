@@ -160,7 +160,7 @@ class TarArchive(BaseArchive):
                     # Some corrupt tar files seem to produce this
                     # (specifically bad symlinks)
                     print("In the tar file %s the member %s is invalid: %s" %
-                            (name, member.name, exc))
+                          (name, member.name, exc))
                 else:
                     dirname = os.path.dirname(filename)
                     if dirname and not os.path.exists(dirname):

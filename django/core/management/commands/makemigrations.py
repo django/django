@@ -3,15 +3,14 @@ import os
 import operator
 from optparse import make_option
 
+from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
-from django.core.exceptions import ImproperlyConfigured
 from django.db import connections, DEFAULT_DB_ALIAS, migrations
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.questioner import MigrationQuestioner, InteractiveMigrationQuestioner
 from django.db.migrations.state import ProjectState
 from django.db.migrations.writer import MigrationWriter
-from django.db.models.loading import cache
 from django.utils.six.moves import reduce
 
 
@@ -38,8 +37,8 @@ class Command(BaseCommand):
         bad_app_labels = set()
         for app_label in app_labels:
             try:
-                cache.get_app(app_label)
-            except ImproperlyConfigured:
+                apps.get_app_config(app_label)
+            except LookupError:
                 bad_app_labels.add(app_label)
         if bad_app_labels:
             for app_label in bad_app_labels:
@@ -73,7 +72,7 @@ class Command(BaseCommand):
         # Detect changes
         autodetector = MigrationAutodetector(
             loader.graph.project_state(),
-            ProjectState.from_app_cache(cache),
+            ProjectState.from_apps(apps),
             InteractiveMigrationQuestioner(specified_apps=app_labels),
         )
         changes = autodetector.changes(graph=loader.graph, trim_to_apps=app_labels or None)

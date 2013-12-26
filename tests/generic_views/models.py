@@ -1,5 +1,7 @@
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.db.models import QuerySet
+from django.db.models.manager import BaseManager
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -31,6 +33,13 @@ class Author(models.Model):
         return self.name
 
 
+class DoesNotExistQuerySet(QuerySet):
+    def get(self, *args, **kwargs):
+        raise Author.DoesNotExist
+
+DoesNotExistBookManager = BaseManager.from_queryset(DoesNotExistQuerySet)
+
+
 @python_2_unicode_compatible
 class Book(models.Model):
     name = models.CharField(max_length=300)
@@ -38,6 +47,9 @@ class Book(models.Model):
     pages = models.IntegerField()
     authors = models.ManyToManyField(Author)
     pubdate = models.DateField()
+
+    objects = models.Manager()
+    does_not_exist = DoesNotExistBookManager()
 
     class Meta:
         ordering = ['-pubdate']

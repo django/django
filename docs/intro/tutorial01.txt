@@ -17,7 +17,7 @@ tell Django is installed and which version by running the following command:
 
 .. code-block:: bash
 
-    python -c "import django; print(django.get_version())"
+    $ python -c "import django; print(django.get_version())"
 
 If Django is installed, you should see the version of your installation. If it
 isn't, you'll get an error telling "No module named django".
@@ -55,7 +55,7 @@ code, then run the following command:
 
 .. code-block:: bash
 
-   django-admin.py startproject mysite
+   $ django-admin.py startproject mysite
 
 This will create a ``mysite`` directory in your current directory. If it didn't
 work, see :ref:`troubleshooting-django-admin-py`.
@@ -131,8 +131,13 @@ The development server
 ----------------------
 
 Let's verify this worked. Change into the outer :file:`mysite` directory, if
-you haven't already, and run the command ``python manage.py runserver``. You'll
-see the following output on the command line:
+you haven't already, and run the command:
+
+.. code-block:: bash
+
+   $ python manage.py runserver
+
+You'll see the following output on the command line:
 
 .. parsed-literal::
 
@@ -568,9 +573,11 @@ make new ones - it specialises in upgrading your database live, without
 losing data. We'll cover them in more depth in a later part of the tutorial,
 but for now, remember the three-step guide to making model changes:
 
-* Change your models (in models.py)
-* Run ``python manage.py makemigrations`` to create migrations for those changes
-* Run ``python manage.py migrate`` to apply those changes to the database.
+* Change your models (in ``models.py``).
+* Run :djadmin:`python manage.py makemigrations <makemigrations>` to create
+  migrations for those changes
+* Run :djadmin:`python manage.py migrate <migrate>` to apply those changes to
+  the database.
 
 The reason there's separate commands to make and apply migrations is because
 you'll commit migrations to your version control system and ship them with

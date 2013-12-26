@@ -5,6 +5,7 @@ from functools import partial
 from importlib import import_module
 from inspect import getargspec, getcallargs
 
+from django.apps import apps
 from django.conf import settings
 from django.template.context import (BaseContext, Context, RequestContext,  # NOQA: imported for backwards compatibility
     ContextPopException)
@@ -92,8 +93,7 @@ class VariableDoesNotExist(Exception):
         self.params = params
 
     def __str__(self):
-        return self.msg % tuple(force_text(p, errors='replace')
-                                 for p in self.params)
+        return self.msg % tuple(force_text(p, errors='replace') for p in self.params)
 
 
 class InvalidTemplateLibrary(Exception):
@@ -1055,8 +1055,7 @@ class TagHelperNode(Node):
         resolved_args = [var.resolve(context) for var in self.args]
         if self.takes_context:
             resolved_args = [context] + resolved_args
-        resolved_kwargs = dict((k, v.resolve(context))
-                                for k, v in self.kwargs.items())
+        resolved_kwargs = dict((k, v.resolve(context)) for k, v in self.kwargs.items())
         return resolved_args, resolved_kwargs
 
 
@@ -1304,9 +1303,12 @@ def get_templatetags_modules():
         # Populate list once per process. Mutate the local list first, and
         # then assign it to the global name to ensure there are no cases where
         # two threads try to populate it simultaneously.
-        for app_module in ['django'] + list(settings.INSTALLED_APPS):
+
+        templatetags_modules_candidates = ['django.templatetags']
+        templatetags_modules_candidates += ['%s.templatetags' % app_config.name
+            for app_config in apps.get_app_configs()]
+        for templatetag_module in templatetags_modules_candidates:
             try:
-                templatetag_module = '%s.templatetags' % app_module
                 import_module(templatetag_module)
                 _templatetags_modules.append(templatetag_module)
             except ImportError:

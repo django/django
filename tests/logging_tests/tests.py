@@ -5,8 +5,8 @@ import warnings
 
 from django.conf import LazySettings
 from django.core import mail
-from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings, patch_logger
+from django.test import TestCase, RequestFactory, override_settings
+from django.test.utils import patch_logger
 from django.utils.encoding import force_text
 from django.utils.log import (CallbackFilter, RequireDebugFalse,
     RequireDebugTrue)

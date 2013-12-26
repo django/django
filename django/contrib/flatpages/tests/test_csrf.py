@@ -2,7 +2,7 @@ import os
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TestCase, Client
-from django.test.utils import override_settings
+from django.test import override_settings
 
 
 @override_settings(

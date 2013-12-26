@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
+from django.apps.registry import Apps
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.db.models.loading import BaseAppCache
 from django.test import TestCase
 
 from .models import Author, Article
@@ -61,7 +61,7 @@ class ContentTypesViewsTests(TestCase):
             class Meta:
                 verbose_name = 'a model created on the fly'
                 app_label = 'my_great_app'
-                app_cache = BaseAppCache()
+                apps = Apps()
 
         ct = ContentType.objects.get_for_model(ModelCreatedOnTheFly)
         self.assertEqual(ct.app_label, 'my_great_app')

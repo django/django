@@ -9,8 +9,8 @@ import warnings
 from base64 import b64decode, b64encode
 from itertools import tee
 
+from django.apps import apps
 from django.db import connection
-from django.db.models.loading import get_model
 from django.db.models.query_utils import QueryWrapper
 from django.conf import settings
 from django import forms
@@ -51,7 +51,7 @@ BLANK_CHOICE_DASH = [("", "---------")]
 
 
 def _load_field(app_label, model_name, field_name):
-    return get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
+    return apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
 
 
 class FieldDoesNotExist(Exception):
@@ -287,7 +287,7 @@ class Field(object):
     def __reduce__(self):
         """
         Pickling should return the model._meta.fields instance of the field,
-        not a new copy of that field. So, we use the app cache to load the
+        not a new copy of that field. So, we use the app registry to load the
         model and then the field back.
         """
         if not hasattr(self, 'model'):
@@ -298,8 +298,8 @@ class Field(object):
             # values - so, this is very close to normal pickle.
             return _empty, (self.__class__,), self.__dict__
         if self.model._deferred:
-            # Deferred model will not be found from the app cache. This could
-            # be fixed by reconstructing the deferred model on unpickle.
+            # Deferred model will not be found from the app registry. This
+            # could be fixed by reconstructing the deferred model on unpickle.
             raise RuntimeError("Fields of deferred models can't be reduced")
         return _load_field, (self.model._meta.app_label, self.model._meta.object_name,
                              self.name)
@@ -603,7 +603,7 @@ class Field(object):
         rel_model = self.rel.to
         if hasattr(self.rel, 'get_related_field'):
             lst = [(getattr(x, self.rel.get_related_field().attname),
-                        smart_text(x))
+                   smart_text(x))
                    for x in rel_model._default_manager.complex_filter(
                        self.rel.limit_choices_to)]
         else:

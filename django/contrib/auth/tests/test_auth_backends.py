@@ -10,8 +10,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.contrib.auth import authenticate, get_user
 from django.http import HttpRequest
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.contrib.auth.hashers import MD5PasswordHasher
 
 

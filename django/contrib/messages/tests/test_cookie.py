@@ -5,8 +5,7 @@ from django.contrib.messages.tests.base import BaseTests
 from django.contrib.messages.storage.cookie import (CookieStorage,
     MessageEncoder, MessageDecoder)
 from django.contrib.messages.storage.base import Message
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils.safestring import SafeData, mark_safe
 
 

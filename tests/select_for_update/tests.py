@@ -8,7 +8,7 @@ from django.db import transaction, connection, router
 from django.db.utils import ConnectionHandler, DEFAULT_DB_ALIAS, DatabaseError
 from django.test import (TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
-from django.test.utils import override_settings
+from django.test import override_settings
 
 from multiple_database.routers import TestRouter
 

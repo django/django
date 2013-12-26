@@ -11,8 +11,8 @@ from threading import local
 from django.conf import settings
 from django.template import Template, Context
 from django.template.base import TemplateSyntaxError
-from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings, TransRealMixin
+from django.test import TestCase, RequestFactory, override_settings
+from django.test.utils import TransRealMixin
 from django.utils import translation
 from django.utils.formats import (get_format, date_format, time_format,
     localize, localize_input, iter_format_modules, get_format_modules,
@@ -1035,11 +1035,26 @@ class ResolutionOrderI18NTests(TransRealMixin, TestCase):
             "translation of '%s'; the actual result is '%s'." % (msgstr, msgid, result)))
 
 
-@override_settings(INSTALLED_APPS=['i18n.resolution'] + list(settings.INSTALLED_APPS))
 class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
     def test_app_translation(self):
-        self.assertUgettext('Date/time', 'APP')
+        # Original translation.
+        self.assertUgettext('Date/time', 'Datum/Zeit')
+
+        # Different translation.
+        with self.modify_settings(INSTALLED_APPS={'append': 'i18n.resolution'}):
+            self.flush_caches()
+            activate('de')
+
+            # Doesn't work because it's added later in the list.
+            self.assertUgettext('Date/time', 'Datum/Zeit')
+
+            with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.admin'}):
+                self.flush_caches()
+                activate('de')
+
+                # Unless the original is removed from the list.
+                self.assertUgettext('Date/time', 'Datum/Zeit (APP)')
 
 
 @override_settings(LOCALE_PATHS=extended_locale_paths)
@@ -1049,8 +1064,7 @@ class LocalePathsResolutionOrderI18NTests(ResolutionOrderI18NTests):
         self.assertUgettext('Time', 'LOCALE_PATHS')
 
     def test_locale_paths_override_app_translation(self):
-        extended_apps = list(settings.INSTALLED_APPS) + ['i18n.resolution']
-        with self.settings(INSTALLED_APPS=extended_apps):
+        with self.settings(INSTALLED_APPS=['i18n.resolution']):
             self.assertUgettext('Time', 'LOCALE_PATHS')
 
 
@@ -1247,51 +1261,12 @@ class LocaleMiddlewareTests(TransRealMixin, TestCase):
             'django.middleware.common.CommonMiddleware',
         ),
     )
-    def test_session_language(self):
-        """
-        Check that language is stored in session if missing.
-        """
-        # Create an empty session
-        engine = import_module(settings.SESSION_ENGINE)
-        session = engine.SessionStore()
-        session.save()
-        self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
-
-        # Clear the session data before request
-        session.save()
-        self.client.get('/en/simple/')
-        self.assertEqual(self.client.session['_language'], 'en')
-
-        # Clear the session data before request
-        session.save()
+    def test_language_not_saved_to_session(self):
+        """Checks that current language is not automatically saved to
+        session on every request."""
+        # Regression test for #21473
         self.client.get('/fr/simple/')
-        self.assertEqual(self.client.session['_language'], 'fr')
-
-        # Check that language is not changed in session
-        self.client.get('/en/simple/')
-        self.assertEqual(self.client.session['_language'], 'fr')
-
-    @override_settings(
-        MIDDLEWARE_CLASSES=(
-            'django.contrib.sessions.middleware.SessionMiddleware',
-            'django.middleware.locale.LocaleMiddleware',
-            'django.middleware.common.CommonMiddleware',
-        ),
-    )
-    def test_backwards_session_language(self):
-        """
-        Check that language is stored in session if missing.
-        """
-        # Create session with old language key name
-        engine = import_module(settings.SESSION_ENGINE)
-        session = engine.SessionStore()
-        session['django_language'] = 'en'
-        session.save()
-        self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
-
-        # request other language; should default to old language key value
-        self.client.get('/fr/simple/')
-        self.assertEqual(self.client.session['_language'], 'en')
+        self.assertNotIn('_language', self.client.session)
 
 
 @override_settings(

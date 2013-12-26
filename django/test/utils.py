@@ -9,6 +9,7 @@ import warnings
 from functools import wraps
 from xml.dom.minidom import parseString, Node
 
+from django.apps import apps
 from django.conf import settings, UserSettingsHolder
 from django.core import mail
 from django.core.signals import request_started
@@ -23,8 +24,10 @@ from django.utils.translation import deactivate
 
 
 __all__ = (
-    'Approximate', 'ContextList', 'get_runner', 'override_settings',
-    'requires_tz_support', 'setup_test_environment', 'teardown_test_environment',
+    'Approximate', 'ContextList', 'get_runner',
+    'modify_settings', 'override_settings',
+    'requires_tz_support',
+    'setup_test_environment', 'teardown_test_environment',
 )
 
 RESTORE_LOADERS_ATTR = '_original_template_source_loaders'
@@ -204,11 +207,7 @@ class override_settings(object):
                 raise Exception(
                     "Only subclasses of Django SimpleTestCase can be decorated "
                     "with override_settings")
-            if test_func._custom_settings:
-                test_func._custom_settings = dict(
-                    test_func._custom_settings, **self.options)
-            else:
-                test_func._custom_settings = self.options
+            self.save_options(test_func)
             return test_func
         else:
             @wraps(test_func)
@@ -217,7 +216,23 @@ class override_settings(object):
                     return test_func(*args, **kwargs)
         return inner
 
+    def save_options(self, test_func):
+        if test_func._overridden_settings is None:
+            test_func._overridden_settings = self.options
+        else:
+            # Duplicate dict to prevent subclasses from altering their parent.
+            test_func._overridden_settings = dict(
+                test_func._overridden_settings, **self.options)
+
     def enable(self):
+        # Keep this code at the beginning to leave the settings unchanged
+        # in case it raises an exception because INSTALLED_APPS is invalid.
+        if 'INSTALLED_APPS' in self.options:
+            try:
+                apps.set_installed_apps(self.options['INSTALLED_APPS'])
+            except Exception:
+                apps.unset_installed_apps()
+                raise
         override = UserSettingsHolder(settings._wrapped)
         for key, new_value in self.options.items():
             setattr(override, key, new_value)
@@ -228,12 +243,61 @@ class override_settings(object):
                                  setting=key, value=new_value, enter=True)
 
     def disable(self):
+        if 'INSTALLED_APPS' in self.options:
+            apps.unset_installed_apps()
         settings._wrapped = self.wrapped
         del self.wrapped
         for key in self.options:
             new_value = getattr(settings, key, None)
             setting_changed.send(sender=settings._wrapped.__class__,
                                  setting=key, value=new_value, enter=False)
+
+
+class modify_settings(override_settings):
+    """
+    Like override_settings, but makes it possible to append, prepend or remove
+    items instead of redefining the entire list.
+    """
+    def __init__(self, *args, **kwargs):
+        if args:
+            # Hack used when instaciating from SimpleTestCase._pre_setup.
+            assert not kwargs
+            self.operations = args[0]
+        else:
+            assert not args
+            self.operations = list(kwargs.items())
+
+    def save_options(self, test_func):
+        if test_func._modified_settings is None:
+            test_func._modified_settings = self.operations
+        else:
+            # Duplicate list to prevent subclasses from altering their parent.
+            test_func._modified_settings = list(
+                test_func._modified_settings) + self.operations
+
+    def enable(self):
+        self.options = {}
+        for name, operations in self.operations:
+            try:
+                # When called from SimpleTestCase._pre_setup, values may be
+                # overridden several times; cumulate changes.
+                value = self.options[name]
+            except KeyError:
+                value = list(getattr(settings, name, []))
+            for action, items in operations.items():
+                # items my be a single value or an iterable.
+                if isinstance(items, six.string_types):
+                    items = [items]
+                if action == 'append':
+                    value = value + [item for item in items if item not in value]
+                elif action == 'prepend':
+                    value = [item for item in items if item not in value] + value
+                elif action == 'remove':
+                    value = [item for item in value if item not in items]
+                else:
+                    raise ValueError("Unsupported action: %s" % action)
+            self.options[name] = value
+        super(modify_settings, self).enable()
 
 
 def compare_xml(want, got):

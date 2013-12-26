@@ -9,6 +9,7 @@ all about the internals of models in order to get the information it needs.
 
 from collections import OrderedDict
 import copy
+import warnings
 
 from django.utils.encoding import force_text
 from django.utils.tree import Node
@@ -452,9 +453,9 @@ class Query(object):
         'rhs' query.
         """
         assert self.model == rhs.model, \
-                "Cannot combine queries on two different base models."
+            "Cannot combine queries on two different base models."
         assert self.can_filter(), \
-                "Cannot combine queries once a slice has been taken."
+            "Cannot combine queries once a slice has been taken."
         assert self.distinct == rhs.distinct, \
             "Cannot combine a unique query with a non-unique query."
         assert self.distinct_fields == rhs.distinct_fields, \
@@ -1031,11 +1032,14 @@ class Query(object):
         # Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
         # uses of None as a query value.
         if value is None:
-            if lookup_type != 'exact':
+            if lookup_type not in ('exact', 'iexact'):
                 raise ValueError("Cannot use None as a query value")
             lookup_type = 'isnull'
             value = True
         elif callable(value):
+            warnings.warn(
+                "Passing callable arguments to queryset is deprecated.",
+                PendingDeprecationWarning, stacklevel=2)
             value = value()
         elif isinstance(value, ExpressionNode):
             # If value is a query expression, evaluate it

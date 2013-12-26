@@ -21,7 +21,11 @@ from django.contrib.sites.models import get_current_site
 
 UNMASKED_DIGITS_TO_SHOW = 6
 
-mask_password = lambda p: "%s%s" % (p[:UNMASKED_DIGITS_TO_SHOW], "*" * max(len(p) - UNMASKED_DIGITS_TO_SHOW, 0))
+
+def mask_password(password):
+    shown = password[:UNMASKED_DIGITS_TO_SHOW]
+    masked = "*" * max(len(password) - UNMASKED_DIGITS_TO_SHOW, 0)
+    return shown + masked
 
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
@@ -75,7 +79,7 @@ class UserCreationForm(forms.ModelForm):
     username = forms.RegexField(label=_("Username"), max_length=30,
         regex=r'^[\w.@+-]+$',
         help_text=_("Required. 30 characters or fewer. Letters, digits and "
-                      "@/./+/-/_ only."),
+                    "@/./+/-/_ only."),
         error_messages={
             'invalid': _("This value may contain only letters, numbers and "
                          "@/./+/-/_ characters.")})
@@ -124,7 +128,7 @@ class UserChangeForm(forms.ModelForm):
     username = forms.RegexField(
         label=_("Username"), max_length=30, regex=r"^[\w.@+-]+$",
         help_text=_("Required. 30 characters or fewer. Letters, digits and "
-                      "@/./+/-/_ only."),
+                    "@/./+/-/_ only."),
         error_messages={
             'invalid': _("This value may contain only letters, numbers and "
                          "@/./+/-/_ characters.")})

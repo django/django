@@ -25,10 +25,6 @@ class SitemapTestsBase(TestCase):
 
     def setUp(self):
         self.base_url = '%s://%s' % (self.protocol, self.domain)
-        self.old_Site_meta_installed = Site._meta.installed
         cache.clear()
         # Create an object for sitemap content.
         TestModel.objects.create(name='Test Object')
-
-    def tearDown(self):
-        Site._meta.installed = self.old_Site_meta_installed

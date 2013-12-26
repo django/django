@@ -1,6 +1,6 @@
 import unittest
 
-from django.db.models import get_app
+from django.apps import apps
 from django.test.utils import IgnoreAllDeprecationWarningsMixin
 
 
@@ -20,8 +20,8 @@ class SuiteOverrideTest(IgnoreAllDeprecationWarningsMixin, unittest.TestCase):
         """
 
         from django.test.simple import build_suite
-        app = get_app("test_suite_override")
-        suite = build_suite(app)
+        app_config = apps.get_app_config("test_suite_override")
+        suite = build_suite(app_config)
         self.assertEqual(suite.countTestCases(), 1)
 
 

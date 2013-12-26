@@ -1873,24 +1873,26 @@ class TemplateTagLoading(TestCase):
             self.assertTrue('ImportError' in e.args[0])
             self.assertTrue('Xtemplate' in e.args[0])
 
-    @override_settings(INSTALLED_APPS=('tagsegg',))
     def test_load_error_egg(self):
         ttext = "{% load broken_egg %}"
         egg_name = '%s/tagsegg.egg' % self.egg_dir
         sys.path.append(egg_name)
-        self.assertRaises(template.TemplateSyntaxError, template.Template, ttext)
+        with self.assertRaises(template.TemplateSyntaxError):
+            with self.settings(INSTALLED_APPS=['tagsegg']):
+                template.Template(ttext)
         try:
-            template.Template(ttext)
+            with self.settings(INSTALLED_APPS=['tagsegg']):
+                template.Template(ttext)
         except template.TemplateSyntaxError as e:
             self.assertTrue('ImportError' in e.args[0])
             self.assertTrue('Xtemplate' in e.args[0])
 
-    @override_settings(INSTALLED_APPS=('tagsegg',))
     def test_load_working_egg(self):
         ttext = "{% load working_egg %}"
         egg_name = '%s/tagsegg.egg' % self.egg_dir
         sys.path.append(egg_name)
-        template.Template(ttext)
+        with self.settings(INSTALLED_APPS=['tagsegg']):
+            template.Template(ttext)
 
 
 class RequestContextTests(unittest.TestCase):

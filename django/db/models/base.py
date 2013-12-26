@@ -5,6 +5,8 @@ import sys
 from functools import update_wrapper
 from django.utils.six.moves import zip
 
+from django.apps import apps
+from django.apps.base import MODELS_MODULE_NAME
 import django.db.models.manager  # NOQA: Imported to register signal handler.
 from django.conf import settings
 from django.core.exceptions import (ObjectDoesNotExist,
@@ -19,7 +21,6 @@ from django.db.models.query_utils import DeferredAttribute, deferred_class_facto
 from django.db.models.deletion import Collector
 from django.db.models.options import Options
 from django.db.models import signals
-from django.db.models.loading import get_model, MODELS_MODULE_NAME
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
 from django.utils.encoding import force_str, force_text
@@ -150,8 +151,7 @@ class ModelBase(type):
                 new_class._base_manager = new_class._base_manager._copy_to_model(new_class)
 
         # Bail out early if we have already created this class.
-        m = new_class._meta.app_cache.get_model(new_class._meta.app_label, name,
-                      seed_cache=False, only_installed=False)
+        m = new_class._meta.apps.get_registered_model(new_class._meta.app_label, name)
         if m is not None:
             return m
 
@@ -160,9 +160,11 @@ class ModelBase(type):
             new_class.add_to_class(obj_name, obj)
 
         # All the fields of any type declared on this model
-        new_fields = new_class._meta.local_fields + \
-                     new_class._meta.local_many_to_many + \
-                     new_class._meta.virtual_fields
+        new_fields = (
+            new_class._meta.local_fields +
+            new_class._meta.local_many_to_many +
+            new_class._meta.virtual_fields
+        )
         field_names = set(f.name for f in new_fields)
 
         # Basic setup for proxy models.
@@ -216,10 +218,11 @@ class ModelBase(type):
             # moment).
             for field in parent_fields:
                 if field.name in field_names:
-                    raise FieldError('Local field %r in class %r clashes '
-                                     'with field of similar name from '
-                                     'base class %r' %
-                                        (field.name, name, base.__name__))
+                    raise FieldError(
+                        'Local field %r in class %r clashes '
+                        'with field of similar name from '
+                        'base class %r' % (field.name, name, base.__name__)
+                    )
             if not base._meta.abstract:
                 # Concrete classes...
                 base = base._meta.concrete_model
@@ -253,10 +256,11 @@ class ModelBase(type):
             # class
             for field in base._meta.virtual_fields:
                 if base._meta.abstract and field.name in field_names:
-                    raise FieldError('Local field %r in class %r clashes '
-                                     'with field of similar name from '
-                                     'abstract base class %r' %
-                                        (field.name, name, base.__name__))
+                    raise FieldError(
+                        'Local field %r in class %r clashes '
+                        'with field of similar name from '
+                        'abstract base class %r' % (field.name, name, base.__name__)
+                    )
                 new_class.add_to_class(field.name, copy.deepcopy(field))
 
         if abstract:
@@ -269,13 +273,12 @@ class ModelBase(type):
 
         new_class._prepare()
 
-        new_class._meta.app_cache.register_models(new_class._meta.app_label, new_class)
+        new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
         # Because of the way imports happen (recursively), we may or may not be
         # the first time this model tries to register with the framework. There
         # should only be one class for each model, so we always return the
         # registered version.
-        return new_class._meta.app_cache.get_model(new_class._meta.app_label, name,
-                         seed_cache=False, only_installed=False)
+        return new_class._meta.apps.get_registered_model(new_class._meta.app_label, name)
 
     def copy_managers(cls, base_managers):
         # This is in-place sorting of an Options attribute, but that's fine.
@@ -1062,7 +1065,7 @@ def model_unpickle(model_id, attrs, factory):
     Used to unpickle Model subclasses with deferred fields.
     """
     if isinstance(model_id, tuple):
-        model = get_model(*model_id)
+        model = apps.get_model(*model_id)
     else:
         # Backwards compat - the model was cached directly in earlier versions.
         model = model_id

@@ -28,6 +28,14 @@ def clear_cache_handlers(**kwargs):
 
 
 @receiver(setting_changed)
+def update_installed_apps(**kwargs):
+    if kwargs['setting'] == 'INSTALLED_APPS':
+        # Rebuild any AppDirectoriesFinder instance.
+        from django.contrib.staticfiles.finders import get_finder
+        get_finder.cache_clear()
+
+
+@receiver(setting_changed)
 def update_connections_time_zone(**kwargs):
     if kwargs['setting'] == 'TIME_ZONE':
         # Reset process time zone
@@ -97,4 +105,7 @@ def file_storage_changed(**kwargs):
 @receiver(setting_changed)
 def complex_setting_changed(**kwargs):
     if kwargs['enter'] and kwargs['setting'] in COMPLEX_OVERRIDE_SETTINGS:
-        warnings.warn("Overriding setting %s can lead to unexpected behaviour." % kwargs['setting'])
+        # Considering the current implementation of the signals framework,
+        # stacklevel=5 shows the line containing the override_settings call.
+        warnings.warn("Overriding setting %s can lead to unexpected behaviour."
+                      % kwargs['setting'], stacklevel=5)

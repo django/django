@@ -189,9 +189,9 @@ def deferred_class_factory(model, attrs):
         proxy = True
         app_label = model._meta.app_label
 
-    # The app_cache wants a unique name for each model, otherwise the new class
-    # won't be created (we get an old one back). Therefore, we generate the
-    # name using the passed in attrs. It's OK to reuse an existing class
+    # The app registry wants a unique name for each model, otherwise the new
+    # class won't be created (we get an old one back). Therefore, we generate
+    # the name using the passed in attrs. It's OK to reuse an existing class
     # object if the attrs are identical.
     name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(list(attrs))))
     name = utils.truncate_name(name, 80, 32)

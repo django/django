@@ -117,7 +117,7 @@ class ExtendsNode(Node):
             if not isinstance(node, TextNode):
                 if not isinstance(node, ExtendsNode):
                     blocks = dict((n.name, n) for n in
-                                   compiled_parent.nodelist.get_nodes_by_type(BlockNode))
+                                  compiled_parent.nodelist.get_nodes_by_type(BlockNode))
                     block_context.add_blocks(blocks)
                 break
 

@@ -28,13 +28,16 @@ from django.core.management import call_command
 HAVE_JS = ['admin']
 
 
-def _get_locale_dirs(include_core=True):
+def _get_locale_dirs(resources, include_core=True):
     """
     Return a tuple (contrib name, absolute path) for all locale directories,
     optionally including the django core catalog.
+    If resources list is not None, filter directories matching resources content.
     """
     contrib_dir = os.path.join(os.getcwd(), 'django', 'contrib')
     dirs = []
+
+    # Collect all locale directories
     for contrib_name in os.listdir(contrib_dir):
         path = os.path.join(contrib_dir, contrib_name, 'locale')
         if os.path.isdir(path):
@@ -43,6 +46,15 @@ def _get_locale_dirs(include_core=True):
                 dirs.append(("%s-js" % contrib_name, path))
     if include_core:
         dirs.insert(0, ('core', os.path.join(os.getcwd(), 'django', 'conf', 'locale')))
+
+    # Filter by resources, if any
+    if resources is not None:
+        res_names = [d[0] for d in dirs]
+        dirs = [ld for ld in dirs if ld[0] in resources]
+        if len(resources) > len(dirs):
+            print("You have specified some unknown resources. "
+                  "Available resource names are: %s" % (', '.join(res_names),))
+            exit(1)
     return dirs
 
 
@@ -72,7 +84,7 @@ def update_catalogs(resources=None, languages=None):
     Update the en/LC_MESSAGES/django.po (main and contrib) files with
     new/updated translatable strings.
     """
-    contrib_dirs = _get_locale_dirs(include_core=False)
+    contrib_dirs = _get_locale_dirs(resources, include_core=False)
 
     os.chdir(os.path.join(os.getcwd(), 'django'))
     print("Updating main en catalog")
@@ -81,8 +93,6 @@ def update_catalogs(resources=None, languages=None):
 
     # Contrib catalogs
     for name, dir_ in contrib_dirs:
-        if resources and not name in resources:
-            continue
         os.chdir(os.path.join(dir_, '..'))
         print("Updating en catalog in %s" % dir_)
         if name.endswith('-js'):
@@ -99,11 +109,9 @@ def lang_stats(resources=None, languages=None):
     If resources is provided, it should be a list of translation resource to
     limit the output (e.g. ['core', 'gis']).
     """
-    locale_dirs = _get_locale_dirs()
+    locale_dirs = _get_locale_dirs(resources)
 
     for name, dir_ in locale_dirs:
-        if resources and not name in resources:
-            continue
         print("\nShowing translations stats for '%s':" % name)
         langs = sorted([d for d in os.listdir(dir_) if not d.startswith('_')])
         for lang in langs:
@@ -126,17 +134,14 @@ def fetch(resources=None, languages=None):
     """
     Fetch translations from Transifex, wrap long lines, generate mo files.
     """
-    locale_dirs = _get_locale_dirs()
+    locale_dirs = _get_locale_dirs(resources)
     errors = []
 
     for name, dir_ in locale_dirs:
-        if resources and not name in resources:
-            continue
-
         # Transifex pull
         if languages is None:
-            call('tx pull -r %(res)s -a -f' % {'res': _tx_resource_for_name(name)}, shell=True)
-            languages = sorted([d for d in os.listdir(dir_) if not d.startswith('_')])
+            call('tx pull -r %(res)s -a -f  --minimum-perc=5' % {'res': _tx_resource_for_name(name)}, shell=True)
+            languages = sorted([d for d in os.listdir(dir_) if not d.startswith('_') and d != 'en'])
         else:
             for lang in languages:
                 call('tx pull -r %(res)s -f -l %(lang)s' % {
@@ -146,6 +151,10 @@ def fetch(resources=None, languages=None):
         for lang in languages:
             po_path = '%(path)s/%(lang)s/LC_MESSAGES/django%(ext)s.po' % {
                 'path': dir_, 'lang': lang, 'ext': 'js' if name.endswith('-js') else ''}
+            if not os.path.exists(po_path):
+                print("No %(lang)s translation for resource %(name)s" % {
+                    'lang': lang, 'name': name})
+                continue
             call('msgcat -o %s %s' % (po_path, po_path), shell=True)
             res = call('msgfmt -c -o %s.mo %s' % (po_path[:-3], po_path), shell=True)
             if res != 0:

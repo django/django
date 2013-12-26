@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import copy
 import datetime
+import json
 import warnings
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -14,6 +15,7 @@ from django.forms import (
     NullBooleanField, PasswordInput, RadioSelect, Select, SplitDateTimeField,
     Textarea, TextInput, ValidationError, widgets,
 )
+from django.forms.utils import ErrorList
 from django.http import QueryDict
 from django.template import Template, Context
 from django.test import TestCase
@@ -2031,3 +2033,64 @@ class FormsTestCase(TestCase):
 
         form = SomeForm()
         self.assertHTMLEqual(form.as_p(), '<p id="p_some_field"></p>')
+
+    def test_error_dict(self):
+        class MyForm(Form):
+            foo = CharField()
+            bar = CharField()
+
+            def clean(self):
+                raise ValidationError('Non-field error.', code='secret', params={'a': 1, 'b': 2})
+
+        form = MyForm({})
+        self.assertEqual(form.is_valid(), False)
+
+        errors = form.errors.as_text()
+        control = [
+            '* foo\n  * This field is required.',
+            '* bar\n  * This field is required.',
+            '* __all__\n  * Non-field error.',
+        ]
+        for error in control:
+            self.assertIn(error, errors)
+
+        errors = form.errors.as_ul()
+        control = [
+            '<li>foo<ul class="errorlist"><li>This field is required.</li></ul></li>',
+            '<li>bar<ul class="errorlist"><li>This field is required.</li></ul></li>',
+            '<li>__all__<ul class="errorlist"><li>Non-field error.</li></ul></li>',
+        ]
+        for error in control:
+            self.assertInHTML(error, errors)
+
+        errors = json.loads(form.errors.as_json())
+        control = {
+            'foo': [{'code': 'required', 'message': 'This field is required.'}],
+            'bar': [{'code': 'required', 'message': 'This field is required.'}],
+            '__all__': [{'code': 'secret', 'message': 'Non-field error.'}]
+        }
+        self.assertEqual(errors, control)
+
+    def test_error_list(self):
+        e = ErrorList()
+        e.append('Foo')
+        e.append(ValidationError('Foo%(bar)s', code='foobar', params={'bar': 'bar'}))
+
+        self.assertTrue(isinstance(e, list))
+        self.assertIn('Foo', e)
+        self.assertIn('Foo', forms.ValidationError(e))
+
+        self.assertEqual(
+            e.as_text(),
+            '* Foo\n* Foobar'
+        )
+
+        self.assertEqual(
+            e.as_ul(),
+            '<ul class="errorlist"><li>Foo</li><li>Foobar</li></ul>'
+        )
+
+        self.assertEqual(
+            json.loads(e.as_json()),
+            [{"message": "Foo", "code": ""}, {"message": "Foobar", "code": "foobar"}]
+        )

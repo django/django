@@ -23,8 +23,8 @@ from django.middleware.cache import (FetchFromCacheMiddleware,
     UpdateCacheMiddleware, CacheMiddleware)
 from django.template import Template
 from django.template.response import TemplateResponse
-from django.test import TestCase, TransactionTestCase, RequestFactory
-from django.test.utils import (override_settings, IgnoreDeprecationWarningsMixin,
+from django.test import TestCase, TransactionTestCase, RequestFactory, override_settings
+from django.test.utils import (IgnoreDeprecationWarningsMixin,
     IgnorePendingDeprecationWarningsMixin)
 from django.utils import six
 from django.utils import timezone

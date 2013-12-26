@@ -27,7 +27,7 @@ class TestFilenameGenerator(TestCase):
         self.assertIn(os.path.join(LOCALE_PATH, 'nl', 'LC_MESSAGES', 'django.mo'),
                       filenames)
 
-    @override_settings(INSTALLED_APPS=())
+    @override_settings(INSTALLED_APPS=[])
     def test_project_root_locale(self):
         """
         Test that gen_filenames also yields from the current directory (project
@@ -43,10 +43,10 @@ class TestFilenameGenerator(TestCase):
         finally:
             os.chdir(old_cwd)
 
-    @override_settings(INSTALLED_APPS=('django.contrib.admin',))
+    @override_settings(INSTALLED_APPS=['django.contrib.admin'])
     def test_app_locales(self):
         """
-        Test that gen_filenames also yields from INSTALLED_APPS locales.
+        Test that gen_filenames also yields from locale dirs in installed apps.
         """
         filenames = list(gen_filenames())
         self.assertIn(os.path.join(os.path.dirname(admin.__file__), 'locale',

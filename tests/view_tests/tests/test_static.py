@@ -6,8 +6,7 @@ import unittest
 
 from django.conf.urls.static import static
 from django.http import HttpResponseNotModified
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from django.test import SimpleTestCase, override_settings
 from django.utils.http import http_date
 from django.views.static import was_modified_since
 
@@ -75,8 +74,7 @@ class StaticTests(SimpleTestCase):
         response_content = b''.join(response)
         with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response_content)
-        self.assertEqual(len(response_content),
-                          int(response['Content-Length']))
+        self.assertEqual(len(response_content), int(response['Content-Length']))
 
     def test_invalid_if_modified_since2(self):
         """Handle even more bogus If-Modified-Since values gracefully
@@ -91,8 +89,7 @@ class StaticTests(SimpleTestCase):
         response_content = b''.join(response)
         with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response_content)
-        self.assertEqual(len(response_content),
-                          int(response['Content-Length']))
+        self.assertEqual(len(response_content), int(response['Content-Length']))
 
     def test_404(self):
         response = self.client.get('/views/%s/non_existing_resource' % self.prefix)

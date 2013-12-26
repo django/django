@@ -1,3 +1,4 @@
+from importlib import import_module
 import os
 from optparse import make_option
 import unittest
@@ -89,11 +90,11 @@ class DiscoverRunner(object):
                     break
                 kwargs['top_level_dir'] = top_level
 
-            if not (tests and tests.countTestCases()):
-                # if no tests found, it's probably a package; try discovery
+            if not (tests and tests.countTestCases()) and is_discoverable(label):
+                # Try discovery if path is a package or directory
                 tests = self.test_loader.discover(start_dir=label, **kwargs)
 
-                # make unittest forget the top-level dir it calculated from this
+                # Make unittest forget the top-level dir it calculated from this
                 # run, to support running tests from two different top-levels.
                 self.test_loader._top_level_dir = None
 
@@ -148,6 +149,20 @@ class DiscoverRunner(object):
         self.teardown_databases(old_config)
         self.teardown_test_environment()
         return self.suite_result(suite, result)
+
+
+def is_discoverable(label):
+    """
+    Check if a test label points to a python package or file directory.
+    """
+    try:
+        mod = import_module(label)
+    except ImportError:
+        pass
+    else:
+        return hasattr(mod, '__path__')
+
+    return os.path.isdir(os.path.abspath(label))
 
 
 def dependency_ordered(test_databases, dependencies):

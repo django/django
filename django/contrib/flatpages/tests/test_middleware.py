@@ -3,8 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.flatpages.models import FlatPage
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 
 
 @override_settings(

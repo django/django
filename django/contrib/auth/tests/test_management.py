@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from datetime import date
 
+from django.apps import apps
 from django.contrib.auth import models, management
 from django.contrib.auth.management import create_permissions
 from django.contrib.auth.management.commands import changepassword
@@ -12,9 +13,7 @@ from django.core import exceptions
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.core.management.validation import get_validation_errors
-from django.db.models.loading import get_app
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils import six
 from django.utils.six import StringIO
 
@@ -82,6 +81,19 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
         with self.assertRaises(CommandError):
             command.execute("joe", stdout=self.stdout, stderr=self.stderr)
+
+    def test_that_changepassword_command_works_with_nonascii_output(self):
+        """
+        #21627 -- Executing the changepassword management command should allow
+        non-ASCII characters from the User object representation.
+        """
+        # 'Julia' with accented 'u':
+        models.User.objects.create_user(username='J\xfalia', password='qwerty')
+
+        command = changepassword.Command()
+        command._get_pass = lambda *args: 'not qwerty'
+
+        command.execute("J\xfalia", stdout=self.stdout)
 
 
 @skipIfCustomUser
@@ -184,21 +196,21 @@ class CustomUserModelValidationTestCase(TestCase):
     def test_required_fields_is_list(self):
         "REQUIRED_FIELDS should be a list."
         new_io = StringIO()
-        get_validation_errors(new_io, get_app('auth'))
+        get_validation_errors(new_io, apps.get_app_config('auth').models_module)
         self.assertIn("The REQUIRED_FIELDS must be a list or tuple.", new_io.getvalue())
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserBadRequiredFields')
     def test_username_not_in_required_fields(self):
         "USERNAME_FIELD should not appear in REQUIRED_FIELDS."
         new_io = StringIO()
-        get_validation_errors(new_io, get_app('auth'))
+        get_validation_errors(new_io, apps.get_app_config('auth').models_module)
         self.assertIn("The field named as the USERNAME_FIELD should not be included in REQUIRED_FIELDS on a swappable User model.", new_io.getvalue())
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonUniqueUsername')
     def test_username_non_unique(self):
         "A non-unique USERNAME_FIELD should raise a model validation error."
         new_io = StringIO()
-        get_validation_errors(new_io, get_app('auth'))
+        get_validation_errors(new_io, apps.get_app_config('auth').models_module)
         self.assertIn("The USERNAME_FIELD must be unique. Add unique=True to the field parameters.", new_io.getvalue())
 
 

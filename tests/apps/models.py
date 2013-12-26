@@ -1,9 +1,12 @@
+from __future__ import unicode_literals
+
+from django.apps.registry import Apps
 from django.db import models
-from django.db.models.loading import BaseAppCache
 
-# We're testing app cache presence on load, so this is handy.
 
-new_app_cache = BaseAppCache()
+# We're testing app registry presence on load, so this is handy.
+
+new_apps = Apps()
 
 
 class TotallyNormal(models.Model):
@@ -14,4 +17,4 @@ class SoAlternative(models.Model):
     name = models.CharField(max_length=255)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps

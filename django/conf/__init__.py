@@ -34,11 +34,8 @@ class LazySettings(LazyObject):
         is used the first time we need any settings at all, if the user has not
         previously configured the settings manually.
         """
-        try:
-            settings_module = os.environ[ENVIRONMENT_VARIABLE]
-            if not settings_module:  # If it's set but is an empty string.
-                raise KeyError
-        except KeyError:
+        settings_module = os.environ.get(ENVIRONMENT_VARIABLE)
+        if not settings_module:
             desc = ("setting %s" % name) if name else "settings"
             raise ImproperlyConfigured(
                 "Requested %s, but settings are not configured. "

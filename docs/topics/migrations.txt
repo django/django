@@ -70,7 +70,7 @@ PostgreSQL
 
 PostgreSQL is the most capable of all the databases here in terms of schema
 support; the only caveat is that adding columns with default values will
-lock a table for a time proportional to the number of rows in it.
+cause a full rewrite of the table, for a time proportional to its size.
 
 For this reason, it's recommended you always create new columns with
 ``null=True``, as this way they will be added immediately.
@@ -83,11 +83,11 @@ meaning that if a migration fails to apply you will have to manually unpick
 the changes in order to try again (it's impossible to roll back to an
 earlier point).
 
-In addition, MySQL will lock tables for almost every schema operation and
-generally takes a time proportional to the number of rows in the table to
-add or remove columns. On slower hardware this can be worse than a minute
-per million rows - adding a few columns to a table with just a few million
-rows could lock your site up for over ten minutes.
+In addition, MySQL will fully rewrite tables for almost every schema operation
+and generally takes a time proportional to the number of rows in the table to
+add or remove columns. On slower hardware this can be worse than a minute per
+million rows - adding a few columns to a table with just a few million rows
+could lock your site up for over ten minutes.
 
 Finally, MySQL has reasonably small limits on name lengths for columns, tables
 and indexes, as well as a limit on the combined size of all columns an index

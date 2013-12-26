@@ -2,7 +2,7 @@ from django.contrib.comments.models import Comment
 from django.contrib.comments.moderation import (moderator, CommentModerator,
     AlreadyModerated)
 from django.core import mail
-from django.test.utils import override_settings
+from django.test import override_settings
 
 from . import CommentTestCase
 from ..models import Entry

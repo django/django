@@ -38,8 +38,8 @@ Usage
 
 .. code-block:: bash
 
-    django-admin.py <command> [options]
-    manage.py <command> [options]
+    $ django-admin.py <command> [options]
+    $ manage.py <command> [options]
 
 ``command`` should be one of the commands listed in this document.
 ``options``, which is optional, should be zero or more of the options available

@@ -4,8 +4,8 @@ from __future__ import unicode_literals
 import os
 
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
-from django.test.utils import override_settings, TransRealMixin
+from django.test import TestCase, override_settings
+from django.test.utils import TransRealMixin
 from django.utils._os import upath
 from django.utils import six
 from django.utils import translation

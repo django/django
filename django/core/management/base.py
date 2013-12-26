@@ -11,7 +11,6 @@ import sys
 from optparse import make_option, OptionParser
 
 import django
-from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.utils.encoding import force_str
 from django.utils.six import StringIO
@@ -342,16 +341,25 @@ class AppCommand(BaseCommand):
     args = '<appname appname ...>'
 
     def handle(self, *app_labels, **options):
-        from django.db import models
+        from django.apps import apps
         if not app_labels:
             raise CommandError('Enter at least one appname.')
+        # Populate models and don't use only_with_models_module=True when
+        # calling get_app_config() to tell apart missing apps from apps
+        # without a model module -- which can't be supported with the legacy
+        # API since it passes the models module to handle_app().
+        apps.populate_models()
         try:
-            app_list = [models.get_app(app_label) for app_label in app_labels]
-        except (ImproperlyConfigured, ImportError) as e:
+            app_configs = [apps.get_app_config(app_label) for app_label in app_labels]
+        except (LookupError, ImportError) as e:
             raise CommandError("%s. Are you sure your INSTALLED_APPS setting is correct?" % e)
         output = []
-        for app in app_list:
-            app_output = self.handle_app(app, **options)
+        for app_config in app_configs:
+            if app_config.models_module is None:
+                raise CommandError(
+                    "AppCommand cannot handle app %r because it doesn't have "
+                    "a models module." % app_config.label)
+            app_output = self.handle_app(app_config.models_module, **options)
             if app_output:
                 output.append(app_output)
         return '\n'.join(output)

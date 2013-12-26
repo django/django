@@ -3,7 +3,7 @@ import time
 from django.conf import settings
 from django.contrib.comments.forms import CommentForm
 from django.contrib.comments.models import Comment
-from django.test.utils import override_settings
+from django.test import override_settings
 
 from . import CommentTestCase
 from ..models import Article

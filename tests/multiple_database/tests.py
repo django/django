@@ -10,8 +10,7 @@ from django.core import management
 from django.db import connections, router, DEFAULT_DB_ALIAS, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils.six import StringIO
 
 from .models import Book, Person, Pet, Review, UserProfile
