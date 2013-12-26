@@ -95,6 +95,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
         command.execute("J\xfalia", stdout=self.stdout)
 
+
 @skipIfCustomUser
 class CreatesuperuserManagementCommandTestCase(TestCase):
 
