@@ -154,12 +154,10 @@ def setup(verbosity, test_labels):
         if not test_labels:
             module_found_in_labels = True
         else:
-            match = lambda label: (
-                module_label == label or  # exact match
-                module_label.startswith(label + '.')  # ancestor match
-            )
-
-            module_found_in_labels = any(match(l) for l in test_labels_set)
+            module_found_in_labels = any(
+                # exact match or ancestor match
+                module_label == label or module_label.startswith(label + '.')
+                for label in test_labels_set)
 
         if module_found_in_labels:
             if verbosity >= 2:

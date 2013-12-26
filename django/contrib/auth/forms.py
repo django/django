@@ -21,7 +21,11 @@ from django.contrib.sites.models import get_current_site
 
 UNMASKED_DIGITS_TO_SHOW = 6
 
-mask_password = lambda p: "%s%s" % (p[:UNMASKED_DIGITS_TO_SHOW], "*" * max(len(p) - UNMASKED_DIGITS_TO_SHOW, 0))
+
+def mask_password(password):
+    shown = password[:UNMASKED_DIGITS_TO_SHOW]
+    masked = "*" * max(len(password) - UNMASKED_DIGITS_TO_SHOW, 0)
+    return shown + masked
 
 
 class ReadOnlyPasswordHashWidget(forms.Widget):

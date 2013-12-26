@@ -1,8 +1,7 @@
 from __future__ import unicode_literals
 
-from collections import OrderedDict
-import re
 from bisect import bisect
+from collections import OrderedDict
 import warnings
 
 from django.apps import apps
@@ -13,10 +12,9 @@ from django.db.models.fields.proxy import OrderWrt
 from django.utils import six
 from django.utils.functional import cached_property
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
+from django.utils.text import camel_case_to_spaces
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 
-# Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
-get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', ' \\1', class_name).lower().strip()
 
 DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
@@ -109,7 +107,7 @@ class Options(object):
         # First, construct the default values for these options.
         self.object_name = cls.__name__
         self.model_name = self.object_name.lower()
-        self.verbose_name = get_verbose_name(self.object_name)
+        self.verbose_name = camel_case_to_spaces(self.object_name)
 
         # Store the original user-defined values for each option,
         # for use when serializing the model definition

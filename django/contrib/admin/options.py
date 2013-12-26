@@ -46,9 +46,12 @@ from django.views.decorators.csrf import csrf_protect
 IS_POPUP_VAR = '_popup'
 TO_FIELD_VAR = '_to_field'
 
+
 HORIZONTAL, VERTICAL = 1, 2
-# returns the <ul> class for a given radio_admin field
-get_ul_class = lambda x: 'radiolist%s' % (' inline' if x == HORIZONTAL else '')
+
+
+def get_ul_class(radio_style):
+    return 'radiolist' if radio_style == VERTICAL else 'radiolist inline'
 
 
 class IncorrectLookupParameters(Exception):
