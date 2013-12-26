@@ -15,7 +15,8 @@ Extensive contribution guidelines are available in the repository at
 
 https://docs.djangoproject.com/en/dev/internals/contributing/
 
-**Warning: pull requests are ignored!** `File a ticket`__ to suggest changes.
+**Warning: non-trivial pull requests (anything more than fixing a typo) without
+Trac tickets will be closed!** `Please file a ticket`__ to suggest changes.
 
 __ https://code.djangoproject.com/newticket
 
