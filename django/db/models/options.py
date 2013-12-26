@@ -438,7 +438,7 @@ class Options(object):
             if hasattr(f, 'related'):
                 cache[f.name] = cache[f.attname] = (
                     f.related, None if f.model == self.model else f.model, True, False)
-        if apps.ready():
+        if apps.ready:
             self._name_map = cache
         return cache
 
@@ -564,7 +564,7 @@ class Options(object):
                             and not isinstance(f.rel.to, six.string_types)
                             and self == f.rel.to._meta):
                         cache[f.related] = None
-        if apps.ready():
+        if apps.ready:
             self._related_many_to_many_cache = cache
         return cache
 

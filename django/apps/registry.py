@@ -138,9 +138,10 @@ class Apps(object):
                 self.get_models.cache_clear()
                 self._models_loaded = True
 
+    @property
     def ready(self):
         """
-        Returns True if the registry is fully populated.
+        Whether the registry is fully populated.
 
         Useful for code that wants to cache the results of get_models() for
         themselves once it is safe to do so.
@@ -378,9 +379,9 @@ class Apps(object):
 
     def app_cache_ready(self):
         warnings.warn(
-            "app_cache_ready() is deprecated.",
+            "app_cache_ready() is deprecated in favor of the ready property.",
             PendingDeprecationWarning, stacklevel=2)
-        return self.ready()
+        return self.ready
 
     def get_app(self, app_label):
         """
