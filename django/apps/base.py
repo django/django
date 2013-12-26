@@ -1,7 +1,7 @@
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.module_loading import import_by_path, module_has_submodule
+from django.utils.module_loading import module_has_submodule
 from django.utils._os import upath
 
 
@@ -66,13 +66,24 @@ class AppConfig(object):
             module = import_module(entry)
 
         except ImportError:
+            # Avoid django.utils.module_loading.import_by_path because it
+            # masks errors -- it reraises ImportError as ImproperlyConfigured.
+            mod_path, _, cls_name = entry.rpartition('.')
+
             # Raise the original exception when entry cannot be a path to an
-            # app config class. Since module names are allowable here, the
-            # standard exception message from import_by_path is unsuitable.
-            if '.' not in entry:
+            # app config class.
+            if not mod_path:
                 raise
 
-            cls = import_by_path(entry)
+            mod = import_module(mod_path)
+            try:
+                cls = getattr(mod, cls_name)
+            except AttributeError:
+                # Emulate the error that "from <mod_path> import <cls_name>"
+                # would raise when <mod_path> exists but not <cls_name>, with
+                # more context (Python just says "cannot import name ...").
+                raise ImportError(
+                    "cannot import name %r from %r" % (cls_name, mod_path))
 
             # Check for obvious errors. (This check prevents duck typing, but
             # it could be removed if it became a problem in practice.)
