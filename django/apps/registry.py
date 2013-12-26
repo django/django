@@ -346,7 +346,7 @@ class Apps(object):
         imports safely (eg. that could lead to registering listeners twice),
         models are registered when they're imported and never removed.
         """
-        self.stored_app_configs.append(self.app_configs)
+        self.stored_app_configs.append((self.app_configs, self._apps_loaded, self._models_loaded))
         self.app_configs = OrderedDict()
         self.get_models.cache_clear()
         self._apps_loaded = False
@@ -358,7 +358,7 @@ class Apps(object):
         """
         Cancels a previous call to set_installed_apps().
         """
-        self.app_configs = self.stored_app_configs.pop()
+        self.app_configs, self._apps_loaded, self._models_loaded = self.stored_app_configs.pop()
         self.get_models.cache_clear()
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
