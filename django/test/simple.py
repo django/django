@@ -102,7 +102,7 @@ def get_tests(app_config):
     except ImportError:
         # Couldn't import tests.py. Was it due to a missing file, or
         # due to an import error in a tests.py that actually exists?
-        if not module_has_submodule(app_config.app_module, TEST_MODULE):
+        if not module_has_submodule(app_config.module, TEST_MODULE):
             test_module = None
         else:
             # The module exists, so there must be an import error in the test

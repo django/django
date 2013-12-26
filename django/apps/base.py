@@ -13,13 +13,13 @@ class AppConfig(object):
     Class representing a Django application and its configuration.
     """
 
-    def __init__(self, app_name):
+    def __init__(self, app_name, app_module):
         # Full Python path to the application eg. 'django.contrib.admin'.
         self.name = app_name
 
         # Root module for the application eg. <module 'django.contrib.admin'
         # from 'django/contrib/admin/__init__.pyc'>.
-        self.app_module = import_module(app_name)
+        self.module = app_module
 
         # The following attributes could be defined at the class level in a
         # subclass, hence the test-and-set pattern.
@@ -39,7 +39,7 @@ class AppConfig(object):
         # egg. Otherwise it's a unicode on Python 2 and a str on Python 3.
         if not hasattr(self, 'path'):
             try:
-                self.path = upath(self.app_module.__path__[0])
+                self.path = upath(app_module.__path__[0])
             except AttributeError:
                 self.path = None
 
@@ -63,7 +63,7 @@ class AppConfig(object):
         try:
             # If import_module succeeds, entry is a path to an app module.
             # Otherwise, entry is a path to an app config class or an error.
-            import_module(entry)
+            module = import_module(entry)
 
         except ImportError:
             # Raise the original exception when entry cannot be a path to an
@@ -88,12 +88,15 @@ class AppConfig(object):
                 raise ImproperlyConfigured(
                     "%r must supply a name attribute." % entry)
 
+            # Ensure app_names points to a valid module.
+            app_module = import_module(app_name)
+
             # Entry is a path to an app config class.
-            return cls(app_name)
+            return cls(app_name, app_module)
 
         else:
             # Entry is a path to an app module.
-            return cls(entry)
+            return cls(entry, module)
 
     def import_models(self, all_models):
         # Dictionary of models for this app, primarily maintained in the
@@ -102,6 +105,6 @@ class AppConfig(object):
         # imported, which may happen before populate_models() runs.
         self.models = all_models
 
-        if module_has_submodule(self.app_module, MODELS_MODULE_NAME):
+        if module_has_submodule(self.module, MODELS_MODULE_NAME):
             models_module_name = '%s.%s' % (self.name, MODELS_MODULE_NAME)
             self.models_module = import_module(models_module_name)

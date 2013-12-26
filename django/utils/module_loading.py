@@ -80,7 +80,7 @@ def autodiscover_modules(*args, **kwargs):
             # Decide whether to bubble up this error. If the app just
             # doesn't have an admin module, we can ignore the error
             # attempting to import it, otherwise we want it to bubble up.
-            if module_has_submodule(app_config.app_module, module_to_search):
+            if module_has_submodule(app_config.module, module_to_search):
                 raise
 
 

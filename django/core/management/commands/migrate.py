@@ -47,7 +47,7 @@ class Command(BaseCommand):
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
         for app_config in apps.get_app_configs():
-            if module_has_submodule(app_config.app_module, "management"):
+            if module_has_submodule(app_config.module, "management"):
                 import_module('.management', app_config.name)
 
         # Get the database we're operating from

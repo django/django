@@ -20,7 +20,7 @@ def get_comment_app():
     except LookupError:
         raise ImproperlyConfigured("The COMMENTS_APP (%r) "
                                    "must be in INSTALLED_APPS" % settings.COMMENTS_APP)
-    return app_config.app_module
+    return app_config.module
 
 def get_comment_app_name():
     """

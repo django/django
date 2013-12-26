@@ -141,7 +141,7 @@ Read-only attributes
     It may be ``None`` if the application isn't stored in a directory, for
     instance if it's loaded from an egg.
 
-.. attribute:: AppConfig.app_module
+.. attribute:: AppConfig.module
 
     Root module for the application, e.g. ``<module 'django.contrib.admin' from
     'django/contrib/admin/__init__.pyc'>``.
