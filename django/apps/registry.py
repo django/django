@@ -32,9 +32,13 @@ class Apps(object):
         # get_model[s].
         self.master = master
 
-        # Mapping of app labels => model names => model classes. Used to
-        # register models before the registry is populated and also for
-        # applications that aren't installed.
+        # Mapping of app labels => model names => model classes. Every time a
+        # model is imported, ModelBase.__new__ calls apps.register_model which
+        # creates an entry in all_models. All imported models are registered,
+        # regardless of whether they're defined in an installed application
+        # and whether the registry has been populated. Since it isn't possible
+        # to reimport a module safely (it could reexecute initialization code)
+        # all_models is never overridden or reset.
         self.all_models = defaultdict(OrderedDict)
 
         # Mapping of labels to AppConfig instances for installed apps.

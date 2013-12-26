@@ -96,9 +96,10 @@ class AppConfig(object):
             return cls(entry)
 
     def import_models(self, all_models):
-        # Dictionary of models for this app, stored in the 'all_models'
-        # attribute of the Apps this AppConfig is attached to. Injected as a
-        # parameter because it may get populated before this method has run.
+        # Dictionary of models for this app, primarily maintained in the
+        # 'all_models' attribute of the Apps this AppConfig is attached to.
+        # Injected as a parameter because it gets populated when models are
+        # imported, which may happen before populate_models() runs.
         self.models = all_models
 
         if module_has_submodule(self.app_module, MODELS_MODULE_NAME):
