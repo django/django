@@ -305,6 +305,17 @@ The Django adapter is currently only available in the Dev branch.
 
 .. _release branches: http://dev.mysql.com/downloads/connector/python/
 
+.. _mysql-time-zone-definitions:
+
+Time zone definitions
+---------------------
+
+If you plan on using Django's :doc:`timezone support </topics/i18n/timezones>`,
+use `mysql_tzinfo_to_sql`_ to load time zone tables into the MySQL database.
+This needs to be done just once for your MySQL server, not per database.
+
+.. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.5/en/mysql-tzinfo-to-sql.html
+
 Creating your database
 ----------------------
 
