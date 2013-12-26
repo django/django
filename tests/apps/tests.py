@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 from django.apps import apps
 from django.apps.registry import Apps
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.test import TestCase, override_settings
 
@@ -28,6 +29,7 @@ SOME_INSTALLED_APPS_NAMES = [
 
 SOME_INSTALLED_APPS_WTH_MODELS_NAMES = SOME_INSTALLED_APPS_NAMES[:4]
 
+
 class AppsTests(TestCase):
 
     def test_singleton_master(self):
@@ -52,6 +54,38 @@ class AppsTests(TestCase):
         # Currently, non-master app registries are artificially considered
         # ready regardless of whether populate_models() has run.
         self.assertTrue(apps.ready)
+
+    def test_bad_app_config(self):
+        """
+        Tests when INSTALLED_APPS contains an incorrect app config.
+        """
+        with self.assertRaises(ImproperlyConfigured):
+            with self.settings(INSTALLED_APPS=['apps.apps.BadConfig']):
+                pass
+
+    def test_not_an_app_config(self):
+        """
+        Tests when INSTALLED_APPS contains a class that isn't an app config.
+        """
+        with self.assertRaises(ImproperlyConfigured):
+            with self.settings(INSTALLED_APPS=['apps.apps.NotAConfig']):
+                pass
+
+    def test_no_such_app(self):
+        """
+        Tests when INSTALLED_APPS contains an app config for an app that doesn't exist.
+        """
+        with self.assertRaises(ImportError):
+            with self.settings(INSTALLED_APPS=['apps.apps.NoSuchApp']):
+                pass
+
+    def test_no_such_app_config(self):
+        """
+        Tests when INSTALLED_APPS contains an entry that doesn't exist.
+        """
+        with self.assertRaises(ImportError):
+            with self.settings(INSTALLED_APPS=['apps.apps.NoSuchConfig']):
+                pass
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_app_configs(self):
