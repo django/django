@@ -136,6 +136,12 @@ class AppsTests(TestCase):
         with self.assertRaises(LookupError):
             apps.get_app_config('staticfiles', only_with_models_module=True)
 
+    @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
+    def test_has_app(self):
+        self.assertTrue(apps.has_app('django.contrib.admin'))
+        self.assertTrue(apps.has_app('django.contrib.staticfiles'))
+        self.assertFalse(apps.has_app('django.contrib.webdesign'))
+
     def test_models_py(self):
         """
         Tests that the models in the models.py file were loaded correctly.
