@@ -1046,12 +1046,18 @@ the contents of a Web page depend on a user's language preference, the page is
 said to "vary on language."
 
 By default, Django's cache system creates its cache keys using the requested
-path and query -- e.g., ``"/stories/2005/?order_by=author"``. This means every
+fully-qualified URL -- e.g.,
+``"http://www.example.com/stories/2005/?order_by=author"``. This means every
 request to that URL will use the same cached version, regardless of user-agent
 differences such as cookies or language preferences. However, if this page
 produces different content based on some difference in request headers -- such
 as a cookie, or a language, or a user-agent -- you'll need to use the ``Vary``
 header to tell caching mechanisms that the page output depends on those things.
+
+    .. versionchanged:: 1.7
+
+        Cache keys use the request's fully-qualified URL rather than path
+        and query string.
 
 To do this in Django, use the convenient
 :func:`django.views.decorators.vary.vary_on_headers` view decorator, like so::
