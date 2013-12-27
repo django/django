@@ -23,5 +23,3 @@ class NotAConfig(object):
 
 class NoSuchApp(AppConfig):
     name = 'there is no such app'
-
-

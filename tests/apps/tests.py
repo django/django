@@ -2,7 +2,6 @@ from __future__ import absolute_import, unicode_literals
 
 from django.apps import apps
 from django.apps.registry import Apps
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.test import TestCase, override_settings
