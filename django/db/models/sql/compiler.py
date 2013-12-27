@@ -846,13 +846,21 @@ class SQLInsertCompiler(SQLCompiler):
             ]
             # Oracle Spatial needs to remove some values due to #10888
             params = self.connection.ops.modify_insert_params(placeholders, params)
-        if self.return_id and self.connection.features.supports_returning_clause:
+
+        fetch_func = None
+        if self.returning_fields:
+            if self.connection.features.can_return_multiple_fields:
+                fetch_func = self.connection.ops.return_values
+                fetch_kwargs = {'nvars': len(self.returning_fields) + 1}
+        elif self.return_id:
+            if self.connection.features.can_return_id_from_insert:
+                fetch_func = self.connection.ops.return_insert_id
+                fetch_kwargs = {}
+        if fetch_func:
             params = params[0]
             col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
             result.append("VALUES (%s)" % ", ".join(placeholders[0]))
-            r_fmt, r_params = self.connection.ops.return_values(
-                nvars=len(self.returning_fields) + 1
-            )
+            r_fmt, r_params = fetch_func(**fetch_kwargs)
             # Skip empty r_fmt to allow subclasses to customize behaviour for
             # 3rd party backends. Refs #19096.
             if r_fmt:
@@ -882,11 +890,15 @@ class SQLInsertCompiler(SQLCompiler):
             cursor.execute(sql, params)
         if not (return_id and cursor):
             return
-        if self.connection.features.supports_returning_clause:
+        if self.returning_fields and self.connection.features.can_return_multiple_fields:
             return self.connection.ops.fetch_returned_values(cursor)
-        return (self.connection.ops.last_insert_id(
-            cursor, self.query.get_meta().db_table,
-            self.query.get_meta().pk.column), )
+        elif self.connection.features.can_return_id_from_insert:
+            return [self.connection.ops.fetch_returned_insert_id(cursor)]
+        else:
+            return [self.connection.ops.last_insert_id(
+                cursor, self.query.get_meta().db_table,
+                self.query.get_meta().pk.column
+            )]
 
 
 class SQLDeleteCompiler(SQLCompiler):
@@ -949,7 +961,8 @@ class SQLUpdateCompiler(SQLCompiler):
         where, params = self.query.where.as_sql(qn=qn, connection=self.connection)
         if where:
             result.append('WHERE %s' % where)
-        if self.connection.features.supports_returning_clause and self.returning_fields:
+
+        if self.connection.features.can_return_multiple_fields and self.returning_fields:
             r_fmt, r_params = self.connection.ops.return_values(
                 nvars=len(self.returning_fields)
             )
@@ -976,7 +989,7 @@ class SQLUpdateCompiler(SQLCompiler):
         cursor = super(SQLUpdateCompiler, self).execute_sql(result_type)
         rows = cursor.rowcount if cursor else 0
         if returning_fields:
-            returning_values = cursor.fetchone()
+            returning_values = self.connection.ops.fetch_returned_values(cursor)
         else:
             returning_values = []
         is_empty = cursor is None

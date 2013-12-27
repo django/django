@@ -558,7 +558,7 @@ class Model(six.with_metaclass(ModelBase)):
                     if field.name != field.attname:
                         field_names.add(field.attname)
 
-                        non_model_fields = update_fields.difference(field_names)
+            non_model_fields = update_fields.difference(field_names)
 
             if non_model_fields:
                 raise ValueError("The following fields do not exist in this "

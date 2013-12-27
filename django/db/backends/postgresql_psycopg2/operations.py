@@ -219,6 +219,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             return cursor.query.decode('utf-8')
         return None
 
+    def return_insert_id(self):
+        return self.return_values(nvars=1)
+
     def return_values(self, nvars=1):
         assert nvars > 0
         vars_string = ", ".join(["%s"] * nvars)

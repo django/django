@@ -47,7 +47,8 @@ def utc_tzinfo_factory(offset):
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
-    supports_returning_clause = True
+    can_return_id_from_insert = True
+    can_return_multiple_fields = True
     requires_rollback_on_dirty_transaction = True
     has_real_datatype = True
     can_defer_constraint_checks = True

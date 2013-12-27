@@ -85,7 +85,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     uses_savepoints = True
     has_select_for_update = True
     has_select_for_update_nowait = True
-    supports_returning_clause = True
+    can_return_id_from_insert = True
     allow_sliced_subqueries = False
     supports_subqueries_in_group_by = False
     supports_transactions = True
@@ -271,7 +271,7 @@ WHEN (new.%(col_name)s IS NULL)
     def drop_sequence_sql(self, table):
         return "DROP SEQUENCE %s;" % self.quote_name(self._get_sequence_name(table))
 
-    def fetch_returned_values(self, cursor):
+    def fetch_returned_insert_id(self, cursor):
         return int(cursor._insert_id_var.getvalue())
 
     def field_cast_sql(self, db_type, internal_type):
@@ -357,7 +357,7 @@ WHEN (new.%(col_name)s IS NULL)
         self.connection.cursor()
         return self.connection.ops.regex_lookup(lookup_type)
 
-    def return_values(self):
+    def return_insert_id(self):
         return "RETURNING %s INTO %%s", (InsertIdVar(),)
 
     def savepoint_create_sql(self, sid):
@@ -548,7 +548,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         self.features = DatabaseFeatures(self)
         use_returning_into = self.settings_dict["OPTIONS"].get('use_returning_into', True)
-        self.features.supports_returning_clause = use_returning_into
+        self.features.can_return_id_from_insert = use_returning_into
         self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
