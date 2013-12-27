@@ -261,19 +261,13 @@ class Apps(object):
         # perform imports because of the risk of import loops. It mustn't
         # call get_app_config().
         model_name = model._meta.model_name
-        models = self.all_models[app_label]
-        if model_name in models:
-            # The same model may be imported via different paths (e.g.
-            # appname.models and project.appname.models). We use the source
-            # filename as a means to detect identity.
-            fname1 = os.path.abspath(upath(sys.modules[model.__module__].__file__))
-            fname2 = os.path.abspath(upath(sys.modules[models[model_name].__module__].__file__))
-            # Since the filename extension could be .py the first time and
-            # .pyc or .pyo the second time, ignore the extension when
-            # comparing.
-            if os.path.splitext(fname1)[0] == os.path.splitext(fname2)[0]:
-                return
-        models[model_name] = model
+        app_models = self.all_models[app_label]
+        # Defensive check for extra safety.
+        if model_name in app_models:
+            raise RuntimeError(
+                "Conflicting '%s' models in application '%s': %s and %s." %
+                (model_name, app_label, app_models[model_name], model))
+        app_models[model_name] = model
         self.get_models.cache_clear()
 
     def has_app(self, app_name):
