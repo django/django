@@ -83,13 +83,13 @@ class AppConfig(object):
                 # would raise when <mod_path> exists but not <cls_name>, with
                 # more context (Python just says "cannot import name ...").
                 raise ImportError(
-                    "cannot import name %r from %r" % (cls_name, mod_path))
+                    "cannot import name '%s' from '%s'" % (cls_name, mod_path))
 
             # Check for obvious errors. (This check prevents duck typing, but
             # it could be removed if it became a problem in practice.)
             if not issubclass(cls, AppConfig):
                 raise ImproperlyConfigured(
-                    "%r isn't a subclass of AppConfig." % entry)
+                    "'%s' isn't a subclass of AppConfig." % entry)
 
             # Obtain app name here rather than in AppClass.__init__ to keep
             # all error checking for entries in INSTALLED_APPS in one place.
@@ -97,7 +97,7 @@ class AppConfig(object):
                 app_name = cls.name
             except AttributeError:
                 raise ImproperlyConfigured(
-                    "%r must supply a name attribute." % entry)
+                    "'%s' must supply a name attribute." % entry)
 
             # Ensure app_names points to a valid module.
             app_module = import_module(app_name)

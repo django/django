@@ -181,9 +181,9 @@ class Apps(object):
 
         app_config = self.app_configs.get(app_label)
         if app_config is None:
-            raise LookupError("No installed app with label %r." % app_label)
+            raise LookupError("No installed app with label '%s'." % app_label)
         if only_with_models_module and app_config.models_module is None:
-            raise LookupError("App with label %r doesn't have a models module." % app_label)
+            raise LookupError("App with label '%s' doesn't have a models module." % app_label)
         return app_config
 
     # This method is performance-critical at least for Django's test suite.
