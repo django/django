@@ -1,5 +1,4 @@
 from django.apps import apps
-from django.contrib.contenttypes.models import ContentType
 from django.db import DEFAULT_DB_ALIAS, router
 from django.db.models import signals
 from django.utils.encoding import smart_text
@@ -7,13 +6,16 @@ from django.utils import six
 from django.utils.six.moves import input
 
 
-def update_contenttypes(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, **kwargs):
+def update_contenttypes(app_config, verbosity=2, interactive=True, db=DEFAULT_DB_ALIAS, **kwargs):
     """
     Creates content types for models in the given app, removing any model
     entries that no longer have a matching model class.
     """
+    if not app_config.models_module:
+        return
+
     try:
-        apps.get_model('contenttypes', 'ContentType')
+        ContentType = apps.get_model('contenttypes', 'ContentType')
     except LookupError:
         return
 
@@ -21,7 +23,7 @@ def update_contenttypes(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, *
         return
 
     ContentType.objects.clear_cache()
-    app_models = apps.get_models(app)
+    app_models = apps.get_models(app_config.models_module)
     if not app_models:
         return
     # They all have the same app_label, get the first one.
@@ -85,11 +87,13 @@ If you're unsure, answer 'no'.
                 print("Stale content types remain.")
 
 
-def update_all_contenttypes(verbosity=2, **kwargs):
+def update_all_contenttypes(**kwargs):
     for app_config in apps.get_app_configs(only_with_models_module=True):
-        update_contenttypes(app_config.models_module, None, verbosity, **kwargs)
+        update_contenttypes(app_config, **kwargs)
+
 
 signals.post_migrate.connect(update_contenttypes)
+
 
 if __name__ == "__main__":
     update_all_contenttypes()

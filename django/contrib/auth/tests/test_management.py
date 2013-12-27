@@ -232,13 +232,15 @@ class PermissionTestCase(TestCase):
         Test that we show proper error message if we are trying to create
         duplicate permissions.
         """
+        auth_app_config = apps.get_app_config('auth')
+
         # check duplicated default permission
         models.Permission._meta.permissions = [
             ('change_permission', 'Can edit permission (duplicate)')]
         six.assertRaisesRegex(self, CommandError,
             "The permission codename 'change_permission' clashes with a "
             "builtin permission for model 'auth.Permission'.",
-            create_permissions, models, [], verbosity=0)
+            create_permissions, auth_app_config, verbosity=0)
 
         # check duplicated custom permissions
         models.Permission._meta.permissions = [
@@ -249,21 +251,23 @@ class PermissionTestCase(TestCase):
         six.assertRaisesRegex(self, CommandError,
             "The permission codename 'my_custom_permission' is duplicated for model "
             "'auth.Permission'.",
-            create_permissions, models, [], verbosity=0)
+            create_permissions, auth_app_config, verbosity=0)
 
         # should not raise anything
         models.Permission._meta.permissions = [
             ('my_custom_permission', 'Some permission'),
             ('other_one', 'Some other permission'),
         ]
-        create_permissions(models, [], verbosity=0)
+        create_permissions(auth_app_config, verbosity=0)
 
     def test_default_permissions(self):
+        auth_app_config = apps.get_app_config('auth')
+
         permission_content_type = ContentType.objects.get_by_natural_key('auth', 'permission')
         models.Permission._meta.permissions = [
             ('my_custom_permission', 'Some permission'),
         ]
-        create_permissions(models, [], verbosity=0)
+        create_permissions(auth_app_config, verbosity=0)
 
         # add/change/delete permission by default + custom permission
         self.assertEqual(models.Permission.objects.filter(
@@ -272,7 +276,7 @@ class PermissionTestCase(TestCase):
 
         models.Permission.objects.filter(content_type=permission_content_type).delete()
         models.Permission._meta.default_permissions = []
-        create_permissions(models, [], verbosity=0)
+        create_permissions(auth_app_config, verbosity=0)
 
         # custom permission only since default permissions is empty
         self.assertEqual(models.Permission.objects.filter(
@@ -280,10 +284,12 @@ class PermissionTestCase(TestCase):
         ).count(), 1)
 
     def test_verbose_name_length(self):
+        auth_app_config = apps.get_app_config('auth')
+
         permission_content_type = ContentType.objects.get_by_natural_key('auth', 'permission')
         models.Permission.objects.filter(content_type=permission_content_type).delete()
         models.Permission._meta.verbose_name = "some ridiculously long verbose name that is out of control"
 
         six.assertRaisesRegex(self, exceptions.ValidationError,
             "The verbose_name of permission is longer than 39 characters",
-            create_permissions, models, [], verbosity=0)
+            create_permissions, auth_app_config, verbosity=0)
