@@ -866,7 +866,7 @@ For example::
         url(r'^advanced/$', 'apps.help.views.views.advanced'),
     )
 
-    url(r'^help/', include(help_patterns, 'bar', 'foo')),
+    url(r'^help/', include((help_patterns, 'bar', 'foo'))),
 
 This will include the nominated URL patterns into the given application and
 instance namespace.
@@ -877,3 +877,8 @@ attribute: A 3-tuple that contains all the patterns in the corresponding admin
 site, plus the application namespace ``'admin'``, and the name of the admin
 instance. It is this ``urls`` attribute that you ``include()`` into your
 projects ``urlpatterns`` when you deploy an Admin instance.
+
+Be sure to pass a tuple to ``include()``. If you simply pass three arguments:
+``include(help_patterns, 'bar', 'foo')``, Django won't throw an error but due
+to the signature of ``include()``, ``'bar'`` will be the instance namespace and
+``'foo'`` will be the application namespace instead of vice versa.
