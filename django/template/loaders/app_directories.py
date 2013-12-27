@@ -19,6 +19,8 @@ def calculate_app_template_dirs():
         fs_encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
     app_template_dirs = []
     for app_config in apps.get_app_configs():
+        if not app_config.path:
+            continue
         template_dir = os.path.join(app_config.path, 'templates')
         if os.path.isdir(template_dir):
             if six.PY2:
