@@ -3,6 +3,7 @@ import warnings
 from collections import OrderedDict
 from optparse import make_option
 
+from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
 from django.db import router, DEFAULT_DB_ALIAS
@@ -37,8 +38,6 @@ class Command(BaseCommand):
     args = '[appname appname.ModelName ...]'
 
     def handle(self, *app_labels, **options):
-        from django.apps import apps
-
         format = options.get('format')
         indent = options.get('indent')
         using = options.get('database')
@@ -63,24 +62,23 @@ class Command(BaseCommand):
         for exclude in excludes:
             if '.' in exclude:
                 app_label, model_name = exclude.split('.', 1)
-                model_obj = apps.get_model(app_label, model_name)
-                if not model_obj:
+                model = apps.get_model(app_label, model_name)
+                if not model:
                     raise CommandError('Unknown model in excludes: %s' % exclude)
-                excluded_models.add(model_obj)
+                excluded_models.add(model)
             else:
                 try:
-                    app_obj = apps.get_app_config(exclude).models_module
-                    if app_obj is not None:
-                        excluded_apps.add(app_obj)
+                    app_config = apps.get_app_config(exclude)
                 except LookupError:
                     raise CommandError('Unknown app in excludes: %s' % exclude)
+                excluded_apps.add(app_config)
 
         if len(app_labels) == 0:
             if primary_keys:
                 raise CommandError("You can only use --pks option with one model")
-            app_list = OrderedDict((app_config.models_module, None)
+            app_list = OrderedDict((app_config, None)
                 for app_config in apps.get_app_configs(only_with_models_module=True)
-                if app_config.models_module not in excluded_apps)
+                if app_config not in excluded_apps)
         else:
             if len(app_labels) > 1 and primary_keys:
                 raise CommandError("You can only use --pks option with one model")
@@ -89,32 +87,30 @@ class Command(BaseCommand):
                 try:
                     app_label, model_label = label.split('.')
                     try:
-                        app = apps.get_app_config(app_label).models_module
+                        app_config = apps.get_app_config(app_label)
                     except LookupError:
                         raise CommandError("Unknown application: %s" % app_label)
-                    if app is None or app in excluded_apps:
+                    if app_config.models_module is None or app_config in excluded_apps:
                         continue
                     model = apps.get_model(app_label, model_label)
                     if model is None:
                         raise CommandError("Unknown model: %s.%s" % (app_label, model_label))
 
-                    if app in app_list.keys():
-                        if app_list[app] and model not in app_list[app]:
-                            app_list[app].append(model)
-                    else:
-                        app_list[app] = [model]
+                    app_list_value = app_list.setdefault(app_config, [])
+                    if model not in app_list_value:
+                        app_list_value.append(model)
                 except ValueError:
                     if primary_keys:
                         raise CommandError("You can only use --pks option with one model")
                     # This is just an app - no model qualifier
                     app_label = label
                     try:
-                        app = apps.get_app_config(app_label).models_module
+                        app_config = apps.get_app_config(app_label)
                     except LookupError:
                         raise CommandError("Unknown application: %s" % app_label)
-                    if app is None or app in excluded_apps:
+                    if app_config.models_module is None or app_config in excluded_apps:
                         continue
-                    app_list[app] = None
+                    app_list[app_config] = None
 
         # Check that the serialization format exists; this is a shortcut to
         # avoid collating all the objects and _then_ failing.
@@ -156,19 +152,18 @@ class Command(BaseCommand):
 
 
 def sort_dependencies(app_list):
-    """Sort a list of app,modellist pairs into a single list of models.
+    """Sort a list of (app_config, models) pairs into a single list of models.
 
     The single list of models is sorted so that any model with a natural key
     is serialized before a normal model, and any model with a natural key
     dependency has it's dependencies serialized first.
     """
-    from django.apps import apps
     # Process the list of models, and get the list of dependencies
     model_dependencies = []
     models = set()
-    for app, model_list in app_list:
+    for app_config, model_list in app_list:
         if model_list is None:
-            model_list = apps.get_models(app)
+            model_list = apps.get_models(app_config.models_module)
 
         for model in model_list:
             models.add(model)
