@@ -381,12 +381,10 @@ handlers are registered anywhere else they may not be loaded by
 Arguments sent with this signal:
 
 ``sender``
-    The ``models`` module of the app about to be migrated/synced.
-    For example, if :djadmin:`migrate` is about to install
-    an app called ``"foo.bar.myapp"``, ``sender`` will be the
-    ``foo.bar.myapp.models`` module.
+    An :class:`~django.apps.AppConfig` instance for the application about to
+    be migrated/synced.
 
-``app``
+``app_config``
     Same as ``sender``.
 
 ``verbosity``
@@ -415,14 +413,48 @@ pre_syncdb
 
 .. deprecated:: 1.7
 
-    This signal has been renamed to :data:`~django.db.models.signals.pre_migrate`.
+    This signal has been replaced by :data:`~django.db.models.signals.pre_migrate`.
 
-Alias of :data:`django.db.models.signals.pre_migrate`. As long as this alias
-is present, for backwards-compatibility this signal has an extra argument it sends:
+Sent by the :djadmin:`syncdb` command before it starts to install an
+application.
+
+Any handlers that listen to this signal need to be written in a particular
+place: a ``management`` module in one of your :setting:`INSTALLED_APPS`. If
+handlers are registered anywhere else they may not be loaded by
+:djadmin:`syncdb`.
+
+Arguments sent with this signal:
+
+``sender``
+    The ``models`` module that was just installed. That is, if
+    :djadmin:`syncdb` just installed an app called ``"foo.bar.myapp"``,
+    ``sender`` will be the ``foo.bar.myapp.models`` module.
+
+``app``
+    Same as ``sender``.
 
 ``create_models``
-    A list of the model classes from any app which :djadmin:`migrate` is
-    going to create, **only if the app has no migrations**.
+    A list of the model classes from any app which :djadmin:`syncdb` plans to
+    create.
+
+
+``verbosity``
+    Indicates how much information manage.py is printing on screen. See
+    the :djadminopt:`--verbosity` flag for details.
+
+    Functions which listen for :data:`pre_syncdb` should adjust what they
+    output to the screen based on the value of this argument.
+
+``interactive``
+    If ``interactive`` is ``True``, it's safe to prompt the user to input
+    things on the command line. If ``interactive`` is ``False``, functions
+    which listen for this signal should not try to prompt for anything.
+
+    For example, the :mod:`django.contrib.auth` app only prompts to create a
+    superuser when ``interactive`` is ``True``.
+
+``db``
+    The alias of database on which a command will operate.
 
 post_migrate
 ------------
@@ -444,11 +476,10 @@ idempotent changes (e.g. no database alterations) as this may cause the
 Arguments sent with this signal:
 
 ``sender``
-    The ``models`` module that was just installed. That is, if
-    :djadmin:`migrate` just installed an app called ``"foo.bar.myapp"``,
-    ``sender`` will be the ``foo.bar.myapp.models`` module.
+    An :class:`~django.apps.AppConfig` instance for the application that was
+    just installed.
 
-``app``
+``app_config``
     Same as ``sender``.
 
 ``verbosity``
@@ -489,14 +520,62 @@ post_syncdb
 
 .. deprecated:: 1.7
 
-    This signal has been renamed to :data:`~django.db.models.signals.post_migrate`.
+    This signal has been replaced by :data:`~django.db.models.signals.post_migrate`.
 
-Alias of :data:`django.db.models.signals.post_migrate`. As long as this alias
-is present, for backwards-compatibility this signal has an extra argument it sends:
+Sent by the :djadmin:`syncdb` command after it installs an application, and the
+:djadmin:`flush` command.
+
+Any handlers that listen to this signal need to be written in a particular
+place: a ``management`` module in one of your :setting:`INSTALLED_APPS`. If
+handlers are registered anywhere else they may not be loaded by
+:djadmin:`syncdb`. It is important that handlers of this signal perform
+idempotent changes (e.g. no database alterations) as this may cause the
+:djadmin:`flush` management command to fail if it also ran during the
+:djadmin:`syncdb` command.
+
+Arguments sent with this signal:
+
+``sender``
+    The ``models`` module that was just installed. That is, if
+    :djadmin:`syncdb` just installed an app called ``"foo.bar.myapp"``,
+    ``sender`` will be the ``foo.bar.myapp.models`` module.
+
+``app``
+    Same as ``sender``.
 
 ``created_models``
-    A list of the model classes from any app which :djadmin:`migrate` has
-    created, **only if the app has no migrations**.
+    A list of the model classes from any app which :djadmin:`syncdb` has
+    created so far.
+
+``verbosity``
+    Indicates how much information manage.py is printing on screen. See
+    the :djadminopt:`--verbosity` flag for details.
+
+    Functions which listen for :data:`post_syncdb` should adjust what they
+    output to the screen based on the value of this argument.
+
+``interactive``
+    If ``interactive`` is ``True``, it's safe to prompt the user to input
+    things on the command line. If ``interactive`` is ``False``, functions
+    which listen for this signal should not try to prompt for anything.
+
+    For example, the :mod:`django.contrib.auth` app only prompts to create a
+    superuser when ``interactive`` is ``True``.
+
+``db``
+    The database alias used for synchronization. Defaults to the ``default``
+    database.
+
+For example, ``yourapp/management/__init__.py`` could be written like::
+
+    from django.db.models.signals import post_syncdb
+    import yourapp.models
+
+    def my_callback(sender, **kwargs):
+        # Your specific logic here
+        pass
+
+    post_syncdb.connect(my_callback, sender=yourapp.models)
 
 Request/response signals
 ========================
