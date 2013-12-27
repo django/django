@@ -657,8 +657,8 @@ class Model(six.with_metaclass(ModelBase)):
         Does the heavy-lifting involved in saving. Updates or inserts the data
         for a single table.
 
-        This also respects ``use_on_update`` and ``use_on_insert`` flags on
-        fields except for the case of fixture loading (``raw == True``).
+        This also respects the ``delegate_to_db`` flag on fields except for
+        the case of fixture loading (``raw == True``).
 
         """
         meta = cls._meta

@@ -15,6 +15,7 @@ from django.core import validators
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.db.models import Field
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -334,5 +335,5 @@ class CustomErrorMessage(models.Model):
 class DbDefaultModel(models.Model):
 
     name1 = models.CharField(max_length=50)
-    name2 = models.CharField(max_length=50, use_on_insert=False)
-    name3 = models.CharField(max_length=50, use_on_update=False)
+    name2 = models.CharField(max_length=50, delegate_to_db=Field.CREATE)
+    name3 = models.CharField(max_length=50, delegate_to_db=Field.UPDATE)

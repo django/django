@@ -11,6 +11,7 @@ except ImproperlyConfigured:
 
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.db.models import Field
 from django.db.models.fields.files import ImageFieldFile, ImageField
 
 
@@ -231,17 +232,15 @@ if Image:
 
 class UpdateModel(models.Model):
 
-    f = models.CharField(max_length=20, null=True, use_on_insert=False)
+    f = models.CharField(max_length=20, null=True, delegate_to_db=Field.CREATE)
 
 
 class SelectModel(models.Model):
 
-    f = models.CharField(max_length=20, null=True, use_on_update=False,
-                         use_on_insert=False)
+    f = models.CharField(max_length=20, null=True, delegate_to_db=Field.ALL)
 
 
 class RefreshModel(models.Model):
 
-    f = models.CharField(max_length=20, null=True, use_on_update=False,
-                         use_on_insert=False)
+    f = models.CharField(max_length=20, null=True, delegate_to_db=Field.ALL)
     normal = models.CharField(max_length=20, null=True)

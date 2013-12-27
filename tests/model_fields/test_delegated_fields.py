@@ -4,6 +4,7 @@ import unittest
 
 from django import test
 from django.db import connections, models, DEFAULT_DB_ALIAS
+from django.db.models import Field
 
 from .models import UpdateModel, SelectModel, RefreshModel
 
@@ -71,20 +72,22 @@ class PrimaryKeysUseOnInsertUpdateTestCase(unittest.TestCase):
 
     def test_pk_and_not_use_on_insert_raises_exception(self):
         self.assertRaises(
-            ValueError, models.Field, primary_key=True, use_on_insert=False
+            ValueError, models.Field,
+            primary_key=True, delegate_to_db=Field.CREATE
         )
 
     def test_pk_and_not_use_on_update_raises_exception(self):
         self.assertRaises(
-            ValueError, models.Field, primary_key=True, use_on_update=False
+            ValueError, models.Field,
+            primary_key=True, delegate_to_db=Field.UPDATE
         )
 
     def test_autofield_always_sets_use_on_insert(self):
-        f = models.AutoField(primary_key=True, use_on_insert=False)
+        f = models.AutoField(primary_key=True, delegate_to_db=Field.CREATE)
         self.assertTrue(f.use_on_insert)
 
     def test_autofield_always_sets_use_on_update(self):
-        f = models.AutoField(primary_key=True, use_on_update=False)
+        f = models.AutoField(primary_key=True, delegate_to_db=Field.UPDATE)
         self.assertTrue(f.use_on_update)
 
 

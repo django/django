@@ -109,13 +109,29 @@ class Field(object):
         }
     description = property(_description)
 
+    # Available values for a db-handled field.
+    # NONE: The database does nothing.
+    # CREATE: The database handles INSERTs.
+    # UPDATE: The database handles UPDATEs.
+    # ALL: The database handles both INSERTs and UPDATEs; equivalent to
+    #      a read-only field.
+    NONE, CREATE, UPDATE, ALL = 0, 1, 2, 3
+
+    @property
+    def use_on_insert(self):
+        return self.delegate_to_db in (self.NONE, self.UPDATE)
+
+    @property
+    def use_on_update(self):
+        return self.delegate_to_db in (self.NONE, self.CREATE)
+
     def __init__(self, verbose_name=None, name=None, primary_key=False,
             max_length=None, unique=False, blank=False, null=False,
             db_index=False, rel=None, default=NOT_PROVIDED, editable=True,
             serialize=True, unique_for_date=None, unique_for_month=None,
             unique_for_year=None, choices=None, help_text='', db_column=None,
             db_tablespace=None, auto_created=False, validators=[],
-                 error_messages=None, use_on_insert=True, use_on_update=True):
+                 error_messages=None, delegate_to_db=None):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
         self._verbose_name = verbose_name  # Store original for deconstruction
@@ -136,12 +152,14 @@ class Field(object):
         self.auto_created = auto_created
         # Flags to indicate, whether the field shoud be used in an
         # INSERT and UDPATE statement.
-        self.use_on_insert = use_on_insert
-        self.use_on_update = use_on_update
+        if delegate_to_db is None:
+            delegate_to_db = self.NONE
+        self.delegate_to_db = delegate_to_db
 
-        normal_field = self.use_on_insert and self.use_on_update
-        if self.primary_key and not normal_field:
-            raise ValueError("A primary key cannot be set as ")
+        if self.primary_key and self.delegate_to_db != self.NONE:
+            raise ValueError(
+                "A primary key cannot be set as handled by the database."
+            )
 
         # Set db_index to True if the field has a relationship and doesn't
         # explicitly set db_index.
@@ -215,8 +233,7 @@ class Field(object):
             "auto_created": False,
             "validators": [],
             "error_messages": None,
-            "use_on_insert": True,
-            "use_on_update": True,
+            "delegate_to_db": self.NONE,
         }
         attr_overrides = {
             "unique": "_unique",
@@ -728,8 +745,7 @@ class AutoField(Field):
         assert kwargs.get('primary_key', False) is True, \
             "%ss must have primary_key=True." % self.__class__.__name__
         kwargs['blank'] = True
-        kwargs['use_on_insert'] = True
-        kwargs['use_on_update'] = True
+        kwargs['delegate_to_db'] = self.NONE
         Field.__init__(self, *args, **kwargs)
 
     def deconstruct(self):
