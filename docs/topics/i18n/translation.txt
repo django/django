@@ -206,7 +206,9 @@ For example::
 In this example the number of objects is passed to the translation
 languages as the ``count`` variable.
 
-Lets see a slightly more complex usage example::
+Note that pluralization is complicated and works differently in each language.
+Comparing ``count`` to 1 isn't always the correct rule. This code looks
+sophisticated, but will produce incorrect results for some languages::
 
     from django.utils.translation import ungettext
     from myapp.models import Report
@@ -218,42 +220,45 @@ Lets see a slightly more complex usage example::
         name = Report._meta.verbose_name_plural
 
     text = ungettext(
-            'There is %(count)d %(name)s available.',
-            'There are %(count)d %(name)s available.',
-            count
+        'There is %(count)d %(name)s available.',
+        'There are %(count)d %(name)s available.',
+        count
     ) % {
         'count': count,
         'name': name
     }
 
-Here we reuse localizable, hopefully already translated literals (contained in
-the ``verbose_name`` and ``verbose_name_plural`` model ``Meta`` options) for
-other parts of the sentence so all of it is consistently based on the
-cardinality of the elements at play.
+Don't try to implement your own singular-or-plural logic, it won't be correct.
+In a case like this, consider something like the following::
+
+    text = ungettext(
+        'There is %(count)d %(name)s object available.',
+        'There are %(count)d %(name)s objects available.',
+        count
+    ) % {
+        'count': count,
+        'name': Report._meta.verbose_name,
+    }
 
 .. _pluralization-var-notes:
 
 .. note::
 
-    When using this technique, make sure you use a single name for every
-    extrapolated variable included in the literal. In the example above note how
-    we used the ``name`` Python variable in both translation strings. This
-    example would fail::
+    When using ``ungettext()``, make sure you use a single name for every
+    extrapolated variable included in the literal. In the examples above, note
+    how we used the ``name`` Python variable in both translation strings. This
+    example, besides being incorrect in some languages as noted above, would
+    fail::
 
-        from django.utils.translation import ungettext
-        from myapp.models import Report
-
-        count = Report.objects.count()
-        d = {
-            'count': count,
+        text = ungettext(
+            'There is %(count)d %(name)s available.',
+            'There are %(count)d %(plural_name)s available.',
+            count
+        ) % {
+            'count': Report.objects.count(),
             'name': Report._meta.verbose_name,
             'plural_name': Report._meta.verbose_name_plural
         }
-        text = ungettext(
-                'There is %(count)d %(name)s available.',
-                'There are %(count)d %(plural_name)s available.',
-                count
-        ) % d
 
     You would get an error when running :djadmin:`django-admin.py
     compilemessages <compilemessages>`::
