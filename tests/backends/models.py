@@ -110,3 +110,14 @@ class ObjectReference(models.Model):
 
     def __str__(self):
         return str(self.obj_id)
+
+
+#Test model for the patch for ticket #14334
+class TestClass1(models.Model):
+    name = models.CharField(max_length=30)
+    phone = models.IntegerField(max_length=11)
+    isValid = models.BooleanField()
+
+
+class TestClass2(models.Model):
+    ref1 = models.ForeignKey(TestClass1)

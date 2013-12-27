@@ -25,6 +25,7 @@ from django.test import (TestCase, skipUnlessDBFeature, skipIfDBFeature,
 from django.test.utils import override_settings, str_prefix
 from django.utils import six
 from django.utils.six.moves import xrange
+from django.core.exceptions import FieldError
 
 from . import models
 
@@ -1008,3 +1009,20 @@ class UnicodeArrayTestCase(TestCase):
         a = ["ᄲawef"]
         b = self.select(a)
         self.assertEqual(a[0], b[0])
+
+
+#Test for #14334
+class TestForComparisionObjectsCheck(TestCase):
+    def setUp(self):
+        obj1 = models.TestClass1(name="anubhav", phone="8084", isValid=False)
+        obj2 = models.TestClass1(name="joshi", phone="9935", isValid=True)
+        obj1.save()
+        obj2.save()
+
+    def test_chk(self):
+        self.assertRaises(FieldError, models.TestClass1.objects.get, name=24)
+        self.assertRaises(FieldError, models.TestClass1.objects.get, phone="8084")
+        obj2 = models.TestClass1.objects.get(name="joshi")
+        obj3 = models.TestClass2(ref1=obj2)
+        self.assertRaises(FieldError, models.TestClass2.objects.get, ref1=obj3)
+        self.assertRaises(FieldError, models.TestClass1.objects.filter, name__in=['anubhav', 'joshi', 24])

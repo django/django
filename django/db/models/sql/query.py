@@ -17,7 +17,7 @@ from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.aggregates import refs_aggregate
 from django.db.models.expressions import ExpressionNode
-from django.db.models.fields import FieldDoesNotExist
+from django.db.models.fields import FieldDoesNotExist, AutoField
 from django.db.models.query_utils import Q
 from django.db.models.related import PathInfo
 from django.db.models.sql import aggregates as base_aggregates_module
@@ -1137,6 +1137,27 @@ class Query(object):
         try:
             field, sources, opts, join_list, path = self.setup_joins(
                 parts, opts, alias, can_reuse, allow_many)
+            #Patch for #14334
+            if value is not None or value != '':
+                if field.rel:
+                    if hasattr(value, '__iter__'):
+                        for v in value:
+                            if type(v)!= long and type(v)!= bool:
+                                if not isinstance(v, field.rel.to):
+                                    raise FieldError("'%s' is not of '%s' type." %(v, field.rel.to.__name__))
+                    else:
+                        if type(value)!= long and type(value)!= bool:
+                            if not isinstance(value, field.rel.to):
+                                raise FieldError("'%s' is not of '%s' type." %(value, field.rel.to.__name__))
+                else:
+                    if not isinstance(field, AutoField):
+                        if hasattr(value,'__iter__'):
+                            for v in value:
+                                if not isinstance(v, field.to_python(v).__class__):
+                                    raise FieldError("'%s' is not of '%s' type." %(v, field))
+                        else:
+                            if not isinstance(value, field.to_python(value).__class__):
+                                raise FieldError("'%s' is not of '%s' type." %(value, field))
         except MultiJoin as e:
             return self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]),
                                       can_reuse, e.names_with_path)
