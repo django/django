@@ -6,6 +6,8 @@ from django.apps import apps
 from django.utils import datetime_safe
 from django.utils.six.moves import input
 
+from .loader import MIGRATIONS_MODULE_NAME
+
 
 class MigrationQuestioner(object):
     """
@@ -31,7 +33,7 @@ class MigrationQuestioner(object):
             app_config = apps.get_app_config(app_label)
         except LookupError:         # It's a fake app.
             return self.defaults.get("ask_initial", False)
-        migrations_import_path = "%s.migrations" % app_config.name
+        migrations_import_path = "%s.%s" % (app_config.name, MIGRATIONS_MODULE_NAME)
         try:
             migrations_module = importlib.import_module(migrations_import_path)
         except ImportError:

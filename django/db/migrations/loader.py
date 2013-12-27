@@ -9,6 +9,9 @@ from django.utils import six
 from django.conf import settings
 
 
+MIGRATIONS_MODULE_NAME = 'migrations'
+
+
 class MigrationLoader(object):
     """
     Loads migration files from disk, and their status from the database.
@@ -46,7 +49,8 @@ class MigrationLoader(object):
         if app_label in settings.MIGRATION_MODULES:
             return settings.MIGRATION_MODULES[app_label]
         else:
-            return '%s.migrations' % apps.get_app_config(app_label).name
+            app_package_name = apps.get_app_config(app_label).name
+            return '%s.%s' % (app_package_name, MIGRATIONS_MODULE_NAME)
 
     def load_disk(self):
         """
@@ -64,7 +68,7 @@ class MigrationLoader(object):
             except ImportError as e:
                 # I hate doing this, but I don't want to squash other import errors.
                 # Might be better to try a directory check directly.
-                if "No module named" in str(e) and "migrations" in str(e):
+                if "No module named" in str(e) and MIGRATIONS_MODULE_NAME in str(e):
                     self.unmigrated_apps.add(app_config.label)
                     continue
                 raise
