@@ -13,19 +13,22 @@ from django.template.loader import BaseLoader
 from django.utils._os import safe_join
 from django.utils import six
 
-# At compile time, cache the directories to search.
-if six.PY2:
-    fs_encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
-app_template_dirs = []
-for app_config in apps.get_app_configs():
-    template_dir = os.path.join(app_config.path, 'templates')
-    if os.path.isdir(template_dir):
-        if six.PY2:
-            template_dir = template_dir.decode(fs_encoding)
-        app_template_dirs.append(template_dir)
 
-# It won't change, so convert it to a tuple to save memory.
-app_template_dirs = tuple(app_template_dirs)
+def calculate_app_template_dirs():
+    if six.PY2:
+        fs_encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
+    app_template_dirs = []
+    for app_config in apps.get_app_configs():
+        template_dir = os.path.join(app_config.path, 'templates')
+        if os.path.isdir(template_dir):
+            if six.PY2:
+                template_dir = template_dir.decode(fs_encoding)
+            app_template_dirs.append(template_dir)
+    return tuple(app_template_dirs)
+
+
+# At compile time, cache the directories to search.
+app_template_dirs = calculate_app_template_dirs()
 
 
 class Loader(BaseLoader):
