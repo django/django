@@ -1198,8 +1198,20 @@ class CacheUtils(TestCase):
     """TestCase for django.utils.cache functions."""
 
     def setUp(self):
+        self.host = 'www.example.com'
         self.path = '/cache/test/'
-        self.factory = RequestFactory()
+        self.factory = RequestFactory(HTTP_HOST=self.host)
+
+    def _get_request_cache(self, method='GET', query_string=None, update_cache=None):
+        request = self._get_request(self.host, self.path,
+                                    method, query_string=query_string)
+        request._cache_update_cache = True if not update_cache else update_cache
+        return request
+
+    def _set_cache(self, request, msg):
+        response = HttpResponse()
+        response.content = msg
+        return UpdateCacheMiddleware().process_response(request, response)
 
     def test_patch_vary_headers(self):
         headers = (
@@ -1229,10 +1241,19 @@ class CacheUtils(TestCase):
         self.assertEqual(get_cache_key(request), None)
         # Set headers to an empty list.
         learn_cache_key(request, response)
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.9fa0fd092afb73bdce204bb4f94d5804.d41d8cd98f00b204e9800998ecf8427e')
+
+        self.assertEqual(
+            get_cache_key(request),
+            'views.decorators.cache.cache_page.settingsprefix.GET.'
+            '18a03f9c9649f7d684af5db3524f5c99.d41d8cd98f00b204e9800998ecf8427e'
+        )
         # Verify that a specified key_prefix is taken into account.
         learn_cache_key(request, response, key_prefix=key_prefix)
-        self.assertEqual(get_cache_key(request, key_prefix=key_prefix), 'views.decorators.cache.cache_page.localprefix.GET.9fa0fd092afb73bdce204bb4f94d5804.d41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(
+            get_cache_key(request, key_prefix=key_prefix),
+            'views.decorators.cache.cache_page.localprefix.GET.'
+            '18a03f9c9649f7d684af5db3524f5c99.d41d8cd98f00b204e9800998ecf8427e'
+        )
 
     def test_get_cache_key_with_query(self):
         request = self.factory.get(self.path, {'test': 1})
@@ -1242,7 +1263,22 @@ class CacheUtils(TestCase):
         # Set headers to an empty list.
         learn_cache_key(request, response)
         # Verify that the querystring is taken into account.
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.d11198ba31883732b0de5786a80cc12b.d41d8cd98f00b204e9800998ecf8427e')
+
+        self.assertEqual(
+            get_cache_key(request),
+            'views.decorators.cache.cache_page.settingsprefix.GET.'
+            'beaf87a9a99ee81c673ea2d67ccbec2a.d41d8cd98f00b204e9800998ecf8427e'
+        )
+
+    def test_cache_key_varies_by_url(self):
+        """
+        get_cache_key keys differ by fully-qualfied URL instead of path
+        """
+        request1 = self.factory.get(self.path, HTTP_HOST='sub-1.example.com')
+        learn_cache_key(request1, HttpResponse())
+        request2 = self.factory.get(self.path, HTTP_HOST='sub-2.example.com')
+        learn_cache_key(request2, HttpResponse())
+        self.assertTrue(get_cache_key(request1) != get_cache_key(request2))
 
     def test_learn_cache_key(self):
         request = self.factory.head(self.path)
@@ -1250,7 +1286,12 @@ class CacheUtils(TestCase):
         response['Vary'] = 'Pony'
         # Make sure that the Vary header is added to the key hash
         learn_cache_key(request, response)
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.9fa0fd092afb73bdce204bb4f94d5804.d41d8cd98f00b204e9800998ecf8427e')
+
+        self.assertEqual(
+            get_cache_key(request),
+            'views.decorators.cache.cache_page.settingsprefix.GET.'
+            '18a03f9c9649f7d684af5db3524f5c99.d41d8cd98f00b204e9800998ecf8427e'
+        )
 
     def test_patch_cache_control(self):
         tests = (
@@ -1874,10 +1915,19 @@ class TestWithTemplateResponse(TestCase):
         self.assertEqual(get_cache_key(request), None)
         # Set headers to an empty list.
         learn_cache_key(request, response)
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.9fa0fd092afb73bdce204bb4f94d5804.d41d8cd98f00b204e9800998ecf8427e')
+
+        self.assertEqual(
+            get_cache_key(request),
+            'views.decorators.cache.cache_page.settingsprefix.GET.'
+            '58a0a05c8a5620f813686ff969c26853.d41d8cd98f00b204e9800998ecf8427e'
+        )
         # Verify that a specified key_prefix is taken into account.
         learn_cache_key(request, response, key_prefix=key_prefix)
-        self.assertEqual(get_cache_key(request, key_prefix=key_prefix), 'views.decorators.cache.cache_page.localprefix.GET.9fa0fd092afb73bdce204bb4f94d5804.d41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(
+            get_cache_key(request, key_prefix=key_prefix),
+            'views.decorators.cache.cache_page.localprefix.GET.'
+            '58a0a05c8a5620f813686ff969c26853.d41d8cd98f00b204e9800998ecf8427e'
+        )
 
     def test_get_cache_key_with_query(self):
         request = self.factory.get(self.path, {'test': 1})
@@ -1887,7 +1937,11 @@ class TestWithTemplateResponse(TestCase):
         # Set headers to an empty list.
         learn_cache_key(request, response)
         # Verify that the querystring is taken into account.
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.d11198ba31883732b0de5786a80cc12b.d41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(
+            get_cache_key(request),
+            'views.decorators.cache.cache_page.settingsprefix.GET.'
+            '0f1c2d56633c943073c4569d9a9502fe.d41d8cd98f00b204e9800998ecf8427e'
+        )
 
     @override_settings(USE_ETAGS=False)
     def test_without_etag(self):
