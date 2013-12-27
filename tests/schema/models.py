@@ -111,7 +111,7 @@ class Thing(models.Model):
     when = models.CharField(max_length=1, primary_key=True)
 
     class Meta:
-        db_table = 'select'
+        db_table = 'drop'
 
     def __str__(self):
         return self.when
