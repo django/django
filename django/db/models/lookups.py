@@ -158,12 +158,30 @@ class In(BuiltinLookup):
 default_lookups['in'] = In
 
 
-class StartsWith(BuiltinLookup):
+class PatternLookup(BuiltinLookup):
+    def get_rhs_op(self, connection, rhs):
+        # Assume we are in startswith. We need to produce SQL like:
+        #     col LIKE %s, ['thevalue%']
+        # For python values we can (and should) do that directly in Python,
+        # but if the value is for example reference to other column, then
+        # we need to add the % pattern match to the lookup by something like
+        #     col LIKE othercol || '%%'
+        # So, for Python values we don't need any special pattern, but for
+        # SQL reference values we need the correct pattern added.
+        value = self.rhs
+        if (hasattr(value, 'get_compiler') or hasattr(value, 'as_sql')
+                or hasattr(value, '_as_sql')):
+            return connection.pattern_ops[self.lookup_name] % rhs
+        else:
+            return super(PatternLookup, self).get_rhs_op(connection, rhs)
+
+
+class StartsWith(PatternLookup):
     lookup_name = 'startswith'
 default_lookups['startswith'] = StartsWith
 
 
-class IStartsWith(BuiltinLookup):
+class IStartsWith(PatternLookup):
     lookup_name = 'istartswith'
 default_lookups['istartswith'] = IStartsWith
 
