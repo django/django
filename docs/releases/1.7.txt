@@ -593,6 +593,10 @@ methods are only referring to fields or other items in ``model._meta``.
 App-loading changes
 ~~~~~~~~~~~~~~~~~~~
 
+Subclasses of :class:`~django.core.management.AppCommand` must now implement a
+:meth:`~django.core.management.AppCommand.handle_app_config` method instead of
+``handle_app()``. This method receives an :class:`~django.apps.AppConfig` instance.
+
 Since :setting:`INSTALLED_APPS` now supports application configuration classes
 in addition to application modules, you should review code that accesses this
 setting directly and use the app registry (:attr:`django.apps.apps`) instead.

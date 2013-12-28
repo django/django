@@ -1416,27 +1416,24 @@ class CommandTypes(AdminScriptTestCase):
         args = ['app_command', 'auth']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.auth.models'")
-        self.assertOutput(out, "module 'django.contrib.auth.models' from")
-        self.assertOutput(out, str_prefix("'>, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+        self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.auth, options=")
+        self.assertOutput(out, str_prefix(", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
 
     def test_app_command_no_apps(self):
         "User AppCommands raise an error when no app name is provided"
         args = ['app_command']
         out, err = self.run_manage(args)
-        self.assertOutput(err, 'Error: Enter at least one appname.')
+        self.assertOutput(err, 'Error: Enter at least one application label.')
 
     def test_app_command_multiple_apps(self):
         "User AppCommands raise an error when multiple app names are provided"
         args = ['app_command', 'auth', 'contenttypes']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.auth.models'")
-        self.assertOutput(out, "module 'django.contrib.auth.models' from")
-        self.assertOutput(out, str_prefix("'>, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
-        self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.contenttypes.models'")
-        self.assertOutput(out, "module 'django.contrib.contenttypes.models' from")
-        self.assertOutput(out, str_prefix("'>, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+        self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.auth, options=")
+        self.assertOutput(out, str_prefix(", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+        self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.contenttypes, options=")
+        self.assertOutput(out, str_prefix(", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
 
     def test_app_command_invalid_appname(self):
         "User AppCommands can execute when a single app name is provided"
