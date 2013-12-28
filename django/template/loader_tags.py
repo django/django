@@ -59,7 +59,7 @@ class BlockNode(Node):
                 if block is None:
                     block = self
                 # Create new block so we can store context without thread-safety issues.
-                block = BlockNode(block.name, block.nodelist)
+                block = type(self)(block.name, block.nodelist)
                 block.context = context
                 context['block'] = block
                 result = block.nodelist.render(context)
