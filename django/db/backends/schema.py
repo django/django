@@ -185,6 +185,10 @@ class BaseDatabaseSchemaEditor(object):
             db_params = field.db_parameters(connection=self.connection)
             if db_params['check']:
                 definition += " CHECK (%s)" % db_params['check']
+            # Autoincrement SQL (for backends with inline variant)
+            col_type_suffix = field.db_type_suffix(connection=self.connection)
+            if col_type_suffix:
+                definition += " %s" % col_type_suffix
             # Add the SQL to our big list
             column_sqls.append("%s %s" % (
                 self.quote_name(field.column),
@@ -214,7 +218,7 @@ class BaseDatabaseSchemaEditor(object):
                         "to_column": self.quote_name(to_column),
                     }
                 )
-            # Autoincrement SQL
+            # Autoincrement SQL (for backends with post table definition variant)
             if field.get_internal_type() == "AutoField":
                 autoinc_sql = self.connection.ops.autoinc_sql(model._meta.db_table, field.column)
                 if autoinc_sql:
