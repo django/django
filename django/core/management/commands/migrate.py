@@ -75,7 +75,7 @@ class Command(BaseCommand):
         run_syncdb = False
         target_app_labels_only = True
         if len(args) > 2:
-            raise CommandError("Too many command-line arguments (expecting 'appname' or 'appname migrationname')")
+            raise CommandError("Too many command-line arguments (expecting 'app_label' or 'app_label migrationname')")
         elif len(args) == 2:
             app_label, migration_name = args
             if app_label not in executor.loader.migrated_apps:

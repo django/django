@@ -1149,7 +1149,7 @@ DEFAULT_URLCONF_TEMPLATE = """
 <div id="instructions">
   <p>
     Of course, you haven't actually done any work yet.
-    Next, start your first app by running <code>python manage.py startapp [appname]</code>.
+    Next, start your first app by running <code>python manage.py startapp [app_label]</code>.
   </p>
 </div>
 

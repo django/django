@@ -16,10 +16,12 @@ class Command(BaseCommand):
         make_option('--indent', default=None, dest='indent', type='int',
             help='Specifies the indent level to use when pretty-printing output'),
         make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a specific database to dump '
-                'fixtures from. Defaults to the "default" database.'),
+            default=DEFAULT_DB_ALIAS,
+            help='Nominates a specific database to dump fixtures from. '
+                 'Defaults to the "default" database.'),
         make_option('-e', '--exclude', dest='exclude', action='append', default=[],
-            help='An appname or appname.ModelName to exclude (use multiple --exclude to exclude multiple apps/models).'),
+            help='An app_label or app_label.ModelName to exclude '
+                 '(use multiple --exclude to exclude multiple apps/models).'),
         make_option('-n', '--natural', action='store_true', dest='use_natural_keys', default=False,
             help='Use natural keys if they are available.'),
         make_option('--natural-foreign', action='store_true', dest='use_natural_foreign_keys', default=False,
@@ -27,15 +29,17 @@ class Command(BaseCommand):
         make_option('--natural-primary', action='store_true', dest='use_natural_primary_keys', default=False,
             help='Use natural primary keys if they are available.'),
         make_option('-a', '--all', action='store_true', dest='use_base_manager', default=False,
-            help="Use Django's base manager to dump all models stored in the database, including those that would otherwise be filtered or modified by a custom manager."),
-        make_option('--pks', dest='primary_keys', help="Only dump objects with "
-            "given primary keys. Accepts a comma separated list of keys. "
-            "This option will only work when you specify one model."),
+            help="Use Django's base manager to dump all models stored in the database, "
+                 "including those that would otherwise be filtered or modified by a custom manager."),
+        make_option('--pks', dest='primary_keys',
+            help="Only dump objects with given primary keys. "
+                 "Accepts a comma separated list of keys. "
+                 "This option will only work when you specify one model."),
     )
     help = ("Output the contents of the database as a fixture of the given "
             "format (using each model's default manager unless --all is "
             "specified).")
-    args = '[appname appname.ModelName ...]'
+    args = '[app_label app_label.ModelName ...]'
 
     def handle(self, *app_labels, **options):
         format = options.get('format')

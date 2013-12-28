@@ -22,7 +22,7 @@ class MigrationExecutor(object):
         plan = []
         applied = set(self.loader.applied_migrations)
         for target in targets:
-            # If the target is (appname, None), that means unmigrate everything
+            # If the target is (app_label, None), that means unmigrate everything
             if target[1] is None:
                 for root in self.loader.graph.root_nodes():
                     if root[0] == target[0]:

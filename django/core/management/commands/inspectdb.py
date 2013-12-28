@@ -45,7 +45,7 @@ class Command(NoArgsCommand):
         yield "#   * Remove `managed = False` lines for those models you wish to give write DB access"
         yield "# Feel free to rename the models, but don't rename db_table values or field names."
         yield "#"
-        yield "# Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'"
+        yield "# Also note: You'll have to insert the output of 'django-admin.py sqlcustom [app_label]'"
         yield "# into your database."
         yield "from __future__ import unicode_literals"
         yield ''

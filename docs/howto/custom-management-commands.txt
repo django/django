@@ -199,8 +199,8 @@ All attributes can be set in your derived class and can be used in
 
   A string listing the arguments accepted by the command,
   suitable for use in help messages; e.g., a command which takes
-  a list of application names might set this to '<appname
-  appname ...>'.
+  a list of application names might set this to '<app_label
+  app_label ...>'.
 
 .. attribute:: BaseCommand.can_import_settings
 

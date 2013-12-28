@@ -1435,13 +1435,13 @@ class CommandTypes(AdminScriptTestCase):
         self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.contenttypes, options=")
         self.assertOutput(out, str_prefix(", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
 
-    def test_app_command_invalid_appname(self):
+    def test_app_command_invalid_app_label(self):
         "User AppCommands can execute when a single app name is provided"
         args = ['app_command', 'NOT_AN_APP']
         out, err = self.run_manage(args)
         self.assertOutput(err, "No installed app with label 'NOT_AN_APP'.")
 
-    def test_app_command_some_invalid_appnames(self):
+    def test_app_command_some_invalid_app_labels(self):
         "User AppCommands can execute when some of the provided app names are invalid"
         args = ['app_command', 'auth', 'NOT_AN_APP']
         out, err = self.run_manage(args)

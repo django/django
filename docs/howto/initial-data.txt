@@ -150,13 +150,13 @@ Database-backend-specific SQL data
 There's also a hook for backend-specific SQL data. For example, you
 can have separate initial-data files for PostgreSQL and SQLite. For
 each app, Django looks for a file called
-``<appname>/sql/<modelname>.<backend>.sql``, where ``<appname>`` is
+``<app_label>/sql/<modelname>.<backend>.sql``, where ``<app_label>`` is
 your app directory, ``<modelname>`` is the model's name in lowercase
 and ``<backend>`` is the last part of the module name provided for the
 :setting:`ENGINE <DATABASE-ENGINE>` in your settings file (e.g., if you have
 defined a database with an :setting:`ENGINE <DATABASE-ENGINE>` value of
 ``django.db.backends.sqlite3``, Django will look for
-``<appname>/sql/<modelname>.sqlite3.sql``).
+``<app_label>/sql/<modelname>.sqlite3.sql``).
 
 Backend-specific SQL data is executed before non-backend-specific SQL
 data. For example, if your app contains the files ``sql/person.sql``

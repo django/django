@@ -31,7 +31,7 @@ class Command(BaseCommand):
 
         # Resolve command-line arguments into a migration
         if len(args) != 2:
-            raise CommandError("Wrong number of arguments (expecting 'sqlmigrate appname migrationname')")
+            raise CommandError("Wrong number of arguments (expecting 'sqlmigrate app_label migrationname')")
         else:
             app_label, migration_name = args
             if app_label not in executor.loader.migrated_apps:

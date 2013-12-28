@@ -264,7 +264,7 @@ If your app already has models and database tables, and doesn't have migrations
 yet (for example, you created it against a previous Django version), you'll
 need to convert it to use migrations; this is a simple process::
 
-    $ python manage.py makemigrations yourappname
+    $ python manage.py makemigrations your_app_label
 
 This will make a new initial migration for your app. Now, when you run
 :djadmin:`migrate`, Django will detect that you have an initial migration

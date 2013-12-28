@@ -183,8 +183,8 @@ if they have Django's default value. Such settings are prefixed by ``"###"``.
 
     The :djadminopt:`--all` option was added.
 
-dumpdata <appname appname appname.Model ...>
---------------------------------------------
+dumpdata <app_label app_label app_label.Model ...>
+--------------------------------------------------
 
 .. django-admin:: dumpdata
 
@@ -217,10 +217,10 @@ easy for humans to read, so you can use the ``--indent`` option to
 pretty-print the output with a number of indentation spaces.
 
 The :djadminopt:`--exclude` option may be provided to prevent specific
-applications or models (specified as in the form of ``appname.ModelName``) from
-being dumped. If you specify a model name to ``dumpdata``, the dumped output
-will be restricted to that model, rather than the entire application. You can
-also mix application names and model names.
+applications or models (specified as in the form of ``app_label.ModelName``)
+from being dumped. If you specify a model name to ``dumpdata``, the dumped
+output will be restricted to that model, rather than the entire application.
+You can also mix application names and model names.
 
 The :djadminopt:`--database` option can be used to specify the database
 from which data will be dumped.
@@ -398,7 +398,7 @@ directories will be included in the search path. For example::
 
     django-admin.py loaddata foo/bar/mydata.json
 
-would search ``<appname>/fixtures/foo/bar/mydata.json`` for each installed
+would search ``<app_label>/fixtures/foo/bar/mydata.json`` for each installed
 application,  ``<dirname>/foo/bar/mydata.json`` for each directory in
 :setting:`FIXTURE_DIRS`, and the literal path ``foo/bar/mydata.json``.
 
@@ -587,8 +587,8 @@ Use the ``--keep-pot`` option to prevent Django from deleting the temporary
 .pot files it generates before creating the .po file. This is useful for
 debugging errors which may prevent the final language files from being created.
 
-makemigrations [<appname>]
---------------------------
+makemigrations [<app_label>]
+----------------------------
 
 .. django-admin:: makemigrations
 
@@ -610,8 +610,8 @@ for advanced users and should not be used unless you are familiar with
 the migration format, migration operations, and the dependencies between
 your migrations.
 
-migrate [<appname> [<migrationname>]]
--------------------------------------
+migrate [<app_label> [<migrationname>]]
+---------------------------------------
 
 .. django-admin:: migrate
 
@@ -625,10 +625,10 @@ The behavior of this command changes depending on the arguments provided:
 
 * No arguments: All migrated apps have all of their migrations run,
   and all unmigrated apps are synchronized with the database,
-* ``<appname>``: The specified app has its migrations run, up to the most
+* ``<app_label>``: The specified app has its migrations run, up to the most
   recent migration. This may involve running other apps' migrations too, due
   to dependencies.
-* ``<appname> <migrationname>``: Brings the database schema to a state where it
+* ``<app_label> <migrationname>``: Brings the database schema to a state where it
   would have just run the given migration, but no further - this may involve
   unapplying migrations if you have previously migrated past the named
   migration. Use the name `zero` to unapply all migrations for an app.
@@ -942,8 +942,8 @@ behavior you can use the ``--no-startup`` option. e.g.::
 
     The ``--no-startup`` option was added in Django 1.6.
 
-sql <appname appname ...>
--------------------------
+sql <app_label app_label ...>
+-----------------------------
 
 .. django-admin:: sql
 
@@ -952,8 +952,8 @@ Prints the CREATE TABLE SQL statements for the given app name(s).
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-sqlall <appname appname ...>
-----------------------------
+sqlall <app_label app_label ...>
+--------------------------------
 
 .. django-admin:: sqlall
 
@@ -965,8 +965,8 @@ specify initial data.
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-sqlclear <appname appname ...>
-------------------------------
+sqlclear <app_label app_label ...>
+----------------------------------
 
 .. django-admin:: sqlclear
 
@@ -975,19 +975,19 @@ Prints the DROP TABLE SQL statements for the given app name(s).
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-sqlcustom <appname appname ...>
--------------------------------
+sqlcustom <app_label app_label ...>
+-----------------------------------
 
 .. django-admin:: sqlcustom
 
 Prints the custom SQL statements for the given app name(s).
 
 For each model in each specified app, this command looks for the file
-``<appname>/sql/<modelname>.sql``, where ``<appname>`` is the given app name and
-``<modelname>`` is the model's name in lowercase. For example, if you have an
-app ``news`` that includes a ``Story`` model, ``sqlcustom`` will attempt
-to read a file ``news/sql/story.sql`` and append it to the output of this
-command.
+``<app_label>/sql/<modelname>.sql``, where ``<app_label>`` is the given app
+name and ``<modelname>`` is the model's name in lowercase. For example, if you
+have an app ``news`` that includes a ``Story`` model, ``sqlcustom`` will
+attempt to read a file ``news/sql/story.sql`` and append it to the output of
+this command.
 
 Each of the SQL files, if given, is expected to contain valid SQL. The SQL
 files are piped directly into the database after all of the models'
@@ -999,8 +999,8 @@ Note that the order in which the SQL files are processed is undefined.
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-sqldropindexes <appname appname ...>
-------------------------------------
+sqldropindexes <app_label app_label ...>
+----------------------------------------
 
 .. django-admin:: sqldropindexes
 
@@ -1022,8 +1022,8 @@ command.
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-sqlindexes <appname appname ...>
---------------------------------
+sqlindexes <app_label app_label ...>
+------------------------------------
 
 .. django-admin:: sqlindexes
 
@@ -1032,8 +1032,8 @@ Prints the CREATE INDEX SQL statements for the given app name(s).
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-sqlmigrate <appname> <migrationname>
-------------------------------------
+sqlmigrate <app_label> <migrationname>
+--------------------------------------
 
 .. django-admin:: sqlmigrate
 
@@ -1050,8 +1050,8 @@ By default, the SQL created is for running the migration in the forwards
 direction. Pass ``--backwards`` to generate the SQL for
 un-applying the migration instead.
 
-sqlsequencereset <appname appname ...>
---------------------------------------
+sqlsequencereset <app_label app_label ...>
+------------------------------------------
 
 .. django-admin:: sqlsequencereset
 
@@ -1066,8 +1066,8 @@ of sync with its automatically incremented field data.
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-startapp <appname> [destination]
---------------------------------
+startapp <app_label> [destination]
+----------------------------------
 
 .. django-admin:: startapp
 
