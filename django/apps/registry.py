@@ -27,9 +27,8 @@ class Apps(object):
         if master and hasattr(sys.modules[__name__], 'apps'):
             raise RuntimeError("You may create only one master registry.")
 
-        # When master is set to False, the registry isn't populated from
-        # INSTALLED_APPS and ignores the only_installed arguments to
-        # get_model[s].
+        # When master is set to False, the registry ignores the only_installed
+        # arguments to get_model[s].
         self.master = master
 
         # Mapping of app labels => model names => model classes. Every time a
@@ -48,9 +47,9 @@ class Apps(object):
         # set_available_apps and set_installed_apps.
         self.stored_app_configs = []
 
-        # Internal flags used when populating the master registry.
-        self._apps_loaded = not self.master
-        self._models_loaded = not self.master
+        # Internal flags used when populating the registry.
+        self._apps_loaded = False
+        self._models_loaded = False
 
         # Pending lookups for lazy relations.
         self._pending_lookups = {}
@@ -82,8 +81,11 @@ class Apps(object):
             # Therefore we simply import them sequentially.
             if installed_apps is None:
                 installed_apps = settings.INSTALLED_APPS
-            for app_name in installed_apps:
-                app_config = AppConfig.create(app_name)
+            for entry in installed_apps:
+                if isinstance(entry, AppConfig):
+                    app_config = entry
+                else:
+                    app_config = AppConfig.create(entry)
                 self.app_configs[app_config.label] = app_config
 
             self.get_models.cache_clear()

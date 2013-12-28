@@ -1,3 +1,4 @@
+from django.apps import AppConfig
 from django.apps.registry import Apps
 from django.db import models
 from django.db.models.options import DEFAULT_NAMES, normalize_unique_together
@@ -33,6 +34,11 @@ class ProjectState(object):
         "Turns the project state into actual models in a new Apps"
         if self.apps is None:
             self.apps = Apps()
+            # Populate the app registry with a stub for each application.
+            app_labels = set(model_state.app_label for model_state in self.models.values())
+            app_configs = [AppConfigStub(label) for label in sorted(app_labels)]
+            self.apps.populate_apps(app_configs)
+            self.apps.populate_models()
             # We keep trying to render the models in a loop, ignoring invalid
             # base errors, until the size of the unrendered models doesn't
             # decrease by at least one, meaning there's a base dependency loop/
@@ -66,6 +72,19 @@ class ProjectState(object):
 
     def __ne__(self, other):
         return not (self == other)
+
+
+class AppConfigStub(AppConfig):
+    """
+    Stubs a Django AppConfig. Only provides a label and a dict of models.
+    """
+    def __init__(self, label):
+        self.label = label
+        self.path = None
+        super(AppConfigStub, self).__init__(None, None)
+
+    def import_models(self, all_models):
+        self.models = all_models
 
 
 class ModelState(object):

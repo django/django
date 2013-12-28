@@ -53,7 +53,7 @@ class AppConfig(object):
         self.models = None
 
     def __repr__(self):
-        return '<AppConfig: %s>' % self.label
+        return '<%s: %s>' % (self.__class__.__name__, self.label)
 
     @classmethod
     def create(cls, entry):

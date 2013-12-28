@@ -50,8 +50,10 @@ class AppsTests(TestCase):
         Tests the ready property of a registry other than the master.
         """
         apps = Apps()
-        # Currently, non-master app registries are artificially considered
-        # ready regardless of whether populate_models() has run.
+        self.assertFalse(apps.ready)
+        apps.populate_apps([])
+        self.assertFalse(apps.ready)
+        apps.populate_models()
         self.assertTrue(apps.ready)
 
     def test_bad_app_config(self):
