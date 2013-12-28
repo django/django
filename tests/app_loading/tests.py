@@ -75,12 +75,6 @@ class GetModelsTest(TestCase):
         self.assertEqual(
             apps.get_model("not_installed", "NotInstalledModel"), None)
 
-    def test_get_model_with_not_installed(self):
-        self.assertEqual(
-            apps.get_model(
-                "not_installed", "NotInstalledModel", only_installed=False),
-            self.not_installed_module.NotInstalledModel)
-
     def test_get_models_only_returns_installed_models(self):
         self.assertNotIn(
             "NotInstalledModel",
