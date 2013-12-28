@@ -200,7 +200,10 @@ class WhereNode(tree.Node):
 
         if hasattr(params, 'as_sql'):
             extra, params = params.as_sql(qn, connection)
-            cast_sql = ''
+            if lookup_type in connection.operators:
+                cast_sql, extra = extra, ''
+            else:
+                cast_sql = ''
         else:
             extra = ''
 
