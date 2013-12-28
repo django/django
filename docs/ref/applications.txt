@@ -153,6 +153,15 @@ Read-only attributes
 
     It may be ``None`` if the application doesn't contain a ``models`` module.
 
+Methods
+-------
+
+.. method:: AppConfig.get_model(model_name)
+
+    Returns the :class:`~django.db.models.Model` with the given
+    ``model_name``. Raises :exc:`~exceptions.LookupError` if no such model
+    exists. ``model_name`` is case-insensitive.
+
 Application registry
 ====================
 
@@ -189,3 +198,9 @@ Application registry
     Unlike :meth:`~django.apps.apps.get_app_config`, this method can be called
     safely at import time. If the registry is still being populated, it may
     return ``False``, even though the app will become available later.
+
+.. method:: apps.get_model(app_label, model_name)
+
+    Returns the :class:`~django.db.models.Model` with the given ``app_label``
+    and ``model_name``. Returns ``None`` if no such application or model
+    exists. ``model_name`` is case-insensitive.

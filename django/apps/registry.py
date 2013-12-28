@@ -185,7 +185,7 @@ class Apps(object):
         if app_config is None:
             raise LookupError("No installed app with label '%s'." % app_label)
         if only_with_models_module and app_config.models_module is None:
-            raise LookupError("App with label '%s' doesn't have a models module." % app_label)
+            raise LookupError("App '%s' doesn't have a models module." % app_label)
         return app_config
 
     # This method is performance-critical at least for Django's test suite.
@@ -242,21 +242,20 @@ class Apps(object):
             )
         return model_list
 
-    def get_model(self, app_label, model_name, only_installed=True):
+    def get_model(self, app_label, model_name):
         """
-        Returns the model matching the given app_label and case-insensitive
-        model_name.
+        Returns the model matching the given app_label and model_name.
 
-        Returns None if no model is found.
+        model_name is case-insensitive.
+
+        Returns None if no application exists with this label, or no model
+        exists with this name in the application.
         """
-        if not self.master:
-            only_installed = False
         self.populate_models()
-        if only_installed:
-            app_config = self.app_configs.get(app_label)
-            if app_config is None:
-                return None
-        return self.all_models[app_label].get(model_name.lower())
+        try:
+            return self.get_app_config(app_label).get_model(model_name.lower())
+        except LookupError:
+            return None
 
     def register_model(self, app_label, model):
         # Since this method is called when models are imported, it cannot
@@ -286,10 +285,11 @@ class Apps(object):
 
     def get_registered_model(self, app_label, model_name):
         """
-        Returns the model class if one is registered and None otherwise.
+        Similar to get_model(), but doesn't require that an app exists with
+        the given app_label.
 
         It's safe to call this method at import time, even while the registry
-        is being populated. It returns False for models that aren't loaded yet.
+        is being populated. It returns None for models that aren't loaded yet.
         """
         return self.all_models[app_label].get(model_name.lower())
 
