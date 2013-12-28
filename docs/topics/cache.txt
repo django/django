@@ -1054,10 +1054,10 @@ produces different content based on some difference in request headers -- such
 as a cookie, or a language, or a user-agent -- you'll need to use the ``Vary``
 header to tell caching mechanisms that the page output depends on those things.
 
-    .. versionchanged:: 1.7
+.. versionchanged:: 1.7
 
-        Cache keys use the request's fully-qualified URL rather than path
-        and query string.
+    Cache keys use the request's fully-qualified URL rather than just the path
+    and query string.
 
 To do this in Django, use the convenient
 :func:`django.views.decorators.vary.vary_on_headers` view decorator, like so::
