@@ -53,7 +53,7 @@ class AppConfig(object):
         self.models = None
 
     def __repr__(self):
-        return '<AppConfig: %s>' % self.label
+        return '<%s: %s>' % (self.__class__.__name__, self.label)
 
     @classmethod
     def create(cls, entry):
@@ -108,6 +108,23 @@ class AppConfig(object):
         else:
             # Entry is a path to an app module.
             return cls(entry, module)
+
+    def get_model(self, model_name):
+        """
+        Returns the model with the given case-insensitive model_name.
+
+        Raises LookupError if no model exists with this name.
+
+        This method assumes that apps.populate_models() has run.
+        """
+        if self.models is None:
+            raise LookupError(
+                "App '%s' doesn't have any models." % self.label)
+        try:
+            return self.models[model_name.lower()]
+        except KeyError:
+            raise LookupError(
+                "App '%s' doesn't have a '%s' model." % (self.label, model_name))
 
     def import_models(self, all_models):
         # Dictionary of models for this app, primarily maintained in the

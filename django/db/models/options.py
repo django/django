@@ -514,7 +514,7 @@ class Options(object):
                     cache[obj] = model
         # Collect also objects which are in relation to some proxy child/parent of self.
         proxy_cache = cache.copy()
-        for klass in self.apps.get_models(include_auto_created=True, only_installed=False):
+        for klass in self.apps.get_models(include_auto_created=True):
             if not klass._meta.swapped:
                 for f in klass._meta.local_fields:
                     if f.rel and not isinstance(f.rel.to, six.string_types) and f.generate_reverse_relation:
@@ -557,7 +557,7 @@ class Options(object):
                     cache[obj] = parent
                 else:
                     cache[obj] = model
-        for klass in self.apps.get_models(only_installed=False):
+        for klass in self.apps.get_models():
             if not klass._meta.swapped:
                 for f in klass._meta.local_many_to_many:
                     if (f.rel

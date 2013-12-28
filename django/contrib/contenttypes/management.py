@@ -12,7 +12,9 @@ def update_contenttypes(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, *
     Creates content types for models in the given app, removing any model
     entries that no longer have a matching model class.
     """
-    if apps.get_model('contenttypes', 'ContentType') is None:
+    try:
+        apps.get_model('contenttypes', 'ContentType')
+    except LookupError:
         return
 
     if not router.allow_migrate(db, ContentType):

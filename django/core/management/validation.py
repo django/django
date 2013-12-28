@@ -42,7 +42,9 @@ def get_validation_errors(outfile, app=None):
             except ValueError:
                 e.add(opts, "%s is not of the form 'app_label.app_name'." % opts.swappable)
                 continue
-            if not apps.get_model(app_label, model_name):
+            try:
+                apps.get_model(app_label, model_name)
+            except LookupError:
                 e.add(opts, "Model has been swapped out for '%s' which has not been installed or is abstract." % opts.swapped)
             # No need to perform any other validation checks on a swapped model.
             continue

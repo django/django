@@ -27,11 +27,6 @@ class Apps(object):
         if master and hasattr(sys.modules[__name__], 'apps'):
             raise RuntimeError("You may create only one master registry.")
 
-        # When master is set to False, the registry isn't populated from
-        # INSTALLED_APPS and ignores the only_installed arguments to
-        # get_model[s].
-        self.master = master
-
         # Mapping of app labels => model names => model classes. Every time a
         # model is imported, ModelBase.__new__ calls apps.register_model which
         # creates an entry in all_models. All imported models are registered,
@@ -48,9 +43,9 @@ class Apps(object):
         # set_available_apps and set_installed_apps.
         self.stored_app_configs = []
 
-        # Internal flags used when populating the master registry.
-        self._apps_loaded = not self.master
-        self._models_loaded = not self.master
+        # Internal flags used when populating the registry.
+        self._apps_loaded = False
+        self._models_loaded = False
 
         # Pending lookups for lazy relations.
         self._pending_lookups = {}
@@ -82,8 +77,11 @@ class Apps(object):
             # Therefore we simply import them sequentially.
             if installed_apps is None:
                 installed_apps = settings.INSTALLED_APPS
-            for app_name in installed_apps:
-                app_config = AppConfig.create(app_name)
+            for entry in installed_apps:
+                if isinstance(entry, AppConfig):
+                    app_config = entry
+                else:
+                    app_config = AppConfig.create(entry)
                 self.app_configs[app_config.label] = app_config
 
             self.get_models.cache_clear()
@@ -183,14 +181,13 @@ class Apps(object):
         if app_config is None:
             raise LookupError("No installed app with label '%s'." % app_label)
         if only_with_models_module and app_config.models_module is None:
-            raise LookupError("App with label '%s' doesn't have a models module." % app_label)
+            raise LookupError("App '%s' doesn't have a models module." % app_label)
         return app_config
 
     # This method is performance-critical at least for Django's test suite.
     @lru_cache.lru_cache(maxsize=None)
-    def get_models(self, app_mod=None,
-                   include_auto_created=False, include_deferred=False,
-                   only_installed=True, include_swapped=False):
+    def get_models(self, app_mod=None, include_auto_created=False,
+                   include_deferred=False, include_swapped=False):
         """
         Given a module containing models, returns a list of the models.
         Otherwise returns a list of all installed models.
@@ -203,33 +200,20 @@ class Apps(object):
         queries are *not* included in the list of models. However, if
         you specify include_deferred, they will be.
 
-        By default, models that aren't part of installed apps will *not*
-        be included in the list of models. However, if you specify
-        only_installed=False, they will be. If you're using a non-default
-        Apps, this argument does nothing - all models will be included.
-
         By default, models that have been swapped out will *not* be
         included in the list of models. However, if you specify
         include_swapped, they will be.
         """
-        if not self.master:
-            only_installed = False
         model_list = None
         self.populate_models()
         if app_mod:
             app_label = app_mod.__name__.split('.')[-2]
-            if only_installed:
-                try:
-                    model_dicts = [self.app_configs[app_label].models]
-                except KeyError:
-                    model_dicts = []
-            else:
-                model_dicts = [self.all_models[app_label]]
+            try:
+                model_dicts = [self.app_configs[app_label].models]
+            except KeyError:
+                model_dicts = []
         else:
-            if only_installed:
-                model_dicts = [app_config.models for app_config in self.app_configs.values()]
-            else:
-                model_dicts = self.all_models.values()
+            model_dicts = [app_config.models for app_config in self.app_configs.values()]
         model_list = []
         for model_dict in model_dicts:
             model_list.extend(
@@ -240,21 +224,17 @@ class Apps(object):
             )
         return model_list
 
-    def get_model(self, app_label, model_name, only_installed=True):
+    def get_model(self, app_label, model_name):
         """
-        Returns the model matching the given app_label and case-insensitive
-        model_name.
+        Returns the model matching the given app_label and model_name.
 
-        Returns None if no model is found.
+        model_name is case-insensitive.
+
+        Raises LookupError if no application exists with this label, or no
+        model exists with this name in the application.
         """
-        if not self.master:
-            only_installed = False
         self.populate_models()
-        if only_installed:
-            app_config = self.app_configs.get(app_label)
-            if app_config is None:
-                return None
-        return self.all_models[app_label].get(model_name.lower())
+        return self.get_app_config(app_label).get_model(model_name.lower())
 
     def register_model(self, app_label, model):
         # Since this method is called when models are imported, it cannot
@@ -284,12 +264,17 @@ class Apps(object):
 
     def get_registered_model(self, app_label, model_name):
         """
-        Returns the model class if one is registered and None otherwise.
+        Similar to get_model(), but doesn't require that an app exists with
+        the given app_label.
 
         It's safe to call this method at import time, even while the registry
-        is being populated. It returns False for models that aren't loaded yet.
+        is being populated.
         """
-        return self.all_models[app_label].get(model_name.lower())
+        model = self.all_models[app_label].get(model_name.lower())
+        if model is None:
+            raise LookupError(
+                "Model '%s.%s' not registered." % (app_label, model_name))
+        return model
 
     def set_available_apps(self, available):
         """

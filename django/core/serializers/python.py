@@ -156,8 +156,6 @@ def _get_model(model_identifier):
     """
     try:
         Model = apps.get_model(*model_identifier.split("."))
-    except TypeError:
-        Model = None
-    if Model is None:
+    except (LookupError, TypeError):
         raise base.DeserializationError("Invalid model identifier: '%s'" % model_identifier)
     return Model

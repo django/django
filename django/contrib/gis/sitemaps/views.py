@@ -81,8 +81,9 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
     must be that of a geographic field.
     """
     placemarks = []
-    klass = apps.get_model(label, model)
-    if not klass:
+    try:
+        klass = apps.get_model(label, model)
+    except LookupError:
         raise Http404('You must supply a valid app label and module name.  Got "%s.%s"' % (label, model))
 
     if field_name:

@@ -151,9 +151,10 @@ class ModelBase(type):
                 new_class._base_manager = new_class._base_manager._copy_to_model(new_class)
 
         # Bail out early if we have already created this class.
-        m = new_class._meta.apps.get_registered_model(new_class._meta.app_label, name)
-        if m is not None:
-            return m
+        try:
+            return new_class._meta.apps.get_registered_model(new_class._meta.app_label, name)
+        except LookupError:
+            pass
 
         # Add all attributes to the class.
         for obj_name, obj in attrs.items():

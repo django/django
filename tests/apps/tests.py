@@ -50,8 +50,10 @@ class AppsTests(TestCase):
         Tests the ready property of a registry other than the master.
         """
         apps = Apps()
-        # Currently, non-master app registries are artificially considered
-        # ready regardless of whether populate_models() has run.
+        self.assertFalse(apps.ready)
+        apps.populate_apps([])
+        self.assertFalse(apps.ready)
+        apps.populate_models()
         self.assertTrue(apps.ready)
 
     def test_bad_app_config(self):
@@ -146,9 +148,11 @@ class AppsTests(TestCase):
         Tests that the models in the models.py file were loaded correctly.
         """
         self.assertEqual(apps.get_model("apps", "TotallyNormal"), TotallyNormal)
-        self.assertEqual(apps.get_model("apps", "SoAlternative"), None)
+        with self.assertRaises(LookupError):
+            apps.get_model("apps", "SoAlternative")
 
-        self.assertEqual(new_apps.get_model("apps", "TotallyNormal"), None)
+        with self.assertRaises(LookupError):
+            new_apps.get_model("apps", "TotallyNormal")
         self.assertEqual(new_apps.get_model("apps", "SoAlternative"), SoAlternative)
 
     def test_dynamic_load(self):
@@ -172,4 +176,6 @@ class AppsTests(TestCase):
             old_models,
             apps.get_models(apps.get_app_config("apps").models_module),
         )
+        with self.assertRaises(LookupError):
+            apps.get_model("apps", "SouthPonies")
         self.assertEqual(new_apps.get_model("apps", "SouthPonies"), temp_model)

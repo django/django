@@ -68,13 +68,14 @@ def add_lazy_relation(cls, field, relation, operation):
     # string right away. If get_model returns None, it means that the related
     # model isn't loaded yet, so we need to pend the relation until the class
     # is prepared.
-    model = cls._meta.apps.get_registered_model(app_label, model_name)
-    if model:
-        operation(field, model, cls)
-    else:
+    try:
+        model = cls._meta.apps.get_registered_model(app_label, model_name)
+    except LookupError:
         key = (app_label, model_name)
         value = (cls, field, operation)
         cls._meta.apps._pending_lookups.setdefault(key, []).append(value)
+    else:
+        operation(field, model, cls)
 
 
 def do_pending_lookups(sender, **kwargs):
