@@ -211,6 +211,13 @@ def emit_pre_migrate_signal(create_models, verbosity, interactive, db):
         if verbosity >= 2:
             print("Running pre-migrate handlers for application %s" % app_config.label)
         models.signals.pre_migrate.send(
+            sender=app_config,
+            app_config=app_config,
+            verbosity=verbosity,
+            interactive=interactive,
+            db=db)
+        # For backwards-compatibility -- remove in Django 1.9.
+        models.signals.pre_syncdb.send(
             sender=app_config.models_module,
             app=app_config.models_module,
             create_models=create_models,
@@ -225,6 +232,13 @@ def emit_post_migrate_signal(created_models, verbosity, interactive, db):
         if verbosity >= 2:
             print("Running post-migrate handlers for application %s" % app_config.label)
         models.signals.post_migrate.send(
+            sender=app_config,
+            app_config=app_config,
+            verbosity=verbosity,
+            interactive=interactive,
+            db=db)
+        # For backwards-compatibility -- remove in Django 1.9.
+        models.signals.post_syncdb.send(
             sender=app_config.models_module,
             app=app_config.models_module,
             created_models=created_models,
