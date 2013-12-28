@@ -27,10 +27,6 @@ class Apps(object):
         if master and hasattr(sys.modules[__name__], 'apps'):
             raise RuntimeError("You may create only one master registry.")
 
-        # When master is set to False, the registry ignores the only_installed
-        # arguments to get_model[s].
-        self.master = master
-
         # Mapping of app labels => model names => model classes. Every time a
         # model is imported, ModelBase.__new__ calls apps.register_model which
         # creates an entry in all_models. All imported models are registered,
@@ -190,9 +186,8 @@ class Apps(object):
 
     # This method is performance-critical at least for Django's test suite.
     @lru_cache.lru_cache(maxsize=None)
-    def get_models(self, app_mod=None,
-                   include_auto_created=False, include_deferred=False,
-                   only_installed=True, include_swapped=False):
+    def get_models(self, app_mod=None, include_auto_created=False,
+                   include_deferred=False, include_swapped=False):
         """
         Given a module containing models, returns a list of the models.
         Otherwise returns a list of all installed models.
@@ -205,33 +200,20 @@ class Apps(object):
         queries are *not* included in the list of models. However, if
         you specify include_deferred, they will be.
 
-        By default, models that aren't part of installed apps will *not*
-        be included in the list of models. However, if you specify
-        only_installed=False, they will be. If you're using a non-default
-        Apps, this argument does nothing - all models will be included.
-
         By default, models that have been swapped out will *not* be
         included in the list of models. However, if you specify
         include_swapped, they will be.
         """
-        if not self.master:
-            only_installed = False
         model_list = None
         self.populate_models()
         if app_mod:
             app_label = app_mod.__name__.split('.')[-2]
-            if only_installed:
-                try:
-                    model_dicts = [self.app_configs[app_label].models]
-                except KeyError:
-                    model_dicts = []
-            else:
-                model_dicts = [self.all_models[app_label]]
+            try:
+                model_dicts = [self.app_configs[app_label].models]
+            except KeyError:
+                model_dicts = []
         else:
-            if only_installed:
-                model_dicts = [app_config.models for app_config in self.app_configs.values()]
-            else:
-                model_dicts = self.all_models.values()
+            model_dicts = [app_config.models for app_config in self.app_configs.values()]
         model_list = []
         for model_dict in model_dicts:
             model_list.extend(

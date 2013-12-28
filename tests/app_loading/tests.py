@@ -82,16 +82,3 @@ class GetModelsTest(TestCase):
 
     def test_get_models_with_app_label_only_returns_installed_models(self):
         self.assertEqual(apps.get_models(self.not_installed_module), [])
-
-    def test_get_models_with_not_installed(self):
-        self.assertIn(
-            "NotInstalledModel",
-            [m.__name__ for m in apps.get_models(only_installed=False)])
-
-
-class NotInstalledModelsTest(TestCase):
-    def test_related_not_installed_model(self):
-        from .not_installed.models import NotInstalledModel
-        self.assertEqual(
-            set(NotInstalledModel._meta.get_all_field_names()),
-            set(["id", "relatedmodel", "m2mrelatedmodel"]))

@@ -593,6 +593,10 @@ methods are only referring to fields or other items in ``model._meta``.
 App-loading changes
 ~~~~~~~~~~~~~~~~~~~
 
+You should make sure that your project doesn't import models from applications
+that aren't in :setting:`INSTALLED_APPS`. Relations involving such models may
+not be created properly.
+
 Subclasses of :class:`~django.core.management.AppCommand` must now implement a
 :meth:`~django.core.management.AppCommand.handle_app_config` method instead of
 ``handle_app()``. This method receives an :class:`~django.apps.AppConfig` instance.
@@ -609,8 +613,8 @@ period. In addition, the following changes take effect immediately:
 * ``get_model`` raises :exc:`~exceptions.LookupError` instead of returning
   ``None`` when no model is found.
 
-* The ``only_installed`` and ``seed_cache`` arguments of ``get_model`` no
-  longer exist.
+* The ``only_installed`` argument of ``get_model`` and ``get_models`` no
+  longer exists, nor does the ``seed_cache`` argument of ``get_model``.
 
 While the new implementation is believed to be more robust, regressions cannot
 be ruled out, especially during the import sequence. Circular imports that
