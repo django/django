@@ -52,6 +52,7 @@ class BaseDatabaseSchemaEditor(object):
     sql_delete_unique = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
     sql_create_fk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
+    sql_create_inline_fk = None
     sql_delete_fk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s"
@@ -189,11 +190,6 @@ class BaseDatabaseSchemaEditor(object):
             col_type_suffix = field.db_type_suffix(connection=self.connection)
             if col_type_suffix:
                 definition += " %s" % col_type_suffix
-            # Add the SQL to our big list
-            column_sqls.append("%s %s" % (
-                self.quote_name(field.column),
-                definition,
-            ))
             params.extend(extra_params)
             # Indexes
             if field.db_index and not field.unique:
@@ -206,18 +202,29 @@ class BaseDatabaseSchemaEditor(object):
                     }
                 )
             # FK
-            if field.rel and self.connection.features.supports_foreign_keys:
+            if field.rel:
                 to_table = field.rel.to._meta.db_table
                 to_column = field.rel.to._meta.get_field(field.rel.field_name).column
-                self.deferred_sql.append(
-                    self.sql_create_fk % {
-                        "name": self._create_index_name(model, [field.column], suffix="_fk_%s_%s" % (to_table, to_column)),
-                        "table": self.quote_name(model._meta.db_table),
-                        "column": self.quote_name(field.column),
+                if self.connection.features.supports_foreign_keys:
+                    self.deferred_sql.append(
+                        self.sql_create_fk % {
+                            "name": self._create_index_name(model, [field.column], suffix="_fk_%s_%s" % (to_table, to_column)),
+                            "table": self.quote_name(model._meta.db_table),
+                            "column": self.quote_name(field.column),
+                            "to_table": self.quote_name(to_table),
+                            "to_column": self.quote_name(to_column),
+                        }
+                    )
+                elif self.sql_create_inline_fk:
+                    definition += " " + self.sql_create_inline_fk % {
                         "to_table": self.quote_name(to_table),
                         "to_column": self.quote_name(to_column),
                     }
-                )
+            # Add the SQL to our big list
+            column_sqls.append("%s %s" % (
+                self.quote_name(field.column),
+                definition,
+            ))
             # Autoincrement SQL (for backends with post table definition variant)
             if field.get_internal_type() == "AutoField":
                 autoinc_sql = self.connection.ops.autoinc_sql(model._meta.db_table, field.column)

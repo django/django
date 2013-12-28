@@ -6,6 +6,7 @@ from django.db.models.fields.related import ManyToManyField
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     sql_delete_table = "DROP TABLE %(table)s"
+    sql_create_inline_fk = "REFERENCES %(to_table)s (%(to_column)s)"
 
     def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[], rename_fields=[], override_uniques=None):
         """
