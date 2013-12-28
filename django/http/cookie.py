@@ -71,7 +71,7 @@ else:
 
 
 def parse_cookie(cookie):
-    if cookie == '':
+    if not cookie:
         return {}
     if not isinstance(cookie, http_cookies.BaseCookie):
         try:
