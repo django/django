@@ -148,9 +148,11 @@ class AppsTests(TestCase):
         Tests that the models in the models.py file were loaded correctly.
         """
         self.assertEqual(apps.get_model("apps", "TotallyNormal"), TotallyNormal)
-        self.assertEqual(apps.get_model("apps", "SoAlternative"), None)
+        with self.assertRaises(LookupError):
+            apps.get_model("apps", "SoAlternative")
 
-        self.assertEqual(new_apps.get_model("apps", "TotallyNormal"), None)
+        with self.assertRaises(LookupError):
+            new_apps.get_model("apps", "TotallyNormal")
         self.assertEqual(new_apps.get_model("apps", "SoAlternative"), SoAlternative)
 
     def test_dynamic_load(self):
@@ -174,4 +176,6 @@ class AppsTests(TestCase):
             old_models,
             apps.get_models(apps.get_app_config("apps").models_module),
         )
+        with self.assertRaises(LookupError):
+            apps.get_model("apps", "SouthPonies")
         self.assertEqual(new_apps.get_model("apps", "SouthPonies"), temp_model)

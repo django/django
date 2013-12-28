@@ -192,11 +192,12 @@ class ModelState(object):
             meta_contents["unique_together"] = list(meta_contents["unique_together"])
         meta = type("Meta", tuple(), meta_contents)
         # Then, work out our bases
-        bases = tuple(
-            (apps.get_model(*base.split(".", 1)) if isinstance(base, six.string_types) else base)
-            for base in self.bases
-        )
-        if None in bases:
+        try:
+            bases = tuple(
+                (apps.get_model(*base.split(".", 1)) if isinstance(base, six.string_types) else base)
+                for base in self.bases
+            )
+        except LookupError:
             raise InvalidBasesError("Cannot resolve one or more bases from %r" % (self.bases,))
         # Turn fields into a dict for the body, add other bits
         body = dict(self.fields)

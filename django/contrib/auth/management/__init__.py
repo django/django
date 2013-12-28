@@ -61,7 +61,9 @@ def _check_permission_clashing(custom, builtin, ctype):
 
 
 def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kwargs):
-    if apps.get_model('auth', 'Permission') is None:
+    try:
+        apps.get_model('auth', 'Permission')
+    except LookupError:
         return
 
     if not router.allow_migrate(db, auth_app.Permission):
@@ -117,7 +119,9 @@ def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kw
 
 
 def create_superuser(app, created_models, verbosity, db, **kwargs):
-    if apps.get_model('auth', 'Permission') is None:
+    try:
+        apps.get_model('auth', 'Permission')
+    except LookupError:
         return
 
     UserModel = get_user_model()

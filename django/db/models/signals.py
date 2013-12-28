@@ -39,8 +39,9 @@ class ModelSignal(Signal):
                     "Specified sender must either be a model or a "
                     "model name of the 'app_label.ModelName' form."
                 )
-            sender = apps.get_registered_model(app_label, model_name)
-            if sender is None:
+            try:
+                sender = apps.get_registered_model(app_label, model_name)
+            except LookupError:
                 ref = (app_label, model_name)
                 refs = self.unresolved_references.setdefault(ref, [])
                 refs.append((receiver, weak, dispatch_uid))

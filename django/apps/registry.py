@@ -248,14 +248,11 @@ class Apps(object):
 
         model_name is case-insensitive.
 
-        Returns None if no application exists with this label, or no model
-        exists with this name in the application.
+        Raises LookupError if no application exists with this label, or no
+        model exists with this name in the application.
         """
         self.populate_models()
-        try:
-            return self.get_app_config(app_label).get_model(model_name.lower())
-        except LookupError:
-            return None
+        return self.get_app_config(app_label).get_model(model_name.lower())
 
     def register_model(self, app_label, model):
         # Since this method is called when models are imported, it cannot
@@ -289,9 +286,13 @@ class Apps(object):
         the given app_label.
 
         It's safe to call this method at import time, even while the registry
-        is being populated. It returns None for models that aren't loaded yet.
+        is being populated.
         """
-        return self.all_models[app_label].get(model_name.lower())
+        model = self.all_models[app_label].get(model_name.lower())
+        if model is None:
+            raise LookupError(
+                "Model '%s.%s' not registered." % (app_label, model_name))
+        return model
 
     def set_available_apps(self, available):
         """

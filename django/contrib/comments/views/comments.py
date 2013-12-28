@@ -54,7 +54,7 @@ def post_comment(request, next=None, using=None):
     except TypeError:
         return CommentPostBadRequest(
             "Invalid content_type value: %r" % escape(ctype))
-    except AttributeError:
+    except LookupError:
         return CommentPostBadRequest(
             "The given content-type %r does not resolve to a valid model." % \
                 escape(ctype))

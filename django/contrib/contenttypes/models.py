@@ -157,7 +157,10 @@ class ContentType(models.Model):
 
     def model_class(self):
         "Returns the Python model class for this type of content."
-        return apps.get_model(self.app_label, self.model)
+        try:
+            return apps.get_model(self.app_label, self.model)
+        except LookupError:
+            return None
 
     def get_object_for_this_type(self, **kwargs):
         """
