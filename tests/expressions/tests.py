@@ -224,6 +224,13 @@ class ExpressionsTests(TestCase):
         acme.num_employees = F("num_employees") + 16
         self.assertRaises(TypeError, acme.save)
 
+    def test_ticket_11722_iexact_lookup(self):
+        Employee.objects.create(firstname="John", lastname="Doe")
+        Employee.objects.create(firstname="Test", lastname="test")
+
+        queryset = Employee.objects.filter(firstname__iexact=F('lastname'))
+        self.assertQuerysetEqual(queryset, ["<Employee: Test test>"])
+
     def test_ticket_18375_join_reuse(self):
         # Test that reverse multijoin F() references and the lookup target
         # the same join. Pre #18375 the F() join was generated first, and the
