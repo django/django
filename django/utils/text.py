@@ -29,6 +29,18 @@ re_newlines = re.compile(r'\r\n|\r')  # Used in normalize_newlines
 re_camel_case = re.compile(r'(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))')
 
 
+def word_capital(text):
+    """
+    Capitalizes the first character of each word, it converts a string into
+    titlecase by making words start with an uppercase character and keep the
+    remaining characters.
+    """
+    if text and len(text) > 0:
+        return ' '.join([s[0].upper() + s[1:] for s in text.split(' ') if len(s) > 0])
+    else:
+        return text
+
+
 def wrap(text, width):
     """
     A word-wrap function that preserves existing line breaks and most spaces in

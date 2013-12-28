@@ -16,7 +16,7 @@ from django.utils.html import (conditional_escape, escapejs, fix_ampersands,
     escape, urlize as _urlize, linebreaks, strip_tags, avoid_wrapping,
     remove_tags)
 from django.utils.http import urlquote
-from django.utils.text import Truncator, wrap, phone2numeric
+from django.utils.text import Truncator, wrap, phone2numeric, word_capital
 from django.utils.safestring import mark_safe, SafeData, mark_for_escaping
 from django.utils import six
 from django.utils.timesince import timesince, timeuntil
@@ -262,6 +262,15 @@ def title(value):
     """Converts a string into titlecase."""
     t = re.sub("([a-z])'([A-Z])", lambda m: m.group(0).lower(), value.title())
     return re.sub("\d([A-Z])", lambda m: m.group(0).lower(), t)
+
+
+@register.filter(is_safe=True)
+@stringfilter
+def wordcap(value):
+    """
+    Capitalizes the first character of each word.
+    """
+    return word_capital(value)
 
 
 @register.filter(is_safe=True)
