@@ -7,7 +7,6 @@ from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.utils import DNS_NAME
 from django.core.mail.message import sanitize_address
-from django.utils.encoding import force_bytes
 
 
 class EmailBackend(BaseEmailBackend):
@@ -107,11 +106,9 @@ class EmailBackend(BaseEmailBackend):
         recipients = [sanitize_address(addr, email_message.encoding)
                       for addr in email_message.recipients()]
         message = email_message.message()
-        charset = message.get_charset().get_output_charset() if message.get_charset() else 'utf-8'
         try:
-            self.connection.sendmail(from_email, recipients,
-                    force_bytes(message.as_string(), charset))
-        except:
+            self.connection.sendmail(from_email, recipients, message.as_bytes())
+        except smtplib.SMTPException:
             if not self.fail_silently:
                 raise
             return False
