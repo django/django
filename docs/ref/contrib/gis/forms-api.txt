@@ -156,6 +156,20 @@ Widget classes
     This is the default widget used by all GeoDjango form fields.
     ``template_name`` is ``gis/openlayers.html``.
 
+    ``OpenLayersWidget`` and :class:`OSMWidget` use the ``openlayers.js`` file
+    hosted on the ``openlayers.org`` Web site. This works for basic usage
+    during development, but isn't appropropriate for a production deployment as
+    ``openlayers.org/api/`` has no guaranteed uptime and runs on a slow server.
+    You are therefore advised to subclass these widgets in order to specify
+    your own version of the ``openlayers.js`` file in the ``js`` property of
+    the inner ``Media`` class (see :ref:`assets-as-a-static-definition`). You
+    can host a copy of ``openlayers.js``
+    `tailored to your needs`_ on your own server or refer to a copy from a
+    content-delivery network like http://cdnjs.com/. This will also allow
+    you to serve the JavaScript file(s) using the ``https`` protocol if needed.
+
+    .. _tailored to your needs: http://docs.openlayers.org/library/deploying.html
+
 ``OSMWidget``
 
 .. class:: OSMWidget
@@ -163,3 +177,9 @@ Widget classes
     This widget uses an OpenStreetMap base layer (Mapnik) to display geographic
     objects on.
     ``template_name`` is ``gis/openlayers-osm.html``.
+
+    The :class:`OpenLayersWidget` note about JavaScript file hosting above also
+    applies here. See also this `FAQ answer`_ about ``https`` access to map
+    tiles.
+
+    .. _FAQ answer: https://help.openstreetmap.org/questions/10920/how-to-embed-a-map-in-my-https-site
