@@ -578,6 +578,20 @@ Backwards incompatible changes in 1.7
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
+Cache keys are now generated from the request's absolute URL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Previous versions of Django generated cache keys using, among other attributes
+such as locale, a `Vary` header, or a specified `key_prefix`, a request's
+path and query string, but not the scheme or host. If one Django application
+was serving multiple subdomains or domains, cache keys could collide. In
+Django 1.7, cache keys therefore vary by the absolute URL of the request,
+including scheme, host, path, and query string. For example, the URL portion
+of a cache key is now generated from `http://www.example.com/path/to/?key=val`
+rather than `/path/to/?key=val`. Migration from 1.6 to 1.7 will make existing
+cache keys unreachable, and cause the first request to any previously-cached
+URL to be a cache miss.
+
 allow_syncdb/allow_migrate
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
