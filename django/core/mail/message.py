@@ -167,7 +167,14 @@ class SafeMIMEText(MIMEMixin, MIMEText):
             # We do it manually and trigger re-encoding of the payload.
             MIMEText.__init__(self, text, subtype, None)
             del self['Content-Transfer-Encoding']
-            self.set_payload(text, utf8_charset)
+            # Work around a bug in python 3.3.3 [sic], see
+            # http://bugs.python.org/issue19063 for details.
+            if sys.version_info[:3] == (3, 3, 3):
+                payload = text.encode(utf8_charset.output_charset)
+                self._payload = payload.decode('ascii', 'surrogateescape')
+                self.set_charset(utf8_charset)
+            else:
+                self.set_payload(text, utf8_charset)
             self.replace_header('Content-Type', 'text/%s; charset="%s"' % (subtype, charset))
         else:
             MIMEText.__init__(self, text, subtype, charset)
