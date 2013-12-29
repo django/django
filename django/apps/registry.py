@@ -344,7 +344,7 @@ class Apps(object):
 
         This is mostly used in tests.
         """
-        self.clear_cache()
+        self.get_models.cache_clear()
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
 
