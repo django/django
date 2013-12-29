@@ -23,5 +23,5 @@ class Command(AppCommand):
         if app_config.models_module is None:
             return
         connection = connections[options.get('database')]
-        statements = sql_indexes(app_config.models_module, self.style, connection)
+        statements = sql_indexes(app_config, self.style, connection)
         return '\n'.join(statements)

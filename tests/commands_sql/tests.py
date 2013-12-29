@@ -17,8 +17,8 @@ class SQLCommandsTestCase(TestCase):
         return len([o for o in output if o.startswith(cmd)])
 
     def test_sql_create(self):
-        app = apps.get_app_config('commands_sql').models_module
-        output = sql_create(app, no_style(), connections[DEFAULT_DB_ALIAS])
+        app_config = apps.get_app_config('commands_sql')
+        output = sql_create(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
         create_tables = [o for o in output if o.startswith('CREATE TABLE')]
         self.assertEqual(len(create_tables), 3)
         # Lower so that Oracle's upper case tbl names wont break
@@ -26,8 +26,8 @@ class SQLCommandsTestCase(TestCase):
         six.assertRegex(self, sql, r'^create table .commands_sql_book.*')
 
     def test_sql_delete(self):
-        app = apps.get_app_config('commands_sql').models_module
-        output = sql_delete(app, no_style(), connections[DEFAULT_DB_ALIAS])
+        app_config = apps.get_app_config('commands_sql')
+        output = sql_delete(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
         drop_tables = [o for o in output if o.startswith('DROP TABLE')]
         self.assertEqual(len(drop_tables), 3)
         # Lower so that Oracle's upper case tbl names wont break
@@ -35,20 +35,20 @@ class SQLCommandsTestCase(TestCase):
         six.assertRegex(self, sql, r'^drop table .commands_sql_comment.*')
 
     def test_sql_indexes(self):
-        app = apps.get_app_config('commands_sql').models_module
-        output = sql_indexes(app, no_style(), connections[DEFAULT_DB_ALIAS])
+        app_config = apps.get_app_config('commands_sql')
+        output = sql_indexes(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
         # PostgreSQL creates one additional index for CharField
         self.assertIn(self.count_ddl(output, 'CREATE INDEX'), [3, 4])
 
     def test_sql_destroy_indexes(self):
-        app = apps.get_app_config('commands_sql').models_module
-        output = sql_destroy_indexes(app, no_style(), connections[DEFAULT_DB_ALIAS])
+        app_config = apps.get_app_config('commands_sql')
+        output = sql_destroy_indexes(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
         # PostgreSQL creates one additional index for CharField
         self.assertIn(self.count_ddl(output, 'DROP INDEX'), [3, 4])
 
     def test_sql_all(self):
-        app = apps.get_app_config('commands_sql').models_module
-        output = sql_all(app, no_style(), connections[DEFAULT_DB_ALIAS])
+        app_config = apps.get_app_config('commands_sql')
+        output = sql_all(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
 
         self.assertEqual(self.count_ddl(output, 'CREATE TABLE'), 3)
         # PostgreSQL creates one additional index for CharField
@@ -69,8 +69,8 @@ class SQLCommandsRouterTestCase(TestCase):
         router.routers = self._old_routers
 
     def test_router_honored(self):
-        app = apps.get_app_config('commands_sql').models_module
+        app_config = apps.get_app_config('commands_sql')
         for sql_command in (sql_all, sql_create, sql_delete, sql_indexes, sql_destroy_indexes):
-            output = sql_command(app, no_style(), connections[DEFAULT_DB_ALIAS])
+            output = sql_command(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
             self.assertEqual(len(output), 0,
                 "%s command is not honoring routers" % sql_command.__name__)

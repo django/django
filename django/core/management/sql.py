@@ -11,7 +11,7 @@ from django.core.management.base import CommandError
 from django.db import models, router
 
 
-def sql_create(app, style, connection):
+def sql_create(app_config, style, connection):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
 
     if connection.settings_dict['ENGINE'] == 'django.db.backends.dummy':
@@ -25,13 +25,13 @@ def sql_create(app, style, connection):
     # We trim models from the current app so that the sqlreset command does not
     # generate invalid SQL (leaving models out of known_models is harmless, so
     # we can be conservative).
-    app_models = apps.get_models(app, include_auto_created=True)
+    app_models = app_config.get_models(include_auto_created=True)
     final_output = []
     tables = connection.introspection.table_names()
     known_models = set(model for model in connection.introspection.installed_models(tables) if model not in app_models)
     pending_references = {}
 
-    for model in router.get_migratable_models(app, connection.alias, include_auto_created=True):
+    for model in router.get_migratable_models(app_config.models_module, connection.alias, include_auto_created=True):
         output, references = connection.creation.sql_create_model(model, style, known_models)
         final_output.extend(output)
         for refto, refs in references.items():
@@ -57,7 +57,7 @@ def sql_create(app, style, connection):
     return final_output
 
 
-def sql_delete(app, style, connection):
+def sql_delete(app_config, style, connection):
     "Returns a list of the DROP TABLE SQL statements for the given app."
 
     # This should work even if a connection isn't available
@@ -78,7 +78,7 @@ def sql_delete(app, style, connection):
     to_delete = set()
 
     references_to_delete = {}
-    app_models = router.get_migratable_models(app, connection.alias, include_auto_created=True)
+    app_models = router.get_migratable_models(app_config.models_module, connection.alias, include_auto_created=True)
     for model in app_models:
         if cursor and connection.introspection.table_name_converter(model._meta.db_table) in table_names:
             # The table exists, so it needs to be dropped
@@ -118,11 +118,11 @@ def sql_flush(style, connection, only_django=False, reset_sequences=True, allow_
     return statements
 
 
-def sql_custom(app, style, connection):
+def sql_custom(app_config, style, connection):
     "Returns a list of the custom table modifying SQL statements for the given app."
     output = []
 
-    app_models = router.get_migratable_models(app, connection.alias)
+    app_models = router.get_migratable_models(app_config.models_module, connection.alias)
 
     for model in app_models:
         output.extend(custom_sql_for_model(model, style, connection))
@@ -130,25 +130,25 @@ def sql_custom(app, style, connection):
     return output
 
 
-def sql_indexes(app, style, connection):
+def sql_indexes(app_config, style, connection):
     "Returns a list of the CREATE INDEX SQL statements for all models in the given app."
     output = []
-    for model in router.get_migratable_models(app, connection.alias, include_auto_created=True):
+    for model in router.get_migratable_models(app_config.models_module, connection.alias, include_auto_created=True):
         output.extend(connection.creation.sql_indexes_for_model(model, style))
     return output
 
 
-def sql_destroy_indexes(app, style, connection):
+def sql_destroy_indexes(app_config, style, connection):
     "Returns a list of the DROP INDEX SQL statements for all models in the given app."
     output = []
-    for model in router.get_migratable_models(app, connection.alias, include_auto_created=True):
+    for model in router.get_migratable_models(app_config.models_module, connection.alias, include_auto_created=True):
         output.extend(connection.creation.sql_destroy_indexes_for_model(model, style))
     return output
 
 
-def sql_all(app, style, connection):
+def sql_all(app_config, style, connection):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
-    return sql_create(app, style, connection) + sql_custom(app, style, connection) + sql_indexes(app, style, connection)
+    return sql_create(app_config, style, connection) + sql_custom(app_config, style, connection) + sql_indexes(app_config, style, connection)
 
 
 def _split_statements(content):
