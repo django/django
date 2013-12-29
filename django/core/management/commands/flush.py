@@ -94,5 +94,5 @@ Are you sure you want to do this?
         # respond as if the database had been migrated from scratch.
         all_models = []
         for app_config in apps.get_app_configs(only_with_models_module=True):
-            all_models.extend(router.get_migratable_models(app_config.models_module, database, include_auto_created=True))
+            all_models.extend(router.get_migratable_models(app_config, database, include_auto_created=True))
         emit_post_migrate_signal(set(all_models), verbosity, interactive, database)
