@@ -156,6 +156,10 @@ Read-only attributes
 Methods
 -------
 
+.. method:: AppConfig.get_models()
+
+    Returns an iterable of :class:`~django.db.models.Model` classes.
+
 .. method:: AppConfig.get_model(model_name)
 
     Returns the :class:`~django.db.models.Model` with the given

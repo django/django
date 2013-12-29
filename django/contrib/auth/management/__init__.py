@@ -74,14 +74,12 @@ def create_permissions(app_config, verbosity=22, interactive=True, db=DEFAULT_DB
 
     from django.contrib.contenttypes.models import ContentType
 
-    app_models = apps.get_models(app_config.models_module)
-
     # This will hold the permissions we're looking for as
     # (content_type, (codename, name))
     searched_perms = list()
     # The codenames and ctypes that should exist.
     ctypes = set()
-    for klass in app_models:
+    for klass in app_config.get_models():
         # Force looking up the content types in the current database
         # before creating foreign keys to them.
         ctype = ContentType.objects.db_manager(db).get_for_model(klass)

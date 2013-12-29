@@ -126,6 +126,32 @@ class AppConfig(object):
             raise LookupError(
                 "App '%s' doesn't have a '%s' model." % (self.label, model_name))
 
+    def get_models(self, include_auto_created=False,
+                   include_deferred=False, include_swapped=False):
+        """
+        Returns an iterable of models.
+
+        By default, the following models aren't included:
+
+        - auto-created models for many-to-many relations without
+          an explicit intermediate table,
+        - models created to satisfy deferred attribute queries,
+        - models that have been swapped out.
+
+        Set the corresponding keyword argument to True to include such models.
+        Keyword arguments aren't documented; they're a private API.
+
+        This method assumes that apps.populate_models() has run.
+        """
+        for model in self.models.values():
+            if model._deferred and not include_deferred:
+                continue
+            if model._meta.auto_created and not include_auto_created:
+                continue
+            if model._meta.swapped and not include_swapped:
+                continue
+            yield model
+
     def import_models(self, all_models):
         # Dictionary of models for this app, primarily maintained in the
         # 'all_models' attribute of the Apps this AppConfig is attached to.

@@ -23,6 +23,6 @@ class Command(AppCommand):
         if app_config.models_module is None:
             return
         connection = connections[options.get('database')]
-        models = apps.get_models(app_config.models_module, include_auto_created=True)
+        models = app_config.get_models(include_auto_created=True)
         statements = connection.ops.sequence_reset_sql(self.style, models)
         return '\n'.join(statements)

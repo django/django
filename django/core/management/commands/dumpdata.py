@@ -169,7 +169,7 @@ def sort_dependencies(app_list):
     models = set()
     for app_config, model_list in app_list:
         if model_list is None:
-            model_list = apps.get_models(app_config.models_module)
+            model_list = app_config.get_models()
 
         for model in model_list:
             models.add(model)
