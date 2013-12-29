@@ -201,16 +201,20 @@ compile_implementations = defaultdict(dict)
 
 
 def get_implementations(vendor):
-    try:
-        implementation = compile_implementations[vendor]
-    except KeyError:
-        # TODO: do we need thread safety here? We could easily use an lock...
-        implementation = {}
-        compile_implementations[vendor] = implementation
-    return implementation
+    return compile_implementations[vendor]
 
 
 class add_implementation(object):
+    """
+    A decorator to allow customised implementations for query expressions.
+    For example:
+        @add_implementation(Exact, 'mysql')
+        def mysql_exact(node, qn, connection):
+            # Play with the node here.
+            return somesql, list_of_params
+    Now Exact nodes are compiled to SQL using mysql_exact instead of
+    Exact.as_sql() when using MySQL backend.
+    """
     def __init__(self, klass, vendor):
         self.klass = klass
         self.vendor = vendor

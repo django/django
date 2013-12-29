@@ -1,6 +1,6 @@
 from django.db.models.sql.constants import QUERY_TERMS
 
-ALL_TERMS = set([
+GIS_LOOKUPS = {
     'bbcontains', 'bboverlaps', 'contained', 'contains',
     'contains_properly', 'coveredby', 'covers', 'crosses', 'disjoint',
     'distance_gt', 'distance_gte', 'distance_lt', 'distance_lte',
@@ -9,8 +9,7 @@ ALL_TERMS = set([
     'left', 'right', 'overlaps_left', 'overlaps_right',
     'overlaps_above', 'overlaps_below',
     'strictly_above', 'strictly_below'
-])
-GIS_LOOKUPS = ALL_TERMS.copy()
-ALL_TERMS.update(QUERY_TERMS)
+}
+ALL_TERMS = GIS_LOOKUPS | QUERY_TERMS
 
 __all__ = ['ALL_TERMS', 'GIS_LOOKUPS']
