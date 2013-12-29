@@ -187,40 +187,35 @@ class Apps(object):
     def get_models(self, app_mod=None, include_auto_created=False,
                    include_deferred=False, include_swapped=False):
         """
-        Given a module containing models, returns a list of the models.
-        Otherwise returns a list of all installed models.
+        Returns a list of all installed models.
 
-        By default, auto-created models (i.e., m2m models without an
-        explicit intermediate table) are not included. However, if you
-        specify include_auto_created=True, they will be.
+        By default, the following models aren't included:
 
-        By default, models created to satisfy deferred attribute
-        queries are *not* included in the list of models. However, if
-        you specify include_deferred, they will be.
+        - auto-created models for many-to-many relations without
+          an explicit intermediate table,
+        - models created to satisfy deferred attribute queries,
+        - models that have been swapped out.
 
-        By default, models that have been swapped out will *not* be
-        included in the list of models. However, if you specify
-        include_swapped, they will be.
+        Set the corresponding keyword argument to True to include such models.
         """
-        model_list = None
         self.populate_models()
+
         if app_mod:
+            warnings.warn(
+                "The app_mod argument of get_models is deprecated.",
+                PendingDeprecationWarning, stacklevel=2)
             app_label = app_mod.__name__.split('.')[-2]
             try:
-                model_dicts = [self.app_configs[app_label].models]
-            except KeyError:
-                model_dicts = []
-        else:
-            model_dicts = [app_config.models for app_config in self.app_configs.values()]
-        model_list = []
-        for model_dict in model_dicts:
-            model_list.extend(
-                model for model in model_dict.values()
-                if ((not model._deferred or include_deferred) and
-                    (not model._meta.auto_created or include_auto_created) and
-                    (not model._meta.swapped or include_swapped))
-            )
-        return model_list
+                return list(self.get_app_config(app_label).get_models(
+                    include_auto_created, include_deferred, include_swapped))
+            except LookupError:
+                return []
+
+        result = []
+        for app_config in self.app_configs.values():
+            result.extend(list(app_config.get_models(
+                include_auto_created, include_deferred, include_swapped)))
+        return result
 
     def get_model(self, app_label, model_name):
         """

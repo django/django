@@ -615,8 +615,9 @@ setting directly and use the app registry (:attr:`django.apps.apps`) instead.
 
 The "app registry" that manages the list of installed applications doesn't
 have the same features as the old "app cache". Even though the "app cache" was
-a private API, obsolete methods will be removed after a standard deprecation
-period. In addition, the following changes take effect immediately:
+a private API, obsolete methods and arguments will be removed after a standard
+deprecation period. In addition, the following changes take effect
+immediately:
 
 * ``get_model`` raises :exc:`~exceptions.LookupError` instead of returning
   ``None`` when no model is found.

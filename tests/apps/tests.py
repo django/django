@@ -159,7 +159,7 @@ class AppsTests(TestCase):
         """
         Makes a new model at runtime and ensures it goes into the right place.
         """
-        old_models = apps.get_models(apps.get_app_config("apps").models_module)
+        old_models = list(apps.get_app_config("apps").get_models())
         # Construct a new model in a new app registry
         body = {}
         new_apps = Apps()
@@ -172,10 +172,7 @@ class AppsTests(TestCase):
         body['__module__'] = TotallyNormal.__module__
         temp_model = type(str("SouthPonies"), (models.Model,), body)
         # Make sure it appeared in the right place!
-        self.assertEqual(
-            old_models,
-            apps.get_models(apps.get_app_config("apps").models_module),
-        )
+        self.assertListEqual(list(apps.get_app_config("apps").get_models()), old_models)
         with self.assertRaises(LookupError):
             apps.get_model("apps", "SouthPonies")
         self.assertEqual(new_apps.get_model("apps", "SouthPonies"), temp_model)
