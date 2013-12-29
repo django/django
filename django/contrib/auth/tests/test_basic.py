@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import locale
 
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.contrib.auth.management.commands import createsuperuser
 from django.contrib.auth.models import User, AnonymousUser
@@ -25,6 +26,7 @@ def user_model_swapped(**kwargs):
         # Reset User manager
         setattr(User, 'objects', User._default_manager)
         ensure_default_manager(User)
+        apps.get_models.cache_clear()
 
 
 def mock_inputs(inputs):
