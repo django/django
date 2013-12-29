@@ -8,7 +8,7 @@ from django.db import DEFAULT_DB_ALIAS, connections, router
 from django.db.models import signals
 
 
-def create_default_site(app_config, verbosity=22, interactive=True, db=DEFAULT_DB_ALIAS, **kwargs):
+def create_default_site(app_config, verbosity=2, interactive=True, db=DEFAULT_DB_ALIAS, **kwargs):
     try:
         Site = apps.get_model('sites', 'Site')
     except LookupError:

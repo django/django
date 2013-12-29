@@ -60,7 +60,7 @@ def _check_permission_clashing(custom, builtin, ctype):
         pool.add(codename)
 
 
-def create_permissions(app_config, verbosity=22, interactive=True, db=DEFAULT_DB_ALIAS, **kwargs):
+def create_permissions(app_config, verbosity=2, interactive=True, db=DEFAULT_DB_ALIAS, **kwargs):
     if not app_config.models_module:
         return
 
@@ -119,7 +119,7 @@ def create_permissions(app_config, verbosity=22, interactive=True, db=DEFAULT_DB
             print("Adding permission '%s'" % perm)
 
 
-def create_superuser(app_config, verbosity=22, interactive=True, db=DEFAULT_DB_ALIAS, **kwargs):
+def create_superuser(app_config, verbosity=2, interactive=True, db=DEFAULT_DB_ALIAS, **kwargs):
     try:
         apps.get_model('auth', 'Permission')
     except LookupError:
