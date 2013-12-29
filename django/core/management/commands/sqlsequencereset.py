@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from optparse import make_option
 
-from django.apps import apps
 from django.core.management.base import AppCommand
 from django.db import connections, DEFAULT_DB_ALIAS
 
