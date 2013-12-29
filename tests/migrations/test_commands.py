@@ -136,7 +136,7 @@ class MakeMigrationsTests(MigrationTestBase):
     def tearDown(self):
         apps.app_configs['migrations'].models = self._old_models
         apps.all_models['migrations'] = self._old_models
-        apps.get_models.cache_clear()
+        apps.clear_cache()
 
         os.chdir(self.test_dir)
         try:

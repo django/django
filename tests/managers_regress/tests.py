@@ -128,7 +128,7 @@ class ManagersRegressionTests(TestCase):
         finally:
             apps.app_configs['managers_regress'].models = _old_models
             apps.all_models['managers_regress'] = _old_models
-            apps.get_models.cache_clear()
+            apps.clear_cache()
 
     @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
     def test_custom_swappable_manager(self):
@@ -156,7 +156,7 @@ class ManagersRegressionTests(TestCase):
         finally:
             apps.app_configs['managers_regress'].models = _old_models
             apps.all_models['managers_regress'] = _old_models
-            apps.get_models.cache_clear()
+            apps.clear_cache()
 
     @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
     def test_explicit_swappable_manager(self):
@@ -184,7 +184,7 @@ class ManagersRegressionTests(TestCase):
         finally:
             apps.app_configs['managers_regress'].models = _old_models
             apps.all_models['managers_regress'] = _old_models
-            apps.get_models.cache_clear()
+            apps.clear_cache()
 
     def test_regress_3871(self):
         related = RelatedModel.objects.create()
