@@ -67,7 +67,7 @@ class Command(NoArgsCommand):
         # XXX: (Temporary) workaround for ticket #1796: force early loading of all
         # models from installed apps.
         from django.apps import apps
-        apps.get_models()
+        apps.populate_models()
 
         use_plain = options.get('plain', False)
         no_startup = options.get('no_startup', False)
