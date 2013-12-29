@@ -1,5 +1,3 @@
-"Utilities for loading models and the modules that contain them."
-
 from collections import defaultdict, OrderedDict
 import os
 import sys
