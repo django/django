@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load i18n l10n admin_urls %}
 
-{% block bodyclass %}app-{{ opts.app_label }} model-{{ opts.object_name.lower }} delete-confirmation delete-selected-confirmation{% endblock %}
+{% block bodyclass %}app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation delete-selected-confirmation{% endblock %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">

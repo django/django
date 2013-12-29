@@ -152,7 +152,7 @@ class ModelState(object):
                     options[name] = model._meta.original_attrs[name]
         # Make our record
         bases = tuple(
-            ("%s.%s" % (base._meta.app_label, base._meta.object_name.lower()) if hasattr(base, "_meta") else base)
+            ("%s.%s" % (base._meta.app_label, base._meta.model_name) if hasattr(base, "_meta") else base)
             for base in model.__bases__
             if (not hasattr(base, "_meta") or not base._meta.abstract)
         )

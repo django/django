@@ -10,7 +10,7 @@
 
 {% block coltype %}colM{% endblock %}
 
-{% block bodyclass %}app-{{ opts.app_label }} model-{{ opts.object_name.lower }} change-form{% endblock %}
+{% block bodyclass %}app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}
 
 {% if not is_popup %}
 {% block breadcrumbs %}

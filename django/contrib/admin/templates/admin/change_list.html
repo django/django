@@ -32,7 +32,7 @@
 {% endif %}{% endif %}
 {% endblock %}
 
-{% block bodyclass %}app-{{ opts.app_label }} model-{{ opts.object_name.lower }} change-list{% endblock %}
+{% block bodyclass %}app-{{ opts.app_label }} model-{{ opts.model_name }} change-list{% endblock %}
 
 {% if not is_popup %}
 {% block breadcrumbs %}
