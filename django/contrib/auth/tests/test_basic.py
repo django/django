@@ -26,7 +26,7 @@ def user_model_swapped(**kwargs):
         # Reset User manager
         setattr(User, 'objects', User._default_manager)
         ensure_default_manager(User)
-        apps.get_models.cache_clear()
+        apps.clear_cache()
 
 
 def mock_inputs(inputs):

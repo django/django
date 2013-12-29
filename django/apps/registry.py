@@ -84,7 +84,7 @@ class Apps(object):
                     app_config = AppConfig.create(entry)
                 self.app_configs[app_config.label] = app_config
 
-            self.get_models.cache_clear()
+            self.clear_cache()
             self._apps_loaded = True
 
     def populate_models(self):
@@ -133,7 +133,7 @@ class Apps(object):
 
                 del self._postponed
 
-                self.get_models.cache_clear()
+                self.clear_cache()
                 self._models_loaded = True
 
     @property
@@ -248,7 +248,7 @@ class Apps(object):
                 "Conflicting '%s' models in application '%s': %s and %s." %
                 (model_name, app_label, app_models[model_name], model))
         app_models[model_name] = model
-        self.get_models.cache_clear()
+        self.clear_cache()
 
     def has_app(self, app_name):
         """
@@ -299,14 +299,14 @@ class Apps(object):
             (label, app_config)
             for label, app_config in self.app_configs.items()
             if app_config.name in available)
-        self.get_models.cache_clear()
+        self.clear_cache()
 
     def unset_available_apps(self):
         """
         Cancels a previous call to set_available_apps().
         """
         self.app_configs = self.stored_app_configs.pop()
-        self.get_models.cache_clear()
+        self.clear_cache()
 
     def set_installed_apps(self, installed):
         """
@@ -327,7 +327,7 @@ class Apps(object):
         """
         self.stored_app_configs.append((self.app_configs, self._apps_loaded, self._models_loaded))
         self.app_configs = OrderedDict()
-        self.get_models.cache_clear()
+        self.clear_cache()
         self._apps_loaded = False
         self.populate_apps(installed)
         self._models_loaded = False
@@ -338,7 +338,15 @@ class Apps(object):
         Cancels a previous call to set_installed_apps().
         """
         self.app_configs, self._apps_loaded, self._models_loaded = self.stored_app_configs.pop()
-        self.get_models.cache_clear()
+        self.clear_cache()
+
+    def clear_cache(self):
+        """
+        Clears all internal caches, for methods that alter the app registry.
+
+        This is mostly used in tests.
+        """
+        self.clear_cache()
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
 
@@ -353,7 +361,7 @@ class Apps(object):
         app_config = AppConfig.create(app_name)
         app_config.import_models(self.all_models[app_config.label])
         self.app_configs[app_config.label] = app_config
-        self.get_models.cache_clear()
+        self.clear_cache()
         return app_config.models_module
 
     def app_cache_ready(self):
