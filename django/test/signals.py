@@ -36,6 +36,9 @@ def update_installed_apps(**kwargs):
         # Rebuild app_template_dirs cache.
         from django.template.loaders import app_directories as mod
         mod.app_template_dirs = mod.calculate_app_template_dirs()
+        # Rebuild templatetags module cache.
+        from django.template import base
+        base.templatetags_modules[:] = []
 
 
 @receiver(setting_changed)
