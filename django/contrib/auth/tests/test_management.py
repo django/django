@@ -196,21 +196,21 @@ class CustomUserModelValidationTestCase(TestCase):
     def test_required_fields_is_list(self):
         "REQUIRED_FIELDS should be a list."
         new_io = StringIO()
-        get_validation_errors(new_io, apps.get_app_config('auth').models_module)
+        get_validation_errors(new_io, apps.get_app_config('auth'))
         self.assertIn("The REQUIRED_FIELDS must be a list or tuple.", new_io.getvalue())
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserBadRequiredFields')
     def test_username_not_in_required_fields(self):
         "USERNAME_FIELD should not appear in REQUIRED_FIELDS."
         new_io = StringIO()
-        get_validation_errors(new_io, apps.get_app_config('auth').models_module)
+        get_validation_errors(new_io, apps.get_app_config('auth'))
         self.assertIn("The field named as the USERNAME_FIELD should not be included in REQUIRED_FIELDS on a swappable User model.", new_io.getvalue())
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonUniqueUsername')
     def test_username_non_unique(self):
         "A non-unique USERNAME_FIELD should raise a model validation error."
         new_io = StringIO()
-        get_validation_errors(new_io, apps.get_app_config('auth').models_module)
+        get_validation_errors(new_io, apps.get_app_config('auth'))
         self.assertIn("The USERNAME_FIELD must be unique. Add unique=True to the field parameters.", new_io.getvalue())
 
 

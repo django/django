@@ -20,7 +20,7 @@ class ModelErrorCollection:
         self.outfile.write(self.style.ERROR(force_str("%s: %s\n" % (context, error))))
 
 
-def get_validation_errors(outfile, app=None):
+def get_validation_errors(outfile, app_config=None):
     """
     Validates all models that are part of the specified app. If no app name is provided,
     validates all models of all installed apps. Writes errors, if any, to outfile.
@@ -32,7 +32,7 @@ def get_validation_errors(outfile, app=None):
 
     e = ModelErrorCollection(outfile)
 
-    for cls in apps.get_models(app, include_swapped=True):
+    for cls in (app_config or apps).get_models(include_swapped=True):
         opts = cls._meta
 
         # Check swappable attribute.

@@ -141,8 +141,8 @@ class BaseCommand(object):
         performed prior to executing the command. Default value is
         ``True``. To validate an individual application's models
         rather than all applications' models, call
-        ``self.validate(app)`` from ``handle()``, where ``app`` is the
-        application's Python module.
+        ``self.validate(app_config)`` from ``handle()``, where ``app_config``
+        is the application's configuration provided by the app registry.
 
     ``leave_locale_alone``
         A boolean indicating whether the locale set in settings should be
@@ -304,16 +304,16 @@ class BaseCommand(object):
             if saved_locale is not None:
                 translation.activate(saved_locale)
 
-    def validate(self, app=None, display_num_errors=False):
+    def validate(self, app_config=None, display_num_errors=False):
         """
         Validates the given app, raising CommandError for any errors.
 
-        If app is None, then this will validate all installed apps.
+        If app_config is None, then this will validate all installed apps.
 
         """
         from django.core.management.validation import get_validation_errors
         s = StringIO()
-        num_errors = get_validation_errors(s, app)
+        num_errors = get_validation_errors(s, app_config)
         if num_errors:
             s.seek(0)
             error_text = s.read()

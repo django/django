@@ -32,13 +32,13 @@ class InvalidModelTestCase(unittest.TestCase):
         TEST_SWAPPED_MODEL_BAD_MODEL='not_an_app.Target',
     )
     def test_invalid_models(self):
-        module = apps.get_app_config("invalid_models").models_module
-        get_validation_errors(self.stdout, module)
+        app_config = apps.get_app_config("invalid_models")
+        get_validation_errors(self.stdout, app_config)
 
         self.stdout.seek(0)
         error_log = self.stdout.read()
         actual = error_log.split('\n')
-        expected = module.model_errors.split('\n')
+        expected = app_config.models_module.model_errors.split('\n')
 
         unexpected = [err for err in actual if err not in expected]
         missing = [err for err in expected if err not in actual]
