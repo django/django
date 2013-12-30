@@ -14,7 +14,7 @@ class StateTests(TestCase):
         Tests making a ProjectState from an Apps
         """
 
-        new_apps = Apps()
+        new_apps = Apps(["migrations"])
 
         class Author(models.Model):
             name = models.CharField(max_length=255)
@@ -108,7 +108,7 @@ class StateTests(TestCase):
                 apps = Apps()
 
         # First, test rendering individually
-        apps = Apps()
+        apps = Apps(["migrations"])
 
         # We shouldn't be able to render yet
         ms = ModelState.from_model(Novel)
@@ -135,7 +135,7 @@ class StateTests(TestCase):
                 app_label = "migrations"
                 apps = Apps()
 
-        apps = Apps()
+        apps = Apps(["migrations"])
 
         # We shouldn't be able to render yet
         ms = ModelState.from_model(FooBar)

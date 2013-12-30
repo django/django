@@ -33,12 +33,9 @@ class ProjectState(object):
     def render(self):
         "Turns the project state into actual models in a new Apps"
         if self.apps is None:
-            self.apps = Apps()
             # Populate the app registry with a stub for each application.
             app_labels = set(model_state.app_label for model_state in self.models.values())
-            app_configs = [AppConfigStub(label) for label in sorted(app_labels)]
-            self.apps.populate_apps(app_configs)
-            self.apps.populate_models()
+            self.apps = Apps([AppConfigStub(label) for label in sorted(app_labels)])
             # We keep trying to render the models in a loop, ignoring invalid
             # base errors, until the size of the unrendered models doesn't
             # decrease by at least one, meaning there's a base dependency loop/

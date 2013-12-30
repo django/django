@@ -36,7 +36,7 @@ class AppsTests(TestCase):
         Ensures that only one master registry can exist.
         """
         with self.assertRaises(RuntimeError):
-            Apps(master=True)
+            Apps(installed_apps=None)
 
     def test_ready(self):
         """
@@ -44,17 +44,8 @@ class AppsTests(TestCase):
         """
         # The master app registry is always ready when the tests run.
         self.assertTrue(apps.ready)
-
-    def test_non_master_ready(self):
-        """
-        Tests the ready property of a registry other than the master.
-        """
-        apps = Apps()
-        self.assertFalse(apps.ready)
-        apps.populate_apps([])
-        self.assertFalse(apps.ready)
-        apps.populate_models()
-        self.assertTrue(apps.ready)
+        # Non-master app registries are populated in __init__.
+        self.assertTrue(Apps().ready)
 
     def test_bad_app_config(self):
         """
@@ -162,7 +153,7 @@ class AppsTests(TestCase):
         old_models = list(apps.get_app_config("apps").get_models())
         # Construct a new model in a new app registry
         body = {}
-        new_apps = Apps()
+        new_apps = Apps(["apps"])
         meta_contents = {
             'app_label': "apps",
             'apps': new_apps,

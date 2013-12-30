@@ -19,11 +19,12 @@ class Apps(object):
     It also keeps track of models eg. to provide reverse-relations.
     """
 
-    def __init__(self, master=False):
-        # Only one master registry may exist at a given time, and it shall be
-        # the apps variable defined at the end of this module.
-        if master and hasattr(sys.modules[__name__], 'apps'):
-            raise RuntimeError("You may create only one master registry.")
+    def __init__(self, installed_apps=()):
+        # installed_apps is set to None when creating the master registry
+        # because it cannot be populated at that point. Other registries must
+        # provide a list of installed apps and are populated immediately.
+        if installed_apps is None and hasattr(sys.modules[__name__], 'apps'):
+            raise RuntimeError("You must supply an installed_apps argument.")
 
         # Mapping of app labels => model names => model classes. Every time a
         # model is imported, ModelBase.__new__ calls apps.register_model which
@@ -47,6 +48,11 @@ class Apps(object):
 
         # Pending lookups for lazy relations.
         self._pending_lookups = {}
+
+        # Populate apps and models, unless it's the master registry.
+        if installed_apps is not None:
+            self.populate_apps(installed_apps)
+            self.populate_models()
 
     def populate_apps(self, installed_apps=None):
         """
@@ -442,4 +448,4 @@ class Apps(object):
             self.register_model(app_label, model)
 
 
-apps = Apps(master=True)
+apps = Apps(installed_apps=None)
