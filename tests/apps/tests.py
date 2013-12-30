@@ -26,8 +26,6 @@ SOME_INSTALLED_APPS_NAMES = [
     'django.contrib.auth',
 ] + SOME_INSTALLED_APPS[2:]
 
-SOME_INSTALLED_APPS_WTH_MODELS_NAMES = SOME_INSTALLED_APPS_NAMES[:4]
-
 
 class AppsTests(TestCase):
 
@@ -94,16 +92,6 @@ class AppsTests(TestCase):
             SOME_INSTALLED_APPS_NAMES)
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
-    def test_get_app_configs_with_models(self):
-        """
-        Tests get_app_configs(only_with_models_module=True).
-        """
-        app_configs = apps.get_app_configs(only_with_models_module=True)
-        self.assertListEqual(
-            [app_config.name for app_config in app_configs],
-            SOME_INSTALLED_APPS_WTH_MODELS_NAMES)
-
-    @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_app_config(self):
         """
         Tests get_app_config().
@@ -116,17 +104,6 @@ class AppsTests(TestCase):
 
         with self.assertRaises(LookupError):
             apps.get_app_config('webdesign')
-
-    @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
-    def test_get_app_config_with_models(self):
-        """
-        Tests get_app_config(only_with_models_module=True).
-        """
-        app_config = apps.get_app_config('admin', only_with_models_module=True)
-        self.assertEqual(app_config.name, 'django.contrib.admin')
-
-        with self.assertRaises(LookupError):
-            apps.get_app_config('staticfiles', only_with_models_module=True)
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_has_app(self):

@@ -101,35 +101,24 @@ class Apps(object):
                 "App registry isn't populated yet. "
                 "Have you called django.setup()?")
 
-    def get_app_configs(self, only_with_models_module=False):
+    def get_app_configs(self):
         """
         Imports applications and returns an iterable of app configs.
-
-        If only_with_models_module in True (non-default), imports models and
-        considers only applications containing a models module.
         """
         self.check_ready()
-        for app_config in self.app_configs.values():
-            if only_with_models_module and app_config.models_module is None:
-                continue
-            yield app_config
+        return self.app_configs.values()
 
-    def get_app_config(self, app_label, only_with_models_module=False):
+    def get_app_config(self, app_label):
         """
         Imports applications and returns an app config for the given label.
 
         Raises LookupError if no application exists with this label.
-
-        If only_with_models_module in True (non-default), imports models and
-        considers only applications containing a models module.
         """
         self.check_ready()
-        app_config = self.app_configs.get(app_label)
-        if app_config is None:
+        try:
+            return self.app_configs[app_label]
+        except KeyError:
             raise LookupError("No installed app with label '%s'." % app_label)
-        if only_with_models_module and app_config.models_module is None:
-            raise LookupError("App '%s' doesn't have a models module." % app_label)
-        return app_config
 
     # This method is performance-critical at least for Django's test suite.
     @lru_cache.lru_cache(maxsize=None)
@@ -319,11 +308,14 @@ class Apps(object):
             "get_app_config(app_label).models_module supersedes get_app(app_label).",
             PendingDeprecationWarning, stacklevel=2)
         try:
-            return self.get_app_config(
-                app_label, only_with_models_module=True).models_module
+            models_module = self.get_app_config(app_label).models_module
         except LookupError as exc:
             # Change the exception type for backwards compatibility.
             raise ImproperlyConfigured(*exc.args)
+        if models_module is None:
+            raise ImproperlyConfigured(
+                "App '%s' doesn't have a models module." % app_label)
+        return models_module
 
     def get_apps(self):
         """
@@ -332,8 +324,9 @@ class Apps(object):
         warnings.warn(
             "[a.models_module for a in get_app_configs()] supersedes get_apps().",
             PendingDeprecationWarning, stacklevel=2)
-        app_configs = self.get_app_configs(only_with_models_module=True)
-        return [app_config.models_module for app_config in app_configs]
+        app_configs = self.get_app_configs()
+        return [app_config.models_module for app_config in app_configs
+                if app_config.models_module is not None]
 
     def _get_app_package(self, app):
         return '.'.join(app.__name__.split('.')[:-1])

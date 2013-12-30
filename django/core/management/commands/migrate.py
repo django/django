@@ -181,8 +181,8 @@ class Command(BaseCommand):
         all_models = [
             (app_config.label,
                 router.get_migratable_models(app_config, connection.alias, include_auto_created=True))
-            for app_config in apps.get_app_configs(only_with_models_module=True)
-            if app_config.label in app_labels
+            for app_config in apps.get_app_configs()
+            if app_config.models_module is not None and app_config.label in app_labels
         ]
 
         def model_installed(model):

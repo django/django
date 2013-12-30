@@ -184,21 +184,15 @@ Application registry
 
     Returns ``True`` if the registry is fully populated.
 
-.. method:: apps.get_app_configs(only_with_models_module=False)
+.. method:: apps.get_app_configs()
 
     Returns an iterable of :class:`~django.apps.AppConfig` instances.
 
-    If only applications containing a models module are of interest, this method
-    can be called with ``only_with_models_module=True``.
-
-.. method:: apps.get_app_config(app_label, only_with_models_module=False)
+.. method:: apps.get_app_config(app_label)
 
     Returns an :class:`~django.apps.AppConfig` for the application with the
     given ``app_label``. Raises :exc:`~exceptions.LookupError` if no such
     application exists.
-
-    If only applications containing a models module are of interest, this method
-    can be called with ``only_with_models_module=True``.
 
 .. method:: apps.has_app(app_name)
 

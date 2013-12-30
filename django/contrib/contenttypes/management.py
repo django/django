@@ -88,7 +88,7 @@ If you're unsure, answer 'no'.
 
 
 def update_all_contenttypes(**kwargs):
-    for app_config in apps.get_app_configs(only_with_models_module=True):
+    for app_config in apps.get_app_configs():
         update_contenttypes(app_config, **kwargs)
 
 

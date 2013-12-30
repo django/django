@@ -93,6 +93,6 @@ Are you sure you want to do this?
         # Emit the post migrate signal. This allows individual applications to
         # respond as if the database had been migrated from scratch.
         all_models = []
-        for app_config in apps.get_app_configs(only_with_models_module=True):
+        for app_config in apps.get_app_configs():
             all_models.extend(router.get_migratable_models(app_config, database, include_auto_created=True))
         emit_post_migrate_signal(set(all_models), verbosity, interactive, database)

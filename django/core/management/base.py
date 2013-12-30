@@ -344,9 +344,6 @@ class AppCommand(BaseCommand):
         from django.apps import apps
         if not app_labels:
             raise CommandError("Enter at least one application label.")
-        # Don't use only_with_models_module=True in get_app_config() to tell
-        # apart missing apps from apps without a model module -- which can't
-        # be supported with the legacy API since it passes the models module.
         try:
             app_configs = [apps.get_app_config(app_label) for app_label in app_labels]
         except (LookupError, ImportError) as e:

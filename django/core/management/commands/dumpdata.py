@@ -82,8 +82,8 @@ class Command(BaseCommand):
             if primary_keys:
                 raise CommandError("You can only use --pks option with one model")
             app_list = OrderedDict((app_config, None)
-                for app_config in apps.get_app_configs(only_with_models_module=True)
-                if app_config not in excluded_apps)
+                for app_config in apps.get_app_configs()
+                if app_config.models_module is not None and app_config not in excluded_apps)
         else:
             if len(app_labels) > 1 and primary_keys:
                 raise CommandError("You can only use --pks option with one model")
