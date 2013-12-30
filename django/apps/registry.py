@@ -109,39 +109,15 @@ class Apps(object):
                 raise RuntimeError(
                     "populate_models() must run after populate_apps()")
 
-            # Models modules are likely to import other models modules, for
-            # example to reference related objects. As a consequence:
-            # - we deal with import loops by postponing affected modules.
-            # - we provide reentrancy by making import_models() idempotent.
-
-            outermost = not hasattr(self, '_postponed')
-            if outermost:
-                self._postponed = []
-
             for app_config in self.app_configs.values():
+                all_models = self.all_models[app_config.label]
+                app_config.import_models(all_models)
 
-                if app_config.models is not None:
-                    continue
+            self.clear_cache()
+            self._models_loaded = True
 
-                try:
-                    all_models = self.all_models[app_config.label]
-                    app_config.import_models(all_models)
-                except ImportError:
-                    self._postponed.append(app_config)
-
-            if outermost:
-                try:
-                    for app_config in self._postponed:
-                        all_models = self.all_models[app_config.label]
-                        app_config.import_models(all_models)
-                finally:
-                    del self._postponed
-
-                self.clear_cache()
-                self._models_loaded = True
-
-                for app_config in self.get_app_configs():
-                    app_config.setup()
+            for app_config in self.get_app_configs():
+                app_config.setup()
 
     def check_ready(self):
         """
