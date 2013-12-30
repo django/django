@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 import asyncore
-from email import message_from_file, message_from_string
 from email.mime.text import MIMEText
 import os
 import shutil
@@ -20,16 +19,17 @@ from django.core.mail.backends import console, dummy, locmem, filebased, smtp
 from django.core.mail.message import BadHeaderError
 from django.test import SimpleTestCase
 from django.test import override_settings
-from django.utils.encoding import force_str, force_text, force_bytes
-from django.utils.six import PY3, StringIO, string_types
+from django.utils.encoding import force_text, force_bytes
+from django.utils.six import PY3, StringIO, binary_type
 from django.utils.translation import ugettext_lazy
 
 if PY3:
     from email.utils import parseaddr
-    from email import message_from_bytes
+    from email import message_from_bytes, message_from_binary_file
 else:
     from email.Utils import parseaddr
-    message_from_bytes = message_from_string
+    from email import (message_from_string as message_from_bytes,
+        message_from_file as message_from_binary_file)
 
 
 class HeadersCheckMixin(object):
@@ -42,13 +42,9 @@ class HeadersCheckMixin(object):
         string with the contens of an email message.
         :param headers: should be a set of (header-name, header-value) tuples.
         """
-        if isinstance(message, string_types):
-            just_headers = message.split('\n\n', 1)[0]
-            hlist = just_headers.split('\n')
-            pairs = [hl.split(':', 1) for hl in hlist]
-            msg_headers = {(n, v.lstrip()) for (n, v) in pairs}
-        else:
-            msg_headers = set(message.items())
+        if isinstance(message, binary_type):
+            message = message_from_bytes(message)
+        msg_headers = set(message.items())
         self.assertTrue(headers.issubset(msg_headers), msg='Message is missing '
                         'the following headers: %s' % (headers - msg_headers),)
 
@@ -694,9 +690,9 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
     def get_mailbox_content(self):
         messages = []
         for filename in os.listdir(self.tmp_dir):
-            with open(os.path.join(self.tmp_dir, filename), 'r') as fp:
-                session = force_text(fp.read()).split('\n' + ('-' * 79) + '\n')
-            messages.extend(message_from_string(force_str(m)) for m in session if m)
+            with open(os.path.join(self.tmp_dir, filename), 'rb') as fp:
+                session = fp.read().split(force_bytes('\n' + ('-' * 79) + '\n', encoding='ascii'))
+            messages.extend(message_from_bytes(m) for m in session if m)
         return messages
 
     def test_file_sessions(self):
@@ -706,8 +702,8 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         connection.send_messages([msg])
 
         self.assertEqual(len(os.listdir(self.tmp_dir)), 1)
-        with open(os.path.join(self.tmp_dir, os.listdir(self.tmp_dir)[0])) as fp:
-            message = message_from_file(fp)
+        with open(os.path.join(self.tmp_dir, os.listdir(self.tmp_dir)[0]), 'rb') as fp:
+            message = message_from_binary_file(fp)
         self.assertEqual(message.get_content_type(), 'text/plain')
         self.assertEqual(message.get('subject'), 'Subject')
         self.assertEqual(message.get('from'), 'from@example.com')
@@ -748,7 +744,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
         self.stream = sys.stdout = StringIO()
 
     def get_mailbox_content(self):
-        messages = self.stream.getvalue().split(force_str('\n' + ('-' * 79) + '\n'))
+        messages = self.stream.getvalue().split(str('\n' + ('-' * 79) + '\n'))
         return [message_from_bytes(force_bytes(m)) for m in messages if m]
 
     def test_console_stream_kwarg(self):
@@ -758,14 +754,15 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
         s = StringIO()
         connection = mail.get_connection('django.core.mail.backends.console.EmailBackend', stream=s)
         send_mail('Subject', 'Content', 'from@example.com', ['to@example.com'], connection=connection)
-        self.assertMessageHasHeaders(s.getvalue(), {
+        message = force_bytes(s.getvalue().split('\n' + ('-' * 79) + '\n')[0])
+        self.assertMessageHasHeaders(message, {
             ('MIME-Version', '1.0'),
             ('Content-Type', 'text/plain; charset="utf-8"'),
             ('Content-Transfer-Encoding', '7bit'),
             ('Subject', 'Subject'),
             ('From', 'from@example.com'),
             ('To', 'to@example.com')})
-        self.assertIn('\nDate: ', s.getvalue())
+        self.assertIn(b'\nDate: ', message)
 
 
 class FakeSMTPChannel(smtpd.SMTPChannel):
