@@ -13,5 +13,4 @@ def setup():
     # INSTALLED_APPS or any other setting) and populate the app registry.
     from django.apps import apps
     from django.conf import settings
-    apps.populate_apps(settings.INSTALLED_APPS)
-    apps.populate_models()
+    apps.populate(settings.INSTALLED_APPS)

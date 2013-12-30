@@ -152,8 +152,7 @@ class AppConfig(object):
         # Dictionary of models for this app, primarily maintained in the
         # 'all_models' attribute of the Apps this AppConfig is attached to.
         # Injected as a parameter because it gets populated when models are
-        # imported, which might happen before populate_models() runs (or at
-        # least used to).
+        # imported, which might happen before populate() imports models.
         self.models = all_models
 
         if module_has_submodule(self.module, MODELS_MODULE_NAME):

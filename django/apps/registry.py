@@ -41,43 +41,39 @@ class Apps(object):
         # set_available_apps and set_installed_apps.
         self.stored_app_configs = []
 
-        # Internal flags used when populating the registry.
-        self._apps_loaded = False
-        self._models_loaded = False
+        # Whether the registry is populated.
+        self.ready = False
 
         # Pending lookups for lazy relations.
         self._pending_lookups = {}
 
         # Populate apps and models, unless it's the master registry.
         if installed_apps is not None:
-            self.populate_apps(installed_apps)
-            self.populate_models()
+            self.populate(installed_apps)
 
-    def populate_apps(self, installed_apps=None):
+    def populate(self, installed_apps=None):
         """
-        Populate app-related information.
+        Loads application configurations and models.
 
-        This method imports each application module.
+        This method imports each application module and then each model module.
 
         It is thread safe and idempotent, but not reentrant.
         """
-        if self._apps_loaded:
+        if self.ready:
             return
-        # Since populate_apps() may be a side effect of imports, and since
-        # it will itself import modules, an ABBA deadlock between threads
-        # would be possible if we didn't take the import lock. See #18251.
+        # Since populate() may be a side effect of imports, and since it will
+        # itself import modules, an ABBA deadlock between threads would be
+        # possible if we didn't take the import lock. See #18251.
         with import_lock():
-            if self._apps_loaded:
+            if self.ready:
                 return
 
             # app_config should be pristine, otherwise the code below won't
             # guarantee that the order matches the order in INSTALLED_APPS.
             if self.app_configs:
-                raise RuntimeError("populate_apps() isn't reentrant")
+                raise RuntimeError("populate() isn't reentrant")
 
-            # Application modules aren't expected to import anything, and
-            # especially not other application modules, even indirectly.
-            # Therefore we simply import them sequentially.
+            # Load app configs and app modules.
             for entry in installed_apps:
                 if isinstance(entry, AppConfig):
                     app_config = entry
@@ -85,36 +81,13 @@ class Apps(object):
                     app_config = AppConfig.create(entry)
                 self.app_configs[app_config.label] = app_config
 
-            self.clear_cache()
-            self._apps_loaded = True
-
-    def populate_models(self):
-        """
-        Populate model-related information.
-
-        This method imports each models module.
-
-        It is thread safe, idempotent and reentrant.
-        """
-        if self._models_loaded:
-            return
-        # Since populate_models() may be a side effect of imports, and since
-        # it will itself import modules, an ABBA deadlock between threads
-        # would be possible if we didn't take the import lock. See #18251.
-        with import_lock():
-            if self._models_loaded:
-                return
-
-            if not self._apps_loaded:
-                raise RuntimeError(
-                    "populate_models() must run after populate_apps()")
-
+            # Load models.
             for app_config in self.app_configs.values():
                 all_models = self.all_models[app_config.label]
                 app_config.import_models(all_models)
 
             self.clear_cache()
-            self._models_loaded = True
+            self.ready = True
 
             for app_config in self.get_app_configs():
                 app_config.setup()
@@ -123,20 +96,10 @@ class Apps(object):
         """
         Raises an exception if the registry isn't ready.
         """
-        if not self._models_loaded:
+        if not self.ready:
             raise RuntimeError(
                 "App registry isn't populated yet. "
                 "Have you called django.setup()?")
-
-    @property
-    def ready(self):
-        """
-        Whether the registry is fully populated.
-
-        Useful for code that wants to cache the results of get_models() for
-        themselves once it is safe to do so.
-        """
-        return self._models_loaded              # implies self._apps_loaded.
 
     def get_app_configs(self, only_with_models_module=False):
         """
@@ -306,19 +269,16 @@ class Apps(object):
         self.check_ready()
         self.stored_app_configs.append(self.app_configs)
         self.app_configs = OrderedDict()
+        self.ready = False
         self.clear_cache()
-        self._apps_loaded = False
-        self.populate_apps(installed)
-        self._models_loaded = False
-        self.populate_models()
+        self.populate(installed)
 
     def unset_installed_apps(self):
         """
         Cancels a previous call to set_installed_apps().
         """
         self.app_configs = self.stored_app_configs.pop()
-        self._apps_loaded = True
-        self._models_loaded = True
+        self.ready = True
         self.clear_cache()
 
     def clear_cache(self):

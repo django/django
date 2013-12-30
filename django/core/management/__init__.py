@@ -121,8 +121,7 @@ def get_commands():
             # avoid catching ImproperlyConfigured errors that aren't caused
             # by the absence of a settings module.
             from django.apps import apps
-            apps.populate_apps(installed_apps)
-            apps.populate_models()
+            apps.populate(installed_apps)
             app_configs = apps.get_app_configs()
             app_names = [app_config.name for app_config in app_configs]
 
