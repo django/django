@@ -178,8 +178,8 @@ The URLconf doesn't look at the request method. In other words, all request
 methods -- ``POST``, ``GET``, ``HEAD``, etc. -- will be routed to the same
 function for the same URL.
 
-Notes on capturing text in URLs
-===============================
+Captured arguments are always strings
+=====================================
 
 Each captured argument is sent to the view as a plain Python string, regardless
 of what sort of match the regular expression makes. For example, in this
@@ -189,6 +189,9 @@ URLconf line::
 
 ...the ``year`` argument to ``news.views.year_archive()`` will be a string, not
 an integer, even though the ``\d{4}`` will only match integer strings.
+
+Specifying defaults for view arguments
+======================================
 
 A convenient trick is to specify default parameters for your views' arguments.
 Here's an example URLconf and view::
