@@ -73,11 +73,18 @@ attach configuration data to applications.
 
 Improvements thus far include:
 
+* Applications can run code at startup, before Django does anything else, with
+  the :meth:`~django.apps.AppConfig.setup` method of their configuration.
+
 * It is possible to omit ``models.py`` entirely if an application doesn't
   have any models.
 
 * The name of applications can be customized in the admin with the
   :attr:`~django.apps.AppConfig.verbose_name` of application configurations.
+
+* Django imports all application configurations and models as soon as it
+  starts, through a deterministic and straightforward process. This should
+  make it easier to diagnose import issues such as import loops.
 
 New method on Field subclasses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
