@@ -135,6 +135,9 @@ class Apps(object):
                 self.clear_cache()
                 self._models_loaded = True
 
+                for app_config in self.get_app_configs():
+                    app_config.setup()
+
     @property
     def ready(self):
         """

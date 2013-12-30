@@ -162,3 +162,8 @@ class AppConfig(object):
         if module_has_submodule(self.module, MODELS_MODULE_NAME):
             models_module_name = '%s.%s' % (self.name, MODELS_MODULE_NAME)
             self.models_module = import_module(models_module_name)
+
+    def setup(self):
+        """
+        Override this method in subclasses to run setup code.
+        """
