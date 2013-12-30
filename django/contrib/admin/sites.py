@@ -160,7 +160,6 @@ class AdminSite(object):
         The default implementation checks that admin and contenttypes apps are
         installed, as well as the auth context processor.
         """
-        apps.populate_apps()
         if not apps.has_app('django.contrib.admin'):
             raise ImproperlyConfigured("Put 'django.contrib.admin' in your "
                 "INSTALLED_APPS setting in order to use the admin application.")

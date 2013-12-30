@@ -1,6 +1,7 @@
-import os
-from django.core.management.base import NoArgsCommand
 from optparse import make_option
+import os
+
+from django.core.management.base import NoArgsCommand
 
 
 class Command(NoArgsCommand):
@@ -64,11 +65,6 @@ class Command(NoArgsCommand):
         raise ImportError
 
     def handle_noargs(self, **options):
-        # XXX: (Temporary) workaround for ticket #1796: force early loading of all
-        # models from installed apps.
-        from django.apps import apps
-        apps.populate_models()
-
         use_plain = options.get('plain', False)
         no_startup = options.get('no_startup', False)
         interface = options.get('interface', None)

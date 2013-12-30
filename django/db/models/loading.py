@@ -30,6 +30,5 @@ def get_app_errors():
     try:
         return apps.app_errors
     except AttributeError:
-        apps.populate_models()
         apps.app_errors = {}
         return apps.app_errors

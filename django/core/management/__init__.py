@@ -41,6 +41,9 @@ def find_management_module(app_name):
 
     Raises ImportError if the management module cannot be found for any reason.
     """
+    # TODO: this method is only called from get_commands() which has already
+    # imported the application module at that point.
+
     parts = app_name.split('.')
     parts.append('management')
     parts.reverse()
@@ -108,7 +111,7 @@ def get_commands():
 
         # Find the installed apps
         try:
-            settings.INSTALLED_APPS
+            installed_apps = settings.INSTALLED_APPS
         except ImproperlyConfigured:
             # Still useful for commands that do not require functional
             # settings, like startproject or help.
@@ -118,6 +121,8 @@ def get_commands():
             # avoid catching ImproperlyConfigured errors that aren't caused
             # by the absence of a settings module.
             from django.apps import apps
+            apps.populate_apps(installed_apps)
+            apps.populate_models()
             app_configs = apps.get_app_configs()
             app_names = [app_config.name for app_config in app_configs]
 

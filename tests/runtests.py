@@ -9,6 +9,7 @@ import sys
 import tempfile
 import warnings
 
+import django
 from django import contrib
 from django.utils._os import upath
 from django.utils import six
@@ -85,7 +86,6 @@ def get_installed():
 
 
 def setup(verbosity, test_labels):
-    import django
     from django.apps import apps, AppConfig
     from django.conf import settings
     from django.test import TransactionTestCase, TestCase
@@ -128,7 +128,7 @@ def setup(verbosity, test_labels):
     # Load all the ALWAYS_INSTALLED_APPS.
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', 'django.contrib.comments is deprecated and will be removed before Django 1.8.', DeprecationWarning)
-        apps.populate_models()
+        django.setup()
 
     # Load all the test model apps.
     test_modules = get_test_modules()

@@ -48,8 +48,7 @@ Listening to signals
 ====================
 
 To receive a signal, you need to register a *receiver* function that gets
-called when the signal is sent by using the
-:meth:`.Signal.connect` method:
+called when the signal is sent by using the :meth:`Signal.connect` method:
 
 .. method:: Signal.connect(receiver, [sender=None, weak=True, dispatch_uid=None])
 
@@ -115,8 +114,13 @@ manual connect route:
 
     request_finished.connect(my_callback)
 
-Alternatively, you can use a ``receiver`` decorator when you define your
-receiver:
+Alternatively, you can use a :func:`receiver` decorator:
+
+.. function:: receiver(signal)
+
+    :param signal: A signal or a list of signals to connect a function to.
+
+Here's how you connect with the decorator:
 
 .. code-block:: python
 
@@ -129,16 +133,25 @@ receiver:
 
 Now, our ``my_callback`` function will be called each time a request finishes.
 
-Note that ``receiver`` can also take a list of signals to connect a function
-to.
 
 .. admonition:: Where should this code live?
 
-    You can put signal handling and registration code anywhere you like.
-    However, you'll need to make sure that the module it's in gets imported
-    early on so that the signal handling gets registered before any signals need
-    to be sent. This makes your app's ``models.py`` a good place to put
-    registration of signal handlers.
+    Strictly speaking, signal handling and registration code can live anywhere
+    you like, although it's recommended to avoid the application's root module
+    and its ``models`` module to minimize side-effects of importing code.
+
+    In practice, signal handlers are usually defined in a ``signals``
+    submodule of the application they relate to. Signal receivers are
+    connected in the :meth:`~django.apps.AppConfig.setup` method of your
+    application configuration class. If you're using the :func:`receiver`
+    decorator, simply import the ``signals`` submodule inside
+    :meth:`~django.apps.AppConfig.setup`.
+
+    .. versionchanged:: 1.7
+
+        Since :meth:`~django.apps.AppConfig.setup` didn't exist in previous
+        versions of Django, signal registration usually happened in the
+        ``models`` module.
 
 .. _connecting-to-specific-signals:
 
@@ -178,10 +191,9 @@ particular signal.
 Preventing duplicate signals
 ----------------------------
 
-In some circumstances, the module in which you are connecting signals may be
-imported multiple times. This can cause your receiver function to be
-registered more than once, and thus called multiples times for a single signal
-event.
+In some circumstances, the code connecting receivers to signals may run
+multiple times. This can cause your receiver function to be registered more
+than once, and thus called multiples times for a single signal event.
 
 If this behavior is problematic (such as when using signals to
 send an email whenever a model is saved), pass a unique identifier as

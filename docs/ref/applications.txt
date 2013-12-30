@@ -166,6 +166,12 @@ Methods
     ``model_name``. Raises :exc:`~exceptions.LookupError` if no such model
     exists. ``model_name`` is case-insensitive.
 
+.. method:: AppConfig.setup()
+
+    Subclasses can override this method to perform setup tasks such as
+    registering signals. It is called as soon as the registry is fully
+    populated.
+
 Application registry
 ====================
 
