@@ -125,11 +125,12 @@ class Apps(object):
                     self._postponed.append(app_config)
 
             if outermost:
-                for app_config in self._postponed:
-                    all_models = self.all_models[app_config.label]
-                    app_config.import_models(all_models)
-
-                del self._postponed
+                try:
+                    for app_config in self._postponed:
+                        all_models = self.all_models[app_config.label]
+                        app_config.import_models(all_models)
+                finally:
+                    del self._postponed
 
                 self.clear_cache()
                 self._models_loaded = True
