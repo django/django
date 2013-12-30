@@ -15,8 +15,8 @@ SQLite_ so you won't need to set up a database just yet.
 
 .. _sqlite: http://sqlite.org/
 
-Get Python at http://www.python.org. If you're running Linux or Mac OS X, you
-probably already have it installed.
+Get the latest version of Python at http://www.python.org/download/ or with
+your operating system's package manager.
 
 .. admonition:: Django on Jython
 
@@ -28,8 +28,8 @@ probably already have it installed.
 You can verify that Python is installed by typing ``python`` from your shell;
 you should see something like::
 
-    Python 2.7.3 (default, Jan  2 2013, 13:56:14)
-    [GCC 4.7.2] on linux2
+    Python 3.3.3 (default, Nov 26 2013, 13:33:18)
+    [GCC 4.8.2] on linux
     Type "help", "copyright", "credits" or "license" for more information.
     >>>
 

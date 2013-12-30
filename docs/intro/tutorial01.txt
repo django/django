@@ -22,13 +22,12 @@ tell Django is installed and which version by running the following command:
 If Django is installed, you should see the version of your installation. If it
 isn't, you'll get an error telling "No module named django".
 
-This tutorial is written for Django |version| and Python 2.x. If the Django
-version doesn't match, you can refer to the tutorial for your version of
-Django by using the version switcher at the bottom right corner of this page,
-or update Django to the newest version. If you are using Python 3.x, be aware
-that your code may need to differ from what is in the tutorial and you should
-continue using the tutorial only if you know what you are doing with Python
-3.x.
+This tutorial is written for Django |version| and Python 3.2 or later. If the
+Django version doesn't match, you can refer to the tutorial for your version
+of Django by using the version switcher at the bottom right corner of this
+page, or update Django to the newest version. If you are still using Python
+2.7, you will need to adjust the code samples slightly, as described in
+comments.
 
 See :doc:`How to install Django </topics/install>` for advice on how to remove
 older versions of Django and install a newer one.
@@ -154,7 +153,7 @@ purely in Python. We've included this with Django so you can develop things
 rapidly, without having to deal with configuring a production server -- such as
 Apache -- until you're ready for production.
 
-Now's a good time to note: **Don't** use this server in anything resembling a
+Now's a good time to note: **don't** use this server in anything resembling a
 production environment. It's intended only for use while developing. (We're in
 the business of making Web frameworks, not Web servers.)
 
@@ -190,9 +189,8 @@ It worked!
 
     The development server automatically reloads Python code for each request
     as needed. You don't need to restart the server for code changes to take
-    effect. However, some actions like adding files or compiling translation
-    files don't trigger a restart, so you'll have to restart the server in
-    these cases.
+    effect. However, some actions like adding files don't trigger a restart,
+    so you'll have to restart the server in these cases.
 
 Database setup
 --------------
@@ -214,8 +212,8 @@ settings:
   ``'django.db.backends.sqlite3'``,
   ``'django.db.backends.postgresql_psycopg2'``,
   ``'django.db.backends.mysql'``, or
-  ``'django.db.backends.oracle'``. Other backends are :setting:`also available
-  <DATABASE-ENGINE>`.
+  ``'django.db.backends.oracle'``. Other backends are :ref:`also available
+  <third-party-notes>`.
 
 * :setting:`NAME` -- The name of your database. If you're using SQLite, the
   database will be a file on your computer; in that case, :setting:`NAME`
@@ -654,9 +652,8 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
 Wait a minute. ``<Question: Question object>`` is, utterly, an unhelpful representation
 of this object. Let's fix that by editing the ``Question`` model (in the
 ``polls/models.py`` file) and adding a
-:meth:`~django.db.models.Model.__unicode__` method to both ``Question`` and
-``Choice``. On Python 3, simply replace ``__unicode__`` by ``__str__`` in the
-following example:
+:meth:`~django.db.models.Model.__str__` method to both ``Question`` and
+``Choice``:
 
 .. snippet::
     :filename: polls/models.py
@@ -665,42 +662,35 @@ following example:
 
     class Question(models.Model):
         # ...
-        def __unicode__(self):  # Python 3: def __str__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.question_text
 
     class Choice(models.Model):
         # ...
-        def __unicode__(self):  # Python 3: def __str__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.choice_text
 
-It's important to add :meth:`~django.db.models.Model.__unicode__` methods (or
-:meth:`~django.db.models.Model.__str__` on Python 3) to your models, not only
-for your own sanity when dealing with the interactive prompt, but also because
-objects' representations are used throughout Django's automatically-generated
-admin.
+It's important to add :meth:`~django.db.models.Model.__str__` methods to your
+models, not only for your own sanity when dealing with the interactive prompt,
+but also because objects' representations are used throughout Django's
+automatically-generated admin.
 
-.. admonition:: ``__unicode__`` or ``__str__``?
+.. admonition:: ``__str__`` or ``__unicode__``?
 
-    On Python 3, things are simpler, just use
-    :meth:`~django.db.models.Model.__str__` and forget about
-    :meth:`~django.db.models.Model.__unicode__`.
+    On Python 3, it's easy, just use
+    :meth:`~django.db.models.Model.__str__`.
 
-    If you're familiar with Python 2, you might be in the habit of adding
-    :meth:`~django.db.models.Model.__str__` methods to your classes, not
-    :meth:`~django.db.models.Model.__unicode__` methods. We use
-    :meth:`~django.db.models.Model.__unicode__` here because Django models deal
-    with Unicode by default. All data stored in your database is converted to
-    Unicode when it's returned.
+    On Python 2, you should define :meth:`~django.db.models.Model.__unicode__`
+    methods returning ``unicode`` values instead. Django models have a default
+    :meth:`~django.db.models.Model.__str__` method that calls
+    :meth:`~django.db.models.Model.__unicode__` and converts the result to a
+    UTF-8 bytestring. This means that ``unicode(p)`` will return a Unicode
+    string, and ``str(p)`` will return a bytestring, with characters encoded
+    as UTF-8. Python does the opposite: :class:`object` has a ``__unicode__``
+    method that calls ``__str__`` and interprets the result as an ASCII
+    bytestring. This difference can create confusion.
 
-    Django models have a default :meth:`~django.db.models.Model.__str__` method
-    that calls :meth:`~django.db.models.Model.__unicode__` and converts the
-    result to a UTF-8 bytestring. This means that ``unicode(p)`` will return a
-    Unicode string, and ``str(p)`` will return a normal string, with characters
-    encoded as UTF-8.
-
-    If all of this is gibberish to you, just remember to add
-    :meth:`~django.db.models.Model.__unicode__` methods to your models. With any
-    luck, things should Just Work for you.
+    If all of this is gibberish to you, just use Python 3.
 
 Note these are normal Python methods. Let's add a custom method, just for
 demonstration:

@@ -20,8 +20,8 @@ For this tutorial, we expect that you have at least a basic understanding of
 how Django works. This means you should be comfortable going through the
 existing tutorials on :doc:`writing your first Django app</intro/tutorial01>`.
 In addition, you should have a good understanding of Python itself. But if you
-don't, "Dive Into Python" (for `Python 2`__, for `Python 3`__) is a fantastic
-(and free) online book for beginning Python programmers.
+don't, `Dive Into Python`__ is a fantastic (and free) online book for
+beginning Python programmers.
 
 Those of you who are unfamiliar with version control systems and Trac will find
 that this tutorial and its links include just enough information to get started.
@@ -37,7 +37,6 @@ so that it can be of use to the widest audience.
     to |django-developers| or drop by `#django-dev on irc.freenode.net`__ to
     chat with other Django users who might be able to help.
 
-__ http://diveintopython.net/toc/index.html
 __ http://diveintopython3.net/
 __ irc://irc.freenode.net/django-dev
 
