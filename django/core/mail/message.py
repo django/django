@@ -131,20 +131,24 @@ class MIMEMixin():
         This overrides the default as_string() implementation to not mangle
         lines that begin with 'From '. See bug #13433 for details.
         """
-        # Using a normal Generator on python 3 will yield a string, which will
-        # get base64 encoded in some cases to ensure that it's always convertable
-        # to ascii. We don't want base64 encoded emails, so we use a BytesGenertor
-        # which will do the right thing and then decode according to our known
-        # encoding. See #21093 and #3472 for details.
-        if six.PY3 and sys.version_info >= (3, 3, 3):
+        fp = six.StringIO()
+        g = generator.Generator(fp, mangle_from_=False)
+        g.flatten(self, unixfrom=unixfrom)
+        return fp.getvalue()
+
+    if six.PY2:
+        as_bytes = as_string
+    else:
+        def as_bytes(self, unixfrom=False):
+            """Return the entire formatted message as bytes.
+            Optional `unixfrom' when True, means include the Unix From_ envelope
+            header.
+
+            This overrides the default as_bytes() implementation to not mangle
+            lines that begin with 'From '. See bug #13433 for details.
+            """
             fp = six.BytesIO()
             g = generator.BytesGenerator(fp, mangle_from_=False)
-            g.flatten(self, unixfrom=unixfrom)
-            encoding = self.get_charset().get_output_charset() if self.get_charset() else 'utf-8'
-            return fp.getvalue().decode(encoding)
-        else:
-            fp = six.StringIO()
-            g = generator.Generator(fp, mangle_from_=False)
             g.flatten(self, unixfrom=unixfrom)
             return fp.getvalue()
 
@@ -167,9 +171,8 @@ class SafeMIMEText(MIMEMixin, MIMEText):
             # We do it manually and trigger re-encoding of the payload.
             MIMEText.__init__(self, text, subtype, None)
             del self['Content-Transfer-Encoding']
-            # Work around a bug in python 3.3.3 [sic], see
-            # http://bugs.python.org/issue19063 for details.
-            if sys.version_info[:3] == (3, 3, 3):
+            # Workaround for versions without http://bugs.python.org/issue19063
+            if (3, 2) < sys.version_info < (3, 3, 4):
                 payload = text.encode(utf8_charset.output_charset)
                 self._payload = payload.decode('ascii', 'surrogateescape')
                 self.set_charset(utf8_charset)
