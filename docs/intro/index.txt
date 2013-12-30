@@ -29,14 +29,10 @@ place: read this material to quickly get up and running.
     `list of Python resources for non-programmers`_
 
     If you already know a few other languages and want to get up to speed with
-    Python quickly, we recommend "Dive Into Python" (for `Python 2`_, for
-    `Python 3`_, also available in a
-    `dead-tree version`_). If that's not quite your style, there are quite
-    a few other `books about Python`_.
+    Python quickly, we recommend `Dive Into Python`_. If that's not quite your
+    style, there are many other `books about Python`_.
 
     .. _python: http://python.org/
     .. _list of Python resources for non-programmers: https://wiki.python.org/moin/BeginnersGuide/NonProgrammers
-    .. _Python 2: http://diveintopython.net/
-    .. _Python 3: http://diveintopython3.net/
-    .. _dead-tree version: http://www.amazon.com/exec/obidos/ASIN/1590593561/ref=nosim/jacobian20
+    .. _Dive Into Python: http://diveintopython3.net/
     .. _books about Python: https://wiki.python.org/moin/PythonBooks
