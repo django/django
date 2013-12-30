@@ -613,6 +613,15 @@ Since :setting:`INSTALLED_APPS` now supports application configuration classes
 in addition to application modules, you should review code that accesses this
 setting directly and use the app registry (:attr:`django.apps.apps`) instead.
 
+If you're using Django in a plain Python script (not a management command) and
+rely on the :envvar:`DJANGO_SETTINGS_MODULE` environment variable, you must
+now explicitly initialize Django at the beginning of your script with::
+
+    >>> import django
+    >>> django.setup()
+
+Otherwise, you will most likely encounter a :exc:`~exceptions.RuntimeError`.
+
 The "app registry" that manages the list of installed applications doesn't
 have the same features as the old "app cache". Even though the "app cache" was
 a private API, obsolete methods and arguments will be removed after a standard

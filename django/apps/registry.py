@@ -3,7 +3,6 @@ import os
 import sys
 import warnings
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import lru_cache
 from django.utils.module_loading import import_lock
@@ -79,8 +78,6 @@ class Apps(object):
             # Application modules aren't expected to import anything, and
             # especially not other application modules, even indirectly.
             # Therefore we simply import them sequentially.
-            if installed_apps is None:
-                installed_apps = settings.INSTALLED_APPS
             for entry in installed_apps:
                 if isinstance(entry, AppConfig):
                     app_config = entry
@@ -108,7 +105,9 @@ class Apps(object):
             if self._models_loaded:
                 return
 
-            self.populate_apps()
+            if not self._apps_loaded:
+                raise RuntimeError(
+                    "populate_models() must run after populate_apps()")
 
             # Models modules are likely to import other models modules, for
             # example to reference related objects. As a consequence:
@@ -144,6 +143,15 @@ class Apps(object):
                 for app_config in self.get_app_configs():
                     app_config.setup()
 
+    def check_ready(self):
+        """
+        Raises an exception if the registry isn't ready.
+        """
+        if not self._models_loaded:
+            raise RuntimeError(
+                "App registry isn't populated yet. "
+                "Have you called django.setup()?")
+
     @property
     def ready(self):
         """
@@ -161,11 +169,7 @@ class Apps(object):
         If only_with_models_module in True (non-default), imports models and
         considers only applications containing a models module.
         """
-        if only_with_models_module:
-            self.populate_models()
-        else:
-            self.populate_apps()
-
+        self.check_ready()
         for app_config in self.app_configs.values():
             if only_with_models_module and app_config.models_module is None:
                 continue
@@ -180,11 +184,7 @@ class Apps(object):
         If only_with_models_module in True (non-default), imports models and
         considers only applications containing a models module.
         """
-        if only_with_models_module:
-            self.populate_models()
-        else:
-            self.populate_apps()
-
+        self.check_ready()
         app_config = self.app_configs.get(app_label)
         if app_config is None:
             raise LookupError("No installed app with label '%s'." % app_label)
@@ -208,8 +208,7 @@ class Apps(object):
 
         Set the corresponding keyword argument to True to include such models.
         """
-        self.populate_models()
-
+        self.check_ready()
         if app_mod:
             warnings.warn(
                 "The app_mod argument of get_models is deprecated.",
@@ -236,7 +235,7 @@ class Apps(object):
         Raises LookupError if no application exists with this label, or no
         model exists with this name in the application.
         """
-        self.populate_models()
+        self.check_ready()
         return self.get_app_config(app_label).get_model(model_name.lower())
 
     def register_model(self, app_label, model):
@@ -328,7 +327,8 @@ class Apps(object):
         imports safely (eg. that could lead to registering listeners twice),
         models are registered when they're imported and never removed.
         """
-        self.stored_app_configs.append((self.app_configs, self._apps_loaded, self._models_loaded))
+        self.check_ready()
+        self.stored_app_configs.append(self.app_configs)
         self.app_configs = OrderedDict()
         self.clear_cache()
         self._apps_loaded = False
@@ -340,7 +340,9 @@ class Apps(object):
         """
         Cancels a previous call to set_installed_apps().
         """
-        self.app_configs, self._apps_loaded, self._models_loaded = self.stored_app_configs.pop()
+        self.app_configs = self.stored_app_configs.pop()
+        self._apps_loaded = True
+        self._models_loaded = True
         self.clear_cache()
 
     def clear_cache(self):
@@ -429,9 +431,7 @@ class Apps(object):
         warnings.warn(
             "[a.path for a in get_app_configs()] supersedes get_app_paths().",
             PendingDeprecationWarning, stacklevel=2)
-
-        self.populate_models()
-
+        self.check_ready()
         app_paths = []
         for app in self.get_apps():
             app_paths.append(self._get_app_path(app))

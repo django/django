@@ -1,4 +1,3 @@
-from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
@@ -15,10 +14,6 @@ __all__ = ['BaseValidator', 'InlineValidator']
 
 
 class BaseValidator(object):
-    def __init__(self):
-        # Before we can introspect models, they need the app registry to be
-        # fully loaded so that inter-relations are set up correctly.
-        apps.populate_models()
 
     def validate(self, cls, model):
         for m in dir(self):

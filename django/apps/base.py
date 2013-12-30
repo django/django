@@ -114,8 +114,6 @@ class AppConfig(object):
         Returns the model with the given case-insensitive model_name.
 
         Raises LookupError if no model exists with this name.
-
-        This method assumes that apps.populate_models() has run.
         """
         if self.models is None:
             raise LookupError(
@@ -140,8 +138,6 @@ class AppConfig(object):
 
         Set the corresponding keyword argument to True to include such models.
         Keyword arguments aren't documented; they're a private API.
-
-        This method assumes that apps.populate_models() has run.
         """
         for model in self.models.values():
             if model._deferred and not include_deferred:
@@ -156,7 +152,8 @@ class AppConfig(object):
         # Dictionary of models for this app, primarily maintained in the
         # 'all_models' attribute of the Apps this AppConfig is attached to.
         # Injected as a parameter because it gets populated when models are
-        # imported, which may happen before populate_models() runs.
+        # imported, which might happen before populate_models() runs (or at
+        # least used to).
         self.models = all_models
 
         if module_has_submodule(self.module, MODELS_MODULE_NAME):

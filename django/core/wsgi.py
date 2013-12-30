@@ -1,5 +1,4 @@
-from django.apps import apps
-from django.conf import settings
+import django
 from django.core.handlers.wsgi import WSGIHandler
 
 
@@ -12,9 +11,5 @@ def get_wsgi_application():
     case the internal WSGI implementation changes or moves in the future.
 
     """
-    # Configure the settings (this happens automatically on the first access).
-    # Populate the app registry.
-    apps.populate_apps(settings.INSTALLED_APPS)
-    apps.populate_models()
-
+    django.setup()
     return WSGIHandler()

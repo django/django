@@ -602,9 +602,19 @@ the Python import path to your :file:`mysite/settings.py` file.
 .. admonition:: Bypassing manage.py
 
     If you'd rather not use :file:`manage.py`, no problem. Just set the
-    ``DJANGO_SETTINGS_MODULE`` environment variable to ``mysite.settings`` and
-    run ``python`` from the same directory :file:`manage.py` is in (or ensure
-    that directory is on the Python path, so that ``import mysite`` works).
+    :envvar:`DJANGO_SETTINGS_MODULE` environment variable to
+    ``mysite.settings``, start a plain Python shell, and set up Django::
+
+    >>> import django
+    >>> django.setup()
+
+    If this raises an :exc:`~exceptions.AttributeError`, you're probably using
+    a version of Django that doesn't match this tutorial version. You'll want
+    to either switch to the older tutorial or the newer Django version.
+
+    You must run ``python`` from the same directory :file:`manage.py` is in,
+    or ensure that directory is on the Python path, so that ``import mysite``
+    works.
 
     For more information on all of this, see the :doc:`django-admin.py
     documentation </ref/django-admin>`.
