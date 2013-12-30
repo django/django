@@ -568,6 +568,12 @@ Tests
 * :meth:`~django.test.TransactionTestCase.assertNumQueries` now prints
   out the list of executed queries if the assertion fails.
 
+* The new :meth:`~django.test.SimpleTestCase.assertNoBrokenLinks` assertion
+  checks for all the links rendered in a template being valid. If
+  ``internal_only`` argument is ``True`` (default), it will only check for
+  internal links. If ``follow`` argument is ``False`` (default), it will
+  consider all redirections as correct links and don't follow them.
+
 Validators
 ^^^^^^^^^^
 

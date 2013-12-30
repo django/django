@@ -13,11 +13,17 @@ from django.template import (TemplateSyntaxError,
     Context, Template, loader)
 import django.template.context
 from django.test import Client, TestCase, override_settings
+from django.test import testcases
 from django.test.client import encode_file, RequestFactory
 from django.test.utils import ContextList, str_prefix
 from django.template.response import SimpleTemplateResponse
 from django.utils._os import upath
 from django.utils.translation import ugettext_lazy
+from django.utils.six.moves import StringIO
+from django.utils.six.moves.urllib.request import (HTTPHandler, build_opener,
+                                                   install_opener)
+from django.utils.six.moves.urllib.response import addinfourl
+from django.utils.six.moves.urllib.error import HTTPError
 from django.http import HttpResponse
 from django.contrib.auth.signals import user_logged_out, user_logged_in
 from django.contrib.auth.models import User
@@ -1401,3 +1407,136 @@ class RequestFactoryEnvironmentTests(TestCase):
         self.assertEqual(request.META.get('SERVER_PROTOCOL'), 'HTTP/1.1')
         self.assertEqual(request.META.get('SCRIPT_NAME') +
                          request.META.get('PATH_INFO'), '/path/')
+
+
+_is_external_broken = False
+
+class AssertNoBrokenLinksTests(TestCase):
+    """
+    Regression tests for #5418.
+    """
+    class DummyHTTPHandler(HTTPHandler):
+        """
+        HTTP handler for ``urllib`` that returns 200 or 404 pages depending on
+        global ``_is_external_broken``.
+        """
+        def http_open(self, req):
+            response = addinfourl(fp=StringIO(''), headers={},
+                    url=req.get_full_url())
+            if _is_external_broken:
+                response.msg = 'Not Found'
+                response.code = 404
+            else:
+                response.msg = 'OK'
+                response.code = 200
+            return response
+
+    def setUp(self):
+        global _is_external_broken
+        _is_external_broken = False
+        opener = build_opener(self.DummyHTTPHandler)
+        install_opener(opener)
+
+    def tearDown(self):
+        install_opener(build_opener())
+
+    def test_no_broken_links(self):
+        "Tests that assertion confirms internal and external non-broken links."
+
+        response = self.client.get('/test_client_regress/no_broken_links_view/')
+        self.assertEqual(response.status_code, 200)
+
+        self.assertNoBrokenLinks(response, internal_only=False)
+
+    def test_broken_external_link(self):
+        "Tests that assertion finds broken external links"
+
+        response = self.client.get('/test_client_regress/broken_external_link_view/')
+        self.assertEqual(response.status_code, 200)
+
+        # No internal broken links:
+        self.assertNoBrokenLinks(response)
+
+        # But there is an external broken link:
+        global _is_external_broken
+        _is_external_broken = True
+        with self.assertRaises(AssertionError):
+            self.assertNoBrokenLinks(response, internal_only=False)
+
+    def test_broken_internal_link(self):
+        "Tests that assertion finds broken internal links"
+
+        response = self.client.get('/test_client_regress/broken_internal_link_view/')
+        self.assertEqual(response.status_code, 200)
+
+        with self.assertRaises(AssertionError) as cm:
+            self.assertNoBrokenLinks(response)
+        self.assertIn(
+            ("The link '/test_client_regress/broken_view/' on line 4"
+            " appears to be broken (status is 500)"),
+            str(cm.exception),
+        )
+
+    def test_bad_internal_link(self):
+        "Tests that assertion finds bad internal links"
+
+        response = self.client.get('/test_client_regress/bad_internal_link_view/')
+        self.assertEqual(response.status_code, 200)
+
+        with self.assertRaises(AssertionError) as cm:
+            self.assertNoBrokenLinks(response)
+        self.assertIn(
+            ("The link '/test_client_regress/bad_view/' on line 4 appears to"
+            " be broken (status is 404)"),
+            str(cm.exception),
+        )
+
+    def test_blank_link(self):
+        "Tests that links with blank hrefs are identified appropriately"
+
+        response = self.client.get('/test_client_regress/blank_link_view/')
+        self.assertEqual(response.status_code, 200)
+
+        with self.assertRaises(AssertionError) as cm:
+            self.assertNoBrokenLinks(response)
+        self.assertIn(
+            "The page contains a link with an empty href on line 8.",
+            str(cm.exception),
+        )
+
+    def test_internal_page_link(self):
+        "Tests that internal page links are valid"
+
+        response = self.client.get('/test_client_regress/internal_page_link_view/')
+        self.assertEqual(response.status_code, 200)
+
+        with self.assertRaises(AssertionError) as cm:
+            self.assertNoBrokenLinks(response)
+        self.assertIn(
+            ("The internal link to #footer on line 9 does not link to a"
+            " corresponding element with an id=\"footer\"."),
+            str(cm.exception),
+        )
+
+    def test_redirections(self):
+        "Tests that assertion confirms all successful redirections."
+
+        response = self.client.get('/test_client_regress/no_broken_links_view/')
+        self.assertEqual(response.status_code, 200)
+
+        self.assertNoBrokenLinks(response, internal_only=False, follow=False)
+        self.assertNoBrokenLinks(response, internal_only=False, follow=True)
+
+    def test_broken_redirected_link(self):
+        """
+        Tests that without following redirections assertion confirms broken
+        redirections but that when following redirections, fails.
+        """
+
+        response = self.client.get('/test_client_regress/'
+                                   'broken_redirected_link_view/')
+        self.assertEqual(response.status_code, 200)
+
+        self.assertNoBrokenLinks(response, follow=False)
+        with self.assertRaises(AssertionError):
+            self.assertNoBrokenLinks(response, follow=True)

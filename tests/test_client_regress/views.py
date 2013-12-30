@@ -3,7 +3,8 @@ import warnings
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import (HttpResponse, HttpResponseRedirect,
+                         HttpResponseServerError, HttpResponseNotFound,)
 from django.shortcuts import render_to_response
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template import RequestContext
@@ -83,6 +84,113 @@ def login_protected_redirect_view(request):
     return HttpResponseRedirect('/test_client_regress/get_view/')
 login_protected_redirect_view = login_required(login_protected_redirect_view)
 
+def no_broken_links_view(request):
+    return HttpResponse(
+    """
+    Lots of html stuff, including a few local links:
+      <a href="/test_client_regress/get_view/">here</a>
+      <a href="/test_client_regress/get_view">This should redirect to add the /</a>
+      <a some="attribute" href="/test_client_regress/no_template_view/">
+        a redirect view. Doesn't matter if closing tag missing.
+
+    Some external links:
+      <a href="http://djangoproject.com/weblog/">Django blog</a>
+
+    Some anchor links should be ignored, such as:
+      <a href="mailto:me@example.com">Send me an email</a>, or
+      <a href="ftp://example.com">Download from here</a>
+
+    Including a <a lats of bad="stuff" href="http://djangoproject.com">Missing slash</a>
+    Whole bunch of other stuff before the page ends.
+    """
+    )
+
+def broken_external_link_view(request):
+    return HttpResponse(
+    """
+    Lots of html stuff, including a few local links:
+      <a href="/test_client_regress/get_view/">here</a>
+      <a href="/test_client_regress/get_view">This should redirect to add the /</a>
+      <a some="attribute" href="/test_client_regress/no_template_view/">
+        a redirect view. Doesn't matter if closing tag missing.
+
+    Some external links:
+      <a class="this one's fine" href="http://djangoproject.com/weblog">Django blog</a>
+    But this one's a
+      <a href="http://djangoproject.com/badlink.html">Broken link</a>
+    Whole bunch of other stuff before the page ends.
+    """
+    )
+
+def broken_internal_link_view(request):
+    return HttpResponse(
+    """
+    Lots of html stuff, including a few local links:
+
+      <a class="test" href="/test_client_regress/broken_view/">A broken view</a>
+
+    """
+    )
+
+def broken_redirected_link_view(request):
+    return HttpResponse(
+    """
+    Lots of html stuff, including a few local links:
+
+      <a class="test" href="/test_client_regress/broken_view">A broken
+      redirected view</a>
+
+    """
+    )
+
+def bad_internal_link_view(request):
+    return HttpResponse(
+    """
+    Lots of html stuff, including a few local links:
+
+      <a class="test" href="/test_client_regress/bad_view/">A bad view</a>
+
+    """
+    )
+
+def blank_link_view(request):
+    return HttpResponse(
+    """
+    If a link uses the url template tag to create the link for the href like
+    this:
+     href="{% url my-url-name arg %}"
+    and fails, it will end up with blank href="", this would be useful to
+    catch!
+
+      <a class="test" href="">A blank link.</a>
+
+    """
+    )
+
+def internal_page_link_view(request):
+    return HttpResponse(
+    """
+    A link which is just internal to the page, href="#content" needs to
+    have a matching element with an id="content" on the page.
+
+      <a class="test" href="#content">This one should be fine</a>
+
+      <a href="#">This one should be ignored (lots of JS uses)</a>
+
+      <a href="#footer">But this one isn't valid</a> as there's no corresponding
+      element with the id="footer"
+
+      <div id="content">
+        Here's the content
+      </div>
+    """
+    )
+
+def broken_view(request):
+    return HttpResponseServerError()
+
+def bad_view(request):
+    return HttpResponseNotFound()
 
 def set_session_view(request):
     "A view that sets a session variable"
