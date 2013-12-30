@@ -696,7 +696,7 @@ automatically-generated admin.
     :meth:`~django.db.models.Model.__unicode__` and converts the result to a
     UTF-8 bytestring. This means that ``unicode(p)`` will return a Unicode
     string, and ``str(p)`` will return a bytestring, with characters encoded
-    as UTF-8. Python does the opposite: :class:`object` has a ``__unicode__``
+    as UTF-8. Python does the opposite: ``object`` has a ``__unicode__``
     method that calls ``__str__`` and interprets the result as an ASCII
     bytestring. This difference can create confusion.
 
