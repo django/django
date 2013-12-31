@@ -222,11 +222,9 @@ set to ``True`` (which is the default) the default configuration is completely
 overridden. Alternatively you can redefine some or all of the loggers by
 setting ``disable_existing_loggers`` to ``False``.
 
-Logging is configured as soon as settings have been loaded
-(either manually using :func:`~django.conf.settings.configure` or when at least
-one setting is accessed). Since the loading of settings is one of the first
-things that Django does, you can be certain that loggers are always ready for
-use in your project code.
+Logging is configured as part of the general Django ``setup()`` function.
+Therefore, you can be certain that loggers are always ready for use in your
+project code.
 
 .. _dictConfig format: http://docs.python.org/library/logging.config.html#configuration-dictionary-schema
 

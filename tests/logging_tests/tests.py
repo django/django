@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import logging
 import warnings
 
-from django.conf import LazySettings
 from django.core import mail
 from django.test import TestCase, RequestFactory, override_settings
 from django.test.utils import patch_logger
@@ -342,15 +341,14 @@ def dictConfig(config):
 dictConfig.called = False
 
 
-class SettingsConfigureLogging(TestCase):
+class SetupConfigureLogging(TestCase):
     """
-    Test that calling settings.configure() initializes the logging
-    configuration.
+    Test that calling django.setup() initializes the logging configuration.
     """
+    @override_settings(LOGGING_CONFIG='logging_tests.tests.dictConfig')
     def test_configure_initializes_logging(self):
-        settings = LazySettings()
-        settings.configure(
-            LOGGING_CONFIG='logging_tests.tests.dictConfig')
+        from django import setup
+        setup()
         self.assertTrue(dictConfig.called)
 
 

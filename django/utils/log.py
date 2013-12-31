@@ -1,8 +1,11 @@
 import logging
+import sys
+import warnings
 
 from django.conf import settings
 from django.core import mail
 from django.core.mail import get_connection
+from django.utils.module_loading import import_by_path
 from django.views.debug import ExceptionReporter, get_exception_reporter_filter
 
 # Imports kept for backwards-compatibility in Django 1.7.
@@ -59,6 +62,24 @@ DEFAULT_LOGGING = {
         },
     }
 }
+
+
+def configure_logging(logging_config, logging_settings):
+    if not sys.warnoptions:
+        # Route warnings through python logging
+        logging.captureWarnings(True)
+        # Allow DeprecationWarnings through the warnings filters
+        warnings.simplefilter("default", DeprecationWarning)
+
+    if logging_config:
+         # First find the logging configuration function ...
+        logging_config_func = import_by_path(logging_config)
+
+        logging_config_func(DEFAULT_LOGGING)
+
+        # ... then invoke it with the logging settings
+        if logging_settings:
+            logging_config_func(logging_settings)
 
 
 class AdminEmailHandler(logging.Handler):
