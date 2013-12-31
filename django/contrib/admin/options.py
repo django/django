@@ -11,6 +11,7 @@ from django.contrib.admin import widgets, helpers
 from django.contrib.admin.utils import (unquote, flatten_fieldsets, get_deleted_objects,
     model_format_dict, NestedObjects, lookup_needs_distinct)
 from django.contrib.admin import validation
+from django.contrib.admin.exceptions import DisallowedModelAdminLookup
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.auth import get_permission_codename
@@ -155,11 +156,16 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
             # OneToOneField with parent_link=True or a M2M intermediary.
             if formfield and db_field.name not in self.raw_id_fields:
                 related_modeladmin = self.admin_site._registry.get(db_field.rel.to)
-                can_add_related = bool(related_modeladmin and
-                    related_modeladmin.has_add_permission(request))
+                wrapper_kwargs = {}
+                if related_modeladmin:
+                    wrapper_kwargs.update(
+                        can_add_related=related_modeladmin.has_add_permission(request),
+                        can_change_related=related_modeladmin.has_change_permission(request),
+                        can_delete_related=related_modeladmin.has_delete_permission(request)
+                    )
                 formfield.widget = widgets.RelatedFieldWidgetWrapper(
-                    formfield.widget, db_field.rel, self.admin_site,
-                    can_add_related=can_add_related)
+                    formfield.widget, db_field.rel, self.admin_site, **wrapper_kwargs
+                )
 
             return formfield
 
@@ -593,18 +599,42 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.views.main import ChangeList
         return ChangeList
 
-    def get_object(self, request, object_id):
+    def get_object(self, request, object_id, from_field=None):
         """
-        Returns an instance matching the primary key provided. ``None``  is
-        returned if no match is found (or the object_id failed validation
-        against the primary key field).
+        Returns an instance matching the field and value provided, the primary
+        key is used if no field is provided. ``None`` is returned if the
+        field doesn't exists, if no match is found or the object_id failed
+        validation.
         """
         queryset = self.get_queryset(request)
         model = queryset.model
+        opts = model._meta
+
+        if from_field is None:
+            field = opts.pk
+        else:
+            # Since `from_field` can be user provided we make sure the field
+            # exists and at least one registered model references it.
+            try:
+                field = opts.get_field(from_field)
+            except FieldDoesNotExist:
+                raise DisallowedModelAdminLookup(
+                    "Filtering by %s is not allowed" % from_field
+                )
+            for related_object in opts.get_all_related_objects():
+                # XXX: This will required adjustments once composite FK lands.
+                if (related_object.model in self.admin_site._registry and
+                    related_object.field.foreign_related_fields[0] is field):
+                    break
+            else:
+                raise DisallowedModelAdminLookup(
+                    "Filtering by %s is not allowed" % from_field
+                )
+
         try:
-            object_id = model._meta.pk.to_python(object_id)
-            return queryset.get(pk=object_id)
-        except (model.DoesNotExist, ValidationError, ValueError):
+            value = field.to_python(object_id)
+            return queryset.get(**{field.name: value})
+        except (model.DoesNotExist, ValueError, ValidationError):
             return None
 
     def get_changelist_form(self, request, **kwargs):
@@ -1071,6 +1101,21 @@ class ModelAdmin(BaseModelAdmin):
         Determines the HttpResponse for the change_view stage.
         """
 
+        if IS_POPUP_VAR in request.POST:
+            to_field = request.POST.get(TO_FIELD_VAR)
+            if to_field:
+                attr = str(to_field)
+            else:
+                attr = obj._meta.pk.attname
+            value = escape(request.resolver_match.args[0])
+            new_value = obj.serializable_value(attr)
+            return SimpleTemplateResponse('admin/popup_response.html', {
+                'action': 'change',
+                'value': escape(value),
+                'obj': escapejs(obj),
+                'new_value': escape(new_value)
+            })
+
         opts = self.model._meta
         pk_value = obj._get_pk_val()
         preserved_filters = self.get_preserved_filters(request)
@@ -1209,17 +1254,32 @@ class ModelAdmin(BaseModelAdmin):
             self.message_user(request, msg, messages.WARNING)
             return None
 
-    def response_delete(self, request, obj_display):
+    def response_delete(self, request, obj, obj_id):
         """
         Determines the HttpResponse for the delete_view stage.
         """
 
         opts = self.model._meta
 
+        if IS_POPUP_VAR in request.POST:
+            to_field = request.POST.get(TO_FIELD_VAR)
+            if to_field:
+                attr = str(to_field)
+            else:
+                attr = opts.pk.attname
+            # Assign back the pk since it was removed on deletion and might
+            # be required for value retrieval.
+            setattr(obj, opts.pk.attname, obj_id)
+            value = obj.serializable_value(attr)
+            return SimpleTemplateResponse('admin/popup_response.html', {
+                'action': 'delete',
+                'value': escape(value)
+            })
+
         self.message_user(request,
             _('The %(name)s "%(obj)s" was deleted successfully.') % {
                 'name': force_text(opts.verbose_name),
-                'obj': force_text(obj_display)
+                'obj': force_text(obj)
             }, messages.SUCCESS)
 
         if self.has_change_permission(request, None):
@@ -1238,6 +1298,11 @@ class ModelAdmin(BaseModelAdmin):
     def render_delete_form(self, request, context):
         opts = self.model._meta
         app_label = opts.app_label
+
+        context.update(
+            to_field_var=TO_FIELD_VAR,
+            is_popup_var=IS_POPUP_VAR
+        )
 
         return TemplateResponse(request,
             self.delete_confirmation_template or [
@@ -1323,7 +1388,10 @@ class ModelAdmin(BaseModelAdmin):
         model = self.model
         opts = model._meta
 
-        obj = self.get_object(request, unquote(object_id))
+        to_field = request.POST.get(
+            TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR)
+        )
+        obj = self.get_object(request, unquote(object_id), to_field)
 
         if not self.has_change_permission(request, obj):
             raise PermissionDenied
@@ -1380,8 +1448,7 @@ class ModelAdmin(BaseModelAdmin):
             original=obj,
             is_popup=(IS_POPUP_VAR in request.POST or
                       IS_POPUP_VAR in request.GET),
-            to_field=request.POST.get(TO_FIELD_VAR,
-                                      request.GET.get(TO_FIELD_VAR)),
+            to_field=to_field,
             media=media,
             inline_admin_formsets=inline_admin_formsets,
             errors=helpers.AdminErrorList(form, formsets),
@@ -1555,7 +1622,10 @@ class ModelAdmin(BaseModelAdmin):
         opts = self.model._meta
         app_label = opts.app_label
 
-        obj = self.get_object(request, unquote(object_id))
+        to_field = request.POST.get(
+            TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR)
+        )
+        obj = self.get_object(request, unquote(object_id), to_field)
 
         if not self.has_delete_permission(request, obj):
             raise PermissionDenied
@@ -1580,7 +1650,7 @@ class ModelAdmin(BaseModelAdmin):
             self.log_deletion(request, obj, obj_display)
             self.delete_model(request, obj)
 
-            return self.response_delete(request, obj_display)
+            return self.response_delete(request, obj, object_id)
 
         object_name = force_text(opts.verbose_name)
 
@@ -1600,6 +1670,9 @@ class ModelAdmin(BaseModelAdmin):
             opts=opts,
             app_label=app_label,
             preserved_filters=self.get_preserved_filters(request),
+            is_popup=(IS_POPUP_VAR in request.POST or
+                      IS_POPUP_VAR in request.GET),
+            to_field=to_field
         )
         context.update(extra_context or {})
 
