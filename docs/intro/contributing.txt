@@ -281,7 +281,7 @@ correctly in a couple different situations.
     computer programming, so there's lots of information out there:
 
     * A good first look at writing tests for Django can be found in the
-      documentation on :doc:`Testing Django applications </topics/testing/overview>`.
+      documentation on :doc:`/topics/testing/overview`.
     * Dive Into Python (a free online book for beginning Python developers)
       includes a great `introduction to Unit Testing`__.
     * After reading those, if you want something a little meatier to sink
