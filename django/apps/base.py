@@ -159,7 +159,7 @@ class AppConfig(object):
             models_module_name = '%s.%s' % (self.name, MODELS_MODULE_NAME)
             self.models_module = import_module(models_module_name)
 
-    def setup(self):
+    def ready(self):
         """
-        Override this method in subclasses to run setup code.
+        Override this method in subclasses to run code when Django starts.
         """

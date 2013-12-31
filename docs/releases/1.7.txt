@@ -74,7 +74,7 @@ attach configuration data to applications.
 Improvements thus far include:
 
 * Applications can run code at startup, before Django does anything else, with
-  the :meth:`~django.apps.AppConfig.setup` method of their configuration.
+  the :meth:`~django.apps.AppConfig.ready` method of their configuration.
 
 * It is possible to omit ``models.py`` entirely if an application doesn't
   have any models.

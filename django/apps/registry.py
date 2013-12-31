@@ -105,7 +105,7 @@ class Apps(object):
             self.ready = True
 
             for app_config in self.get_app_configs():
-                app_config.setup()
+                app_config.ready()
 
     def check_ready(self):
         """

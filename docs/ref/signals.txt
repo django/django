@@ -355,7 +355,7 @@ been defined and registered with Django's model system. Django uses this
 signal internally; it's not generally used in third-party applications.
 
 Since this signal is sent during the app registry population process, and
-:meth:`AppConfig.setup() <django.apps.AppConfig.setup>` runs after the app
+:meth:`AppConfig.ready() <django.apps.AppConfig.ready>` runs after the app
 registry is fully populated, receivers cannot be connected in that method.
 One possibility is to connect them ``AppConfig.__init__()`` instead, taking
 care not to import models or trigger calls to the app registry.
