@@ -608,42 +608,82 @@ methods are only referring to fields or other items in ``model._meta``.
 App-loading changes
 ~~~~~~~~~~~~~~~~~~~
 
+Start-up sequence
+^^^^^^^^^^^^^^^^^
+
+Django 1.7 loads application configurations and models as soon as it starts.
+While this behavior is more straightforward and is believed to be more robust,
+regressions cannot be ruled out. You may encounter the following exceptions:
+
+* ``RuntimeError: App registry isn't ready yet.`` This happens when importing
+  an application configuration or a models module triggers code that depends
+  on the app registry.
+
+  For example, :func:`~django.utils.translation.ugettext()` uses the app
+  registry to look up translation catalogs in applications. To translate at
+  import time, you need :func:`~django.utils.translation.ugettext_lazy()`
+  instead. (Using :func:`~django.utils.translation.ugettext()` would be a bug,
+  because the translation would happen at import time, rather than at each
+  request depending on the active language.)
+
+  Executing database queries with the ORM at import time in models modules
+  will also trigger this exception. The ORM cannot function properly until all
+  models are available.
+
+* ``ImportError: cannot import name ...`` This happens if the import sequence
+  ends up in a loop.
+
+  To eliminate such problems, you should minimize dependencies between your
+  models modules and do as little work as possible at import time. To avoid
+  executing code at import time, you can move it into a function and cache its
+  results. The code will be executed when you first need its results. This
+  concept is known as "lazy evaluation".
+
+Standalone scripts
+^^^^^^^^^^^^^^^^^^
+
+If you're using Django in a plain Python script — rather than a management
+command — and you rely on the :envvar:`DJANGO_SETTINGS_MODULE` environment
+variable, you must now explicitly initialize Django at the beginning of your
+script with::
+
+    >>> import django
+    >>> django.setup()
+
+Otherwise, you will hit ``RuntimeError: App registry isn't ready yet.``
+
+Subclassing AppCommand
+^^^^^^^^^^^^^^^^^^^^^^
+
+Subclasses of :class:`~django.core.management.AppCommand` must now implement a
+:meth:`~django.core.management.AppCommand.handle_app_config` method instead of
+``handle_app()``. This method receives an :class:`~django.apps.AppConfig`
+instance instead of a models module.
+
+App registry consistency
+^^^^^^^^^^^^^^^^^^^^^^^^
+
 You should make sure that your project doesn't import models from applications
 that aren't in :setting:`INSTALLED_APPS`. Relations involving such models may
 not be created properly.
 
-Subclasses of :class:`~django.core.management.AppCommand` must now implement a
-:meth:`~django.core.management.AppCommand.handle_app_config` method instead of
-``handle_app()``. This method receives an :class:`~django.apps.AppConfig` instance.
+Introspecting applications
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Since :setting:`INSTALLED_APPS` now supports application configuration classes
 in addition to application modules, you should review code that accesses this
 setting directly and use the app registry (:attr:`django.apps.apps`) instead.
 
-If you're using Django in a plain Python script (not a management command) and
-rely on the :envvar:`DJANGO_SETTINGS_MODULE` environment variable, you must
-now explicitly initialize Django at the beginning of your script with::
-
-    >>> import django
-    >>> django.setup()
-
-Otherwise, you will most likely encounter a :exc:`~exceptions.RuntimeError`.
-
-The "app registry" that manages the list of installed applications doesn't
-have the same features as the old "app cache". Even though the "app cache" was
-a private API, obsolete methods and arguments will be removed after a standard
-deprecation period. In addition, the following changes take effect
-immediately:
+The app registry has preserved some features of the old app cache. Even though
+the app cache was a private API, obsolete methods and arguments will be
+removed through a standard deprecation path, with the exception of the
+following changes that take effect immediately:
 
 * ``get_model`` raises :exc:`~exceptions.LookupError` instead of returning
   ``None`` when no model is found.
 
 * The ``only_installed`` argument of ``get_model`` and ``get_models`` no
   longer exists, nor does the ``seed_cache`` argument of ``get_model``.
-
-While the new implementation is believed to be more robust, regressions cannot
-be ruled out, especially during the import sequence. Circular imports that
-didn't happen with previous versions of Django might appear.
 
 Behavior of ``LocMemCache`` regarding pickle errors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

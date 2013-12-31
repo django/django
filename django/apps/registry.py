@@ -97,9 +97,7 @@ class Apps(object):
         Raises an exception if the registry isn't ready.
         """
         if not self.ready:
-            raise RuntimeError(
-                "App registry isn't populated yet. "
-                "Have you called django.setup()?")
+            raise RuntimeError("App registry isn't ready yet.")
 
     def get_app_configs(self):
         """
