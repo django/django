@@ -21,7 +21,7 @@ get_models = apps.get_models
 get_model = apps.get_model
 register_models = apps.register_models
 load_app = apps.load_app
-app_cache_ready = apps.ready
+app_cache_ready = apps.app_cache_ready
 
 
 # This method doesn't return anything interesting in Django 1.6. Maintain it
