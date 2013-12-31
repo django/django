@@ -364,12 +364,14 @@ class DeprecationDisplayTest(AdminScriptTestCase):
     def test_runner_deprecation_verbosity_default(self):
         args = ['test', '--settings=test_project.settings', 'test_runner_deprecation_app']
         out, err = self.run_django_admin(args)
+        self.assertIn("Ran 1 test", err)
         self.assertIn("DeprecationWarning: warning from test", err)
         self.assertIn("DeprecationWarning: module-level warning from deprecation_app", err)
 
     def test_runner_deprecation_verbosity_zero(self):
-        args = ['test', '--settings=settings', '--verbosity=0']
+        args = ['test', '--settings=test_project.settings', '--verbosity=0', 'test_runner_deprecation_app']
         out, err = self.run_django_admin(args)
+        self.assertIn("Ran 1 test", err)
         self.assertFalse("DeprecationWarning: warning from test" in err)
 
 
