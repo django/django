@@ -13,6 +13,18 @@ def expectedFailureIf(condition):
     return lambda func: func
 
 
+@contextmanager
+def change_cwd(directory):
+    current_dir = os.path.abspath(os.path.dirname(__file__))
+    new_dir = os.path.join(current_dir, directory)
+    old_cwd = os.getcwd()
+    os.chdir(new_dir)
+    try:
+        yield
+    finally:
+        os.chdir(old_cwd)
+
+
 class DiscoverRunnerTest(TestCase):
 
     def test_dotted_test_module(self):
@@ -51,22 +63,24 @@ class DiscoverRunnerTest(TestCase):
         self.assertEqual(count, 1)
 
     def test_file_path(self):
-        @contextmanager
-        def change_cwd_to_tests():
-            """Change CWD to tests directory (one level up from this file)"""
-            current_dir = os.path.abspath(os.path.dirname(__file__))
-            tests_dir = os.path.join(current_dir, '..')
-            old_cwd = os.getcwd()
-            os.chdir(tests_dir)
-            yield
-            os.chdir(old_cwd)
-
-        with change_cwd_to_tests():
+        with change_cwd(".."):
             count = DiscoverRunner().build_suite(
                 ["test_discovery_sample/"],
             ).countTestCases()
 
         self.assertEqual(count, 3)
+
+    def test_empty_label(self):
+        """
+        If the test label is empty, discovery should happen on the current
+        working directory.
+        """
+        with change_cwd("."):
+            suite = DiscoverRunner().build_suite([])
+            self.assertEqual(
+                suite._tests[0].id().split(".")[0],
+                os.path.basename(os.getcwd()),
+            )
 
     def test_empty_test_case(self):
         count = DiscoverRunner().build_suite(
