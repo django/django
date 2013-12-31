@@ -230,13 +230,40 @@ use in your project code.
 
 .. _dictConfig format: http://docs.python.org/library/logging.config.html#configuration-dictionary-schema
 
-An example
-----------
+Examples
+--------
 
 The full documentation for `dictConfig format`_ is the best source of
 information about logging configuration dictionaries. However, to give
-you a taste of what is possible, here is an example of a fairly
-complex logging setup, configured using :func:`logging.config.dictConfig`::
+you a taste of what is possible, here are a couple examples.
+
+First, here's a simple configuration which writes all request logging from the
+:ref:`django-request-logger` logger to a local file::
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'file': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': '/path/to/django/debug.log',
+            },
+        },
+        'loggers': {
+            'django.request': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+        },
+    }
+
+If you use this example, be sure to change the ``'filename'`` path to a
+location that's writable by the user that's running the Django application.
+
+Second, here's an example of a fairly complex logging setup, configured using
+:func:`logging.config.dictConfig`::
 
     LOGGING = {
         'version': 1,
@@ -395,6 +422,8 @@ Django provides four built-in loggers.
 
 ``django`` is the catch-all logger. No messages are posted directly to
 this logger.
+
+.. _django-request-logger:
 
 ``django.request``
 ~~~~~~~~~~~~~~~~~~
