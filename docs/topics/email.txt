@@ -588,6 +588,5 @@ the email body. You then only need to set the :setting:`EMAIL_HOST` and
 :setting:`EMAIL_PORT` accordingly. For a more detailed discussion of SMTP
 server options, see the Python documentation for the :mod:`smtpd` module.
 
-For information about unit-testing the sending of emails in your
-application, see the :ref:`topics-testing-email` section of :doc:`Testing
-Django applications </topics/testing/overview>`.
+For information about unit-testing the sending of emails in your application,
+see the :ref:`topics-testing-email` section of the testing documentation.

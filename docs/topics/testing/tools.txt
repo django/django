@@ -1,0 +1,1514 @@
+=============
+Testing tools
+=============
+
+.. currentmodule:: django.test
+
+Django provides a small set of tools that come in handy when writing tests.
+
+.. _test-client:
+
+The test client
+---------------
+
+.. module:: django.test.client
+   :synopsis: Django's test client.
+
+The test client is a Python class that acts as a dummy Web browser, allowing
+you to test your views and interact with your Django-powered application
+programmatically.
+
+Some of the things you can do with the test client are:
+
+* Simulate GET and POST requests on a URL and observe the response --
+  everything from low-level HTTP (result headers and status codes) to
+  page content.
+
+* See the chain of redirects (if any) and check the URL and status code at
+  each step.
+
+* Test that a given request is rendered by a given Django template, with
+  a template context that contains certain values.
+
+Note that the test client is not intended to be a replacement for Selenium_ or
+other "in-browser" frameworks. Django's test client has a different focus. In
+short:
+
+* Use Django's test client to establish that the correct template is being
+  rendered and that the template is passed the correct context data.
+
+* Use in-browser frameworks like Selenium_ to test *rendered* HTML and the
+  *behavior* of Web pages, namely JavaScript functionality. Django also
+  provides special support for those frameworks; see the section on
+  :class:`~django.test.LiveServerTestCase` for more details.
+
+A comprehensive test suite should use a combination of both test types.
+
+Overview and a quick example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To use the test client, instantiate ``django.test.client.Client`` and retrieve
+Web pages::
+
+    >>> from django.test.client import Client
+    >>> c = Client()
+    >>> response = c.post('/login/', {'username': 'john', 'password': 'smith'})
+    >>> response.status_code
+    200
+    >>> response = c.get('/customer/details/')
+    >>> response.content
+    '<!DOCTYPE html...'
+
+As this example suggests, you can instantiate ``Client`` from within a session
+of the Python interactive interpreter.
+
+Note a few important things about how the test client works:
+
+* The test client does *not* require the Web server to be running. In fact,
+  it will run just fine with no Web server running at all! That's because
+  it avoids the overhead of HTTP and deals directly with the Django
+  framework. This helps make the unit tests run quickly.
+
+* When retrieving pages, remember to specify the *path* of the URL, not the
+  whole domain. For example, this is correct::
+
+      >>> c.get('/login/')
+
+  This is incorrect::
+
+      >>> c.get('http://www.example.com/login/')
+
+  The test client is not capable of retrieving Web pages that are not
+  powered by your Django project. If you need to retrieve other Web pages,
+  use a Python standard library module such as :mod:`urllib` or
+  :mod:`urllib2`.
+
+* To resolve URLs, the test client uses whatever URLconf is pointed-to by
+  your :setting:`ROOT_URLCONF` setting.
+
+* Although the above example would work in the Python interactive
+  interpreter, some of the test client's functionality, notably the
+  template-related functionality, is only available *while tests are
+  running*.
+
+  The reason for this is that Django's test runner performs a bit of black
+  magic in order to determine which template was loaded by a given view.
+  This black magic (essentially a patching of Django's template system in
+  memory) only happens during test running.
+
+* By default, the test client will disable any CSRF checks
+  performed by your site.
+
+  If, for some reason, you *want* the test client to perform CSRF
+  checks, you can create an instance of the test client that
+  enforces CSRF checks. To do this, pass in the
+  ``enforce_csrf_checks`` argument when you construct your
+  client::
+
+      >>> from django.test import Client
+      >>> csrf_client = Client(enforce_csrf_checks=True)
+
+Making requests
+~~~~~~~~~~~~~~~
+
+Use the ``django.test.client.Client`` class to make requests.
+
+.. class:: Client(enforce_csrf_checks=False, **defaults)
+
+    It requires no arguments at time of construction. However, you can use
+    keywords arguments to specify some default headers. For example, this will
+    send a ``User-Agent`` HTTP header in each request::
+
+        >>> c = Client(HTTP_USER_AGENT='Mozilla/5.0')
+
+    The values from the ``extra`` keywords arguments passed to
+    :meth:`~django.test.client.Client.get()`,
+    :meth:`~django.test.client.Client.post()`, etc. have precedence over
+    the defaults passed to the class constructor.
+
+    The ``enforce_csrf_checks`` argument can be used to test CSRF
+    protection (see above).
+
+    Once you have a ``Client`` instance, you can call any of the following
+    methods:
+
+    .. method:: Client.get(path, data={}, follow=False, **extra)
+
+
+        Makes a GET request on the provided ``path`` and returns a ``Response``
+        object, which is documented below.
+
+        The key-value pairs in the ``data`` dictionary are used to create a GET
+        data payload. For example::
+
+            >>> c = Client()
+            >>> c.get('/customers/details/', {'name': 'fred', 'age': 7})
+
+        ...will result in the evaluation of a GET request equivalent to::
+
+            /customers/details/?name=fred&age=7
+
+        The ``extra`` keyword arguments parameter can be used to specify
+        headers to be sent in the request. For example::
+
+            >>> c = Client()
+            >>> c.get('/customers/details/', {'name': 'fred', 'age': 7},
+            ...       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        ...will send the HTTP header ``HTTP_X_REQUESTED_WITH`` to the
+        details view, which is a good way to test code paths that use the
+        :meth:`django.http.HttpRequest.is_ajax()` method.
+
+        .. admonition:: CGI specification
+
+            The headers sent via ``**extra`` should follow CGI_ specification.
+            For example, emulating a different "Host" header as sent in the
+            HTTP request from the browser to the server should be passed
+            as ``HTTP_HOST``.
+
+            .. _CGI: http://www.w3.org/CGI/
+
+        If you already have the GET arguments in URL-encoded form, you can
+        use that encoding instead of using the data argument. For example,
+        the previous GET request could also be posed as::
+
+        >>> c = Client()
+        >>> c.get('/customers/details/?name=fred&age=7')
+
+        If you provide a URL with both an encoded GET data and a data argument,
+        the data argument will take precedence.
+
+        If you set ``follow`` to ``True`` the client will follow any redirects
+        and a ``redirect_chain`` attribute will be set in the response object
+        containing tuples of the intermediate urls and status codes.
+
+        If you had a URL ``/redirect_me/`` that redirected to ``/next/``, that
+        redirected to ``/final/``, this is what you'd see::
+
+            >>> response = c.get('/redirect_me/', follow=True)
+            >>> response.redirect_chain
+            [(u'http://testserver/next/', 302), (u'http://testserver/final/', 302)]
+
+    .. method:: Client.post(path, data={}, content_type=MULTIPART_CONTENT, follow=False, **extra)
+
+        Makes a POST request on the provided ``path`` and returns a
+        ``Response`` object, which is documented below.
+
+        The key-value pairs in the ``data`` dictionary are used to submit POST
+        data. For example::
+
+            >>> c = Client()
+            >>> c.post('/login/', {'name': 'fred', 'passwd': 'secret'})
+
+        ...will result in the evaluation of a POST request to this URL::
+
+            /login/
+
+        ...with this POST data::
+
+            name=fred&passwd=secret
+
+        If you provide ``content_type`` (e.g. :mimetype:`text/xml` for an XML
+        payload), the contents of ``data`` will be sent as-is in the POST
+        request, using ``content_type`` in the HTTP ``Content-Type`` header.
+
+        If you don't provide a value for ``content_type``, the values in
+        ``data`` will be transmitted with a content type of
+        :mimetype:`multipart/form-data`. In this case, the key-value pairs in
+        ``data`` will be encoded as a multipart message and used to create the
+        POST data payload.
+
+        To submit multiple values for a given key -- for example, to specify
+        the selections for a ``<select multiple>`` -- provide the values as a
+        list or tuple for the required key. For example, this value of ``data``
+        would submit three selected values for the field named ``choices``::
+
+            {'choices': ('a', 'b', 'd')}
+
+        Submitting files is a special case. To POST a file, you need only
+        provide the file field name as a key, and a file handle to the file you
+        wish to upload as a value. For example::
+
+            >>> c = Client()
+            >>> with open('wishlist.doc') as fp:
+            ...     c.post('/customers/wishes/', {'name': 'fred', 'attachment': fp})
+
+        (The name ``attachment`` here is not relevant; use whatever name your
+        file-processing code expects.)
+
+        Note that if you wish to use the same file handle for multiple
+        ``post()`` calls then you will need to manually reset the file
+        pointer between posts. The easiest way to do this is to
+        manually close the file after it has been provided to
+        ``post()``, as demonstrated above.
+
+        You should also ensure that the file is opened in a way that
+        allows the data to be read. If your file contains binary data
+        such as an image, this means you will need to open the file in
+        ``rb`` (read binary) mode.
+
+        The ``extra`` argument acts the same as for :meth:`Client.get`.
+
+        If the URL you request with a POST contains encoded parameters, these
+        parameters will be made available in the request.GET data. For example,
+        if you were to make the request::
+
+        >>> c.post('/login/?visitor=true', {'name': 'fred', 'passwd': 'secret'})
+
+        ... the view handling this request could interrogate request.POST
+        to retrieve the username and password, and could interrogate request.GET
+        to determine if the user was a visitor.
+
+        If you set ``follow`` to ``True`` the client will follow any redirects
+        and a ``redirect_chain`` attribute will be set in the response object
+        containing tuples of the intermediate urls and status codes.
+
+    .. method:: Client.head(path, data={}, follow=False, **extra)
+
+        Makes a HEAD request on the provided ``path`` and returns a
+        ``Response`` object. This method works just like :meth:`Client.get`,
+        including the ``follow`` and ``extra`` arguments, except it does not
+        return a message body.
+
+    .. method:: Client.options(path, data='', content_type='application/octet-stream', follow=False, **extra)
+
+        Makes an OPTIONS request on the provided ``path`` and returns a
+        ``Response`` object. Useful for testing RESTful interfaces.
+
+        When ``data`` is provided, it is used as the request body, and
+        a ``Content-Type`` header is set to ``content_type``.
+
+        .. versionchanged:: 1.5
+
+            :meth:`Client.options` used to process ``data`` like
+            :meth:`Client.get`.
+
+        The ``follow`` and ``extra`` arguments act the same as for
+        :meth:`Client.get`.
+
+    .. method:: Client.put(path, data='', content_type='application/octet-stream', follow=False, **extra)
+
+        Makes a PUT request on the provided ``path`` and returns a
+        ``Response`` object. Useful for testing RESTful interfaces.
+
+        When ``data`` is provided, it is used as the request body, and
+        a ``Content-Type`` header is set to ``content_type``.
+
+        .. versionchanged:: 1.5
+
+            :meth:`Client.put` used to process ``data`` like
+            :meth:`Client.post`.
+
+        The ``follow`` and ``extra`` arguments act the same as for
+        :meth:`Client.get`.
+
+    .. method:: Client.patch(path, data='', content_type='application/octet-stream', follow=False, **extra)
+
+        Makes a PATCH request on the provided ``path`` and returns a
+        ``Response`` object. Useful for testing RESTful interfaces.
+
+        The ``follow`` and ``extra`` arguments act the same as for
+        :meth:`Client.get`.
+
+    .. method:: Client.delete(path, data='', content_type='application/octet-stream', follow=False, **extra)
+
+        Makes an DELETE request on the provided ``path`` and returns a
+        ``Response`` object. Useful for testing RESTful interfaces.
+
+        When ``data`` is provided, it is used as the request body, and
+        a ``Content-Type`` header is set to ``content_type``.
+
+        .. versionchanged:: 1.5
+
+            :meth:`Client.delete` used to process ``data`` like
+            :meth:`Client.get`.
+
+        The ``follow`` and ``extra`` arguments act the same as for
+        :meth:`Client.get`.
+
+
+    .. method:: Client.login(**credentials)
+
+        If your site uses Django's :doc:`authentication system</topics/auth/index>`
+        and you deal with logging in users, you can use the test client's
+        ``login()`` method to simulate the effect of a user logging into the
+        site.
+
+        After you call this method, the test client will have all the cookies
+        and session data required to pass any login-based tests that may form
+        part of a view.
+
+        The format of the ``credentials`` argument depends on which
+        :ref:`authentication backend <authentication-backends>` you're using
+        (which is configured by your :setting:`AUTHENTICATION_BACKENDS`
+        setting). If you're using the standard authentication backend provided
+        by Django (``ModelBackend``), ``credentials`` should be the user's
+        username and password, provided as keyword arguments::
+
+            >>> c = Client()
+            >>> c.login(username='fred', password='secret')
+
+            # Now you can access a view that's only available to logged-in users.
+
+        If you're using a different authentication backend, this method may
+        require different credentials. It requires whichever credentials are
+        required by your backend's ``authenticate()`` method.
+
+        ``login()`` returns ``True`` if it the credentials were accepted and
+        login was successful.
+
+        Finally, you'll need to remember to create user accounts before you can
+        use this method. As we explained above, the test runner is executed
+        using a test database, which contains no users by default. As a result,
+        user accounts that are valid on your production site will not work
+        under test conditions. You'll need to create users as part of the test
+        suite -- either manually (using the Django model API) or with a test
+        fixture. Remember that if you want your test user to have a password,
+        you can't set the user's password by setting the password attribute
+        directly -- you must use the
+        :meth:`~django.contrib.auth.models.User.set_password()` function to
+        store a correctly hashed password. Alternatively, you can use the
+        :meth:`~django.contrib.auth.models.UserManager.create_user` helper
+        method to create a new user with a correctly hashed password.
+
+    .. method:: Client.logout()
+
+        If your site uses Django's :doc:`authentication system</topics/auth/index>`,
+        the ``logout()`` method can be used to simulate the effect of a user
+        logging out of your site.
+
+        After you call this method, the test client will have all the cookies
+        and session data cleared to defaults. Subsequent requests will appear
+        to come from an :class:`~django.contrib.auth.models.AnonymousUser`.
+
+Testing responses
+~~~~~~~~~~~~~~~~~
+
+The ``get()`` and ``post()`` methods both return a ``Response`` object. This
+``Response`` object is *not* the same as the ``HttpResponse`` object returned
+Django views; the test response object has some additional data useful for
+test code to verify.
+
+Specifically, a ``Response`` object has the following attributes:
+
+.. class:: Response()
+
+    .. attribute:: client
+
+        The test client that was used to make the request that resulted in the
+        response.
+
+    .. attribute:: content
+
+        The body of the response, as a string. This is the final page content as
+        rendered by the view, or any error message.
+
+    .. attribute:: context
+
+        The template ``Context`` instance that was used to render the template that
+        produced the response content.
+
+        If the rendered page used multiple templates, then ``context`` will be a
+        list of ``Context`` objects, in the order in which they were rendered.
+
+        Regardless of the number of templates used during rendering, you can
+        retrieve context values using the ``[]`` operator. For example, the
+        context variable ``name`` could be retrieved using::
+
+            >>> response = client.get('/foo/')
+            >>> response.context['name']
+            'Arthur'
+
+    .. attribute:: request
+
+        The request data that stimulated the response.
+
+    .. attribute:: status_code
+
+        The HTTP status of the response, as an integer. See
+        :rfc:`2616#section-10` for a full list of HTTP status codes.
+
+    .. attribute:: templates
+
+        A list of ``Template`` instances used to render the final content, in
+        the order they were rendered. For each template in the list, use
+        ``template.name`` to get the template's file name, if the template was
+        loaded from a file. (The name is a string such as
+        ``'admin/index.html'``.)
+
+You can also use dictionary syntax on the response object to query the value
+of any settings in the HTTP headers. For example, you could determine the
+content type of a response using ``response['Content-Type']``.
+
+Exceptions
+~~~~~~~~~~
+
+If you point the test client at a view that raises an exception, that exception
+will be visible in the test case. You can then use a standard ``try ... except``
+block or :meth:`~unittest.TestCase.assertRaises` to test for exceptions.
+
+The only exceptions that are not visible to the test client are ``Http404``,
+``PermissionDenied`` and ``SystemExit``. Django catches these exceptions
+internally and converts them into the appropriate HTTP response codes. In these
+cases, you can check ``response.status_code`` in your test.
+
+Persistent state
+~~~~~~~~~~~~~~~~
+
+The test client is stateful. If a response returns a cookie, then that cookie
+will be stored in the test client and sent with all subsequent ``get()`` and
+``post()`` requests.
+
+Expiration policies for these cookies are not followed. If you want a cookie
+to expire, either delete it manually or create a new ``Client`` instance (which
+will effectively delete all cookies).
+
+A test client has two attributes that store persistent state information. You
+can access these properties as part of a test condition.
+
+.. attribute:: Client.cookies
+
+    A Python :class:`~Cookie.SimpleCookie` object, containing the current values
+    of all the client cookies. See the documentation of the :mod:`Cookie` module
+    for more.
+
+.. attribute:: Client.session
+
+    A dictionary-like object containing session information. See the
+    :doc:`session documentation</topics/http/sessions>` for full details.
+
+    To modify the session and then save it, it must be stored in a variable
+    first (because a new ``SessionStore`` is created every time this property
+    is accessed)::
+
+        def test_something(self):
+            session = self.client.session
+            session['somekey'] = 'test'
+            session.save()
+
+Example
+~~~~~~~
+
+The following is a simple unit test using the test client::
+
+    from django.utils import unittest
+    from django.test.client import Client
+
+    class SimpleTest(unittest.TestCase):
+        def setUp(self):
+            # Every test needs a client.
+            self.client = Client()
+
+        def test_details(self):
+            # Issue a GET request.
+            response = self.client.get('/customer/details/')
+
+            # Check that the response is 200 OK.
+            self.assertEqual(response.status_code, 200)
+
+            # Check that the rendered context contains 5 customers.
+            self.assertEqual(len(response.context['customers']), 5)
+
+.. seealso::
+
+    :class:`django.test.client.RequestFactory`
+
+.. _django-testcase-subclasses:
+
+Provided test case classes
+--------------------------
+
+.. currentmodule:: django.test
+
+Normal Python unit test classes extend a base class of
+:class:`unittest.TestCase`. Django provides a few extensions of this base class:
+
+.. _testcase_hierarchy_diagram:
+
+.. figure:: _images/django_unittest_classes_hierarchy.*
+   :alt: Hierarchy of Django unit testing classes (TestCase subclasses)
+   :width: 508
+   :height: 391
+
+   Hierarchy of Django unit testing classes
+
+Regardless of the version of Python you're using, if you've installed
+``unittest2``, ``django.utils.unittest`` will point to that library.
+
+SimpleTestCase
+~~~~~~~~~~~~~~
+
+.. class:: SimpleTestCase()
+
+A thin subclass of :class:`unittest.TestCase`, it extends it with some basic
+functionality like:
+
+* Saving and restoring the Python warning machinery state.
+* Some useful assertions like:
+
+  * Checking that a callable :meth:`raises a certain exception
+    <SimpleTestCase.assertRaisesMessage>`.
+  * Testing form field :meth:`rendering and error treatment
+    <SimpleTestCase.assertFieldOutput>`.
+  * Testing :meth:`HTML responses for the presence/lack of a given fragment
+    <SimpleTestCase.assertContains>`.
+  * Verifying that a template :meth:`has/hasn't been used to generate a given
+    response content <SimpleTestCase.assertTemplateUsed>`.
+  * Verifying a HTTP :meth:`redirect <SimpleTestCase.assertRedirects>` is
+    performed by the app.
+  * Robustly testing two :meth:`HTML fragments <SimpleTestCase.assertHTMLEqual>`
+    for equality/inequality or :meth:`containment <SimpleTestCase.assertInHTML>`.
+  * Robustly testing two :meth:`XML fragments <SimpleTestCase.assertXMLEqual>`
+    for equality/inequality.
+  * Robustly testing two :meth:`JSON fragments <SimpleTestCase.assertJSONEqual>`
+    for equality.
+
+* The ability to run tests with :ref:`modified settings <overriding-settings>`.
+* Using the :attr:`~SimpleTestCase.client` :class:`~django.test.client.Client`.
+* Custom test-time :attr:`URL maps <SimpleTestCase.urls>`.
+
+.. versionchanged:: 1.6
+
+    The latter two features were moved from ``TransactionTestCase`` to
+    ``SimpleTestCase`` in Django 1.6.
+
+If you need any of the other more complex and heavyweight Django-specific
+features like:
+
+* Testing or using the ORM.
+* Database :attr:`~TransactionTestCase.fixtures`.
+* Test :ref:`skipping based on database backend features <skipping-tests>`.
+* The remaining specialized :meth:`assert*
+  <TransactionTestCase.assertQuerysetEqual>` methods.
+
+then you should use :class:`~django.test.TransactionTestCase` or
+:class:`~django.test.TestCase` instead.
+
+``SimpleTestCase`` inherits from ``django.utils.unittest.TestCase``.
+
+TransactionTestCase
+~~~~~~~~~~~~~~~~~~~
+
+.. class:: TransactionTestCase()
+
+Django's ``TestCase`` class (described below) makes use of database transaction
+facilities to speed up the process of resetting the database to a known state
+at the beginning of each test. A consequence of this, however, is that the
+effects of transaction commit and rollback cannot be tested by a Django
+``TestCase`` class. If your test requires testing of such transactional
+behavior, you should use a Django ``TransactionTestCase``.
+
+``TransactionTestCase`` and ``TestCase`` are identical except for the manner
+in which the database is reset to a known state and the ability for test code
+to test the effects of commit and rollback:
+
+* A ``TransactionTestCase`` resets the database after the test runs by
+  truncating all tables. A ``TransactionTestCase`` may call commit and rollback
+  and observe the effects of these calls on the database.
+
+* A ``TestCase``, on the other hand, does not truncate tables after a test.
+  Instead, it encloses the test code in a database transaction that is rolled
+  back at the end of the test. Both explicit commits like
+  ``transaction.commit()`` and implicit ones that may be caused by
+  ``transaction.atomic()`` are replaced with a ``nop`` operation. This
+  guarantees that the rollback at the end of the test restores the database to
+  its initial state.
+
+  When running on a database that does not support rollback (e.g. MySQL with the
+  MyISAM storage engine), ``TestCase`` falls back to initializing the database
+  by truncating tables and reloading initial data.
+
+.. warning::
+
+    While ``commit`` and ``rollback`` operations still *appear* to work when
+    used in ``TestCase``, no actual commit or rollback will be performed by the
+    database. This can cause your tests to pass or fail unexpectedly. Always
+    use ``TransactionTestCase`` when testing transactional behavior.
+
+.. versionchanged:: 1.5
+
+    Prior to 1.5, :class:`~django.test.TransactionTestCase` flushed the
+    database tables *before* each test. In Django 1.5, this is instead done
+    *after* the test has been run.
+
+    When the flush took place before the test, it was guaranteed that primary
+    key values started at one in :class:`~django.test.TransactionTestCase`
+    tests.
+
+    Tests should not depend on this behavior, but for legacy tests that do,
+    the :attr:`~TransactionTestCase.reset_sequences` attribute can be used
+    until the test has been properly updated.
+
+.. versionchanged:: 1.5
+
+    The order in which tests are run has changed. See :ref:`order-of-tests`.
+
+``TransactionTestCase`` inherits from :class:`~django.test.SimpleTestCase`.
+
+TestCase
+~~~~~~~~
+
+.. class:: TestCase()
+
+This class provides some additional capabilities that can be useful for testing
+Web sites.
+
+Converting a normal :class:`unittest.TestCase` to a Django :class:`TestCase` is
+easy: Just change the base class of your test from ``'unittest.TestCase'`` to
+``'django.test.TestCase'``. All of the standard Python unit test functionality
+will continue to be available, but it will be augmented with some useful
+additions, including:
+
+* Automatic loading of fixtures.
+
+* Wraps each test in a transaction.
+
+* Creates a TestClient instance.
+
+* Django-specific assertions for testing for things like redirection and form
+  errors.
+
+.. versionchanged:: 1.5
+
+    The order in which tests are run has changed. See :ref:`order-of-tests`.
+
+``TestCase`` inherits from :class:`~django.test.TransactionTestCase`.
+
+.. _live-test-server:
+
+LiveServerTestCase
+~~~~~~~~~~~~~~~~~~
+
+.. class:: LiveServerTestCase()
+
+``LiveServerTestCase`` does basically the same as
+:class:`~django.test.TransactionTestCase` with one extra feature: it launches a
+live Django server in the background on setup, and shuts it down on teardown.
+This allows the use of automated test clients other than the
+:ref:`Django dummy client <test-client>` such as, for example, the Selenium_
+client, to execute a series of functional tests inside a browser and simulate a
+real user's actions.
+
+By default the live server's address is ``'localhost:8081'`` and the full URL
+can be accessed during the tests with ``self.live_server_url``. If you'd like
+to change the default address (in the case, for example, where the 8081 port is
+already taken) then you may pass a different one to the :djadmin:`test` command
+via the :djadminopt:`--liveserver` option, for example:
+
+.. code-block:: bash
+
+    ./manage.py test --liveserver=localhost:8082
+
+Another way of changing the default server address is by setting the
+`DJANGO_LIVE_TEST_SERVER_ADDRESS` environment variable somewhere in your
+code (for example, in a :ref:`custom test runner<topics-testing-test_runner>`):
+
+.. code-block:: python
+
+    import os
+    os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8082'
+
+In the case where the tests are run by multiple processes in parallel (for
+example, in the context of several simultaneous `continuous integration`_
+builds), the processes will compete for the same address, and therefore your
+tests might randomly fail with an "Address already in use" error. To avoid this
+problem, you can pass a comma-separated list of ports or ranges of ports (at
+least as many as the number of potential parallel processes). For example:
+
+.. code-block:: bash
+
+    ./manage.py test --liveserver=localhost:8082,8090-8100,9000-9200,7041
+
+Then, during test execution, each new live test server will try every specified
+port until it finds one that is free and takes it.
+
+.. _continuous integration: http://en.wikipedia.org/wiki/Continuous_integration
+
+To demonstrate how to use ``LiveServerTestCase``, let's write a simple Selenium
+test. First of all, you need to install the `selenium package`_ into your
+Python path:
+
+.. code-block:: bash
+
+   pip install selenium
+
+Then, add a ``LiveServerTestCase``-based test to your app's tests module
+(for example: ``myapp/tests.py``). The code for this test may look as follows:
+
+.. code-block:: python
+
+    from django.test import LiveServerTestCase
+    from selenium.webdriver.firefox.webdriver import WebDriver
+
+    class MySeleniumTests(LiveServerTestCase):
+        fixtures = ['user-data.json']
+
+        @classmethod
+        def setUpClass(cls):
+            cls.selenium = WebDriver()
+            super(MySeleniumTests, cls).setUpClass()
+
+        @classmethod
+        def tearDownClass(cls):
+            cls.selenium.quit()
+            super(MySeleniumTests, cls).tearDownClass()
+
+        def test_login(self):
+            self.selenium.get('%s%s' % (self.live_server_url, '/login/'))
+            username_input = self.selenium.find_element_by_name("username")
+            username_input.send_keys('myuser')
+            password_input = self.selenium.find_element_by_name("password")
+            password_input.send_keys('secret')
+            self.selenium.find_element_by_xpath('//input[@value="Log in"]').click()
+
+Finally, you may run the test as follows:
+
+.. code-block:: bash
+
+    ./manage.py test myapp.MySeleniumTests.test_login
+
+This example will automatically open Firefox then go to the login page, enter
+the credentials and press the "Log in" button. Selenium offers other drivers in
+case you do not have Firefox installed or wish to use another browser. The
+example above is just a tiny fraction of what the Selenium client can do; check
+out the `full reference`_ for more details.
+
+.. _Selenium: http://seleniumhq.org/
+.. _selenium package: https://pypi.python.org/pypi/selenium
+.. _full reference: http://selenium-python.readthedocs.org/en/latest/api.html
+.. _Firefox: http://www.mozilla.com/firefox/
+
+.. note::
+
+    ``LiveServerTestCase`` makes use of the :doc:`staticfiles contrib app
+    </howto/static-files/index>` so you'll need to have your project configured
+    accordingly (in particular by setting :setting:`STATIC_URL`).
+
+.. note::
+
+    When using an in-memory SQLite database to run the tests, the same database
+    connection will be shared by two threads in parallel: the thread in which
+    the live server is run and the thread in which the test case is run. It's
+    important to prevent simultaneous database queries via this shared
+    connection by the two threads, as that may sometimes randomly cause the
+    tests to fail. So you need to ensure that the two threads don't access the
+    database at the same time. In particular, this means that in some cases
+    (for example, just after clicking a link or submitting a form), you might
+    need to check that a response is received by Selenium and that the next
+    page is loaded before proceeding with further test execution.
+    Do this, for example, by making Selenium wait until the ``<body>`` HTML tag
+    is found in the response (requires Selenium > 2.13):
+
+    .. code-block:: python
+
+        def test_login(self):
+            from selenium.webdriver.support.wait import WebDriverWait
+            timeout = 2
+            ...
+            self.selenium.find_element_by_xpath('//input[@value="Log in"]').click()
+            # Wait until the response is received
+            WebDriverWait(self.selenium, timeout).until(
+                lambda driver: driver.find_element_by_tag_name('body'))
+
+    The tricky thing here is that there's really no such thing as a "page load,"
+    especially in modern Web apps that generate HTML dynamically after the
+    server generates the initial document. So, simply checking for the presence
+    of ``<body>`` in the response might not necessarily be appropriate for all
+    use cases. Please refer to the `Selenium FAQ`_ and
+    `Selenium documentation`_ for more information.
+
+    .. _Selenium FAQ: http://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions#Q:_WebDriver_fails_to_find_elements_/_Does_not_block_on_page_loa
+    .. _Selenium documentation: http://seleniumhq.org/docs/04_webdriver_advanced.html#explicit-waits
+
+Test cases features
+-------------------
+
+Default test client
+~~~~~~~~~~~~~~~~~~~
+
+.. attribute:: SimpleTestCase.client
+
+Every test case in a ``django.test.*TestCase`` instance has access to an
+instance of a Django test client. This client can be accessed as
+``self.client``. This client is recreated for each test, so you don't have to
+worry about state (such as cookies) carrying over from one test to another.
+
+This means, instead of instantiating a ``Client`` in each test::
+
+    from django.utils import unittest
+    from django.test.client import Client
+
+    class SimpleTest(unittest.TestCase):
+        def test_details(self):
+            client = Client()
+            response = client.get('/customer/details/')
+            self.assertEqual(response.status_code, 200)
+
+        def test_index(self):
+            client = Client()
+            response = client.get('/customer/index/')
+            self.assertEqual(response.status_code, 200)
+
+...you can just refer to ``self.client``, like so::
+
+    from django.test import TestCase
+
+    class SimpleTest(TestCase):
+        def test_details(self):
+            response = self.client.get('/customer/details/')
+            self.assertEqual(response.status_code, 200)
+
+        def test_index(self):
+            response = self.client.get('/customer/index/')
+            self.assertEqual(response.status_code, 200)
+
+Customizing the test client
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. attribute:: SimpleTestCase.client_class
+
+If you want to use a different ``Client`` class (for example, a subclass
+with customized behavior), use the :attr:`~SimpleTestCase.client_class` class
+attribute::
+
+    from django.test import TestCase
+    from django.test.client import Client
+
+    class MyTestClient(Client):
+        # Specialized methods for your environment...
+
+    class MyTest(TestCase):
+        client_class = MyTestClient
+
+        def test_my_stuff(self):
+            # Here self.client is an instance of MyTestClient...
+            call_some_test_code()
+
+.. _topics-testing-fixtures:
+
+Fixture loading
+~~~~~~~~~~~~~~~
+
+.. attribute:: TransactionTestCase.fixtures
+
+A test case for a database-backed Web site isn't much use if there isn't any
+data in the database. To make it easy to put test data into the database,
+Django's custom ``TransactionTestCase`` class provides a way of loading
+**fixtures**.
+
+A fixture is a collection of data that Django knows how to import into a
+database. For example, if your site has user accounts, you might set up a
+fixture of fake user accounts in order to populate your database during tests.
+
+The most straightforward way of creating a fixture is to use the
+:djadmin:`manage.py dumpdata <dumpdata>` command. This assumes you
+already have some data in your database. See the :djadmin:`dumpdata
+documentation<dumpdata>` for more details.
+
+.. note::
+
+    If you've ever run :djadmin:`manage.py syncdb<syncdb>`, you've
+    already used a fixture without even knowing it! When you call
+    :djadmin:`syncdb` in the database for the first time, Django
+    installs a fixture called ``initial_data``. This gives you a way
+    of populating a new database with any initial data, such as a
+    default set of categories.
+
+    Fixtures with other names can always be installed manually using
+    the :djadmin:`manage.py loaddata<loaddata>` command.
+
+.. admonition:: Initial SQL data and testing
+
+    Django provides a second way to insert initial data into models --
+    the :ref:`custom SQL hook <initial-sql>`. However, this technique
+    *cannot* be used to provide initial data for testing purposes.
+    Django's test framework flushes the contents of the test database
+    after each test; as a result, any data added using the custom SQL
+    hook will be lost.
+
+Once you've created a fixture and placed it in a ``fixtures`` directory in one
+of your :setting:`INSTALLED_APPS`, you can use it in your unit tests by
+specifying a ``fixtures`` class attribute on your :class:`django.test.TestCase`
+subclass::
+
+    from django.test import TestCase
+    from myapp.models import Animal
+
+    class AnimalTestCase(TestCase):
+        fixtures = ['mammals.json', 'birds']
+
+        def setUp(self):
+            # Test definitions as before.
+            call_setup_methods()
+
+        def testFluffyAnimals(self):
+            # A test that uses the fixtures.
+            call_some_test_code()
+
+Here's specifically what will happen:
+
+* At the start of each test case, before ``setUp()`` is run, Django will
+  flush the database, returning the database to the state it was in
+  directly after :djadmin:`syncdb` was called.
+
+* Then, all the named fixtures are installed. In this example, Django will
+  install any JSON fixture named ``mammals``, followed by any fixture named
+  ``birds``. See the :djadmin:`loaddata` documentation for more
+  details on defining and installing fixtures.
+
+This flush/load procedure is repeated for each test in the test case, so you
+can be certain that the outcome of a test will not be affected by another test,
+or by the order of test execution.
+
+By default, fixtures are only loaded into the ``default`` database. If you are
+using multiple databases and set :attr:`multi_db=True
+<TransactionTestCase.multi_db>`, fixtures will be loaded into all databases.
+
+URLconf configuration
+~~~~~~~~~~~~~~~~~~~~~
+
+.. attribute:: SimpleTestCase.urls
+
+If your application provides views, you may want to include tests that use the
+test client to exercise those views. However, an end user is free to deploy the
+views in your application at any URL of their choosing. This means that your
+tests can't rely upon the fact that your views will be available at a
+particular URL.
+
+In order to provide a reliable URL space for your test,
+``django.test.*TestCase`` classes provide the ability to customize the URLconf
+configuration for the duration of the execution of a test suite. If your
+``*TestCase`` instance defines an ``urls`` attribute, the ``*TestCase`` will use
+the value of that attribute as the :setting:`ROOT_URLCONF` for the duration
+of that test.
+
+For example::
+
+    from django.test import TestCase
+
+    class TestMyViews(TestCase):
+        urls = 'myapp.test_urls'
+
+        def testIndexPageView(self):
+            # Here you'd test your view using ``Client``.
+            call_some_test_code()
+
+This test case will use the contents of ``myapp.test_urls`` as the
+URLconf for the duration of the test case.
+
+.. _emptying-test-outbox:
+
+Multi-database support
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. attribute:: TransactionTestCase.multi_db
+
+Django sets up a test database corresponding to every database that is
+defined in the :setting:`DATABASES` definition in your settings
+file. However, a big part of the time taken to run a Django TestCase
+is consumed by the call to ``flush`` that ensures that you have a
+clean database at the start of each test run. If you have multiple
+databases, multiple flushes are required (one for each database),
+which can be a time consuming activity -- especially if your tests
+don't need to test multi-database activity.
+
+As an optimization, Django only flushes the ``default`` database at
+the start of each test run. If your setup contains multiple databases,
+and you have a test that requires every database to be clean, you can
+use the ``multi_db`` attribute on the test suite to request a full
+flush.
+
+For example::
+
+    class TestMyViews(TestCase):
+        multi_db = True
+
+        def testIndexPageView(self):
+            call_some_test_code()
+
+This test case will flush *all* the test databases before running
+``testIndexPageView``.
+
+The ``multi_db`` flag also affects into which databases the
+attr:`TransactionTestCase.fixtures` are loaded. By default (when
+``multi_db=False``), fixtures are only loaded into the ``default`` database.
+If ``multi_db=True``, fixtures are loaded into all databases.
+
+.. _overriding-settings:
+
+Overriding settings
+~~~~~~~~~~~~~~~~~~~
+
+.. method:: SimpleTestCase.settings
+
+For testing purposes it's often useful to change a setting temporarily and
+revert to the original value after running the testing code. For this use case
+Django provides a standard Python context manager (see :pep:`343`)
+:meth:`~django.test.SimpleTestCase.settings`, which can be used like this::
+
+    from django.test import TestCase
+
+    class LoginTestCase(TestCase):
+
+        def test_login(self):
+
+            # First check for the default behavior
+            response = self.client.get('/sekrit/')
+            self.assertRedirects(response, '/accounts/login/?next=/sekrit/')
+
+            # Then override the LOGIN_URL setting
+            with self.settings(LOGIN_URL='/other/login/'):
+                response = self.client.get('/sekrit/')
+                self.assertRedirects(response, '/other/login/?next=/sekrit/')
+
+This example will override the :setting:`LOGIN_URL` setting for the code
+in the ``with`` block and reset its value to the previous state afterwards.
+
+.. currentmodule:: django.test.utils
+
+.. function:: override_settings
+
+In case you want to override a setting for just one test method or even the
+whole :class:`~django.test.TestCase` class, Django provides the
+:func:`~django.test.utils.override_settings` decorator (see :pep:`318`). It's
+used like this::
+
+    from django.test import TestCase
+    from django.test.utils import override_settings
+
+    class LoginTestCase(TestCase):
+
+        @override_settings(LOGIN_URL='/other/login/')
+        def test_login(self):
+            response = self.client.get('/sekrit/')
+            self.assertRedirects(response, '/other/login/?next=/sekrit/')
+
+The decorator can also be applied to test case classes::
+
+    from django.test import TestCase
+    from django.test.utils import override_settings
+
+    @override_settings(LOGIN_URL='/other/login/')
+    class LoginTestCase(TestCase):
+
+        def test_login(self):
+            response = self.client.get('/sekrit/')
+            self.assertRedirects(response, '/other/login/?next=/sekrit/')
+
+.. note::
+
+    When given a class, the decorator modifies the class directly and
+    returns it; it doesn't create and return a modified copy of it.  So if
+    you try to tweak the above example to assign the return value to a
+    different name than ``LoginTestCase``, you may be surprised to find that
+    the original ``LoginTestCase`` is still equally affected by the
+    decorator.
+
+You can also simulate the absence of a setting by deleting it after settings
+have been overriden, like this::
+
+    @override_settings()
+    def test_something(self):
+        del settings.LOGIN_URL
+        ...
+
+When overriding settings, make sure to handle the cases in which your app's
+code uses a cache or similar feature that retains state even if the
+setting is changed. Django provides the
+:data:`django.test.signals.setting_changed` signal that lets you register
+callbacks to clean up and otherwise reset state when settings are changed.
+
+Django itself uses this signal to reset various data:
+
+================================ ========================
+Overriden settings               Data reset
+================================ ========================
+USE_TZ, TIME_ZONE                Databases timezone
+TEMPLATE_CONTEXT_PROCESSORS      Context processors cache
+TEMPLATE_LOADERS                 Template loaders cache
+SERIALIZATION_MODULES            Serializers cache
+LOCALE_PATHS, LANGUAGE_CODE      Default translation and loaded translations
+MEDIA_ROOT, DEFAULT_FILE_STORAGE Default file storage
+================================ ========================
+
+Emptying the test outbox
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you use any of Django's custom ``TestCase`` classes, the test runner will
+clear the contents of the test email outbox at the start of each test case.
+
+For more detail on email services during tests, see `Email services`_ below.
+
+.. _assertions:
+
+Assertions
+~~~~~~~~~~
+
+.. currentmodule:: django.test
+
+As Python's normal :class:`unittest.TestCase` class implements assertion methods
+such as :meth:`~unittest.TestCase.assertTrue` and
+:meth:`~unittest.TestCase.assertEqual`, Django's custom :class:`TestCase` class
+provides a number of custom assertion methods that are useful for testing Web
+applications:
+
+The failure messages given by most of these assertion methods can be customized
+with the ``msg_prefix`` argument. This string will be prefixed to any failure
+message generated by the assertion. This allows you to provide additional
+details that may help you to identify the location and cause of an failure in
+your test suite.
+
+.. method:: SimpleTestCase.assertRaisesMessage(expected_exception, expected_message, callable_obj=None, *args, **kwargs)
+
+    Asserts that execution of callable ``callable_obj`` raised the
+    ``expected_exception`` exception and that such exception has an
+    ``expected_message`` representation. Any other outcome is reported as a
+    failure. Similar to unittest's :meth:`~unittest.TestCase.assertRaisesRegexp`
+    with the difference that ``expected_message`` isn't a regular expression.
+
+.. method:: SimpleTestCase.assertFieldOutput(self, fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value=u'')
+
+    Asserts that a form field behaves correctly with various inputs.
+
+    :param fieldclass: the class of the field to be tested.
+    :param valid: a dictionary mapping valid inputs to their expected cleaned
+        values.
+    :param invalid: a dictionary mapping invalid inputs to one or more raised
+        error messages.
+    :param field_args: the args passed to instantiate the field.
+    :param field_kwargs: the kwargs passed to instantiate the field.
+    :param empty_value: the expected clean output for inputs in ``empty_values``.
+
+    For example, the following code tests that an ``EmailField`` accepts
+    "a@a.com" as a valid email address, but rejects "aaa" with a reasonable
+    error message::
+
+        self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': [u'Enter a valid email address.']})
+
+.. method:: SimpleTestCase.assertFormError(response, form, field, errors, msg_prefix='')
+
+    Asserts that a field on a form raises the provided list of errors when
+    rendered on the form.
+
+    ``form`` is the name the ``Form`` instance was given in the template
+    context.
+
+    ``field`` is the name of the field on the form to check. If ``field``
+    has a value of ``None``, non-field errors (errors you can access via
+    ``form.non_field_errors()``) will be checked.
+
+    ``errors`` is an error string, or a list of error strings, that are
+    expected as a result of form validation.
+
+.. method:: SimpleTestCase.assertFormsetError(response, formset, form_index, field, errors, msg_prefix='')
+
+    .. versionadded:: 1.6
+
+    Asserts that the ``formset`` raises the provided list of errors when
+    rendered.
+
+    ``formset`` is the name the ``Formset`` instance was given in the template
+    context.
+
+    ``form_index`` is the number of the form within the ``Formset``.  If
+    ``form_index`` has a value of ``None``, non-form errors (errors you can
+    access via ``formset.non_form_errors()``) will be checked.
+
+    ``field`` is the name of the field on the form to check. If ``field``
+    has a value of ``None``, non-field errors (errors you can access via
+    ``form.non_field_errors()``) will be checked.
+
+    ``errors`` is an error string, or a list of error strings, that are
+    expected as a result of form validation.
+
+.. method:: SimpleTestCase.assertContains(response, text, count=None, status_code=200, msg_prefix='', html=False)
+
+    Asserts that a ``Response`` instance produced the given ``status_code`` and
+    that ``text`` appears in the content of the response. If ``count`` is
+    provided, ``text`` must occur exactly ``count`` times in the response.
+
+    Set ``html`` to ``True`` to handle ``text`` as HTML. The comparison with
+    the response content will be based on HTML semantics instead of
+    character-by-character equality. Whitespace is ignored in most cases,
+    attribute ordering is not significant. See
+    :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
+
+.. method:: SimpleTestCase.assertNotContains(response, text, status_code=200, msg_prefix='', html=False)
+
+    Asserts that a ``Response`` instance produced the given ``status_code`` and
+    that ``text`` does not appears in the content of the response.
+
+    Set ``html`` to ``True`` to handle ``text`` as HTML. The comparison with
+    the response content will be based on HTML semantics instead of
+    character-by-character equality. Whitespace is ignored in most cases,
+    attribute ordering is not significant. See
+    :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
+
+.. method:: SimpleTestCase.assertTemplateUsed(response, template_name, msg_prefix='')
+
+    Asserts that the template with the given name was used in rendering the
+    response.
+
+    The name is a string such as ``'admin/index.html'``.
+
+    You can use this as a context manager, like this::
+
+        with self.assertTemplateUsed('index.html'):
+            render_to_string('index.html')
+        with self.assertTemplateUsed(template_name='index.html'):
+            render_to_string('index.html')
+
+.. method:: SimpleTestCase.assertTemplateNotUsed(response, template_name, msg_prefix='')
+
+    Asserts that the template with the given name was *not* used in rendering
+    the response.
+
+    You can use this as a context manager in the same way as
+    :meth:`~SimpleTestCase.assertTemplateUsed`.
+
+.. method:: SimpleTestCase.assertRedirects(response, expected_url, status_code=302, target_status_code=200, msg_prefix='')
+
+    Asserts that the response return a ``status_code`` redirect status, it
+    redirected to ``expected_url`` (including any GET data), and the final
+    page was received with ``target_status_code``.
+
+    If your request used the ``follow`` argument, the ``expected_url`` and
+    ``target_status_code`` will be the url and status code for the final
+    point of the redirect chain.
+
+.. method:: SimpleTestCase.assertHTMLEqual(html1, html2, msg=None)
+
+    Asserts that the strings ``html1`` and ``html2`` are equal. The comparison
+    is based on HTML semantics. The comparison takes following things into
+    account:
+
+    * Whitespace before and after HTML tags is ignored.
+    * All types of whitespace are considered equivalent.
+    * All open tags are closed implicitly, e.g. when a surrounding tag is
+      closed or the HTML document ends.
+    * Empty tags are equivalent to their self-closing version.
+    * The ordering of attributes of an HTML element is not significant.
+    * Attributes without an argument are equal to attributes that equal in
+      name and value (see the examples).
+
+    The following examples are valid tests and don't raise any
+    ``AssertionError``::
+
+        self.assertHTMLEqual('<p>Hello <b>world!</p>',
+            '''<p>
+                Hello   <b>world! <b/>
+            </p>''')
+        self.assertHTMLEqual(
+            '<input type="checkbox" checked="checked" id="id_accept_terms" />',
+            '<input id="id_accept_terms" type='checkbox' checked>')
+
+    ``html1`` and ``html2`` must be valid HTML. An ``AssertionError`` will be
+    raised if one of them cannot be parsed.
+
+    Output in case of error can be customized with the ``msg`` argument.
+
+.. method:: SimpleTestCase.assertHTMLNotEqual(html1, html2, msg=None)
+
+    Asserts that the strings ``html1`` and ``html2`` are *not* equal. The
+    comparison is based on HTML semantics. See
+    :meth:`~SimpleTestCase.assertHTMLEqual` for details.
+
+    ``html1`` and ``html2`` must be valid HTML. An ``AssertionError`` will be
+    raised if one of them cannot be parsed.
+
+    Output in case of error can be customized with the ``msg`` argument.
+
+.. method:: SimpleTestCase.assertXMLEqual(xml1, xml2, msg=None)
+
+    .. versionadded:: 1.5
+
+    Asserts that the strings ``xml1`` and ``xml2`` are equal. The
+    comparison is based on XML semantics. Similarily to
+    :meth:`~SimpleTestCase.assertHTMLEqual`, the comparison is
+    made on parsed content, hence only semantic differences are considered, not
+    syntax differences. When unvalid XML is passed in any parameter, an
+    ``AssertionError`` is always raised, even if both string are identical.
+
+    Output in case of error can be customized with the ``msg`` argument.
+
+.. method:: SimpleTestCase.assertXMLNotEqual(xml1, xml2, msg=None)
+
+    .. versionadded:: 1.5
+
+    Asserts that the strings ``xml1`` and ``xml2`` are *not* equal. The
+    comparison is based on XML semantics. See
+    :meth:`~SimpleTestCase.assertXMLEqual` for details.
+
+    Output in case of error can be customized with the ``msg`` argument.
+
+.. method:: SimpleTestCase.assertInHTML(needle, haystack, count=None, msg_prefix='')
+
+    .. versionadded:: 1.5
+
+    Asserts that the HTML fragment ``needle`` is contained in the ``haystack`` one.
+
+    If the ``count`` integer argument is specified, then additionally the number
+    of ``needle`` occurrences will be strictly verified.
+
+    Whitespace in most cases is ignored, and attribute ordering is not
+    significant. The passed-in arguments must be valid HTML.
+
+.. method:: SimpleTestCase.assertJSONEqual(raw, expected_data, msg=None)
+
+    .. versionadded:: 1.5
+
+    Asserts that the JSON fragments ``raw`` and ``expected_data`` are equal.
+    Usual JSON non-significant whitespace rules apply as the heavyweight is
+    delegated to the :mod:`json` library.
+
+    Output in case of error can be customized with the ``msg`` argument.
+
+.. method:: TransactionTestCase.assertQuerysetEqual(qs, values, transform=repr, ordered=True)
+
+    Asserts that a queryset ``qs`` returns a particular list of values ``values``.
+
+    The comparison of the contents of ``qs`` and ``values`` is performed using
+    the function ``transform``; by default, this means that the ``repr()`` of
+    each value is compared. Any other callable can be used if ``repr()`` doesn't
+    provide a unique or helpful comparison.
+
+    By default, the comparison is also ordering dependent. If ``qs`` doesn't
+    provide an implicit ordering, you can set the ``ordered`` parameter to
+    ``False``, which turns the comparison into a Python set comparison.
+
+    .. versionchanged:: 1.6
+
+        The method now checks for undefined order and raises ``ValueError``
+        if undefined order is spotted. The ordering is seen as undefined if
+        the given ``qs`` isn't ordered and the comparison is against more
+        than one ordered values.
+
+.. method:: TransactionTestCase.assertNumQueries(num, func, *args, **kwargs)
+
+    Asserts that when ``func`` is called with ``*args`` and ``**kwargs`` that
+    ``num`` database queries are executed.
+
+    If a ``"using"`` key is present in ``kwargs`` it is used as the database
+    alias for which to check the number of queries.  If you wish to call a
+    function with a ``using`` parameter you can do it by wrapping the call with
+    a ``lambda`` to add an extra parameter::
+
+        self.assertNumQueries(7, lambda: my_function(using=7))
+
+    You can also use this as a context manager::
+
+        with self.assertNumQueries(2):
+            Person.objects.create(name="Aaron")
+            Person.objects.create(name="Daniel")
+
+.. _topics-testing-email:
+
+Email services
+--------------
+
+If any of your Django views send email using :doc:`Django's email
+functionality </topics/email>`, you probably don't want to send email each time
+you run a test using that view. For this reason, Django's test runner
+automatically redirects all Django-sent email to a dummy outbox. This lets you
+test every aspect of sending email -- from the number of messages sent to the
+contents of each message -- without actually sending the messages.
+
+The test runner accomplishes this by transparently replacing the normal
+email backend with a testing backend.
+(Don't worry -- this has no effect on any other email senders outside of
+Django, such as your machine's mail server, if you're running one.)
+
+.. currentmodule:: django.core.mail
+
+.. data:: django.core.mail.outbox
+
+During test running, each outgoing email is saved in
+``django.core.mail.outbox``. This is a simple list of all
+:class:`~django.core.mail.EmailMessage` instances that have been sent.
+The ``outbox`` attribute is a special attribute that is created *only* when
+the ``locmem`` email backend is used. It doesn't normally exist as part of the
+:mod:`django.core.mail` module and you can't import it directly. The code
+below shows how to access this attribute correctly.
+
+Here's an example test that examines ``django.core.mail.outbox`` for length
+and contents::
+
+    from django.core import mail
+    from django.test import TestCase
+
+    class EmailTest(TestCase):
+        def test_send_email(self):
+            # Send message.
+            mail.send_mail('Subject here', 'Here is the message.',
+                'from@example.com', ['to@example.com'],
+                fail_silently=False)
+
+            # Test that one message has been sent.
+            self.assertEqual(len(mail.outbox), 1)
+
+            # Verify that the subject of the first message is correct.
+            self.assertEqual(mail.outbox[0].subject, 'Subject here')
+
+As noted :ref:`previously <emptying-test-outbox>`, the test outbox is emptied
+at the start of every test in a Django ``*TestCase``. To empty the outbox
+manually, assign the empty list to ``mail.outbox``::
+
+    from django.core import mail
+
+    # Empty the test outbox
+    mail.outbox = []
+
+.. _skipping-tests:
+
+Skipping tests
+--------------
+
+.. currentmodule:: django.test
+
+The unittest library provides the :func:`@skipIf <unittest.skipIf>` and
+:func:`@skipUnless <unittest.skipUnless>` decorators to allow you to skip tests
+if you know ahead of time that those tests are going to fail under certain
+conditions.
+
+For example, if your test requires a particular optional library in order to
+succeed, you could decorate the test case with :func:`@skipIf
+<unittest.skipIf>`. Then, the test runner will report that the test wasn't
+executed and why, instead of failing the test or omitting the test altogether.
+
+To supplement these test skipping behaviors, Django provides two
+additional skip decorators. Instead of testing a generic boolean,
+these decorators check the capabilities of the database, and skip the
+test if the database doesn't support a specific named feature.
+
+The decorators use a string identifier to describe database features.
+This string corresponds to attributes of the database connection
+features class. See ``django.db.backends.BaseDatabaseFeatures``
+class for a full list of database features that can be used as a basis
+for skipping tests.
+
+.. function:: skipIfDBFeature(feature_name_string)
+
+Skip the decorated test if the named database feature is supported.
+
+For example, the following test will not be executed if the database
+supports transactions (e.g., it would *not* run under PostgreSQL, but
+it would under MySQL with MyISAM tables)::
+
+    class MyTests(TestCase):
+        @skipIfDBFeature('supports_transactions')
+        def test_transaction_behavior(self):
+            # ... conditional test code
+
+.. function:: skipUnlessDBFeature(feature_name_string)
+
+Skip the decorated test if the named database feature is *not*
+supported.
+
+For example, the following test will only be executed if the database
+supports transactions (e.g., it would run under PostgreSQL, but *not*
+under MySQL with MyISAM tables)::
+
+    class MyTests(TestCase):
+        @skipUnlessDBFeature('supports_transactions')
+        def test_transaction_behavior(self):
+            # ... conditional test code
