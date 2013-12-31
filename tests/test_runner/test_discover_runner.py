@@ -1,16 +1,9 @@
 from contextlib import contextmanager
 import os
-from unittest import expectedFailure, TestSuite, TextTestRunner, defaultTestLoader
+from unittest import TestSuite, TextTestRunner, defaultTestLoader
 
 from django.test import TestCase
 from django.test.runner import DiscoverRunner
-
-
-def expectedFailureIf(condition):
-    """Marks a test as an expected failure if ``condition`` is met."""
-    if condition:
-        return expectedFailure
-    return lambda func: func
 
 
 @contextmanager
