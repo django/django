@@ -224,6 +224,17 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
         self.assertIn('apps', force_text(lines[1]))
 
 
+class TestConfiguration(StaticFilesTestCase):
+    def test_location_empty(self):
+        err = six.StringIO()
+        for root in ['', None]:
+            with override_settings(STATIC_ROOT=root):
+                with six.assertRaisesRegex(
+                        self, ImproperlyConfigured,
+                        'without having set the STATIC_ROOT setting to a filesystem path'):
+                    call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
+
+
 class TestCollection(CollectionTestCase, TestDefaults):
     """
     Test ``collectstatic`` management command.
