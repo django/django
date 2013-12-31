@@ -86,23 +86,35 @@ class ModelBase(type):
             meta = attr_meta
         base_meta = getattr(new_class, '_meta', None)
 
+        # Look for an application configuration to attach the model to.
+        app_config = apps.get_containing_app_config(module)
+
         if getattr(meta, 'app_label', None) is None:
-            # Figure out the app_label by looking one level up from the package
-            # or module named 'models'. If no such package or module exists,
-            # fall back to looking one level up from the module this model is
-            # defined in.
 
-            # For 'django.contrib.sites.models', this would be 'sites'.
-            # For 'geo.models.places' this would be 'geo'.
+            if app_config is None:
+                # If the model is imported before the configuration for its
+                # application is created (#21719), or isn't in an installed
+                # application (#21680), use the legacy logic to figure out the
+                # app_label by looking one level up from the package or module
+                # named 'models'. If no such package or module exists, fall
+                # back to looking one level up from the module this model is
+                # defined in.
 
-            model_module = sys.modules[new_class.__module__]
-            package_components = model_module.__name__.split('.')
-            package_components.reverse()  # find the last occurrence of 'models'
-            try:
-                app_label_index = package_components.index(MODELS_MODULE_NAME) + 1
-            except ValueError:
-                app_label_index = 1
-            kwargs = {"app_label": package_components[app_label_index]}
+                # For 'django.contrib.sites.models', this would be 'sites'.
+                # For 'geo.models.places' this would be 'geo'.
+
+                model_module = sys.modules[new_class.__module__]
+                package_components = model_module.__name__.split('.')
+                package_components.reverse()  # find the last occurrence of 'models'
+                try:
+                    app_label_index = package_components.index(MODELS_MODULE_NAME) + 1
+                except ValueError:
+                    app_label_index = 1
+                kwargs = {"app_label": package_components[app_label_index]}
+
+            else:
+                kwargs = {"app_label": app_config.label}
+
         else:
             kwargs = {}
 

@@ -1,4 +1,4 @@
-from collections import defaultdict, OrderedDict
+from collections import Counter, defaultdict, OrderedDict
 import os
 import sys
 import warnings
@@ -79,7 +79,22 @@ class Apps(object):
                     app_config = entry
                 else:
                     app_config = AppConfig.create(entry)
+                if app_config.label in self.app_configs:
+                    raise ImproperlyConfigured(
+                        "Application labels aren't unique, "
+                        "duplicates: %s" % app_config.label)
+
                 self.app_configs[app_config.label] = app_config
+
+            # Check for duplicate app names.
+            counts = Counter(
+                app_config.name for app_config in self.app_configs.values())
+            duplicates = [
+                name for name, count in counts.most_common() if count > 1]
+            if duplicates:
+                raise ImproperlyConfigured(
+                    "Application names aren't unique, "
+                    "duplicates: %s" % ", ".join(duplicates))
 
             # Load models.
             for app_config in self.app_configs.values():
@@ -189,6 +204,27 @@ class Apps(object):
         """
         app_config = self.app_configs.get(app_name.rpartition(".")[2])
         return app_config is not None and app_config.name == app_name
+
+    def get_containing_app_config(self, object_name):
+        """
+        Look for an app config containing a given object.
+
+        object_name is the dotted Python path to the object.
+
+        Returns the app config for the inner application in case of nesting.
+        Returns None if the object isn't in any registered app config.
+
+        It's safe to call this method at import time, even while the registry
+        is being populated.
+        """
+        candidates = []
+        for app_config in self.app_configs.values():
+            if object_name.startswith(app_config.name):
+                subpath = object_name[len(app_config.name):]
+                if subpath == '' or subpath[0] == '.':
+                    candidates.append(app_config)
+        if candidates:
+            return sorted(candidates, key=lambda ac: -len(ac.name))[0]
 
     def get_registered_model(self, app_label, model_name):
         """

@@ -23,3 +23,12 @@ class NotAConfig(object):
 
 class NoSuchApp(AppConfig):
     name = 'there is no such app'
+
+
+class PlainAppsConfig(AppConfig):
+    name = 'apps'
+
+
+class RelabeledAppsConfig(AppConfig):
+    name = 'apps'
+    label = 'relabeled'
