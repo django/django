@@ -5,6 +5,7 @@ from django.apps.registry import Apps
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.test import TestCase, override_settings
+from django.utils import six
 
 from .models import TotallyNormal, SoAlternative, new_apps
 
@@ -114,6 +115,16 @@ class AppsTests(TestCase):
     @override_settings(INSTALLED_APPS=['apps.apps.RelabeledAppsConfig'])
     def test_relabeling(self):
         self.assertEqual(apps.get_app_config('relabeled').name, 'apps')
+
+    def test_duplicate_labels(self):
+        with six.assertRaisesRegex(self, ImproperlyConfigured, "Application labels aren't unique"):
+            with self.settings(INSTALLED_APPS=['apps.apps.PlainAppsConfig', 'apps']):
+                pass
+
+    def test_duplicate_names(self):
+        with six.assertRaisesRegex(self, ImproperlyConfigured, "Application names aren't unique"):
+            with self.settings(INSTALLED_APPS=['apps.apps.RelabeledAppsConfig', 'apps']):
+                pass
 
     def test_models_py(self):
         """

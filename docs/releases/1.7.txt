@@ -655,6 +655,22 @@ script with::
 
 Otherwise, you will hit ``RuntimeError: App registry isn't ready yet.``
 
+App registry consistency
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+It is no longer possible to have multiple installed applications with the same
+label. In previous versions of Django, this didn't always work correctly, but
+didn't crash outright either.
+
+If you have two apps with the same label, you should create an
+:class:`~django.apps.AppConfig` for one of them and override its
+:class:`~django.apps.AppConfig.label` there. You should then adjust your code
+wherever it references this application or its models with the old label.
+
+You should make sure that your project doesn't import models from applications
+that aren't in :setting:`INSTALLED_APPS`. Relations involving such models may
+not be created properly. Future versions of Django may forbid this entirely.
+
 Subclassing AppCommand
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -662,13 +678,6 @@ Subclasses of :class:`~django.core.management.AppCommand` must now implement a
 :meth:`~django.core.management.AppCommand.handle_app_config` method instead of
 ``handle_app()``. This method receives an :class:`~django.apps.AppConfig`
 instance instead of a models module.
-
-App registry consistency
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-You should make sure that your project doesn't import models from applications
-that aren't in :setting:`INSTALLED_APPS`. Relations involving such models may
-not be created properly.
 
 Introspecting applications
 ^^^^^^^^^^^^^^^^^^^^^^^^^^

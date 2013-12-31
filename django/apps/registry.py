@@ -79,7 +79,11 @@ class Apps(object):
                     app_config = entry
                 else:
                     app_config = AppConfig.create(entry)
-                # TODO: check for duplicate app labels here (#21679).
+                if app_config.label in self.app_configs:
+                    raise ImproperlyConfigured(
+                        "Application labels aren't unique, "
+                        "duplicates: %s" % app_config.label)
+
                 self.app_configs[app_config.label] = app_config
 
             # Check for duplicate app names.
