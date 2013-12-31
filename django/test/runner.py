@@ -154,10 +154,12 @@ class DiscoverRunner(object):
 def is_discoverable(label):
     """
     Check if a test label points to a python package or file directory.
+
+    Relative labels like "." and ".." are seen as directories.
     """
     try:
         mod = import_module(label)
-    except ImportError:
+    except (ImportError, TypeError):
         pass
     else:
         return hasattr(mod, '__path__')
