@@ -441,9 +441,9 @@ Messages to this logger have the following extra context:
 ``django.db.backends``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Messages relating to the interaction of code with the database.
-For example, every SQL statement executed by a request is logged
-at the ``DEBUG`` level to this logger.
+Messages relating to the interaction of code with the database. For example,
+every application-level SQL statement executed by a request is logged at the
+``DEBUG`` level to this logger.
 
 Messages to this logger have the following extra context:
 
@@ -454,6 +454,11 @@ Messages to this logger have the following extra context:
 For performance reasons, SQL logging is only enabled when
 ``settings.DEBUG`` is set to ``True``, regardless of the logging
 level or handlers that are installed.
+
+This logging does not include framework-level initialization (e.g.
+``SET TIMEZONE``) or transaction management queries (e.g. ``BEGIN``,
+``COMMIT``, and ``ROLLBACK``). Turn on query logging in your database if you
+wish the view all database queries.
 
 ``django.security.*``
 ~~~~~~~~~~~~~~~~~~~~~~
