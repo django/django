@@ -1,4 +1,4 @@
-from collections import defaultdict, OrderedDict
+from collections import Counter, defaultdict, OrderedDict
 import os
 import sys
 import warnings
@@ -79,7 +79,18 @@ class Apps(object):
                     app_config = entry
                 else:
                     app_config = AppConfig.create(entry)
+                # TODO: check for duplicate app labels here (#21679).
                 self.app_configs[app_config.label] = app_config
+
+            # Check for duplicate app names.
+            counts = Counter(
+                app_config.name for app_config in self.app_configs.values())
+            duplicates = [
+                name for name, count in counts.most_common() if count > 1]
+            if duplicates:
+                raise ImproperlyConfigured(
+                    "Application names aren't unique, "
+                    "duplicates: %s" % ", ".join(duplicates))
 
             # Load models.
             for app_config in self.app_configs.values():
