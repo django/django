@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import os
 import sys
@@ -29,8 +29,8 @@ class ProxyModelInheritanceTests(TransactionTestCase):
     def test_table_exists(self):
         with self.modify_settings(INSTALLED_APPS={'append': ['app1', 'app2']}):
             call_command('migrate', verbosity=0)
-            from .app1.models import ProxyModel
-            from .app2.models import NiceModel
+            from app1.models import ProxyModel
+            from app2.models import NiceModel
             self.assertEqual(NiceModel.objects.all().count(), 0)
             self.assertEqual(ProxyModel.objects.all().count(), 0)
 

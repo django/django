@@ -76,9 +76,7 @@ class AppConfigStub(AppConfig):
     Stubs a Django AppConfig. Only provides a label and a dict of models.
     """
     def __init__(self, label):
-        self.label = label
-        self.path = None
-        super(AppConfigStub, self).__init__(None, None)
+        super(AppConfigStub, self).__init__(label, None)
 
     def import_models(self, all_models):
         self.models = all_models

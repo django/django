@@ -114,24 +114,33 @@ Application configuration
 Configurable attributes
 -----------------------
 
-.. attribute:: AppConfig.verbose_name
-
-    Human-readable name for the application, e.g. "Admin".
-
-    If this isn't provided, Django uses ``label.title()``.
-
-Read-only attributes
---------------------
-
 .. attribute:: AppConfig.name
 
     Full Python path to the application, e.g. ``'django.contrib.admin'``.
 
+    This attribute defines which application the configuration applies to. It
+    must be set in all :class:`~django.apps.AppConfig` subclasses.
+
+    It must be unique across a Django project.
+
 .. attribute:: AppConfig.label
 
-    Last component of the Python path to the application, e.g. ``'admin'``.
+    Short name for the application, e.g. ``'admin'``
 
-    This value must be unique across a Django project.
+    This attribute allows relabelling an application when two applications
+    have conflicting labels. It defaults to the last component of ``name``.
+    It should be a valid Python identifier.
+
+    It must be unique across a Django project.
+
+.. attribute:: AppConfig.verbose_name
+
+    Human-readable name for the application, e.g. "Admin".
+
+    This attribute defaults to ``label.title()``.
+
+Read-only attributes
+--------------------
 
 .. attribute:: AppConfig.path
 

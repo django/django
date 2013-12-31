@@ -111,6 +111,10 @@ class AppsTests(TestCase):
         self.assertTrue(apps.has_app('django.contrib.staticfiles'))
         self.assertFalse(apps.has_app('django.contrib.webdesign'))
 
+    @override_settings(INSTALLED_APPS=['apps.apps.RelabeledAppsConfig'])
+    def test_relabeling(self):
+        self.assertEqual(apps.get_app_config('relabeled').name, 'apps')
+
     def test_models_py(self):
         """
         Tests that the models in the models.py file were loaded correctly.
