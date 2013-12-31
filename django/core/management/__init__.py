@@ -5,6 +5,7 @@ from optparse import OptionParser, NO_DEFAULT
 import os
 import sys
 
+import django
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError, handle_default_options
@@ -111,17 +112,16 @@ def get_commands():
 
         # Find the installed apps
         try:
-            installed_apps = settings.INSTALLED_APPS
+            settings.INSTALLED_APPS
         except ImproperlyConfigured:
             # Still useful for commands that do not require functional
             # settings, like startproject or help.
             app_names = []
         else:
-            # Populate the app registry outside of the try/except block to
-            # avoid catching ImproperlyConfigured errors that aren't caused
-            # by the absence of a settings module.
-            from django.apps import apps
-            apps.populate(installed_apps)
+            # Setup Django outside of the try/except block to avoid catching
+            # ImproperlyConfigured errors that aren't caused by the absence of
+            # a settings module.
+            django.setup()
             app_configs = apps.get_app_configs()
             app_names = [app_config.name for app_config in app_configs]
 
