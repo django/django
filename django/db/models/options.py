@@ -42,9 +42,11 @@ def normalize_unique_together(unique_together):
 @python_2_unicode_compatible
 class Options(object):
     def __init__(self, meta, app_label=None):
-        self.local_fields, self.local_many_to_many = [], []
+        self.local_fields = []
+        self.local_many_to_many = []
         self.virtual_fields = []
-        self.model_name, self.verbose_name = None, None
+        self.model_name = None
+        self.verbose_name = None
         self.verbose_name_plural = None
         self.db_table = ''
         self.ordering = []
@@ -53,13 +55,15 @@ class Options(object):
         self.select_on_save = False
         self.default_permissions = ('add', 'change', 'delete')
         self.permissions = []
-        self.object_name, self.app_label = None, app_label
+        self.object_name = None
+        self.app_label = app_label
         self.get_latest_by = None
         self.order_with_respect_to = None
         self.db_tablespace = settings.DEFAULT_TABLESPACE
         self.meta = meta
         self.pk = None
-        self.has_auto_field, self.auto_field = False, None
+        self.has_auto_field = False
+        self.auto_field = None
         self.abstract = False
         self.managed = True
         self.proxy = False
