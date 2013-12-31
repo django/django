@@ -1,6 +1,6 @@
 [
   {
-    "model": "syndication.entry",
+    "model": "syndication_tests.entry",
     "pk": 1,
     "fields": {
       "title": "My first entry",
@@ -9,7 +9,7 @@
     }
   },
   {
-    "model": "syndication.entry",
+    "model": "syndication_tests.entry",
     "pk": 2,
     "fields": {
       "title": "My second entry",
@@ -18,7 +18,7 @@
     }
   },
   {
-    "model": "syndication.entry",
+    "model": "syndication_tests.entry",
     "pk": 3,
     "fields": {
       "title": "My third entry",
@@ -27,7 +27,7 @@
     }
   },
   {
-    "model": "syndication.entry",
+    "model": "syndication_tests.entry",
     "pk": 4,
     "fields": {
       "title": "A & B < C > D",
@@ -36,7 +36,7 @@
     }
   },
   {
-    "model": "syndication.entry",
+    "model": "syndication_tests.entry",
     "pk": 5,
     "fields": {
       "title": "My last entry",
@@ -45,7 +45,7 @@
     }
   },
   {
-    "model": "syndication.article",
+    "model": "syndication_tests.article",
     "pk": 1,
     "fields": {
       "title": "My first article",
