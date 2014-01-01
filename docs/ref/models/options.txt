@@ -33,7 +33,7 @@ Available ``Meta`` options
     .. versionadded:: 1.7
 
         ``app_label`` is no longer required for models that are defined
-        in a ``models`` package within an app.
+        outside the ``models`` module of an application.
 
 ``db_table``
 ------------
@@ -81,7 +81,7 @@ Django quotes column and table names behind the scenes.
 
        db_table = '"name_left_in_lowercase"'
 
-   Such quoted names can also be used with Django's other supported database 
+   Such quoted names can also be used with Django's other supported database
    backends; except for Oracle, however, the quotes have no effect. See the
    :ref:`Oracle notes <oracle-notes>` for more details.
 
