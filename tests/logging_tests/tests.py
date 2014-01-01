@@ -91,8 +91,8 @@ class WarningLoggerTests(TestCase):
     """
     def setUp(self):
         # If tests are invoke with "-Wall" (or any -W flag actually) then
-        # warning logging gets disabled (see django/conf/__init__.py). However,
-        # these tests expect warnings to be logged, so manually force warnings
+        # warning logging gets disabled (see configure_logging in django/utils/log.py).
+        # However, these tests expect warnings to be logged, so manually force warnings
         # to the logs. Use getattr() here because the logging capture state is
         # undocumented and (I assume) brittle.
         self._old_capture_state = bool(getattr(logging, '_warnings_showwarning', False))

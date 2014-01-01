@@ -125,10 +125,13 @@ def setup(verbosity, test_labels):
         handler = logging.StreamHandler()
         logger.addHandler(handler)
 
+    warnings.filterwarnings(
+        'ignore',
+        'django.contrib.comments is deprecated and will be removed before Django 1.8.',
+        DeprecationWarning
+    )
     # Load all the ALWAYS_INSTALLED_APPS.
-    with warnings.catch_warnings():
-        warnings.filterwarnings('ignore', 'django.contrib.comments is deprecated and will be removed before Django 1.8.', DeprecationWarning)
-        django.setup()
+    django.setup()
 
     # Load all the test model apps.
     test_modules = get_test_modules()
