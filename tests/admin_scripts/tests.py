@@ -25,7 +25,7 @@ from django.test.utils import str_prefix
 from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils.six import StringIO
-from django.test import LiveServerTestCase
+from django.test import LiveServerTestCase, TestCase
 
 
 test_dir = os.path.realpath(os.path.join(os.environ['DJANGO_TEST_TEMP_DIR'], 'test_project'))
@@ -1467,6 +1467,24 @@ class CommandTypes(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, str_prefix("EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
         self.assertOutput(out, str_prefix("EXECUTE:LabelCommand label=anotherlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+
+
+class Discovery(TestCase):
+
+    def test_precedence(self):
+        """
+        Apps listed first in INSTALLED_APPS have precendence.
+        """
+        with self.settings(INSTALLED_APPS=['admin_scripts.complex_app',
+                                           'admin_scripts.simple_app']):
+            out = StringIO()
+            call_command('duplicate', stdout=out)
+            self.assertEqual(out.getvalue().strip(), 'complex_app')
+        with self.settings(INSTALLED_APPS=['admin_scripts.simple_app',
+                                           'admin_scripts.complex_app']):
+            out = StringIO()
+            call_command('duplicate', stdout=out)
+            self.assertEqual(out.getvalue().strip(), 'simple_app')
 
 
 class ArgumentOrder(AdminScriptTestCase):

@@ -697,6 +697,18 @@ following changes that take effect immediately:
 * The ``only_installed`` argument of ``get_model`` and ``get_models`` no
   longer exists, nor does the ``seed_cache`` argument of ``get_model``.
 
+Management commands and order of :setting:`INSTALLED_APPS`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When several applications provide management commands with the same name,
+Django loads the command from the application that comes first in
+:setting:`INSTALLED_APPS`. Previous versions loaded the command from the
+applicatino that came last.
+
+This brings discovery of management commands in line with other parts of
+Django that rely on the order of :setting:`INSTALLED_APPS`, such as static
+files, templates, and translations.
+
 Behavior of ``LocMemCache`` regarding pickle errors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

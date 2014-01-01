@@ -1319,6 +1319,10 @@ Django installation. Each string should be a dotted Python path to:
     These rules apply regardless of whether :setting:`INSTALLED_APPS`
     references application configuration classes on application packages.
 
+When several applications provide different versions of the same resource
+(template, static file, management command, translation), the application
+listed first in :setting:`INSTALLED_APPS` has precedence.
+
 .. setting:: INTERNAL_IPS
 
 INTERNAL_IPS

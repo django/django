@@ -120,7 +120,7 @@ def get_commands():
         # a settings module.
         django.setup()
         app_configs = apps.get_app_configs()
-        app_names = [app_config.name for app_config in app_configs]
+        app_names = [app_config.name for app_config in reversed(app_configs)]
 
     # Find and load the management module for each installed app.
     for app_name in app_names:
