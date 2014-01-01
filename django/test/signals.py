@@ -39,6 +39,9 @@ def update_installed_apps(**kwargs):
         # Rebuild templatetags module cache.
         from django.template import base
         base.templatetags_modules[:] = []
+        # Rebuild management commands cache
+        from django.core.management import get_commands
+        get_commands.cache_clear()
 
 
 @receiver(setting_changed)
