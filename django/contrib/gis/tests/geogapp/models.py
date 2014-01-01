@@ -21,6 +21,7 @@ class City(NamedModel):
 
 
 class Zipcode(NamedModel):
+    code = models.CharField(max_length=10)
     poly = models.PolygonField(geography=True)
 
 
