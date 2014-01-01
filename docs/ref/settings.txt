@@ -1286,9 +1286,12 @@ INSTALLED_APPS
 Default: ``()`` (Empty tuple)
 
 A tuple of strings designating all applications that are enabled in this
-Django installation. Each string should be a full Python path to an
-application configuration class or to a Python package containing a
-application. :doc:`Learn more about applications </ref/applications>`.
+Django installation. Each string should be a dotted Python path to:
+
+* an application configuration class, or
+* a package containing a application.
+
+:doc:`Learn more about application configurations </ref/applications>`.
 
 .. versionchanged:: 1.7
 
@@ -1296,15 +1299,25 @@ application. :doc:`Learn more about applications </ref/applications>`.
 
 .. admonition:: Use the application registry for introspection
 
-    Your code should never access :setting:`INSTALLED_APPS` directly. Use the
-    app registry, :attr:`django.apps.apps`, instead.
+    Your code should never access :setting:`INSTALLED_APPS` directly. Use
+    :attr:`django.apps.apps` instead.
 
-.. admonition:: Application labels must be unique
+.. admonition:: Application names and labels must be unique in
+                :setting:`INSTALLED_APPS`
 
-    Application labels (that is, the final part of the dotted path to
-    application packages) *must* be unique in :setting:`INSTALLED_APPS`.
-    For example, you can't include both ``django.contrib.auth`` and
-    ``myproject.auth``.
+    Application :attr:`names <django.apps.AppConfig.name>` — the dotted Python
+    path to the application package — must be unique. There is no way to
+    include the same application twice, short of duplicating its code under
+    another name.
+
+    Application :attr:`labels <django.apps.AppConfig.label>` — by default the
+    final part of the name — must be unique too. For example, you can't
+    include both ``django.contrib.auth`` and ``myproject.auth``. However, you
+    can relabel an application with a custom configuration that defines a
+    different :attr:`~django.apps.AppConfig.label`.
+
+    These rules apply regardless of whether :setting:`INSTALLED_APPS`
+    references application configuration classes on application packages.
 
 .. setting:: INTERNAL_IPS
 
