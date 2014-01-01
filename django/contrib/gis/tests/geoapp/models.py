@@ -19,6 +19,7 @@ class NamedModel(models.Model):
     def __str__(self):
         return self.name
 
+
 class Country(NamedModel):
     mpoly = models.MultiPolygonField()  # SRID, by default, is 4326
 
@@ -37,7 +38,7 @@ class PennsylvaniaCity(City):
     objects = models.GeoManager()
 
     class Meta:
-       app_label = 'geoapp'
+        app_label = 'geoapp'
 
 
 class State(NamedModel):
@@ -61,7 +62,6 @@ if not spatialite:
 
     class Feature(NamedModel):
         geom = models.GeometryField()
-
 
     class MinusOneSRID(models.Model):
         geom = models.PointField(srid=-1)  # Minus one SRID.

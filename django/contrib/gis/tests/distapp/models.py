@@ -49,4 +49,3 @@ class Interstate(NamedModel):
 class SouthTexasInterstate(NamedModel):
     "Projected model for South Texas Interstates."
     path = models.LineStringField(srid=32140)
-
