@@ -47,7 +47,7 @@ Is Django stable?
 -----------------
 
 Yes, it's quite stable. World Online has been using Django for many years. Sites built on
-Django have weathered traffic spikes of over one million hits an hour.
+Django have weathered traffic spikes of over 50 thousand hits per second.
 
 Does Django scale?
 ------------------
