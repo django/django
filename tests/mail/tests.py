@@ -217,16 +217,16 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         msg.encoding = 'iso-8859-1'
         msg.attach_alternative(html_content, "text/html")
         payload0 = msg.message().get_payload(0)
-        self.assertMessageHasHeaders(payload0, {
+        self.assertMessageHasHeaders(payload0, set((
             ('MIME-Version', '1.0'),
             ('Content-Type', 'text/plain; charset="iso-8859-1"'),
-            ('Content-Transfer-Encoding', 'quoted-printable')})
+            ('Content-Transfer-Encoding', 'quoted-printable'))))
         self.assertTrue(payload0.as_bytes().endswith(b'\n\nFirstname S=FCrname is a great guy.'))
         payload1 = msg.message().get_payload(1)
-        self.assertMessageHasHeaders(payload1, {
+        self.assertMessageHasHeaders(payload1, set((
             ('MIME-Version', '1.0'),
             ('Content-Type', 'text/html; charset="iso-8859-1"'),
-            ('Content-Transfer-Encoding', 'quoted-printable')})
+            ('Content-Transfer-Encoding', 'quoted-printable'))))
         self.assertTrue(payload1.as_bytes().endswith(b'\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>'))
 
     def test_attachments(self):
@@ -654,13 +654,13 @@ class ConsoleBackendTests(HeadersCheckMixin, BaseEmailBackendTests, SimpleTestCa
         connection = mail.get_connection('django.core.mail.backends.console.EmailBackend', stream=s)
         send_mail('Subject', 'Content', 'from@example.com', ['to@example.com'], connection=connection)
         message = force_bytes(s.getvalue().split('\n' + ('-' * 79) + '\n')[0])
-        self.assertMessageHasHeaders(message, {
+        self.assertMessageHasHeaders(message, set((
             ('MIME-Version', '1.0'),
             ('Content-Type', 'text/plain; charset="utf-8"'),
             ('Content-Transfer-Encoding', '7bit'),
             ('Subject', 'Subject'),
             ('From', 'from@example.com'),
-            ('To', 'to@example.com')})
+            ('To', 'to@example.com'))))
         self.assertIn(b'\nDate: ', message)
 
 
