@@ -33,23 +33,20 @@ class AustraliaCity(NamedModel):
 
 class CensusZipcode(NamedModel):
     "Model for a few South Texas ZIP codes (in original Census NAD83)."
-    name = models.CharField(max_length=5)
     poly = models.PolygonField(srid=4269)
 
 
 class SouthTexasZipcode(NamedModel):
     "Model for a few South Texas ZIP codes."
-    name = models.CharField(max_length=5)
     poly = models.PolygonField(srid=32140, null=True)
 
 
 class Interstate(NamedModel):
     "Geodetic model for U.S. Interstates."
-    name = models.CharField(max_length=10)
     path = models.LineStringField()
 
 
 class SouthTexasInterstate(NamedModel):
     "Projected model for South Texas Interstates."
-    name = models.CharField(max_length=10)
+    path = models.LineStringField(srid=32140)
 
