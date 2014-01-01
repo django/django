@@ -89,6 +89,12 @@ Improvements thus far include:
   starts, through a deterministic and straightforward process. This should
   make it easier to diagnose import issues such as import loops.
 
+* The admin has an :class:`~django.contrib.admin.app.AdminConfig` configuration
+  which removes the need to call ``autodiscover()`` in ``urls.py`` if you're
+  upgrading. To use, simply replace ``django.contrib.admin`` in
+  :setting:`INSTALLED_APPS` with ``django.contrib.admin.app.AdminConfig`` and
+  remove the ``autodiscover()`` from your ``urls.py``.
+
 New method on Field subclasses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

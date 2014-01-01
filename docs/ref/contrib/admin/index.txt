@@ -76,7 +76,7 @@ Other topics
 .. class:: ModelAdmin
 
     The ``ModelAdmin`` class is the representation of a model in the admin
-    interface. These are stored in a file named ``admin.py`` in your
+    interface. Usually, these are stored in a file named ``admin.py`` in your
     application. Let's take a look at a very simple example of
     the ``ModelAdmin``::
 
@@ -128,6 +128,28 @@ The register decorator
         @admin.register(Author, Reader, Editor, site=custom_admin_site)
         class PersonAdmin(admin.ModelAdmin):
             pass
+
+Discovery of admin files
+------------------------
+
+The admin needs to instructed to look for ``admin.py`` files in your project.
+The simplest way to do this if you are using the default ``AdminSite`` is to
+call ``django.contrib.admin.autodiscover()``. This will look for an
+``admin.py`` contained in each of your :setting:`INSTALLED_APPS` and import it.
+By default this is done in the root urlconf of the project template.
+
+If you are using a custom ``AdminSite`` if is common to import all of the
+``ModelAdmin`` subclasses into your code and register them to the custom
+``AdminSite`` there, so you no longer need to use ``autodiscover()``.
+
+.. class:: app.AdminConfig
+
+    .. versionadded:: 1.7
+
+    You may also use the bundled :class:`~django.apps.AppConfig` subclass
+    ``django.contrib.admin.app.AdminConfig`` in your setting:`INSTALLED_APPS`.
+    This will call ``autodiscover()`` when the :data:`~django.apps.apps`
+    registry is complete, so you can remove it from your ``urls.py``.
 
 ``ModelAdmin`` options
 ----------------------
@@ -2377,14 +2399,9 @@ In this example, we register the default ``AdminSite`` instance
     from django.conf.urls import patterns, include
     from django.contrib import admin
 
-    admin.autodiscover()
-
     urlpatterns = patterns('',
         (r'^admin/', include(admin.site.urls)),
     )
-
-Above we used ``admin.autodiscover()`` to automatically load the
-:setting:`INSTALLED_APPS` admin.py modules.
 
 In this example, we register the ``AdminSite`` instance
 ``myproject.admin.admin_site`` at the URL ``/myadmin/`` ::
@@ -2397,9 +2414,12 @@ In this example, we register the ``AdminSite`` instance
         (r'^myadmin/', include(admin_site.urls)),
     )
 
-There is really no need to use autodiscover when using your own ``AdminSite``
-instance since you will likely be importing all the per-app admin.py modules
-in your ``myproject.admin`` module.
+Note that there is really no need to use autodiscover when using your own
+``AdminSite`` instance since you will likely be importing all the per-app
+admin.py modules in your ``myproject.admin`` module. This means you likely do
+not need ``django.contrib.admin.app.AdminConfig`` in your
+:setting:`INSTALLED_APPS` and can just use the raw app
+``django.contrib.admin``.
 
 Multiple admin sites in the same URLconf
 ----------------------------------------
