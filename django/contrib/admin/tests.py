@@ -57,7 +57,6 @@ class AdminSeleniumWebDriverTestCase(StaticLiveServerCase):
         """
         Helper function that blocks until an css selector is found on the page.
         """
-        from selenium.common.exceptions import NoSuchElementException, WebDriverException
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support import expected_conditions as ec
         self.wait_until(
