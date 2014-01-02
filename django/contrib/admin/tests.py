@@ -32,7 +32,6 @@ class AdminSeleniumWebDriverTestCase(StaticLiveServerCase):
     @classmethod
     def _tearDownClassInternal(cls):
         if hasattr(cls, 'selenium'):
-            cls.selenium.refresh()  # see ticket #21227
             cls.selenium.quit()
         super(AdminSeleniumWebDriverTestCase, cls)._tearDownClassInternal()
 

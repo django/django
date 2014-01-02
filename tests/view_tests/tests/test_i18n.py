@@ -192,7 +192,6 @@ class JavascriptI18nTests(LiveServerTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.selenium.refresh()  # see ticket #21227
         cls.selenium.quit()
         super(JavascriptI18nTests, cls).tearDownClass()
 
