@@ -59,7 +59,7 @@ For application authors
 If you're creating a pluggable app called "Rock ’n’ roll", here's how you
 would provide a proper name for the admin::
 
-    # rock_n_roll/app.py
+    # rock_n_roll/apps.py
 
     from django.apps import AppConfig
 
@@ -67,11 +67,11 @@ would provide a proper name for the admin::
         name = 'rock_n_roll'
         verbose_name = "Rock ’n’ roll"
 
-You would then tell your users to add ``'rock_n_roll.app.RockNRollConfig'`` to
-their :setting:`INSTALLED_APPS`.
+You would then tell your users to add ``'rock_n_roll.apps.RockNRollConfig'``
+to their :setting:`INSTALLED_APPS`.
 
 The recommended convention is to put the configuration class in a submodule of
-the application called ``app``. However, this isn't enforced by Django.
+the application called ``apps``. However, this isn't enforced by Django.
 
 You must include the :attr:`~django.apps.AppConfig.name` attribute for Django
 to determine which application this configuration applies to. You can define
