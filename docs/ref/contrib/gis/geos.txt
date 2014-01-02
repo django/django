@@ -311,7 +311,7 @@ geometry.  This should only be used for geometries with an SRID of
 .. attribute:: GEOSGeometry.ogr
 
 Returns an :class:`~django.contrib.gis.gdal.OGRGeometry` object
-correspondg to the GEOS geometry.
+corresponding to the GEOS geometry.
 
 .. note::
 
@@ -565,7 +565,7 @@ corresponding to the SRID of the geometry or ``None``.
 
 .. method:: GEOSGeometry.transform(ct, clone=False)
 
-Transforms the geometry according to the given coordinate transformation paramter
+Transforms the geometry according to the given coordinate transformation parameter
 (``ct``), which may be an integer SRID, spatial reference WKT string,
 a PROJ.4 string, a :class:`~django.contrib.gis.gdal.SpatialReference` object, or a
 :class:`~django.contrib.gis.gdal.CoordTransform` object. By default, the geometry
