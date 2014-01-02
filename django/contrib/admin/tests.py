@@ -51,8 +51,29 @@ class AdminSeleniumWebDriverTestCase(StaticLiveServerCase):
         Helper function that blocks until the element with the given tag name
         is found on the page.
         """
+        self.wait_for(tag_name, timeout)
+
+    def wait_for(self, css_selector, timeout=10):
+        """
+        Helper function that blocks until an css selector is found on the page.
+        """
+        from selenium.common.exceptions import NoSuchElementException, WebDriverException
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support import expected_conditions as ec
         self.wait_until(
-            lambda driver: driver.find_element_by_tag_name(tag_name),
+            ec.presence_of_element_located((By.CSS_SELECTOR, css_selector)),
+            timeout
+        )
+
+    def wait_for_text(self, css_selector, text, timeout=10):
+        """
+        Helper function that blocks until the text is found in the css selector.
+        """
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support import expected_conditions as ec
+        self.wait_until(
+            ec.text_to_be_present_in_element_value(
+                (By.CSS_SELECTOR, css_selector), text),
             timeout
         )
 
