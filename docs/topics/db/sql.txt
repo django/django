@@ -23,11 +23,11 @@ return model instances:
 
 .. method:: Manager.raw(raw_query, params=None, translations=None)
 
-This method method takes a raw SQL query, executes it, and returns a
+This method takes a raw SQL query, executes it, and returns a
 ``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
-can be iterated over just like an normal QuerySet to provide object instances.
+can be iterated over just like a normal QuerySet to provide object instances.
 
-This is best illustrated with an example. Suppose you've got the following model::
+This is best illustrated with an example. Suppose you have the following model::
 
     class Person(models.Model):
         first_name = models.CharField(...)
@@ -108,7 +108,7 @@ write::
     >>> first_person = Person.objects.raw('SELECT * from myapp_person')[0]
 
 However, the indexing and slicing are not performed at the database level. If
-you have a big amount of ``Person`` objects in your database, it is more
+you have a large number of ``Person`` objects in your database, it is more
 efficient to limit the query at the SQL level::
 
     >>> first_person = Person.objects.raw('SELECT * from myapp_person LIMIT 1')[0]
