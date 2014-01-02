@@ -115,10 +115,6 @@ def get_commands():
         # settings, like startproject or help.
         app_names = []
     else:
-        # Setup Django outside of the try/except block to avoid catching
-        # ImproperlyConfigured errors that aren't caused by the absence of
-        # a settings module.
-        django.setup()
         app_configs = apps.get_app_configs()
         app_names = [app_config.name for app_config in app_configs]
 
@@ -388,6 +384,12 @@ class ManagementUtility(object):
             handle_default_options(options)
         except:  # Needed because parser.parse_args can raise SystemExit
             pass  # Ignore any option errors at this point.
+
+        try:
+            django.setup()
+        except ImproperlyConfigured:
+            # Some commands are supposed to work without configured settings
+            pass
 
         try:
             subcommand = self.argv[1]
