@@ -686,8 +686,7 @@ class Model(six.with_metaclass(ModelBase)):
             if force_fetch:
                 # Fields to read from the database.
                 returning_fields = [
-                    f.db_column or f.column
-                    for f in meta.local_concrete_fields
+                    f for f in meta.local_concrete_fields
                     if not f.use_on_update
                 ]
             else:
@@ -705,11 +704,12 @@ class Model(six.with_metaclass(ModelBase)):
             # there were actual values to update.
             if force_fetch and values:
                 if returning_values:
-                    for f, value in zip(returning_fields, returning_values):
+                    attrs = (f.attname for f in returning_fields)
+                    for f, value in zip(attrs, returning_values):
                         setattr(self, f, value)
                 else:
                     res = self.__class__.objects.values(
-                        *list(returning_fields)
+                        *list(f.column for f in returning_fields)
                     ).get(pk=self.pk)
                     for k, v in six.iteritems(res):
                         setattr(self, k, v)
@@ -728,8 +728,7 @@ class Model(six.with_metaclass(ModelBase)):
                 fields = (f for f in fields if f.use_on_insert)
                 if force_fetch:
                     returning_fields = [
-                        f.db_column or f.column
-                        for f in meta.local_concrete_fields
+                        f for f in meta.local_concrete_fields
                         if not f.use_on_insert
                     ]
             if not pk_set:
@@ -744,11 +743,12 @@ class Model(six.with_metaclass(ModelBase)):
                 setattr(self, meta.pk.attname, result[0])
                 if force_fetch:
                     if result[1:]:
-                        for f, value in zip(returning_fields, result[1:]):
+                        attrs = (f.attname for f in returning_fields)
+                        for f, value in zip(attrs, result[1:]):
                             setattr(self, f, value)
                     else:
                         res = self.__class__.objects.values(
-                            *list(returning_fields)
+                            *list(f.column for f in returning_fields)
                         ).get(pk=self.pk)
                         for k, v in six.iteritems(res):
                             setattr(self, k, v)

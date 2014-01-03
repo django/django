@@ -222,7 +222,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def return_insert_id(self):
         return self.return_values(nvars=1)
 
-    def return_values(self, nvars=1):
+    def return_values(self, nvars=1, fields=None):
         assert nvars > 0
         vars_string = ", ".join(["%s"] * nvars)
         return "RETURNING " + vars_string, ()

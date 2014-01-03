@@ -851,7 +851,10 @@ class SQLInsertCompiler(SQLCompiler):
         if self.returning_fields:
             if self.connection.features.can_return_multiple_fields:
                 fetch_func = self.connection.ops.return_values
-                fetch_kwargs = {'nvars': len(self.returning_fields) + 1}
+                fetch_kwargs = {
+                    'nvars': len(self.returning_fields) + 1,
+                    'fields': self.returning_fields
+                }
         elif self.return_id:
             if self.connection.features.can_return_id_from_insert:
                 fetch_func = self.connection.ops.return_insert_id
@@ -866,7 +869,9 @@ class SQLInsertCompiler(SQLCompiler):
             if r_fmt:
                 extra_fields = []
                 for f in self.returning_fields:
-                    extra_fields += ["%s.%s" % (qn(opts.db_table), qn(f))]
+                    extra_fields += [
+                        "%s.%s" % (qn(opts.db_table), qn(f.column))
+                    ]
                 result.append(
                     r_fmt % tuple(itertools.chain([col], extra_fields))
                 )
@@ -964,13 +969,16 @@ class SQLUpdateCompiler(SQLCompiler):
 
         if self.connection.features.can_return_multiple_fields and self.returning_fields:
             r_fmt, r_params = self.connection.ops.return_values(
-                nvars=len(self.returning_fields)
+                nvars=len(self.returning_fields),
+                fields=self.returning_fields
             )
             if r_fmt:
                 extra_fields = []
                 opts = self.query.get_meta()
                 for f in self.returning_fields:
-                    extra_fields += ["%s.%s" % (qn(opts.db_table), qn(f))]
+                    extra_fields += [
+                        "%s.%s" % (qn(opts.db_table), qn(f.column))
+                    ]
                 result.append(r_fmt % tuple(extra_fields))
                 params += r_params
         return ' '.join(result), tuple(update_params + params)
