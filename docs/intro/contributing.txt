@@ -237,7 +237,7 @@ widget. Before we make those changes though, we're going to write a couple
 tests to verify that our modification functions correctly and continues to
 function correctly in the future.
 
-Navigate to Django's ``tests/admin_widgets/`` folder and
+Navigate to Django's ``tests/regressiontests/admin_widgets/`` folder and
 open the ``tests.py`` file. Add the following code on line 269 right before the
 ``AdminFileWidgetTest`` class::
 
@@ -467,10 +467,11 @@ This patch file contains all your changes and should look this:
 
      Relationship fields
      ===================
-    diff --git a/tests/admin_widgets/tests.py b/tests/admin_widgets/tests.py
+    diff --git a/tests/regressiontests/admin_widgets/tests.py b/tests/regressiontests/admin_widgets/tests.py
     index 4b11543..94acc6d 100644
-    --- a/tests/admin_widgets/tests.py
-    +++ b/tests/admin_widgets/tests.py
+    --- a/tests/regressiontests/admin_widgets/tests.py
+    +++ b/tests/regressiontests/admin_widgets/tests.py
+
     @@ -265,6 +265,35 @@ class AdminSplitDateTimeWidgetTest(DjangoTestCase):
                          '<p class="datetime">Datum: <input value="01.12.2007" type="text" class="vDateField" name="test_0" size="10" /><br />Zeit: <input value="09:30:00" type="text" class="vTimeField" name="test_1" size="8" /></p>',
                      )
