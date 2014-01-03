@@ -7,21 +7,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_sequence = "DROP SEQUENCE IF EXISTS %(sequence)s CASCADE"
     sql_set_sequence_max = "SELECT setval('%(sequence)s', MAX(%(column)s)) FROM %(table)s"
 
-    def _alter_column_type_sql(self, table, column, type):
-        """
-        Makes ALTER TYPE with SERIAL make sense.
-        """
-        if type.lower() == "serial":
-            sequence_name = "%s_%s_seq" % (table, column)
-            return (
-                (
-                    self.sql_alter_column_type % {
-                        "column": self.quote_name(column),
-                        "type": "integer",
-                    },
-                    [],
-                ),
-                [
+    def _alter_db_column_sql(self, model, column, alteration=None, values={}, fragment=False, params=None):
+        if alteration == 'type' and values.get('type', '').lower() == 'serial':
+            # Makes ALTER TYPE with SERIAL make sense.
+            sequence_name = "%s_%s_seq" % (model._meta.db_table, column)
+            values['type'] = 'integer'
+
+            actions, post_actions = super(DatabaseSchemaEditor, self)._alter_column_type_sql(model, column, alteration,
+                values, fragment, params)
+            post_actions.extend([
                     (
                         self.sql_delete_sequence % {
                             "sequence": sequence_name,
@@ -52,7 +46,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                         },
                         [],
                     ),
-                ],
-            )
+            ])
         else:
-            return super(DatabaseSchemaEditor, self)._alter_column_type_sql(table, column, type)
+            actions, post_actions = super(DatabaseSchemaEditor, self)._alter_column_type_sql(model, column, alteration,
+                values, fragment, params)
+        return actions, post_actions
+
+    def _quote_parameter(self, value):
+        # Inner import so backend fails nicely if it's not present
+        import psycopg2
+        return psycopg2.extensions.adapt(value)
+

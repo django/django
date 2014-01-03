@@ -37,28 +37,21 @@ class SchemaTests(TransactionTestCase):
 
     def delete_tables(self):
         "Deletes all model tables for our models for a clean test environment"
-        cursor = connection.cursor()
-        connection.disable_constraint_checking()
-        table_names = connection.introspection.table_names(cursor)
-        for model in self.models:
-            # Remove any M2M tables first
-            for field in model._meta.local_many_to_many:
-                with atomic():
-                    tbl = field.rel.through._meta.db_table
-                    if tbl in table_names:
-                        cursor.execute(connection.schema_editor().sql_delete_table % {
-                            "table": connection.ops.quote_name(tbl),
-                        })
-                        table_names.remove(tbl)
-            # Then remove the main tables
+        with connection.cursor() as cursor:
             with atomic():
-                tbl = model._meta.db_table
-                if tbl in table_names:
-                    cursor.execute(connection.schema_editor().sql_delete_table % {
-                        "table": connection.ops.quote_name(tbl),
-                    })
-                    table_names.remove(tbl)
-        connection.enable_constraint_checking()
+                table_names = connection.introspection.table_names(cursor)
+                for model in self.models:
+                    # Remove any M2M tables first
+                    for field in model._meta.local_many_to_many:
+                        tbl = field.rel.through._meta.db_table
+                        if tbl in table_names:
+                            connection.schema_editor().delete_model(field.rel.through)
+                            table_names.remove(tbl)
+                    # Then remove the main tables
+                    tbl = model._meta.db_table
+                    if tbl in table_names:
+                        connection.schema_editor().delete_model(model)
+                        table_names.remove(tbl)
 
     def column_classes(self, model):
         cursor = connection.cursor()

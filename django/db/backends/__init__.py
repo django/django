@@ -651,9 +651,6 @@ class BaseDatabaseFeatures(object):
     # Can we issue more than one ALTER COLUMN clause in an ALTER TABLE?
     supports_combined_alters = False
 
-    # What's the maximum length for index names?
-    max_index_name_length = 63
-
     # Does it support foreign keys?
     supports_foreign_keys = True
 
@@ -664,9 +661,6 @@ class BaseDatabaseFeatures(object):
     # parameter passing? Note this can be provided by the backend even if not
     # supported by the Python driver
     supports_paramstyle_pyformat = True
-
-    # Does the backend require literal defaults, rather than parameterised ones?
-    requires_literal_defaults = False
 
     # Does the backend require a connection reset after each material schema change?
     connection_persists_old_columns = False
@@ -971,15 +965,6 @@ class BaseDatabaseOperations(object):
         not quote the given name if it's already been quoted.
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a quote_name() method')
-
-    def quote_parameter(self, value):
-        """
-        Returns a quoted version of the value so it's safe to use in an SQL
-        string. This should NOT be used to prepare SQL statements to send to
-        the database; it is meant for outputting SQL statements to a file
-        or the console for later execution by a developer/DBA.
-        """
-        raise NotImplementedError()
 
     def random_function_sql(self):
         """
