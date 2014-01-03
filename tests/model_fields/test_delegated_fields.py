@@ -46,7 +46,7 @@ class SelectOnlyTests(test.TestCase):
         m = SelectModel.objects.create(f='text')
         m.f = 'text'
         m.save()
-        self.assertIsNone(SelectModel.objects.all()[0].f)
+        self.assertFalse(SelectModel.objects.all()[0].f)
 
     def test_field_is_fetched_on_select(self):
         SelectModel.objects.create(f='text')
