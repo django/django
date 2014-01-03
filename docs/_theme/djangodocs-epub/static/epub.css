@@ -33,11 +33,12 @@ pre {
 a:link, a:visited { color: #396623; }
 a:hover { color: #1d3311; }
 
-/* Unlike in the default theme, we will only use em units, to make sure changing text size works. */
+/* Use special styled note boxes from the default theme, but with the left side
+fitted after the icon, to allow text resizing with breaking. */
 .note, .admonition {
-	background-position: 0.8em 0.8em;
+	background-position: 9px 0.8em;
 	background-repeat: no-repeat;
-	padding: 0.8em 1em 0.8em 4.25em;
+	padding: 0.8em 1em 0.8em 65px;
 	margin: 1em 0;
 	border: 0.01em solid black;
 }
