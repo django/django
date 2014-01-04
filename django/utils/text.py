@@ -327,6 +327,7 @@ def javascript_quote(s, quote_double_quotes=False):
     s = s.replace('\n', '\\n')
     s = s.replace('\t', '\\t')
     s = s.replace("'", "\\'")
+    s = s.replace('</', '<\\/')
     if quote_double_quotes:
         s = s.replace('"', '&quot;')
     return str(ustring_re.sub(fix, s))
