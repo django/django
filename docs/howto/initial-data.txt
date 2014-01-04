@@ -78,9 +78,9 @@ Automatically loading initial data fixtures
 -------------------------------------------
 
 If you create a fixture named ``initial_data.[xml/yaml/json]``, that fixture will
-be loaded every time you run :djadmin:`syncdb`. This is extremely convenient,
+be loaded every time you run :djadmin:`migrate`. This is extremely convenient,
 but be careful: remember that the data will be refreshed *every time* you run
-:djadmin:`syncdb`. So don't use ``initial_data`` for data you'll want to edit.
+:djadmin:`migrate`. So don't use ``initial_data`` for data you'll want to edit.
 
 Where Django finds fixture files
 --------------------------------
@@ -104,7 +104,7 @@ Providing initial SQL data
 ==========================
 
 Django provides a hook for passing the database arbitrary SQL that's executed
-just after the CREATE TABLE statements when you run :djadmin:`syncdb`. You can
+just after the CREATE TABLE statements when you run :djadmin:`migrate`. You can
 use this hook to populate default records, or you could also create SQL
 functions, views, triggers, etc.
 

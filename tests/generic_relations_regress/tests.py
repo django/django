@@ -222,10 +222,10 @@ class GenericRelationTests(TestCase):
         Link.objects.create(content_object=b)
         qs = HasLinkThing.objects.annotate(Sum('links'))
         # If content_type restriction isn't in the query's join condition,
-        # then wrong results are produced here as b will also match (it has
-        # same pk).
+        # then wrong results are produced here as the link to b will also match
+        # (b and hs1 have equal pks).
         self.assertEqual(qs.count(), 1)
-        self.assertEqual(qs[0].links__sum, 1)
+        self.assertEqual(qs[0].links__sum, l.id)
         l.delete()
         # Now if we don't have proper left join, we will not produce any
         # results at all here.

@@ -1,6 +1,7 @@
 import re
+import os
 import sys
-from django.utils import datetime_safe
+from django.utils import datetime_safe, importlib
 from django.utils.six.moves import input
 from django.db.migrations import operations
 from django.db.migrations.migration import Migration
@@ -410,15 +411,22 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
 
     def ask_initial(self, app_label):
         "Should we create an initial migration for the app?"
-        # Don't ask for django.contrib apps
-        app = cache.get_app(app_label)
-        if app.__name__.startswith("django.contrib"):
-            return False
         # If it was specified on the command line, definitely true
         if app_label in self.specified_apps:
             return True
-        # Now ask
-        return self._boolean_input("Do you want to enable migrations for app '%s'? [y/N]" % app_label, False)
+        # Otherwise, we look to see if it has a migrations module
+        # without any Python files in it, apart from __init__.py.
+        # Apps from the new app template will have these; the python
+        # file check will ensure we skip South ones.
+        models_module = cache.get_app(app_label)
+        migrations_import_path = "%s.migrations" % models_module.__package__
+        try:
+            migrations_module = importlib.import_module(migrations_import_path)
+        except ImportError:
+            return False
+        else:
+            filenames = os.listdir(os.path.dirname(migrations_module.__file__))
+            return not any(x.endswith(".py") for x in filenames if x != "__init__.py")
 
     def ask_not_null_addition(self, field_name, model_name):
         "Adding a NOT NULL field to a model"

@@ -368,6 +368,10 @@ class ClientTest(TestCase):
         response = self.client.get('/test_client/login_protected_view/')
         self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/login_protected_view/')
 
+    @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.signed_cookies")
+    def test_logout_cookie_sessions(self):
+        self.test_logout()
+
     def test_view_with_permissions(self):
         "Request a page that is protected with @permission_required"
 

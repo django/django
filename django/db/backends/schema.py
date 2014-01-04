@@ -5,6 +5,7 @@ from django.db.backends.creation import BaseDatabaseCreation
 from django.db.backends.utils import truncate_name
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.transaction import atomic
+from django.utils.encoding import force_bytes
 from django.utils.log import getLogger
 from django.utils.six.moves import reduce
 from django.utils.six import callable
@@ -109,7 +110,7 @@ class BaseDatabaseSchemaEditor(object):
         params = []
         # Check for fields that aren't actually columns (e.g. M2M)
         if sql is None:
-            return None, []
+            return None, None
         # Work out nullability
         null = field.null
         # If we were told to include a default value, do so
@@ -731,7 +732,7 @@ class BaseDatabaseSchemaEditor(object):
             index_name = index_name[1:]
         # If it's STILL too long, just hash it down
         if len(index_name) > self.connection.features.max_index_name_length:
-            index_name = hashlib.md5(index_name).hexdigest()[:self.connection.features.max_index_name_length]
+            index_name = hashlib.md5(force_bytes(index_name)).hexdigest()[:self.connection.features.max_index_name_length]
         # It can't start with a number on Oracle, so prepend D if we need to
         if index_name[0].isdigit():
             index_name = "D%s" % index_name[:-1]

@@ -1870,6 +1870,12 @@ The ``InlineModelAdmin`` class adds:
     through to :func:`~django.forms.models.inlineformset_factory` when
     creating the formset for this inline.
 
+.. warning::
+    When writing custom validation for ``InlineModelAdmin`` forms, be cautious
+    of writing validation that relies on features of the parent model. If the
+    parent model fails to validate, it may be left in an inconsistent state as
+    described in the warning in :ref:`validation-on-modelform`.
+
 .. attribute:: InlineModelAdmin.extra
 
     This controls the number of extra forms the formset will display in
@@ -2522,7 +2528,8 @@ that instance as a ``current_app`` hint to the reverse call. For example,
 if you specifically wanted the admin view from the admin instance named
 ``custom``, you would need to call::
 
-    >>> change_url = urlresolvers.reverse('custom:polls_choice_change', args=(c.id,))
+    >>> change_url = urlresolvers.reverse('admin:polls_choice_change',
+    ...                                   args=(c.id,), current_app='custom')
 
 For more details, see the documentation on :ref:`reversing namespaced URLs
 <topics-http-reversing-url-namespaces>`.

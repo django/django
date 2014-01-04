@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
 from django.contrib.contenttypes.models import ContentType
+from django.db import models
+from django.db.models.loading import BaseAppCache
 from django.test import TestCase
 
 from .models import Author, Article
@@ -46,3 +48,22 @@ class ContentTypesViewsTests(TestCase):
         short_url = '/shortcut/%s/%s/' % (42424242, an_author.pk)
         response = self.client.get(short_url)
         self.assertEqual(response.status_code, 404)
+
+    def test_create_contenttype_on_the_spot(self):
+        """
+        Make sure ContentTypeManager.get_for_model creates the corresponding
+        content type if it doesn't exist in the database (for some reason).
+        """
+
+        class ModelCreatedOnTheFly(models.Model):
+            name = models.CharField()
+
+            class Meta:
+                verbose_name = 'a model created on the fly'
+                app_label = 'my_great_app'
+                app_cache = BaseAppCache()
+
+        ct = ContentType.objects.get_for_model(ModelCreatedOnTheFly)
+        self.assertEqual(ct.app_label, 'my_great_app')
+        self.assertEqual(ct.model, 'modelcreatedonthefly')
+        self.assertEqual(ct.name, 'a model created on the fly')

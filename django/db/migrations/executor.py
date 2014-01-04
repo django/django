@@ -74,7 +74,7 @@ class MigrationExecutor(object):
                     migration.apply(project_state, schema_editor, collect_sql=True)
                 else:
                     migration.unapply(project_state, schema_editor, collect_sql=True)
-                statements.extend(schema_editor.collected_sql)
+            statements.extend(schema_editor.collected_sql)
         return statements
 
     def apply_migration(self, migration, fake=False):

@@ -73,14 +73,14 @@ If you attempt to access a database that you haven't defined in your
 Synchronizing your databases
 ============================
 
-The :djadmin:`syncdb` management command operates on one database at a
+The :djadmin:`migrate` management command operates on one database at a
 time. By default, it operates on the ``default`` database, but by
-providing a :djadminopt:`--database` argument, you can tell syncdb to
-synchronize a different database. So, to synchronize all models onto
+providing a :djadminopt:`--database` argument, you can tell :djadmin:`migrate`
+to synchronize a different database. So, to synchronize all models onto
 all databases in our example, you would need to call::
 
-    $ ./manage.py syncdb
-    $ ./manage.py syncdb --database=users
+    $ ./manage.py migrate
+    $ ./manage.py migrate --database=users
 
 If you don't want every application to be synchronized onto a
 particular database, you can define a :ref:`database
@@ -97,7 +97,7 @@ Using other management commands
 -------------------------------
 
 The other ``django-admin.py`` commands that interact with the database
-operate in the same way as :djadmin:`syncdb` -- they only ever operate
+operate in the same way as :djadmin:`migrate` -- they only ever operate
 on one database at a time, using :djadminopt:`--database` to control
 the database used.
 
@@ -681,7 +681,7 @@ how you can split these models across databases:
   in the same database as ``sites``.
 
 In addition, some objects are automatically created just after
-:djadmin:`syncdb` creates a table to hold them in a database:
+:djadmin:`migrate` creates a table to hold them in a database:
 
 - a default ``Site``,
 - a ``ContentType`` for each model (including those not stored in that
@@ -693,7 +693,7 @@ For common setups with multiple databases, it isn't useful to have these
 objects in more than one database. Common setups include master / slave and
 connecting to external databases. Therefore, it's recommended:
 
-- either to run :djadmin:`syncdb` only for the default database;
+- either to run :djadmin:`migrate` only for the default database;
 - or to write :ref:`database router<topics-db-multi-db-routing>` that allows
   synchronizing these three models only to one database.
 

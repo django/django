@@ -13,10 +13,12 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, NoReverseMatch
 # Register auth models with the admin.
 from django.contrib.auth import get_permission_codename
+from django.contrib.admin import ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import LogEntry, DELETION
 from django.contrib.admin.sites import LOGIN_FORM_KEY
 from django.contrib.admin.utils import quote
+from django.contrib.admin.validation import ModelAdminValidator
 from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.auth import REDIRECT_FIELD_NAME
@@ -49,7 +51,8 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
     Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage,
-    Telegram, Pizza, Topping, FilteredManager, City, Restaurant, Worker)
+    Telegram, Pizza, Topping, FilteredManager, City, Restaurant, Worker,
+    ParentWithDependentChildren)
 from .admin import site, site2, CityAdmin
 
 
@@ -2969,7 +2972,7 @@ class AdminInlineFileUploadTest(TestCase):
             "pictures-1-image": "",
         }
         response = self.client.post('/test_admin/%s/admin_views/gallery/%d/' % (self.urlbit, self.gallery.id), post_data)
-        self.assertTrue(response._container[0].find("Currently:") > -1)
+        self.assertContains(response, b"Currently")
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -4595,7 +4598,7 @@ class TestLabelVisibility(TestCase):
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
-class AdminViewOnSiteTest(TestCase):
+class AdminViewOnSiteTests(TestCase):
     urls = "admin_views.urls"
     fixtures = ['admin-views-users.xml', 'admin-views-restaurants.xml']
 
@@ -4604,6 +4607,64 @@ class AdminViewOnSiteTest(TestCase):
 
     def tearDown(self):
         self.client.logout()
+
+    def test_add_view_form_and_formsets_run_validation(self):
+        """
+        Issue #20522
+        Verifying that if the parent form fails validation, the inlines also
+        run validation even if validation is contingent on parent form data
+        """
+        # The form validation should fail because 'some_required_info' is
+        # not included on the parent form, and the family_name of the parent
+        # does not match that of the child
+        post_data = {"family_name": "Test1",
+                     "dependentchild_set-TOTAL_FORMS": "1",
+                     "dependentchild_set-INITIAL_FORMS": "0",
+                     "dependentchild_set-MAX_NUM_FORMS": "1",
+                     "dependentchild_set-0-id": "",
+                     "dependentchild_set-0-parent": "",
+                     "dependentchild_set-0-family_name": "Test2"}
+        response = self.client.post('/test_admin/admin/admin_views/parentwithdependentchildren/add/',
+                                    post_data)
+
+        # just verifying the parent form failed validation, as expected --
+        # this isn't the regression test
+        self.assertTrue('some_required_info' in response.context['adminform'].form.errors)
+
+        # actual regression test
+        for error_set in response.context['inline_admin_formset'].formset.errors:
+            self.assertEqual(['Children must share a family name with their parents in this contrived test case'],
+                              error_set.get('__all__'))
+
+    def test_change_view_form_and_formsets_run_validation(self):
+        """
+        Issue #20522
+        Verifying that if the parent form fails validation, the inlines also
+        run validation even if validation is contingent on parent form data
+        """
+        pwdc = ParentWithDependentChildren.objects.create(some_required_info=6,
+                                                          family_name="Test1")
+        # The form validation should fail because 'some_required_info' is
+        # not included on the parent form, and the family_name of the parent
+        # does not match that of the child
+        post_data = {"family_name": "Test2",
+                     "dependentchild_set-TOTAL_FORMS": "1",
+                     "dependentchild_set-INITIAL_FORMS": "0",
+                     "dependentchild_set-MAX_NUM_FORMS": "1",
+                     "dependentchild_set-0-id": "",
+                     "dependentchild_set-0-parent": str(pwdc.id),
+                     "dependentchild_set-0-family_name": "Test1"}
+        response = self.client.post('/test_admin/admin/admin_views/parentwithdependentchildren/%d/'
+                                    % pwdc.id, post_data)
+
+        # just verifying the parent form failed validation, as expected --
+        # this isn't the regression test
+        self.assertTrue('some_required_info' in response.context['adminform'].form.errors)
+
+        # actual regression test
+        for error_set in response.context['inline_admin_formset'].formset.errors:
+            self.assertEqual(['Children must share a family name with their parents in this contrived test case'],
+                              error_set.get('__all__'))
 
     def test_validate(self):
         "Ensure that the view_on_site value is either a boolean or a callable"
@@ -4641,6 +4702,11 @@ class AdminViewOnSiteTest(TestCase):
                             '"/worker/%s/%s/"' % (worker.surname, worker.name),
                             )
 
+    def test_missing_get_absolute_url(self):
+        "Ensure None is returned if model doesn't have get_absolute_url"
+        model_admin = ModelAdmin(Worker, None)
+        self.assertIsNone(model_admin.get_view_on_site_url(Worker()))
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class InlineAdminViewOnSiteTest(TestCase):
@@ -4676,3 +4742,20 @@ class InlineAdminViewOnSiteTest(TestCase):
         self.assertContains(response,
                             '"/worker_inline/%s/%s/"' % (worker.surname, worker.name),
                             )
+
+
+class AdminGenericRelationTests(TestCase):
+    def test_generic_relation_fk_list_filter(self):
+        """
+        Validates a model with a generic relation to a model with
+        a foreign key can specify the generic+fk relationship
+        path as a list_filter. See trac #21428.
+        """
+        class GenericFKAdmin(ModelAdmin):
+            list_filter = ('tags__content_type',)
+
+        validator = ModelAdminValidator()
+        try:
+            validator.validate_list_filter(GenericFKAdmin, Plot)
+        except ImproperlyConfigured:
+            self.fail("Couldn't validate a GenericRelation -> FK path in ModelAdmin.list_filter")

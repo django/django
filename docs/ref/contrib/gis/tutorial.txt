@@ -262,8 +262,8 @@ argument. Use an integer representing the coordinate system's EPSG code.
 
 __ http://en.wikipedia.org/wiki/SRID
 
-Run ``syncdb``
---------------
+Run ``migrate``
+---------------
 
 After defining your model, you need to sync it with the database. First,
 let's look at the SQL that will generate the table for the
@@ -296,14 +296,14 @@ This command should produce the following output:
     CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ( "mpoly" GIST_GEOMETRY_OPS );
     COMMIT;
 
-If this looks correct, run ``syncdb`` to create this table in the database::
+If this looks correct, run :djadmin:`migrate` to create this table in the database::
 
-    $ python manage.py syncdb
+    $ python manage.py migrate
     Creating table world_worldborder
     Installing custom SQL for world.WorldBorder model
 
-The ``syncdb`` command may also prompt you to create an admin user. Either
-do so now, or later by running ``django-admin.py createsuperuser``.
+The :djadmin:`migrate` command may also prompt you to create an admin user.
+Either do so now, or later by running ``django-admin.py createsuperuser``.
 
 Importing Spatial Data
 ======================
@@ -742,7 +742,7 @@ Start up the Django development server:
     $ python manage.py runserver
 
 Finally, browse to ``http://localhost:8000/admin/``, and log in with the admin
-user created after running ``syncdb``.  Browse to any of the ``WorldBorder``
+user created after running :djadmin:`migrate`. Browse to any of the ``WorldBorder``
 entries -- the borders may be edited by clicking on a polygon and dragging
 the vertexes to the desired position.
 

@@ -99,11 +99,11 @@ def visit_snippet(self, node):
     linenos = node.rawsource.count('\n') >= self.highlightlinenothreshold - 1
     fname = node['filename']
     highlight_args = node.get('highlight_args', {})
-    if node.has_key('language'):
+    if 'language' in node:
         # code-block directives
         lang = node['language']
         highlight_args['force'] = True
-    if node.has_key('linenos'):
+    if 'linenos' in node:
         linenos = node['linenos']
 
     def warner(msg):

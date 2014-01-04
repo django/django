@@ -215,9 +215,10 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
             })
             kwargs['empty_label'] = _('None') if db_field.blank else None
 
-        queryset = self.get_field_queryset(db, db_field, request)
-        if queryset is not None:
-            kwargs['queryset'] = queryset
+        if not 'queryset' in kwargs:
+            queryset = self.get_field_queryset(db, db_field, request)
+            if queryset is not None:
+                kwargs['queryset'] = queryset
 
         return db_field.formfield(**kwargs)
 
@@ -238,9 +239,10 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):
             kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
 
-        queryset = self.get_field_queryset(db, db_field, request)
-        if queryset is not None:
-            kwargs['queryset'] = queryset
+        if not 'queryset' in kwargs:
+            queryset = self.get_field_queryset(db, db_field, request)
+            if queryset is not None:
+                kwargs['queryset'] = queryset
 
         return db_field.formfield(**kwargs)
 
@@ -250,7 +252,7 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
 
         if callable(self.view_on_site):
             return self.view_on_site(obj)
-        elif self.view_on_site:
+        elif self.view_on_site and hasattr(obj, 'get_absolute_url'):
             # use the ContentType lookup if view_on_site is True
             return reverse('admin:view_on_site', kwargs={
                 'content_type_id': ContentType.objects.get_for_model(obj).pk,
@@ -1259,7 +1261,7 @@ class ModelAdmin(BaseModelAdmin):
                 form_validated = True
             else:
                 form_validated = False
-                new_object = self.model()
+                new_object = form.instance
             formsets, inline_instances = self._create_formsets(request, new_object)
             if all_valid(formsets) and form_validated:
                 self.save_model(request, new_object, form, False)
@@ -1340,7 +1342,7 @@ class ModelAdmin(BaseModelAdmin):
                 new_object = self.save_form(request, form, change=True)
             else:
                 form_validated = False
-                new_object = obj
+                new_object = form.instance
             formsets, inline_instances = self._create_formsets(request, new_object)
             if all_valid(formsets) and form_validated:
                 self.save_model(request, new_object, form, True)

@@ -514,7 +514,7 @@ class TemplateRegressionTests(TestCase):
         o2 = t2.render(ctx)
 
         self.assertEqual(o1, 'foo')
-        self.assertNotEqual(o1, o2)
+        self.assertEqual(o2, 'bar')
 
     def test_cache_missing_backend(self):
         """

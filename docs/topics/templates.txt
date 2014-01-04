@@ -432,7 +432,7 @@ template fragment::
     Hello, {{ name }}.
 
 At first, this seems like a harmless way to display a user's name, but consider
-what would happen if the user entered his name as this::
+what would happen if the user entered their name as this::
 
     <script>alert('hello')</script>
 

@@ -22,7 +22,7 @@ Model signals
    :synopsis: Signals sent by the model system.
 
 The :mod:`django.db.models.signals` module defines a set of signals sent by the
-module system.
+model system.
 
 .. warning::
 
@@ -36,6 +36,14 @@ module system.
     Note also that Django stores signal handlers as weak references by default,
     so if your handler is a local function, it may be garbage collected.  To
     prevent this, pass ``weak=False`` when you call the signal's :meth:`~django.dispatch.Signal.connect`.
+
+.. versionadded:: 1.7
+
+    Model signals ``sender`` model can be lazily referenced when connecting a
+    receiver by specifying its full application label. For example, an
+    ``Answer`` model defined in the ``polls`` application could be referenced
+    as ``'polls.Answer'``. This sort of reference can be quite handy when
+    dealing with circular import dependencies and swappable models.
 
 pre_init
 --------

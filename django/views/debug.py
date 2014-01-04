@@ -388,7 +388,10 @@ class ExceptionReporter(object):
         """
         source = None
         if loader is not None and hasattr(loader, "get_source"):
-            source = loader.get_source(module_name)
+            try:
+                source = loader.get_source(module_name)
+            except ImportError:
+                pass
             if source is not None:
                 source = source.splitlines()
         if source is None:

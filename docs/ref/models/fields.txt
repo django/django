@@ -366,8 +366,9 @@ otherwise. See :ref:`automatic-primary-key-fields`.
 .. class:: BigIntegerField([**options])
 
 A 64 bit integer, much like an :class:`IntegerField` except that it is
-guaranteed to fit numbers from -9223372036854775808 to 9223372036854775807. The
-default form widget for this field is a :class:`~django.forms.TextInput`.
+guaranteed to fit numbers from ``-9223372036854775808`` to
+``9223372036854775807``. The default form widget for this field is a
+:class:`~django.forms.TextInput`.
 
 ``BinaryField``
 -------------------
@@ -505,8 +506,8 @@ A fixed-precision decimal number, represented in Python by a
 
     The number of decimal places to store with the number.
 
-For example, to store numbers up to 999 with a resolution of 2 decimal places,
-you'd use::
+For example, to store numbers up to ``999`` with a resolution of 2 decimal
+places, you'd use::
 
     models.DecimalField(..., max_digits=5, decimal_places=2)
 
@@ -595,7 +596,8 @@ Has two optional arguments:
     A storage object, which handles the storage and retrieval of your
     files. See :doc:`/topics/files` for details on how to provide this object.
 
-The default form widget for this field is a :class:`~django.forms.FileInput`.
+The default form widget for this field is a
+:class:`~django.forms.ClearableFileInput`.
 
 Using a :class:`FileField` or an :class:`ImageField` (see below) in a model
 takes a few steps:
@@ -838,12 +840,16 @@ By default, :class:`ImageField` instances are created as ``varchar(100)``
 columns in your database. As with other fields, you can change the maximum
 length using the :attr:`~CharField.max_length` argument.
 
+The default form widget for this field is a
+:class:`~django.forms.ClearableFileInput`.
+
 ``IntegerField``
 ----------------
 
 .. class:: IntegerField([**options])
 
-An integer. The default form widget for this field is a
+An integer. Values from ``-2147483648`` to ``2147483647`` are safe in all
+databases supported by Django. The default form widget for this field is a
 :class:`~django.forms.TextInput`.
 
 ``IPAddressField``
@@ -904,7 +910,8 @@ widget for this field is a :class:`~django.forms.NullBooleanSelect`.
 .. class:: PositiveIntegerField([**options])
 
 Like an :class:`IntegerField`, but must be either positive or zero (``0``).
-The value ``0`` is accepted for backward compatibility reasons.
+Values from ``0`` to ``2147483647`` are safe in all databases supported by
+Django. The value ``0`` is accepted for backward compatibility reasons.
 
 ``PositiveSmallIntegerField``
 -----------------------------
@@ -912,8 +919,8 @@ The value ``0`` is accepted for backward compatibility reasons.
 .. class:: PositiveSmallIntegerField([**options])
 
 Like a :class:`PositiveIntegerField`, but only allows values under a certain
-(database-dependent) point. Values up to 32767 are safe in all databases
-supported by Django.
+(database-dependent) point. Values from ``0`` to ``32767`` are safe in all
+databases supported by Django.
 
 ``SlugField``
 -------------
@@ -941,8 +948,8 @@ of some other value.  You can do this automatically in the admin using
 .. class:: SmallIntegerField([**options])
 
 Like an :class:`IntegerField`, but only allows values under a certain
-(database-dependent) point. Values from -32768 to 32767 are safe in all databases
-supported by Django.
+(database-dependent) point. Values from ``-32768`` to ``32767``` are safe in all
+databases supported by Django.
 
 ``TextField``
 -------------
@@ -1248,13 +1255,6 @@ that control how the relationship functions.
 .. attribute:: ManyToManyField.related_name
 
     Same as :attr:`ForeignKey.related_name`.
-
-    If you have more than one ``ManyToManyField`` pointing to the same model
-    and want to suppress the backwards relations, set each ``related_name``
-    to a unique value ending with ``'+'``::
-
-        users = models.ManyToManyField(User, related_name='u+')
-        referents = models.ManyToManyField(User, related_name='ref+')
 
 .. attribute:: ForeignKey.related_query_name
 

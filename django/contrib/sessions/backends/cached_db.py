@@ -6,7 +6,7 @@ import logging
 
 from django.conf import settings
 from django.contrib.sessions.backends.db import SessionStore as DBStore
-from django.core.cache import get_cache
+from django.core.cache import caches
 from django.core.exceptions import SuspiciousOperation
 from django.utils import timezone
 from django.utils.encoding import force_text
@@ -20,7 +20,7 @@ class SessionStore(DBStore):
     """
 
     def __init__(self, session_key=None):
-        self._cache = get_cache(settings.SESSION_CACHE_ALIAS)
+        self._cache = caches[settings.SESSION_CACHE_ALIAS]
         super(SessionStore, self).__init__(session_key)
 
     @property

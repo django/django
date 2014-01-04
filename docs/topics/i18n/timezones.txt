@@ -184,24 +184,25 @@ error handling entirely for the sake of simplicity.)
 
 Add the following middleware to :setting:`MIDDLEWARE_CLASSES`::
 
+    import pytz
+
     from django.utils import timezone
 
     class TimezoneMiddleware(object):
         def process_request(self, request):
-            tz = request.session.get('django_timezone')
-            if tz:
-                timezone.activate(tz)
+            tzname = request.session.get('django_timezone')
+            if tzname:
+                timezone.activate(pytz.timezone(tzname))
             else:
                 timezone.deactivate()
 
 Create a view that can set the current timezone::
 
-    import pytz
     from django.shortcuts import redirect, render
 
     def set_timezone(request):
         if request.method == 'POST':
-            request.session['django_timezone'] = pytz.timezone(request.POST['timezone'])
+            request.session['django_timezone'] = request.POST['timezone']
             return redirect('/')
         else:
             return render(request, 'template.html', {'timezones': pytz.common_timezones})

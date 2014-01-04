@@ -1,7 +1,7 @@
 from optparse import make_option
 
 from django.conf import settings
-from django.core.cache import get_cache
+from django.core.cache import caches
 from django.core.cache.backends.db import BaseDatabaseCache
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
@@ -30,7 +30,7 @@ class Command(BaseCommand):
                 self.create_table(db, tablename)
         else:
             for cache_alias in settings.CACHES:
-                cache = get_cache(cache_alias)
+                cache = caches[cache_alias]
                 if isinstance(cache, BaseDatabaseCache):
                     self.create_table(db, cache._table)
 

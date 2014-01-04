@@ -712,6 +712,26 @@ class Choice(models.Model):
         choices=((1, 'Yes'), (0, 'No'), (None, 'No opinion')))
 
 
+class ParentWithDependentChildren(models.Model):
+    """
+    Issue #20522
+    Model where the validation of child foreign-key relationships depends
+    on validation of the parent
+    """
+    some_required_info = models.PositiveIntegerField()
+    family_name = models.CharField(max_length=255, blank=False)
+
+
+class DependentChild(models.Model):
+    """
+    Issue #20522
+    Model that depends on validation of the parent class for one of its
+    fields to validate during clean
+    """
+    parent = models.ForeignKey(ParentWithDependentChildren)
+    family_name = models.CharField(max_length=255)
+
+
 class _Manager(models.Manager):
     def get_queryset(self):
         return super(_Manager, self).get_queryset().filter(pk__gt=1)
@@ -745,10 +765,16 @@ class City(models.Model):
     state = models.ForeignKey(State)
     name = models.CharField(max_length=100)
 
+    def get_absolute_url(self):
+        return '/dummy/%s/' % self.pk
+
 
 class Restaurant(models.Model):
     city = models.ForeignKey(City)
     name = models.CharField(max_length=100)
+
+    def get_absolute_url(self):
+        return '/dummy/%s/' % self.pk
 
 
 class Worker(models.Model):

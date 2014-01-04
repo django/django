@@ -28,6 +28,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import absolute_import  # Avoid importing `importlib` from this package.
+
 import os
 import signal
 import sys
@@ -38,7 +40,7 @@ import traceback
 from django.conf import settings
 from django.core.signals import request_finished
 from django.utils._os import upath
-from django.utils.importlib import import_module
+from importlib import import_module
 from django.utils import six
 try:
     from django.utils.six.moves import _thread as thread

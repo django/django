@@ -282,13 +282,6 @@ class HttpResponseBase(six.Iterator):
         # Handle non-string types (#16494)
         return force_bytes(value, self._charset)
 
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        # Subclasses must define self._iterator for this function.
-        return self.make_bytes(next(self._iterator))
-
     # These methods partially implement the file-like object interface.
     # See http://docs.python.org/lib/bltin-file-objects.html
 
@@ -337,23 +330,25 @@ class HttpResponse(HttpResponseBase):
 
     @property
     def content(self):
-        return b''.join(self.make_bytes(e) for e in self._container)
+        return b''.join(self._container)
 
     @content.setter
     def content(self, value):
+        # Consume iterators upon assignment to allow repeated iteration.
         if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.string_types)):
             if hasattr(value, 'close'):
                 self._closable_objects.append(value)
-            value = b''.join(self.make_bytes(e) for e in value)
+            value = b''.join(self.make_bytes(chunk) for chunk in value)
+        else:
+            value = self.make_bytes(value)
+        # Create a list of properly encoded bytestrings to support write().
         self._container = [value]
 
     def __iter__(self):
-        if not hasattr(self, '_iterator'):
-            self._iterator = iter(self._container)
-        return self
+        return iter(self._container)
 
     def write(self, content):
-        self._container.append(content)
+        self._container.append(self.make_bytes(content))
 
     def tell(self):
         return len(self.content)
@@ -391,6 +386,9 @@ class StreamingHttpResponse(HttpResponseBase):
         self._iterator = iter(value)
         if hasattr(value, 'close'):
             self._closable_objects.append(value)
+
+    def __iter__(self):
+        return self.streaming_content
 
 
 class HttpResponseRedirectBase(HttpResponse):

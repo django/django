@@ -105,6 +105,13 @@ class UniqueTest(models.Model):
         unique_together = ["year", "slug"]
 
 
+class BookWithLongName(models.Model):
+    author_foreign_key_with_really_long_field_name = models.ForeignKey(Author)
+
+    class Meta:
+        app_cache = new_app_cache
+
+
 class DummyTarget(models.Model):
     class Meta:
         app_cache = new_app_cache

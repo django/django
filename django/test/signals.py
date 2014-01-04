@@ -1,5 +1,6 @@
 import os
 import time
+import threading
 import warnings
 
 from django.conf import settings
@@ -17,6 +18,13 @@ setting_changed = Signal(providing_args=["setting", "value", "enter"])
 
 # Settings that may not work well when using 'override_settings' (#19031)
 COMPLEX_OVERRIDE_SETTINGS = set(['DATABASES'])
+
+
+@receiver(setting_changed)
+def clear_cache_handlers(**kwargs):
+    if kwargs['setting'] == 'CACHES':
+        from django.core.cache import caches
+        caches._caches = threading.local()
 
 
 @receiver(setting_changed)

@@ -3,6 +3,7 @@
 # files to search for such a header to decode the source file content
 from __future__ import unicode_literals
 
+import importlib
 import inspect
 import os
 import re
@@ -19,6 +20,7 @@ from django.test import TestCase, RequestFactory
 from django.test.utils import (override_settings, setup_test_template_loader,
     restore_template_loaders)
 from django.utils.encoding import force_text, force_bytes
+from django.utils import six
 from django.views.debug import ExceptionReporter
 
 from .. import BrokenException, except_args
@@ -238,6 +240,21 @@ class ExceptionReporterTests(TestCase):
         self.assertNotIn('<h2>Traceback ', html)
         self.assertIn('<h2>Request information</h2>', html)
         self.assertIn('<p>Request data not supplied</p>', html)
+
+    @skipIf(six.PY2, 'Bug manifests on PY3 only')
+    def test_unfrozen_importlib(self):
+        """
+        importlib is not a frozen app, but its loader thinks it's frozen which
+        results in an ImportError on Python 3. Refs #21443.
+        """
+        try:
+            request = self.rf.get('/test_view/')
+            importlib.import_module('abc.def.invalid.name')
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertIn('<h1>ImportError at /test_view/</h1>', html)
 
 
 class PlainTextReportTests(TestCase):

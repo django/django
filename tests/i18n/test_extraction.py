@@ -69,7 +69,7 @@ class BasicExtractorTests(ExtractorTests):
 
     def test_comments_extractor(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with io.open(self.PO_FILE, 'r', encoding='utf-8') as fp:
             po_contents = fp.read()
@@ -97,7 +97,7 @@ class BasicExtractorTests(ExtractorTests):
     def test_templatize_trans_tag(self):
         # ticket #11240
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
@@ -113,7 +113,7 @@ class BasicExtractorTests(ExtractorTests):
     def test_templatize_blocktrans_tag(self):
         # ticket #11966
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
@@ -123,7 +123,7 @@ class BasicExtractorTests(ExtractorTests):
 
     def test_blocktrans_trimmed(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
@@ -139,9 +139,9 @@ class BasicExtractorTests(ExtractorTests):
 
     def test_extraction_error(self):
         os.chdir(self.test_dir)
-        self.assertRaises(SyntaxError, management.call_command, 'makemessages', locale=LOCALE, extensions=['tpl'], verbosity=0)
+        self.assertRaises(SyntaxError, management.call_command, 'makemessages', locale=[LOCALE], extensions=['tpl'], verbosity=0)
         with self.assertRaises(SyntaxError) as context_manager:
-            management.call_command('makemessages', locale=LOCALE, extensions=['tpl'], verbosity=0)
+            management.call_command('makemessages', locale=[LOCALE], extensions=['tpl'], verbosity=0)
         six.assertRegex(
             self, str(context_manager.exception),
             r'Translation blocks must not include other block tags: blocktrans \(file templates[/\\]template_with_error\.tpl, line 3\)'
@@ -154,7 +154,7 @@ class BasicExtractorTests(ExtractorTests):
         shutil.copyfile('./not_utf8.sample', './not_utf8.txt')
         self.addCleanup(self.rmfile, os.path.join(self.test_dir, 'not_utf8.txt'))
         stdout = StringIO()
-        management.call_command('makemessages', locale=LOCALE, stdout=stdout)
+        management.call_command('makemessages', locale=[LOCALE], stdout=stdout)
         self.assertIn("UnicodeDecodeError: skipped file not_utf8.txt in .",
                       force_text(stdout.getvalue()))
 
@@ -164,7 +164,7 @@ class BasicExtractorTests(ExtractorTests):
         shutil.copyfile('./code.sample', './code_sample.py')
         self.addCleanup(self.rmfile, os.path.join(self.test_dir, 'code_sample.py'))
         stdout = StringIO()
-        management.call_command('makemessages', locale=LOCALE, stdout=stdout)
+        management.call_command('makemessages', locale=[LOCALE], stdout=stdout)
         self.assertIn("code_sample.py:4", force_text(stdout.getvalue()))
 
     def test_template_message_context_extractor(self):
@@ -174,7 +174,7 @@ class BasicExtractorTests(ExtractorTests):
         Refs #14806.
         """
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
@@ -200,7 +200,7 @@ class BasicExtractorTests(ExtractorTests):
 
     def test_context_in_single_quotes(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
@@ -219,7 +219,7 @@ class BasicExtractorTests(ExtractorTests):
         # translator comments syntax
         with warnings.catch_warnings(record=True) as ws:
             warnings.simplefilter('always')
-            management.call_command('makemessages', locale=LOCALE, extensions=['thtml'], verbosity=0)
+            management.call_command('makemessages', locale=[LOCALE], extensions=['thtml'], verbosity=0)
             self.assertEqual(len(ws), 3)
             for w in ws:
                 self.assertTrue(issubclass(w.category, TranslatorCommentWarning))
@@ -279,7 +279,7 @@ class JavascriptExtractorTests(ExtractorTests):
 
     def test_javascript_literals(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', domain='djangojs', locale=LOCALE, verbosity=0)
+        management.call_command('makemessages', domain='djangojs', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
@@ -307,7 +307,7 @@ class IgnoredExtractorTests(ExtractorTests):
             'xxx_*',
         ]
         stdout = StringIO()
-        management.call_command('makemessages', locale=LOCALE, verbosity=2,
+        management.call_command('makemessages', locale=[LOCALE], verbosity=2,
             ignore_patterns=ignore_patterns, stdout=stdout)
         data = stdout.getvalue()
         self.assertTrue("ignoring directory ignore_dir" in data)
@@ -351,7 +351,7 @@ class SymlinkExtractorTests(ExtractorTests):
                 except (OSError, NotImplementedError):
                     raise SkipTest("os.symlink() is available on this OS but can't be used by this user.")
             os.chdir(self.test_dir)
-            management.call_command('makemessages', locale=LOCALE, verbosity=0, symlinks=True)
+            management.call_command('makemessages', locale=[LOCALE], verbosity=0, symlinks=True)
             self.assertTrue(os.path.exists(self.PO_FILE))
             with open(self.PO_FILE, 'r') as fp:
                 po_contents = force_text(fp.read())
@@ -373,7 +373,7 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
 
     def test_copy_plural_forms(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
@@ -382,7 +382,7 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
     def test_override_plural_forms(self):
         """Ticket #20311."""
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale='es', extensions=['djtpl'], verbosity=0)
+        management.call_command('makemessages', locale=['es'], extensions=['djtpl'], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE_ES))
         with io.open(self.PO_FILE_ES, 'r', encoding='utf-8') as fp:
             po_contents = fp.read()
@@ -394,7 +394,7 @@ class NoWrapExtractorTests(ExtractorTests):
 
     def test_no_wrap_enabled(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0, no_wrap=True)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0, no_wrap=True)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
@@ -402,7 +402,7 @@ class NoWrapExtractorTests(ExtractorTests):
 
     def test_no_wrap_disabled(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0, no_wrap=False)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0, no_wrap=False)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
@@ -414,7 +414,7 @@ class LocationCommentsTests(ExtractorTests):
     def test_no_location_enabled(self):
         """Behavior is correct if --no-location switch is specified. See #16903."""
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0, no_location=True)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0, no_location=True)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
@@ -424,7 +424,7 @@ class LocationCommentsTests(ExtractorTests):
     def test_no_location_disabled(self):
         """Behavior is correct if --no-location switch isn't specified."""
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0, no_location=False)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0, no_location=False)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             # Standard comment with source file relative path should be present -- #16903
@@ -462,18 +462,18 @@ class KeepPotFileExtractorTests(ExtractorTests):
 
     def test_keep_pot_disabled_by_default(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertFalse(os.path.exists(self.POT_FILE))
 
     def test_keep_pot_explicitly_disabled(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0,
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0,
                                 keep_pot=False)
         self.assertFalse(os.path.exists(self.POT_FILE))
 
     def test_keep_pot_enabled(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0,
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0,
                                 keep_pot=True)
         self.assertTrue(os.path.exists(self.POT_FILE))
 
@@ -495,11 +495,5 @@ class MultipleLocaleExtractionTests(ExtractorTests):
     def test_multiple_locales(self):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=['pt', 'de'], verbosity=0)
-        self.assertTrue(os.path.exists(self.PO_FILE_PT))
-        self.assertTrue(os.path.exists(self.PO_FILE_DE))
-
-    def test_comma_separated_locales(self):
-        os.chdir(self.test_dir)
-        management.call_command('makemessages', locale='pt,de,ch', verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE_PT))
         self.assertTrue(os.path.exists(self.PO_FILE_DE))

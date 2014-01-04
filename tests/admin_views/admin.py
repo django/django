@@ -7,6 +7,7 @@ import os
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
+from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMessage
 from django.core.servers.basehttp import FileWrapper
@@ -31,7 +32,8 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
     RelatedPrepopulated, UndeletableObject, UnchangeableObject, UserMessenger, Simple, Choice,
     ShortMessage, Telegram, FilteredManager, EmptyModelHidden,
-    EmptyModelVisible, EmptyModelMixin, State, City, Restaurant, Worker)
+    EmptyModelVisible, EmptyModelMixin, State, City, Restaurant, Worker,
+    ParentWithDependentChildren, DependentChild)
 
 
 def callable_year(dt_value):
@@ -716,6 +718,28 @@ class ChoiceList(admin.ModelAdmin):
     fields = ['choice']
 
 
+class DependentChildAdminForm(forms.ModelForm):
+    """
+    Issue #20522
+    Form to test child dependency on parent object's validation
+    """
+    def clean(self):
+        parent = self.cleaned_data.get('parent')
+        if parent.family_name and parent.family_name != self.cleaned_data.get('family_name'):
+            raise ValidationError("Children must share a family name with their parents " +
+                                  "in this contrived test case")
+        return super(DependentChildAdminForm, self).clean()
+
+
+class DependentChildInline(admin.TabularInline):
+    model = DependentChild
+    form = DependentChildAdminForm
+
+
+class ParentWithDependentChildrenAdmin(admin.ModelAdmin):
+    inlines = [DependentChildInline]
+
+
 # Tests for ticket 11277 ----------------------------------
 
 class FormWithoutHiddenField(forms.ModelForm):
@@ -872,6 +896,7 @@ site.register(Color2, CustomTemplateFilterColorAdmin)
 site.register(Simple, AttributeErrorRaisingAdmin)
 site.register(UserMessenger, MessageTestingAdmin)
 site.register(Choice, ChoiceList)
+site.register(ParentWithDependentChildren, ParentWithDependentChildrenAdmin)
 site.register(EmptyModelHidden, EmptyModelHiddenAdmin)
 site.register(EmptyModelVisible, EmptyModelVisibleAdmin)
 site.register(EmptyModelMixin, EmptyModelMixinAdmin)

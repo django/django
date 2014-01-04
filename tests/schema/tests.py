@@ -8,7 +8,9 @@ from django.db.models.fields import IntegerField, TextField, CharField, SlugFiel
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.models.loading import BaseAppCache
 from django.db.transaction import atomic
-from .models import Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, BookWithRepointedAuthor, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest, DummyTarget
+from .models import (Author, AuthorWithM2M, Book, BookWithLongName,
+    BookWithSlug, BookWithM2M, BookWithRepointedAuthor, Tag, TagIndexed,
+    TagM2MTest, TagUniqueRename, UniqueTest, DummyTarget)
 
 
 class SchemaTests(TransactionTestCase):
@@ -22,7 +24,11 @@ class SchemaTests(TransactionTestCase):
 
     available_apps = []
 
-    models = [Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, BookWithRepointedAuthor, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest, DummyTarget]
+    models = [
+        Author, AuthorWithM2M, Book, BookWithLongName, BookWithSlug,
+        BookWithM2M, BookWithRepointedAuthor, Tag, TagIndexed, TagM2MTest,
+        TagUniqueRename, UniqueTest, DummyTarget,
+    ]
 
     # Utility functions
 
@@ -660,3 +666,21 @@ class SchemaTests(TransactionTestCase):
                 raise SomeError
         except SomeError:
             self.assertFalse(connection.in_atomic_block)
+
+    def test_foreign_key_index_long_names_regression(self):
+        """
+        Regression test for #21497. Only affects databases that supports
+        foreign keys.
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(BookWithLongName)
+        # Find the properly shortened column name
+        column_name = connection.ops.quote_name("author_foreign_key_with_really_long_field_name_id")
+        column_name = column_name[1:-1].lower()  # unquote, and, for Oracle, un-upcase
+        # Ensure the table is there and has an index on the column
+        self.assertIn(
+            column_name,
+            connection.introspection.get_indexes(connection.cursor(), BookWithLongName._meta.db_table),
+        )

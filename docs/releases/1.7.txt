@@ -269,6 +269,18 @@ Minor features
   allowing the ``published`` element to be included in the feed (which
   relies on ``pubdate``).
 
+Cache
+^^^^^
+
+* Access to caches configured in :setting:`CACHES` is now available via
+  :data:`django.core.cache.caches`. This dict-like object provides a different
+  instance per thread. It supersedes :func:`django.core.cache.get_cache` which
+  is now deprecated.
+
+* If you instanciate cache backends directly, be aware that they aren't
+  thread-safe any more, as :data:`django.core.cache.caches` now yields
+  differend instances per thread.
+
 Email
 ^^^^^
 
@@ -377,7 +389,7 @@ Management Commands
 
 * The :djadmin:`runserver` command received several improvements:
 
-  # On BSD systems, including OS X, the development server will reload
+  * On BSD systems, including OS X, the development server will reload
     immediately when a file is changed. Previously, it polled the filesystem
     for changes every second. That caused a small delay before reloads and
     reduced battery life on laptops.
@@ -413,16 +425,25 @@ Models
 * Is it now possible to avoid creating a backward relation for
   :class:`~django.db.models.OneToOneField` by setting its
   :attr:`~django.db.models.ForeignKey.related_name` to
-  `'+'` or ending it with `'+'`.
+  ``'+'`` or ending it with ``'+'``.
 
 * :class:`F expressions <django.db.models.F>` support the power operator
   (``**``).
+
+* The ``remove()`` and ``clear()`` methods of the related managers created by
+  ``ForeignKey`` and ``GenericForeignKey`` now accept the ``bulk`` keyword
+  argument to control whether or not to perform operations in bulk
+  (i.e. using ``QuerySet.update()``). Defaults to ``True``.
 
 Signals
 ^^^^^^^
 
 * The ``enter`` argument was added to the
   :data:`~django.test.signals.setting_changed` signal.
+
+* The model signals can be now be connected to using a ``str`` of the
+  ``'app_label.ModelName'`` form – just like related fields – to lazily
+  reference their senders.
 
 Templates
 ^^^^^^^^^
@@ -524,6 +545,18 @@ For apps with migrations, ``allow_migrate`` will now get passed
 without custom attributes, methods or managers. Make sure your ``allow_migrate``
 methods are only referring to fields or other items in ``model._meta``.
 
+Behavior of ``LocMemCache`` regarding pickle errors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An inconsistency existed in previous versions of Django regarding how pickle
+errors are handled by different cache backends.
+``django.core.cache.backends.locmem.LocMemCache`` used to fail silently when
+such an error occurs, which is inconsistent with other backends and leads to
+cache-specific errors. This has been fixed in Django 1.7, see
+`Ticket #21200`_ for more details.
+
+.. _Ticket #21200: https://code.djangoproject.com/ticket/21200
+
 Passing ``None`` to ``Manager.db_manager()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -545,6 +578,34 @@ If your project handles datetimes before 1970 or after 2037 and Django raises
 a :exc:`~exceptions.ValueError` when encountering them, you will have to
 install pytz_. You may be affected by this problem if you use Django's time
 zone-related date formats or :mod:`django.contrib.syndication`.
+
+``remove()`` and ``clear()`` methods of related managers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``remove()`` and ``clear()`` methods of the related managers created by
+``ForeignKey``, ``GenericForeignKey``, and ``ManyToManyField`` suffered from a
+number of issues. Some operations ran multiple data modifying queries without
+wrapping them in a transaction, and some operations didn't respect default
+filtering when it was present (i.e. when the default manager on the related
+model implemented a custom ``get_queryset()``).
+
+Fixing the issues introduced some backward incompatible changes:
+
+- The default implementation of ``remove()`` for ``ForeignKey`` related managers
+  changed from a series of ``Model.save()`` calls to a single
+  ``QuerySet.update()`` call. The change means that ``pre_save`` and
+  ``post_save`` signals aren't sent anymore. You can use the ``bulk=False``
+  keyword argument to revert to the previous behavior.
+
+- The ``remove()`` and ``clear()`` methods for ``GenericForeignKey`` related
+  managers now perform bulk delete. The ``Model.delete()`` method isn't called
+  on each instance anymore. You can use the ``bulk=False`` keyword argument to
+  revert to the previous behavior.
+
+- The ``remove()`` and ``clear()`` methods for ``ManyToManyField`` related
+  managers perform nested queries when filtering is involved, which may or
+  may not be an issue depending on your database and your data itself.
+  See :ref:`this note <nested-queries-performance>` for more details.
 
 .. _pytz: https://pypi.python.org/pypi/pytz/
 
@@ -642,6 +703,12 @@ Miscellaneous
 
 Features deprecated in 1.7
 ==========================
+
+``django.core.cache.get_cache``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:func:`django.core.cache.get_cache` has been supplanted by
+:data:`django.core.cache.caches`.
 
 ``django.utils.dictconfig``/``django.utils.importlib``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

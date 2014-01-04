@@ -289,11 +289,11 @@ user ``apache``.
 Local-memory caching
 --------------------
 
-If you want the speed advantages of in-memory caching but don't have the
-capability of running Memcached, consider the local-memory cache backend. This
-cache is multi-process and thread-safe. To use it, set
-:setting:`BACKEND <CACHES-BACKEND>` to
-``"django.core.cache.backends.locmem.LocMemCache"``. For example::
+This is the default cache if another is not specified in your settings file. If
+you want the speed advantages of in-memory caching but don't have the capability
+of running Memcached, consider the local-memory cache backend. This cache is
+multi-process and thread-safe. To use it, set :setting:`BACKEND <CACHES-BACKEND>`
+to ``"django.core.cache.backends.locmem.LocMemCache"``. For example::
 
     CACHES = {
         'default': {
@@ -703,22 +703,50 @@ pickling.)
 Accessing the cache
 -------------------
 
+.. data:: django.core.cache.caches
+
+    .. versionadded:: 1.7
+
+    You can access the caches configured in the :setting:`CACHES` setting
+    through a dict-like object: ``django.core.cache.caches``. Repeated
+    requests for the same alias in the same thread will return the same
+    object.
+
+        >>> from django.core.cache import caches
+        >>> cache1 = caches['myalias']
+        >>> cache2 = caches['myalias']
+        >>> cache1 is cache2
+        True
+
+    If the named key does not exist, ``InvalidCacheBackendError`` will be
+    raised.
+
+    To provide thread-safety, a different instance of the cache backend will
+    be returned for each thread.
+
+.. data:: django.core.cache.cache
+
+    As a shortcut, the default cache is available as
+    ``django.core.cache.cache``::
+
+        >>> from django.core.cache import cache
+
+    This object is equivalent to ``caches['default']``.
+
 .. function:: django.core.cache.get_cache(backend, **kwargs)
 
-The cache module, ``django.core.cache``, has a ``cache`` object that's
-automatically created from the ``'default'`` entry in the :setting:`CACHES`
-setting::
+    .. deprecated:: 1.7
+        This function has been deprecated in favour of
+        :data:`~django.core.cache.caches`.
 
-    >>> from django.core.cache import cache
+    Before Django 1.7 this function was the canonical way to obtain a cache
+    instance. It could also be used to create a new cache instance with a
+    different configuration.
 
-If you have multiple caches defined in :setting:`CACHES`, then you can use
-:func:`django.core.cache.get_cache` to retrieve a cache object for any key::
-
-    >>> from django.core.cache import get_cache
-    >>> cache = get_cache('alternate')
-
-If the named key does not exist, ``InvalidCacheBackendError`` will be raised.
-
+        >>> from django.core.cache import get_cache
+        >>> get_cache('default')
+        >>> get_cache('django.core.cache.backends.memcached.MemcachedCache', LOCATION='127.0.0.2')
+        >>> get_cache('default', TIMEOUT=300)
 
 Basic usage
 -----------
@@ -999,8 +1027,8 @@ expose incorrect or sensitive data to subsequent visitors to those pages.
 For example, say you operate a Web email system, and the contents of the
 "inbox" page obviously depend on which user is logged in. If an ISP blindly
 cached your site, then the first user who logged in through that ISP would have
-his user-specific inbox page cached for subsequent visitors to the site. That's
-not cool.
+their user-specific inbox page cached for subsequent visitors to the site.
+That's not cool.
 
 Fortunately, HTTP provides a solution to this problem. A number of HTTP headers
 exist to instruct upstream caches to differ their cache contents depending on

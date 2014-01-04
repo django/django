@@ -263,7 +263,7 @@ Django quotes column and table names behind the scenes.
     Defaults to ``('add', 'change', 'delete')``. You may customize this list,
     for example, by setting this to an empty list if your app doesn't require
     any of the default permissions. It must be specified on the model before
-    the model is created by :djadmin:`syncdb` in order to prevent any omitted
+    the model is created by :djadmin:`migrate` in order to prevent any omitted
     permissions from being created.
 
 ``proxy``
