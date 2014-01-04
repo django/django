@@ -728,7 +728,7 @@ class AutoField(Field):
         assert kwargs.get('primary_key', False) is True, \
             "%ss must have primary_key=True." % self.__class__.__name__
         kwargs['blank'] = True
-        Field.__init__(self, *args, **kwargs)
+        super(AutoField, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(AutoField, self).deconstruct()
@@ -786,7 +786,7 @@ class BooleanField(Field):
 
     def __init__(self, *args, **kwargs):
         kwargs['blank'] = True
-        Field.__init__(self, *args, **kwargs)
+        super(BooleanField, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(BooleanField, self).deconstruct()
@@ -898,7 +898,7 @@ class DateField(Field):
         if auto_now or auto_now_add:
             kwargs['editable'] = False
             kwargs['blank'] = True
-        Field.__init__(self, verbose_name, name, **kwargs)
+        super(DateField, self).__init__(verbose_name, name, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(DateField, self).deconstruct()
@@ -1110,7 +1110,7 @@ class DecimalField(Field):
     def __init__(self, verbose_name=None, name=None, max_digits=None,
                  decimal_places=None, **kwargs):
         self.max_digits, self.decimal_places = max_digits, decimal_places
-        Field.__init__(self, verbose_name, name, **kwargs)
+        super(DecimalField, self).__init__(verbose_name, name, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(DecimalField, self).deconstruct()
@@ -1182,7 +1182,7 @@ class EmailField(CharField):
         # compliant with RFCs 3696 and 5321
 
         kwargs['max_length'] = kwargs.get('max_length', 75)
-        CharField.__init__(self, *args, **kwargs)
+        super(EmailField, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(EmailField, self).deconstruct()
@@ -1208,7 +1208,7 @@ class FilePathField(Field):
         self.path, self.match, self.recursive = path, match, recursive
         self.allow_files, self.allow_folders = allow_files, allow_folders
         kwargs['max_length'] = kwargs.get('max_length', 100)
-        Field.__init__(self, verbose_name, name, **kwargs)
+        super(FilePathField, self).__init__(verbose_name, name, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(FilePathField, self).deconstruct()
@@ -1339,7 +1339,7 @@ class IPAddressField(Field):
         warnings.warn("IPAddressField has been deprecated. Use GenericIPAddressField instead.",
                       PendingDeprecationWarning)
         kwargs['max_length'] = 15
-        Field.__init__(self, *args, **kwargs)
+        super(IPAddressField, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(IPAddressField, self).deconstruct()
@@ -1368,7 +1368,8 @@ class GenericIPAddressField(Field):
             validators.ip_address_validators(protocol, unpack_ipv4)
         self.default_error_messages['invalid'] = invalid_error_message
         kwargs['max_length'] = 39
-        Field.__init__(self, verbose_name, name, *args, **kwargs)
+        super(GenericIPAddressField, self).__init__(verbose_name, name, *args,
+                                                    **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(GenericIPAddressField, self).deconstruct()
@@ -1422,7 +1423,7 @@ class NullBooleanField(Field):
     def __init__(self, *args, **kwargs):
         kwargs['null'] = True
         kwargs['blank'] = True
-        Field.__init__(self, *args, **kwargs)
+        super(NullBooleanField, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(NullBooleanField, self).deconstruct()
@@ -1571,7 +1572,7 @@ class TimeField(Field):
         if auto_now or auto_now_add:
             kwargs['editable'] = False
             kwargs['blank'] = True
-        Field.__init__(self, verbose_name, name, **kwargs)
+        super(TimeField, self).__init__(verbose_name, name, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(TimeField, self).deconstruct()
@@ -1646,7 +1647,7 @@ class URLField(CharField):
 
     def __init__(self, verbose_name=None, name=None, **kwargs):
         kwargs['max_length'] = kwargs.get('max_length', 200)
-        CharField.__init__(self, verbose_name, name, **kwargs)
+        super(URLField, self).__init__(verbose_name, name, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(URLField, self).deconstruct()
