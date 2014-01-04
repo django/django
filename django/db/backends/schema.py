@@ -577,7 +577,12 @@ class BaseDatabaseSchemaEditor(object):
         # Type change?
         if old_type != new_type:
             type_actions = self._alter_db_column_sql(model, new_field.column, 'type',
-                values={'type': new_type}, fragment=True)
+                values={
+                    'type': new_type,
+                    'old_type': old_type,
+                },
+                fragment=True,
+            )
             actions.extend(type_actions[0])
             post_actions.extend(type_actions[1])
         # Default change?
