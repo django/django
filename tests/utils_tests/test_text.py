@@ -144,3 +144,14 @@ class TestUtilsText(SimpleTestCase):
     def test_get_valid_filename(self):
         filename = "^&'@{}[],$=!-#()%+~_123.txt"
         self.assertEqual(text.get_valid_filename(filename), "-_123.txt")
+
+    def test_javascript_quote(self):
+        input = "<script>alert('Hello \\xff.\n Welcome\there\r');</script>"
+        output = r"<script>alert(\'Hello \\xff.\n Welcome\there\r\');<\/script>"
+        self.assertEqual(text.javascript_quote(input), output)
+
+        # Exercising quote_double_quotes keyword argument
+        input = '"Text"'
+        self.assertEqual(text.javascript_quote(input), '"Text"')
+        self.assertEqual(text.javascript_quote(input, quote_double_quotes=True),
+                         '&quot;Text&quot;')
