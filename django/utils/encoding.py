@@ -43,6 +43,11 @@ class StrAndUnicode(object):
         def __str__(self):
             return self.__unicode__().encode('utf-8')
 
+class _Python_2_Unicode_Compatible_Str(object):
+    def __call__(self, obj):
+        return self.__unicode__().encode('utf-8')
+_python_2_unicode_compatible_str = _STR()
+
 def python_2_unicode_compatible(klass):
     """
     A decorator that defines __unicode__ and __str__ methods under Python 2.
@@ -56,8 +61,11 @@ def python_2_unicode_compatible(klass):
             raise ValueError("@python_2_unicode_compatible cannot be applied "
                              "to %s because it doesn't define __str__()." %
                              klass.__name__)
+        # this was already applied once
+        if klass.__str__ == _python_2_unicode_compatible_str:
+            return klass
         klass.__unicode__ = klass.__str__
-        klass.__str__ = lambda self: self.__unicode__().encode('utf-8')
+        klass.__str__ = _python_2_unicode_compatible_str
     return klass
 
 def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
