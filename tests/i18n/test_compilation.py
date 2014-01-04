@@ -1,4 +1,5 @@
 import os
+import stat
 import unittest
 
 from django.core.management import call_command, CommandError
@@ -36,6 +37,19 @@ class PoFileTests(MessageCompilationTests):
             call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
         self.assertIn("file has a BOM (Byte Order Mark)", cm.exception.args[0])
         self.assertFalse(os.path.exists(self.MO_FILE))
+
+    def test_no_write_access(self):
+        mo_file_en = 'locale/en/LC_MESSAGES/django.mo'
+        err_buffer = StringIO()
+        # put file in read-only mode
+        old_mode = os.stat(mo_file_en).st_mode
+        os.chmod(mo_file_en, stat.S_IREAD)
+        try:
+            call_command('compilemessages', locale=['en'], stderr=err_buffer, verbosity=0)
+            err = err_buffer.getvalue()
+            self.assertIn("not writable location", err)
+        finally:
+            os.chmod(mo_file_en, old_mode)
 
 
 class PoFileContentsTests(MessageCompilationTests):

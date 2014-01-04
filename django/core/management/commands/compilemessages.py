@@ -17,45 +17,15 @@ def has_bom(fn):
         sample.startswith(codecs.BOM_UTF16_BE)
 
 
-def compile_messages(stdout, locale=None):
-    program = 'msgfmt'
-    if find_command(program) is None:
-        raise CommandError("Can't find %s. Make sure you have GNU gettext tools 0.15 or newer installed." % program)
-
-    basedirs = [os.path.join('conf', 'locale'), 'locale']
-    if os.environ.get('DJANGO_SETTINGS_MODULE'):
-        from django.conf import settings
-        basedirs.extend([upath(path) for path in settings.LOCALE_PATHS])
-
-    # Gather existing directories.
-    basedirs = set(map(os.path.abspath, filter(os.path.isdir, basedirs)))
-
-    if not basedirs:
-        raise CommandError("This script should be run from the Django Git checkout or your project or app tree, or with the settings module specified.")
-
-    for basedir in basedirs:
-        if locale:
-            dirs = [os.path.join(basedir, l, 'LC_MESSAGES') for l in locale]
-        else:
-            dirs = [basedir]
-        for ldir in dirs:
-            for dirpath, dirnames, filenames in os.walk(ldir):
-                for f in filenames:
-                    if not f.endswith('.po'):
-                        continue
-                    stdout.write('processing file %s in %s\n' % (f, dirpath))
-                    fn = os.path.join(dirpath, f)
-                    if has_bom(fn):
-                        raise CommandError("The %s file has a BOM (Byte Order Mark). Django only supports .po files encoded in UTF-8 and without any BOM." % fn)
-                    pf = os.path.splitext(fn)[0]
-                    args = [program, '--check-format', '-o', npath(pf + '.mo'), npath(pf + '.po')]
-                    output, errors, status = popen_wrapper(args)
-                    if status:
-                        if errors:
-                            msg = "Execution of %s failed: %s" % (program, errors)
-                        else:
-                            msg = "Execution of %s failed" % program
-                        raise CommandError(msg)
+def is_writable(path):
+    # Known side effect: updating file access/modified time to current time if
+    # it is writable.
+    try:
+        with open(path, 'a'):
+            os.utime(path, None)
+    except (IOError, OSError):
+        return False
+    return True
 
 
 class Command(BaseCommand):
@@ -67,7 +37,67 @@ class Command(BaseCommand):
 
     requires_system_checks = False
     leave_locale_alone = True
+    program = 'msgfmt'
 
     def handle(self, **options):
         locale = options.get('locale')
-        compile_messages(self.stdout, locale=locale)
+        self.verbosity = int(options.get('verbosity'))
+
+        if find_command(self.program) is None:
+            raise CommandError("Can't find %s. Make sure you have GNU gettext "
+                               "tools 0.15 or newer installed." % self.program)
+
+        basedirs = [os.path.join('conf', 'locale'), 'locale']
+        if os.environ.get('DJANGO_SETTINGS_MODULE'):
+            from django.conf import settings
+            basedirs.extend([upath(path) for path in settings.LOCALE_PATHS])
+
+        # Gather existing directories.
+        basedirs = set(map(os.path.abspath, filter(os.path.isdir, basedirs)))
+
+        if not basedirs:
+            raise CommandError("This script should be run from the Django Git "
+                               "checkout or your project or app tree, or with "
+                               "the settings module specified.")
+
+        for basedir in basedirs:
+            if locale:
+                dirs = [os.path.join(basedir, l, 'LC_MESSAGES') for l in locale]
+            else:
+                dirs = [basedir]
+            locations = []
+            for ldir in dirs:
+                for dirpath, dirnames, filenames in os.walk(ldir):
+                    locations.extend((dirpath, f) for f in filenames if f.endswith('.po'))
+            if locations:
+                self.compile_messages(locations)
+
+    def compile_messages(self, locations):
+        """
+        Locations is a list of tuples: [(directory, file), ...]
+        """
+        for i, (dirpath, f) in enumerate(locations):
+            if self.verbosity > 0:
+                self.stdout.write('processing file %s in %s\n' % (f, dirpath))
+            po_path = os.path.join(dirpath, f)
+            if has_bom(po_path):
+                raise CommandError("The %s file has a BOM (Byte Order Mark). "
+                                   "Django only supports .po files encoded in "
+                                   "UTF-8 and without any BOM." % po_path)
+            base_path = os.path.splitext(po_path)[0]
+
+            # Check writability on first location
+            if i == 0 and not is_writable(npath(base_path + '.mo')):
+                self.stderr.write("The po files under %s are in a seemingly not "
+                                  "writable location. mo files will not be updated/created." % dirpath)
+                return
+
+            args = [self.program, '--check-format', '-o',
+                    npath(base_path + '.mo'), npath(base_path + '.po')]
+            output, errors, status = popen_wrapper(args)
+            if status:
+                if errors:
+                    msg = "Execution of %s failed: %s" % (self.program, errors)
+                else:
+                    msg = "Execution of %s failed" % self.program
+                raise CommandError(msg)
