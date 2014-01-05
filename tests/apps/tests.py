@@ -107,10 +107,10 @@ class AppsTests(TestCase):
             apps.get_app_config('webdesign')
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
-    def test_has_app(self):
-        self.assertTrue(apps.has_app('django.contrib.admin'))
-        self.assertTrue(apps.has_app('django.contrib.staticfiles'))
-        self.assertFalse(apps.has_app('django.contrib.webdesign'))
+    def test_installed(self):
+        self.assertTrue(apps.installed('django.contrib.admin'))
+        self.assertTrue(apps.installed('django.contrib.staticfiles'))
+        self.assertFalse(apps.installed('django.contrib.webdesign'))
 
     @override_settings(INSTALLED_APPS=['apps.apps.RelabeledAppsConfig'])
     def test_relabeling(self):
