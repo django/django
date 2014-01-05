@@ -15,14 +15,8 @@ class EggLoadingTest(TestCase):
         self.old_path = sys.path[:]
         self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
 
-        # The models need to be removed after the test in order to prevent bad
-        # interactions with the flush operation in other tests.
-        self._old_models = apps.all_models['app_loading'].copy()
-
     def tearDown(self):
-        apps.all_models['app_loading'] = self._old_models
         apps.clear_cache()
-
         sys.path = self.old_path
 
     def test_egg1(self):
@@ -32,6 +26,7 @@ class EggLoadingTest(TestCase):
         with self.settings(INSTALLED_APPS=['app_with_models']):
             models_module = apps.get_app_config('app_with_models').models_module
             self.assertIsNotNone(models_module)
+        del apps.all_models['app_with_models']
 
     def test_egg2(self):
         """Loading an app from an egg that has no models returns no models (and no error)"""
@@ -40,6 +35,7 @@ class EggLoadingTest(TestCase):
         with self.settings(INSTALLED_APPS=['app_no_models']):
             models_module = apps.get_app_config('app_no_models').models_module
             self.assertIsNone(models_module)
+        del apps.all_models['app_no_models']
 
     def test_egg3(self):
         """Models module can be loaded from an app located under an egg's top-level package"""
@@ -48,6 +44,7 @@ class EggLoadingTest(TestCase):
         with self.settings(INSTALLED_APPS=['omelet.app_with_models']):
             models_module = apps.get_app_config('app_with_models').models_module
             self.assertIsNotNone(models_module)
+        del apps.all_models['app_with_models']
 
     def test_egg4(self):
         """Loading an app with no models from under the top-level egg package generates no error"""
@@ -56,6 +53,7 @@ class EggLoadingTest(TestCase):
         with self.settings(INSTALLED_APPS=['omelet.app_no_models']):
             models_module = apps.get_app_config('app_no_models').models_module
             self.assertIsNone(models_module)
+        del apps.all_models['app_no_models']
 
     def test_egg5(self):
         """Loading an app from an egg that has an import error in its models module raises that error"""
