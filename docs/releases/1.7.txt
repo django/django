@@ -76,6 +76,10 @@ Improvements thus far include:
 * Applications can run code at startup, before Django does anything else, with
   the :meth:`~django.apps.AppConfig.ready` method of their configuration.
 
+* Application labels are assigned correctly to models even when they're
+  defined outside of ``models.py``. You don't have to set
+  :attr:`~django.db.models.Options.app_label` explicitly any more.
+
 * It is possible to omit ``models.py`` entirely if an application doesn't
   have any models.
 
