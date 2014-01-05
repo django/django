@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import unittest
+from copy import copy
 
 from django import test
 from django.db import connections, models, DEFAULT_DB_ALIAS
@@ -92,24 +93,27 @@ class PrimaryKeysUseOnInsertUpdateTestCase(unittest.TestCase):
 
 
 @unittest.skipIf(connections[DEFAULT_DB_ALIAS].vendor == 'sqlite',
-                 "ALTER COLUMN is not supported in sqlite3.")
+                 "SET DEFAULT is not supported in sqlite3.")
 class RefreshDbDefaultFieldsOnInsert(test.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        qn = connections[DEFAULT_DB_ALIAS].ops.quote_name
-        cursor = connections[DEFAULT_DB_ALIAS].cursor()
-        query = "ALTER TABLE %s ALTER COLUMN %s SET DEFAULT 'default'"
-        args = (qn(SelectModel._meta.db_table), qn('f'))
-        cursor.execute(query % args)
+        with connections[DEFAULT_DB_ALIAS].schema_editor() as schema_editor:
+            f = SelectModel._meta.get_field_by_name('f')[0]
+            copy_f = copy(f)
+            f.default = u'default'
+
+            schema_editor.alter_field(SelectModel, copy_f, f)
+            f.default = models.fields.NOT_PROVIDED
 
     @classmethod
     def tearDownClass(cls):
-        qn = connections[DEFAULT_DB_ALIAS].ops.quote_name
-        cursor = connections[DEFAULT_DB_ALIAS].cursor()
-        query = "ALTER TABLE %s ALTER COLUMN %s SET DEFAULT NULL"
-        args = (qn(SelectModel._meta.db_table), qn('f'))
-        cursor.execute(query % args)
+        with connections[DEFAULT_DB_ALIAS].schema_editor() as schema_editor:
+            f = SelectModel._meta.get_field_by_name('f')[0]
+            copy_f = copy(f)
+            f.default = u'default'
+            schema_editor.alter_field(SelectModel, f, copy_f)
+            f.default = models.fields.NOT_PROVIDED
 
     def test_force_fetch_is_false_does_not_refresh_fields(self):
         m = SelectModel()
