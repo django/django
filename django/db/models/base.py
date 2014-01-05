@@ -162,12 +162,6 @@ class ModelBase(type):
                 new_class._default_manager = new_class._default_manager._copy_to_model(new_class)
                 new_class._base_manager = new_class._base_manager._copy_to_model(new_class)
 
-        # Bail out early if we have already created this class.
-        try:
-            return new_class._meta.apps.get_registered_model(new_class._meta.app_label, name)
-        except LookupError:
-            pass
-
         # Add all attributes to the class.
         for obj_name, obj in attrs.items():
             new_class.add_to_class(obj_name, obj)
@@ -285,13 +279,8 @@ class ModelBase(type):
             return new_class
 
         new_class._prepare()
-
         new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
-        # Because of the way imports happen (recursively), we may or may not be
-        # the first time this model tries to register with the framework. There
-        # should only be one class for each model, so we always return the
-        # registered version.
-        return new_class._meta.apps.get_registered_model(new_class._meta.app_label, name)
+        return new_class
 
     def copy_managers(cls, base_managers):
         # This is in-place sorting of an Options attribute, but that's fine.

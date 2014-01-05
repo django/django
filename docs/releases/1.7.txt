@@ -664,6 +664,12 @@ If you have two apps with the same label, you should create an
 :class:`~django.apps.AppConfig.label` there. You should then adjust your code
 wherever it references this application or its models with the old label.
 
+It isn't possible to import the same model twice through different paths any
+more. As of Django 1.6, this may happen only if you're manually putting a
+directory and a subdirectory on :envvar:`PYTHONPATH`. Refer to the section on
+the new project layout in the :doc:`1.4 release notes </releases/1.4>` for
+migration instructions.
+
 You should make sure that your project doesn't import models from applications
 that aren't in :setting:`INSTALLED_APPS`. Relations involving such models may
 not be created properly. Future versions of Django may forbid this entirely.
