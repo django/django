@@ -82,10 +82,6 @@ class Location(models.Model):
     location1 = models.CharField(max_length=1000, default='location1')
 
 
-class Item(models.Model):
-    pass
-
-
 class Request(models.Model):
     profile = models.ForeignKey(Profile, null=True, blank=True)
     location = models.ForeignKey(Location)
