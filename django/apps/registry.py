@@ -185,7 +185,6 @@ class Apps(object):
         # call get_app_config().
         model_name = model._meta.model_name
         app_models = self.all_models[app_label]
-        # Defensive check for extra safety.
         if model_name in app_models:
             raise RuntimeError(
                 "Conflicting '%s' models in application '%s': %s and %s." %

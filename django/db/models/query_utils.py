@@ -7,6 +7,7 @@ circular import difficulties.
 """
 from __future__ import unicode_literals
 
+from django.apps import apps
 from django.db.backends import utils
 from django.utils import six
 from django.utils import tree
@@ -185,22 +186,28 @@ def deferred_class_factory(model, attrs):
     being replaced with DeferredAttribute objects. The "pk_value" ties the
     deferred attributes to a particular instance of the model.
     """
-    class Meta:
-        proxy = True
-        app_label = model._meta.app_label
-
     # The app registry wants a unique name for each model, otherwise the new
-    # class won't be created (we get an old one back). Therefore, we generate
+    # class won't be created (we get an exception). Therefore, we generate
     # the name using the passed in attrs. It's OK to reuse an existing class
     # object if the attrs are identical.
     name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(list(attrs))))
     name = utils.truncate_name(name, 80, 32)
 
-    overrides = dict((attr, DeferredAttribute(attr, model)) for attr in attrs)
-    overrides["Meta"] = Meta
-    overrides["__module__"] = model.__module__
-    overrides["_deferred"] = True
-    return type(str(name), (model,), overrides)
+    try:
+        return apps.get_model(model._meta.app_label, name)
+
+    except LookupError:
+
+        class Meta:
+            proxy = True
+            app_label = model._meta.app_label
+
+        overrides = dict((attr, DeferredAttribute(attr, model)) for attr in attrs)
+        overrides["Meta"] = Meta
+        overrides["__module__"] = model.__module__
+        overrides["_deferred"] = True
+        return type(str(name), (model,), overrides)
+
 
 # The above function is also used to unpickle model instances with deferred
 # fields.
