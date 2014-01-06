@@ -382,32 +382,35 @@ class BaseDatabaseSchemaEditor(object):
         'model'         The model containing the column that is being modified.
         'column'        The column name that is being modified.
         'alteration'    The name of the column alternation that corresponds to
-                        the property with the prefix 'sql_alter_column_'.
+                        the property with the prefix 'sql_alter_column_'. When
+                        None, the main sql_alter_column format string is used.
         'values'        The named values that will be provided to the SQL format
                         string.
         'fragment'      Indicates whether the caller wants SQL framents and is
                         capable of combining the framents to execute.
         'params'        The default params for the SQL format string.
         """
-        if alteration is None:
-            format_str = self.sql_alter_column
-            fragment = None # generic alteration doesn't have a fragment only version
-        else:
-            format_str = getattr(self, 'sql_alter_column_' + alteration)
         default_values = {
+            'table': self.quote_name(model._meta.db_table),
             'column': self.quote_name(column),
         }
         default_values.update(values)
-        if 'default' in alteration:
-            default_values['constraint_name'] = self.quote_name(
-                self._create_constraint_name(model, column, constraint_type='default')
-            )
-        sql = format_str % default_values
-        if fragment == False:
-            sql = self.sql_alter_column % {
-                'table': self.quote_name(model._meta.db_table),
-                'column': self.quote_name(column),
-            }
+        if alteration is None:
+            sql = self.sql_alter_column % default_values
+        else:
+            if not hasattr(self, 'sql_alter_column_' + alteration):
+                raise NotImplementedError("Backend has not defined SQL for the '%s' column alteration" % alteration)
+            if 'default' in alteration:
+                default_values['constraint_name'] = self.quote_name(
+                    self._create_constraint_name(model, column, constraint_type='default')
+                )
+            format_str = getattr(self, 'sql_alter_column_' + alteration)
+            # build the SQL fragment
+            sql = format_str % default_values
+            if not fragment:
+                # add the SQL fragment to the full statement alter column statement
+                default_values.update({'changes': sql})
+                sql = self.sql_alter_column % default_values
         return [(sql, params or [])], [(None, [])]
 
     def add_field(self, model, field):
