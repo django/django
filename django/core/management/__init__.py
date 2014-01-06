@@ -261,7 +261,6 @@ class ManagementUtility(object):
                     usage.append("    %s" % name)
             # Output an extra note if settings are not properly configured
             try:
-                from django.conf import settings
                 settings.INSTALLED_APPS
             except ImproperlyConfigured as e:
                 usage.append(style.NOTICE(
@@ -343,7 +342,6 @@ class ManagementUtility(object):
             elif cwords[0] in ('dumpdata', 'sql', 'sqlall', 'sqlclear',
                     'sqlcustom', 'sqlindexes', 'sqlsequencereset', 'test'):
                 try:
-                    from django.apps import apps
                     app_configs = apps.get_app_configs()
                     # Get the last part of the dotted path as the app name.
                     options += [(app_config.label, 0) for app_config in app_configs]
@@ -386,10 +384,12 @@ class ManagementUtility(object):
             pass  # Ignore any option errors at this point.
 
         try:
-            django.setup()
+            settings.INSTALLED_APPS
         except ImproperlyConfigured:
             # Some commands are supposed to work without configured settings
             pass
+        else:
+            django.setup()
 
         try:
             subcommand = self.argv[1]
