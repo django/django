@@ -48,17 +48,17 @@ class BaseDatabaseSchemaEditor(object):
     sql_create_check = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s CHECK (%(check)s)"
     sql_delete_check = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
-    sql_create_unique = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s UNIQUE (%(column)s)"
+    sql_create_unique = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s UNIQUE (%(columns)s)"
     sql_delete_unique = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
-    sql_create_fk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
+    sql_create_fk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(columns)s) REFERENCES %(to_table)s (%(to_columns)s) DEFERRABLE INITIALLY DEFERRED"
     sql_create_fk_inline = ""
     sql_delete_fk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
-    sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(column)s)%(extra)s"
+    sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s"
     sql_delete_index = "DROP INDEX %(name)s"
 
-    sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(column)s)"
+    sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(columns)s)"
     sql_delete_pk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
     def __init__(self, connection, collect_sql=False):
@@ -216,7 +216,7 @@ class BaseDatabaseSchemaEditor(object):
                             suffix="_%s_%s" % (to_table, to_column)),
                         'field': field,
                         'to_table': self.quote_name(to_table),
-                        'to_column': self.quote_name(to_column),
+                        'to_columns': self.quote_name(to_column),
                     },
                 )
 
@@ -234,7 +234,7 @@ class BaseDatabaseSchemaEditor(object):
             if field.get_internal_type() == "AutoField":
                 autoinc_sql = self.connection.ops.autoinc_sql(model._meta.db_table, field.column)
                 if autoinc_sql:
-                    self.deferred_sql.extend([(sql, []) for sql in autoinc_sql])
+                    self.deferred_sql.extend((sql, []) for sql in autoinc_sql)
         # Add any unique_togethers
         for fields in model._meta.unique_together:
             columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
@@ -474,7 +474,7 @@ class BaseDatabaseSchemaEditor(object):
                             suffix="_refs_%s_%s" % (to_table, to_column)),
                         'field': field,
                         'to_table': self.quote_name(to_table),
-                        'to_column': self.quote_name(to_column),
+                        'to_columns': self.quote_name(to_column),
                     }
                 )
             )
@@ -672,14 +672,14 @@ class BaseDatabaseSchemaEditor(object):
         if new_field.rel:
             self.execute(*self._create_db_constraint_sql(model, new_field.column, 'fk', values={
                 "to_table": self.quote_name(new_field.rel.to._meta.db_table),
-                "to_column": self.quote_name(new_field.rel.get_related_field().column),
+                "to_columns": self.quote_name(new_field.rel.get_related_field().column),
             }))
         # Rebuild FKs that pointed to us if we previously had to drop them
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
             for rel in new_field.model._meta.get_all_related_objects():
                 self.execute(*self._create_db_constraint_sql(model, new_field.column, 'fk', values={
                     "to_table": self.quote_name(model._meta.db_table),
-                    "to_column": self.quote_name(new_field.column),
+                    "to_columns": self.quote_name(new_field.column),
                 }))
         # Does it have check constraints we need to add?
         if old_db_params['check'] != new_db_params['check'] and new_db_params['check']:
@@ -738,9 +738,9 @@ class BaseDatabaseSchemaEditor(object):
             'name': self.quote_name(self._create_constraint_name(model, column, constraint_type)),
         }
         if isinstance(column, (list, tuple)):
-            default_values['column'] = ', '.join(map(self.quote_name, column))
+            default_values['columns'] = ', '.join(map(self.quote_name, column))
         else:
-            default_values['column'] = self.quote_name(column)
+            default_values['columns'] = self.quote_name(column)
         default_values.update(values)
         return sql % default_values, params
 
