@@ -203,7 +203,7 @@ Application registry
     given ``app_label``. Raises :exc:`~exceptions.LookupError` if no such
     application exists.
 
-.. method:: apps.has_app(app_name)
+.. method:: apps.is_installed(app_name)
 
     Checks whether an application with the given name exists in the registry.
     ``app_name`` is the full name of the app, e.g. 'django.contrib.admin'.

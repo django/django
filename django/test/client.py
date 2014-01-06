@@ -390,7 +390,7 @@ class Client(RequestFactory):
         """
         Obtains the current session variables.
         """
-        if apps.has_app('django.contrib.sessions'):
+        if apps.is_installed('django.contrib.sessions'):
             engine = import_module(settings.SESSION_ENGINE)
             cookie = self.cookies.get(settings.SESSION_COOKIE_NAME, None)
             if cookie:
@@ -551,7 +551,7 @@ class Client(RequestFactory):
         """
         user = authenticate(**credentials)
         if (user and user.is_active and
-                apps.has_app('django.contrib.sessions')):
+                apps.is_installed('django.contrib.sessions')):
             engine = import_module(settings.SESSION_ENGINE)
 
             # Create a fake request that goes through request middleware

@@ -15,7 +15,7 @@ from django.utils.translation import ugettext_lazy
 
 def skipUnlessAuthIsInstalled(func):
     return skipUnless(
-        apps.has_app('django.contrib.auth'),
+        apps.is_installed('django.contrib.auth'),
         "django.contrib.auth isn't installed")(func)
 
 

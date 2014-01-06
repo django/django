@@ -15,7 +15,7 @@ class RedirectFallbackMiddleware(object):
     response_redirect_class = http.HttpResponsePermanentRedirect
 
     def __init__(self):
-        if not apps.has_app('django.contrib.sites'):
+        if not apps.is_installed('django.contrib.sites'):
             raise ImproperlyConfigured(
                 "You cannot use RedirectFallbackMiddleware when "
                 "django.contrib.sites is not installed."

@@ -118,7 +118,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 """ % date.today()
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
-    @skipUnless(apps.has_app('django.contrib.sites'),
+    @skipUnless(apps.is_installed('django.contrib.sites'),
                 "django.contrib.sites app not installed.")
     def test_sitemap_get_urls_no_site_1(self):
         """

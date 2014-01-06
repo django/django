@@ -192,7 +192,7 @@ class Apps(object):
         app_models[model_name] = model
         self.clear_cache()
 
-    def has_app(self, app_name):
+    def is_installed(self, app_name):
         """
         Checks whether an application with this name exists in the registry.
 

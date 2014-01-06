@@ -10,7 +10,7 @@ from .base import SitemapTestsBase
 
 class FlatpagesSitemapTests(SitemapTestsBase):
 
-    @skipUnless(apps.has_app('django.contrib.flatpages'),
+    @skipUnless(apps.is_installed('django.contrib.flatpages'),
                 "django.contrib.flatpages app not installed.")
     def test_flatpage_sitemap(self):
         "Basic FlatPage sitemap test"
