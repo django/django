@@ -1,11 +1,13 @@
-import weakref
+import sys
 import threading
+import weakref
 
-from django.dispatch import saferef
 from django.utils.six.moves import xrange
 
-
-WEAKREF_TYPES = (weakref.ReferenceType, saferef.BoundMethodWeakref)
+if sys.version_info < (3,4):
+    from .weakref_backports import WeakMethod
+else:
+    from weakref import WeakMethod
 
 
 def _make_id(target):
@@ -57,9 +59,7 @@ class Signal(object):
                 A function or an instance method which is to receive signals.
                 Receivers must be hashable objects.
 
-                If weak is True, then receiver must be weak-referencable (more
-                precisely saferef.safeRef() must be able to create a reference
-                to the receiver).
+                If weak is True, then receiver must be weak-referencable.
 
                 Receivers must be able to accept keyword arguments.
 
@@ -105,20 +105,33 @@ class Signal(object):
                 assert argspec[2] is not None, \
                     "Signal receivers must accept keyword arguments (**kwargs)."
 
+        receiver_id = _make_id(receiver)
         if dispatch_uid:
             lookup_key = (dispatch_uid, _make_id(sender))
         else:
-            lookup_key = (_make_id(receiver), _make_id(sender))
+            lookup_key = (receiver_id, _make_id(sender))
 
         if weak:
-            receiver = saferef.safeRef(receiver, onDelete=self._remove_receiver)
+            ref = weakref.ref
+            original_receiver = receiver
+            # Check for bound methods
+            if hasattr(receiver, '__self__') and hasattr(receiver, '__func__'):
+                ref = WeakMethod
+                original_receiver = original_receiver.__self__
+            if sys.version_info >= (3, 4):
+                receiver = ref(receiver)
+                weakref.finalize(original_receiver, self._remove_receiver, receiver_id=receiver_id)
+            else:
+                receiver = ref(receiver, self._remove_receiver)
+                # Use the id of the weakref, since that's what passed to the weakref callback!
+                receiver_id = _make_id(receiver)
 
         with self.lock:
-            for r_key, _ in self.receivers:
+            for r_key, _, _ in self.receivers:
                 if r_key == lookup_key:
                     break
             else:
-                self.receivers.append((lookup_key, receiver))
+                self.receivers.append((lookup_key, receiver, receiver_id))
             self.sender_receivers_cache.clear()
 
     def disconnect(self, receiver=None, sender=None, weak=True, dispatch_uid=None):
@@ -150,7 +163,7 @@ class Signal(object):
 
         with self.lock:
             for index in xrange(len(self.receivers)):
-                (r_key, _) = self.receivers[index]
+                (r_key, _, _) = self.receivers[index]
                 if r_key == lookup_key:
                     del self.receivers[index]
                     break
@@ -242,7 +255,7 @@ class Signal(object):
             with self.lock:
                 senderkey = _make_id(sender)
                 receivers = []
-                for (receiverkey, r_senderkey), receiver in self.receivers:
+                for (receiverkey, r_senderkey), receiver, _ in self.receivers:
                     if r_senderkey == NONE_ID or r_senderkey == senderkey:
                         receivers.append(receiver)
                 if self.use_caching:
@@ -253,7 +266,7 @@ class Signal(object):
                         self.sender_receivers_cache[sender] = receivers
         non_weak_receivers = []
         for receiver in receivers:
-            if isinstance(receiver, WEAKREF_TYPES):
+            if isinstance(receiver, weakref.ReferenceType):
                 # Dereference the weak reference.
                 receiver = receiver()
                 if receiver is not None:
@@ -262,23 +275,19 @@ class Signal(object):
                 non_weak_receivers.append(receiver)
         return non_weak_receivers
 
-    def _remove_receiver(self, receiver):
+    def _remove_receiver(self, receiver=None, receiver_id=None, _make_id=_make_id):
         """
         Remove dead receivers from connections.
-        """
 
+        `receiver_id` is used by python 3.4 and up. `receiver` is used in older
+        versions and is the weakref to the receiver (if the connection was defined
+        as `weak`). We also need to pass on `_make_id` since the original reference
+        will be None during module shutdown.
+        """
         with self.lock:
-            to_remove = []
-            for key, connected_receiver in self.receivers:
-                if connected_receiver == receiver:
-                    to_remove.append(key)
-            for key in to_remove:
-                last_idx = len(self.receivers) - 1
-                # enumerate in reverse order so that indexes are valid even
-                # after we delete some items
-                for idx, (r_key, _) in enumerate(reversed(self.receivers)):
-                    if r_key == key:
-                        del self.receivers[last_idx - idx]
+            if receiver is not None:
+                receiver_id = _make_id(receiver)
+            self.receivers[:] = [val for val in self.receivers if val[2] != receiver_id]
             self.sender_receivers_cache.clear()
 
 
