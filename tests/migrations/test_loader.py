@@ -49,7 +49,10 @@ class LoaderTests(TestCase):
         migration_loader = MigrationLoader(connection)
         self.assertEqual(
             migration_loader.graph.forwards_plan(("migrations", "0002_second")),
-            [("migrations", "0001_initial"), ("migrations", "0002_second")],
+            [
+                ("migrations", "0001_initial"),
+                ("migrations", "0002_second"),
+            ],
         )
         # Now render it out!
         project_state = migration_loader.graph.project_state(("migrations", "0002_second"))
@@ -65,6 +68,30 @@ class LoaderTests(TestCase):
         self.assertEqual(
             [x for x, y in book_state.fields],
             ["id", "author"]
+        )
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_unmigdep"})
+    def test_load_unmigrated_dependency(self):
+        """
+        Makes sure the loader can load migrations with a dependency on an unmigrated app.
+        """
+        # Load and test the plan
+        migration_loader = MigrationLoader(connection)
+        self.assertEqual(
+            migration_loader.graph.forwards_plan(("migrations", "0001_initial")),
+            [
+                ("auth", "__first__"),
+                ("migrations", "0001_initial"),
+            ],
+        )
+        # Now render it out!
+        project_state = migration_loader.graph.project_state(("migrations", "0001_initial"))
+        self.assertEqual(len(project_state.models), 4)
+
+        book_state = project_state.models["migrations", "book"]
+        self.assertEqual(
+            [x for x, y in book_state.fields],
+            ["id", "user"]
         )
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})

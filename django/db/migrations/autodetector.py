@@ -299,6 +299,7 @@ class MigrationAutodetector(object):
                 for migration in migrations:
                     name_map[(app_label, migration.name)] = (app_label, "__first__")
                 del changes[app_label]
+                continue
             # Work out the next number in the sequence
             if app_leaf is None:
                 next_number = 1

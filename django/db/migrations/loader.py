@@ -5,6 +5,9 @@ import sys
 from django.apps import apps
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.graph import MigrationGraph
+from django.db.migrations.migration import Migration
+from django.db.migrations.state import ModelState
+from django.db.migrations import operations
 from django.utils import six
 from django.conf import settings
 
@@ -191,6 +194,38 @@ class MigrationLoader(object):
             self.graph.add_node(key, migration)
         for key, migration in normal.items():
             for parent in migration.dependencies:
+                # Special-case __first__, which means "the first migration" for
+                # migrated apps, and is ignored for unmigrated apps. It allows
+                # makemigrations to declare dependencies on apps before they
+                # even have migrations.
+                if parent[1] == "__first__" and parent not in self.graph:
+                    if parent[0] in self.unmigrated_apps:
+                        # This app isn't migrated, but something depends on it.
+                        # We'll add a fake initial migration for it into the
+                        # graph.
+                        app_config = apps.get_app_config(parent[0])
+                        ops = []
+                        for model in app_config.get_models():
+                            model_state = ModelState.from_model(model)
+                            ops.append(
+                                operations.CreateModel(
+                                    name=model_state.name,
+                                    fields=model_state.fields,
+                                    options=model_state.options,
+                                    bases=model_state.bases,
+                                )
+                            )
+                        new_migration = type(
+                            "FakeInitialMigration",
+                            (Migration, ),
+                            {"operations": ops},
+                        )(parent[1], parent[0])
+                        self.graph.add_node(parent, new_migration)
+                        self.applied_migrations.add(parent)
+                    elif parent[0] in self.migrated_apps:
+                        parent = (parent[0], list(self.graph.root_nodes(parent[0]))[0])
+                    else:
+                        raise ValueError("Dependency on unknown app %s" % parent[0])
                 self.graph.add_dependency(key, parent)
 
     def detect_conflicts(self):
