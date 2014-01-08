@@ -78,7 +78,7 @@ class BaseDatabaseSchemaEditor(object):
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
             for sql, params in self.deferred_sql:
-                self.execute(sql)
+                self.execute(sql, params)
         atomic(self.connection.alias, self.connection.features.can_rollback_ddl).__exit__(exc_type, exc_value, traceback)
 
     # Core utility functions
