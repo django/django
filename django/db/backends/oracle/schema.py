@@ -99,7 +99,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
             return "'%s'" % value
         elif isinstance(value, six.string_types):
-            return "'%s" % value
+            return "'%s'" % value.replace("'","''")
         elif isinstance(value, bool):
             return "1" if value else "0"
         else:
