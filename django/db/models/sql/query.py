@@ -1211,16 +1211,18 @@ class Query(object):
         connector = q_object.connector
         current_negated = current_negated ^ q_object.negated
         branch_negated = branch_negated or q_object.negated
-        # Note that if the connector happens to match what we have already in
-        # the tree, the add will be a no-op.
         target_clause = self.where_class(connector=connector,
                                          negated=q_object.negated)
-
-        if connector == OR:
+        # Treat case NOT (a AND b) like case ((NOT a) OR (NOT b)) for join
+        # promotion. See ticket #21748.
+        effective_connector = connector
+        if current_negated:
+            effective_connector = OR if effective_connector == AND else AND
+        if effective_connector == OR:
             alias_usage_counts = dict()
             aliases_before = set(self.tables)
         for child in q_object.children:
-            if connector == OR:
+            if effective_connector == OR:
                 refcounts_before = self.alias_refcount.copy()
             if isinstance(child, Node):
                 child_clause = self._add_q(
@@ -1231,11 +1233,11 @@ class Query(object):
                     child, can_reuse=used_aliases, branch_negated=branch_negated,
                     current_negated=current_negated)
             target_clause.add(child_clause, connector)
-            if connector == OR:
+            if effective_connector == OR:
                 used = alias_diff(refcounts_before, self.alias_refcount)
                 for alias in used:
                     alias_usage_counts[alias] = alias_usage_counts.get(alias, 0) + 1
-        if connector == OR:
+        if effective_connector == OR:
             self.promote_disjunction(aliases_before, alias_usage_counts,
                                      len(q_object.children))
         return target_clause
