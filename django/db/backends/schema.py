@@ -197,9 +197,6 @@ class BaseDatabaseSchemaEditor(object):
                     model,
                     field.column,
                     constraint_type='index',
-                    values={
-                        'extra': '',
-                    },
                 ))
             # FK
             if field.rel:
@@ -254,9 +251,6 @@ class BaseDatabaseSchemaEditor(object):
                 model,
                 columns,
                 constraint_type='index',
-                values={
-                    'extra': '',
-                }
             ))
         # Make M2M tables
         for field in model._meta.local_many_to_many:
@@ -327,9 +321,6 @@ class BaseDatabaseSchemaEditor(object):
                 model,
                 columns,
                 constraint_type='index',
-                values={
-                    'extra': '',
-                }
             ))
 
     def alter_db_table(self, model, old_db_table, new_db_table):
@@ -455,9 +446,6 @@ class BaseDatabaseSchemaEditor(object):
                     model,
                     field.column,
                     constraint_type='index',
-                    values={
-                        'extra': '',
-                    }
                 )
             )
         # Add any FK constraints later
@@ -632,7 +620,7 @@ class BaseDatabaseSchemaEditor(object):
             self.execute(*self._create_db_constraint_sql(model, new_field.column, 'unique'))
         # Added an index?
         if not old_field.db_index and new_field.db_index and not new_field.unique and not (not old_field.unique and new_field.unique):
-            self.execute(*self._create_db_constraint_sql(model, new_field.column, 'unique', values={'extra': ''}))
+            self.execute(*self._create_db_constraint_sql(model, new_field.column, 'unique'))
         # Type alteration on primary key? Then we need to alter the column
         # referring to us.
         rels_to_update = []
@@ -735,6 +723,7 @@ class BaseDatabaseSchemaEditor(object):
         default_values = {
             'table': self.quote_name(model._meta.db_table),
             'name': self.quote_name(self._create_constraint_name(model, column, constraint_type)),
+            'extra': '',
         }
         if isinstance(column, (list, tuple)):
             default_values['columns'] = ', '.join(map(self.quote_name, column))
