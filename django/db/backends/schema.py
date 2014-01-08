@@ -659,15 +659,14 @@ class BaseDatabaseSchemaEditor(object):
         for rel in rels_to_update:
             rel_db_params = rel.field.db_parameters(connection=self.connection)
             rel_type = rel_db_params['type']
-            self.execute(
-                self.sql_alter_column % {
-                    "table": self.quote_name(rel.model._meta.db_table),
-                    "changes": self.sql_alter_column_type % {
-                        "column": self.quote_name(rel.field.column),
-                        "type": rel_type,
-                    }
-                }
+            type_actions = self._alter_db_column_sql(rel.model, rel.field.column, 'type',
+                values={
+                    'type': new_type,
+                    'old_type': old_type,
+                },
             )
+
+
         # Does it have a foreign key?
         if new_field.rel:
             self.execute(*self._create_db_constraint_sql(model, new_field.column, 'fk', values={
