@@ -130,7 +130,7 @@ def create_superuser(app_config, verbosity=2, interactive=True, db=DEFAULT_DB_AL
     from django.core.management import call_command
 
     if not UserModel.objects.exists() and interactive:
-        msg = ("\nYou just installed Django's auth system, which means you "
+        msg = ("\nYou have installed Django's auth system, and "
             "don't have any superusers defined.\nWould you like to create one "
             "now? (yes/no): ")
         confirm = input(msg)
