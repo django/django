@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.db import connection
 from django.test import TestCase
 
 from .models import (Bar, Favorites, HiddenPointer, Place, Restaurant, Target,
@@ -226,12 +227,15 @@ class OneToOneRegressionTests(TestCase):
             with self.assertRaises(UndergroundBar.DoesNotExist):
                 p.undergroundbar
 
-        UndergroundBar.objects.create()
+        # Several instances of the origin are only possible if database allows
+        # inserting multiple NULL rows for a unique constraint
+        if connection.features.ignores_nulls_in_unique_constraints:
+            UndergroundBar.objects.create()
 
-        # When there are several instances of the origin
-        with self.assertNumQueries(0):
-            with self.assertRaises(UndergroundBar.DoesNotExist):
-                p.undergroundbar
+            # When there are several instances of the origin
+            with self.assertNumQueries(0):
+                with self.assertRaises(UndergroundBar.DoesNotExist):
+                    p.undergroundbar
 
     def test_set_reverse_on_unsaved_object(self):
         """
