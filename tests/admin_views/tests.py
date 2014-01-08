@@ -91,6 +91,7 @@ class AdminViewBasicTestCase(TestCase):
 
 
 class AdminViewBasicTest(AdminViewBasicTestCase):
+	
     def testTrailingSlashRequired(self):
         """
         If you leave off the trailing slash, app should redirect and add it.
@@ -153,6 +154,107 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         }
         response = self.client.post('/test_admin/%s/admin_views/section/add/' % self.urlbit, post_data)
         self.assertEqual(response.status_code, 302)  # redirect somewhere
+
+    def testExtendedBodyclassTemplateAddUser(self):
+        """
+        Ensure that the templates uses block.super in bodyclass in AddUser
+        tests  : 
+        """
+        template_dirs = settings.TEMPLATE_DIRS + (
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
+        with self.settings(TEMPLATE_DIRS=template_dirs):
+
+            response = self.client.get('/test_admin/%s/admin_views/section/add/' % self.urlbit)
+            self.assertContains(response, 'bodyclass_constitency_check')
+
+    def testExtendedBodyclassTemplateChangepass(self):
+        """
+        Ensure that the templates uses block.super in bodyclass in AddUser
+        tests  :auth/user/change_password.html 
+        """
+        template_dirs = settings.TEMPLATE_DIRS + (
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
+        with self.settings(TEMPLATE_DIRS=template_dirs):
+            user = User.objects.get(username='super')
+            response = self.client.get('/test_admin/%s/auth/user/%s/password/' %  (self.urlbit,user.id) )
+            self.assertContains(response, 'bodyclass_constitency_check')
+
+    def testExtendedBodyclassTemplateIndex(self):
+        """
+        Ensure that the templates uses block.super in bodyclass in AddUser
+        tests : templates/admin/index.html
+        """
+        template_dirs = settings.TEMPLATE_DIRS + (
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
+        with self.settings(TEMPLATE_DIRS=template_dirs):
+            response = self.client.get('/test_admin/%s/' % self.urlbit)
+            self.assertContains(response, 'bodyclass_constitency_check')
+
+    def testExtendedBodyclassModelname(self):
+        """
+        Ensure that the templates uses block.super in bodyclass in AddUser
+        tests : templates/admin/index.html
+        """
+        template_dirs = settings.TEMPLATE_DIRS + (
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
+        with self.settings(TEMPLATE_DIRS=template_dirs):
+            response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit)
+            self.assertContains(response, 'bodyclass_constitency_check')
+
+
+
+
+    def testExtendedBodyclassTemplatLogin(self):
+        """
+        Ensure that the templates uses block.super in bodyclass
+        test: templates/admin/login.html
+        """
+        self.client.logout()
+        template_dirs = settings.TEMPLATE_DIRS + (
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
+        with self.settings(TEMPLATE_DIRS=template_dirs):
+            response = self.client.get('/test_admin/%s/' % self.urlbit )
+            self.assertContains(response, 'bodyclass_constitency_check')
+
+        self.client.login(username='super', password='secret')
+
+    def testExtendedBodyclassTemplatDelete(self):
+        """
+        Ensure that the templates uses block.super in bodyclass
+        test: templates/admin/delete_confirmation.html
+        """
+        from django.contrib.auth.models import Group
+        group = Group(name="foogroup")
+        group.save()
+        template_dirs = settings.TEMPLATE_DIRS + (
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
+        with self.settings(TEMPLATE_DIRS=template_dirs):
+            response = self.client.get('/test_admin/%s/auth/group/%s/delete/' % (self.urlbit, group.id) )
+            self.assertContains(response, 'bodyclass_constitency_check')
+        group.delete()
+
+    def testExtendedBodyclassTemplatSelectedDelete(self):
+        """
+        Ensure that the templates uses block.super in bodyclass
+        test:templates/admin/delete_selected_confirmation.html
+        """
+        from django.contrib.auth.models import Group
+        group = Group(name="foogroup")
+        group.save()
+        template_dirs = settings.TEMPLATE_DIRS + (
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
+        with self.settings(TEMPLATE_DIRS=template_dirs):
+            response = self.client.post('/test_admin/%s/auth/group/' % (self.urlbit),
+                                         { 
+                                              'action':'delete_selected',
+                                              'selected_accross':'0',
+                                              'index':'0',
+                                              '_selected_action':group.id 
+                                  
+                                          }  )
+            self.assertContains(response, 'bodyclass_constitency_check')
+        group.delete()
+
 
     def testPopupAddPost(self):
         """
