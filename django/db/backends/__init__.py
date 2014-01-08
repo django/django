@@ -1235,7 +1235,8 @@ class BaseDatabaseIntrospection(object):
         in sorting order between databases.
         """
         if cursor is None:
-            cursor = self.connection.cursor()
+            with self.connection.cursor() as cursor:
+                return sorted(self.get_table_list(cursor))
         return sorted(self.get_table_list(cursor))
 
     def get_table_list(self, cursor):
