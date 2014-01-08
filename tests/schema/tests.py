@@ -44,12 +44,14 @@ class SchemaTests(TransactionTestCase):
                 for field in model._meta.local_many_to_many:
                     tbl = field.rel.through._meta.db_table
                     if tbl in table_names:
-                        connection.schema_editor().delete_model(field.rel.through)
+                        with connection.schema_editor() as editor:
+                            editor.delete_model(field.rel.through)
                         table_names.remove(tbl)
                 # Then remove the main tables
                 tbl = model._meta.db_table
                 if tbl in table_names:
-                    connection.schema_editor().delete_model(model)
+                    with connection.schema_editor() as editor:
+                        editor.delete_model(model)
                     table_names.remove(tbl)
 
     def get_constraints(self, model):
