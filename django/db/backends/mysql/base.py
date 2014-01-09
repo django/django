@@ -180,15 +180,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def _mysql_storage_engine(self):
         "Internal method used in Django tests. Don't rely on this from your code"
-        cursor = self.connection.cursor()
-        cursor.execute('CREATE TABLE INTROSPECT_TEST (X INT)')
-        # This command is MySQL specific; the second column
-        # will tell you the default table type of the created
-        # table. Since all Django's test tables will have the same
-        # table type, that's enough to evaluate the feature.
-        cursor.execute("SHOW TABLE STATUS WHERE Name='INTROSPECT_TEST'")
-        result = cursor.fetchone()
-        cursor.execute('DROP TABLE INTROSPECT_TEST')
+        with self.connection.cursor() as cursor:
+            cursor.execute('CREATE TABLE INTROSPECT_TEST (X INT)')
+            # This command is MySQL specific; the second column
+            # will tell you the default table type of the created
+            # table. Since all Django's test tables will have the same
+            # table type, that's enough to evaluate the feature.
+            cursor.execute("SHOW TABLE STATUS WHERE Name='INTROSPECT_TEST'")
+            result = cursor.fetchone()
+            cursor.execute('DROP TABLE INTROSPECT_TEST')
         return result[1]
 
     @cached_property
@@ -207,9 +207,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             return False
 
         # Test if the time zone definitions are installed.
-        cursor = self.connection.cursor()
-        cursor.execute("SELECT 1 FROM mysql.time_zone LIMIT 1")
-        return cursor.fetchone() is not None
+        with self.connection.cursor() as cursor:
+            cursor.execute("SELECT 1 FROM mysql.time_zone LIMIT 1")
+            return cursor.fetchone() is not None
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -461,13 +461,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn
 
     def init_connection_state(self):
-        cursor = self.connection.cursor()
-        # SQL_AUTO_IS_NULL in MySQL controls whether an AUTO_INCREMENT column
-        # on a recently-inserted row will return when the field is tested for
-        # NULL.  Disabling this value brings this aspect of MySQL in line with
-        # SQL standards.
-        cursor.execute('SET SQL_AUTO_IS_NULL = 0')
-        cursor.close()
+        with self.connection.cursor() as cursor:
+            # SQL_AUTO_IS_NULL in MySQL controls whether an AUTO_INCREMENT column
+            # on a recently-inserted row will return when the field is tested for
+            # NULL.  Disabling this value brings this aspect of MySQL in line with
+            # SQL standards.
+            cursor.execute('SET SQL_AUTO_IS_NULL = 0')
 
     def create_cursor(self):
         cursor = self.connection.cursor()

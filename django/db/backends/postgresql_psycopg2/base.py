@@ -149,8 +149,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
             if conn_tz != tz:
                 cursor = self.connection.cursor()
-                cursor.execute(self.ops.set_time_zone_sql(), [tz])
-                cursor.close()
+                try:
+                    cursor.execute(self.ops.set_time_zone_sql(), [tz])
+                finally:
+                    cursor.close()
                 # Commit after setting the time zone (see #17062)
                 if not self.get_autocommit():
                     self.connection.commit()

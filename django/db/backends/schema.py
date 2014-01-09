@@ -86,14 +86,13 @@ class BaseDatabaseSchemaEditor(object):
         """
         Executes the given SQL statement, with optional parameters.
         """
-        # Get the cursor
-        cursor = self.connection.cursor()
         # Log the command we're running, then run it
         logger.debug("%s; (params %r)" % (sql, params))
         if self.collect_sql:
             self.collected_sql.append((sql % tuple(map(self.connection.ops.quote_parameter, params))) + ";")
         else:
-            cursor.execute(sql, params)
+            with self.connection.cursor() as cursor:
+                cursor.execute(sql, params)
 
     def quote_name(self, name):
         return self.connection.ops.quote_name(name)
@@ -791,7 +790,8 @@ class BaseDatabaseSchemaEditor(object):
         Returns all constraint names matching the columns and conditions
         """
         column_names = list(column_names) if column_names else None
-        constraints = self.connection.introspection.get_constraints(self.connection.cursor(), model._meta.db_table)
+        with self.connection.cursor() as cursor:
+            constraints = self.connection.introspection.get_constraints(cursor, model._meta.db_table)
         result = []
         for name, infodict in constraints.items():
             if column_names is None or column_names == infodict['columns']:

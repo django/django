@@ -1,4 +1,5 @@
 import datetime
+import sys
 
 from django.conf import settings
 from django.core.exceptions import FieldError
@@ -777,7 +778,7 @@ class SQLCompiler(object):
         cursor = self.connection.cursor()
         try:
             cursor.execute(sql, params)
-        except:
+        except Exception:
             cursor.close()
             raise
 
@@ -908,15 +909,15 @@ class SQLInsertCompiler(SQLCompiler):
     def execute_sql(self, return_id=False):
         assert not (return_id and len(self.query.objs) != 1)
         self.return_id = return_id
-        cursor = self.connection.cursor()
-        for sql, params in self.as_sql():
-            cursor.execute(sql, params)
-        if not (return_id and cursor):
-            return
-        if self.connection.features.can_return_id_from_insert:
-            return self.connection.ops.fetch_returned_insert_id(cursor)
-        return self.connection.ops.last_insert_id(cursor,
-                self.query.get_meta().db_table, self.query.get_meta().pk.column)
+        with self.connection.cursor() as cursor:
+            for sql, params in self.as_sql():
+                cursor.execute(sql, params)
+            if not (return_id and cursor):
+                return
+            if self.connection.features.can_return_id_from_insert:
+                return self.connection.ops.fetch_returned_insert_id(cursor)
+            return self.connection.ops.last_insert_id(cursor,
+                    self.query.get_meta().db_table, self.query.get_meta().pk.column)
 
 
 class SQLDeleteCompiler(SQLCompiler):

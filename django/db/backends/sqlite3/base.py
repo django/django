@@ -122,14 +122,14 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         rule out support for STDDEV. We need to manually check
         whether the call works.
         """
-        cursor = self.connection.cursor()
-        cursor.execute('CREATE TABLE STDDEV_TEST (X INT)')
-        try:
-            cursor.execute('SELECT STDDEV(*) FROM STDDEV_TEST')
-            has_support = True
-        except utils.DatabaseError:
-            has_support = False
-        cursor.execute('DROP TABLE STDDEV_TEST')
+        with self.connection.cursor() as cursor:
+            cursor.execute('CREATE TABLE STDDEV_TEST (X INT)')
+            try:
+                cursor.execute('SELECT STDDEV(*) FROM STDDEV_TEST')
+                has_support = True
+            except utils.DatabaseError:
+                has_support = False
+            cursor.execute('DROP TABLE STDDEV_TEST')
         return has_support
 
     @cached_property

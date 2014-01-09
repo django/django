@@ -59,9 +59,9 @@ class OracleChecks(unittest.TestCase):
         # stored procedure through our cursor wrapper.
         from django.db.backends.oracle.base import convert_unicode
 
-        cursor = connection.cursor()
-        cursor.callproc(convert_unicode('DBMS_SESSION.SET_IDENTIFIER'),
-                        [convert_unicode('_django_testing!')])
+        with connection.cursor() as cursor:
+            cursor.callproc(convert_unicode('DBMS_SESSION.SET_IDENTIFIER'),
+                            [convert_unicode('_django_testing!')])
 
     @unittest.skipUnless(connection.vendor == 'oracle',
                          "No need to check Oracle cursor semantics")
@@ -70,31 +70,31 @@ class OracleChecks(unittest.TestCase):
         # as query parameters.
         from django.db.backends.oracle.base import Database
 
-        cursor = connection.cursor()
-        var = cursor.var(Database.STRING)
-        cursor.execute("BEGIN %s := 'X'; END; ", [var])
-        self.assertEqual(var.getvalue(), 'X')
+        with connection.cursor() as cursor:
+            var = cursor.var(Database.STRING)
+            cursor.execute("BEGIN %s := 'X'; END; ", [var])
+            self.assertEqual(var.getvalue(), 'X')
 
     @unittest.skipUnless(connection.vendor == 'oracle',
                          "No need to check Oracle cursor semantics")
     def test_long_string(self):
         # If the backend is Oracle, test that we can save a text longer
         # than 4000 chars and read it properly
-        c = connection.cursor()
-        c.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
-        long_str = ''.join(six.text_type(x) for x in xrange(4000))
-        c.execute('INSERT INTO ltext VALUES (%s)', [long_str])
-        c.execute('SELECT text FROM ltext')
-        row = c.fetchone()
-        self.assertEqual(long_str, row[0].read())
-        c.execute('DROP TABLE ltext')
+        with connection.cursor() as cursor:
+            cursor.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
+            long_str = ''.join(six.text_type(x) for x in xrange(4000))
+            cursor.execute('INSERT INTO ltext VALUES (%s)', [long_str])
+            cursor.execute('SELECT text FROM ltext')
+            row = cursor.fetchone()
+            self.assertEqual(long_str, row[0].read())
+            cursor.execute('DROP TABLE ltext')
 
     @unittest.skipUnless(connection.vendor == 'oracle',
                          "No need to check Oracle connection semantics")
     def test_client_encoding(self):
         # If the backend is Oracle, test that the client encoding is set
         # correctly.  This was broken under Cygwin prior to r14781.
-        connection.cursor()  # Ensure the connection is initialized.
+        self.connection.ensure_connection()
         self.assertEqual(connection.connection.encoding, "UTF-8")
         self.assertEqual(connection.connection.nencoding, "UTF-8")
 
@@ -103,12 +103,12 @@ class OracleChecks(unittest.TestCase):
     def test_order_of_nls_parameters(self):
         # an 'almost right' datetime should work with configured
         # NLS parameters as per #18465.
-        c = connection.cursor()
-        query = "select 1 from dual where '1936-12-29 00:00' < sysdate"
-        # Test that the query succeeds without errors - pre #18465 this
-        # wasn't the case.
-        c.execute(query)
-        self.assertEqual(c.fetchone()[0], 1)
+        with connection.cursor() as cursor:
+            query = "select 1 from dual where '1936-12-29 00:00' < sysdate"
+            # Test that the query succeeds without errors - pre #18465 this
+            # wasn't the case.
+            cursor.execute(query)
+            self.assertEqual(cursor.fetchone()[0], 1)
 
 
 class SQLiteTests(TestCase):
@@ -327,6 +327,12 @@ class PostgresVersionTest(TestCase):
 
             def fetchone(self):
                 return ["PostgreSQL 8.3"]
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, type, value, traceback):
+                pass
 
         class OlderConnectionMock(object):
             "Mock of psycopg2 (< 2.0.12) connection"

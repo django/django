@@ -55,9 +55,8 @@ class SpatiaLiteCreation(DatabaseCreation):
 
         call_command('createcachetable', database=self.connection.alias)
 
-        # Get a cursor (even though we don't need one yet). This has
-        # the side effect of initializing the test database.
-        self.connection.cursor()
+        # Ensure a connection for the side effect of initializing the test database.
+        self.connection.ensure_connection()
 
         return test_database_name
 

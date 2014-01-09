@@ -896,10 +896,9 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         management.call_command('createcachetable', verbosity=0, interactive=False)
 
     def drop_table(self):
-        cursor = connection.cursor()
-        table_name = connection.ops.quote_name('test cache table')
-        cursor.execute('DROP TABLE %s' % table_name)
-        cursor.close()
+        with connection.cursor() as cursor:
+            table_name = connection.ops.quote_name('test cache table')
+            cursor.execute('DROP TABLE %s' % table_name)
 
     def test_zero_cull(self):
         self._perform_cull_test(caches['zero_cull'], 50, 18)
