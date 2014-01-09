@@ -165,7 +165,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         with self.settings(TEMPLATE_DIRS=template_dirs):
 
             response = self.client.get('/test_admin/%s/admin_views/section/add/' % self.urlbit)
-            self.assertContains(response, 'bodyclass_constitency_check')
+            self.assertContains(response, 'bodyclass_constitency_check ')
 
     def testExtendedBodyclassTemplateChangepass(self):
         """
@@ -177,7 +177,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         with self.settings(TEMPLATE_DIRS=template_dirs):
             user = User.objects.get(username='super')
             response = self.client.get('/test_admin/%s/auth/user/%s/password/' %  (self.urlbit,user.id) )
-            self.assertContains(response, 'bodyclass_constitency_check')
+            self.assertContains(response, 'bodyclass_constitency_check ')
 
     def testExtendedBodyclassTemplateIndex(self):
         """
@@ -188,7 +188,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
         with self.settings(TEMPLATE_DIRS=template_dirs):
             response = self.client.get('/test_admin/%s/' % self.urlbit)
-            self.assertContains(response, 'bodyclass_constitency_check')
+            self.assertContains(response, 'bodyclass_constitency_check ')
 
     def testExtendedBodyclassModelname(self):
         """
@@ -199,7 +199,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
         with self.settings(TEMPLATE_DIRS=template_dirs):
             response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit)
-            self.assertContains(response, 'bodyclass_constitency_check')
+            self.assertContains(response, 'bodyclass_constitency_check ')
 
 
 
@@ -214,7 +214,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
         with self.settings(TEMPLATE_DIRS=template_dirs):
             response = self.client.get('/test_admin/%s/' % self.urlbit )
-            self.assertContains(response, 'bodyclass_constitency_check')
+            self.assertContains(response, 'bodyclass_constitency_check ')
 
         self.client.login(username='super', password='secret')
 
@@ -230,7 +230,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
         with self.settings(TEMPLATE_DIRS=template_dirs):
             response = self.client.get('/test_admin/%s/auth/group/%s/delete/' % (self.urlbit, group.id) )
-            self.assertContains(response, 'bodyclass_constitency_check')
+            self.assertContains(response, 'bodyclass_constitency_check ')
         group.delete()
 
     def testExtendedBodyclassTemplatSelectedDelete(self):
@@ -252,7 +252,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                                               '_selected_action':group.id 
                                   
                                           }  )
-            self.assertContains(response, 'bodyclass_constitency_check')
+            self.assertContains(response, 'bodyclass_constitency_check ')
         group.delete()
 
 
