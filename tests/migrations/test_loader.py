@@ -86,7 +86,7 @@ class LoaderTests(TestCase):
         )
         # Now render it out!
         project_state = migration_loader.graph.project_state(("migrations", "0001_initial"))
-        self.assertEqual(len(project_state.models), 4)
+        self.assertEqual(len([m for a, m in project_state.models if a == "migrations"]), 1)
 
         book_state = project_state.models["migrations", "book"]
         self.assertEqual(
