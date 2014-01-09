@@ -20,6 +20,7 @@ from django.db.backends.utils import format_number, CursorWrapper
 from django.db.models import Sum, Avg, Variance, StdDev
 from django.db.models.fields import (AutoField, DateField, DateTimeField,
     DecimalField, IntegerField, TimeField)
+from django.db.models.sql.constants import CURSOR
 from django.db.utils import ConnectionHandler
 from django.test import (TestCase, TransactionTestCase, override_settings,
     skipUnlessDBFeature, skipIfDBFeature)
@@ -209,7 +210,7 @@ class LastExecutedQueryTest(TestCase):
         """
         persons = models.Reporter.objects.filter(raw_data=b'\x00\x46  \xFE').extra(select={'föö': 1})
         sql, params = persons.query.sql_with_params()
-        cursor = persons.query.get_compiler('default').execute_sql(None)
+        cursor = persons.query.get_compiler('default').execute_sql(CURSOR)
         last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
         self.assertIsInstance(last_sql, six.text_type)
 

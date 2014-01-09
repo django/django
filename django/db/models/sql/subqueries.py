@@ -8,7 +8,7 @@ from django.db import connections
 from django.db.models.query_utils import Q
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import DateField, DateTimeField, FieldDoesNotExist
-from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, SelectInfo
+from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, NO_RESULTS, SelectInfo
 from django.db.models.sql.datastructures import Date, DateTime
 from django.db.models.sql.query import Query
 from django.utils import six
@@ -30,7 +30,7 @@ class DeleteQuery(Query):
     def do_query(self, table, where, using):
         self.tables = [table]
         self.where = where
-        self.get_compiler(using).execute_sql(None)
+        self.get_compiler(using).execute_sql(NO_RESULTS)
 
     def delete_batch(self, pk_list, using, field=None):
         """
@@ -82,7 +82,7 @@ class DeleteQuery(Query):
                 values = innerq
             self.where = self.where_class()
             self.add_q(Q(pk__in=values))
-        self.get_compiler(using).execute_sql(None)
+        self.get_compiler(using).execute_sql(NO_RESULTS)
 
 
 class UpdateQuery(Query):
@@ -116,7 +116,7 @@ class UpdateQuery(Query):
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
             self.add_q(Q(pk__in=pk_list[offset: offset + GET_ITERATOR_CHUNK_SIZE]))
-            self.get_compiler(using).execute_sql(None)
+            self.get_compiler(using).execute_sql(NO_RESULTS)
 
     def add_update_values(self, values):
         """
