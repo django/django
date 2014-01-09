@@ -57,7 +57,7 @@ class FileSystemFinder(BaseFinder):
                 prefix, root = root
             else:
                 prefix = ''
-            if os.path.abspath(settings.STATIC_ROOT) == os.path.abspath(root):
+            if settings.STATIC_ROOT and os.path.abspath(settings.STATIC_ROOT) == os.path.abspath(root):
                 raise ImproperlyConfigured(
                     "The STATICFILES_DIRS setting should "
                     "not contain the STATIC_ROOT setting")
