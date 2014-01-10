@@ -210,90 +210,106 @@ StaticFilesStorage
 
 .. class:: storage.StaticFilesStorage
 
-    A subclass of the :class:`~django.core.files.storage.FileSystemStorage`
-    storage backend that uses the :setting:`STATIC_ROOT` setting as the base
-    file system location and the :setting:`STATIC_URL` setting respectively
-    as the base URL.
+A subclass of the :class:`~django.core.files.storage.FileSystemStorage`
+storage backend that uses the :setting:`STATIC_ROOT` setting as the base
+file system location and the :setting:`STATIC_URL` setting respectively
+as the base URL.
 
-    .. method:: post_process(paths, **options)
+.. method:: post_process(paths, **options)
 
-    This method is called by the :djadmin:`collectstatic` management command
-    after each run and gets passed the local storages and paths of found
-    files as a dictionary, as well as the command line options.
+This method is called by the :djadmin:`collectstatic` management command
+after each run and gets passed the local storages and paths of found
+files as a dictionary, as well as the command line options.
 
-    The :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
-    uses this behind the scenes to replace the paths with their hashed
-    counterparts and update the cache appropriately.
+The :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+uses this behind the scenes to replace the paths with their hashed
+counterparts and update the cache appropriately.
+
+ManifestStaticFilesStorage
+--------------------------
+
+.. versionadded:: 1.7
+
+.. class:: storage.ManifestStaticFilesStorage
+
+A subclass of the :class:`~django.contrib.staticfiles.storage.StaticFilesStorage`
+storage backend which stores the file names it handles by appending the MD5
+hash of the file's content to the filename. For example, the file
+``css/styles.css`` would also be saved as ``css/styles.55e7cbb9ba48.css``.
+
+The purpose of this storage is to keep serving the old files in case some
+pages still refer to those files, e.g. because they are cached by you or
+a 3rd party proxy server. Additionally, it's very helpful if you want to
+apply `far future Expires headers`_ to the deployed files to speed up the
+load time for subsequent page visits.
+
+The storage backend automatically replaces the paths found in the saved
+files matching other saved files with the path of the cached copy (using
+the :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
+method). The regular expressions used to find those paths
+(``django.contrib.staticfiles.storage.HashedFilesMixin.patterns``)
+by default covers the `@import`_ rule and `url()`_ statement of `Cascading
+Style Sheets`_. For example, the ``'css/styles.css'`` file with the
+content
+
+.. code-block:: css+django
+
+    @import url("../admin/css/base.css");
+
+would be replaced by calling the :meth:`~django.core.files.storage.Storage.url`
+method of the ``ManifestStaticFilesStorage`` storage backend, ultimately
+saving a ``'css/styles.55e7cbb9ba48.css'`` file with the following
+content:
+
+.. code-block:: css+django
+
+    @import url("../admin/css/base.27e20196a850.css");
+
+To enable the ``ManifestStaticFilesStorage`` you have to make sure the
+following requirements are met:
+
+* the :setting:`STATICFILES_STORAGE` setting is set to
+  ``'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'``
+* the :setting:`DEBUG` setting is set to ``False``
+* you use the ``staticfiles`` :ttag:`static<staticfiles-static>` template
+  tag to refer to your static files in your templates
+* you've collected all your static files by using the
+  :djadmin:`collectstatic` management command
+
+Since creating the MD5 hash can be a performance burden to your website
+during runtime, ``staticfiles`` will automatically store the mapping with
+hashed names for all processed files in a file called ``staticfiles.json``.
+This happens once when you run the :djadmin:`collectstatic` management
+command.
+
+.. method:: file_hash(name, content=None)
+
+The method that is used when creating the hashed name of a file.
+Needs to return a hash for the given file name and content.
+By default it calculates a MD5 hash from the content's chunks as
+mentioned above. Feel free to override this method to use your own
+hashing algorithm.
+
+.. _`far future Expires headers`: http://developer.yahoo.com/performance/rules.html#expires
+.. _`@import`: http://www.w3.org/TR/CSS2/cascade.html#at-import
+.. _`url()`: http://www.w3.org/TR/CSS2/syndata.html#uri
+.. _`Cascading Style Sheets`: http://www.w3.org/Style/CSS/
 
 CachedStaticFilesStorage
 ------------------------
 
 .. class:: storage.CachedStaticFilesStorage
 
-    A subclass of the :class:`~django.contrib.staticfiles.storage.StaticFilesStorage`
-    storage backend which caches the files it saves by appending the MD5 hash
-    of the file's content to the filename. For example, the file
-    ``css/styles.css`` would also be saved as ``css/styles.55e7cbb9ba48.css``.
+``CachedStaticFilesStorage`` is a similar class like the
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` class
+but uses Django's :doc:`caching framework</topics/cache>` for storing the
+hashed names of processed files instead of a static manifest file called
+``staticfiles.json``. This is mostly useful for situations in which you don't
+have accesss to the file system.
 
-    The purpose of this storage is to keep serving the old files in case some
-    pages still refer to those files, e.g. because they are cached by you or
-    a 3rd party proxy server. Additionally, it's very helpful if you want to
-    apply `far future Expires headers`_ to the deployed files to speed up the
-    load time for subsequent page visits.
-
-    The storage backend automatically replaces the paths found in the saved
-    files matching other saved files with the path of the cached copy (using
-    the :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
-    method). The regular expressions used to find those paths
-    (``django.contrib.staticfiles.storage.CachedStaticFilesStorage.cached_patterns``)
-    by default cover the `@import`_ rule and `url()`_ statement of `Cascading
-    Style Sheets`_. For example, the ``'css/styles.css'`` file with the
-    content
-
-    .. code-block:: css+django
-
-        @import url("../admin/css/base.css");
-
-    would be replaced by calling the
-    :meth:`~django.core.files.storage.Storage.url`
-    method of the ``CachedStaticFilesStorage`` storage backend, ultimately
-    saving a ``'css/styles.55e7cbb9ba48.css'`` file with the following
-    content:
-
-    .. code-block:: css+django
-
-        @import url("../admin/css/base.27e20196a850.css");
-
-    To enable the ``CachedStaticFilesStorage`` you have to make sure the
-    following requirements are met:
-
-    * the :setting:`STATICFILES_STORAGE` setting is set to
-      ``'django.contrib.staticfiles.storage.CachedStaticFilesStorage'``
-    * the :setting:`DEBUG` setting is set to ``False``
-    * you use the ``staticfiles`` :ttag:`static<staticfiles-static>` template
-      tag to refer to your static files in your templates
-    * you've collected all your static files by using the
-      :djadmin:`collectstatic` management command
-
-    Since creating the MD5 hash can be a performance burden to your website
-    during runtime, ``staticfiles`` will automatically try to cache the
-    hashed name for each file path using Django's :doc:`caching
-    framework</topics/cache>`. If you want to override certain options of the
-    cache backend the storage uses, simply specify a custom entry in the
-    :setting:`CACHES` setting named ``'staticfiles'``. It falls back to using
-    the ``'default'`` cache backend.
-
-    .. method:: file_hash(name, content=None)
-
-    The method that is used when creating the hashed name of a file.
-    Needs to return a hash for the given file name and content.
-    By default it calculates a MD5 hash from the content's chunks as
-    mentioned above.
-
-.. _`far future Expires headers`: http://developer.yahoo.com/performance/rules.html#expires
-.. _`@import`: http://www.w3.org/TR/CSS2/cascade.html#at-import
-.. _`url()`: http://www.w3.org/TR/CSS2/syndata.html#uri
-.. _`Cascading Style Sheets`: http://www.w3.org/Style/CSS/
+If you want to override certain options of the cache backend the storage uses,
+simply specify a custom entry in the :setting:`CACHES` setting named
+``'staticfiles'``. It falls back to using the ``'default'`` cache backend.
 
 .. currentmodule:: django.contrib.staticfiles.templatetags.staticfiles
 

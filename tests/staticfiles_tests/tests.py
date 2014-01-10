@@ -371,20 +371,13 @@ class TestCollectionNonLocalStorage(CollectionTestCase, TestNoFilesCreated):
     pass
 
 
-# we set DEBUG to False here since the template tag wouldn't work otherwise
-@override_settings(**dict(
-    TEST_SETTINGS,
-    STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage',
-    DEBUG=False,
-))
-class TestCollectionCachedStorage(BaseCollectionTestCase,
-        BaseStaticFilesTestCase, TestCase):
-    """
-    Tests for the Cache busting storage
-    """
-    def cached_file_path(self, path):
-        fullpath = self.render_template(self.static_template_snippet(path))
-        return fullpath.replace(settings.STATIC_URL, '')
+def hashed_file_path(test, path):
+    fullpath = test.render_template(test.static_template_snippet(path))
+    return fullpath.replace(settings.STATIC_URL, '')
+
+
+class TestHashedFiles(object):
+    hashed_file_path = hashed_file_path
 
     def test_template_tag_return(self):
         """
@@ -405,7 +398,7 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
                                  "/static/path/?query")
 
     def test_template_tag_simple_content(self):
-        relpath = self.cached_file_path("cached/styles.css")
+        relpath = self.hashed_file_path("cached/styles.css")
         self.assertEqual(relpath, "cached/styles.93b1147e8552.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
@@ -413,7 +406,7 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
             self.assertIn(b"other.d41d8cd98f00.css", content)
 
     def test_path_ignored_completely(self):
-        relpath = self.cached_file_path("cached/css/ignored.css")
+        relpath = self.hashed_file_path("cached/css/ignored.css")
         self.assertEqual(relpath, "cached/css/ignored.6c77f2643390.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
@@ -424,7 +417,7 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
             self.assertIn(b'//foobar', content)
 
     def test_path_with_querystring(self):
-        relpath = self.cached_file_path("cached/styles.css?spam=eggs")
+        relpath = self.hashed_file_path("cached/styles.css?spam=eggs")
         self.assertEqual(relpath,
                          "cached/styles.93b1147e8552.css?spam=eggs")
         with storage.staticfiles_storage.open(
@@ -434,7 +427,7 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
             self.assertIn(b"other.d41d8cd98f00.css", content)
 
     def test_path_with_fragment(self):
-        relpath = self.cached_file_path("cached/styles.css#eggs")
+        relpath = self.hashed_file_path("cached/styles.css#eggs")
         self.assertEqual(relpath, "cached/styles.93b1147e8552.css#eggs")
         with storage.staticfiles_storage.open(
                 "cached/styles.93b1147e8552.css") as relfile:
@@ -443,7 +436,7 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
             self.assertIn(b"other.d41d8cd98f00.css", content)
 
     def test_path_with_querystring_and_fragment(self):
-        relpath = self.cached_file_path("cached/css/fragments.css")
+        relpath = self.hashed_file_path("cached/css/fragments.css")
         self.assertEqual(relpath, "cached/css/fragments.75433540b096.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
@@ -453,7 +446,7 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
             self.assertIn(b'#default#VML', content)
 
     def test_template_tag_absolute(self):
-        relpath = self.cached_file_path("cached/absolute.css")
+        relpath = self.hashed_file_path("cached/absolute.css")
         self.assertEqual(relpath, "cached/absolute.23f087ad823a.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
@@ -462,7 +455,7 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
             self.assertIn(b'/static/cached/img/relative.acae32e4532b.png', content)
 
     def test_template_tag_denorm(self):
-        relpath = self.cached_file_path("cached/denorm.css")
+        relpath = self.hashed_file_path("cached/denorm.css")
         self.assertEqual(relpath, "cached/denorm.c5bd139ad821.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
@@ -472,7 +465,7 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
             self.assertIn(b'url("img/relative.acae32e4532b.png', content)
 
     def test_template_tag_relative(self):
-        relpath = self.cached_file_path("cached/relative.css")
+        relpath = self.hashed_file_path("cached/relative.css")
         self.assertEqual(relpath, "cached/relative.2217ea7273c2.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
@@ -484,13 +477,13 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
 
     def test_import_replacement(self):
         "See #18050"
-        relpath = self.cached_file_path("cached/import.css")
+        relpath = self.hashed_file_path("cached/import.css")
         self.assertEqual(relpath, "cached/import.2b1d40b0bbd4.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             self.assertIn(b"""import url("styles.93b1147e8552.css")""", relfile.read())
 
     def test_template_tag_deep_relative(self):
-        relpath = self.cached_file_path("cached/css/window.css")
+        relpath = self.hashed_file_path("cached/css/window.css")
         self.assertEqual(relpath, "cached/css/window.9db38d5169f3.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
@@ -498,25 +491,10 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
             self.assertIn(b'url("img/window.acae32e4532b.png")', content)
 
     def test_template_tag_url(self):
-        relpath = self.cached_file_path("cached/url.css")
+        relpath = self.hashed_file_path("cached/url.css")
         self.assertEqual(relpath, "cached/url.615e21601e4b.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             self.assertIn(b"https://", relfile.read())
-
-    def test_cache_invalidation(self):
-        name = "cached/styles.css"
-        hashed_name = "cached/styles.93b1147e8552.css"
-        # check if the cache is filled correctly as expected
-        cache_key = storage.staticfiles_storage.cache_key(name)
-        cached_name = storage.staticfiles_storage.cache.get(cache_key)
-        self.assertEqual(self.cached_file_path(name), cached_name)
-        # clearing the cache to make sure we re-set it correctly in the url method
-        storage.staticfiles_storage.cache.clear()
-        cached_name = storage.staticfiles_storage.cache.get(cache_key)
-        self.assertEqual(cached_name, None)
-        self.assertEqual(self.cached_file_path(name), hashed_name)
-        cached_name = storage.staticfiles_storage.cache.get(cache_key)
-        self.assertEqual(cached_name, hashed_name)
 
     def test_post_processing(self):
         """Test that post_processing behaves correctly.
@@ -545,18 +523,8 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
         self.assertIn(os.path.join('cached', 'css', 'img', 'window.png'), stats['unmodified'])
         self.assertIn(os.path.join('test', 'nonascii.css'), stats['post_processed'])
 
-    def test_cache_key_memcache_validation(self):
-        """
-        Handle cache key creation correctly, see #17861.
-        """
-        name = "/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/" + "\x16" + "\xb4"
-        cache_key = storage.staticfiles_storage.cache_key(name)
-        cache_validator = BaseCache({})
-        cache_validator.validate_key(cache_key)
-        self.assertEqual(cache_key, 'staticfiles:821ea71ef36f95b3922a77f7364670e7')
-
     def test_css_import_case_insensitive(self):
-        relpath = self.cached_file_path("cached/styles_insensitive.css")
+        relpath = self.hashed_file_path("cached/styles_insensitive.css")
         self.assertEqual(relpath, "cached/styles_insensitive.2f0151cca872.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
@@ -582,6 +550,67 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
 # we set DEBUG to False here since the template tag wouldn't work otherwise
 @override_settings(**dict(
     TEST_SETTINGS,
+    STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage',
+    DEBUG=False,
+))
+class TestCollectionCachedStorage(TestHashedFiles, BaseCollectionTestCase,
+        BaseStaticFilesTestCase, TestCase):
+    """
+    Tests for the Cache busting storage
+    """
+    def test_cache_invalidation(self):
+        name = "cached/styles.css"
+        hashed_name = "cached/styles.93b1147e8552.css"
+        # check if the cache is filled correctly as expected
+        cache_key = storage.staticfiles_storage.hash_key(name)
+        cached_name = storage.staticfiles_storage.hashed_files.get(cache_key)
+        self.assertEqual(self.hashed_file_path(name), cached_name)
+        # clearing the cache to make sure we re-set it correctly in the url method
+        storage.staticfiles_storage.hashed_files.clear()
+        cached_name = storage.staticfiles_storage.hashed_files.get(cache_key)
+        self.assertEqual(cached_name, None)
+        self.assertEqual(self.hashed_file_path(name), hashed_name)
+        cached_name = storage.staticfiles_storage.hashed_files.get(cache_key)
+        self.assertEqual(cached_name, hashed_name)
+
+    def test_cache_key_memcache_validation(self):
+        """
+        Handle cache key creation correctly, see #17861.
+        """
+        name = "/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/" + "\x16" + "\xb4"
+        cache_key = storage.staticfiles_storage.hash_key(name)
+        cache_validator = BaseCache({})
+        cache_validator.validate_key(cache_key)
+        self.assertEqual(cache_key, 'staticfiles:821ea71ef36f95b3922a77f7364670e7')
+
+
+# we set DEBUG to False here since the template tag wouldn't work otherwise
+@override_settings(**dict(
+    TEST_SETTINGS,
+    STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage',
+    DEBUG=False,
+))
+class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
+        BaseStaticFilesTestCase, TestCase):
+    """
+    Tests for the Cache busting storage
+    """
+    def test_manifest_exists(self):
+        filename = storage.staticfiles_storage.manifest_name
+        path = storage.staticfiles_storage.path(filename)
+        self.assertTrue(os.path.exists(path))
+
+    def test_loaded_cache(self):
+        self.assertNotEqual(storage.staticfiles_storage.hashed_files, {})
+        manifest_content = storage.staticfiles_storage.read_manifest()
+        self.assertIn('"version": "%s"' %
+                      storage.staticfiles_storage.manifest_version,
+                      force_text(manifest_content))
+
+
+# we set DEBUG to False here since the template tag wouldn't work otherwise
+@override_settings(**dict(
+    TEST_SETTINGS,
     STATICFILES_STORAGE='staticfiles_tests.storage.SimpleCachedStaticFilesStorage',
     DEBUG=False,
 ))
@@ -590,9 +619,7 @@ class TestCollectionSimpleCachedStorage(BaseCollectionTestCase,
     """
     Tests for the Cache busting storage
     """
-    def cached_file_path(self, path):
-        fullpath = self.render_template(self.static_template_snippet(path))
-        return fullpath.replace(settings.STATIC_URL, '')
+    hashed_file_path = hashed_file_path
 
     def test_template_tag_return(self):
         """
@@ -611,7 +638,7 @@ class TestCollectionSimpleCachedStorage(BaseCollectionTestCase,
                                  "/static/path/?query")
 
     def test_template_tag_simple_content(self):
-        relpath = self.cached_file_path("cached/styles.css")
+        relpath = self.hashed_file_path("cached/styles.css")
         self.assertEqual(relpath, "cached/styles.deploy12345.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()

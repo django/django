@@ -340,6 +340,19 @@ Minor features
   and :attr:`~django.core.files.storage.FileSystemStorage.directory_permissions_mode`
   parameters. See :djadmin:`collectstatic` for example usage.
 
+* The :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+  backend gets a sibling class called
+  :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
+  that doesn't use the cache system at all but instead a JSON file called
+  ``staticfiles.json`` for storing the mapping between the original file name
+  (e.g. ``css/styles.css``) and the hashed file name (e.g.
+  ``css/styles.55e7cbb9ba48.css``. The ``staticfiles.json`` file is created
+  when running the :djadmin:`collectstatic` management command and should
+  be a less expensive alternative for remote storages such as Amazon S3.
+
+  See the :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
+  docs for more information.
+
 :mod:`django.contrib.syndication`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
