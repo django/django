@@ -577,7 +577,7 @@ class BoundField(object):
         """
         Wrapper around the field widget's `id_for_label` method.
         Useful, for example, for focusing on this field regardless of whether
-        it has a single widget or a MutiWidget.
+        it has a single widget or a MultiWidget.
         """
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
