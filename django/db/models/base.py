@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import copy
 import sys
 from functools import update_wrapper
-from django.utils.six.moves import zip
+import warnings
 
 from django.apps import apps
 from django.apps.base import MODELS_MODULE_NAME
@@ -25,6 +25,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
 from django.utils.encoding import force_str, force_text
 from django.utils import six
+from django.utils.six.moves import zip
 from django.utils.text import get_text_list, capfirst
 
 
@@ -102,6 +103,13 @@ class ModelBase(type):
 
                 # For 'django.contrib.sites.models', this would be 'sites'.
                 # For 'geo.models.places' this would be 'geo'.
+
+                warnings.warn(
+                    "Model class %s.%s doesn't declare an explicit app_label "
+                    "and either isn't in an application in  INSTALLED_APPS "
+                    "or else was imported before its application was loaded. "
+                    "This will no longer be supported in Django 1.9."
+                    % (module, name), PendingDeprecationWarning, stacklevel=2)
 
                 model_module = sys.modules[new_class.__module__]
                 package_components = model_module.__name__.split('.')
