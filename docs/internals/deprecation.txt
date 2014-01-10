@@ -170,6 +170,12 @@ these changes.
 * ``allow_syncdb`` on database routers will no longer automatically become
   ``allow_migrate``.
 
+* All models will need to be defined inside an installed application or
+  declare an explicit :attr:`~django.db.models.Options.app_label`.
+  Furthermore, it won't be possible to import them before their application
+  is loaded. In particular, it won't be possible to import models inside
+  the root package of their application.
+
 * If models are organized in a package, Django will no longer look for
   :ref:`initial SQL data<initial-sql>` in ``myapp/models/sql/``. Move your
   custom SQL files to ``myapp/sql/``.

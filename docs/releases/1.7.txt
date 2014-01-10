@@ -677,9 +677,18 @@ directory and a subdirectory on :envvar:`PYTHONPATH`. Refer to the section on
 the new project layout in the :doc:`1.4 release notes </releases/1.4>` for
 migration instructions.
 
-You should make sure that your project doesn't import models from applications
-that aren't in :setting:`INSTALLED_APPS`. Relations involving such models may
-not be created properly. Future versions of Django may forbid this entirely.
+You should make sure that:
+
+* All models are defined in applications that are listed in
+  :setting:`INSTALLED_APPS` or have an explicit
+  :attr:`~django.db.models.Options.app_label`.
+
+* Models aren't imported as a side-effect of loading their application.
+  Specifically, you shouldn't import models in the root module of an
+  application nor in the module that define its configuration class.
+
+Django will enforce these requirements as of version 1.9, after a deprecation
+period.
 
 Subclassing AppCommand
 ^^^^^^^^^^^^^^^^^^^^^^
