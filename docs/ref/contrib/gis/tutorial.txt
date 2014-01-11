@@ -289,12 +289,17 @@ This command should produce the following output:
         "subregion" integer NOT NULL,
         "lon" double precision NOT NULL,
         "lat" double precision NOT NULL
+        "mpoly" geometry(MULTIPOLYGON,4326) NOT NULL
     )
     ;
-    SELECT AddGeometryColumn('world_worldborder', 'mpoly', 4326, 'MULTIPOLYGON', 2);
-    ALTER TABLE "world_worldborder" ALTER "mpoly" SET NOT NULL;
-    CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ( "mpoly" GIST_GEOMETRY_OPS );
+    CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ( "mpoly" );
     COMMIT;
+
+.. note::
+
+    With PostGIS < 2.0, the output is slightly different. The ``mpoly`` geometry
+    column is added through a separate ``SELECT AddGeometryColumn(...)``
+    statement.
 
 If this looks correct, run :djadmin:`migrate` to create this table in the database::
 
