@@ -899,6 +899,14 @@ Miscellaneous
 
 * GeoDjango dropped support for GEOS < 3.1.
 
+* :meth:`~django.utils.translation.parse_accept_lang_header` now returns
+  lowercase locales, instead of the case as it was provided. As locales should
+  be treated case-insensitive this allows us to speed up locale detection.
+
+* :meth:`~django.utils.translation.get_language_from_path` and
+  :meth:`~django.utils.translation.trans_real.get_supported_language_variant`
+  now no longer have a `supported` argument.
+
 Features deprecated in 1.7
 ==========================
 
