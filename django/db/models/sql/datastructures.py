@@ -15,10 +15,6 @@ class Col(object):
     def output_type(self):
         return self.source
 
-    @property
-    def field(self):
-        return self.source
-
     def relabeled_clone(self, relabels):
         return self.__class__(relabels.get(self.alias, self.alias), self.target, self.source)
 
