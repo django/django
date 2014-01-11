@@ -282,6 +282,10 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.max_value, 1.5)
         self.assertEqual(f.min_value, 0.5)
 
+    def test_floatfield_widget_attrs(self):
+        f = FloatField(widget=NumberInput(attrs={'step': 0.01, 'max': 1.0, 'min': 0.0}))
+        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" min="0.0" max="1.0" type="number" id="id_f" />')
+
     def test_floatfield_localized(self):
         """
         Make sure localized FloatField's widget renders to a text input with
@@ -392,6 +396,8 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.widget_attrs(NumberInput()), {'step': '1e-19'})
         f = DecimalField(max_digits=20)
         self.assertEqual(f.widget_attrs(NumberInput()), {'step': 'any'})
+        f = DecimalField(max_digits=6, widget=NumberInput(attrs={'step': '0.01'}))
+        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" type="number" id="id_f" />')
 
     def test_decimalfield_localized(self):
         """
