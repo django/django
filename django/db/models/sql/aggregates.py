@@ -94,7 +94,7 @@ class Aggregate(RegisterLookupMixin):
 
         return self.sql_template % substitutions, params
 
-    def get_cols(self):
+    def get_group_by_cols(self):
         return []
 
     @property

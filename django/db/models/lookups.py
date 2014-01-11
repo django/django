@@ -54,8 +54,8 @@ class Extract(RegisterLookupMixin):
     def relabeled_clone(self, relabels):
         return self.__class__(self.lhs.relabeled_clone(relabels))
 
-    def get_cols(self):
-        return self.lhs.get_cols()
+    def get_group_by_cols(self):
+        return self.lhs.get_group_by_cols()
 
 
 class Lookup(RegisterLookupMixin):
@@ -102,10 +102,10 @@ class Lookup(RegisterLookupMixin):
             new.rhs = new.rhs.relabeled_clone(relabels)
         return new
 
-    def get_cols(self):
-        cols = self.lhs.get_cols()
-        if hasattr(self.rhs, 'get_cols'):
-            cols.extend(self.rhs.get_cols())
+    def get_group_by_cols(self):
+        cols = self.lhs.get_group_by_cols()
+        if hasattr(self.rhs, 'get_group_by_cols'):
+            cols.extend(self.rhs.get_group_by_cols())
         return cols
 
     def as_sql(self, qn, connection):

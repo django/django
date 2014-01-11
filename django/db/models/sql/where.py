@@ -153,16 +153,16 @@ class WhereNode(tree.Node):
                 sql_string = '(%s)' % sql_string
         return sql_string, result_params
 
-    def get_cols(self):
+    def get_group_by_cols(self):
         cols = []
         for child in self.children:
-            if hasattr(child, 'get_cols'):
-                cols.extend(child.get_cols())
+            if hasattr(child, 'get_group_by_cols'):
+                cols.extend(child.get_group_by_cols())
             else:
                 if isinstance(child[0], Constraint):
                     cols.append((child[0].alias, child[0].col))
-                if hasattr(child[3], 'get_cols'):
-                    cols.extend(child[3].get_cols())
+                if hasattr(child[3], 'get_group_by_cols'):
+                    cols.extend(child[3].get_group_by_cols())
         return cols
 
     def make_atom(self, child, qn, connection):

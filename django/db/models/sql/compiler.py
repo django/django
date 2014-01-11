@@ -106,7 +106,7 @@ class SQLCompiler(object):
 
         where, w_params = self.compile(self.query.where)
         having, h_params = self.compile(self.query.having)
-        having_group_by = self.query.having.get_cols()
+        having_group_by = self.query.having.get_group_by_cols()
         params = []
         for val in six.itervalues(self.query.extra_select):
             params.extend(val[1])

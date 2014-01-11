@@ -22,7 +22,7 @@ class Col(object):
     def relabeled_clone(self, relabels):
         return self.__class__(relabels.get(self.alias, self.alias), self.target, self.source)
 
-    def get_cols(self):
+    def get_group_by_cols(self):
         return [(self.alias, self.target.column)]
 
     def get_lookup(self, name):
