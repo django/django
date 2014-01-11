@@ -7,56 +7,71 @@ Custom lookups
 
 .. currentmodule:: django.db.models
 
-(This documentation is candidate for complete rewrite, but contains
-useful information of how to test the current implementation.)
-
-This documentation constains instructions of how to create custom lookups
-for model fields.
-
 Django's ORM works using lookup paths when building query filters and other
-query structures. For example in the query Book.filter(author__age__lte=30)
-the author__age__lte is the lookup path.
+query conditions. For example in the query Book.filter(author__age__lte=30)
+the part "author__age__lte" is the lookup path.
 
-The lookup path consist of three different part. First is the related lookups,
-above part author refers to Book's related model Author. Second part of the
-lookup path is the final field, above this is Author's field age. Finally the
-lte part is commonly called just lookup (TODO: this nomenclature is confusing,
-can we invent something better).
+The lookup path consist of three different parts. First is the related
+lookups. In the author__age__lte example the part author refers to Book's
+related model Author. Second part of the lookup path is the field. This is
+Author's age field in the example. Finally the lte part is commonly called
+just lookup. Both the related lookups part and the final lookup part can
+contain multiple parts, for example "author__friends__birthdate__year__lte"
+has author, friends as related lookups, birthdate as the field and year, lte
+as final lookup part.
 
-This documentation concentrates on writing custom lookups, that is custom
-implementations for lte or any other lookup you wish to use.
+This documentation concentrates on writing custom lookups. By writing custom
+lookups it is possible to control how Django interprets the final lookup part.
 
 Django will fetch a ``Lookup`` class from the final field using the field's
-method get_lookup(lookup_name). This method can do three things:
+method get_lookup(lookup_name). This method is allowed to do these things:
 
   1. Return a Lookup class
   2. Raise a FieldError
   3. Return None
 
-Above return None is only available during backwards compatibility period and
-returning None will not be allowed in Django 1.9 or later. The interpretation
-is to use the old way of lookup hadling inside the ORM.
-
-The returned Lookup will be used to build the query.
+Returning None is only available during backwards compatibility period.
+The interpretation is to use the old way of lookup hadling inside the ORM.
 
 The Lookup class
 ~~~~~~~~~~~~~~~~
+
+A Lookup operates on two values and produces boolean results. The values
+are called lhs and rhs. The lhs is usually a field reference, but it can be
+anything implementing the query expression API. The rhs is a value to compare
+against.
 
 The API is as follows:
 
 .. attribute:: lookup_name
 
-A string used by Django to distinguish different lookups.
+A string used by Django to distinguish different lookups. For example
+'exact'.
 
 .. method:: __init__(lhs, rhs)
 
-The lhs and rhs are the field reference (reference to field age in the
-author__age__lte=30 example), and rhs is the value (30 in the example).
+The lhs is something implementing the query expression API. For example in
+author__age__lte=30 the lhs is a Col instance referencing the age field of
+author model. The rhs is the value to compare against. It can be Python value
+(30 in the example) or SQL reference (produced by using F() or queryset for
+example).
 
 .. attribute:: Lookup.lhs
 
 The left hand side part of this lookup. You can assume it implements the
-query part interface (TODO: write interface definition...).
+query expression interface.
+
+.. attribute:: Lookup.rhs
+
+The value to compare against.
+
+.. method:: Lookup.process_lhs(qn, connection)
+
+Turns the lhs into query string + params.
+
+.. method:: Lookup.process_rhs(qn, connection)
+
+Turns the rhs into query string + params.
 
 .. method:: Lookup.as_sql(qn, connection)
 
@@ -79,42 +94,32 @@ qn.compile(part) instead of part.as_sql(qn, connection) so that 3rd party
 backends have ability to customize the produced query string. More of this
 later on.
 
-The connection is the used connection.
-
-.. method:: Lookup.process_lhs(qn, connection, lhs=None)
-
-This method is used to convert the left hand side of the lookup into query
-string. The left hand side can be a field reference or a nested lookup. The
-lhs kwarg can be used to convert something else than self.lhs to query string.
-
-.. method:: Lookup.process_rhs(qn, connection, rhs=None)
-
-The process_rhs method is used to convert the right hand side into query string.
-The rhs is the value given in the filter clause. It can be a raw value to
-compare agains, a F() reference to another field or even a QuerySet.
+The connection is the connection the SQL is compiled against.
 
 In addition the Lookup class has some private methods - that is, implementing
 just the above mentioned attributes and methods is not enough, instead you
-should subclass Lookup.
+must subclass Lookup.
 
 The Extract class
 ~~~~~~~~~~~~~~~~~
 
-An Extract is something that converts a value to another value in the query string.
-For example you could have an Extract that procudes modulo 3 of the given value.
-In SQL this would be something like "author"."age" % 3.
+An Extract is something that converts a value to another value in the query
+string. For example you could have an Extract that procudes modulo 3 of the
+given value. In SQL this is something like "author"."age" % 3.
 
-Extracts are used in nested lookups. The Extract class must implement the query
-part interface. In addition the Extract should must lookup_name attribute.
+Extracts are used in nested lookups. The Extract class must implement the
+query part interface.
+
+Extracts should be written by subclassing django.db.models.Extract.
 
 A simple Lookup example
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This is how to write a simple div3 lookup for IntegerField::
+This is how to write a simple mod3 lookup for IntegerField::
 
     from django.db.models import Lookup, IntegerField
-    class Div3(Lookup):
-        lookup_name = 'div3'
+    class Mod3(Lookup):
+        lookup_name = 'mod3'
 
         def as_sql(self, qn, connection):
             lhs_sql, params = self.process_lhs(qn, connection)
@@ -126,32 +131,32 @@ This is how to write a simple div3 lookup for IntegerField::
     IntegerField.register_lookup(Div3)
 
 Now all IntegerFields or subclasses of IntegerField will have
-a div3 lookup. For example you could do Author.objects.filter(age__div3=2).
+a mod3 lookup. For example you could do Author.objects.filter(age__mod3=2).
 This query would return every author whose age % 3 == 2.
 
 A simple nested lookup example
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here is how to write an Extract and a Lookup for IntegerField. The example
-lookup can be used similarly as the above div3 lookup, and in addition it
+lookup can be used similarly as the above mod3 lookup, and in addition it
 support nesting lookups::
 
-    class Div3Extract(Extract):
-        lookup_name = 'div3'
+    class Mod3Extract(Extract):
+        lookup_name = 'mod3'
 
         def as_sql(self, qn, connection):
             lhs, lhs_params = qn.compile(self.lhs)
             return '%s %%%% 3' % (lhs,), lhs_params
 
-    IntegerField.register_lookup(Div3Extract)
+    IntegerField.register_lookup(Mod3Extract)
 
-Note that if you already added Div3 for IntegerField in the above
-example, now Div3LookupWithExtract will override that lookup.
+Note that if you already added Mod3 for IntegerField in the above
+example, now Mod3Extract will override that lookup.
 
-This lookup can be used like Div3 lookup, but in addition it supports
+This lookup can be used like Mod3 lookup, but in addition it supports
 nesting, too. The default output type for Extracts is the same type as the
-lhs' output_type. So, the Div3Extract supports all the same lookups as
-IntegerField. For example Author.objects.filter(age__div3__in=[1, 2])
+lhs' output_type. So, the Mod3Extract supports all the same lookups as
+IntegerField. For example Author.objects.filter(age__mod3__in=[1, 2])
 returns all authors for which age % 3 in (1, 2). 
 
 A more complex nested lookup
