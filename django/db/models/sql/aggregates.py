@@ -4,6 +4,7 @@ Classes to represent the default SQL aggregate functions
 import copy
 
 from django.db.models.fields import IntegerField, FloatField
+from django.db.models.lookups import RegisterLookupMixin
 
 
 __all__ = ['Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance']
@@ -14,7 +15,7 @@ ordinal_aggregate_field = IntegerField()
 computed_aggregate_field = FloatField()
 
 
-class Aggregate(object):
+class Aggregate(RegisterLookupMixin):
     """
     Default SQL Aggregate.
     """
@@ -99,9 +100,6 @@ class Aggregate(object):
     @property
     def output_type(self):
         return self.field
-
-    def get_lookup(self, lookup):
-        return self.output_type.get_lookup(lookup)
 
 
 class Avg(Aggregate):

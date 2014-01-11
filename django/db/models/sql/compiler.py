@@ -70,9 +70,10 @@ class SQLCompiler(object):
         return self(name)
 
     def compile(self, node):
-        if node.__class__ in self.connection.compile_implementations:
-            return self.connection.compile_implementations[node.__class__](
-                node, self, self.connection)
+        vendor_impl = getattr(
+            node, 'as_' + self.connection.vendor, None)
+        if vendor_impl:
+            return vendor_impl(self, self.connection)
         else:
             return node.as_sql(self, self.connection)
 

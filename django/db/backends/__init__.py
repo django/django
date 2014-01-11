@@ -67,9 +67,6 @@ class BaseDatabaseWrapper(object):
         self.allow_thread_sharing = allow_thread_sharing
         self._thread_ident = thread.get_ident()
 
-        # Compile implementations, used by compiler.compile(someelem)
-        self.compile_implementations = utils.get_implementations(self.vendor)
-
     def __eq__(self, other):
         if isinstance(other, BaseDatabaseWrapper):
             return self.alias == other.alias

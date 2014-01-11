@@ -195,31 +195,3 @@ def format_number(value, max_digits, decimal_places):
         return "{0:f}".format(value.quantize(decimal.Decimal(".1") ** decimal_places, context=context))
     else:
         return "%.*f" % (decimal_places, value)
-
-# Map of vendor name -> map of query element class -> implementation function
-compile_implementations = defaultdict(dict)
-
-
-def get_implementations(vendor):
-    return compile_implementations[vendor]
-
-
-class add_implementation(object):
-    """
-    A decorator to allow customised implementations for query expressions.
-    For example:
-        @add_implementation(Exact, 'mysql')
-        def mysql_exact(node, qn, connection):
-            # Play with the node here.
-            return somesql, list_of_params
-    Now Exact nodes are compiled to SQL using mysql_exact instead of
-    Exact.as_sql() when using MySQL backend.
-    """
-    def __init__(self, klass, vendor):
-        self.klass = klass
-        self.vendor = vendor
-
-    def __call__(self, func):
-        implementations = get_implementations(self.vendor)
-        implementations[self.klass] = func
-        return func

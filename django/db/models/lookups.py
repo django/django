@@ -1,17 +1,48 @@
 from copy import copy
+import inspect
 
 from django.conf import settings
 from django.utils import timezone
 from django.utils.functional import cached_property
 
 
-class Extract(object):
+class RegisterLookupMixin(object):
+    def get_lookup(self, lookup_name):
+        try:
+            return self.class_lookups[lookup_name]
+        except KeyError:
+            # To allow for inheritance, check parent class class lookups.
+            for parent in inspect.getmro(self.__class__):
+                if not 'class_lookups' in parent.__dict__:
+                    continue
+                if lookup_name in parent.class_lookups:
+                    return parent.class_lookups[lookup_name]
+        except AttributeError:
+            # This class didn't have any class_lookups
+            pass
+        if hasattr(self, 'output_type'):
+            return self.output_type.get_lookup(lookup_name)
+        return None
+
+    @classmethod
+    def register_lookup(cls, lookup):
+        if not 'class_lookups' in cls.__dict__:
+            cls.class_lookups = {}
+        cls.class_lookups[lookup.lookup_name] = lookup
+
+    @classmethod
+    def _unregister_lookup(cls, lookup):
+        """
+        Removes given lookup from cls lookups. Meant to be used in
+        tests only.
+        """
+        del cls.class_lookups[lookup.lookup_name]
+
+
+class Extract(RegisterLookupMixin):
     def __init__(self, lhs, lookups):
         self.lhs = lhs
         self.init_lookups = lookups[:]
-
-    def get_lookup(self, lookup):
-        return self.output_type.get_lookup(lookup)
 
     def as_sql(self, qn, connection):
         raise NotImplementedError
@@ -27,7 +58,7 @@ class Extract(object):
         return self.lhs.get_cols()
 
 
-class Lookup(object):
+class Lookup(RegisterLookupMixin):
     lookup_name = None
 
     def __init__(self, lhs, rhs):

@@ -4,7 +4,6 @@ import collections
 import copy
 import datetime
 import decimal
-import inspect
 import math
 import warnings
 from base64 import b64decode, b64encode
@@ -12,7 +11,7 @@ from itertools import tee
 
 from django.apps import apps
 from django.db import connection
-from django.db.models.lookups import default_lookups
+from django.db.models.lookups import default_lookups, RegisterLookupMixin
 from django.db.models.query_utils import QueryWrapper
 from django.conf import settings
 from django import forms
@@ -82,7 +81,7 @@ def _empty(of_cls):
 
 
 @total_ordering
-class Field(object):
+class Field(RegisterLookupMixin):
     """Base class for all field types"""
 
     # Designates whether empty strings fundamentally are allowed at the
@@ -458,30 +457,6 @@ class Field(object):
 
     def get_internal_type(self):
         return self.__class__.__name__
-
-    def get_lookup(self, lookup_name):
-        try:
-            return self.class_lookups[lookup_name]
-        except KeyError:
-            for parent in inspect.getmro(self.__class__):
-                if not 'class_lookups' in parent.__dict__:
-                    continue
-                if lookup_name in parent.class_lookups:
-                    return parent.class_lookups[lookup_name]
-
-    @classmethod
-    def register_lookup(cls, lookup):
-        if not 'class_lookups' in cls.__dict__:
-            cls.class_lookups = {}
-        cls.class_lookups[lookup.lookup_name] = lookup
-
-    @classmethod
-    def _unregister_lookup(cls, lookup):
-        """
-        Removes given lookup from cls lookups. Meant to be used in
-        tests only.
-        """
-        del cls.class_lookups[lookup.lookup_name]
 
     def pre_save(self, model_instance, add):
         """
