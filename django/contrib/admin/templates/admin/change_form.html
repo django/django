@@ -10,13 +10,13 @@
 
 {% block coltype %}colM{% endblock %}
 
-{% block bodyclass %}app-{{ opts.app_label }} model-{{ opts.object_name.lower }} change-form{% endblock %}
+{% block bodyclass %}app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}
 
 {% if not is_popup %}
 {% block breadcrumbs %}
 <div class="breadcrumbs">
 <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ app_label|capfirst|escape }}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
 &rsaquo; {% if has_change_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
 &rsaquo; {% if add %}{% trans 'Add' %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}{% endif %}
 </div>

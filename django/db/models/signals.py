@@ -1,6 +1,4 @@
-from collections import defaultdict
-
-from django.core.apps import app_cache
+from django.apps import apps
 from django.dispatch import Signal
 from django.utils import six
 
@@ -16,7 +14,7 @@ class ModelSignal(Signal):
 
     def __init__(self, *args, **kwargs):
         super(ModelSignal, self).__init__(*args, **kwargs)
-        self.unresolved_references = defaultdict(list)
+        self.unresolved_references = {}
         class_prepared.connect(self._resolve_references)
 
     def _resolve_references(self, sender, **kwargs):
@@ -35,18 +33,18 @@ class ModelSignal(Signal):
     def connect(self, receiver, sender=None, weak=True, dispatch_uid=None):
         if isinstance(sender, six.string_types):
             try:
-                app_label, object_name = sender.split('.')
+                app_label, model_name = sender.split('.')
             except ValueError:
                 raise ValueError(
                     "Specified sender must either be a model or a "
                     "model name of the 'app_label.ModelName' form."
                 )
-            sender = app_cache.get_model(app_label, object_name, only_installed=False)
-            if sender is None:
-                reference = (app_label, object_name)
-                self.unresolved_references[reference].append(
-                    (receiver, weak, dispatch_uid)
-                )
+            try:
+                sender = apps.get_registered_model(app_label, model_name)
+            except LookupError:
+                ref = (app_label, model_name)
+                refs = self.unresolved_references.setdefault(ref, [])
+                refs.append((receiver, weak, dispatch_uid))
                 return
         super(ModelSignal, self).connect(
             receiver, sender=sender, weak=weak, dispatch_uid=dispatch_uid
@@ -64,7 +62,8 @@ post_delete = ModelSignal(providing_args=["instance", "using"], use_caching=True
 
 m2m_changed = ModelSignal(providing_args=["action", "instance", "reverse", "model", "pk_set", "using"], use_caching=True)
 
-pre_migrate = Signal(providing_args=["app", "create_models", "verbosity", "interactive", "db"])
-pre_syncdb = pre_migrate
-post_migrate = Signal(providing_args=["class", "app", "created_models", "verbosity", "interactive", "db"])
-post_syncdb = post_migrate
+pre_migrate = Signal(providing_args=["app_config", "verbosity", "interactive", "db"])
+post_migrate = Signal(providing_args=["app_config", "verbosity", "interactive", "db"])
+
+pre_syncdb = Signal(providing_args=["app", "create_models", "verbosity", "interactive", "db"])
+post_syncdb = Signal(providing_args=["class", "app", "created_models", "verbosity", "interactive", "db"])

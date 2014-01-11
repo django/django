@@ -128,6 +128,10 @@ Methods
         the :attr:`~django.contrib.auth.models.User.last_name`, with a space in
         between.
 
+    .. method:: get_short_name()
+
+        Returns the :attr:`~django.contrib.auth.models.User.first_name`.
+
     .. method:: set_password(raw_password)
 
         Sets the user's password to the given raw string, taking care of the

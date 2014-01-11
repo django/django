@@ -339,6 +339,34 @@ Template filter code falls into one of two situations:
    handle the auto-escaping issues and return a safe string, the
    ``is_safe`` flag won't change anything either way.
 
+.. warning:: Avoiding XSS vulnerabilities when reusing built-in filters
+
+    Be careful when reusing Django's built-in filters. You'll need to pass
+    ``autoescape=True`` to the filter in order to get the proper autoescaping
+    behavior and avoid a cross-site script vulnerability.
+
+    For example, if you wanted to write a custom filter called
+    ``urlize_and_linebreaks`` that combined the :tfilter:`urlize` and
+    :tfilter:`linebreaksbr` filters, the filter would look like::
+
+        from django.template.defaultfilters import linebreaksbr, urlize
+
+        @register.filter
+        def urlize_and_linebreaks(text):
+            return linebreaksbr(urlize(text, autoescape=True), autoescape=True)
+
+    Then:
+
+    .. code-block:: html+django
+
+        {{ comment|urlize_and_linebreaks }}
+
+    would be equivalent to:
+
+    .. code-block:: html+django
+
+        {{ comment|urlize|linebreaksbr }}
+
 .. _filters-timezones:
 
 Filters and time zones

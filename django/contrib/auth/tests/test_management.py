@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from datetime import date
 
+from django.apps import apps
 from django.contrib.auth import models, management
 from django.contrib.auth.management import create_permissions
 from django.contrib.auth.management.commands import changepassword
@@ -8,13 +9,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
-from django.core.apps import app_cache
 from django.core import exceptions
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.core.management.validation import get_validation_errors
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils import six
 from django.utils.six import StringIO
 
@@ -82,6 +81,19 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
         with self.assertRaises(CommandError):
             command.execute("joe", stdout=self.stdout, stderr=self.stderr)
+
+    def test_that_changepassword_command_works_with_nonascii_output(self):
+        """
+        #21627 -- Executing the changepassword management command should allow
+        non-ASCII characters from the User object representation.
+        """
+        # 'Julia' with accented 'u':
+        models.User.objects.create_user(username='J\xfalia', password='qwerty')
+
+        command = changepassword.Command()
+        command._get_pass = lambda *args: 'not qwerty'
+
+        command.execute("J\xfalia", stdout=self.stdout)
 
 
 @skipIfCustomUser
@@ -184,21 +196,21 @@ class CustomUserModelValidationTestCase(TestCase):
     def test_required_fields_is_list(self):
         "REQUIRED_FIELDS should be a list."
         new_io = StringIO()
-        get_validation_errors(new_io, app_cache.get_app_config('auth').models_module)
+        get_validation_errors(new_io, apps.get_app_config('auth'))
         self.assertIn("The REQUIRED_FIELDS must be a list or tuple.", new_io.getvalue())
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserBadRequiredFields')
     def test_username_not_in_required_fields(self):
         "USERNAME_FIELD should not appear in REQUIRED_FIELDS."
         new_io = StringIO()
-        get_validation_errors(new_io, app_cache.get_app_config('auth').models_module)
+        get_validation_errors(new_io, apps.get_app_config('auth'))
         self.assertIn("The field named as the USERNAME_FIELD should not be included in REQUIRED_FIELDS on a swappable User model.", new_io.getvalue())
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonUniqueUsername')
     def test_username_non_unique(self):
         "A non-unique USERNAME_FIELD should raise a model validation error."
         new_io = StringIO()
-        get_validation_errors(new_io, app_cache.get_app_config('auth').models_module)
+        get_validation_errors(new_io, apps.get_app_config('auth'))
         self.assertIn("The USERNAME_FIELD must be unique. Add unique=True to the field parameters.", new_io.getvalue())
 
 
@@ -220,13 +232,15 @@ class PermissionTestCase(TestCase):
         Test that we show proper error message if we are trying to create
         duplicate permissions.
         """
+        auth_app_config = apps.get_app_config('auth')
+
         # check duplicated default permission
         models.Permission._meta.permissions = [
             ('change_permission', 'Can edit permission (duplicate)')]
         six.assertRaisesRegex(self, CommandError,
             "The permission codename 'change_permission' clashes with a "
             "builtin permission for model 'auth.Permission'.",
-            create_permissions, models, [], verbosity=0)
+            create_permissions, auth_app_config, verbosity=0)
 
         # check duplicated custom permissions
         models.Permission._meta.permissions = [
@@ -237,21 +251,23 @@ class PermissionTestCase(TestCase):
         six.assertRaisesRegex(self, CommandError,
             "The permission codename 'my_custom_permission' is duplicated for model "
             "'auth.Permission'.",
-            create_permissions, models, [], verbosity=0)
+            create_permissions, auth_app_config, verbosity=0)
 
         # should not raise anything
         models.Permission._meta.permissions = [
             ('my_custom_permission', 'Some permission'),
             ('other_one', 'Some other permission'),
         ]
-        create_permissions(models, [], verbosity=0)
+        create_permissions(auth_app_config, verbosity=0)
 
     def test_default_permissions(self):
+        auth_app_config = apps.get_app_config('auth')
+
         permission_content_type = ContentType.objects.get_by_natural_key('auth', 'permission')
         models.Permission._meta.permissions = [
             ('my_custom_permission', 'Some permission'),
         ]
-        create_permissions(models, [], verbosity=0)
+        create_permissions(auth_app_config, verbosity=0)
 
         # add/change/delete permission by default + custom permission
         self.assertEqual(models.Permission.objects.filter(
@@ -260,7 +276,7 @@ class PermissionTestCase(TestCase):
 
         models.Permission.objects.filter(content_type=permission_content_type).delete()
         models.Permission._meta.default_permissions = []
-        create_permissions(models, [], verbosity=0)
+        create_permissions(auth_app_config, verbosity=0)
 
         # custom permission only since default permissions is empty
         self.assertEqual(models.Permission.objects.filter(
@@ -268,10 +284,12 @@ class PermissionTestCase(TestCase):
         ).count(), 1)
 
     def test_verbose_name_length(self):
+        auth_app_config = apps.get_app_config('auth')
+
         permission_content_type = ContentType.objects.get_by_natural_key('auth', 'permission')
         models.Permission.objects.filter(content_type=permission_content_type).delete()
         models.Permission._meta.verbose_name = "some ridiculously long verbose name that is out of control"
 
         six.assertRaisesRegex(self, exceptions.ValidationError,
             "The verbose_name of permission is longer than 39 characters",
-            create_permissions, models, [], verbosity=0)
+            create_permissions, auth_app_config, verbosity=0)

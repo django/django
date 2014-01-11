@@ -14,8 +14,8 @@ from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils.six.moves.urllib.parse import urlparse, ParseResult
 from django.utils._os import upath
-from django.test import TestCase
-from django.test.utils import override_settings, patch_logger
+from django.test import TestCase, override_settings
+from django.test.utils import patch_logger
 from django.middleware.csrf import CsrfViewMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 

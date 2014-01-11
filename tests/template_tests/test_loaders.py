@@ -23,8 +23,7 @@ except ImportError:
 from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import Loader as EggLoader
 from django.template import loader
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils import six
 from django.utils._os import upath
 from django.utils.six import StringIO
@@ -49,7 +48,6 @@ def create_egg(name, resources):
 
 
 @unittest.skipUnless(pkg_resources, 'setuptools is not installed')
-@override_settings(INSTALLED_APPS=[])
 class EggLoaderTest(TestCase):
     def setUp(self):
         # Defined here b/c at module scope we may not have pkg_resources
@@ -98,9 +96,8 @@ class EggLoaderTest(TestCase):
         self.assertEqual(contents, "y")
         self.assertEqual(template_name, "egg:egg_1:templates/y.html")
 
-    @override_settings(INSTALLED_APPS=[])
     def test_not_installed(self):
-        "Loading an existent template from an egg not included in INSTALLED_APPS should fail"
+        "Loading an existent template from an egg not included in any app should fail"
         egg_loader = EggLoader()
         self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "y.html")
 

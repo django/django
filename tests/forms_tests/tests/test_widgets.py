@@ -18,8 +18,7 @@ from django.forms.widgets import RadioFieldRenderer
 from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.translation import activate, deactivate, override
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils.encoding import python_2_unicode_compatible, force_text
 
 from ..models import Article

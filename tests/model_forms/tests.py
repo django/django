@@ -14,7 +14,7 @@ from django.db import connection
 from django.db.models.query import EmptyQuerySet
 from django.forms.models import model_to_dict
 from django.utils._os import upath
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
 from .models import (Article, ArticleStatus, BetterWriter, BigInt, Book,
@@ -637,6 +637,7 @@ class UniqueTest(TestCase):
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['__all__'], ['Price with this Price and Quantity already exists.'])
 
+    @skipUnlessDBFeature('ignores_nulls_in_unique_constraints')
     def test_unique_null(self):
         title = 'I May Be Wrong But I Doubt It'
         form = BookForm({'title': title, 'author': self.writer.pk})

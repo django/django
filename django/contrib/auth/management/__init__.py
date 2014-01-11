@@ -6,9 +6,9 @@ from __future__ import unicode_literals
 import getpass
 import unicodedata
 
+from django.apps import apps
 from django.contrib.auth import (models as auth_app, get_permission_codename,
     get_user_model)
-from django.core.apps import app_cache, UnavailableApp
 from django.core import exceptions
 from django.core.management.base import CommandError
 from django.db import DEFAULT_DB_ALIAS, router
@@ -60,25 +60,26 @@ def _check_permission_clashing(custom, builtin, ctype):
         pool.add(codename)
 
 
-def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kwargs):
-    try:
-        app_cache.get_model('auth', 'Permission')
-    except UnavailableApp:
+def create_permissions(app_config, verbosity=2, interactive=True, db=DEFAULT_DB_ALIAS, **kwargs):
+    if not app_config.models_module:
         return
 
-    if not router.allow_migrate(db, auth_app.Permission):
+    try:
+        Permission = apps.get_model('auth', 'Permission')
+    except LookupError:
+        return
+
+    if not router.allow_migrate(db, Permission):
         return
 
     from django.contrib.contenttypes.models import ContentType
-
-    app_models = app_cache.get_models(app)
 
     # This will hold the permissions we're looking for as
     # (content_type, (codename, name))
     searched_perms = list()
     # The codenames and ctypes that should exist.
     ctypes = set()
-    for klass in app_models:
+    for klass in app_config.get_models():
         # Force looking up the content types in the current database
         # before creating foreign keys to them.
         ctype = ContentType.objects.db_manager(db).get_for_model(klass)
@@ -89,20 +90,20 @@ def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kw
     # Find all the Permissions that have a content_type for a model we're
     # looking for.  We don't need to check for codenames since we already have
     # a list of the ones we're going to create.
-    all_perms = set(auth_app.Permission.objects.using(db).filter(
+    all_perms = set(Permission.objects.using(db).filter(
         content_type__in=ctypes,
     ).values_list(
         "content_type", "codename"
     ))
 
     perms = [
-        auth_app.Permission(codename=codename, name=name, content_type=ctype)
+        Permission(codename=codename, name=name, content_type=ctype)
         for ctype, (codename, name) in searched_perms
         if (ctype.pk, codename) not in all_perms
     ]
     # Validate the permissions before bulk_creation to avoid cryptic
     # database error when the verbose_name is longer than 50 characters
-    permission_name_max_length = auth_app.Permission._meta.get_field('name').max_length
+    permission_name_max_length = Permission._meta.get_field('name').max_length
     verbose_name_max_length = permission_name_max_length - 11  # len('Can change ') prefix
     for perm in perms:
         if len(perm.name) > permission_name_max_length:
@@ -112,23 +113,24 @@ def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kw
                     verbose_name_max_length,
                 )
             )
-    auth_app.Permission.objects.using(db).bulk_create(perms)
+    Permission.objects.using(db).bulk_create(perms)
     if verbosity >= 2:
         for perm in perms:
             print("Adding permission '%s'" % perm)
 
 
-def create_superuser(app, created_models, verbosity, db, **kwargs):
+def create_superuser(app_config, verbosity=2, interactive=True, db=DEFAULT_DB_ALIAS, **kwargs):
     try:
-        app_cache.get_model('auth', 'Permission')
-        UserModel = get_user_model()
-    except UnavailableApp:
+        apps.get_model('auth', 'Permission')
+    except LookupError:
         return
+
+    UserModel = get_user_model()
 
     from django.core.management import call_command
 
-    if UserModel in created_models and kwargs.get('interactive', True):
-        msg = ("\nYou just installed Django's auth system, which means you "
+    if not UserModel.objects.exists() and interactive:
+        msg = ("\nYou have installed Django's auth system, and "
             "don't have any superusers defined.\nWould you like to create one "
             "now? (yes/no): ")
         confirm = input(msg)
@@ -202,7 +204,9 @@ def get_default_username(check_db=True):
             return ''
     return default_username
 
+
 signals.post_migrate.connect(create_permissions,
     dispatch_uid="django.contrib.auth.management.create_permissions")
 signals.post_migrate.connect(create_superuser,
-    sender=auth_app, dispatch_uid="django.contrib.auth.management.create_superuser")
+    sender=apps.get_app_config('auth'),
+    dispatch_uid="django.contrib.auth.management.create_superuser")

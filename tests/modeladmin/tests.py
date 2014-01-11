@@ -13,8 +13,8 @@ from django.contrib.admin import (SimpleListFilter,
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
-from django.test import TestCase
-from django.test.utils import str_prefix, override_settings
+from django.test import TestCase, override_settings
+from django.test.utils import str_prefix
 from django.utils import six
 
 from .models import Band, Concert, ValidationTestModel, ValidationTestInlineModel

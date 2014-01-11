@@ -4,7 +4,7 @@ from operator import attrgetter
 
 from django.db import connection
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.test.utils import override_settings
+from django.test import override_settings
 
 from .models import Country, Restaurant, Pizzeria, State, TwoFields
 

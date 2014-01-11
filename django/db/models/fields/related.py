@@ -70,14 +70,14 @@ def add_lazy_relation(cls, field, relation, operation):
     # string right away. If get_model returns None, it means that the related
     # model isn't loaded yet, so we need to pend the relation until the class
     # is prepared.
-    model = cls._meta.app_cache.get_model(app_label, model_name,
-                      seed_cache=False, only_installed=False)
-    if model:
-        operation(field, model, cls)
-    else:
+    try:
+        model = cls._meta.apps.get_registered_model(app_label, model_name)
+    except LookupError:
         key = (app_label, model_name)
         value = (cls, field, operation)
-        cls._meta.app_cache.pending_lookups.setdefault(key, []).append(value)
+        cls._meta.apps._pending_lookups.setdefault(key, []).append(value)
+    else:
+        operation(field, model, cls)
 
 
 def do_pending_lookups(sender, **kwargs):
@@ -85,7 +85,7 @@ def do_pending_lookups(sender, **kwargs):
     Handle any pending relations to the sending model. Sent from class_prepared.
     """
     key = (sender._meta.app_label, sender.__name__)
-    for cls, field, operation in sender._meta.app_cache.pending_lookups.pop(key, []):
+    for cls, field, operation in sender._meta.apps._pending_lookups.pop(key, []):
         operation(field, sender, cls)
 
 signals.class_prepared.connect(do_pending_lookups)
@@ -1092,7 +1092,7 @@ class ForeignObject(RelatedField):
         if len(self.from_fields) < 1 or len(self.from_fields) != len(self.to_fields):
             raise ValueError('Foreign Object from and to fields must be the same non-zero length')
         if isinstance(self.rel.to, six.string_types):
-            raise ValueError('Related model %r cannot been resolved' % self.rel.to)
+            raise ValueError('Related model %r cannot be resolved' % self.rel.to)
         related_fields = []
         for index in range(len(self.from_fields)):
             from_field_name = self.from_fields[index]
@@ -1286,7 +1286,7 @@ class ForeignKey(ForeignObject):
     def __init__(self, to, to_field=None, rel_class=ManyToOneRel,
                  db_constraint=True, **kwargs):
         try:
-            to._meta.object_name.lower()
+            to._meta.model_name
         except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
             assert isinstance(to, six.string_types), "%s(%r) is invalid. First parameter to ForeignKey must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
         else:
@@ -1502,7 +1502,7 @@ def create_many_to_many_intermediary_model(field, klass):
         'unique_together': (from_, to),
         'verbose_name': '%(from)s-%(to)s relationship' % {'from': from_, 'to': to},
         'verbose_name_plural': '%(from)s-%(to)s relationships' % {'from': from_, 'to': to},
-        'app_cache': field.model._meta.app_cache,
+        'apps': field.model._meta.apps,
     })
     # Construct and return the new class.
     return type(str(name), (models.Model,), {

@@ -17,7 +17,7 @@ from django.contrib.gis.gdal.error import SRSException
 from django.contrib.gis.geos.base import GEOSBase, gdal
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.error import GEOSException, GEOSIndexError
-from django.contrib.gis.geos.libgeos import GEOM_PTR, GEOS_PREPARE
+from django.contrib.gis.geos.libgeos import GEOM_PTR
 
 # All other functions in this module come from the ctypes
 # prototypes module -- which handles all interaction with
@@ -289,8 +289,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         Returns a string containing the reason for any invalidity.
         """
-        if not GEOS_PREPARE:
-            raise GEOSException('Upgrade GEOS to 3.1 to get validity reason.')
         return capi.geos_isvalidreason(self.ptr).decode()
 
     #### Binary predicates. ####
@@ -411,9 +409,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
         extension of the WKB specification that includes SRID value that are
         a part of this geometry.
         """
-        if self.hasz and not GEOS_PREPARE:
-            # See: http://trac.osgeo.org/geos/ticket/216
-            raise GEOSException('Upgrade GEOS to 3.1 to get valid 3D HEXEWKB.')
         return ewkb_w(3 if self.hasz else 2).write_hex(self)
 
     @property
@@ -443,9 +438,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
         This is an extension of the WKB specification that includes any SRID
         value that are a part of this geometry.
         """
-        if self.hasz and not GEOS_PREPARE:
-            # See: http://trac.osgeo.org/geos/ticket/216
-            raise GEOSException('Upgrade GEOS to 3.1 to get valid 3D EWKB.')
         return ewkb_w(3 if self.hasz else 2).write(self)
 
     @property
@@ -460,10 +452,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         Returns a PreparedGeometry corresponding to this geometry -- it is
         optimized for the contains, intersects, and covers operations.
         """
-        if GEOS_PREPARE:
-            return PreparedGeometry(self)
-        else:
-            raise GEOSException('GEOS 3.1+ required for prepared geometry support.')
+        return PreparedGeometry(self)
 
     #### GDAL-specific output routines ####
     @property
@@ -707,16 +696,14 @@ from django.contrib.gis.geos.linestring import LineString, LinearRing
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos.polygon import Polygon
 from django.contrib.gis.geos.collections import GeometryCollection, MultiPoint, MultiLineString, MultiPolygon
-GEOS_CLASSES = {0: Point,
-                1: LineString,
-                2: LinearRing,
-                3: Polygon,
-                4: MultiPoint,
-                5: MultiLineString,
-                6: MultiPolygon,
-                7: GeometryCollection,
-                }
-
-# If supported, import the PreparedGeometry class.
-if GEOS_PREPARE:
-    from django.contrib.gis.geos.prepared import PreparedGeometry
+from django.contrib.gis.geos.prepared import PreparedGeometry
+GEOS_CLASSES = {
+    0: Point,
+    1: LineString,
+    2: LinearRing,
+    3: Polygon,
+    4: MultiPoint,
+    5: MultiLineString,
+    6: MultiPolygon,
+    7: GeometryCollection,
+}

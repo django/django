@@ -1,5 +1,4 @@
-from django.contrib.contenttypes.models import ContentType
-from django.core.apps import app_cache, UnavailableApp
+from django.apps import apps
 from django.db import DEFAULT_DB_ALIAS, router
 from django.db.models import signals
 from django.utils.encoding import smart_text
@@ -7,29 +6,32 @@ from django.utils import six
 from django.utils.six.moves import input
 
 
-def update_contenttypes(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, **kwargs):
+def update_contenttypes(app_config, verbosity=2, interactive=True, db=DEFAULT_DB_ALIAS, **kwargs):
     """
     Creates content types for models in the given app, removing any model
     entries that no longer have a matching model class.
     """
+    if not app_config.models_module:
+        return
+
     try:
-        app_cache.get_model('contenttypes', 'ContentType')
-    except UnavailableApp:
+        ContentType = apps.get_model('contenttypes', 'ContentType')
+    except LookupError:
         return
 
     if not router.allow_migrate(db, ContentType):
         return
 
     ContentType.objects.clear_cache()
-    app_models = app_cache.get_models(app)
-    if not app_models:
-        return
-    # They all have the same app_label, get the first one.
-    app_label = app_models[0]._meta.app_label
+
+    app_label = app_config.label
+
     app_models = dict(
         (model._meta.model_name, model)
-        for model in app_models
-    )
+        for model in app_config.get_models())
+
+    if not app_models:
+        return
 
     # Get all the content types
     content_types = dict(
@@ -85,11 +87,13 @@ If you're unsure, answer 'no'.
                 print("Stale content types remain.")
 
 
-def update_all_contenttypes(verbosity=2, **kwargs):
-    for app_config in app_cache.get_app_configs(only_with_models_module=True):
-        update_contenttypes(app_config.models_module, None, verbosity, **kwargs)
+def update_all_contenttypes(**kwargs):
+    for app_config in apps.get_app_configs():
+        update_contenttypes(app_config, **kwargs)
+
 
 signals.post_migrate.connect(update_contenttypes)
+
 
 if __name__ == "__main__":
     update_all_contenttypes()

@@ -44,8 +44,8 @@ hyperlinks to other components:
 =================   =======================
 Django Component    reStructuredText roles
 =================   =======================
-Models              ``:model:`appname.ModelName```
-Views               ``:view:`appname.view_name```
+Models              ``:model:`app_label.ModelName```
+Views               ``:view:`app_label.view_name```
 Template tags       ``:tag:`tagname```
 Template filters    ``:filter:`filtername```
 Templates           ``:template:`path/to/template.html```

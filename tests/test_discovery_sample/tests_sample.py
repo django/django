@@ -13,3 +13,7 @@ class TestDjangoTestCase(DjangoTestCase):
 
     def test_sample(self):
         self.assertEqual(1, 1)
+
+
+class EmptyTestCase(TestCase):
+    pass

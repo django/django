@@ -12,8 +12,7 @@ from django.core.urlresolvers import (reverse, reverse_lazy, resolve, get_callab
     RegexURLPattern)
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils import six
 
 from . import urlconf_outer, middleware, views

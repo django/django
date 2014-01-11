@@ -9,7 +9,7 @@ import socket
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import LiveServerTestCase
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils.http import urlencode
 from django.utils.six.moves.urllib.error import HTTPError
 from django.utils.six.moves.urllib.request import urlopen

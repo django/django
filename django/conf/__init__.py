@@ -7,16 +7,12 @@ a list of all possible variables.
 """
 
 import importlib
-import logging
 import os
-import sys
 import time     # Needed for Windows
-import warnings
 
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import LazyObject, empty
-from django.utils.module_loading import import_by_path
 from django.utils import six
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -44,33 +40,11 @@ class LazySettings(LazyObject):
                 % (desc, ENVIRONMENT_VARIABLE))
 
         self._wrapped = Settings(settings_module)
-        self._configure_logging()
 
     def __getattr__(self, name):
         if self._wrapped is empty:
             self._setup(name)
         return getattr(self._wrapped, name)
-
-    def _configure_logging(self):
-        """
-        Setup logging from LOGGING_CONFIG and LOGGING settings.
-        """
-        if not sys.warnoptions:
-            # Route warnings through python logging
-            logging.captureWarnings(True)
-            # Allow DeprecationWarnings through the warnings filters
-            warnings.simplefilter("default", DeprecationWarning)
-
-        if self.LOGGING_CONFIG:
-            from django.utils.log import DEFAULT_LOGGING
-            # First find the logging configuration function ...
-            logging_config_func = import_by_path(self.LOGGING_CONFIG)
-
-            logging_config_func(DEFAULT_LOGGING)
-
-            # ... then invoke it with the logging settings
-            if self.LOGGING:
-                logging_config_func(self.LOGGING)
 
     def configure(self, default_settings=global_settings, **options):
         """
@@ -84,7 +58,6 @@ class LazySettings(LazyObject):
         for name, value in options.items():
             setattr(holder, name, value)
         self._wrapped = holder
-        self._configure_logging()
 
     @property
     def configured(self):
@@ -104,11 +77,6 @@ class BaseSettings(object):
         elif name == "ALLOWED_INCLUDE_ROOTS" and isinstance(value, six.string_types):
             raise ValueError("The ALLOWED_INCLUDE_ROOTS setting must be set "
                 "to a tuple, not a string.")
-        elif name == "INSTALLED_APPS":
-            value = list(value)  # force evaluation of generators on Python 3
-            if len(value) != len(set(value)):
-                raise ImproperlyConfigured("The INSTALLED_APPS setting must contain unique values.")
-
         object.__setattr__(self, name, value)
 
 

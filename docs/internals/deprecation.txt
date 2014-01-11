@@ -165,19 +165,24 @@ these changes.
 * The ``syncdb`` command will be removed.
 
 * ``django.db.models.signals.pre_syncdb`` and
-  ``django.db.models.signals.post_syncdb`` will be removed, and
-  ``django.db.models.signals.pre_migrate`` and
-  ``django.db.models.signals.post_migrate`` will lose their
-  ``create_models`` and ``created_models`` arguments.
+  ``django.db.models.signals.post_syncdb`` will be removed.
 
 * ``allow_syncdb`` on database routers will no longer automatically become
   ``allow_migrate``.
+
+* All models will need to be defined inside an installed application or
+  declare an explicit :attr:`~django.db.models.Options.app_label`.
+  Furthermore, it won't be possible to import them before their application
+  is loaded. In particular, it won't be possible to import models inside
+  the root package of their application.
 
 * If models are organized in a package, Django will no longer look for
   :ref:`initial SQL data<initial-sql>` in ``myapp/models/sql/``. Move your
   custom SQL files to ``myapp/sql/``.
 
 * The model and form ``IPAddressField`` will be removed.
+
+* ``AppCommand.handle_app()`` will no longer be supported.
 
 * FastCGI support via the ``runfcgi`` management command will be
   removed. Please deploy your project using WSGI.
@@ -222,9 +227,7 @@ these changes.
 * ``django.core.cache.get_cache`` will be removed. Add suitable entries
   to :setting:`CACHES` and use :data:`django.core.cache.caches` instead.
 
-* ``django.db.models.loading`` will be removed. Use the new application
-  loading APIs instead. Several undocumented methods of the ``AppCache`` class
-  will also be removed.
+* ``django.db.models.loading`` will be removed.
 
 * Passing callable arguments to querysets will no longer be possible.
 

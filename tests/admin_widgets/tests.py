@@ -18,7 +18,7 @@ from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import CharField, DateField
 from django.test import TestCase as DjangoTestCase
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils import six
 from django.utils import translation
 
@@ -993,9 +993,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         # The field now contains the selected band's id
         self.selenium.switch_to_window(main_window)
-        self.assertEqual(
-            self.selenium.find_element_by_id('id_main_band').get_attribute('value'),
-            '42')
+        self.wait_for_value('#id_main_band', '42')
 
         # Reopen the popup window and click on another band
         self.selenium.find_element_by_id('lookup_id_main_band').click()
@@ -1007,9 +1005,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         # The field now contains the other selected band's id
         self.selenium.switch_to_window(main_window)
-        self.assertEqual(
-            self.selenium.find_element_by_id('id_main_band').get_attribute('value'),
-            '98')
+        self.wait_for_value('#id_main_band', '98')
 
     def test_many_to_many(self):
         self.admin_login(username='super', password='secret', login_url='/')
@@ -1032,9 +1028,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         # The field now contains the selected band's id
         self.selenium.switch_to_window(main_window)
-        self.assertEqual(
-            self.selenium.find_element_by_id('id_supporting_bands').get_attribute('value'),
-            '42')
+        self.wait_for_value('#id_supporting_bands', '42')
 
         # Reopen the popup window and click on another band
         self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
@@ -1046,9 +1040,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         # The field now contains the two selected bands' ids
         self.selenium.switch_to_window(main_window)
-        self.assertEqual(
-            self.selenium.find_element_by_id('id_supporting_bands').get_attribute('value'),
-            '42,98')
+        self.wait_for_value('#id_supporting_bands', '42,98')
 
 
 class AdminRawIdWidgetSeleniumChromeTests(AdminRawIdWidgetSeleniumFirefoxTests):
@@ -1087,14 +1079,12 @@ class RelatedFieldWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         save_button_css_selector = '.submit-row > input[type=submit]'
         self.selenium.find_element_by_css_selector(save_button_css_selector).click()
         self.selenium.switch_to_window(main_window)
-        # Wait up to 2 seconds for the new option to show up after clicking save in the popup.
-        self.selenium.implicitly_wait(2)
-        self.selenium.find_element_by_css_selector('#id_user option[value=newuser]')
-        self.selenium.implicitly_wait(0)
+        # The field now contains the new user
+        self.wait_for('#id_user option[value="newuser"]')
 
         # Go ahead and submit the form to make sure it works
         self.selenium.find_element_by_css_selector(save_button_css_selector).click()
-        self.wait_page_loaded()
+        self.wait_for_text('li.success', 'The profile "newuser" was added successfully.')
         profiles = models.Profile.objects.all()
         self.assertEqual(len(profiles), 1)
         self.assertEqual(profiles[0].user.username, username_value)

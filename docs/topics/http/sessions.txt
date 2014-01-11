@@ -655,8 +655,8 @@ Session security
 ================
 
 Subdomains within a site are able to set cookies on the client for the whole
-domain. This makes session fixation possible if all subdomains are not
-controlled by trusted users (or, are at least unable to set cookies).
+domain. This makes session fixation possible if cookies are permitted from
+subdomains not controlled by trusted users.
 
 For example, an attacker could log into ``good.example.com`` and get a valid
 session for their account. If the attacker has control over ``bad.example.com``,

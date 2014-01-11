@@ -54,7 +54,7 @@ class SyndicationFeedTest(FeedTestCase):
     """
     Tests for the high-level syndication feed framework.
     """
-    urls = 'syndication.urls'
+    urls = 'syndication_tests.urls'
 
     def test_rss2_feed(self):
         """

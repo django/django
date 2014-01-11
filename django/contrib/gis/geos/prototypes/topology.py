@@ -2,13 +2,14 @@
  This module houses the GEOS ctypes prototype functions for the
  topological operations on geometries.
 """
-__all__ = ['geos_boundary', 'geos_buffer', 'geos_centroid', 'geos_convexhull',
-           'geos_difference', 'geos_envelope', 'geos_intersection',
-           'geos_linemerge', 'geos_pointonsurface', 'geos_preservesimplify',
-           'geos_simplify', 'geos_symdifference', 'geos_union', 'geos_relate']
+__all__ = ['geos_boundary', 'geos_buffer', 'geos_cascaded_union',
+           'geos_centroid', 'geos_convexhull', 'geos_difference',
+           'geos_envelope', 'geos_intersection', 'geos_linemerge',
+           'geos_pointonsurface', 'geos_preservesimplify', 'geos_simplify',
+           'geos_symdifference', 'geos_union', 'geos_relate']
 
 from ctypes import c_double, c_int
-from django.contrib.gis.geos.libgeos import geos_version_info, GEOM_PTR, GEOS_PREPARE
+from django.contrib.gis.geos.libgeos import geos_version_info, GEOM_PTR
 from django.contrib.gis.geos.prototypes.errcheck import check_geom, check_minus_one, check_string
 from django.contrib.gis.geos.prototypes.geom import geos_char_p
 from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
@@ -39,18 +40,15 @@ geos_simplify = topology(GEOSFunc('GEOSSimplify'), c_double)
 geos_symdifference = topology(GEOSFunc('GEOSSymDifference'), GEOM_PTR)
 geos_union = topology(GEOSFunc('GEOSUnion'), GEOM_PTR)
 
+geos_cascaded_union = GEOSFunc('GEOSUnionCascaded')
+geos_cascaded_union.argtypes = [GEOM_PTR]
+geos_cascaded_union.restype = GEOM_PTR
+
 # GEOSRelate returns a string, not a geometry.
 geos_relate = GEOSFunc('GEOSRelate')
 geos_relate.argtypes = [GEOM_PTR, GEOM_PTR]
 geos_relate.restype = geos_char_p
 geos_relate.errcheck = check_string
-
-# Routines only in GEOS 3.1+
-if GEOS_PREPARE:
-    geos_cascaded_union = GEOSFunc('GEOSUnionCascaded')
-    geos_cascaded_union.argtypes = [GEOM_PTR]
-    geos_cascaded_union.restype = GEOM_PTR
-    __all__.append('geos_cascaded_union')
 
 # Linear referencing routines
 info = geos_version_info()

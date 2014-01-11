@@ -1,4 +1,5 @@
-from django.core.apps.cache import AppCache
+from django.apps import AppConfig
+from django.apps.registry import Apps
 from django.db import models
 from django.db.models.options import DEFAULT_NAMES, normalize_unique_together
 from django.utils import six
@@ -18,7 +19,7 @@ class ProjectState(object):
 
     def __init__(self, models=None):
         self.models = models or {}
-        self.app_cache = None
+        self.apps = None
 
     def add_model_state(self, model_state):
         self.models[(model_state.app_label, model_state.name.lower())] = model_state
@@ -30,9 +31,11 @@ class ProjectState(object):
         )
 
     def render(self):
-        "Turns the project state into actual models in a new AppCache"
-        if self.app_cache is None:
-            self.app_cache = AppCache()
+        "Turns the project state into actual models in a new Apps"
+        if self.apps is None:
+            # Populate the app registry with a stub for each application.
+            app_labels = set(model_state.app_label for model_state in self.models.values())
+            self.apps = Apps([AppConfigStub(label) for label in sorted(app_labels)])
             # We keep trying to render the models in a loop, ignoring invalid
             # base errors, until the size of the unrendered models doesn't
             # decrease by at least one, meaning there's a base dependency loop/
@@ -42,19 +45,19 @@ class ProjectState(object):
                 new_unrendered_models = []
                 for model in unrendered_models:
                     try:
-                        model.render(self.app_cache)
+                        model.render(self.apps)
                     except InvalidBasesError:
                         new_unrendered_models.append(model)
                 if len(new_unrendered_models) == len(unrendered_models):
                     raise InvalidBasesError("Cannot resolve bases for %r" % new_unrendered_models)
                 unrendered_models = new_unrendered_models
-        return self.app_cache
+        return self.apps
 
     @classmethod
-    def from_app_cache(cls, app_cache):
-        "Takes in an AppCache and returns a ProjectState matching it"
+    def from_apps(cls, apps):
+        "Takes in an Apps and returns a ProjectState matching it"
         app_models = {}
-        for model in app_cache.get_models():
+        for model in apps.get_models():
             model_state = ModelState.from_model(model)
             app_models[(model_state.app_label, model_state.name.lower())] = model_state
         return cls(app_models)
@@ -66,6 +69,17 @@ class ProjectState(object):
 
     def __ne__(self, other):
         return not (self == other)
+
+
+class AppConfigStub(AppConfig):
+    """
+    Stubs a Django AppConfig. Only provides a label and a dict of models.
+    """
+    def __init__(self, label):
+        super(AppConfigStub, self).__init__(label, None)
+
+    def import_models(self, all_models):
+        self.models = all_models
 
 
 class ModelState(object):
@@ -123,7 +137,7 @@ class ModelState(object):
         options = {}
         for name in DEFAULT_NAMES:
             # Ignore some special options
-            if name in ["app_cache", "app_label"]:
+            if name in ["apps", "app_label"]:
                 continue
             elif name in model._meta.original_attrs:
                 if name == "unique_together":
@@ -133,7 +147,7 @@ class ModelState(object):
                     options[name] = model._meta.original_attrs[name]
         # Make our record
         bases = tuple(
-            ("%s.%s" % (base._meta.app_label, base._meta.object_name.lower()) if hasattr(base, "_meta") else base)
+            ("%s.%s" % (base._meta.app_label, base._meta.model_name) if hasattr(base, "_meta") else base)
             for base in model.__bases__
             if (not hasattr(base, "_meta") or not base._meta.abstract)
         )
@@ -164,20 +178,21 @@ class ModelState(object):
             bases=self.bases,
         )
 
-    def render(self, app_cache):
-        "Creates a Model object from our current state into the given app_cache"
+    def render(self, apps):
+        "Creates a Model object from our current state into the given apps"
         # First, make a Meta object
-        meta_contents = {'app_label': self.app_label, "app_cache": app_cache}
+        meta_contents = {'app_label': self.app_label, "apps": apps}
         meta_contents.update(self.options)
         if "unique_together" in meta_contents:
             meta_contents["unique_together"] = list(meta_contents["unique_together"])
         meta = type("Meta", tuple(), meta_contents)
         # Then, work out our bases
-        bases = tuple(
-            (app_cache.get_model(*base.split(".", 1)) if isinstance(base, six.string_types) else base)
-            for base in self.bases
-        )
-        if None in bases:
+        try:
+            bases = tuple(
+                (apps.get_model(*base.split(".", 1)) if isinstance(base, six.string_types) else base)
+                for base in self.bases
+            )
+        except LookupError:
             raise InvalidBasesError("Cannot resolve one or more bases from %r" % (self.bases,))
         # Turn fields into a dict for the body, add other bits
         body = dict(self.fields)

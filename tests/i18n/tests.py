@@ -11,8 +11,8 @@ from threading import local
 from django.conf import settings
 from django.template import Template, Context
 from django.template.base import TemplateSyntaxError
-from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings, TransRealMixin
+from django.test import TestCase, RequestFactory, override_settings
+from django.test.utils import TransRealMixin
 from django.utils import translation
 from django.utils.formats import (get_format, date_format, time_format,
     localize, localize_input, iter_format_modules, get_format_modules,
@@ -1035,11 +1035,26 @@ class ResolutionOrderI18NTests(TransRealMixin, TestCase):
             "translation of '%s'; the actual result is '%s'." % (msgstr, msgid, result)))
 
 
-@override_settings(INSTALLED_APPS=['i18n.resolution'] + list(settings.INSTALLED_APPS))
 class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
     def test_app_translation(self):
-        self.assertUgettext('Date/time', 'APP')
+        # Original translation.
+        self.assertUgettext('Date/time', 'Datum/Zeit')
+
+        # Different translation.
+        with self.modify_settings(INSTALLED_APPS={'append': 'i18n.resolution'}):
+            self.flush_caches()
+            activate('de')
+
+            # Doesn't work because it's added later in the list.
+            self.assertUgettext('Date/time', 'Datum/Zeit')
+
+            with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.admin'}):
+                self.flush_caches()
+                activate('de')
+
+                # Unless the original is removed from the list.
+                self.assertUgettext('Date/time', 'Datum/Zeit (APP)')
 
 
 @override_settings(LOCALE_PATHS=extended_locale_paths)
@@ -1049,8 +1064,7 @@ class LocalePathsResolutionOrderI18NTests(ResolutionOrderI18NTests):
         self.assertUgettext('Time', 'LOCALE_PATHS')
 
     def test_locale_paths_override_app_translation(self):
-        extended_apps = list(settings.INSTALLED_APPS) + ['i18n.resolution']
-        with self.settings(INSTALLED_APPS=extended_apps):
+        with self.settings(INSTALLED_APPS=['i18n.resolution']):
             self.assertUgettext('Time', 'LOCALE_PATHS')
 
 

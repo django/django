@@ -1,50 +1,38 @@
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import os
 import sys
 
-from django.conf import settings
-from django.core.apps import app_cache
 from django.core.management import call_command
 from django.test import TestCase, TransactionTestCase
-from django.test.utils import override_settings
 from django.utils._os import upath
 
 from .models import (ConcreteModel, ConcreteModelSubclass,
     ConcreteModelSubclassProxy)
 
 
-@override_settings(INSTALLED_APPS=('app1', 'app2'))
 class ProxyModelInheritanceTests(TransactionTestCase):
     """
     Proxy model inheritance across apps can result in migrate not creating the table
     for the proxied model (as described in #12286).  This test creates two dummy
     apps and calls migrate, then verifies that the table has been created.
     """
-
     available_apps = []
 
     def setUp(self):
         self.old_sys_path = sys.path[:]
         sys.path.append(os.path.dirname(os.path.abspath(upath(__file__))))
-        for app in settings.INSTALLED_APPS:
-            app_cache.load_app(app)
 
     def tearDown(self):
         sys.path = self.old_sys_path
-        del app_cache.app_configs['app1']
-        del app_cache.app_configs['app2']
 
     def test_table_exists(self):
-        try:
-            app_cache.set_available_apps(settings.INSTALLED_APPS)
+        with self.modify_settings(INSTALLED_APPS={'append': ['app1', 'app2']}):
             call_command('migrate', verbosity=0)
-        finally:
-            app_cache.unset_available_apps()
-        from .app1.models import ProxyModel
-        from .app2.models import NiceModel
-        self.assertEqual(NiceModel.objects.all().count(), 0)
-        self.assertEqual(ProxyModel.objects.all().count(), 0)
+            from app1.models import ProxyModel
+            from app2.models import NiceModel
+            self.assertEqual(NiceModel.objects.all().count(), 0)
+            self.assertEqual(ProxyModel.objects.all().count(), 0)
 
 
 class MultiTableInheritanceProxyTest(TestCase):
@@ -54,7 +42,6 @@ class MultiTableInheritanceProxyTest(TestCase):
         Deleting an instance of a model proxying a multi-table inherited
         subclass should cascade delete down the whole inheritance chain (see
         #18083).
-
         """
         instance = ConcreteModelSubclassProxy.objects.create()
         instance.delete()

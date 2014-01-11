@@ -14,8 +14,7 @@ from django.conf import settings
 from django.core.cache.backends.base import BaseCache
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils.encoding import force_text
 from django.utils.functional import empty
 from django.utils._os import rmtree_errorhandler, upath
@@ -225,6 +224,17 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
         self.assertIn('apps', force_text(lines[1]))
 
 
+class TestConfiguration(StaticFilesTestCase):
+    def test_location_empty(self):
+        err = six.StringIO()
+        for root in ['', None]:
+            with override_settings(STATIC_ROOT=root):
+                with six.assertRaisesRegex(
+                        self, ImproperlyConfigured,
+                        'without having set the STATIC_ROOT setting to a filesystem path'):
+                    call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
+
+
 class TestCollection(CollectionTestCase, TestDefaults):
     """
     Test ``collectstatic`` management command.
@@ -298,7 +308,7 @@ class TestCollectionDryRun(CollectionTestCase, TestNoFilesCreated):
 class TestCollectionFilesOverride(CollectionTestCase):
     """
     Test overriding duplicated files by ``collectstatic`` management command.
-    Check for proper handling of apps order in INSTALLED_APPS even if file modification
+    Check for proper handling of apps order in installed apps even if file modification
     dates are in different order:
 
         'staticfiles_tests.apps.test',
@@ -314,7 +324,7 @@ class TestCollectionFilesOverride(CollectionTestCase):
         # prepare duplicate of file2.txt from no_label app
         # this file will have modification time older than no_label/static/file2.txt
         # anyway it should be taken to STATIC_ROOT because 'test' app is before
-        # 'no_label' app in INSTALLED_APPS
+        # 'no_label' app in installed apps
         self.testfile_path = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'file2.txt')
         with open(self.testfile_path, 'w+') as f:
             f.write('duplicate of file2.txt')
@@ -340,7 +350,7 @@ class TestCollectionFilesOverride(CollectionTestCase):
         self.assertFileContains('file2.txt', 'duplicate of file2.txt')
 
         # and now change modification time of no_label/static/file2.txt
-        # test app is first in INSTALLED_APPS so file2.txt should remain unmodified
+        # test app is first in installed apps so file2.txt should remain unmodified
         mtime = os.path.getmtime(self.testfile_path)
         atime = os.path.getatime(self.testfile_path)
         os.utime(self.orig_path, (mtime + 1, atime + 1))

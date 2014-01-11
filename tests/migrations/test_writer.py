@@ -5,11 +5,10 @@ from __future__ import unicode_literals
 import datetime
 import os
 
-from django.core.apps import app_cache
 from django.core.validators import RegexValidator, EmailValidator
 from django.db import models, migrations
 from django.db.migrations.writer import MigrationWriter
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.utils import six
 from django.utils.deconstruct import deconstructible
 from django.utils.translation import ugettext_lazy as _
@@ -122,9 +121,8 @@ class WriterTests(TestCase):
 
         base_dir = os.path.dirname(os.path.dirname(__file__))
 
-        with override_settings(INSTALLED_APPS=test_apps):
-            for app in test_apps:
-                app_cache.load_app(app)
+        for app in test_apps:
+            with self.modify_settings(INSTALLED_APPS={'append': app}):
                 migration = migrations.Migration('0001_initial', app.split('.')[-1])
                 expected_path = os.path.join(base_dir, *(app.split('.') + ['migrations', '0001_initial.py']))
                 writer = MigrationWriter(migration)

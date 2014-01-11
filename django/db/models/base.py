@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 import copy
 import sys
 from functools import update_wrapper
-from django.utils.six.moves import zip
+import warnings
 
-from django.core.apps import app_cache
-from django.core.apps.cache import MODELS_MODULE_NAME
+from django.apps import apps
+from django.apps.base import MODELS_MODULE_NAME
 import django.db.models.manager  # NOQA: Imported to register signal handler.
 from django.conf import settings
 from django.core.exceptions import (ObjectDoesNotExist,
@@ -25,6 +25,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
 from django.utils.encoding import force_str, force_text
 from django.utils import six
+from django.utils.six.moves import zip
 from django.utils.text import get_text_list, capfirst
 
 
@@ -86,23 +87,42 @@ class ModelBase(type):
             meta = attr_meta
         base_meta = getattr(new_class, '_meta', None)
 
+        # Look for an application configuration to attach the model to.
+        app_config = apps.get_containing_app_config(module)
+
         if getattr(meta, 'app_label', None) is None:
-            # Figure out the app_label by looking one level up from the package
-            # or module named 'models'. If no such package or module exists,
-            # fall back to looking one level up from the module this model is
-            # defined in.
 
-            # For 'django.contrib.sites.models', this would be 'sites'.
-            # For 'geo.models.places' this would be 'geo'.
+            if app_config is None:
+                # If the model is imported before the configuration for its
+                # application is created (#21719), or isn't in an installed
+                # application (#21680), use the legacy logic to figure out the
+                # app_label by looking one level up from the package or module
+                # named 'models'. If no such package or module exists, fall
+                # back to looking one level up from the module this model is
+                # defined in.
 
-            model_module = sys.modules[new_class.__module__]
-            package_components = model_module.__name__.split('.')
-            package_components.reverse()  # find the last occurrence of 'models'
-            try:
-                app_label_index = package_components.index(MODELS_MODULE_NAME) + 1
-            except ValueError:
-                app_label_index = 1
-            kwargs = {"app_label": package_components[app_label_index]}
+                # For 'django.contrib.sites.models', this would be 'sites'.
+                # For 'geo.models.places' this would be 'geo'.
+
+                warnings.warn(
+                    "Model class %s.%s doesn't declare an explicit app_label "
+                    "and either isn't in an application in  INSTALLED_APPS "
+                    "or else was imported before its application was loaded. "
+                    "This will no longer be supported in Django 1.9."
+                    % (module, name), PendingDeprecationWarning, stacklevel=2)
+
+                model_module = sys.modules[new_class.__module__]
+                package_components = model_module.__name__.split('.')
+                package_components.reverse()  # find the last occurrence of 'models'
+                try:
+                    app_label_index = package_components.index(MODELS_MODULE_NAME) + 1
+                except ValueError:
+                    app_label_index = 1
+                kwargs = {"app_label": package_components[app_label_index]}
+
+            else:
+                kwargs = {"app_label": app_config.label}
+
         else:
             kwargs = {}
 
@@ -149,12 +169,6 @@ class ModelBase(type):
                 # set explicitly.
                 new_class._default_manager = new_class._default_manager._copy_to_model(new_class)
                 new_class._base_manager = new_class._base_manager._copy_to_model(new_class)
-
-        # Bail out early if we have already created this class.
-        m = new_class._meta.app_cache.get_model(new_class._meta.app_label, name,
-                      seed_cache=False, only_installed=False)
-        if m is not None:
-            return m
 
         # Add all attributes to the class.
         for obj_name, obj in attrs.items():
@@ -273,14 +287,8 @@ class ModelBase(type):
             return new_class
 
         new_class._prepare()
-
-        new_class._meta.app_cache.register_model(new_class._meta.app_label, new_class)
-        # Because of the way imports happen (recursively), we may or may not be
-        # the first time this model tries to register with the framework. There
-        # should only be one class for each model, so we always return the
-        # registered version.
-        return new_class._meta.app_cache.get_model(new_class._meta.app_label, name,
-                         seed_cache=False, only_installed=False)
+        new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
+        return new_class
 
     def copy_managers(cls, base_managers):
         # This is in-place sorting of an Options attribute, but that's fine.
@@ -1067,7 +1075,7 @@ def model_unpickle(model_id, attrs, factory):
     Used to unpickle Model subclasses with deferred fields.
     """
     if isinstance(model_id, tuple):
-        model = app_cache.get_model(*model_id)
+        model = apps.get_model(*model_id)
     else:
         # Backwards compat - the model was cached directly in earlier versions.
         model = model_id

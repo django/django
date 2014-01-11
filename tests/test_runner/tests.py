@@ -3,7 +3,6 @@ Tests for django test runner
 """
 from __future__ import unicode_literals
 
-from importlib import import_module
 from optparse import make_option
 import types
 import unittest
@@ -225,24 +224,21 @@ class ModulesTestsPackages(IgnoreAllDeprecationWarningsMixin, unittest.TestCase)
 
     def test_get_tests(self):
         "Check that the get_tests helper function can find tests in a directory"
-        from django.core.apps.base import AppConfig
+        from django.apps import AppConfig
         from django.test.simple import get_tests
-        app_config = AppConfig(
-            'test_runner.valid_app',
-            import_module('test_runner.valid_app'),
-            import_module('test_runner.valid_app.models'))
+        app_config = AppConfig.create('test_runner.valid_app')
+        app_config.import_models({})
         tests = get_tests(app_config)
         self.assertIsInstance(tests, types.ModuleType)
 
     def test_import_error(self):
         "Test for #12658 - Tests with ImportError's shouldn't fail silently"
-        from django.core.apps.base import AppConfig
+        from django.apps import AppConfig
         from django.test.simple import get_tests
-        app_config = AppConfig(
-            'test_runner_invalid_app',
-            import_module('test_runner_invalid_app'),
-            import_module('test_runner_invalid_app.models'))
-        self.assertRaises(ImportError, get_tests, app_config)
+        app_config = AppConfig.create('test_runner_invalid_app')
+        app_config.import_models({})
+        with self.assertRaises(ImportError):
+            get_tests(app_config)
 
 
 class Sqlite3InMemoryTestDbs(TestCase):
@@ -368,12 +364,14 @@ class DeprecationDisplayTest(AdminScriptTestCase):
     def test_runner_deprecation_verbosity_default(self):
         args = ['test', '--settings=test_project.settings', 'test_runner_deprecation_app']
         out, err = self.run_django_admin(args)
+        self.assertIn("Ran 1 test", err)
         self.assertIn("DeprecationWarning: warning from test", err)
         self.assertIn("DeprecationWarning: module-level warning from deprecation_app", err)
 
     def test_runner_deprecation_verbosity_zero(self):
-        args = ['test', '--settings=settings', '--verbosity=0']
+        args = ['test', '--settings=test_project.settings', '--verbosity=0', 'test_runner_deprecation_app']
         out, err = self.run_django_admin(args)
+        self.assertIn("Ran 1 test", err)
         self.assertFalse("DeprecationWarning: warning from test" in err)
 
 

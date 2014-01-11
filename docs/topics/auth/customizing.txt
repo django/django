@@ -477,7 +477,7 @@ password resets. You must then provide some key implementation details:
         as the identifying field::
 
             class MyUser(AbstractBaseUser):
-                identifier = models.CharField(max_length=40, unique=True, db_index=True)
+                identifier = models.CharField(max_length=40, unique=True)
                 ...
                 USERNAME_FIELD = 'identifier'
 
@@ -965,7 +965,6 @@ authentication app::
             verbose_name='email address',
             max_length=255,
             unique=True,
-            db_index=True,
         )
         date_of_birth = models.DateField()
         is_active = models.BooleanField(default=True)

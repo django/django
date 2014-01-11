@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
 from django.contrib.sites.models import Site
-from django.test import TestCase
+from django.test import TestCase, modify_settings
 from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils._os import upath
 
@@ -18,6 +18,7 @@ if HAS_GEOS:
     from .models import City, Country
 
 
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'})
 @skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoSitemapTest(IgnoreDeprecationWarningsMixin, TestCase):
 
@@ -26,12 +27,6 @@ class GeoSitemapTest(IgnoreDeprecationWarningsMixin, TestCase):
     def setUp(self):
         super(GeoSitemapTest, self).setUp()
         Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
-        self._old_installed = Site._meta.app_config.installed
-        Site._meta.app_config.installed = True
-
-    def tearDown(self):
-        Site._meta.app_config.installed = self._old_installed
-        super(GeoSitemapTest, self).tearDown()
 
     def assertChildNodes(self, elem, expected):
         "Taken from syndication/tests.py."

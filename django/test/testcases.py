@@ -15,9 +15,9 @@ import unittest
 from unittest import skipIf         # NOQA: Imported here for backward compatibility
 from unittest.util import safe_repr
 
+from django.apps import apps
 from django.conf import settings
 from django.core import mail
-from django.core.apps import app_cache
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.core.handlers.wsgi import get_path_info, WSGIHandler
 from django.core.management import call_command
@@ -30,9 +30,9 @@ from django.forms.fields import CharField
 from django.http import QueryDict
 from django.test.client import Client
 from django.test.html import HTMLParseError, parse_html
-from django.test.signals import template_rendered
+from django.test.signals import setting_changed, template_rendered
 from django.test.utils import (CaptureQueriesContext, ContextList,
-    override_settings, compare_xml)
+    override_settings, modify_settings, compare_xml)
 from django.utils.encoding import force_text
 from django.utils import six
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit, urlparse, unquote
@@ -164,7 +164,8 @@ class SimpleTestCase(unittest.TestCase):
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
-    _custom_settings = None
+    _overridden_settings = None
+    _modified_settings = None
 
     def __call__(self, result=None):
         """
@@ -197,9 +198,12 @@ class SimpleTestCase(unittest.TestCase):
         * If the class has a 'urls' attribute, replace ROOT_URLCONF with it.
         * Clearing the mail test outbox.
         """
-        if self._custom_settings:
-            self._overridden = override_settings(**self._custom_settings)
-            self._overridden.enable()
+        if self._overridden_settings:
+            self._overridden_context = override_settings(**self._overridden_settings)
+            self._overridden_context.enable()
+        if self._modified_settings:
+            self._modified_context = modify_settings(self._modified_settings)
+            self._modified_context.enable()
         self.client = self.client_class()
         self._urlconf_setup()
         mail.outbox = []
@@ -217,8 +221,10 @@ class SimpleTestCase(unittest.TestCase):
         * Putting back the original ROOT_URLCONF if it was changed.
         """
         self._urlconf_teardown()
-        if self._custom_settings:
-            self._overridden.disable()
+        if self._modified_settings:
+            self._modified_context.disable()
+        if self._overridden_settings:
+            self._overridden_context.disable()
 
     def _urlconf_teardown(self):
         set_urlconf(None)
@@ -232,6 +238,13 @@ class SimpleTestCase(unittest.TestCase):
         back to the original value when exiting the context.
         """
         return override_settings(**kwargs)
+
+    def modify_settings(self, **kwargs):
+        """
+        A context manager that temporarily applies changes a list setting and
+        reverts back to the original value when exiting the context.
+        """
+        return modify_settings(**kwargs)
 
     def assertRedirects(self, response, expected_url, status_code=302,
                         target_status_code=200, host=None, msg_prefix='',
@@ -719,20 +732,29 @@ class TransactionTestCase(SimpleTestCase):
         """Performs any pre-test setup. This includes:
 
         * If the class has an 'available_apps' attribute, restricting the app
-          cache to these applications, then firing post_migrate -- it must run
-          with the correct set of applications for the test case.
+          registry to these applications, then firing post_migrate -- it must
+          run with the correct set of applications for the test case.
         * If the class has a 'fixtures' attribute, installing these fixtures.
         """
         super(TransactionTestCase, self)._pre_setup()
         if self.available_apps is not None:
-            app_cache.set_available_apps(self.available_apps)
+            apps.set_available_apps(self.available_apps)
+            setting_changed.send(sender=settings._wrapped.__class__,
+                                 setting='INSTALLED_APPS',
+                                 value=self.available_apps,
+                                 enter=True)
             for db_name in self._databases_names(include_mirrors=False):
                 flush.Command.emit_post_migrate(verbosity=0, interactive=False, database=db_name)
         try:
             self._fixture_setup()
         except Exception:
             if self.available_apps is not None:
-                app_cache.unset_available_apps()
+                apps.unset_available_apps()
+                setting_changed.send(sender=settings._wrapped.__class__,
+                                     setting='INSTALLED_APPS',
+                                     value=settings.INSTALLED_APPS,
+                                     enter=False)
+
             raise
 
     def _databases_names(self, include_mirrors=True):
@@ -786,7 +808,12 @@ class TransactionTestCase(SimpleTestCase):
             for conn in connections.all():
                 conn.close()
         finally:
-            app_cache.unset_available_apps()
+            if self.available_apps is not None:
+                apps.unset_available_apps()
+                setting_changed.send(sender=settings._wrapped.__class__,
+                                     setting='INSTALLED_APPS',
+                                     value=settings.INSTALLED_APPS,
+                                     enter=False)
 
     def _fixture_teardown(self):
         # Allow TRUNCATE ... CASCADE and don't emit the post_migrate signal

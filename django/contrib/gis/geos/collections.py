@@ -3,9 +3,8 @@
  GeometryCollection, MultiPoint, MultiLineString, and MultiPolygon
 """
 from ctypes import c_int, c_uint, byref
-from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.geometry import GEOSGeometry
-from django.contrib.gis.geos.libgeos import get_pointer_arr, GEOS_PREPARE
+from django.contrib.gis.geos.libgeos import get_pointer_arr
 from django.contrib.gis.geos.linestring import LineString, LinearRing
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos.polygon import Polygon
@@ -119,10 +118,7 @@ class MultiPolygon(GeometryCollection):
     @property
     def cascaded_union(self):
         "Returns a cascaded union of this MultiPolygon."
-        if GEOS_PREPARE:
-            return GEOSGeometry(capi.geos_cascaded_union(self.ptr), self.srid)
-        else:
-            raise GEOSException('The cascaded union operation requires GEOS 3.1+.')
+        return GEOSGeometry(capi.geos_cascaded_union(self.ptr), self.srid)
 
 # Setting the allowed types here since GeometryCollection is defined before
 # its subclasses.

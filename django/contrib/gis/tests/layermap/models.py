@@ -1,60 +1,74 @@
 from django.contrib.gis.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
-class State(models.Model):
-    name = models.CharField(max_length=20)
+@python_2_unicode_compatible
+class NamedModel(models.Model):
+    name = models.CharField(max_length=25)
+
     objects = models.GeoManager()
 
+    class Meta:
+        abstract = True
+        app_label = 'layermap'
 
-class County(models.Model):
-    name = models.CharField(max_length=25)
+    def __str__(self):
+        return self.name
+
+
+class State(NamedModel):
+    pass
+
+
+class County(NamedModel):
     state = models.ForeignKey(State)
     mpoly = models.MultiPolygonField(srid=4269)  # Multipolygon in NAD83
-    objects = models.GeoManager()
 
 
-class CountyFeat(models.Model):
-    name = models.CharField(max_length=25)
+class CountyFeat(NamedModel):
     poly = models.PolygonField(srid=4269)
-    objects = models.GeoManager()
 
 
-class City(models.Model):
-    name = models.CharField(max_length=25)
+class City(NamedModel):
     name_txt = models.TextField(default='')
     population = models.IntegerField()
     density = models.DecimalField(max_digits=7, decimal_places=1)
     dt = models.DateField()
     point = models.PointField()
-    objects = models.GeoManager()
 
 
-class Interstate(models.Model):
-    name = models.CharField(max_length=20)
+class Interstate(NamedModel):
     length = models.DecimalField(max_digits=6, decimal_places=2)
     path = models.LineStringField()
-    objects = models.GeoManager()
 
 
 # Same as `City` above, but for testing model inheritance.
-class CityBase(models.Model):
-    name = models.CharField(max_length=25)
+class CityBase(NamedModel):
     population = models.IntegerField()
     density = models.DecimalField(max_digits=7, decimal_places=1)
     point = models.PointField()
-    objects = models.GeoManager()
 
 
 class ICity1(CityBase):
     dt = models.DateField()
 
+    class Meta(CityBase.Meta):
+        pass
+
 
 class ICity2(ICity1):
     dt_time = models.DateTimeField(auto_now=True)
 
+    class Meta(ICity1.Meta):
+        pass
+
 
 class Invalid(models.Model):
     point = models.PointField()
+
+    class Meta:
+        app_label = 'layermap'
+
 
 # Mapping dictionaries for the models above.
 co_mapping = {'name': 'Name',

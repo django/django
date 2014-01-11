@@ -2,12 +2,6 @@
 Testing in Django
 =================
 
-.. toctree::
-   :hidden:
-
-   overview
-   advanced
-
 Automated testing is an extremely useful bug-killing tool for the modern
 Web developer. You can use a collection of tests -- a **test suite** -- to
 solve, or avoid, a number of problems:
@@ -28,9 +22,6 @@ it should be doing.
 
 The best part is, it's really easy.
 
-Where to go from here
-=====================
-
 The preferred way to write tests in Django is using the :mod:`unittest` module
 built in to the Python standard library. This is covered in detail in the
 :doc:`overview` document.
@@ -38,3 +29,10 @@ built in to the Python standard library. This is covered in detail in the
 You can also use any *other* Python test framework; Django provides an API and
 tools for that kind of integration. They are described in the
 :ref:`other-testing-frameworks` section of :doc:`advanced`.
+
+.. toctree::
+   :maxdepth: 1
+
+   overview
+   tools
+   advanced

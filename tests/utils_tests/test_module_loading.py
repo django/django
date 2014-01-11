@@ -6,8 +6,7 @@ import unittest
 from zipimport import zipimporter
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from django.test import SimpleTestCase, modify_settings
 from django.utils import six
 from django.utils.module_loading import autodiscover_modules, import_by_path, module_has_submodule
 from django.utils._os import upath
@@ -135,7 +134,7 @@ class ModuleImportTestCase(unittest.TestCase):
             'Should have more than the calling frame in the traceback.')
 
 
-@override_settings(INSTALLED_APPS=('utils_tests.test_module',))
+@modify_settings(INSTALLED_APPS={'append': 'utils_tests.test_module'})
 class AutodiscoverModulesTestCase(SimpleTestCase):
 
     def test_autodiscover_modules_found(self):

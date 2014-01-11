@@ -8,6 +8,7 @@ from copy import copy
 from importlib import import_module
 from io import BytesIO
 
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.core.handlers.base import BaseHandler
@@ -82,10 +83,9 @@ def closing_iterator_wrapper(iterable, close):
 
 class ClientHandler(BaseHandler):
     """
-    A HTTP Handler that can be used for testing purposes.
-    Uses the WSGI interface to compose requests, but returns the raw
-    HttpResponse object with the originating WSGIRequest attached to its
-    ``request_instance`` attribute.
+    A HTTP Handler that can be used for testing purposes. Uses the WSGI
+    interface to compose requests, but returns the raw HttpResponse object with
+    the originating WSGIRequest attached to its ``wsgi_request`` attribute.
     """
     def __init__(self, enforce_csrf_checks=True, *args, **kwargs):
         self.enforce_csrf_checks = enforce_csrf_checks
@@ -111,7 +111,7 @@ class ClientHandler(BaseHandler):
         response = self.get_response(request)
         # Attach the originating request to the response so that it could be
         # later retrieved.
-        response.request_instance = request
+        response.wsgi_request = request
 
         # We're emulating a WSGI server; we must call the close method
         # on completion.
@@ -389,7 +389,7 @@ class Client(RequestFactory):
         """
         Obtains the current session variables.
         """
-        if 'django.contrib.sessions' in settings.INSTALLED_APPS:
+        if apps.is_installed('django.contrib.sessions'):
             engine = import_module(settings.SESSION_ENGINE)
             cookie = self.cookies.get(settings.SESSION_COOKIE_NAME, None)
             if cookie:
@@ -550,11 +550,11 @@ class Client(RequestFactory):
         """
         user = authenticate(**credentials)
         if (user and user.is_active and
-                'django.contrib.sessions' in settings.INSTALLED_APPS):
+                apps.is_installed('django.contrib.sessions')):
             engine = import_module(settings.SESSION_ENGINE)
 
             # Create a fake request that goes through request middleware
-            request = self.request().request_instance
+            request = self.request().wsgi_request
 
             if self.session:
                 request.session = self.session
@@ -588,7 +588,7 @@ class Client(RequestFactory):
         Causes the authenticated user to be logged out.
         """
         # Create a fake request that goes through request middleware
-        request = self.request().request_instance
+        request = self.request().wsgi_request
 
         engine = import_module(settings.SESSION_ENGINE)
         UserModel = get_user_model()

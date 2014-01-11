@@ -12,28 +12,29 @@ from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMessage
 from django.core.servers.basehttp import FileWrapper
 from django.conf.urls import patterns, url
-from django.db import models
 from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, StreamingHttpResponse
 from django.contrib.admin import BooleanFieldListFilter
 from django.utils.six import StringIO
 
-from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
-    Widget, DooHickey, Grommet, Whatsit, FancyDoodad, Category, Link,
+from .models import (Article, Chapter, Child, Parent, Picture, Widget,
+    DooHickey, Grommet, Whatsit, FancyDoodad, Category, Link,
     PrePopulatedPost, PrePopulatedSubPost, CustomArticle, Section,
-    ModelWithStringPrimaryKey, Color, Thing, Actor, Inquisition, Sketch, Person,
-    Persona, Subscriber, ExternalSubscriber, OldSubscriber, Vodcast, EmptyModel,
-    Fabric, Gallery, Language, Recommendation, Recommender, Collector, Post,
-    Gadget, Villain, SuperVillain, Plot, PlotDetails, CyclicOne, CyclicTwo,
-    WorkHour, Reservation, FoodDelivery, RowLevelChangePermissionModel, Paper,
+    ModelWithStringPrimaryKey, Color, Thing, Actor, Inquisition, Sketch,
+    Person, Persona, FooAccount, BarAccount, Subscriber, ExternalSubscriber,
+    OldSubscriber, Podcast, Vodcast, EmptyModel, Fabric, Gallery, Language,
+    Recommendation, Recommender, Collector, Post, Gadget, Villain,
+    SuperVillain, Plot, PlotDetails, CyclicOne, CyclicTwo, WorkHour,
+    Reservation, FoodDelivery, RowLevelChangePermissionModel, Paper,
     CoverLetter, Story, OtherStory, Book, Promo, ChapterXtra1, Pizza, Topping,
-    Album, Question, Answer, ComplexSortedPerson, PluggableSearchPerson, PrePopulatedPostLargeSlug,
-    AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
-    AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
-    RelatedPrepopulated, UndeletableObject, UnchangeableObject, UserMessenger, Simple, Choice,
-    ShortMessage, Telegram, FilteredManager, EmptyModelHidden,
-    EmptyModelVisible, EmptyModelMixin, State, City, Restaurant, Worker,
-    ParentWithDependentChildren, DependentChild)
+    Album, Question, Answer, ComplexSortedPerson, PluggableSearchPerson,
+    PrePopulatedPostLargeSlug, AdminOrderedField, AdminOrderedModelMethod,
+    AdminOrderedAdminMethod, AdminOrderedCallable, Report, Color2,
+    UnorderedObject, MainPrepopulated, RelatedPrepopulated, UndeletableObject,
+    UnchangeableObject, UserMessenger, Simple, Choice, ShortMessage, Telegram,
+    FilteredManager, EmptyModelHidden, EmptyModelVisible, EmptyModelMixin,
+    State, City, Restaurant, Worker, ParentWithDependentChildren,
+    DependentChild)
 
 
 def callable_year(dt_value):
@@ -190,16 +191,6 @@ class PersonAdmin(admin.ModelAdmin):
         return super(PersonAdmin, self).get_queryset(request).order_by('age')
 
 
-class FooAccount(Account):
-    """A service-specific account of type Foo."""
-    servicename = 'foo'
-
-
-class BarAccount(Account):
-    """A service-specific account of type Bar."""
-    servicename = 'bar'
-
-
 class FooAccountAdmin(admin.StackedInline):
     model = FooAccount
     extra = 1
@@ -259,13 +250,6 @@ no_perm.short_description = 'No permission to run'
 
 class ExternalSubscriberAdmin(admin.ModelAdmin):
     actions = [redirect_to, external_mail, download, no_perm]
-
-
-class Podcast(Media):
-    release_date = models.DateField()
-
-    class Meta:
-        ordering = ('release_date',)  # overridden in PodcastAdmin
 
 
 class PodcastAdmin(admin.ModelAdmin):

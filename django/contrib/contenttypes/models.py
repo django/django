@@ -1,4 +1,4 @@
-from django.core.apps import app_cache
+from django.apps import apps
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_text, force_text
@@ -157,8 +157,10 @@ class ContentType(models.Model):
 
     def model_class(self):
         "Returns the Python model class for this type of content."
-        return app_cache.get_model(self.app_label, self.model,
-                                only_installed=False)
+        try:
+            return apps.get_model(self.app_label, self.model)
+        except LookupError:
+            return None
 
     def get_object_for_this_type(self, **kwargs):
         """

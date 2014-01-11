@@ -1,20 +1,21 @@
-from unittest import skipIf
+from unittest import skipUnless
 
 from django import http
-from django.conf import settings, global_settings
+from django.apps import apps
+from django.conf import global_settings
 from django.contrib.messages import constants, utils, get_level, set_level
 from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.constants import DEFAULT_LEVELS
 from django.contrib.messages.storage import default_storage, base
 from django.contrib.messages.storage.base import Message
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
+from django.test import modify_settings, override_settings
 from django.utils.translation import ugettext_lazy
 
 
 def skipUnlessAuthIsInstalled(func):
-    return skipIf(
-        'django.contrib.auth' not in settings.INSTALLED_APPS,
+    return skipUnless(
+        apps.is_installed('django.contrib.auth'),
         "django.contrib.auth isn't installed")(func)
 
 
@@ -218,16 +219,12 @@ class BaseTests(object):
         for msg in data['messages']:
             self.assertContains(response, msg)
 
-    @override_settings(
-        INSTALLED_APPS=filter(
-            lambda app: app != 'django.contrib.messages', settings.INSTALLED_APPS),
-        MIDDLEWARE_CLASSES=filter(
-            lambda m: 'MessageMiddleware' not in m, settings.MIDDLEWARE_CLASSES),
-        TEMPLATE_CONTEXT_PROCESSORS=filter(
-            lambda p: 'context_processors.messages' not in p,
-            settings.TEMPLATE_CONTEXT_PROCESSORS),
-        MESSAGE_LEVEL=constants.DEBUG
+    @modify_settings(
+        INSTALLED_APPS={'remove': 'django.contrib.messages'},
+        MIDDLEWARE_CLASSES={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
+        TEMPLATE_CONTEXT_PROCESSORS={'remove': 'django.contrib.messages.context_processors.messages'},
     )
+    @override_settings(MESSAGE_LEVEL=constants.DEBUG)
     def test_middleware_disabled(self):
         """
         Tests that, when the middleware is disabled, an exception is raised
@@ -243,15 +240,10 @@ class BaseTests(object):
             self.assertRaises(MessageFailure, self.client.post, add_url,
                               data, follow=True)
 
-    @override_settings(
-        INSTALLED_APPS=filter(
-            lambda app: app != 'django.contrib.messages', settings.INSTALLED_APPS),
-        MIDDLEWARE_CLASSES=filter(
-            lambda m: 'MessageMiddleware' not in m, settings.MIDDLEWARE_CLASSES),
-        TEMPLATE_CONTEXT_PROCESSORS=filter(
-            lambda p: 'context_processors.messages' not in p,
-            settings.TEMPLATE_CONTEXT_PROCESSORS),
-        MESSAGE_LEVEL=constants.DEBUG
+    @modify_settings(
+        INSTALLED_APPS={'remove': 'django.contrib.messages'},
+        MIDDLEWARE_CLASSES={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
+        TEMPLATE_CONTEXT_PROCESSORS={'remove': 'django.contrib.messages.context_processors.messages'},
     )
     def test_middleware_disabled_fail_silently(self):
         """

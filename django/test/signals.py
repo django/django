@@ -28,6 +28,23 @@ def clear_cache_handlers(**kwargs):
 
 
 @receiver(setting_changed)
+def update_installed_apps(**kwargs):
+    if kwargs['setting'] == 'INSTALLED_APPS':
+        # Rebuild any AppDirectoriesFinder instance.
+        from django.contrib.staticfiles.finders import get_finder
+        get_finder.cache_clear()
+        # Rebuild app_template_dirs cache.
+        from django.template.loaders import app_directories as mod
+        mod.app_template_dirs = mod.calculate_app_template_dirs()
+        # Rebuild templatetags module cache.
+        from django.template import base
+        base.templatetags_modules[:] = []
+        # Rebuild management commands cache
+        from django.core.management import get_commands
+        get_commands.cache_clear()
+
+
+@receiver(setting_changed)
 def update_connections_time_zone(**kwargs):
     if kwargs['setting'] == 'TIME_ZONE':
         # Reset process time zone

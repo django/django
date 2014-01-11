@@ -172,8 +172,7 @@ three-dimensonal support.
 
 .. note::
 
-    At this time 3D support requires that GEOS 3.1 be installed, and is
-    limited only to the PostGIS spatial backend.
+    At this time 3D support is limited to the PostGIS spatial backend.
 
 ``geography``
 -------------

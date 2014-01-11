@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 
 import os
 import sys
+import warnings
 
 from optparse import make_option, OptionParser
 
@@ -112,8 +113,8 @@ class BaseCommand(object):
     ``args``
         A string listing the arguments accepted by the command,
         suitable for use in help messages; e.g., a command which takes
-        a list of application names might set this to '<appname
-        appname ...>'.
+        a list of application names might set this to '<app_label
+        app_label ...>'.
 
     ``can_import_settings``
         A boolean indicating whether the command needs to be able to
@@ -140,8 +141,8 @@ class BaseCommand(object):
         performed prior to executing the command. Default value is
         ``True``. To validate an individual application's models
         rather than all applications' models, call
-        ``self.validate(app)`` from ``handle()``, where ``app`` is the
-        application's Python module.
+        ``self.validate(app_config)`` from ``handle()``, where ``app_config``
+        is the application's configuration provided by the app registry.
 
     ``leave_locale_alone``
         A boolean indicating whether the locale set in settings should be
@@ -303,16 +304,16 @@ class BaseCommand(object):
             if saved_locale is not None:
                 translation.activate(saved_locale)
 
-    def validate(self, app=None, display_num_errors=False):
+    def validate(self, app_config=None, display_num_errors=False):
         """
         Validates the given app, raising CommandError for any errors.
 
-        If app is None, then this will validate all installed apps.
+        If app_config is None, then this will validate all installed apps.
 
         """
         from django.core.management.validation import get_validation_errors
         s = StringIO()
-        num_errors = get_validation_errors(s, app)
+        num_errors = get_validation_errors(s, app_config)
         if num_errors:
             s.seek(0)
             error_text = s.read()
@@ -331,42 +332,54 @@ class BaseCommand(object):
 
 class AppCommand(BaseCommand):
     """
-    A management command which takes one or more installed application
-    names as arguments, and does something with each of them.
+    A management command which takes one or more installed application labels
+    as arguments, and does something with each of them.
 
     Rather than implementing ``handle()``, subclasses must implement
-    ``handle_app()``, which will be called once for each application.
-
+    ``handle_app_config()``, which will be called once for each application.
     """
-    args = '<appname appname ...>'
+    args = '<app_label app_label ...>'
 
     def handle(self, *app_labels, **options):
-        from django.core.apps import app_cache
+        from django.apps import apps
         if not app_labels:
-            raise CommandError('Enter at least one appname.')
+            raise CommandError("Enter at least one application label.")
         try:
-            app_configs = [app_cache.get_app_config(app_label) for app_label in app_labels]
+            app_configs = [apps.get_app_config(app_label) for app_label in app_labels]
         except (LookupError, ImportError) as e:
             raise CommandError("%s. Are you sure your INSTALLED_APPS setting is correct?" % e)
         output = []
         for app_config in app_configs:
-            if app_config.models_module is None:
-                raise CommandError(
-                    "AppCommand cannot handle app %r because it doesn't have "
-                    "a models module." % app_config.label)
-            app_output = self.handle_app(app_config.models_module, **options)
+            app_output = self.handle_app_config(app_config, **options)
             if app_output:
                 output.append(app_output)
         return '\n'.join(output)
 
-    def handle_app(self, app, **options):
+    def handle_app_config(self, app_config, **options):
         """
-        Perform the command's actions for ``app``, which will be the
-        Python module corresponding to an application name given on
-        the command line.
-
+        Perform the command's actions for app_config, an AppConfig instance
+        corresponding to an application label given on the command line.
         """
-        raise NotImplementedError('subclasses of AppCommand must provide a handle_app() method')
+        try:
+            # During the deprecation path, keep delegating to handle_app if
+            # handle_app_config isn't implemented in a subclass.
+            handle_app = self.handle_app
+        except AttributeError:
+            # Keep only this exception when the deprecation completes.
+            raise NotImplementedError(
+                "Subclasses of AppCommand must provide"
+                "a handle_app_config() method.")
+        else:
+            warnings.warn(
+                "AppCommand.handle_app() is superseded by "
+                "AppCommand.handle_app_config().",
+                PendingDeprecationWarning, stacklevel=2)
+            if app_config.models_module is None:
+                raise CommandError(
+                    "AppCommand cannot handle app '%s' in legacy mode "
+                    "because it doesn't have a models module."
+                    % app_config.label)
+            return handle_app(app_config.models_module, **options)
 
 
 class LabelCommand(BaseCommand):

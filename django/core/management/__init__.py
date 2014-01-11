@@ -5,17 +5,17 @@ from optparse import OptionParser, NO_DEFAULT
 import os
 import sys
 
+import django
+from django.apps import apps
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError, handle_default_options
 from django.core.management.color import color_style
+from django.utils import lru_cache
 from django.utils import six
 
 # For backwards compatibility: get_version() used to be in this module.
 from django import get_version
-
-# A cache of loaded commands, so that call_command
-# doesn't have to reload every time it's called.
-_commands = None
 
 
 def find_commands(management_dir):
@@ -40,6 +40,9 @@ def find_management_module(app_name):
 
     Raises ImportError if the management module cannot be found for any reason.
     """
+    # TODO: this method is only called from get_commands() which has already
+    # imported the application module at that point.
+
     parts = app_name.split('.')
     parts.append('management')
     parts.reverse()
@@ -79,6 +82,7 @@ def load_command_class(app_name, name):
     return module.Command()
 
 
+@lru_cache.lru_cache(maxsize=None)
 def get_commands():
     """
     Returns a dictionary mapping command names to their callback applications.
@@ -101,28 +105,28 @@ def get_commands():
     The dictionary is cached on the first call and reused on subsequent
     calls.
     """
-    global _commands
-    if _commands is None:
-        _commands = dict((name, 'django.core') for name in find_commands(__path__[0]))
+    commands = {name: 'django.core' for name in find_commands(__path__[0])}
 
-        # Find the installed apps
-        from django.conf import settings
+    # Find the installed apps
+    try:
+        settings.INSTALLED_APPS
+    except ImproperlyConfigured:
+        # Still useful for commands that do not require functional
+        # settings, like startproject or help.
+        app_names = []
+    else:
+        app_configs = apps.get_app_configs()
+        app_names = [app_config.name for app_config in app_configs]
+
+    # Find and load the management module for each installed app.
+    for app_name in reversed(app_names):
         try:
-            apps = settings.INSTALLED_APPS
-        except ImproperlyConfigured:
-            # Still useful for commands that do not require functional settings,
-            # like startproject or help
-            apps = []
+            path = find_management_module(app_name)
+            commands.update({name: app_name for name in find_commands(path)})
+        except ImportError:
+            pass  # No management module - ignore this app
 
-        # Find and load the management module for each installed app.
-        for app_name in apps:
-            try:
-                path = find_management_module(app_name)
-                _commands.update(dict((name, app_name) for name in find_commands(path)))
-            except ImportError:
-                pass  # No management module - ignore this app
-
-    return _commands
+    return commands
 
 
 def call_command(name, *args, **options):
@@ -257,7 +261,6 @@ class ManagementUtility(object):
                     usage.append("    %s" % name)
             # Output an extra note if settings are not properly configured
             try:
-                from django.conf import settings
                 settings.INSTALLED_APPS
             except ImproperlyConfigured as e:
                 usage.append(style.NOTICE(
@@ -339,9 +342,9 @@ class ManagementUtility(object):
             elif cwords[0] in ('dumpdata', 'sql', 'sqlall', 'sqlclear',
                     'sqlcustom', 'sqlindexes', 'sqlsequencereset', 'test'):
                 try:
-                    from django.conf import settings
+                    app_configs = apps.get_app_configs()
                     # Get the last part of the dotted path as the app name.
-                    options += [(a.split('.')[-1], 0) for a in settings.INSTALLED_APPS]
+                    options += [(app_config.label, 0) for app_config in app_configs]
                 except ImportError:
                     # Fail silently if DJANGO_SETTINGS_MODULE isn't set. The
                     # user will find out once they execute the command.
@@ -379,6 +382,14 @@ class ManagementUtility(object):
             handle_default_options(options)
         except:  # Needed because parser.parse_args can raise SystemExit
             pass  # Ignore any option errors at this point.
+
+        try:
+            settings.INSTALLED_APPS
+        except ImproperlyConfigured:
+            # Some commands are supposed to work without configured settings
+            pass
+        else:
+            django.setup()
 
         try:
             subcommand = self.argv[1]

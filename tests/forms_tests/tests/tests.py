@@ -239,14 +239,14 @@ class RelatedModelFormTests(TestCase):
         """
         Test for issue 10405
         """
-        class A(models.Model):
-            ref = models.ForeignKey("B")
+        class C(models.Model):
+            ref = models.ForeignKey("D")
 
-        class B(models.Model):
+        class D(models.Model):
             pass
 
         class Meta:
-            model = A
+            model = C
             fields = '__all__'
 
         self.assertTrue(issubclass(ModelFormMetaclass(str('Form'), (ModelForm,), {'Meta': Meta}), ModelForm))

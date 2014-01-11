@@ -6,9 +6,9 @@ for more details:
 __all__ = ['HAS_GEOS']
 
 try:
-    from .libgeos import geos_version, geos_version_info, GEOS_PREPARE  # NOQA: flake8 detects only the last __all__
+    from .libgeos import geos_version, geos_version_info  # NOQA: flake8 detects only the last __all__
     HAS_GEOS = True
-    __all__ += ['geos_version', 'geos_version_info', 'GEOS_PREPARE']
+    __all__ += ['geos_version', 'geos_version_info']
 except ImportError:
     HAS_GEOS = False
 

@@ -7,7 +7,7 @@ from django.contrib.auth.views import (
     password_reset_complete, password_change, password_change_done,
 )
 from django.test import RequestFactory, TestCase
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode
 

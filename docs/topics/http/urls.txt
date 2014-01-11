@@ -178,8 +178,8 @@ The URLconf doesn't look at the request method. In other words, all request
 methods -- ``POST``, ``GET``, ``HEAD``, etc. -- will be routed to the same
 function for the same URL.
 
-Notes on capturing text in URLs
-===============================
+Captured arguments are always strings
+=====================================
 
 Each captured argument is sent to the view as a plain Python string, regardless
 of what sort of match the regular expression makes. For example, in this
@@ -189,6 +189,9 @@ URLconf line::
 
 ...the ``year`` argument to ``news.views.year_archive()`` will be a string, not
 an integer, even though the ``\d{4}`` will only match integer strings.
+
+Specifying defaults for view arguments
+======================================
 
 A convenient trick is to specify default parameters for your views' arguments.
 Here's an example URLconf and view::
@@ -866,7 +869,7 @@ For example::
         url(r'^advanced/$', 'apps.help.views.views.advanced'),
     )
 
-    url(r'^help/', include(help_patterns, 'bar', 'foo')),
+    url(r'^help/', include((help_patterns, 'bar', 'foo'))),
 
 This will include the nominated URL patterns into the given application and
 instance namespace.
@@ -877,3 +880,8 @@ attribute: A 3-tuple that contains all the patterns in the corresponding admin
 site, plus the application namespace ``'admin'``, and the name of the admin
 instance. It is this ``urls`` attribute that you ``include()`` into your
 projects ``urlpatterns`` when you deploy an Admin instance.
+
+Be sure to pass a tuple to ``include()``. If you simply pass three arguments:
+``include(help_patterns, 'bar', 'foo')``, Django won't throw an error but due
+to the signature of ``include()``, ``'bar'`` will be the instance namespace and
+``'foo'`` will be the application namespace instead of vice versa.

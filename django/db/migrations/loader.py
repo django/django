@@ -2,11 +2,17 @@ from importlib import import_module
 import os
 import sys
 
-from django.core.apps import app_cache
+from django.apps import apps
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.graph import MigrationGraph
+from django.db.migrations.migration import Migration
+from django.db.migrations.state import ModelState
+from django.db.migrations import operations
 from django.utils import six
 from django.conf import settings
+
+
+MIGRATIONS_MODULE_NAME = 'migrations'
 
 
 class MigrationLoader(object):
@@ -46,7 +52,8 @@ class MigrationLoader(object):
         if app_label in settings.MIGRATION_MODULES:
             return settings.MIGRATION_MODULES[app_label]
         else:
-            return '%s.migrations' % app_cache.get_app_config(app_label).name
+            app_package_name = apps.get_app_config(app_label).name
+            return '%s.%s' % (app_package_name, MIGRATIONS_MODULE_NAME)
 
     def load_disk(self):
         """
@@ -55,7 +62,9 @@ class MigrationLoader(object):
         self.disk_migrations = {}
         self.unmigrated_apps = set()
         self.migrated_apps = set()
-        for app_config in app_cache.get_app_configs(only_with_models_module=True):
+        for app_config in apps.get_app_configs():
+            if app_config.models_module is None:
+                continue
             # Get the migrations module directory
             module_name = self.migrations_module(app_config.label)
             was_loaded = module_name in sys.modules
@@ -64,7 +73,7 @@ class MigrationLoader(object):
             except ImportError as e:
                 # I hate doing this, but I don't want to squash other import errors.
                 # Might be better to try a directory check directly.
-                if "No module named" in str(e) and "migrations" in str(e):
+                if "No module named" in str(e) and MIGRATIONS_MODULE_NAME in str(e):
                     self.unmigrated_apps.add(app_config.label)
                     continue
                 raise
@@ -185,6 +194,38 @@ class MigrationLoader(object):
             self.graph.add_node(key, migration)
         for key, migration in normal.items():
             for parent in migration.dependencies:
+                # Special-case __first__, which means "the first migration" for
+                # migrated apps, and is ignored for unmigrated apps. It allows
+                # makemigrations to declare dependencies on apps before they
+                # even have migrations.
+                if parent[1] == "__first__" and parent not in self.graph:
+                    if parent[0] in self.unmigrated_apps:
+                        # This app isn't migrated, but something depends on it.
+                        # We'll add a fake initial migration for it into the
+                        # graph.
+                        app_config = apps.get_app_config(parent[0])
+                        ops = []
+                        for model in app_config.get_models():
+                            model_state = ModelState.from_model(model)
+                            ops.append(
+                                operations.CreateModel(
+                                    name=model_state.name,
+                                    fields=model_state.fields,
+                                    options=model_state.options,
+                                    bases=model_state.bases,
+                                )
+                            )
+                        new_migration = type(
+                            "FakeInitialMigration",
+                            (Migration, ),
+                            {"operations": ops},
+                        )(parent[1], parent[0])
+                        self.graph.add_node(parent, new_migration)
+                        self.applied_migrations.add(parent)
+                    elif parent[0] in self.migrated_apps:
+                        parent = (parent[0], list(self.graph.root_nodes(parent[0]))[0])
+                    else:
+                        raise ValueError("Dependency on unknown app %s" % parent[0])
                 self.graph.add_dependency(key, parent)
 
     def detect_conflicts(self):

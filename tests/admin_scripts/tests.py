@@ -25,7 +25,7 @@ from django.test.utils import str_prefix
 from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils.six import StringIO
-from django.test import LiveServerTestCase
+from django.test import LiveServerTestCase, TestCase
 
 
 test_dir = os.path.realpath(os.path.join(os.environ['DJANGO_TEST_TEMP_DIR'], 'test_project'))
@@ -379,14 +379,14 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         args = ['sqlall', '--settings=test_project.settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No app with label 'admin_scripts'.")
+        self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_environment(self):
         "minimal: django-admin builtin commands fail if settings are provided in the environment"
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_django_admin(args, 'test_project.settings')
         self.assertNoOutput(out)
-        self.assertOutput(err, "No app with label 'admin_scripts'.")
+        self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_bad_settings(self):
         "minimal: django-admin builtin commands fail if settings file (from argument) doesn't exist"
@@ -815,21 +815,21 @@ class ManageMinimalSettings(AdminScriptTestCase):
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No app with label 'admin_scripts'.")
+        self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_settings(self):
         "minimal: manage.py builtin commands fail if settings are provided as argument"
         args = ['sqlall', '--settings=test_project.settings', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No app with label 'admin_scripts'.")
+        self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_environment(self):
         "minimal: manage.py builtin commands fail if settings are provided in the environment"
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_manage(args, 'test_project.settings')
         self.assertNoOutput(out)
-        self.assertOutput(err, "No app with label 'admin_scripts'.")
+        self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_bad_settings(self):
         "minimal: manage.py builtin commands fail if settings file (from argument) doesn't exist"
@@ -964,7 +964,7 @@ class ManageMultipleSettings(AdminScriptTestCase):
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No app with label 'admin_scripts'.")
+        self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_settings(self):
         "multiple: manage.py builtin commands succeed if settings are provided as argument"
@@ -1094,7 +1094,7 @@ class ManageValidate(AdminScriptTestCase):
         self.assertOutput(err, 'ImportError')
 
     def test_complex_app(self):
-        "manage.py validate does not raise an ImportError validating a complex app with nested calls to load_app"
+        "manage.py validate does not raise an ImportError validating a complex app"
         self.write_settings('settings.py',
             apps=['admin_scripts.complex_app', 'admin_scripts.simple_app'],
             sdict={'DEBUG': True})
@@ -1416,39 +1416,36 @@ class CommandTypes(AdminScriptTestCase):
         args = ['app_command', 'auth']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.auth.models'")
-        self.assertOutput(out, "module 'django.contrib.auth.models' from")
-        self.assertOutput(out, str_prefix("'>, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+        self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.auth, options=")
+        self.assertOutput(out, str_prefix(", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
 
     def test_app_command_no_apps(self):
         "User AppCommands raise an error when no app name is provided"
         args = ['app_command']
         out, err = self.run_manage(args)
-        self.assertOutput(err, 'Error: Enter at least one appname.')
+        self.assertOutput(err, 'Error: Enter at least one application label.')
 
     def test_app_command_multiple_apps(self):
         "User AppCommands raise an error when multiple app names are provided"
         args = ['app_command', 'auth', 'contenttypes']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.auth.models'")
-        self.assertOutput(out, "module 'django.contrib.auth.models' from")
-        self.assertOutput(out, str_prefix("'>, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
-        self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.contenttypes.models'")
-        self.assertOutput(out, "module 'django.contrib.contenttypes.models' from")
-        self.assertOutput(out, str_prefix("'>, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+        self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.auth, options=")
+        self.assertOutput(out, str_prefix(", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+        self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.contenttypes, options=")
+        self.assertOutput(out, str_prefix(", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
 
-    def test_app_command_invalid_appname(self):
+    def test_app_command_invalid_app_label(self):
         "User AppCommands can execute when a single app name is provided"
         args = ['app_command', 'NOT_AN_APP']
         out, err = self.run_manage(args)
-        self.assertOutput(err, "No app with label 'NOT_AN_APP'.")
+        self.assertOutput(err, "No installed app with label 'NOT_AN_APP'.")
 
-    def test_app_command_some_invalid_appnames(self):
+    def test_app_command_some_invalid_app_labels(self):
         "User AppCommands can execute when some of the provided app names are invalid"
         args = ['app_command', 'auth', 'NOT_AN_APP']
         out, err = self.run_manage(args)
-        self.assertOutput(err, "No app with label 'NOT_AN_APP'.")
+        self.assertOutput(err, "No installed app with label 'NOT_AN_APP'.")
 
     def test_label_command(self):
         "User LabelCommands can execute when a label is provided"
@@ -1470,6 +1467,24 @@ class CommandTypes(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, str_prefix("EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
         self.assertOutput(out, str_prefix("EXECUTE:LabelCommand label=anotherlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+
+
+class Discovery(TestCase):
+
+    def test_precedence(self):
+        """
+        Apps listed first in INSTALLED_APPS have precendence.
+        """
+        with self.settings(INSTALLED_APPS=['admin_scripts.complex_app',
+                                           'admin_scripts.simple_app']):
+            out = StringIO()
+            call_command('duplicate', stdout=out)
+            self.assertEqual(out.getvalue().strip(), 'complex_app')
+        with self.settings(INSTALLED_APPS=['admin_scripts.simple_app',
+                                           'admin_scripts.complex_app']):
+            out = StringIO()
+            call_command('duplicate', stdout=out)
+            self.assertEqual(out.getvalue().strip(), 'simple_app')
 
 
 class ArgumentOrder(AdminScriptTestCase):

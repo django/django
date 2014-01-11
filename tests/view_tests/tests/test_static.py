@@ -6,8 +6,7 @@ import unittest
 
 from django.conf.urls.static import static
 from django.http import HttpResponseNotModified
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from django.test import SimpleTestCase, override_settings
 from django.utils.http import http_date
 from django.views.static import was_modified_since
 

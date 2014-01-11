@@ -3,13 +3,13 @@
  ones that return the area, distance, and length.
 """
 from ctypes import c_int, c_double, POINTER
-from django.contrib.gis.geos.libgeos import GEOM_PTR, GEOS_PREPARE
+from django.contrib.gis.geos.libgeos import GEOM_PTR
 from django.contrib.gis.geos.prototypes.errcheck import check_dbl, check_string
 from django.contrib.gis.geos.prototypes.geom import geos_char_p
 from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 from django.utils.six.moves import xrange
 
-__all__ = ['geos_area', 'geos_distance', 'geos_length']
+__all__ = ['geos_area', 'geos_distance', 'geos_length', 'geos_isvalidreason']
 
 
 ### ctypes generator function ###
@@ -31,11 +31,7 @@ def dbl_from_geom(func, num_geom=1):
 geos_area = dbl_from_geom(GEOSFunc('GEOSArea'))
 geos_distance = dbl_from_geom(GEOSFunc('GEOSDistance'), num_geom=2)
 geos_length = dbl_from_geom(GEOSFunc('GEOSLength'))
-
-# Validity reason; only in GEOS 3.1+
-if GEOS_PREPARE:
-    geos_isvalidreason = GEOSFunc('GEOSisValidReason')
-    geos_isvalidreason.argtypes = [GEOM_PTR]
-    geos_isvalidreason.restype = geos_char_p
-    geos_isvalidreason.errcheck = check_string
-    __all__.append('geos_isvalidreason')
+geos_isvalidreason = GEOSFunc('GEOSisValidReason')
+geos_isvalidreason.argtypes = [GEOM_PTR]
+geos_isvalidreason.restype = geos_char_p
+geos_isvalidreason.errcheck = check_string

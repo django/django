@@ -1,7 +1,6 @@
 from unittest import skipIf
 
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.db import connection
 from django.db.migrations.loader import MigrationLoader, AmbiguityError
 from django.db.migrations.recorder import MigrationRecorder
@@ -44,13 +43,16 @@ class LoaderTests(TestCase):
     def test_load(self):
         """
         Makes sure the loader can load the migrations for the test apps,
-        and then render them out to a new AppCache.
+        and then render them out to a new Apps.
         """
         # Load and test the plan
         migration_loader = MigrationLoader(connection)
         self.assertEqual(
             migration_loader.graph.forwards_plan(("migrations", "0002_second")),
-            [("migrations", "0001_initial"), ("migrations", "0002_second")],
+            [
+                ("migrations", "0001_initial"),
+                ("migrations", "0002_second"),
+            ],
         )
         # Now render it out!
         project_state = migration_loader.graph.project_state(("migrations", "0002_second"))
@@ -66,6 +68,30 @@ class LoaderTests(TestCase):
         self.assertEqual(
             [x for x, y in book_state.fields],
             ["id", "author"]
+        )
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_unmigdep"})
+    def test_load_unmigrated_dependency(self):
+        """
+        Makes sure the loader can load migrations with a dependency on an unmigrated app.
+        """
+        # Load and test the plan
+        migration_loader = MigrationLoader(connection)
+        self.assertEqual(
+            migration_loader.graph.forwards_plan(("migrations", "0001_initial")),
+            [
+                ("auth", "__first__"),
+                ("migrations", "0001_initial"),
+            ],
+        )
+        # Now render it out!
+        project_state = migration_loader.graph.project_state(("migrations", "0001_initial"))
+        self.assertEqual(len([m for a, m in project_state.models if a == "migrations"]), 1)
+
+        book_state = project_state.models["migrations", "book"]
+        self.assertEqual(
+            [x for x, y in book_state.fields],
+            ["id", "user"]
         )
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})

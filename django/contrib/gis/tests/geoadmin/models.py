@@ -7,7 +7,11 @@ from django.utils.encoding import python_2_unicode_compatible
 class City(models.Model):
     name = models.CharField(max_length=30)
     point = models.PointField()
+
     objects = models.GeoManager()
+
+    class Meta:
+        app_label = 'geoadmin'
 
     def __str__(self):
         return self.name

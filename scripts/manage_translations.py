@@ -88,7 +88,7 @@ def update_catalogs(resources=None, languages=None):
 
     os.chdir(os.path.join(os.getcwd(), 'django'))
     print("Updating main en catalog")
-    call_command('makemessages', locale='en')
+    call_command('makemessages', locale=['en'])
     _check_diff('core', os.path.join(os.getcwd(), 'conf', 'locale'))
 
     # Contrib catalogs
@@ -96,9 +96,9 @@ def update_catalogs(resources=None, languages=None):
         os.chdir(os.path.join(dir_, '..'))
         print("Updating en catalog in %s" % dir_)
         if name.endswith('-js'):
-            call_command('makemessages', locale='en', domain='djangojs')
+            call_command('makemessages', locale=['en'], domain='djangojs')
         else:
-            call_command('makemessages', locale='en')
+            call_command('makemessages', locale=['en'])
         _check_diff(name, dir_)
 
 

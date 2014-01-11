@@ -20,19 +20,19 @@ class ModelErrorCollection:
         self.outfile.write(self.style.ERROR(force_str("%s: %s\n" % (context, error))))
 
 
-def get_validation_errors(outfile, app=None):
+def get_validation_errors(outfile, app_config=None):
     """
     Validates all models that are part of the specified app. If no app name is provided,
     validates all models of all installed apps. Writes errors, if any, to outfile.
     Returns number of errors.
     """
-    from django.core.apps import app_cache
+    from django.apps import apps
     from django.db import connection, models
     from django.db.models.deletion import SET_NULL, SET_DEFAULT
 
     e = ModelErrorCollection(outfile)
 
-    for cls in app_cache.get_models(app, include_swapped=True):
+    for cls in (app_config or apps).get_models(include_swapped=True):
         opts = cls._meta
 
         # Check swappable attribute.
@@ -42,7 +42,9 @@ def get_validation_errors(outfile, app=None):
             except ValueError:
                 e.add(opts, "%s is not of the form 'app_label.app_name'." % opts.swappable)
                 continue
-            if not app_cache.get_model(app_label, model_name):
+            try:
+                apps.get_model(app_label, model_name)
+            except LookupError:
                 e.add(opts, "Model has been swapped out for '%s' which has not been installed or is abstract." % opts.swapped)
             # No need to perform any other validation checks on a swapped model.
             continue
@@ -152,7 +154,7 @@ def get_validation_errors(outfile, app=None):
             # Check to see if the related field will clash with any existing
             # fields, m2m fields, m2m related objects or related objects
             if f.rel:
-                if f.rel.to not in app_cache.get_models():
+                if f.rel.to not in apps.get_models():
                     # If the related model is swapped, provide a hint;
                     # otherwise, the model just hasn't been installed.
                     if not isinstance(f.rel.to, six.string_types) and f.rel.to._meta.swapped:
@@ -207,7 +209,7 @@ def get_validation_errors(outfile, app=None):
             # Check to see if the related m2m field will clash with any
             # existing fields, m2m fields, m2m related objects or related
             # objects
-            if f.rel.to not in app_cache.get_models():
+            if f.rel.to not in apps.get_models():
                 # If the related model is swapped, provide a hint;
                 # otherwise, the model just hasn't been installed.
                 if not isinstance(f.rel.to, six.string_types) and f.rel.to._meta.swapped:
@@ -265,7 +267,7 @@ def get_validation_errors(outfile, app=None):
                                 )
                             else:
                                 seen_to = True
-                if f.rel.through not in app_cache.get_models(include_auto_created=True):
+                if f.rel.through not in apps.get_models(include_auto_created=True):
                     e.add(opts, "'%s' specifies an m2m relation through model "
                         "%s, which has not been installed." % (f.name, f.rel.through))
                 signature = (f.rel.to, cls, f.rel.through)

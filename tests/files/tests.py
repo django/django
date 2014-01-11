@@ -161,9 +161,9 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
         Multiple calls of get_image_dimensions() should return the same size.
         """
         img_path = os.path.join(os.path.dirname(upath(__file__)), "test.png")
-        with open(img_path, 'rb') as file:
-            image = images.ImageFile(file)
-            image_pil = Image.open(img_path)
+        with open(img_path, 'rb') as fh:
+            image = images.ImageFile(fh)
+            image_pil = Image.open(fh)
             size_1 = images.get_image_dimensions(image)
             size_2 = images.get_image_dimensions(image)
         self.assertEqual(image_pil.size, size_1)
@@ -180,7 +180,8 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
             size = images.get_image_dimensions(img_path)
         except zlib.error:
             self.fail("Exception raised from get_image_dimensions().")
-        self.assertEqual(size, Image.open(img_path).size)
+        with open(img_path, 'rb') as fh:
+            self.assertEqual(size, Image.open(fh).size)
 
 
 class FileMoveSafeTests(unittest.TestCase):
