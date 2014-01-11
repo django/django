@@ -289,7 +289,7 @@ class FloatField(IntegerField):
 
     def widget_attrs(self, widget):
         attrs = super(FloatField, self).widget_attrs(widget)
-        if isinstance(widget, NumberInput):
+        if isinstance(widget, NumberInput) and 'step' not in widget.attrs:
             attrs.setdefault('step', 'any')
         return attrs
 
@@ -377,7 +377,7 @@ class DecimalField(IntegerField):
 
     def widget_attrs(self, widget):
         attrs = super(DecimalField, self).widget_attrs(widget)
-        if isinstance(widget, NumberInput):
+        if isinstance(widget, NumberInput) and 'step' not in widget.attrs:
             if self.decimal_places is not None:
                 # Use exponential notation for small values since they might
                 # be parsed as 0 otherwise. ref #20765
