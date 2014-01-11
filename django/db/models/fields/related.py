@@ -589,6 +589,10 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
         for lh_field, rh_field in self.field.related_fields:
             try:
                 setattr(instance, lh_field.attname, getattr(value, rh_field.attname))
+                val = getattr(value, rh_field.attname)
+                if value is not None and val is None:
+                    raise ValueError("The %s does not exists on the database." % value)
+                setattr(instance, lh_field.attname, val)
             except AttributeError:
                 setattr(instance, lh_field.attname, None)
 

@@ -515,26 +515,20 @@ class QueryTestCase(TestCase):
         # BUT! if you assign a FK object when the base object hasn't
         # been saved yet, you implicitly assign the database for the
         # base object.
-        chris = Person(name="Chris Mills")
         html5 = Book(title="Dive into HTML5", published=datetime.date(2010, 3, 15))
         # initially, no db assigned
-        self.assertEqual(chris._state.db, None)
         self.assertEqual(html5._state.db, None)
 
         # old object comes from 'other', so the new object is set to use 'other'...
-        dive.editor = chris
         html5.editor = mark
-        self.assertEqual(chris._state.db, 'other')
         self.assertEqual(html5._state.db, 'other')
         # ... but it isn't saved yet
-        self.assertEqual(list(Person.objects.using('other').values_list('name', flat=True)),
-            ['Mark Pilgrim'])
         self.assertEqual(list(Book.objects.using('other').values_list('title', flat=True)),
             ['Dive into Python'])
 
         # When saved (no using required), new objects goes to 'other'
-        chris.save()
         html5.save()
+        dive.save()
         self.assertEqual(list(Person.objects.using('default').values_list('name', flat=True)),
             ['Marty Alchin'])
         self.assertEqual(list(Person.objects.using('other').values_list('name', flat=True)),
@@ -1182,6 +1176,7 @@ class RouterTestCase(TestCase):
         # old object comes from 'other', so the new object is set to use the
         # source of 'other'...
         self.assertEqual(dive._state.db, 'other')
+        chris.save()
         dive.editor = chris
         html5.editor = mark
 
