@@ -1,0 +1,257 @@
+==============
+Custom lookups
+==============
+
+.. module:: django.db.models.lookups
+   :synopsis: Custom lookups
+
+.. currentmodule:: django.db.models
+
+By default Django offers a wide variety of different lookups for filtering
+(for example, `exact` and `icontains`). This documentation explains how to
+write custom lookups and how to alter the working of existing lookups. In
+addition how to transform field values is explained. fFor example how to
+extract the year from a DateField. By writing a custom `YearExtract`
+transformer it is possible to filter on the transformed value, for example::
+
+  Author.objects.filter(birthdate__year__lte=1981)
+
+Currently transformers are only available in filtering. So, it is not possible
+to use it in other parts of the ORM, for example this will not work::
+
+  Author.objects.values_list('birthdate__year')
+
+A simple Lookup example
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Lets start with a simple custom lookup. We will write a custom lookup `ne`
+which works opposite to `exact`. A `Author.objects.filter(name__ne='Jack')`
+will translate to::
+
+  "author"."name" <> 'Jack'
+
+A custom lookup will need an implementation and Django needs to be told
+the existence of the lookup. The implementation for this lookup will be
+simple to write::
+
+  from django.db.models import Lookup
+
+  class NotEqual(Lookup):
+      lookup_name = 'ne'
+
+      def as_sql(self, qn, connection):
+          lhs, lhs_params = self.process_lhs(qn, connection)
+          rhs, rhs_params = self.process_rhs(qn, connection)
+          params = lhs_params + rhs_params
+          return '%s <> %s' % (lhs, rhs), params
+
+To register the `NotEqual` lookup we will just need to call register_lookup
+on the field class we want the lookup to be available::
+
+  from django.db.models.fields import Field
+  Field.register_lookup(NotEqual)
+
+Now Field and all its subclasses have a NotEqual lookup.
+
+The first notable thing about `NotEqual` is the lookup_name. This name must
+be supplied, and it is used by Django in the register_lookup() call so that
+Django knows to associate `ne` to the NotEqual implementation.
+`
+An Lookup works against two values, lhs and rhs. The abbreviations stand for
+left-hand side and right-hand side. The lhs is usually a field reference,
+but it can be anything implementing the query expression API. The
+rhs is the value given by the user. In the example `name__ne=Jack`, the
+lhs is reference to Author's name field and Jack is the value.
+
+The lhs and rhs are turned into values that are possible to use in SQL.
+In the example above lhs is turned into "author"."name", [], and rhs is
+turned into "%s", ['Jack']. The lhs is just raw string without parameters
+but the rhs is turned into a query parameter 'Jack'.
+
+Finally we combine the lhs and rhs by adding ` <> ` in between of them,
+and supply all the parameters for the query.
+
+A Lookup needs to implement a limited part of query expression API. See
+the query expression API for details.
+
+A simple transformer example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We will next write a simple transformer. The transformer will be called
+`YearExtract`. It can be used to extract the year part from `DateField`.
+
+Lets start by writing the implementation::
+
+  from django.db.models import Extract
+
+  class YearExtract(Extract):
+      lookup_name = 'year'
+      output_type = IntegerField()
+
+      def as_sql(self, qn, connection):
+          lhs, params = qn.compile(self.lhs)
+          return "EXTRACT(YEAR FROM %s)" % lhs, params
+
+Next, lets register it for `DateField`::
+
+  from django.db.models import DateField
+  DateField.register_lookup(YearExtract)
+
+Now any DateField in your project will have `year` transformer. For example
+the following query::
+
+  Author.objects.filter(birthdate__year__lte=1981)
+
+would translate to the following query on PostgreSQL::
+
+  SELECT ...
+    FROM "author"
+    WHERE EXTRACT(YEAR FROM "author"."birthdate") <= 1981
+
+An YearExtract class works only against self.lhs. Usually the lhs is
+transformed in some way. Further lookups and extracts work against the
+transformed value.
+
+Note the definition of output_type in the `YearExtract`. The output_type is
+a field instance. It informs Django that the Extract class transformed the
+type of the value to an int. This is currently used only to check which
+lookups the extract has.
+
+The used SQL in this example works on most databases. Check you database
+vendor's documentation to see if EXTRACT(year from date) is supported.
+
+Writing an efficient year__exact lookup
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When using the above written `year` lookup, the SQL produced will not use
+indexes efficiently. We will fix that by writing a custom `exact` lookup
+for YearExtract. For example if the user filters on
+`birthdate__year__exact=1981`, then we want to produce the following SQL::
+
+  birthdate >= to_date('1981-01-01') AND birthdate <= to_date('1981-12-31')
+
+The implementation is::
+
+  from django.db.models import Lookup
+
+  class YearExact(Lookup):
+      lookup_name = 'exact'
+
+      def as_sql(self, qn, connection):
+          lhs, lhs_params = qn.compile(self.lhs.lhs)
+          rhs, rhs_params = self.process_rhs(qn, connection)
+          params = lhs_params + rhs_params + lhs_params + rhs_params
+          return '%s >= to_date(%s || '-01-01') AND %s <= to_date(%s || '-12-31') % (lhs, rhs, lhs, rhs), params
+
+  YearExtract.register_lookup(YearExact)
+
+There are a couple of notable things going on. First, `YearExact` isn't
+calling process_lhs(). Instead it skips and compiles directly the lhs used by
+self.lhs. The reason this is done is to skip `YearExtract` from adding the
+EXTRACT clause to the query. Referring directly to self.lhs.lhs is safe as
+`YearExact` can be accessed only from `year__exact` lookup, that is the lhs
+is always `YearExtract`.
+
+Next, as both the lhs and rhs are used multiple times in the query the params
+need to contain lhs_params and rhs_params multiple times.
+
+The final query does string manipulation directly in the database. The reason
+for doing this is that if the self.rhs is something else than a plain integer
+value (for exampel a `F()` reference) we can't do the transformations in
+Python.
+
+Writing alternative implemenatations for existing lookups
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sometimes different database vendors require different SQL for the same
+operation. For this example we will rewrite a custom implementation for
+MySQL for the NotEqual operator. Instead of `<>` we will be using `!=`
+operator.
+
+There are two ways to do this. The first is to write a subclass with a
+as_mysql() method and registering the subclass over the original class::
+
+  class MySQLNotEqual(NotEqual):
+      def as_mysql(self, qn, connection):
+          lhs, lhs_params = self.process_lhs(qn, connection)
+          rhs, rhs_params = self.process_rhs(qn, connection)
+          params = lhs_params + rhs_params
+          return '%s != %s' % (lhs, rhs), params
+  Field.register_lookup(MySQLNotExact)
+
+The alternate is to monkey-patch the existing class in place::
+  def as_mysql(self, qn, connection):
+      lhs, lhs_params = self.process_lhs(qn, connection)
+      rhs, rhs_params = self.process_rhs(qn, connection)
+      params = lhs_params + rhs_params
+      return '%s != %s' % (lhs, rhs), params
+  NotEqual.as_mysql = as_mysql
+
+The subclass way allows one to override methods of the lookup if needed. The
+monkey-patch way allows writing different implementations for the same class
+in different locations of the project.
+
+The way Django knows to call as_mysql() instead of as_sql() is as follows.
+When qn.compile(notequal_instance) is called, Django first checks if there
+is a method named 'as_%s' % connection.vendor. If that method doesn't exist,
+the as_sql() will be called.
+
+The vendor names for Django's in-built backends are 'sqlite', 'postgresql',
+'oracle' and 'mysql'.
+
+The Lookup API
+~~~~~~~~~~~~~~
+
+An lookup has attributes lhs and rhs. The lhs is something implementing the
+query expression API and the rhs is either a plain value, or something that
+needs to be compiled into SQL. Examples of SQL-compiled values include `F()`
+references and usage of `QuerySets` as value.
+
+A lookup needs to define lookup_name as a class level attribute. This is used
+when registering lookups.
+
+A lookup has three public methods. The as_sql(qn, connection) method needs
+to produce a query string and parameters used by the query string. The qn has
+a method compile() which can be used to compile self.lhs. However usually it
+is better to call self.process_lhs(qn, connection) instead, which returns
+query string and parameters for the lhs. Similary process_rhs(qn, connection)
+returns query string and parameters for the rhs.
+
+The Query Expression API
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+A lookup can assume that the lhs responds to the query expression API.
+Currently direct field references, aggregates and `Extract` instances respond
+to this API.
+
+.. method:: as_sql(qn, connection)
+
+Responsible for producing the query string and parameters for the expression.
+The qn has a compile() method that can be used to compile other expressions.
+The connection is the connection used to execute the query. The
+connection.vendor attribute can be used to return different query strings
+for different backends.
+
+Calling expression.as_sql() directly is usually an error - instead
+qn.compile(expression) should be used. The qn.compile() method will take
+care of calling vendor-specific methods of the expression.
+
+.. method:: as_vendorname(qn, connection)
+
+Works like as_sql() method. When an expression is compiled by qn.compile()
+Django will first try to call as_vendorname(), where vendorname is the vendor
+name of the backend used for executing the query. The vendorname is one of
+'postgresql', 'oracle', 'sqlite' or 'mysql' for Django's inbuilt backends.
+
+.. method:: get_lookup(lookup_name)::
+
+The get_lookup() method is used to fetch lookups. By default the lookup
+is fetched from the expression's output type, but it is possible to override
+this method to alter that behaviour.
+
+.. attribute:: output_type
+
+The output_type attribute is used by the get_lookup() method to check for
+lookups. The output_type should be a field instance.
+
+Note that this documentation lists only the public methods of the API.
