@@ -180,6 +180,7 @@ as_mysql() method and registering the subclass over the original class::
   Field.register_lookup(MySQLNotExact)
 
 The alternate is to monkey-patch the existing class in place::
+
   def as_mysql(self, qn, connection):
       lhs, lhs_params = self.process_lhs(qn, connection)
       rhs, rhs_params = self.process_rhs(qn, connection)
