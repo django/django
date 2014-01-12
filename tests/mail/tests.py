@@ -894,6 +894,16 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
         self.assertRaisesMessage(SMTPException,
             'SMTP AUTH extension not supported by server.', backend.open)
 
+    def test_server_open(self):
+        """
+        Test that open() tells us whether it opened a connection.
+        """
+        backend = smtp.EmailBackend(username='', password='')
+        self.assertFalse(backend.connection)
+        opened = backend.open()
+        backend.close()
+        self.assertTrue(opened)
+
     def test_server_stopped(self):
         """
         Test that closing the backend while the SMTP server is stopped doesn't
