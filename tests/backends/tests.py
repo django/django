@@ -2,6 +2,7 @@
 # Unit and doctests for specific database backends.
 from __future__ import unicode_literals
 
+import copy
 import datetime
 from decimal import Decimal
 import re
@@ -336,16 +337,18 @@ class PostgresVersionTest(TestCase):
         self.assertEqual(pg_version.get_version(conn), 80300)
 
 
-class PostgresNewConnectionTest(TestCase):
-    """
-    #17062: PostgreSQL shouldn't roll back SET TIME ZONE, even if the first
-    transaction is rolled back.
-    """
+class PostgresNewConnectionTests(TestCase):
+
     @unittest.skipUnless(
         connection.vendor == 'postgresql',
         "This test applies only to PostgreSQL")
     def test_connect_and_rollback(self):
-        new_connections = ConnectionHandler(settings.DATABASES)
+        """
+        PostgreSQL shouldn't roll back SET TIME ZONE, even if the first
+        transaction is rolled back (#17062).
+        """
+        databases = copy.deepcopy(settings.DATABASES)
+        new_connections = ConnectionHandler(databases)
         new_connection = new_connections[DEFAULT_DB_ALIAS]
         try:
             # Ensure the database default time zone is different than
