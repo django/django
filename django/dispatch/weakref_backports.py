@@ -2,7 +2,14 @@
 weakref_backports is a partial backport of the weakref module for python
 versions below 3.4.
 
-TODO: LICENSE!
+Copyright (C) 2013 Python Software Foundation, see license.python.txt for
+details.
+
+The following changes were made to the original sources during backporting:
+
+ * Added `self` to `super` calls.
+ * Removed `from None` when raising exceptions.
+
 """
 from weakref import ref
 
