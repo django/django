@@ -2,37 +2,33 @@
 Custom lookups
 ==============
 
+.. versionadded:: 1.7
+
 .. module:: django.db.models.lookups
    :synopsis: Custom lookups
 
 .. currentmodule:: django.db.models
 
-By default Django offers a wide variety of different lookups for filtering
-(for example, `exact` and `icontains`). This documentation explains how to
-write custom lookups and how to alter the working of existing lookups. In
-addition how to transform field values is explained. fFor example how to
-extract the year from a DateField. By writing a custom `YearExtract`
-transformer it is possible to filter on the transformed value, for example::
-
-  Author.objects.filter(birthdate__year__lte=1981)
-
-Currently transformers are only available in filtering. So, it is not possible
-to use it in other parts of the ORM, for example this will not work::
-
-  Author.objects.values_list('birthdate__year')
+By default Django offers a wide variety of :ref:`built-in lookups
+<field-lookups>` for filtering (for example, ``exact`` and ``icontains``). This
+documentation explains how to write custom lookups and how to alter the working
+of existing lookups.
 
 A simple Lookup example
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Lets start with a simple custom lookup. We will write a custom lookup `ne`
-which works opposite to `exact`. A `Author.objects.filter(name__ne='Jack')`
-will translate to::
+Let's start with a simple custom lookup. We will write a custom lookup ``ne``
+which works opposite to ``exact``. ``Author.objects.filter(name__ne='Jack')``
+will translate to the SQL::
 
   "author"."name" <> 'Jack'
 
-A custom lookup will need an implementation and Django needs to be told
-the existence of the lookup. The implementation for this lookup will be
-simple to write::
+This SQL is backend independent, so we don't need to worry about different
+databases.
+
+There are two steps to making this work. Firstly we need to implement the
+lookup, then we need to tell Django about it. The implementation is quite
+straightforwards::
 
   from django.db.models import Lookup
 
@@ -45,131 +41,165 @@ simple to write::
           params = lhs_params + rhs_params
           return '%s <> %s' % (lhs, rhs), params
 
-To register the `NotEqual` lookup we will just need to call register_lookup
-on the field class we want the lookup to be available::
+To register the ``NotEqual`` lookup we will just need to call
+``register_lookup`` on the field class we want the lookup to be available. In
+this case, the lookup makes sense on all ``Field`` subclasses, so we register
+it with ``Field`` directly::
 
   from django.db.models.fields import Field
   Field.register_lookup(NotEqual)
 
-Now Field and all its subclasses have a NotEqual lookup.
+We can now use ``foo__ne`` for any field ``foo``. You will need to ensure that
+this registration happens before you try to create any querysets using it. You
+could place the implementation in a ``models.py`` file, or register the lookup
+in the ``ready()`` method of an ``AppConfig``.
 
-The first notable thing about `NotEqual` is the lookup_name. This name must
-be supplied, and it is used by Django in the register_lookup() call so that
-Django knows to associate `ne` to the NotEqual implementation.
-`
-An Lookup works against two values, lhs and rhs. The abbreviations stand for
-left-hand side and right-hand side. The lhs is usually a field reference,
-but it can be anything implementing the query expression API. The
-rhs is the value given by the user. In the example `name__ne=Jack`, the
-lhs is reference to Author's name field and Jack is the value.
+Taking a closer look at the implementation, the first required attribute is
+``lookup_name``. This allows the ORM to understand how to interpret ``name__ne``
+and use ``NotEqual`` to generate the SQL. By convention, these names are always
+lowercase strings containing only letters, but the only hard requirement is
+that it must not contain the string ``__``.
 
-The lhs and rhs are turned into values that are possible to use in SQL.
-In the example above lhs is turned into "author"."name", [], and rhs is
-turned into "%s", ['Jack']. The lhs is just raw string without parameters
-but the rhs is turned into a query parameter 'Jack'.
+A ``Lookup`` works against two values, ``lhs`` and ``rhs``, standing for
+left-hand side and right-hand side. The left-hand side is usually a field
+reference, but it can be anything implementing the :ref:`query expression API
+<query-expression>`. The right-hand is the value given by the user. In the
+example ``Author.objects.filter(name__ne='Jack')``, the left-hand side is a
+reference to the ``name`` field of the ``Author`` model, and ``'Jack'`` is the
+right-hand side.
 
-Finally we combine the lhs and rhs by adding ` <> ` in between of them,
-and supply all the parameters for the query.
+We call ``process_lhs`` and ``process_rhs`` to convert them into the values we
+need for SQL. In the above example, ``process_lhs`` returns
+``('"author"."name"', [])`` and ``process_rhs`` returns ``('"%s"', ['Jack'])``.
+In this example there were no parameters for the left hand side, but this would
+depend on the object we have, so we still need to include them in the
+parameters we return.
 
-A Lookup needs to implement a limited part of query expression API. See
-the query expression API for details.
+Finally we combine the parts into a SQL expression with ``<>``, and supply all
+the parameters for the query. We then return a tuple containing the generated
+SQL string and the parameters.
 
 A simple transformer example
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We will next write a simple transformer. The transformer will be called
-`YearExtract`. It can be used to extract the year part from `DateField`.
+The custom lookup above is great, but in some cases you may want to be able to
+chain lookups together. For example, let's suppose we are building an
+application where we want to make use of the ``abs()`` operator.
+We have an ``Experiment`` model which records a start value, end value and the
+change (start - end). We would like to find all experiments where the change
+was equal to a certain amount (``Experiment.objects.filter(change__abs=27)``),
+or where it did not exceede a certain amount
+(``Experiment.objects.filter(change__abs__lt=27)``).
 
-Lets start by writing the implementation::
+.. note::
+    This example is somewhat contrived, but it demonstrates nicely the range of
+    functionality which is possible in a database backend independent manner,
+    and without duplicating functionality already in Django.
+
+We will start by writing a ``AbsoluteValue`` transformer. This will use the SQL
+function ``ABS()`` to transform the value before comparison::
 
   from django.db.models import Extract
 
-  class YearExtract(Extract):
-      lookup_name = 'year'
-      output_type = IntegerField()
+  class AbsoluteValue(Extract):
+      lookup_name = 'abs'
 
       def as_sql(self, qn, connection):
           lhs, params = qn.compile(self.lhs)
-          return "EXTRACT(YEAR FROM %s)" % lhs, params
+          return "ABS(%s)" % lhs, params
 
-Next, lets register it for `DateField`::
+Next, lets register it for ``IntegerField``::
 
-  from django.db.models import DateField
-  DateField.register_lookup(YearExtract)
+  from django.db.models import IntegerField
+  IntegerField.register_lookup(AbsoluteValue)
 
-Now any DateField in your project will have `year` transformer. For example
-the following query::
+We can now run the queris we had before.
+``Experiment.objects.filter(change__abs=27)`` will generate the following SQL::
 
-  Author.objects.filter(birthdate__year__lte=1981)
+    SELECT ... WHERE ABS("experiments"."change") = 27
 
-would translate to the following query on PostgreSQL::
+By using ``Extract`` instead of ``Lookup`` it means we are able to chain
+further lookups afterwards. So
+``Experiment.objects.filter(change__abs__lt=27)`` will generate the following
+SQL::
 
-  SELECT ...
-    FROM "author"
-    WHERE EXTRACT(YEAR FROM "author"."birthdate") <= 1981
+    SELECT ... WHERE ABS("experiments"."change") < 27
 
-An YearExtract class works only against self.lhs. Usually the lhs is
-transformed in some way. Further lookups and extracts work against the
-transformed value.
+Subclasses of ``Extract`` usually only operate on the left-hand side of the
+expression. Further lookups will work on the transformed value. Note that in
+this case where there is no other lookup specified, Django interprets
+``change__abs=27`` as ``change__abs__exact=27``.
 
-Note the definition of output_type in the `YearExtract`. The output_type is
-a field instance. It informs Django that the Extract class transformed the
-type of the value to an int. This is currently used only to check which
-lookups the extract has.
+When looking for which lookups are allowable after the ``Extract`` has been
+applied, Django uses the ``output_type`` attribute. We didn't need to specify
+this here as it didn't change, but supposing we were applying ``AbsoluteValue``
+to some field which represents a more complex type (for example a point
+relative to an origin, or a complex number) then we may have wanted to specify
+``output_type = FloatField``, which will ensure that further lookups like
+``abs__lte`` behave as they would for a ``FloatField``.
 
-The used SQL in this example works on most databases. Check you database
-vendor's documentation to see if EXTRACT(year from date) is supported.
+Writing an efficient abs__lt lookup
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Writing an efficient year__exact lookup
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+When using the above written ``abs`` lookup, the SQL produced will not use
+indexes efficiently in some cases. In particular, when we use
+``change__abs__lt=27``, this is equivalent to ``change__gt=-27`` AND
+``change__lt=27``. (For the ``lte`` case we could use the SQL ``BETWEEN``).
 
-When using the above written `year` lookup, the SQL produced will not use
-indexes efficiently. We will fix that by writing a custom `exact` lookup
-for YearExtract. For example if the user filters on
-`birthdate__year__exact=1981`, then we want to produce the following SQL::
+So we would like ``Experiment.objects.filter(change__abs__lt=27)`` to generate
+the following SQL::
 
-  birthdate >= to_date('1981-01-01') AND birthdate <= to_date('1981-12-31')
+    SELECT .. WHERE "experiments"."change" < 27 AND "experiments"."change" > -27
 
 The implementation is::
 
   from django.db.models import Lookup
 
-  class YearExact(Lookup):
-      lookup_name = 'exact'
+  class AbsoluteValueLessThan(Lookup):
+      lookup_name = 'lt'
 
       def as_sql(self, qn, connection):
           lhs, lhs_params = qn.compile(self.lhs.lhs)
           rhs, rhs_params = self.process_rhs(qn, connection)
           params = lhs_params + rhs_params + lhs_params + rhs_params
-          return '%s >= to_date(%s || '-01-01') AND %s <= to_date(%s || '-12-31') % (lhs, rhs, lhs, rhs), params
+          return '%s > %s AND %s < -%s % (lhs, rhs, lhs, rhs), params
 
-  YearExtract.register_lookup(YearExact)
+  AbsoluteValue.register_lookup(AbsoluteValueLessThan)
 
-There are a couple of notable things going on. First, `YearExact` isn't
-calling process_lhs(). Instead it skips and compiles directly the lhs used by
-self.lhs. The reason this is done is to skip `YearExtract` from adding the
-EXTRACT clause to the query. Referring directly to self.lhs.lhs is safe as
-`YearExact` can be accessed only from `year__exact` lookup, that is the lhs
-is always `YearExtract`.
+There are a couple of notable things going on. First, ``AbsoluteValueLessThan``
+isn't calling ``process_lhs()``. Instead it skips the transformation of the
+``lhs`` done by ``AbsoluteValue`` and uses the original ``lhs``. That is, we
+want to get ``27`` not ``ABS(27)``. Referring directly to ``self.lhs.lhs`` is
+safe as ``AbsoluteValueLessThan`` can be accessed only from the
+``AbsoluteValue`` lookup, that is the ``lhs`` is always an instance of
+``AbsoluteValue``.
 
-Next, as both the lhs and rhs are used multiple times in the query the params
-need to contain lhs_params and rhs_params multiple times.
+Notice also that  as both sides are used multiple times in the query the params
+need to contain ``lhs_params`` and ``rhs_params`` multiple times.
 
-The final query does string manipulation directly in the database. The reason
-for doing this is that if the self.rhs is something else than a plain integer
-value (for exampel a `F()` reference) we can't do the transformations in
-Python.
+The final query does the inversion (``27`` to ``-27``) directly in the
+database. The reason for doing this is that if the self.rhs is something else
+than a plain integer value (for example an ``F()`` reference) we can't do the
+transformations in Python.
+
+.. note::
+    In fact, most lookups with ``__abs`` could be implemented as range queries
+    like this, and on most database backend it is likely to be more sensible to
+    do so as you can make use of the indexes. However with PostgreSQL you may
+    want to add an index on ``abs(change)`` which would allow these queries to
+    be very efficient.
 
 Writing alternative implemenatations for existing lookups
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sometimes different database vendors require different SQL for the same
 operation. For this example we will rewrite a custom implementation for
-MySQL for the NotEqual operator. Instead of `<>` we will be using `!=`
-operator.
+MySQL for the NotEqual operator. Instead of ``<>`` we will be using ``!=``
+operator. (Note that in reality almost all databases support both, including
+all the official databases supported by Django).
 
-There are two ways to do this. The first is to write a subclass with a
-as_mysql() method and registering the subclass over the original class::
+We can change the behaviour on a specific backend by creating a subclass of
+``NotEqual`` with a ``as_mysql`` method::
 
   class MySQLNotEqual(NotEqual):
       def as_mysql(self, qn, connection):
@@ -179,80 +209,92 @@ as_mysql() method and registering the subclass over the original class::
           return '%s != %s' % (lhs, rhs), params
   Field.register_lookup(MySQLNotExact)
 
-The alternate is to monkey-patch the existing class in place::
+We can then register it with ``Field``. It takes the place of the original
+``NotEqual`` class as it has 
 
-  def as_mysql(self, qn, connection):
-      lhs, lhs_params = self.process_lhs(qn, connection)
-      rhs, rhs_params = self.process_rhs(qn, connection)
-      params = lhs_params + rhs_params
-      return '%s != %s' % (lhs, rhs), params
-  NotEqual.as_mysql = as_mysql
+When compiling a query, Django first looks for ``as_%s % connection.vendor``
+methods, and then falls back to ``as_sql``. The vendor names for the in-built
+backends are ``sqlite``, ``postgresql``, ``oracle`` and ``mysql``.
 
-The subclass way allows one to override methods of the lookup if needed. The
-monkey-patch way allows writing different implementations for the same class
-in different locations of the project.
+.. note::
+    If for some reason you need to change the lookup just for a specific query,
+    you can do that and reregister the original lookup afterwards. However you
+    need to be careful to ensure that your patch is in place until the queryset
+    is evaluated, not just created.
 
-The way Django knows to call as_mysql() instead of as_sql() is as follows.
-When qn.compile(notequal_instance) is called, Django first checks if there
-is a method named 'as_%s' % connection.vendor. If that method doesn't exist,
-the as_sql() will be called.
-
-The vendor names for Django's in-built backends are 'sqlite', 'postgresql',
-'oracle' and 'mysql'.
-
-The Lookup API
-~~~~~~~~~~~~~~
-
-An lookup has attributes lhs and rhs. The lhs is something implementing the
-query expression API and the rhs is either a plain value, or something that
-needs to be compiled into SQL. Examples of SQL-compiled values include `F()`
-references and usage of `QuerySets` as value.
-
-A lookup needs to define lookup_name as a class level attribute. This is used
-when registering lookups.
-
-A lookup has three public methods. The as_sql(qn, connection) method needs
-to produce a query string and parameters used by the query string. The qn has
-a method compile() which can be used to compile self.lhs. However usually it
-is better to call self.process_lhs(qn, connection) instead, which returns
-query string and parameters for the lhs. Similary process_rhs(qn, connection)
-returns query string and parameters for the rhs.
+.. _query-expression:
 
 The Query Expression API
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 A lookup can assume that the lhs responds to the query expression API.
-Currently direct field references, aggregates and `Extract` instances respond
+Currently direct field references, aggregates and ``Extract`` instances respond
 to this API.
 
 .. method:: as_sql(qn, connection)
 
-Responsible for producing the query string and parameters for the expression.
-The qn has a compile() method that can be used to compile other expressions.
-The connection is the connection used to execute the query. The
-connection.vendor attribute can be used to return different query strings
-for different backends.
+    Responsible for producing the query string and parameters for the
+    expression. The ``qn`` has a ``compile()`` method that can be used to
+    compile other expressions. The ``connection`` is the connection used to
+    execute the query.
 
-Calling expression.as_sql() directly is usually an error - instead
-qn.compile(expression) should be used. The qn.compile() method will take
-care of calling vendor-specific methods of the expression.
+    Calling expression.as_sql() directly is usually incorrect - instead
+    qn.compile(expression) should be used. The qn.compile() method will take
+    care of calling vendor-specific methods of the expression.
 
 .. method:: as_vendorname(qn, connection)
 
-Works like as_sql() method. When an expression is compiled by qn.compile()
-Django will first try to call as_vendorname(), where vendorname is the vendor
-name of the backend used for executing the query. The vendorname is one of
-'postgresql', 'oracle', 'sqlite' or 'mysql' for Django's inbuilt backends.
+    Works like ``as_sql()`` method. When an expression is compiled by
+    ``qn.compile()``, Django will first try to call ``as_vendorname()``, where
+    vendorname is the vendor name of the backend used for executing the query.
+    The vendorname is one of ``postgresql``, ``oracle``, ``sqlite`` or
+    ``mysql`` for Django's built-in backends.
 
-.. method:: get_lookup(lookup_name)::
+.. method:: get_lookup(lookup_name)
 
-The get_lookup() method is used to fetch lookups. By default the lookup
-is fetched from the expression's output type, but it is possible to override
-this method to alter that behaviour.
+    The ``get_lookup()`` method is used to fetch lookups. By default the lookup
+    is fetched from the expression's output type, but it is possible to
+    override this method to alter that behaviour.
 
 .. attribute:: output_type
 
-The output_type attribute is used by the get_lookup() method to check for
-lookups. The output_type should be a field instance.
+    The ``output_type`` attribute is used by the ``get_lookup()`` method to check for
+    lookups. The output_type should be a field.
 
 Note that this documentation lists only the public methods of the API.
+
+Lookup reference
+~~~~~~~~~~~~~~~~
+
+.. class:: Lookup
+
+    In addition to the attributes and methods below, lookups also support
+    ``as_sql`` and ``as_vendorname`` from the query expression API.
+
+.. attribute:: lhs
+
+    The ``lhs`` (left-hand side) of a lookup tells us what we are comparing the
+    rhs to. It is an object which implements the query expression API. This is
+    likely to be a field, an aggregate or a subclass of ``Extract``.
+
+.. attribute:: rhs
+
+    The ``rhs`` (right-hand side) of a lookup is the value we are comparing the
+    left hand side to. It may be a plain value, or something which compiles
+    into SQL, for example an ``F()`` object or a ``Queryset``.
+
+.. attribute:: lookup_name
+
+    This class level attribute is used when registering lookups. It determines
+    the name used in queries to triger this lookup. For example, ``contains``
+    or ``exact``. This should not contain the string ``__``.
+
+.. method:: process_lhs(qn, connection)
+
+    This returns a tuple of ``(lhs_string, lhs_params)``. In some cases you may
+    wish to compile ``lhs`` directly in your ``as_sql`` methods using
+    ``qn.compile(self.lhs)``.
+
+.. method:: process_rhs(qn, connection)
+
+    Behaves the same as ``process_lhs`` but acts on the right-hand side.
