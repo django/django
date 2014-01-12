@@ -6,7 +6,7 @@ from django.utils import six
 
 
 APP_CONFIG = apps.get_app_config('migrate_signals')
-PRE_MIGRATE_ARGS = ['app_config', 'verbosity', 'interactive', 'db']
+PRE_MIGRATE_ARGS = ['app_config', 'verbosity', 'interactive', 'using']
 MIGRATE_DATABASE = 'default'
 MIGRATE_VERBOSITY = 1
 MIGRATE_INTERACTIVE = False
@@ -35,7 +35,7 @@ class OneTimeReceiver(object):
     def __call__(self, signal, sender, **kwargs):
         # Although test runner calls migrate for several databases,
         # testing for only one of them is quite sufficient.
-        if kwargs['db'] == MIGRATE_DATABASE:
+        if kwargs['using'] == MIGRATE_DATABASE:
             self.call_counter = self.call_counter + 1
             self.call_args = kwargs
             # we need to test only one call of migrate
@@ -74,4 +74,4 @@ class MigrateSignalTests(TestCase):
         self.assertEqual(args['app_config'], APP_CONFIG)
         self.assertEqual(args['verbosity'], MIGRATE_VERBOSITY)
         self.assertEqual(args['interactive'], MIGRATE_INTERACTIVE)
-        self.assertEqual(args['db'], 'default')
+        self.assertEqual(args['using'], 'default')

@@ -60,7 +60,7 @@ def _check_permission_clashing(custom, builtin, ctype):
         pool.add(codename)
 
 
-def create_permissions(app_config, verbosity=2, interactive=True, db=DEFAULT_DB_ALIAS, **kwargs):
+def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, **kwargs):
     if not app_config.models_module:
         return
 
@@ -69,7 +69,7 @@ def create_permissions(app_config, verbosity=2, interactive=True, db=DEFAULT_DB_
     except LookupError:
         return
 
-    if not router.allow_migrate(db, Permission):
+    if not router.allow_migrate(using, Permission):
         return
 
     from django.contrib.contenttypes.models import ContentType
@@ -82,7 +82,7 @@ def create_permissions(app_config, verbosity=2, interactive=True, db=DEFAULT_DB_
     for klass in app_config.get_models():
         # Force looking up the content types in the current database
         # before creating foreign keys to them.
-        ctype = ContentType.objects.db_manager(db).get_for_model(klass)
+        ctype = ContentType.objects.db_manager(using).get_for_model(klass)
         ctypes.add(ctype)
         for perm in _get_all_permissions(klass._meta, ctype):
             searched_perms.append((ctype, perm))
@@ -90,7 +90,7 @@ def create_permissions(app_config, verbosity=2, interactive=True, db=DEFAULT_DB_
     # Find all the Permissions that have a content_type for a model we're
     # looking for.  We don't need to check for codenames since we already have
     # a list of the ones we're going to create.
-    all_perms = set(Permission.objects.using(db).filter(
+    all_perms = set(Permission.objects.using(using).filter(
         content_type__in=ctypes,
     ).values_list(
         "content_type", "codename"
@@ -113,13 +113,13 @@ def create_permissions(app_config, verbosity=2, interactive=True, db=DEFAULT_DB_
                     verbose_name_max_length,
                 )
             )
-    Permission.objects.using(db).bulk_create(perms)
+    Permission.objects.using(using).bulk_create(perms)
     if verbosity >= 2:
         for perm in perms:
             print("Adding permission '%s'" % perm)
 
 
-def create_superuser(app_config, verbosity=2, interactive=True, db=DEFAULT_DB_ALIAS, **kwargs):
+def create_superuser(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, **kwargs):
     try:
         apps.get_model('auth', 'Permission')
     except LookupError:
@@ -139,7 +139,7 @@ def create_superuser(app_config, verbosity=2, interactive=True, db=DEFAULT_DB_AL
                 confirm = input('Please enter either "yes" or "no": ')
                 continue
             if confirm == 'yes':
-                call_command("createsuperuser", interactive=True, database=db)
+                call_command("createsuperuser", interactive=True, database=using)
             break
 
 
