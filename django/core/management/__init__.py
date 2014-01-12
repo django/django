@@ -376,7 +376,6 @@ class ManagementUtility(object):
         parser = LaxOptionParser(usage="%prog subcommand [options] [args]",
                                  version=get_version(),
                                  option_list=BaseCommand.option_list)
-        self.autocomplete()
         try:
             options, args = parser.parse_args(self.argv)
             handle_default_options(options)
@@ -390,6 +389,8 @@ class ManagementUtility(object):
             pass
         else:
             django.setup()
+
+        self.autocomplete()
 
         try:
             subcommand = self.argv[1]
