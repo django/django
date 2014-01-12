@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, date
-import time
 
 from django.test import TestCase, override_settings
+from django.test.utils import TZ_SUPPORT, requires_tz_support
 from django.utils.dateformat import format
 from django.utils import dateformat
 from django.utils.timezone import utc, get_fixed_timezone, get_default_timezone, make_aware
@@ -12,9 +12,6 @@ from django.utils import translation
 
 @override_settings(TIME_ZONE='Europe/Copenhagen')
 class DateFormatTests(TestCase):
-
-    # Run tests that require a time zone only when the OS supports it.
-    tz_tests = hasattr(time, 'tzset')
 
     def setUp(self):
         self._orig_lang = translation.get_language()
@@ -31,12 +28,14 @@ class DateFormatTests(TestCase):
         dt = datetime(2009, 5, 16, 5, 30, 30)
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U'))), dt)
 
+    @requires_tz_support
     def test_datetime_with_local_tzinfo(self):
         ltz = get_default_timezone()
         dt = make_aware(datetime(2009, 5, 16, 5, 30, 30), ltz)
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), ltz), dt)
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U'))), dt.replace(tzinfo=None))
 
+    @requires_tz_support
     def test_datetime_with_tzinfo(self):
         tz = get_fixed_timezone(-510)
         ltz = get_default_timezone()
@@ -117,7 +116,7 @@ class DateFormatTests(TestCase):
         tz = get_fixed_timezone(-210)
         aware_dt = datetime(2009, 5, 16, 5, 30, 30, tzinfo=tz)
 
-        if self.tz_tests:
+        if TZ_SUPPORT:
             self.assertEqual(dateformat.format(my_birthday, 'O'), '+0100')
             self.assertEqual(dateformat.format(my_birthday, 'r'), 'Sun, 8 Jul 1979 22:00:00 +0100')
             self.assertEqual(dateformat.format(my_birthday, 'T'), 'CET')
