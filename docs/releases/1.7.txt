@@ -899,6 +899,11 @@ Miscellaneous
 
 * GeoDjango dropped support for GEOS < 3.1.
 
+* The ``init_connection_state`` method of database backends now executes in
+  autocommit mode (unless you set :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>`
+  to ``False``). If you maintain a custom database backend, you should check
+  that method.
+
 Features deprecated in 1.7
 ==========================
 

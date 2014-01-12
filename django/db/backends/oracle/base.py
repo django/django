@@ -627,6 +627,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # Django docs specify cx_Oracle version 4.3.1 or higher, but
             # stmtcachesize is available only in 4.3.2 and up.
             pass
+        # Ensure all changes are preserved even when AUTOCOMMIT is False.
+        if not self.get_autocommit():
+            self.commit()
 
     def create_cursor(self):
         return FormatStylePlaceholderCursor(self.connection)
