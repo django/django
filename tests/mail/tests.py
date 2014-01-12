@@ -891,8 +891,11 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
         """
         backend = smtp.EmailBackend(
             username='not empty username', password='not empty password')
-        self.assertRaisesMessage(SMTPException,
-            'SMTP AUTH extension not supported by server.', backend.open)
+        try:
+            self.assertRaisesMessage(SMTPException,
+                'SMTP AUTH extension not supported by server.', backend.open)
+        finally:
+            backend.close()
 
     def test_server_open(self):
         """
@@ -949,14 +952,20 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
     def test_email_tls_attempts_starttls(self):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_tls)
-        self.assertRaisesMessage(SMTPException,
-            'STARTTLS extension not supported by server.', backend.open)
+        try:
+            self.assertRaisesMessage(SMTPException,
+                'STARTTLS extension not supported by server.', backend.open)
+        finally:
+            backend.close()
 
     @override_settings(EMAIL_USE_SSL=True)
     def test_email_ssl_attempts_ssl_connection(self):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_ssl)
-        self.assertRaises(SSLError, backend.open)
+        try:
+            self.assertRaises(SSLError, backend.open)
+        finally:
+            backend.close()
 
     def test_connection_timeout_default(self):
         """Test that the connection's timeout value is None by default."""
@@ -974,3 +983,4 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
         myemailbackend.open()
         self.assertEqual(myemailbackend.timeout, 42)
         self.assertEqual(myemailbackend.connection.timeout, 42)
+        myemailbackend.close()
