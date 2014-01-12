@@ -99,9 +99,9 @@ or where it did not exceede a certain amount
 We will start by writing a ``AbsoluteValue`` transformer. This will use the SQL
 function ``ABS()`` to transform the value before comparison::
 
-  from django.db.models import Extract
+  from django.db.models import Transform
 
-  class AbsoluteValue(Extract):
+  class AbsoluteValue(Transform):
       lookup_name = 'abs'
 
       def as_sql(self, qn, connection):
@@ -118,19 +118,19 @@ We can now run the queris we had before.
 
     SELECT ... WHERE ABS("experiments"."change") = 27
 
-By using ``Extract`` instead of ``Lookup`` it means we are able to chain
+By using ``Transform`` instead of ``Lookup`` it means we are able to chain
 further lookups afterwards. So
 ``Experiment.objects.filter(change__abs__lt=27)`` will generate the following
 SQL::
 
     SELECT ... WHERE ABS("experiments"."change") < 27
 
-Subclasses of ``Extract`` usually only operate on the left-hand side of the
+Subclasses of ``Transform`` usually only operate on the left-hand side of the
 expression. Further lookups will work on the transformed value. Note that in
 this case where there is no other lookup specified, Django interprets
 ``change__abs=27`` as ``change__abs__exact=27``.
 
-When looking for which lookups are allowable after the ``Extract`` has been
+When looking for which lookups are allowable after the ``Transform`` has been
 applied, Django uses the ``output_type`` attribute. We didn't need to specify
 this here as it didn't change, but supposing we were applying ``AbsoluteValue``
 to some field which represents a more complex type (for example a point
@@ -222,7 +222,7 @@ The Query Expression API
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 A lookup can assume that the lhs responds to the query expression API.
-Currently direct field references, aggregates and ``Extract`` instances respond
+Currently direct field references, aggregates and ``Transform`` instances respond
 to this API.
 
 .. method:: as_sql(qn, connection)
@@ -269,7 +269,7 @@ Lookup reference
 
     The ``lhs`` (left-hand side) of a lookup tells us what we are comparing the
     rhs to. It is an object which implements the query expression API. This is
-    likely to be a field, an aggregate or a subclass of ``Extract``.
+    likely to be a field, an aggregate or a subclass of ``Transform``.
 
 .. attribute:: rhs
 

@@ -39,7 +39,7 @@ class RegisterLookupMixin(object):
         del cls.class_lookups[lookup.lookup_name]
 
 
-class Extract(RegisterLookupMixin):
+class Transform(RegisterLookupMixin):
     def __init__(self, lhs, lookups):
         self.lhs = lhs
         self.init_lookups = lookups[:]
