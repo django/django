@@ -7,7 +7,7 @@ from django.db import models
 from django.db import connection
 
 
-class Div3Lookup(models.lookups.Lookup):
+class Div3Lookup(models.Lookup):
     lookup_name = 'div3'
 
     def as_sql(self, qn, connection):
@@ -17,7 +17,7 @@ class Div3Lookup(models.lookups.Lookup):
         return '%s %%%% 3 = %s' % (lhs, rhs), params
 
 
-class Div3Extract(models.lookups.Extract):
+class Div3Transform(models.Transform):
     lookup_name = 'div3'
 
     def as_sql(self, qn, connection):
@@ -25,7 +25,7 @@ class Div3Extract(models.lookups.Extract):
         return '%s %%%% 3' % (lhs,), lhs_params
 
 
-class YearExtract(models.lookups.Extract):
+class YearTransform(models.Transform):
     lookup_name = 'year'
 
     def as_sql(self, qn, connection):
@@ -53,7 +53,7 @@ class YearExact(models.lookups.Lookup):
         return ("%(lhs)s >= (%(rhs)s || '-01-01')::date "
                 "AND %(lhs)s <= (%(rhs)s || '-12-31')::date" %
                 {'lhs': lhs_sql, 'rhs': rhs_sql}, params)
-YearExtract.register_lookup(YearExact)
+YearTransform.register_lookup(YearExact)
 
 
 class YearLte(models.lookups.LessThanOrEqual):
@@ -62,7 +62,7 @@ class YearLte(models.lookups.LessThanOrEqual):
     """
 
     def as_sql(self, qn, connection):
-        # Skip the YearExtract above us (no possibility for efficient
+        # Skip the YearTransform above us (no possibility for efficient
         # lookup otherwise).
         real_lhs = self.lhs.lhs
         lhs_sql, params = self.process_lhs(qn, connection, real_lhs)
@@ -73,7 +73,7 @@ class YearLte(models.lookups.LessThanOrEqual):
         #     WHERE somecol <= '2013-12-31')
         # but also make it work if the rhs_sql is field reference.
         return "%s <= (%s || '-12-31')::date" % (lhs_sql, rhs_sql), params
-YearExtract.register_lookup(YearLte)
+YearTransform.register_lookup(YearLte)
 
 
 # We will register this class temporarily in the test method.
@@ -155,7 +155,7 @@ class LookupTests(TestCase):
             models.DateField._unregister_lookup(InMonth)
 
     def test_div3_extract(self):
-        models.IntegerField.register_lookup(Div3Extract)
+        models.IntegerField.register_lookup(Div3Transform)
         try:
             a1 = Author.objects.create(name='a1', age=1)
             a2 = Author.objects.create(name='a2', age=2)
@@ -172,19 +172,19 @@ class LookupTests(TestCase):
                 baseqs.filter(age__div3__in=[0, 2]),
                 [a2, a3], lambda x: x)
         finally:
-            models.IntegerField._unregister_lookup(Div3Extract)
+            models.IntegerField._unregister_lookup(Div3Transform)
 
 
 class YearLteTests(TestCase):
     def setUp(self):
-        models.DateField.register_lookup(YearExtract)
+        models.DateField.register_lookup(YearTransform)
         self.a1 = Author.objects.create(name='a1', birthdate=date(1981, 2, 16))
         self.a2 = Author.objects.create(name='a2', birthdate=date(2012, 2, 29))
         self.a3 = Author.objects.create(name='a3', birthdate=date(2012, 1, 31))
         self.a4 = Author.objects.create(name='a4', birthdate=date(2012, 3, 1))
 
     def tearDown(self):
-        models.DateField._unregister_lookup(YearExtract)
+        models.DateField._unregister_lookup(YearTransform)
 
     @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific SQL used")
     def test_year_lte(self):
@@ -270,10 +270,10 @@ class YearLteTests(TestCase):
                             "AND %(lhs)s <= str_to_date(CONCAT(%(rhs)s, '-12-31'), '%%%%Y-%%%%m-%%%%d')" %
                             {'lhs': lhs_sql, 'rhs': rhs_sql}, params)
             setattr(CustomYearExact, 'as_' + connection.vendor, CustomYearExact.as_custom_sql)
-            YearExtract.register_lookup(CustomYearExact)
+            YearTransform.register_lookup(CustomYearExact)
             self.assertIn(
                 'CONCAT(',
                 str(Author.objects.filter(birthdate__year=2012).query))
         finally:
-            YearExtract._unregister_lookup(CustomYearExact)
-            YearExtract.register_lookup(YearExact)
+            YearTransform._unregister_lookup(CustomYearExact)
+            YearTransform.register_lookup(YearExact)
