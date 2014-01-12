@@ -384,10 +384,10 @@ class PostgresNewConnectionTests(TestCase):
         after setting the time zone when AUTOCOMMIT is False (#21452).
         """
         databases = copy.deepcopy(settings.DATABASES)
+        databases[DEFAULT_DB_ALIAS]['AUTOCOMMIT'] = False
         new_connections = ConnectionHandler(databases)
         new_connection = new_connections[DEFAULT_DB_ALIAS]
         try:
-            new_connection.settings_dict['AUTOCOMMIT'] = False
             # Open a database connection.
             new_connection.cursor()
             self.assertFalse(new_connection.get_autocommit())
