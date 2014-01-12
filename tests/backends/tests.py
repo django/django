@@ -388,7 +388,6 @@ class PostgresNewConnectionTests(TestCase):
         new_connection = new_connections[DEFAULT_DB_ALIAS]
         try:
             new_connection.settings_dict['AUTOCOMMIT'] = False
-            cursor = new_connection.cursor()
             self.assertFalse(new_connection.get_autocommit())
         finally:
             new_connection.close()

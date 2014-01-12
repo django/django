@@ -4,7 +4,7 @@ import weakref
 
 from django.utils.six.moves import xrange
 
-if sys.version_info < (3,4):
+if sys.version_info < (3, 4):
     from .weakref_backports import WeakMethod
 else:
     from weakref import WeakMethod
