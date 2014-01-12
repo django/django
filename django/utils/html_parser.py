@@ -12,7 +12,18 @@ use_workaround = (
 HTMLParseError = _html_parser.HTMLParseError
 
 if not use_workaround:
-    HTMLParser = _html_parser.HTMLParser
+    if current_version >= (3, 4):
+        class HTMLParser(_html_parser.HTMLParser):
+            """Explicitly set convert_charrefs to be False.
+
+            This silences a deprecation warning on Python 3.4, but we can't do
+            it at call time because Python 2.7 does not have the keyword
+            argument.
+            """
+            def __init__(self, convert_charrefs=False):
+                _html_parser.HTMLParser.__init__(self, convert_charrefs=convert_charrefs)
+    else:
+        HTMLParser = _html_parser.HTMLParser
 else:
     tagfind = re.compile('([a-zA-Z][-.a-zA-Z0-9:_]*)(?:\s|/(?!>))*')
 
