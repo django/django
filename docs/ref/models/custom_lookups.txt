@@ -216,12 +216,6 @@ When compiling a query, Django first looks for ``as_%s % connection.vendor``
 methods, and then falls back to ``as_sql``. The vendor names for the in-built
 backends are ``sqlite``, ``postgresql``, ``oracle`` and ``mysql``.
 
-.. note::
-    If for some reason you need to change the lookup just for a specific query,
-    you can do that and reregister the original lookup afterwards. However you
-    need to be careful to ensure that your patch is in place until the queryset
-    is evaluated, not just created.
-
 .. _query-expression:
 
 The Query Expression API
