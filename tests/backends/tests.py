@@ -373,10 +373,25 @@ class PostgresNewConnectionTests(TestCase):
             tz = cursor.fetchone()[0]
             self.assertEqual(new_tz, tz)
         finally:
-            try:
-                new_connection.close()
-            except DatabaseError:
-                pass
+            new_connection.close()
+
+    @unittest.skipUnless(
+        connection.vendor == 'postgresql',
+        "This test applies only to PostgreSQL")
+    def test_connect_non_autocommit(self):
+        """
+        The connection wrapper shouldn't believe that autocommit is enabled
+        after setting the time zone when AUTOCOMMIT is False (#21452).
+        """
+        databases = copy.deepcopy(settings.DATABASES)
+        new_connections = ConnectionHandler(databases)
+        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        try:
+            new_connection.settings_dict['AUTOCOMMIT'] = False
+            cursor = new_connection.cursor()
+            self.assertFalse(new_connection.get_autocommit())
+        finally:
+            new_connection.close()
 
 
 # This test needs to run outside of a transaction, otherwise closing the
