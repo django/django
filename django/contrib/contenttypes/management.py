@@ -6,7 +6,7 @@ from django.utils import six
 from django.utils.six.moves import input
 
 
-def update_contenttypes(app_config, verbosity=2, interactive=True, db=DEFAULT_DB_ALIAS, **kwargs):
+def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, **kwargs):
     """
     Creates content types for models in the given app, removing any model
     entries that no longer have a matching model class.
@@ -19,7 +19,7 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, db=DEFAULT_DB
     except LookupError:
         return
 
-    if not router.allow_migrate(db, ContentType):
+    if not router.allow_migrate(using, ContentType):
         return
 
     ContentType.objects.clear_cache()
@@ -36,7 +36,7 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, db=DEFAULT_DB
     # Get all the content types
     content_types = dict(
         (ct.model, ct)
-        for ct in ContentType.objects.using(db).filter(app_label=app_label)
+        for ct in ContentType.objects.using(using).filter(app_label=app_label)
     )
     to_remove = [
         ct
@@ -53,7 +53,7 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, db=DEFAULT_DB
         for (model_name, model) in six.iteritems(app_models)
         if model_name not in content_types
     ]
-    ContentType.objects.using(db).bulk_create(cts)
+    ContentType.objects.using(using).bulk_create(cts)
     if verbosity >= 2:
         for ct in cts:
             print("Adding content type '%s | %s'" % (ct.app_label, ct.model))

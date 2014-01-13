@@ -295,7 +295,7 @@ class SQLCompiler(object):
             if table in only_load and column not in only_load[table]:
                 continue
             if as_pairs:
-                result.append((alias, column))
+                result.append((alias, field))
                 aliases.add(alias)
                 continue
             if with_aliases and column in col_aliases:
@@ -625,10 +625,10 @@ class SQLCompiler(object):
             _, _, _, joins, _ = self.query.setup_joins(
                 [f.name], opts, root_alias)
             alias = joins[-1]
-            columns, aliases = self.get_default_columns(start_alias=alias,
+            columns, _ = self.get_default_columns(start_alias=alias,
                     opts=f.rel.to._meta, as_pairs=True)
             self.query.related_select_cols.extend(
-                SelectInfo(col, field) for col, field in zip(columns, f.rel.to._meta.concrete_fields))
+                SelectInfo((col[0], col[1].column), col[1]) for col in columns)
             if restricted:
                 next = requested.get(f.name, {})
             else:
@@ -652,11 +652,10 @@ class SQLCompiler(object):
                 alias = joins[-1]
                 from_parent = (opts.model if issubclass(model, opts.model)
                                else None)
-                columns, aliases = self.get_default_columns(start_alias=alias,
+                columns, _ = self.get_default_columns(start_alias=alias,
                     opts=model._meta, as_pairs=True, from_parent=from_parent)
                 self.query.related_select_cols.extend(
-                    SelectInfo(col, field) for col, field
-                    in zip(columns, model._meta.concrete_fields))
+                    SelectInfo((col[0], col[1].column), col[1]) for col in columns)
                 next = requested.get(f.related_query_name(), {})
                 self.fill_related_selections(model._meta, alias, cur_depth + 1,
                                              next, restricted)
@@ -699,8 +698,10 @@ class SQLCompiler(object):
                         # found in get_columns(). It would be nice to clean this up.
                         if self.query.select:
                             fields = [f.field for f in self.query.select]
-                        else:
+                        elif self.query.default_cols:
                             fields = self.query.get_meta().concrete_fields
+                        else:
+                            fields = []
                         fields = fields + [f.field for f in self.query.related_select_cols]
 
                         # If the field was deferred, exclude it from being passed

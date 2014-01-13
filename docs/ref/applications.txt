@@ -181,6 +181,13 @@ Methods
     as registering signals. It is called as soon as the registry is fully
     populated.
 
+    You cannot import models in modules that define application configuration
+    classes, but you can use :meth:`get_model` to access a model class by
+    name, like this::
+
+        def ready(self):
+            MyModel = self.get_model('MyModel')
+
 Application registry
 ====================
 

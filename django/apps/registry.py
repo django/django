@@ -1,11 +1,11 @@
 from collections import Counter, defaultdict, OrderedDict
 import os
 import sys
+import threading
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import lru_cache
-from django.utils.module_loading import import_lock
 from django.utils._os import upath
 
 from .base import AppConfig
@@ -44,6 +44,9 @@ class Apps(object):
         # Whether the registry is populated.
         self.ready = False
 
+        # Lock for thread-safe population.
+        self._lock = threading.Lock()
+
         # Pending lookups for lazy relations.
         self._pending_lookups = {}
 
@@ -61,10 +64,10 @@ class Apps(object):
         """
         if self.ready:
             return
-        # Since populate() may be a side effect of imports, and since it will
-        # itself import modules, an ABBA deadlock between threads would be
-        # possible if we didn't take the import lock. See #18251.
-        with import_lock():
+
+        # populate() might be called by two threads in parallel on servers
+        # that create threads before initializing the WSGI callable.
+        with self._lock:
             if self.ready:
                 return
 

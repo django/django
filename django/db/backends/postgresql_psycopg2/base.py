@@ -142,12 +142,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 conn_tz = get_parameter_status('TimeZone')
 
             if conn_tz != tz:
-                # Set the time zone in autocommit mode (see #17062)
-                self.set_autocommit(True)
-                self.connection.cursor().execute(
-                    self.ops.set_time_zone_sql(), [tz]
-                )
-        self.connection.set_isolation_level(self.isolation_level)
+                cursor = self.connection.cursor()
+                cursor.execute(self.ops.set_time_zone_sql(), [tz])
+                cursor.close()
+                # Commit after setting the time zone (see #17062)
+                if not self.get_autocommit():
+                    self.connection.commit()
 
     def create_cursor(self):
         cursor = self.connection.cursor()

@@ -130,6 +130,11 @@ def setup(verbosity, test_labels):
         'django.contrib.comments is deprecated and will be removed before Django 1.8.',
         DeprecationWarning
     )
+    warnings.filterwarnings(
+        'ignore',
+        'Model class django.contrib.comments.models.*supported in Django 1.9.',
+        PendingDeprecationWarning
+    )
     # Load all the ALWAYS_INSTALLED_APPS.
     django.setup()
 
@@ -169,8 +174,8 @@ def setup(verbosity, test_labels):
             if module_label not in settings.INSTALLED_APPS:
                 settings.INSTALLED_APPS.append(module_label)
             app_config = AppConfig.create(module_label)
-            app_config.import_models(apps.all_models[app_config.label])
             apps.app_configs[app_config.label] = app_config
+            app_config.import_models(apps.all_models[app_config.label])
             apps.clear_cache()
 
     return state

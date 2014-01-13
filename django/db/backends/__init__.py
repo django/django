@@ -110,9 +110,8 @@ class BaseDatabaseWrapper(object):
         # Establish the connection
         conn_params = self.get_connection_params()
         self.connection = self.get_new_connection(conn_params)
+        self.set_autocommit(self.settings_dict['AUTOCOMMIT'])
         self.init_connection_state()
-        if self.settings_dict['AUTOCOMMIT']:
-            self.set_autocommit(True)
         connection_created.send(sender=self.__class__, connection=self)
 
     def ensure_connection(self):

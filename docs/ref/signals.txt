@@ -408,7 +408,7 @@ Arguments sent with this signal:
     For example, the :mod:`django.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
 
-``db``
+``using``
     The alias of database on which a command will operate.
 
 pre_syncdb
@@ -459,7 +459,7 @@ Arguments sent with this signal:
     For example, the :mod:`django.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
 
-``db``
+``using``
     The alias of database on which a command will operate.
 
 post_migrate
