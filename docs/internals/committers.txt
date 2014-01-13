@@ -60,17 +60,6 @@ Current developers
 
 Currently, Django is led by a team of volunteers from around the globe.
 
-.. _django-bdfls:
-
-BDFLs
------
-
-Adrian and Jacob are the Co-`Benevolent Dictators for Life`_ of Django. When
-"rough consensus and working code" fails, they're the ones who make the tough
-decisions.
-
-.. _Benevolent Dictators for Life: http://en.wikipedia.org/wiki/Benevolent_Dictator_For_Life
-
 Core developers
 ---------------
 
