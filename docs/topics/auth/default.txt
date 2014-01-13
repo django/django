@@ -111,6 +111,11 @@ Django also provides :ref:`views <built-in-auth-views>` and :ref:`forms
 <built-in-auth-forms>` that may be used to allow users to change their own
 passwords.
 
+.. versionchanged:: 1.7
+
+Changing a user's password will log out all his sessions. See
+:ref:`session-invalidation-on-password-change` for details.
+
 Authenticating Users
 --------------------
 
@@ -1231,3 +1236,8 @@ User passwords are not displayed in the admin (nor stored in the database), but
 the :doc:`password storage details </topics/auth/passwords>` are displayed.
 Included in the display of this information is a link to
 a password change form that allows admins to change user passwords.
+
+.. versionchanged:: 1.7
+
+Changing a user's password will log out all his sessions. See
+:ref:`session-invalidation-on-password-change` for details.

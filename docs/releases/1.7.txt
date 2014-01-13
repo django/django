@@ -805,6 +805,17 @@ Fixing the issues introduced some backward incompatible changes:
 
 .. _pytz: https://pypi.python.org/pypi/pytz/
 
+Session signing and invalidation on password change
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :meth:`AbstractBaseUser.get_session_auth_hash()
+<django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash>`
+method was added and if your :setting:`AUTH_USER_MODEL` inherits from
+:class:`~django.contrib.auth.models.AbstractBaseUser`, changing a user's
+password now invalidates old sessions. As a side effect of this change, users
+will be logged out when upgrading from an older version of Django. See
+:ref:`session-invalidation-on-password-change` for more details.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 

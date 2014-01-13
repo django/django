@@ -3,13 +3,15 @@ import re
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.utils.module_loading import import_by_path
 from django.middleware.csrf import rotate_token
+from django.utils.crypto import constant_time_compare
+from django.utils.module_loading import import_by_path
 
 from .signals import user_logged_in, user_logged_out, user_login_failed
 
 SESSION_KEY = '_auth_user_id'
 BACKEND_SESSION_KEY = '_auth_user_backend'
+SESSION_HASH_KEY = '_auth_user_hash'
 REDIRECT_FIELD_NAME = 'next'
 
 
@@ -74,11 +76,16 @@ def login(request, user):
     have to reauthenticate on every request. Note that data set during
     the anonymous session is retained when the user logs in.
     """
+    session_auth_hash = ''
     if user is None:
         user = request.user
-    # TODO: It would be nice to support different login methods, like signed cookies.
+    if hasattr(user, 'get_session_auth_hash'):
+        session_auth_hash = user.get_session_auth_hash()
+
     if SESSION_KEY in request.session:
-        if request.session[SESSION_KEY] != user.pk:
+        if request.session[SESSION_KEY] != user.pk or (
+                session_auth_hash and
+                request.session[SESSION_HASH_KEY] != session_auth_hash):
             # To avoid reusing another user's session, create a new, empty
             # session if the existing session corresponds to a different
             # authenticated user.
@@ -87,6 +94,7 @@ def login(request, user):
         request.session.cycle_key()
     request.session[SESSION_KEY] = user.pk
     request.session[BACKEND_SESSION_KEY] = user.backend
+    request.session[SESSION_HASH_KEY] = session_auth_hash
     if hasattr(request, 'user'):
         request.user = user
     rotate_token(request)
@@ -145,9 +153,18 @@ def get_user(request):
     try:
         user_id = request.session[SESSION_KEY]
         backend_path = request.session[BACKEND_SESSION_KEY]
-        assert backend_path in settings.AUTHENTICATION_BACKENDS
+        if backend_path not in settings.AUTHENTICATION_BACKENDS:
+            raise AssertionError
         backend = load_backend(backend_path)
         user = backend.get_user(user_id) or AnonymousUser()
+        if hasattr(user, 'get_session_auth_hash'):
+            session_hash = request.session.get(SESSION_HASH_KEY)
+            session_hash_verified = session_hash and constant_time_compare(
+                session_hash,
+                user.get_session_auth_hash()
+            )
+            if not session_hash_verified:
+                raise AssertionError
     except (KeyError, AssertionError):
         user = AnonymousUser()
     return user
