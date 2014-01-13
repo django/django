@@ -13,6 +13,7 @@ from django.core.management.utils import (handle_extensions, find_command,
     popen_wrapper)
 from django.utils.encoding import force_str
 from django.utils.functional import total_ordering
+from django.utils import six
 from django.utils.text import get_text_list
 from django.utils.jslex import prepare_js_for_gettext
 
@@ -93,7 +94,7 @@ class TranslatableFile(object):
             orig_file = os.path.join(self.dirpath, self.file)
             is_templatized = file_ext in command.extensions
             if is_templatized:
-                with open(orig_file, "rU") as fp:
+                with open(orig_file, 'r' if six.PY3 else 'rU') as fp:
                     src_data = fp.read()
                 thefile = '%s.py' % self.file
                 content = templatize(src_data, orig_file[2:])
@@ -440,7 +441,7 @@ class Command(NoArgsCommand):
         for domain in domains:
             django_po = os.path.join(django_dir, 'conf', 'locale', locale, 'LC_MESSAGES', '%s.po' % domain)
             if os.path.exists(django_po):
-                with io.open(django_po, 'rU', encoding='utf-8') as fp:
+                with io.open(django_po, 'r' if six.PY3 else 'rU', encoding='utf-8') as fp:
                     m = plural_forms_re.search(fp.read())
                 if m:
                     plural_form_line = force_str(m.group('value'))
