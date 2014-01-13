@@ -16,7 +16,7 @@ Journal-World`_ of Lawrence, Kansas, USA.
     He was lead developer at World Online for 2.5 years, during which time
     Django was developed and implemented on World Online's sites. He was the
     leader and founder of EveryBlock_, a "news feed for your block." He now
-    develops for Soundslice_.
+    develops Soundslice_.
 
     Adrian lives in Chicago, USA.
 
