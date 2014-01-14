@@ -1,4 +1,5 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, url, include
+from django.contrib import admin
 from django.contrib.auth import context_processors
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.urls import urlpatterns
@@ -98,4 +99,7 @@ urlpatterns = urlpatterns + patterns('',
     (r'^auth_processor_messages/$', auth_processor_messages),
     (r'^custom_request_auth_login/$', custom_request_auth_login),
     url(r'^userpage/(.+)/$', userpage, name="userpage"),
+
+    # This line is only required to render the password reset with is_admin=True
+    (r'^admin/', include(admin.site.urls)),
 )

@@ -17,6 +17,7 @@ from django.utils.http import urlsafe_base64_encode
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
 )
 class AuthTemplateTests(TestCase):
+    urls = 'django.contrib.auth.tests.urls'
 
     def test_titles(self):
         rf = RequestFactory()

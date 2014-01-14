@@ -550,6 +550,8 @@ class TemplateRegressionTests(TestCase):
                        os.path.dirname(os.path.abspath(upath(__file__))),),
                    )
 class TemplateTests(TransRealMixin, TestCase):
+    urls = 'template_tests.urls'
+
     def test_templates(self):
         template_tests = self.get_template_tests()
         filter_tests = filters.get_filter_tests()
@@ -1701,28 +1703,28 @@ class TemplateTests(TransRealMixin, TestCase):
 
             ### URL TAG ########################################################
             # Successes
-            'url01': ('{% url "template_tests.views.client" client.id %}', {'client': {'id': 1}}, '/url_tag/client/1/'),
-            'url02': ('{% url "template_tests.views.client_action" id=client.id action="update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
-            'url02a': ('{% url "template_tests.views.client_action" client.id "update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
-            'url02b': ("{% url 'template_tests.views.client_action' id=client.id action='update' %}", {'client': {'id': 1}}, '/url_tag/client/1/update/'),
-            'url02c': ("{% url 'template_tests.views.client_action' client.id 'update' %}", {'client': {'id': 1}}, '/url_tag/client/1/update/'),
-            'url03': ('{% url "template_tests.views.index" %}', {}, '/url_tag/'),
-            'url04': ('{% url "named.client" client.id %}', {'client': {'id': 1}}, '/url_tag/named-client/1/'),
-            'url05': ('{% url "метка_оператора" v %}', {'v': 'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
-            'url06': ('{% url "метка_оператора_2" tag=v %}', {'v': 'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
-            'url07': ('{% url "template_tests.views.client2" tag=v %}', {'v': 'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
-            'url08': ('{% url "метка_оператора" v %}', {'v': 'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
-            'url09': ('{% url "метка_оператора_2" tag=v %}', {'v': 'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
-            'url10': ('{% url "template_tests.views.client_action" id=client.id action="two words" %}', {'client': {'id': 1}}, '/url_tag/client/1/two%20words/'),
-            'url11': ('{% url "template_tests.views.client_action" id=client.id action="==" %}', {'client': {'id': 1}}, '/url_tag/client/1/%3D%3D/'),
-            'url12': ('{% url "template_tests.views.client_action" id=client.id action="," %}', {'client': {'id': 1}}, '/url_tag/client/1/%2C/'),
-            'url13': ('{% url "template_tests.views.client_action" id=client.id action=arg|join:"-" %}', {'client': {'id': 1}, 'arg': ['a', 'b']}, '/url_tag/client/1/a-b/'),
-            'url14': ('{% url "template_tests.views.client_action" client.id arg|join:"-" %}', {'client': {'id': 1}, 'arg': ['a', 'b']}, '/url_tag/client/1/a-b/'),
-            'url15': ('{% url "template_tests.views.client_action" 12 "test" %}', {}, '/url_tag/client/12/test/'),
-            'url18': ('{% url "template_tests.views.client" "1,2" %}', {}, '/url_tag/client/1%2C2/'),
+            'url01': ('{% url "template_tests.views.client" client.id %}', {'client': {'id': 1}}, '/client/1/'),
+            'url02': ('{% url "template_tests.views.client_action" id=client.id action="update" %}', {'client': {'id': 1}}, '/client/1/update/'),
+            'url02a': ('{% url "template_tests.views.client_action" client.id "update" %}', {'client': {'id': 1}}, '/client/1/update/'),
+            'url02b': ("{% url 'template_tests.views.client_action' id=client.id action='update' %}", {'client': {'id': 1}}, '/client/1/update/'),
+            'url02c': ("{% url 'template_tests.views.client_action' client.id 'update' %}", {'client': {'id': 1}}, '/client/1/update/'),
+            'url03': ('{% url "template_tests.views.index" %}', {}, '/'),
+            'url04': ('{% url "named.client" client.id %}', {'client': {'id': 1}}, '/named-client/1/'),
+            'url05': ('{% url "метка_оператора" v %}', {'v': 'Ω'}, '/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
+            'url06': ('{% url "метка_оператора_2" tag=v %}', {'v': 'Ω'}, '/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
+            'url07': ('{% url "template_tests.views.client2" tag=v %}', {'v': 'Ω'}, '/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
+            'url08': ('{% url "метка_оператора" v %}', {'v': 'Ω'}, '/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
+            'url09': ('{% url "метка_оператора_2" tag=v %}', {'v': 'Ω'}, '/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
+            'url10': ('{% url "template_tests.views.client_action" id=client.id action="two words" %}', {'client': {'id': 1}}, '/client/1/two%20words/'),
+            'url11': ('{% url "template_tests.views.client_action" id=client.id action="==" %}', {'client': {'id': 1}}, '/client/1/%3D%3D/'),
+            'url12': ('{% url "template_tests.views.client_action" id=client.id action="," %}', {'client': {'id': 1}}, '/client/1/%2C/'),
+            'url13': ('{% url "template_tests.views.client_action" id=client.id action=arg|join:"-" %}', {'client': {'id': 1}, 'arg': ['a', 'b']}, '/client/1/a-b/'),
+            'url14': ('{% url "template_tests.views.client_action" client.id arg|join:"-" %}', {'client': {'id': 1}, 'arg': ['a', 'b']}, '/client/1/a-b/'),
+            'url15': ('{% url "template_tests.views.client_action" 12 "test" %}', {}, '/client/12/test/'),
+            'url18': ('{% url "template_tests.views.client" "1,2" %}', {}, '/client/1%2C2/'),
 
-            'url19': ('{% url named_url client.id %}', {'named_url': 'template_tests.views.client', 'client': {'id': 1}}, '/url_tag/client/1/'),
-            'url20': ('{% url url_name_in_var client.id %}', {'url_name_in_var': 'named.client', 'client': {'id': 1}}, '/url_tag/named-client/1/'),
+            'url19': ('{% url named_url client.id %}', {'named_url': 'template_tests.views.client', 'client': {'id': 1}}, '/client/1/'),
+            'url20': ('{% url url_name_in_var client.id %}', {'url_name_in_var': 'named.client', 'client': {'id': 1}}, '/named-client/1/'),
 
             # Failures
             'url-fail01': ('{% url %}', {}, template.TemplateSyntaxError),
@@ -1747,7 +1749,7 @@ class TemplateTests(TransRealMixin, TestCase):
 
             # {% url ... as var %}
             'url-asvar01': ('{% url "template_tests.views.index" as url %}', {}, ''),
-            'url-asvar02': ('{% url "template_tests.views.index" as url %}{{ url }}', {}, '/url_tag/'),
+            'url-asvar02': ('{% url "template_tests.views.index" as url %}{{ url }}', {}, '/'),
             'url-asvar03': ('{% url "no_such_view" as url %}{{ url }}', {}, ''),
 
             ### CACHE TAG ######################################################
