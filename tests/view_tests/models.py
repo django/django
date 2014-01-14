@@ -14,7 +14,7 @@ class Author(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return '/views/authors/%s/' % self.id
+        return '/authors/%s/' % self.id
 
 
 @python_2_unicode_compatible

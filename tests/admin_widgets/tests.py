@@ -184,13 +184,14 @@ class AdminFormfieldForDBFieldTests(TestCase):
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
+    urls = 'admin_widgets.urls'
 
     def testFilterChoicesByRequestUser(self):
         """
         Ensure the user can only see their own cars in the foreign key dropdown.
         """
         self.client.login(username="super", password="secret")
-        response = self.client.get("/widget_admin/admin_widgets/cartire/add/")
+        response = self.client.get("/admin_widgets/cartire/add/")
         self.assertNotContains(response, "BMW M3")
         self.assertContains(response, "Volkswagon Passat")
 
@@ -198,7 +199,7 @@ class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminForeignKeyWidgetChangeList(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
-    admin_root = '/widget_admin'
+    urls = 'admin_widgets.urls'
 
     def setUp(self):
         self.client.login(username="super", password="secret")
@@ -207,14 +208,14 @@ class AdminForeignKeyWidgetChangeList(DjangoTestCase):
         self.client.logout()
 
     def test_changelist_foreignkey(self):
-        response = self.client.get('%s/admin_widgets/car/' % self.admin_root)
-        self.assertContains(response, '%s/auth/user/add/' % self.admin_root)
+        response = self.client.get('/admin_widgets/car/')
+        self.assertContains(response, '/auth/user/add/')
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminForeignKeyRawIdWidget(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
-    admin_root = '/widget_admin'
+    urls = 'admin_widgets.urls'
 
     def setUp(self):
         self.client.login(username="super", password="secret")
@@ -231,8 +232,7 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
         }
         # Try posting with a non-existent pk in a raw id field: this
         # should result in an error message, not a server exception.
-        response = self.client.post('%s/admin_widgets/event/add/' % self.admin_root,
-            post_data)
+        response = self.client.post('/admin_widgets/event/add/', post_data)
         self.assertContains(response,
             'Select a valid choice. That choice is not one of the available choices.')
 
@@ -240,7 +240,7 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
 
         for test_str in ('Iñtërnâtiônàlizætiøn', "1234'", -1234):
             # This should result in an error message, not a server exception.
-            response = self.client.post('%s/admin_widgets/event/add/' % self.admin_root,
+            response = self.client.post('/admin_widgets/event/add/',
                 {"main_band": test_str})
 
             self.assertContains(response,
@@ -392,6 +392,8 @@ class AdminFileWidgetTest(DjangoTestCase):
 
 
 class ForeignKeyRawIdWidgetTest(DjangoTestCase):
+    urls = 'admin_widgets.urls'
+
     def test_render(self):
         band = models.Band.objects.create(name='Linkin Park')
         band.album_set.create(
@@ -402,7 +404,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('test', band.pk, attrs={}),
-            '<input type="text" name="test" value="%(bandpk)s" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/band/?_to_field=id" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Linkin Park</strong>' % dict(admin_static_prefix(), bandpk=band.pk)
+            '<input type="text" name="test" value="%(bandpk)s" class="vForeignKeyRawIdAdminField" /><a href="/admin_widgets/band/?_to_field=id" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Linkin Park</strong>' % dict(admin_static_prefix(), bandpk=band.pk)
         )
 
     def test_relations_to_non_primary_key(self):
@@ -417,7 +419,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('test', core.parent_id, attrs={}),
-            '<input type="text" name="test" value="86" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Apple</strong>' % admin_static_prefix()
+            '<input type="text" name="test" value="86" class="vForeignKeyRawIdAdminField" /><a href="/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Apple</strong>' % admin_static_prefix()
         )
 
     def test_fk_related_model_not_in_admin(self):
@@ -459,11 +461,13 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         )
         self.assertHTMLEqual(
             w.render('test', child_of_hidden.parent_id, attrs={}),
-            '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Hidden</strong>' % admin_static_prefix()
+            '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" /><a href="/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Hidden</strong>' % admin_static_prefix()
         )
 
 
 class ManyToManyRawIdWidgetTest(DjangoTestCase):
+    urls = 'admin_widgets.urls'
+
     def test_render(self):
         band = models.Band.objects.create(name='Linkin Park')
 
@@ -475,12 +479,12 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
         w = widgets.ManyToManyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('test', [m1.pk, m2.pk], attrs={}),
-            '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" class="vManyToManyRawIdAdminField" /><a href="/widget_admin/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="/static/admin/img/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk, m2pk=m2.pk)
+            '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" class="vManyToManyRawIdAdminField" /><a href="/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="/static/admin/img/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk, m2pk=m2.pk)
         )
 
         self.assertHTMLEqual(
             w.render('test', [m1.pk]),
-            '<input type="text" name="test" value="%(m1pk)s" class="vManyToManyRawIdAdminField" /><a href="/widget_admin/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk)
+            '<input type="text" name="test" value="%(m1pk)s" class="vManyToManyRawIdAdminField" /><a href="/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk)
         )
 
     def test_m2m_related_model_not_in_admin(self):

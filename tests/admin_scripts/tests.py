@@ -1542,6 +1542,7 @@ class ArgumentOrder(AdminScriptTestCase):
 
 class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
+    urls = 'admin_scripts.urls'
     available_apps = [
         'admin_scripts',
         'django.contrib.auth',
@@ -1649,7 +1650,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
     def test_custom_project_template_from_tarball_by_url(self):
         "Make sure the startproject management command is able to use a different project template from a tarball via a url"
-        template_url = '%s/admin_scripts/custom_templates/project_template.tgz' % self.live_server_url
+        template_url = '%s/custom_templates/project_template.tgz' % self.live_server_url
 
         args = ['startproject', '--template', template_url, 'urltestproject']
         testproject_dir = os.path.join(test_dir, 'urltestproject')
@@ -1662,7 +1663,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
     def test_project_template_tarball_url(self):
         "Startproject management command handles project template tar/zip balls from non-canonical urls"
-        template_url = '%s/admin_scripts/custom_templates/project_template.tgz/' % self.live_server_url
+        template_url = '%s/custom_templates/project_template.tgz/' % self.live_server_url
 
         args = ['startproject', '--template', template_url, 'urltestproject']
         testproject_dir = os.path.join(test_dir, 'urltestproject')
