@@ -387,9 +387,13 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
     def get_full_name(self):
         """
         Returns the first_name plus the last_name, with a space in between.
+        If first_name and last_name are not set, returns a username.
         """
-        full_name = '%s %s' % (self.first_name, self.last_name)
-        return full_name.strip()
+        if self.first_name and self.last_name:
+            full_name = '%s %s' % (self.first_name, self.last_name)
+            return full_name.strip()
+        else:
+            return self.username
 
     def get_short_name(self):
         "Returns the short name for the user."
