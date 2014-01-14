@@ -32,13 +32,14 @@ from .views import get_view
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class ClientTest(TestCase):
     fixtures = ['testdata.json']
+    urls = 'test_client.urls'
 
     def test_get_view(self):
         "GET a view"
         # The data is ignored, but let's check it doesn't crash the system
         # anyway.
         data = {'var': '\xf2'}
-        response = self.client.get('/test_client/get_view/', data)
+        response = self.client.get('/get_view/', data)
 
         # Check some response details
         self.assertContains(response, 'This is a test')
@@ -47,7 +48,7 @@ class ClientTest(TestCase):
 
     def test_get_post_view(self):
         "GET a view that normally expects POSTs"
-        response = self.client.get('/test_client/post_view/', {})
+        response = self.client.get('/post_view/', {})
 
         # Check some response details
         self.assertEqual(response.status_code, 200)
@@ -57,7 +58,7 @@ class ClientTest(TestCase):
 
     def test_empty_post(self):
         "POST an empty dictionary to a view"
-        response = self.client.post('/test_client/post_view/', {})
+        response = self.client.post('/post_view/', {})
 
         # Check some response details
         self.assertEqual(response.status_code, 200)
@@ -70,7 +71,7 @@ class ClientTest(TestCase):
         post_data = {
             'value': 37
         }
-        response = self.client.post('/test_client/post_view/', post_data)
+        response = self.client.post('/post_view/', post_data)
 
         # Check some response details
         self.assertEqual(response.status_code, 200)
@@ -80,7 +81,7 @@ class ClientTest(TestCase):
 
     def test_response_headers(self):
         "Check the value of HTTP headers returned in a response"
-        response = self.client.get("/test_client/header_view/")
+        response = self.client.get("/header_view/")
 
         self.assertEqual(response['X-DJANGO-TEST'], 'Slartibartfast')
 
@@ -90,7 +91,7 @@ class ClientTest(TestCase):
         originating environ dict and a ``wsgi_request`` with the originating
         ``WSGIRequest`` instance.
         """
-        response = self.client.get("/test_client/header_view/")
+        response = self.client.get("/header_view/")
 
         self.assertTrue(hasattr(response, 'request'))
         self.assertTrue(hasattr(response, 'wsgi_request'))
@@ -101,7 +102,7 @@ class ClientTest(TestCase):
     def test_raw_post(self):
         "POST raw data (with a content type) to a view"
         test_doc = """<?xml version="1.0" encoding="utf-8"?><library><book><title>Blink</title><author>Malcolm Gladwell</author></book></library>"""
-        response = self.client.post("/test_client/raw_post_view/", test_doc,
+        response = self.client.post("/raw_post_view/", test_doc,
                                     content_type="text/xml")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.templates[0].name, "Book template")
@@ -109,81 +110,81 @@ class ClientTest(TestCase):
 
     def test_insecure(self):
         "GET a URL through http"
-        response = self.client.get('/test_client/secure_view/', secure=False)
+        response = self.client.get('/secure_view/', secure=False)
         self.assertFalse(response.test_was_secure_request)
         self.assertEqual(response.test_server_port, '80')
 
     def test_secure(self):
         "GET a URL through https"
-        response = self.client.get('/test_client/secure_view/', secure=True)
+        response = self.client.get('/secure_view/', secure=True)
         self.assertTrue(response.test_was_secure_request)
         self.assertEqual(response.test_server_port, '443')
 
     def test_redirect(self):
         "GET a URL that redirects elsewhere"
-        response = self.client.get('/test_client/redirect_view/')
+        response = self.client.get('/redirect_view/')
         # Check that the response was a 302 (redirect) and that
         # assertRedirect() understands to put an implicit http://testserver/ in
         # front of non-absolute URLs.
-        self.assertRedirects(response, '/test_client/get_view/')
+        self.assertRedirects(response, '/get_view/')
 
         host = 'django.testserver'
         client_providing_host = Client(HTTP_HOST=host)
-        response = client_providing_host.get('/test_client/redirect_view/')
+        response = client_providing_host.get('/redirect_view/')
         # Check that the response was a 302 (redirect) with absolute URI
-        self.assertRedirects(response, '/test_client/get_view/', host=host)
+        self.assertRedirects(response, '/get_view/', host=host)
 
     def test_redirect_with_query(self):
         "GET a URL that redirects with given GET parameters"
-        response = self.client.get('/test_client/redirect_view/', {'var': 'value'})
+        response = self.client.get('/redirect_view/', {'var': 'value'})
 
         # Check if parameters are intact
-        self.assertRedirects(response, 'http://testserver/test_client/get_view/?var=value')
+        self.assertRedirects(response, 'http://testserver/get_view/?var=value')
 
     def test_permanent_redirect(self):
         "GET a URL that redirects permanently elsewhere"
-        response = self.client.get('/test_client/permanent_redirect_view/')
+        response = self.client.get('/permanent_redirect_view/')
         # Check that the response was a 301 (permanent redirect)
-        self.assertRedirects(response, 'http://testserver/test_client/get_view/', status_code=301)
+        self.assertRedirects(response, 'http://testserver/get_view/', status_code=301)
 
         client_providing_host = Client(HTTP_HOST='django.testserver')
-        response = client_providing_host.get('/test_client/permanent_redirect_view/')
+        response = client_providing_host.get('/permanent_redirect_view/')
         # Check that the response was a 301 (permanent redirect) with absolute URI
-        self.assertRedirects(response, 'http://django.testserver/test_client/get_view/', status_code=301)
+        self.assertRedirects(response, 'http://django.testserver/get_view/', status_code=301)
 
     def test_temporary_redirect(self):
         "GET a URL that does a non-permanent redirect"
-        response = self.client.get('/test_client/temporary_redirect_view/')
+        response = self.client.get('/temporary_redirect_view/')
         # Check that the response was a 302 (non-permanent redirect)
-        self.assertRedirects(response, 'http://testserver/test_client/get_view/', status_code=302)
+        self.assertRedirects(response, 'http://testserver/get_view/', status_code=302)
 
     def test_redirect_to_strange_location(self):
         "GET a URL that redirects to a non-200 page"
-        response = self.client.get('/test_client/double_redirect_view/')
+        response = self.client.get('/double_redirect_view/')
 
         # Check that the response was a 302, and that
         # the attempt to get the redirection location returned 301 when retrieved
-        self.assertRedirects(response, 'http://testserver/test_client/permanent_redirect_view/', target_status_code=301)
+        self.assertRedirects(response, 'http://testserver/permanent_redirect_view/', target_status_code=301)
 
     def test_follow_redirect(self):
         "A URL that redirects can be followed to termination."
-        response = self.client.get('/test_client/double_redirect_view/', follow=True)
-        self.assertRedirects(response, 'http://testserver/test_client/get_view/', status_code=302, target_status_code=200)
+        response = self.client.get('/double_redirect_view/', follow=True)
+        self.assertRedirects(response, 'http://testserver/get_view/', status_code=302, target_status_code=200)
         self.assertEqual(len(response.redirect_chain), 2)
 
     def test_redirect_http(self):
         "GET a URL that redirects to an http URI"
-        response = self.client.get('/test_client/http_redirect_view/', follow=True)
+        response = self.client.get('/http_redirect_view/', follow=True)
         self.assertFalse(response.test_was_secure_request)
 
     def test_redirect_https(self):
         "GET a URL that redirects to an https URI"
-        response = self.client.get('/test_client/https_redirect_view/', follow=True)
+        response = self.client.get('/https_redirect_view/', follow=True)
         self.assertTrue(response.test_was_secure_request)
 
     def test_notfound_response(self):
         "GET a URL that responds as '404:Not Found'"
-        response = self.client.get('/test_client/bad_view/')
+        response = self.client.get('/bad_view/')
 
         # Check that the response was a 404, and that the content contains MAGIC
         self.assertContains(response, 'MAGIC', status_code=404)
@@ -197,7 +198,7 @@ class ClientTest(TestCase):
             'single': 'b',
             'multi': ('b', 'c', 'e')
         }
-        response = self.client.post('/test_client/form_view/', post_data)
+        response = self.client.post('/form_view/', post_data)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Valid POST Template")
 
@@ -207,7 +208,7 @@ class ClientTest(TestCase):
             'text': 'Hello World',
             'multi': ('b', 'c', 'e')
         }
-        response = self.client.get('/test_client/form_view/', data=hints)
+        response = self.client.get('/form_view/', data=hints)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Form GET Template")
         # Check that the multi-value data has been rolled out ok
@@ -219,7 +220,7 @@ class ClientTest(TestCase):
             'text': 'Hello World',
             'value': 37
         }
-        response = self.client.post('/test_client/form_view/', post_data)
+        response = self.client.post('/form_view/', post_data)
         self.assertContains(response, 'This field is required.', 3)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Invalid POST Template")
@@ -237,7 +238,7 @@ class ClientTest(TestCase):
             'single': 'b',
             'multi': ('b', 'c', 'e')
         }
-        response = self.client.post('/test_client/form_view/', post_data)
+        response = self.client.post('/form_view/', post_data)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Invalid POST Template")
 
@@ -252,7 +253,7 @@ class ClientTest(TestCase):
             'single': 'b',
             'multi': ('b', 'c', 'e')
         }
-        response = self.client.post('/test_client/form_view_with_template/', post_data)
+        response = self.client.post('/form_view_with_template/', post_data)
         self.assertContains(response, 'POST data OK')
         self.assertTemplateUsed(response, "form_view.html")
         self.assertTemplateUsed(response, 'base.html')
@@ -264,7 +265,7 @@ class ClientTest(TestCase):
             'text': 'Hello World',
             'value': 37
         }
-        response = self.client.post('/test_client/form_view_with_template/', post_data)
+        response = self.client.post('/form_view_with_template/', post_data)
         self.assertContains(response, 'POST data has errors')
         self.assertTemplateUsed(response, 'form_view.html')
         self.assertTemplateUsed(response, 'base.html')
@@ -283,7 +284,7 @@ class ClientTest(TestCase):
             'single': 'b',
             'multi': ('b', 'c', 'e')
         }
-        response = self.client.post('/test_client/form_view_with_template/', post_data)
+        response = self.client.post('/form_view_with_template/', post_data)
         self.assertContains(response, 'POST data has errors')
         self.assertTemplateUsed(response, "form_view.html")
         self.assertTemplateUsed(response, 'base.html')
@@ -293,31 +294,31 @@ class ClientTest(TestCase):
 
     def test_unknown_page(self):
         "GET an invalid URL"
-        response = self.client.get('/test_client/unknown_view/')
+        response = self.client.get('/unknown_view/')
 
         # Check that the response was a 404
         self.assertEqual(response.status_code, 404)
 
     def test_url_parameters(self):
         "Make sure that URL ;-parameters are not stripped."
-        response = self.client.get('/test_client/unknown_view/;some-parameter')
+        response = self.client.get('/unknown_view/;some-parameter')
 
         # Check that the path in the response includes it (ignore that it's a 404)
-        self.assertEqual(response.request['PATH_INFO'], '/test_client/unknown_view/;some-parameter')
+        self.assertEqual(response.request['PATH_INFO'], '/unknown_view/;some-parameter')
 
     def test_view_with_login(self):
         "Request a page that is protected with @login_required"
 
         # Get the page without logging in. Should result in 302.
-        response = self.client.get('/test_client/login_protected_view/')
-        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/login_protected_view/')
+        response = self.client.get('/login_protected_view/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/login_protected_view/')
 
         # Log in
         login = self.client.login(username='testclient', password='password')
         self.assertTrue(login, 'Could not log in')
 
         # Request a page that requires a login
-        response = self.client.get('/test_client/login_protected_view/')
+        response = self.client.get('/login_protected_view/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, 'testclient')
 
@@ -325,15 +326,15 @@ class ClientTest(TestCase):
         "Request a page that is protected with a @login_required method"
 
         # Get the page without logging in. Should result in 302.
-        response = self.client.get('/test_client/login_protected_method_view/')
-        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/login_protected_method_view/')
+        response = self.client.get('/login_protected_method_view/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/login_protected_method_view/')
 
         # Log in
         login = self.client.login(username='testclient', password='password')
         self.assertTrue(login, 'Could not log in')
 
         # Request a page that requires a login
-        response = self.client.get('/test_client/login_protected_method_view/')
+        response = self.client.get('/login_protected_method_view/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, 'testclient')
 
@@ -341,15 +342,15 @@ class ClientTest(TestCase):
         "Request a page that is protected with @login_required(redirect_field_name='redirect_to')"
 
         # Get the page without logging in. Should result in 302.
-        response = self.client.get('/test_client/login_protected_view_custom_redirect/')
-        self.assertRedirects(response, 'http://testserver/accounts/login/?redirect_to=/test_client/login_protected_view_custom_redirect/')
+        response = self.client.get('/login_protected_view_custom_redirect/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?redirect_to=/login_protected_view_custom_redirect/')
 
         # Log in
         login = self.client.login(username='testclient', password='password')
         self.assertTrue(login, 'Could not log in')
 
         # Request a page that requires a login
-        response = self.client.get('/test_client/login_protected_view_custom_redirect/')
+        response = self.client.get('/login_protected_view_custom_redirect/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, 'testclient')
 
@@ -371,7 +372,7 @@ class ClientTest(TestCase):
         self.client.login(username='testclient', password='password')
 
         # Request a page that requires a login
-        response = self.client.get('/test_client/login_protected_view/')
+        response = self.client.get('/login_protected_view/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, 'testclient')
 
@@ -379,8 +380,8 @@ class ClientTest(TestCase):
         self.client.logout()
 
         # Request a page that requires a login
-        response = self.client.get('/test_client/login_protected_view/')
-        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/login_protected_view/')
+        response = self.client.get('/login_protected_view/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/login_protected_view/')
 
     @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.signed_cookies")
     def test_logout_cookie_sessions(self):
@@ -390,16 +391,16 @@ class ClientTest(TestCase):
         "Request a page that is protected with @permission_required"
 
         # Get the page without logging in. Should result in 302.
-        response = self.client.get('/test_client/permission_protected_view/')
-        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/permission_protected_view/')
+        response = self.client.get('/permission_protected_view/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/permission_protected_view/')
 
         # Log in
         login = self.client.login(username='testclient', password='password')
         self.assertTrue(login, 'Could not log in')
 
         # Log in with wrong permissions. Should result in 302.
-        response = self.client.get('/test_client/permission_protected_view/')
-        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/permission_protected_view/')
+        response = self.client.get('/permission_protected_view/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/permission_protected_view/')
 
         # TODO: Log in with right permissions and request the page again
 
@@ -407,7 +408,7 @@ class ClientTest(TestCase):
         "Request a page that is protected with @permission_required but raises a exception"
 
         # Get the page without logging in. Should result in 403.
-        response = self.client.get('/test_client/permission_protected_view_exception/')
+        response = self.client.get('/permission_protected_view_exception/')
         self.assertEqual(response.status_code, 403)
 
         # Log in
@@ -415,28 +416,28 @@ class ClientTest(TestCase):
         self.assertTrue(login, 'Could not log in')
 
         # Log in with wrong permissions. Should result in 403.
-        response = self.client.get('/test_client/permission_protected_view_exception/')
+        response = self.client.get('/permission_protected_view_exception/')
         self.assertEqual(response.status_code, 403)
 
     def test_view_with_method_permissions(self):
         "Request a page that is protected with a @permission_required method"
 
         # Get the page without logging in. Should result in 302.
-        response = self.client.get('/test_client/permission_protected_method_view/')
-        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/permission_protected_method_view/')
+        response = self.client.get('/permission_protected_method_view/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/permission_protected_method_view/')
 
         # Log in
         login = self.client.login(username='testclient', password='password')
         self.assertTrue(login, 'Could not log in')
 
         # Log in with wrong permissions. Should result in 302.
-        response = self.client.get('/test_client/permission_protected_method_view/')
-        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/permission_protected_method_view/')
+        response = self.client.get('/permission_protected_method_view/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/permission_protected_method_view/')
 
         # TODO: Log in with right permissions and request the page again
 
     def test_external_redirect(self):
-        response = self.client.get('/test_client/django_project_redirect/')
+        response = self.client.get('/django_project_redirect/')
         self.assertRedirects(response, 'https://www.djangoproject.com/', fetch_redirect_response=False)
 
     def test_session_modifying_view(self):
@@ -448,18 +449,18 @@ class ClientTest(TestCase):
         except KeyError:
             pass
 
-        self.client.post('/test_client/session_view/')
+        self.client.post('/session_view/')
 
         # Check that the session was modified
         self.assertEqual(self.client.session['tobacconist'], 'hovercraft')
 
     def test_view_with_exception(self):
         "Request a page that is known to throw an error"
-        self.assertRaises(KeyError, self.client.get, "/test_client/broken_view/")
+        self.assertRaises(KeyError, self.client.get, "/broken_view/")
 
         # Try the same assertion, a different way
         try:
-            self.client.get('/test_client/broken_view/')
+            self.client.get('/broken_view/')
             self.fail('Should raise an error')
         except KeyError:
             pass
@@ -467,7 +468,7 @@ class ClientTest(TestCase):
     def test_mail_sending(self):
         "Test that mail is redirected to a dummy outbox during test setup"
 
-        response = self.client.get('/test_client/mail_sending_view/')
+        response = self.client.get('/mail_sending_view/')
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(len(mail.outbox), 1)
@@ -480,7 +481,7 @@ class ClientTest(TestCase):
     def test_mass_mail_sending(self):
         "Test that mass mail is redirected to a dummy outbox during test setup"
 
-        response = self.client.get('/test_client/mass_mail_sending_view/')
+        response = self.client.get('/mass_mail_sending_view/')
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(len(mail.outbox), 2)
@@ -501,16 +502,18 @@ class ClientTest(TestCase):
     MIDDLEWARE_CLASSES=('django.middleware.csrf.CsrfViewMiddleware',)
 )
 class CSRFEnabledClientTests(TestCase):
+    urls = 'test_client.urls'
+
     def test_csrf_enabled_client(self):
         "A client can be instantiated with CSRF checks enabled"
         csrf_client = Client(enforce_csrf_checks=True)
 
         # The normal client allows the post
-        response = self.client.post('/test_client/post_view/', {})
+        response = self.client.post('/post_view/', {})
         self.assertEqual(response.status_code, 200)
 
         # The CSRF-enabled client rejects it
-        response = csrf_client.post('/test_client/post_view/', {})
+        response = csrf_client.post('/post_view/', {})
         self.assertEqual(response.status_code, 403)
 
 
@@ -527,6 +530,8 @@ class CustomTestClientTest(TestCase):
 
 
 class RequestFactoryTest(TestCase):
+    urls = 'test_client.urls'
+
     def test_request_factory(self):
         factory = RequestFactory()
         request = factory.get('/somewhere/')

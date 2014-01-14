@@ -74,13 +74,13 @@ def nested_view(request):
     """
     setup_test_environment()
     c = Client()
-    c.get("/test_client_regress/no_template_view")
+    c.get("/no_template_view")
     return render_to_response('base.html', {'nested': 'yes'})
 
 
 def login_protected_redirect_view(request):
     "A view that redirects all requests to the GET view"
-    return HttpResponseRedirect('/test_client_regress/get_view/')
+    return HttpResponseRedirect('/get_view/')
 login_protected_redirect_view = login_required(login_protected_redirect_view)
 
 

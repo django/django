@@ -23,6 +23,7 @@ from ..urls import locale_dir
 
 class I18NTests(TestCase):
     """ Tests django views in django/views/i18n.py """
+    urls = 'view_tests.urls'
 
     def test_setlang(self):
         """
@@ -31,9 +32,9 @@ class I18NTests(TestCase):
         The user is redirected to the 'next' argument if provided.
         """
         for lang_code, lang_name in settings.LANGUAGES:
-            post_data = dict(language=lang_code, next='/views/')
-            response = self.client.post('/views/i18n/setlang/', data=post_data)
-            self.assertRedirects(response, 'http://testserver/views/')
+            post_data = dict(language=lang_code, next='/')
+            response = self.client.post('/i18n/setlang/', data=post_data)
+            self.assertRedirects(response, 'http://testserver/')
             self.assertEqual(self.client.session['_language'], lang_code)
 
     def test_setlang_unsafe_next(self):
@@ -43,12 +44,12 @@ class I18NTests(TestCase):
         """
         lang_code, lang_name = settings.LANGUAGES[0]
         post_data = dict(language=lang_code, next='//unsafe/redirection/')
-        response = self.client.post('/views/i18n/setlang/', data=post_data)
+        response = self.client.post('/i18n/setlang/', data=post_data)
         self.assertEqual(response.url, 'http://testserver/')
         self.assertEqual(self.client.session['_language'], lang_code)
 
     def test_setlang_reversal(self):
-        self.assertEqual(reverse('set_language'), '/views/i18n/setlang/')
+        self.assertEqual(reverse('set_language'), '/i18n/setlang/')
 
     def test_jsi18n(self):
         """The javascript_catalog can be deployed with language settings"""
@@ -59,7 +60,7 @@ class I18NTests(TestCase):
                     trans_txt = catalog.gettext('this is to be translated')
                 else:
                     trans_txt = catalog.ugettext('this is to be translated')
-                response = self.client.get('/views/jsi18n/')
+                response = self.client.get('/jsi18n/')
                 # response content must include a line like:
                 # "this is to be translated": <value of trans_txt Python variable>
                 # javascript_quote is used to be able to check unicode strings
@@ -74,6 +75,7 @@ class JsI18NTests(TestCase):
     Tests django views in django/views/i18n.py that need to change
     settings.LANGUAGE_CODE.
     """
+    urls = 'view_tests.urls'
 
     def test_jsi18n_with_missing_en_files(self):
         """
@@ -86,7 +88,7 @@ class JsI18NTests(TestCase):
         than English.
         """
         with self.settings(LANGUAGE_CODE='es'), override('en-us'):
-            response = self.client.get('/views/jsi18n/')
+            response = self.client.get('/jsi18n/')
             self.assertNotContains(response, 'esto tiene que ser traducido')
 
     def test_jsi18n_fallback_language(self):
@@ -95,7 +97,7 @@ class JsI18NTests(TestCase):
         in cases where the selected language cannot be found.
         """
         with self.settings(LANGUAGE_CODE='fr'), override('fi'):
-            response = self.client.get('/views/jsi18n/')
+            response = self.client.get('/jsi18n/')
             self.assertContains(response, 'il faut le traduire')
 
     def testI18NLanguageNonEnglishDefault(self):
@@ -106,7 +108,7 @@ class JsI18NTests(TestCase):
         #3594 and #13726 for more details.
         """
         with self.settings(LANGUAGE_CODE='fr'), override('en-us'):
-            response = self.client.get('/views/jsi18n/')
+            response = self.client.get('/jsi18n/')
             self.assertNotContains(response, 'Choisir une heure')
 
     @modify_settings(INSTALLED_APPS={'append': 'view_tests.app0'})
@@ -117,7 +119,7 @@ class JsI18NTests(TestCase):
         with the proper English translations. See #13726 for more details.
         """
         with self.settings(LANGUAGE_CODE='fr'), override('en-us'):
-            response = self.client.get('/views/jsi18n_english_translation/')
+            response = self.client.get('/jsi18n_english_translation/')
             self.assertContains(response, javascript_quote('this app0 string is to be translated'))
 
     def testI18NLanguageNonEnglishFallback(self):
@@ -126,16 +128,17 @@ class JsI18NTests(TestCase):
         in cases where the selected language cannot be found.
         """
         with self.settings(LANGUAGE_CODE='fr'), override('none'):
-            response = self.client.get('/views/jsi18n/')
+            response = self.client.get('/jsi18n/')
             self.assertContains(response, 'Choisir une heure')
 
     def test_escaping(self):
         # Force a language via GET otherwise the gettext functions are a noop!
-        response = self.client.get('/views/jsi18n_admin/?language=de')
+        response = self.client.get('/jsi18n_admin/?language=de')
         self.assertContains(response, '\\x04')
 
 
 class JsI18NTestsMultiPackage(TestCase):
+    urls = 'view_tests.urls'
     """
     Tests for django views in django/views/i18n.py that need to change
     settings.LANGUAGE_CODE and merge JS translation from several packages.
@@ -150,7 +153,7 @@ class JsI18NTestsMultiPackage(TestCase):
         #3594 and #13514 for more details.
         """
         with self.settings(LANGUAGE_CODE='en-us'), override('fr'):
-            response = self.client.get('/views/jsi18n_multi_packages1/')
+            response = self.client.get('/jsi18n_multi_packages1/')
             self.assertContains(response, javascript_quote('il faut traduire cette chaîne de caractères de app1'))
 
     @modify_settings(INSTALLED_APPS={'append': ['view_tests.app3', 'view_tests.app4']})
@@ -160,7 +163,7 @@ class JsI18NTestsMultiPackage(TestCase):
         English.
         """
         with self.settings(LANGUAGE_CODE='fr'), override('es-ar'):
-            response = self.client.get('/views/jsi18n_multi_packages2/')
+            response = self.client.get('/jsi18n_multi_packages2/')
             self.assertContains(response, javascript_quote('este texto de app3 debe ser traducido'))
 
     def testI18NWithLocalePaths(self):
@@ -169,7 +172,7 @@ class JsI18NTestsMultiPackage(TestCase):
                 path.dirname(path.abspath(upath(__file__)))), 'app3', 'locale'),)
         with self.settings(LANGUAGE_CODE='es-ar', LOCALE_PATHS=extended_locale_paths):
             with override('es-ar'):
-                response = self.client.get('/views/jsi18n/')
+                response = self.client.get('/jsi18n/')
                 self.assertContains(response,
                     javascript_quote('este texto de app3 debe ser traducido'))
 
