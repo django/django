@@ -180,6 +180,27 @@ for the following, instead of backend specific behavior.
     finally:
         c.close()
 
+Custom lookups
+~~~~~~~~~~~~~~
+
+It is now possible to write custom lookups and transforms for the ORM.
+Custom lookups work just like Django's inbuilt lookups (e.g. ``lte``,
+``icontains``) while transforms are a new concept.
+
+The :class:`django.db.models.Lookup` class provides a way to add lookup
+operators for model fields. As an example it is possible to add ``day_lte``
+opertor for ``DateFields``.
+
+The :class:`django.db.models.Transform` class allows transformations of
+database values prior to the final lookup. For example it is possible to
+write a ``year`` transform that extracts year from the field's value.
+Transforms allow for chaining. After the ``year`` transform has been added
+to ``DateField`` it is possible to filter on the transformed value, for
+example ``qs.filter(author__birthdate__year__lte=1981)``.
+
+For more information about both custom lookups and transforms refer to
+:doc:`custom lookups </ref/models/custom-lookups>` documentation.
+
 Minor features
 ~~~~~~~~~~~~~~
 

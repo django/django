@@ -662,6 +662,12 @@ Django filter lookups: ``exact``, ``iexact``, ``contains``, ``icontains``,
 ``endswith``, ``iendswith``, ``range``, ``year``, ``month``, ``day``,
 ``isnull``, ``search``, ``regex``, and ``iregex``.
 
+.. versionadded:: 1.7
+
+    If you are using :doc:`Custom lookups </ref/models/custom-lookups>` the
+    ``lookup_type`` can be any ``lookup_name`` used by the project's custom
+    lookups.
+
 Your method must be prepared to handle all of these ``lookup_type`` values and
 should raise either a ``ValueError`` if the ``value`` is of the wrong sort (a
 list when you were expecting an object, for example) or a ``TypeError`` if

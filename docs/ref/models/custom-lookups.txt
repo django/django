@@ -28,7 +28,7 @@ databases.
 
 There are two steps to making this work. Firstly we need to implement the
 lookup, then we need to tell Django about it. The implementation is quite
-straightforwards::
+straightforward::
 
   from django.db.models import Lookup
 
@@ -280,7 +280,7 @@ Lookup reference
 .. attribute:: lookup_name
 
     This class level attribute is used when registering lookups. It determines
-    the name used in queries to triger this lookup. For example, ``contains``
+    the name used in queries to trigger this lookup. For example, ``contains``
     or ``exact``. This should not contain the string ``__``.
 
 .. method:: process_lhs(qn, connection)
@@ -292,3 +292,22 @@ Lookup reference
 .. method:: process_rhs(qn, connection)
 
     Behaves the same as ``process_lhs`` but acts on the right-hand side.
+
+Transform reference
+~~~~~~~~~~~~~~~~~~~
+
+.. class:: Transform
+
+    In addition to implementing the query expression API Transforms have the
+    following methods and attributes.
+
+.. attribute:: lhs
+
+    The ``lhs`` (left-hand-side) of a transform contains the value to be
+    transformed. The ``lhs`` implements the query expression API.
+
+.. attribute:: lookup_name
+
+    This class level attribute is used when registering lookups. It determines
+    the name used in queries to trigger this lookup. For example, ``year``
+    or ``dayofweek``. This should not contain the string ``__``.
