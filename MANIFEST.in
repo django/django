@@ -3,6 +3,7 @@ include AUTHORS
 include INSTALL
 include LICENSE
 include MANIFEST.in
+include django/bin/django_bash_completion
 include django/contrib/gis/gdal/LICENSE
 include django/contrib/gis/geos/LICENSE
 include django/dispatch/license.txt

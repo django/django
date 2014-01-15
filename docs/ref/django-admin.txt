@@ -1334,7 +1334,7 @@ Bash completion
 ---------------
 
 If you use the Bash shell, consider installing the Django bash completion
-script, which lives in ``extras/django_bash_completion`` in the Django
+script, which lives in ``django/bin/django_bash_completion`` in the Django
 distribution. It enables tab-completion of ``django-admin.py`` and
 ``manage.py`` commands, so you can, for instance...
 
