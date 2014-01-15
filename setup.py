@@ -71,7 +71,7 @@ if u'SVN' in version:
     version = ' '.join(version.split(' ')[:-1])
 
 setup(
-    name = "Django",
+    name = "mmf-Django",
     version = version.replace(' ', '-'),
     url = 'http://www.djangoproject.com/',
     author = 'Django Software Foundation',
