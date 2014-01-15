@@ -9,7 +9,7 @@ class StaticFilesNode(StaticNode):
 
     def url(self, context):
         path = self.path.resolve(context)
-        return staticfiles_storage.url(path)
+        return static(path)
 
 
 @register.tag('static')
