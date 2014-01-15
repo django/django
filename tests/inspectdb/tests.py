@@ -45,7 +45,7 @@ class InspectDBTestCase(TestCase):
             self.assertEqual(definition, out_def)
 
         if not connection.features.can_introspect_autofield:
-            assertFieldType('id', "models.IntegerField(primary_key=True) # AutoField?")
+            assertFieldType('id', "models.IntegerField(primary_key=True)  # AutoField?")
         assertFieldType('big_int_field', "models.BigIntegerField()")
         if connection.vendor == 'mysql':
             # No native boolean type on MySQL
@@ -60,7 +60,7 @@ class InspectDBTestCase(TestCase):
         assertFieldType('date_time_field', "models.DateTimeField()")
         if connection.vendor == 'sqlite':
             # Guessed arguments, see #5014
-            assertFieldType('decimal_field', "models.DecimalField(max_digits=10, decimal_places=5) "
+            assertFieldType('decimal_field', "models.DecimalField(max_digits=10, decimal_places=5)  "
                 "# max_digits and decimal_places have been guessed, as this database handles decimal fields as float")
         else:
             assertFieldType('decimal_field', "models.DecimalField(max_digits=6, decimal_places=1)")
