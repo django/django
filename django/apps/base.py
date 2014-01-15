@@ -99,7 +99,7 @@ class AppConfig(object):
                 raise ImproperlyConfigured(
                     "'%s' must supply a name attribute." % entry)
 
-            # Ensure app_names points to a valid module.
+            # Ensure app_name points to a valid module.
             app_module = import_module(app_name)
 
             # Entry is a path to an app config class.
