@@ -1,5 +1,5 @@
 import warnings
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.db import models
 
 
@@ -149,21 +149,43 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(kwargs, {})
 
     def test_foreign_key(self):
+        # Test basic pointing
+        field = models.ForeignKey("auth.Permission")
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.ForeignKey")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"to": "auth.Permission"})
+        self.assertFalse(hasattr(kwargs['to'], "setting_name"))
+        # Test swap detection for swappable model
         field = models.ForeignKey("auth.User")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"to": "auth.User"})
+        self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
+        # Test nonexistent (for now) model
         field = models.ForeignKey("something.Else")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"to": "something.Else"})
+        # Test on_delete
         field = models.ForeignKey("auth.User", on_delete=models.SET_NULL)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"to": "auth.User", "on_delete": models.SET_NULL})
+
+    @override_settings(AUTH_USER_MODEL="auth.Permission")
+    def test_foreign_key_swapped(self):
+        # It doesn't matter that we swapped out user for permission;
+        # there's no validation. We just want to check the setting stuff works.
+        field = models.ForeignKey("auth.Permission")
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.ForeignKey")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"to": "auth.Permission"})
+        self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
 
     def test_image_field(self):
         field = models.ImageField(upload_to="foo/barness", width_field="width", height_field="height")
@@ -201,11 +223,31 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(kwargs, {"protocol": "IPv6"})
 
     def test_many_to_many_field(self):
+        # Test normal
+        field = models.ManyToManyField("auth.Permission")
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.ManyToManyField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"to": "auth.Permission"})
+        self.assertFalse(hasattr(kwargs['to'], "setting_name"))
+        # Test swappable
         field = models.ManyToManyField("auth.User")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ManyToManyField")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"to": "auth.User"})
+        self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
+
+    @override_settings(AUTH_USER_MODEL="auth.Permission")
+    def test_many_to_many_field_swapped(self):
+        # It doesn't matter that we swapped out user for permission;
+        # there's no validation. We just want to check the setting stuff works.
+        field = models.ManyToManyField("auth.Permission")
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.ManyToManyField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"to": "auth.Permission"})
+        self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
 
     def test_null_boolean_field(self):
         field = models.NullBooleanField()

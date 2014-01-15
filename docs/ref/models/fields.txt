@@ -1201,6 +1201,23 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     you manually add an SQL ``ON DELETE`` constraint to the database field
     (perhaps using :ref:`initial sql<initial-sql>`).
 
+.. attribute:: ForeignKey.swappable
+
+    .. versionadded:: 1.7
+
+    Controls the migration framework's reaction if this :class:`ForeignKey`
+    is pointing at a swappable model. If it is ``True`` - the default -
+    then if the :class:`ForeignKey` is pointing at a model which matches
+    the current value of ``settings.AUTH_USER_MODEL`` (or another swappable
+    model setting) the relationship will be stored in the migration using
+    a reference to the setting, not to the model directly.
+
+    You only want to override this to be ``False`` if you are sure your
+    model should always point towards the swapped-in model - for example,
+    if it is a profile model designed specifically for your custom user model.
+
+    If in doubt, leave it to its default of ``True``.
+
 .. _ref-manytomany:
 
 ``ManyToManyField``
@@ -1308,6 +1325,23 @@ that control how the relationship functions.
     * You're sharding your database.
 
     It is an error to pass both ``db_constraint`` and ``through``.
+
+.. attribute:: ManyToManyField.swappable
+
+    .. versionadded:: 1.7
+
+    Controls the migration framework's reaction if this :class:`ManyToManyField`
+    is pointing at a swappable model. If it is ``True`` - the default -
+    then if the :class:`ManyToManyField` is pointing at a model which matches
+    the current value of ``settings.AUTH_USER_MODEL`` (or another swappable
+    model setting) the relationship will be stored in the migration using
+    a reference to the setting, not to the model directly.
+
+    You only want to override this to be ``False`` if you are sure your
+    model should always point towards the swapped-in model - for example,
+    if it is a profile model designed specifically for your custom user model.
+
+    If in doubt, leave it to its default of ``True``.
 
 
 .. _ref-onetoone:

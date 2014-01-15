@@ -16,6 +16,7 @@ from django.utils.deprecation import RenameMethodsBase
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry, cached_property
 from django.core import exceptions
+from django.apps import apps
 from django import forms
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
@@ -120,6 +121,30 @@ class RelatedField(Field):
             add_lazy_relation(cls, self, other, resolve_related_class)
         else:
             self.do_related_class(other, cls)
+
+    @property
+    def swappable_setting(self):
+        """
+        Gets the setting that this is powered from for swapping, or None
+        if it's not swapped in / marked with swappable=False.
+        """
+        if self.swappable:
+            # Work out string form of "to"
+            if isinstance(self.rel.to, six.string_types):
+                to_string = self.rel.to
+            else:
+                to_string = "%s.%s" % (
+                    self.rel.to._meta.app_label,
+                    self.rel.to._meta.object_name,
+                )
+            # See if anything swapped/swappable matches
+            for model in apps.get_models(include_swapped=True):
+                if model._meta.swapped:
+                    if model._meta.swapped == to_string:
+                        return model._meta.swappable
+                if ("%s.%s" % (model._meta.app_label, model._meta.object_name)) == to_string and model._meta.swappable:
+                    return model._meta.swappable
+        return None
 
     def set_attributes_from_rel(self):
         self.name = self.name or (self.rel.to._meta.model_name + '_' + self.rel.to._meta.pk.name)
@@ -1061,9 +1086,10 @@ class ForeignObject(RelatedField):
     generate_reverse_relation = True
     related_accessor_class = ForeignRelatedObjectsDescriptor
 
-    def __init__(self, to, from_fields, to_fields, **kwargs):
+    def __init__(self, to, from_fields, to_fields, swappable=True, **kwargs):
         self.from_fields = from_fields
         self.to_fields = to_fields
+        self.swappable = swappable
 
         if 'rel' not in kwargs:
             kwargs['rel'] = ForeignObjectRel(
@@ -1082,10 +1108,25 @@ class ForeignObject(RelatedField):
         name, path, args, kwargs = super(ForeignObject, self).deconstruct()
         kwargs['from_fields'] = self.from_fields
         kwargs['to_fields'] = self.to_fields
+        # Work out string form of "to"
         if isinstance(self.rel.to, six.string_types):
             kwargs['to'] = self.rel.to
         else:
             kwargs['to'] = "%s.%s" % (self.rel.to._meta.app_label, self.rel.to._meta.object_name)
+        # If swappable is True, then see if we're actually pointing to the target
+        # of a swap.
+        swappable_setting = self.swappable_setting
+        if swappable_setting is not None:
+            # If it's already a settings reference, error
+            if hasattr(kwargs['to'], "setting_name"):
+                if kwargs['to'].setting_name != swappable_setting:
+                    raise ValueError("Cannot deconstruct a ForeignKey pointing to a model that is swapped in place of more than one model (%s and %s)" % (kwargs['to'].setting_name, swappable_setting))
+            # Set it
+            from django.db.migrations.writer import SettingsReference
+            kwargs['to'] = SettingsReference(
+                kwargs['to'],
+                swappable_setting,
+            )
         return name, path, args, kwargs
 
     def resolve_related_fields(self):
@@ -1516,7 +1557,7 @@ def create_many_to_many_intermediary_model(field, klass):
 class ManyToManyField(RelatedField):
     description = _("Many-to-many relationship")
 
-    def __init__(self, to, db_constraint=True, **kwargs):
+    def __init__(self, to, db_constraint=True, swappable=True, **kwargs):
         try:
             assert not to._meta.abstract, "%s cannot define a relation with abstract class %s" % (self.__class__.__name__, to._meta.object_name)
         except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
@@ -1534,6 +1575,7 @@ class ManyToManyField(RelatedField):
             db_constraint=db_constraint,
         )
 
+        self.swappable = swappable
         self.db_table = kwargs.pop('db_table', None)
         if kwargs['rel'].through is not None:
             assert self.db_table is None, "Cannot specify a db_table if an intermediary model is used."
@@ -1552,6 +1594,20 @@ class ManyToManyField(RelatedField):
             kwargs['to'] = self.rel.to
         else:
             kwargs['to'] = "%s.%s" % (self.rel.to._meta.app_label, self.rel.to._meta.object_name)
+        # If swappable is True, then see if we're actually pointing to the target
+        # of a swap.
+        swappable_setting = self.swappable_setting
+        if swappable_setting is not None:
+            # If it's already a settings reference, error
+            if hasattr(kwargs['to'], "setting_name"):
+                if kwargs['to'].setting_name != swappable_setting:
+                    raise ValueError("Cannot deconstruct a ManyToManyField pointing to a model that is swapped in place of more than one model (%s and %s)" % (kwargs['to'].setting_name, swappable_setting))
+            # Set it
+            from django.db.migrations.writer import SettingsReference
+            kwargs['to'] = SettingsReference(
+                kwargs['to'],
+                swappable_setting,
+            )
         return name, path, args, kwargs
 
     def _get_path_info(self, direct=False):

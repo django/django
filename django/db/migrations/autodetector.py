@@ -105,8 +105,12 @@ class MigrationAutodetector(object):
                     )
                 )
                 for field_name, other_app_label, other_model_name in related_fields:
-                    if app_label != other_app_label:
-                        self.add_dependency(app_label, other_app_label)
+                    # If it depends on a swappable something, add a dynamic depend'cy
+                    swappable_setting = new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0].swappable_setting
+                    if swappable_setting is not None:
+                        self.add_swappable_dependency(app_label, swappable_setting)
+                    elif app_label != other_app_label:
+                            self.add_dependency(app_label, other_app_label)
                 del pending_add[app_label, model_name]
             # Ah well, we'll need to split one. Pick deterministically.
             else:
@@ -140,7 +144,11 @@ class MigrationAutodetector(object):
                 ),
                 new=True,
             )
-            if app_label != other_app_label:
+            # If it depends on a swappable something, add a dynamic depend'cy
+            swappable_setting = new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0].swappable_setting
+            if swappable_setting is not None:
+                self.add_swappable_dependency(app_label, swappable_setting)
+            elif app_label != other_app_label:
                 self.add_dependency(app_label, other_app_label)
         # Removing models
         removed_models = set(old_model_keys) - set(new_model_keys)
@@ -274,6 +282,13 @@ class MigrationAutodetector(object):
             dependency = (other_app_label, self.migrations[other_app_label][-1].name)
         else:
             dependency = (other_app_label, "__first__")
+        self.migrations[app_label][-1].dependencies.append(dependency)
+
+    def add_swappable_dependency(self, app_label, setting_name):
+        """
+        Adds a dependency to the value of a swappable model setting.
+        """
+        dependency = ("__setting__", setting_name)
         self.migrations[app_label][-1].dependencies.append(dependency)
 
     def _arrange_for_graph(self, changes, graph):

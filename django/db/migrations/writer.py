@@ -13,6 +13,20 @@ from django.utils.functional import Promise
 from django.utils import six
 
 
+class SettingsReference(str):
+    """
+    Special subclass of string which actually references a current settings
+    value. It's treated as the value in memory, but serializes out to a
+    settings.NAME attribute reference.
+    """
+
+    def __new__(self, value, setting_name):
+        return str.__new__(self, value)
+
+    def __init__(self, value, setting_name):
+        self.setting_name = setting_name
+
+
 class MigrationWriter(object):
     """
     Takes a Migration instance and is able to produce the contents
@@ -27,7 +41,6 @@ class MigrationWriter(object):
         Returns a string of the file contents.
         """
         items = {
-            "dependencies": repr(self.migration.dependencies),
             "replaces_str": "",
         }
         imports = set()
@@ -46,6 +59,15 @@ class MigrationWriter(object):
                 arg_strings.append("%s = %s" % (kw, arg_string))
             operation_strings.append("migrations.%s(%s\n        )" % (name, "".join("\n            %s," % arg for arg in arg_strings)))
         items["operations"] = "[%s\n    ]" % "".join("\n        %s," % s for s in operation_strings)
+        # Format dependencies and write out swappable dependencies right
+        items["dependencies"] = "["
+        for dependency in self.migration.dependencies:
+            if dependency[0] == "__setting__":
+                items["dependencies"] += "\n        migrations.swappable_dependency(settings.%s)," % dependency[1]
+                imports.add("from django.conf import settings")
+            else:
+                items["dependencies"] += "\n        %s," % repr(dependency)
+        items["dependencies"] += "\n    ]"
         # Format imports nicely
         imports.discard("from django.db import models")
         if not imports:
@@ -136,6 +158,9 @@ class MigrationWriter(object):
         # Datetimes
         elif isinstance(value, (datetime.datetime, datetime.date)):
             return repr(value), set(["import datetime"])
+        # Settings references
+        elif isinstance(value, SettingsReference):
+            return "settings.%s" % value.setting_name, set(["from django.conf import settings"])
         # Simple types
         elif isinstance(value, six.integer_types + (float, six.binary_type, six.text_type, bool, type(None))):
             return repr(value), set()

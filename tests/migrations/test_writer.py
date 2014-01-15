@@ -7,8 +7,9 @@ import os
 
 from django.core.validators import RegexValidator, EmailValidator
 from django.db import models, migrations
-from django.db.migrations.writer import MigrationWriter
+from django.db.migrations.writer import MigrationWriter, SettingsReference
 from django.test import TestCase
+from django.conf import settings
 from django.utils import six
 from django.utils.deconstruct import deconstructible
 from django.utils.translation import ugettext_lazy as _
@@ -37,8 +38,8 @@ class WriterTests(TestCase):
     def assertSerializedEqual(self, value):
         self.assertEqual(self.serialize_round_trip(value), value)
 
-    def assertSerializedIs(self, value):
-        self.assertIs(self.serialize_round_trip(value), value)
+    def assertSerializedResultEqual(self, value, target):
+        self.assertEqual(MigrationWriter.serialize(value), target)
 
     def assertSerializedFieldEqual(self, value):
         new_value = self.serialize_round_trip(value)
@@ -92,6 +93,15 @@ class WriterTests(TestCase):
         # Django fields
         self.assertSerializedFieldEqual(models.CharField(max_length=255))
         self.assertSerializedFieldEqual(models.TextField(null=True, blank=True))
+        # Setting references
+        self.assertSerializedEqual(SettingsReference(settings.AUTH_USER_MODEL, "AUTH_USER_MODEL"))
+        self.assertSerializedResultEqual(
+            SettingsReference("someapp.model", "AUTH_USER_MODEL"),
+            (
+                "settings.AUTH_USER_MODEL",
+                set(["from django.conf import settings"]),
+            )
+        )
 
     def test_simple_migration(self):
         """
