@@ -50,12 +50,13 @@ class Command(NoArgsCommand):
         yield "from __future__ import unicode_literals"
         yield ''
         yield 'from %s import models' % self.db_module
-        yield ''
         known_models = []
         for table_name in connection.introspection.table_names(cursor):
             if table_name_filter is not None and callable(table_name_filter):
                 if not table_name_filter(table_name):
                     continue
+            yield ''
+            yield ''
             yield 'class %s(models.Model):' % table2model(table_name)
             known_models.append(table2model(table_name))
             try:
@@ -134,7 +135,7 @@ class Command(NoArgsCommand):
                         for k, v in extra_params.items()])
                 field_desc += ')'
                 if comment_notes:
-                    field_desc += ' # ' + ' '.join(comment_notes)
+                    field_desc += '  # ' + ' '.join(comment_notes)
                 yield '    %s' % field_desc
             for meta_line in self.get_meta(table_name):
                 yield meta_line
@@ -239,7 +240,7 @@ class Command(NoArgsCommand):
         to construct the inner Meta class for the model corresponding
         to the given database table name.
         """
-        return ["    class Meta:",
+        return ["",
+                "    class Meta:",
                 "        managed = False",
-                "        db_table = '%s'" % table_name,
-                ""]
+                "        db_table = '%s'" % table_name]
