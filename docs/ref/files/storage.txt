@@ -39,7 +39,7 @@ The FileSystemStorage Class
     .. note::
 
         The ``FileSystemStorage.delete()`` method will not raise
-        raise an exception if the given file name does not exist.
+        an exception if the given file name does not exist.
 
 The Storage Class
 -----------------
