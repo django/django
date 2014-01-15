@@ -537,8 +537,11 @@ class EmailField(CharField):
     default_validators = [validators.validate_email]
 
     def clean(self, value):
+        # strip blanks and make canonical by lower-casing the domain part
         value = self.to_python(value).strip()
-        return super(EmailField, self).clean(value)
+        value = super(EmailField, self).clean(value)
+        usr, dom = value.rsplit('@', 1)
+        return "%s@%s" % (usr, dom.lower())
 
 
 class FileField(Field):
