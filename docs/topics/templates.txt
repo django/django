@@ -211,18 +211,23 @@ tags:
         {% endfor %}
         </ul>
 
-:ttag:`if` and ``else``
+:ttag:`if`, ``elif``, and ``else``
     Evaluates a variable, and if that variable is "true" the contents of the
     block are displayed::
 
         {% if athlete_list %}
             Number of athletes: {{ athlete_list|length }}
+        {% elif athlete_in_locker_room_list %}
+            Athletes should be out of the locker room soon!
         {% else %}
             No athletes.
         {% endif %}
 
     In the above, if ``athlete_list`` is not empty, the number of athletes
-    will be displayed by the ``{{ athlete_list|length }}`` variable.
+    will be displayed by the ``{{ athlete_list|length }}`` variable. Otherwise,
+    if ``athlete_in_locker_room_list`` is not empty, the message "Athletes
+    should be out..." will be displayed. If both lists are empty,
+    "No athletes." will be displayed.
 
     You can also use filters and various operators in the :ttag:`if` tag::
 
