@@ -91,7 +91,7 @@ class BaseDatabaseSchemaEditor(object):
         # Log the command we're running, then run it
         logger.debug("%s; (params %r)" % (sql, params))
         if self.collect_sql:
-            self.collected_sql.append((sql % tuple(map(self.connection.ops.quote_parameter, params))) + ";")
+            self.collected_sql.append((sql % tuple(map(self._quote_parameter, params))) + ";")
         else:
             cursor.execute(sql, params)
 
@@ -117,14 +117,9 @@ class BaseDatabaseSchemaEditor(object):
         # If we were told to include a default value, do so
         default_value = self.effective_default(field)
         if include_default and default_value is not None:
-            if self.connection.features.requires_literal_defaults:
-                # Some databases can't take defaults as a parameter (oracle)
-                # If this is the case, the individual schema backend should
-                # implement prepare_default
-                sql += " DEFAULT %s" % self.prepare_default(default_value)
-            else:
-                sql += " DEFAULT %s"
-                params += [default_value]
+            default_sql, default_params = self.prepare_default(default_value)
+            sql += " DEFAULT %s" % default_sql
+            params += default_params
         # Oracle treats the empty string ('') as null, so coerce the null
         # option whenever '' is a possible value.
         if (field.empty_strings_allowed and not field.primary_key and
@@ -148,9 +143,11 @@ class BaseDatabaseSchemaEditor(object):
 
     def prepare_default(self, value):
         """
-        Only used for backends which have requires_literal_defaults feature
+        Return a tuple containing the default's value SQL and params. Any 
+        database that doesn't support literal strings or params in ALTER TABLE 
+        statements should override this.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseSchemaEditor for backends which have requires_literal_defaults must provide a prepare_default() method')
+        return "%s", [value]
 
     def effective_default(self, field):
         """
@@ -565,25 +562,14 @@ class BaseDatabaseSchemaEditor(object):
                     [],
                 ))
             else:
-                if self.connection.features.requires_literal_defaults:
-                    # Some databases can't take defaults as a parameter (oracle)
-                    # If this is the case, the individual schema backend should
-                    # implement prepare_default
-                    actions.append((
-                        self.sql_alter_column_default % {
-                            "column": self.quote_name(new_field.column),
-                            "default": self.prepare_default(new_default),
-                        },
-                        [],
-                    ))
-                else:
-                    actions.append((
-                        self.sql_alter_column_default % {
-                            "column": self.quote_name(new_field.column),
-                            "default": "%s",
-                        },
-                        [new_default],
-                    ))
+                default_sql, default_params = self.prepare_default(new_default)
+                actions.append((
+                    self.sql_alter_column_default % {
+                        "column": self.quote_name(new_field.column),
+                        "default": default_sql,
+                    },
+                    default_params,
+                ))
         # Nullability change?
         if old_field.null != new_field.null:
             if new_field.null:
@@ -807,3 +793,13 @@ class BaseDatabaseSchemaEditor(object):
                     continue
                 result.append(name)
         return result
+
+    def _quote_parameter(self, value):
+        """
+        Returns a quoted version of the value so it's safe to use in an SQL
+        string. This should NOT be used to prepare SQL statements to send to
+        the database; it is meant for outputting SQL statements to a file
+        or the console for later execution by a developer/DBA.
+        """
+        raise NotImplementedError()
+

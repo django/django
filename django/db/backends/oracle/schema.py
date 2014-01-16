@@ -1,7 +1,8 @@
 import copy
+import datetime
 
 from django.db.backends.schema import BaseDatabaseSchemaEditor
-from django.db.utils import DatabaseError
+from django.db.utils import DatabaseError, six
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -92,4 +93,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return self.normalize_name(for_name + "_" + suffix)
 
     def prepare_default(self, value):
-        return self.connection.ops.quote_parameter(value)
+        return "%s" % self._quote_parameter(value), []
+
+    def _quote_parameter(self, value):
+        if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
+            return "'%s'" % value
+        elif isinstance(value, six.string_types):
+            return "'%s" % value
+        elif isinstance(value, bool):
+            return "1" if value else "0"
+        else:
+            return str(value)
+

@@ -1,6 +1,7 @@
 from django.apps.registry import Apps
 from django.db.backends.schema import BaseDatabaseSchemaEditor
 from django.db.models.fields.related import ManyToManyField
+from django.utils import six
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -154,3 +155,22 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         ))
         # Delete the old through table
         self.delete_model(old_field.rel.through)
+
+    def _quote_parameter(self, value):
+        # Inner import to allow nice failure for backend if not present
+        import _sqlite3
+        try:
+            value = _sqlite3.adapt(value)
+        except _sqlite3.ProgrammingError:
+            pass
+        # Manual emulation of SQLite parameter quoting
+        if isinstance(value, six.integer_types):
+            return str(value)
+        elif isinstance(value, six.string_types):
+            return six.text_type(value)
+        elif isinstance(value, type(True)):
+            return str(int(value))
+        elif value is None:
+            return "NULL"
+        else:
+            raise ValueError("Cannot quote parameter value %r" % value)

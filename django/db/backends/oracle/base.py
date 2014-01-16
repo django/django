@@ -101,7 +101,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_combined_alters = False
     max_index_name_length = 30
     nulls_order_largest = True
-    requires_literal_defaults = True
     connection_persists_old_columns = True
     closed_cursor_error_class = InterfaceError
 
@@ -326,16 +325,6 @@ WHEN (new.%(col_name)s IS NULL)
         # that stage so we aren't really making the name longer here.
         name = name.replace('%', '%%')
         return name.upper()
-
-    def quote_parameter(self, value):
-        if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
-            return "'%s'" % value
-        elif isinstance(value, six.string_types):
-            return repr(value)
-        elif isinstance(value, bool):
-            return "1" if value else "0"
-        else:
-            return str(value)
 
     def random_function_sql(self):
         return "DBMS_RANDOM.RANDOM"
