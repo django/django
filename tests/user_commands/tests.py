@@ -60,6 +60,11 @@ class CommandTests(SimpleTestCase):
             management.call_command('leave_locale_alone_true', stdout=out)
             self.assertEqual(out.getvalue(), "pl\n")
 
+    def test_detect_pyc(self):
+        """ Tests that a file with a .pyc extension can
+            be recognized as a management command.
+        """
+        self.assertIn('dummy',management.get_commands())
 
 class UtilsTests(SimpleTestCase):
 
