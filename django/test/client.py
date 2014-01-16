@@ -276,29 +276,29 @@ class RequestFactory(object):
             path = path.encode('utf-8').decode('iso-8859-1')
         return path
 
-    def get(self, path, data={}, secure=False, **extra):
+    def get(self, path, data=None, secure=False, **extra):
         "Construct a GET request."
 
         r = {
-            'QUERY_STRING': urlencode(data, doseq=True),
+            'QUERY_STRING': urlencode(data or {}, doseq=True),
         }
         r.update(extra)
         return self.generic('GET', path, secure=secure, **r)
 
-    def post(self, path, data={}, content_type=MULTIPART_CONTENT,
+    def post(self, path, data=None, content_type=MULTIPART_CONTENT,
              secure=False, **extra):
         "Construct a POST request."
 
-        post_data = self._encode_data(data, content_type)
+        post_data = self._encode_data(data or {}, content_type)
 
         return self.generic('POST', path, post_data, content_type,
                             secure=secure, **extra)
 
-    def head(self, path, data={}, secure=False, **extra):
+    def head(self, path, data=None, secure=False, **extra):
         "Construct a HEAD request."
 
         r = {
-            'QUERY_STRING': urlencode(data, doseq=True),
+            'QUERY_STRING': urlencode(data or {}, doseq=True),
         }
         r.update(extra)
         return self.generic('HEAD', path, secure=secure, **r)
@@ -460,7 +460,7 @@ class Client(RequestFactory):
             signals.template_rendered.disconnect(dispatch_uid=signal_uid)
             got_request_exception.disconnect(dispatch_uid="request-exception")
 
-    def get(self, path, data={}, follow=False, secure=False, **extra):
+    def get(self, path, data=None, follow=False, secure=False, **extra):
         """
         Requests a response from the server using GET.
         """
@@ -470,7 +470,7 @@ class Client(RequestFactory):
             response = self._handle_redirects(response, **extra)
         return response
 
-    def post(self, path, data={}, content_type=MULTIPART_CONTENT,
+    def post(self, path, data=None, content_type=MULTIPART_CONTENT,
              follow=False, secure=False, **extra):
         """
         Requests a response from the server using POST.
@@ -482,7 +482,7 @@ class Client(RequestFactory):
             response = self._handle_redirects(response, **extra)
         return response
 
-    def head(self, path, data={}, follow=False, secure=False, **extra):
+    def head(self, path, data=None, follow=False, secure=False, **extra):
         """
         Request a response from the server using HEAD.
         """

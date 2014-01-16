@@ -129,7 +129,7 @@ Use the ``django.test.Client`` class to make requests.
     Once you have a ``Client`` instance, you can call any of the following
     methods:
 
-    .. method:: Client.get(path, data={}, follow=False, secure=False, **extra)
+    .. method:: Client.get(path, data=None, follow=False, secure=False, **extra)
 
         .. versionadded:: 1.7
 
@@ -192,7 +192,7 @@ Use the ``django.test.Client`` class to make requests.
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
 
-    .. method:: Client.post(path, data={}, content_type=MULTIPART_CONTENT, follow=False, secure=False, **extra)
+    .. method:: Client.post(path, data=None, content_type=MULTIPART_CONTENT, follow=False, secure=False, **extra)
 
         Makes a POST request on the provided ``path`` and returns a
         ``Response`` object, which is documented below.
@@ -269,7 +269,7 @@ Use the ``django.test.Client`` class to make requests.
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
 
-    .. method:: Client.head(path, data={}, follow=False, secure=False, **extra)
+    .. method:: Client.head(path, data=None, follow=False, secure=False, **extra)
 
         Makes a HEAD request on the provided ``path`` and returns a
         ``Response`` object. This method works just like :meth:`Client.get`,
