@@ -111,6 +111,7 @@ TemplateView
     This view inherits methods and attributes from the following views:
 
     * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.base.ContextMixin`
     * :class:`django.views.generic.base.View`
 
     **Method Flowchart**
@@ -146,8 +147,8 @@ TemplateView
 
     **Context**
 
-    * ``params``: The dictionary of keyword arguments captured from the URL
-      pattern that served the view.
+    * Populated (through :class:`~django.views.generic.base.ContextMixin`) with
+      the keyword arguments captured from the URL pattern that served the view.
 
 RedirectView
 ------------
