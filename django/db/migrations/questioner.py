@@ -97,7 +97,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             print("Please enter the default value now, as valid Python")
             print("The datetime module is available, so you can do e.g. datetime.date.today()")
             while True:
-                code = input(">>> ")
+                code = input(">>> ").decode(sys.stdin.encoding)
                 if not code:
                     print("Please enter some code, or 'exit' (with no quotes) to exit.")
                 elif code == "exit":
