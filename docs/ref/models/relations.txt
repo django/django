@@ -138,9 +138,13 @@ Related objects reference
     .. note::
 
        Note that ``add()``, ``create()``, ``remove()``, and ``clear()`` all
-       apply database changes immediately for all types of related fields. In other
-       words, there is no need to call ``save()`` on either end of the
+       apply database changes immediately for all types of related fields. In
+       other words, there is no need to call ``save()`` on either end of the
        relationship.
+
+       Also, if you are using :ref:`an intermediate model
+       <intermediary-manytomany>` for a many-to-many relationship, some of the
+       related manager's methods are disabled.
 
 .. _direct-assignment:
 
