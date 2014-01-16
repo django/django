@@ -25,17 +25,18 @@ User objects
 authentication system. They typically represent the people interacting with
 your site and are used to enable things like restricting access, registering
 user profiles, associating content with creators etc. Only one class of user
-exists in Django's authentication framework, i.e., 'superusers' or admin
-'staff' users are just user objects with special attributes set, not different
-classes of user objects.
+exists in Django's authentication framework, i.e., :attr:`'superusers'
+<django.contrib.auth.models.User.is_superuser>` or admin :attr:`'staff'
+<django.contrib.auth.models.User.is_staff>` users are just user objects with
+special attributes set, not different classes of user objects.
 
 The primary attributes of the default user are:
 
-* username
-* password
-* email
-* first name
-* last name
+* :attr:`~django.contrib.auth.models.User.username`
+* :attr:`~django.contrib.auth.models.User.password`
+* :attr:`~django.contrib.auth.models.User.email`
+* :attr:`~django.contrib.auth.models.User.first_name`
+* :attr:`~django.contrib.auth.models.User.last_name`
 
 See the :class:`full API documentation <django.contrib.auth.models.User>` for
 full reference, the documentation that follows is more task oriented.
