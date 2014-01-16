@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection
 from django.db.models import Prefetch
@@ -228,17 +229,22 @@ class CustomPrefetchTests(TestCase):
             for part in path:
                 if not part:
                     continue
-                rel_objs.extend(cls.traverse_qs(getattr(obj, part[0]), [part[1:]]))
+                try:
+                    related = getattr(obj, part[0])
+                except ObjectDoesNotExist:
+                    continue
+                if related is not None:
+                    rel_objs.extend(cls.traverse_qs(related, [part[1:]]))
             ret_val.append((obj, rel_objs))
         return ret_val
 
     def setUp(self):
         self.person1 = Person.objects.create(name="Joe")
         self.person2 = Person.objects.create(name="Mary")
-        self.house1 = House.objects.create(address="123 Main St", owner=self.person1)
-        self.house2 = House.objects.create(address="45 Side St", owner=self.person1)
-        self.house3 = House.objects.create(address="6 Downing St", owner=self.person2)
-        self.house4 = House.objects.create(address="7 Regents St", owner=self.person2)
+        self.house1 = House.objects.create(name='House 1', address="123 Main St", owner=self.person1)
+        self.house2 = House.objects.create(name='House 2', address="45 Side St", owner=self.person1)
+        self.house3 = House.objects.create(name='House 3', address="6 Downing St", owner=self.person2)
+        self.house4 = House.objects.create(name='house 4', address="7 Regents St", owner=self.person2)
         self.room1_1 = Room.objects.create(name="Dining room", house=self.house1)
         self.room1_2 = Room.objects.create(name="Lounge", house=self.house1)
         self.room1_3 = Room.objects.create(name="Kitchen", house=self.house1)
@@ -253,6 +259,14 @@ class CustomPrefetchTests(TestCase):
         self.room4_3 = Room.objects.create(name="Kitchen", house=self.house4)
         self.person1.houses.add(self.house1, self.house2)
         self.person2.houses.add(self.house3, self.house4)
+        self.house1.main_room = self.room1_1
+        self.house1.save()
+        self.house2.main_room = self.room2_1
+        self.house2.save()
+        self.house3.main_room = self.room3_1
+        self.house3.save()
+        self.house4.main_room = self.room4_1
+        self.house4.save()
 
     def test_traverse_qs(self):
         qs = Person.objects.prefetch_related('houses')
@@ -262,16 +276,17 @@ class CustomPrefetchTests(TestCase):
         self.assertEqual(related_objs_normal, (related_objs_from_traverse,))
 
     def test_ambiguous(self):
-        # Ambiguous.
+        # Ambiguous: Lookup was already seen with a different queryset.
         with self.assertRaises(ValueError):
             self.traverse_qs(
                 Person.objects.prefetch_related('houses__rooms', Prefetch('houses', queryset=House.objects.all())),
                 [['houses', 'rooms']]
             )
 
+        # Ambiguous: Lookup houses_lst doesn't yet exist when performing houses_lst__rooms.
         with self.assertRaises(AttributeError):
             self.traverse_qs(
-                Person.objects.prefetch_related('houses_list__rooms', Prefetch('houses', queryset=House.objects.all(), to_attr='houses_lst')),
+                Person.objects.prefetch_related('houses_lst__rooms', Prefetch('houses', queryset=House.objects.all(), to_attr='houses_lst')),
                 [['houses', 'rooms']]
             )
 
@@ -490,6 +505,50 @@ class CustomPrefetchTests(TestCase):
         self.assertEqual(lst2[0].houses_lst[0].rooms_lst[0], self.room1_1)
         self.assertEqual(lst2[0].houses_lst[0].rooms_lst[1], self.room1_2)
         self.assertEqual(len(lst2[1].houses_lst), 0)
+
+        # Test ReverseSingleRelatedObjectDescriptor.
+        houses = House.objects.select_related('owner')
+        with self.assertNumQueries(6):
+            rooms = Room.objects.all().prefetch_related('house')
+            lst1 = self.traverse_qs(rooms, [['house', 'owner']])
+        with self.assertNumQueries(2):
+            rooms = Room.objects.all().prefetch_related(Prefetch('house', queryset=houses.all()))
+            lst2 = self.traverse_qs(rooms, [['house', 'owner']])
+        self.assertEqual(lst1, lst2)
+        with self.assertNumQueries(2):
+            houses = House.objects.select_related('owner')
+            rooms = Room.objects.all().prefetch_related(Prefetch('house', queryset=houses.all(), to_attr='house_attr'))
+            lst2 = self.traverse_qs(rooms, [['house_attr', 'owner']])
+        self.assertEqual(lst1, lst2)
+        room = Room.objects.all().prefetch_related(Prefetch('house', queryset=houses.filter(address='DoesNotExist'))).first()
+        with self.assertRaises(ObjectDoesNotExist):
+            getattr(room, 'house')
+        room = Room.objects.all().prefetch_related(Prefetch('house', queryset=houses.filter(address='DoesNotExist'), to_attr='house_attr')).first()
+        self.assertIsNone(room.house_attr)
+        rooms = Room.objects.all().prefetch_related(Prefetch('house', queryset=House.objects.only('name')))
+        with self.assertNumQueries(2):
+            getattr(rooms.first().house, 'name')
+        with self.assertNumQueries(3):
+            getattr(rooms.first().house, 'address')
+
+        # Test SingleRelatedObjectDescriptor.
+        houses = House.objects.select_related('owner')
+        with self.assertNumQueries(6):
+            rooms = Room.objects.all().prefetch_related('main_room_of')
+            lst1 = self.traverse_qs(rooms, [['main_room_of', 'owner']])
+        with self.assertNumQueries(2):
+            rooms = Room.objects.all().prefetch_related(Prefetch('main_room_of', queryset=houses.all()))
+            lst2 = self.traverse_qs(rooms, [['main_room_of', 'owner']])
+        self.assertEqual(lst1, lst2)
+        with self.assertNumQueries(2):
+            rooms = list(Room.objects.all().prefetch_related(Prefetch('main_room_of', queryset=houses.all(), to_attr='main_room_of_attr')))
+            lst2 = self.traverse_qs(rooms, [['main_room_of_attr', 'owner']])
+        self.assertEqual(lst1, lst2)
+        room = Room.objects.filter(main_room_of__isnull=False).prefetch_related(Prefetch('main_room_of', queryset=houses.filter(address='DoesNotExist'))).first()
+        with self.assertRaises(ObjectDoesNotExist):
+            getattr(room, 'main_room_of')
+        room = Room.objects.filter(main_room_of__isnull=False).prefetch_related(Prefetch('main_room_of', queryset=houses.filter(address='DoesNotExist'), to_attr='main_room_of_attr')).first()
+        self.assertIsNone(room.main_room_of_attr)
 
 
 class DefaultManagerTests(TestCase):

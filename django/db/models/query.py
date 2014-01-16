@@ -1667,8 +1667,8 @@ class Prefetch(object):
     def get_current_to_attr(self, level):
         parts = self.prefetch_to.split(LOOKUP_SEP)
         to_attr = parts[level]
-        to_list = self.to_attr and level == len(parts) - 1
-        return to_attr, to_list
+        as_attr = self.to_attr and level == len(parts) - 1
+        return to_attr, as_attr
 
     def get_current_queryset(self, level):
         if self.get_current_prefetch_to(level) == self.prefetch_to:
@@ -1913,12 +1913,13 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
     for obj in instances:
         instance_attr_val = instance_attr(obj)
         vals = rel_obj_cache.get(instance_attr_val, [])
+        to_attr, as_attr = lookup.get_current_to_attr(level)
         if single:
-            # Need to assign to single cache on instance
-            setattr(obj, cache_name, vals[0] if vals else None)
+            val = vals[0] if vals else None
+            to_attr = to_attr if as_attr else cache_name
+            setattr(obj, to_attr, val)
         else:
-            to_attr, to_list = lookup.get_current_to_attr(level)
-            if to_list:
+            if as_attr:
                 setattr(obj, to_attr, vals)
             else:
                 # Cache in the QuerySet.all().
