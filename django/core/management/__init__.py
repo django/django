@@ -27,8 +27,8 @@ def find_commands(management_dir):
     """
     command_dir = os.path.join(management_dir, 'commands')
     try:
-        return [f[:-3] for f in os.listdir(command_dir)
-                if not f.startswith('_') and f.endswith('.py')]
+        return set("".join(f.split('.')[:-1]) for f in os.listdir(command_dir)
+                if not f.startswith('_') and (f.endswith('.py') or f.endswith('.pyc')))
     except OSError:
         return []
 
