@@ -989,6 +989,24 @@ less ambiguous than storing a filtered result in the related manager's cache:
     ...     Prefetch('pizzas', queryset=queryset))
     >>> vegetarian_pizzas = restaurants[0].pizzas.all()
 
+Custom prefetching also works with single related relations like
+forward ``ForeignKey`` or ``OneToOneField``. Generally you'll want to use
+:meth:`select_related()` for these relations, but there are a number of cases
+where prefetching with a custom ``QuerySet`` is useful:
+
+* You want to use a ``QuerySet`` that performs further prefetching
+  on related models.
+
+* You want to prefetch only a subset of the related objects.
+
+* You want to use performance optimization techniques like
+  :meth:`deferred fields <defer()>`:
+
+    >>> queryset = Pizza.objects.only('name')
+    >>>
+    >>> restaurants = Restaurant.objects.prefetch_related(
+    ...     Prefetch('best_pizza', queryset=queryset))
+
 .. note::
 
     The ordering of lookups matters.

@@ -375,24 +375,29 @@ class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescri
         return hasattr(instance, self.cache_name)
 
     def get_queryset(self, **hints):
+        # Gotcha: we return a `Manager` instance (i.e. not a `QuerySet`)!
         return self.related.model._base_manager.db_manager(hints=hints)
 
     def get_prefetch_queryset(self, instances, queryset=None):
-        if queryset is not None:
-            raise ValueError("Custom queryset can't be used for this lookup.")
+        if queryset is None:
+            # Despite its name `get_queryset()` returns an instance of
+            # `Manager`, therefore we call `all()` to normalize to `QuerySet`.
+            queryset = self.get_queryset().all()
+        queryset._add_hints(instance=instances[0])
 
         rel_obj_attr = attrgetter(self.related.field.attname)
         instance_attr = lambda obj: obj._get_pk_val()
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
         query = {'%s__in' % self.related.field.name: instances}
-        qs = self.get_queryset(instance=instances[0]).filter(**query)
+        queryset = queryset.filter(**query)
+
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
         rel_obj_cache_name = self.related.field.get_cache_name()
-        for rel_obj in qs:
+        for rel_obj in queryset:
             instance = instances_dict[rel_obj_attr(rel_obj)]
             setattr(rel_obj, rel_obj_cache_name, instance)
-        return qs, rel_obj_attr, instance_attr, True, self.cache_name
+        return queryset, rel_obj_attr, instance_attr, True, self.cache_name
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
@@ -503,13 +508,17 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
         # If the related manager indicates that it should be used for
         # related fields, respect that.
         if getattr(rel_mgr, 'use_for_related_fields', False):
+            # Gotcha: we return a `Manager` instance (i.e. not a `QuerySet`)!
             return rel_mgr
         else:
             return QuerySet(self.field.rel.to, hints=hints)
 
     def get_prefetch_queryset(self, instances, queryset=None):
-        if queryset is not None:
-            raise ValueError("Custom queryset can't be used for this lookup.")
+        if queryset is None:
+            # Despite its name `get_queryset()` may return an instance of
+            # `Manager`, therefore we call `all()` to normalize to `QuerySet`.
+            queryset = self.get_queryset().all()
+        queryset._add_hints(instance=instances[0])
 
         rel_obj_attr = self.field.get_foreign_related_value
         instance_attr = self.field.get_local_related_value
@@ -524,16 +533,16 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
             query = {'%s__in' % related_field.name: set(instance_attr(inst)[0] for inst in instances)}
         else:
             query = {'%s__in' % self.field.related_query_name(): instances}
+        queryset = queryset.filter(**query)
 
-        qs = self.get_queryset(instance=instances[0]).filter(**query)
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
         if not self.field.rel.multiple:
             rel_obj_cache_name = self.field.related.get_cache_name()
-            for rel_obj in qs:
+            for rel_obj in queryset:
                 instance = instances_dict[rel_obj_attr(rel_obj)]
                 setattr(rel_obj, rel_obj_cache_name, instance)
-        return qs, rel_obj_attr, instance_attr, True, self.cache_name
+        return queryset, rel_obj_attr, instance_attr, True, self.cache_name
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
