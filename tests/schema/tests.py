@@ -37,38 +37,39 @@ class SchemaTests(TransactionTestCase):
 
     def delete_tables(self):
         "Deletes all model tables for our models for a clean test environment"
-        cursor = connection.cursor()
-        connection.disable_constraint_checking()
-        table_names = connection.introspection.table_names(cursor)
-        for model in self.models:
-            # Remove any M2M tables first
-            for field in model._meta.local_many_to_many:
-                with atomic():
+        with atomic():
+            table_names = connection.introspection.table_names()
+            for model in self.models:
+                # Remove any M2M tables first
+                for field in model._meta.local_many_to_many:
                     tbl = field.rel.through._meta.db_table
                     if tbl in table_names:
-                        cursor.execute(connection.schema_editor().sql_delete_table % {
-                            "table": connection.ops.quote_name(tbl),
-                        })
+                        with connection.schema_editor() as editor:
+                            editor.delete_model(field.rel.through)
                         table_names.remove(tbl)
-            # Then remove the main tables
-            with atomic():
+                # Then remove the main tables
                 tbl = model._meta.db_table
                 if tbl in table_names:
-                    cursor.execute(connection.schema_editor().sql_delete_table % {
-                        "table": connection.ops.quote_name(tbl),
-                    })
+                    with connection.schema_editor() as editor:
+                        editor.delete_model(model)
                     table_names.remove(tbl)
-        connection.enable_constraint_checking()
+
+    def get_constraints(self, model):
+        """
+        Get the constraints for a model.
+        """
+        with connection.cursor() as cursor:
+            return connection.introspection.get_constraints(cursor, model._meta.db_table)
 
     def column_classes(self, model):
-        cursor = connection.cursor()
-        columns = dict(
-            (d[0], (connection.introspection.get_field_type(d[1], d), d))
-            for d in connection.introspection.get_table_description(
-                cursor,
-                model._meta.db_table,
+        with connection.cursor() as cursor:
+            columns = dict(
+                (d[0], (connection.introspection.get_field_type(d[1], d), d))
+                for d in connection.introspection.get_table_description(
+                    cursor,
+                    model._meta.db_table,
+                )
             )
-        )
         # SQLite has a different format for field_type
         for name, (type, desc) in columns.items():
             if isinstance(type, tuple):
@@ -127,7 +128,7 @@ class SchemaTests(TransactionTestCase):
                 strict=True,
             )
         # Make sure the new FK constraint is present
-        constraints = connection.introspection.get_constraints(connection.cursor(), Book._meta.db_table)
+        constraints = self.get_constraints(Book)
         for name, details in constraints.items():
             if details['columns'] == ["author_id"] and details['foreign_key']:
                 self.assertEqual(details['foreign_key'], ('schema_tag', 'id'))
@@ -283,7 +284,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(TagM2MTest)
             editor.create_model(UniqueTest)
         # Ensure the M2M exists and points to TagM2MTest
-        constraints = connection.introspection.get_constraints(connection.cursor(), BookWithM2M._meta.get_field_by_name("tags")[0].rel.through._meta.db_table)
+        constraints = self.get_constraints(BookWithM2M._meta.get_field_by_name("tags")[0].rel.through)
         if connection.features.supports_foreign_keys:
             for name, details in constraints.items():
                 if details['columns'] == ["tagm2mtest_id"] and details['foreign_key']:
@@ -304,7 +305,7 @@ class SchemaTests(TransactionTestCase):
             # Ensure old M2M is gone
             self.assertRaises(DatabaseError, self.column_classes, BookWithM2M._meta.get_field_by_name("tags")[0].rel.through)
             # Ensure the new M2M exists and points to UniqueTest
-            constraints = connection.introspection.get_constraints(connection.cursor(), new_field.rel.through._meta.db_table)
+            constraints = self.get_constraints(new_field.rel.through)
             if connection.features.supports_foreign_keys:
                 for name, details in constraints.items():
                     if details['columns'] == ["uniquetest_id"] and details['foreign_key']:
@@ -329,7 +330,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
         # Ensure the constraint exists
-        constraints = connection.introspection.get_constraints(connection.cursor(), Author._meta.db_table)
+        constraints = self.get_constraints(Author)
         for name, details in constraints.items():
             if details['columns'] == ["height"] and details['check']:
                 break
@@ -345,7 +346,7 @@ class SchemaTests(TransactionTestCase):
                 new_field,
                 strict=True,
             )
-        constraints = connection.introspection.get_constraints(connection.cursor(), Author._meta.db_table)
+        constraints = self.get_constraints(Author)
         for name, details in constraints.items():
             if details['columns'] == ["height"] and details['check']:
                 self.fail("Check constraint for height found")
@@ -357,7 +358,7 @@ class SchemaTests(TransactionTestCase):
                 Author._meta.get_field_by_name("height")[0],
                 strict=True,
             )
-        constraints = connection.introspection.get_constraints(connection.cursor(), Author._meta.db_table)
+        constraints = self.get_constraints(Author)
         for name, details in constraints.items():
             if details['columns'] == ["height"] and details['check']:
                 break
@@ -468,7 +469,7 @@ class SchemaTests(TransactionTestCase):
             False,
             any(
                 c["index"]
-                for c in connection.introspection.get_constraints(connection.cursor(), "schema_tag").values()
+                for c in self.get_constraints(Tag).values()
                 if c['columns'] == ["slug", "title"]
             ),
         )
@@ -484,7 +485,7 @@ class SchemaTests(TransactionTestCase):
             True,
             any(
                 c["index"]
-                for c in connection.introspection.get_constraints(connection.cursor(), "schema_tag").values()
+                for c in self.get_constraints(Tag).values()
                 if c['columns'] == ["slug", "title"]
             ),
         )
@@ -502,7 +503,7 @@ class SchemaTests(TransactionTestCase):
             False,
             any(
                 c["index"]
-                for c in connection.introspection.get_constraints(connection.cursor(), "schema_tag").values()
+                for c in self.get_constraints(Tag).values()
                 if c['columns'] == ["slug", "title"]
             ),
         )
@@ -519,7 +520,7 @@ class SchemaTests(TransactionTestCase):
             True,
             any(
                 c["index"]
-                for c in connection.introspection.get_constraints(connection.cursor(), "schema_tagindexed").values()
+                for c in self.get_constraints(TagIndexed).values()
                 if c['columns'] == ["slug", "title"]
             ),
         )

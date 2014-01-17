@@ -10,32 +10,39 @@ class MigrationTestBase(TransactionTestCase):
     available_apps = ["migrations"]
 
     def assertTableExists(self, table):
-        self.assertIn(table, connection.introspection.get_table_list(connection.cursor()))
+        with connection.cursor() as cursor:
+            self.assertIn(table, connection.introspection.get_table_list(cursor))
 
     def assertTableNotExists(self, table):
-        self.assertNotIn(table, connection.introspection.get_table_list(connection.cursor()))
+        with connection.cursor() as cursor:
+            self.assertNotIn(table, connection.introspection.get_table_list(cursor))
 
     def assertColumnExists(self, table, column):
-        self.assertIn(column, [c.name for c in connection.introspection.get_table_description(connection.cursor(), table)])
+        with connection.cursor() as cursor:
+            self.assertIn(column, [c.name for c in connection.introspection.get_table_description(cursor, table)])
 
     def assertColumnNotExists(self, table, column):
-        self.assertNotIn(column, [c.name for c in connection.introspection.get_table_description(connection.cursor(), table)])
+        with connection.cursor() as cursor:
+            self.assertNotIn(column, [c.name for c in connection.introspection.get_table_description(cursor, table)])
 
     def assertColumnNull(self, table, column):
-        self.assertEqual([c.null_ok for c in connection.introspection.get_table_description(connection.cursor(), table) if c.name == column][0], True)
+        with connection.cursor() as cursor:
+            self.assertEqual([c.null_ok for c in connection.introspection.get_table_description(cursor, table) if c.name == column][0], True)
 
     def assertColumnNotNull(self, table, column):
-        self.assertEqual([c.null_ok for c in connection.introspection.get_table_description(connection.cursor(), table) if c.name == column][0], False)
+        with connection.cursor() as cursor:
+            self.assertEqual([c.null_ok for c in connection.introspection.get_table_description(cursor, table) if c.name == column][0], False)
 
     def assertIndexExists(self, table, columns, value=True):
-        self.assertEqual(
-            value,
-            any(
-                c["index"]
-                for c in connection.introspection.get_constraints(connection.cursor(), table).values()
-                if c['columns'] == list(columns)
-            ),
-        )
+        with connection.cursor() as cursor:
+            self.assertEqual(
+                value,
+                any(
+                    c["index"]
+                    for c in connection.introspection.get_constraints(cursor, table).values()
+                    if c['columns'] == list(columns)
+                ),
+            )
 
     def assertIndexNotExists(self, table, columns):
         return self.assertIndexExists(table, columns, False)

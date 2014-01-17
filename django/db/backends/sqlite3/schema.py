@@ -1,12 +1,13 @@
 from django.apps.registry import Apps
 from django.db.backends.schema import BaseDatabaseSchemaEditor
 from django.db.models.fields.related import ManyToManyField
+from django.utils import six
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     sql_delete_table = "DROP TABLE %(table)s"
-    sql_create_inline_fk = "REFERENCES %(to_table)s (%(to_column)s)"
+    sql_create_inline_fk = "REFERENCES %(to_table)s (%(to_columns)s)"
 
     def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[], rename_fields=[], override_uniques=None):
         """
@@ -67,8 +68,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Rename the new to the old
         self.alter_db_table(model, temp_model._meta.db_table, model._meta.db_table)
         # Run deferred SQL on correct table
-        for sql in self.deferred_sql:
-            self.execute(sql.replace(temp_model._meta.db_table, model._meta.db_table))
+        for sql, params in self.deferred_sql:
+            self.execute(sql.replace(temp_model._meta.db_table, model._meta.db_table), params)
         self.deferred_sql = []
         # Fix any PK-removed field
         if restore_pk_field:
@@ -154,3 +155,22 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         ))
         # Delete the old through table
         self.delete_model(old_field.rel.through)
+
+    def _quote_parameter(self, value):
+        # Inner import to allow nice failure for backend if not present
+        import _sqlite3
+        try:
+            value = _sqlite3.adapt(value)
+        except _sqlite3.ProgrammingError:
+            pass
+        # Manual emulation of SQLite parameter quoting
+        if isinstance(value, six.integer_types):
+            return str(value)
+        elif isinstance(value, six.string_types):
+            return six.text_type(value)
+        elif isinstance(value, type(True)):
+            return str(int(value))
+        elif value is None:
+            return "NULL"
+        else:
+            raise ValueError("Cannot quote parameter value %r" % value)

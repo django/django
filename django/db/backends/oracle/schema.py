@@ -1,7 +1,8 @@
 import copy
+import datetime
 
 from django.db.backends.schema import BaseDatabaseSchemaEditor
-from django.db.utils import DatabaseError
+from django.db.utils import DatabaseError, six
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -92,4 +93,24 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return self.normalize_name(for_name + "_" + suffix)
 
     def prepare_default(self, value):
-        return self.connection.ops.quote_parameter(value)
+        return "%s" % self._quote_parameter(value), []
+
+    def _quote_parameter(self, value):
+        if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
+            return "'%s'" % value
+        elif isinstance(value, six.string_types):
+            return "'%s'" % value.replace("'","''")
+        elif isinstance(value, bool):
+            return "1" if value else "0"
+        else:
+            return str(value)
+
+    def _create_constraint_name(self, model, column_names, constraint_type='', suffix=""):
+        name = super(DatabaseSchemaEditor, self)._create_constraint_name(model, column_names, constraint_type, suffix)
+        # It shouldn't start with an underscore (Oracle hates this)
+        if name[0] == "_":
+            name = name[1:]
+        # It can't start with a number on Oracle, so prepend D if we need to
+        if name[0].isdigit():
+            name = "D%s" % name[:-1]
+        return name
