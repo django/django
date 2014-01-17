@@ -68,6 +68,11 @@ var ARABIC_MAP = {
     'ن':'n', 'ه':'h', 'و':'o', 'ي':'y'
 }
 
+var AZERBAIJANI_MAP = {
+    'ç':'c', 'Ç':'C', 'ə':'e', 'Ə':'E', 'ğ':'g', 'Ğ':'G', 'ı':'i', 'İ':'I',
+    'ö':'o', 'Ö':'O', 'ş':'s', 'Ş':'S', 'ü':'u', 'Ü':'U'
+}
+
 var ALL_DOWNCODE_MAPS=new Array()
 ALL_DOWNCODE_MAPS[0]=LATIN_MAP
 ALL_DOWNCODE_MAPS[1]=LATIN_SYMBOLS_MAP
@@ -79,6 +84,7 @@ ALL_DOWNCODE_MAPS[6]=CZECH_MAP
 ALL_DOWNCODE_MAPS[7]=POLISH_MAP
 ALL_DOWNCODE_MAPS[8]=LATVIAN_MAP
 ALL_DOWNCODE_MAPS[9]=ARABIC_MAP
+ALL_DOWNCODE_MAPS[10]=AZERBAIJANI_MAP
 
 var Downcoder = new Object();
 Downcoder.Initialize = function()
@@ -145,4 +151,3 @@ function URLify(s, num_chars) {
     s = s.toLowerCase();             // convert to lowercase
     return s.substring(0, num_chars);// trim to first num_chars chars
 }
-
