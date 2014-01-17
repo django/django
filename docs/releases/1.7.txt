@@ -805,6 +805,18 @@ Fixing the issues introduced some backward incompatible changes:
 
 .. _pytz: https://pypi.python.org/pypi/pytz/
 
+Logout protected against CSRF
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+User log out is now protected against cross-site attacks. For this reason
+``POST`` request are required to actually log out user. Function
+:func:`~django.contrib.auth.views.logout` may not log user out and can
+return a confirmation page instead. The function also have new ``confirmation_template_name``
+argument. Also new attribute
+:attr:`~django.contrib.admin.sites.AdminSite.logout_confirmation_template` was
+added for customization of administration.
+
+
 Miscellaneous
 ~~~~~~~~~~~~~
 

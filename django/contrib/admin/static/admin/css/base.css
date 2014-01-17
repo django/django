@@ -828,6 +828,23 @@ table#change-history tbody th {
     text-align: right;
 }
 
+#user-tools .logout {
+    display: inline-block;
+}
+
+#user-tools .logout input {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+}
+
+#user-tools .logout input:hover {
+    text-decoration: underline;
+}
+
 /* SIDEBAR */
 
 #content-related h3 {

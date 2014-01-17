@@ -680,9 +680,9 @@ patterns.
     .. _site framework docs: ../sites/
 
 
-.. function:: logout(request, [next_page, template_name, redirect_field_name, current_app, extra_context])
+.. function:: logout(request, [next_page, template_name, redirect_field_name, confirmation_template_name, current_app, extra_context])
 
-    Logs a user out.
+    Logs a user out or displays a confirmation page.
 
     **URL name:** ``logout``
 
@@ -698,12 +698,20 @@ patterns.
       URL to redirect to after log out. Defaults to ``next``. Overrides the
       ``next_page`` URL if the given ``GET`` parameter is passed.
 
+    * ``confirmation_template_name``: The full name of a template to display if the
+      user's confirmation is required. Defaults to
+      :file:`registration/logged_confirmation.html` if no argument is supplied.
+
     * ``current_app``: A hint indicating which application contains the current
       view. See the :ref:`namespaced URL resolution strategy
       <topics-http-reversing-url-namespaces>` for more information.
 
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
+
+    .. versionchanged:: 1.7
+
+        The view can return the confirmation page. The argument ``confirmation_template_name`` was added.
 
     **Template context:**
 

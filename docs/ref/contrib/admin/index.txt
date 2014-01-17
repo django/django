@@ -2278,8 +2278,9 @@ Root and login templates
 
 If you wish to change the index, login or logout templates, you are better off
 creating your own ``AdminSite`` instance (see below), and changing the
-:attr:`AdminSite.index_template` , :attr:`AdminSite.login_template` or
-:attr:`AdminSite.logout_template` properties.
+:attr:`AdminSite.index_template` , :attr:`AdminSite.login_template`,
+:attr:`AdminSite.logout_template` or :attr:`AdminSite.logout_confirmation_template`
+properties.
 
 ``AdminSite`` objects
 =====================
@@ -2352,6 +2353,12 @@ Templates can override or extend base admin templates as described in
 .. attribute:: AdminSite.logout_template
 
     Path to a custom template that will be used by the admin site logout view.
+
+.. attribute:: AdminSite.logout_confirmation_template
+
+    .. versionadded:: 1.7
+
+    Path to a custom template that will be used by the admin site logout confirmation view.
 
 .. attribute:: AdminSite.password_change_template
 
