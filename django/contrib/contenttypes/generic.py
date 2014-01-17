@@ -324,7 +324,7 @@ def create_generic_related_manager(superclass):
             self.pk_val = self.instance._get_pk_val()
             self.core_filters = {
                 '%s__pk' % content_type_field_name: content_type.id,
-                '%s__exact' % object_id_field_name: instance._get_pk_val(),
+                '%s' % object_id_field_name: instance._get_pk_val(),
             }
 
         def __call__(self, **kwargs):

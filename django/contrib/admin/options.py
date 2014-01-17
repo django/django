@@ -1620,7 +1620,7 @@ class ModelAdmin(BaseModelAdmin):
         app_label = opts.app_label
         action_list = LogEntry.objects.filter(
             object_id=unquote(object_id),
-            content_type__id__exact=ContentType.objects.get_for_model(model).id
+            content_type=ContentType.objects.get_for_model(model)
         ).select_related().order_by('action_time')
 
         context = dict(self.admin_site.each_context(),

@@ -39,4 +39,4 @@ class CurrentSiteManager(models.Manager):
     def get_queryset(self):
         if not self.__is_validated:
             self._validate_field_name()
-        return super(CurrentSiteManager, self).get_queryset().filter(**{self.__field_name + '__id__exact': settings.SITE_ID})
+        return super(CurrentSiteManager, self).get_queryset().filter(**{self.__field_name + '__id': settings.SITE_ID})
