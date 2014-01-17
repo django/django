@@ -1053,10 +1053,12 @@ cause your site to display an error page.
 If you'd like to retrieve a URL without displaying it, you can use a slightly
 different call::
 
-
     {% url 'path.to.view' arg arg2 as the_url %}
 
     <a href="{{ the_url }}">I'm linking to {{ the_url }}</a>
+
+The scope of the variable created by the  ``as var`` syntax is the
+``{% block %}`` in which the ``{% url %}`` tag appears.
 
 This ``{% url ... as var %}`` syntax will *not* cause an error if the view is
 missing. In practice you'll use this to link to views that are optional::
