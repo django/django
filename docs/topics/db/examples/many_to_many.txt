@@ -111,7 +111,7 @@ Create and add a ``Publication`` to an ``Article`` in one step using
 Many-to-many relationships can be queried using :ref:`lookups across
 relationships <lookups-that-span-relationships>`::
 
-    >>> Article.objects.filter(publications__id__exact=1)
+    >>> Article.objects.filter(publications__id=1)
     [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
     >>> Article.objects.filter(publications__pk=1)
     [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
@@ -143,7 +143,7 @@ The :meth:`~django.db.models.query.QuerySet.count` function respects
 Reverse m2m queries are supported (i.e., starting at the table that doesn't have
 a :class:`~django.db.models.ManyToManyField`)::
 
-    >>> Publication.objects.filter(id__exact=1)
+    >>> Publication.objects.filter(id=1)
     [<Publication: The Python Journal>]
     >>> Publication.objects.filter(pk=1)
     [<Publication: The Python Journal>]
@@ -151,7 +151,7 @@ a :class:`~django.db.models.ManyToManyField`)::
     >>> Publication.objects.filter(article__headline__startswith="NASA")
     [<Publication: Highlights for Children>, <Publication: Science News>, <Publication: Science Weekly>, <Publication: The Python Journal>]
 
-    >>> Publication.objects.filter(article__id__exact=1)
+    >>> Publication.objects.filter(article__id=1)
     [<Publication: The Python Journal>]
     >>> Publication.objects.filter(article__pk=1)
     [<Publication: The Python Journal>]

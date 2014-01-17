@@ -84,7 +84,7 @@ This accomplishes several things quite nicely:
 
       def article_detail(request, article_id):
           try:
-              a = Article.objects.get(id=article_id, sites__id__exact=get_current_site(request).id)
+              a = Article.objects.get(id=article_id, sites__id=get_current_site(request).id)
           except Article.DoesNotExist:
               raise Http404
           # ...

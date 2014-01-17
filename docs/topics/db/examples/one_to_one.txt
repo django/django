@@ -113,7 +113,7 @@ This of course works in reverse::
 
     >>> Place.objects.get(pk=1)
     <Place: Demon Dogs the place>
-    >>> Place.objects.get(restaurant__place__exact=p1)
+    >>> Place.objects.get(restaurant__place=p1)
     <Place: Demon Dogs the place>
     >>> Place.objects.get(restaurant=r)
     <Place: Demon Dogs the place>

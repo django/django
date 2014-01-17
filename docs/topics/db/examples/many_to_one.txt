@@ -123,7 +123,7 @@ This works as many levels deep as you want. There's no limit. For example::
     [<Article: This is a test>]
 
     # Find all Articles for any Reporter whose first name is "John".
-    >>> Article.objects.filter(reporter__first_name__exact='John')
+    >>> Article.objects.filter(reporter__first_name='John')
     [<Article: John's second story>, <Article: This is a test>]
 
 Exact match is implied here::
@@ -134,7 +134,7 @@ Exact match is implied here::
 Query twice over the related field. This translates to an AND condition in the
 WHERE clause::
 
-    >>> Article.objects.filter(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
+    >>> Article.objects.filter(reporter__first_name='John', reporter__last_name='Smith')
     [<Article: John's second story>, <Article: This is a test>]
 
 For the related lookup you can supply a primary key value or pass the related
@@ -184,7 +184,7 @@ Queries can go round in circles::
     [<Reporter: John Smith>, <Reporter: John Smith>, <Reporter: John Smith>, <Reporter: John Smith>]
     >>> Reporter.objects.filter(article__reporter__first_name__startswith='John').distinct()
     [<Reporter: John Smith>]
-    >>> Reporter.objects.filter(article__reporter__exact=r).distinct()
+    >>> Reporter.objects.filter(article__reporter=r).distinct()
     [<Reporter: John Smith>]
 
 If you delete a reporter, his articles will be deleted (assuming that the

@@ -411,7 +411,7 @@ can specify the field name suffixed with ``_id``. In this case, the value
 parameter is expected to contain the raw value of the foreign model's primary
 key. For example:
 
-    >>> Entry.objects.filter(blog_id__exact=4)
+    >>> Entry.objects.filter(blog_id=4)
 
 If you pass an invalid keyword argument, a lookup function will raise
 ``TypeError``.
@@ -489,7 +489,7 @@ want.
 This example retrieves all ``Entry`` objects with a ``Blog`` whose ``name``
 is ``'Beatles Blog'``::
 
-    >>> Entry.objects.filter(blog__name__exact='Beatles Blog')
+    >>> Entry.objects.filter(blog__name='Beatles Blog')
 
 This spanning can be as deep as you'd like.
 
