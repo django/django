@@ -2501,10 +2501,9 @@ get_static_prefix
 
 .. highlight:: html+django
 
-If you're not using :class:`~django.template.RequestContext`, or if you need
-more control over exactly where and how :setting:`STATIC_URL` is injected
-into the template, you can use the :ttag:`get_static_prefix` template tag
-instead::
+You should prefer the :ttag:`static` template tag, but if you need more control
+over exactly where and how :setting:`STATIC_URL` is injected into the template,
+you can use the :ttag:`get_static_prefix` template tag::
 
     {% load static %}
     <img src="{% get_static_prefix %}images/hi.jpg" alt="Hi!" />

@@ -2628,9 +2628,7 @@ tuples, e.g.::
         ("downloads", "/opt/webfiles/stats"),
     )
 
-Example:
-
-Assuming you have :setting:`STATIC_URL` set ``'/static/'``, the
+For example, assuming you have :setting:`STATIC_URL` set to ``'/static/'``, the
 :djadmin:`collectstatic` management command would collect the "stats" files
 in a ``'downloads'`` subdirectory of :setting:`STATIC_ROOT`.
 
@@ -2640,7 +2638,7 @@ This would allow you to refer to the local file
 
 .. code-block:: html+django
 
-    <a href="{{ STATIC_URL }}downloads/polls_20101022.tar.gz">
+    <a href="{% static "downloads/polls_20101022.tar.gz" %}">
 
 .. setting:: STATICFILES_STORAGE
 
