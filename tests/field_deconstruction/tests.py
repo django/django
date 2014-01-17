@@ -96,6 +96,12 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(path, "django.db.models.DateTimeField")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"auto_now_add": True})
+        # Bug #21785
+        field = models.DateTimeField(auto_now=True, auto_now_add=True)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.DateTimeField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"auto_now_add": True, "auto_now": True})
 
     def test_decimal_field(self):
         field = models.DecimalField(max_digits=5, decimal_places=2)
