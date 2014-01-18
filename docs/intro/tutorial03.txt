@@ -105,14 +105,19 @@ with:
     :filename: mysite/urls.py
 
     from django.conf.urls import patterns, include, url
-
     from django.contrib import admin
-    admin.autodiscover()
 
     urlpatterns = patterns('',
         url(r'^polls/', include('polls.urls')),
         url(r'^admin/', include(admin.site.urls)),
     )
+
+.. admonition:: Doesn't match what you see?
+
+    If you're seeing ``admin.autodiscover()`` before the definition of
+    ``urlpatterns``, you're probably using a version of Django that doesn't
+    match this tutorial version.  You'll want to either switch to the older
+    tutorial or the newer Django version.
 
 You have now wired an ``index`` view into the URLconf. Go to
 http://localhost:8000/polls/ in your browser, and you should see the text
@@ -587,9 +592,7 @@ it to include namespacing:
     :filename: mysite/urls.py
 
     from django.conf.urls import patterns, include, url
-
     from django.contrib import admin
-    admin.autodiscover()
 
     urlpatterns = patterns('',
         url(r'^polls/', include('polls.urls', namespace="polls")),

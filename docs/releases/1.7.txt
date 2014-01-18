@@ -93,6 +93,13 @@ Improvements thus far include:
   starts, through a deterministic and straightforward process. This should
   make it easier to diagnose import issues such as import loops.
 
+* The admin has an :class:`~django.contrib.admin.apps.AdminConfig` application
+  configuration class. When Django starts, this class takes care of calling
+  :func:`~django.contrib.admin.autodiscover()`. To use it, simply replace
+  ``'django.contrib.admin'`` in :setting:`INSTALLED_APPS` with
+  ``'django.contrib.admin.apps.AdminConfig'`` and remove
+  ``admin.autodiscover()`` from your URLconf.
+
 New method on Field subclasses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -115,7 +115,7 @@ In addition, modify the :setting:`INSTALLED_APPS` setting to include
 and ``world`` (your newly created application)::
 
     INSTALLED_APPS = (
-        'django.contrib.admin',
+        'django.contrib.admin.apps.AdminConfig',
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
@@ -733,8 +733,6 @@ Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
 
     from django.conf.urls import patterns, url, include
     from django.contrib.gis import admin
-
-    admin.autodiscover()
 
     urlpatterns = patterns('',
         url(r'^admin/', include(admin.site.urls)),
