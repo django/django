@@ -167,11 +167,12 @@ def setup(verbosity, test_labels):
                 module_label == label or module_label.startswith(label + '.')
                 for label in test_labels_set)
 
+        installed_app_names = set(get_installed())
         if module_found_in_labels:
             if verbosity >= 2:
                 print("Importing application %s" % module_name)
             # HACK.
-            if module_label not in settings.INSTALLED_APPS:
+            if module_label not in installed_app_names:
                 settings.INSTALLED_APPS.append(module_label)
             app_config = AppConfig.create(module_label)
             apps.app_configs[app_config.label] = app_config
