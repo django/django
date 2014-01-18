@@ -52,7 +52,7 @@ class TemplateCommand(BaseCommand):
                          'Separate multiple extensions with commas, or use '
                          '-n multiple times.')
     )
-    requires_model_validation = False
+    requires_system_checks = False
     # Can't import settings during this command, because they haven't
     # necessarily been created.
     can_import_settings = False

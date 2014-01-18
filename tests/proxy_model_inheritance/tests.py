@@ -5,6 +5,7 @@ import sys
 
 from django.core.management import call_command
 from django.test import TestCase, TransactionTestCase
+from django.test.utils import override_system_checks
 from django.utils._os import upath
 
 from .models import (ConcreteModel, ConcreteModelSubclass,
@@ -26,6 +27,9 @@ class ProxyModelInheritanceTests(TransactionTestCase):
     def tearDown(self):
         sys.path = self.old_sys_path
 
+    # `auth` app is imported, but not installed in this test, so we need to
+    # exclude checks registered by this app.
+    @override_system_checks([])
     def test_table_exists(self):
         with self.modify_settings(INSTALLED_APPS={'append': ['app1', 'app2']}):
             call_command('migrate', verbosity=0)

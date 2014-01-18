@@ -14,7 +14,7 @@ class Command(BaseCommand):
                 'open a shell.  Defaults to the "default" database.'),
     )
 
-    requires_model_validation = False
+    requires_system_checks = False
 
     def handle(self, **options):
         connection = connections[options.get('database')]

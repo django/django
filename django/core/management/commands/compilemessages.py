@@ -65,7 +65,7 @@ class Command(BaseCommand):
     )
     help = 'Compiles .po files to .mo files for use with builtin gettext support.'
 
-    requires_model_validation = False
+    requires_system_checks = False
     leave_locale_alone = True
 
     def handle(self, **options):

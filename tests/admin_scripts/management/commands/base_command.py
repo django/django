@@ -10,7 +10,7 @@ class Command(BaseCommand):
         make_option('--option_c', '-c', action='store', dest='option_c', default='3'),
     )
     help = 'Test basic commands'
-    requires_model_validation = False
+    requires_system_checks = False
     args = '[labels ...]'
 
     def handle(self, *labels, **options):

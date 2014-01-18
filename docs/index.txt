@@ -291,6 +291,7 @@ Learn about some other core functionalities of the Django framework:
 * :doc:`Flatpages <ref/contrib/flatpages>`
 * :doc:`Redirects <ref/contrib/redirects>`
 * :doc:`Signals <topics/signals>`
+* :doc:`System check framework <ref/checks>`
 * :doc:`The sites framework <ref/contrib/sites>`
 * :doc:`Unicode in Django <ref/unicode>`
 

@@ -142,8 +142,8 @@ class ValidationTestCase(TestCase):
         class MyAdmin(admin.ModelAdmin):
             inlines = [TwoAlbumFKAndAnEInline]
 
-        self.assertRaisesMessage(Exception,
-            "<class 'admin_validation.models.TwoAlbumFKAndAnE'> has more than 1 ForeignKey to <class 'admin_validation.models.Album'>",
+        self.assertRaisesMessage(ValueError,
+            "'admin_validation.TwoAlbumFKAndAnE' has more than one ForeignKey to 'admin_validation.Album'.",
             MyAdmin.validate, Album)
 
     def test_inline_with_specified(self):

@@ -37,7 +37,7 @@ class Command(BaseCommand):
     args = '[optional port number, or ipaddr:port]'
 
     # Validation is called explicitly each time the server is reloaded.
-    requires_model_validation = False
+    requires_system_checks = False
 
     def get_handler(self, *args, **options):
         """
@@ -99,7 +99,7 @@ class Command(BaseCommand):
         shutdown_message = options.get('shutdown_message', '')
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
 
-        self.stdout.write("Validating models...\n\n")
+        self.stdout.write("Performing system checks...\n\n")
         self.validate(display_num_errors=True)
         self.check_migrations()
         now = datetime.now().strftime('%B %d, %Y - %X')
