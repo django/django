@@ -116,7 +116,7 @@ class BuiltinLookup(Lookup):
     def as_sql(self, qn, connection):
         lhs_sql, params = self.process_lhs(qn, connection)
         field_internal_type = self.lhs.output_type.get_internal_type()
-        db_type = self.lhs.output_type
+        db_type = self.lhs.output_type.db_type(connection=connection)
         lhs_sql = connection.ops.field_cast_sql(db_type, field_internal_type) % lhs_sql
         lhs_sql = connection.ops.lookup_cast(self.lookup_name) % lhs_sql
         rhs_sql, rhs_params = self.process_rhs(qn, connection)
