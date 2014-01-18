@@ -17,6 +17,7 @@ from django.db.models.fields.related import (  # NOQA
 from django.db.models.fields.proxy import OrderWrt  # NOQA
 from django.db.models.deletion import (  # NOQA
     CASCADE, PROTECT, SET, SET_NULL, SET_DEFAULT, DO_NOTHING, ProtectedError)
+from django.db.models.lookups import Lookup, Transform  # NOQA
 from django.db.models import signals  # NOQA
 
 

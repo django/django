@@ -5,18 +5,27 @@ the SQL domain.
 
 
 class Col(object):
-    def __init__(self, alias, col):
-        self.alias = alias
-        self.col = col
+    def __init__(self, alias, target, source):
+        self.alias, self.target, self.source = alias, target, source
 
     def as_sql(self, qn, connection):
-        return '%s.%s' % (qn(self.alias), self.col), []
+        return "%s.%s" % (qn(self.alias), qn(self.target.column)), []
+
+    @property
+    def output_type(self):
+        return self.source
+
+    def relabeled_clone(self, relabels):
+        return self.__class__(relabels.get(self.alias, self.alias), self.target, self.source)
+
+    def get_group_by_cols(self):
+        return [(self.alias, self.target.column)]
+
+    def get_lookup(self, name):
+        return self.output_type.get_lookup(name)
 
     def prepare(self):
         return self
-
-    def relabeled_clone(self, relabels):
-        return self.__class__(relabels.get(self.alias, self.alias), self.col)
 
 
 class EmptyResultSet(Exception):

@@ -334,6 +334,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKE %s ESCAPE '\\'",
     }
 
+    pattern_ops = {
+        'startswith': "LIKE %s || '%%%%'",
+        'istartswith': "LIKE UPPER(%s) || '%%%%'",
+    }
+
     Database = Database
 
     def __init__(self, *args, **kwargs):

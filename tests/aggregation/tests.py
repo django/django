@@ -443,7 +443,7 @@ class BaseAggregateTestCase(TestCase):
         vals = Author.objects.filter(pk=1).aggregate(Count("friends__id"))
         self.assertEqual(vals, {"friends__id__count": 2})
 
-        books = Book.objects.annotate(num_authors=Count("authors__name")).filter(num_authors__ge=2).order_by("pk")
+        books = Book.objects.annotate(num_authors=Count("authors__name")).filter(num_authors__exact=2).order_by("pk")
         self.assertQuerysetEqual(
             books, [
                 "The Definitive Guide to Django: Web Development Done Right",

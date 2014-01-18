@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.core.exceptions import FieldError
 from django.db.models import F
 from django.db import transaction
-from django.test import TestCase
+from django.test import TestCase, skipIfDBFeature
 from django.utils import six
 
 from .models import Company, Employee
@@ -223,6 +223,25 @@ class ExpressionsTests(TestCase):
         )
         acme.num_employees = F("num_employees") + 16
         self.assertRaises(TypeError, acme.save)
+
+    def test_ticket_11722_iexact_lookup(self):
+        Employee.objects.create(firstname="John", lastname="Doe")
+        Employee.objects.create(firstname="Test", lastname="test")
+
+        queryset = Employee.objects.filter(firstname__iexact=F('lastname'))
+        self.assertQuerysetEqual(queryset, ["<Employee: Test test>"])
+
+    @skipIfDBFeature('has_case_insensitive_like')
+    def test_ticket_16731_startswith_lookup(self):
+        Employee.objects.create(firstname="John", lastname="Doe")
+        e2 = Employee.objects.create(firstname="Jack", lastname="Jackson")
+        e3 = Employee.objects.create(firstname="Jack", lastname="jackson")
+        self.assertQuerysetEqual(
+            Employee.objects.filter(lastname__startswith=F('firstname')),
+            [e2], lambda x: x)
+        self.assertQuerysetEqual(
+            Employee.objects.filter(lastname__istartswith=F('firstname')).order_by('pk'),
+            [e2, e3], lambda x: x)
 
     def test_ticket_18375_join_reuse(self):
         # Test that reverse multijoin F() references and the lookup target

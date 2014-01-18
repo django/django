@@ -5,9 +5,11 @@ from django.db.backends import utils
 from django.db.models import signals, Q
 from django.db.models.fields import (AutoField, Field, IntegerField,
     PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist)
+from django.db.models.lookups import IsNull
 from django.db.models.related import RelatedObject, PathInfo
 from django.db.models.query import QuerySet
 from django.db.models.deletion import CASCADE
+from django.db.models.sql.datastructures import Col
 from django.utils.encoding import smart_text
 from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
@@ -987,6 +989,11 @@ class ForeignObjectRel(object):
         # example custom multicolumn joins currently have no remote field).
         self.field_name = None
 
+    def get_lookup_constraint(self, constraint_class, alias, targets, sources, lookup_type,
+                              raw_value):
+        return self.field.get_lookup_constraint(constraint_class, alias, targets, sources,
+                                                lookup_type, raw_value)
+
 
 class ManyToOneRel(ForeignObjectRel):
     def __init__(self, field, to, field_name, related_name=None, limit_choices_to=None,
@@ -1193,14 +1200,16 @@ class ForeignObject(RelatedField):
         pathinfos = [PathInfo(from_opts, opts, (opts.pk,), self.rel, not self.unique, False)]
         return pathinfos
 
-    def get_lookup_constraint(self, constraint_class, alias, targets, sources, lookup_type,
+    def get_lookup_constraint(self, constraint_class, alias, targets, sources, lookups,
                               raw_value):
-        from django.db.models.sql.where import SubqueryConstraint, Constraint, AND, OR
+        from django.db.models.sql.where import SubqueryConstraint, AND, OR
         root_constraint = constraint_class()
         assert len(targets) == len(sources)
+        if len(lookups) > 1:
+            raise exceptions.FieldError('Relation fields do not support nested lookups')
+        lookup_type = lookups[0]
 
         def get_normalized_value(value):
-
             from django.db.models import Model
             if isinstance(value, Model):
                 value_list = []
@@ -1221,28 +1230,27 @@ class ForeignObject(RelatedField):
                                                    [source.name for source in sources], raw_value),
                                 AND)
         elif lookup_type == 'isnull':
-            root_constraint.add(
-                (Constraint(alias, targets[0].column, targets[0]), lookup_type, raw_value), AND)
+            root_constraint.add(IsNull(Col(alias, targets[0], sources[0]), raw_value), AND)
         elif (lookup_type == 'exact' or (lookup_type in ['gt', 'lt', 'gte', 'lte']
                                          and not is_multicolumn)):
             value = get_normalized_value(raw_value)
-            for index, source in enumerate(sources):
+            for target, source, val in zip(targets, sources, value):
+                lookup_class = target.get_lookup(lookup_type)
                 root_constraint.add(
-                    (Constraint(alias, targets[index].column, sources[index]), lookup_type,
-                     value[index]), AND)
+                    lookup_class(Col(alias, target, source), val), AND)
         elif lookup_type in ['range', 'in'] and not is_multicolumn:
             values = [get_normalized_value(value) for value in raw_value]
             value = [val[0] for val in values]
-            root_constraint.add(
-                (Constraint(alias, targets[0].column, sources[0]), lookup_type, value), AND)
+            lookup_class = targets[0].get_lookup(lookup_type)
+            root_constraint.add(lookup_class(Col(alias, targets[0], sources[0]), value), AND)
         elif lookup_type == 'in':
             values = [get_normalized_value(value) for value in raw_value]
             for value in values:
                 value_constraint = constraint_class()
-                for index, target in enumerate(targets):
-                    value_constraint.add(
-                        (Constraint(alias, target.column, sources[index]), 'exact', value[index]),
-                        AND)
+                for source, target, val in zip(sources, targets, value):
+                    lookup_class = target.get_lookup('exact')
+                    lookup = lookup_class(Col(alias, target, source), val)
+                    value_constraint.add(lookup, AND)
                 root_constraint.add(value_constraint, OR)
         else:
             raise TypeError('Related Field got invalid lookup: %s' % lookup_type)

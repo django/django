@@ -478,10 +478,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         (alias, col, db_type), the lookup type string, lookup value, and
         the geometry field.
         """
-        alias, col, db_type = lvalue
-
-        # Getting the quoted geometry column.
-        geo_col = '%s.%s' % (qn(alias), qn(col))
+        geo_col, db_type = lvalue
 
         if lookup_type in self.geometry_operators:
             if field.geography and not lookup_type in self.geography_operators:

@@ -2632,8 +2632,15 @@ class WhereNodeTest(TestCase):
         def as_sql(self, qn, connection):
             return 'dummy', []
 
+    class MockCompiler(object):
+        def compile(self, node):
+            return node.as_sql(self, connection)
+
+        def __call__(self, name):
+            return connection.ops.quote_name(name)
+
     def test_empty_full_handling_conjunction(self):
-        qn = connection.ops.quote_name
+        qn = WhereNodeTest.MockCompiler()
         w = WhereNode(children=[EverythingNode()])
         self.assertEqual(w.as_sql(qn, connection), ('', []))
         w.negate()
@@ -2658,7 +2665,7 @@ class WhereNodeTest(TestCase):
         self.assertEqual(w.as_sql(qn, connection), ('', []))
 
     def test_empty_full_handling_disjunction(self):
-        qn = connection.ops.quote_name
+        qn = WhereNodeTest.MockCompiler()
         w = WhereNode(children=[EverythingNode()], connector='OR')
         self.assertEqual(w.as_sql(qn, connection), ('', []))
         w.negate()
@@ -2685,7 +2692,7 @@ class WhereNodeTest(TestCase):
         self.assertEqual(w.as_sql(qn, connection), ('NOT (dummy)', []))
 
     def test_empty_nodes(self):
-        qn = connection.ops.quote_name
+        qn = WhereNodeTest.MockCompiler()
         empty_w = WhereNode()
         w = WhereNode(children=[empty_w, empty_w])
         self.assertEqual(w.as_sql(qn, connection), (None, []))

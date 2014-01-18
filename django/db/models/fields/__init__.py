@@ -11,6 +11,7 @@ from itertools import tee
 
 from django.apps import apps
 from django.db import connection
+from django.db.models.lookups import default_lookups, RegisterLookupMixin
 from django.db.models.query_utils import QueryWrapper
 from django.conf import settings
 from django import forms
@@ -80,7 +81,7 @@ def _empty(of_cls):
 
 
 @total_ordering
-class Field(object):
+class Field(RegisterLookupMixin):
     """Base class for all field types"""
 
     # Designates whether empty strings fundamentally are allowed at the
@@ -101,6 +102,7 @@ class Field(object):
         'unique': _('%(model_name)s with this %(field_label)s '
                     'already exists.'),
     }
+    class_lookups = default_lookups.copy()
 
     # Generic field type description, usually overridden by subclasses
     def _description(self):
@@ -514,8 +516,7 @@ class Field(object):
             except ValueError:
                 raise ValueError("The __year lookup type requires an integer "
                                  "argument")
-
-        raise TypeError("Field has invalid lookup: %s" % lookup_type)
+        return self.get_prep_value(value)
 
     def get_db_prep_lookup(self, lookup_type, value, connection,
                            prepared=False):
@@ -564,6 +565,8 @@ class Field(object):
                 return connection.ops.year_lookup_bounds_for_date_field(value)
             else:
                 return [value]          # this isn't supposed to happen
+        else:
+            return [value]
 
     def has_default(self):
         """

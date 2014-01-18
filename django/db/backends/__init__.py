@@ -673,6 +673,9 @@ class BaseDatabaseFeatures(object):
     # What kind of error does the backend throw when accessing closed cursor?
     closed_cursor_error_class = ProgrammingError
 
+    # Does 'a' LIKE 'A' match?
+    has_case_insensitive_like = True
+
     def __init__(self, connection):
         self.connection = connection
 
