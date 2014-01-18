@@ -88,7 +88,7 @@ application where we want to make use of the ``abs()`` operator.
 We have an ``Experiment`` model which records a start value, end value and the
 change (start - end). We would like to find all experiments where the change
 was equal to a certain amount (``Experiment.objects.filter(change__abs=27)``),
-or where it did not exceede a certain amount
+or where it did not exceed a certain amount
 (``Experiment.objects.filter(change__abs__lt=27)``).
 
 .. note::
@@ -113,7 +113,7 @@ Next, lets register it for ``IntegerField``::
   from django.db.models import IntegerField
   IntegerField.register_lookup(AbsoluteValue)
 
-We can now run the queris we had before.
+We can now run the queries we had before.
 ``Experiment.objects.filter(change__abs=27)`` will generate the following SQL::
 
     SELECT ... WHERE ABS("experiments"."change") = 27
@@ -184,13 +184,13 @@ transformations in Python.
 
 .. note::
     In fact, most lookups with ``__abs`` could be implemented as range queries
-    like this, and on most database backend it is likely to be more sensible to
+    like this, and on most database backends it is likely to be more sensible to
     do so as you can make use of the indexes. However with PostgreSQL you may
     want to add an index on ``abs(change)`` which would allow these queries to
     be very efficient.
 
-Writing alternative implemenatations for existing lookups
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Writing alternative implementations for existing lookups
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sometimes different database vendors require different SQL for the same
 operation. For this example we will rewrite a custom implementation for
@@ -210,7 +210,7 @@ We can change the behaviour on a specific backend by creating a subclass of
   Field.register_lookup(MySQLNotExact)
 
 We can then register it with ``Field``. It takes the place of the original
-``NotEqual`` class as it has 
+``NotEqual`` class as it has the same ``lookup_name``.
 
 When compiling a query, Django first looks for ``as_%s % connection.vendor``
 methods, and then falls back to ``as_sql``. The vendor names for the in-built

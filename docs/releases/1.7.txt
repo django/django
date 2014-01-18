@@ -189,7 +189,7 @@ Custom lookups work just like Django's inbuilt lookups (e.g. ``lte``,
 
 The :class:`django.db.models.Lookup` class provides a way to add lookup
 operators for model fields. As an example it is possible to add ``day_lte``
-opertor for ``DateFields``.
+operator for ``DateFields``.
 
 The :class:`django.db.models.Transform` class allows transformations of
 database values prior to the final lookup. For example it is possible to
