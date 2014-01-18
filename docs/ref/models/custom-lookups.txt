@@ -236,6 +236,13 @@ to this API.
     qn.compile(expression) should be used. The qn.compile() method will take
     care of calling vendor-specific methods of the expression.
 
+.. method:: get_lookup(lookup_name)
+
+    The ``get_lookup()`` method is used to fetch lookups. By default the
+    lookup is fetched from the expression's output type in the same way
+    described in registering and fetching lookup documentation below.
+    It is possible to override this method to alter that behaviour.
+
 .. method:: as_vendorname(qn, connection)
 
     Works like ``as_sql()`` method. When an expression is compiled by
@@ -243,12 +250,6 @@ to this API.
     vendorname is the vendor name of the backend used for executing the query.
     The vendorname is one of ``postgresql``, ``oracle``, ``sqlite`` or
     ``mysql`` for Django's built-in backends.
-
-.. method:: get_lookup(lookup_name)
-
-    The ``get_lookup()`` method is used to fetch lookups. By default the lookup
-    is fetched from the expression's output type, but it is possible to
-    override this method to alter that behaviour.
 
 .. attribute:: output_type
 
@@ -311,3 +312,25 @@ Transform reference
     This class level attribute is used when registering lookups. It determines
     the name used in queries to trigger this lookup. For example, ``year``
     or ``dayofweek``. This should not contain the string ``__``.
+
+.. _lookup-registration-api:
+
+Registering and fetching lookups
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The lookup registration API is explained below.
+
+.. classmethod:: register_lookup(lookup)
+
+    Registers the Lookup or Transform for the class. For example
+    ``DateField.register_lookup(YearExact)`` will register ``YearExact`` for
+    all ``DateFields`` in the project, but also for fields that are instances
+    of a subclass of ``DateField`` (for example ``DateTimeField``).
+
+.. method:: get_lookup(lookup_name)
+
+    Django uses ``get_lookup(lookup_name)`` to fetch lookups or transforms.
+    The implementation of ``get_lookup()`` fetches lookups or transforms
+    registered for the current class based on their lookup_name attribute.
+
+The lookup registration API is available for ``Transform`` and ``Field`` classes.

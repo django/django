@@ -343,6 +343,13 @@ underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 A list of validators to run for this field. See the :doc:`validators
 documentation </ref/validators>` for more information.
 
+Registering and fetching lookups
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``Field`` implements the :ref:`lookup registration API <lookup-registration-api>`.
+The API can be used to customize which lookups are available for a field class, and
+how lookups are fetched from a field.
+
 .. _model-field-types:
 
 Field types
