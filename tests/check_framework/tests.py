@@ -31,6 +31,7 @@ class SystemCheckFrameworkTests(TestCase):
         calls = [0]
 
         registry = CheckRegistry()
+
         @registry.register()
         def f(**kwargs):
             calls[0] += 1
@@ -101,10 +102,10 @@ class Django_1_6_0_CompatibilityChecks(TestCase):
             errors = check_1_6_compatibility()
             expected = [
                 checks.Warning(
-                    "Django 1.6 introduced a new default test runner ('django.test.runner.DiscoverRunner'). "
-                        'You should ensure your tests are all running & behaving as expected.',
-                    hint='See https://docs.djangoproject.com/en/dev/releases/1.6/#discovery-of-tests-in-any-test-module '
-                        'for more information.',
+                    ("Django 1.6 introduced a new default test runner ('django.test.runner.DiscoverRunner'). "
+                     'You should ensure your tests are all running & behaving as expected.'),
+                    hint=('See https://docs.djangoproject.com/en/dev/releases/1.6/#discovery-of-tests-in-any-test-module '
+                          'for more information.'),
                     obj=None,
                     id='1_6.W001',
                 )
@@ -125,10 +126,10 @@ class Django_1_6_0_CompatibilityChecks(TestCase):
                 errors = check_1_6_compatibility()
                 expected = [
                     checks.Warning(
-                        'BooleanField does not have a default value. '
-                            'Django 1.6 changed the default value of BooleanField from False to None',
-                        hint='See https://docs.djangoproject.com/en/1.6/ref/models/fields/#booleanfield '
-                            'for more information.',
+                        ('BooleanField does not have a default value. '
+                         'Django 1.6 changed the default value of BooleanField from False to None'),
+                        hint=('See https://docs.djangoproject.com/en/1.6/ref/models/fields/#booleanfield '
+                              'for more information.'),
                         obj=boolean_field,
                         id='1_6.W002',
                     )

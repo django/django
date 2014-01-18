@@ -4687,13 +4687,13 @@ class AdminViewOnSiteTests(TestCase):
             self.assertEqual(CityAdmin.check(City), [])
             CityAdmin.view_on_site = []
             self.assertEqual(CityAdmin.check(City), [
-                    Error(
-                        '"view_on_site" is not a callable or a boolean value.',
-                        hint=None,
-                        obj=CityAdmin,
-                        id='admin.E025',
-                    ),
-                ])
+                Error(
+                    '"view_on_site" is not a callable or a boolean value.',
+                    hint=None,
+                    obj=CityAdmin,
+                    id='admin.E025',
+                ),
+            ])
         finally:
             # Restore the original values for the benefit of other tests.
             CityAdmin.view_on_site = True

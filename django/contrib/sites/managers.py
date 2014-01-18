@@ -26,10 +26,9 @@ class CurrentSiteManager(models.Manager):
         except FieldDoesNotExist:
             return [
                 checks.Error(
-                    "CurrentSiteManager could not find a field named '%s'."
-                        % field_name,
-                    hint='Ensure that you did not misspell the field name. '
-                        'Does the field exist?',
+                    "CurrentSiteManager could not find a field named '%s'." % field_name,
+                    hint=('Ensure that you did not misspell the field name. '
+                         'Does the field exist?'),
                     obj=self,
                     id='sites.E001',
                 )

@@ -80,8 +80,7 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
         except FieldDoesNotExist:
             return [
                 checks.Error(
-                    'The field refers to "%s" field which is missing.'
-                        % self.fk_field,
+                    'The field refers to "%s" field which is missing.' % self.fk_field,
                     hint=None,
                     obj=self,
                     id='contenttypes.E001',
@@ -261,8 +260,9 @@ class GenericRelation(ForeignObject):
             except FieldDoesNotExist:
                 return [
                     checks.Error(
-                        'The field refers to %s.%s field which is missing.'
-                            % (opts.object_name, self.object_id_field_name),
+                        'The field refers to %s.%s field which is missing.' % (
+                            opts.object_name, self.object_id_field_name
+                        ),
                         hint=None,
                         obj=self,
                         id='contenttypes.E003',
@@ -288,9 +288,10 @@ class GenericRelation(ForeignObject):
             else:
                 return [
                     checks.Warning(
-                        'The field defines a generic relation with the model '
-                            '%s.%s, but the model lacks GenericForeignKey.'
-                            % (target._meta.app_label, target._meta.object_name),
+                        ('The field defines a generic relation with the model '
+                         '%s.%s, but the model lacks GenericForeignKey.') % (
+                            target._meta.app_label, target._meta.object_name
+                        ),
                         hint=None,
                         obj=self,
                         id='contenttypes.E004',
@@ -375,8 +376,9 @@ def _check_content_type_field(model, field_name, checked_object):
     except FieldDoesNotExist:
         return [
             checks.Error(
-                'The field refers to %s.%s field which is missing.'
-                    % (model._meta.object_name, field_name),
+                'The field refers to %s.%s field which is missing.' % (
+                    model._meta.object_name, field_name
+                ),
                 hint=None,
                 obj=checked_object,
                 id='contenttypes.E005',
@@ -386,10 +388,11 @@ def _check_content_type_field(model, field_name, checked_object):
         if not isinstance(field, models.ForeignKey):
             return [
                 checks.Error(
-                    '"%s" field is used by a %s '
-                        'as content type field and therefore it must be '
-                        'a ForeignKey.'
-                        % (field_name, checked_object.__class__.__name__),
+                    ('"%s" field is used by a %s '
+                     'as content type field and therefore it must be '
+                     'a ForeignKey.') % (
+                        field_name, checked_object.__class__.__name__
+                    ),
                     hint=None,
                     obj=checked_object,
                     id='contenttypes.E006',
@@ -398,10 +401,11 @@ def _check_content_type_field(model, field_name, checked_object):
         elif field.rel.to != ContentType:
             return [
                 checks.Error(
-                    '"%s" field is used by a %s '
-                        'as content type field and therefore it must be '
-                        'a ForeignKey to ContentType.'
-                        % (field_name, checked_object.__class__.__name__),
+                    ('"%s" field is used by a %s '
+                     'as content type field and therefore it must be '
+                     'a ForeignKey to ContentType.') % (
+                        field_name, checked_object.__class__.__name__
+                    ),
                     hint=None,
                     obj=checked_object,
                     id='contenttypes.E007',
@@ -409,6 +413,7 @@ def _check_content_type_field(model, field_name, checked_object):
             ]
         else:
             return []
+
 
 class ReverseGenericRelatedObjectsDescriptor(object):
     """

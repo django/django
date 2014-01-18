@@ -21,11 +21,11 @@ class DatabaseValidation(BaseDatabaseValidation):
             field_type = ''
 
         if (field_type.startswith('varchar') and field.unique
-            and (field.max_length is None or int(field.max_length) > 255)):
+                and (field.max_length is None or int(field.max_length) > 255)):
             errors.append(
                 checks.Error(
-                    'Under mysql backend, the field cannot have a "max_length" '
-                        'greated than 255 when it is unique.',
+                    ('Under mysql backend, the field cannot have a "max_length" '
+                     'greated than 255 when it is unique.'),
                     hint=None,
                     obj=field,
                     id='E047',

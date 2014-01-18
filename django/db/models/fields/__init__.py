@@ -220,10 +220,10 @@ class Field(RegisterLookupMixin):
                      for choice in self.choices):
                 return [
                     checks.Error(
-                        'All "choices" elements must be a tuple of two '
-                            'elements (the first one is the actual value '
-                            'to be stored and the second element is '
-                            'the human-readable name).',
+                        ('All "choices" elements must be a tuple of two '
+                         'elements (the first one is the actual value '
+                         'to be stored and the second element is '
+                         'the human-readable name).'),
                         hint=None,
                         obj=self,
                         id='E034',
@@ -256,8 +256,8 @@ class Field(RegisterLookupMixin):
             return [
                 checks.Error(
                     'Primary keys must not have null=True.',
-                    hint='Set null=False on the field or '
-                        'remove primary_key=True argument.',
+                    hint=('Set null=False on the field or '
+                          'remove primary_key=True argument.'),
                     obj=self,
                     id='E036',
                 )
@@ -1634,8 +1634,8 @@ class GenericIPAddressField(Field):
         if not getattr(self, 'null', False) and getattr(self, 'blank', False):
             return [
                 checks.Error(
-                    'The field cannot accept blank values if null values '
-                        'are not allowed, as blank values are stored as null.',
+                    ('The field cannot accept blank values if null values '
+                     'are not allowed, as blank values are stored as null.'),
                     hint=None,
                     obj=self,
                     id='E046',

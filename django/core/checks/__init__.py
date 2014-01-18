@@ -7,8 +7,8 @@ from .messages import (CheckMessage,
 from .registration import register, run_checks, tag_exists
 
 # Import these to force registration of checks
-import django.core.checks.compatibility.django_1_6_0  #NOQA
-import django.core.checks.model_checks  #NOQA
+import django.core.checks.compatibility.django_1_6_0  # NOQA
+import django.core.checks.model_checks  # NOQA
 
 __all__ = [
     'CheckMessage',

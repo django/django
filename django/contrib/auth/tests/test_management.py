@@ -219,8 +219,8 @@ class CustomUserModelValidationTestCase(TestCase):
         errors = checks.run_checks()
         expected = [
             checks.Error(
-                'The field named as the USERNAME_FIELD must not be included '
-                    'in REQUIRED_FIELDS on a custom user model.',
+                ('The field named as the USERNAME_FIELD must not be included '
+                 'in REQUIRED_FIELDS on a custom user model.'),
                 hint=None,
                 obj=CustomUserBadRequiredFields,
                 id='auth.E002',
@@ -237,8 +237,8 @@ class CustomUserModelValidationTestCase(TestCase):
         errors = checks.run_checks()
         expected = [
             checks.Error(
-                'The CustomUserNonUniqueUsername.username field must be '
-                    'unique because it is pointed to by USERNAME_FIELD.',
+                ('The CustomUserNonUniqueUsername.username field must be '
+                 'unique because it is pointed to by USERNAME_FIELD.'),
                 hint=None,
                 obj=CustomUserNonUniqueUsername,
                 id='auth.E003',
@@ -260,10 +260,10 @@ class CustomUserModelValidationTestCase(TestCase):
         errors = checks.run_checks()
         expected = [
             checks.Warning(
-                'The CustomUserNonUniqueUsername.username field is pointed to '
-                    'by USERNAME_FIELD, but it is not unique.',
-                hint='Ensure that your authentication backend can handle '
-                    'non-unique usernames.',
+                ('The CustomUserNonUniqueUsername.username field is pointed to '
+                 'by USERNAME_FIELD, but it is not unique.'),
+                hint=('Ensure that your authentication backend can handle '
+                      'non-unique usernames.'),
                 obj=CustomUserNonUniqueUsername,
                 id='auth.W004',
             )

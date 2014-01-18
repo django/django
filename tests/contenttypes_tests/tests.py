@@ -122,9 +122,9 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         errors = Model.content_object.check()
         expected = [
             checks.Error(
-                '"content_type" field is used by a GenericForeignKey '
-                    'as content type field and therefore it must be '
-                    'a ForeignKey.',
+                ('"content_type" field is used by a GenericForeignKey '
+                 'as content type field and therefore it must be '
+                 'a ForeignKey.'),
                 hint=None,
                 obj=Model.content_object,
                 id='contenttypes.E006',
@@ -142,9 +142,9 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         errors = Model.content_object.check()
         expected = [
             checks.Error(
-                '"content_type" field is used by a GenericForeignKey '
-                    'as content type field and therefore it must be '
-                    'a ForeignKey to ContentType.',
+                ('"content_type" field is used by a GenericForeignKey '
+                 'as content type field and therefore it must be '
+                 'a ForeignKey to ContentType.'),
                 hint=None,
                 obj=Model.content_object,
                 id='contenttypes.E007',
@@ -235,11 +235,11 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         errors = Model.rel.field.check()
         expected = [
             checks.Error(
-                'The field has a relation with model MissingModel, '
-                    'which has either not been installed or is abstract.',
-                hint='Ensure that you did not misspell the model name and '
-                    'the model is not abstract. Does your INSTALLED_APPS '
-                    'setting contain the app where MissingModel is defined?',
+                ('The field has a relation with model MissingModel, '
+                 'which has either not been installed or is abstract.'),
+                hint=('Ensure that you did not misspell the model name and '
+                      'the model is not abstract. Does your INSTALLED_APPS '
+                      'setting contain the app where MissingModel is defined?'),
                 obj=Model.rel.field,
                 id='E030',
             )
@@ -308,9 +308,9 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         errors = Bookmark.tags.field.check()
         expected = [
             checks.Warning(
-                'The field defines a generic relation with the model '
-                    'contenttypes_tests.TaggedItem, but the model lacks '
-                    'GenericForeignKey.',
+                ('The field defines a generic relation with the model '
+                 'contenttypes_tests.TaggedItem, but the model lacks '
+                 'GenericForeignKey.'),
                 hint=None,
                 obj=Bookmark.tags.field,
                 id='contenttypes.E004',
@@ -337,9 +337,9 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         errors = Model.rel.field.check()
         expected = [
             checks.Error(
-                'The field defines a relation with the model '
-                    'contenttypes_tests.SwappedModel, '
-                    'which has been swapped out.',
+                ('The field defines a relation with the model '
+                 'contenttypes_tests.SwappedModel, '
+                 'which has been swapped out.'),
                 hint='Update the relation to point at settings.TEST_SWAPPED_MODEL',
                 obj=Model.rel.field,
                 id='E029',

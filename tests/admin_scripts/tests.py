@@ -1421,11 +1421,12 @@ class CommandTypes(AdminScriptTestCase):
     def _test_base_command(self, args, labels, option_a="'1'", option_b="'2'"):
         out, err = self.run_manage(args)
 
-        expected_out = str_prefix("EXECUTE:BaseCommand labels=%%s, "
-            "options=[('no_color', False), ('option_a', %%s), ('option_b', %%s), "
-            "('option_c', '3'), ('pythonpath', None), ('settings', None), "
-            "('traceback', None), ('verbosity', %(_)s'1')]"
-            ) % (labels, option_a, option_b)
+        expected_out = str_prefix(
+            ("EXECUTE:BaseCommand labels=%%s, "
+             "options=[('no_color', False), ('option_a', %%s), ('option_b', %%s), "
+             "('option_c', '3'), ('pythonpath', None), ('settings', None), "
+             "('traceback', None), ('verbosity', %(_)s'1')]")
+        ) % (labels, option_a, option_b)
         self.assertNoOutput(err)
         self.assertOutput(out, expected_out)
 

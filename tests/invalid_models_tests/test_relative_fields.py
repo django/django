@@ -34,11 +34,11 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                'The field has a relation with model Rel1, '
-                    'which has either not been installed or is abstract.',
-                hint='Ensure that you did not misspell the model name and '
-                    'the model is not abstract. Does your INSTALLED_APPS '
-                    'setting contain the app where Rel1 is defined?',
+                ('The field has a relation with model Rel1, '
+                 'which has either not been installed or is abstract.'),
+                hint=('Ensure that you did not misspell the model name and '
+                      'the model is not abstract. Does your INSTALLED_APPS '
+                      'setting contain the app where Rel1 is defined?'),
                 obj=field,
                 id='E030',
             ),
@@ -53,11 +53,11 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Model)
         expected = [
             Error(
-                'The field has a relation with model Rel2, '
-                    'which has either not been installed or is abstract.',
-                hint='Ensure that you did not misspell the model name and '
-                    'the model is not abstract. Does your INSTALLED_APPS '
-                    'setting contain the app where Rel2 is defined?',
+                ('The field has a relation with model Rel2, '
+                 'which has either not been installed or is abstract.'),
+                hint=('Ensure that you did not misspell the model name and '
+                      'the model is not abstract. Does your INSTALLED_APPS '
+                      'setting contain the app where Rel2 is defined?'),
                 obj=field,
                 id='E030',
             ),
@@ -83,13 +83,13 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Group)
         expected = [
             Error(
-                'The model is used as an intermediary model by '
-                    'invalid_models_tests.Group.field, but it has more than one '
-                    'foreign key to Person, '
-                    'which is ambiguous and is not permitted.',
-                hint='If you want to create a recursive relationship, use '
-                    'ForeignKey("self", symmetrical=False, '
-                    'through="AmbiguousRelationship").',
+                ('The model is used as an intermediary model by '
+                 'invalid_models_tests.Group.field, but it has more than one '
+                 'foreign key to Person, '
+                 'which is ambiguous and is not permitted.'),
+                hint=('If you want to create a recursive relationship, use '
+                      'ForeignKey("self", symmetrical=False, '
+                      'through="AmbiguousRelationship").'),
                 obj=field,
                 id='E027',
             ),
@@ -116,9 +116,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Group)
         expected = [
             Error(
-                'The model is used as an intermediary model by '
-                    'invalid_models_tests.Group.members, but it misses '
-                    'a foreign key to Group or Person.',
+                ('The model is used as an intermediary model by '
+                 'invalid_models_tests.Group.members, but it misses '
+                 'a foreign key to Group or Person.'),
                 hint=None,
                 obj=InvalidRelationship,
                 id='E028',
@@ -142,9 +142,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Group)
         expected = [
             Error(
-                'The model is used as an intermediary model by '
-                    'invalid_models_tests.Group.members, but it misses '
-                    'a foreign key to Group or Person.',
+                ('The model is used as an intermediary model by '
+                 'invalid_models_tests.Group.members, but it misses '
+                 'a foreign key to Group or Person.'),
                 hint=None,
                 obj=InvalidRelationship,
                 id='E028',
@@ -164,11 +164,11 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Group)
         expected = [
             Error(
-                'The field specifies a many-to-many relation through model '
-                    'MissingM2MModel, which has not been installed.',
-                hint='Ensure that you did not misspell the model name and '
-                    'the model is not abstract. Does your INSTALLED_APPS '
-                    'setting contain the app where MissingM2MModel is defined?',
+                ('The field specifies a many-to-many relation through model '
+                 'MissingM2MModel, which has not been installed.'),
+                hint=('Ensure that you did not misspell the model name and '
+                      'the model is not abstract. Does your INSTALLED_APPS '
+                      'setting contain the app where MissingM2MModel is defined?'),
                 obj=field,
                 id='E023',
             ),
@@ -210,10 +210,10 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Person)
         expected = [
             Error(
-                'The model is used as an intermediary model by '
-                    'invalid_models_tests.Person.friends, but it has more than two '
-                    'foreign keys to Person, which is ambiguous and '
-                    'is not permitted.',
+                ('The model is used as an intermediary model by '
+                 'invalid_models_tests.Person.friends, but it has more than two '
+                 'foreign keys to Person, which is ambiguous and '
+                 'is not permitted.'),
                 hint=None,
                 obj=InvalidRelationship,
                 id='E025',
@@ -255,11 +255,11 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                'The field has a relation with model AbstractModel, '
-                    'which has either not been installed or is abstract.',
-                hint='Ensure that you did not misspell the model name and '
-                    'the model is not abstract. Does your INSTALLED_APPS '
-                    'setting contain the app where AbstractModel is defined?',
+                ('The field has a relation with model AbstractModel, '
+                 'which has either not been installed or is abstract.'),
+                hint=('Ensure that you did not misspell the model name and '
+                      'the model is not abstract. Does your INSTALLED_APPS '
+                      'setting contain the app where AbstractModel is defined?'),
                 obj=field,
                 id='E030',
             ),
@@ -278,11 +278,11 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Model)
         expected = [
             Error(
-                'The field has a relation with model AbstractModel, '
-                    'which has either not been installed or is abstract.',
-                hint='Ensure that you did not misspell the model name and '
-                    'the model is not abstract. Does your INSTALLED_APPS '
-                    'setting contain the app where AbstractModel is defined?',
+                ('The field has a relation with model AbstractModel, '
+                 'which has either not been installed or is abstract.'),
+                hint=('Ensure that you did not misspell the model name and '
+                      'the model is not abstract. Does your INSTALLED_APPS '
+                      'setting contain the app where AbstractModel is defined?'),
                 obj=field,
                 id='E030',
             ),
@@ -364,10 +364,10 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                'No unique=True constraint on field combination '
-                    '"country_id,city_id" under model Person.',
-                hint='Set unique=True argument on any of the fields '
-                    '"country_id,city_id" under model Person.',
+                ('No unique=True constraint on field combination '
+                 '"country_id,city_id" under model Person.'),
+                hint=('Set unique=True argument on any of the fields '
+                      '"country_id,city_id" under model Person.'),
                 obj=field,
                 id='E018',
             )
@@ -489,8 +489,8 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         ]
 
         expected_error = Error(
-            'The field defines a relation with the model '
-                'invalid_models_tests.SwappedModel, which has been swapped out.',
+            ('The field defines a relation with the model '
+             'invalid_models_tests.SwappedModel, which has been swapped out.'),
             hint='Update the relation to point at settings.TEST_SWAPPED_MODEL',
             id='E029',
         )
@@ -547,9 +547,9 @@ class AccessorClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Accessor for field Model.rel clashes with field Target.model_set.',
-                hint='Rename field Target.model_set or add/change '
-                    'a related_name argument to the definition '
-                    'for field Model.rel.',
+                hint=('Rename field Target.model_set or add/change '
+                      'a related_name argument to the definition '
+                      'for field Model.rel.'),
                 obj=Model._meta.get_field('rel'),
                 id='E014',
             ),
@@ -568,15 +568,15 @@ class AccessorClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Clash between accessors for Model.foreign and Model.m2m.',
-                hint='Add or change a related_name argument to the definition '
-                    'for Model.foreign or Model.m2m.',
+                hint=('Add or change a related_name argument to the definition '
+                      'for Model.foreign or Model.m2m.'),
                 obj=Model._meta.get_field('foreign'),
                 id='E016',
             ),
             Error(
                 'Clash between accessors for Model.m2m and Model.foreign.',
-                hint='Add or change a related_name argument to the definition '
-                    'for Model.m2m or Model.foreign.',
+                hint=('Add or change a related_name argument to the definition '
+                      'for Model.m2m or Model.foreign.'),
                 obj=Model._meta.get_field('m2m'),
                 id='E016',
             ),
@@ -630,9 +630,9 @@ class ReverseQueryNameClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Reverse query name for field Model.rel clashes with field Target.model.',
-                hint='Rename field Target.model or add/change '
-                    'a related_name argument to the definition '
-                    'for field Model.rel.',
+                hint=('Rename field Target.model or add/change '
+                      'a related_name argument to the definition '
+                      'for field Model.rel.'),
                 obj=Model._meta.get_field('rel'),
                 id='E015',
             ),
@@ -686,16 +686,17 @@ class ExplicitRelatedNameClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Accessor for field Model.rel clashes with field Target.clash.',
-                hint='Rename field Target.clash or add/change '
-                    'a related_name argument to the definition '
-                    'for field Model.rel.',
+                hint=('Rename field Target.clash or add/change '
+                      'a related_name argument to the definition '
+                      'for field Model.rel.'),
                 obj=Model._meta.get_field('rel'),
                 id='E014',
             ),
-            Error('Reverse query name for field Model.rel clashes with field Target.clash.',
-                hint='Rename field Target.clash or add/change '
-                    'a related_name argument to the definition '
-                    'for field Model.rel.',
+            Error(
+                'Reverse query name for field Model.rel clashes with field Target.clash.',
+                hint=('Rename field Target.clash or add/change '
+                      'a related_name argument to the definition '
+                      'for field Model.rel.'),
                 obj=Model._meta.get_field('rel'),
                 id='E015',
             ),
@@ -755,8 +756,8 @@ class ExplicitRelatedQueryNameClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Reverse query name for field Model.rel clashes with field Target.clash.',
-                hint='Rename field Target.clash or add/change a related_name '
-                    'argument to the definition for field Model.rel.',
+                hint=('Rename field Target.clash or add/change a related_name '
+                      'argument to the definition for field Model.rel.'),
                 obj=Model._meta.get_field('rel'),
                 id='E015',
             ),
@@ -775,15 +776,15 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Clash between accessors for Model.first_m2m and Model.second_m2m.',
-                hint=u'Add or change a related_name argument to the definition '
-                    'for Model.first_m2m or Model.second_m2m.',
+                hint=('Add or change a related_name argument to the definition '
+                      'for Model.first_m2m or Model.second_m2m.'),
                 obj=Model._meta.get_field('first_m2m'),
                 id='E016',
             ),
             Error(
                 'Clash between accessors for Model.second_m2m and Model.first_m2m.',
-                hint=u'Add or change a related_name argument to the definition '
-                    'for Model.second_m2m or Model.first_m2m.',
+                hint=('Add or change a related_name argument to the definition '
+                      'for Model.second_m2m or Model.first_m2m.'),
                 obj=Model._meta.get_field('second_m2m'),
                 id='E016',
             ),
@@ -798,9 +799,9 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Accessor for field Model.model_set clashes with field Model.model_set.',
-                hint='Rename field Model.model_set or add/change '
-                    'a related_name argument to the definition '
-                    'for field Model.model_set.',
+                hint=('Rename field Model.model_set or add/change '
+                     'a related_name argument to the definition '
+                     'for field Model.model_set.'),
                 obj=Model._meta.get_field('model_set'),
                 id='E014',
             ),
@@ -815,8 +816,8 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Reverse query name for field Model.model clashes with field Model.model.',
-                hint='Rename field Model.model or add/change a related_name '
-                    'argument to the definition for field Model.model.',
+                hint=('Rename field Model.model or add/change a related_name '
+                      'argument to the definition for field Model.model.'),
                 obj=Model._meta.get_field('model'),
                 id='E015',
             ),
@@ -833,15 +834,15 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Accessor for field Model.m2m clashes with field Model.clash.',
-                hint='Rename field Model.clash or add/change a related_name '
-                    'argument to the definition for field Model.m2m.',
+                hint=('Rename field Model.clash or add/change a related_name '
+                      'argument to the definition for field Model.m2m.'),
                 obj=Model._meta.get_field('m2m'),
                 id='E014',
             ),
             Error(
                 'Reverse query name for field Model.m2m clashes with field Model.clash.',
-                hint='Rename field Model.clash or add/change a related_name '
-                    'argument to the definition for field Model.m2m.',
+                hint=('Rename field Model.clash or add/change a related_name '
+                      'argument to the definition for field Model.m2m.'),
                 obj=Model._meta.get_field('m2m'),
                 id='E015',
             ),
@@ -869,9 +870,9 @@ class SelfReferentialFKClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Accessor for field Model.model_set clashes with field Model.model_set.',
-                hint='Rename field Model.model_set or add/change '
-                    'a related_name argument to the definition '
-                    'for field Model.model_set.',
+                hint=('Rename field Model.model_set or add/change '
+                      'a related_name argument to the definition '
+                      'for field Model.model_set.'),
                 obj=Model._meta.get_field('model_set'),
                 id='E014',
             ),
@@ -886,9 +887,9 @@ class SelfReferentialFKClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Reverse query name for field Model.model clashes with field Model.model.',
-                hint='Rename field Model.model or add/change '
-                    'a related_name argument to the definition '
-                    'for field Model.model.',
+                hint=('Rename field Model.model or add/change '
+                      'a related_name argument to the definition '
+                      'for field Model.model.'),
                 obj=Model._meta.get_field('model'),
                 id='E015',
             ),
@@ -904,17 +905,17 @@ class SelfReferentialFKClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Accessor for field Model.foreign clashes with field Model.clash.',
-                hint='Rename field Model.clash or add/change '
-                    'a related_name argument to the definition '
-                    'for field Model.foreign.',
+                hint=('Rename field Model.clash or add/change '
+                      'a related_name argument to the definition '
+                      'for field Model.foreign.'),
                 obj=Model._meta.get_field('foreign'),
                 id='E014',
             ),
             Error(
                 'Reverse query name for field Model.foreign clashes with field Model.clash.',
-                hint='Rename field Model.clash or add/change '
-                    'a related_name argument to the definition '
-                    'for field Model.foreign.',
+                hint=('Rename field Model.clash or add/change '
+                      'a related_name argument to the definition '
+                      'for field Model.foreign.'),
                 obj=Model._meta.get_field('foreign'),
                 id='E015',
             ),
@@ -947,88 +948,88 @@ class ComplexClashTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 'Accessor for field Model.foreign_1 clashes with field Target.id.',
-                hint='Rename field Target.id or add/change a related_name '
-                    'argument to the definition for field Model.foreign_1.',
+                hint=('Rename field Target.id or add/change a related_name '
+                      'argument to the definition for field Model.foreign_1.'),
                 obj=Model._meta.get_field('foreign_1'),
                 id='E014',
             ),
             Error(
                 'Reverse query name for field Model.foreign_1 clashes with field Target.id.',
-                hint='Rename field Target.id or add/change a related_name '
-                    'argument to the definition for field Model.foreign_1.',
+                hint=('Rename field Target.id or add/change a related_name '
+                      'argument to the definition for field Model.foreign_1.'),
                 obj=Model._meta.get_field('foreign_1'),
                 id='E015',
             ),
             Error(
                 'Clash between accessors for Model.foreign_1 and Model.m2m_1.',
-                hint='Add or change a related_name argument to '
-                    'the definition for Model.foreign_1 or Model.m2m_1.',
+                hint=('Add or change a related_name argument to '
+                      'the definition for Model.foreign_1 or Model.m2m_1.'),
                 obj=Model._meta.get_field('foreign_1'),
                 id='E016',
             ),
             Error(
                 'Clash between reverse query names for Model.foreign_1 and Model.m2m_1.',
-                hint='Add or change a related_name argument to '
-                    'the definition for Model.foreign_1 or Model.m2m_1.',
+                hint=('Add or change a related_name argument to '
+                      'the definition for Model.foreign_1 or Model.m2m_1.'),
                 obj=Model._meta.get_field('foreign_1'),
                 id='E017',
             ),
 
             Error(
                 'Clash between accessors for Model.foreign_2 and Model.m2m_2.',
-                hint='Add or change a related_name argument '
-                    'to the definition for Model.foreign_2 or Model.m2m_2.',
+                hint=('Add or change a related_name argument '
+                      'to the definition for Model.foreign_2 or Model.m2m_2.'),
                 obj=Model._meta.get_field('foreign_2'),
                 id='E016',
             ),
             Error(
                 'Clash between reverse query names for Model.foreign_2 and Model.m2m_2.',
-                hint='Add or change a related_name argument to '
-                    'the definition for Model.foreign_2 or Model.m2m_2.',
+                hint=('Add or change a related_name argument to '
+                      'the definition for Model.foreign_2 or Model.m2m_2.'),
                 obj=Model._meta.get_field('foreign_2'),
                 id='E017',
             ),
 
             Error(
                 'Accessor for field Model.m2m_1 clashes with field Target.id.',
-                hint='Rename field Target.id or add/change a related_name '
-                    'argument to the definition for field Model.m2m_1.',
+                hint=('Rename field Target.id or add/change a related_name '
+                      'argument to the definition for field Model.m2m_1.'),
                 obj=Model._meta.get_field('m2m_1'),
                 id='E014',
             ),
             Error(
                 'Reverse query name for field Model.m2m_1 clashes with field Target.id.',
-                hint='Rename field Target.id or add/change a related_name '
-                    'argument to the definition for field Model.m2m_1.',
+                hint=('Rename field Target.id or add/change a related_name '
+                      'argument to the definition for field Model.m2m_1.'),
                 obj=Model._meta.get_field('m2m_1'),
                 id='E015',
             ),
             Error(
                 'Clash between accessors for Model.m2m_1 and Model.foreign_1.',
-                hint='Add or change a related_name argument to the definition '
-                    'for Model.m2m_1 or Model.foreign_1.',
+                hint=('Add or change a related_name argument to the definition '
+                      'for Model.m2m_1 or Model.foreign_1.'),
                 obj=Model._meta.get_field('m2m_1'),
                 id='E016',
             ),
             Error(
                 'Clash between reverse query names for Model.m2m_1 and Model.foreign_1.',
-                hint='Add or change a related_name argument to '
-                    'the definition for Model.m2m_1 or Model.foreign_1.',
+                hint=('Add or change a related_name argument to '
+                      'the definition for Model.m2m_1 or Model.foreign_1.'),
                 obj=Model._meta.get_field('m2m_1'),
                 id='E017',
             ),
 
             Error(
                 'Clash between accessors for Model.m2m_2 and Model.foreign_2.',
-                hint='Add or change a related_name argument to the definition '
-                    'for Model.m2m_2 or Model.foreign_2.',
+                hint=('Add or change a related_name argument to the definition '
+                      'for Model.m2m_2 or Model.foreign_2.'),
                 obj=Model._meta.get_field('m2m_2'),
                 id='E016',
             ),
             Error(
                 'Clash between reverse query names for Model.m2m_2 and Model.foreign_2.',
-                hint='Add or change a related_name argument to the definition '
-                    'for Model.m2m_2 or Model.foreign_2.',
+                hint=('Add or change a related_name argument to the definition '
+                      'for Model.m2m_2 or Model.foreign_2.'),
                 obj=Model._meta.get_field('m2m_2'),
                 id='E017',
             ),

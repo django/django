@@ -185,8 +185,8 @@ class BaseModelAdminChecks(object):
                     return [
                         checks.Error(
                             '"%s" cannot include the ManyToManyField "%s", '
-                                'because "%s" manually specifies relationship model.'
-                                % (label, field_name, field_name),
+                            'because "%s" manually specifies relationship model.'
+                            % (label, field_name, field_name),
                             hint=None,
                             obj=cls,
                             id='admin.E013',
@@ -291,8 +291,9 @@ class BaseModelAdminChecks(object):
             if not (isinstance(field, models.ForeignKey) or field.choices):
                 return [
                     checks.Error(
-                        '"%s" refers to "%s", which is neither an instance of ForeignKey nor does have choices set.'
-                            % (label, field_name),
+                        '"%s" refers to "%s", which is neither an instance of ForeignKey nor does have choices set.' % (
+                            label, field_name
+                        ),
                         hint=None,
                         obj=cls,
                         id='admin.E023',
@@ -370,8 +371,9 @@ class BaseModelAdminChecks(object):
                 return [
                     checks.Error(
                         '"%s" refers to "%s", which must not be a DateTimeField, '
-                            'ForeignKey or ManyToManyField.'
-                            % (label, field_name),
+                        'ForeignKey or ManyToManyField.' % (
+                            label, field_name
+                        ),
                         hint=None,
                         obj=cls,
                         id='admin.E028',
@@ -425,7 +427,7 @@ class BaseModelAdminChecks(object):
             return [
                 checks.Error(
                     '"ordering" has the random ordering marker "?", '
-                        'but contains other fields as well.',
+                    'but contains other fields as well.',
                     hint='Either remove the "?", or remove the other fields.',
                     obj=cls,
                     id='admin.E032',
@@ -475,8 +477,9 @@ class BaseModelAdminChecks(object):
             except models.FieldDoesNotExist:
                 return [
                     checks.Error(
-                        '"%s" is neither a callable nor an attribute of "%s" nor found in the model %s.%s.'
-                            % (label, cls.__name__, model._meta.app_label, model._meta.object_name),
+                        '"%s" is neither a callable nor an attribute of "%s" nor found in the model %s.%s.' % (
+                            label, cls.__name__, model._meta.app_label, model._meta.object_name
+                        ),
                         hint=None,
                         obj=cls,
                         id='admin.E035',
@@ -586,8 +589,9 @@ class ModelAdminChecks(BaseModelAdminChecks):
             if field is None:
                 return [
                     checks.Error(
-                        '"%s" refers to "%s" that is neither a field, method nor a property of model %s.%s.'
-                            % label, item, model._meta.app_label, model._meta.object_name,
+                        '"%s" refers to "%s" that is neither a field, method nor a property of model %s.%s.' % (
+                            label, item, model._meta.app_label, model._meta.object_name
+                        ),
                         hint=None,
                         obj=cls,
                         id='admin.E108',
@@ -610,8 +614,9 @@ class ModelAdminChecks(BaseModelAdminChecks):
             except models.FieldDoesNotExist:
                 return [
                     checks.Error(
-                        '"%s" is neither a callable nor an attribute of "%s" nor found in model %s.%s.'
-                            % (label, cls.__name__, model._meta.app_label, model._meta.object_name),
+                        '"%s" is neither a callable nor an attribute of "%s" nor found in model %s.%s.' % (
+                            label, cls.__name__, model._meta.app_label, model._meta.object_name
+                        ),
                         hint=None,
                         obj=cls,
                         id='admin.E110',
@@ -638,8 +643,9 @@ class ModelAdminChecks(BaseModelAdminChecks):
         if field_name not in cls.list_display:
             return [
                 checks.Error(
-                    '"%s" refers to "%s", which is not defined in "list_display".'
-                        % (label, field_name),
+                    '"%s" refers to "%s", which is not defined in "list_display".' % (
+                        label, field_name
+                    ),
                     hint=None,
                     obj=cls,
                     id='admin.E112',
@@ -762,8 +768,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             elif field_name in cls.list_display_links:
                 return [
                     checks.Error(
-                        '"%s" cannot be in both "list_editable" and "list_display_links".'
-                            % field_name,
+                        '"%s" cannot be in both "list_editable" and "list_display_links".' % field_name,
                         hint=None,
                         obj=cls,
                         id='admin.E124',
@@ -773,8 +778,9 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 return [
                     checks.Error(
                         '"%s" refers to the first field in list_display ("%s"), '
-                            'which cannot be used unless list_display_links is set.'
-                            % (label, cls.list_display[0]),
+                        'which cannot be used unless list_display_links is set.' % (
+                            label, cls.list_display[0]
+                        ),
                         hint=None,
                         obj=cls,
                         id='admin.E125',
@@ -783,8 +789,9 @@ class ModelAdminChecks(BaseModelAdminChecks):
             elif not field.editable:
                 return [
                     checks.Error(
-                        '"%s" refers to field "%s", whih is not editable through the admin.'
-                            % (label, field_name),
+                        '"%s" refers to field "%s", whih is not editable through the admin.' % (
+                            label, field_name
+                        ),
                         hint=None,
                         obj=cls,
                         id='admin.E126',
@@ -849,8 +856,9 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
             return [
                 checks.Error(
                     'Cannot exclude the field "%s", because it is the foreign key '
-                        'to the parent model %s.%s.'
-                        % (fk.name, parent_model._meta.app_label, parent_model._meta.object_name),
+                    'to the parent model %s.%s.' % (
+                        fk.name, parent_model._meta.app_label, parent_model._meta.object_name
+                    ),
                     hint=None,
                     obj=cls,
                     id='admin.E201',
@@ -920,8 +928,9 @@ def must_inherit_from(parent, option, obj, id):
 def refer_to_missing_field(field, option, model, obj, id):
     return [
         checks.Error(
-            '"%s" refers to field "%s", which is missing from model %s.%s.'
-                % (option, field, model._meta.app_label, model._meta.object_name),
+            '"%s" refers to field "%s", which is missing from model %s.%s.' % (
+                option, field, model._meta.app_label, model._meta.object_name
+            ),
             hint=None,
             obj=obj,
             id=id,

@@ -111,7 +111,7 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
     # Validation of ModelAdmin definitions
     # Old, deprecated style:
     validator_class = None
-    default_validator_class  = validation.BaseValidator
+    default_validator_class = validation.BaseValidator
     # New style:
     checks_class = BaseModelAdminChecks
 
@@ -120,7 +120,7 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         warnings.warn(
             'ModelAdmin.validate() is deprecated. Use "check()" instead.',
             PendingDeprecationWarning)
-	if cls.validator_class:
+        if cls.validator_class:
             validator = cls.validator_class()
         else:
             validator = cls.default_validator_class()
@@ -466,7 +466,6 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         opts = self.opts
         codename = get_permission_codename('delete', opts)
         return request.user.has_perm("%s.%s" % (opts.app_label, codename))
-
 
 
 @python_2_unicode_compatible

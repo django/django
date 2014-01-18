@@ -91,8 +91,8 @@ class IndexTogetherTests(IsolatedModelsTestCase):
         errors = Model.check()
         expected = [
             Error(
-                '"index_together" refers to a m2m "m2m" field, but '
-                    'ManyToManyFields are not supported in "index_together".',
+                ('"index_together" refers to a m2m "m2m" field, but '
+                 'ManyToManyFields are not supported in "index_together".'),
                 hint=None,
                 obj=Model,
                 id='E011',
@@ -181,8 +181,8 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
         errors = Model.check()
         expected = [
             Error(
-                '"unique_together" refers to a m2m "m2m" field, but '
-                'ManyToManyFields are not supported in "unique_together".',
+                ('"unique_together" refers to a m2m "m2m" field, but '
+                 'ManyToManyFields are not supported in "unique_together".'),
                 hint=None,
                 obj=Model,
                 id='E011',
@@ -200,11 +200,10 @@ class OtherModelTests(IsolatedModelsTestCase):
         errors = Model.check()
         expected = [
             Error(
-                'You cannot use "id" as a field name, because each model '
-                    'automatically gets an "id" field if none of the fields '
-                    'have primary_key=True.',
-                hint='Remove or rename "id" field or '
-                    'add primary_key=True to a field.',
+                ('You cannot use "id" as a field name, because each model '
+                 'automatically gets an "id" field if none of the fields '
+                 'have primary_key=True.'),
+                hint='Remove or rename "id" field or add primary_key=True to a field.',
                 obj=Model,
                 id='E005',
             ),
@@ -246,8 +245,8 @@ class OtherModelTests(IsolatedModelsTestCase):
         errors = Model.check()
         expected = [
             Error(
-                '"ordering" must be a tuple or list '
-                    '(even if you want to order by only one field).',
+                ('"ordering" must be a tuple or list '
+                 '(even if you want to order by only one field).'),
                 hint=None,
                 obj=Model,
                 id='E012',
@@ -297,11 +296,11 @@ class OtherModelTests(IsolatedModelsTestCase):
         errors = Model.check()
         expected = [
             Error(
-                'The model has been swapped out for not_an_app.Target '
-                    'which has not been installed or is abstract.',
-                hint='Ensure that you did not misspell the model name and '
-                    'the app name as well as the model is not abstract. Does '
-                    'your INSTALLED_APPS setting contain the "not_an_app" app?',
+                ('The model has been swapped out for not_an_app.Target '
+                 'which has not been installed or is abstract.'),
+                hint=('Ensure that you did not misspell the model name and '
+                      'the app name as well as the model is not abstract. Does '
+                      'your INSTALLED_APPS setting contain the "not_an_app" app?'),
                 obj=Model,
                 id='E003',
             ),
@@ -325,8 +324,8 @@ class OtherModelTests(IsolatedModelsTestCase):
         errors = Group.check()
         expected = [
             Error(
-                'The model has two many-to-many relations through '
-                    'the intermediary Membership model, which is not permitted.',
+                ('The model has two many-to-many relations through '
+                 'the intermediary Membership model, which is not permitted.'),
                 hint=None,
                 obj=Group,
                 id='E004',

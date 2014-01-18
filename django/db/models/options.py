@@ -43,6 +43,7 @@ def normalize_unique_together(unique_together):
         # verbatim; this will be picked up by the check framework later.
         return unique_together
 
+
 @python_2_unicode_compatible
 class Options(object):
     def __init__(self, meta, app_label=None):

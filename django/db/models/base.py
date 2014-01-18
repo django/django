@@ -1038,7 +1038,6 @@ class Model(six.with_metaclass(ModelBase)):
             errors.extend(cls._check_unique_together())
             errors.extend(cls._check_ordering())
 
-
         return errors
 
     @classmethod
@@ -1052,8 +1051,7 @@ class Model(six.with_metaclass(ModelBase)):
             except ValueError:
                 errors.append(
                     checks.Error(
-                        '"%s" is not of the form "app_label.app_name".'
-                            % cls._meta.swappable,
+                        '"%s" is not of the form "app_label.app_name".' % cls._meta.swappable,
                         hint=None,
                         obj=cls,
                         id='E002',
@@ -1065,14 +1063,14 @@ class Model(six.with_metaclass(ModelBase)):
                 except LookupError:
                     errors.append(
                         checks.Error(
-                            'The model has been swapped out for %s.%s '
-                                'which has not been installed or is abstract.'
-                                % (app_label, model_name),
-                            hint='Ensure that you did not misspell the model '
-                                'name and the app name as well as the model '
-                                'is not abstract. Does your INSTALLED_APPS '
-                                'setting contain the "%s" app?'
-                                % app_label,
+                            ('The model has been swapped out for %s.%s '
+                             'which has not been installed or is abstract.') % (
+                                app_label, model_name
+                            ),
+                            hint=('Ensure that you did not misspell the model '
+                                  'name and the app name as well as the model '
+                                  'is not abstract. Does your INSTALLED_APPS '
+                                  'setting contain the "%s" app?') % app_label,
                             obj=cls,
                             id='E003',
                         )
@@ -1121,9 +1119,10 @@ class Model(six.with_metaclass(ModelBase)):
             if signature in seen_intermediary_signatures:
                 errors.append(
                     checks.Error(
-                        'The model has two many-to-many relations through '
-                            'the intermediary %s model, which is not permitted.'
-                            % f.rel.through._meta.object_name,
+                        ('The model has two many-to-many relations through '
+                         'the intermediary %s model, which is not permitted.') % (
+                            f.rel.through._meta.object_name
+                        ),
                         hint=None,
                         obj=cls,
                         id='E004',
@@ -1143,11 +1142,11 @@ class Model(six.with_metaclass(ModelBase)):
         if fields and not fields[0].primary_key and cls._meta.pk.name == 'id':
             return [
                 checks.Error(
-                    'You cannot use "id" as a field name, because each model '
-                        'automatically gets an "id" field if none '
-                        'of the fields have primary_key=True.',
-                    hint='Remove or rename "id" field '
-                        'or add primary_key=True to a field.',
+                    ('You cannot use "id" as a field name, because each model '
+                     'automatically gets an "id" field if none '
+                     'of the fields have primary_key=True.'),
+                    hint=('Remove or rename "id" field '
+                          'or add primary_key=True to a field.'),
                     obj=cls,
                     id='E005',
                 )
@@ -1168,8 +1167,7 @@ class Model(six.with_metaclass(ModelBase)):
             if column_name and column_name in used_column_names:
                 errors.append(
                     checks.Error(
-                        'Field "%s" has column name "%s" that is already used.'
-                            % (f.name, column_name),
+                        'Field "%s" has column name "%s" that is already used.' % (f.name, column_name),
                         hint=None,
                         obj=cls,
                     )
@@ -1251,8 +1249,7 @@ class Model(six.with_metaclass(ModelBase)):
             except models.FieldDoesNotExist:
                 errors.append(
                     checks.Error(
-                        '"%s" points to a missing field named "%s".'
-                            % (option, field_name),
+                        '"%s" points to a missing field named "%s".' % (option, field_name),
                         hint='Ensure that you did not misspell the field name.',
                         obj=cls,
                         id='E010',
@@ -1262,9 +1259,10 @@ class Model(six.with_metaclass(ModelBase)):
                 if isinstance(field.rel, models.ManyToManyRel):
                     errors.append(
                         checks.Error(
-                            '"%s" refers to a m2m "%s" field, but '
-                                'ManyToManyFields are not supported in "%s".'
-                                % (option, field_name, option),
+                            ('"%s" refers to a m2m "%s" field, but '
+                             'ManyToManyFields are not supported in "%s".') % (
+                                option, field_name, option
+                            ),
                             hint=None,
                             obj=cls,
                             id='E011',
@@ -1285,8 +1283,8 @@ class Model(six.with_metaclass(ModelBase)):
         if not isinstance(cls._meta.ordering, (list, tuple)):
             return [
                 checks.Error(
-                    '"ordering" must be a tuple or list '
-                        '(even if you want to order by only one field).',
+                    ('"ordering" must be a tuple or list '
+                     '(even if you want to order by only one field).'),
                     hint=None,
                     obj=cls,
                     id='E012',
@@ -1327,6 +1325,7 @@ class Model(six.with_metaclass(ModelBase)):
                     )
                 )
         return errors
+
 
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #

@@ -148,8 +148,8 @@ class SystemChecksTestCase(TestCase):
         errors = AlbumAdmin.check(model=Album)
         expected = [
             checks.Error(
-                'Cannot exclude the field "album", because it is the foreign key '
-                    'to the parent model admin_checks.Album.',
+                ('Cannot exclude the field "album", because it is the foreign key '
+                 'to the parent model admin_checks.Album.'),
                 hint=None,
                 obj=SongInline,
                 id='admin.E201',
@@ -168,8 +168,8 @@ class SystemChecksTestCase(TestCase):
         errors = RawIdNonexistingAdmin.check(model=Album)
         expected = [
             checks.Error(
-                '"raw_id_fields[0]" refers to field "nonexisting", which is '
-                    'missing from model admin_checks.Album.',
+                ('"raw_id_fields[0]" refers to field "nonexisting", which is '
+                 'missing from model admin_checks.Album.'),
                 hint=None,
                 obj=RawIdNonexistingAdmin,
                 id='admin.E002',
@@ -265,8 +265,8 @@ class SystemChecksTestCase(TestCase):
         errors = SongAdmin.check(model=Song)
         expected = [
             checks.Error(
-                '"readonly_fields[1]" is neither a callable nor an attribute '
-                    'of "SongAdmin" nor found in the model admin_checks.Song.',
+                ('"readonly_fields[1]" is neither a callable nor an attribute '
+                 'of "SongAdmin" nor found in the model admin_checks.Song.'),
                 hint=None,
                 obj=SongAdmin,
                 id='admin.E035',
@@ -277,13 +277,13 @@ class SystemChecksTestCase(TestCase):
     def test_nonexistant_field_on_inline(self):
         class CityInline(admin.TabularInline):
             model = City
-            readonly_fields=['i_dont_exist']  # Missing attribute
+            readonly_fields = ['i_dont_exist']  # Missing attribute
 
         errors = CityInline.check(State)
         expected = [
             checks.Error(
-                '"readonly_fields[0]" is neither a callable nor an attribute '
-                    'of "CityInline" nor found in the model admin_checks.City.',
+                ('"readonly_fields[0]" is neither a callable nor an attribute '
+                 'of "CityInline" nor found in the model admin_checks.City.'),
                 hint=None,
                 obj=CityInline,
                 id='admin.E035',
@@ -321,8 +321,8 @@ class SystemChecksTestCase(TestCase):
         errors = BookAdmin.check(model=Book)
         expected = [
             checks.Error(
-                '"fields" cannot include the ManyToManyField "authors", '
-                    'because "authors" manually specifies relationship model.',
+                ('"fields" cannot include the ManyToManyField "authors", '
+                 'because "authors" manually specifies relationship model.'),
                 hint=None,
                 obj=BookAdmin,
                 id='admin.E013',
@@ -340,8 +340,8 @@ class SystemChecksTestCase(TestCase):
         errors = FieldsetBookAdmin.check(model=Book)
         expected = [
             checks.Error(
-                '"fieldsets[1][1][\'fields\']" cannot include the ManyToManyField '
-                    '"authors", because "authors" manually specifies relationship model.',
+                ('"fieldsets[1][1][\'fields\']" cannot include the ManyToManyField '
+                 '"authors", because "authors" manually specifies relationship model.'),
                 hint=None,
                 obj=FieldsetBookAdmin,
                 id='admin.E013',
@@ -405,10 +405,10 @@ class SystemChecksTestCase(TestCase):
 
         class SongForm(forms.ModelForm):
             extra_data = forms.CharField()
+
             class Meta:
                 model = Song
                 fields = '__all__'
-
 
         class FieldsOnFormOnlyAdmin(admin.ModelAdmin):
             form = SongForm

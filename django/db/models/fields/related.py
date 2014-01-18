@@ -108,13 +108,11 @@ class RelatedField(Field):
         if rel_is_missing and (rel_is_string or not self.rel.to._meta.swapped):
             return [
                 checks.Error(
-                    'The field has a relation with model %s, which '
-                        'has either not been installed or is abstract.'
-                        % model_name,
-                    hint='Ensure that you did not misspell the model name and '
-                        'the model is not abstract. Does your INSTALLED_APPS '
-                        'setting contain the app where %s is defined?'
-                        % model_name,
+                    ('The field has a relation with model %s, which '
+                     'has either not been installed or is abstract.') % model_name,
+                    hint=('Ensure that you did not misspell the model name and '
+                          'the model is not abstract. Does your INSTALLED_APPS '
+                          'setting contain the app where %s is defined?') % model_name,
                     obj=self,
                     id='E030',
                 )
@@ -131,10 +129,9 @@ class RelatedField(Field):
             )
             return [
                 checks.Error(
-                    'The field defines a relation with the model %s, '
-                        'which has been swapped out.' % model,
-                    hint='Update the relation to point at settings.%s'
-                        % self.rel.to._meta.swappable,
+                    ('The field defines a relation with the model %s, '
+                     'which has been swapped out.') % model,
+                    hint='Update the relation to point at settings.%s' % self.rel.to._meta.swappable,
                     obj=self,
                     id='E029',
                 )
@@ -193,11 +190,9 @@ class RelatedField(Field):
             if clash_field.name == rel_name:
                 errors.append(
                     checks.Error(
-                        'Accessor for field %s clashes with field %s.'
-                            % (field_name, clash_name),
-                        hint='Rename field %s or add/change a related_name '
-                            'argument to the definition for field %s.'
-                            % (clash_name, field_name),
+                        'Accessor for field %s clashes with field %s.' % (field_name, clash_name),
+                        hint=('Rename field %s or add/change a related_name '
+                              'argument to the definition for field %s.') % (clash_name, field_name),
                         obj=self,
                         id='E014',
                     )
@@ -206,11 +201,9 @@ class RelatedField(Field):
             if clash_field.name == rel_query_name:
                 errors.append(
                     checks.Error(
-                        'Reverse query name for field %s clashes with field %s.'
-                            % (field_name, clash_name),
-                        hint='Rename field %s or add/change a related_name '
-                            'argument to the definition for field %s.'
-                            % (clash_name, field_name),
+                        'Reverse query name for field %s clashes with field %s.' % (field_name, clash_name),
+                        hint=('Rename field %s or add/change a related_name '
+                              'argument to the definition for field %s.') % (clash_name, field_name),
                         obj=self,
                         id='E015',
                     )
@@ -230,11 +223,9 @@ class RelatedField(Field):
             if clash_field.get_accessor_name() == rel_name:
                 errors.append(
                     checks.Error(
-                        'Clash between accessors for %s and %s.'
-                            % (field_name, clash_name),
-                        hint='Add or change a related_name argument '
-                            'to the definition for %s or %s.'
-                            % (field_name, clash_name),
+                        'Clash between accessors for %s and %s.' % (field_name, clash_name),
+                        hint=('Add or change a related_name argument '
+                              'to the definition for %s or %s.') % (field_name, clash_name),
                         obj=self,
                         id='E016',
                     )
@@ -243,11 +234,9 @@ class RelatedField(Field):
             if clash_field.get_accessor_name() == rel_query_name:
                 errors.append(
                     checks.Error(
-                        'Clash between reverse query names for %s and %s.'
-                            % (field_name, clash_name),
-                        hint='Add or change a related_name argument '
-                            'to the definition for %s or %s.'
-                            % (field_name, clash_name),
+                        'Clash between reverse query names for %s and %s.' % (field_name, clash_name),
+                        hint=('Add or change a related_name argument '
+                              'to the definition for %s or %s.') % (field_name, clash_name),
                         obj=self,
                         id='E017',
                     )
@@ -1270,12 +1259,10 @@ class ForeignObject(RelatedField):
             model_name = self.rel.to.__name__
             return [
                 checks.Error(
-                    'No unique=True constraint '
-                        'on field combination "%s" under model %s.'
-                        % (field_combination, model_name),
-                    hint='Set unique=True argument on any of the fields '
-                        '"%s" under model %s.'
-                        % (field_combination, model_name),
+                    ('No unique=True constraint '
+                     'on field combination "%s" under model %s.') % (field_combination, model_name),
+                    hint=('Set unique=True argument on any of the fields '
+                          '"%s" under model %s.') % (field_combination, model_name),
                     obj=self,
                     id='E018',
                 )
@@ -1285,9 +1272,8 @@ class ForeignObject(RelatedField):
             model_name = self.rel.to.__name__
             return [
                 checks.Error(
-                    '%s.%s must have unique=True '
-                        'because it is referenced by a foreign key.'
-                        % (model_name, field_name),
+                    ('%s.%s must have unique=True '
+                     'because it is referenced by a foreign key.') % (model_name, field_name),
                     hint=None,
                     obj=self,
                     id='E019',
@@ -1810,13 +1796,11 @@ class ManyToManyField(RelatedField):
             # The relationship model is not installed.
             errors.append(
                 checks.Error(
-                    'The field specifies a many-to-many relation through model '
-                        '%s, which has not been installed.'
-                        % self.rel.through,
-                    hint='Ensure that you did not misspell the model name and '
-                        'the model is not abstract. Does your INSTALLED_APPS '
-                        'setting contain the app where %s is defined?'
-                        % self.rel.through,
+                    ('The field specifies a many-to-many relation through model '
+                     '%s, which has not been installed.') % self.rel.through,
+                    hint=('Ensure that you did not misspell the model name and '
+                          'the model is not abstract. Does your INSTALLED_APPS '
+                          'setting contain the app where %s is defined?') % self.rel.through,
                     obj=self,
                     id='E023',
                 )
@@ -1859,10 +1843,9 @@ class ManyToManyField(RelatedField):
                 if seen_self > 2:
                     errors.append(
                         checks.Error(
-                            'The model is used as an intermediary model by '
-                                '%s, but it has more than two foreign keys '
-                                'to %s, which is ambiguous and is not permitted.'
-                                % (self, from_model_name),
+                            ('The model is used as an intermediary model by '
+                             '%s, but it has more than two foreign keys '
+                             'to %s, which is ambiguous and is not permitted.') % (self, from_model_name),
                             hint=None,
                             obj=self.rel.through,
                             id='E025',
@@ -1879,14 +1862,12 @@ class ManyToManyField(RelatedField):
                 if seen_from > 1:
                     errors.append(
                         checks.Error(
-                            'The model is used as an intermediary model by '
-                                '%s, but it has more than one foreign key '
-                                'to %s, which is ambiguous and is not permitted.'
-                                % (self, from_model_name),
-                            hint='If you want to create a recursive relationship, '
-                                'use ForeignKey("self", symmetrical=False, '
-                                'through="%s").'
-                                % relationship_model_name,
+                            ('The model is used as an intermediary model by '
+                             '%s, but it has more than one foreign key '
+                             'to %s, which is ambiguous and is not permitted.') % (self, from_model_name),
+                            hint=('If you want to create a recursive relationship, '
+                                  'use ForeignKey("self", symmetrical=False, '
+                                  'through="%s").') % relationship_model_name,
                             obj=self,
                             id='E026',
                         )
@@ -1895,14 +1876,12 @@ class ManyToManyField(RelatedField):
                 if seen_to > 1:
                     errors.append(
                         checks.Error(
-                            'The model is used as an intermediary model by '
-                                '%s, but it has more than one foreign key '
-                                'to %s, which is ambiguous and is not permitted.'
-                                % (self, to_model_name),
-                            hint='If you want to create a recursive '
-                                'relationship, use ForeignKey("self", '
-                                'symmetrical=False, through="%s").'
-                                % relationship_model_name,
+                            ('The model is used as an intermediary model by '
+                             '%s, but it has more than one foreign key '
+                             'to %s, which is ambiguous and is not permitted.') % (self, to_model_name),
+                            hint=('If you want to create a recursive '
+                                  'relationship, use ForeignKey("self", '
+                                  'symmetrical=False, through="%s").') % relationship_model_name,
                             obj=self,
                             id='E027',
                         )
@@ -1911,9 +1890,10 @@ class ManyToManyField(RelatedField):
                 if seen_from == 0 or seen_to == 0:
                     errors.append(
                         checks.Error(
-                            'The model is used as an intermediary model by '
-                                '%s, but it misses a foreign key to %s or %s.'
-                                % (self, from_model_name, to_model_name),
+                            ('The model is used as an intermediary model by '
+                             '%s, but it misses a foreign key to %s or %s.') % (
+                                self, from_model_name, to_model_name
+                            ),
                             hint=None,
                             obj=self.rel.through,
                             id='E028',

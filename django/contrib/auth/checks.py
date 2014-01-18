@@ -29,15 +29,14 @@ def check_user_model(**kwargs):
     if cls.USERNAME_FIELD in cls.REQUIRED_FIELDS:
         errors.append(
             checks.Error(
-                'The field named as the USERNAME_FIELD '
-                    'must not be included in REQUIRED_FIELDS '
-                    'on a custom user model.',
+                ('The field named as the USERNAME_FIELD '
+                 'must not be included in REQUIRED_FIELDS '
+                 'on a custom user model.'),
                 hint=None,
                 obj=cls,
                 id='auth.E002',
             )
         )
-
 
     # Check that the username field is unique
     if not cls._meta.get_field(cls.USERNAME_FIELD).unique:
@@ -45,9 +44,10 @@ def check_user_model(**kwargs):
                 ('django.contrib.auth.backends.ModelBackend',)):
             errors.append(
                 checks.Error(
-                    'The %s.%s field must be unique because it is '
-                        'pointed to by USERNAME_FIELD.'
-                        % (cls._meta.object_name, cls.USERNAME_FIELD),
+                    ('The %s.%s field must be unique because it is '
+                     'pointed to by USERNAME_FIELD.') % (
+                        cls._meta.object_name, cls.USERNAME_FIELD
+                    ),
                     hint=None,
                     obj=cls,
                     id='auth.E003',
@@ -56,11 +56,12 @@ def check_user_model(**kwargs):
         else:
             errors.append(
                 checks.Warning(
-                    'The %s.%s field is pointed to by USERNAME_FIELD, '
-                        'but it is not unique.'
-                        % (cls._meta.object_name, cls.USERNAME_FIELD),
-                    hint='Ensure that your authentication backend can handle '
-                        'non-unique usernames.',
+                    ('The %s.%s field is pointed to by USERNAME_FIELD, '
+                     'but it is not unique.') % (
+                        cls._meta.object_name, cls.USERNAME_FIELD
+                    ),
+                    hint=('Ensure that your authentication backend can handle '
+                          'non-unique usernames.'),
                     obj=cls,
                     id='auth.W004',
                 )

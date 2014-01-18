@@ -29,10 +29,10 @@ def _check_test_runner(app_configs=None, **kwargs):
     if test_runner_setting == new_default and not settings.is_overridden("TEST_RUNNER"):
         return [
             Warning(
-                "Django 1.6 introduced a new default test runner ('%s'). "
-                    "You should ensure your tests are all running & behaving as expected." % new_default,
-                hint="See https://docs.djangoproject.com/en/dev/releases/1.6/#discovery-of-tests-in-any-test-module "
-                    "for more information.",
+                ("Django 1.6 introduced a new default test runner ('%s'). "
+                 "You should ensure your tests are all running & behaving as expected.") % new_default,
+                hint=("See https://docs.djangoproject.com/en/dev/releases/1.6/#discovery-of-tests-in-any-test-module "
+                      "for more information."),
                 obj=None,
                 id='1_6.W001',
             )
@@ -58,10 +58,10 @@ def _check_boolean_field_default_value(app_configs=None, **kwargs):
 
     return [
         Warning(
-            "BooleanField does not have a default value. "
-                "Django 1.6 changed the default value of BooleanField from False to None",
-            hint="See https://docs.djangoproject.com/en/1.6/ref/models/fields/#booleanfield "
-                "for more information.",
+            ("BooleanField does not have a default value. "
+             "Django 1.6 changed the default value of BooleanField from False to None"),
+            hint=("See https://docs.djangoproject.com/en/1.6/ref/models/fields/#booleanfield "
+                  "for more information."),
             obj=field,
             id='1_6.W002',
         )

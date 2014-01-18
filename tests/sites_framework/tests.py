@@ -49,10 +49,10 @@ class SitesFrameworkTestCase(TestCase):
         errors = InvalidArticle.check()
         expected = [
             checks.Error(
-                "CurrentSiteManager could not find a field named "
-                    "'places_this_article_should_appear'.",
-                hint='Ensure that you did not misspell the field name. '
-                    'Does the field exist?',
+                ("CurrentSiteManager could not find a field named "
+                 "'places_this_article_should_appear'."),
+                hint=('Ensure that you did not misspell the field name. '
+                      'Does the field exist?'),
                 obj=InvalidArticle.on_site,
                 id='sites.E001',
             )

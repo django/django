@@ -43,7 +43,6 @@ class TestNoInitialDataLoading(TransactionTestCase):
             )
             self.assertQuerysetEqual(Book.objects.all(), [])
 
-
     @override_system_checks([])
     def test_flush(self):
         # Test presence of fixture (flush called by TransactionTestCase)

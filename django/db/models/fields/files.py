@@ -260,8 +260,7 @@ class FileField(Field):
         if self._unique_set_explicitly:
             return [
                 checks.Error(
-                    '"unique" is not a valid argument for %s.'
-                        % self.__class__.__name__,
+                    '"unique" is not a valid argument for %s.' % self.__class__.__name__,
                     hint=None,
                     obj=self,
                     id='E049',
@@ -274,8 +273,7 @@ class FileField(Field):
         if self._primary_key_set_explicitly:
             return [
                 checks.Error(
-                    '"primary_key" is not a valid argument for %s.'
-                        % self.__class__.__name__,
+                    '"primary_key" is not a valid argument for %s.' % self.__class__.__name__,
                     hint=None,
                     obj=self,
                     id='E050',
@@ -404,13 +402,13 @@ class ImageField(FileField):
 
     def _check_image_library_installed(self):
         try:
-            from django.utils.image import Image
+            from django.utils.image import Image  # NOQA
         except ImproperlyConfigured:
             return [
                 checks.Error(
                     'To use ImageFields, Pillow must be installed.',
-                    hint='Get Pillow at https://pypi.python.org/pypi/Pillow '
-                        'or run command "pip install pillow".',
+                    hint=('Get Pillow at https://pypi.python.org/pypi/Pillow '
+                          'or run command "pip install pillow".'),
                     obj=self,
                     id='E032',
                 )

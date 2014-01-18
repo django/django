@@ -150,9 +150,9 @@ class CharFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                'All "choices" elements must be a tuple of two elements '
-                    '(the first one is the actual value to be stored '
-                    'and the second element is the human-readable name).',
+                ('All "choices" elements must be a tuple of two elements '
+                 '(the first one is the actual value to be stored '
+                 'and the second element is the human-readable name).'),
                 hint=None,
                 obj=field,
                 id='E034',
@@ -187,8 +187,8 @@ class CharFieldTests(IsolatedModelsTestCase):
         errors = validator.check_field(field)
         expected = [
             Error(
-                'Under mysql backend, the field cannot have a "max_length" '
-                    'greated than 255 when it is unique.',
+                ('Under mysql backend, the field cannot have a "max_length" '
+                 'greated than 255 when it is unique.'),
                 hint=None,
                 obj=field,
                 id='E047',
@@ -380,14 +380,15 @@ class GenericIPAddressFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                'The field cannot accept blank values if null values '
-                    'are not allowed, as blank values are stored as null.',
+                ('The field cannot accept blank values if null values '
+                 'are not allowed, as blank values are stored as null.'),
                 hint=None,
                 obj=field,
                 id='E046',
             ),
         ]
         self.assertEqual(errors, expected)
+
 
 class ImageFieldTests(IsolatedModelsTestCase):
 
@@ -407,8 +408,8 @@ class ImageFieldTests(IsolatedModelsTestCase):
         expected = [] if pillow_installed else [
             Error(
                 'To use ImageFields, Pillow must be installed.',
-                hint='Get Pillow at https://pypi.python.org/pypi/Pillow '
-                    'or run command "pip install pillow".',
+                hint=('Get Pillow at https://pypi.python.org/pypi/Pillow '
+                      'or run command "pip install pillow".'),
                 obj=field,
                 id='E032',
             ),
