@@ -1061,7 +1061,7 @@ class Query(object):
         if (connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls and
                 lookups[-1] == 'exact' and value == ''):
             value = True
-            lookups[-1] = ['isnull']
+            lookups[-1] = 'isnull'
         return value, lookups
 
     def solve_lookup_type(self, lookup):
