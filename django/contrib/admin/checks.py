@@ -22,11 +22,6 @@ def check_admin_app(**kwargs):
 
 class BaseModelAdminChecks(object):
 
-    def __init__(self):
-        # Before we can introspect models, they need to be fully loaded so that
-        # inter-relations are set up correctly. We force that here.
-        models.get_apps()
-
     def check(self, cls, model, **kwargs):
         errors = []
         errors.extend(self._check_raw_id_fields(cls, model))
