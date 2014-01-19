@@ -26,7 +26,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         This routine is overridden from Query to handle customized selection of
         geometry columns.
         """
-        qn = self.quote_name_unless_alias
+        qn = self
         qn2 = self.connection.ops.quote_name
         result = ['(%s) AS %s' % (self.get_extra_select_format(alias) % col[0], qn2(alias))
                   for alias, col in six.iteritems(self.query.extra_select)]
