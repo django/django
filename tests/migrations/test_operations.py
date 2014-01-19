@@ -184,6 +184,14 @@ class OperationTests(MigrationTestBase):
             if n == "height"
         ][0]
         self.assertEqual(field.default, NOT_PROVIDED)
+        # Test the database alteration
+        project_state.render().get_model("test_adflpd", "pony").objects.create(
+            weight = 4,
+        )
+        self.assertColumnNotExists("test_adflpd_pony", "height")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_adflpd", editor, project_state, new_state)
+        self.assertColumnExists("test_adflpd_pony", "height")
 
     def test_add_field_m2m(self):
         """
