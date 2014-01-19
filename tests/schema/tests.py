@@ -145,7 +145,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure there's no age field
         columns = self.column_classes(Author)
         self.assertNotIn("age", columns)
-        # Alter the name field to a TextField
+        # Add the new field
         new_field = IntegerField(null=True)
         new_field.set_attributes_from_name("age")
         with connection.schema_editor() as editor:
@@ -157,6 +157,32 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Author)
         self.assertEqual(columns['age'][0], "IntegerField")
         self.assertEqual(columns['age'][1][6], True)
+
+    def test_add_field_temp_default(self):
+        """
+        Tests adding fields to models with a temporary default
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Ensure there's no age field
+        columns = self.column_classes(Author)
+        self.assertNotIn("age", columns)
+        # Add some rows of data
+        Author.objects.create(name="Andrew", height=30)
+        Author.objects.create(name="Andrea")
+        # Add a not-null field
+        new_field = CharField(max_length=30, default="Godwin")
+        new_field.set_attributes_from_name("surname")
+        with connection.schema_editor() as editor:
+            editor.add_field(
+                Author,
+                new_field,
+            )
+        # Ensure the field is right afterwards
+        columns = self.column_classes(Author)
+        self.assertEqual(columns['surname'][0], "CharField")
+        self.assertEqual(columns['surname'][1][6], False)
 
     def test_alter(self):
         """

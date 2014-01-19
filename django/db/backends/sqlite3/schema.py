@@ -29,6 +29,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Add in any created fields
         for field in create_fields:
             body[field.name] = field
+            # If there's a default, insert it into the copy map
+            if field.get_default():
+                mapping[field.column] = self.connection.ops.quote_parameter(
+                    field.get_default()
+                )
         # Add in any altered fields
         for (old_field, new_field) in alter_fields:
             del body[old_field.name]
