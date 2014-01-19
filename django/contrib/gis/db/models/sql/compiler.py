@@ -61,7 +61,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
                         aliases.add(r)
                         col_aliases.add(col[1])
                 else:
-                    col_sql, col_params = col.as_sql(qn, self.connection)
+                    col_sql, col_params = col.as_sql(self, self.connection)
                     result.append(col_sql)
                     params.extend(col_params)
 
@@ -77,7 +77,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
 
         max_name_length = self.connection.ops.max_name_length()
         for alias, aggregate in self.query.aggregate_select.items():
-            agg_sql, agg_params = aggregate.as_sql(qn, self.connection)
+            agg_sql, agg_params = aggregate.as_sql(self, self.connection)
             if alias is None:
                 result.append(agg_sql)
             else:
