@@ -108,7 +108,7 @@ class StateTests(TestCase):
                 ('tag_ptr', models.OneToOneField(
                     auto_created=True,
                     primary_key=True,
-                    to_field=u'id',
+                    to_field='id',
                     serialize=False,
                     to='migrations.Tag',
                 )),
