@@ -10,7 +10,6 @@ from django.db.models.fields import FieldDoesNotExist
 from django.forms.models import BaseModelForm, _get_foreign_key, BaseModelFormSet
 
 
-@checks.register('admin')
 def check_admin_app(**kwargs):
     from django.contrib.admin.sites import site
 

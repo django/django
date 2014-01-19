@@ -24,4 +24,4 @@ __all__ = [
 def autodiscover():
     autodiscover_modules('admin', register_to=site)
 
-checks.register(check_admin_app)
+checks.register('admin')(check_admin_app)

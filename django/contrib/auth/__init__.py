@@ -2,8 +2,9 @@ import inspect
 import re
 
 from django.conf import settings
+from django.core import checks
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-import django.contrib.auth.checks  # NOQA
+from django.contrib.auth.checks import check_user_model
 from django.utils.module_loading import import_by_path
 from django.middleware.csrf import rotate_token
 
@@ -13,6 +14,9 @@ SESSION_KEY = '_auth_user_id'
 BACKEND_SESSION_KEY = '_auth_user_backend'
 REDIRECT_FIELD_NAME = 'next'
 
+
+# Register the user model checks
+checks.register('models')(check_user_model)
 
 def load_backend(path):
     return import_by_path(path)()

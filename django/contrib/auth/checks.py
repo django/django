@@ -5,7 +5,6 @@ from django.apps import apps
 from django.core import checks
 
 
-@checks.register()
 def check_user_model(**kwargs):
     from django.conf import settings
 
