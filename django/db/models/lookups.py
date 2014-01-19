@@ -1,4 +1,5 @@
 from copy import copy
+from itertools import repeat
 import inspect
 
 from django.conf import settings
@@ -77,8 +78,8 @@ class Lookup(RegisterLookupMixin):
         lhs = lhs or self.lhs
         return qn.compile(lhs)
 
-    def process_rhs(self, qn, connection, rhs=None):
-        value = rhs or self.rhs
+    def process_rhs(self, qn, connection):
+        value = self.rhs
         # Due to historical reasons there are a couple of different
         # ways to produce sql here. get_compiler is likely a Query
         # instance, _as_sql QuerySet and as_sql just something with
@@ -94,6 +95,12 @@ class Lookup(RegisterLookupMixin):
             return '(' + sql + ')', params
         else:
             return self.get_db_prep_lookup(value, connection)
+
+    def rhs_is_direct_value(self):
+        return not(
+            hasattr(self.rhs, 'as_sql') or
+            hasattr(self.rhs, '_as_sql') or
+            hasattr(self.rhs, 'get_compiler'))
 
     def relabeled_clone(self, relabels):
         new = copy(self)
@@ -186,6 +193,31 @@ class In(BuiltinLookup):
 
     def get_rhs_op(self, connection, rhs):
         return 'IN %s' % rhs
+
+    def as_sql(self, qn, connection):
+        max_in_list_size = connection.ops.max_in_list_size()
+        if self.rhs_is_direct_value() and (max_in_list_size and
+                                           len(self.rhs) > max_in_list_size):
+            rhs, rhs_params = self.process_rhs(qn, connection)
+            lhs, lhs_params = self.process_lhs(qn, connection)
+            in_clause_elements = ['(']
+            params = []
+            for offset in xrange(0, len(rhs_params), max_in_list_size):
+                if offset > 0:
+                    in_clause_elements.append(' OR ')
+                in_clause_elements.append('%s IN (' % lhs)
+                params.extend(lhs_params)
+                group_size = min(len(rhs_params) - offset, max_in_list_size)
+                param_group = ', '.join(repeat('%s', group_size))
+                in_clause_elements.append(param_group)
+                in_clause_elements.append(')')
+                params.extend(rhs_params[offset: offset + max_in_list_size])
+            in_clause_elements.append(')')
+            return ''.join(in_clause_elements), params
+        else:
+            return super(In, self).as_sql(qn, connection)
+
+
 default_lookups['in'] = In
 
 
