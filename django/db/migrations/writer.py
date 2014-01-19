@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 import inspect
+import decimal
 from importlib import import_module
 import os
 import types
@@ -221,6 +222,9 @@ class MigrationWriter(object):
         # Promise
         elif isinstance(value, Promise):
             return repr(force_text(value)), set()
+        # Decimal
+        elif isinstance(value, decimal.Decimal):
+            return repr(value), set(["from decimal import Decimal"])
         # Django fields
         elif isinstance(value, models.Field):
             attr_name, path, args, kwargs = value.deconstruct()
@@ -255,7 +259,7 @@ class MigrationWriter(object):
                 return "%s.%s" % (module, value.__name__), set(["import %s" % module])
         # Uh oh.
         else:
-            raise ValueError("Cannot serialize: %r" % value)
+            raise ValueError("Cannot serialize: %r\nThere are some values Django cannot serialize into migration files.\nFor more, see https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing" % value)
 
 
 MIGRATION_TEMPLATE = """\

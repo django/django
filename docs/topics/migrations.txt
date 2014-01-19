@@ -281,6 +281,7 @@ Note that this only works given two things:
   that your database doesn't match your models, you'll just get errors when
   migrations try to modify those tables.
 
+
 .. _historical-models:
 
 Historical models
@@ -302,3 +303,56 @@ so you must always keep base classes around for as long as there is a migration
 that contains a reference to them. On the plus side, methods and managers
 from these base classes inherit normally, so if you absolutely need access
 to these you can opt to move them into a superclass.
+
+
+.. _migration-serializing:
+
+Serializing values
+------------------
+
+Migrations are just Python files containing the old definitions of your models
+- thus, to write them, Django must take the current state of your models and
+serialize them out into a file.
+
+While Django can serialize most things, there are some things that we just
+can't serialize out into a valid Python representation - there's no Python
+standard for how a value can be turned back into code (``repr()`` only works
+for basic values, and doesn't specify import paths).
+
+Django can serialize the following:
+
+- ``int``, ``long``, ``float``, ``bool``, ``str``, ``unicode``, ``bytes``, ``None``
+- ``list``, ``set``, ``tuple``, ``dict``
+- ``datetime.date`` and ``datetime.datetime`` instances
+- ``decimal.Decimal`` instances
+- Any Django field
+- Any function or method reference (e.g. ``datetime.datetime.today``)
+- Any class reference
+- Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
+
+Django cannot serialize:
+
+- Arbitrary class instances (e.g. ``MyClass(4.3, 5.7)``)
+- Lambdas
+
+.. _custom-deconstruct-method:
+
+Adding a deconstruct() method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can let Django serialize your own custom class instances by giving the class
+a ``deconstruct`` method. It takes no arguments, and should return a tuple
+of 3 things: ``(path, args, kwargs)``.
+
+``path`` should be the Python path to the class, with the class name included as the
+last part (for example, ``myapp.custom_things.MyClass``). If your class is not
+available at the top level of a module it is not serializable.
+
+``args`` should be a list of positional arguments to pass to your class'
+``__init__`` method. Everything in this list should itself be serializable.
+
+``kwargs`` should be a dict of keyword arguments to pass to your class'
+``__init__`` method. Every value should itself be serializable.
+
+Django will write out the value as an instatiation of your class with the
+given arguments, similar to the way it writes out references to Django fields.
