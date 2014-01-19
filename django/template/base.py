@@ -1354,3 +1354,4 @@ def add_to_builtins(module):
 
 add_to_builtins('django.template.defaulttags')
 add_to_builtins('django.template.defaultfilters')
+add_to_builtins('django.template.loader_tags')
