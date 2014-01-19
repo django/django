@@ -102,7 +102,7 @@ class OperationTests(MigrationTestBase):
                 ('pony_ptr', models.OneToOneField(
                     auto_created=True,
                     primary_key=True,
-                    to_field=u'id',
+                    to_field='id',
                     serialize=False,
                     to='test_crmoih.Pony',
                 )),
