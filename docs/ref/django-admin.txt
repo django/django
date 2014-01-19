@@ -103,11 +103,11 @@ check <appname appname ...>
 .. versionchanged:: 1.7
 
 Uses the :doc:`system check framework </ref/checks>` to inspect
-the entire Django project for likely problems.
+the entire Django project for common problems.
 
 The system check framework will confirm that there aren't any problems with
 your installed models or your admin registrations. It will also provide warnings
-of likely compatibility problems introduced by upgrading Django to a new version.
+of common compatibility problems introduced by upgrading Django to a new version.
 Custom checks may be introduced by other libraries and applications.
 
 By default, all apps will be checkd. You can check a subset of apps by providing

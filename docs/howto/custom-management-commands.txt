@@ -233,7 +233,7 @@ All attributes can be set in your derived class and can be used in
 
   A boolean; if ``True``, the entire Django project will be checked for
   potential problems prior to executing the command. If
-  ``requires_system_checks``is missing, the value of
+  ``requires_system_checks`` is missing, the value of
   ``requires_model_validation`` is used. If the latter flag is missing
   as well, the default value (``True``) is used. Defining both
   ``requires_system_checks`` and ``requires_model_validation`` will result
@@ -322,8 +322,8 @@ the :meth:`~BaseCommand.handle` method must be implemented.
     potential problems. Serious problems are raised as a :class:`CommandError`;
     warnings are output to stderr; minor notifications are output to stdout.
 
-    If `apps` and `tags` are both None, all system checks are performed.
-    `tags` can be a list of check tags, like ``compatibility`` or ``models``.
+    If ``apps`` and ``tags`` are both None, all system checks are performed.
+    ``tags`` can be a list of check tags, like ``compatibility`` or ``models``.
 
 .. method:: BaseCommand.validate(app=None, display_num_errors=False)
 
