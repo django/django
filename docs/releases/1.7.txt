@@ -137,7 +137,7 @@ New system check framework
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We've added a new :doc:`System check framework </ref/checks>` for
-detecting common problems (like invalid models), and providing hints for
+detecting common problems (like invalid models) and providing hints for
 resolving those problems. The framework is extensible so you can add your
 own checks for your own apps and libraries.
 
