@@ -147,11 +147,16 @@ class ModelState(object):
                     options[name] = model._meta.original_attrs[name]
         # Make our record
         bases = tuple(
-            ("%s.%s" % (base._meta.app_label, base._meta.model_name) if hasattr(base, "_meta") else base)
+            (
+                "%s.%s" % (base._meta.app_label, base._meta.model_name)
+                if hasattr(base, "_meta") else
+                base
+            )
             for base in model.__bases__
             if (not hasattr(base, "_meta") or not base._meta.abstract)
         )
-        if not bases:
+        # Ensure at least one base inherits from models.Model
+        if not any((isinstance(base, six.string_types) or issubclass(base, models.Model)) for base in bases):
             bases = (models.Model, )
         return cls(
             model._meta.app_label,
