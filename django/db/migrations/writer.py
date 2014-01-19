@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import inspect
 from importlib import import_module
 import os
 import types
@@ -27,6 +28,64 @@ class SettingsReference(str):
         self.setting_name = setting_name
 
 
+class OperationWriter(object):
+    indentation = 2
+
+    def __init__(self, operation):
+        self.operation = operation
+        self.buff = []
+
+    def serialize(self):
+        imports = set()
+        name, args, kwargs = self.operation.deconstruct()
+        argspec = inspect.getargspec(self.operation.__init__)
+        normalized_kwargs = inspect.getcallargs(self.operation.__init__, *args, **kwargs)
+
+        self.feed('migrations.%s(' % name)
+        self.indent()
+        for arg_name in argspec.args[1:]:
+            arg_value = normalized_kwargs[arg_name]
+            if (arg_name in self.operation.serialization_expand_args and
+                    isinstance(arg_value, (list, tuple, dict))):
+                if isinstance(arg_value, dict):
+                    self.feed('%s={' % arg_name)
+                    self.indent()
+                    for key, value in arg_value.items():
+                        arg_string, arg_imports = MigrationWriter.serialize(value)
+                        self.feed('%s: %s,' % (repr(key), arg_string))
+                        imports.update(arg_imports)
+                    self.unindent()
+                    self.feed('},')
+                else:
+                    self.feed('%s=[' % arg_name)
+                    self.indent()
+                    for item in arg_value:
+                        arg_string, arg_imports = MigrationWriter.serialize(item)
+                        self.feed('%s,' % arg_string)
+                        imports.update(arg_imports)
+                    self.unindent()
+                    self.feed('],')
+            else:
+                arg_string, arg_imports = MigrationWriter.serialize(arg_value)
+                self.feed('%s=%s,' % (arg_name, arg_string))
+                imports.update(arg_imports)
+        self.unindent()
+        self.feed('),')
+        return self.render(), imports
+
+    def indent(self):
+        self.indentation += 1
+
+    def unindent(self):
+        self.indentation -= 1
+
+    def feed(self, line):
+        self.buff.append(' ' * (self.indentation * 4) + line)
+
+    def render(self):
+        return '\n'.join(self.buff)
+
+
 class MigrationWriter(object):
     """
     Takes a Migration instance and is able to produce the contents
@@ -43,40 +102,35 @@ class MigrationWriter(object):
         items = {
             "replaces_str": "",
         }
+
         imports = set()
+
         # Deconstruct operations
-        operation_strings = []
+        operations = []
         for operation in self.migration.operations:
-            name, args, kwargs = operation.deconstruct()
-            arg_strings = []
-            for arg in args:
-                arg_string, arg_imports = self.serialize(arg)
-                arg_strings.append(arg_string)
-                imports.update(arg_imports)
-            for kw, arg in kwargs.items():
-                arg_string, arg_imports = self.serialize(arg)
-                imports.update(arg_imports)
-                arg_strings.append("%s = %s" % (kw, arg_string))
-            operation_strings.append("migrations.%s(%s\n        )" % (name, "".join("\n            %s," % arg for arg in arg_strings)))
-        items["operations"] = "[%s\n    ]" % "".join("\n        %s," % s for s in operation_strings)
+            operation_string, operation_imports = OperationWriter(operation).serialize()
+            imports.update(operation_imports)
+            operations.append(operation_string)
+        items["operations"] = "\n".join(operations) + "\n" if operations else ""
+
         # Format dependencies and write out swappable dependencies right
-        items["dependencies"] = "["
+        dependencies = []
         for dependency in self.migration.dependencies:
             if dependency[0] == "__setting__":
-                items["dependencies"] += "\n        migrations.swappable_dependency(settings.%s)," % dependency[1]
+                dependencies.append("        migrations.swappable_dependency(settings.%s)," % dependency[1])
                 imports.add("from django.conf import settings")
             else:
-                items["dependencies"] += "\n        %s," % repr(dependency)
-        items["dependencies"] += "\n    ]"
+                dependencies.append("        %s," % repr(dependency))
+        items["dependencies"] = "\n".join(dependencies) + "\n" if dependencies else ""
+
         # Format imports nicely
         imports.discard("from django.db import models")
-        if not imports:
-            items["imports"] = ""
-        else:
-            items["imports"] = "\n".join(imports) + "\n"
+        items["imports"] = "\n".join(imports) + "\n" if imports else ""
+
         # If there's a replaces, make a string for it
         if self.migration.replaces:
             items['replaces_str'] = "\n    replaces = %s\n" % repr(self.migration.replaces)
+
         return (MIGRATION_TEMPLATE % items).encode("utf8")
 
     @property
@@ -110,16 +164,16 @@ class MigrationWriter(object):
         else:
             imports = set(["import %s" % module])
             name = path
-        arg_strings = []
+        strings = []
         for arg in args:
             arg_string, arg_imports = cls.serialize(arg)
-            arg_strings.append(arg_string)
+            strings.append(arg_string)
             imports.update(arg_imports)
         for kw, arg in kwargs.items():
             arg_string, arg_imports = cls.serialize(arg)
             imports.update(arg_imports)
-            arg_strings.append("%s=%s" % (kw, arg_string))
-        return "%s(%s)" % (name, ", ".join(arg_strings)), imports
+            strings.append("%s=%s" % (kw, arg_string))
+        return "%s(%s)" % (name, ", ".join(strings)), imports
 
     @classmethod
     def serialize(cls, value):
@@ -140,7 +194,7 @@ class MigrationWriter(object):
             if isinstance(value, set):
                 format = "set([%s])"
             elif isinstance(value, tuple):
-                format = "(%s,)"
+                format = "(%s)" if len(value) else "(%s,)"
             else:
                 format = "[%s]"
             return format % (", ".join(strings)), imports
@@ -204,13 +258,18 @@ class MigrationWriter(object):
             raise ValueError("Cannot serialize: %r" % value)
 
 
-MIGRATION_TEMPLATE = """# encoding: utf8
+MIGRATION_TEMPLATE = """\
+# encoding: utf8
 from django.db import models, migrations
 %(imports)s
 
 class Migration(migrations.Migration):
     %(replaces_str)s
-    dependencies = %(dependencies)s
+    dependencies = [
+%(dependencies)s\
+    ]
 
-    operations = %(operations)s
+    operations = [
+%(operations)s\
+    ]
 """
