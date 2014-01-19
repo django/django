@@ -40,6 +40,9 @@ class RegexValidator(object):
         if not self.regex.search(force_text(value)):
             raise ValidationError(self.message, code=self.code)
 
+    def __eq__(self, other):
+        return isinstance(other, RegexValidator) and (self.regex == other.regex) and (self.message == other.message) and (self.code == other.code)
+
 
 @deconstructible
 class URLValidator(RegexValidator):
@@ -139,6 +142,9 @@ class EmailValidator(object):
                 pass
             raise ValidationError(self.message, code=self.code)
 
+    def __eq__(self, other):
+        return isinstance(other, EmailValidator) and (self.domain_whitelist == other.domain_whitelist) and (self.message == other.message) and (self.code == other.code)
+
 validate_email = EmailValidator()
 
 slug_re = re.compile(r'^[-a-zA-Z0-9_]+$')
@@ -204,6 +210,9 @@ class BaseValidator(object):
         params = {'limit_value': self.limit_value, 'show_value': cleaned}
         if self.compare(cleaned, self.limit_value):
             raise ValidationError(self.message, code=self.code, params=params)
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and (self.limit_value == other.limit_value) and (self.message == other.message) and (self.code == other.code)
 
 
 @deconstructible
