@@ -2,9 +2,9 @@ import inspect
 import re
 
 from django.conf import settings
+from django.contrib.auth.checks import check_user_model
 from django.core import checks
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.contrib.auth.checks import check_user_model
 from django.utils.module_loading import import_by_path
 from django.middleware.csrf import rotate_token
 
@@ -17,6 +17,7 @@ REDIRECT_FIELD_NAME = 'next'
 
 # Register the user model checks
 checks.register('models')(check_user_model)
+
 
 def load_backend(path):
     return import_by_path(path)()
