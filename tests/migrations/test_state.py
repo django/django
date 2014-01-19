@@ -33,6 +33,12 @@ class StateTests(TestCase):
                 proxy = True
                 ordering = ["name"]
 
+        class SubAuthor(Author):
+            width = models.FloatField(null=True)
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
         class Book(models.Model):
             title = models.CharField(max_length=1000)
             author = models.ForeignKey(Author)
@@ -47,6 +53,7 @@ class StateTests(TestCase):
         project_state = ProjectState.from_apps(new_apps)
         author_state = project_state.models['migrations', 'author']
         author_proxy_state = project_state.models['migrations', 'authorproxy']
+        sub_author_state = project_state.models['migrations', 'subauthor']
         book_state = project_state.models['migrations', 'book']
 
         self.assertEqual(author_state.app_label, "migrations")
@@ -55,7 +62,7 @@ class StateTests(TestCase):
         self.assertEqual(author_state.fields[1][1].max_length, 255)
         self.assertEqual(author_state.fields[2][1].null, False)
         self.assertEqual(author_state.fields[3][1].null, True)
-        self.assertEqual(author_state.options, {"unique_together": {("name", "bio")}})
+        self.assertEqual(author_state.options, {"unique_together": set([("name", "bio")])})
         self.assertEqual(author_state.bases, (models.Model, ))
 
         self.assertEqual(book_state.app_label, "migrations")
@@ -73,6 +80,11 @@ class StateTests(TestCase):
         self.assertEqual(author_proxy_state.options, {"proxy": True, "ordering": ["name"]})
         self.assertEqual(author_proxy_state.bases, ("migrations.author", ))
 
+        self.assertEqual(sub_author_state.app_label, "migrations")
+        self.assertEqual(sub_author_state.name, "SubAuthor")
+        self.assertEqual(len(sub_author_state.fields), 2)
+        self.assertEqual(sub_author_state.bases, ("migrations.author", ))
+
     def test_render(self):
         """
         Tests rendering a ProjectState into an Apps.
@@ -89,10 +101,27 @@ class StateTests(TestCase):
             {},
             None,
         ))
+        project_state.add_model_state(ModelState(
+            "migrations",
+            "SubTag",
+            [
+                ('tag_ptr', models.OneToOneField(
+                    auto_created=True,
+                    primary_key=True,
+                    to_field=u'id',
+                    serialize=False,
+                    to='migrations.Tag',
+                )),
+                ("awesome", models.BooleanField()),
+            ],
+            options={},
+            bases=("migrations.Tag",),
+        ))
 
         new_apps = project_state.render()
         self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field_by_name("name")[0].max_length, 100)
         self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field_by_name("hidden")[0].null, False)
+        self.assertEqual(len(new_apps.get_model("migrations", "SubTag")._meta.local_fields), 2)
 
     def test_render_model_inheritance(self):
         class Book(models.Model):

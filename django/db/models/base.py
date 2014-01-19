@@ -251,7 +251,10 @@ class ModelBase(type):
                     attr_name = '%s_ptr' % base._meta.model_name
                     field = OneToOneField(base, name=attr_name,
                             auto_created=True, parent_link=True)
-                    new_class.add_to_class(attr_name, field)
+                    # Only add the ptr field if it's not already present;
+                    # e.g. migrations will already have it specified
+                    if not hasattr(new_class, attr_name):
+                        new_class.add_to_class(attr_name, field)
                 else:
                     field = None
                 new_class._meta.parents[base] = field

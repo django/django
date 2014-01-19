@@ -194,7 +194,7 @@ class MigrationWriter(object):
             if isinstance(value, set):
                 format = "set([%s])"
             elif isinstance(value, tuple):
-                format = "(%s)" if len(value) else "(%s,)"
+                format = "(%s)" if len(value) > 1 else "(%s,)"
             else:
                 format = "[%s]"
             return format % (", ".join(strings)), imports
