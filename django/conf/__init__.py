@@ -99,7 +99,6 @@ class Settings(BaseSettings):
             )
 
         tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS")
-
         for setting in dir(mod):
             if setting.isupper():
                 setting_value = getattr(mod, setting)
@@ -125,9 +124,6 @@ class Settings(BaseSettings):
             # we don't do this unconditionally (breaks Windows).
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
-
-    def is_overridden(self, setting):
-        return setting in self.__dict__
 
 
 class UserSettingsHolder(BaseSettings):
@@ -162,10 +158,5 @@ class UserSettingsHolder(BaseSettings):
     def __dir__(self):
         return list(self.__dict__) + dir(self.default_settings)
 
-    def is_overridden(self, setting):
-        if setting in self._deleted:
-            return False
-        else:
-            return self.default_settings.is_overridden(setting)
 
 settings = LazySettings()

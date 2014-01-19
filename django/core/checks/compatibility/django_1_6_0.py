@@ -26,7 +26,7 @@ def _check_test_runner(app_configs=None, **kwargs):
     new_default = 'django.test.runner.DiscoverRunner'
     test_runner_setting = getattr(settings, 'TEST_RUNNER', new_default)
 
-    if test_runner_setting == new_default and not settings.is_overridden("TEST_RUNNER"):
+    if test_runner_setting == new_default:
         return [
             Warning(
                 ("Django 1.6 introduced a new default test runner ('%s'). "
