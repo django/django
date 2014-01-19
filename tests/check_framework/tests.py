@@ -8,7 +8,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core import checks
 from django.core.checks import Error
-from django.core.checks.registration import CheckRegistry
+from django.core.checks.registry import CheckRegistry
 from django.core.checks.compatibility.django_1_6_0 import check_1_6_compatibility
 from django.core.management.base import CommandError
 from django.core.management import call_command

@@ -305,7 +305,7 @@ def override_system_checks(new_checks):
     Useful when you override `INSTALLED_APPS`, e.g. if you exclude `auth` app,
     you also need to exclude its system checks. """
 
-    from django.core.checks.registration import registry
+    from django.core.checks.registry import registry
 
     def outer(test_func):
         @wraps(test_func)

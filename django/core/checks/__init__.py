@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from .messages import (CheckMessage,
         Debug, Info, Warning, Error, Critical,
         DEBUG, INFO, WARNING, ERROR, CRITICAL)
-from .registration import register, run_checks, tag_exists
+from .registry import register, run_checks, tag_exists
 
 # Import these to force registration of checks
 import django.core.checks.compatibility.django_1_6_0  # NOQA
