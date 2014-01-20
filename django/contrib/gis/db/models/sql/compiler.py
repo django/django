@@ -1,18 +1,15 @@
 import datetime
-try:
-    from itertools import zip_longest
-except ImportError:
-    from itertools import izip_longest as zip_longest
 
 from django.conf import settings
-from django.db.backends.util import truncate_name, typecast_date, typecast_timestamp
+from django.db.backends.utils import truncate_name, typecast_date, typecast_timestamp
 from django.db.models.sql import compiler
 from django.db.models.sql.constants import MULTI
 from django.utils import six
-from django.utils.six.moves import zip
+from django.utils.six.moves import zip, zip_longest
 from django.utils import timezone
 
 SQLCompiler = compiler.SQLCompiler
+
 
 class GeoSQLCompiler(compiler.SQLCompiler):
 
@@ -29,7 +26,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         This routine is overridden from Query to handle customized selection of
         geometry columns.
         """
-        qn = self.quote_name_unless_alias
+        qn = self
         qn2 = self.connection.ops.quote_name
         result = ['(%s) AS %s' % (self.get_extra_select_format(alias) % col[0], qn2(alias))
                   for alias, col in six.iteritems(self.query.extra_select)]
@@ -136,7 +133,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
             if table in only_load and field.column not in only_load[table]:
                 continue
             if as_pairs:
-                result.append((alias, field.column))
+                result.append((alias, field))
                 aliases.add(alias)
                 continue
             # This part of the function is customized for GeoQuery. We
@@ -170,7 +167,8 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         # doing pagination with Oracle.
         rn_offset = 0
         if self.connection.ops.oracle:
-            if self.query.high_mark is not None or self.query.low_mark: rn_offset = 1
+            if self.query.high_mark is not None or self.query.low_mark:
+                rn_offset = 1
         index_start = rn_offset + len(aliases)
 
         # Converting any extra selection values (e.g., geometries and
@@ -230,8 +228,8 @@ class GeoSQLCompiler(compiler.SQLCompiler):
             # transformed geometries have an SRID different than that of the
             # field -- this is only used by `transform` for Oracle and
             # SpatiaLite backends.
-            if self.query.transformed_srid and ( self.connection.ops.oracle or
-                                                 self.connection.ops.spatialite ):
+            if self.query.transformed_srid and (self.connection.ops.oracle or
+                                                self.connection.ops.spatialite):
                 sel_fmt = "'SRID=%d;'||%s" % (self.query.transformed_srid, sel_fmt)
         else:
             sel_fmt = '%s'
@@ -247,21 +245,27 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         used.  If `column` is specified, it will be used instead of the value
         in `field.column`.
         """
-        if table_alias is None: table_alias = self.query.get_meta().db_table
+        if table_alias is None:
+            table_alias = self.query.get_meta().db_table
         return "%s.%s" % (self.quote_name_unless_alias(table_alias),
                           self.connection.ops.quote_name(column or field.column))
+
 
 class SQLInsertCompiler(compiler.SQLInsertCompiler, GeoSQLCompiler):
     pass
 
+
 class SQLDeleteCompiler(compiler.SQLDeleteCompiler, GeoSQLCompiler):
     pass
+
 
 class SQLUpdateCompiler(compiler.SQLUpdateCompiler, GeoSQLCompiler):
     pass
 
+
 class SQLAggregateCompiler(compiler.SQLAggregateCompiler, GeoSQLCompiler):
     pass
+
 
 class SQLDateCompiler(compiler.SQLDateCompiler, GeoSQLCompiler):
     """
@@ -287,6 +291,7 @@ class SQLDateCompiler(compiler.SQLDateCompiler, GeoSQLCompiler):
                 if isinstance(date, datetime.datetime):
                     date = date.date()
                 yield date
+
 
 class SQLDateTimeCompiler(compiler.SQLDateTimeCompiler, GeoSQLCompiler):
     """

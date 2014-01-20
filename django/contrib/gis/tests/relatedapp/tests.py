@@ -27,7 +27,7 @@ class RelatedGeoModelTest(TestCase):
         cities = (
             ('Aurora', 'TX', -97.516111, 33.058333),
             ('Roswell', 'NM', -104.528056, 33.387222),
-            ('Kecksburg', 'PA',  -79.460734, 40.18476),
+            ('Kecksburg', 'PA', -79.460734, 40.18476),
         )
 
         for qs in (qs1, qs2, qs3):
@@ -79,7 +79,8 @@ class RelatedGeoModelTest(TestCase):
         # between the Oracle and PostGIS spatial backends on the extent calculation.
         tol = 4
         for ref, e in [(all_extent, e1), (txpa_extent, e2), (all_extent, e3)]:
-            for ref_val, e_val in zip(ref, e): self.assertAlmostEqual(ref_val, e_val, tol)
+            for ref_val, e_val in zip(ref, e):
+                self.assertAlmostEqual(ref_val, e_val, tol)
 
     @no_mysql
     def test04b_related_union_aggregate(self):
@@ -119,7 +120,7 @@ class RelatedGeoModelTest(TestCase):
     def test05_select_related_fk_to_subclass(self):
         "Testing that calling select_related on a query over a model with an FK to a model subclass works"
         # Regression test for #9752.
-        l = list(DirectoryEntry.objects.all().select_related())
+        list(DirectoryEntry.objects.all().select_related())
 
     def test06_f_expressions(self):
         "Testing F() expressions on GeometryFields."
@@ -134,7 +135,7 @@ class RelatedGeoModelTest(TestCase):
         c1 = pcity.location.point
         c2 = c1.transform(2276, clone=True)
         b2 = c2.buffer(100)
-        p1 = Parcel.objects.create(name='P1', city=pcity, center1=c1, center2=c2, border1=b1, border2=b2)
+        Parcel.objects.create(name='P1', city=pcity, center1=c1, center2=c2, border1=b1, border2=b2)
 
         # Now creating a second Parcel where the borders are the same, just
         # in different coordinate systems.  The center points are also the
@@ -142,7 +143,7 @@ class RelatedGeoModelTest(TestCase):
         # actually correspond to the centroid of the border.
         c1 = b1.centroid
         c2 = c1.transform(2276, clone=True)
-        p2 = Parcel.objects.create(name='P2', city=pcity, center1=c1, center2=c2, border1=b1, border2=b1)
+        Parcel.objects.create(name='P2', city=pcity, center1=c1, center2=c2, border1=b1, border2=b1)
 
         # Should return the second Parcel, which has the center within the
         # border.
@@ -263,7 +264,7 @@ class RelatedGeoModelTest(TestCase):
     @no_oracle
     def test13_select_related_null_fk(self):
         "Testing `select_related` on a nullable ForeignKey via `GeoManager`. See #11381."
-        no_author = Book.objects.create(title='Without Author')
+        Book.objects.create(title='Without Author')
         b = Book.objects.select_related('author').get(title='Without Author')
         # Should be `None`, and not a 'dummy' model.
         self.assertEqual(None, b.author)
@@ -294,7 +295,7 @@ class RelatedGeoModelTest(TestCase):
         # This triggers TypeError when `get_default_columns` has no `local_only`
         # keyword.  The TypeError is swallowed if QuerySet is actually
         # evaluated as list generation swallows TypeError in CPython.
-        sql = str(qs.query)
+        str(qs.query)
 
     def test16_annotated_date_queryset(self):
         "Ensure annotated date querysets work if spatial backend is used.  See #14648."

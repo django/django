@@ -1,4 +1,5 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, url, include
+from django.contrib import admin
 from django.contrib.auth import context_processors
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.urls import urlpatterns
@@ -10,10 +11,12 @@ from django.shortcuts import render_to_response
 from django.template import Template, RequestContext
 from django.views.decorators.cache import never_cache
 
+
 class CustomRequestAuthenticationForm(AuthenticationForm):
     def __init__(self, request, *args, **kwargs):
         assert isinstance(request, HttpRequest)
         super(CustomRequestAuthenticationForm, self).__init__(request, *args, **kwargs)
+
 
 @never_cache
 def remote_user_auth_view(request):
@@ -22,38 +25,46 @@ def remote_user_auth_view(request):
     c = RequestContext(request, {})
     return HttpResponse(t.render(c))
 
+
 def auth_processor_no_attr_access(request):
-    r1 = render_to_response('context_processors/auth_attrs_no_access.html',
+    render_to_response('context_processors/auth_attrs_no_access.html',
         RequestContext(request, {}, processors=[context_processors.auth]))
     # *After* rendering, we check whether the session was accessed
     return render_to_response('context_processors/auth_attrs_test_access.html',
-        {'session_accessed':request.session.accessed})
+        {'session_accessed': request.session.accessed})
+
 
 def auth_processor_attr_access(request):
-    r1 = render_to_response('context_processors/auth_attrs_access.html',
+    render_to_response('context_processors/auth_attrs_access.html',
         RequestContext(request, {}, processors=[context_processors.auth]))
     return render_to_response('context_processors/auth_attrs_test_access.html',
-        {'session_accessed':request.session.accessed})
+        {'session_accessed': request.session.accessed})
+
 
 def auth_processor_user(request):
     return render_to_response('context_processors/auth_attrs_user.html',
         RequestContext(request, {}, processors=[context_processors.auth]))
 
+
 def auth_processor_perms(request):
     return render_to_response('context_processors/auth_attrs_perms.html',
         RequestContext(request, {}, processors=[context_processors.auth]))
 
+
 def auth_processor_perm_in_perms(request):
     return render_to_response('context_processors/auth_attrs_perm_in_perms.html',
         RequestContext(request, {}, processors=[context_processors.auth]))
+
 
 def auth_processor_messages(request):
     info(request, "Message 1")
     return render_to_response('context_processors/auth_attrs_messages.html',
          RequestContext(request, {}, processors=[context_processors.auth]))
 
+
 def userpage(request):
     pass
+
 
 def custom_request_auth_login(request):
     return login(request, authentication_form=CustomRequestAuthenticationForm)
@@ -88,4 +99,7 @@ urlpatterns = urlpatterns + patterns('',
     (r'^auth_processor_messages/$', auth_processor_messages),
     (r'^custom_request_auth_login/$', custom_request_auth_login),
     url(r'^userpage/(.+)/$', userpage, name="userpage"),
+
+    # This line is only required to render the password reset with is_admin=True
+    (r'^admin/', include(admin.site.urls)),
 )

@@ -167,11 +167,11 @@ LANG_INFO = {
         'name': 'French',
         'name_local': 'français',
     },
-    'fy-nl': {
+    'fy': {
         'bidi': False,
-        'code': 'fy-nl',
+        'code': 'fy',
         'name': 'Frisian',
-        'name_local': 'Frisian',
+        'name_local': 'frysk',
     },
     'ga': {
         'bidi': False,
@@ -468,7 +468,7 @@ LANG_INFO = {
         'name_local': 'Українська',
     },
     'ur': {
-        'bidi': False,
+        'bidi': True,
         'code': 'ur',
         'name': 'Urdu',
         'name_local': 'اردو',
@@ -484,6 +484,18 @@ LANG_INFO = {
         'code': 'zh-cn',
         'name': 'Simplified Chinese',
         'name_local': '简体中文',
+    },
+    'zh-hans': {
+        'bidi': False,
+        'code': 'zh-hans',
+        'name': 'Simplified Chinese',
+        'name_local': '简体中文',
+    },
+    'zh-hant': {
+        'bidi': False,
+        'code': 'zh-hant',
+        'name': 'Traditional Chinese',
+        'name_local': '繁體中文',
     },
     'zh-tw': {
         'bidi': False,

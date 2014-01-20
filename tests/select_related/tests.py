@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from .models import Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species
+from .models import Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species, HybridSpecies
 
 
 class SelectRelatedTests(TestCase):
@@ -100,8 +100,9 @@ class SelectRelatedTests(TestCase):
                 ['Agaricales', 'Diptera', 'Fabales', 'Primates'])
 
     def test_select_related_with_extra(self):
-        s = Species.objects.all().select_related()\
-            .extra(select={'a': 'select_related_species.id + 10'})[0]
+        s = (Species.objects.all()
+             .select_related()
+             .extra(select={'a': 'select_related_species.id + 10'})[0])
         self.assertEqual(s.id + 10, s.a)
 
     def test_certain_fields(self):
@@ -131,12 +132,14 @@ class SelectRelatedTests(TestCase):
 
     def test_field_traversal(self):
         with self.assertNumQueries(1):
-            s = Species.objects.all().select_related('genus__family__order'
-                ).order_by('id')[0:1].get().genus.family.order.name
+            s = (Species.objects.all()
+                 .select_related('genus__family__order')
+                 .order_by('id')[0:1].get().genus.family.order.name)
             self.assertEqual(s, 'Diptera')
 
     def test_depth_fields_fails(self):
-        self.assertRaises(TypeError,
+        self.assertRaises(
+            TypeError,
             Species.objects.select_related,
             'genus__family__order', depth=4
         )
@@ -144,3 +147,12 @@ class SelectRelatedTests(TestCase):
     def test_none_clears_list(self):
         queryset = Species.objects.select_related('genus').select_related(None)
         self.assertEqual(queryset.query.select_related, False)
+
+    def test_chaining(self):
+        parent_1, parent_2 = Species.objects.all()[:2]
+        HybridSpecies.objects.create(name='hybrid', parent_1=parent_1, parent_2=parent_2)
+        queryset = HybridSpecies.objects.select_related('parent_1').select_related('parent_2')
+        with self.assertNumQueries(1):
+            obj = queryset[0]
+            self.assertEqual(obj.parent_1, parent_1)
+            self.assertEqual(obj.parent_2, parent_2)

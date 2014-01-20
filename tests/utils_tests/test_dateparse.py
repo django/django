@@ -4,7 +4,7 @@ from datetime import date, time, datetime
 import unittest
 
 from django.utils.dateparse import parse_date, parse_time, parse_datetime
-from django.utils.tzinfo import FixedOffset
+from django.utils.timezone import get_fixed_timezone
 
 
 class DateParseTests(unittest.TestCase):
@@ -34,11 +34,11 @@ class DateParseTests(unittest.TestCase):
         self.assertEqual(parse_datetime('2012-4-9 4:8:16'),
             datetime(2012, 4, 9, 4, 8, 16))
         self.assertEqual(parse_datetime('2012-04-23T09:15:00Z'),
-            datetime(2012, 4, 23, 9, 15, 0, 0, FixedOffset(0)))
+            datetime(2012, 4, 23, 9, 15, 0, 0, get_fixed_timezone(0)))
         self.assertEqual(parse_datetime('2012-4-9 4:8:16-0320'),
-            datetime(2012, 4, 9, 4, 8, 16, 0, FixedOffset(-200)))
+            datetime(2012, 4, 9, 4, 8, 16, 0, get_fixed_timezone(-200)))
         self.assertEqual(parse_datetime('2012-04-23T10:20:30.400+02:30'),
-            datetime(2012, 4, 23, 10, 20, 30, 400000, FixedOffset(150)))
+            datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(150)))
         # Invalid inputs
         self.assertEqual(parse_datetime('20120423091500'), None)
         self.assertRaises(ValueError, parse_datetime, '2012-04-56T09:15:90')

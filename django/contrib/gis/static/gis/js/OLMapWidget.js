@@ -170,7 +170,7 @@ function MapWidget(options) {
     // Mapping from OGRGeomType name to OpenLayers.Geometry name
     if (options['geom_name'] == 'Unknown') options['geom_type'] = OpenLayers.Geometry;
     else if (options['geom_name'] == 'GeometryCollection') options['geom_type'] = OpenLayers.Geometry.Collection;
-    else options['geom_type'] = eval('OpenLayers.Geometry' + options['geom_name']);
+    else options['geom_type'] = eval('OpenLayers.Geometry.' + options['geom_name']);
 
     // Default options
     this.options = {
@@ -178,7 +178,7 @@ function MapWidget(options) {
         default_lat: 0,
         default_lon: 0,
         default_zoom: 4,
-        is_collection: options['geom_type'] instanceof OpenLayers.Geometry.Collection,
+        is_collection: new options['geom_type']() instanceof OpenLayers.Geometry.Collection,
         layerswitcher: false,
         map_options: {},
         map_srid: 4326,
@@ -197,10 +197,7 @@ function MapWidget(options) {
         }
     }
 
-    this.map = new OpenLayers.Map(this.options.map_id, this.options.map_options);
-    if (this.options.base_layer) this.layers.base = this.options.base_layer;
-    else this.layers.base = new OpenLayers.Layer.WMS('OpenLayers WMS', 'http://vmap0.tiles.osgeo.org/wms/vmap0', {layers: 'basic'});
-    this.map.addLayer(this.layers.base);
+    this.map = this.create_map();
 
     var defaults_style = {
         'fillColor': '#' + this.options.color,
@@ -213,7 +210,7 @@ function MapWidget(options) {
     var styleMap = new OpenLayers.StyleMap({'default': OpenLayers.Util.applyDefaults(defaults_style, OpenLayers.Feature.Vector.style['default'])});
     this.layers.vector = new OpenLayers.Layer.Vector(" " + this.options.name, {styleMap: styleMap});
     this.map.addLayer(this.layers.vector);
-    wkt = document.getElementById(this.options.id).value;
+    var wkt = document.getElementById(this.options.id).value;
     if (wkt) {
         var feat = OpenLayers.Util.properFeatures(this.read_wkt(wkt), this.options.geom_type);
         this.write_wkt(feat);
@@ -259,6 +256,14 @@ function MapWidget(options) {
         this.enableDrawing();
     }
 }
+
+MapWidget.prototype.create_map = function() {
+    var map = new OpenLayers.Map(this.options.map_id, this.options.map_options);
+    if (this.options.base_layer) this.layers.base = this.options.base_layer;
+    else this.layers.base = new OpenLayers.Layer.WMS('OpenLayers WMS', 'http://vmap0.tiles.osgeo.org/wms/vmap0', {layers: 'basic'});
+    map.addLayer(this.layers.base);
+    return map
+};
 
 MapWidget.prototype.get_ewkt = function(feat) {
     return "SRID=" + this.options.map_srid + ";" + this.wkt_f.write(feat);
@@ -354,13 +359,13 @@ MapWidget.prototype.getControls = function(layer) {
     this.controls = [new OpenLayers.Control.Navigation()];
     if (!this.options.modifiable && layer.features.length)
         return;
-    if (this.options.geom_name == 'LineString' || this.options.geom_name == 'Unknown') {
+    if (this.options.geom_name.indexOf('LineString') >= 0 || this.options.geom_name == 'Unknown') {
         this.controls.push(new OpenLayers.Control.DrawFeature(layer, OpenLayers.Handler.Path, {'displayClass': 'olControlDrawFeaturePath'}));
     }
-    if (this.options.geom_name == 'Polygon' || this.options.geom_name == 'Unknown') {
+    if (this.options.geom_name.indexOf('Polygon') >= 0 || this.options.geom_name == 'Unknown') {
         this.controls.push(new OpenLayers.Control.DrawFeature(layer, OpenLayers.Handler.Polygon, {'displayClass': 'olControlDrawFeaturePolygon'}));
     }
-    if (this.options.geom_name == 'Point' || this.options.geom_name == 'Unknown') {
+    if (this.options.geom_name.indexOf('Point') >= 0 || this.options.geom_name == 'Unknown') {
         this.controls.push(new OpenLayers.Control.DrawFeature(layer, OpenLayers.Handler.Point, {'displayClass': 'olControlDrawFeaturePoint'}));
     }
     if (this.options.modifiable) {

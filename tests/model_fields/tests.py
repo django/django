@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import datetime
 from decimal import Decimal
 import unittest
+import warnings
 
 from django import test
 from django import forms
@@ -12,13 +13,12 @@ from django.db.models.fields import (
     AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
     CommaSeparatedIntegerField, DateField, DateTimeField, DecimalField,
     EmailField, FilePathField, FloatField, IntegerField, IPAddressField,
-    GenericIPAddressField, NullBooleanField, PositiveIntegerField,
+    GenericIPAddressField, NOT_PROVIDED, NullBooleanField, PositiveIntegerField,
     PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
     TimeField, URLField)
 from django.db.models.fields.files import FileField, ImageField
 from django.utils import six
 from django.utils.functional import lazy
-from django.utils.unittest import skipIf
 
 from .models import (
     Foo, Bar, Whiz, BigD, BigS, BigInt, Post, NullBooleanModel,
@@ -78,14 +78,17 @@ class BasicFieldTests(test.TestCase):
 
         self.assertEqual(m._meta.get_field('id').verbose_name, 'verbose pk')
 
-    def test_formclass_with_choices(self):
-        # regression for 18162
-        class CustomChoiceField(forms.TypedChoiceField):
-            pass
-        choices = [('a@b.cc', 'a@b.cc'), ('b@b.cc', 'b@b.cc')]
+    def test_choices_form_class(self):
+        """Can supply a custom choices form class. Regression for #20999."""
+        choices = [('a', 'a')]
         field = models.CharField(choices=choices)
-        klass = CustomChoiceField
-        self.assertIsInstance(field.formfield(form_class=klass), klass)
+        klass = forms.TypedMultipleChoiceField
+        self.assertIsInstance(field.formfield(choices_form_class=klass), klass)
+
+    def test_field_str(self):
+        from django.utils.encoding import force_str
+        f = Foo._meta.get_field('a')
+        self.assertEqual(force_str(f), "model_fields.Foo.a")
 
 
 class DecimalFieldTests(test.TestCase):
@@ -135,12 +138,14 @@ class DecimalFieldTests(test.TestCase):
         # This should not crash. That counts as a win for our purposes.
         Foo.objects.filter(d__gte=100000000000)
 
+
 class ForeignKeyTests(test.TestCase):
     def test_callable_default(self):
         """Test the use of a lazy callable for ForeignKey.default"""
         a = Foo.objects.create(id=1, a='abc', d=Decimal("12.34"))
         b = Bar.objects.create(b="bcd")
         self.assertEqual(b.a, a)
+
 
 class DateTimeFieldTests(unittest.TestCase):
     def test_datetimefield_to_python_usecs(self):
@@ -158,6 +163,7 @@ class DateTimeFieldTests(unittest.TestCase):
                          datetime.time(1, 2, 3, 4))
         self.assertEqual(f.to_python('01:02:03.999999'),
                          datetime.time(1, 2, 3, 999999))
+
 
 class BooleanFieldTests(unittest.TestCase):
     def _test_get_db_prep_lookup(self, f):
@@ -275,13 +281,27 @@ class BooleanFieldTests(unittest.TestCase):
         Check that a BooleanField defaults to None -- which isn't
         a valid value (#15124).
         """
-        b = BooleanModel()
-        self.assertIsNone(b.bfield)
-        with self.assertRaises(IntegrityError):
-            b.save()
+        # Patch the boolean field's default value. We give it a default
+        # value when defining the model to satisfy the check tests
+        # #20895.
+        boolean_field = BooleanModel._meta.get_field('bfield')
+        self.assertTrue(boolean_field.has_default())
+        old_default = boolean_field.default
+        try:
+            boolean_field.default = NOT_PROVIDED
+            # check patch was succcessful
+            self.assertFalse(boolean_field.has_default())
+            b = BooleanModel()
+            self.assertIsNone(b.bfield)
+            with self.assertRaises(IntegrityError):
+                b.save()
+        finally:
+            boolean_field.default = old_default
+
         nb = NullBooleanModel()
         self.assertIsNone(nb.nbfield)
         nb.save()           # no error
+
 
 class ChoicesTests(test.TestCase):
     def test_choices_and_field_display(self):
@@ -294,6 +314,7 @@ class ChoicesTests(test.TestCase):
         self.assertEqual(Whiz(c=9).get_c_display(), 9)          # Invalid value
         self.assertEqual(Whiz(c=None).get_c_display(), None)    # Blank value
         self.assertEqual(Whiz(c='').get_c_display(), '')        # Empty value
+
 
 class SlugFieldTests(test.TestCase):
     def test_slugfield_max_length(self):
@@ -398,6 +419,7 @@ class BigIntegerFieldTests(test.TestCase):
         b = BigInt.objects.get(value='10')
         self.assertEqual(b.value, 10)
 
+
 class TypeCoercionTests(test.TestCase):
     """
     Test that database lookups can accept the wrong types and convert
@@ -410,6 +432,7 @@ class TypeCoercionTests(test.TestCase):
 
     def test_lookup_integer_in_textfield(self):
         self.assertEqual(Post.objects.filter(body=24).count(), 0)
+
 
 class FileFieldTests(unittest.TestCase):
     def test_clearable(self):
@@ -485,6 +508,7 @@ class BinaryFieldTests(test.TestCase):
         dm = DataModel(short_data=self.binary_data * 4)
         self.assertRaises(ValidationError, dm.full_clean)
 
+
 class GenericIPAddressFieldTests(test.TestCase):
     def test_genericipaddressfield_formfield_protocol(self):
         """
@@ -506,7 +530,7 @@ class PromiseTest(test.TestCase):
             AutoField(primary_key=True).get_prep_value(lazy_func()),
             int)
 
-    @skipIf(six.PY3, "Python 3 has no `long` type.")
+    @unittest.skipIf(six.PY3, "Python 3 has no `long` type.")
     def test_BigIntegerField(self):
         lazy_func = lazy(lambda: long(9999999999999999999), long)
         self.assertIsInstance(
@@ -593,9 +617,11 @@ class PromiseTest(test.TestCase):
 
     def test_IPAddressField(self):
         lazy_func = lazy(lambda: '127.0.0.1', six.text_type)
-        self.assertIsInstance(
-            IPAddressField().get_prep_value(lazy_func()),
-            six.text_type)
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            self.assertIsInstance(
+                IPAddressField().get_prep_value(lazy_func()),
+                six.text_type)
 
     def test_GenericIPAddressField(self):
         lazy_func = lazy(lambda: '127.0.0.1', six.text_type)
@@ -650,3 +676,26 @@ class PromiseTest(test.TestCase):
         self.assertIsInstance(
             URLField().get_prep_value(lazy_func()),
             six.text_type)
+
+
+class CustomFieldTests(unittest.TestCase):
+
+    def test_14786(self):
+        """
+        Regression test for #14786 -- Test that field values are not prepared
+        twice in get_db_prep_lookup().
+        """
+        class NoopField(models.TextField):
+            def __init__(self, *args, **kwargs):
+                self.prep_value_count = 0
+                super(NoopField, self).__init__(*args, **kwargs)
+
+            def get_prep_value(self, value):
+                self.prep_value_count += 1
+                return super(NoopField, self).get_prep_value(value)
+
+        field = NoopField()
+        field.get_db_prep_lookup(
+            'exact', 'TEST', connection=connection, prepared=False
+        )
+        self.assertEqual(field.prep_value_count, 1)

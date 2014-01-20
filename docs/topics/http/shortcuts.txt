@@ -15,14 +15,19 @@ introduce controlled coupling for convenience's sake.
 ``render``
 ==========
 
-.. function:: render(request, template_name[, dictionary][, context_instance][, content_type][, status][, current_app])
+.. function:: render(request, template_name[, dictionary][, context_instance][, content_type][, status][, current_app][, dirs])
 
    Combines a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
 
    :func:`render()` is the same as a call to
-   :func:`render_to_response()` with a `context_instance` argument that
+   :func:`render_to_response()` with a ``context_instance`` argument that
    forces the use of a :class:`~django.template.RequestContext`.
+
+   Django does not provide a shortcut function which returns a
+   :class:`~django.template.response.TemplateResponse` because the constructor
+   of :class:`~django.template.response.TemplateResponse` offers the same level
+   of convenience as :func:`render()`.
 
 Required arguments
 ------------------
@@ -50,10 +55,6 @@ Optional arguments
     The MIME type to use for the resulting document. Defaults to the value of
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
 
-    .. versionchanged:: 1.5
-
-        This parameter used to be called ``mimetype``.
-
 ``status``
     The status code for the response. Defaults to ``200``.
 
@@ -61,6 +62,13 @@ Optional arguments
     A hint indicating which application contains the current view. See the
     :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`
     for more information.
+
+``dirs``
+    A tuple or list of values to override the :setting:`TEMPLATE_DIRS` setting.
+
+.. versionchanged:: 1.7
+
+   The ``dirs`` parameter was added.
 
 Example
 -------
@@ -82,16 +90,24 @@ This example is equivalent to::
 
     def my_view(request):
         # View code here...
-        t = loader.get_template('myapp/template.html')
+        t = loader.get_template('myapp/index.html')
         c = RequestContext(request, {'foo': 'bar'})
         return HttpResponse(t.render(c),
             content_type="application/xhtml+xml")
 
+If you want to override the :setting:`TEMPLATE_DIRS` setting, use the
+``dirs`` parameter::
+
+    from django.shortcuts import render
+
+    def my_view(request):
+        # View code here...
+        return render(request, 'index.html', dirs=('custom_templates',))
 
 ``render_to_response``
 ======================
 
-.. function:: render_to_response(template_name[, dictionary][, context_instance][, content_type])
+.. function:: render_to_response(template_name[, dictionary][, context_instance][, content_type][, dirs])
 
    Renders a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
@@ -129,10 +145,12 @@ Optional arguments
     The MIME type to use for the resulting document. Defaults to the value of
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
 
-    .. versionchanged:: 1.5
+``dirs``
+    A tuple or list of values to override the :setting:`TEMPLATE_DIRS` setting.
 
-        This parameter used to be called ``mimetype``.
+.. versionchanged:: 1.7
 
+   The ``dirs`` parameter was added.
 
 Example
 -------
@@ -154,10 +172,19 @@ This example is equivalent to::
 
     def my_view(request):
         # View code here...
-        t = loader.get_template('myapp/template.html')
+        t = loader.get_template('myapp/index.html')
         c = Context({'foo': 'bar'})
         return HttpResponse(t.render(c),
             content_type="application/xhtml+xml")
+
+If you want to override the :setting:`TEMPLATE_DIRS` setting, use the
+``dirs`` parameter::
+
+    from django.shortcuts import render_to_response
+
+    def my_view(request):
+        # View code here...
+        return render_to_response('index.html', dirs=('custom_templates',))
 
 ``redirect``
 ============
@@ -169,7 +196,8 @@ This example is equivalent to::
 
    The arguments could be:
 
-   * A model: the model's `get_absolute_url()` function will be called.
+   * A model: the model's :meth:`~django.db.models.Model.get_absolute_url()`
+     function will be called.
 
    * A view name, possibly with arguments: :func:`urlresolvers.reverse
      <django.core.urlresolvers.reverse>` will be used to reverse-resolve the
@@ -238,9 +266,10 @@ Required arguments
 ------------------
 
 ``klass``
-    A :class:`~django.db.models.Model`, :class:`~django.db.models.Manager` or
-    :class:`~django.db.models.query.QuerySet` instance from which to get the
-    object.
+    A :class:`~django.db.models.Model` class,
+    a :class:`~django.db.models.Manager`,
+    or a :class:`~django.db.models.query.QuerySet` instance from which to get
+    the object.
 
 ``**kwargs``
     Lookup parameters, which should be in the format accepted by ``get()`` and
@@ -266,6 +295,32 @@ This example is equivalent to::
             my_object = MyModel.objects.get(pk=1)
         except MyModel.DoesNotExist:
             raise Http404
+
+The most common use case is to pass a :class:`~django.db.models.Model`, as
+shown above. However, you can also pass a
+:class:`~django.db.models.query.QuerySet` instance::
+
+    queryset = Book.objects.filter(title__startswith='M')
+    get_object_or_404(queryset, pk=1)
+
+The above example is a bit contrived since it's equivalent to doing::
+
+    get_object_or_404(Book, title__startswith='M', pk=1)
+
+but it can be useful if you are passed the ``queryset`` variable from somewhere
+else.
+
+Finally, you can also use a :class:`~django.db.models.Manager`. This is useful
+for example if you have a
+:ref:`custom manager<custom-managers>`::
+
+    get_object_or_404(Book.dahl_objects, title='Matilda')
+
+You can also use
+:class:`related managers<django.db.models.fields.related.RelatedManager>`::
+
+    author = Author.objects.get(name='Roald Dahl')
+    get_object_or_404(author.book_set, title='Matilda')
 
 Note: As with ``get()``, a
 :class:`~django.core.exceptions.MultipleObjectsReturned` exception

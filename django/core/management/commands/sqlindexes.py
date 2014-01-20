@@ -6,6 +6,7 @@ from django.core.management.base import AppCommand
 from django.core.management.sql import sql_indexes
 from django.db import connections, DEFAULT_DB_ALIAS
 
+
 class Command(AppCommand):
     help = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
 
@@ -18,5 +19,9 @@ class Command(AppCommand):
 
     output_transaction = True
 
-    def handle_app(self, app, **options):
-        return '\n'.join(sql_indexes(app, self.style, connections[options.get('database')]))
+    def handle_app_config(self, app_config, **options):
+        if app_config.models_module is None:
+            return
+        connection = connections[options.get('database')]
+        statements = sql_indexes(app_config, self.style, connection)
+        return '\n'.join(statements)

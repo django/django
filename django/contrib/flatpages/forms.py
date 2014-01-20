@@ -3,12 +3,13 @@ from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
 from django.utils.translation import ugettext, ugettext_lazy as _
 
+
 class FlatpageForm(forms.ModelForm):
     url = forms.RegexField(label=_("URL"), max_length=100, regex=r'^[-\w/\.~]+$',
-        help_text = _("Example: '/about/contact/'. Make sure to have leading"
-                      " and trailing slashes."),
-        error_message = _("This value must contain only letters, numbers,"
-                          " dots, underscores, dashes, slashes or tildes."))
+        help_text=_("Example: '/about/contact/'. Make sure to have leading"
+                    " and trailing slashes."),
+        error_message=_("This value must contain only letters, numbers,"
+                        " dots, underscores, dashes, slashes or tildes."))
 
     class Meta:
         model = FlatPage
@@ -22,8 +23,8 @@ class FlatpageForm(forms.ModelForm):
                 code='missing_leading_slash',
             )
         if (settings.APPEND_SLASH and
-            'django.middleware.common.CommonMiddleware' in settings.MIDDLEWARE_CLASSES and
-            not url.endswith('/')):
+                'django.middleware.common.CommonMiddleware' in settings.MIDDLEWARE_CLASSES and
+                not url.endswith('/')):
             raise forms.ValidationError(
                 ugettext("URL is missing a trailing slash."),
                 code='missing_trailing_slash',

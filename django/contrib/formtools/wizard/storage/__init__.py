@@ -5,6 +5,10 @@ from django.contrib.formtools.wizard.storage.base import BaseStorage
 from django.contrib.formtools.wizard.storage.exceptions import (
     MissingStorage, NoFileStorageConfigured)
 
+__all__ = [
+    "BaseStorage", "MissingStorage", "NoFileStorageConfigured", "get_storage",
+]
+
 
 def get_storage(path, *args, **kwargs):
     try:

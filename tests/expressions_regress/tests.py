@@ -7,7 +7,8 @@ import datetime
 
 from django.db import connection
 from django.db.models import F
-from django.test import TestCase, Approximate, skipUnlessDBFeature
+from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import Approximate
 
 from .models import Number, Experiment
 
@@ -78,11 +79,11 @@ class ExpressionsRegressTests(TestCase):
         """
         n = Number.objects.create(integer=10, float=123.45)
         self.assertEqual(Number.objects.filter(pk=n.pk)
-                                .update(float=F('integer') + F('float') * 2),
-                          1)
+            .update(float=F('integer') + F('float') * 2), 1)
 
         self.assertEqual(Number.objects.get(pk=n.pk).integer, 10)
         self.assertEqual(Number.objects.get(pk=n.pk).float, Approximate(256.900, places=3))
+
 
 class ExpressionOperatorTests(TestCase):
     def setUp(self):
@@ -144,6 +145,13 @@ class ExpressionOperatorTests(TestCase):
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 58)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
+    def test_lefthand_power(self):
+        # LH Powert arithmetic operation on floats and integers
+        Number.objects.filter(pk=self.n.pk).update(integer=F('integer') ** 2,
+                                                float=F('float') ** 1.5)
+        self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 1764)
+        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(61.02, places=2))
+
     def test_right_hand_addition(self):
         # Right hand operators
         Number.objects.filter(pk=self.n.pk).update(integer=15 + F('integer'),
@@ -184,6 +192,13 @@ class ExpressionOperatorTests(TestCase):
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 27)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
+    def test_righthand_power(self):
+        # RH Powert arithmetic operation on floats and integers
+        Number.objects.filter(pk=self.n.pk).update(integer=2 ** F('integer'),
+                                                float=1.5 ** F('float'))
+        self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 4398046511104)
+        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(536.308, places=3))
+
 
 class FTimeDeltaTests(TestCase):
 
@@ -205,13 +220,13 @@ class FTimeDeltaTests(TestCase):
         self.days_long = []
 
         # e0: started same day as assigned, zero duration
-        end = stime+delta0
+        end = stime + delta0
         e0 = Experiment.objects.create(name='e0', assigned=sday, start=stime,
             end=end, completed=end.date())
         self.deltas.append(delta0)
-        self.delays.append(e0.start-
+        self.delays.append(e0.start -
             datetime.datetime.combine(e0.assigned, midnight))
-        self.days_long.append(e0.completed-e0.assigned)
+        self.days_long.append(e0.completed - e0.assigned)
 
         # e1: started one day after assigned, tiny duration, data
         # set so that end time has no fractional seconds, which
@@ -222,86 +237,93 @@ class FTimeDeltaTests(TestCase):
             delay = datetime.timedelta(1)
             end = stime + delay + delta1
             e1 = Experiment.objects.create(name='e1', assigned=sday,
-                start=stime+delay, end=end, completed=end.date())
+                start=stime + delay, end=end, completed=end.date())
             self.deltas.append(delta1)
-            self.delays.append(e1.start-
+            self.delays.append(e1.start -
                 datetime.datetime.combine(e1.assigned, midnight))
-            self.days_long.append(e1.completed-e1.assigned)
+            self.days_long.append(e1.completed - e1.assigned)
 
         # e2: started three days after assigned, small duration
-        end = stime+delta2
+        end = stime + delta2
         e2 = Experiment.objects.create(name='e2',
-            assigned=sday-datetime.timedelta(3), start=stime, end=end,
+            assigned=sday - datetime.timedelta(3), start=stime, end=end,
             completed=end.date())
         self.deltas.append(delta2)
-        self.delays.append(e2.start-
+        self.delays.append(e2.start -
             datetime.datetime.combine(e2.assigned, midnight))
-        self.days_long.append(e2.completed-e2.assigned)
+        self.days_long.append(e2.completed - e2.assigned)
 
         # e3: started four days after assigned, medium duration
         delay = datetime.timedelta(4)
         end = stime + delay + delta3
         e3 = Experiment.objects.create(name='e3',
-            assigned=sday, start=stime+delay, end=end, completed=end.date())
+            assigned=sday, start=stime + delay, end=end, completed=end.date())
         self.deltas.append(delta3)
-        self.delays.append(e3.start-
+        self.delays.append(e3.start -
             datetime.datetime.combine(e3.assigned, midnight))
-        self.days_long.append(e3.completed-e3.assigned)
+        self.days_long.append(e3.completed - e3.assigned)
 
         # e4: started 10 days after assignment, long duration
         end = stime + delta4
         e4 = Experiment.objects.create(name='e4',
-            assigned=sday-datetime.timedelta(10), start=stime, end=end,
+            assigned=sday - datetime.timedelta(10), start=stime, end=end,
             completed=end.date())
         self.deltas.append(delta4)
-        self.delays.append(e4.start-
+        self.delays.append(e4.start -
             datetime.datetime.combine(e4.assigned, midnight))
-        self.days_long.append(e4.completed-e4.assigned)
+        self.days_long.append(e4.completed - e4.assigned)
         self.expnames = [e.name for e in Experiment.objects.all()]
+
+    def test_multiple_query_compilation(self):
+        # Ticket #21643
+        queryset = Experiment.objects.filter(end__lt=F('start') + datetime.timedelta(hours=1))
+        q1 = str(queryset.query)
+        q2 = str(queryset.query)
+        self.assertEqual(q1, q2)
 
     def test_delta_add(self):
         for i in range(len(self.deltas)):
             delta = self.deltas[i]
             test_set = [e.name for e in
-                Experiment.objects.filter(end__lt=F('start')+delta)]
+                Experiment.objects.filter(end__lt=F('start') + delta)]
             self.assertEqual(test_set, self.expnames[:i])
 
             test_set = [e.name for e in
-                Experiment.objects.filter(end__lte=F('start')+delta)]
-            self.assertEqual(test_set, self.expnames[:i+1])
+                Experiment.objects.filter(end__lte=F('start') + delta)]
+            self.assertEqual(test_set, self.expnames[:i + 1])
 
     def test_delta_subtract(self):
         for i in range(len(self.deltas)):
             delta = self.deltas[i]
             test_set = [e.name for e in
-                Experiment.objects.filter(start__gt=F('end')-delta)]
+                Experiment.objects.filter(start__gt=F('end') - delta)]
             self.assertEqual(test_set, self.expnames[:i])
 
             test_set = [e.name for e in
-                Experiment.objects.filter(start__gte=F('end')-delta)]
-            self.assertEqual(test_set, self.expnames[:i+1])
+                Experiment.objects.filter(start__gte=F('end') - delta)]
+            self.assertEqual(test_set, self.expnames[:i + 1])
 
     def test_exclude(self):
         for i in range(len(self.deltas)):
             delta = self.deltas[i]
             test_set = [e.name for e in
-                Experiment.objects.exclude(end__lt=F('start')+delta)]
+                Experiment.objects.exclude(end__lt=F('start') + delta)]
             self.assertEqual(test_set, self.expnames[i:])
 
             test_set = [e.name for e in
-                Experiment.objects.exclude(end__lte=F('start')+delta)]
-            self.assertEqual(test_set, self.expnames[i+1:])
+                Experiment.objects.exclude(end__lte=F('start') + delta)]
+            self.assertEqual(test_set, self.expnames[i + 1:])
 
     def test_date_comparison(self):
         for i in range(len(self.days_long)):
             days = self.days_long[i]
             test_set = [e.name for e in
-                Experiment.objects.filter(completed__lt=F('assigned')+days)]
+                Experiment.objects.filter(completed__lt=F('assigned') + days)]
             self.assertEqual(test_set, self.expnames[:i])
 
             test_set = [e.name for e in
-                Experiment.objects.filter(completed__lte=F('assigned')+days)]
-            self.assertEqual(test_set, self.expnames[:i+1])
+                Experiment.objects.filter(completed__lte=F('assigned') + days)]
+            self.assertEqual(test_set, self.expnames[:i + 1])
 
     @skipUnlessDBFeature("supports_mixed_date_datetime_comparisons")
     def test_mixed_comparisons1(self):
@@ -310,35 +332,35 @@ class FTimeDeltaTests(TestCase):
             if not connection.features.supports_microsecond_precision:
                 delay = datetime.timedelta(delay.days, delay.seconds)
             test_set = [e.name for e in
-                Experiment.objects.filter(assigned__gt=F('start')-delay)]
+                Experiment.objects.filter(assigned__gt=F('start') - delay)]
             self.assertEqual(test_set, self.expnames[:i])
 
             test_set = [e.name for e in
-                Experiment.objects.filter(assigned__gte=F('start')-delay)]
-            self.assertEqual(test_set, self.expnames[:i+1])
+                Experiment.objects.filter(assigned__gte=F('start') - delay)]
+            self.assertEqual(test_set, self.expnames[:i + 1])
 
     def test_mixed_comparisons2(self):
         delays = [datetime.timedelta(delay.days) for delay in self.delays]
         for i in range(len(delays)):
             delay = delays[i]
             test_set = [e.name for e in
-                Experiment.objects.filter(start__lt=F('assigned')+delay)]
+                Experiment.objects.filter(start__lt=F('assigned') + delay)]
             self.assertEqual(test_set, self.expnames[:i])
 
             test_set = [e.name for e in
-                Experiment.objects.filter(start__lte=F('assigned')+delay+
+                Experiment.objects.filter(start__lte=F('assigned') + delay +
                     datetime.timedelta(1))]
-            self.assertEqual(test_set, self.expnames[:i+1])
+            self.assertEqual(test_set, self.expnames[:i + 1])
 
     def test_delta_update(self):
         for i in range(len(self.deltas)):
             delta = self.deltas[i]
             exps = Experiment.objects.all()
             expected_durations = [e.duration() for e in exps]
-            expected_starts = [e.start+delta for e in exps]
-            expected_ends = [e.end+delta for e in exps]
+            expected_starts = [e.start + delta for e in exps]
+            expected_ends = [e.end + delta for e in exps]
 
-            Experiment.objects.update(start=F('start')+delta, end=F('end')+delta)
+            Experiment.objects.update(start=F('start') + delta, end=F('end') + delta)
             exps = Experiment.objects.all()
             new_starts = [e.start for e in exps]
             new_ends = [e.end for e in exps]
@@ -350,7 +372,7 @@ class FTimeDeltaTests(TestCase):
     def test_delta_invalid_op_mult(self):
         raised = False
         try:
-            r = repr(Experiment.objects.filter(end__lt=F('start')*self.deltas[0]))
+            repr(Experiment.objects.filter(end__lt=F('start') * self.deltas[0]))
         except TypeError:
             raised = True
         self.assertTrue(raised, "TypeError not raised on attempt to multiply datetime by timedelta.")
@@ -358,7 +380,7 @@ class FTimeDeltaTests(TestCase):
     def test_delta_invalid_op_div(self):
         raised = False
         try:
-            r = repr(Experiment.objects.filter(end__lt=F('start')/self.deltas[0]))
+            repr(Experiment.objects.filter(end__lt=F('start') / self.deltas[0]))
         except TypeError:
             raised = True
         self.assertTrue(raised, "TypeError not raised on attempt to divide datetime by timedelta.")
@@ -366,7 +388,7 @@ class FTimeDeltaTests(TestCase):
     def test_delta_invalid_op_mod(self):
         raised = False
         try:
-            r = repr(Experiment.objects.filter(end__lt=F('start')%self.deltas[0]))
+            repr(Experiment.objects.filter(end__lt=F('start') % self.deltas[0]))
         except TypeError:
             raised = True
         self.assertTrue(raised, "TypeError not raised on attempt to modulo divide datetime by timedelta.")
@@ -374,7 +396,7 @@ class FTimeDeltaTests(TestCase):
     def test_delta_invalid_op_and(self):
         raised = False
         try:
-            r = repr(Experiment.objects.filter(end__lt=F('start').bitand(self.deltas[0])))
+            repr(Experiment.objects.filter(end__lt=F('start').bitand(self.deltas[0])))
         except TypeError:
             raised = True
         self.assertTrue(raised, "TypeError not raised on attempt to binary and a datetime with a timedelta.")
@@ -382,7 +404,7 @@ class FTimeDeltaTests(TestCase):
     def test_delta_invalid_op_or(self):
         raised = False
         try:
-            r = repr(Experiment.objects.filter(end__lt=F('start').bitor(self.deltas[0])))
+            repr(Experiment.objects.filter(end__lt=F('start').bitor(self.deltas[0])))
         except TypeError:
             raised = True
         self.assertTrue(raised, "TypeError not raised on attempt to binary or a datetime with a timedelta.")

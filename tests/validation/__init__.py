@@ -13,4 +13,3 @@ class ValidationTestCase(TestCase):
             clean()
         self.assertIn(field_name, cm.exception.message_dict)
         self.assertEqual(message, cm.exception.message_dict[field_name])
-

@@ -6,7 +6,9 @@ import unittest
 from zipimport import zipimporter
 
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.module_loading import import_by_path, module_has_submodule
+from django.test import SimpleTestCase, modify_settings
+from django.utils import six
+from django.utils.module_loading import autodiscover_modules, import_by_path, module_has_submodule
 from django.utils._os import upath
 
 
@@ -41,13 +43,14 @@ class DefaultLoader(unittest.TestCase):
         self.assertRaises(ImportError, import_module, 'utils_tests.test_module.django')
 
         # Don't be confused by caching of import misses
-        import types  # causes attempted import of utils_tests.types
+        import types  # NOQA: causes attempted import of utils_tests.types
         self.assertFalse(module_has_submodule(sys.modules['utils_tests'], 'types'))
 
         # A module which doesn't have a __path__ (so no submodules)
         self.assertFalse(module_has_submodule(test_no_submodule, 'anything'))
         self.assertRaises(ImportError, import_module,
             'utils_tests.test_no_submodule.anything')
+
 
 class EggLoader(unittest.TestCase):
     def setUp(self):
@@ -131,6 +134,33 @@ class ModuleImportTestCase(unittest.TestCase):
             'Should have more than the calling frame in the traceback.')
 
 
+@modify_settings(INSTALLED_APPS={'append': 'utils_tests.test_module'})
+class AutodiscoverModulesTestCase(SimpleTestCase):
+
+    def test_autodiscover_modules_found(self):
+        autodiscover_modules('good_module')
+
+    def test_autodiscover_modules_not_found(self):
+        autodiscover_modules('missing_module')
+
+    def test_autodiscover_modules_found_but_bad_module(self):
+        with six.assertRaisesRegex(self, ImportError, "No module named '?a_package_name_that_does_not_exist'?"):
+            autodiscover_modules('bad_module')
+
+    def test_autodiscover_modules_several_one_bad_module(self):
+        with six.assertRaisesRegex(self, ImportError, "No module named '?a_package_name_that_does_not_exist'?"):
+            autodiscover_modules('good_module', 'bad_module')
+
+    def test_autodiscover_modules_several_found(self):
+        autodiscover_modules('good_module', 'another_good_module')
+
+    def test_validate_registry_keeps_intact(self):
+        from .test_module import site
+        with six.assertRaisesRegex(self, Exception, "Some random exception."):
+            autodiscover_modules('another_bad_module', register_to=site)
+        self.assertEqual(site._registry, {})
+
+
 class ProxyFinder(object):
     def __init__(self):
         self._cache = {}
@@ -159,6 +189,7 @@ class ProxyFinder(object):
             if fd:
                 fd.close()
 
+
 class TestFinder(object):
     def __init__(self, *args, **kwargs):
         self.importer = zipimporter(*args, **kwargs)
@@ -169,6 +200,7 @@ class TestFinder(object):
             return
         return TestLoader(importer)
 
+
 class TestLoader(object):
     def __init__(self, importer):
         self.importer = importer
@@ -177,6 +209,7 @@ class TestLoader(object):
         mod = self.importer.load_module(name)
         mod.__loader__ = self
         return mod
+
 
 class CustomLoader(EggLoader):
     """The Custom Loader test is exactly the same as the EggLoader, but

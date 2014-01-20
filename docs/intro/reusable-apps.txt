@@ -19,7 +19,7 @@ could save some of this repeated work?
 Reusability is the way of life in Python. `The Python Package Index (PyPI)
 <http://guide.python-distribute.org/contributing.html#pypi-info>`_ has a vast
 range of packages you can use in your own Python programs. Check out `Django
-Packages <http://www.djangopackages.com>`_ for existing reusable apps you could
+Packages <https://www.djangopackages.com>`_ for existing reusable apps you could
 incorporate in your project. Django itself is also just a Python package. This
 means that you can take existing Python packages or Django apps and compose
 them into your own web project. You only need to write the parts that make
@@ -42,9 +42,10 @@ projects and ready to publish for others to install and use.
     bar``. For a directory (like ``polls``) to form a package, it must contain
     a special file ``__init__.py``, even if this file is empty.
 
-    A Django *app* is just a Python package that is specifically intended for
-    use in a Django project. An app may also use common Django conventions,
-    such as having a ``models.py`` file.
+    A Django *application* is just a Python package that is specifically
+    intended for use in a Django project. An application may use common Django
+    conventions, such as having ``models``, ``tests``, ``urls``, and ``views``
+    submodules.
 
     Later on we use the term *packaging* to describe the process of making a
     Python package easy for others to install. It can be a little confusing, we
@@ -100,15 +101,15 @@ Installing some prerequisites
 =============================
 
 The current state of Python packaging is a bit muddled with various tools. For
-this tutorial, we're going to use distribute_ to build our package. It's a
-community-maintained fork of the older ``setuptools`` project. We'll also be
-using `pip`_ to uninstall it after we're finished. You should install these
+this tutorial, we're going to use setuptools_ to build our package. It's the
+recommended packaging tool (merged with the ``distribute`` fork). We'll also be
+using `pip`_ to install and uninstall it. You should install these
 two packages now. If you need help, you can refer to :ref:`how to install
-Django with pip<installing-official-release>`. You can install ``distribute``
+Django with pip<installing-official-release>`. You can install ``setuptools``
 the same way.
 
-.. _distribute: http://pypi.python.org/pypi/distribute
-.. _pip: http://pypi.python.org/pypi/pip
+.. _setuptools: https://pypi.python.org/pypi/setuptools
+.. _pip: https://pypi.python.org/pypi/pip
 
 Packaging your app
 ==================
@@ -120,111 +121,123 @@ this. For a small app like polls, this process isn't too difficult.
 1. First, create a parent directory for ``polls``, outside of your Django
    project. Call this directory ``django-polls``.
 
-.. admonition::  Choosing a name for your app
+   .. admonition::  Choosing a name for your app
 
-   When choosing a name for your package, check resources like PyPI to avoid
-   naming conflicts with existing packages. It's often useful to prepend
-   ``django-`` to your module name when creating a package to distribute.
-   This helps others looking for Django apps identify your app as Django
-   specific.
+       When choosing a name for your package, check resources like PyPI to avoid
+       naming conflicts with existing packages. It's often useful to prepend
+       ``django-`` to your module name when creating a package to distribute.
+       This helps others looking for Django apps identify your app as Django
+       specific.
+
+       Application labels (that is, the final part of the dotted path to
+       application packages) *must* be unique in :setting:`INSTALLED_APPS`.
+       Avoid using the same label as any of the Django :doc:`contrib packages
+       </ref/contrib/index>`, for example ``auth``, ``admin``, or
+       ``messages``.
 
 2. Move the ``polls`` directory into the ``django-polls`` directory.
 
-3. Create a file ``django-polls/README.rst`` with the following contents::
+3. Create a file ``django-polls/README.rst`` with the following contents:
 
-    =====
-    Polls
-    =====
+   .. snippet::
+       :filename: django-polls/README.rst
 
-    Polls is a simple Django app to conduct Web-based polls. For each
-    question, visitors can choose between a fixed number of answers.
+       =====
+       Polls
+       =====
 
-    Detailed documentation is in the "docs" directory.
+       Polls is a simple Django app to conduct Web-based polls. For each
+       question, visitors can choose between a fixed number of answers.
 
-    Quick start
-    -----------
+       Detailed documentation is in the "docs" directory.
 
-    1. Add "polls" to your INSTALLED_APPS setting like this::
+       Quick start
+       -----------
 
-          INSTALLED_APPS = (
-              ...
-              'polls',
-          )
+       1. Add "polls" to your INSTALLED_APPS setting like this::
 
-    2. Include the polls URLconf in your project urls.py like this::
+           INSTALLED_APPS = (
+               ...
+               'polls',
+           )
 
-          url(r'^polls/', include('polls.urls')),
+       2. Include the polls URLconf in your project urls.py like this::
 
-    3. Run `python manage.py syncdb` to create the polls models.
+           url(r'^polls/', include('polls.urls')),
 
-    4. Start the development server and visit http://127.0.0.1:8000/admin/
-       to create a poll (you'll need the Admin app enabled).
+       3. Run `python manage.py migrate` to create the polls models.
 
-    5. Visit http://127.0.0.1:8000/polls/ to participate in the poll.
+       4. Start the development server and visit http://127.0.0.1:8000/admin/
+          to create a poll (you'll need the Admin app enabled).
+
+       5. Visit http://127.0.0.1:8000/polls/ to participate in the poll.
 
 4. Create a ``django-polls/LICENSE`` file. Choosing a license is beyond the
-scope of this tutorial, but suffice it to say that code released publicly
-without a license is *useless*. Django and many Django-compatible apps are
-distributed under the BSD license; however, you're free to pick your own
-license. Just be aware that your licensing choice will affect who is able
-to use your code.
+   scope of this tutorial, but suffice it to say that code released publicly
+   without a license is *useless*. Django and many Django-compatible apps are
+   distributed under the BSD license; however, you're free to pick your own
+   license. Just be aware that your licensing choice will affect who is able
+   to use your code.
 
 5. Next we'll create a ``setup.py`` file which provides details about how to
-build and install the app.  A full explanation of this file is beyond the
-scope of this tutorial, but the `distribute docs
-<http://packages.python.org/distribute/setuptools.html>`_ have a good explanation.
-Create a file ``django-polls/setup.py`` with the following contents::
+   build and install the app.  A full explanation of this file is beyond the
+   scope of this tutorial, but the `setuptools docs
+   <http://pythonhosted.org/setuptools/setuptools.html>`_ have a good
+   explanation. Create a file ``django-polls/setup.py`` with the following
+   contents:
 
-    import os
-    from setuptools import setup
+   .. snippet::
+       :filename: django-polls/setup.py
 
-    README = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
+       import os
+       from setuptools import setup
 
-    # allow setup.py to be run from any path
-    os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
+       README = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
 
-    setup(
-        name='django-polls',
-        version='0.1',
-        packages=['polls'],
-        include_package_data=True,
-        license='BSD License',  # example license
-        description='A simple Django app to conduct Web-based polls.',
-        long_description=README,
-        url='http://www.example.com/',
-        author='Your Name',
-        author_email='yourname@example.com',
-        classifiers=[
-            'Environment :: Web Environment',
-            'Framework :: Django',
-            'Intended Audience :: Developers',
-            'License :: OSI Approved :: BSD License', # example license
-            'Operating System :: OS Independent',
-            'Programming Language :: Python',
-            'Programming Language :: Python :: 2.6',
-            'Programming Language :: Python :: 2.7',
-            'Topic :: Internet :: WWW/HTTP',
-            'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-        ],
-    )
+       # allow setup.py to be run from any path
+       os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
-.. admonition:: I thought you said we were going to use ``distribute``?
-
-    Distribute is a drop-in replacement for ``setuptools``. Even though we
-    appear to import from ``setuptools``, since we have ``distribute``
-    installed, it will override the import.
+       setup(
+           name='django-polls',
+           version='0.1',
+           packages=['polls'],
+           include_package_data=True,
+           license='BSD License',  # example license
+           description='A simple Django app to conduct Web-based polls.',
+           long_description=README,
+           url='http://www.example.com/',
+           author='Your Name',
+           author_email='yourname@example.com',
+           classifiers=[
+               'Environment :: Web Environment',
+               'Framework :: Django',
+               'Intended Audience :: Developers',
+               'License :: OSI Approved :: BSD License', # example license
+               'Operating System :: OS Independent',
+               'Programming Language :: Python',
+               # Replace these appropriately if you are stuck on Python 2.
+               'Programming Language :: Python :: 3',
+               'Programming Language :: Python :: 3.2',
+               'Programming Language :: Python :: 3.3',
+               'Topic :: Internet :: WWW/HTTP',
+               'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+           ],
+       )
 
 6. Only Python modules and packages are included in the package by default. To
    include additional files, we'll need to create a ``MANIFEST.in`` file. The
-   distribute docs referred to in the previous step discuss this file in more
+   setuptools docs referred to in the previous step discuss this file in more
    details. To include the templates, the ``README.rst`` and our ``LICENSE``
    file, create a file ``django-polls/MANIFEST.in`` with the following
-   contents::
+   contents:
 
-    include LICENSE
-    include README.rst
-    recursive-include polls/static *
-    recursive-include polls/templates *
+   .. snippet::
+       :filename: django-polls/MANIFEST.in
+
+       include LICENSE
+       include README.rst
+       recursive-include polls/static *
+       recursive-include polls/templates *
 
 7. It's optional, but recommended, to include detailed documentation with your
    app. Create an empty directory ``django-polls/docs`` for future
@@ -234,7 +247,7 @@ Create a file ``django-polls/setup.py`` with the following contents::
 
    Note that the ``docs`` directory won't be included in your package unless
    you add some files to it. Many Django apps also provide their documentation
-   online through sites like `readthedocs.org <http://readthedocs.org>`_.
+   online through sites like `readthedocs.org <https://readthedocs.org>`_.
 
 8. Try building your package with ``python setup.py sdist`` (run from inside
    ``django-polls``). This creates a directory called ``dist`` and builds your
@@ -261,29 +274,19 @@ working. We'll now fix this by installing our new ``django-polls`` package.
    tools that run as that user, so ``virtualenv`` is a more robust solution
    (see below).
 
-1. Inside ``django-polls/dist``, untar the new package
-   ``django-polls-0.1.tar.gz`` (e.g. ``tar xzvf django-polls-0.1.tar.gz``). If
-   you're using Windows, you can download the command-line tool bsdtar_ to do
-   this, or you can use a GUI-based tool such as 7-zip_.
+1. To install the package, use pip (you already :ref:`installed it
+   <installing-reusable-apps-prerequisites>`, right?)::
 
-2. Change into the directory created in step 1 (e.g. ``cd django-polls-0.1``).
+    pip install --user django-polls/dist/django-polls-0.1.tar.gz
 
-3. If you're using GNU/Linux, Mac OS X or some other flavor of Unix, enter the
-   command ``python setup.py install --user`` at the shell prompt.  If you're
-   using Windows, start up a command shell and run the command
-   ``setup.py install --user``.
-
-   With luck, your Django project should now work correctly again. Run the
+2. With luck, your Django project should now work correctly again. Run the
    server again to confirm this.
 
-4. To uninstall the package, use pip (you already :ref:`installed it
-   <installing-reusable-apps-prerequisites>`, right?)::
+3. To uninstall the package, use pip::
 
     pip uninstall django-polls
 
-.. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
-.. _7-zip: http://www.7-zip.org/
-.. _pip: http://pypi.python.org/pypi/pip
+.. _pip: https://pypi.python.org/pypi/pip
 
 Publishing your app
 ===================

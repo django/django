@@ -13,8 +13,8 @@ The tests cover:
 We appreciate any and all contributions to the test suite!
 
 The Django tests all use the testing infrastructure that ships with Django for
-testing applications. See :doc:`Testing Django applications
-</topics/testing/overview>` for an explanation of how to write new tests.
+testing applications. See :doc:`/topics/testing/overview` for an explanation of
+how to write new tests.
 
 .. _running-unit-tests:
 
@@ -30,20 +30,24 @@ sample settings module that uses the SQLite database. To run the tests:
 
 .. code-block:: bash
 
-    git clone git@github.com:django/django.git django-repo
-    cd django-repo/tests
-    ./runtests.py
+   $ git clone git@github.com:django/django.git django-repo
+   $ cd django-repo/tests
+   $ PYTHONPATH=..:$PYTHONPATH ./runtests.py
 
 .. versionchanged:: 1.7
 
-Older versions of Django required running the tests like this::
+Older versions of Django required specifying a settings file:
 
-    PYTHONPATH=..:$PYTHONPATH python ./runtests.py --settings=test_sqlite
+.. code-block:: bash
 
-``runtests.py`` now uses the Django package found at ``tests/../django`` (there
-isn't a need to add this on your ``PYTHONPATH``) and ``test_sqlite`` for the
-settings if settings aren't provided through either ``--settings`` or
-:envvar:`DJANGO_SETTINGS_MODULE`.
+   $ PYTHONPATH=..:$PYTHONPATH python ./runtests.py --settings=test_sqlite
+
+``runtests.py`` now uses ``test_sqlite`` by default if settings aren't provided
+through either ``--settings`` or :envvar:`DJANGO_SETTINGS_MODULE`.
+
+You can avoid typing the ``PYTHONPATH`` bit each time by adding your Django
+checkout to your ``PYTHONPATH`` or by installing the source checkout using pip.
+See :ref:`installing-development-version`.
 
 .. _running-unit-tests-settings:
 
@@ -64,27 +68,31 @@ two databases:
 * A ``default`` database. This database should use the backend that
   you want to use for primary testing
 
-* A database with the alias ``other``. The ``other`` database is
-  used to establish that queries can be directed to different
-  databases. As a result, this database can use any backend you
-  want. It doesn't need to use the same backend as the ``default``
-  database (although it can use the same backend if you want to).
+* A database with the alias ``other``. The ``other`` database is used to
+  establish that queries can be directed to different databases. As a result,
+  this database can use any backend you want. It doesn't need to use the same
+  backend as the ``default`` database (although it can use the same backend if
+  you want to). It cannot be the same database as the ``default``.
 
 If you're using a backend that isn't SQLite, you will need to provide other
 details for each database:
 
-* The :setting:`USER` option for each of your databases needs to
-  specify an existing user account for the database.
+* The :setting:`USER` option needs to specify an existing user account
+  for the database. That user needs permission to execute ``CREATE DATABASE``
+  so that the test database can be created.
 
 * The :setting:`PASSWORD` option needs to provide the password for
   the :setting:`USER` that has been specified.
 
-* The :setting:`NAME` option must be the name of an existing database to
-  which the given user has permission to connect. The unit tests will not
-  touch this database; the test runner creates a new database whose name
-  is :setting:`NAME` prefixed with ``test_``, and this test database is
-  deleted when the tests are finished. This means your user account needs
-  permission to execute ``CREATE DATABASE``.
+Test databases get their names by prepending ``test_`` to the value of the
+:setting:`NAME` settings for the databases defined in :setting:`DATABASES`.
+These test databases are deleted when the tests are finished.
+
+.. versionchanged:: 1.7
+
+    Before Django 1.7, the :setting:`NAME` setting was mandatory and had to
+    be the name of an existing database to which the given user had permission
+    to connect.
 
 You will also need to ensure that your database uses UTF-8 as the default
 character set. If your database server doesn't use UTF-8 as a default charset,
@@ -105,7 +113,7 @@ internationalization, type:
 
 .. code-block:: bash
 
-    ./runtests.py --settings=path.to.settings generic_relations i18n
+   $ ./runtests.py --settings=path.to.settings generic_relations i18n
 
 How do you find out the names of individual tests? Look in ``tests/`` — each
 directory name there is the name of a test. Contrib app names are also valid
@@ -117,13 +125,13 @@ of the ``i18n`` module, type:
 
 .. code-block:: bash
 
-    ./runtests.py --settings=path.to.settings i18n.TranslationTests
+   $ ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests
 
 Going beyond that, you can specify an individual test method like this:
 
 .. code-block:: bash
 
-    ./runtests.py --settings=path.to.settings i18n.TranslationTests.test_lazy_objects
+   $ ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests.test_lazy_objects
 
 Running the Selenium tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -135,7 +143,7 @@ the tests with the ``--selenium`` option:
 
 .. code-block:: bash
 
-    ./runtests.py --settings=test_sqlite --selenium admin_inlines
+   $ ./runtests.py --settings=test_sqlite --selenium admin_inlines
 
 
 .. _running-unit-tests-dependencies:
@@ -148,6 +156,7 @@ dependencies:
 
 *  bcrypt_
 *  docutils_
+*  numpy_
 *  Pillow_
 *  PyYAML_
 *  pytz_
@@ -158,9 +167,11 @@ dependencies:
 
 You can find these dependencies in `pip requirements files`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them
-like so::
+like so:
 
-    pip install -r tests/requirements/py2.txt  # Python 3: py3.txt
+.. code-block:: bash
+
+   $ pip install -r tests/requirements/py2.txt  # Python 3: py3.txt
 
 You can also install the database adapter(s) of your choice using
 ``oracle.txt``, ``mysql.txt``, or ``postgres.txt``.
@@ -176,14 +187,15 @@ associated tests will be skipped.
 
 .. _bcrypt: https://pypi.python.org/pypi/bcrypt
 .. _docutils: https://pypi.python.org/pypi/docutils
+.. _numpy: https://pypi.python.org/pypi/numpy
 .. _Pillow: https://pypi.python.org/pypi/Pillow/
 .. _PyYAML: http://pyyaml.org/wiki/PyYAML
 .. _pytz: https://pypi.python.org/pypi/pytz/
-.. _setuptools: http://pypi.python.org/pypi/setuptools/
+.. _setuptools: https://pypi.python.org/pypi/setuptools/
 .. _memcached: http://memcached.org/
 .. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
-.. _selenium: http://pypi.python.org/pypi/selenium
-.. _pip requirements files: http://www.pip-installer.org/en/latest/requirements.html
+.. _selenium: https://pypi.python.org/pypi/selenium
+.. _pip requirements files: http://www.pip-installer.org/en/latest/cookbook.html#requirements-files
 
 Code coverage
 ~~~~~~~~~~~~~
@@ -192,13 +204,17 @@ Contributors are encouraged to run coverage on the test suite to identify areas
 that need additional tests. The coverage tool installation and use is described
 in :ref:`testing code coverage<topics-testing-code-coverage>`.
 
-To run coverage on the Django test suite using the standard test settings::
+To run coverage on the Django test suite using the standard test settings:
 
-    coverage run ./runtests.py --settings=test_sqlite
+.. code-block:: bash
 
-After running coverage, generate the html report by running::
+   $ coverage run ./runtests.py --settings=test_sqlite
 
-    coverage html
+After running coverage, generate the html report by running:
+
+.. code-block:: bash
+
+   $ coverage html
 
 When running coverage for the Django tests, the included ``.coveragerc``
 settings file  defines ``coverage_html`` as the output directory for the report
@@ -214,10 +230,11 @@ Tests for contrib apps go in their respective directories under
 ``django/contrib``, in a ``tests.py`` file. You can split the tests over
 multiple modules by using a ``tests`` directory in the normal Python way.
 
-For the tests to be found, a ``models.py`` file must exist, even if it's empty.
 If you have URLs that need to be mapped, put them in ``tests/urls.py``.
 
 To run tests for just one contrib app (e.g. ``auth``), use the same
-method as above::
+method as above:
 
-    ./runtests.py --settings=settings auth
+.. code-block:: bash
+
+   $ ./runtests.py --settings=settings django.contrib.auth

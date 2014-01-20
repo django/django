@@ -6,17 +6,17 @@ import os
 import warnings
 import zipfile
 from optparse import make_option
-import warnings
 
+from django.apps import apps
 from django.conf import settings
 from django.core import serializers
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.db import (connections, router, transaction, DEFAULT_DB_ALIAS,
       IntegrityError, DatabaseError)
-from django.db.models import get_app_paths
+from django.utils import lru_cache
 from django.utils.encoding import force_text
-from django.utils.functional import cached_property, memoize
+from django.utils.functional import cached_property
 from django.utils._os import upath
 from itertools import product
 
@@ -47,8 +47,8 @@ class Command(BaseCommand):
 
         if not len(fixture_labels):
             raise CommandError(
-                    "No database fixture specified. Please provide the path "
-                    "of at least one fixture in the command line.")
+                "No database fixture specified. Please provide the path "
+                "of at least one fixture in the command line.")
 
         self.verbosity = int(options.get('verbosity'))
 
@@ -73,9 +73,9 @@ class Command(BaseCommand):
 
         self.serialization_formats = serializers.get_public_serializer_formats()
         self.compression_formats = {
-            None:   open,
-            'gz':   gzip.GzipFile,
-            'zip':  SingleZipReader
+            None: open,
+            'gz': gzip.GzipFile,
+            'zip': SingleZipReader
         }
         if has_bz2:
             self.compression_formats['bz2'] = bz2.BZ2File
@@ -134,18 +134,18 @@ class Command(BaseCommand):
 
                 for obj in objects:
                     objects_in_fixture += 1
-                    if router.allow_syncdb(self.using, obj.object.__class__):
+                    if router.allow_migrate(self.using, obj.object.__class__):
                         loaded_objects_in_fixture += 1
                         self.models.add(obj.object.__class__)
                         try:
                             obj.save(using=self.using)
                         except (DatabaseError, IntegrityError) as e:
                             e.args = ("Could not load %(app_label)s.%(object_name)s(pk=%(pk)s): %(error_msg)s" % {
-                                    'app_label': obj.object._meta.app_label,
-                                    'object_name': obj.object._meta.object_name,
-                                    'pk': obj.object.pk,
-                                    'error_msg': force_text(e)
-                                },)
+                                'app_label': obj.object._meta.app_label,
+                                'object_name': obj.object._meta.object_name,
+                                'pk': obj.object.pk,
+                                'error_msg': force_text(e)
+                            },)
                             raise
 
                 self.loaded_object_count += loaded_objects_in_fixture
@@ -165,7 +165,8 @@ class Command(BaseCommand):
                     RuntimeWarning
                 )
 
-    def _find_fixtures(self, fixture_label):
+    @lru_cache.lru_cache(maxsize=None)
+    def find_fixtures(self, fixture_label):
         """
         Finds fixture files for a given label.
         """
@@ -173,12 +174,6 @@ class Command(BaseCommand):
         databases = [self.using, None]
         cmp_fmts = list(self.compression_formats.keys()) if cmp_fmt is None else [cmp_fmt]
         ser_fmts = serializers.get_public_serializer_formats() if ser_fmt is None else [ser_fmt]
-
-        # Check kept for backwards-compatibility; it doesn't look very useful.
-        if '.' in os.path.basename(fixture_name):
-            raise CommandError(
-                    "Problem installing fixture '%s': %s is not a known "
-                    "serialization format." % tuple(fixture_name.rsplit('.')))
 
         if self.verbosity >= 2:
             self.stdout.write("Loading '%s' fixtures..." % fixture_name)
@@ -188,6 +183,10 @@ class Command(BaseCommand):
             fixture_name = os.path.basename(fixture_name)
         else:
             fixture_dirs = self.fixture_dirs
+            if os.path.sep in fixture_name:
+                fixture_dirs = [os.path.join(dir_, os.path.dirname(fixture_name))
+                                for dir_ in fixture_dirs]
+                fixture_name = os.path.basename(fixture_name)
 
         suffixes = ('.'.join(ext for ext in combo if ext)
                 for combo in product(databases, ser_fmts, cmp_fmts))
@@ -211,8 +210,8 @@ class Command(BaseCommand):
             # duplicates are only allowed in different directories.
             if len(fixture_files_in_dir) > 1:
                 raise CommandError(
-                        "Multiple fixtures named '%s' in %s. Aborting." %
-                        (fixture_name, humanize(fixture_dir)))
+                    "Multiple fixtures named '%s' in %s. Aborting." %
+                    (fixture_name, humanize(fixture_dir)))
             fixture_files.extend(fixture_files_in_dir)
 
         if fixture_name != 'initial_data' and not fixture_files:
@@ -220,9 +219,6 @@ class Command(BaseCommand):
             warnings.warn("No fixture named '%s' found." % fixture_name)
 
         return fixture_files
-
-    _label_to_fixtures_cache = {}
-    find_fixtures = memoize(_find_fixtures, _label_to_fixtures_cache, 2)
 
     @cached_property
     def fixture_dirs(self):
@@ -234,8 +230,8 @@ class Command(BaseCommand):
         current directory.
         """
         dirs = []
-        for path in get_app_paths():
-            d = os.path.join(path, 'fixtures')
+        for app_config in apps.get_app_configs():
+            d = os.path.join(app_config.path, 'fixtures')
             if os.path.isdir(d):
                 dirs.append(d)
         dirs.extend(list(settings.FIXTURE_DIRS))
@@ -255,9 +251,14 @@ class Command(BaseCommand):
         else:
             cmp_fmt = None
 
-        if len(parts) > 1 and parts[-1] in self.serialization_formats:
-            ser_fmt = parts[-1]
-            parts = parts[:-1]
+        if len(parts) > 1:
+            if parts[-1] in self.serialization_formats:
+                ser_fmt = parts[-1]
+                parts = parts[:-1]
+            else:
+                raise CommandError(
+                    "Problem installing fixture '%s': %s is not a known "
+                    "serialization format." % (''.join(parts[:-1]), parts[-1]))
         else:
             ser_fmt = None
 

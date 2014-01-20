@@ -25,17 +25,18 @@ User objects
 authentication system. They typically represent the people interacting with
 your site and are used to enable things like restricting access, registering
 user profiles, associating content with creators etc. Only one class of user
-exists in Django's authentication framework, i.e., 'superusers' or admin
-'staff' users are just user objects with special attributes set, not different
-classes of user objects.
+exists in Django's authentication framework, i.e., :attr:`'superusers'
+<django.contrib.auth.models.User.is_superuser>` or admin :attr:`'staff'
+<django.contrib.auth.models.User.is_staff>` users are just user objects with
+special attributes set, not different classes of user objects.
 
 The primary attributes of the default user are:
 
-* username
-* password
-* email
-* first name
-* last name
+* :attr:`~django.contrib.auth.models.User.username`
+* :attr:`~django.contrib.auth.models.User.password`
+* :attr:`~django.contrib.auth.models.User.email`
+* :attr:`~django.contrib.auth.models.User.first_name`
+* :attr:`~django.contrib.auth.models.User.last_name`
 
 See the :class:`full API documentation <django.contrib.auth.models.User>` for
 full reference, the documentation that follows is more task oriented.
@@ -65,12 +66,12 @@ interactively <auth-admin>`.
 Creating superusers
 -------------------
 
-:djadmin:`manage.py syncdb <syncdb>` prompts you to create a superuser the
+:djadmin:`manage.py migrate <migrate>` prompts you to create a superuser the
 first time you run it with ``'django.contrib.auth'`` in your
 :setting:`INSTALLED_APPS`. If you need to create a superuser at a later date,
 you can use a command line utility::
 
-    manage.py createsuperuser --username=joe --email=joe@example.com
+    $ python manage.py createsuperuser --username=joe --email=joe@example.com
 
 You will be prompted for a password. After you enter one, the user will be
 created immediately. If you leave off the :djadminopt:`--username` or the
@@ -100,7 +101,7 @@ You can also change a password programmatically, using
 .. code-block:: python
 
     >>> from django.contrib.auth.models import User
-    >>> u = User.objects.get(username__exact='john')
+    >>> u = User.objects.get(username='john')
     >>> u.set_password('new password')
     >>> u.save()
 
@@ -190,13 +191,13 @@ setting, it will ensure that three default permissions -- add, change and
 delete -- are created for each Django model defined in one of your installed
 applications.
 
-These permissions will be created when you run :djadmin:`manage.py syncdb
-<syncdb>`; the first time you run ``syncdb`` after adding
+These permissions will be created when you run :djadmin:`manage.py migrate
+<migrate>`; the first time you run ``migrate`` after adding
 ``django.contrib.auth`` to :setting:`INSTALLED_APPS`, the default permissions
 will be created for all previously-installed models, as well as for any new
 models being installed at that time. Afterward, it will create default
-permissions for new models each time you run :djadmin:`manage.py syncdb
-<syncdb>`.
+permissions for new models each time you run :djadmin:`manage.py migrate
+<migrate>`.
 
 Assuming you have an application with an
 :attr:`~django.db.models.Options.app_label` ``foo`` and a model named ``Bar``,
@@ -434,12 +435,10 @@ The login_required decorator
 
         (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 
-    .. versionchanged:: 1.5
-
-        The :setting:`settings.LOGIN_URL <LOGIN_URL>` also accepts
-        view function names and :ref:`named URL patterns <naming-url-patterns>`.
-        This allows you to freely remap your login view within your URLconf
-        without having to update the setting.
+    The :setting:`settings.LOGIN_URL <LOGIN_URL>` also accepts view function
+    names and :ref:`named URL patterns <naming-url-patterns>`. This allows you
+    to freely remap your login view within your URLconf without having to
+    update the setting.
 
 .. note::
 
@@ -494,7 +493,7 @@ checks to make sure the user has an email in the desired domain::
 The permission_required decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: permission_required([login_url=None, raise_exception=False])
+.. function:: permission_required(perm, [login_url=None, raise_exception=False])
 
     It's a relatively common task to check whether a user has a particular
     permission. For that reason, Django provides a shortcut for that case: the
@@ -579,8 +578,7 @@ patterns.
       log the user in. Defaults to :file:`registration/login.html`.
 
     * ``redirect_field_name``: The name of a ``GET`` field containing the
-      URL to redirect to after login. Overrides ``next`` if the given
-      ``GET`` parameter is passed.
+      URL to redirect to after login. Defaults to ``next``.
 
     * ``authentication_form``: A callable (typically just a form class) to
       use for authentication. Defaults to
@@ -697,8 +695,8 @@ patterns.
       :file:`registration/logged_out.html` if no argument is supplied.
 
     * ``redirect_field_name``: The name of a ``GET`` field containing the
-      URL to redirect to after log out. Overrides ``next_page`` if the given
-      ``GET`` parameter is passed.
+      URL to redirect to after log out. Defaults to ``next``. Overrides the
+      ``next_page`` URL if the given ``GET`` parameter is passed.
 
     * ``current_app``: A hint indicating which application contains the current
       view. See the :ref:`namespaced URL resolution strategy
@@ -1186,10 +1184,6 @@ Thus, you can check permissions in template ``{% if %}`` statements:
     {% else %}
         <p>You don't have permission to do anything in the foo app.</p>
     {% endif %}
-
-.. versionadded:: 1.5
-
-    Permission lookup by "if in".
 
 It is possible to also look permissions up by ``{% if in %}`` statements.
 For example:

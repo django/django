@@ -87,6 +87,9 @@ and in production.
 Cache servers often have weak authentication. Make sure they only accept
 connections from your application servers.
 
+If you're using Memcached, consider using :ref:`cached sessions
+<cached-sessions-backend>` to improve performance.
+
 :setting:`DATABASES`
 --------------------
 

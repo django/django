@@ -1,5 +1,8 @@
 [run]
 omit = */django/contrib/*/tests*,*/django/utils/unittest*,*/django/utils/importlib.py,*/django/test/_doctest.py,*/django/core/servers/fastcgi.py,*/django/utils/autoreload.py,*/django/utils/dictconfig.py
 
+[report]
+ignore_errors = True
+
 [html]
 directory = coverage_html

@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 import re
-from unittest import expectedFailure
+from unittest import expectedFailure, skipUnless
 
 from django.core.management import call_command
 from django.db import connection
@@ -14,6 +14,7 @@ if connection.vendor == 'oracle':
 else:
     expectedFailureOnOracle = lambda f: f
 
+
 class InspectDBTestCase(TestCase):
 
     def test_stealth_table_name_filter_option(self):
@@ -21,7 +22,7 @@ class InspectDBTestCase(TestCase):
         # Lets limit the introspection to tables created for models of this
         # application
         call_command('inspectdb',
-                     table_name_filter=lambda tn:tn.startswith('inspectdb_'),
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
                      stdout=out)
         error_message = "inspectdb has examined a table that should have been filtered out."
         # contrib.contenttypes is one of the apps always installed when running
@@ -35,14 +36,16 @@ class InspectDBTestCase(TestCase):
         """Test introspection of various Django field types"""
         out = StringIO()
         call_command('inspectdb',
-                     table_name_filter=lambda tn:tn.startswith('inspectdb_columntypes'),
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'),
                      stdout=out)
         output = out.getvalue()
+
         def assertFieldType(name, definition):
             out_def = re.search(r'^\s*%s = (models.*)$' % name, output, re.MULTILINE).groups()[0]
             self.assertEqual(definition, out_def)
 
-        assertFieldType('id', "models.IntegerField(primary_key=True)")
+        if not connection.features.can_introspect_autofield:
+            assertFieldType('id', "models.IntegerField(primary_key=True)  # AutoField?")
         assertFieldType('big_int_field', "models.BigIntegerField()")
         if connection.vendor == 'mysql':
             # No native boolean type on MySQL
@@ -57,7 +60,7 @@ class InspectDBTestCase(TestCase):
         assertFieldType('date_time_field', "models.DateTimeField()")
         if connection.vendor == 'sqlite':
             # Guessed arguments, see #5014
-            assertFieldType('decimal_field', "models.DecimalField(max_digits=10, decimal_places=5) "
+            assertFieldType('decimal_field', "models.DecimalField(max_digits=10, decimal_places=5)  "
                 "# max_digits and decimal_places have been guessed, as this database handles decimal fields as float")
         else:
             assertFieldType('decimal_field', "models.DecimalField(max_digits=6, decimal_places=1)")
@@ -98,7 +101,7 @@ class InspectDBTestCase(TestCase):
         # Lets limit the introspection to tables created for models of this
         # application
         call_command('inspectdb',
-                     table_name_filter=lambda tn:tn.startswith('inspectdb_'),
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
                      stdout=out)
         output = out.getvalue()
         error_message = "inspectdb generated an attribute name which is a python keyword"
@@ -119,7 +122,7 @@ class InspectDBTestCase(TestCase):
         # Lets limit the introspection to tables created for models of this
         # application
         call_command('inspectdb',
-                     table_name_filter=lambda tn:tn.startswith('inspectdb_'),
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
                      stdout=out)
         output = out.getvalue()
         error_message = "inspectdb generated a model field name which is a number"
@@ -157,8 +160,30 @@ class InspectDBTestCase(TestCase):
         """Test that by default the command generates models with `Meta.managed = False` (#14305)"""
         out = StringIO()
         call_command('inspectdb',
-                     table_name_filter=lambda tn:tn.startswith('inspectdb_columntypes'),
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'),
                      stdout=out)
         output = out.getvalue()
         self.longMessage = False
         self.assertIn("        managed = False", output, msg='inspectdb should generate unmanaged models.')
+
+    @skipUnless(connection.vendor == 'sqlite',
+        "Only patched sqlite's DatabaseIntrospection.data_types_reverse for this test")
+    def test_custom_fields(self):
+        """
+        Introspection of columns with a custom field (#21090)
+        """
+        out = StringIO()
+        orig_data_types_reverse = connection.introspection.data_types_reverse
+        try:
+            connection.introspection.data_types_reverse = {
+                'text': 'myfields.TextField',
+                'bigint': 'BigIntegerField',
+            }
+            call_command('inspectdb',
+                         table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'),
+                         stdout=out)
+            output = out.getvalue()
+            self.assertIn("text_field = myfields.TextField()", output)
+            self.assertIn("big_int_field = models.BigIntegerField()", output)
+        finally:
+            connection.introspection.data_types_reverse = orig_data_types_reverse

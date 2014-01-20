@@ -13,6 +13,7 @@ class Parent(models.Model):
     # Use a simple string for forward declarations.
     bestchild = models.ForeignKey("Child", null=True, related_name="favoured_by")
 
+
 class Child(models.Model):
     name = models.CharField(max_length=100)
 

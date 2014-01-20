@@ -9,6 +9,7 @@ from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.gdal.field import OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime
 from django.utils import six
 
+
 def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):
     """
     Given a DataSource, generates a dictionary that may be used
@@ -37,13 +38,17 @@ def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):
     # Generating the field name for each field in the layer.
     for field in data_source[layer_key].fields:
         mfield = field.lower()
-        if mfield[-1:] == '_': mfield += 'field'
+        if mfield[-1:] == '_':
+            mfield += 'field'
         _mapping[mfield] = field
     gtype = data_source[layer_key].geom_type
-    if multi_geom and gtype.num in (1, 2, 3): prefix = 'MULTI'
-    else: prefix = ''
+    if multi_geom and gtype.num in (1, 2, 3):
+        prefix = 'MULTI'
+    else:
+        prefix = ''
     _mapping[geom_name] = prefix + str(gtype).upper()
     return _mapping
+
 
 def ogrinspect(*args, **kwargs):
     """
@@ -115,6 +120,7 @@ def ogrinspect(*args, **kwargs):
     """
     return '\n'.join(s for s in _ogrinspect(*args, **kwargs))
 
+
 def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=None,
                 multi_geom=False, name_field=None, imports=True,
                 decimal=False, blank=False, null=False):
@@ -151,10 +157,14 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
     # Gets the `null` and `blank` keywords for the given field name.
     def get_kwargs_str(field_name):
         kwlist = []
-        if field_name.lower() in null_fields: kwlist.append('null=True')
-        if field_name.lower() in blank_fields: kwlist.append('blank=True')
-        if kwlist: return ', ' + ', '.join(kwlist)
-        else: return ''
+        if field_name.lower() in null_fields:
+            kwlist.append('null=True')
+        if field_name.lower() in blank_fields:
+            kwlist.append('blank=True')
+        if kwlist:
+            return ', ' + ', '.join(kwlist)
+        else:
+            return ''
 
     # For those wishing to disable the imports.
     if imports:
@@ -167,7 +177,8 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
     for field_name, width, precision, field_type in zip(ogr_fields, layer.field_widths, layer.field_precisions, layer.field_types):
         # The model field name.
         mfield = field_name.lower()
-        if mfield[-1:] == '_': mfield += 'field'
+        if mfield[-1:] == '_':
+            mfield += 'field'
 
         # Getting the keyword args string.
         kwargs_str = get_kwargs_str(field_name)

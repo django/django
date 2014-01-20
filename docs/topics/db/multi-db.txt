@@ -73,14 +73,14 @@ If you attempt to access a database that you haven't defined in your
 Synchronizing your databases
 ============================
 
-The :djadmin:`syncdb` management command operates on one database at a
+The :djadmin:`migrate` management command operates on one database at a
 time. By default, it operates on the ``default`` database, but by
-providing a :djadminopt:`--database` argument, you can tell syncdb to
-synchronize a different database. So, to synchronize all models onto
+providing a :djadminopt:`--database` argument, you can tell :djadmin:`migrate`
+to synchronize a different database. So, to synchronize all models onto
 all databases in our example, you would need to call::
 
-    $ ./manage.py syncdb
-    $ ./manage.py syncdb --database=users
+    $ ./manage.py migrate
+    $ ./manage.py migrate --database=users
 
 If you don't want every application to be synchronized onto a
 particular database, you can define a :ref:`database
@@ -97,7 +97,7 @@ Using other management commands
 -------------------------------
 
 The other ``django-admin.py`` commands that interact with the database
-operate in the same way as :djadmin:`syncdb` -- they only ever operate
+operate in the same way as :djadmin:`migrate` -- they only ever operate
 on one database at a time, using :djadminopt:`--database` to control
 the database used.
 
@@ -155,13 +155,22 @@ A database Router is a class that provides up to four methods:
     used by foreign key and many to many operations to determine if a
     relation should be allowed between two objects.
 
-.. method:: allow_syncdb(db, model)
+.. method:: allow_migrate(db, model)
 
-    Determine if the ``model`` should be synchronized onto the
+    Determine if the ``model`` should have tables/indexes created in the
     database with alias ``db``. Return True if the model should be
-    synchronized, False if it should not be synchronized, or None if
+    migrated, False if it should not be migrated, or None if
     the router has no opinion. This method can be used to determine
     the availability of a model on a given database.
+
+    Note that migrations will just silently not perform any operations
+    on a model for which this returns ``False``. This may result in broken
+    ForeignKeys, extra tables or missing tables if you change it once you
+    have applied some migrations.
+
+    The value passed for ``model`` may be a
+    :ref:`historical model <historical-models>`, and thus not have any
+    custom attributes, methods or managers. You should only rely on ``_meta``.
 
 A router doesn't have to provide *all* these methods -- it may omit one
 or more of them. If one of the methods is omitted, Django will skip
@@ -288,7 +297,7 @@ send queries for the ``auth`` app to ``auth_db``::
                return True
             return None
 
-        def allow_syncdb(self, db, model):
+        def allow_migrate(self, db, model):
             """
             Make sure the auth app only appears in the 'auth_db'
             database.
@@ -328,7 +337,7 @@ from::
                 return True
             return None
 
-        def allow_syncdb(self, db, model):
+        def allow_migrate(self, db, model):
             """
             All non-auth models end up in this pool.
             """
@@ -347,7 +356,7 @@ be queried in the order the are listed in the
 result, decisions concerning the models in ``auth`` are processed
 before any other decision is made. If the :setting:`DATABASE_ROUTERS`
 setting listed the two routers in the other order,
-``MasterSlaveRouter.allow_syncdb()`` would be processed first. The
+``MasterSlaveRouter.allow_migrate()`` would be processed first. The
 catch-all nature of the MasterSlaveRouter implementation would mean
 that all models would be available on all databases.
 
@@ -433,7 +442,7 @@ Consider the following example::
 
 In statement 1, a new ``Person`` object is saved to the ``first``
 database. At this time, ``p`` doesn't have a primary key, so Django
-issues a SQL ``INSERT`` statement. This creates a primary key, and
+issues an SQL ``INSERT`` statement. This creates a primary key, and
 Django assigns that primary key to ``p``.
 
 When the save occurs in statement 2, ``p`` already has a primary key
@@ -457,7 +466,7 @@ database::
     >>> p.save(using='second') # Write a completely new object.
 
 The second option is to use the ``force_insert`` option to ``save()``
-to ensure that Django does a SQL ``INSERT``::
+to ensure that Django does an SQL ``INSERT``::
 
     >>> p = Person(name='Fred')
     >>> p.save(using='first')
@@ -672,7 +681,7 @@ how you can split these models across databases:
   in the same database as ``sites``.
 
 In addition, some objects are automatically created just after
-:djadmin:`syncdb` creates a table to hold them in a database:
+:djadmin:`migrate` creates a table to hold them in a database:
 
 - a default ``Site``,
 - a ``ContentType`` for each model (including those not stored in that
@@ -680,16 +689,11 @@ In addition, some objects are automatically created just after
 - three ``Permission`` for each model (including those not stored in that
   database).
 
-.. versionchanged:: 1.5
-
-    Previously, ``ContentType`` and ``Permission`` instances were created only
-    in the default database.
-
 For common setups with multiple databases, it isn't useful to have these
 objects in more than one database. Common setups include master / slave and
 connecting to external databases. Therefore, it's recommended:
 
-- either to run :djadmin:`syncdb` only for the default database;
+- either to run :djadmin:`migrate` only for the default database;
 - or to write :ref:`database router<topics-db-multi-db-routing>` that allows
   synchronizing these three models only to one database.
 

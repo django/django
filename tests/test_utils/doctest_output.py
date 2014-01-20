@@ -59,7 +59,7 @@ __test__ = {"API_TEST": r"""
 
 """}
 
-if not six.PY3:
+if six.PY2:
     __test__["API_TEST"] += """
 >>> def produce_long():
 ...     return 42L

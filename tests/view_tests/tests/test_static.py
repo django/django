@@ -6,8 +6,7 @@ import unittest
 
 from django.conf.urls.static import static
 from django.http import HttpResponseNotModified
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from django.test import SimpleTestCase, override_settings
 from django.utils.http import http_date
 from django.views.static import was_modified_since
 
@@ -19,13 +18,14 @@ from ..urls import media_dir
 class StaticTests(SimpleTestCase):
     """Tests django views in django/views/static.py"""
 
+    urls = 'view_tests.urls'
     prefix = 'site_media'
 
     def test_serve(self):
         "The static view can serve static media"
         media_files = ['file.txt', 'file.txt.gz']
         for filename in media_files:
-            response = self.client.get('/views/%s/%s' % (self.prefix, filename))
+            response = self.client.get('/%s/%s' % (self.prefix, filename))
             response_content = b''.join(response)
             file_path = path.join(media_dir, filename)
             with open(file_path, 'rb') as fp:
@@ -34,19 +34,19 @@ class StaticTests(SimpleTestCase):
             self.assertEqual(mimetypes.guess_type(file_path)[1], response.get('Content-Encoding', None))
 
     def test_unknown_mime_type(self):
-        response = self.client.get('/views/%s/file.unknown' % self.prefix)
+        response = self.client.get('/%s/file.unknown' % self.prefix)
         self.assertEqual('application/octet-stream', response['Content-Type'])
 
     def test_copes_with_empty_path_component(self):
         file_name = 'file.txt'
-        response = self.client.get('/views/%s//%s' % (self.prefix, file_name))
+        response = self.client.get('/%s//%s' % (self.prefix, file_name))
         response_content = b''.join(response)
         with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response_content)
 
     def test_is_modified_since(self):
         file_name = 'file.txt'
-        response = self.client.get('/views/%s/%s' % (self.prefix, file_name),
+        response = self.client.get('/%s/%s' % (self.prefix, file_name),
             HTTP_IF_MODIFIED_SINCE='Thu, 1 Jan 1970 00:00:00 GMT')
         response_content = b''.join(response)
         with open(path.join(media_dir, file_name), 'rb') as fp:
@@ -55,11 +55,11 @@ class StaticTests(SimpleTestCase):
     def test_not_modified_since(self):
         file_name = 'file.txt'
         response = self.client.get(
-            '/views/%s/%s' % (self.prefix, file_name),
+            '/%s/%s' % (self.prefix, file_name),
             HTTP_IF_MODIFIED_SINCE='Mon, 18 Jan 2038 05:14:07 GMT'
             # This is 24h before max Unix time. Remember to fix Django and
             # update this test well before 2038 :)
-            )
+        )
         self.assertIsInstance(response, HttpResponseNotModified)
 
     def test_invalid_if_modified_since(self):
@@ -70,13 +70,12 @@ class StaticTests(SimpleTestCase):
         """
         file_name = 'file.txt'
         invalid_date = 'Mon, 28 May 999999999999 28:25:26 GMT'
-        response = self.client.get('/views/%s/%s' % (self.prefix, file_name),
+        response = self.client.get('/%s/%s' % (self.prefix, file_name),
                                    HTTP_IF_MODIFIED_SINCE=invalid_date)
         response_content = b''.join(response)
         with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response_content)
-        self.assertEqual(len(response_content),
-                          int(response['Content-Length']))
+        self.assertEqual(len(response_content), int(response['Content-Length']))
 
     def test_invalid_if_modified_since2(self):
         """Handle even more bogus If-Modified-Since values gracefully
@@ -86,16 +85,15 @@ class StaticTests(SimpleTestCase):
         """
         file_name = 'file.txt'
         invalid_date = ': 1291108438, Wed, 20 Oct 2010 14:05:00 GMT'
-        response = self.client.get('/views/%s/%s' % (self.prefix, file_name),
+        response = self.client.get('/%s/%s' % (self.prefix, file_name),
                                    HTTP_IF_MODIFIED_SINCE=invalid_date)
         response_content = b''.join(response)
         with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response_content)
-        self.assertEqual(len(response_content),
-                          int(response['Content-Length']))
+        self.assertEqual(len(response_content), int(response['Content-Length']))
 
     def test_404(self):
-        response = self.client.get('/views/%s/non_existing_resource' % self.prefix)
+        response = self.client.get('/%s/non_existing_resource' % self.prefix)
         self.assertEqual(404, response.status_code)
 
 

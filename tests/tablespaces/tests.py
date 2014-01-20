@@ -1,12 +1,9 @@
 from __future__ import unicode_literals
 
-import copy
-
+from django.apps import apps
 from django.conf import settings
 from django.db import connection
-from django.db import models
-from django.db.models.loading import cache
-from django.core.management.color import no_style 
+from django.core.management.color import no_style
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import Article, ArticleRef, Authors, Reviewers, Scientist, ScientistRef
@@ -15,8 +12,10 @@ from .models import Article, ArticleRef, Authors, Reviewers, Scientist, Scientis
 # because they're evaluated when the model class is defined. As a consequence,
 # @override_settings doesn't work, and the tests depend
 
+
 def sql_for_table(model):
     return '\n'.join(connection.creation.sql_create_model(model, no_style())[0])
+
 
 def sql_for_index(model):
     return '\n'.join(connection.creation.sql_indexes_for_model(model, no_style()))
@@ -27,8 +26,7 @@ class TablespacesTests(TestCase):
     def setUp(self):
         # The unmanaged models need to be removed after the test in order to
         # prevent bad interactions with the flush operation in other tests.
-        self.old_app_models = copy.deepcopy(cache.app_models)
-        self.old_app_store = copy.deepcopy(cache.app_store)
+        self._old_models = apps.app_configs['tablespaces'].models.copy()
 
         for model in Article, Authors, Reviewers, Scientist:
             model._meta.managed = True
@@ -37,9 +35,9 @@ class TablespacesTests(TestCase):
         for model in Article, Authors, Reviewers, Scientist:
             model._meta.managed = False
 
-        cache.app_models = self.old_app_models
-        cache.app_store = self.old_app_store
-        cache._get_models_cache = {}
+        apps.app_configs['tablespaces'].models = self._old_models
+        apps.all_models['tablespaces'] = self._old_models
+        apps.clear_cache()
 
     def assertNumContains(self, haystack, needle, count):
         real_count = haystack.count(needle)

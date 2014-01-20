@@ -3,30 +3,30 @@ from __future__ import unicode_literals
 
 import locale
 
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.contrib.auth.management.commands import createsuperuser
 from django.contrib.auth.models import User, AnonymousUser
-from django.contrib.auth.tests.test_custom_user import CustomUser
+from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.dispatch import receiver
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.signals import setting_changed
-from django.test.utils import override_settings
 from django.utils import translation
 from django.utils.encoding import force_str
-from django.utils.six import binary_type, PY3, StringIO
+from django.utils.six import binary_type, PY2, StringIO
 
 
 @receiver(setting_changed)
 def user_model_swapped(**kwargs):
     if kwargs['setting'] == 'AUTH_USER_MODEL':
         from django.db.models.manager import ensure_default_manager
-        from django.contrib.auth.models import User
         # Reset User manager
         setattr(User, 'objects', User._default_manager)
         ensure_default_manager(User)
+        apps.clear_cache()
 
 
 def mock_inputs(inputs):
@@ -39,7 +39,7 @@ def mock_inputs(inputs):
             class mock_getpass:
                 @staticmethod
                 def getpass(prompt=b'Password: ', stream=None):
-                    if not PY3:
+                    if PY2:
                         # getpass on Windows only supports prompt as bytestring (#19807)
                         assert isinstance(prompt, binary_type)
                     return inputs['password']
@@ -131,7 +131,8 @@ class BasicTestCase(TestCase):
         "Check the operation of the createsuperuser management command"
         # We can use the management command to create a superuser
         new_io = StringIO()
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe",
             email="joe@somewhere.org",
@@ -147,7 +148,8 @@ class BasicTestCase(TestCase):
 
         # We can supress output on the management command
         new_io = StringIO()
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe2",
             email="joe2@somewhere.org",
@@ -160,7 +162,8 @@ class BasicTestCase(TestCase):
         self.assertEqual(u.email, 'joe2@somewhere.org')
         self.assertFalse(u.has_usable_password())
 
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe+admin@somewhere.org",
             email="joe@somewhere.org",
@@ -183,7 +186,8 @@ class BasicTestCase(TestCase):
             locale.getdefaultlocale = lambda: (None, None)
 
             # Call the command in this new environment
-            call_command("createsuperuser",
+            call_command(
+                "createsuperuser",
                 interactive=True,
                 username="nolocale@somewhere.org",
                 email="nolocale@somewhere.org",
@@ -213,7 +217,8 @@ class BasicTestCase(TestCase):
         username_field.verbose_name = ulazy('uživatel')
         new_io = StringIO()
         try:
-            call_command("createsuperuser",
+            call_command(
+                "createsuperuser",
                 interactive=True,
                 stdout=new_io
             )

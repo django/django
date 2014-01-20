@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 """
 A series of tests to establish that the command-line managment tools work as
 advertised - especially with regards to the handling of the DJANGO_SETTINGS_MODULE
 and default settings.py files.
 """
-from __future__ import unicode_literals
 
 import codecs
 import os
@@ -14,17 +15,20 @@ import socket
 import subprocess
 import sys
 import unittest
+import warnings
 
 import django
 from django import conf, get_version
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError, call_command
 from django.db import connection
-from django.test.runner import DiscoverRunner
 from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils.six import StringIO
-from django.test import LiveServerTestCase
+from django.test import LiveServerTestCase, TestCase
+from django.test.runner import DiscoverRunner
+from django.test.utils import str_prefix
 
 
 test_dir = os.path.realpath(os.path.join(os.environ['DJANGO_TEST_TEMP_DIR'], 'test_project'))
@@ -51,6 +55,7 @@ class AdminScriptTestCase(unittest.TestCase):
                 'DATABASES',
                 'ROOT_URLCONF',
                 'SECRET_KEY',
+                'TEST_RUNNER',  # We need to include TEST_RUNNER, otherwise we get a compatibility warning.
             ]
             for s in exports:
                 if hasattr(settings, s):
@@ -106,7 +111,6 @@ class AdminScriptTestCase(unittest.TestCase):
         return paths
 
     def run_test(self, script, args, settings_file=None, apps=None):
-        project_dir = test_dir
         base_dir = os.path.dirname(test_dir)
         # The base dir for Django's tests is one level up.
         tests_dir = os.path.dirname(os.path.dirname(__file__))
@@ -289,6 +293,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
+
 class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
     """A series of tests for django-admin.py when using a settings.py file that
     contains the test application specified using a full path.
@@ -355,6 +360,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
+
 class DjangoAdminMinimalSettings(AdminScriptTestCase):
     """A series of tests for django-admin.py when using a settings.py file that
     doesn't contain the test application.
@@ -377,14 +383,14 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         args = ['sqlall', '--settings=test_project.settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'App with label admin_scripts could not be found')
+        self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_environment(self):
         "minimal: django-admin builtin commands fail if settings are provided in the environment"
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_django_admin(args, 'test_project.settings')
         self.assertNoOutput(out)
-        self.assertOutput(err, 'App with label admin_scripts could not be found')
+        self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_bad_settings(self):
         "minimal: django-admin builtin commands fail if settings file (from argument) doesn't exist"
@@ -420,6 +426,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         out, err = self.run_django_admin(args, 'test_project.settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
+
 
 class DjangoAdminAlternateSettings(AdminScriptTestCase):
     """A series of tests for django-admin.py when using a settings file
@@ -796,6 +803,7 @@ class ManageFullPathDefaultSettings(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
+
 class ManageMinimalSettings(AdminScriptTestCase):
     """A series of tests for manage.py when using a settings.py file that
     doesn't contain the test application.
@@ -811,21 +819,21 @@ class ManageMinimalSettings(AdminScriptTestCase):
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'App with label admin_scripts could not be found')
+        self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_settings(self):
         "minimal: manage.py builtin commands fail if settings are provided as argument"
         args = ['sqlall', '--settings=test_project.settings', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'App with label admin_scripts could not be found')
+        self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_environment(self):
         "minimal: manage.py builtin commands fail if settings are provided in the environment"
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_manage(args, 'test_project.settings')
         self.assertNoOutput(out)
-        self.assertOutput(err, 'App with label admin_scripts could not be found')
+        self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_bad_settings(self):
         "minimal: manage.py builtin commands fail if settings file (from argument) doesn't exist"
@@ -861,6 +869,7 @@ class ManageMinimalSettings(AdminScriptTestCase):
         out, err = self.run_manage(args, 'test_project.settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
+
 
 class ManageAlternateSettings(AdminScriptTestCase):
     """A series of tests for manage.py when using a settings file
@@ -922,21 +931,21 @@ class ManageAlternateSettings(AdminScriptTestCase):
         "alternate: manage.py can execute user commands if settings are provided as argument"
         args = ['noargs_command', '--settings=alternate_settings']
         out, err = self.run_manage(args)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('no_color', False), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, str_prefix("EXECUTE:NoArgsCommand options=[('no_color', False), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', %(_)s'1')]"))
         self.assertNoOutput(err)
 
     def test_custom_command_with_environment(self):
         "alternate: manage.py can execute user commands if settings are provided in environment"
         args = ['noargs_command']
         out, err = self.run_manage(args, 'alternate_settings')
-        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, str_prefix("EXECUTE:NoArgsCommand options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
         self.assertNoOutput(err)
 
     def test_custom_command_output_color(self):
         "alternate: manage.py output syntax color can be deactivated with the `--no-color` option"
         args = ['noargs_command', '--no-color', '--settings=alternate_settings']
         out, err = self.run_manage(args)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('no_color', True), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, str_prefix("EXECUTE:NoArgsCommand options=[('no_color', True), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', %(_)s'1')]"))
         self.assertNoOutput(err)
 
 
@@ -959,7 +968,7 @@ class ManageMultipleSettings(AdminScriptTestCase):
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'App with label admin_scripts could not be found.')
+        self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_settings(self):
         "multiple: manage.py builtin commands succeed if settings are provided as argument"
@@ -1011,28 +1020,24 @@ class ManageMultipleSettings(AdminScriptTestCase):
         self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
 
-class ManageSettingsWithImportError(AdminScriptTestCase):
-    """Tests for manage.py when using the default settings.py file
-    with an import error. Ticket #14130.
+class ManageSettingsWithSettingsErrors(AdminScriptTestCase):
+    """
+    Tests for manage.py when using the default settings.py file containing
+    runtime errors.
     """
     def tearDown(self):
         self.remove_settings('settings.py')
 
-    def write_settings_with_import_error(self, filename, apps=None, is_dir=False, sdict=None):
-        if is_dir:
-            settings_dir = os.path.join(test_dir, filename)
-            os.mkdir(settings_dir)
-            settings_file_path = os.path.join(settings_dir, '__init__.py')
-        else:
-            settings_file_path = os.path.join(test_dir, filename)
+    def write_settings_with_import_error(self, filename):
+        settings_file_path = os.path.join(test_dir, filename)
         with open(settings_file_path, 'w') as settings_file:
             settings_file.write('# Settings file automatically generated by admin_scripts test case\n')
             settings_file.write('# The next line will cause an import error:\nimport foo42bar\n')
 
-    def test_builtin_command(self):
+    def test_import_error(self):
         """
         import error: manage.py builtin commands shows useful diagnostic info
-        when settings with import errors is provided
+        when settings with import errors is provided (#14130).
         """
         self.write_settings_with_import_error('settings.py')
         args = ['sqlall', 'admin_scripts']
@@ -1041,9 +1046,10 @@ class ManageSettingsWithImportError(AdminScriptTestCase):
         self.assertOutput(err, "No module named")
         self.assertOutput(err, "foo42bar")
 
-    def test_builtin_command_with_attribute_error(self):
+    def test_attribute_error(self):
         """
-        manage.py builtin commands does not swallow attribute errors from bad settings (#18845)
+        manage.py builtin commands does not swallow attribute error due to bad
+        settings (#18845).
         """
         self.write_settings('settings.py', sdict={'BAD_VAR': 'INSTALLED_APPS.crash'})
         args = ['collectstatic', 'admin_scripts']
@@ -1051,50 +1057,144 @@ class ManageSettingsWithImportError(AdminScriptTestCase):
         self.assertNoOutput(out)
         self.assertOutput(err, "AttributeError: 'list' object has no attribute 'crash'")
 
+    def test_key_error(self):
+        self.write_settings('settings.py', sdict={'BAD_VAR': 'DATABASES["blah"]'})
+        args = ['collectstatic', 'admin_scripts']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(out)
+        self.assertOutput(err, "KeyError: 'blah'")
 
-class ManageValidate(AdminScriptTestCase):
+    def test_help(self):
+        """
+        Test listing available commands output note when only core commands are
+        available.
+        """
+        self.write_settings('settings.py', sdict={'MEDIA_URL': '"/no_ending_slash"'})
+        args = ['help']
+        out, err = self.run_manage(args)
+        self.assertOutput(out, 'only Django core commands are listed')
+        self.assertNoOutput(err)
+
+
+class ManageCheck(AdminScriptTestCase):
     def tearDown(self):
         self.remove_settings('settings.py')
 
     def test_nonexistent_app(self):
-        "manage.py validate reports an error on a non-existent app in INSTALLED_APPS"
-        self.write_settings('settings.py', apps=['admin_scriptz.broken_app'], sdict={'USE_I18N': False})
-        args = ['validate']
+        """ manage.py check reports an error on a non-existent app in
+        INSTALLED_APPS """
+
+        self.write_settings('settings.py',
+            apps=['admin_scriptz.broken_app'],
+            sdict={'USE_I18N': False})
+        args = ['check']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
+        self.assertOutput(err, 'ImportError')
         self.assertOutput(err, 'No module named')
         self.assertOutput(err, 'admin_scriptz')
 
     def test_broken_app(self):
-        "manage.py validate reports an ImportError if an app's models.py raises one on import"
+        """ manage.py check reports an ImportError if an app's models.py
+        raises one on import """
+
         self.write_settings('settings.py', apps=['admin_scripts.broken_app'])
-        args = ['validate']
+        args = ['check']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'ImportError')
 
     def test_complex_app(self):
-        "manage.py validate does not raise an ImportError validating a complex app with nested calls to load_app"
-        self.write_settings('settings.py',
-            apps=['admin_scripts.complex_app', 'admin_scripts.simple_app'],
-            sdict={'DEBUG': True})
-        args = ['validate']
+        """ manage.py check does not raise an ImportError validating a
+        complex app with nested calls to load_app """
+
+        self.write_settings(
+            'settings.py',
+            apps=[
+                'admin_scripts.complex_app',
+                'admin_scripts.simple_app',
+                'django.contrib.admin',
+                'django.contrib.auth',
+                'django.contrib.contenttypes',
+            ],
+            sdict={
+                'DEBUG': True
+            }
+        )
+        args = ['check']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, '0 errors found')
+        self.assertEqual(out, 'System check identified no issues.\n')
 
     def test_app_with_import(self):
-        "manage.py validate does not raise errors when an app imports a base class that itself has an abstract base"
+        """ manage.py check does not raise errors when an app imports a base
+        class that itself has an abstract base. """
+
         self.write_settings('settings.py',
             apps=['admin_scripts.app_with_import',
                   'django.contrib.auth',
                   'django.contrib.contenttypes',
                   'django.contrib.sites'],
             sdict={'DEBUG': True})
-        args = ['validate']
+        args = ['check']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, '0 errors found')
+        self.assertEqual(out, 'System check identified no issues.\n')
+
+    def test_output_format(self):
+        """ All errors/warnings should be sorted by level and by message. """
+
+        self.write_settings('settings.py',
+            apps=['admin_scripts.app_raising_messages',
+                  'django.contrib.auth',
+                  'django.contrib.contenttypes'],
+            sdict={'DEBUG': True})
+        args = ['check']
+        out, err = self.run_manage(args)
+        expected_err = (
+            "CommandError: System check identified some issues:\n"
+            "\n"
+            "ERRORS:\n"
+            "?: An error\n"
+            "\tHINT: Error hint\n"
+            "\n"
+            "WARNINGS:\n"
+            "a: Second warning\n"
+            "obj: First warning\n"
+            "\tHINT: Hint\n"
+            "\n"
+            "System check identified 3 issues.\n"
+        )
+        self.assertEqual(err, expected_err)
+        self.assertNoOutput(out)
+
+    def test_warning_does_not_halt(self):
+        """
+        When there are only warnings or less serious messages, then Django
+        should not prevent user from launching their project, so `check`
+        command should not raise `CommandError` exception.
+
+        In this test we also test output format.
+
+        """
+
+        self.write_settings('settings.py',
+            apps=['admin_scripts.app_raising_warning',
+                  'django.contrib.auth',
+                  'django.contrib.contenttypes'],
+            sdict={'DEBUG': True})
+        args = ['check']
+        out, err = self.run_manage(args)
+        expected_err = (
+            "System check identified some issues:\n"  # No "CommandError: " part
+            "\n"
+            "WARNINGS:\n"
+            "?: A warning\n"
+            "\n"
+            "System check identified 1 issue.\n"
+        )
+        self.assertEqual(err, expected_err)
+        self.assertNoOutput(out)
 
 
 class CustomTestRunner(DiscoverRunner):
@@ -1105,6 +1205,7 @@ class CustomTestRunner(DiscoverRunner):
 
     def run_tests(self, test_labels, extra_tests=None, **kwargs):
         pass
+
 
 class ManageTestCommand(AdminScriptTestCase):
     def setUp(self):
@@ -1199,6 +1300,7 @@ class ManageRunserver(AdminScriptTestCase):
         self.cmd.handle(addrport="deadbeef:7654")
         self.assertServerSettings('deadbeef', '7654')
 
+
 class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
     def setUp(self):
         self.write_settings('settings.py', sdict={
@@ -1289,37 +1391,44 @@ class CommandTypes(AdminScriptTestCase):
     def test_base_command(self):
         "User BaseCommands can execute when a label is provided"
         args = ['base_command', 'testlabel']
-        out, err = self.run_manage(args)
-        self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_color', False), ('option_a', '1'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        expected_labels = "('testlabel',)"
+        self._test_base_command(args, expected_labels)
 
     def test_base_command_no_label(self):
         "User BaseCommands can execute when no labels are provided"
         args = ['base_command']
-        out, err = self.run_manage(args)
-        self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=(), options=[('no_color', False), ('option_a', '1'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        expected_labels = "()"
+        self._test_base_command(args, expected_labels)
 
     def test_base_command_multiple_label(self):
         "User BaseCommands can execute when no labels are provided"
         args = ['base_command', 'testlabel', 'anotherlabel']
-        out, err = self.run_manage(args)
-        self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel', 'anotherlabel'), options=[('no_color', False), ('option_a', '1'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        expected_labels = "('testlabel', 'anotherlabel')"
+        self._test_base_command(args, expected_labels)
 
     def test_base_command_with_option(self):
         "User BaseCommands can execute with options when a label is provided"
         args = ['base_command', 'testlabel', '--option_a=x']
-        out, err = self.run_manage(args)
-        self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_color', False), ('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        expected_labels = "('testlabel',)"
+        self._test_base_command(args, expected_labels, option_a="'x'")
 
     def test_base_command_with_options(self):
         "User BaseCommands can execute with multiple options when a label is provided"
         args = ['base_command', 'testlabel', '-a', 'x', '--option_b=y']
+        expected_labels = "('testlabel',)"
+        self._test_base_command(args, expected_labels, option_a="'x'", option_b="'y'")
+
+    def _test_base_command(self, args, labels, option_a="'1'", option_b="'2'"):
         out, err = self.run_manage(args)
+
+        expected_out = str_prefix(
+            ("EXECUTE:BaseCommand labels=%%s, "
+             "options=[('no_color', False), ('option_a', %%s), ('option_b', %%s), "
+             "('option_c', '3'), ('pythonpath', None), ('settings', None), "
+             "('traceback', None), ('verbosity', %(_)s'1')]")
+        ) % (labels, option_a, option_b)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_color', False), ('option_a', 'x'), ('option_b', 'y'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, expected_out)
 
     def test_base_run_from_argv(self):
         """
@@ -1327,6 +1436,7 @@ class CommandTypes(AdminScriptTestCase):
         Also test proper traceback display.
         """
         command = BaseCommand()
+
         def raise_command_error(*args, **kwargs):
             raise CommandError("Custom error")
 
@@ -1360,12 +1470,27 @@ class CommandTypes(AdminScriptTestCase):
         finally:
             sys.stderr = old_stderr
 
+    def test_run_from_argv_non_ascii_error(self):
+        """
+        Test that non-ascii message of CommandError does not raise any
+        UnicodeDecodeError in run_from_argv.
+        """
+        def raise_command_error(*args, **kwargs):
+            raise CommandError("Erreur personnalisée")
+
+        command = BaseCommand()
+        command.execute = raise_command_error
+        command.stderr = StringIO()
+
+        with self.assertRaises(SystemExit):
+            command.run_from_argv(['', ''])
+
     def test_noargs(self):
         "NoArg Commands can be executed"
         args = ['noargs_command']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, str_prefix("EXECUTE:NoArgsCommand options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
 
     def test_noargs_with_args(self):
         "NoArg Commands raise an error if an argument is provided"
@@ -1378,46 +1503,43 @@ class CommandTypes(AdminScriptTestCase):
         args = ['app_command', 'auth']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.auth.models'")
-        self.assertOutput(out, os.sep.join(['django', 'contrib', 'auth', 'models.py']))
-        self.assertOutput(out, "'>, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.auth, options=")
+        self.assertOutput(out, str_prefix(", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
 
     def test_app_command_no_apps(self):
         "User AppCommands raise an error when no app name is provided"
         args = ['app_command']
         out, err = self.run_manage(args)
-        self.assertOutput(err, 'Error: Enter at least one appname.')
+        self.assertOutput(err, 'Error: Enter at least one application label.')
 
     def test_app_command_multiple_apps(self):
         "User AppCommands raise an error when multiple app names are provided"
         args = ['app_command', 'auth', 'contenttypes']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.auth.models'")
-        self.assertOutput(out, os.sep.join(['django', 'contrib', 'auth', 'models.py']))
-        self.assertOutput(out, "'>, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
-        self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.contenttypes.models'")
-        self.assertOutput(out, os.sep.join(['django', 'contrib', 'contenttypes', 'models.py']))
-        self.assertOutput(out, "'>, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.auth, options=")
+        self.assertOutput(out, str_prefix(", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+        self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.contenttypes, options=")
+        self.assertOutput(out, str_prefix(", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
 
-    def test_app_command_invalid_appname(self):
+    def test_app_command_invalid_app_label(self):
         "User AppCommands can execute when a single app name is provided"
         args = ['app_command', 'NOT_AN_APP']
         out, err = self.run_manage(args)
-        self.assertOutput(err, "App with label NOT_AN_APP could not be found")
+        self.assertOutput(err, "No installed app with label 'NOT_AN_APP'.")
 
-    def test_app_command_some_invalid_appnames(self):
+    def test_app_command_some_invalid_app_labels(self):
         "User AppCommands can execute when some of the provided app names are invalid"
         args = ['app_command', 'auth', 'NOT_AN_APP']
         out, err = self.run_manage(args)
-        self.assertOutput(err, "App with label NOT_AN_APP could not be found")
+        self.assertOutput(err, "No installed app with label 'NOT_AN_APP'.")
 
     def test_label_command(self):
         "User LabelCommands can execute when a label is provided"
         args = ['label_command', 'testlabel']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, str_prefix("EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
 
     def test_label_command_no_label(self):
         "User LabelCommands raise an error if no label is provided"
@@ -1430,8 +1552,37 @@ class CommandTypes(AdminScriptTestCase):
         args = ['label_command', 'testlabel', 'anotherlabel']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
-        self.assertOutput(out, "EXECUTE:LabelCommand label=anotherlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, str_prefix("EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+        self.assertOutput(out, str_prefix("EXECUTE:LabelCommand label=anotherlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+
+    def test_requires_model_validation_and_requires_system_checks_both_defined(self):
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.core.management.base')
+            from .management.commands.validation_command import InvalidCommand
+            self.assertRaises(ImproperlyConfigured, InvalidCommand)
+
+
+class Discovery(TestCase):
+
+    def test_precedence(self):
+        """
+        Apps listed first in INSTALLED_APPS have precendence.
+        """
+        with self.settings(INSTALLED_APPS=['admin_scripts.complex_app',
+                                           'admin_scripts.simple_app',
+                                           'django.contrib.auth',
+                                           'django.contrib.contenttypes']):
+            out = StringIO()
+            call_command('duplicate', stdout=out)
+            self.assertEqual(out.getvalue().strip(), 'complex_app')
+        with self.settings(INSTALLED_APPS=['admin_scripts.simple_app',
+                                           'admin_scripts.complex_app',
+                                           'django.contrib.auth',
+                                           'django.contrib.contenttypes']):
+            out = StringIO()
+            call_command('duplicate', stdout=out)
+            self.assertEqual(out.getvalue().strip(), 'simple_app')
+
 
 class ArgumentOrder(AdminScriptTestCase):
     """Tests for 2-stage argument parsing scheme.
@@ -1451,43 +1602,40 @@ class ArgumentOrder(AdminScriptTestCase):
         self.remove_settings('alternate_settings.py')
 
     def test_setting_then_option(self):
-        "Options passed after settings are correctly handled"
+        """ Options passed after settings are correctly handled. """
         args = ['base_command', 'testlabel', '--settings=alternate_settings', '--option_a=x']
-        out, err = self.run_manage(args)
-        self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_color', False), ('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
+        self._test(args)
 
     def test_setting_then_short_option(self):
-        "Short options passed after settings are correctly handled"
-        args = ['base_command', 'testlabel', '--settings=alternate_settings', '--option_a=x']
-        out, err = self.run_manage(args)
-        self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_color', False), ('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
+        """ Short options passed after settings are correctly handled. """
+        args = ['base_command', 'testlabel', '--settings=alternate_settings', '-a', 'x']
+        self._test(args)
 
     def test_option_then_setting(self):
-        "Options passed before settings are correctly handled"
+        """ Options passed before settings are correctly handled. """
         args = ['base_command', 'testlabel', '--option_a=x', '--settings=alternate_settings']
-        out, err = self.run_manage(args)
-        self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_color', False), ('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
+        self._test(args)
 
     def test_short_option_then_setting(self):
-        "Short options passed before settings are correctly handled"
+        """ Short options passed before settings are correctly handled. """
         args = ['base_command', 'testlabel', '-a', 'x', '--settings=alternate_settings']
-        out, err = self.run_manage(args)
-        self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_color', False), ('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
+        self._test(args)
 
     def test_option_then_setting_then_option(self):
-        "Options are correctly handled when they are passed before and after a setting"
+        """ Options are correctly handled when they are passed before and after
+        a setting. """
         args = ['base_command', 'testlabel', '--option_a=x', '--settings=alternate_settings', '--option_b=y']
+        self._test(args, option_b="'y'")
+
+    def _test(self, args, option_b="'2'"):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_color', False), ('option_a', 'x'), ('option_b', 'y'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, str_prefix("EXECUTE:BaseCommand labels=('testlabel',), options=[('no_color', False), ('option_a', 'x'), ('option_b', %%s), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', %(_)s'1')]") % option_b)
 
 
 class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
+    urls = 'admin_scripts.urls'
     available_apps = [
         'admin_scripts',
         'django.contrib.auth',
@@ -1595,7 +1743,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
     def test_custom_project_template_from_tarball_by_url(self):
         "Make sure the startproject management command is able to use a different project template from a tarball via a url"
-        template_url = '%s/admin_scripts/custom_templates/project_template.tgz' % self.live_server_url
+        template_url = '%s/custom_templates/project_template.tgz' % self.live_server_url
 
         args = ['startproject', '--template', template_url, 'urltestproject']
         testproject_dir = os.path.join(test_dir, 'urltestproject')
@@ -1608,7 +1756,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
     def test_project_template_tarball_url(self):
         "Startproject management command handles project template tar/zip balls from non-canonical urls"
-        template_url = '%s/admin_scripts/custom_templates/project_template.tgz/' % self.live_server_url
+        template_url = '%s/custom_templates/project_template.tgz/' % self.live_server_url
 
         args = ['startproject', '--template', template_url, 'urltestproject']
         testproject_dir = os.path.join(test_dir, 'urltestproject')
@@ -1634,7 +1782,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         for f in ('Procfile', 'additional_file.py', 'requirements.txt'):
             self.assertTrue(os.path.exists(os.path.join(base_path, f)))
             with open(os.path.join(base_path, f)) as fh:
-                self.assertEqual(fh.read(),
+                self.assertEqual(fh.read().strip(),
                     '# some file for customtestproject test project')
 
     def test_custom_project_template_context_variables(self):
@@ -1693,9 +1841,10 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         path = os.path.join(testproject_dir, 'ticket-18091-non-ascii-template.txt')
-        with codecs.open(path, 'r', 'utf-8') as f:
-            self.assertEqual(f.read(),
-                'Some non-ASCII text for testing ticket #18091:\nüäö €\n')
+        with codecs.open(path, 'r', encoding='utf-8') as f:
+            self.assertEqual(f.read().splitlines(False), [
+                'Some non-ASCII text for testing ticket #18091:',
+                'üäö €'])
 
 
 class DiffSettings(AdminScriptTestCase):
@@ -1718,6 +1867,7 @@ class DiffSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "### STATIC_URL = None")
+
 
 class Dumpdata(AdminScriptTestCase):
     """Tests for dumpdata management command."""

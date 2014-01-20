@@ -12,7 +12,7 @@ YEAR_MONTH_FORMAT = r'F \d\e Y'
 MONTH_DAY_FORMAT = r'j \d\e F'
 SHORT_DATE_FORMAT = 'd/m/Y'
 SHORT_DATETIME_FORMAT = 'd/m/Y H:i'
-FIRST_DAY_OF_WEEK = 1 # Monday
+FIRST_DAY_OF_WEEK = 1  # Monday
 
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
 # see http://docs.python.org/library/datetime.html#strftime-strptime-behavior
@@ -31,4 +31,3 @@ DATETIME_INPUT_FORMATS = (
 DECIMAL_SEPARATOR = ','
 THOUSAND_SEPARATOR = '.'
 NUMBER_GROUPING = 3
-

@@ -334,6 +334,12 @@ You can tell if a query is ordered or not by checking the
 :attr:`.QuerySet.ordered` attribute, which will be ``True`` if the
 ``QuerySet`` has been ordered in any way.
 
+.. warning::
+
+    Ordering is not a free operation. Each field you add to the ordering
+    incurs a cost to your database. Each foreign key you add will
+    implicitly include all of its default orderings as well.
+
 reverse
 ~~~~~~~
 
@@ -682,13 +688,12 @@ manager or a ``QuerySet`` and do further filtering on the result. After calling
 select_related
 ~~~~~~~~~~~~~~
 
-.. method:: select_related()
+.. method:: select_related(*fields)
 
-Returns a ``QuerySet`` that will automatically "follow" foreign-key
-relationships, selecting that additional related-object data when it executes
-its query. This is a performance booster which results in (sometimes much)
-larger queries but means later use of foreign-key relationships won't require
-database queries.
+Returns a ``QuerySet`` that will "follow" foreign-key relationships, selecting
+additional related-object data when it executes its query. This is a
+performance booster which results in a single more complex query but means
+later use of foreign-key relationships won't require database queries.
 
 The following examples illustrate the difference between plain lookups and
 ``select_related()`` lookups. Here's standard lookup::
@@ -702,13 +707,13 @@ The following examples illustrate the difference between plain lookups and
 And here's ``select_related`` lookup::
 
     # Hits the database.
-    e = Entry.objects.select_related().get(id=5)
+    e = Entry.objects.select_related('blog').get(id=5)
 
     # Doesn't hit the database, because e.blog has been prepopulated
     # in the previous query.
     b = e.blog
 
-``select_related()`` follows foreign keys as far as possible. If you have the
+You can follow foreign keys in a similar way to querying them. If you have the
 following models::
 
     from django.db import models
@@ -725,10 +730,11 @@ following models::
         # ...
         author = models.ForeignKey(Person)
 
-...then a call to ``Book.objects.select_related().get(id=4)`` will cache the
-related ``Person`` *and* the related ``City``::
+...then a call to ``Book.objects.select_related('person',
+'person__city').get(id=4)`` will cache the related ``Person`` *and* the related
+``City``::
 
-    b = Book.objects.select_related().get(id=4)
+    b = Book.objects.select_related('person__city').get(id=4)
     p = b.author         # Doesn't hit the database.
     c = p.hometown       # Doesn't hit the database.
 
@@ -736,45 +742,9 @@ related ``Person`` *and* the related ``City``::
     p = b.author         # Hits the database.
     c = p.hometown       # Hits the database.
 
-Note that, by default, ``select_related()`` does not follow foreign keys that
-have ``null=True``.
-
-Usually, using ``select_related()`` can vastly improve performance because your
-app can avoid many database calls. However, there are times you are only
-interested in specific related models, or have deeply nested sets of
-relationships, and in these cases ``select_related()`` can be optimized by
-explicitly passing the related field names you are interested in. Only
-the specified relations will be followed.
-
-You can even do this for models that are more than one relation away by
-separating the field names with double underscores, just as for filters. For
-example, if you have this model::
-
-    class Room(models.Model):
-        # ...
-        building = models.ForeignKey(...)
-
-    class Group(models.Model):
-        # ...
-        teacher = models.ForeignKey(...)
-        room = models.ForeignKey(Room)
-        subject = models.ForeignKey(...)
-
-...and you only needed to work with the ``room`` and ``subject`` attributes,
-you could write this::
-
-    g = Group.objects.select_related('room', 'subject')
-
-This is also valid::
-
-    g = Group.objects.select_related('room__building', 'subject')
-
-...and would also pull in the ``building`` relation.
-
 You can refer to any :class:`~django.db.models.ForeignKey` or
 :class:`~django.db.models.OneToOneField` relation in the list of fields
-passed to ``select_related()``. This includes foreign keys that have
-``null=True`` (which are omitted in a no-parameter ``select_related()`` call).
+passed to ``select_related()``.
 
 You can also refer to the reverse direction of a
 :class:`~django.db.models.OneToOneField` in the list of fields passed to
@@ -783,12 +753,26 @@ You can also refer to the reverse direction of a
 is defined. Instead of specifying the field name, use the :attr:`related_name
 <django.db.models.ForeignKey.related_name>` for the field on the related object.
 
+There may be some situations where you wish to call ``select_related()`` with a
+lot of related objects, or where you don't know all of the relations. In these
+cases it is possible to call ``select_related()`` with no arguments. This will
+follow all non-null foreign keys it can find - nullable foreign keys must be
+specified. This is not recommended in most cases as it is likely to make the
+underlying query more complex, and return more data, than is actually needed.
+
 .. versionadded:: 1.6
 
 If you need to clear the list of related fields added by past calls of
 ``select_related`` on a ``QuerySet``, you can pass ``None`` as a parameter::
 
    >>> without_relations = queryset.select_related(None)
+
+.. versionchanged:: 1.7
+
+Chaining ``select_related`` calls now works in a similar way to other methods -
+that is that ``select_related('foo', 'bar')`` is equivalent to
+``select_related('foo').select_related('bar')``. Previously the latter would
+have been equivalent to ``select_related('bar')``.
 
 prefetch_related
 ~~~~~~~~~~~~~~~~
@@ -802,7 +786,7 @@ This has a similar purpose to ``select_related``, in that both are designed to
 stop the deluge of database queries that is caused by accessing related objects,
 but the strategy is quite different.
 
-``select_related`` works by creating a SQL join and including the fields of the
+``select_related`` works by creating an SQL join and including the fields of the
 related object in the ``SELECT`` statement. For this reason, ``select_related``
 gets the related objects in the same database query. However, to avoid the much
 larger result set that would result from joining across a 'many' relationship,
@@ -913,8 +897,8 @@ needed by ``select_related``), it is able to detect that the ``best_pizza``
 objects have already been fetched, and it will skip fetching them again.
 
 Chaining ``prefetch_related`` calls will accumulate the lookups that are
-prefetched. To clear any ``prefetch_related`` behavior, pass `None` as a
-parameter::
+prefetched. To clear any ``prefetch_related`` behavior, pass ``None`` as a
+parameter:
 
    >>> non_prefetched = qs.prefetch_related(None)
 
@@ -932,7 +916,7 @@ referenced is needed, rather than one query for all the items. There could be
 additional queries on the ``ContentType`` table if the relevant rows have not
 already been fetched.
 
-``prefetch_related`` in most cases will be implemented using a SQL query that
+``prefetch_related`` in most cases will be implemented using an SQL query that
 uses the 'IN' operator. This means that for a large ``QuerySet`` a large 'IN' clause
 could be generated, which, depending on the database, might have performance
 problems of its own when it comes to parsing or executing the SQL query. Always
@@ -940,6 +924,91 @@ profile for your use case!
 
 Note that if you use ``iterator()`` to run the query, ``prefetch_related()``
 calls will be ignored since these two optimizations do not make sense together.
+
+.. versionadded:: 1.7
+
+You can use the :class:`~django.db.models.Prefetch` object to further control
+the prefetch operation.
+
+In its simplest form ``Prefetch`` is equivalent to the traditional string based
+lookups:
+
+    >>> Restaurant.objects.prefetch_related(Prefetch('pizzas__toppings'))
+
+You can provide a custom queryset with the optional ``queryset`` argument.
+This can be used to change the default ordering of the queryset:
+
+    >>> Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas__toppings', queryset=Toppings.objects.order_by('name')))
+
+Or to call :meth:`~django.db.models.query.QuerySet.select_related()` when
+applicable to reduce the number of queries even further:
+
+    >>> Pizza.objects.prefetch_related(
+    ...     Prefetch('restaurants', queryset=Restaurant.objects.select_related('best_pizza')))
+
+You can also assign the prefetched result to a custom attribute with the optional
+``to_attr`` argument. The result will be stored directly in a list.
+
+This allows prefetching the same relation multiple times with a different
+``QuerySet``; for instance:
+
+    >>> vegetarian_pizzas = Pizza.objects.filter(vegetarian=True)
+    >>> Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas', to_attr='menu'),
+    ...     Prefetch('pizzas', queryset=vegetarian_pizzas, to_attr='vegetarian_menu'))
+
+Lookups created with custom ``to_attr`` can still be traversed as usual by other
+lookups:
+
+    >>> vegetarian_pizzas = Pizza.objects.filter(vegetarian=True)
+    >>> Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas', queryset=vegetarian_pizzas, to_attr='vegetarian_menu'),
+    ...     'vegetarian_menu__toppings')
+
+Using ``to_attr`` is recommended when filtering down the prefetch result as it is
+less ambiguous than storing a filtered result in the related manager's cache:
+
+    >>> queryset = Pizza.objects.filter(vegetarian=True)
+    >>>
+    >>> # Recommended:
+    >>> restaurants = Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas', to_attr='vegetarian_pizzas' queryset=queryset))
+    >>> vegetarian_pizzas = restaurants[0].vegetarian_pizzas
+    >>>
+    >>> # Not recommended:
+    >>> restaurants = Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas', queryset=queryset))
+    >>> vegetarian_pizzas = restaurants[0].pizzas.all()
+
+.. note::
+
+    The ordering of lookups matters.
+
+    Take the following examples:
+
+       >>> prefetch_related('pizzas__toppings', 'pizzas')
+
+    This works even though it's unordered because ``'pizzas__toppings'``
+    already contains all the needed information, therefore the second argument
+    ``'pizzas'`` is actually redundant.
+
+        >>> prefetch_related('pizzas__toppings', Prefetch('pizzas', queryset=Pizza.objects.all()))
+
+    This will raise a ``ValueError`` because of the attempt to redefine the
+    queryset of a previously seen lookup. Note that an implicit queryset was
+    created to traverse ``'pizzas'`` as part of the ``'pizzas__toppings'``
+    lookup.
+
+        >>> prefetch_related('pizza_list__toppings', Prefetch('pizzas', to_attr='pizza_list'))
+
+    This will trigger an ``AttributeError`` because ``'pizza_list'`` doesn't exist yet
+    when ``'pizza_list__toppings'`` is being processed.
+
+    This consideration is not limited to the use of ``Prefetch`` objects. Some
+    advanced techniques may require that the lookups be performed in a
+    specific order to avoid creating extra queries; therefore it's recommended
+    to always carefully order ``prefetch_related`` arguments.
 
 extra
 ~~~~~
@@ -1149,13 +1218,11 @@ to ``defer()``::
     # Load all fields immediately.
     my_queryset.defer(None)
 
-.. versionchanged:: 1.5
-
-    Some fields in a model won't be deferred, even if you ask for them. You can
-    never defer the loading of the primary key. If you are using
-    :meth:`select_related()` to retrieve related models, you shouldn't defer the
-    loading of the field that connects from the primary model to the related
-    one, doing so will result in an error.
+Some fields in a model won't be deferred, even if you ask for them. You can
+never defer the loading of the primary key. If you are using
+:meth:`select_related()` to retrieve related models, you shouldn't defer the
+loading of the field that connects from the primary model to the related
+one, doing so will result in an error.
 
 .. note::
 
@@ -1177,8 +1244,6 @@ to ``defer()``::
     might otherwise call ``defer()``. This makes your code more explicit to the
     reader, is slightly faster and consumes a little less memory in the Python
     process.
-
-.. versionchanged:: 1.5
 
 .. note::
 
@@ -1227,16 +1292,14 @@ All of the cautions in the note for the :meth:`defer` documentation apply to
 ``only()`` as well. Use it cautiously and only after exhausting your other
 options.
 
-.. versionchanged:: 1.5
+Using :meth:`only` and omitting a field requested using :meth:`select_related`
+is an error as well.
 
-    Using :meth:`only` and omitting a field requested using
-    :meth:`select_related` is an error as well.
+.. note::
 
-    .. note::
-
-        When calling :meth:`~django.db.models.Model.save()` for instances with
-        deferred fields, only the loaded fields will be saved. See
-        :meth:`~django.db.models.Model.save()` for more details.
+    When calling :meth:`~django.db.models.Model.save()` for instances with
+    deferred fields, only the loaded fields will be saved. See
+    :meth:`~django.db.models.Model.save()` for more details.
 
 using
 ~~~~~
@@ -1457,7 +1520,7 @@ call.
 Finally, a word on using ``get_or_create()`` in Django views: please make sure
 to use it only in ``POST`` requests unless you have a good reason not to
 ``GET`` requests shouldn't have any effect on data; use ``POST`` whenever a
-request to a page as a side effect on your data. For more, see `Safe methods`_
+request to a page has a side effect on your data. For more, see `Safe methods`_
 in the HTTP spec.
 
 .. _Safe methods: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
@@ -1562,14 +1625,11 @@ This has a number of caveats though:
 * It does not work with child models in a multi-table inheritance scenario.
 * If the model's primary key is an :class:`~django.db.models.AutoField` it
   does not retrieve and set the primary key attribute, as ``save()`` does.
+* It does not work with many-to-many relationships.
 
 The ``batch_size`` parameter controls how many objects are created in single
 query. The default is to create all objects in one batch, except for SQLite
 where the default is such that at maximum 999 variables per query is used.
-
-.. versionadded:: 1.5
-
-    The ``batch_size`` parameter was added in version 1.5.
 
 count
 ~~~~~
@@ -1900,10 +1960,6 @@ methods on your models. It does, however, emit the
 :data:`~django.db.models.signals.post_delete` signals for all deleted objects
 (including cascaded deletions).
 
-.. versionadded:: 1.5
-
-    Allow fast-path deletion of objects.
-
 Django needs to fetch objects into memory to send signals and handle cascades.
 However, if there are no cascades and no signals, then Django may take a
 fast-path and delete objects without fetching into memory. For large
@@ -1911,7 +1967,7 @@ deletes this can result in significantly reduced memory usage. The amount of
 executed queries can be reduced, too.
 
 ForeignKeys which are set to :attr:`~django.db.models.ForeignKey.on_delete`
-DO_NOTHING do not prevent taking the fast-path in deletion.
+``DO_NOTHING`` do not prevent taking the fast-path in deletion.
 
 Note that the queries generated in object deletion is an implementation
 detail subject to change.
@@ -1938,6 +1994,9 @@ specified as keyword arguments to the ``QuerySet`` methods :meth:`filter()`,
 
 For an introduction, see :ref:`models and database queries documentation
 <field-lookups-intro>`.
+
+Django's inbuilt lookups are listed below. It is also possible to write
+:doc:`custom lookups </ref/models/custom-lookups>` for model fields.
 
 .. fieldlookup:: exact
 
@@ -1973,9 +2032,15 @@ iexact
 
 Case-insensitive exact match.
 
+.. versionchanged:: 1.7
+
+    If the value provided for comparision is ``None``, it will be interpreted
+    as an SQL ``NULL`` (see :lookup:`isnull` for more details).
+
 Example::
 
     Blog.objects.get(name__iexact='beatles blog')
+    Blog.objects.get(name__iexact=None)
 
 SQL equivalent::
 
@@ -2076,6 +2141,8 @@ extract two field values, where only one is expected::
     # Bad code! Will raise a TypeError.
     inner_qs = Blog.objects.filter(name__contains='Ch').values('name', 'id')
     entries = Entry.objects.filter(blog__name__in=inner_qs)
+
+.. _nested-queries-performance:
 
 .. admonition:: Performance considerations
 
@@ -2282,7 +2349,8 @@ SQL equivalent::
 (The exact SQL syntax varies for each database engine.)
 
 When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
-current time zone before filtering.
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
 
 .. fieldlookup:: day
 
@@ -2305,7 +2373,8 @@ Note this will match any record with a pub_date on the third day of the month,
 such as January 3, July 3, etc.
 
 When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
-current time zone before filtering.
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
 
 .. fieldlookup:: week_day
 
@@ -2329,7 +2398,8 @@ Note this will match any record with a ``pub_date`` that falls on a Monday (day
 are indexed with day 1 being Sunday and day 7 being Saturday.
 
 When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
-current time zone before filtering.
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
 
 .. fieldlookup:: hour
 

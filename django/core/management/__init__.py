@@ -5,17 +5,18 @@ from optparse import OptionParser, NO_DEFAULT
 import os
 import sys
 
+import django
+from django.apps import apps
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError, handle_default_options
 from django.core.management.color import color_style
+from django.utils import lru_cache
 from django.utils import six
 
 # For backwards compatibility: get_version() used to be in this module.
 from django import get_version
 
-# A cache of loaded commands, so that call_command
-# doesn't have to reload every time it's called.
-_commands = None
 
 def find_commands(management_dir):
     """
@@ -31,6 +32,7 @@ def find_commands(management_dir):
     except OSError:
         return []
 
+
 def find_management_module(app_name):
     """
     Determines the path to the management module for the given app_name,
@@ -38,6 +40,9 @@ def find_management_module(app_name):
 
     Raises ImportError if the management module cannot be found for any reason.
     """
+    # TODO: this method is only called from get_commands() which has already
+    # imported the application module at that point.
+
     parts = app_name.split('.')
     parts.append('management')
     parts.reverse()
@@ -66,6 +71,7 @@ def find_management_module(app_name):
             f.close()
     return path
 
+
 def load_command_class(app_name, name):
     """
     Given a command name and an application name, returns the Command
@@ -75,6 +81,8 @@ def load_command_class(app_name, name):
     module = import_module('%s.management.commands.%s' % (app_name, name))
     return module.Command()
 
+
+@lru_cache.lru_cache(maxsize=None)
 def get_commands():
     """
     Returns a dictionary mapping command names to their callback applications.
@@ -97,29 +105,29 @@ def get_commands():
     The dictionary is cached on the first call and reused on subsequent
     calls.
     """
-    global _commands
-    if _commands is None:
-        _commands = dict([(name, 'django.core') for name in find_commands(__path__[0])])
+    commands = {name: 'django.core' for name in find_commands(__path__[0])}
 
-        # Find the installed apps
-        from django.conf import settings
+    # Find the installed apps
+    try:
+        settings.INSTALLED_APPS
+    except ImproperlyConfigured:
+        # Still useful for commands that do not require functional
+        # settings, like startproject or help.
+        app_names = []
+    else:
+        app_configs = apps.get_app_configs()
+        app_names = [app_config.name for app_config in app_configs]
+
+    # Find and load the management module for each installed app.
+    for app_name in reversed(app_names):
         try:
-            apps = settings.INSTALLED_APPS
-        except ImproperlyConfigured:
-            # Still useful for commands that do not require functional settings,
-            # like startproject or help
-            apps = []
+            path = find_management_module(app_name)
+            commands.update({name: app_name for name in find_commands(path)})
+        except ImportError:
+            pass  # No management module - ignore this app
 
-        # Find and load the management module for each installed app.
-        for app_name in apps:
-            try:
-                path = find_management_module(app_name)
-                _commands.update(dict([(name, app_name)
-                                       for name in find_commands(path)]))
-            except ImportError:
-                pass # No management module - ignore this app
+    return commands
 
-    return _commands
 
 def call_command(name, *args, **options):
     """
@@ -157,6 +165,7 @@ def call_command(name, *args, **options):
     defaults.update(options)
 
     return klass.execute(*args, **defaults)
+
 
 class LaxOptionParser(OptionParser):
     """
@@ -209,8 +218,9 @@ class LaxOptionParser(OptionParser):
                     # dealing with options
                     del rargs[0]
                     raise Exception
-            except:
+            except:  # Needed because we might need to catch a SystemExit
                 largs.append(arg)
+
 
 class ManagementUtility(object):
     """
@@ -249,6 +259,14 @@ class ManagementUtility(object):
                 usage.append(style.NOTICE("[%s]" % app))
                 for name in sorted(commands_dict[app]):
                     usage.append("    %s" % name)
+            # Output an extra note if settings are not properly configured
+            try:
+                settings.INSTALLED_APPS
+            except ImproperlyConfigured as e:
+                usage.append(style.NOTICE(
+                    "Note that only Django core commands are listed as settings "
+                    "are not properly configured (error: %s)." % e))
+
         return '\n'.join(usage)
 
     def fetch_command(self, subcommand):
@@ -257,10 +275,12 @@ class ManagementUtility(object):
         appropriate command called from the command line (usually
         "django-admin.py" or "manage.py") if it can't be found.
         """
+        # Get commands outside of try block to prevent swallowing exceptions
+        commands = get_commands()
         try:
-            app_name = get_commands()[subcommand]
+            app_name = commands[subcommand]
         except KeyError:
-            sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" % \
+            sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" %
                 (subcommand, self.prog_name))
             sys.exit(1)
         if isinstance(app_name, BaseCommand):
@@ -299,7 +319,7 @@ class ManagementUtility(object):
         cword = int(os.environ['COMP_CWORD'])
 
         try:
-            curr = cwords[cword-1]
+            curr = cwords[cword - 1]
         except IndexError:
             curr = ''
 
@@ -322,9 +342,9 @@ class ManagementUtility(object):
             elif cwords[0] in ('dumpdata', 'sql', 'sqlall', 'sqlclear',
                     'sqlcustom', 'sqlindexes', 'sqlsequencereset', 'test'):
                 try:
-                    from django.conf import settings
+                    app_configs = apps.get_app_configs()
                     # Get the last part of the dotted path as the app name.
-                    options += [(a.split('.')[-1], 0) for a in settings.INSTALLED_APPS]
+                    options += [(app_config.label, 0) for app_config in app_configs]
                 except ImportError:
                     # Fail silently if DJANGO_SETTINGS_MODULE isn't set. The
                     # user will find out once they execute the command.
@@ -332,11 +352,11 @@ class ManagementUtility(object):
             options += [(s_opt.get_opt_string(), s_opt.nargs) for s_opt in
                         subcommand_cls.option_list]
             # filter out previously specified options from available options
-            prev_opts = [x.split('=')[0] for x in cwords[1:cword-1]]
+            prev_opts = [x.split('=')[0] for x in cwords[1:cword - 1]]
             options = [opt for opt in options if opt[0] not in prev_opts]
 
             # filter options by current input
-            options = sorted([(k, v) for k, v in options if k.startswith(curr)])
+            options = sorted((k, v) for k, v in options if k.startswith(curr))
             for option in options:
                 opt_label = option[0]
                 # append '=' to options which require args
@@ -356,17 +376,26 @@ class ManagementUtility(object):
         parser = LaxOptionParser(usage="%prog subcommand [options] [args]",
                                  version=get_version(),
                                  option_list=BaseCommand.option_list)
-        self.autocomplete()
         try:
             options, args = parser.parse_args(self.argv)
             handle_default_options(options)
-        except:
-            pass # Ignore any option errors at this point.
+        except:  # Needed because parser.parse_args can raise SystemExit
+            pass  # Ignore any option errors at this point.
+
+        try:
+            settings.INSTALLED_APPS
+        except ImproperlyConfigured:
+            # Some commands are supposed to work without configured settings
+            pass
+        else:
+            django.setup()
+
+        self.autocomplete()
 
         try:
             subcommand = self.argv[1]
         except IndexError:
-            subcommand = 'help' # Display help if no arguments were given.
+            subcommand = 'help'  # Display help if no arguments were given.
 
         if subcommand == 'help':
             if len(args) <= 2:
@@ -388,6 +417,7 @@ class ManagementUtility(object):
             sys.stdout.write(self.main_help_text() + '\n')
         else:
             self.fetch_command(subcommand).run_from_argv(self.argv)
+
 
 def execute_from_command_line(argv=None):
     """

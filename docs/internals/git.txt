@@ -135,8 +135,8 @@ Feature-development branches
 .. admonition:: Historical information
 
     Since Django moved to Git in 2012, anyone can clone the repository and
-    create his own branches, alleviating the need for official branches in the
-    source code repository.
+    create their own branches, alleviating the need for official branches in
+    the source code repository.
 
     The following section is mostly useful if you're exploring the repository's
     history, for example if you're trying to understand how some features were

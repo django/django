@@ -12,7 +12,7 @@ except NameError:
     class WindowsError(Exception):
         pass
 
-if not six.PY3:
+if six.PY2:
     fs_encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
 
 
@@ -34,22 +34,25 @@ else:
             path = join(os.getcwdu(), path)
         return normpath(path)
 
+
 def upath(path):
     """
     Always return a unicode path.
     """
-    if not six.PY3 and not isinstance(path, six.text_type):
+    if six.PY2 and not isinstance(path, six.text_type):
         return path.decode(fs_encoding)
     return path
+
 
 def npath(path):
     """
     Always return a native path, that is unicode on Python 3 and bytestring on
     Python 2.
     """
-    if not six.PY3 and not isinstance(path, bytes):
+    if six.PY2 and not isinstance(path, bytes):
         return path.encode(fs_encoding)
     return path
+
 
 def safe_join(base, *paths):
     """
@@ -71,8 +74,8 @@ def safe_join(base, *paths):
     #  b) The final path must be the same as the base path.
     #  c) The base path must be the most root path (meaning either "/" or "C:\\")
     if (not normcase(final_path).startswith(normcase(base_path + sep)) and
-        normcase(final_path) != normcase(base_path) and
-        dirname(normcase(base_path)) != normcase(base_path)):
+            normcase(final_path) != normcase(base_path) and
+            dirname(normcase(base_path)) != normcase(base_path)):
         raise ValueError('The joined path (%s) is located outside of the base '
                          'path component (%s)' % (final_path, base_path))
     return final_path

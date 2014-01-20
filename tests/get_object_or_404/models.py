@@ -21,9 +21,11 @@ class Author(models.Model):
     def __str__(self):
         return self.name
 
+
 class ArticleManager(models.Manager):
     def get_queryset(self):
         return super(ArticleManager, self).get_queryset().filter(authors__name__icontains='sir')
+
 
 @python_2_unicode_compatible
 class Article(models.Model):

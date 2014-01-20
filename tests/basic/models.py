@@ -14,10 +14,17 @@ class Article(models.Model):
     pub_date = models.DateTimeField()
 
     class Meta:
-        ordering = ('pub_date','headline')
+        ordering = ('pub_date', 'headline')
 
     def __str__(self):
         return self.headline
+
+
+class ArticleSelectOnSave(Article):
+    class Meta:
+        proxy = True
+        select_on_save = True
+
 
 @python_2_unicode_compatible
 class SelfRef(models.Model):

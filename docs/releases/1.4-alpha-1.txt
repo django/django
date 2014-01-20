@@ -337,9 +337,10 @@ docs </ref/contrib/csrf>` for more information.
 Error report filtering
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Two new function decorators, :func:`sensitive_variables` and
-:func:`sensitive_post_parameters`, were added to allow designating the
-local variables and POST parameters which may contain sensitive
+We added two function decorators,
+:func:`~django.views.decorators.debug.sensitive_variables` and
+:func:`~django.views.decorators.debug.sensitive_post_parameters`, to allow
+designating the local variables and POST parameters that may contain sensitive
 information and should be filtered out of error reports.
 
 All POST parameters are now systematically filtered out of error reports for

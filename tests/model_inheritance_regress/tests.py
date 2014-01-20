@@ -15,7 +15,7 @@ from .models import (Place, Restaurant, ItalianRestaurant, ParkingLot,
     SelfRefChild, ArticleWithAuthor, M2MChild, QualityControl, DerivedM,
     Person, BirthdayParty, BachelorParty, MessyBachelorParty,
     InternalCertificationAudit, BusStation, TrainStation, User, Profile,
-    ParkingLot4A, ParkingLot4B)
+    ParkingLot4A, ParkingLot4B, Senator)
 
 
 class ModelInheritanceTest(TestCase):
@@ -52,21 +52,21 @@ class ModelInheritanceTest(TestCase):
         places = list(Place.objects.all())
         self.assertEqual(places, [place1, place2])
 
-        dicts = list(Restaurant.objects.values('name','serves_hot_dogs'))
+        dicts = list(Restaurant.objects.values('name', 'serves_hot_dogs'))
         self.assertEqual(dicts, [{
             'name': "Guido's House of Pasta",
             'serves_hot_dogs': True
         }])
 
         dicts = list(ItalianRestaurant.objects.values(
-            'name','serves_hot_dogs','serves_gnocchi'))
+            'name', 'serves_hot_dogs', 'serves_gnocchi'))
         self.assertEqual(dicts, [{
             'name': "Guido's House of Pasta",
             'serves_gnocchi': True,
             'serves_hot_dogs': True,
         }])
 
-        dicts = list(ParkingLot.objects.values('name','capacity'))
+        dicts = list(ParkingLot.objects.values('name', 'capacity'))
         self.assertEqual(dicts, [{
             'capacity': 100,
             'name': 'Main St',
@@ -82,7 +82,7 @@ class ModelInheritanceTest(TestCase):
         italian_restaurant.serves_gnocchi = False
         italian_restaurant.save_base(raw=True)
 
-        place2.name='Derelict lot'
+        place2.name = 'Derelict lot'
         place2.save_base(raw=True)
 
         park.capacity = 50
@@ -94,7 +94,7 @@ class ModelInheritanceTest(TestCase):
         self.assertEqual(places[0].name, 'Derelict lot')
         self.assertEqual(places[1].name, "Guido's All New House of Pasta")
 
-        dicts = list(Restaurant.objects.values('name','serves_hot_dogs'))
+        dicts = list(Restaurant.objects.values('name', 'serves_hot_dogs'))
         self.assertEqual(dicts, [{
             'name': "Guido's All New House of Pasta",
             'serves_hot_dogs': False,
@@ -108,7 +108,7 @@ class ModelInheritanceTest(TestCase):
             'serves_hot_dogs': False,
         }])
 
-        dicts = list(ParkingLot.objects.values('name','capacity'))
+        dicts = list(ParkingLot.objects.values('name', 'capacity'))
         self.assertEqual(dicts, [{
             'capacity': 50,
             'name': 'Derelict lot',
@@ -123,7 +123,7 @@ class ModelInheritanceTest(TestCase):
         # Note that the name has not changed
         # - name is an attribute of Place, not ItalianRestaurant
         dicts = list(ItalianRestaurant.objects.values(
-            'name','serves_hot_dogs','serves_gnocchi'))
+            'name', 'serves_hot_dogs', 'serves_gnocchi'))
         self.assertEqual(dicts, [{
             'name': "Guido's All New House of Pasta",
             'serves_gnocchi': False,
@@ -133,7 +133,7 @@ class ModelInheritanceTest(TestCase):
     def test_issue_7105(self):
         # Regressions tests for #7105: dates() queries should be able to use
         # fields from the parent model as easily as the child.
-        obj = Child.objects.create(
+        Child.objects.create(
             name='child',
             created=datetime.datetime(2008, 6, 26, 17, 0, 0))
         datetimes = list(Child.objects.datetimes('created', 'month'))
@@ -159,7 +159,7 @@ class ModelInheritanceTest(TestCase):
 
         ident = ItalianRestaurant.objects.all()[0].id
         self.assertEqual(Place.objects.get(pk=ident), place1)
-        xx = Restaurant.objects.create(
+        Restaurant.objects.create(
             name='a',
             address='xx',
             serves_hot_dogs=True,
@@ -385,8 +385,8 @@ class ModelInheritanceTest(TestCase):
         # abstract models in the inheritance chain, for consistency with
         # verbose_name.
         self.assertEqual(
-                InternalCertificationAudit._meta.verbose_name_plural,
-                'Audits'
+            InternalCertificationAudit._meta.verbose_name_plural,
+            'Audits'
         )
 
     def test_inherited_nullable_exclude(self):
@@ -412,13 +412,11 @@ class ModelInheritanceTest(TestCase):
         # when more than one model has a concrete->abstract->concrete
         # inheritance hierarchy.
         self.assertEqual(
-            len([field for field in BusStation._meta.local_fields
-                       if field.primary_key]),
+            len([field for field in BusStation._meta.local_fields if field.primary_key]),
             1
         )
         self.assertEqual(
-            len([field for field in TrainStation._meta.local_fields
-                       if field.primary_key]),
+            len([field for field in TrainStation._meta.local_fields if field.primary_key]),
             1
         )
         self.assertIs(BusStation._meta.pk.model, BusStation)
@@ -455,3 +453,16 @@ class ModelInheritanceTest(TestCase):
         # used in the qs and top contains direct pointer to the bottom model.
         qs = ItalianRestaurant.objects.values_list('serves_gnocchi').filter(name='foo')
         self.assertEqual(str(qs.query).count('JOIN'), 1)
+
+    def test_issue_21554(self):
+        senator = Senator.objects.create(
+            name='John Doe', title='X', state='Y'
+        )
+
+        Senator.objects.get(pk=senator.pk)
+
+    def test_inheritance_resolve_columns(self):
+        Restaurant.objects.create(name='Bobs Cafe', address="Somewhere",
+                                  serves_pizza=True, serves_hot_dogs=True)
+        p = Place.objects.all().select_related('restaurant')[0]
+        self.assertIsInstance(p.restaurant.serves_pizza, bool)

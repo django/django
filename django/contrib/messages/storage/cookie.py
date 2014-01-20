@@ -38,13 +38,14 @@ class MessageDecoder(json.JSONDecoder):
                 return Message(*obj[2:])
             return [self.process_messages(item) for item in obj]
         if isinstance(obj, dict):
-            return dict([(key, self.process_messages(value))
-                         for key, value in six.iteritems(obj)])
+            return dict((key, self.process_messages(value))
+                        for key, value in six.iteritems(obj))
         return obj
 
     def decode(self, s, **kwargs):
         decoded = super(MessageDecoder, self).decode(s, **kwargs)
         return self.process_messages(decoded)
+
 
 class CookieStorage(BaseStorage):
     """
@@ -79,7 +80,9 @@ class CookieStorage(BaseStorage):
         """
         if encoded_data:
             response.set_cookie(self.cookie_name, encoded_data,
-                domain=settings.SESSION_COOKIE_DOMAIN)
+                domain=settings.SESSION_COOKIE_DOMAIN,
+                secure=settings.SESSION_COOKIE_SECURE or None,
+                httponly=settings.SESSION_COOKIE_HTTPONLY or None)
         else:
             response.delete_cookie(self.cookie_name,
                 domain=settings.SESSION_COOKIE_DOMAIN)
@@ -98,7 +101,8 @@ class CookieStorage(BaseStorage):
         if self.max_cookie_size:
             # data is going to be stored eventually by SimpleCookie, which
             # adds it's own overhead, which we must account for.
-            cookie = SimpleCookie() # create outside the loop
+            cookie = SimpleCookie()  # create outside the loop
+
             def stored_length(val):
                 return len(cookie.value_encode(val)[1])
 

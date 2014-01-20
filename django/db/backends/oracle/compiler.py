@@ -1,9 +1,5 @@
 from django.db.models.sql import compiler
-# The izip_longest was renamed to zip_longest in py3
-try:
-    from itertools import zip_longest
-except ImportError:
-    from itertools import izip_longest as zip_longest
+from django.utils.six.moves import zip_longest
 
 
 class SQLCompiler(compiler.SQLCompiler):

@@ -7,6 +7,7 @@ from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
+from django.utils.encoding import python_2_unicode_compatible
 
 
 def ensure_default_manager(sender, **kwargs):
@@ -58,6 +59,7 @@ class RenameManagerMethods(RenameMethodsBase):
     )
 
 
+@python_2_unicode_compatible
 class BaseManager(six.with_metaclass(RenameManagerMethods)):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
@@ -68,6 +70,20 @@ class BaseManager(six.with_metaclass(RenameManagerMethods)):
         self.model = None
         self._inherited = False
         self._db = None
+        self._hints = {}
+
+    def __str__(self):
+        """ Return "app_label.model_label.manager_name". """
+        model = self.model
+        opts = model._meta
+        app = model._meta.app_label
+        manager_name = next(name for (_, name, manager)
+            in opts.concrete_managers + opts.abstract_managers
+            if manager == self)
+        return '%s.%s.%s' % (app, model._meta.object_name, manager_name)
+
+    def check(self, **kwargs):
+        return []
 
     @classmethod
     def _get_queryset_methods(cls, queryset_class):
@@ -144,21 +160,26 @@ class BaseManager(six.with_metaclass(RenameManagerMethods)):
         mgr._inherited = True
         return mgr
 
-    def db_manager(self, using):
+    def db_manager(self, using=None, hints=None):
         obj = copy.copy(self)
-        obj._db = using
+        obj._db = using or self._db
+        obj._hints = hints or self._hints
         return obj
 
     @property
     def db(self):
-        return self._db or router.db_for_read(self.model)
+        return self._db or router.db_for_read(self.model, **self._hints)
+
+    #######################
+    # PROXIES TO QUERYSET #
+    #######################
 
     def get_queryset(self):
         """
         Returns a new QuerySet object.  Subclasses can override this method to
         easily customize the behavior of the Manager.
         """
-        return self._queryset_class(self.model, using=self._db)
+        return self._queryset_class(self.model, using=self._db, hints=self._hints)
 
     def all(self):
         # We can't proxy this method through the `QuerySet` like we do for the

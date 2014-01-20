@@ -30,6 +30,7 @@ def file_upload_view(request):
     else:
         return HttpResponseServerError()
 
+
 def file_upload_view_verify(request):
     """
     Use the sha digest hash to verify the uploaded contents.
@@ -56,6 +57,7 @@ def file_upload_view_verify(request):
     obj.testfile.save(largefile.name, largefile)
 
     return HttpResponse('')
+
 
 def file_upload_unicode_name(request):
 
@@ -85,19 +87,22 @@ def file_upload_unicode_name(request):
     else:
         return HttpResponse('')
 
+
 def file_upload_echo(request):
     """
     Simple view to echo back info about uploaded files for tests.
     """
-    r = dict([(k, f.name) for k, f in request.FILES.items()])
+    r = dict((k, f.name) for k, f in request.FILES.items())
     return HttpResponse(json.dumps(r))
+
 
 def file_upload_echo_content(request):
     """
     Simple view to echo back the content of uploaded files for tests.
     """
-    r = dict([(k, f.read().decode('utf-8')) for k, f in request.FILES.items()])
+    r = dict((k, f.read().decode('utf-8')) for k, f in request.FILES.items())
     return HttpResponse(json.dumps(r))
+
 
 def file_upload_quota(request):
     """
@@ -106,6 +111,7 @@ def file_upload_quota(request):
     request.upload_handlers.insert(0, QuotaUploadHandler())
     return file_upload_echo(request)
 
+
 def file_upload_quota_broken(request):
     """
     You can't change handlers after reading FILES; this view shouldn't work.
@@ -113,6 +119,7 @@ def file_upload_quota_broken(request):
     response = file_upload_echo(request)
     request.upload_handlers.insert(0, QuotaUploadHandler())
     return response
+
 
 def file_upload_getlist_count(request):
     """
@@ -124,9 +131,11 @@ def file_upload_getlist_count(request):
         file_counts[key] = len(request.FILES.getlist(key))
     return HttpResponse(json.dumps(file_counts))
 
+
 def file_upload_errors(request):
     request.upload_handlers.insert(0, ErroringUploadHandler())
     return file_upload_echo(request)
+
 
 def file_upload_filename_case_view(request):
     """
@@ -136,6 +145,7 @@ def file_upload_filename_case_view(request):
     obj = FileModel()
     obj.testfile.save(file.name, file)
     return HttpResponse('%d' % obj.pk)
+
 
 def file_upload_content_type_extra(request):
     """

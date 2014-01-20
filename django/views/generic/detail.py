@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.http import Http404
 from django.utils.translation import ugettext as _
@@ -50,7 +50,7 @@ class SingleObjectMixin(ContextMixin):
         try:
             # Get the single item from the filtered queryset
             obj = queryset.get()
-        except ObjectDoesNotExist:
+        except queryset.model.DoesNotExist:
             raise Http404(_("No %(verbose_name)s found matching the query") %
                           {'verbose_name': queryset.model._meta.verbose_name})
         return obj
@@ -137,28 +137,34 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             # we just start with an empty list.
             names = []
 
-        # If self.template_name_field is set, grab the value of the field
-        # of that name from the object; this is the most specific template
-        # name, if given.
-        if self.object and self.template_name_field:
-            name = getattr(self.object, self.template_name_field, None)
-            if name:
-                names.insert(0, name)
+            # If self.template_name_field is set, grab the value of the field
+            # of that name from the object; this is the most specific template
+            # name, if given.
+            if self.object and self.template_name_field:
+                name = getattr(self.object, self.template_name_field, None)
+                if name:
+                    names.insert(0, name)
 
-        # The least-specific option is the default <app>/<model>_detail.html;
-        # only use this if the object in question is a model.
-        if isinstance(self.object, models.Model):
-            names.append("%s/%s%s.html" % (
-                self.object._meta.app_label,
-                self.object._meta.model_name,
-                self.template_name_suffix
-            ))
-        elif hasattr(self, 'model') and self.model is not None and issubclass(self.model, models.Model):
-            names.append("%s/%s%s.html" % (
-                self.model._meta.app_label,
-                self.model._meta.model_name,
-                self.template_name_suffix
-            ))
+            # The least-specific option is the default <app>/<model>_detail.html;
+            # only use this if the object in question is a model.
+            if isinstance(self.object, models.Model):
+                names.append("%s/%s%s.html" % (
+                    self.object._meta.app_label,
+                    self.object._meta.model_name,
+                    self.template_name_suffix
+                ))
+            elif hasattr(self, 'model') and self.model is not None and issubclass(self.model, models.Model):
+                names.append("%s/%s%s.html" % (
+                    self.model._meta.app_label,
+                    self.model._meta.model_name,
+                    self.template_name_suffix
+                ))
+
+            # If we still haven't managed to find any template names, we should
+            # re-raise the ImproperlyConfigured to alert the user.
+            if not names:
+                raise
+
         return names
 
 

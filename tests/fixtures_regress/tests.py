@@ -2,6 +2,7 @@
 # Unittests for fixtures.
 from __future__ import unicode_literals
 
+import json
 import os
 import re
 import warnings
@@ -14,16 +15,17 @@ from django.db import transaction, IntegrityError
 from django.db.models import signals
 from django.test import (TestCase, TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils import six
 from django.utils.six import PY3, StringIO
-import json
 
 from .models import (Animal, Stuff, Absolute, Parent, Child, Article, Widget,
     Store, Person, Book, NKChild, RefToNKChild, Circle1, Circle2, Circle3,
     ExternalDependency, Thingy)
+
+_cur_dir = os.path.dirname(os.path.abspath(upath(__file__)))
 
 
 class TestFixtures(TestCase):
@@ -148,7 +150,33 @@ class TestFixtures(TestCase):
             load_absolute_path,
             verbosity=0,
         )
-        self.assertEqual(Absolute.load_count, 1)
+        self.assertEqual(Absolute.objects.count(), 1)
+
+    def test_relative_path(self, path=['fixtures', 'absolute.json']):
+        relative_path = os.path.join(*path)
+        cwd = os.getcwd()
+        try:
+            os.chdir(_cur_dir)
+            management.call_command(
+                'loaddata',
+                relative_path,
+                verbosity=0,
+            )
+        finally:
+            os.chdir(cwd)
+        self.assertEqual(Absolute.objects.count(), 1)
+
+    @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures_1')])
+    def test_relative_path_in_fixture_dirs(self):
+        self.test_relative_path(path=['inner', 'absolute.json'])
+
+    def test_path_containing_dots(self):
+        management.call_command(
+            'loaddata',
+            'path.containing.dots.json',
+            verbosity=0,
+        )
+        self.assertEqual(Absolute.objects.count(), 1)
 
     def test_unknown_format(self):
         """
@@ -357,7 +385,6 @@ class TestFixtures(TestCase):
         self.maxDiff = 1024
         self.assertEqual(data, animals_data)
 
-
     def test_proxy_model_included(self):
         """
         Regression for #11428 - Proxy models aren't included when you dumpdata
@@ -376,7 +403,7 @@ class TestFixtures(TestCase):
             stdout.getvalue(),
             """[{"pk": %d, "model": "fixtures_regress.widget", "fields": {"name": "grommet"}}]"""
             % widget.pk
-            )
+        )
 
     def test_loaddata_works_when_fixture_has_forward_refs(self):
         """
@@ -401,8 +428,6 @@ class TestFixtures(TestCase):
                 'forward_ref_bad_data.json',
                 verbosity=0,
             )
-
-    _cur_dir = os.path.dirname(os.path.abspath(upath(__file__)))
 
     @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures_1'),
                                      os.path.join(_cur_dir, 'fixtures_2')])
@@ -443,6 +468,17 @@ class TestFixtures(TestCase):
             )
         self.assertTrue("No fixture 'this_fixture_doesnt_exist' in" in
             force_text(stdout_output.getvalue()))
+
+    def test_ticket_20820(self):
+        """
+        Regression for ticket #20820 -- loaddata on a model that inherits
+        from a model with a M2M shouldn't blow up.
+        """
+        management.call_command(
+            'loaddata',
+            'special-article.json',
+            verbosity=0,
+        )
 
 
 class NaturalKeyFixtureTests(TestCase):
@@ -510,7 +546,7 @@ class NaturalKeyFixtureTests(TestCase):
             'loaddata',
             'forward_ref_lookup.json',
             verbosity=0,
-            )
+        )
 
         stdout = StringIO()
         management.call_command(
@@ -520,12 +556,13 @@ class NaturalKeyFixtureTests(TestCase):
             'fixtures_regress.store',
             verbosity=0,
             format='json',
-            use_natural_keys=True,
+            use_natural_foreign_keys=True,
+            use_natural_primary_keys=True,
             stdout=stdout,
         )
         self.assertJSONEqual(
             stdout.getvalue(),
-            """[{"pk": 2, "model": "fixtures_regress.store", "fields": {"main": null, "name": "Amazon"}}, {"pk": 3, "model": "fixtures_regress.store", "fields": {"main": null, "name": "Borders"}}, {"pk": 4, "model": "fixtures_regress.person", "fields": {"name": "Neal Stephenson"}}, {"pk": 1, "model": "fixtures_regress.book", "fields": {"stores": [["Amazon"], ["Borders"]], "name": "Cryptonomicon", "author": ["Neal Stephenson"]}}]"""
+            """[{"fields": {"main": null, "name": "Amazon"}, "model": "fixtures_regress.store"}, {"fields": {"main": null, "name": "Borders"}, "model": "fixtures_regress.store"}, {"fields": {"name": "Neal Stephenson"}, "model": "fixtures_regress.person"}, {"pk": 1, "model": "fixtures_regress.book", "fields": {"stores": [["Amazon"], ["Borders"]], "name": "Cryptonomicon", "author": ["Neal Stephenson"]}}]"""
         )
 
     def test_dependency_sorting(self):

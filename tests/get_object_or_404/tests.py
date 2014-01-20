@@ -30,7 +30,8 @@ class GetObjectOr404Tests(TestCase):
         )
 
         # No articles containing "Camelot".  This should raise a Http404 error.
-        self.assertRaises(Http404,
+        self.assertRaises(
+            Http404,
             get_object_or_404, a1.article_set, title__contains="Camelot"
         )
 
@@ -49,12 +50,14 @@ class GetObjectOr404Tests(TestCase):
         # Just as when using a get() lookup, you will get an error if more than
         # one object is returned.
 
-        self.assertRaises(Author.MultipleObjectsReturned,
+        self.assertRaises(
+            Author.MultipleObjectsReturned,
             get_object_or_404, Author.objects.all()
         )
 
         # Using an empty QuerySet raises a Http404 error.
-        self.assertRaises(Http404,
+        self.assertRaises(
+            Http404,
             get_object_or_404, Article.objects.none(), title__contains="Run"
         )
 
@@ -65,7 +68,8 @@ class GetObjectOr404Tests(TestCase):
         )
 
         # Http404 is returned if the list is empty.
-        self.assertRaises(Http404,
+        self.assertRaises(
+            Http404,
             get_list_or_404, a1.article_set, title__icontains="Shrubbery"
         )
 
@@ -84,7 +88,8 @@ class GetObjectOr404Tests(TestCase):
     def test_bad_class(self):
         # Given an argument klass that is not a Model, Manager, or Queryset
         # raises a helpful ValueError message
-        self.assertRaisesMessage(ValueError,
+        self.assertRaisesMessage(
+            ValueError,
             "Object is of type 'str', but must be a Django Model, Manager, "
             "or QuerySet",
             get_object_or_404, str("Article"), title__icontains="Run"
@@ -93,14 +98,16 @@ class GetObjectOr404Tests(TestCase):
         class CustomClass(object):
             pass
 
-        self.assertRaisesMessage(ValueError,
+        self.assertRaisesMessage(
+            ValueError,
             "Object is of type 'CustomClass', but must be a Django Model, "
             "Manager, or QuerySet",
             get_object_or_404, CustomClass, title__icontains="Run"
         )
 
         # Works for lists too
-        self.assertRaisesMessage(ValueError,
+        self.assertRaisesMessage(
+            ValueError,
             "Object is of type 'list', but must be a Django Model, Manager, "
             "or QuerySet",
             get_list_or_404, [Article], title__icontains="Run"

@@ -42,7 +42,7 @@ Django's documentation uses the Sphinx__ documentation system, which in turn
 is based on docutils__. The basic idea is that lightly-formatted plain-text
 documentation is transformed into HTML, PDF, and any other output format.
 
-__ http://sphinx.pocoo.org/
+__ http://sphinx-doc.org/
 __ http://docutils.sourceforge.net/
 
 To actually build the documentation locally, you'll currently need to install
@@ -65,6 +65,19 @@ Primer <sphinx:rst-primer>`. After that, you'll want to read about the
 :ref:`Sphinx-specific markup <sphinx:sphinxmarkup>` that's used to manage
 metadata, indexing, and cross-references.
 
+Writing style
+-------------
+
+When using pronouns in reference to a hypothetical person, such as "a user with
+a session cookie", gender neutral pronouns (they/their/them) should be used.
+Instead of:
+
+* he or she... use they.
+* him or her... use them.
+* his or her... use their.
+* his or hers... use theirs.
+* himself or herself... use themselves.
+
 Commonly used terms
 -------------------
 
@@ -77,6 +90,10 @@ documentation:
 * **email** -- no hyphen.
 
 * **MySQL**, **PostgreSQL**, **SQLite**
+
+* **SQL** -- when referring to SQL, the expected pronunciation should be
+  "Ess Queue Ell" and not "sequel". Thus in a phrase like "Returns an
+  SQL expression", "SQL" should be preceded by "an" and not "a".
 
 * **Python** -- when referring to the language, capitalize Python.
 
@@ -137,7 +154,7 @@ Django-specific markup
 Besides the `Sphinx built-in markup`__, Django's docs defines some extra
 description units:
 
-__ http://sphinx.pocoo.org/markup/desc.html
+__ http://sphinx-doc.org/markup/desc.html
 
 * Settings::
 
@@ -165,9 +182,9 @@ __ http://sphinx.pocoo.org/markup/desc.html
 
 * ``django-admin`` commands::
 
-        .. django-admin:: syncdb
+        .. django-admin:: migrate
 
-  To link, use ``:djadmin:`syncdb```.
+  To link, use ``:djadmin:`migrate```.
 
 * ``django-admin`` command-line options::
 
@@ -246,23 +263,26 @@ example:
 
   .. code-block:: rst
 
-    .. setting:: ADMIN_FOR
+    .. setting:: ADMINS
 
-    ADMIN_FOR
-    ---------
+    ADMINS
+    ------
 
     Default: ``()`` (Empty tuple)
 
-    Used for admin-site settings modules, this should be a tuple of
-    settings modules (in the format ``'foo.bar.baz'``) for which this site
-    is an admin.
+    A tuple that lists people who get code error notifications. When
+    ``DEBUG=False`` and a view raises an exception, Django will email these people
+    with the full exception information. Each member of the tuple should be a tuple
+    of (Full name, email address). Example::
 
-    The admin site uses this in its automatically-introspected
-    documentation of models, views and template tags.
+        (('John', 'john@example.com'), ('Mary', 'mary@example.com'))
+
+    Note that Django will email *all* of these people whenever an error happens.
+    See :doc:`/howto/error-reporting` for more information.
 
   This marks up the following header as the "canonical" target for the
-  setting ``ADMIN_FOR`` This means any time I talk about ``ADMIN_FOR``,
-  I can reference it using ``:setting:`ADMIN_FOR```.
+  setting ``ADMINS``. This means any time I talk about ``ADMINS``,
+  I can reference it using ``:setting:`ADMINS```.
 
 That's basically how everything fits together.
 
@@ -301,10 +321,10 @@ look better:
 
 * Add `info field lists`__ where appropriate.
 
-  __ http://sphinx.pocoo.org/markup/desc.html#info-field-lists
+  __ http://sphinx-doc.org/markup/desc.html#info-field-lists
 
-* Whenever possible, use links. So, use ``:setting:`ADMIN_FOR``` instead
-  of ````ADMIN_FOR````.
+* Whenever possible, use links. So, use ``:setting:`ADMINS``` instead
+  of ````ADMINS````.
 
 * Use directives where appropriate. Some directives
   (e.g. ``.. setting::``) are prefix-style directives; they go *before*

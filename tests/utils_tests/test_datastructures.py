@@ -6,13 +6,15 @@ import copy
 import pickle
 
 from django.test import SimpleTestCase
+from django.test.utils import IgnorePendingDeprecationWarningsMixin
 from django.utils.datastructures import (DictWrapper, ImmutableList,
     MultiValueDict, MultiValueDictKeyError, MergeDict, SortedDict)
 from django.utils import six
 
 
-class SortedDictTests(SimpleTestCase):
+class SortedDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
     def setUp(self):
+        super(SortedDictTests, self).setUp()
         self.d1 = SortedDict()
         self.d1[7] = 'seven'
         self.d1[1] = 'one'
@@ -49,7 +51,7 @@ class SortedDictTests(SimpleTestCase):
         self.d2[7] = 'lucky number 7'
         self.assertEqual(list(six.iterkeys(self.d2)), [1, 9, 0, 7])
 
-    if not six.PY3:
+    if six.PY2:
         def test_change_keys(self):
             """
             Changing the keys won't do anything, it's only a copy of the
@@ -134,19 +136,17 @@ class SortedDictTests(SimpleTestCase):
         self.assertEqual(list(reversed(self.d2)), [7, 0, 9, 1])
 
 
-class MergeDictTests(SimpleTestCase):
+class MergeDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
 
     def test_simple_mergedict(self):
-        d1 = {'chris':'cool', 'camri':'cute', 'cotton':'adorable',
-              'tulip':'snuggable', 'twoofme':'firstone'}
+        d1 = {'chris': 'cool', 'camri': 'cute', 'cotton': 'adorable',
+              'tulip': 'snuggable', 'twoofme': 'firstone'}
 
-        d2 = {'chris2':'cool2', 'camri2':'cute2', 'cotton2':'adorable2',
-              'tulip2':'snuggable2'}
+        d2 = {'chris2': 'cool2', 'camri2': 'cute2', 'cotton2': 'adorable2',
+              'tulip2': 'snuggable2'}
 
-        d3 = {'chris3':'cool3', 'camri3':'cute3', 'cotton3':'adorable3',
-              'tulip3':'snuggable3'}
-
-        d4 = {'twoofme': 'secondone'}
+        d3 = {'chris3': 'cool3', 'camri3': 'cute3', 'cotton3': 'adorable3',
+              'tulip3': 'snuggable3'}
 
         md = MergeDict(d1, d2, d3)
 
@@ -179,14 +179,17 @@ class MergeDictTests(SimpleTestCase):
 
         self.assertTrue('value1' in six.itervalues(mm))
 
-        self.assertEqual(sorted(six.iteritems(mm), key=lambda k: k[0]),
-                          [('key1', 'value1'), ('key2', 'value3'),
-                           ('key4', 'value6')])
+        self.assertEqual(
+            sorted(six.iteritems(mm), key=lambda k: k[0]),
+            [('key1', 'value1'), ('key2', 'value3'), ('key4', 'value6')]
+        )
 
-        self.assertEqual([(k,mm.getlist(k)) for k in sorted(mm)],
-                          [('key1', ['value1']),
-                           ('key2', ['value2', 'value3']),
-                           ('key4', ['value5', 'value6'])])
+        self.assertEqual(
+            [(k, mm.getlist(k)) for k in sorted(mm)],
+            [('key1', ['value1']),
+             ('key2', ['value2', 'value3']),
+             ('key4', ['value5', 'value6'])]
+        )
 
     def test_bool_casting(self):
         empty = MergeDict({}, {}, {})
@@ -212,18 +215,17 @@ class MultiValueDictTests(SimpleTestCase):
         self.assertEqual(d['name'], 'Simon')
         self.assertEqual(d.get('name'), 'Simon')
         self.assertEqual(d.getlist('name'), ['Adrian', 'Simon'])
-        self.assertEqual(sorted(list(six.iteritems(d))),
-                          [('name', 'Simon'), ('position', 'Developer')])
+        self.assertEqual(
+            sorted(list(six.iteritems(d))),
+            [('name', 'Simon'), ('position', 'Developer')]
+        )
 
-        self.assertEqual(sorted(list(six.iterlists(d))),
-                          [('name', ['Adrian', 'Simon']),
-                           ('position', ['Developer'])])
+        self.assertEqual(
+            sorted(list(six.iterlists(d))),
+            [('name', ['Adrian', 'Simon']), ('position', ['Developer'])]
+        )
 
-        # MultiValueDictKeyError: "Key 'lastname' not found in
-        # <MultiValueDict: {'position': ['Developer'],
-        #                   'name': ['Adrian', 'Simon']}>"
-        six.assertRaisesRegex(self, MultiValueDictKeyError,
-            r'"Key \'lastname\' not found in <MultiValueDict',
+        six.assertRaisesRegex(self, MultiValueDictKeyError, 'lastname',
             d.__getitem__, 'lastname')
 
         self.assertEqual(d.get('lastname'), None)
@@ -302,5 +304,7 @@ class DictWrapperTests(SimpleTestCase):
     def test_dictwrapper(self):
         f = lambda x: "*%s" % x
         d = DictWrapper({'a': 'a'}, f, 'xx_')
-        self.assertEqual("Normal: %(a)s. Modified: %(xx_a)s" % d,
-                          'Normal: a. Modified: *a')
+        self.assertEqual(
+            "Normal: %(a)s. Modified: %(xx_a)s" % d,
+            'Normal: a. Modified: *a'
+        )

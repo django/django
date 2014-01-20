@@ -10,6 +10,7 @@ from django.views.generic import View, TemplateView, RedirectView
 
 from . import views
 
+
 class SimpleView(View):
     """
     A simple view with a docstring.
@@ -76,7 +77,7 @@ class ViewTest(unittest.TestCase):
         Test that a view can't be accidentally instantiated before deployment
         """
         try:
-            view = SimpleView(key='value').as_view()
+            SimpleView(key='value').as_view()
             self.fail('Should not be able to instantiate a view')
         except AttributeError:
             pass
@@ -86,7 +87,7 @@ class ViewTest(unittest.TestCase):
         Test that a view can't be accidentally instantiated before deployment
         """
         try:
-            view = SimpleView.as_view('value')
+            SimpleView.as_view('value')
             self.fail('Should not be able to use non-keyword arguments instantiating a view')
         except TypeError:
             pass
@@ -226,6 +227,15 @@ class ViewTest(unittest.TestCase):
         for attribute in ('args', 'kwargs', 'request'):
             self.assertNotIn(attribute, dir(bare_view))
             self.assertIn(attribute, dir(view))
+
+    def test_direct_instantiation(self):
+        """
+        It should be possible to use the view by directly instantiating it
+        without going through .as_view() (#21564).
+        """
+        view = PostOnlyView()
+        response = view.dispatch(self.rf.head('/'))
+        self.assertEqual(response.status_code, 405)
 
 
 class TemplateViewTest(TestCase):
@@ -420,6 +430,15 @@ class RedirectViewTest(TestCase):
         response = RedirectView.as_view(url='/bar/')(self.rf.request(PATH_INFO='/foo/'))
         self.assertEqual(response.status_code, 301)
 
+    def test_direct_instantiation(self):
+        """
+        It should be possible to use the view without going through .as_view()
+        (#21564).
+        """
+        view = RedirectView()
+        response = view.dispatch(self.rf.head('/foo/'))
+        self.assertEqual(response.status_code, 410)
+
 
 class GetContextDataTest(unittest.TestCase):
 
@@ -468,3 +487,15 @@ class UseMultipleObjectMixinTest(unittest.TestCase):
         # Overwrite the view's queryset with queryset from kwarg
         context = test_view.get_context_data(object_list=queryset)
         self.assertEqual(context['object_list'], queryset)
+
+
+class SingleObjectTemplateResponseMixinTest(unittest.TestCase):
+
+    def test_template_mixin_without_template(self):
+        """
+        We want to makes sure that if you use a template mixin, but forget the
+        template, it still tells you it's ImproperlyConfigured instead of
+        TemplateDoesNotExist.
+        """
+        view = views.TemplateResponseWithoutTemplate()
+        self.assertRaises(ImproperlyConfigured, view.get_template_names)

@@ -1,15 +1,23 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import importlib
 import json
 from datetime import datetime
+import re
 import unittest
 from xml.dom import minidom
+try:
+    import yaml
+    HAS_YAML = True
+except ImportError:
+    HAS_YAML = False
 
-from django.conf import settings
-from django.core import serializers
+
+from django.core import management, serializers
 from django.db import transaction, connection
-from django.test import TestCase, TransactionTestCase, Approximate
+from django.test import TestCase, TransactionTestCase, override_settings
+from django.test.utils import Approximate
 from django.utils import six
 from django.utils.six import StringIO
 
@@ -17,22 +25,18 @@ from .models import (Category, Author, Article, AuthorProfile, Actor, Movie,
     Score, Player, Team)
 
 
-class SerializerRegistrationTests(unittest.TestCase):
+@override_settings(
+    SERIALIZATION_MODULES={
+        "json2": "django.core.serializers.json",
+    }
+)
+class SerializerRegistrationTests(TestCase):
     def setUp(self):
-        self.old_SERIALIZATION_MODULES = getattr(settings, 'SERIALIZATION_MODULES', None)
         self.old_serializers = serializers._serializers
-
         serializers._serializers = {}
-        settings.SERIALIZATION_MODULES = {
-            "json2" : "django.core.serializers.json",
-        }
 
     def tearDown(self):
         serializers._serializers = self.old_serializers
-        if self.old_SERIALIZATION_MODULES:
-            settings.SERIALIZATION_MODULES = self.old_SERIALIZATION_MODULES
-        else:
-            delattr(settings, 'SERIALIZATION_MODULES')
 
     def test_register(self):
         "Registering a new serializer populates the full registry. Refs #14823"
@@ -66,6 +70,7 @@ class SerializerRegistrationTests(unittest.TestCase):
 
         self.assertIn('python', all_formats)
         self.assertNotIn('python', public_formats)
+
 
 class SerializersTestBase(object):
     @staticmethod
@@ -139,7 +144,7 @@ class SerializersTestBase(object):
         serialized field list - it replaces the pk identifier.
         """
         profile = AuthorProfile(author=self.joe,
-                                date_of_birth=datetime(1970,1,1))
+                                date_of_birth=datetime(1970, 1, 1))
         profile.save()
         serial_str = serializers.serialize(self.serializer_name,
                                            AuthorProfile.objects.all())
@@ -150,7 +155,7 @@ class SerializersTestBase(object):
 
     def test_serialize_field_subset(self):
         """Tests that output can be restricted to a subset of fields"""
-        valid_fields = ('headline','pub_date')
+        valid_fields = ('headline', 'pub_date')
         invalid_fields = ("author", "categories")
         serial_str = serializers.serialize(self.serializer_name,
                                     Article.objects.all(),
@@ -189,7 +194,7 @@ class SerializersTestBase(object):
         mv.save()
 
         with self.assertNumQueries(0):
-            serial_str = serializers.serialize(self.serializer_name, [mv])
+            serializers.serialize(self.serializer_name, [mv])
 
     def test_serialize_with_null_pk(self):
         """
@@ -237,9 +242,9 @@ class SerializersTestBase(object):
         # Regression for #12524 -- dates before 1000AD get prefixed
         # 0's on the year
         a = Article.objects.create(
-        author = self.jane,
-        headline = "Nobody remembers the early years",
-        pub_date = datetime(1, 2, 3, 4, 5, 6))
+            author=self.jane,
+            headline="Nobody remembers the early years",
+            pub_date=datetime(1, 2, 3, 4, 5, 6))
 
         serial_str = serializers.serialize(self.serializer_name, [a])
         date_values = self._get_field_values(serial_str, "pub_date")
@@ -334,6 +339,7 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
                 ret_list.append("".join(temp))
         return ret_list
 
+
 class XmlSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
     serializer_name = "xml"
     fwd_ref_str = """<?xml version="1.0" encoding="utf-8"?>
@@ -392,6 +398,18 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
                 ret_list.append(obj_dict["fields"][field_name])
         return ret_list
 
+    def test_indentation_whitespace(self):
+        Score.objects.create(score=5.0)
+        Score.objects.create(score=6.0)
+        qset = Score.objects.all()
+
+        s = serializers.json.Serializer()
+        json_data = s.serialize(qset, indent=2)
+        for line in json_data.splitlines():
+            if re.search(r'.+,\s*$', line):
+                self.assertEqual(line, line.rstrip())
+
+
 class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
     serializer_name = "json"
     fwd_ref_str = """[
@@ -420,14 +438,76 @@ class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, Transact
         }
     }]"""
 
-try:
-    import yaml
-except ImportError:
-    pass
-else:
-    class YamlSerializerTestCase(SerializersTestBase, TestCase):
-        serializer_name = "yaml"
-        fwd_ref_str = """- fields:
+
+YAML_IMPORT_ERROR_MESSAGE = r'No module named yaml'
+
+
+class YamlImportModuleMock(object):
+    """Provides a wrapped import_module function to simulate yaml ImportError
+
+    In order to run tests that verify the behavior of the YAML serializer
+    when run on a system that has yaml installed (like the django CI server),
+    mock import_module, so that it raises an ImportError when the yaml
+    serializer is being imported.  The importlib.import_module() call is
+    being made in the serializers.register_serializer().
+
+    Refs: #12756
+    """
+    def __init__(self):
+        self._import_module = importlib.import_module
+
+    def import_module(self, module_path):
+        if module_path == serializers.BUILTIN_SERIALIZERS['yaml']:
+            raise ImportError(YAML_IMPORT_ERROR_MESSAGE)
+
+        return self._import_module(module_path)
+
+
+class NoYamlSerializerTestCase(TestCase):
+    """Not having pyyaml installed provides a misleading error
+
+    Refs: #12756
+    """
+    @classmethod
+    def setUpClass(cls):
+        """Removes imported yaml and stubs importlib.import_module"""
+        super(NoYamlSerializerTestCase, cls).setUpClass()
+
+        cls._import_module_mock = YamlImportModuleMock()
+        importlib.import_module = cls._import_module_mock.import_module
+
+        # clear out cached serializers to emulate yaml missing
+        serializers._serializers = {}
+
+    @classmethod
+    def tearDownClass(cls):
+        """Puts yaml back if necessary"""
+        super(NoYamlSerializerTestCase, cls).tearDownClass()
+
+        importlib.import_module = cls._import_module_mock._import_module
+
+        # clear out cached serializers to clean out BadSerializer instances
+        serializers._serializers = {}
+
+    def test_serializer_pyyaml_error_message(self):
+        """Using yaml serializer without pyyaml raises ImportError"""
+        jane = Author(name="Jane")
+        self.assertRaises(ImportError, serializers.serialize, "yaml", [jane])
+
+    def test_deserializer_pyyaml_error_message(self):
+        """Using yaml deserializer without pyyaml raises ImportError"""
+        self.assertRaises(ImportError, serializers.deserialize, "yaml", "")
+
+    def test_dumpdata_pyyaml_error_message(self):
+        """Calling dumpdata produces an error when yaml package missing"""
+        with six.assertRaisesRegex(self, management.CommandError, YAML_IMPORT_ERROR_MESSAGE):
+            management.call_command('dumpdata', format='yaml')
+
+
+@unittest.skipUnless(HAS_YAML, "No yaml library detected")
+class YamlSerializerTestCase(SerializersTestBase, TestCase):
+    serializer_name = "yaml"
+    fwd_ref_str = """- fields:
     headline: Forward references pose no problem
     pub_date: 2006-06-16 15:00:00
     categories: [1]
@@ -443,7 +523,7 @@ else:
   pk: 1
   model: serializers.author"""
 
-        pkless_str = """- fields:
+    pkless_str = """- fields:
     name: Reference
   pk: null
   model: serializers.category
@@ -451,42 +531,44 @@ else:
     name: Non-fiction
   model: serializers.category"""
 
-        @staticmethod
-        def _validate_output(serial_str):
-            try:
-                yaml.safe_load(StringIO(serial_str))
-            except Exception:
-                return False
-            else:
-                return True
+    @staticmethod
+    def _validate_output(serial_str):
+        try:
+            yaml.safe_load(StringIO(serial_str))
+        except Exception:
+            return False
+        else:
+            return True
 
-        @staticmethod
-        def _get_pk_values(serial_str):
-            ret_list = []
-            stream = StringIO(serial_str)
-            for obj_dict in yaml.safe_load(stream):
-                ret_list.append(obj_dict["pk"])
-            return ret_list
+    @staticmethod
+    def _get_pk_values(serial_str):
+        ret_list = []
+        stream = StringIO(serial_str)
+        for obj_dict in yaml.safe_load(stream):
+            ret_list.append(obj_dict["pk"])
+        return ret_list
 
-        @staticmethod
-        def _get_field_values(serial_str, field_name):
-            ret_list = []
-            stream = StringIO(serial_str)
-            for obj_dict in yaml.safe_load(stream):
-                if "fields" in obj_dict and field_name in obj_dict["fields"]:
-                    field_value = obj_dict["fields"][field_name]
-                    # yaml.safe_load will return non-string objects for some
-                    # of the fields we are interested in, this ensures that
-                    # everything comes back as a string
-                    if isinstance(field_value, six.string_types):
-                        ret_list.append(field_value)
-                    else:
-                        ret_list.append(str(field_value))
-            return ret_list
+    @staticmethod
+    def _get_field_values(serial_str, field_name):
+        ret_list = []
+        stream = StringIO(serial_str)
+        for obj_dict in yaml.safe_load(stream):
+            if "fields" in obj_dict and field_name in obj_dict["fields"]:
+                field_value = obj_dict["fields"][field_name]
+                # yaml.safe_load will return non-string objects for some
+                # of the fields we are interested in, this ensures that
+                # everything comes back as a string
+                if isinstance(field_value, six.string_types):
+                    ret_list.append(field_value)
+                else:
+                    ret_list.append(str(field_value))
+        return ret_list
 
-    class YamlSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
-        serializer_name = "yaml"
-        fwd_ref_str = """- fields:
+
+@unittest.skipUnless(HAS_YAML, "No yaml library detected")
+class YamlSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
+    serializer_name = "yaml"
+    fwd_ref_str = """- fields:
     headline: Forward references pose no problem
     pub_date: 2006-06-16 15:00:00
     categories: [1]

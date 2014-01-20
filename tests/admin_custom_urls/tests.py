@@ -1,11 +1,9 @@
 from __future__ import unicode_literals
-import warnings
 
-from django.contrib.admin.util import quote
+from django.contrib.admin.utils import quote
 from django.core.urlresolvers import reverse
 from django.template.response import TemplateResponse
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 
 from .models import Action, Person, Car
 
@@ -18,6 +16,7 @@ class AdminCustomUrlsTest(TestCase):
     * The ModelAdmin for Action customizes the add_view URL, it's
       '<app name>/<model name>/!add/'
     """
+    urls = 'admin_custom_urls.urls'
     fixtures = ['users.json', 'actions.json']
 
     def setUp(self):
@@ -30,7 +29,7 @@ class AdminCustomUrlsTest(TestCase):
         """
         Ensure GET on the add_view works.
         """
-        response = self.client.get('/custom_urls/admin/admin_custom_urls/action/!add/')
+        response = self.client.get('/admin/admin_custom_urls/action/!add/')
         self.assertIsInstance(response, TemplateResponse)
         self.assertEqual(response.status_code, 200)
 
@@ -39,7 +38,7 @@ class AdminCustomUrlsTest(TestCase):
         Ensure GET on the add_view plus specifying a field value in the query
         string works.
         """
-        response = self.client.get('/custom_urls/admin/admin_custom_urls/action/!add/', {'name': 'My Action'})
+        response = self.client.get('/admin/admin_custom_urls/action/!add/', {'name': 'My Action'})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'value="My Action"')
 
@@ -52,7 +51,7 @@ class AdminCustomUrlsTest(TestCase):
             "name": 'Action added through a popup',
             "description": "Description of added action",
         }
-        response = self.client.post('/custom_urls/admin/admin_custom_urls/action/!add/', post_data)
+        response = self.client.post('/admin/admin_custom_urls/action/!add/', post_data)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'dismissAddAnotherPopup')
         self.assertContains(response, 'Action added through a popup')
@@ -63,7 +62,7 @@ class AdminCustomUrlsTest(TestCase):
         """
         # Should get the change_view for model instance with PK 'add', not show
         # the add_view
-        response = self.client.get('/custom_urls/admin/admin_custom_urls/action/add/')
+        response = self.client.get('/admin/admin_custom_urls/action/add/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Change action')
 
@@ -86,6 +85,7 @@ class AdminCustomUrlsTest(TestCase):
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class CustomRedirects(TestCase):
+    urls = 'admin_custom_urls.urls'
     fixtures = ['users.json', 'actions.json']
 
     def setUp(self):
@@ -101,7 +101,7 @@ class CustomRedirects(TestCase):
         new object.
         Refs 8001, 18310, 19505.
         """
-        post_data = { 'name': 'John Doe', }
+        post_data = {'name': 'John Doe'}
         self.assertEqual(Person.objects.count(), 0)
         response = self.client.post(
             reverse('admin:admin_custom_urls_person_add'), post_data)
@@ -120,7 +120,7 @@ class CustomRedirects(TestCase):
         Person.objects.create(name='John Doe')
         self.assertEqual(Person.objects.count(), 1)
         person = Person.objects.all()[0]
-        post_data = { 'name': 'Jack Doe', }
+        post_data = {'name': 'Jack Doe'}
         response = self.client.post(
             reverse('admin:admin_custom_urls_person_change', args=[person.pk]), post_data)
         self.assertRedirects(
@@ -131,7 +131,7 @@ class CustomRedirects(TestCase):
         Ensures that the ModelAdmin.response_add()'s parameter `post_url_continue`
         controls the redirection after an object has been created.
         """
-        post_data = { 'name': 'SuperFast', '_continue': '1' }
+        post_data = {'name': 'SuperFast', '_continue': '1'}
         self.assertEqual(Car.objects.count(), 0)
         response = self.client.post(
             reverse('admin:admin_custom_urls_car_add'), post_data)

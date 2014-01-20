@@ -1,3 +1,4 @@
+from importlib import import_module
 import os
 from optparse import make_option
 import unittest
@@ -14,6 +15,8 @@ class DiscoverRunner(object):
     A Django test runner that uses unittest2 test discovery.
     """
 
+    test_suite = TestSuite
+    test_runner = unittest.TextTestRunner
     test_loader = defaultTestLoader
     reorder_by = (TestCase, )
     option_list = (
@@ -23,7 +26,7 @@ class DiscoverRunner(object):
         make_option('-p', '--pattern', action='store', dest='pattern',
             default="test*.py",
             help='The test matching pattern. Defaults to test*.py.'),
-        )
+    )
 
     def __init__(self, pattern=None, top_level=None,
                  verbosity=1, interactive=True, failfast=False,
@@ -42,7 +45,7 @@ class DiscoverRunner(object):
         unittest.installHandler()
 
     def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
-        suite = TestSuite()
+        suite = self.test_suite()
         test_labels = test_labels or ['.']
         extra_tests = extra_tests or []
 
@@ -87,12 +90,11 @@ class DiscoverRunner(object):
                     break
                 kwargs['top_level_dir'] = top_level
 
-
-            if not (tests and tests.countTestCases()):
-                # if no tests found, it's probably a package; try discovery
+            if not (tests and tests.countTestCases()) and is_discoverable(label):
+                # Try discovery if path is a package or directory
                 tests = self.test_loader.discover(start_dir=label, **kwargs)
 
-                # make unittest forget the top-level dir it calculated from this
+                # Make unittest forget the top-level dir it calculated from this
                 # run, to support running tests from two different top-levels.
                 self.test_loader._top_level_dir = None
 
@@ -107,7 +109,7 @@ class DiscoverRunner(object):
         return setup_databases(self.verbosity, self.interactive, **kwargs)
 
     def run_suite(self, suite, **kwargs):
-        return unittest.TextTestRunner(
+        return self.test_runner(
             verbosity=self.verbosity,
             failfast=self.failfast,
         ).run(suite)
@@ -147,6 +149,22 @@ class DiscoverRunner(object):
         self.teardown_databases(old_config)
         self.teardown_test_environment()
         return self.suite_result(suite, result)
+
+
+def is_discoverable(label):
+    """
+    Check if a test label points to a python package or file directory.
+
+    Relative labels like "." and ".." are seen as directories.
+    """
+    try:
+        mod = import_module(label)
+    except (ImportError, TypeError):
+        pass
+    else:
+        return hasattr(mod, '__path__')
+
+    return os.path.isdir(os.path.abspath(label))
 
 
 def dependency_ordered(test_databases, dependencies):
@@ -201,10 +219,11 @@ def reorder_suite(suite, classes):
     classes[1], etc. Tests with no match in classes are placed last.
     """
     class_count = len(classes)
-    bins = [unittest.TestSuite() for i in range(class_count+1)]
+    suite_class = type(suite)
+    bins = [suite_class() for i in range(class_count + 1)]
     partition_suite(suite, classes, bins)
     for i in range(class_count):
-        bins[0].addTests(bins[i+1])
+        bins[0].addTests(bins[i + 1])
     return bins[0]
 
 
@@ -218,8 +237,9 @@ def partition_suite(suite, classes, bins):
     Tests of type classes[i] are added to bins[i],
     tests with no match found in classes are place in bins[-1]
     """
+    suite_class = type(suite)
     for test in suite:
-        if isinstance(test, unittest.TestSuite):
+        if isinstance(test, suite_class):
             partition_suite(test, classes, bins)
         else:
             for i in range(len(classes)):
@@ -269,14 +289,14 @@ def setup_databases(verbosity, interactive, **kwargs):
     mirrors = []
 
     for signature, (db_name, aliases) in dependency_ordered(
-        test_databases.items(), dependencies):
+            test_databases.items(), dependencies):
         test_db_name = None
         # Actually create the database for the first connection
         for alias in aliases:
             connection = connections[alias]
             if test_db_name is None:
                 test_db_name = connection.creation.create_test_db(
-                        verbosity, autoclobber=not interactive)
+                    verbosity, autoclobber=not interactive)
                 destroy = True
             else:
                 connection.settings_dict['NAME'] = test_db_name

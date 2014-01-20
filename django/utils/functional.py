@@ -2,6 +2,7 @@ import copy
 import operator
 from functools import wraps
 import sys
+import warnings
 
 from django.utils import six
 from django.utils.six.moves import copyreg
@@ -24,6 +25,10 @@ def memoize(func, cache, num_args):
 
     Only the first num_args are considered when creating the key.
     """
+    warnings.warn("memoize wrapper is deprecated and will be removed in "
+                  "Django 1.9. Use django.utils.lru_cache instead.",
+                  PendingDeprecationWarning, stacklevel=2)
+
     @wraps(func)
     def wrapper(*args):
         mem_args = args[:num_args]
@@ -88,6 +93,7 @@ def lazy(func, *resultclasses):
                 (func, self.__args, self.__kw) + resultclasses
             )
 
+        @classmethod
         def __prepare_class__(cls):
             cls.__dispatch = {}
             for resultclass in resultclasses:
@@ -114,8 +120,8 @@ def lazy(func, *resultclasses):
                     cls.__bytes__ = cls.__bytes_cast
                 else:
                     cls.__str__ = cls.__bytes_cast
-        __prepare_class__ = classmethod(__prepare_class__)
 
+        @classmethod
         def __promise__(cls, klass, funcname, method):
             # Builds a wrapper around some magic method and registers that
             # magic method for the given type and method name.
@@ -132,7 +138,6 @@ def lazy(func, *resultclasses):
                 cls.__dispatch[klass] = {}
             cls.__dispatch[klass][funcname] = method
             return __wrapper__
-        __promise__ = classmethod(__promise__)
 
         def __text_cast(self):
             return func(*self.__args, **self.__kw)
@@ -148,6 +153,11 @@ def lazy(func, *resultclasses):
             else:
                 return func(*self.__args, **self.__kw)
 
+        def __ne__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() != other
+
         def __eq__(self, other):
             if isinstance(other, Promise):
                 other = other.__cast()
@@ -162,7 +172,7 @@ def lazy(func, *resultclasses):
             return hash(self.__cast())
 
         def __mod__(self, rhs):
-            if self._delegate_bytes and not six.PY3:
+            if self._delegate_bytes and six.PY2:
                 return bytes(self) % rhs
             elif self._delegate_text:
                 return six.text_type(self) % rhs
@@ -250,25 +260,20 @@ class LazyObject(object):
 
     def _setup(self):
         """
-        Must be implemented by subclasses to initialise the wrapped object.
+        Must be implemented by subclasses to initialize the wrapped object.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of LazyObject must provide a _setup() method')
 
     # Introspection support
     __dir__ = new_method_proxy(dir)
 
     # Dictionary methods support
-    @new_method_proxy
-    def __getitem__(self, key):
-        return self[key]
+    __getitem__ = new_method_proxy(operator.getitem)
+    __setitem__ = new_method_proxy(operator.setitem)
+    __delitem__ = new_method_proxy(operator.delitem)
 
-    @new_method_proxy
-    def __setitem__(self, key, value):
-        self[key] = value
-
-    @new_method_proxy
-    def __delitem__(self, key):
-        del self[key]
+    __len__ = new_method_proxy(len)
+    __contains__ = new_method_proxy(operator.contains)
 
 
 # Workaround for http://bugs.python.org/issue12370

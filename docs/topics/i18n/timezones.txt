@@ -184,24 +184,25 @@ error handling entirely for the sake of simplicity.)
 
 Add the following middleware to :setting:`MIDDLEWARE_CLASSES`::
 
+    import pytz
+
     from django.utils import timezone
 
     class TimezoneMiddleware(object):
         def process_request(self, request):
-            tz = request.session.get('django_timezone')
-            if tz:
-                timezone.activate(tz)
+            tzname = request.session.get('django_timezone')
+            if tzname:
+                timezone.activate(pytz.timezone(tzname))
             else:
                 timezone.deactivate()
 
 Create a view that can set the current timezone::
 
-    import pytz
     from django.shortcuts import redirect, render
 
     def set_timezone(request):
         if request.method == 'POST':
-            request.session['django_timezone'] = pytz.timezone(request.POST['timezone'])
+            request.session['django_timezone'] = request.POST['timezone']
             return redirect('/')
         else:
             return render(request, 'template.html', {'timezones': pytz.common_timezones})
@@ -431,14 +432,15 @@ code: :func:`~django.utils.timezone.now`,
 Finally, in order to help you locate code that needs upgrading, Django raises
 a warning when you attempt to save a naive datetime to the database::
 
-    RuntimeWarning: DateTimeField received a naive datetime (2012-01-01 00:00:00) while time zone support is active.
+    RuntimeWarning: DateTimeField ModelName.field_name received a naive
+    datetime (2012-01-01 00:00:00) while time zone support is active.
 
 During development, you can turn such warnings into exceptions and get a
 traceback by adding the following to your settings file::
 
     import warnings
     warnings.filterwarnings(
-            'error', r"DateTimeField received a naive datetime",
+            'error', r"DateTimeField .* received a naive datetime",
             RuntimeWarning, r'django\.db\.models\.fields')
 
 Fixtures
@@ -646,6 +648,12 @@ Troubleshooting
        datetime.datetime(2012, 3, 3, 8, 30, tzinfo=<DstTzInfo 'Asia/Singapore' SGT+8:00:00 STD>)
        >>> local.date()
        datetime.date(2012, 3, 3)
+
+4. **I get an error** "``Are time zone definitions for your database and pytz
+   installed?``" **pytz is installed, so I guess the problem is my database?**
+
+   If you are using MySQL, see the :ref:`mysql-time-zone-definitions` section
+   of the MySQL notes for instructions on loading time zone definitions.
 
 Usage
 -----

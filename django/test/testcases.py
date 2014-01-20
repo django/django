@@ -6,40 +6,37 @@ import errno
 from functools import wraps
 import json
 import os
+import posixpath
 import re
-import sys
 import socket
+import sys
 import threading
 import unittest
-from unittest import skipIf         # Imported here for backward compatibility
+from unittest import skipIf         # NOQA: Imported here for backward compatibility
 from unittest.util import safe_repr
-try:
-    from urllib.parse import urlsplit, urlunsplit
-except ImportError:     # Python 2
-    from urlparse import urlsplit, urlunsplit
 
+from django.apps import apps
 from django.conf import settings
-from django.contrib.staticfiles.handlers import StaticFilesHandler
 from django.core import mail
 from django.core.exceptions import ValidationError, ImproperlyConfigured
-from django.core.handlers.wsgi import WSGIHandler
+from django.core.handlers.wsgi import get_path_info, WSGIHandler
 from django.core.management import call_command
 from django.core.management.color import no_style
 from django.core.management.commands import flush
-from django.core.servers.basehttp import (WSGIRequestHandler, WSGIServer,
-    WSGIServerException)
+from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
 from django.core.urlresolvers import clear_url_caches, set_urlconf
 from django.db import connection, connections, DEFAULT_DB_ALIAS, transaction
-from django.db.models.loading import cache
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.test.client import Client
 from django.test.html import HTMLParseError, parse_html
-from django.test.signals import template_rendered
+from django.test.signals import setting_changed, template_rendered
 from django.test.utils import (CaptureQueriesContext, ContextList,
-    override_settings, compare_xml)
-from django.utils import six
+    override_settings, modify_settings, compare_xml)
 from django.utils.encoding import force_text
+from django.utils import six
+from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit, urlparse, unquote
+from django.utils.six.moves.urllib.request import url2pathname
 from django.views.static import serve
 
 
@@ -64,8 +61,10 @@ real_enter_transaction_management = transaction.enter_transaction_management
 real_leave_transaction_management = transaction.leave_transaction_management
 real_abort = transaction.abort
 
+
 def nop(*args, **kwargs):
     return
+
 
 def disable_transaction_methods():
     transaction.commit = nop
@@ -73,6 +72,7 @@ def disable_transaction_methods():
     transaction.enter_transaction_management = nop
     transaction.leave_transaction_management = nop
     transaction.abort = nop
+
 
 def restore_transaction_methods():
     transaction.commit = real_commit
@@ -103,8 +103,12 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
             return
         executed = len(self)
         self.test_case.assertEqual(
-            executed, self.num, "%d queries executed, %d expected" % (
-                executed, self.num
+            executed, self.num,
+            "%d queries executed, %d expected\nCaptured queries were:\n%s" % (
+                executed, self.num,
+                '\n'.join(
+                    query['sql'] for query in self.captured_queries
+                )
             )
         )
 
@@ -160,6 +164,8 @@ class SimpleTestCase(unittest.TestCase):
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
+    _overridden_settings = None
+    _modified_settings = None
 
     def __call__(self, result=None):
         """
@@ -174,8 +180,6 @@ class SimpleTestCase(unittest.TestCase):
         if not skipped:
             try:
                 self._pre_setup()
-            except (KeyboardInterrupt, SystemExit):
-                raise
             except Exception:
                 result.addError(self, sys.exc_info())
                 return
@@ -183,8 +187,6 @@ class SimpleTestCase(unittest.TestCase):
         if not skipped:
             try:
                 self._post_teardown()
-            except (KeyboardInterrupt, SystemExit):
-                raise
             except Exception:
                 result.addError(self, sys.exc_info())
                 return
@@ -196,6 +198,12 @@ class SimpleTestCase(unittest.TestCase):
         * If the class has a 'urls' attribute, replace ROOT_URLCONF with it.
         * Clearing the mail test outbox.
         """
+        if self._overridden_settings:
+            self._overridden_context = override_settings(**self._overridden_settings)
+            self._overridden_context.enable()
+        if self._modified_settings:
+            self._modified_context = modify_settings(self._modified_settings)
+            self._modified_context.enable()
         self.client = self.client_class()
         self._urlconf_setup()
         mail.outbox = []
@@ -213,6 +221,10 @@ class SimpleTestCase(unittest.TestCase):
         * Putting back the original ROOT_URLCONF if it was changed.
         """
         self._urlconf_teardown()
+        if self._modified_settings:
+            self._modified_context.disable()
+        if self._overridden_settings:
+            self._overridden_context.disable()
 
     def _urlconf_teardown(self):
         set_urlconf(None)
@@ -227,16 +239,27 @@ class SimpleTestCase(unittest.TestCase):
         """
         return override_settings(**kwargs)
 
+    def modify_settings(self, **kwargs):
+        """
+        A context manager that temporarily applies changes a list setting and
+        reverts back to the original value when exiting the context.
+        """
+        return modify_settings(**kwargs)
+
     def assertRedirects(self, response, expected_url, status_code=302,
-                        target_status_code=200, host=None, msg_prefix=''):
+                        target_status_code=200, host=None, msg_prefix='',
+                        fetch_redirect_response=True):
         """Asserts that a response redirected to a specific URL, and that the
         redirect URL can be loaded.
 
         Note that assertRedirects won't work for external links since it uses
-        TestClient to do a request.
+        TestClient to do a request (use fetch_redirect_response=False to check
+        such links without fetching thtem).
         """
         if msg_prefix:
             msg_prefix += ": "
+
+        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(expected_url)
 
         if hasattr(response, 'redirect_chain'):
             # The request was a followed redirect
@@ -251,6 +274,7 @@ class SimpleTestCase(unittest.TestCase):
                     (response.redirect_chain[0][1], status_code))
 
             url, status_code = response.redirect_chain[-1]
+            scheme, netloc, path, query, fragment = urlsplit(url)
 
             self.assertEqual(response.status_code, target_status_code,
                 msg_prefix + "Response didn't redirect as expected: Final"
@@ -267,39 +291,31 @@ class SimpleTestCase(unittest.TestCase):
             url = response.url
             scheme, netloc, path, query, fragment = urlsplit(url)
 
-            redirect_response = response.client.get(path, QueryDict(query))
+            if fetch_redirect_response:
+                redirect_response = response.client.get(path, QueryDict(query),
+                                                        secure=(scheme == 'https'))
 
-            # Get the redirection page, using the same client that was used
-            # to obtain the original response.
-            self.assertEqual(redirect_response.status_code, target_status_code,
-                msg_prefix + "Couldn't retrieve redirection page '%s':"
-                " response code was %d (expected %d)" %
-                    (path, redirect_response.status_code, target_status_code))
+                # Get the redirection page, using the same client that was used
+                # to obtain the original response.
+                self.assertEqual(redirect_response.status_code, target_status_code,
+                    msg_prefix + "Couldn't retrieve redirection page '%s':"
+                    " response code was %d (expected %d)" %
+                        (path, redirect_response.status_code, target_status_code))
 
-        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(
-                                                              expected_url)
-        if not (e_scheme or e_netloc):
-            expected_url = urlunsplit(('http', host or 'testserver', e_path,
-                e_query, e_fragment))
+        e_scheme = e_scheme if e_scheme else scheme or 'http'
+        e_netloc = e_netloc if e_netloc else host or 'testserver'
+        expected_url = urlunsplit((e_scheme, e_netloc, e_path, e_query,
+            e_fragment))
 
         self.assertEqual(url, expected_url,
             msg_prefix + "Response redirected to '%s', expected '%s'" %
                 (url, expected_url))
 
-    def assertContains(self, response, text, count=None, status_code=200,
-                       msg_prefix='', html=False):
-        """
-        Asserts that a response indicates that some content was retrieved
-        successfully, (i.e., the HTTP status code was as expected), and that
-        ``text`` occurs ``count`` times in the content of the response.
-        If ``count`` is None, the count doesn't matter - the assertion is true
-        if the text occurs at least once in the response.
-        """
-
+    def _assert_contains(self, response, text, status_code, msg_prefix, html):
         # If the response supports deferred rendering and hasn't been rendered
         # yet, then ensure that it does get rendered before proceeding further.
         if (hasattr(response, 'render') and callable(response.render)
-            and not response.is_rendered):
+                and not response.is_rendered):
             response.render()
 
         if msg_prefix:
@@ -325,6 +341,20 @@ class SimpleTestCase(unittest.TestCase):
             text = assert_and_parse_html(self, text, None,
                 "Second argument is not valid HTML:")
         real_count = content.count(text)
+        return (text_repr, real_count, msg_prefix)
+
+    def assertContains(self, response, text, count=None, status_code=200,
+                       msg_prefix='', html=False):
+        """
+        Asserts that a response indicates that some content was retrieved
+        successfully, (i.e., the HTTP status code was as expected), and that
+        ``text`` occurs ``count`` times in the content of the response.
+        If ``count`` is None, the count doesn't matter - the assertion is true
+        if the text occurs at least once in the response.
+        """
+        text_repr, real_count, msg_prefix = self._assert_contains(
+            response, text, status_code, msg_prefix, html)
+
         if count is not None:
             self.assertEqual(real_count, count,
                 msg_prefix + "Found %d instances of %s in response"
@@ -340,34 +370,11 @@ class SimpleTestCase(unittest.TestCase):
         successfully, (i.e., the HTTP status code was as expected), and that
         ``text`` doesn't occurs in the content of the response.
         """
+        text_repr, real_count, msg_prefix = self._assert_contains(
+            response, text, status_code, msg_prefix, html)
 
-        # If the response supports deferred rendering and hasn't been rendered
-        # yet, then ensure that it does get rendered before proceeding further.
-        if (hasattr(response, 'render') and callable(response.render)
-            and not response.is_rendered):
-            response.render()
-
-        if msg_prefix:
-            msg_prefix += ": "
-
-        self.assertEqual(response.status_code, status_code,
-            msg_prefix + "Couldn't retrieve content: Response code was %d"
-            " (expected %d)" % (response.status_code, status_code))
-
-        content = response.content
-        if not isinstance(text, bytes) or html:
-            text = force_text(text, encoding=response._charset)
-            content = content.decode(response._charset)
-            text_repr = "'%s'" % text
-        else:
-            text_repr = repr(text)
-        if html:
-            content = assert_and_parse_html(self, content, None,
-                'Response\'s content is not valid HTML:')
-            text = assert_and_parse_html(self, text, None,
-                'Second argument is not valid HTML:')
-        self.assertEqual(content.count(text), 0,
-            msg_prefix + "Response should not contain %s" % text_repr)
+        self.assertEqual(real_count, 0,
+                msg_prefix + "Response should not contain %s" % text_repr)
 
     def assertFormError(self, response, form, field, errors, msg_prefix=''):
         """
@@ -388,7 +395,7 @@ class SimpleTestCase(unittest.TestCase):
 
         # Search all contexts for the error.
         found_form = False
-        for i,context in enumerate(contexts):
+        for i, context in enumerate(contexts):
             if form not in context:
                 continue
             found_form = True
@@ -400,15 +407,15 @@ class SimpleTestCase(unittest.TestCase):
                             msg_prefix + "The field '%s' on form '%s' in"
                             " context %d does not contain the error '%s'"
                             " (actual errors: %s)" %
-                                (field, form, i, err, repr(field_errors)))
+                            (field, form, i, err, repr(field_errors)))
                     elif field in context[form].fields:
                         self.fail(msg_prefix + "The field '%s' on form '%s'"
                                   " in context %d contains no errors" %
-                                      (field, form, i))
+                                  (field, form, i))
                     else:
                         self.fail(msg_prefix + "The form '%s' in context %d"
                                   " does not contain the field '%s'" %
-                                      (form, i, field))
+                                  (form, i, field))
                 else:
                     non_field_errors = context[form].non_field_errors()
                     self.assertTrue(err in non_field_errors,
@@ -458,30 +465,30 @@ class SimpleTestCase(unittest.TestCase):
                                 msg_prefix + "The field '%s' on formset '%s', "
                                 "form %d in context %d does not contain the "
                                 "error '%s' (actual errors: %s)" %
-                                        (field, formset, form_index, i, err,
-                                        repr(field_errors)))
+                                (field, formset, form_index, i, err,
+                                 repr(field_errors)))
                     elif field in context[formset].forms[form_index].fields:
                         self.fail(msg_prefix + "The field '%s' "
                                   "on formset '%s', form %d in "
                                   "context %d contains no errors" %
-                                        (field, formset, form_index, i))
+                                  (field, formset, form_index, i))
                     else:
                         self.fail(msg_prefix + "The formset '%s', form %d in "
-                                 "context %d does not contain the field '%s'" %
-                                        (formset, form_index, i, field))
+                                  "context %d does not contain the field '%s'" %
+                                  (formset, form_index, i, field))
                 elif form_index is not None:
                     non_field_errors = context[formset].forms[form_index].non_field_errors()
                     self.assertFalse(len(non_field_errors) == 0,
-                                msg_prefix + "The formset '%s', form %d in "
-                                "context %d does not contain any non-field "
-                                "errors." % (formset, form_index, i))
+                                     msg_prefix + "The formset '%s', form %d in "
+                                     "context %d does not contain any non-field "
+                                     "errors." % (formset, form_index, i))
                     self.assertTrue(err in non_field_errors,
                                     msg_prefix + "The formset '%s', form %d "
                                     "in context %d does not contain the "
                                     "non-field error '%s' "
                                     "(actual errors: %s)" %
-                                        (formset, form_index, i, err,
-                                         repr(non_field_errors)))
+                                    (formset, form_index, i, err,
+                                     repr(non_field_errors)))
                 else:
                     non_form_errors = context[formset].non_form_errors()
                     self.assertFalse(len(non_form_errors) == 0,
@@ -492,31 +499,42 @@ class SimpleTestCase(unittest.TestCase):
                                     msg_prefix + "The formset '%s' in context "
                                     "%d does not contain the "
                                     "non-form error '%s' (actual errors: %s)" %
-                                      (formset, i, err, repr(non_form_errors)))
+                                    (formset, i, err, repr(non_form_errors)))
         if not found_formset:
             self.fail(msg_prefix + "The formset '%s' was not used to render "
                       "the response" % formset)
 
-    def assertTemplateUsed(self, response=None, template_name=None, msg_prefix=''):
-        """
-        Asserts that the template with the provided name was used in rendering
-        the response. Also usable as context manager.
-        """
+    def _assert_template_used(self, response, template_name, msg_prefix):
+
         if response is None and template_name is None:
             raise TypeError('response and/or template_name argument must be provided')
 
         if msg_prefix:
             msg_prefix += ": "
 
-        # Use assertTemplateUsed as context manager.
         if not hasattr(response, 'templates') or (response is None and template_name):
             if response:
                 template_name = response
                 response = None
-            context = _AssertTemplateUsedContext(self, template_name)
-            return context
+            # use this template with context manager
+            return template_name, None, msg_prefix
 
-        template_names = [t.name for t in response.templates]
+        template_names = [t.name for t in response.templates if t.name is not
+                          None]
+        return None, template_names, msg_prefix
+
+    def assertTemplateUsed(self, response=None, template_name=None, msg_prefix=''):
+        """
+        Asserts that the template with the provided name was used in rendering
+        the response. Also usable as context manager.
+        """
+        context_mgr_template, template_names, msg_prefix = self._assert_template_used(
+            response, template_name, msg_prefix)
+
+        if context_mgr_template:
+            # Use assertTemplateUsed as context manager.
+            return _AssertTemplateUsedContext(self, context_mgr_template)
+
         if not template_names:
             self.fail(msg_prefix + "No templates used to render the response")
         self.assertTrue(template_name in template_names,
@@ -529,21 +547,14 @@ class SimpleTestCase(unittest.TestCase):
         Asserts that the template with the provided name was NOT used in
         rendering the response. Also usable as context manager.
         """
-        if response is None and template_name is None:
-            raise TypeError('response and/or template_name argument must be provided')
 
-        if msg_prefix:
-            msg_prefix += ": "
+        context_mgr_template, template_names, msg_prefix = self._assert_template_used(
+            response, template_name, msg_prefix)
 
-        # Use assertTemplateUsed as context manager.
-        if not hasattr(response, 'templates') or (response is None and template_name):
-            if response:
-                template_name = response
-                response = None
-            context = _AssertTemplateNotUsedContext(self, template_name)
-            return context
+        if context_mgr_template:
+            # Use assertTemplateNotUsed as context manager.
+            return _AssertTemplateNotUsedContext(self, context_mgr_template)
 
-        template_names = [t.name for t in response.templates]
         self.assertFalse(template_name in template_names,
             msg_prefix + "Template '%s' was used unexpectedly in rendering"
             " the response" % template_name)
@@ -610,7 +621,7 @@ class SimpleTestCase(unittest.TestCase):
             self.assertEqual(optional.clean(e), empty_value)
         # test that max_length and min_length are always accepted
         if issubclass(fieldclass, CharField):
-            field_kwargs.update({'min_length':2, 'max_length':20})
+            field_kwargs.update({'min_length': 2, 'max_length': 20})
             self.assertTrue(isinstance(fieldclass(*field_args, **field_kwargs),
                                        fieldclass))
 
@@ -714,25 +725,36 @@ class TransactionTestCase(SimpleTestCase):
     # Subclasses can enable only a subset of apps for faster tests
     available_apps = None
 
+    # Subclasses can define fixtures which will be automatically installed.
+    fixtures = None
+
     def _pre_setup(self):
         """Performs any pre-test setup. This includes:
 
         * If the class has an 'available_apps' attribute, restricting the app
-          cache to these applications, then firing post_syncdb -- it must run
-          with the correct set of applications for the test case.
+          registry to these applications, then firing post_migrate -- it must
+          run with the correct set of applications for the test case.
         * If the class has a 'fixtures' attribute, installing these fixtures.
         """
         super(TransactionTestCase, self)._pre_setup()
         if self.available_apps is not None:
-            cache.set_available_apps(self.available_apps)
+            apps.set_available_apps(self.available_apps)
+            setting_changed.send(sender=settings._wrapped.__class__,
+                                 setting='INSTALLED_APPS',
+                                 value=self.available_apps,
+                                 enter=True)
             for db_name in self._databases_names(include_mirrors=False):
-                flush.Command.emit_post_syncdb(
-                        verbosity=0, interactive=False, database=db_name)
+                flush.Command.emit_post_migrate(verbosity=0, interactive=False, database=db_name)
         try:
             self._fixture_setup()
         except Exception:
             if self.available_apps is not None:
-                cache.unset_available_apps()
+                apps.unset_available_apps()
+                setting_changed.send(sender=settings._wrapped.__class__,
+                                     setting='INSTALLED_APPS',
+                                     value=settings.INSTALLED_APPS,
+                                     enter=False)
+
             raise
 
     def _databases_names(self, include_mirrors=True):
@@ -747,9 +769,8 @@ class TransactionTestCase(SimpleTestCase):
     def _reset_sequences(self, db_name):
         conn = connections[db_name]
         if conn.features.supports_sequence_reset:
-            sql_list = \
-                conn.ops.sequence_reset_by_name_sql(no_style(),
-                                                    conn.introspection.sequence_list())
+            sql_list = conn.ops.sequence_reset_by_name_sql(
+                no_style(), conn.introspection.sequence_list())
             if sql_list:
                 with transaction.commit_on_success_unless_managed(using=db_name):
                     cursor = conn.cursor()
@@ -762,17 +783,17 @@ class TransactionTestCase(SimpleTestCase):
             if self.reset_sequences:
                 self._reset_sequences(db_name)
 
-            if hasattr(self, 'fixtures'):
+            if self.fixtures:
                 # We have to use this slightly awkward syntax due to the fact
                 # that we're using *args and **kwargs together.
                 call_command('loaddata', *self.fixtures,
-                             **{'verbosity': 0, 'database': db_name, 'skip_validation': True})
+                             **{'verbosity': 0, 'database': db_name, 'skip_checks': True})
 
     def _post_teardown(self):
         """Performs any post-test things. This includes:
 
         * Flushing the contents of the database, to leave a clean slate. If
-          the class has an 'available_apps' attribute, post_syncdb isn't fired.
+          the class has an 'available_apps' attribute, post_migrate isn't fired.
         * Force-closing the connection, so the next test gets a clean cursor.
         """
         try:
@@ -787,17 +808,22 @@ class TransactionTestCase(SimpleTestCase):
             for conn in connections.all():
                 conn.close()
         finally:
-            cache.unset_available_apps()
+            if self.available_apps is not None:
+                apps.unset_available_apps()
+                setting_changed.send(sender=settings._wrapped.__class__,
+                                     setting='INSTALLED_APPS',
+                                     value=settings.INSTALLED_APPS,
+                                     enter=False)
 
     def _fixture_teardown(self):
-        # Allow TRUNCATE ... CASCADE and don't emit the post_syncdb signal
+        # Allow TRUNCATE ... CASCADE and don't emit the post_migrate signal
         # when flushing only a subset of the apps
         for db_name in self._databases_names(include_mirrors=False):
             call_command('flush', verbosity=0, interactive=False,
-                         database=db_name, skip_validation=True,
+                         database=db_name, skip_checks=True,
                          reset_sequences=False,
                          allow_cascade=self.available_apps is not None,
-                         inhibit_post_syncdb=self.available_apps is not None)
+                         inhibit_post_migrate=self.available_apps is not None)
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True):
         items = six.moves.map(transform, qs)
@@ -854,14 +880,14 @@ class TestCase(TransactionTestCase):
         disable_transaction_methods()
 
         for db_name in self._databases_names(include_mirrors=False):
-            if hasattr(self, 'fixtures'):
+            if self.fixtures:
                 try:
                     call_command('loaddata', *self.fixtures,
                                  **{
-                                    'verbosity': 0,
-                                    'commit': False,
-                                    'database': db_name,
-                                    'skip_validation': True,
+                                     'verbosity': 0,
+                                     'commit': False,
+                                     'database': db_name,
+                                     'skip_checks': True,
                                  })
                 except Exception:
                     self._fixture_teardown()
@@ -934,10 +960,74 @@ class QuietWSGIRequestHandler(WSGIRequestHandler):
         pass
 
 
-class _MediaFilesHandler(StaticFilesHandler):
+class FSFilesHandler(WSGIHandler):
     """
-    Handler for serving the media files. This is a private class that is
-    meant to be used solely as a convenience by LiveServerThread.
+    WSGI middleware that intercepts calls to a directory, as defined by one of
+    the *_ROOT settings, and serves those files, publishing them under *_URL.
+    """
+    def __init__(self, application):
+        self.application = application
+        self.base_url = urlparse(self.get_base_url())
+        super(FSFilesHandler, self).__init__()
+
+    def _should_handle(self, path):
+        """
+        Checks if the path should be handled. Ignores the path if:
+
+        * the host is provided as part of the base_url
+        * the request's path isn't under the media path (or equal)
+        """
+        return path.startswith(self.base_url[2]) and not self.base_url[1]
+
+    def file_path(self, url):
+        """
+        Returns the relative path to the file on disk for the given URL.
+        """
+        relative_url = url[len(self.base_url[2]):]
+        return url2pathname(relative_url)
+
+    def get_response(self, request):
+        from django.http import Http404
+
+        if self._should_handle(request.path):
+            try:
+                return self.serve(request)
+            except Http404:
+                pass
+        return super(FSFilesHandler, self).get_response(request)
+
+    def serve(self, request):
+        os_rel_path = self.file_path(request.path)
+        os_rel_path = posixpath.normpath(unquote(os_rel_path))
+        # Emulate behavior of django.contrib.staticfiles.views.serve() when it
+        # invokes staticfiles' finders functionality.
+        # TODO: Modify if/when that internal API is refactored
+        final_rel_path = os_rel_path.replace('\\', '/').lstrip('/')
+        return serve(request, final_rel_path, document_root=self.get_base_dir())
+
+    def __call__(self, environ, start_response):
+        if not self._should_handle(get_path_info(environ)):
+            return self.application(environ, start_response)
+        return super(FSFilesHandler, self).__call__(environ, start_response)
+
+
+class _StaticFilesHandler(FSFilesHandler):
+    """
+    Handler for serving static files. A private class that is meant to be used
+    solely as a convenience by LiveServerThread.
+    """
+
+    def get_base_dir(self):
+        return settings.STATIC_ROOT
+
+    def get_base_url(self):
+        return settings.STATIC_URL
+
+
+class _MediaFilesHandler(FSFilesHandler):
+    """
+    Handler for serving the media files. A private class that is meant to be
+    used solely as a convenience by LiveServerThread.
     """
 
     def get_base_dir(self):
@@ -946,22 +1036,19 @@ class _MediaFilesHandler(StaticFilesHandler):
     def get_base_url(self):
         return settings.MEDIA_URL
 
-    def serve(self, request):
-        relative_url = request.path[len(self.base_url[2]):]
-        return serve(request, relative_url, document_root=self.get_base_dir())
-
 
 class LiveServerThread(threading.Thread):
     """
     Thread for running a live http server while the tests are running.
     """
 
-    def __init__(self, host, possible_ports, connections_override=None):
+    def __init__(self, host, possible_ports, static_handler, connections_override=None):
         self.host = host
         self.port = None
         self.possible_ports = possible_ports
         self.is_ready = threading.Event()
         self.error = None
+        self.static_handler = static_handler
         self.connections_override = connections_override
         super(LiveServerThread, self).__init__()
 
@@ -977,7 +1064,7 @@ class LiveServerThread(threading.Thread):
                 connections[alias] = conn
         try:
             # Create the handler for serving static and media files
-            handler = StaticFilesHandler(_MediaFilesHandler(WSGIHandler()))
+            handler = self.static_handler(_MediaFilesHandler(WSGIHandler()))
 
             # Go through the list of possible ports, hoping that we can find
             # one that is free to use for the WSGI server.
@@ -985,10 +1072,9 @@ class LiveServerThread(threading.Thread):
                 try:
                     self.httpd = WSGIServer(
                         (self.host, port), QuietWSGIRequestHandler)
-                except WSGIServerException as e:
+                except socket.error as e:
                     if (index + 1 < len(self.possible_ports) and
-                        hasattr(e.args[0], 'errno') and
-                        e.args[0].errno == errno.EADDRINUSE):
+                            e.errno == errno.EADDRINUSE):
                         # This port is already in use, so we go on and try with
                         # the next one in the list.
                         continue
@@ -1009,12 +1095,11 @@ class LiveServerThread(threading.Thread):
             self.error = e
             self.is_ready.set()
 
-    def join(self, timeout=None):
+    def terminate(self):
         if hasattr(self, 'httpd'):
             # Stop the WSGI server
             self.httpd.shutdown()
             self.httpd.server_close()
-        super(LiveServerThread, self).join(timeout)
 
 
 class LiveServerTestCase(TransactionTestCase):
@@ -1029,6 +1114,8 @@ class LiveServerTestCase(TransactionTestCase):
     other thread can see the changes.
     """
 
+    static_handler = _StaticFilesHandler
+
     @property
     def live_server_url(self):
         return 'http://%s:%s' % (
@@ -1041,7 +1128,7 @@ class LiveServerTestCase(TransactionTestCase):
             # If using in-memory sqlite databases, pass the connections to
             # the server thread.
             if (conn.vendor == 'sqlite'
-                and conn.settings_dict['NAME'] == ':memory:'):
+                    and conn.settings_dict['NAME'] == ':memory:'):
                 # Explicitly enable thread-shareability for this connection
                 conn.allow_thread_sharing = True
                 connections_override[conn.alias] = conn
@@ -1070,30 +1157,38 @@ class LiveServerTestCase(TransactionTestCase):
         except Exception:
             msg = 'Invalid address ("%s") for live server.' % specified_address
             six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg), sys.exc_info()[2])
-        cls.server_thread = LiveServerThread(
-            host, possible_ports, connections_override)
+        cls.server_thread = LiveServerThread(host, possible_ports,
+                                             cls.static_handler,
+                                             connections_override=connections_override)
         cls.server_thread.daemon = True
         cls.server_thread.start()
 
         # Wait for the live server to be ready
         cls.server_thread.is_ready.wait()
         if cls.server_thread.error:
+            # Clean up behind ourselves, since tearDownClass won't get called in
+            # case of errors.
+            cls._tearDownClassInternal()
             raise cls.server_thread.error
 
         super(LiveServerTestCase, cls).setUpClass()
 
     @classmethod
-    def tearDownClass(cls):
+    def _tearDownClassInternal(cls):
         # There may not be a 'server_thread' attribute if setUpClass() for some
         # reasons has raised an exception.
         if hasattr(cls, 'server_thread'):
             # Terminate the live server's thread
+            cls.server_thread.terminate()
             cls.server_thread.join()
 
         # Restore sqlite connections' non-sharability
         for conn in connections.all():
             if (conn.vendor == 'sqlite'
-                and conn.settings_dict['NAME'] == ':memory:'):
+                    and conn.settings_dict['NAME'] == ':memory:'):
                 conn.allow_thread_sharing = False
 
+    @classmethod
+    def tearDownClass(cls):
+        cls._tearDownClassInternal()
         super(LiveServerTestCase, cls).tearDownClass()

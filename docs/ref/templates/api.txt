@@ -274,11 +274,6 @@ Builtin variables
 Every context contains ``True``, ``False`` and ``None``. As you would expect,
 these variables resolve to the corresponding Python objects.
 
-.. versionadded:: 1.5
-
-    Before Django 1.5, these variables weren't a special case, and they
-    resolved to ``None`` unless you defined them in the context.
-
 Playing with Context objects
 ----------------------------
 
@@ -311,10 +306,12 @@ If you ``pop()`` too much, it'll raise
     >>> c = Context()
     >>> c['foo'] = 'first level'
     >>> c.push()
+    {}
     >>> c['foo'] = 'second level'
     >>> c['foo']
     'second level'
     >>> c.pop()
+    {'foo': 'second level'}
     >>> c['foo']
     'first level'
     >>> c['foo'] = 'overwritten'
@@ -599,16 +596,30 @@ The Python API
 
 ``django.template.loader`` has two functions to load templates from files:
 
-.. function:: get_template(template_name)
+.. function:: get_template(template_name[, dirs])
 
     ``get_template`` returns the compiled template (a ``Template`` object) for
     the template with the given name. If the template doesn't exist, it raises
     ``django.template.TemplateDoesNotExist``.
 
-.. function:: select_template(template_name_list)
+    To override the :setting:`TEMPLATE_DIRS` setting, use the ``dirs``
+    parameter. The ``dirs`` parameter may be a tuple or list.
+
+    .. versionchanged:: 1.7
+
+       The ``dirs`` parameter was added.
+
+.. function:: select_template(template_name_list[, dirs])
 
     ``select_template`` is just like ``get_template``, except it takes a list
     of template names. Of the list, it returns the first template that exists.
+
+    To override the :setting:`TEMPLATE_DIRS` setting, use the ``dirs``
+    parameter. The ``dirs`` parameter may be a tuple or list.
+
+    .. versionchanged:: 1.7
+
+       The ``dirs`` parameter was added.
 
 For example, if you call ``get_template('story_detail.html')`` and have the
 above :setting:`TEMPLATE_DIRS` setting, here are the files Django will look for,
@@ -764,10 +775,45 @@ Django uses the template loaders in order according to the
 :setting:`TEMPLATE_LOADERS` setting. It uses each loader until a loader finds a
 match.
 
+.. currentmodule:: django.template
+
+Template origin
+~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.7
+
+When :setting:`TEMPLATE_DEBUG` is ``True`` template objects will have an
+``origin`` attribute depending on the source they are loaded from.
+
+.. class:: loader.LoaderOrigin
+
+    Templates created from a template loader will use the
+    ``django.template.loader.LoaderOrigin`` class.
+
+    .. attribute:: name
+
+        The path to the template as returned by the template loader.
+        For loaders that read from the file system, this is the full
+        path to the template.
+
+    .. attribute:: loadname
+
+        The relative path to the template as passed into the
+        template loader.
+
+.. class:: StringOrigin
+
+    Templates created from a ``Template`` class will use the
+    ``django.template.StringOrigin`` class.
+
+    .. attribute:: source
+
+        The string used to create the template.
+
 The ``render_to_string`` shortcut
 ===================================
 
-.. function:: django.template.loader.render_to_string(template_name, dictionary=None, context_instance=None)
+.. function:: loader.render_to_string(template_name, dictionary=None, context_instance=None)
 
 To cut down on the repetitive nature of loading and rendering
 templates, Django provides a shortcut function which largely
@@ -789,9 +835,9 @@ dictionary
     positional argument.
 
 context_instance
-    An instance of ``Context`` or a subclass (e.g., an instance of
-    ``RequestContext``) to use as the template's context. This can
-    also be passed as the third positional argument.
+    An instance of :class:`~django.template.Context` or a subclass (e.g., an
+    instance of :class:`~django.template.RequestContext`) to use as the
+    template's context. This can also be passed as the third positional argument.
 
 See also the :func:`~django.shortcuts.render_to_response()` shortcut, which
 calls ``render_to_string`` and feeds the result into an :class:`~django.http.HttpResponse`

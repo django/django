@@ -7,6 +7,7 @@ from .models import (Media, PhoneNumber, Episode, EpisodeExtra, Contact,
 
 site = admin.AdminSite(name="admin")
 
+
 class MediaInline(generic.GenericTabularInline):
     model = Media
 

@@ -7,8 +7,7 @@ from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.context_processors import PermWrapper, PermLookupDict
 from django.db.models import Q
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils._os import upath
 
 
@@ -112,7 +111,7 @@ class AuthContextProcessorTests(TestCase):
         self.assertContains(response, "Has auth permissions")
         self.assertContains(response, "Has auth.add_permission permissions")
         self.assertNotContains(response, "nonexisting")
-    
+
     def test_perm_in_perms_attrs(self):
         u = User.objects.create_user(username='normal', password='secret')
         u.user_permissions.add(

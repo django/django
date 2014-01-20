@@ -48,8 +48,8 @@ class UserAdmin(admin.ModelAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'password1', 'password2')}
-        ),
+            'fields': ('username', 'password1', 'password2'),
+        }),
     )
     form = UserChangeForm
     add_form = UserCreationForm
@@ -144,7 +144,8 @@ class UserAdmin(admin.ModelAdmin):
             'adminForm': adminForm,
             'form_url': form_url,
             'form': form,
-            'is_popup': IS_POPUP_VAR in request.REQUEST,
+            'is_popup': (IS_POPUP_VAR in request.POST or
+                         IS_POPUP_VAR in request.GET),
             'add': True,
             'change': False,
             'has_delete_permission': False,

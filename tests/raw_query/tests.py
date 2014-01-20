@@ -32,11 +32,15 @@ class RawQueryTests(TestCase):
 
             for field in model._meta.fields:
                 # Check that all values on the model are equal
-                self.assertEqual(getattr(item,field.attname),
-                                  getattr(orig_item,field.attname))
+                self.assertEqual(
+                    getattr(item, field.attname),
+                    getattr(orig_item, field.attname)
+                )
                 # This includes checking that they are the same type
-                self.assertEqual(type(getattr(item,field.attname)),
-                                  type(getattr(orig_item,field.attname)))
+                self.assertEqual(
+                    type(getattr(item, field.attname)),
+                    type(getattr(orig_item, field.attname))
+                )
 
     def assertNoAnnotations(self, results):
         """
@@ -234,6 +238,4 @@ class RawQueryTests(TestCase):
         )
 
     def test_query_count(self):
-        self.assertNumQueries(1,
-            list, Author.objects.raw("SELECT * FROM raw_query_author")
-        )
+        self.assertNumQueries(1, list, Author.objects.raw("SELECT * FROM raw_query_author"))

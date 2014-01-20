@@ -14,6 +14,8 @@ from django.db.backends.postgresql_psycopg2.client import DatabaseClient
 from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation
 from django.db.backends.postgresql_psycopg2.version import get_version
 from django.db.backends.postgresql_psycopg2.introspection import DatabaseIntrospection
+from django.db.backends.postgresql_psycopg2.schema import DatabaseSchemaEditor
+from django.db.utils import InterfaceError
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeText, SafeBytes
@@ -30,6 +32,7 @@ DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
+psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
 psycopg2.extensions.register_adapter(SafeBytes, psycopg2.extensions.QuotedString)
 psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
 
@@ -55,6 +58,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_tablespaces = True
     supports_transactions = True
     can_distinct_on_fields = True
+    can_rollback_ddl = True
+    supports_combined_alters = True
+    nulls_order_largest = True
+    closed_cursor_error_class = InterfaceError
+    has_case_insensitive_like = False
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
@@ -76,6 +84,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': 'LIKE UPPER(%s)',
     }
 
+    pattern_ops = {
+        'startswith': "LIKE %s || '%%%%'",
+        'istartswith': "LIKE UPPER(%s) || '%%%%'",
+    }
+
     Database = Database
 
     def __init__(self, *args, **kwargs):
@@ -94,13 +107,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def get_connection_params(self):
         settings_dict = self.settings_dict
-        if not settings_dict['NAME']:
+        # None may be used to connect to the default 'postgres' db
+        if settings_dict['NAME'] == '':
             from django.core.exceptions import ImproperlyConfigured
             raise ImproperlyConfigured(
                 "settings.DATABASES is improperly configured. "
                 "Please supply the NAME value.")
         conn_params = {
-            'database': settings_dict['NAME'],
+            'database': settings_dict['NAME'] or 'postgres',
         }
         conn_params.update(settings_dict['OPTIONS'])
         if 'autocommit' in conn_params:
@@ -134,12 +148,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 conn_tz = get_parameter_status('TimeZone')
 
             if conn_tz != tz:
-                # Set the time zone in autocommit mode (see #17062)
-                self.set_autocommit(True)
-                self.connection.cursor().execute(
-                    self.ops.set_time_zone_sql(), [tz]
-                )
-        self.connection.set_isolation_level(self.isolation_level)
+                cursor = self.connection.cursor()
+                cursor.execute(self.ops.set_time_zone_sql(), [tz])
+                cursor.close()
+                # Commit after setting the time zone (see #17062)
+                if not self.get_autocommit():
+                    self.connection.commit()
 
     def create_cursor(self):
         cursor = self.connection.cursor()
@@ -160,7 +174,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # notification. If we don't set self.connection to None, the error
             # will occur a every request.
             self.connection = None
-            logger.warning('psycopg2 error while closing the connection.',
+            logger.warning(
+                'psycopg2 error while closing the connection.',
                 exc_info=sys.exc_info()
             )
             raise
@@ -200,6 +215,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return False
         else:
             return True
+
+    def schema_editor(self, *args, **kwargs):
+        "Returns a new instance of this backend's SchemaEditor"
+        return DatabaseSchemaEditor(self, *args, **kwargs)
 
     @cached_property
     def psycopg2_version(self):

@@ -1,6 +1,7 @@
-from django.test.testcases import TestCase
+from django.test import TestCase
 from django.contrib.messages.tests.urls import ContactFormViewWithMsg
 from django.core.urlresolvers import reverse
+
 
 class SuccessMessageMixinTests(TestCase):
     urls = 'django.contrib.messages.tests.urls'

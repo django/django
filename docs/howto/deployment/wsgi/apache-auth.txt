@@ -16,7 +16,7 @@ version >= 2.2 and mod_wsgi >= 2.0. For example, you could:
 
 .. note::
     If you have installed a :ref:`custom User model <auth-custom-user>` and
-    want to use this default auth handler, it must support an `is_active`
+    want to use this default auth handler, it must support an ``is_active``
     attribute. If you want to use group based authorization, your custom user
     must have a relation named 'groups', referring to a related object that has
     a 'name' field. You can also specify your own custom mod_wsgi
@@ -38,6 +38,7 @@ only authenticated users to be able to view:
 .. code-block:: apache
 
     WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
+    WSGIPythonPath /path/to/mysite.com
 
     WSGIProcessGroup %{GLOBAL}
     WSGIApplicationGroup django
@@ -76,7 +77,6 @@ function:
 .. code-block:: python
 
     import os
-    import sys
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
 

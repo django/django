@@ -1,19 +1,21 @@
-from unittest import skipIf
+from unittest import skipUnless
 
 from django import http
-from django.conf import settings, global_settings
+from django.apps import apps
+from django.conf import global_settings
 from django.contrib.messages import constants, utils, get_level, set_level
 from django.contrib.messages.api import MessageFailure
+from django.contrib.messages.constants import DEFAULT_LEVELS
 from django.contrib.messages.storage import default_storage, base
 from django.contrib.messages.storage.base import Message
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
+from django.test import modify_settings, override_settings
 from django.utils.translation import ugettext_lazy
 
 
 def skipUnlessAuthIsInstalled(func):
-    return skipIf(
-        'django.contrib.auth' not in settings.INSTALLED_APPS,
+    return skipUnless(
+        apps.is_installed('django.contrib.auth'),
         "django.contrib.auth isn't installed")(func)
 
 
@@ -31,14 +33,15 @@ def add_level_messages(storage):
 
 
 class override_settings_tags(override_settings):
-     def enable(self):
+    def enable(self):
         super(override_settings_tags, self).enable()
         # LEVEL_TAGS is a constant defined in the
         # django.contrib.messages.storage.base module, so after changing
         # settings.MESSAGE_TAGS, we need to update that constant too.
         self.old_level_tags = base.LEVEL_TAGS
         base.LEVEL_TAGS = utils.get_level_tags()
-     def disable(self):
+
+    def disable(self):
         super(override_settings_tags, self).disable()
         base.LEVEL_TAGS = self.old_level_tags
 
@@ -56,11 +59,12 @@ class BaseTests(object):
 
     def setUp(self):
         self.settings_override = override_settings_tags(
-            TEMPLATE_DIRS   = (),
-            TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS,
-            MESSAGE_TAGS    = '',
-            MESSAGE_STORAGE = '%s.%s' % (self.storage_class.__module__,
-                                         self.storage_class.__name__),
+            TEMPLATE_DIRS=(),
+            TEMPLATE_CONTEXT_PROCESSORS=global_settings.TEMPLATE_CONTEXT_PROCESSORS,
+            MESSAGE_TAGS='',
+            MESSAGE_STORAGE='%s.%s' % (self.storage_class.__module__,
+                                       self.storage_class.__name__),
+            SESSION_SERIALIZER='django.contrib.sessions.serializers.JSONSerializer',
         )
         self.settings_override.enable()
 
@@ -161,8 +165,7 @@ class BaseTests(object):
             response = self.client.post(add_url, data, follow=True)
             self.assertRedirects(response, show_url)
             self.assertTrue('messages' in response.context)
-            messages = [Message(self.levels[level], msg) for msg in
-                                                         data['messages']]
+            messages = [Message(self.levels[level], msg) for msg in data['messages']]
             self.assertEqual(list(response.context['messages']), messages)
             for msg in data['messages']:
                 self.assertContains(response, msg)
@@ -187,6 +190,13 @@ class BaseTests(object):
             for msg in data['messages']:
                 self.assertNotContains(response, msg)
 
+    def test_context_processor_message_levels(self):
+        show_url = reverse('django.contrib.messages.tests.urls.show_template_response')
+        response = self.client.get(show_url)
+
+        self.assertTrue('DEFAULT_MESSAGE_LEVELS' in response.context)
+        self.assertEqual(response.context['DEFAULT_MESSAGE_LEVELS'], DEFAULT_LEVELS)
+
     @override_settings(MESSAGE_LEVEL=constants.DEBUG)
     def test_multiple_posts(self):
         """
@@ -199,8 +209,7 @@ class BaseTests(object):
         show_url = reverse('django.contrib.messages.tests.urls.show')
         messages = []
         for level in ('debug', 'info', 'success', 'warning', 'error'):
-            messages.extend([Message(self.levels[level], msg) for msg in
-                                                             data['messages']])
+            messages.extend([Message(self.levels[level], msg) for msg in data['messages']])
             add_url = reverse('django.contrib.messages.tests.urls.add',
                               args=(level,))
             self.client.post(add_url, data)
@@ -210,16 +219,12 @@ class BaseTests(object):
         for msg in data['messages']:
             self.assertContains(response, msg)
 
-    @override_settings(
-        INSTALLED_APPS=filter(
-            lambda app:app!='django.contrib.messages', settings.INSTALLED_APPS),
-        MIDDLEWARE_CLASSES=filter(
-            lambda m:'MessageMiddleware' not in m, settings.MIDDLEWARE_CLASSES),
-        TEMPLATE_CONTEXT_PROCESSORS=filter(
-            lambda p:'context_processors.messages' not in p,
-                 settings.TEMPLATE_CONTEXT_PROCESSORS),
-        MESSAGE_LEVEL=constants.DEBUG
+    @modify_settings(
+        INSTALLED_APPS={'remove': 'django.contrib.messages'},
+        MIDDLEWARE_CLASSES={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
+        TEMPLATE_CONTEXT_PROCESSORS={'remove': 'django.contrib.messages.context_processors.messages'},
     )
+    @override_settings(MESSAGE_LEVEL=constants.DEBUG)
     def test_middleware_disabled(self):
         """
         Tests that, when the middleware is disabled, an exception is raised
@@ -228,22 +233,17 @@ class BaseTests(object):
         data = {
             'messages': ['Test message %d' % x for x in range(5)],
         }
-        show_url = reverse('django.contrib.messages.tests.urls.show')
+        reverse('django.contrib.messages.tests.urls.show')
         for level in ('debug', 'info', 'success', 'warning', 'error'):
             add_url = reverse('django.contrib.messages.tests.urls.add',
                               args=(level,))
             self.assertRaises(MessageFailure, self.client.post, add_url,
                               data, follow=True)
 
-    @override_settings(
-        INSTALLED_APPS=filter(
-            lambda app:app!='django.contrib.messages', settings.INSTALLED_APPS),
-        MIDDLEWARE_CLASSES=filter(
-            lambda m:'MessageMiddleware' not in m, settings.MIDDLEWARE_CLASSES),
-        TEMPLATE_CONTEXT_PROCESSORS=filter(
-            lambda p:'context_processors.messages' not in p,
-                 settings.TEMPLATE_CONTEXT_PROCESSORS),
-        MESSAGE_LEVEL=constants.DEBUG
+    @modify_settings(
+        INSTALLED_APPS={'remove': 'django.contrib.messages'},
+        MIDDLEWARE_CLASSES={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
+        TEMPLATE_CONTEXT_PROCESSORS={'remove': 'django.contrib.messages.context_processors.messages'},
     )
     def test_middleware_disabled_fail_silently(self):
         """
@@ -275,7 +275,7 @@ class BaseTests(object):
     def get_existing_storage(self):
         return self.get_storage([Message(constants.INFO, 'Test message 1'),
                                  Message(constants.INFO, 'Test message 2',
-                                              extra_tags='tag')])
+                                 extra_tags='tag')])
 
     def test_existing_read(self):
         """
@@ -351,13 +351,22 @@ class BaseTests(object):
                          ['info', '', 'extra-tag debug', 'warning', 'error',
                           'success'])
 
+    def test_level_tag(self):
+        storage = self.get_storage()
+        storage.level = 0
+        add_level_messages(storage)
+        tags = [msg.level_tag for msg in storage]
+        self.assertEqual(tags,
+                         ['info', '', 'debug', 'warning', 'error',
+                          'success'])
+
     @override_settings_tags(MESSAGE_TAGS={
-            constants.INFO: 'info',
-            constants.DEBUG: '',
-            constants.WARNING: '',
-            constants.ERROR: 'bad',
-            29: 'custom',
-        }
+        constants.INFO: 'info',
+        constants.DEBUG: '',
+        constants.WARNING: '',
+        constants.ERROR: 'bad',
+        29: 'custom',
+    }
     )
     def test_custom_tags(self):
         storage = self.get_storage()

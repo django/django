@@ -3,12 +3,13 @@ from __future__ import unicode_literals
 import datetime
 
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
-from django.contrib.admin.util import (lookup_field, display_for_field,
+from django.contrib.admin.utils import (lookup_field, display_for_field,
     display_for_value, label_for_field)
 from django.contrib.admin.views.main import (ALL_VAR, EMPTY_CHANGELIST_VALUE,
     ORDER_VAR, PAGE_VAR, SEARCH_VAR)
 from django.contrib.admin.templatetags.admin_static import static
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import NoReverseMatch
 from django.db import models
 from django.utils import formats
 from django.utils.html import escapejs, format_html
@@ -24,20 +25,22 @@ register = Library()
 
 DOT = '.'
 
+
 @register.simple_tag
-def paginator_number(cl,i):
+def paginator_number(cl, i):
     """
     Generates an individual page index link in a paginated list.
     """
     if i == DOT:
         return '... '
     elif i == cl.page_num:
-        return format_html('<span class="this-page">{0}</span> ', i+1)
+        return format_html('<span class="this-page">{0}</span> ', i + 1)
     else:
         return format_html('<a href="{0}"{1}>{2}</a> ',
                            cl.get_query_string({PAGE_VAR: i}),
-                           mark_safe(' class="end"' if i == cl.paginator.num_pages-1 else ''),
-                           i+1)
+                           mark_safe(' class="end"' if i == cl.paginator.num_pages - 1 else ''),
+                           i + 1)
+
 
 @register.inclusion_tag('admin/pagination.html')
 def pagination(cl):
@@ -85,15 +88,17 @@ def pagination(cl):
         '1': 1,
     }
 
+
 def result_headers(cl):
     """
     Generates the list column headers.
     """
     ordering_field_columns = cl.get_ordering_field_columns()
     for i, field_name in enumerate(cl.list_display):
-        text, attr = label_for_field(field_name, cl.model,
-            model_admin = cl.model_admin,
-            return_attr = True
+        text, attr = label_for_field(
+            field_name, cl.model,
+            model_admin=cl.model_admin,
+            return_attr=True
         )
         if attr:
             # Potentially not sortable
@@ -132,13 +137,13 @@ def result_headers(cl):
             new_order_type = {'asc': 'desc', 'desc': 'asc'}[order_type]
 
         # build new ordering param
-        o_list_primary = [] # URL for making this field the primary sort
-        o_list_remove  = [] # URL for removing this field from sort
-        o_list_toggle  = [] # URL for toggling order type for this field
+        o_list_primary = []  # URL for making this field the primary sort
+        o_list_remove = []  # URL for removing this field from sort
+        o_list_toggle = []  # URL for toggling order type for this field
         make_qs_param = lambda t, n: ('-' if t == 'desc' else '') + str(n)
 
         for j, ot in ordering_field_columns.items():
-            if j == i: # Same column
+            if j == i:  # Same column
                 param = make_qs_param(new_order_type, j)
                 # We want clicking on this header to bring the ordering to the
                 # front
@@ -154,7 +159,6 @@ def result_headers(cl):
         if i not in ordering_field_columns:
             o_list_primary.insert(0, make_qs_param(new_order_type, i))
 
-
         yield {
             "text": text,
             "sortable": True,
@@ -164,19 +168,28 @@ def result_headers(cl):
             "url_primary": cl.get_query_string({ORDER_VAR: '.'.join(o_list_primary)}),
             "url_remove": cl.get_query_string({ORDER_VAR: '.'.join(o_list_remove)}),
             "url_toggle": cl.get_query_string({ORDER_VAR: '.'.join(o_list_toggle)}),
-            "class_attrib": format_html(' class="{0}"', ' '.join(th_classes))
-                            if th_classes else '',
+            "class_attrib": format_html(' class="{0}"', ' '.join(th_classes)) if th_classes else '',
         }
+
 
 def _boolean_icon(field_val):
     icon_url = static('admin/img/icon-%s.gif' %
                       {True: 'yes', False: 'no', None: 'unknown'}[field_val])
     return format_html('<img src="{0}" alt="{1}" />', icon_url, field_val)
 
+
 def items_for_result(cl, result, form):
     """
     Generates the actual list of data.
     """
+
+    def link_in_col(is_first, field_name, cl):
+        if cl.list_display_links is None:
+            return False
+        if is_first and not cl.list_display_links:
+            return True
+        return field_name in cl.list_display_links
+
     first = True
     pk = cl.lookup_opts.pk.attname
     for field_name in cl.list_display:
@@ -215,26 +228,36 @@ def items_for_result(cl, result, form):
             result_repr = mark_safe('&nbsp;')
         row_class = mark_safe(' class="%s"' % ' '.join(row_classes))
         # If list_display_links not defined, add the link tag to the first field
-        if (first and not cl.list_display_links) or field_name in cl.list_display_links:
-            table_tag = {True:'th', False:'td'}[first]
+        if link_in_col(first, field_name, cl):
+            table_tag = 'th' if first else 'td'
             first = False
-            url = cl.url_for_result(result)
-            url = add_preserved_filters({'preserved_filters': cl.preserved_filters, 'opts': cl.opts}, url)
-            # Convert the pk to something that can be used in Javascript.
-            # Problem cases are long ints (23L) and non-ASCII strings.
-            if cl.to_field:
-                attr = str(cl.to_field)
+
+            # Display link to the result's change_view if the url exists, else
+            # display just the result's representation.
+            try:
+                url = cl.url_for_result(result)
+            except NoReverseMatch:
+                link_or_text = result_repr
             else:
-                attr = pk
-            value = result.serializable_value(attr)
-            result_id = escapejs(value)
-            yield format_html('<{0}{1}><a href="{2}"{3}>{4}</a></{5}>',
+                url = add_preserved_filters({'preserved_filters': cl.preserved_filters, 'opts': cl.opts}, url)
+                # Convert the pk to something that can be used in Javascript.
+                # Problem cases are long ints (23L) and non-ASCII strings.
+                if cl.to_field:
+                    attr = str(cl.to_field)
+                else:
+                    attr = pk
+                value = result.serializable_value(attr)
+                result_id = escapejs(value)
+                link_or_text = format_html(
+                    '<a href="{0}"{1}>{2}</a>',
+                    url,
+                    format_html(' onclick="opener.dismissRelatedLookupPopup(window, &#39;{0}&#39;); return false;"', result_id) if cl.is_popup else '',
+                    result_repr)
+
+            yield format_html('<{0}{1}>{2}</{3}>',
                               table_tag,
                               row_class,
-                              url,
-                              format_html(' onclick="opener.dismissRelatedLookupPopup(window, &#39;{0}&#39;); return false;"', result_id)
-                                if cl.is_popup else '',
-                              result_repr,
+                              link_or_text,
                               table_tag)
         else:
             # By default the fields come from ModelAdmin.list_editable, but if we pull
@@ -242,12 +265,13 @@ def items_for_result(cl, result, form):
             # can provide fields on a per request basis
             if (form and field_name in form.fields and not (
                     field_name == cl.model._meta.pk.name and
-                        form[cl.model._meta.pk.name].is_hidden)):
+                    form[cl.model._meta.pk.name].is_hidden)):
                 bf = form[field_name]
                 result_repr = mark_safe(force_text(bf.errors) + force_text(bf))
             yield format_html('<td{0}>{1}</td>', row_class, result_repr)
     if form and not form[cl.model._meta.pk.name].is_hidden:
         yield format_html('<td>{0}</td>', force_text(form[cl.model._meta.pk.name]))
+
 
 class ResultList(list):
     # Wrapper class used to return items in a list_editable
@@ -258,6 +282,7 @@ class ResultList(list):
         self.form = form
         super(ResultList, self).__init__(*items)
 
+
 def results(cl):
     if cl.formset:
         for res, form in zip(cl.result_list, cl.formset.forms):
@@ -266,11 +291,13 @@ def results(cl):
         for res in cl.result_list:
             yield ResultList(None, items_for_result(cl, res, None))
 
+
 def result_hidden_fields(cl):
     if cl.formset:
         for res, form in zip(cl.result_list, cl.formset.forms):
             if form[cl.model._meta.pk.name].is_hidden:
                 yield mark_safe(force_text(form[cl.model._meta.pk.name]))
+
 
 @register.inclusion_tag("admin/change_list_results.html")
 def result_list(cl):
@@ -287,6 +314,7 @@ def result_list(cl):
             'result_headers': headers,
             'num_sorted_fields': num_sorted_fields,
             'results': list(results(cl))}
+
 
 @register.inclusion_tag('admin/date_hierarchy.html')
 def date_hierarchy(cl):
@@ -305,7 +333,7 @@ def date_hierarchy(cl):
         month_lookup = cl.params.get(month_field)
         day_lookup = cl.params.get(day_field)
 
-        link = lambda d: cl.get_query_string(d, [field_generic])
+        link = lambda filters: cl.get_query_string(filters, [field_generic])
 
         if not (year_lookup or month_lookup or day_lookup):
             # select appropriate start level
@@ -365,6 +393,7 @@ def date_hierarchy(cl):
                 } for year in years]
             }
 
+
 @register.inclusion_tag('admin/search_form.html')
 def search_form(cl):
     """
@@ -376,14 +405,16 @@ def search_form(cl):
         'search_var': SEARCH_VAR
     }
 
+
 @register.simple_tag
 def admin_list_filter(cl, spec):
     tpl = get_template(spec.template)
     return tpl.render(Context({
         'title': spec.title,
-        'choices' : list(spec.choices(cl)),
+        'choices': list(spec.choices(cl)),
         'spec': spec,
     }))
+
 
 @register.inclusion_tag('admin/actions.html', takes_context=True)
 def admin_actions(context):

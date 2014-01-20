@@ -8,14 +8,16 @@ import warnings
 
 from django import http
 from django.contrib.formtools import preview, utils
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils._os import upath
 
-from django.contrib.formtools.tests.forms import *
+from django.contrib.formtools.tests.forms import (
+    HashTestBlankForm, HashTestForm, TestForm,
+)
 
 success_string = "Done was called!"
 success_string_encoded = success_string.encode()
+
 
 class TestFormPreview(preview.FormPreview):
     def get_context(self, request, form):
@@ -28,6 +30,7 @@ class TestFormPreview(preview.FormPreview):
 
     def done(self, request, cleaned_data):
         return http.HttpResponse(success_string)
+
 
 @override_settings(
     TEMPLATE_DIRS=(
@@ -117,7 +120,7 @@ class PreviewTests(TestCase):
         ``bool1``. We need to make sure the hashes are the same in both cases.
 
         """
-        self.test_data.update({'stage':2})
+        self.test_data.update({'stage': 2})
         hash = self.preview.security_hash(None, TestForm(self.test_data))
         self.test_data.update({'hash': hash, 'bool1': 'False'})
         with warnings.catch_warnings(record=True):
@@ -131,14 +134,13 @@ class PreviewTests(TestCase):
         """
         # Pass strings for form submittal and add stage variable to
         # show we previously saw first stage of the form.
-        self.test_data.update({'stage':2})
+        self.test_data.update({'stage': 2})
         response = self.client.post('/preview/', self.test_data)
         self.assertNotEqual(response.content, success_string_encoded)
         hash = utils.form_hmac(TestForm(self.test_data))
         self.test_data.update({'hash': hash})
         response = self.client.post('/preview/', self.test_data)
         self.assertEqual(response.content, success_string_encoded)
-
 
     def test_form_submit_bad_hash(self):
         """
@@ -147,7 +149,7 @@ class PreviewTests(TestCase):
         """
         # Pass strings for form submittal and add stage variable to
         # show we previously saw first stage of the form.
-        self.test_data.update({'stage':2})
+        self.test_data.update({'stage': 2})
         response = self.client.post('/preview/', self.test_data)
         self.assertEqual(response.status_code, 200)
         self.assertNotEqual(response.content, success_string_encoded)

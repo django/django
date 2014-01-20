@@ -85,7 +85,7 @@ class CommonMiddleware(object):
             return
         if new_url[0]:
             newurl = "%s://%s%s" % (
-                'https' if request.is_secure() else 'http',
+                request.scheme,
                 new_url[0], urlquote(new_url[1]))
         else:
             newurl = urlquote(new_url[1])
@@ -122,7 +122,7 @@ class CommonMiddleware(object):
                 etag = '"%s"' % hashlib.md5(response.content).hexdigest()
             if etag is not None:
                 if (200 <= response.status_code < 300
-                    and request.META.get('HTTP_IF_NONE_MATCH') == etag):
+                        and request.META.get('HTTP_IF_NONE_MATCH') == etag):
                     cookies = response.cookies
                     response = http.HttpResponseNotModified()
                     response.cookies = cookies

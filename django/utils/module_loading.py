@@ -1,3 +1,6 @@
+from __future__ import absolute_import  # Avoid importing `importlib` from this package.
+
+import copy
 import imp
 from importlib import import_module
 import os
@@ -30,6 +33,42 @@ def import_by_path(dotted_path, error_prefix=''):
         raise ImproperlyConfigured('%sModule "%s" does not define a "%s" attribute/class' % (
             error_prefix, module_path, class_name))
     return attr
+
+
+def autodiscover_modules(*args, **kwargs):
+    """
+    Auto-discover INSTALLED_APPS modules and fail silently when
+    not present. This forces an import on them to register any admin bits they
+    may want.
+
+    You may provide a register_to keyword parameter as a way to access a
+    registry. This register_to object must have a _registry instance variable
+    to access it.
+    """
+    from django.apps import apps
+
+    register_to = kwargs.get('register_to')
+    for app_config in apps.get_app_configs():
+        # Attempt to import the app's module.
+        try:
+            if register_to:
+                before_import_registry = copy.copy(register_to._registry)
+
+            for module_to_search in args:
+                import_module('%s.%s' % (app_config.name, module_to_search))
+        except:
+            # Reset the model registry to the state before the last import as
+            # this import will have to reoccur on the next request and this
+            # could raise NotRegistered and AlreadyRegistered exceptions
+            # (see #8245).
+            if register_to:
+                register_to._registry = before_import_registry
+
+            # Decide whether to bubble up this error. If the app just
+            # doesn't have an admin module, we can ignore the error
+            # attempting to import it, otherwise we want it to bubble up.
+            if module_has_submodule(app_config.module, module_to_search):
+                raise
 
 
 def module_has_submodule(package, module_name):

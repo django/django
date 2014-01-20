@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 import time
+import sys
 from email.header import Header
 try:
     from urllib.parse import urlparse
@@ -122,8 +123,11 @@ class HttpResponseBase(six.Iterator):
 
     def serialize_headers(self):
         """HTTP headers as a bytestring."""
+        def to_bytes(val, encoding):
+            return val if isinstance(val, bytes) else val.encode(encoding)
+
         headers = [
-            ('%s: %s' % (key, value)).encode('us-ascii')
+            (b': '.join([to_bytes(key, 'ascii'), to_bytes(value, 'latin-1')]))
             for key, value in self._headers.values()
         ]
         return b'\r\n'.join(headers)
@@ -134,10 +138,10 @@ class HttpResponseBase(six.Iterator):
         __str__ = serialize_headers
 
     def _convert_to_charset(self, value, charset, mime_encode=False):
-        """Converts headers key/value to ascii/latin1 native strings.
+        """Converts headers key/value to ascii/latin-1 native strings.
 
         `charset` must be 'ascii' or 'latin-1'. If `mime_encode` is True and
-        `value` value can't be represented in the given charset, MIME-encoding
+        `value` can't be represented in the given charset, MIME-encoding
         is applied.
         """
         if not isinstance(value, (bytes, six.text_type)):
@@ -160,7 +164,7 @@ class HttpResponseBase(six.Iterator):
         except UnicodeError as e:
             if mime_encode:
                 # Wrapping in str() is a workaround for #12422 under Python 2.
-                value = str(Header(value, 'utf-8').encode())
+                value = str(Header(value, 'utf-8', maxlinelen=sys.maxsize).encode())
             else:
                 e.reason += ', HTTP response headers must be in %s format' % charset
                 raise
@@ -170,7 +174,7 @@ class HttpResponseBase(six.Iterator):
 
     def __setitem__(self, header, value):
         header = self._convert_to_charset(header, 'ascii')
-        value = self._convert_to_charset(value, 'latin1', mime_encode=True)
+        value = self._convert_to_charset(value, 'latin-1', mime_encode=True)
         self._headers[header.lower()] = (header, value)
 
     def __delitem__(self, header):
@@ -184,7 +188,7 @@ class HttpResponseBase(six.Iterator):
 
     def __getstate__(self):
         # SimpleCookie is not pickeable with pickle.HIGHEST_PROTOCOL, so we
-        # serialise to a string instead
+        # serialize to a string instead
         state = self.__dict__.copy()
         state['cookies'] = str(state['cookies'])
         return state
@@ -278,13 +282,6 @@ class HttpResponseBase(six.Iterator):
         # Handle non-string types (#16494)
         return force_bytes(value, self._charset)
 
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        # Subclasses must define self._iterator for this function.
-        return self.make_bytes(next(self._iterator))
-
     # These methods partially implement the file-like object interface.
     # See http://docs.python.org/lib/bltin-file-objects.html
 
@@ -317,7 +314,7 @@ class HttpResponse(HttpResponseBase):
 
     streaming = False
 
-    def __init__(self, content='', *args, **kwargs):
+    def __init__(self, content=b'', *args, **kwargs):
         super(HttpResponse, self).__init__(*args, **kwargs)
         # Content is a bytestring. See the `content` property methods.
         self.content = content
@@ -333,23 +330,25 @@ class HttpResponse(HttpResponseBase):
 
     @property
     def content(self):
-        return b''.join(self.make_bytes(e) for e in self._container)
+        return b''.join(self._container)
 
     @content.setter
     def content(self, value):
+        # Consume iterators upon assignment to allow repeated iteration.
         if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.string_types)):
             if hasattr(value, 'close'):
                 self._closable_objects.append(value)
-            value = b''.join(self.make_bytes(e) for e in value)
+            value = b''.join(self.make_bytes(chunk) for chunk in value)
+        else:
+            value = self.make_bytes(value)
+        # Create a list of properly encoded bytestrings to support write().
         self._container = [value]
 
     def __iter__(self):
-        if not hasattr(self, '_iterator'):
-            self._iterator = iter(self._container)
-        return self
+        return iter(self._container)
 
     def write(self, content):
-        self._container.append(content)
+        self._container.append(self.make_bytes(content))
 
     def tell(self):
         return len(self.content)
@@ -387,6 +386,9 @@ class StreamingHttpResponse(HttpResponseBase):
         self._iterator = iter(value)
         if hasattr(value, 'close'):
             self._closable_objects.append(value)
+
+    def __iter__(self):
+        return self.streaming_content
 
 
 class HttpResponseRedirectBase(HttpResponse):

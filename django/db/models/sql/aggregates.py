@@ -4,13 +4,18 @@ Classes to represent the default SQL aggregate functions
 import copy
 
 from django.db.models.fields import IntegerField, FloatField
+from django.db.models.lookups import RegisterLookupMixin
+
+
+__all__ = ['Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance']
+
 
 # Fake fields used to identify aggregate types in data-conversion operations.
 ordinal_aggregate_field = IntegerField()
 computed_aggregate_field = FloatField()
 
 
-class Aggregate(object):
+class Aggregate(RegisterLookupMixin):
     """
     Default SQL Aggregate.
     """
@@ -77,9 +82,9 @@ class Aggregate(object):
         if hasattr(self.col, 'as_sql'):
             field_name, params = self.col.as_sql(qn, connection)
         elif isinstance(self.col, (list, tuple)):
-            field_name = '.'.join([qn(c) for c in self.col])
+            field_name = '.'.join(qn(c) for c in self.col)
         else:
-            field_name = self.col
+            field_name = qn(self.col)
 
         substitutions = {
             'function': self.sql_function,
@@ -88,6 +93,13 @@ class Aggregate(object):
         substitutions.update(self.extra)
 
         return self.sql_template % substitutions, params
+
+    def get_group_by_cols(self):
+        return []
+
+    @property
+    def output_type(self):
+        return self.field
 
 
 class Avg(Aggregate):

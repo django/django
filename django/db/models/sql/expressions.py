@@ -24,11 +24,11 @@ class SQLEvaluator(object):
                                    (change_map.get(col[0], col[0]), col[1])))
         return clone
 
-    def get_cols(self):
+    def get_group_by_cols(self):
         cols = []
         for node, col in self.cols:
-            if hasattr(node, 'get_cols'):
-                cols.extend(node.get_cols())
+            if hasattr(node, 'get_group_by_cols'):
+                cols.extend(node.get_group_by_cols())
             elif isinstance(col, tuple):
                 cols.append(col)
         return cols
@@ -60,6 +60,7 @@ class SQLEvaluator(object):
                 field, sources, opts, join_list, path = query.setup_joins(
                     field_list, query.get_meta(),
                     query.get_initial_alias(), self.reuse)
+                self._used_joins = join_list
                 targets, _, join_list = query.trim_joins(sources, join_list, path)
                 if self.reuse is not None:
                     self.reuse.update(join_list)
@@ -110,9 +111,9 @@ class SQLEvaluator(object):
     def evaluate_date_modifier_node(self, node, qn, connection):
         timedelta = node.children.pop()
         sql, params = self.evaluate_node(node, qn, connection)
+        node.children.append(timedelta)
 
-        if timedelta.days == 0 and timedelta.seconds == 0 and \
-                timedelta.microseconds == 0:
+        if (timedelta.days == timedelta.seconds == timedelta.microseconds == 0):
             return sql, params
 
         return connection.ops.date_interval_sql(sql, node.connector, timedelta), params

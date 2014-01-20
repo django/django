@@ -34,7 +34,8 @@ class CustomPKTests(TestCase):
         self.assertEqual(Employee.objects.get(pk=123), dan)
         self.assertEqual(Employee.objects.get(pk=456), fran)
 
-        self.assertRaises(Employee.DoesNotExist,
+        self.assertRaises(
+            Employee.DoesNotExist,
             lambda: Employee.objects.get(pk=42)
         )
 
@@ -141,19 +142,24 @@ class CustomPKTests(TestCase):
 
     def test_unicode_pk(self):
         # Primary key may be unicode string
-        bus = Business.objects.create(name='jaźń')
+        Business.objects.create(name='jaźń')
 
     def test_unique_pk(self):
         # The primary key must also obviously be unique, so trying to create a
         # new object with the same primary key will fail.
-        e = Employee.objects.create(
+        Employee.objects.create(
             employee_code=123, first_name="Frank", last_name="Jones"
         )
-        sid = transaction.savepoint()
-        self.assertRaises(IntegrityError,
-            Employee.objects.create, employee_code=123, first_name="Fred", last_name="Jones"
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                Employee.objects.create(employee_code=123, first_name="Fred", last_name="Jones")
+
+    def test_zero_non_autoincrement_pk(self):
+        Employee.objects.create(
+            employee_code=0, first_name="Frank", last_name="Jones"
         )
-        transaction.savepoint_rollback(sid)
+        employee = Employee.objects.get(pk=0)
+        self.assertEqual(employee.employee_code, 0)
 
     def test_custom_field_pk(self):
         # Regression for #10785 -- Custom fields can be used for primary keys.
@@ -175,8 +181,6 @@ class CustomPKTests(TestCase):
     def test_required_pk(self):
         # The primary key must be specified, so an error is raised if you
         # try to create an object without it.
-        sid = transaction.savepoint()
-        self.assertRaises(IntegrityError,
-            Employee.objects.create, first_name="Tom", last_name="Smith"
-        )
-        transaction.savepoint_rollback(sid)
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                Employee.objects.create(first_name="Tom", last_name="Smith")

@@ -45,14 +45,16 @@ class GetOrCreateTests(TestCase):
 
         # If you don't specify a value or default value for all required
         # fields, you will get an error.
-        self.assertRaises(IntegrityError,
+        self.assertRaises(
+            IntegrityError,
             Person.objects.get_or_create, first_name="Tom", last_name="Smith"
         )
 
         # If you specify an existing primary key, but different other fields,
         # then you will get an error and data will not be updated.
-        m = ManualPrimaryKeyTest.objects.create(id=1, data="Original")
-        self.assertRaises(IntegrityError,
+        ManualPrimaryKeyTest.objects.create(id=1, data="Original")
+        self.assertRaises(
+            IntegrityError,
             ManualPrimaryKeyTest.objects.get_or_create, id=1, data="Different"
         )
         self.assertEqual(ManualPrimaryKeyTest.objects.get(id=1).data, "Original")
@@ -63,7 +65,7 @@ class GetOrCreateTests(TestCase):
         # the actual traceback. Refs #16340.
         try:
             ManualPrimaryKeyTest.objects.get_or_create(id=1, data="Different")
-        except IntegrityError as e:
+        except IntegrityError:
             formatted_traceback = traceback.format_exc()
             self.assertIn(str('obj.save'), formatted_traceback)
 
@@ -177,11 +179,12 @@ class UpdateOrCreateTests(TestCase):
         self.assertRaises(IntegrityError,
             Person.objects.update_or_create, first_name="Tom", last_name="Smith")
 
-    def test_mananual_primary_key_test(self):
+    def test_manual_primary_key_test(self):
         # If you specify an existing primary key, but different other fields,
         # then you will get an error and data will not be updated.
         ManualPrimaryKeyTest.objects.create(id=1, data="Original")
-        self.assertRaises(IntegrityError,
+        self.assertRaises(
+            IntegrityError,
             ManualPrimaryKeyTest.objects.update_or_create, id=1, data="Different"
         )
         self.assertEqual(ManualPrimaryKeyTest.objects.get(id=1).data, "Original")
@@ -193,6 +196,6 @@ class UpdateOrCreateTests(TestCase):
         # the actual traceback. Refs #16340.
         try:
             ManualPrimaryKeyTest.objects.update_or_create(id=1, data="Different")
-        except IntegrityError as e:
+        except IntegrityError:
             formatted_traceback = traceback.format_exc()
             self.assertIn('obj.save', formatted_traceback)

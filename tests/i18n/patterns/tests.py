@@ -4,11 +4,16 @@ import os
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, clear_url_caches
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.http import HttpResponsePermanentRedirect
+from django.middleware.locale import LocaleMiddleware
+from django.test import TestCase, override_settings
 from django.template import Template, Context
 from django.utils._os import upath
 from django.utils import translation
+
+
+class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
+    response_redirect_class = HttpResponsePermanentRedirect
 
 
 @override_settings(
@@ -181,6 +186,16 @@ class URLRedirectTests(URLTestCaseBase):
         response = self.client.get(response['location'])
         self.assertEqual(response.status_code, 200)
 
+    @override_settings(
+        MIDDLEWARE_CLASSES=(
+            'i18n.patterns.tests.PermanentRedirectLocaleMiddleWare',
+            'django.middleware.common.CommonMiddleware',
+        ),
+    )
+    def test_custom_redirect_class(self):
+        response = self.client.get('/account/register/', HTTP_ACCEPT_LANGUAGE='en')
+        self.assertRedirects(response, '/en/account/register/', 301)
+
 
 class URLVaryAcceptLanguageTests(URLTestCaseBase):
     """
@@ -287,7 +302,7 @@ class URLTagTests(URLTestCaseBase):
                          ['/vertaald/', '/traduzidos/'])
 
     def test_context(self):
-        ctx = Context({'lang1':'nl', 'lang2':'pt-br'})
+        ctx = Context({'lang1': 'nl', 'lang2': 'pt-br'})
         tpl = Template("""{% load i18n %}
             {% language lang1 %}{% url 'no-prefix-translated' %}{% endlanguage %}
             {% language lang2 %}{% url 'no-prefix-translated' %}{% endlanguage %}""")

@@ -375,7 +375,9 @@ For each field, we describe the default widget used if you don't specify
 
         A function that takes one argument and returns a coerced value. Examples
         include the built-in ``int``, ``float``, ``bool`` and other types. Defaults
-        to an identity function.
+        to an identity function. Note that coercion happens after input
+        validation, so it is possible to coerce to a value not present in
+        ``choices``.
 
     .. attribute:: empty_value
 
@@ -455,6 +457,12 @@ For each field, we describe the default widget used if you don't specify
         '%m/%d/%y']              # '10/25/06'
 
     See also :ref:`format localization <format-localization>`.
+
+    .. deprecated:: 1.7
+
+        The ability to use :class:`SplitDateTimeWidget` with ``DateTimeField``
+        has been deprecated and will be removed in Django 1.9. Use
+        :class:`SplitDateTimeField` instead.
 
 ``DecimalField``
 ~~~~~~~~~~~~~~~~
@@ -573,15 +581,11 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: allow_files
 
-        .. versionadded:: 1.5
-
         Optional.  Either ``True`` or ``False``.  Default is ``True``.  Specifies
         whether files in the specified location should be included.  Either this or
         :attr:`allow_folders` must be ``True``.
 
     .. attribute:: allow_folders
-
-        .. versionadded:: 1.5
 
         Optional.  Either ``True`` or ``False``.  Default is ``False``.  Specifies
         whether folders in the specified location should be included.  Either this or
@@ -660,6 +664,10 @@ For each field, we describe the default widget used if you don't specify
 ~~~~~~~~~~~~~~~~~~
 
 .. class:: IPAddressField(**kwargs)
+
+    .. deprecated:: 1.7
+        This field has been deprecated in favour of
+        :class:`~django.forms.GenericIPAddressField`.
 
     * Default widget: :class:`TextInput`
     * Empty value: ``''`` (an empty string)
@@ -934,7 +942,7 @@ Slightly complex built-in ``Field`` classes
                                   required=False),
                     )
                     super(PhoneField, self).__init__(
-                        self, error_messages=error_messages, fields=fields,
+                        error_messages=error_messages, fields=fields,
                         require_all_fields=False, *args, **kwargs)
 
     .. attribute:: MultiValueField.widget
@@ -1064,11 +1072,6 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
       queryset.
     * Error message keys: ``required``, ``list``, ``invalid_choice``,
       ``invalid_pk_value``
-
-    .. versionchanged:: 1.5
-
-        The empty and normalized values were changed to be consistently
-        ``QuerySets`` instead of ``[]`` and ``QuerySet`` respectively.
 
     .. versionchanged:: 1.6
 

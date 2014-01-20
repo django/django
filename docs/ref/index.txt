@@ -5,6 +5,8 @@ API Reference
 .. toctree::
    :maxdepth: 1
 
+   applications
+   checks
    class-based-views/index
    clickjacking
    contrib/index

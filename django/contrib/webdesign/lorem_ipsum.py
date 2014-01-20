@@ -42,6 +42,7 @@ COMMON_WORDS = ('lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur',
         'adipisicing', 'elit', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt',
         'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua')
 
+
 def sentence():
     """
     Returns a randomly generated sentence of lorem ipsum text.
@@ -56,13 +57,15 @@ def sentence():
     # Convert to sentence case and add end punctuation.
     return '%s%s%s' % (s[0].upper(), s[1:], random.choice('?.'))
 
+
 def paragraph():
     """
     Returns a randomly generated paragraph of lorem ipsum text.
 
     The paragraph consists of between 1 and 4 sentences, inclusive.
     """
-    return ' '.join([sentence() for i in range(random.randint(1, 4))])
+    return ' '.join(sentence() for i in range(random.randint(1, 4)))
+
 
 def paragraphs(count, common=True):
     """
@@ -79,6 +82,7 @@ def paragraphs(count, common=True):
         else:
             paras.append(paragraph())
     return paras
+
 
 def words(count, common=True):
     """

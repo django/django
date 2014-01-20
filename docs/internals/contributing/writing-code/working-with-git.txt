@@ -212,7 +212,7 @@ This way your branch will contain only commits related to its topic, which
 makes squashing easier.
 
 After review
-------------
+~~~~~~~~~~~~
 
 It is unusual to get any non-trivial amount of code into core without changes
 requested by reviewers. In this case, it is often a good idea to add the
@@ -225,7 +225,8 @@ commits, you would run::
 
     git rebase -i HEAD~2
 
-Squash the second commit into the first. Write a commit message along the lines of::
+Squash the second commit into the first. Write a commit message along the lines
+of::
 
     Made changes asked in review by <reviewer>
 
@@ -239,8 +240,25 @@ the public commits during the rebase, you should not need to force-push::
 
 Your pull request should now contain the new commit too.
 
-Note that the committer is likely to squash the review commit into the previous commit
-when committing the code.
+Note that the committer is likely to squash the review commit into the previous
+commit when committing the code.
+
+Working on a patch
+------------------
+
+One of the ways that developers can contribute to Django is by reviewing
+patches. Those patches will typically exist as pull requests on GitHub and
+can be easily integrated into your local repository::
+
+    git checkout -b pull_xxxxx upstream/master
+    curl https://github.com/django/django/pull/xxxxx.patch | git am
+
+This will create a new branch and then apply the changes from the pull request
+to it. At this point you can run the tests or do anything else you need to
+do to investigate the quality of the patch.
+
+For more detail on working with pull requests see the
+:ref:`guidelines for committers <handling-pull-requests>`.
 
 Summary
 -------

@@ -206,7 +206,9 @@ For example::
 In this example the number of objects is passed to the translation
 languages as the ``count`` variable.
 
-Lets see a slightly more complex usage example::
+Note that pluralization is complicated and works differently in each language.
+Comparing ``count`` to 1 isn't always the correct rule. This code looks
+sophisticated, but will produce incorrect results for some languages::
 
     from django.utils.translation import ungettext
     from myapp.models import Report
@@ -218,42 +220,45 @@ Lets see a slightly more complex usage example::
         name = Report._meta.verbose_name_plural
 
     text = ungettext(
-            'There is %(count)d %(name)s available.',
-            'There are %(count)d %(name)s available.',
-            count
+        'There is %(count)d %(name)s available.',
+        'There are %(count)d %(name)s available.',
+        count
     ) % {
         'count': count,
         'name': name
     }
 
-Here we reuse localizable, hopefully already translated literals (contained in
-the ``verbose_name`` and ``verbose_name_plural`` model ``Meta`` options) for
-other parts of the sentence so all of it is consistently based on the
-cardinality of the elements at play.
+Don't try to implement your own singular-or-plural logic, it won't be correct.
+In a case like this, consider something like the following::
+
+    text = ungettext(
+        'There is %(count)d %(name)s object available.',
+        'There are %(count)d %(name)s objects available.',
+        count
+    ) % {
+        'count': count,
+        'name': Report._meta.verbose_name,
+    }
 
 .. _pluralization-var-notes:
 
 .. note::
 
-    When using this technique, make sure you use a single name for every
-    extrapolated variable included in the literal. In the example above note how
-    we used the ``name`` Python variable in both translation strings. This
-    example would fail::
+    When using ``ungettext()``, make sure you use a single name for every
+    extrapolated variable included in the literal. In the examples above, note
+    how we used the ``name`` Python variable in both translation strings. This
+    example, besides being incorrect in some languages as noted above, would
+    fail::
 
-        from django.utils.translation import ungettext
-        from myapp.models import Report
-
-        count = Report.objects.count()
-        d = {
-            'count': count,
+        text = ungettext(
+            'There is %(count)d %(name)s available.',
+            'There are %(count)d %(plural_name)s available.',
+            count
+        ) % {
+            'count': Report.objects.count(),
             'name': Report._meta.verbose_name,
             'plural_name': Report._meta.verbose_name_plural
         }
-        text = ungettext(
-                'There is %(count)d %(name)s available.',
-                'There are %(count)d %(plural_name)s available.',
-                count
-        ) % d
 
     You would get an error when running :djadmin:`django-admin.py
     compilemessages <compilemessages>`::
@@ -557,7 +562,7 @@ string in the message catalogs.
 
 It's not possible to mix a template variable inside a string within ``{% trans
 %}``. If your translations require strings with variables (placeholders), use
-``{% blocktrans %}`` instead.
+:ttag:`{% blocktrans %}<blocktrans>` instead.
 
 
 If you'd like to retrieve a translated string without displaying it, you can
@@ -674,6 +679,49 @@ markers<contextual-markers>` using the ``context`` keyword:
 
     {% blocktrans with name=user.username context "greeting" %}Hi {{ name }}{% endblocktrans %}
 
+Another feature ``{% blocktrans %}`` supports is the ``trimmed`` option. This
+option will remove newline characters from the beginning and the end of the
+content of the ``{% blocktrans %}`` tag, replace any whitespace at the beginning
+and end of a line and merge all lines into one using a space character to
+separate them. This is quite useful for indenting the content of a ``{%
+blocktrans %}`` tag without having the indentation characters end up in the
+corresponding entry in the PO file, which makes the translation process easier.
+
+For instance, the following ``{% blocktrans %}`` tag::
+
+    {% blocktrans trimmed %}
+      First sentence.
+      Second paragraph.
+    {% endblocktrans %}
+
+will result in the entry ``"First sentence. Second paragraph."`` in the PO file,
+compared to ``"\n  First sentence.\n  Second sentence.\n"``, if the ``trimmed``
+option had not been specified.
+
+.. versionchanged:: 1.7
+
+    The ``trimmed`` option was added.
+
+
+String literals passed to tags and filters
+------------------------------------------
+
+You can translate string literals passed as arguments to tags and filters
+by using the familiar ``_()`` syntax::
+
+    {% some_tag _("Page not found") value|yesno:_("yes,no") %}
+
+In this case, both the tag and the filter will see the translated string,
+so they don't need to be aware of translations.
+
+.. note::
+    In this example, the translation infrastructure will be passed the string
+    ``"yes,no"``, not the individual strings ``"yes"`` and ``"no"``. The
+    translated string will need to contain the comma so that the filter
+    parsing code knows how to split up the arguments. For example, a German
+    translator might translate the string ``"yes,no"`` as ``"ja,nein"``
+    (keeping the comma intact).
+
 .. _translator-comments-in-templates:
 
 Comments for translators in templates
@@ -782,23 +830,6 @@ three tags::
     {% get_current_language_bidi as LANGUAGE_BIDI %}
 
 These tags also require a ``{% load i18n %}``.
-
-Translation hooks are also available within any template block tag that accepts
-constant strings. In those cases, just use ``_()`` syntax to specify a
-translation string::
-
-    {% some_special_tag _("Page not found") value|yesno:_("yes,no") %}
-
-In this case, both the tag and the filter will see the already-translated
-string, so they don't need to be aware of translations.
-
-.. note::
-    In this example, the translation infrastructure will be passed the string
-    ``"yes,no"``, not the individual strings ``"yes"`` and ``"no"``. The
-    translated string will need to contain the comma so that the filter
-    parsing code knows how to split up the arguments. For example, a German
-    translator might translate the string ``"yes,no"`` as ``"ja,nein"``
-    (keeping the comma intact).
 
 You can also retrieve information about any of the available languages using
 provided template tags and filters. To get information about a single language,
@@ -989,8 +1020,8 @@ for a given version of a site — it's a good candidate for caching.
 
 Server-side caching will reduce CPU load. It's easily implemented with the
 :func:`~django.views.decorators.cache.cache_page` decorator. To trigger cache
-invalidation when your translations change, provide a version-dependant key
-prefix, as shown in the example below, or map the view at a version-dependant
+invalidation when your translations change, provide a version-dependent key
+prefix, as shown in the example below, or map the view at a version-dependent
 URL.
 
 .. code-block:: python
@@ -1030,8 +1061,6 @@ in django-statici18n_.
 
 Internationalization: in URL patterns
 =====================================
-
-..  versionadded:: 1.4
 
 .. module:: django.conf.urls.i18n
 
@@ -1191,21 +1220,6 @@ Once the string literals of an application have been tagged for later
 translation, the translation themselves need to be written (or obtained). Here's
 how that works.
 
-.. _locale-restrictions:
-
-.. admonition:: Locale restrictions
-
-    Django does not support localizing your application into a locale for which
-    Django itself has not been translated. In this case, it will ignore your
-    translation files. If you were to try this and Django supported it, you
-    would inevitably see a mixture of translated strings (from your application)
-    and English strings (from Django itself). If you want to support a locale
-    for your application that is not already part of Django, you'll need to make
-    at least a minimal translation of the Django core.
-
-    A good starting point is to copy the Django English ``.po`` file and to
-    translate at least some :term:`translation strings <translation string>`.
-
 Message files
 -------------
 
@@ -1246,6 +1260,17 @@ and pulls out all strings marked for translation (see
 is configured correctly). It creates (or updates) a message file in the
 directory ``locale/LANG/LC_MESSAGES``. In the ``de`` example, the file will be
 ``locale/de/LC_MESSAGES/django.po``.
+
+.. versionchanged:: 1.7
+
+    When you run ``makemessages`` from the root directory of your project, the
+    extracted strings will be automatically distributed to the proper message
+    files. That is, a string extracted from a file of an app containing a
+    ``locale`` directory will go in a message file under that directory.
+    A string extracted from a file of an app without any ``locale`` directory
+    will either go in a message file under the directory listed first in
+    :setting:`LOCALE_PATHS` or will generate an error if :setting:`LOCALE_PATHS`
+    is empty.
 
 By default :djadmin:`django-admin.py makemessages <makemessages>` examines every
 file that has the ``.html`` or ``.txt`` file extension. In case you want to
@@ -1552,14 +1577,17 @@ should be used -- installation-wide, for a particular user, or both.
 
 To set an installation-wide language preference, set :setting:`LANGUAGE_CODE`.
 Django uses this language as the default translation -- the final attempt if no
-other translator finds a translation.
+better matching translation is found through one of the methods employed by the
+locale middleware (see below).
 
-If all you want to do is run Django with your native language, and a language
-file is available for it, all you need to do is set :setting:`LANGUAGE_CODE`.
+If all you want is to run Django with your native language all you need to do
+is set :setting:`LANGUAGE_CODE` and make sure the corresponding :term:`message
+files <message file>` and their compiled versions (``.mo``) exist.
 
-If you want to let each individual user specify which language he or she
-prefers, use ``LocaleMiddleware``. ``LocaleMiddleware`` enables language
-selection based on data from the request. It customizes content for each user.
+If you want to let each individual user specify which language they
+prefer, then you also need to use use the ``LocaleMiddleware``.
+``LocaleMiddleware`` enables language selection based on data from the request.
+It customizes content for each user.
 
 To use ``LocaleMiddleware``, add ``'django.middleware.locale.LocaleMiddleware'``
 to your :setting:`MIDDLEWARE_CLASSES` setting. Because middleware order
@@ -1591,8 +1619,13 @@ following this algorithm:
   root URLconf. See :ref:`url-internationalization` for more information
   about the language prefix and how to internationalize URL patterns.
 
-* Failing that, it looks for a ``django_language`` key in the current
-  user's session.
+* Failing that, it looks for a ``_language`` key in the current user's session.
+
+  .. versionchanged:: 1.7
+
+      In previous versions, the key was named ``django_language`` but it was
+      renamed to start with an underscore to denote a Django reserved session
+      key.
 
 * Failing that, it looks for a cookie.
 
@@ -1634,35 +1667,18 @@ Notes:
   en-us).
 
 * If you define a custom :setting:`LANGUAGES` setting, as explained in the
-  previous bullet, it's OK to mark the languages as translation strings
-  -- but use a "dummy" ``ugettext()`` function, not the one in
-  ``django.utils.translation``. You should *never* import
-  ``django.utils.translation`` from within your settings file, because that
-  module in itself depends on the settings, and that would cause a circular
-  import.
+  previous bullet, you can mark the language names as translation strings
+  -- but use :func:`~django.utils.translation.ugettext_lazy` instead of
+  :func:`~django.utils.translation.ugettext` to avoid a circular import.
 
-  The solution is to use a "dummy" ``ugettext()`` function. Here's a sample
-  settings file::
+  Here's a sample settings file::
 
-      ugettext = lambda s: s
+      from django.utils.translation import ugettext_lazy as _
 
       LANGUAGES = (
-          ('de', ugettext('German')),
-          ('en', ugettext('English')),
+          ('de', _('German')),
+          ('en', _('English')),
       )
-
-  With this arrangement, :djadmin:`django-admin.py makemessages <makemessages>`
-  will still find and mark these strings for translation, but the translation
-  won't happen at runtime -- so you'll have to remember to wrap the languages in
-  the *real* ``ugettext()`` in any code that uses :setting:`LANGUAGES` at
-  runtime.
-
-* The ``LocaleMiddleware`` can only select languages for which there is a
-  Django-provided base translation. If you want to provide translations
-  for your application that aren't already in the set of translations
-  in Django's source tree, you'll want to provide at least a basic
-  one as described in the :ref:`Locale restrictions<locale-restrictions>`
-  note.
 
 Once ``LocaleMiddleware`` determines the user's preference, it makes this
 preference available as ``request.LANGUAGE_CODE`` for each
@@ -1730,24 +1746,9 @@ All message file repositories are structured the same way. They are:
 * ``$PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/django.(po|mo)``
 
 To create message files, you use the :djadmin:`django-admin.py makemessages <makemessages>`
-tool. You only need to be in the same directory where the ``locale/`` directory
-is located. And you use :djadmin:`django-admin.py compilemessages <compilemessages>`
+tool. And you use :djadmin:`django-admin.py compilemessages <compilemessages>`
 to produce the binary ``.mo`` files that are used by ``gettext``.
 
 You can also run :djadmin:`django-admin.py compilemessages
 --settings=path.to.settings <compilemessages>` to make the compiler process all
 the directories in your :setting:`LOCALE_PATHS` setting.
-
-Finally, you should give some thought to the structure of your translation
-files. If your applications need to be delivered to other users and will be used
-in other projects, you might want to use app-specific translations. But using
-app-specific translations and project-specific translations could produce weird
-problems with :djadmin:`makemessages`: it will traverse all directories below
-the current path and so might put message IDs into a unified, common message
-file for the current project that are already in application message files.
-
-The easiest way out is to store applications that are not part of the project
-(and so carry their own translations) outside the project tree. That way,
-:djadmin:`django-admin.py makemessages <makemessages>`, when ran on a project
-level will only extract strings that are connected to your explicit project and
-not strings that are distributed independently.

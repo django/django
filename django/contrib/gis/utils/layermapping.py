@@ -7,7 +7,7 @@
    http://geodjango.org/docs/layermapping.html
 """
 import sys
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation as DecimalInvalidOperation
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connections, router
 from django.contrib.gis.db.models import GeometryField
@@ -21,43 +21,57 @@ from django.utils.encoding import force_text
 
 
 # LayerMapping exceptions.
-class LayerMapError(Exception): pass
-class InvalidString(LayerMapError): pass
-class InvalidDecimal(LayerMapError): pass
-class InvalidInteger(LayerMapError): pass
-class MissingForeignKey(LayerMapError): pass
+class LayerMapError(Exception):
+    pass
+
+
+class InvalidString(LayerMapError):
+    pass
+
+
+class InvalidDecimal(LayerMapError):
+    pass
+
+
+class InvalidInteger(LayerMapError):
+    pass
+
+
+class MissingForeignKey(LayerMapError):
+    pass
+
 
 class LayerMapping(object):
     "A class that maps OGR Layers to GeoDjango Models."
 
     # Acceptable 'base' types for a multi-geometry type.
-    MULTI_TYPES = {1 : OGRGeomType('MultiPoint'),
-                   2 : OGRGeomType('MultiLineString'),
-                   3 : OGRGeomType('MultiPolygon'),
-                   OGRGeomType('Point25D').num : OGRGeomType('MultiPoint25D'),
-                   OGRGeomType('LineString25D').num : OGRGeomType('MultiLineString25D'),
-                   OGRGeomType('Polygon25D').num : OGRGeomType('MultiPolygon25D'),
+    MULTI_TYPES = {1: OGRGeomType('MultiPoint'),
+                   2: OGRGeomType('MultiLineString'),
+                   3: OGRGeomType('MultiPolygon'),
+                   OGRGeomType('Point25D').num: OGRGeomType('MultiPoint25D'),
+                   OGRGeomType('LineString25D').num: OGRGeomType('MultiLineString25D'),
+                   OGRGeomType('Polygon25D').num: OGRGeomType('MultiPolygon25D'),
                    }
 
     # Acceptable Django field types and corresponding acceptable OGR
     # counterparts.
     FIELD_TYPES = {
-        models.AutoField : OFTInteger,
-        models.IntegerField : (OFTInteger, OFTReal, OFTString),
-        models.FloatField : (OFTInteger, OFTReal),
-        models.DateField : OFTDate,
-        models.DateTimeField : OFTDateTime,
-        models.EmailField : OFTString,
-        models.TimeField : OFTTime,
-        models.DecimalField : (OFTInteger, OFTReal),
-        models.CharField : OFTString,
-        models.SlugField : OFTString,
-        models.TextField : OFTString,
-        models.URLField : OFTString,
-        models.BigIntegerField : (OFTInteger, OFTReal, OFTString),
-        models.SmallIntegerField : (OFTInteger, OFTReal, OFTString),
-        models.PositiveSmallIntegerField : (OFTInteger, OFTReal, OFTString),
-        }
+        models.AutoField: OFTInteger,
+        models.IntegerField: (OFTInteger, OFTReal, OFTString),
+        models.FloatField: (OFTInteger, OFTReal),
+        models.DateField: OFTDate,
+        models.DateTimeField: OFTDateTime,
+        models.EmailField: OFTString,
+        models.TimeField: OFTTime,
+        models.DecimalField: (OFTInteger, OFTReal),
+        models.CharField: OFTString,
+        models.SlugField: OFTString,
+        models.TextField: OFTString,
+        models.URLField: OFTString,
+        models.BigIntegerField: (OFTInteger, OFTReal, OFTString),
+        models.SmallIntegerField: (OFTInteger, OFTReal, OFTString),
+        models.PositiveSmallIntegerField: (OFTInteger, OFTReal, OFTString),
+    }
 
     def __init__(self, model, data, mapping, layer=0,
                  source_srs=None, encoding='utf-8',
@@ -115,7 +129,7 @@ class LayerMapping(object):
 
         if unique:
             self.check_unique(unique)
-            transaction_mode = 'autocommit' # Has to be set to autocommit.
+            transaction_mode = 'autocommit'  # Has to be set to autocommit.
             self.unique = unique
         else:
             self.unique = None
@@ -216,7 +230,7 @@ class LayerMapping(object):
                     for rel_name, ogr_field in ogr_name.items():
                         idx = check_ogr_fld(ogr_field)
                         try:
-                            rel_field = rel_model._meta.get_field(rel_name)
+                            rel_model._meta.get_field(rel_name)
                         except models.fields.FieldDoesNotExist:
                             raise LayerMapError('ForeignKey mapping field "%s" not in %s fields.' %
                                                 (rel_name, rel_model.__class__.__name__))
@@ -263,14 +277,16 @@ class LayerMapping(object):
         if isinstance(unique, (list, tuple)):
             # List of fields to determine uniqueness with
             for attr in unique:
-                if not attr in self.mapping: raise ValueError
+                if not attr in self.mapping:
+                    raise ValueError
         elif isinstance(unique, six.string_types):
             # Only a single field passed in.
-            if unique not in self.mapping: raise ValueError
+            if unique not in self.mapping:
+                raise ValueError
         else:
             raise TypeError('Unique keyword argument must be set with a tuple, list, or string.')
 
-    #### Keyword argument retrieval routines ####
+    # Keyword argument retrieval routines ####
     def feature_kwargs(self, feat):
         """
         Given an OGR Feature, this will return a dictionary of keyword arguments
@@ -311,7 +327,7 @@ class LayerMapping(object):
         of the feature kwargs.
         """
         if isinstance(self.unique, six.string_types):
-            return {self.unique : kwargs[self.unique]}
+            return {self.unique: kwargs[self.unique]}
         else:
             return dict((fld, kwargs[fld]) for fld in self.unique)
 
@@ -323,7 +339,7 @@ class LayerMapping(object):
         otherwise the proper exception is raised.
         """
         if (isinstance(ogr_field, OFTString) and
-            isinstance(model_field, (models.CharField, models.TextField))):
+                isinstance(model_field, (models.CharField, models.TextField))):
             if self.encoding:
                 # The encoding for OGR data sources may be specified here
                 # (e.g., 'cp437' for Census Bureau boundary files).
@@ -337,13 +353,13 @@ class LayerMapping(object):
             try:
                 # Creating an instance of the Decimal value to use.
                 d = Decimal(str(ogr_field.value))
-            except:
+            except DecimalInvalidOperation:
                 raise InvalidDecimal('Could not construct decimal from: %s' % ogr_field.value)
 
             # Getting the decimal value as a tuple.
             dtup = d.as_tuple()
             digits = dtup[1]
-            d_idx = dtup[2] # index where the decimal is
+            d_idx = dtup[2]  # index where the decimal is
 
             # Maximum amount of precision, or digits to the left of the decimal.
             max_prec = model_field.max_digits - model_field.decimal_places
@@ -365,7 +381,7 @@ class LayerMapping(object):
             # Attempt to convert any OFTReal and OFTString value to an OFTInteger.
             try:
                 val = int(ogr_field.value)
-            except:
+            except ValueError:
                 raise InvalidInteger('Could not construct integer from: %s' % ogr_field.value)
         else:
             val = ogr_field.value
@@ -413,7 +429,8 @@ class LayerMapping(object):
         # Transforming the geometry with our Coordinate Transformation object,
         # but only if the class variable `transform` is set w/a CoordTransform
         # object.
-        if self.transform: g.transform(self.transform)
+        if self.transform:
+            g.transform(self.transform)
 
         # Returning the WKT of the geometry.
         return g.wkt
@@ -512,7 +529,8 @@ class LayerMapping(object):
                     kwargs = self.feature_kwargs(feat)
                 except LayerMapError as msg:
                     # Something borked the validation
-                    if strict: raise
+                    if strict:
+                        raise
                     elif not silent:
                         stream.write('Ignoring Feature ID %s because: %s\n' % (feat.fid, msg))
                 else:
@@ -534,7 +552,8 @@ class LayerMapping(object):
                             # just-updated geometry WKT.
                             geom = getattr(m, self.geom_field).ogr
                             new = OGRGeometry(kwargs[self.geom_field])
-                            for g in new: geom.add(g)
+                            for g in new:
+                                geom.add(g)
                             setattr(m, self.geom_field, geom.wkt)
                         except ObjectDoesNotExist:
                             # No unique model exists yet, create.
@@ -546,9 +565,8 @@ class LayerMapping(object):
                         # Attempting to save.
                         m.save(using=self.using)
                         num_saved += 1
-                        if verbose: stream.write('%s: %s\n' % ('Updated' if is_update else 'Saved', m))
-                    except SystemExit:
-                        raise
+                        if verbose:
+                            stream.write('%s: %s\n' % ('Updated' if is_update else 'Saved', m))
                     except Exception as msg:
                         if strict:
                             # Bailing out if the `strict` keyword is set.
@@ -582,13 +600,15 @@ class LayerMapping(object):
             for i, end in enumerate(indices):
                 # Constructing the slice to use for this step; the last slice is
                 # special (e.g, [100:] instead of [90:100]).
-                if i+1 == n_i: step_slice = slice(beg, None)
-                else: step_slice = slice(beg, end)
+                if i + 1 == n_i:
+                    step_slice = slice(beg, None)
+                else:
+                    step_slice = slice(beg, end)
 
                 try:
                     num_feat, num_saved = _save(step_slice, num_feat, num_saved)
                     beg = end
-                except:
+                except:  # Deliberately catch everything
                     stream.write('%s\nFailed to save slice: %s\n' % ('=-' * 20, step_slice))
                     raise
         else:

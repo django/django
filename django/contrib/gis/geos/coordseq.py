@@ -10,6 +10,7 @@ from django.contrib.gis.geos.libgeos import CS_PTR
 from django.contrib.gis.geos import prototypes as capi
 from django.utils.six.moves import xrange
 
+
 class GEOSCoordSeq(GEOSBase):
     "The internal representation of a list of coordinates inside a Geometry."
 
@@ -64,7 +65,8 @@ class GEOSCoordSeq(GEOSBase):
         # Setting the X, Y, Z
         self.setX(index, value[0])
         self.setY(index, value[1])
-        if set_3d: self.setZ(index, value[2])
+        if set_3d:
+            self.setZ(index, value[2])
 
     #### Internal Routines ####
     def _checkindex(self, index):
@@ -144,14 +146,18 @@ class GEOSCoordSeq(GEOSBase):
         "Returns the KML representation for the coordinates."
         # Getting the substitution string depending on whether the coordinates have
         #  a Z dimension.
-        if self.hasz: substr = '%s,%s,%s '
-        else: substr = '%s,%s,0 '
+        if self.hasz:
+            substr = '%s,%s,%s '
+        else:
+            substr = '%s,%s,0 '
         return '<coordinates>%s</coordinates>' % \
-            ''.join([substr % self[i] for i in xrange(len(self))]).strip()
+            ''.join(substr % self[i] for i in xrange(len(self))).strip()
 
     @property
     def tuple(self):
         "Returns a tuple version of this coordinate sequence."
         n = self.size
-        if n == 1: return self[0]
-        else: return tuple([self[i] for i in xrange(n)])
+        if n == 1:
+            return self[0]
+        else:
+            return tuple(self[i] for i in xrange(n))

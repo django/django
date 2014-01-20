@@ -6,7 +6,8 @@ _standard_context_processors = None
 # We need the CSRF processor no matter what the user has in their settings,
 # because otherwise it is a security vulnerability, and we can't afford to leave
 # this to human error or failure to read migration instructions.
-_builtin_context_processors =  ('django.core.context_processors.csrf',)
+_builtin_context_processors = ('django.core.context_processors.csrf',)
+
 
 class ContextPopException(Exception):
     "pop() has been called more times than push()"
@@ -144,10 +145,11 @@ class RenderContext(BaseContext):
         return key in self.dicts[-1]
 
     def get(self, key, otherwise=None):
-        d = self.dicts[-1]
-        if key in d:
-            return d[key]
-        return otherwise
+        return self.dicts[-1].get(key, otherwise)
+
+    def __getitem__(self, key):
+        return self.dicts[-1][key]
+
 
 # This is a function rather than module-level procedural code because we only
 # want it to execute if somebody uses RequestContext.
@@ -165,6 +167,7 @@ def get_standard_processors():
         _standard_context_processors = tuple(processors)
     return _standard_context_processors
 
+
 class RequestContext(Context):
     """
     This subclass of template.Context automatically populates itself using
@@ -180,5 +183,7 @@ class RequestContext(Context):
             processors = ()
         else:
             processors = tuple(processors)
+        updates = dict()
         for processor in get_standard_processors() + processors:
-            self.update(processor(request))
+            updates.update(processor(request))
+        self.update(updates)

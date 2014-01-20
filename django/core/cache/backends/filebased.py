@@ -1,159 +1,156 @@
 "File-based cache backend"
-
+import errno
+import glob
 import hashlib
+import io
 import os
-import shutil
+import random
+import tempfile
 import time
+import zlib
+from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
+from django.core.files.move import file_move_safe
+from django.utils.encoding import force_bytes
 try:
     from django.utils.six.moves import cPickle as pickle
 except ImportError:
     import pickle
 
-from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
-from django.utils.encoding import force_bytes
-
 
 class FileBasedCache(BaseCache):
+    cache_suffix = '.djcache'
+
     def __init__(self, dir, params):
-        BaseCache.__init__(self, params)
-        self._dir = dir
-        if not os.path.exists(self._dir):
-            self._createdir()
+        super(FileBasedCache, self).__init__(params)
+        self._dir = os.path.abspath(dir)
+        self._createdir()
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        if self.has_key(key, version=version):
+        if self.has_key(key, version):
             return False
-
-        self.set(key, value, timeout, version=version)
+        self.set(key, value, timeout, version)
         return True
 
     def get(self, key, default=None, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
-
-        fname = self._key_to_file(key)
-        try:
-            with open(fname, 'rb') as f:
-                exp = pickle.load(f)
-                now = time.time()
-                if exp is not None and exp < now:
-                    self._delete(fname)
-                else:
-                    return pickle.load(f)
-        except (IOError, OSError, EOFError, pickle.PickleError):
-            pass
+        fname = self._key_to_file(key, version)
+        if os.path.exists(fname):
+            try:
+                with io.open(fname, 'rb') as f:
+                    if not self._is_expired(f):
+                        return pickle.loads(zlib.decompress(f.read()))
+            except IOError as e:
+                if e.errno == errno.ENOENT:
+                    pass  # Cache file was removed after the exists check
         return default
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
-
-        fname = self._key_to_file(key)
-        dirname = os.path.dirname(fname)
-
-        if timeout == DEFAULT_TIMEOUT:
-            timeout = self.default_timeout
-
-        self._cull()
-
+        self._createdir()  # Cache dir can be deleted at any time.
+        fname = self._key_to_file(key, version)
+        self._cull()  # make some room if necessary
+        fd, tmp_path = tempfile.mkstemp(dir=self._dir)
+        renamed = False
         try:
-            if not os.path.exists(dirname):
-                os.makedirs(dirname)
-
-            with open(fname, 'wb') as f:
-                expiry = None if timeout is None else time.time() + timeout
-                pickle.dump(expiry, f, pickle.HIGHEST_PROTOCOL)
-                pickle.dump(value, f, pickle.HIGHEST_PROTOCOL)
-        except (IOError, OSError):
-            pass
+            with io.open(fd, 'wb') as f:
+                expiry = self.get_backend_timeout(timeout)
+                f.write(pickle.dumps(expiry, -1))
+                f.write(zlib.compress(pickle.dumps(value), -1))
+            file_move_safe(tmp_path, fname, allow_overwrite=True)
+            renamed = True
+        finally:
+            if not renamed:
+                os.remove(tmp_path)
 
     def delete(self, key, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
-        try:
-            self._delete(self._key_to_file(key))
-        except (IOError, OSError):
-            pass
+        self._delete(self._key_to_file(key, version))
 
     def _delete(self, fname):
-        os.remove(fname)
+        if not fname.startswith(self._dir) or not os.path.exists(fname):
+            return
         try:
-            # Remove the 2 subdirs if they're empty
-            dirname = os.path.dirname(fname)
-            os.rmdir(dirname)
-            os.rmdir(os.path.dirname(dirname))
-        except (IOError, OSError):
-            pass
+            os.remove(fname)
+        except OSError as e:
+            # ENOENT can happen if the cache file is removed (by another
+            # process) after the os.path.exists check.
+            if e.errno != errno.ENOENT:
+                raise
 
     def has_key(self, key, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
-        fname = self._key_to_file(key)
-        try:
-            with open(fname, 'rb') as f:
-                exp = pickle.load(f)
-            now = time.time()
-            if exp < now:
-                self._delete(fname)
-                return False
-            else:
-                return True
-        except (IOError, OSError, EOFError, pickle.PickleError):
-            return False
+        fname = self._key_to_file(key, version)
+        if os.path.exists(fname):
+            with io.open(fname, 'rb') as f:
+                return not self._is_expired(f)
+        return False
 
     def _cull(self):
-        if int(self._num_entries) < self._max_entries:
-            return
-
-        try:
-            filelist = sorted(os.listdir(self._dir))
-        except (IOError, OSError):
-            return
-
+        """
+        Removes random cache entries if max_entries is reached at a ratio
+        of num_entries / cull_frequency. A value of 0 for CULL_FREQUENCY means
+        that the entire cache will be purged.
+        """
+        filelist = self._list_cache_files()
+        num_entries = len(filelist)
+        if num_entries < self._max_entries:
+            return  # return early if no culling is required
         if self._cull_frequency == 0:
-            doomed = filelist
-        else:
-            doomed = [os.path.join(self._dir, k) for (i, k) in enumerate(filelist) if i % self._cull_frequency == 0]
-
-        for topdir in doomed:
-            try:
-                for root, _, files in os.walk(topdir):
-                    for f in files:
-                        self._delete(os.path.join(root, f))
-            except (IOError, OSError):
-                pass
+            return self.clear()  # Clear the cache when CULL_FREQUENCY = 0
+        # Delete a random selection of entries
+        filelist = random.sample(filelist,
+                                 int(num_entries / self._cull_frequency))
+        for fname in filelist:
+            self._delete(fname)
 
     def _createdir(self):
-        try:
-            os.makedirs(self._dir)
-        except OSError:
-            raise EnvironmentError("Cache directory '%s' does not exist and could not be created'" % self._dir)
+        if not os.path.exists(self._dir):
+            try:
+                os.makedirs(self._dir, 0o700)
+            except OSError as e:
+                if e.errno != errno.EEXIST:
+                    raise EnvironmentError(
+                        "Cache directory '%s' does not exist "
+                        "and could not be created'" % self._dir)
 
-    def _key_to_file(self, key):
+    def _key_to_file(self, key, version=None):
         """
-        Convert the filename into an md5 string. We'll turn the first couple
-        bits of the path into directory prefixes to be nice to filesystems
-        that have problems with large numbers of files in a directory.
-
-        Thus, a cache key of "foo" gets turnned into a file named
-        ``{cache-dir}ac/bd/18db4cc2f85cedef654fccc4a4d8``.
+        Convert a key into a cache file path. Basically this is the
+        root cache path joined with the md5sum of the key and a suffix.
         """
-        path = hashlib.md5(force_bytes(key)).hexdigest()
-        path = os.path.join(path[:2], path[2:4], path[4:])
-        return os.path.join(self._dir, path)
-
-    def _get_num_entries(self):
-        count = 0
-        for _,_,files in os.walk(self._dir):
-            count += len(files)
-        return count
-    _num_entries = property(_get_num_entries)
+        key = self.make_key(key, version=version)
+        self.validate_key(key)
+        return os.path.join(self._dir, ''.join(
+            [hashlib.md5(force_bytes(key)).hexdigest(), self.cache_suffix]))
 
     def clear(self):
-        try:
-            shutil.rmtree(self._dir)
-        except (IOError, OSError):
-            pass
+        """
+        Remove all the cache files.
+        """
+        if not os.path.exists(self._dir):
+            return
+        for fname in self._list_cache_files():
+            self._delete(fname)
+
+    def _is_expired(self, f):
+        """
+        Takes an open cache file and determines if it has expired,
+        deletes the file if it is has passed its expiry time.
+        """
+        exp = pickle.load(f)
+        if exp is not None and exp < time.time():
+            f.close()  # On Windows a file has to be closed before deleting
+            self._delete(f.name)
+            return True
+        return False
+
+    def _list_cache_files(self):
+        """
+        Get a list of paths to all the cache files. These are all the files
+        in the root cache dir that end on the cache_suffix.
+        """
+        if not os.path.exists(self._dir):
+            return []
+        filelist = [os.path.join(self._dir, fname) for fname
+                    in glob.glob1(self._dir, '*%s' % self.cache_suffix)]
+        return filelist
+
 
 # For backwards compatibility
 class CacheClass(FileBasedCache):

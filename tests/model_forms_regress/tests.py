@@ -35,6 +35,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
             Person.objects.create(name="Person %s" % i)
 
         self._validator_run = False
+
         def my_validator(value):
             self._validator_run = True
 
@@ -43,6 +44,29 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
         f.clean([p.pk for p in Person.objects.all()[8:9]])
         self.assertTrue(self._validator_run)
+
+    def test_model_multiple_choice_show_hidden_initial(self):
+        """
+        Test support of show_hidden_initial by ModelMultipleChoiceField.
+        """
+        class PersonForm(forms.Form):
+            persons = forms.ModelMultipleChoiceField(show_hidden_initial=True,
+                                                     queryset=Person.objects.all())
+
+        person1 = Person.objects.create(name="Person 1")
+        person2 = Person.objects.create(name="Person 2")
+
+        form = PersonForm(initial={'persons': [person1, person2]},
+                          data={'initial-persons': [str(person1.pk), str(person2.pk)],
+                                'persons': [str(person1.pk), str(person2.pk)]})
+        self.assertTrue(form.is_valid())
+        self.assertFalse(form.has_changed())
+
+        form = PersonForm(initial={'persons': [person1, person2]},
+                          data={'initial-persons': [str(person1.pk), str(person2.pk)],
+                                'persons': [str(person2.pk)]})
+        self.assertTrue(form.is_valid())
+        self.assertTrue(form.has_changed())
 
 
 class TripleForm(forms.ModelForm):
@@ -92,7 +116,6 @@ class OverrideCleanTests(TestCase):
         self.assertEqual(form.instance.left, 1)
 
 
-
 class PartiallyLocalizedTripleForm(forms.ModelForm):
     class Meta:
         model = Triple
@@ -105,6 +128,7 @@ class FullyLocalizedTripleForm(forms.ModelForm):
         model = Triple
         localized_fields = '__all__'
         fields = '__all__'
+
 
 class LocalizedModelFormTest(TestCase):
     def test_model_form_applies_localize_to_some_fields(self):
@@ -167,6 +191,7 @@ class FilePathFieldTests(TestCase):
         names.sort()
         self.assertEqual(names, ['---------', '__init__.py', 'models.py', 'tests.py'])
 
+
 class ManyToManyCallableInitialTests(TestCase):
     def test_callable(self):
         "Regression for #10349: A callable can be provided as the initial value for an m2m field"
@@ -178,9 +203,9 @@ class ManyToManyCallableInitialTests(TestCase):
             return db_field.formfield(**kwargs)
 
         # Set up some Publications to use as data
-        book1 = Publication.objects.create(title="First Book", date_published=date(2007,1,1))
-        book2 = Publication.objects.create(title="Second Book", date_published=date(2008,1,1))
-        book3 = Publication.objects.create(title="Third Book", date_published=date(2009,1,1))
+        book1 = Publication.objects.create(title="First Book", date_published=date(2007, 1, 1))
+        book2 = Publication.objects.create(title="Second Book", date_published=date(2008, 1, 1))
+        book3 = Publication.objects.create(title="Third Book", date_published=date(2009, 1, 1))
 
         # Create a ModelForm, instantiate it, and check that the output is as expected
         ModelForm = modelform_factory(Article, fields="__all__",
@@ -207,8 +232,9 @@ class CustomFieldSaveTests(TestCase):
 
         # It's enough that the form saves without error -- the custom save routine will
         # generate an AssertionError if it is called more than once during save.
-        form = CFFForm(data = {'f': None})
+        form = CFFForm(data={'f': None})
         form.save()
+
 
 class ModelChoiceIteratorTests(TestCase):
     def test_len(self):
@@ -236,11 +262,13 @@ class CustomModelFormSaveMethod(TestCase):
         self.assertEqual(form.is_valid(), False)
         self.assertEqual(form.errors['__all__'], ['Please specify a real name.'])
 
+
 class ModelClassTests(TestCase):
     def test_no_model_class(self):
         class NoModelModelForm(forms.ModelForm):
             pass
         self.assertRaises(ValueError, NoModelModelForm)
+
 
 class OneToOneFieldTests(TestCase):
     def test_assignment_of_none(self):
@@ -252,7 +280,7 @@ class OneToOneFieldTests(TestCase):
         publication = Publication.objects.create(title="Pravda",
             date_published=date(1991, 8, 22))
         author = Author.objects.create(publication=publication, full_name='John Doe')
-        form = AuthorForm({'publication':'', 'full_name':'John Doe'}, instance=author)
+        form = AuthorForm({'publication': '', 'full_name': 'John Doe'}, instance=author)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['publication'], None)
         author = form.save()
@@ -270,7 +298,7 @@ class OneToOneFieldTests(TestCase):
         publication = Publication.objects.create(title="Pravda",
             date_published=date(1991, 8, 22))
         author = Author1.objects.create(publication=publication, full_name='John Doe')
-        form = AuthorForm({'publication':'', 'full_name':'John Doe'}, instance=author)
+        form = AuthorForm({'publication': '', 'full_name': 'John Doe'}, instance=author)
         self.assertTrue(not form.is_valid())
 
 
@@ -350,7 +378,7 @@ class FormFieldCallbackTests(TestCase):
         self.assertNotEqual(Form.base_fields['name'].widget.__class__, forms.Textarea)
 
         # With a widget should not set the widget to textarea
-        Form = modelform_factory(Person, fields="__all__", widgets={'name':widget})
+        Form = modelform_factory(Person, fields="__all__", widgets={'name': widget})
         self.assertEqual(Form.base_fields['name'].widget.__class__, forms.Textarea)
 
     def test_custom_callback(self):
@@ -370,8 +398,7 @@ class FormFieldCallbackTests(TestCase):
                 widgets = {'name': widget}
                 fields = "__all__"
 
-        _ = modelform_factory(Person, form=BaseForm,
-                              formfield_callback=callback)
+        modelform_factory(Person, form=BaseForm, formfield_callback=callback)
         id_field, name_field = Person._meta.fields
 
         self.assertEqual(callback_args,
@@ -568,7 +595,7 @@ class TestTicket19733(TestCase):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always", DeprecationWarning)
             # This should become an error once deprecation cycle is complete.
-            form = modelform_factory(Person)
+            modelform_factory(Person)
         self.assertEqual(w[0].category, DeprecationWarning)
 
     def test_modelform_factory_with_all_fields(self):

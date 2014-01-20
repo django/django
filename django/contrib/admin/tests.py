@@ -1,12 +1,12 @@
 import os
 from unittest import SkipTest
 
-from django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerCase
 from django.utils.module_loading import import_by_path
 from django.utils.translation import ugettext as _
 
 
-class AdminSeleniumWebDriverTestCase(LiveServerTestCase):
+class AdminSeleniumWebDriverTestCase(StaticLiveServerCase):
 
     available_apps = [
         'django.contrib.admin',
@@ -26,13 +26,14 @@ class AdminSeleniumWebDriverTestCase(LiveServerTestCase):
         except Exception as e:
             raise SkipTest('Selenium webdriver "%s" not installed or not '
                            'operational: %s' % (cls.webdriver_class, str(e)))
+        # This has to be last to ensure that resources are cleaned up properly!
         super(AdminSeleniumWebDriverTestCase, cls).setUpClass()
 
     @classmethod
-    def tearDownClass(cls):
+    def _tearDownClassInternal(cls):
         if hasattr(cls, 'selenium'):
             cls.selenium.quit()
-        super(AdminSeleniumWebDriverTestCase, cls).tearDownClass()
+        super(AdminSeleniumWebDriverTestCase, cls)._tearDownClassInternal()
 
     def wait_until(self, callback, timeout=10):
         """
@@ -49,8 +50,40 @@ class AdminSeleniumWebDriverTestCase(LiveServerTestCase):
         Helper function that blocks until the element with the given tag name
         is found on the page.
         """
+        self.wait_for(tag_name, timeout)
+
+    def wait_for(self, css_selector, timeout=10):
+        """
+        Helper function that blocks until an css selector is found on the page.
+        """
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support import expected_conditions as ec
         self.wait_until(
-            lambda driver: driver.find_element_by_tag_name(tag_name),
+            ec.presence_of_element_located((By.CSS_SELECTOR, css_selector)),
+            timeout
+        )
+
+    def wait_for_text(self, css_selector, text, timeout=10):
+        """
+        Helper function that blocks until the text is found in the css selector.
+        """
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support import expected_conditions as ec
+        self.wait_until(
+            ec.text_to_be_present_in_element(
+                (By.CSS_SELECTOR, css_selector), text),
+            timeout
+        )
+
+    def wait_for_value(self, css_selector, text, timeout=10):
+        """
+        Helper function that blocks until the value is found in the css selector.
+        """
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support import expected_conditions as ec
+        self.wait_until(
+            ec.text_to_be_present_in_element_value(
+                (By.CSS_SELECTOR, css_selector), text),
             timeout
         )
 

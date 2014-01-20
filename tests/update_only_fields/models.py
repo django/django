@@ -7,6 +7,7 @@ GENDER_CHOICES = (
     ('F', 'Female'),
 )
 
+
 class Account(models.Model):
     num = models.IntegerField()
 

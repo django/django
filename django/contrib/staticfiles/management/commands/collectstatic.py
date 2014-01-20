@@ -45,7 +45,7 @@ class Command(NoArgsCommand):
                 "'.*' and '*~'."),
     )
     help = "Collect static files in a single location."
-    requires_model_validation = False
+    requires_system_checks = False
 
     def __init__(self, *args, **kwargs):
         super(NoArgsCommand, self).__init__(*args, **kwargs)
@@ -137,32 +137,38 @@ class Command(NoArgsCommand):
 
     def handle_noargs(self, **options):
         self.set_options(**options)
-        # Warn before doing anything more.
-        if (isinstance(self.storage, FileSystemStorage) and
+
+        message = ['\n']
+        if self.dry_run:
+            message.append(
+                'You have activated the --dry-run option so no files will be modified.\n\n'
+            )
+
+        message.append(
+            'You have requested to collect static files at the destination\n'
+            'location as specified in your settings'
+        )
+
+        if (isinstance(self.storage._wrapped, FileSystemStorage) and
                 self.storage.location):
             destination_path = self.storage.location
-            destination_display = ':\n\n    %s' % destination_path
+            message.append(':\n\n    %s\n\n' % destination_path)
         else:
             destination_path = None
-            destination_display = '.'
+            message.append('.\n\n')
 
         if self.clear:
-            clear_display = 'This will DELETE EXISTING FILES!'
+            message.append('This will DELETE EXISTING FILES!\n')
         else:
-            clear_display = 'This will overwrite existing files!'
+            message.append('This will overwrite existing files!\n')
 
-        if self.interactive:
-            confirm = input("""
-You have requested to collect static files at the destination
-location as specified in your settings%s
+        message.append(
+            'Are you sure you want to do this?\n\n'
+            "Type 'yes' to continue, or 'no' to cancel: "
+        )
 
-%s
-Are you sure you want to do this?
-
-Type 'yes' to continue, or 'no' to cancel: """
-% (destination_display, clear_display))
-            if confirm != 'yes':
-                raise CommandError("Collecting static files cancelled.")
+        if self.interactive and input(''.join(message)) != 'yes':
+            raise CommandError("Collecting static files cancelled.")
 
         collected = self.collect()
         modified_count = len(collected['modified'])
@@ -294,12 +300,6 @@ Type 'yes' to continue, or 'no' to cancel: """
             self.log("Pretending to copy '%s'" % source_path, level=1)
         else:
             self.log("Copying '%s'" % source_path, level=1)
-            if self.local:
-                full_path = self.storage.path(prefixed_path)
-                try:
-                    os.makedirs(os.path.dirname(full_path))
-                except OSError:
-                    pass
             with source_storage.open(path) as source_file:
                 self.storage.save(prefixed_path, source_file)
         if not prefixed_path in self.copied_files:

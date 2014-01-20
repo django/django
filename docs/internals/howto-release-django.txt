@@ -83,10 +83,18 @@ A few items need to be taken care of before even beginning the release process.
 This stuff starts about a week before the release; most of it can be done
 any time leading up to the actual release:
 
-#. If this is a security release, send out pre-notification **one week**
-   before the release. We maintain a list of who gets these pre-notification
-   emails at *FIXME WHERE?*. This email should be signed by the key you'll use
-   for the release, and should include patches for each issue being fixed.
+#. If this is a security release, send out pre-notification **one week** before
+   the release. We maintain a list of who gets these pre-notification emails in
+   the private ``django-core`` repository. This email should be signed by the
+   key you'll use for the release, and should include patches for each issue
+   being fixed.
+
+#. If this is a major release, make sure the tests pass, then increase
+   the default PBKDF2 iterations in
+   ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` by about 10%
+   (pick a round number). Run the tests, and update the 3 failing
+   hasher tests with the new values. Make sure this gets noted in the
+   release notes (see release notes on 1.6 for an example).
 
 #. As the release approaches, watch Trac to make sure no release blockers
    are left for the upcoming release.
@@ -160,6 +168,9 @@ OK, this is the fun part, where we actually push out a release!
    on ``VERSION``. Here's `an example commit updating version numbers`__
 
    __ https://github.com/django/django/commit/18d920ea4839fb54f9d2a5dcb555b6a5666ee469
+
+#. For a version release, remove the ``UNDER DEVELOPMENT`` header at the top of
+   the release notes.
 
 #. If this is a pre-release package, update the "Development Status" trove
    classifier in ``setup.py`` to reflect this. Otherwise, make sure the
@@ -291,7 +302,8 @@ Now you're ready to actually put the release out there. To do this:
 
 #. Go to the `Add release page in the admin`__, enter the new release number
    exactly as it appears in the name of the tarball (Django-<version>.tar.gz).
-   So for example enter "1.5.1" or "1.4-rc-2", etc.
+   So for example enter "1.5.1" or "1.4-rc-2", etc. If the release is part of
+   an LTS branch, mark it so.
 
    __ https://www.djangoproject.com/admin/releases/release/add/
 
@@ -303,8 +315,8 @@ Now you're ready to actually put the release out there. To do this:
    database (this will automatically flip it to ``False`` for all
    others); you can do this using the site's admin.
 
-#. Post the release announcement to the django-announce,
-   django-developers and django-users mailing lists. This should
+#. Post the release announcement to the |django-announce|,
+   |django-developers| and |django-users| mailing lists. This should
    include links to the announcement blog post and the release notes.
 
 Post-release
@@ -324,10 +336,14 @@ You're almost done! All that's left to do now is:
    JSON fixture, so people without access to the production DB can still
    run an up-to-date copy of the docs site.
 
-#. Add the release in `Trac's versions list`_ if necessary. Not all versions
-   are declared; take example on previous releases.
+#. Add the release in `Trac's versions list`_ if necessary (and make it the
+   default if it's a final release). Not all versions are declared;
+   take example on previous releases.
 
 .. _Trac's versions list: https://code.djangoproject.com/admin/ticket/versions
+
+#. On the master branch, remove the ``UNDER DEVELOPMENT`` header in the notes
+   of the release that's just been pushed out.
 
 Notes on setting the VERSION tuple
 ==================================

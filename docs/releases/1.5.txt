@@ -2,6 +2,8 @@
 Django 1.5 release notes
 ========================
 
+*February 26, 2013*
+
 Welcome to Django 1.5!
 
 These release notes cover the `new features`_, as well
@@ -677,13 +679,14 @@ Miscellaneous
   needs. The new default value is ``0666`` (octal) and the current umask value
   is first masked out.
 
-* The :ref:`F() expressions <query-expressions>` supported bitwise operators by
+* The :class:`F expressions <django.db.models.F>` supported bitwise operators by
   ``&`` and ``|``. These operators are now available using ``.bitand()`` and
-  ``.bitor()`` instead. The removal of ``&`` and ``|`` was done to be consistent with
-  :ref:`Q() expressions <complex-lookups-with-q>` and ``QuerySet`` combining where
-  the operators are used as boolean AND and OR operators.
+  ``.bitor()`` instead. The removal of ``&`` and ``|`` was done to be
+  consistent with :ref:`Q() expressions <complex-lookups-with-q>` and
+  ``QuerySet`` combining where the operators are used as boolean AND and OR
+  operators.
 
-* In a ``filter()`` call, when :ref:`F() expressions <query-expressions>`
+* In a ``filter()`` call, when :class:`F expressions <django.db.models.F>`
   contained lookups spanning multi-valued relations, they didn't always reuse
   the same relations as other lookups along the same chain. This was changed,
   and now F() expressions will always use the same relations as other lookups
@@ -707,6 +710,10 @@ Miscellaneous
 * :meth:`BoundField.label_tag <django.forms.BoundField.label_tag>` now
   escapes its ``contents`` argument. To avoid the HTML escaping, use
   :func:`django.utils.safestring.mark_safe` on the argument before passing it.
+
+* Accessing reverse one-to-one relations fetched via
+  :meth:`~django.db.models.query.QuerySet.select_related` now raises
+  :exc:`~django.core.exceptions.DoesNotExist` instead of returning ``None``.
 
 Features deprecated in 1.5
 ==========================

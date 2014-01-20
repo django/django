@@ -1,5 +1,6 @@
 from django.db.backends.oracle.creation import DatabaseCreation
-from django.db.backends.util import truncate_name
+from django.db.backends.utils import truncate_name
+
 
 class OracleCreation(DatabaseCreation):
 

@@ -83,6 +83,6 @@ Other bugfixes and changes
 ==========================
 
 * Prevented transaction state from leaking from one request to the next (#19707).
-* Changed a SQL command syntax to be MySQL 4 compatible (#19702).
+* Changed an SQL command syntax to be MySQL 4 compatible (#19702).
 * Added backwards-compatibility with old unsalted MD5 passwords (#18144).
 * Numerous documentation improvements and fixes.

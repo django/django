@@ -32,6 +32,13 @@ Attributes
 All attributes should be considered read-only, unless stated otherwise below.
 ``session`` is a notable exception.
 
+.. attribute:: HttpRequest.scheme
+
+   .. versionadded:: 1.7
+
+   A string representing the scheme of the request (``http`` or ``https`` 
+   usually).
+
 .. attribute:: HttpRequest.body
 
     The raw HTTP request body as a byte string. This is useful for processing
@@ -93,10 +100,6 @@ All attributes should be considered read-only, unless stated otherwise below.
     non-form data posted in the request, access this through the
     :attr:`HttpRequest.body` attribute instead.
 
-    .. versionchanged:: 1.5
-
-        Before Django 1.5, HttpRequest.POST contained non-form data.
-
     It's possible that a request can come in via POST with an empty ``POST``
     dictionary -- if, say, a form is requested via the POST HTTP method but
     does not include form data. Therefore, you shouldn't use ``if request.POST``
@@ -106,6 +109,9 @@ All attributes should be considered read-only, unless stated otherwise below.
     Note: ``POST`` does *not* include file-upload information. See ``FILES``.
 
 .. attribute:: HttpRequest.REQUEST
+
+    .. deprecated:: 1.7
+        Use the more explicit ``GET`` and ``POST`` instead.
 
     For convenience, a dictionary-like object that searches ``POST`` first,
     then ``GET``. Inspired by PHP's ``$_REQUEST``.
@@ -195,8 +201,6 @@ All attributes should be considered read-only, unless stated otherwise below.
     setting. See :ref:`how-django-processes-a-request` for details.
 
 .. attribute:: HttpRequest.resolver_match
-
-    .. versionadded:: 1.5
 
     An instance of :class:`~django.core.urlresolvers.ResolverMatch` representing
     the resolved url. This attribute is only set after url resolving took place,
@@ -623,7 +627,7 @@ Attributes
 
 .. attribute:: HttpResponse.content
 
-    A string representing the content, encoded from a Unicode
+    A bytestring representing the content, encoded from a Unicode
     object if necessary.
 
 .. attribute:: HttpResponse.status_code
@@ -823,8 +827,6 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
 StreamingHttpResponse objects
 =============================
-
-.. versionadded:: 1.5
 
 .. class:: StreamingHttpResponse
 

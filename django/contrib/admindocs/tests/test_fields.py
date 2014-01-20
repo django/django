@@ -11,6 +11,7 @@ from django.utils.translation import ugettext as _
 class CustomField(models.Field):
     description = "A custom field type"
 
+
 class DescriptionLackingField(models.Field):
     pass
 
@@ -20,7 +21,8 @@ class TestFieldType(unittest.TestCase):
         pass
 
     def test_field_name(self):
-        self.assertRaises(AttributeError,
+        self.assertRaises(
+            AttributeError,
             views.get_readable_field_data_type, "NotAField"
         )
 

@@ -8,13 +8,14 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.mail.backends.console import EmailBackend as ConsoleEmailBackend
 from django.utils import six
 
+
 class EmailBackend(ConsoleEmailBackend):
     def __init__(self, *args, **kwargs):
         self._fname = None
         if 'file_path' in kwargs:
             self.file_path = kwargs.pop('file_path')
         else:
-            self.file_path = getattr(settings, 'EMAIL_FILE_PATH',None)
+            self.file_path = getattr(settings, 'EMAIL_FILE_PATH', None)
         # Make sure self.file_path is a string.
         if not isinstance(self.file_path, six.string_types):
             raise ImproperlyConfigured('Path for saving emails is invalid: %r' % self.file_path)
@@ -37,6 +38,11 @@ class EmailBackend(ConsoleEmailBackend):
         kwargs['stream'] = None
         super(EmailBackend, self).__init__(*args, **kwargs)
 
+    def write_message(self, message):
+        self.stream.write(message.message().as_bytes() + b'\n')
+        self.stream.write(b'-' * 79)
+        self.stream.write(b'\n')
+
     def _get_filename(self):
         """Return a unique file name."""
         if self._fname is None:
@@ -47,7 +53,7 @@ class EmailBackend(ConsoleEmailBackend):
 
     def open(self):
         if self.stream is None:
-            self.stream = open(self._get_filename(), 'a')
+            self.stream = open(self._get_filename(), 'ab')
             return True
         return False
 
@@ -57,4 +63,3 @@ class EmailBackend(ConsoleEmailBackend):
                 self.stream.close()
         finally:
             self.stream = None
-

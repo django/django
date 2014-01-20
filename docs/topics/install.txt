@@ -10,8 +10,8 @@ Install Python
 Being a Python Web framework, Django requires Python. It works with Python 2.7,
 3.2 or 3.3.
 
-Get Python at http://www.python.org. If you're running Linux or Mac OS X, you
-probably already have it installed.
+Get the latest version of Python at http://www.python.org/download/ or with
+your operating system's package manager.
 
 .. admonition:: Django on Jython
 
@@ -86,19 +86,9 @@ from other databases, so if you are working on something substantial, it's
 recommended to develop with the same database as you plan on using in
 production.
 
-In addition to the officially supported databases, there are backends provided
-by 3rd parties that allow you to use other databases with Django:
-
-* `Sybase SQL Anywhere`_
-* `IBM DB2`_
-* `Microsoft SQL Server 2005`_
-* Firebird_
-* ODBC_
-
-The Django versions and ORM features supported by these unofficial backends
-vary considerably. Queries regarding the specific capabilities of these
-unofficial backends, along with any support queries, should be directed to the
-support channels provided by each 3rd party project.
+In addition to the officially supported databases, there are :ref:`backends
+provided by 3rd parties <third-party-notes>` that allow you to use other
+databases with Django.
 
 In addition to a database backend, you'll need to make sure your Python
 database bindings are installed.
@@ -113,6 +103,9 @@ database bindings are installed.
   1.2.1p2 or higher. You will also want to read the database-specific
   :ref:`notes for the MySQL backend <mysql-notes>`.
 
+* If you're using SQLite you might want to read the :ref:`SQLite backend notes
+  <sqlite-notes>`.
+
 * If you're using Oracle, you'll need a copy of cx_Oracle_, but please
   read the database-specific :ref:`notes for the Oracle backend <oracle-notes>`
   for important information regarding supported versions of both Oracle and
@@ -121,14 +114,12 @@ database bindings are installed.
 * If you're using an unofficial 3rd party backend, please consult the
   documentation provided for any additional requirements.
 
-If you plan to use Django's ``manage.py syncdb`` command to automatically
+If you plan to use Django's ``manage.py migrate`` command to automatically
 create database tables for your models (after first installing Django and
 creating a project), you'll need to ensure that Django has permission to create
 and alter tables in the database you're using; if you plan to manually create
 the tables, you can simply grant Django ``SELECT``, ``INSERT``, ``UPDATE`` and
-``DELETE`` permissions. On some databases, Django will need ``ALTER TABLE``
-privileges during ``syncdb`` but won't issue ``ALTER TABLE`` statements on a
-table once ``syncdb`` has created it. After creating a database user with these
+``DELETE`` permissions. After creating a database user with these
 permissions, you'll specify the details in your project's settings file,
 see :setting:`DATABASES` for details.
 
@@ -220,7 +211,7 @@ This is the recommended way to install Django.
 
 .. _pip: http://www.pip-installer.org/
 .. _virtualenv: http://www.virtualenv.org/
-.. _virtualenvwrapper: http://www.doughellmann.com/docs/virtualenvwrapper/
+.. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
 .. _standalone pip installer: http://www.pip-installer.org/en/latest/installing.html#using-the-installer
 
 Installing an official release manually

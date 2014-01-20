@@ -45,7 +45,7 @@ Refactored documentation
     have Sphinx installed, build the HTML yourself from the
     documentation files bundled with Django.
 
-.. _Sphinx: http://sphinx.pocoo.org/
+.. _Sphinx: http://sphinx-doc.org/
 .. _online: https://docs.djangoproject.com/
 
 Along with these new features, the Django team has also been hard at

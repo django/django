@@ -7,6 +7,7 @@ produced by the `ogrinfo` utility.
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.gdal.geometries import GEO_CLASSES
 
+
 def ogrinfo(data_source, num_features=10):
     """
     Walks the available layers in the supplied `data_source`, displaying
@@ -31,7 +32,7 @@ def ogrinfo(data_source, num_features=10):
         print("      extent: %s - %s" % (extent_tup[0:2], extent_tup[2:4]))
         print("Displaying the first %s features ====" % num_features)
 
-        width = max(*map(len,layer.fields))
+        width = max(*map(len, layer.fields))
         fmt = " %%%ss: %%s" % width
         for j, feature in enumerate(layer[:num_features]):
             print("=== Feature %s" % j)

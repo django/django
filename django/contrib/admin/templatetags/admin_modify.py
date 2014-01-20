@@ -2,6 +2,7 @@ from django import template
 
 register = template.Library()
 
+
 @register.inclusion_tag('admin/prepopulated_fields_js.html', takes_context=True)
 def prepopulated_fields_js(context):
     """
@@ -19,6 +20,7 @@ def prepopulated_fields_js(context):
     context.update({'prepopulated_fields': prepopulated_fields})
     return context
 
+
 @register.inclusion_tag('admin/submit_line.html', takes_context=True)
 def submit_row(context):
     """
@@ -30,11 +32,9 @@ def submit_row(context):
     save_as = context['save_as']
     ctx = {
         'opts': opts,
-        'show_delete_link': (not is_popup and context['has_delete_permission']
-                              and change and context.get('show_delete', True)),
+        'show_delete_link': not is_popup and context['has_delete_permission'] and change and context.get('show_delete', True),
         'show_save_as_new': not is_popup and change and save_as,
-        'show_save_and_add_another': context['has_add_permission'] and
-                            not is_popup and (not save_as or context['add']),
+        'show_save_and_add_another': context['has_add_permission'] and not is_popup and (not save_as or context['add']),
         'show_save_and_continue': not is_popup and context['has_change_permission'],
         'is_popup': is_popup,
         'show_save': True,
@@ -44,10 +44,11 @@ def submit_row(context):
         ctx['original'] = context['original']
     return ctx
 
+
 @register.filter
 def cell_count(inline_admin_form):
     """Returns the number of cells used in a tabular inline"""
-    count = 1 # Hidden cell with hidden 'id' field
+    count = 1  # Hidden cell with hidden 'id' field
     for fieldset in inline_admin_form:
         # Loop through all the fields (one per cell)
         for line in fieldset:

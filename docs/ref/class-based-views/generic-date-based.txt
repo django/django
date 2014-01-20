@@ -138,23 +138,15 @@ YearArchiveView
     * ``year``: A :class:`~datetime.date` object
       representing the given year.
 
-      .. versionchanged:: 1.5
-
-         Previously, this returned a string.
-
     * ``next_year``: A :class:`~datetime.date` object
       representing the first day of the next year, according to
       :attr:`~BaseDateListView.allow_empty` and
       :attr:`~DateMixin.allow_future`.
 
-      .. versionadded:: 1.5
-
     * ``previous_year``: A :class:`~datetime.date` object
       representing the first day of the previous year, according to
       :attr:`~BaseDateListView.allow_empty` and
       :attr:`~DateMixin.allow_future`.
-
-      .. versionadded:: 1.5
 
     **Notes**
 
@@ -619,8 +611,11 @@ DateDetailView
 .. note::
 
     All of the generic views listed above have matching ``Base`` views that
-    only differ in that the they do not include the
-    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`:
+    only differ in that they do not include the
+    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    (for the archive views) or
+    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    (for the :class:`DateDetailView`):
 
     .. class:: BaseArchiveIndexView
 

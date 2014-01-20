@@ -10,29 +10,27 @@ from django.conf import settings
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
 from django.contrib.sites.models import Site
-from django.test import TestCase
+from django.test import TestCase, modify_settings
+from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils._os import upath
 
 if HAS_GEOS:
     from .models import City, Country
 
 
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'})
 @skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
-class GeoSitemapTest(TestCase):
+class GeoSitemapTest(IgnoreDeprecationWarningsMixin, TestCase):
 
     urls = 'django.contrib.gis.tests.geoapp.urls'
 
     def setUp(self):
+        super(GeoSitemapTest, self).setUp()
         Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
-        self.old_Site_meta_installed = Site._meta.installed
-        Site._meta.installed = True
-
-    def tearDown(self):
-        Site._meta.installed = self.old_Site_meta_installed
 
     def assertChildNodes(self, elem, expected):
         "Taken from syndication/tests.py."
-        actual = set([n.nodeName for n in elem.childNodes])
+        actual = set(n.nodeName for n in elem.childNodes)
         expected = set(expected)
         self.assertEqual(actual, expected)
 
@@ -59,7 +57,7 @@ class GeoSitemapTest(TestCase):
             self.assertEqual(urlset.getAttribute('xmlns:geo'), 'http://www.google.com/geo/schemas/sitemap/1.0')
 
             urls = urlset.getElementsByTagName('url')
-            self.assertEqual(2, len(urls)) # Should only be 2 sitemaps.
+            self.assertEqual(2, len(urls))  # Should only be 2 sitemaps.
             for url in urls:
                 self.assertChildNodes(url, ['loc', 'geo:geo'])
                 # Making sure the 'geo:format' element was properly set.

@@ -110,14 +110,14 @@ pygments_style = 'trac'
 # Links to Python's docs should reference the most recent version of the 2.x
 # branch, which is located at this URL.
 intersphinx_mapping = {
-    'python': ('http://docs.python.org/2.7', None),
-    'sphinx': ('http://sphinx.pocoo.org/', None),
+    'python': ('http://docs.python.org/', None),
+    'sphinx': ('http://sphinx-doc.org/', None),
     'six': ('http://pythonhosted.org/six/', None),
     'simplejson': ('http://simplejson.readthedocs.org/en/latest/', None),
 }
 
 # Python's docs don't change every week.
-intersphinx_cache_limit = 90 # days
+intersphinx_cache_limit = 90  # days
 
 # -- Options for HTML output ---------------------------------------------------
 
@@ -206,6 +206,14 @@ htmlhelp_basename = 'Djangodoc'
 
 modindex_common_prefix = ["django."]
 
+# Appended to every page
+rst_epilog = """
+.. |django-users| replace:: :ref:`django-users <django-users-mailing-list>`
+.. |django-core-mentorship| replace:: :ref:`django-core-mentorship <django-core-mentorship-mailing-list>`
+.. |django-developers| replace:: :ref:`django-developers <django-developers-mailing-list>`
+.. |django-announce| replace:: :ref:`django-announce <django-announce-mailing-list>`
+.. |django-updates| replace:: :ref:`django-updates <django-updates-mailing-list>`
+"""
 
 # -- Options for LaTeX output --------------------------------------------------
 
@@ -218,8 +226,8 @@ latex_elements = {
 # (source start file, target name, title, author, document class [howto/manual]).
 #latex_documents = []
 latex_documents = [
-  ('contents', 'django.tex', 'Django Documentation',
-   'Django Software Foundation', 'manual'),
+    ('contents', 'django.tex', 'Django Documentation',
+     'Django Software Foundation', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -256,7 +264,7 @@ man_pages = [
 
 # List of tuples (startdocname, targetname, title, author, dir_entry,
 # description, category, toctree_only)
-texinfo_documents=[(
+texinfo_documents = [(
     master_doc, "django", "", "", "Django",
     "Documentation of the Django framework", "Web development", False
 )]

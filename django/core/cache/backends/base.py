@@ -1,6 +1,7 @@
 "Base Cache class."
 from __future__ import unicode_literals
 
+import time
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured, DjangoRuntimeWarning
@@ -74,6 +75,18 @@ class BaseCache(object):
         self.version = params.get('VERSION', 1)
         self.key_func = get_key_func(params.get('KEY_FUNCTION', None))
 
+    def get_backend_timeout(self, timeout=DEFAULT_TIMEOUT):
+        """
+        Returns the timeout value usable by this backend based upon the provided
+        timeout.
+        """
+        if timeout == DEFAULT_TIMEOUT:
+            timeout = self.default_timeout
+        elif timeout == 0:
+            # ticket 21147 - avoid time.time() related precision issues
+            timeout = -1
+        return None if timeout is None else time.time() + timeout
+
     def make_key(self, key, version=None):
         """Constructs the key used by all other methods. By default it
         uses the key_func to generate a key (which, by default,
@@ -96,27 +109,27 @@ class BaseCache(object):
 
         Returns True if the value was stored, False otherwise.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseCache must provide an add() method')
 
     def get(self, key, default=None, version=None):
         """
         Fetch a given key from the cache. If the key does not exist, return
         default, which itself defaults to None.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseCache must provide a get() method')
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         """
         Set a value in the cache. If timeout is given, that timeout will be
         used for the key; otherwise the default cache timeout will be used.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseCache must provide a set() method')
 
     def delete(self, key, version=None):
         """
         Delete a key from the cache, failing silently.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseCache must provide a delete() method')
 
     def get_many(self, keys, version=None):
         """
@@ -190,7 +203,7 @@ class BaseCache(object):
 
     def clear(self):
         """Remove *all* values from the cache at once."""
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseCache must provide a clear() method')
 
     def validate_key(self, key):
         """
@@ -220,9 +233,9 @@ class BaseCache(object):
         if value is None:
             raise ValueError("Key '%s' not found" % key)
 
-        self.set(key, value, version=version+delta)
+        self.set(key, value, version=version + delta)
         self.delete(key, version=version)
-        return version+delta
+        return version + delta
 
     def decr_version(self, key, delta=1, version=None):
         """Substracts delta from the cache version for the supplied key. Returns

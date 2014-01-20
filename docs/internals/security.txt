@@ -1,3 +1,5 @@
+.. _internals-security:
+
 ==========================
 Django's security policies
 ==========================
@@ -108,12 +110,11 @@ On the day of disclosure, we will take the following steps:
    relevant patches and new releases, and crediting the reporter of
    the issue (if the reporter wishes to be publicly identified).
 
-4. Post a notice to the `django-announce`_ mailing list that links to the blog
+4. Post a notice to the |django-announce| mailing list that links to the blog
    post.
 
-.. _the Python Package Index: http://pypi.python.org/pypi
+.. _the Python Package Index: https://pypi.python.org/pypi
 .. _the official Django development blog: https://www.djangoproject.com/weblog/
-.. _django-announce: http://groups.google.com/group/django-announce
 
 If a reported issue is believed to be particularly time-sensitive --
 due to a known exploit in the wild, for example -- the time between
@@ -125,6 +126,10 @@ us affects other frameworks or tools in the Python/web ecosystem, we
 may privately contact and discuss those issues with the appropriate
 maintainers, and coordinate our own disclosure and resolution with
 theirs.
+
+The Django team also maintains an :doc:`archive of security issues
+disclosed in Django</releases/security>`.
+
 
 .. _security-notifications:
 

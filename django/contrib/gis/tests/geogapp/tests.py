@@ -42,13 +42,13 @@ class GeographyTest(TestCase):
         "Testing GeoQuerySet.distance() support on non-point geography fields."
         # `GeoQuerySet.distance` is not allowed geometry fields.
         htown = City.objects.get(name='Houston')
-        qs = Zipcode.objects.distance(htown.point)
+        Zipcode.objects.distance(htown.point)
 
     def test04_invalid_operators_functions(self):
         "Ensuring exceptions are raised for operators & functions invalid on geography fields."
         # Only a subset of the geometry functions & operator are available
         # to PostGIS geography types.  For more information, visit:
-        #  http://postgis.refractions.net/documentation/manual-1.5/ch08.html#PostGIS_GeographyFunctions
+        # http://postgis.refractions.net/documentation/manual-1.5/ch08.html#PostGIS_GeographyFunctions
         z = Zipcode.objects.get(code='77002')
         # ST_Within not available.
         self.assertRaises(ValueError, City.objects.filter(point__within=z.poly).count)
@@ -69,14 +69,14 @@ class GeographyTest(TestCase):
         # Getting the shapefile and mapping dictionary.
         shp_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), '..', 'data'))
         co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
-        co_mapping = {'name' : 'Name',
-                      'state' : 'State',
-                      'mpoly' : 'MULTIPOLYGON',
+        co_mapping = {'name': 'Name',
+                      'state': 'State',
+                      'mpoly': 'MULTIPOLYGON',
                       }
 
         # Reference county names, number of polygons, and state names.
         names = ['Bexar', 'Galveston', 'Harris', 'Honolulu', 'Pueblo']
-        num_polys = [1, 2, 1, 19, 1] # Number of polygons for each.
+        num_polys = [1, 2, 1, 19, 1]  # Number of polygons for each.
         st_names = ['Texas', 'Texas', 'Texas', 'Hawaii', 'Colorado']
 
         lm = LayerMapping(County, co_shp, co_mapping, source_srs=4269, unique='name')

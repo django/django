@@ -1,8 +1,6 @@
 import datetime
 import time
 
-from django.db.utils import DatabaseError
-
 try:
     from django.utils.six.moves import _thread as thread
 except ImportError:
@@ -12,11 +10,12 @@ from contextlib import contextmanager
 from importlib import import_module
 
 from django.conf import settings
+from django.core import checks
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends.signals import connection_created
-from django.db.backends import util
+from django.db.backends import utils
 from django.db.transaction import TransactionManagementError
-from django.db.utils import DatabaseErrorWrapper
+from django.db.utils import DatabaseError, DatabaseErrorWrapper, ProgrammingError
 from django.utils.functional import cached_property
 from django.utils import six
 from django.utils import timezone
@@ -84,19 +83,19 @@ class BaseDatabaseWrapper(object):
 
     def get_connection_params(self):
         """Returns a dict of parameters suitable for get_new_connection."""
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a get_connection_params() method')
 
     def get_new_connection(self, conn_params):
         """Opens a connection to the database."""
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a get_new_connection() method')
 
     def init_connection_state(self):
         """Initializes the database connection settings."""
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require an init_connection_state() method')
 
     def create_cursor(self):
         """Creates a cursor. Assumes that a connection is established."""
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a create_cursor() method')
 
     ##### Backend-specific methods for creating connections #####
 
@@ -112,9 +111,8 @@ class BaseDatabaseWrapper(object):
         # Establish the connection
         conn_params = self.get_connection_params()
         self.connection = self.get_new_connection(conn_params)
+        self.set_autocommit(self.settings_dict['AUTOCOMMIT'])
         self.init_connection_state()
-        if self.settings_dict['AUTOCOMMIT']:
-            self.set_autocommit(True)
         connection_created.send(sender=self.__class__, connection=self)
 
     def ensure_connection(self):
@@ -122,29 +120,29 @@ class BaseDatabaseWrapper(object):
         Guarantees that a connection to the database is established.
         """
         if self.connection is None:
-            with self.wrap_database_errors():
+            with self.wrap_database_errors:
                 self.connect()
 
     ##### Backend-specific wrappers for PEP-249 connection methods #####
 
     def _cursor(self):
         self.ensure_connection()
-        with self.wrap_database_errors():
+        with self.wrap_database_errors:
             return self.create_cursor()
 
     def _commit(self):
         if self.connection is not None:
-            with self.wrap_database_errors():
+            with self.wrap_database_errors:
                 return self.connection.commit()
 
     def _rollback(self):
         if self.connection is not None:
-            with self.wrap_database_errors():
+            with self.wrap_database_errors:
                 return self.connection.rollback()
 
     def _close(self):
         if self.connection is not None:
-            with self.wrap_database_errors():
+            with self.wrap_database_errors:
                 return self.connection.close()
 
     ##### Generic wrappers for PEP-249 connection methods #####
@@ -155,10 +153,10 @@ class BaseDatabaseWrapper(object):
         """
         self.validate_thread_sharing()
         if (self.use_debug_cursor or
-            (self.use_debug_cursor is None and settings.DEBUG)):
+                (self.use_debug_cursor is None and settings.DEBUG)):
             cursor = self.make_debug_cursor(self._cursor())
         else:
-            cursor = util.CursorWrapper(self._cursor(), self)
+            cursor = utils.CursorWrapper(self._cursor(), self)
         return cursor
 
     def commit(self):
@@ -262,7 +260,7 @@ class BaseDatabaseWrapper(object):
         """
         Backend-specific implementation to enable or disable autocommit.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a _set_autocommit() method')
 
     ##### Generic transaction management methods #####
 
@@ -361,6 +359,12 @@ class BaseDatabaseWrapper(object):
             raise TransactionManagementError(
                 "This is forbidden when an 'atomic' block is active.")
 
+    def validate_no_broken_transaction(self):
+        if self.needs_rollback:
+            raise TransactionManagementError(
+                "An error occurred in the current transaction. You can't "
+                "execute queries until the end of the 'atomic' block.")
+
     def abort(self):
         """
         Roll back any ongoing transaction and clean the transaction state
@@ -440,7 +444,7 @@ class BaseDatabaseWrapper(object):
         Tests if the database connection is usable.
         This function may assume that self.connection is not None.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require an is_usable() method')
 
     def close_if_unusable_or_obsolete(self):
         """
@@ -484,6 +488,7 @@ class BaseDatabaseWrapper(object):
 
     ##### Miscellaneous #####
 
+    @cached_property
     def wrap_database_errors(self):
         """
         Context manager and decorator that re-throws backend-specific database
@@ -495,7 +500,7 @@ class BaseDatabaseWrapper(object):
         """
         Creates a cursor that logs all queries in self.queries.
         """
-        return util.CursorDebugWrapper(cursor, self)
+        return utils.CursorDebugWrapper(cursor, self)
 
     @contextmanager
     def temporary_connection(self):
@@ -519,7 +524,11 @@ class BaseDatabaseWrapper(object):
         """
         Only required when autocommits_when_autocommit_is_off = True.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a _start_transaction_under_autocommit() method')
+
+    def schema_editor(self, *args, **kwargs):
+        "Returns a new instance of this backend's SchemaEditor"
+        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a schema_editor() method')
 
 
 class BaseDatabaseFeatures(object):
@@ -595,6 +604,9 @@ class BaseDatabaseFeatures(object):
     # to remove any ordering?
     requires_explicit_null_ordering_when_grouping = False
 
+    # Does the backend order NULL values as largest or smallest?
+    nulls_order_largest = False
+
     # Is there a 1000 item limit on query parameters?
     supports_1000_query_parameters = True
 
@@ -620,6 +632,9 @@ class BaseDatabaseFeatures(object):
     # which can't do it for MyISAM tables
     can_introspect_foreign_keys = True
 
+    # Can the backend introspect an AutoField, instead of an IntegerField?
+    can_introspect_autofield = False
+
     # Support for the DISTINCT ON clause
     can_distinct_on_fields = False
 
@@ -627,10 +642,40 @@ class BaseDatabaseFeatures(object):
     # when autocommit is disabled? http://bugs.python.org/issue8145#msg109965
     autocommits_when_autocommit_is_off = False
 
+    # Does the backend prevent running SQL queries in broken transactions?
+    atomic_transactions = True
+
+    # Can we roll back DDL in a transaction?
+    can_rollback_ddl = False
+
+    # Can we issue more than one ALTER COLUMN clause in an ALTER TABLE?
+    supports_combined_alters = False
+
+    # What's the maximum length for index names?
+    max_index_name_length = 63
+
+    # Does it support foreign keys?
+    supports_foreign_keys = True
+
+    # Does it support CHECK constraints?
+    supports_check_constraints = True
+
     # Does the backend support 'pyformat' style ("... %(name)s ...", {'name': value})
     # parameter passing? Note this can be provided by the backend even if not
     # supported by the Python driver
     supports_paramstyle_pyformat = True
+
+    # Does the backend require literal defaults, rather than parameterised ones?
+    requires_literal_defaults = False
+
+    # Does the backend require a connection reset after each material schema change?
+    connection_persists_old_columns = False
+
+    # What kind of error does the backend throw when accessing closed cursor?
+    closed_cursor_error_class = ProgrammingError
+
+    # Does 'a' LIKE 'A' match?
+    has_case_insensitive_like = True
 
     def __init__(self, connection):
         self.connection = connection
@@ -700,7 +745,7 @@ class BaseDatabaseOperations(object):
 
     def cache_key_culling_sql(self):
         """
-        Returns a SQL query that retrieves the first cache key greater than the
+        Returns an SQL query that retrieves the first cache key greater than the
         n smallest.
 
         This is used by the 'db' cache backend to determine where to start
@@ -713,13 +758,13 @@ class BaseDatabaseOperations(object):
         Given a lookup_type of 'year', 'month' or 'day', returns the SQL that
         extracts a value from the given date field field_name.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a date_extract_sql() method')
 
     def date_interval_sql(self, sql, connector, timedelta):
         """
         Implements the date interval functionality for expressions
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a date_interval_sql() method')
 
     def date_trunc_sql(self, lookup_type, field_name):
         """
@@ -727,7 +772,7 @@ class BaseDatabaseOperations(object):
         truncates the given date field field_name to a date object with only
         the given specificity.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetrunc_sql() method')
 
     def datetime_cast_sql(self):
         """
@@ -744,7 +789,7 @@ class BaseDatabaseOperations(object):
         'second', returns the SQL that extracts a value from the given
         datetime field field_name, and a tuple of parameters.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_extract_sql() method')
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         """
@@ -753,7 +798,7 @@ class BaseDatabaseOperations(object):
         field_name to a datetime object with only the given specificity, and
         a tuple of parameters.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_trunk_sql() method')
 
     def deferrable_sql(self):
         """
@@ -888,7 +933,7 @@ class BaseDatabaseOperations(object):
         Returns the value to use for the LIMIT when we are wanting "LIMIT
         infinity". Returns None if the limit clause can be omitted in this case.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a no_limit_value() method')
 
     def pk_default_value(self):
         """
@@ -928,11 +973,20 @@ class BaseDatabaseOperations(object):
         Returns a quoted version of the given table, index or column name. Does
         not quote the given name if it's already been quoted.
         """
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a quote_name() method')
+
+    def quote_parameter(self, value):
+        """
+        Returns a quoted version of the value so it's safe to use in an SQL
+        string. This should NOT be used to prepare SQL statements to send to
+        the database; it is meant for outputting SQL statements to a file
+        or the console for later execution by a developer/DBA.
+        """
         raise NotImplementedError()
 
     def random_function_sql(self):
         """
-        Returns a SQL expression that returns a random value.
+        Returns an SQL expression that returns a random value.
         """
         return 'RANDOM()'
 
@@ -945,7 +999,7 @@ class BaseDatabaseOperations(object):
         If the feature is not supported (or part of it is not supported), a
         NotImplementedError exception can be raised.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a regex_lookup() method')
 
     def savepoint_create_sql(self, sid):
         """
@@ -991,7 +1045,7 @@ class BaseDatabaseOperations(object):
         to tables with foreign keys pointing the tables being truncated.
         PostgreSQL requires a cascade even if these tables are empty.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseDatabaseOperations must provide a sql_flush() method')
 
     def sequence_reset_by_name_sql(self, style, sequences):
         """
@@ -1091,7 +1145,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return util.format_number(value, max_digits, decimal_places)
+        return utils.format_number(value, max_digits, decimal_places)
 
     def year_lookup_bounds_for_date_field(self, value):
         """
@@ -1126,7 +1180,7 @@ class BaseDatabaseOperations(object):
         Coerce the value returned by the database backend into a consistent type
         that is compatible with the field type.
         """
-        if value is None:
+        if value is None or field is None:
             return value
         internal_type = field.get_internal_type()
         if internal_type == 'FloatField':
@@ -1164,8 +1218,7 @@ class BaseDatabaseOperations(object):
 
 # Structure returned by the DB-API cursor.description interface (PEP 249)
 FieldInfo = namedtuple('FieldInfo',
-    'name type_code display_size internal_size precision scale null_ok'
-)
+    'name type_code display_size internal_size precision scale null_ok')
 
 
 class BaseDatabaseIntrospection(object):
@@ -1208,7 +1261,7 @@ class BaseDatabaseIntrospection(object):
         Returns an unsorted list of names of all tables that exist in the
         database.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_table_list() method')
 
     def django_table_names(self, only_existing=False):
         """
@@ -1218,16 +1271,15 @@ class BaseDatabaseIntrospection(object):
         If only_existing is True, the resulting list will only include the tables
         that actually exist in the database.
         """
-        from django.db import models, router
+        from django.apps import apps
+        from django.db import router
         tables = set()
-        for app in models.get_apps():
-            for model in models.get_models(app):
+        for app_config in apps.get_app_configs():
+            for model in router.get_migratable_models(app_config, self.connection.alias):
                 if not model._meta.managed:
                     continue
-                if not router.allow_syncdb(self.connection.alias, model):
-                    continue
                 tables.add(model._meta.db_table)
-                tables.update([f.m2m_db_table() for f in model._meta.local_many_to_many])
+                tables.update(f.m2m_db_table() for f in model._meta.local_many_to_many)
         tables = list(tables)
         if only_existing:
             existing_tables = self.table_names()
@@ -1240,12 +1292,11 @@ class BaseDatabaseIntrospection(object):
 
     def installed_models(self, tables):
         "Returns a set of all models represented by the provided list of table names."
-        from django.db import models, router
+        from django.apps import apps
+        from django.db import router
         all_models = []
-        for app in models.get_apps():
-            for model in models.get_models(app):
-                if router.allow_syncdb(self.connection.alias, model):
-                    all_models.append(model)
+        for app_config in apps.get_app_configs():
+            all_models.extend(router.get_migratable_models(app_config, self.connection.alias))
         tables = list(map(self.table_name_converter, tables))
         return set([
             m for m in all_models
@@ -1254,18 +1305,16 @@ class BaseDatabaseIntrospection(object):
 
     def sequence_list(self):
         "Returns a list of information about all DB sequences for all models in all apps."
+        from django.apps import apps
         from django.db import models, router
 
-        apps = models.get_apps()
         sequence_list = []
 
-        for app in apps:
-            for model in models.get_models(app):
+        for app_config in apps.get_app_configs():
+            for model in router.get_migratable_models(app_config, self.connection.alias):
                 if not model._meta.managed:
                     continue
                 if model._meta.swapped:
-                    continue
-                if not router.allow_syncdb(self.connection.alias, model):
                     continue
                 for f in model._meta.local_fields:
                     if isinstance(f, models.AutoField):
@@ -1285,7 +1334,7 @@ class BaseDatabaseIntrospection(object):
         Backends can override this to return a list of (column_name, referenced_table_name,
         referenced_column_name) for all key columns in given table.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_key_columns() method')
 
     def get_primary_key_column(self, cursor, table_name):
         """
@@ -1305,7 +1354,26 @@ class BaseDatabaseIntrospection(object):
 
         Only single-column indexes are introspected.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_indexes() method')
+
+    def get_constraints(self, cursor, table_name):
+        """
+        Retrieves any constraints or keys (unique, pk, fk, check, index)
+        across one or more columns.
+
+        Returns a dict mapping constraint names to their attributes,
+        where attributes is a dict with keys:
+         * columns: List of columns this covers
+         * primary_key: True if primary key, False otherwise
+         * unique: True if this is a unique constraint, False otherwise
+         * foreign_key: (table, column) of target, or None
+         * check: True if check constraint, False otherwise
+         * index: True if index, False otherwise.
+
+        Some backends may return special constraint names that don't exist
+        if they don't name constraints of a certain type (e.g. SQLite)
+        """
+        raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_constraints() method')
 
 
 class BaseDatabaseClient(object):
@@ -1322,7 +1390,7 @@ class BaseDatabaseClient(object):
         self.connection = connection
 
     def runshell(self):
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseDatabaseClient must provide a runshell() method')
 
 
 class BaseDatabaseValidation(object):
@@ -1333,5 +1401,30 @@ class BaseDatabaseValidation(object):
         self.connection = connection
 
     def validate_field(self, errors, opts, f):
-        "By default, there is no backend-specific validation"
+        """
+        By default, there is no backend-specific validation.
+
+        This method has been deprecated by the new checks framework. New
+        backends should implement check_field instead.
+        """
+        # This is deliberately commented out. It exists as a marker to
+        # remind us to remove this method, and the check_field() shim,
+        # when the time comes.
+        # warnings.warn('"validate_field" has been deprecated", PendingDeprecationWarning)
         pass
+
+    def check_field(self, field, **kwargs):
+        class ErrorList(list):
+            """A dummy list class that emulates API used by the older
+            validate_field() method. When validate_field() is fully
+            deprecated, this dummy can be removed too.
+            """
+            def add(self, opts, error_message):
+                self.append(checks.Error(error_message, hint=None, obj=field))
+
+        errors = ErrorList()
+        # Some tests create fields in isolation -- the fields are not attached
+        # to any model, so they have no `model` attribute.
+        opts = field.model._meta if hasattr(field, 'model') else None
+        self.validate_field(errors, field, opts)
+        return list(errors)

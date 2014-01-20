@@ -14,6 +14,12 @@ two things for you before delegating to ``django-admin.py``:
 * It sets the :envvar:`DJANGO_SETTINGS_MODULE` environment variable so that
   it points to your project's ``settings.py`` file.
 
+* It calls ``django.setup()`` to initialize various internals of Django.
+
+.. versionadded:: 1.7
+
+    ``django.setup()`` didn't exist in previous versions of Django.
+
 The ``django-admin.py`` script should be on your system path if you installed
 Django via its ``setup.py`` utility. If it's not on your path, you can find it
 in ``site-packages/django/bin`` within your Python installation. Consider
@@ -38,8 +44,8 @@ Usage
 
 .. code-block:: bash
 
-    django-admin.py <command> [options]
-    manage.py <command> [options]
+    $ django-admin.py <command> [options]
+    $ manage.py <command> [options]
 
 ``command`` should be one of the commands listed in this document.
 ``options``, which is optional, should be zero or more of the options available
@@ -89,25 +95,43 @@ documentation for the :djadminopt:`--verbosity` option.
 Available commands
 ==================
 
-check
------
+check <appname appname ...>
+---------------------------
 
 .. django-admin:: check
 
-.. versionadded:: 1.6
+.. versionchanged:: 1.7
 
-Performs a series of checks to verify a given setup (settings/application code)
-is compatible with the current version of Django.
+Uses the :doc:`system check framework </ref/checks>` to inspect
+the entire Django project for common problems.
 
-Upon finding things that are incompatible or require notifying the user, it
-issues a series of warnings.
+The system check framework will confirm that there aren't any problems with
+your installed models or your admin registrations. It will also provide warnings
+of common compatibility problems introduced by upgrading Django to a new version.
+Custom checks may be introduced by other libraries and applications.
+
+By default, all apps will be checked. You can check a subset of apps by providing
+a list of app labels as arguments::
+
+    python manage.py check auth admin myapp
+
+If you do not specify any app, all apps will be checked.
+
+.. django-admin-option:: --tag <tagname>
+
+The :doc:`system check framework </ref/checks>` performs many different
+types of checks. These check types are categorized with tags. You can use these tags
+to restrict the checks performed to just those in a particular category. For example,
+to perform only security and compatibility checks, you would run::
+
+    python manage.py check --tag security --tag compatibility
 
 compilemessages
 ---------------
 
 .. django-admin:: compilemessages
 
-Compiles .po files created with ``makemessages`` to .mo files for use with
+Compiles .po files created :djadmin:`makemessages` to .mo files for use with
 the builtin gettext support. See :doc:`/topics/i18n/index`.
 
 Use the :djadminopt:`--locale` option (or its shorter version ``-l``) to
@@ -119,8 +143,6 @@ Example usage::
     django-admin.py compilemessages --locale=pt_BR --locale=fr
     django-admin.py compilemessages -l pt_BR
     django-admin.py compilemessages -l pt_BR -l fr
-    django-admin.py compilemessages --locale=pt_BR,fr
-    django-admin.py compilemessages -l pt_BR,fr
 
 .. versionchanged:: 1.6
 
@@ -131,11 +153,18 @@ createcachetable
 
 .. django-admin:: createcachetable
 
-Creates a cache table named ``tablename`` for use with the database cache
-backend. See :doc:`/topics/cache` for more information.
+Creates the cache tables for use with the database cache backend. See
+:doc:`/topics/cache` for more information.
 
 The :djadminopt:`--database` option can be used to specify the database
 onto which the cachetable will be installed.
+
+.. versionchanged:: 1.7
+
+    It is no longer necessary to provide the cache table name or the
+    :djadminopt:`--database` option. Django takes this information from your
+    settings file. If you have configured multiple caches or multiple databases,
+    all cache tables are created.
 
 dbshell
 -------
@@ -178,8 +207,8 @@ if they have Django's default value. Such settings are prefixed by ``"###"``.
 
     The :djadminopt:`--all` option was added.
 
-dumpdata <appname appname appname.Model ...>
---------------------------------------------
+dumpdata <app_label app_label app_label.Model ...>
+--------------------------------------------------
 
 .. django-admin:: dumpdata
 
@@ -188,7 +217,7 @@ application(s).
 
 If no application name is provided, all installed applications will be dumped.
 
-The output of ``dumpdata`` can be used as input for ``loaddata``.
+The output of ``dumpdata`` can be used as input for :djadmin:`loaddata`.
 
 Note that ``dumpdata`` uses the default manager on the model for selecting the
 records to dump. If you're using a :ref:`custom manager <custom-managers>` as
@@ -212,21 +241,42 @@ easy for humans to read, so you can use the ``--indent`` option to
 pretty-print the output with a number of indentation spaces.
 
 The :djadminopt:`--exclude` option may be provided to prevent specific
-applications or models (specified as in the form of ``appname.ModelName``) from
-being dumped. If you specify a model name to ``dumpdata``, the dumped output
-will be restricted to that model, rather than the entire application. You can
-also mix application names and model names.
+applications or models (specified as in the form of ``app_label.ModelName``)
+from being dumped. If you specify a model name to ``dumpdata``, the dumped
+output will be restricted to that model, rather than the entire application.
+You can also mix application names and model names.
 
 The :djadminopt:`--database` option can be used to specify the database
 from which data will be dumped.
 
+.. django-admin-option:: --natural-foreign
+
+.. versionadded:: 1.7
+
+When this option is specified, Django will use the ``natural_key()`` model
+method to serialize any foreign key and many-to-many relationship to objects of
+the type that defines the method. If you are dumping ``contrib.auth``
+``Permission`` objects or ``contrib.contenttypes`` ``ContentType`` objects, you
+should probably be using this flag. See the :ref:`natural keys
+<topics-serialization-natural-keys>` documentation for more details on this
+and the next option.
+
+.. django-admin-option:: --natural-primary
+
+.. versionadded:: 1.7
+
+When this option is specified, Django will not provide the primary key in the
+serialized data of this object since it can be calculated during
+deserialization.
+
 .. django-admin-option:: --natural
+
+.. deprecated:: 1.7
+    Equivalent to the :djadminopt:`--natural-foreign` option; use that instead.
 
 Use :ref:`natural keys <topics-serialization-natural-keys>` to represent
 any foreign key and many-to-many relationship with a model that provides
-a natural key definition. If you are dumping ``contrib.auth`` ``Permission``
-objects or ``contrib.contenttypes`` ``ContentType`` objects, you should
-probably be using this flag.
+a natural key definition.
 
 .. versionadded:: 1.6
 
@@ -242,10 +292,8 @@ flush
 
 .. django-admin:: flush
 
-Returns the database to the state it was in immediately after :djadmin:`syncdb`
-was executed. This means that all data will be removed from the database, any
-post-synchronization handlers will be re-executed, and the ``initial_data``
-fixture will be re-installed.
+Removes all data from the database, re-executes any post-synchronization
+handlers, and reinstalls any initial data fixtures.
 
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
@@ -255,8 +303,6 @@ to flush.
 
 ``--no-initial-data``
 ~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.5
 
 Use ``--no-initial-data`` to avoid loading the initial_data fixture.
 
@@ -334,8 +380,6 @@ onto which the data will be loaded.
 
 .. django-admin-option:: --ignorenonexistent
 
-.. versionadded:: 1.5
-
 The :djadminopt:`--ignorenonexistent` option can be used to ignore fields that
 may have been removed from models since the fixture was originally generated.
 
@@ -378,7 +422,7 @@ directories will be included in the search path. For example::
 
     django-admin.py loaddata foo/bar/mydata.json
 
-would search ``<appname>/fixtures/foo/bar/mydata.json`` for each installed
+would search ``<app_label>/fixtures/foo/bar/mydata.json`` for each installed
 application,  ``<dirname>/foo/bar/mydata.json`` for each directory in
 :setting:`FIXTURE_DIRS`, and the literal path ``foo/bar/mydata.json``.
 
@@ -430,7 +474,7 @@ one fixture can reference data in another fixture. If the database backend
 supports row-level constraints, these constraints will be checked at the
 end of the transaction.
 
-The ``dumpdata`` command can be used to generate input for ``loaddata``.
+The :djadmin:`dumpdata` command can be used to generate input for ``loaddata``.
 
 Compressed fixtures
 ~~~~~~~~~~~~~~~~~~~
@@ -474,10 +518,10 @@ makemessages
 
 Runs over the entire source tree of the current directory and pulls out all
 strings marked for translation. It creates (or updates) a message file in the
-conf/locale (in the django tree) or locale (for project and application)
+conf/locale (in the Django tree) or locale (for project and application)
 directory. After making changes to the messages files you need to compile them
-with ``compilemessages`` for use with the builtin gettext support. See the
-:ref:`i18n documentation <how-to-create-language-files>` for details.
+with :djadmin:`compilemessages` for use with the builtin gettext support. See
+the :ref:`i18n documentation <how-to-create-language-files>` for details.
 
 .. django-admin-option:: --all
 
@@ -511,11 +555,6 @@ Example usage::
     django-admin.py makemessages -l pt_BR
     django-admin.py makemessages -l pt_BR -l fr
 
-You can also use commas to separate multiple locales::
-
-    django-admin.py makemessages --locale=de,fr,pt_BR
-    django-admin.py makemessages -l de,fr,pt_BR
-
 .. versionchanged:: 1.6
 
     Added the ability to specify multiple locales.
@@ -542,7 +581,7 @@ Example usage::
 Use the ``--ignore`` or ``-i`` option to ignore files or directories matching
 the given :mod:`glob`-style pattern. Use multiple times to ignore more.
 
-These patterns are used by default: ``'CVS'``, ``'.*'``, ``'*~'``
+These patterns are used by default: ``'CVS'``, ``'.*'``, ``'*~'``, ``'*.pyc'``
 
 Example usage::
 
@@ -568,9 +607,55 @@ for technically skilled translators to understand each message's context.
 
 .. versionadded:: 1.6
 
-Use the ``--keep-pot`` option to prevent django from deleting the temporary
-.pot file it generates before creating the .po file. This is useful for
+Use the ``--keep-pot`` option to prevent Django from deleting the temporary
+.pot files it generates before creating the .po file. This is useful for
 debugging errors which may prevent the final language files from being created.
+
+makemigrations [<app_label>]
+----------------------------
+
+.. django-admin:: makemigrations
+
+.. versionadded:: 1.7
+
+Creates new migrations based on the changes detected to your models.
+Migrations, their relationship with apps and more are covered in depth in
+:doc:`the migrations documentation</topics/migrations>`.
+
+Providing one or more app names as arguments will limit the migrations created
+to the app(s) specified and any dependencies needed (the table at the other end
+of a ``ForeignKey``, for example).
+
+.. django-admin-option:: --empty
+
+The ``--empty`` option will cause ``makemigrations`` to output an empty
+migration for the specified apps, for manual editing. This option is only
+for advanced users and should not be used unless you are familiar with
+the migration format, migration operations, and the dependencies between
+your migrations.
+
+migrate [<app_label> [<migrationname>]]
+---------------------------------------
+
+.. django-admin:: migrate
+
+.. versionadded:: 1.7
+
+Synchronizes the database state with the current set of models and migrations.
+Migrations, their relationship with apps and more are covered in depth in
+:doc:`the migrations documentation</topics/migrations>`.
+
+The behavior of this command changes depending on the arguments provided:
+
+* No arguments: All migrated apps have all of their migrations run,
+  and all unmigrated apps are synchronized with the database,
+* ``<app_label>``: The specified app has its migrations run, up to the most
+  recent migration. This may involve running other apps' migrations too, due
+  to dependencies.
+* ``<app_label> <migrationname>``: Brings the database schema to a state where it
+  would have just run the given migration, but no further - this may involve
+  unapplying migrations if you have previously migrated past the named
+  migration. Use the name `zero` to unapply all migrations for an app.
 
 runfcgi [options]
 -----------------
@@ -723,11 +808,29 @@ Django.)
 
 The development server automatically reloads Python code for each request, as
 needed. You don't need to restart the server for code changes to take effect.
+However, some actions like adding files don't trigger a restart, so you'll
+have to restart the server in these cases.
+
+.. versionchanged:: 1.7
+
+    Compiling translation files now also restarts the development server.
+
+If you are using Linux and install `pyinotify`_, kernel signals will be used to
+autoreload the server (rather than polling file modification timestamps each
+second). This offers better scaling to large projects, reduction in response
+time to code modification, more robust change detection, and battery usage
+reduction.
+
+.. _pyinotify: https://pypi.python.org/pypi/pyinotify/
+
+.. versionadded:: 1.7
+
+    ``pyinotify`` support was added.
 
 When you start the server, and each time you change Python code while the
-server is running, the server will validate all of your installed models. (See
-the ``validate`` command below.) If the validator finds errors, it will print
-them to standard output, but it won't stop the server.
+server is running, the server will check your entire Django project for errors (see
+the :djadmin:`check` command). If any errors are found, they will be printed
+to standard output, but it won't stop the server.
 
 You can run as many servers as you want, as long as they're on separate ports.
 Just execute ``django-admin.py runserver`` more than once.
@@ -859,16 +962,12 @@ behavior you can use the ``--no-startup`` option. e.g.::
 
     django-admin.py shell --plain --no-startup
 
-.. versionadded:: 1.5
-
-    The ``--interface`` option was added in Django 1.5.
-
 .. versionadded:: 1.6
 
     The ``--no-startup`` option was added in Django 1.6.
 
-sql <appname appname ...>
--------------------------
+sql <app_label app_label ...>
+-----------------------------
 
 .. django-admin:: sql
 
@@ -877,21 +976,21 @@ Prints the CREATE TABLE SQL statements for the given app name(s).
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-sqlall <appname appname ...>
-----------------------------
+sqlall <app_label app_label ...>
+--------------------------------
 
 .. django-admin:: sqlall
 
 Prints the CREATE TABLE and initial-data SQL statements for the given app name(s).
 
-Refer to the description of ``sqlcustom`` for an explanation of how to
+Refer to the description of :djadmin:`sqlcustom` for an explanation of how to
 specify initial data.
 
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-sqlclear <appname appname ...>
-------------------------------
+sqlclear <app_label app_label ...>
+----------------------------------
 
 .. django-admin:: sqlclear
 
@@ -900,19 +999,19 @@ Prints the DROP TABLE SQL statements for the given app name(s).
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-sqlcustom <appname appname ...>
--------------------------------
+sqlcustom <app_label app_label ...>
+-----------------------------------
 
 .. django-admin:: sqlcustom
 
 Prints the custom SQL statements for the given app name(s).
 
 For each model in each specified app, this command looks for the file
-``<appname>/sql/<modelname>.sql``, where ``<appname>`` is the given app name and
-``<modelname>`` is the model's name in lowercase. For example, if you have an
-app ``news`` that includes a ``Story`` model, ``sqlcustom`` will attempt
-to read a file ``news/sql/story.sql`` and append it to the output of this
-command.
+``<app_label>/sql/<modelname>.sql``, where ``<app_label>`` is the given app
+name and ``<modelname>`` is the model's name in lowercase. For example, if you
+have an app ``news`` that includes a ``Story`` model, ``sqlcustom`` will
+attempt to read a file ``news/sql/story.sql`` and append it to the output of
+this command.
 
 Each of the SQL files, if given, is expected to contain valid SQL. The SQL
 files are piped directly into the database after all of the models'
@@ -924,8 +1023,8 @@ Note that the order in which the SQL files are processed is undefined.
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-sqldropindexes <appname appname ...>
-------------------------------------
+sqldropindexes <app_label app_label ...>
+----------------------------------------
 
 .. django-admin:: sqldropindexes
 
@@ -947,8 +1046,8 @@ command.
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-sqlindexes <appname appname ...>
---------------------------------
+sqlindexes <app_label app_label ...>
+------------------------------------
 
 .. django-admin:: sqlindexes
 
@@ -957,8 +1056,26 @@ Prints the CREATE INDEX SQL statements for the given app name(s).
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-sqlsequencereset <appname appname ...>
+sqlmigrate <app_label> <migrationname>
 --------------------------------------
+
+.. django-admin:: sqlmigrate
+
+Prints the SQL for the named migration. This requires an active database
+connection, which it will use to resolve constraint names; this means you must
+generate the SQL against a copy of the database you wish to later apply it on.
+
+The :djadminopt:`--database` option can be used to specify the database for
+which to generate the SQL.
+
+.. django-admin-option:: --backwards
+
+By default, the SQL created is for running the migration in the forwards
+direction. Pass ``--backwards`` to generate the SQL for
+un-applying the migration instead.
+
+sqlsequencereset <app_label app_label ...>
+------------------------------------------
 
 .. django-admin:: sqlsequencereset
 
@@ -973,8 +1090,8 @@ of sync with its automatically incremented field data.
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-startapp <appname> [destination]
---------------------------------
+startapp <app_label> [destination]
+----------------------------------
 
 .. django-admin:: startapp
 
@@ -1110,47 +1227,13 @@ syncdb
 
 .. django-admin:: syncdb
 
-Creates the database tables for all apps in :setting:`INSTALLED_APPS` whose
-tables have not already been created.
+.. deprecated:: 1.7
 
-Use this command when you've added new applications to your project and want to
-install them in the database. This includes any apps shipped with Django that
-might be in :setting:`INSTALLED_APPS` by default. When you start a new project,
-run this command to install the default apps.
+    This command has been deprecated in favour of the :djadmin:`migrate`
+    command, which performs both the old behaviour as well as executing
+    migrations. It is now just an alias to that command.
 
-.. admonition:: Syncdb will not alter existing tables
-
-   ``syncdb`` will only create tables for models which have not yet been
-   installed. It will *never* issue ``ALTER TABLE`` statements to match
-   changes made to a model class after installation. Changes to model classes
-   and database schemas often involve some form of ambiguity and, in those
-   cases, Django would have to guess at the correct changes to make. There is
-   a risk that critical data would be lost in the process.
-
-   If you have made changes to a model and wish to alter the database tables
-   to match, use the ``sql`` command to display the new SQL structure and
-   compare that to your existing table schema to work out the changes.
-
-If you're installing the ``django.contrib.auth`` application, ``syncdb`` will
-give you the option of creating a superuser immediately.
-
-``syncdb`` will also search for and install any fixture named ``initial_data``
-with an appropriate extension (e.g. ``json`` or ``xml``). See the
-documentation for ``loaddata`` for details on the specification of fixture
-data files.
-
-The :djadminopt:`--noinput` option may be provided to suppress all user
-prompts.
-
-The :djadminopt:`--database` option can be used to specify the database to
-synchronize.
-
-``--no-initial-data``
-~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.5
-
-Use ``--no-initial-data`` to avoid loading the initial_data fixture.
+Alias for :djadmin:`migrate`.
 
 test <app or test identifier>
 -----------------------------
@@ -1182,8 +1265,8 @@ testserver <fixture fixture ...>
 
 .. django-admin:: testserver
 
-Runs a Django development server (as in ``runserver``) using data from the
-given fixture(s).
+Runs a Django development server (as in :djadmin:`runserver`) using data from
+the given fixture(s).
 
 For example, this command::
 
@@ -1193,8 +1276,8 @@ For example, this command::
 
 1. Create a test database, as described in :ref:`the-test-database`.
 2. Populate the test database with fixture data from the given fixtures.
-   (For more on fixtures, see the documentation for ``loaddata`` above.)
-3. Runs the Django development server (as in ``runserver``), pointed at
+   (For more on fixtures, see the documentation for :djadmin:`loaddata` above.)
+3. Runs the Django development server (as in :djadmin:`runserver`), pointed at
    this newly created test database instead of your production database.
 
 This is useful in a number of ways:
@@ -1205,21 +1288,22 @@ This is useful in a number of ways:
 
 * Let's say you're developing your Django application and have a "pristine"
   copy of a database that you'd like to interact with. You can dump your
-  database to a fixture (using the ``dumpdata`` command, explained above),
-  then use ``testserver`` to run your Web application with that data. With
-  this arrangement, you have the flexibility of messing up your data
+  database to a fixture (using the :djadmin:`dumpdata` command, explained
+  above), then use ``testserver`` to run your Web application with that data.
+  With this arrangement, you have the flexibility of messing up your data
   in any way, knowing that whatever data changes you're making are only
   being made to a test database.
 
 Note that this server does *not* automatically detect changes to your Python
-source code (as ``runserver`` does). It does, however, detect changes to
+source code (as :djadmin:`runserver` does). It does, however, detect changes to
 templates.
 
 .. django-admin-option:: --addrport [port number or ipaddr:port]
 
 Use ``--addrport`` to specify a different port, or IP address and port, from
 the default of ``127.0.0.1:8000``. This value follows exactly the same format and
-serves exactly the same function as the argument to the ``runserver`` command.
+serves exactly the same function as the argument to the :djadmin:`runserver`
+command.
 
 Examples:
 
@@ -1243,6 +1327,9 @@ validate
 --------
 
 .. django-admin:: validate
+
+.. deprecated:: 1.7
+    Replaced by the :djadmin:`check` command.
 
 Validates all installed models (according to the :setting:`INSTALLED_APPS`
 setting) and prints validation errors to standard output.
@@ -1288,8 +1375,8 @@ This command is only available if Django's :doc:`authentication system
 
 Creates a superuser account (a user who has all permissions). This is
 useful if you need to create an initial superuser account but did not
-do so during ``syncdb``, or if you need to programmatically generate
-superuser accounts for your site(s).
+do so during the first :djadmin:`migrate`, or if you need to programmatically
+generate superuser accounts for your site(s).
 
 When run interactively, this command will prompt for a password for
 the new superuser account. When run non-interactively, no password
@@ -1326,8 +1413,6 @@ clearsessions
 ~~~~~~~~~~~~~~~
 
 .. django-admin:: clearsessions
-
-.. versionadded:: 1.5
 
 Can be run as a cron job or directly to clean out expired sessions.
 
@@ -1374,7 +1459,7 @@ allows for the following options:
 
 Example usage::
 
-    django-admin.py syncdb --pythonpath='/home/djangoprojects/myproject'
+    django-admin.py migrate --pythonpath='/home/djangoprojects/myproject'
 
 Adds the given filesystem path to the Python `import search path`_. If this
 isn't provided, ``django-admin.py`` will use the ``PYTHONPATH`` environment
@@ -1389,7 +1474,7 @@ setting the Python path for you.
 
 Example usage::
 
-    django-admin.py syncdb --settings=mysite.settings
+    django-admin.py migrate --settings=mysite.settings
 
 Explicitly specifies the settings module to use. The settings module should be
 in Python package syntax, e.g. ``mysite.settings``. If this isn't provided,
@@ -1403,7 +1488,7 @@ Note that this option is unnecessary in ``manage.py``, because it uses
 
 Example usage::
 
-    django-admin.py syncdb --traceback
+    django-admin.py migrate --traceback
 
 By default, ``django-admin.py`` will show a simple error message whenever an
 :class:`~django.core.management.CommandError` occurs, but a full stack trace
@@ -1419,7 +1504,7 @@ will also output a full stack trace when a ``CommandError`` is raised.
 
 Example usage::
 
-    django-admin.py syncdb --verbosity 2
+    django-admin.py migrate --verbosity 2
 
 Use ``--verbosity`` to specify the amount of notification and debug information
 that ``django-admin.py`` should print to the console.
@@ -1494,6 +1579,11 @@ color-coded output if your terminal supports ANSI-colored output. It
 won't use the color codes if you're piping the command's output to
 another program.
 
+Under Windows, the native console doesn't support ANSI escape sequences so by
+default there is no color output. But you can install the `ANSICON`_
+third-party tool, the Django commands will detect its presence and will make
+use of its services to color output just like on Unix-based platforms.
+
 The colors used for syntax highlighting can be customized. Django
 ships with three color palettes:
 
@@ -1519,7 +1609,7 @@ number of roles in which color is used:
 * ``notice`` - A minor error.
 * ``sql_field`` - The name of a model field in SQL.
 * ``sql_coltype`` - The type of a model field in SQL.
-* ``sql_keyword`` - A SQL keyword.
+* ``sql_keyword`` - An SQL keyword.
 * ``sql_table`` - The name of a model in SQL.
 * ``http_info`` - A 1XX HTTP Informational server response.
 * ``http_success`` - A 2XX HTTP Success server response.
@@ -1578,6 +1668,14 @@ would specify the use of all the colors in the light color palette,
 *except* for the colors for errors and notices which would be
 overridden as specified.
 
+.. versionadded:: 1.7
+
+Support for color-coded output from ``django-admin.py`` / ``manage.py``
+utilities on Windows by relying on the ANSICON application was added in Django
+1.7.
+
+.. _ANSICON: http://adoxa.hostmyway.net/ansicon/
+
 Bash completion
 ---------------
 
@@ -1619,6 +1717,15 @@ Examples::
       from django.core import management
       management.call_command('flush', verbosity=0, interactive=False)
       management.call_command('loaddata', 'test_data', verbosity=0)
+
+Note that command options that take no arguments are passed as keywords
+with ``True`` or ``False``::
+
+      management.call_command('dumpdata', use_natural_keys=True)
+
+Command options which take multiple options are passed a list::
+
+      management.call_command('dumpdata', exclude=['contenttypes', 'auth'])
 
 Output redirection
 ==================

@@ -1,0 +1,21 @@
+==========================
+Django 1.6.2 release notes
+==========================
+
+*Under development*
+
+This is Django 1.6.2, a bugfix release for Django 1.6.
+
+Bug fixes
+=========
+
+* Prevented the base geometry object of a prepared geometry to be garbage
+  collected, which could lead to crash Django (#21662).
+
+* Fixed a crash when executing the :djadmin:`changepassword` command when the
+  user object representation contained non-ASCII characters (#21627).
+
+* The :djadmin:`collectstatic` command will raise an error rather than
+  default to using the current working directory if :setting:`STATIC_ROOT` is
+  not set. Combined with the ``--clear`` option, the previous behavior could
+  wipe anything below the current working directory.

@@ -4,6 +4,7 @@ from unittest import TestCase
 
 from django import template
 
+
 class CallableVariablesTests(TestCase):
 
     def test_callable(self):
@@ -12,6 +13,7 @@ class CallableVariablesTests(TestCase):
             def __init__(self, value):
                 self.num_calls = 0
                 self.value = value
+
             def __call__(self):
                 self.num_calls += 1
                 return {"the_value": self.value}
@@ -38,9 +40,11 @@ class CallableVariablesTests(TestCase):
 
         class Doodad(object):
             alters_data = True
+
             def __init__(self, value):
                 self.num_calls = 0
                 self.value = value
+
             def __call__(self):
                 self.num_calls += 1
                 return {"the_value": self.value}
@@ -63,9 +67,11 @@ class CallableVariablesTests(TestCase):
 
         class Doodad(object):
             do_not_call_in_templates = True
+
             def __init__(self, value):
                 self.num_calls = 0
                 self.value = value
+
             def __call__(self):
                 self.num_calls += 1
                 return {"the_value": self.value}
@@ -94,9 +100,11 @@ class CallableVariablesTests(TestCase):
         class Doodad(object):
             do_not_call_in_templates = True
             alters_data = True
+
             def __init__(self, value):
                 self.num_calls = 0
                 self.value = value
+
             def __call__(self):
                 self.num_calls += 1
                 return {"the_value": self.value}

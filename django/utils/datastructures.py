@@ -1,6 +1,8 @@
 import copy
 import warnings
+from collections import OrderedDict
 from django.utils import six
+
 
 class MergeDict(object):
     """
@@ -11,6 +13,8 @@ class MergeDict(object):
     first occurrence will be used.
     """
     def __init__(self, *dicts):
+        warnings.warn('`MergeDict` is deprecated, use `dict.update()` '
+                      'instead.', PendingDeprecationWarning, 2)
         self.dicts = dicts
 
     def __bool__(self):
@@ -113,6 +117,7 @@ class MergeDict(object):
         '''
         dictreprs = ', '.join(repr(d) for d in self.dicts)
         return '%s(%s)' % (self.__class__.__name__, dictreprs)
+
 
 class SortedDict(dict):
     """
@@ -230,14 +235,47 @@ class SortedDict(dict):
         Replaces the normal dict.__repr__ with a version that returns the keys
         in their sorted order.
         """
-        return '{%s}' % ', '.join(['%r: %r' % (k, v) for k, v in six.iteritems(self)])
+        return '{%s}' % ', '.join('%r: %r' % (k, v) for k, v in six.iteritems(self))
 
     def clear(self):
         super(SortedDict, self).clear()
         self.keyOrder = []
 
+
+class OrderedSet(object):
+    """
+    A set which keeps the ordering of the inserted items.
+    Currently backs onto OrderedDict.
+    """
+
+    def __init__(self, iterable=None):
+        self.dict = OrderedDict(((x, None) for x in iterable) if iterable else [])
+
+    def add(self, item):
+        self.dict[item] = None
+
+    def remove(self, item):
+        del self.dict[item]
+
+    def discard(self, item):
+        try:
+            self.remove(item)
+        except KeyError:
+            pass
+
+    def __iter__(self):
+        return iter(self.dict.keys())
+
+    def __contains__(self, item):
+        return item in self.dict
+
+    def __nonzero__(self):
+        return bool(self.dict)
+
+
 class MultiValueDictKeyError(KeyError):
     pass
+
 
 class MultiValueDict(dict):
     """
@@ -276,7 +314,7 @@ class MultiValueDict(dict):
         try:
             list_ = super(MultiValueDict, self).__getitem__(key)
         except KeyError:
-            raise MultiValueDictKeyError("Key %r not found in %r" % (key, self))
+            raise MultiValueDictKeyError(repr(key))
         try:
             return list_[-1]
         except IndexError:
@@ -303,7 +341,7 @@ class MultiValueDict(dict):
 
     def __getstate__(self):
         obj_dict = self.__dict__.copy()
-        obj_dict['_data'] = dict([(k, self.getlist(k)) for k in self])
+        obj_dict['_data'] = dict((k, self.getlist(k)) for k in self)
         return obj_dict
 
     def __setstate__(self, obj_dict):
@@ -457,19 +495,20 @@ class ImmutableList(tuple):
             raise AttributeError(self.warning)
 
     # All list mutation functions complain.
-    __delitem__  = complain
+    __delitem__ = complain
     __delslice__ = complain
-    __iadd__     = complain
-    __imul__     = complain
-    __setitem__  = complain
+    __iadd__ = complain
+    __imul__ = complain
+    __setitem__ = complain
     __setslice__ = complain
-    append       = complain
-    extend       = complain
-    insert       = complain
-    pop          = complain
-    remove       = complain
-    sort         = complain
-    reverse      = complain
+    append = complain
+    extend = complain
+    insert = complain
+    pop = complain
+    remove = complain
+    sort = complain
+    reverse = complain
+
 
 class DictWrapper(dict):
     """

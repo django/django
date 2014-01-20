@@ -28,6 +28,7 @@ def normalize_name(name):
     new = re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', '_\\1', name)
     return new.lower().strip('_')
 
+
 class StepsHelper(object):
 
     def __init__(self, wizard):
@@ -122,7 +123,7 @@ class WizardView(TemplateView):
 
     @classmethod
     def get_initkwargs(cls, form_list=None, initial_dict=None,
-        instance_dict=None, condition_dict=None, *args, **kwargs):
+            instance_dict=None, condition_dict=None, *args, **kwargs):
         """
         Creates a dict with all needed parameters for the form wizard instances.
 
@@ -184,8 +185,8 @@ class WizardView(TemplateView):
                 if (isinstance(field, forms.FileField) and
                         not hasattr(cls, 'file_storage')):
                     raise NoFileStorageConfigured(
-                            "You need to define 'file_storage' in your "
-                            "wizard view in order to handle file uploads.")
+                        "You need to define 'file_storage' in your "
+                        "wizard view in order to handle file uploads.")
 
         # build the kwargs for the wizardview instances
         kwargs['form_list'] = computed_form_list
@@ -330,7 +331,7 @@ class WizardView(TemplateView):
     def render_done(self, form, **kwargs):
         """
         This method gets called when all forms passed. The method should also
-        re-validate all steps to prevent manipulation. If any form don't
+        re-validate all steps to prevent manipulation. If any form fails to
         validate, `render_revalidation_failure` should get called.
         If everything is fine call `done`.
         """
@@ -398,23 +399,24 @@ class WizardView(TemplateView):
         """
         if step is None:
             step = self.steps.current
+        form_class = self.form_list[step]
         # prepare the kwargs for the form instance.
         kwargs = self.get_form_kwargs(step)
         kwargs.update({
             'data': data,
             'files': files,
-            'prefix': self.get_form_prefix(step, self.form_list[step]),
+            'prefix': self.get_form_prefix(step, form_class),
             'initial': self.get_form_initial(step),
         })
-        if issubclass(self.form_list[step], forms.ModelForm):
-            # If the form is based on ModelForm, add instance if available
-            # and not previously set.
+        if issubclass(form_class, (forms.ModelForm, forms.models.BaseInlineFormSet)):
+            # If the form is based on ModelForm or InlineFormSet,
+            # add instance if available and not previously set.
             kwargs.setdefault('instance', self.get_form_instance(step))
-        elif issubclass(self.form_list[step], forms.models.BaseModelFormSet):
+        elif issubclass(form_class, forms.models.BaseModelFormSet):
             # If the form is based on ModelFormSet, add queryset if available
             # and not previous set.
             kwargs.setdefault('queryset', self.get_form_instance(step))
-        return self.form_list[step](**kwargs)
+        return form_class(**kwargs)
 
     def process_step(self, form):
         """

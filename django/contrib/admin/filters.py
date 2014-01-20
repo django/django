@@ -12,9 +12,10 @@ from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils.encoding import smart_text, force_text
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from django.contrib.admin.util import (get_model_from_relation,
+from django.contrib.admin.utils import (get_model_from_relation,
     reverse_field_path, get_limit_choices_to_from_path, prepare_lookup_value)
 from django.contrib.admin.options import IncorrectLookupParameters
+
 
 class ListFilter(object):
     title = None  # Human-readable title to appear in the right sidebar.
@@ -33,26 +34,26 @@ class ListFilter(object):
         """
         Returns True if some choices would be output for this filter.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of ListFilter must provide a has_output() method')
 
     def choices(self, cl):
         """
         Returns choices ready to be output in the template.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of ListFilter must provide a choices() method')
 
     def queryset(self, request, queryset):
         """
         Returns the filtered queryset.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of ListFilter must provide a queryset() method')
 
     def expected_parameters(self):
         """
         Returns the list of parameter names that are expected from the
         request's query string and that will be used by this filter.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of ListFilter must provide an expected_parameters() method')
 
 
 class SimpleListFilter(ListFilter):
@@ -66,13 +67,13 @@ class SimpleListFilter(ListFilter):
             raise ImproperlyConfigured(
                 "The list filter '%s' does not specify "
                 "a 'parameter_name'." % self.__class__.__name__)
+        if self.parameter_name in params:
+            value = params.pop(self.parameter_name)
+            self.used_parameters[self.parameter_name] = value
         lookup_choices = self.lookups(request, model_admin)
         if lookup_choices is None:
             lookup_choices = ()
         self.lookup_choices = list(lookup_choices)
-        if self.parameter_name in params:
-            value = params.pop(self.parameter_name)
-            self.used_parameters[self.parameter_name] = value
 
     def has_output(self):
         return len(self.lookup_choices) > 0
@@ -89,7 +90,9 @@ class SimpleListFilter(ListFilter):
         """
         Must be overridden to return a list of tuples (value, verbose value)
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The SimpleListFilter.lookups() method must be overridden to '
+            'return a list of tuples (value, verbose value)')
 
     def expected_parameters(self):
         return [self.parameter_name]
@@ -164,9 +167,8 @@ class RelatedFieldListFilter(FieldListFilter):
             rel_name = other_model._meta.pk.name
         self.lookup_kwarg = '%s__%s__exact' % (field_path, rel_name)
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
-        self.lookup_val = request.GET.get(self.lookup_kwarg, None)
-        self.lookup_val_isnull = request.GET.get(
-                                      self.lookup_kwarg_isnull, None)
+        self.lookup_val = request.GET.get(self.lookup_kwarg)
+        self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull)
         self.lookup_choices = field.get_choices(include_blank=False)
         super(RelatedFieldListFilter, self).__init__(
             field, request, params, model, model_admin, field_path)
@@ -177,9 +179,9 @@ class RelatedFieldListFilter(FieldListFilter):
         self.title = self.lookup_title
 
     def has_output(self):
-        if (isinstance(self.field, models.related.RelatedObject)
-                and self.field.field.null or hasattr(self.field, 'rel')
-                    and self.field.null):
+        if (isinstance(self.field, models.related.RelatedObject) and
+                self.field.field.null or hasattr(self.field, 'rel') and
+                self.field.null):
             extra = 1
         else:
             extra = 0
@@ -204,9 +206,9 @@ class RelatedFieldListFilter(FieldListFilter):
                 }, [self.lookup_kwarg_isnull]),
                 'display': val,
             }
-        if (isinstance(self.field, models.related.RelatedObject)
-                and self.field.field.null or hasattr(self.field, 'rel')
-                    and self.field.null):
+        if (isinstance(self.field, models.related.RelatedObject) and
+                self.field.field.null or hasattr(self.field, 'rel') and
+                self.field.null):
             yield {
                 'selected': bool(self.lookup_val_isnull),
                 'query_string': cl.get_query_string({
@@ -216,8 +218,8 @@ class RelatedFieldListFilter(FieldListFilter):
             }
 
 FieldListFilter.register(lambda f: (
-        bool(f.rel) if hasattr(f, 'rel') else
-        isinstance(f, models.related.RelatedObject)), RelatedFieldListFilter)
+    bool(f.rel) if hasattr(f, 'rel') else
+    isinstance(f, models.related.RelatedObject)), RelatedFieldListFilter)
 
 
 class BooleanFieldListFilter(FieldListFilter):
@@ -240,16 +242,16 @@ class BooleanFieldListFilter(FieldListFilter):
             yield {
                 'selected': self.lookup_val == lookup and not self.lookup_val2,
                 'query_string': cl.get_query_string({
-                        self.lookup_kwarg: lookup,
-                    }, [self.lookup_kwarg2]),
+                    self.lookup_kwarg: lookup,
+                }, [self.lookup_kwarg2]),
                 'display': title,
             }
         if isinstance(self.field, models.NullBooleanField):
             yield {
                 'selected': self.lookup_val2 == 'True',
                 'query_string': cl.get_query_string({
-                        self.lookup_kwarg2: 'True',
-                    }, [self.lookup_kwarg]),
+                    self.lookup_kwarg2: 'True',
+                }, [self.lookup_kwarg]),
                 'display': _('Unknown'),
             }
 
@@ -277,7 +279,7 @@ class ChoicesFieldListFilter(FieldListFilter):
             yield {
                 'selected': smart_text(lookup) == self.lookup_val,
                 'query_string': cl.get_query_string({
-                                    self.lookup_kwarg: lookup}),
+                    self.lookup_kwarg: lookup}),
                 'display': title,
             }
 
@@ -287,8 +289,8 @@ FieldListFilter.register(lambda f: bool(f.choices), ChoicesFieldListFilter)
 class DateFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.field_generic = '%s__' % field_path
-        self.date_params = dict([(k, v) for k, v in params.items()
-                                 if k.startswith(self.field_generic)])
+        self.date_params = dict((k, v) for k, v in params.items()
+                                if k.startswith(self.field_generic))
 
         now = timezone.now()
         # When time zone support is enabled, convert "now" to the user's time
@@ -301,6 +303,11 @@ class DateFieldListFilter(FieldListFilter):
         else:       # field is a models.DateField
             today = now.date()
         tomorrow = today + datetime.timedelta(days=1)
+        if today.month == 12:
+            next_month = today.replace(year=today.year + 1, month=1, day=1)
+        else:
+            next_month = today.replace(month=today.month + 1, day=1)
+        next_year = today.replace(year=today.year + 1, month=1, day=1)
 
         self.lookup_kwarg_since = '%s__gte' % field_path
         self.lookup_kwarg_until = '%s__lt' % field_path
@@ -316,11 +323,11 @@ class DateFieldListFilter(FieldListFilter):
             }),
             (_('This month'), {
                 self.lookup_kwarg_since: str(today.replace(day=1)),
-                self.lookup_kwarg_until: str(tomorrow),
+                self.lookup_kwarg_until: str(next_month),
             }),
             (_('This year'), {
                 self.lookup_kwarg_since: str(today.replace(month=1, day=1)),
-                self.lookup_kwarg_until: str(tomorrow),
+                self.lookup_kwarg_until: str(next_year),
             }),
         )
         super(DateFieldListFilter, self).__init__(
@@ -334,7 +341,7 @@ class DateFieldListFilter(FieldListFilter):
             yield {
                 'selected': self.date_params == param_dict,
                 'query_string': cl.get_query_string(
-                                    param_dict, [self.field_generic]),
+                    param_dict, [self.field_generic]),
                 'display': title,
             }
 

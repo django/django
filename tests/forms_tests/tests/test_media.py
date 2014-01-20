@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from django.forms import TextInput, Media, TextInput, CharField, Form, MultiWidget
+from django.forms import Media, TextInput, CharField, Form, MultiWidget
 from django.template import Template, Context
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 
 
 @override_settings(
@@ -14,7 +13,7 @@ class FormsMediaTestCase(TestCase):
 
     def test_construction(self):
         # Check construction of media objects
-        m = Media(css={'all': ('path/to/css1','/path/to/css2')}, js=('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3'))
+        m = Media(css={'all': ('path/to/css1', '/path/to/css2')}, js=('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3'))
         self.assertEqual(str(m), """<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
 <script type="text/javascript" src="/path/to/js1"></script>
@@ -23,9 +22,9 @@ class FormsMediaTestCase(TestCase):
 
         class Foo:
             css = {
-               'all': ('path/to/css1','/path/to/css2')
+                'all': ('path/to/css1', '/path/to/css2')
             }
-            js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+            js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         m3 = Media(Foo)
         self.assertEqual(str(m3), """<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
@@ -52,9 +51,9 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         w1 = MyWidget1()
         self.assertEqual(str(w1.media), """<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
@@ -77,23 +76,23 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         class MyWidget2(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css2','/path/to/css3')
+                    'all': ('/path/to/css2', '/path/to/css3')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         class MyWidget3(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3', 'path/to/css1')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         w1 = MyWidget1()
         w2 = MyWidget2()
@@ -133,7 +132,7 @@ class FormsMediaTestCase(TestCase):
         # Widget media can be defined as a property
         class MyWidget4(TextInput):
             def _media(self):
-                return Media(css={'all': ('/some/path',)}, js = ('/some/js',))
+                return Media(css={'all': ('/some/path',)}, js=('/some/js',))
             media = property(_media)
 
         w4 = MyWidget4()
@@ -143,7 +142,7 @@ class FormsMediaTestCase(TestCase):
         # Media properties can reference the media of their parents
         class MyWidget5(MyWidget4):
             def _media(self):
-                return super(MyWidget5, self).media + Media(css={'all': ('/other/path',)}, js = ('/other/js',))
+                return super(MyWidget5, self).media + Media(css={'all': ('/other/path',)}, js=('/other/js',))
             media = property(_media)
 
         w5 = MyWidget5()
@@ -158,13 +157,13 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         class MyWidget6(MyWidget1):
             def _media(self):
-                return super(MyWidget6, self).media + Media(css={'all': ('/other/path',)}, js = ('/other/js',))
+                return super(MyWidget6, self).media + Media(css={'all': ('/other/path',)}, js=('/other/js',))
             media = property(_media)
 
         w6 = MyWidget6()
@@ -185,9 +184,9 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         class MyWidget7(MyWidget1):
             pass
@@ -203,9 +202,9 @@ class FormsMediaTestCase(TestCase):
         class MyWidget8(MyWidget1):
             class Media:
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3', 'path/to/css1')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         w8 = MyWidget8()
         self.assertEqual(str(w8.media), """<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
@@ -222,13 +221,13 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         class MyWidget4(TextInput):
             def _media(self):
-                return Media(css={'all': ('/some/path',)}, js = ('/some/js',))
+                return Media(css={'all': ('/some/path',)}, js=('/some/js',))
             media = property(_media)
 
         class MyWidget9(MyWidget4):
@@ -249,9 +248,9 @@ class FormsMediaTestCase(TestCase):
             class Media:
                 extend = False
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3', 'path/to/css1')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         w10 = MyWidget10()
         self.assertEqual(str(w10.media), """<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
@@ -264,17 +263,17 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         class MyWidget11(MyWidget1):
             class Media:
                 extend = True
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3', 'path/to/css1')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         w11 = MyWidget11()
         self.assertEqual(str(w11.media), """<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
@@ -290,17 +289,17 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         class MyWidget12(MyWidget1):
             class Media:
                 extend = ('css',)
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3', 'path/to/css1')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         w12 = MyWidget12()
         self.assertEqual(str(w12.media), """<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
@@ -318,11 +317,11 @@ class FormsMediaTestCase(TestCase):
         class MultimediaWidget(TextInput):
             class Media:
                 css = {
-                   'screen, print': ('/file1','/file2'),
-                   'screen': ('/file3',),
-                   'print': ('/file4',)
+                    'screen, print': ('/file1', '/file2'),
+                    'screen': ('/file3',),
+                    'print': ('/file4',)
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         multimedia = MultimediaWidget()
         self.assertEqual(str(multimedia.media), """<link href="/file4" type="text/css" media="print" rel="stylesheet" />
@@ -340,23 +339,23 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         class MyWidget2(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css2','/path/to/css3')
+                    'all': ('/path/to/css2', '/path/to/css3')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         class MyWidget3(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3', 'path/to/css1')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         # MultiWidgets have a default media definition that gets all the
         # media from the component widgets
@@ -382,23 +381,23 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         class MyWidget2(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css2','/path/to/css3')
+                    'all': ('/path/to/css2', '/path/to/css3')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         class MyWidget3(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3', 'path/to/css1')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         # You can ask a form for the media required by its widgets.
         class MyForm(Form):
@@ -429,6 +428,7 @@ class FormsMediaTestCase(TestCase):
         class FormWithMedia(Form):
             field1 = CharField(max_length=20, widget=MyWidget1())
             field2 = CharField(max_length=20, widget=MyWidget2())
+
             class Media:
                 js = ('/some/form/javascript',)
                 css = {
@@ -465,7 +465,7 @@ class StaticFormsMediaTestCase(TestCase):
 
     def test_construction(self):
         # Check construction of media objects
-        m = Media(css={'all': ('path/to/css1','/path/to/css2')}, js=('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3'))
+        m = Media(css={'all': ('path/to/css1', '/path/to/css2')}, js=('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3'))
         self.assertEqual(str(m), """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet" />
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
 <script type="text/javascript" src="/path/to/js1"></script>
@@ -474,9 +474,9 @@ class StaticFormsMediaTestCase(TestCase):
 
         class Foo:
             css = {
-               'all': ('path/to/css1','/path/to/css2')
+                'all': ('path/to/css1', '/path/to/css2')
             }
-            js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+            js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         m3 = Media(Foo)
         self.assertEqual(str(m3), """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet" />
@@ -503,9 +503,9 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         w1 = MyWidget1()
         self.assertEqual(str(w1.media), """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet" />
@@ -528,23 +528,23 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         class MyWidget2(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css2','/path/to/css3')
+                    'all': ('/path/to/css2', '/path/to/css3')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         class MyWidget3(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3', 'path/to/css1')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         w1 = MyWidget1()
         w2 = MyWidget2()
@@ -584,7 +584,7 @@ class StaticFormsMediaTestCase(TestCase):
         # Widget media can be defined as a property
         class MyWidget4(TextInput):
             def _media(self):
-                return Media(css={'all': ('/some/path',)}, js = ('/some/js',))
+                return Media(css={'all': ('/some/path',)}, js=('/some/js',))
             media = property(_media)
 
         w4 = MyWidget4()
@@ -594,7 +594,7 @@ class StaticFormsMediaTestCase(TestCase):
         # Media properties can reference the media of their parents
         class MyWidget5(MyWidget4):
             def _media(self):
-                return super(MyWidget5, self).media + Media(css={'all': ('/other/path',)}, js = ('/other/js',))
+                return super(MyWidget5, self).media + Media(css={'all': ('/other/path',)}, js=('/other/js',))
             media = property(_media)
 
         w5 = MyWidget5()
@@ -609,13 +609,13 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         class MyWidget6(MyWidget1):
             def _media(self):
-                return super(MyWidget6, self).media + Media(css={'all': ('/other/path',)}, js = ('/other/js',))
+                return super(MyWidget6, self).media + Media(css={'all': ('/other/path',)}, js=('/other/js',))
             media = property(_media)
 
         w6 = MyWidget6()
@@ -636,9 +636,9 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         class MyWidget7(MyWidget1):
             pass
@@ -654,9 +654,9 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget8(MyWidget1):
             class Media:
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3', 'path/to/css1')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         w8 = MyWidget8()
         self.assertEqual(str(w8.media), """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet" />
@@ -673,13 +673,13 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         class MyWidget4(TextInput):
             def _media(self):
-                return Media(css={'all': ('/some/path',)}, js = ('/some/js',))
+                return Media(css={'all': ('/some/path',)}, js=('/some/js',))
             media = property(_media)
 
         class MyWidget9(MyWidget4):
@@ -700,9 +700,9 @@ class StaticFormsMediaTestCase(TestCase):
             class Media:
                 extend = False
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3', 'path/to/css1')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         w10 = MyWidget10()
         self.assertEqual(str(w10.media), """<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
@@ -715,17 +715,17 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         class MyWidget11(MyWidget1):
             class Media:
                 extend = True
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3', 'path/to/css1')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         w11 = MyWidget11()
         self.assertEqual(str(w11.media), """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet" />
@@ -741,17 +741,17 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         class MyWidget12(MyWidget1):
             class Media:
                 extend = ('css',)
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3', 'path/to/css1')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         w12 = MyWidget12()
         self.assertEqual(str(w12.media), """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet" />
@@ -769,11 +769,11 @@ class StaticFormsMediaTestCase(TestCase):
         class MultimediaWidget(TextInput):
             class Media:
                 css = {
-                   'screen, print': ('/file1','/file2'),
-                   'screen': ('/file3',),
-                   'print': ('/file4',)
+                    'screen, print': ('/file1', '/file2'),
+                    'screen': ('/file3',),
+                    'print': ('/file4',)
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         multimedia = MultimediaWidget()
         self.assertEqual(str(multimedia.media), """<link href="/file4" type="text/css" media="print" rel="stylesheet" />
@@ -791,23 +791,23 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         class MyWidget2(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css2','/path/to/css3')
+                    'all': ('/path/to/css2', '/path/to/css3')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         class MyWidget3(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3', 'path/to/css1')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         # MultiWidgets have a default media definition that gets all the
         # media from the component widgets
@@ -833,23 +833,23 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1', '/path/to/css2')
                 }
-                js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
+                js = ('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3')
 
         class MyWidget2(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css2','/path/to/css3')
+                    'all': ('/path/to/css2', '/path/to/css3')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         class MyWidget3(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3', 'path/to/css1')
                 }
-                js = ('/path/to/js1','/path/to/js4')
+                js = ('/path/to/js1', '/path/to/js4')
 
         # You can ask a form for the media required by its widgets.
         class MyForm(Form):
@@ -880,6 +880,7 @@ class StaticFormsMediaTestCase(TestCase):
         class FormWithMedia(Form):
             field1 = CharField(max_length=20, widget=MyWidget1())
             field2 = CharField(max_length=20, widget=MyWidget2())
+
             class Media:
                 js = ('/some/form/javascript',)
                 css = {

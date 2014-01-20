@@ -99,7 +99,7 @@ one fell swoop.
 Testing improvements
 --------------------
 
-.. currentmodule:: django.test.client
+.. currentmodule:: django.test
 
 A couple of small but very useful improvements have been made to the
 :doc:`testing framework </topics/testing/index>`:

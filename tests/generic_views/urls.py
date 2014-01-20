@@ -55,7 +55,8 @@ urlpatterns = patterns('',
         views.AuthorDetail.as_view(queryset=None)),
     (r'^detail/nonmodel/1/$',
         views.NonModelDetail.as_view()),
-
+    (r'^detail/doesnotexist/(?P<pk>\d+)/$',
+        views.ObjectDoesNotExistDetail.as_view()),
     # FormView
     (r'^contact/$',
         views.ContactView.as_view()),
@@ -260,5 +261,5 @@ urlpatterns = patterns('',
         views.BookSigningDetail.as_view()),
 
     # Useful for testing redirects
-    (r'^accounts/login/$',  'django.contrib.auth.views.login')
+    (r'^accounts/login/$', 'django.contrib.auth.views.login')
 )

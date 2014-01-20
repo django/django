@@ -1,21 +1,21 @@
 from __future__ import unicode_literals
 
 import re
-try:
-    from urllib.parse import urlsplit, urlunsplit
-except ImportError:     # Python 2
-    from urlparse import urlsplit, urlunsplit
 
 from django.core.exceptions import ValidationError
+from django.utils.deconstruct import deconstructible
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 from django.utils.encoding import force_text
 from django.utils.ipv6 import is_valid_ipv6_address
 from django.utils import six
+from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
+
 
 # These values, if given to validate(), will trigger the self.required check.
 EMPTY_VALUES = (None, '', [], (), {})
 
 
+@deconstructible
 class RegexValidator(object):
     regex = ''
     message = _('Enter a valid value.')
@@ -40,10 +40,14 @@ class RegexValidator(object):
         if not self.regex.search(force_text(value)):
             raise ValidationError(self.message, code=self.code)
 
+    def __eq__(self, other):
+        return isinstance(other, RegexValidator) and (self.regex == other.regex) and (self.message == other.message) and (self.code == other.code)
 
+
+@deconstructible
 class URLValidator(RegexValidator):
     regex = re.compile(
-        r'^(?:http|ftp)s?://'  # http:// or https://
+        r'^(?:[a-z0-9\.\-]*)://'  # scheme is validated separately
         r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
         r'localhost|'  # localhost...
         r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'  # ...or ipv4
@@ -51,14 +55,26 @@ class URLValidator(RegexValidator):
         r'(?::\d+)?'  # optional port
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
     message = _('Enter a valid URL.')
+    schemes = ['http', 'https', 'ftp', 'ftps']
+
+    def __init__(self, schemes=None, **kwargs):
+        super(URLValidator, self).__init__(**kwargs)
+        if schemes is not None:
+            self.schemes = schemes
 
     def __call__(self, value):
+        value = force_text(value)
+        # Check first if the scheme is valid
+        scheme = value.split('://')[0].lower()
+        if scheme not in self.schemes:
+            raise ValidationError(self.message, code=self.code)
+
+        # Then check full URL
         try:
             super(URLValidator, self).__call__(value)
         except ValidationError as e:
             # Trivial case failed. Try for possible IDN domain
             if value:
-                value = force_text(value)
                 scheme, netloc, path, query, fragment = urlsplit(value)
                 try:
                     netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE
@@ -79,15 +95,16 @@ def validate_integer(value):
         raise ValidationError(_('Enter a valid integer.'), code='invalid')
 
 
+@deconstructible
 class EmailValidator(object):
     message = _('Enter a valid email address.')
     code = 'invalid'
     user_regex = re.compile(
         r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*$"  # dot-atom
-        r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"$)', # quoted-string
+        r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"$)',  # quoted-string
         re.IGNORECASE)
     domain_regex = re.compile(
-        r'(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}|[A-Z0-9-]{2,})\.?$'  # domain
+        r'(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}|[A-Z0-9-]{2,})$'  # domain
         # literal form, ipv4 address (SMTP 4.1.3)
         r'|^\[(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}\]$',
         re.IGNORECASE)
@@ -124,6 +141,9 @@ class EmailValidator(object):
             except UnicodeError:
                 pass
             raise ValidationError(self.message, code=self.code)
+
+    def __eq__(self, other):
+        return isinstance(other, EmailValidator) and (self.domain_whitelist == other.domain_whitelist) and (self.message == other.message) and (self.code == other.code)
 
 validate_email = EmailValidator()
 
@@ -175,6 +195,7 @@ comma_separated_int_list_re = re.compile('^[\d,]+$')
 validate_comma_separated_integer_list = RegexValidator(comma_separated_int_list_re, _('Enter only digits separated by commas.'), 'invalid')
 
 
+@deconstructible
 class BaseValidator(object):
     compare = lambda self, a, b: a is not b
     clean = lambda self, x: x
@@ -190,19 +211,25 @@ class BaseValidator(object):
         if self.compare(cleaned, self.limit_value):
             raise ValidationError(self.message, code=self.code, params=params)
 
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and (self.limit_value == other.limit_value) and (self.message == other.message) and (self.code == other.code)
 
+
+@deconstructible
 class MaxValueValidator(BaseValidator):
     compare = lambda self, a, b: a > b
     message = _('Ensure this value is less than or equal to %(limit_value)s.')
     code = 'max_value'
 
 
+@deconstructible
 class MinValueValidator(BaseValidator):
     compare = lambda self, a, b: a < b
     message = _('Ensure this value is greater than or equal to %(limit_value)s.')
     code = 'min_value'
 
 
+@deconstructible
 class MinLengthValidator(BaseValidator):
     compare = lambda self, a, b: a < b
     clean = lambda self, x: len(x)
@@ -213,6 +240,7 @@ class MinLengthValidator(BaseValidator):
     code = 'min_length'
 
 
+@deconstructible
 class MaxLengthValidator(BaseValidator):
     compare = lambda self, a, b: a > b
     clean = lambda self, x: len(x)

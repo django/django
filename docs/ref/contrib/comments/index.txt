@@ -31,7 +31,7 @@ To get started using the ``comments`` app, follow these steps:
 #. Install the comments framework by adding ``'django.contrib.comments'`` to
    :setting:`INSTALLED_APPS`.
 
-#. Run ``manage.py syncdb`` so that Django will create the comment tables.
+#. Run ``manage.py migrate`` so that Django will create the comment tables.
 
 #. Add the comment app's URLs to your project's ``urls.py``:
 

@@ -67,6 +67,6 @@ GeoDjango's admin site
 .. class:: OSMGeoAdmin
 
    A subclass of :class:`GeoModelAdmin` that uses a spherical mercator projection
-   with `OpenStreetMap <http://openstreetmap.org/>`_ street data tiles.
+   with `OpenStreetMap <http://www.openstreetmap.org/>`_ street data tiles.
    See the :ref:`OSMGeoAdmin introduction <osmgeoadmin-intro>`
    in the tutorial for a usage example.

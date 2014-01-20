@@ -204,8 +204,6 @@ The functions defined in this module share the following properties:
 
 .. function:: smart_text(s, encoding='utf-8', strings_only=False, errors='strict')
 
-    .. versionadded:: 1.5
-
     Returns a text object representing ``s`` -- ``unicode`` on Python 2 and
     ``str`` on Python 3. Treats bytestrings using the ``encoding`` codec.
 
@@ -225,8 +223,6 @@ The functions defined in this module share the following properties:
 
 .. function:: force_text(s, encoding='utf-8', strings_only=False, errors='strict')
 
-    .. versionadded:: 1.5
-
     Similar to ``smart_text``, except that lazy instances are resolved to
     strings, rather than kept as lazy objects.
 
@@ -239,8 +235,6 @@ The functions defined in this module share the following properties:
 
 .. function:: smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict')
 
-    .. versionadded:: 1.5
-
     Returns a bytestring version of ``s``, encoded as specified in
     ``encoding``.
 
@@ -248,8 +242,6 @@ The functions defined in this module share the following properties:
     objects.
 
 .. function:: force_bytes(s, encoding='utf-8', strings_only=False, errors='strict')
-
-    .. versionadded:: 1.5
 
     Similar to ``smart_bytes``, except that lazy instances are resolved to
     bytestrings, rather than kept as lazy objects.
@@ -440,7 +432,9 @@ Atom1Feed
 
     Consider a typical case, where a view might need to call a model's method
     to perform some computation, before placing the model instance into the
-    context, where the template might invoke the method once more::
+    context, where the template might invoke the method once more:
+
+    .. code-block:: python
 
         # the model
         class Person(models.Model):
@@ -503,8 +497,8 @@ Atom1Feed
 
     For cases like this, use the ``django.utils.functional.allow_lazy()``
     decorator. It modifies the function so that *if* it's called with a lazy
-    translation as the first argument, the function evaluation is delayed until it
-    needs to be converted to a string.
+    translation as one of its arguments, the function evaluation is delayed
+    until it needs to be converted to a string.
 
     For example::
 
@@ -745,8 +739,6 @@ appropriate entities.
 
 .. class:: SafeBytes
 
-    .. versionadded:: 1.5
-
     A ``bytes`` subclass that has been specifically marked as "safe"
     (requires no further escaping) for HTML output purposes.
 
@@ -757,8 +749,6 @@ appropriate entities.
     :class:`SafeBytes` on Python 2 and :class:`SafeText` on Python 3.
 
 .. class:: SafeText
-
-    .. versionadded:: 1.5
 
     A ``str`` (in Python 3) or ``unicode`` (in Python 2) subclass
     that has been specifically marked as "safe" for HTML output purposes.
@@ -773,6 +763,17 @@ appropriate entities.
     object can be used everywhere a string or unicode object is appropriate.
 
     Can be called multiple times on a single string.
+
+    String marked safe will become unsafe again if modified. For example::
+
+        >>> mystr = '<b>Hello World</b>   '
+        >>> mystr = mark_safe(mystr)
+        >>> type(mystr)
+        <class 'django.utils.safestring.SafeBytes'>
+
+        >>> mystr = mystr.strip()  # removing whitespace
+        >>> type(mystr)
+        <type 'str'>
 
 .. function:: mark_for_escaping(s)
 
@@ -857,7 +858,7 @@ For a complete discussion on the usage of the following see the
 
 .. function:: ngettext_lazy(singular, plural, number)
 .. function:: ungettext_lazy(singular, plural, number)
-.. function:: npgettext_lazy(singular, plural, number)
+.. function:: npgettext_lazy(context, singular, plural, number)
 
     Same as the non-lazy versions above, but using lazy execution.
 
@@ -939,6 +940,17 @@ For a complete discussion on the usage of the following see the
 
     :class:`~datetime.tzinfo` instance that represents UTC.
 
+.. function:: get_fixed_timezone(offset)
+
+    .. versionadded:: 1.7
+
+    Returns a :class:`~datetime.tzinfo` instance that represents a time zone
+    with a fixed offset from UTC.
+
+    ``offset`` is a :class:`datetime.timedelta` or an integer number of
+    minutes. Use positive values for time zones east of UTC and negative
+    values for west of UTC.
+
 .. function:: get_default_timezone()
 
     Returns a :class:`~datetime.tzinfo` instance that represents the
@@ -976,8 +988,6 @@ For a complete discussion on the usage of the following see the
     the previously active time zone on exit. If the ``timezone`` argument is
     ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
     on entry with :func:`deactivate()` instead.
-
-.. versionadded:: 1.5
 
 .. function:: localtime(value, timezone=None)
 
@@ -1035,6 +1045,9 @@ For a complete discussion on the usage of the following see the
 ``django.utils.tzinfo``
 =======================
 
+.. deprecated:: 1.7
+    Use :mod:`~django.utils.timezone` instead.
+
 .. module:: django.utils.tzinfo
    :synopsis: Implementation of ``tzinfo`` classes for use with ``datetime.datetime``.
 
@@ -1042,6 +1055,12 @@ For a complete discussion on the usage of the following see the
 
     Fixed offset in minutes east from UTC.
 
+    .. deprecated:: 1.7
+        Use :func:`~django.utils.timezone.get_fixed_timezone` instead.
+
 .. class:: LocalTimezone
 
     Proxy timezone information from time module.
+
+    .. deprecated:: 1.7
+        Use :func:`~django.utils.timezone.get_default_timezone` instead.

@@ -3,7 +3,7 @@ from django.contrib import comments
 from django.contrib.comments.models import Comment
 from django.contrib.comments.forms import CommentForm
 from django.core.exceptions import ImproperlyConfigured
-from django.test.utils import override_settings
+from django.test import modify_settings, override_settings
 from django.utils import six
 
 from . import CommentTestCase
@@ -14,14 +14,6 @@ class CommentAppAPITests(CommentTestCase):
 
     def testGetCommentApp(self):
         self.assertEqual(comments.get_comment_app(), comments)
-
-    @override_settings(
-        COMMENTS_APP='missing_app',
-        INSTALLED_APPS=list(settings.INSTALLED_APPS) + ['missing_app'],
-    )
-    def testGetMissingCommentApp(self):
-        with six.assertRaisesRegex(self, ImproperlyConfigured, 'missing_app'):
-            _ = comments.get_comment_app()
 
     def testGetForm(self):
         self.assertEqual(comments.get_form(), CommentForm)
@@ -42,11 +34,8 @@ class CommentAppAPITests(CommentTestCase):
         self.assertEqual(comments.get_approve_url(c), "/approve/12345/")
 
 
-@override_settings(
-    COMMENTS_APP='comment_tests.custom_comments',
-    INSTALLED_APPS=list(settings.INSTALLED_APPS) + [
-        'comment_tests.custom_comments'],
-)
+@modify_settings(INSTALLED_APPS={'append': 'comment_tests.custom_comments'})
+@override_settings(COMMENTS_APP='comment_tests.custom_comments')
 class CustomCommentTest(CommentTestCase):
     urls = 'comment_tests.urls'
 
@@ -69,10 +58,10 @@ class CustomCommentTest(CommentTestCase):
         c = Comment(id=12345)
         self.assertEqual(comments.get_flag_url(c), "/flag/12345/")
 
-    def getGetDeleteURL(self):
+    def testGetDeleteURL(self):
         c = Comment(id=12345)
         self.assertEqual(comments.get_delete_url(c), "/delete/12345/")
 
-    def getGetApproveURL(self):
+    def testGetApproveURL(self):
         c = Comment(id=12345)
         self.assertEqual(comments.get_approve_url(c), "/approve/12345/")

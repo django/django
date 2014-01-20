@@ -46,15 +46,15 @@ Query expressions
 Queries can now refer to a another field on the query and can traverse
 relationships to refer to fields on related models. This is implemented in the
 new :class:`F` object; for full details, including examples, consult the
-:ref:`documentation for F expressions <query-expressions>`.
+:class:`F expressions documentation <django.db.models.F>`.
 
 Performance improvements
 ------------------------
 
 .. currentmodule:: django.test
 
-Tests written using Django's :doc:`testing framework </topics/testing/index>` now run
-dramatically faster (as much as 10 times faster in many cases).
+Tests written using Django's :doc:`testing framework </topics/testing/index>`
+now run dramatically faster (as much as 10 times faster in many cases).
 
 This was accomplished through the introduction of transaction-based tests: when
 using :class:`django.test.TestCase`, your tests will now be run in a transaction

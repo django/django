@@ -3,6 +3,7 @@ from django.contrib.admin.models import LogEntry
 
 register = template.Library()
 
+
 class AdminLogNode(template.Node):
     def __init__(self, limit, varname, user):
         self.limit, self.varname, self.user = limit, varname, user
@@ -17,8 +18,9 @@ class AdminLogNode(template.Node):
             user_id = self.user
             if not user_id.isdigit():
                 user_id = context[self.user].pk
-            context[self.varname] = LogEntry.objects.filter(user__pk__exact=user_id).select_related('content_type', 'user')[:int(self.limit)]
+            context[self.varname] = LogEntry.objects.filter(user__pk=user_id).select_related('content_type', 'user')[:int(self.limit)]
         return ''
+
 
 @register.tag
 def get_admin_log(parser, token):

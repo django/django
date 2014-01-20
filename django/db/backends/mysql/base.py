@@ -16,8 +16,6 @@ except ImportError as e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading MySQLdb module: %s" % e)
 
-from django.utils.functional import cached_property
-
 # We want version (1, 2, 1, 'final', 2) or later. We can't just use
 # lexicographic ordering in this check because then (1, 2, 1, 'gamma')
 # inadvertently passes the version test.
@@ -37,13 +35,15 @@ except ImportError:
 
 from django.conf import settings
 from django.db import utils
-from django.db.backends import (util, BaseDatabaseFeatures,
+from django.db.backends import (utils as backend_utils, BaseDatabaseFeatures,
     BaseDatabaseOperations, BaseDatabaseWrapper)
 from django.db.backends.mysql.client import DatabaseClient
 from django.db.backends.mysql.creation import DatabaseCreation
 from django.db.backends.mysql.introspection import DatabaseIntrospection
 from django.db.backends.mysql.validation import DatabaseValidation
 from django.utils.encoding import force_str, force_text
+from django.db.backends.mysql.schema import DatabaseSchemaEditor
+from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes, SafeText
 from django.utils import six
 from django.utils import timezone
@@ -88,9 +88,9 @@ def adapt_datetime_with_timezone_support(value, conv):
 # timezone support is active, Django expects timezone-aware datetime objects.
 django_conversions = conversions.copy()
 django_conversions.update({
-    FIELD_TYPE.TIME: util.typecast_time,
-    FIELD_TYPE.DECIMAL: util.typecast_decimal,
-    FIELD_TYPE.NEWDECIMAL: util.typecast_decimal,
+    FIELD_TYPE.TIME: backend_utils.typecast_time,
+    FIELD_TYPE.DECIMAL: backend_utils.typecast_decimal,
+    FIELD_TYPE.NEWDECIMAL: backend_utils.typecast_decimal,
     FIELD_TYPE.DATETIME: parse_datetime_with_timezone_support,
     datetime.datetime: adapt_datetime_with_timezone_support,
 })
@@ -106,7 +106,7 @@ server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 # MySQL-4.1 and newer, so the MysqlDebugWrapper is unnecessary. Since the
 # point is to raise Warnings as exceptions, this can be done with the Python
 # warning module, and this is setup when the connection is created, and the
-# standard util.CursorDebugWrapper can be used. Also, using sql_mode
+# standard backend_utils.CursorDebugWrapper can be used. Also, using sql_mode
 # TRADITIONAL will automatically cause most warnings to be treated as errors.
 
 class CursorWrapper(object):
@@ -171,6 +171,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_explicit_null_ordering_when_grouping = True
     allows_primary_key_0 = False
     uses_savepoints = True
+    atomic_transactions = False
+    supports_check_constraints = False
 
     def __init__(self, connection):
         super(DatabaseFeatures, self).__init__(connection)
@@ -224,7 +226,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def date_trunc_sql(self, lookup_type, field_name):
         fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
-        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s') # Use double percents to escape.
+        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s')  # Use double percents to escape.
         format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
         try:
             i = fields.index(lookup_type) + 1
@@ -257,7 +259,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             params = []
         fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
-        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s') # Use double percents to escape.
+        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s')  # Use double percents to escape.
         format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
         try:
             i = fields.index(lookup_type) + 1
@@ -298,8 +300,13 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def quote_name(self, name):
         if name.startswith("`") and name.endswith("`"):
-            return name # Quoting once is enough.
+            return name  # Quoting once is enough.
         return "`%s`" % name
+
+    def quote_parameter(self, value):
+        # Inner import to allow module to fail to load gracefully
+        import MySQLdb.converters
+        return MySQLdb.escape(value, MySQLdb.converters.conversions)
 
     def random_function_sql(self):
         return 'RAND()'
@@ -325,13 +332,15 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Truncate already resets the AUTO_INCREMENT field from
         # MySQL version 5.0.13 onwards. Refs #16961.
         if self.connection.mysql_version < (5, 0, 13):
-            return ["%s %s %s %s %s;" %
-                    (style.SQL_KEYWORD('ALTER'),
+            return [
+                "%s %s %s %s %s;" % (
+                    style.SQL_KEYWORD('ALTER'),
                     style.SQL_KEYWORD('TABLE'),
                     style.SQL_TABLE(self.quote_name(sequence['table'])),
                     style.SQL_KEYWORD('AUTO_INCREMENT'),
                     style.SQL_FIELD('= 1'),
-                    ) for sequence in sequences]
+                ) for sequence in sequences
+            ]
         else:
             return []
 
@@ -379,6 +388,14 @@ class DatabaseOperations(BaseDatabaseOperations):
         items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
         return "VALUES " + ", ".join([items_sql] * num_values)
 
+    def combine_expression(self, connector, sub_expressions):
+        """
+        MySQL requires special cases for ^ operators in query expressions
+        """
+        if connector == '^':
+            return 'POW(%s)' % ','.join(sub_expressions)
+        return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'
@@ -416,7 +433,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             'conv': django_conversions,
             'charset': 'utf8',
         }
-        if not six.PY3:
+        if six.PY2:
             kwargs['use_unicode'] = True
         settings_dict = self.settings_dict
         if settings_dict['USER']:
@@ -477,7 +494,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         """
         Re-enable foreign key checks after they have been disabled.
         """
-        self.cursor().execute('SET foreign_key_checks=1')
+        # Override needs_rollback in case constraint_checks_disabled is
+        # nested inside transaction.atomic.
+        self.needs_rollback, needs_rollback = False, self.needs_rollback
+        try:
+            self.cursor().execute('SET foreign_key_checks=1')
+        finally:
+            self.needs_rollback = needs_rollback
 
     def check_constraints(self, table_names=None):
         """
@@ -514,6 +537,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                         table_name, column_name, bad_row[1],
                         referenced_table_name, referenced_column_name))
 
+    def schema_editor(self, *args, **kwargs):
+        "Returns a new instance of this backend's SchemaEditor"
+        return DatabaseSchemaEditor(self, *args, **kwargs)
+
     def is_usable(self):
         try:
             self.connection.ping()
@@ -529,4 +556,4 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         match = server_version_re.match(server_info)
         if not match:
             raise Exception('Unable to determine MySQL version from version string %r' % server_info)
-        return tuple([int(x) for x in match.groups()])
+        return tuple(int(x) for x in match.groups())

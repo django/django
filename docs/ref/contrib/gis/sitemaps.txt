@@ -23,4 +23,4 @@ Reference
 -----------------
 
 .. rubric:: Footnotes
-.. [#] Google, Inc., `What is a Geo Sitemap? <http://support.google.com/webmasters/bin/answer.py?answer=94555>`_.
+.. [#] Google, Inc., `What is a Geo Sitemap? <https://support.google.com/webmasters/answer/94555>`_.

@@ -54,20 +54,21 @@ Storage backends
 
 The messages framework can use different backends to store temporary messages.
 
-Django provides three built-in storage classes:
+Django provides three built-in storage classes in
+:mod:`django.contrib.messages`:
 
-.. class:: django.contrib.messages.storage.session.SessionStorage
+.. class:: storage.session.SessionStorage
 
     This class stores all messages inside of the request's session. Therefore
     it requires Django's ``contrib.sessions`` application.
 
-.. class:: django.contrib.messages.storage.cookie.CookieStorage
+.. class:: storage.cookie.CookieStorage
 
     This class stores the message data in a cookie (signed with a secret hash
     to prevent manipulation) to persist notifications across requests. Old
     messages are dropped if the cookie data size would exceed 2048 bytes.
 
-.. class:: django.contrib.messages.storage.fallback.FallbackStorage
+.. class:: storage.fallback.FallbackStorage
 
     This class first uses ``CookieStorage``, and falls back to using
     ``SessionStorage`` for the messages that could not fit in a single cookie.
@@ -82,6 +83,8 @@ another storage class by setting :setting:`MESSAGE_STORAGE` to its full import
 path, for example::
 
     MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+
+.. class:: storage.base.BaseStorage
 
 To write your own storage class, subclass the ``BaseStorage`` class in
 ``django.contrib.messages.storage.base`` and implement the ``_get`` and
@@ -174,8 +177,9 @@ used tags (which are usually represented as HTML classes for the message)::
 
 Displaying messages
 -------------------
+.. function:: get_messages(request)
 
-In your template, use something like::
+**In your template**, use something like::
 
     {% if messages %}
     <ul class="messages">
@@ -192,6 +196,67 @@ the template context.
 Even if you know there is only just one message, you should still iterate over
 the ``messages`` sequence, because otherwise the message storage will not be cleared
 for the next request.
+
+.. versionadded:: 1.7
+
+The context processor also provides a ``DEFAULT_MESSAGE_LEVELS`` variable which
+is a mapping of the message level names to their numeric value::
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+            {{ message }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+
+
+**Outside of templates**, you can use
+:func:`~django.contrib.messages.get_messages`::
+
+    from django.contrib.messages import get_messages
+
+    storage = get_messages(request)
+    for message in storage:
+        do_something_with_the_message(message)
+
+For instance, you can fetch all the messages to return them in a
+:ref:`JSONResponseMixin <jsonresponsemixin-example>` instead of a
+:class:`~django.views.generic.base.TemplateResponseMixin`.
+
+:func:`~django.contrib.messages.get_messages` will return an
+instance of the configured storage backend.
+
+
+The ``Message`` class
+---------------------
+
+.. class:: storage.base.Message
+
+    When you loop over the list of messages in a template, what you get are
+    instances of the ``Message`` class. It's quite a simple object, with only a
+    few attributes:
+
+    * ``message``: The actual text of the message.
+
+    * ``level``: An integer describing the type of the message (see the
+      `message levels`_ section above).
+
+    * ``tags``: A string combining all the message's tags (``extra_tags`` and
+      ``level_tag``) separated by spaces.
+
+    * ``extra_tags``: A string containing custom tags for this message,
+      separated by spaces. It's empty by default.
+
+    .. versionadded:: 1.7
+
+    * ``level_tag``: The string representation of the level. By default, it's
+      the lowercase version of the name of the associated constant, but this
+      can be changed if you need by using the :setting:`MESSAGE_TAGS` setting.
 
 Creating custom message levels
 ------------------------------
@@ -373,3 +438,12 @@ behavior:
 * :setting:`MESSAGE_LEVEL`
 * :setting:`MESSAGE_STORAGE`
 * :setting:`MESSAGE_TAGS`
+
+.. versionadded:: 1.7
+
+For backends that use cookies, the settings for the cookie are taken from
+the session cookie settings:
+
+* :setting:`SESSION_COOKIE_DOMAIN`
+* :setting:`SESSION_COOKIE_SECURE`
+* :setting:`SESSION_COOKIE_HTTPONLY`

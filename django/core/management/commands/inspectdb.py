@@ -18,7 +18,7 @@ class Command(NoArgsCommand):
                 'introspect.  Defaults to using the "default" database.'),
     )
 
-    requires_model_validation = False
+    requires_system_checks = False
 
     db_module = 'django.db'
 
@@ -45,17 +45,18 @@ class Command(NoArgsCommand):
         yield "#   * Remove `managed = False` lines for those models you wish to give write DB access"
         yield "# Feel free to rename the models, but don't rename db_table values or field names."
         yield "#"
-        yield "# Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'"
+        yield "# Also note: You'll have to insert the output of 'django-admin.py sqlcustom [app_label]'"
         yield "# into your database."
         yield "from __future__ import unicode_literals"
         yield ''
         yield 'from %s import models' % self.db_module
-        yield ''
         known_models = []
         for table_name in connection.introspection.table_names(cursor):
             if table_name_filter is not None and callable(table_name_filter):
                 if not table_name_filter(table_name):
                     continue
+            yield ''
+            yield ''
             yield 'class %s(models.Model):' % table2model(table_name)
             known_models.append(table2model(table_name))
             try:
@@ -66,9 +67,9 @@ class Command(NoArgsCommand):
                 indexes = connection.introspection.get_indexes(cursor, table_name)
             except NotImplementedError:
                 indexes = {}
-            used_column_names = [] # Holds column names used in the table so far
+            used_column_names = []  # Holds column names used in the table so far
             for i, row in enumerate(connection.introspection.get_table_description(cursor, table_name)):
-                comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
+                comment_notes = []  # Holds Field notes, to be displayed in a Python comment.
                 extra_params = OrderedDict()  # Holds Field parameters such as 'db_column'.
                 column_name = row[0]
                 is_relation = i in relations
@@ -104,12 +105,15 @@ class Command(NoArgsCommand):
 
                 # Don't output 'id = meta.AutoField(primary_key=True)', because
                 # that's assumed if it doesn't exist.
-                if att_name == 'id' and field_type == 'AutoField(' and extra_params == {'primary_key': True}:
-                    continue
+                if att_name == 'id' and extra_params == {'primary_key': True}:
+                    if field_type == 'AutoField(':
+                        continue
+                    elif field_type == 'IntegerField(' and not connection.features.can_introspect_autofield:
+                        comment_notes.append('AutoField?')
 
                 # Add 'null' and 'blank', if the 'null_ok' flag was present in the
                 # table description.
-                if row[6]: # If it's NULL...
+                if row[6]:  # If it's NULL...
                     if field_type == 'BooleanField(':
                         field_type = 'NullBooleanField('
                     else:
@@ -117,7 +121,12 @@ class Command(NoArgsCommand):
                         if not field_type in ('TextField(', 'CharField('):
                             extra_params['null'] = True
 
-                field_desc = '%s = models.%s' % (att_name, field_type)
+                field_desc = '%s = %s%s' % (
+                    att_name,
+                    # Custom fields will have a dotted path
+                    '' if '.' in field_type else 'models.',
+                    field_type,
+                )
                 if extra_params:
                     if not field_desc.endswith('('):
                         field_desc += ', '
@@ -126,7 +135,7 @@ class Command(NoArgsCommand):
                         for k, v in extra_params.items()])
                 field_desc += ')'
                 if comment_notes:
-                    field_desc += ' # ' + ' '.join(comment_notes)
+                    field_desc += '  # ' + ' '.join(comment_notes)
                 yield '    %s' % field_desc
             for meta_line in self.get_meta(table_name):
                 yield meta_line
@@ -231,7 +240,7 @@ class Command(NoArgsCommand):
         to construct the inner Meta class for the model corresponding
         to the given database table name.
         """
-        return ["    class Meta:",
+        return ["",
+                "    class Meta:",
                 "        managed = False",
-                "        db_table = '%s'" % table_name,
-                ""]
+                "        db_table = '%s'" % table_name]

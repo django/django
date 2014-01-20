@@ -1,5 +1,6 @@
 from django.contrib.gis.gdal import SpatialReference
 
+
 def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
                   database=None):
     """
@@ -56,10 +57,10 @@ def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
 
     # Initializing the keyword arguments dictionary for both PostGIS
     # and SpatiaLite.
-    kwargs = {'srid' : srs.srid,
-              'auth_name' : auth_name,
-              'auth_srid' : auth_srid or srs.srid,
-              'proj4text' : srs.proj4,
+    kwargs = {'srid': srs.srid,
+              'auth_name': auth_name,
+              'auth_srid': auth_srid or srs.srid,
+              'proj4text': srs.proj4,
               }
 
     # Backend-specific fields for the SpatialRefSys model.
@@ -72,9 +73,9 @@ def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
     try:
         # Try getting via SRID only, because using all kwargs may
         # differ from exact wkt/proj in database.
-        sr = SpatialRefSys.objects.using(database).get(srid=srs.srid)
+        SpatialRefSys.objects.using(database).get(srid=srs.srid)
     except SpatialRefSys.DoesNotExist:
-        sr = SpatialRefSys.objects.using(database).create(**kwargs)
+        SpatialRefSys.objects.using(database).create(**kwargs)
 
 # Alias is for backwards-compatibility purposes.
 add_postgis_srs = add_srs_entry

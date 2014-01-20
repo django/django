@@ -10,8 +10,8 @@ Usage::
 To add your own serializers, use the SERIALIZATION_MODULES setting::
 
     SERIALIZATION_MODULES = {
-        "csv" : "path.to.csv.serializer",
-        "txt" : "path.to.txt.serializer",
+        "csv": "path.to.csv.serializer",
+        "txt": "path.to.txt.serializer",
     }
 
 """
@@ -24,19 +24,31 @@ from django.core.serializers.base import SerializerDoesNotExist
 
 # Built-in serializers
 BUILTIN_SERIALIZERS = {
-    "xml"    : "django.core.serializers.xml_serializer",
-    "python" : "django.core.serializers.python",
-    "json"   : "django.core.serializers.json",
+    "xml": "django.core.serializers.xml_serializer",
+    "python": "django.core.serializers.python",
+    "json": "django.core.serializers.json",
+    "yaml": "django.core.serializers.pyyaml",
 }
 
-# Check for PyYaml and register the serializer if it's available.
-try:
-    import yaml
-    BUILTIN_SERIALIZERS["yaml"] = "django.core.serializers.pyyaml"
-except ImportError:
-    pass
-
 _serializers = {}
+
+
+class BadSerializer(object):
+    """
+    Stub serializer to hold exception raised during registration
+
+    This allows the serializer registration to cache serializers and if there
+    is an error raised in the process of creating a serializer it will be
+    raised and passed along to the caller when the serializer is used.
+    """
+    internal_use_only = False
+
+    def __init__(self, exception):
+        self.exception = exception
+
+    def __call__(self, *args, **kwargs):
+        raise self.exception
+
 
 def register_serializer(format, serializer_module, serializers=None):
     """Register a new serializer.
@@ -53,11 +65,22 @@ def register_serializer(format, serializer_module, serializers=None):
     """
     if serializers is None and not _serializers:
         _load_serializers()
-    module = importlib.import_module(serializer_module)
+
+    try:
+        module = importlib.import_module(serializer_module)
+    except ImportError as exc:
+        bad_serializer = BadSerializer(exc)
+
+        module = type('BadSerializerModule', (object,), {
+            'Deserializer': bad_serializer,
+            'Serializer': bad_serializer,
+        })
+
     if serializers is None:
         _serializers[format] = module
     else:
         serializers[format] = module
+
 
 def unregister_serializer(format):
     "Unregister a given serializer. This is not a thread-safe operation."
@@ -67,6 +90,7 @@ def unregister_serializer(format):
         raise SerializerDoesNotExist(format)
     del _serializers[format]
 
+
 def get_serializer(format):
     if not _serializers:
         _load_serializers()
@@ -74,15 +98,18 @@ def get_serializer(format):
         raise SerializerDoesNotExist(format)
     return _serializers[format].Serializer
 
+
 def get_serializer_formats():
     if not _serializers:
         _load_serializers()
     return list(_serializers)
 
+
 def get_public_serializer_formats():
     if not _serializers:
         _load_serializers()
     return [k for k, v in six.iteritems(_serializers) if not v.Serializer.internal_use_only]
+
 
 def get_deserializer(format):
     if not _serializers:
@@ -90,6 +117,7 @@ def get_deserializer(format):
     if format not in _serializers:
         raise SerializerDoesNotExist(format)
     return _serializers[format].Deserializer
+
 
 def serialize(format, queryset, **options):
     """
@@ -100,6 +128,7 @@ def serialize(format, queryset, **options):
     s.serialize(queryset, **options)
     return s.getvalue()
 
+
 def deserialize(format, stream_or_string, **options):
     """
     Deserialize a stream or a string. Returns an iterator that yields ``(obj,
@@ -109,6 +138,7 @@ def deserialize(format, stream_or_string, **options):
     """
     d = get_deserializer(format)
     return d(stream_or_string, **options)
+
 
 def _load_serializers():
     """

@@ -12,7 +12,18 @@ use_workaround = (
 HTMLParseError = _html_parser.HTMLParseError
 
 if not use_workaround:
-    HTMLParser = _html_parser.HTMLParser
+    if current_version >= (3, 4):
+        class HTMLParser(_html_parser.HTMLParser):
+            """Explicitly set convert_charrefs to be False.
+
+            This silences a deprecation warning on Python 3.4, but we can't do
+            it at call time because Python 2.7 does not have the keyword
+            argument.
+            """
+            def __init__(self, convert_charrefs=False):
+                _html_parser.HTMLParser.__init__(self, convert_charrefs=convert_charrefs)
+    else:
+        HTMLParser = _html_parser.HTMLParser
 else:
     tagfind = re.compile('([a-zA-Z][-.a-zA-Z0-9:_]*)(?:\s|/(?!>))*')
 
@@ -59,8 +70,8 @@ else:
                 attrname, rest, attrvalue = m.group(1, 2, 3)
                 if not rest:
                     attrvalue = None
-                elif attrvalue[:1] == '\'' == attrvalue[-1:] or \
-                     attrvalue[:1] == '"' == attrvalue[-1:]:
+                elif (attrvalue[:1] == '\'' == attrvalue[-1:] or
+                        attrvalue[:1] == '"' == attrvalue[-1:]):
                     attrvalue = attrvalue[1:-1]
                 if attrvalue:
                     attrvalue = self.unescape(attrvalue)
@@ -72,8 +83,8 @@ else:
                 lineno, offset = self.getpos()
                 if "\n" in self.__starttag_text:
                     lineno = lineno + self.__starttag_text.count("\n")
-                    offset = len(self.__starttag_text) \
-                             - self.__starttag_text.rfind("\n")
+                    offset = (len(self.__starttag_text)
+                             - self.__starttag_text.rfind("\n"))
                 else:
                     offset = offset + len(self.__starttag_text)
                 self.error("junk characters in start tag: %r"
@@ -84,22 +95,22 @@ else:
             else:
                 self.handle_starttag(tag, attrs)
                 if tag in self.CDATA_CONTENT_ELEMENTS:
-                    self.set_cdata_mode(tag) # <--------------------------- Changed
+                    self.set_cdata_mode(tag)  # <--------------------------- Changed
             return endpos
 
         # Internal -- parse endtag, return end or -1 if incomplete
         def parse_endtag(self, i):
             rawdata = self.rawdata
             assert rawdata[i:i + 2] == "</", "unexpected call to parse_endtag"
-            match = _html_parser.endendtag.search(rawdata, i + 1) # >
+            match = _html_parser.endendtag.search(rawdata, i + 1)  # >
             if not match:
                 return -1
             j = match.end()
-            match = _html_parser.endtagfind.match(rawdata, i) # </ + tag + >
+            match = _html_parser.endtagfind.match(rawdata, i)  # </ + tag + >
             if not match:
-                if self.cdata_tag is not None: # *** add ***
-                    self.handle_data(rawdata[i:j]) # *** add ***
-                    return j # *** add ***
+                if self.cdata_tag is not None:  # *** add ***
+                    self.handle_data(rawdata[i:j])  # *** add ***
+                    return j  # *** add ***
                 self.error("bad end tag: %r" % (rawdata[i:j],))
             # --- changed start ---------------------------------------------------
             tag = match.group(1).strip()

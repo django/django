@@ -5,18 +5,18 @@ Advanced testing topics
 The request factory
 ===================
 
-.. module:: django.test.client
+.. currentmodule:: django.test
 
 .. class:: RequestFactory
 
-The :class:`~django.test.client.RequestFactory` shares the same API as
+The :class:`~django.test.RequestFactory` shares the same API as
 the test client. However, instead of behaving like a browser, the
 RequestFactory provides a way to generate a request instance that can
 be used as the first argument to any view. This means you can test a
 view function the same way as you would test any other function -- as
 a black box, with exactly known inputs, testing for specific outputs.
 
-The API for the :class:`~django.test.client.RequestFactory` is a slightly
+The API for the :class:`~django.test.RequestFactory` is a slightly
 restricted subset of the test client API:
 
 * It only has access to the HTTP methods :meth:`~Client.get()`,
@@ -38,15 +38,14 @@ Example
 The following is a simple unit test using the request factory::
 
     from django.contrib.auth.models import User
-    from django.test import TestCase
-    from django.test.client import RequestFactory
+    from django.test import TestCase, RequestFactory
 
     class SimpleTest(TestCase):
         def setUp(self):
             # Every test needs access to the request factory.
             self.factory = RequestFactory()
             self.user = User.objects.create_user(
-                first_name='jacob', email='jacob@…', password='top_secret')
+                username='jacob', email='jacob@…', password='top_secret')
 
         def test_details(self):
             # Create an instance of a GET request.
@@ -165,8 +164,6 @@ exception will be raised.
 Advanced features of ``TransactionTestCase``
 ============================================
 
-.. currentmodule:: django.test
-
 .. attribute:: TransactionTestCase.available_apps
 
     .. versionadded:: 1.6
@@ -182,7 +179,7 @@ Advanced features of ``TransactionTestCase``
 
     By default, ``available_apps`` is set to ``None``. After each test, Django
     calls :djadmin:`flush` to reset the database state. This empties all tables
-    and emits the :data:`~django.db.models.signals.post_syncdb` signal, which
+    and emits the :data:`~django.db.models.signals.post_migrate` signal, which
     re-creates one content type and three permissions for each model. This
     operation gets expensive proportionally to the number of models.
 
@@ -190,13 +187,13 @@ Advanced features of ``TransactionTestCase``
     behave as if only the models from these applications were available. The
     behavior of ``TransactionTestCase`` changes as follows:
 
-    - :data:`~django.db.models.signals.post_syncdb` is fired before each
+    - :data:`~django.db.models.signals.post_migrate` is fired before each
       test to create the content types and permissions for each model in
       available apps, in case they're missing.
     - After each test, Django empties only tables corresponding to models in
       available apps. However, at the database level, truncation may cascade to
       related models in unavailable apps. Furthermore
-      :data:`~django.db.models.signals.post_syncdb` isn't fired; it will be
+      :data:`~django.db.models.signals.post_migrate` isn't fired; it will be
       fired by the next ``TransactionTestCase``, after the correct set of
       applications is selected.
 
@@ -205,10 +202,10 @@ Advanced features of ``TransactionTestCase``
     cause unrelated tests to fail. Be careful with tests that use sessions;
     the default session engine stores them in the database.
 
-    Since :data:`~django.db.models.signals.post_syncdb` isn't emitted after
+    Since :data:`~django.db.models.signals.post_migrate` isn't emitted after
     flushing the database, its state after a ``TransactionTestCase`` isn't the
     same as after a ``TestCase``: it's missing the rows created by listeners
-    to :data:`~django.db.models.signals.post_syncdb`. Considering the
+    to :data:`~django.db.models.signals.post_migrate`. Considering the
     :ref:`order in which tests are executed <order-of-tests>`, this isn't an
     issue, provided either all ``TransactionTestCase`` in a given test suite
     declare ``available_apps``, or none of them.
@@ -216,8 +213,6 @@ Advanced features of ``TransactionTestCase``
     ``available_apps`` is mandatory in Django's own test suite.
 
 .. attribute:: TransactionTestCase.reset_sequences
-
-    .. versionadded:: 1.5
 
     Setting ``reset_sequences = True`` on a ``TransactionTestCase`` will make
     sure sequences are always reset before the test run::
@@ -278,7 +273,7 @@ testing behavior. This behavior involves:
 
 #. Creating the test databases.
 
-#. Running ``syncdb`` to install models and initial data into the test
+#. Running ``migrate`` to install models and initial data into the test
    databases.
 
 #. Running the tests that were found.
@@ -300,11 +295,13 @@ Defining a test runner
 
 .. currentmodule:: django.test.runner
 
+.. versionadded:: 1.6
+
 A test runner is a class defining a ``run_tests()`` method. Django ships
-with a ``DiscoverRunner`` class that defines the default Django
-testing behavior. This class defines the ``run_tests()`` entry point,
-plus a selection of other methods that are used to by ``run_tests()`` to
-set up, execute and tear down the test suite.
+with a ``DiscoverRunner`` class that defines the default Django testing
+behavior. This class defines the ``run_tests()`` entry point, plus a
+selection of other methods that are used to by ``run_tests()`` to set up,
+execute and tear down the test suite.
 
 .. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=True, **kwargs)
 
@@ -341,6 +338,32 @@ set up, execute and tear down the test suite.
 Attributes
 ~~~~~~~~~~
 
+.. attribute:: DiscoverRunner.test_suite
+
+    .. versionadded:: 1.7
+
+    The class used to build the test suite. By default it is set to
+    ``unittest.TestSuite``. This can be overridden if you wish to implement
+    different logic for collecting tests.
+
+.. attribute:: DiscoverRunner.test_runner
+
+    .. versionadded:: 1.7
+
+    This is the class of the low-level test runner which is used to execute
+    the individual tests and format the results. By default it is set to
+    ``unittest.TextTestRunner``. Despite the unfortunate similarity in
+    naming conventions, this is not the same type of class as
+    ``DiscoverRunner``, which covers a broader set of responsibilites. You
+    can override this attribute to modify the way tests are run and reported.
+
+.. attribute:: DiscoverRunner.test_loader
+
+    This is the class that loads tests, whether from TestCases or modules or
+    otherwise and bundles them into test suites for the runner to execute.
+    By default it is set to ``unittest.defaultTestLoader``. You can override
+    this attribute if your tests are going to be loaded in unusual ways.
+
 .. attribute:: DiscoverRunner.option_list
 
     This is the tuple of ``optparse`` options which will be fed into the
@@ -354,21 +377,9 @@ Methods
 
     Run the test suite.
 
-    ``test_labels`` is a list of strings describing the tests to be run. A test
-    label can take one of four forms:
-
-    * ``path.to.test_module.TestCase.test_method`` -- Run a single test method
-      in a test case.
-    * ``path.to.test_module.TestCase`` -- Run all the test methods in a test
-      case.
-    * ``path.to.module`` -- Search for and run all tests in the named Python
-      package or module.
-    * ``path/to/directory`` -- Search for and run all tests below the named
-      directory.
-
-    If ``test_labels`` has a value of ``None``, the test runner will search for
-    tests in all files below the current directory whose names match its
-    ``pattern`` (see above).
+    ``test_labels`` allows you to specify which tests to run and supports
+    several formats (see :meth:`DiscoverRunner.build_suite` for a list of
+    supported formats).
 
     ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
     suite that is executed by the test runner. These extra tests are run
@@ -387,15 +398,20 @@ Methods
     Constructs a test suite that matches the test labels provided.
 
     ``test_labels`` is a list of strings describing the tests to be run. A test
-    label can take one of three forms:
+    label can take one of four forms:
 
-    * ``app.TestCase.test_method`` -- Run a single test method in a test
+    * ``path.to.test_module.TestCase.test_method`` -- Run a single test method
+      in a test case.
+    * ``path.to.test_module.TestCase`` -- Run all the test methods in a test
       case.
-    * ``app.TestCase`` -- Run all the test methods in a test case.
-    * ``app`` -- Search for and run all tests in the named application.
+    * ``path.to.module`` -- Search for and run all tests in the named Python
+      package or module.
+    * ``path/to/directory`` -- Search for and run all tests below the named
+      directory.
 
-    If ``test_labels`` has a value of ``None``, the test runner should run
-    search for tests in all the applications in :setting:`INSTALLED_APPS`.
+    If ``test_labels`` has a value of ``None``, the test runner will search for
+    tests in all files below the current directory whose names match its
+    ``pattern`` (see above).
 
     ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
     suite that is executed by the test runner. These extra tests are run
@@ -469,7 +485,7 @@ can be useful during testing.
 
 .. function:: create_test_db([verbosity=1, autoclobber=False])
 
-    Creates a new test database and runs ``syncdb`` against it.
+    Creates a new test database and runs ``migrate`` against it.
 
     ``verbosity`` has the same behavior as in ``run_tests()``.
 
@@ -526,4 +542,4 @@ For more options like annotated HTML listings detailing missed lines, see the
 `coverage.py`_ docs.
 
 .. _coverage.py: http://nedbatchelder.com/code/coverage/
-.. _install coverage.py: http://pypi.python.org/pypi/coverage
+.. _install coverage.py: https://pypi.python.org/pypi/coverage

@@ -90,8 +90,6 @@ MultipleObjectMixin
 
     .. attribute:: page_kwarg
 
-        .. versionadded:: 1.5
-
         A string specifying the name to use for the page parameter.
         The view will expect this prameter to be available either as a query
         string parameter (via ``request.GET``) or as a kwarg variable specified

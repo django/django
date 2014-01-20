@@ -9,16 +9,13 @@ import datetime
 import os
 import re
 import sys
-try:
-    from urllib.parse import urlsplit, urlunsplit
-except ImportError:     # Python 2
-    from urlparse import urlsplit, urlunsplit
+import warnings
 from decimal import Decimal, DecimalException
 from io import BytesIO
 
 from django.core import validators
 from django.core.exceptions import ValidationError
-from django.forms.util import ErrorList, from_current_timezone, to_current_timezone
+from django.forms.utils import from_current_timezone, to_current_timezone
 from django.forms.widgets import (
     TextInput, NumberInput, EmailInput, URLInput, HiddenInput,
     MultipleHiddenInput, ClearableFileInput, CheckboxInput, Select,
@@ -29,15 +26,16 @@ from django.utils import formats
 from django.utils.encoding import smart_text, force_str, force_text
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
+from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
 # Provide this import for backwards compatibility.
-from django.core.validators import EMPTY_VALUES
+from django.core.validators import EMPTY_VALUES  # NOQA
 
 
 __all__ = (
     'Field', 'CharField', 'IntegerField',
-    'DateField', 'TimeField', 'DateTimeField', 'TimeField',
+    'DateField', 'TimeField', 'DateTimeField',
     'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
     'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
@@ -47,9 +45,9 @@ __all__ = (
 
 
 class Field(object):
-    widget = TextInput # Default widget to use when rendering this type of Field.
-    hidden_widget = HiddenInput # Default widget to use when rendering this as "hidden".
-    default_validators = [] # Default set of validators
+    widget = TextInput  # Default widget to use when rendering this type of Field.
+    hidden_widget = HiddenInput  # Default widget to use when rendering this as "hidden".
+    default_validators = []  # Default set of validators
     # Add an 'invalid' entry to default_error_message if you want a specific
     # field error message not raised by the field validators.
     default_error_messages = {
@@ -118,8 +116,6 @@ class Field(object):
         super(Field, self).__init__()
 
     def prepare_value(self, value):
-        if self.widget.is_localized:
-            value = formats.localize_input(value)
         return value
 
     def to_python(self, value):
@@ -282,9 +278,18 @@ class FloatField(IntegerField):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         return value
 
+    def validate(self, value):
+        super(FloatField, self).validate(value)
+
+        # Check for NaN (which is the only thing not equal to itself) and +/- infinity
+        if value != value or value in (Decimal('Inf'), Decimal('-Inf')):
+            raise ValidationError(self.error_messages['invalid'], code='invalid')
+
+        return value
+
     def widget_attrs(self, widget):
         attrs = super(FloatField, self).widget_attrs(widget)
-        if isinstance(widget, NumberInput):
+        if isinstance(widget, NumberInput) and 'step' not in widget.attrs:
             attrs.setdefault('step', 'any')
         return attrs
 
@@ -372,7 +377,7 @@ class DecimalField(IntegerField):
 
     def widget_attrs(self, widget):
         attrs = super(DecimalField, self).widget_attrs(widget)
-        if isinstance(widget, NumberInput):
+        if isinstance(widget, NumberInput) and 'step' not in widget.attrs:
             if self.decimal_places is not None:
                 # Use exponential notation for small values since they might
                 # be parsed as 0 otherwise. ref #20765
@@ -462,7 +467,6 @@ class DateTimeField(BaseTemporalField):
     }
 
     def prepare_value(self, value):
-        value = super(DateTimeField, self).prepare_value(value)
         if isinstance(value, datetime.datetime):
             value = to_current_timezone(value)
         return value
@@ -482,6 +486,10 @@ class DateTimeField(BaseTemporalField):
         if isinstance(value, list):
             # Input comes from a SplitDateTimeWidget, for example. So, it's two
             # components: date and time.
+            warnings.warn(
+                'Using SplitDateTimeWidget with DateTimeField is deprecated. '
+                'Use SplitDateTimeField instead.',
+                PendingDeprecationWarning, stacklevel=2)
             if len(value) != 2:
                 raise ValidationError(self.error_messages['invalid'], code='invalid')
             if value[0] in self.empty_values and value[1] in self.empty_values:
@@ -563,7 +571,7 @@ class FileField(Field):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
 
         if self.max_length is not None and len(file_name) > self.max_length:
-            params =  {'max': self.max_length, 'length': len(file_name)}
+            params = {'max': self.max_length, 'length': len(file_name)}
             raise ValidationError(self.error_messages['max_length'], code='max_length', params=params)
         if not file_name:
             raise ValidationError(self.error_messages['invalid'], code='invalid')
@@ -818,12 +826,10 @@ class TypedChoiceField(ChoiceField):
         self.empty_value = kwargs.pop('empty_value', '')
         super(TypedChoiceField, self).__init__(*args, **kwargs)
 
-    def to_python(self, value):
+    def _coerce(self, value):
         """
-        Validates that the value is in self.choices and can be coerced to the
-        right type.
+        Validate that the value can be coerced to the right type (if not empty).
         """
-        value = super(TypedChoiceField, self).to_python(value)
         if value == self.empty_value or value in self.empty_values:
             return self.empty_value
         try:
@@ -835,6 +841,10 @@ class TypedChoiceField(ChoiceField):
                 params={'value': value},
             )
         return value
+
+    def clean(self, value):
+        value = super(TypedChoiceField, self).clean(value)
+        return self._coerce(value)
 
 
 class MultipleChoiceField(ChoiceField):
@@ -874,8 +884,8 @@ class MultipleChoiceField(ChoiceField):
             data = []
         if len(initial) != len(data):
             return True
-        initial_set = set([force_text(value) for value in initial])
-        data_set = set([force_text(value) for value in data])
+        initial_set = set(force_text(value) for value in initial)
+        data_set = set(force_text(value) for value in data)
         return data_set != initial_set
 
 
@@ -885,12 +895,11 @@ class TypedMultipleChoiceField(MultipleChoiceField):
         self.empty_value = kwargs.pop('empty_value', [])
         super(TypedMultipleChoiceField, self).__init__(*args, **kwargs)
 
-    def to_python(self, value):
+    def _coerce(self, value):
         """
         Validates that the values are in self.choices and can be coerced to the
         right type.
         """
-        value = super(TypedMultipleChoiceField, self).to_python(value)
         if value == self.empty_value or value in self.empty_values:
             return self.empty_value
         new_value = []
@@ -904,6 +913,10 @@ class TypedMultipleChoiceField(MultipleChoiceField):
                     params={'value': choice},
                 )
         return new_value
+
+    def clean(self, value):
+        value = super(TypedMultipleChoiceField, self).clean(value)
+        return self._coerce(value)
 
     def validate(self, value):
         if value != self.empty_value:
@@ -971,6 +984,11 @@ class MultiValueField(Field):
                 f.required = False
         self.fields = fields
 
+    def __deepcopy__(self, memo):
+        result = super(MultiValueField, self).__deepcopy__(memo)
+        result.fields = tuple([x.__deepcopy__(memo) for x in self.fields])
+        return result
+
     def validate(self, value):
         pass
 
@@ -984,7 +1002,7 @@ class MultiValueField(Field):
         DateField.clean(value[0]) and TimeField.clean(value[1]).
         """
         clean_data = []
-        errors = ErrorList()
+        errors = []
         if not value or isinstance(value, (list, tuple)):
             if not value or not [v for v in value if v not in self.empty_values]:
                 if self.required:
@@ -1088,8 +1106,8 @@ class FilePathField(ChoiceField):
                         continue
                     full_file = os.path.join(self.path, f)
                     if (((self.allow_files and os.path.isfile(full_file)) or
-                        (self.allow_folders and os.path.isdir(full_file))) and
-                        (self.match is None or self.match_re.search(f))):
+                            (self.allow_folders and os.path.isdir(full_file))) and
+                            (self.match is None or self.match_re.search(f))):
                         self.choices.append((full_file, f))
             except OSError:
                 pass
@@ -1135,6 +1153,11 @@ class SplitDateTimeField(MultiValueField):
 
 class IPAddressField(CharField):
     default_validators = [validators.validate_ipv4_address]
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn("IPAddressField has been deprecated. Use GenericIPAddressField instead.",
+                      PendingDeprecationWarning)
+        super(IPAddressField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
         if value in self.empty_values:

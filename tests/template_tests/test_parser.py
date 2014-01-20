@@ -6,8 +6,8 @@ from __future__ import unicode_literals
 from unittest import TestCase
 
 from django.template import (TokenParser, FilterExpression, Parser, Variable,
-    Template, TemplateSyntaxError)
-from django.test.utils import override_settings
+    Template, TemplateSyntaxError, Library)
+from django.test import override_settings
 from django.utils import six
 
 
@@ -58,9 +58,7 @@ class ParserTests(TestCase):
 
         # Filtered variables should reject access of attributes beginning with
         # underscores.
-        self.assertRaises(TemplateSyntaxError,
-            FilterExpression, "article._hidden|upper", p
-        )
+        self.assertRaises(TemplateSyntaxError, FilterExpression, "article._hidden|upper", p)
 
     def test_variable_parsing(self):
         c = {"article": {"section": "News"}}
@@ -83,9 +81,11 @@ class ParserTests(TestCase):
 
         # Variables should reject access of attributes beginning with
         # underscores.
-        self.assertRaises(TemplateSyntaxError,
-            Variable, "article._hidden"
-        )
+        self.assertRaises(TemplateSyntaxError, Variable, "article._hidden")
+
+        # Variables should raise on non string type
+        with six.assertRaisesRegex(self, TypeError, "Variable must be a string or number, got <(class|type) 'dict'>"):
+            Variable({})
 
     @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
     def test_compile_filter_error(self):
@@ -94,3 +94,47 @@ class ParserTests(TestCase):
         with six.assertRaisesRegex(self, TemplateSyntaxError, msg) as cm:
             Template("{% if 1 %}{{ foo@bar }}{% endif %}")
         self.assertEqual(cm.exception.django_template_source[1], (10, 23))
+
+    def test_filter_args_count(self):
+        p = Parser("")
+        l = Library()
+
+        @l.filter
+        def no_arguments(value):
+            pass
+
+        @l.filter
+        def one_argument(value, arg):
+            pass
+
+        @l.filter
+        def one_opt_argument(value, arg=False):
+            pass
+
+        @l.filter
+        def two_arguments(value, arg, arg2):
+            pass
+
+        @l.filter
+        def two_one_opt_arg(value, arg, arg2=False):
+            pass
+        p.add_library(l)
+        for expr in (
+                '1|no_arguments:"1"',
+                '1|two_arguments',
+                '1|two_arguments:"1"',
+                '1|two_one_opt_arg',
+        ):
+            with self.assertRaises(TemplateSyntaxError):
+                FilterExpression(expr, p)
+        for expr in (
+                # Correct number of arguments
+                '1|no_arguments',
+                '1|one_argument:"1"',
+                # One optional
+                '1|one_opt_argument',
+                '1|one_opt_argument:"1"',
+                # Not supplying all
+                '1|two_one_opt_arg:"1"',
+        ):
+            FilterExpression(expr, p)

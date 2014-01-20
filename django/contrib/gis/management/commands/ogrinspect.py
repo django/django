@@ -1,6 +1,9 @@
+import inspect
 from optparse import make_option
+
 from django.contrib.gis import gdal
 from django.core.management.base import LabelCommand, CommandError
+
 
 def layer_option(option, opt, value, parser):
     """
@@ -13,6 +16,7 @@ def layer_option(option, opt, value, parser):
         dest = value
     setattr(parser.values, option.dest, dest)
 
+
 def list_option(option, opt, value, parser):
     """
     Callback for `make_option` for `ogrinspect` keywords that require
@@ -24,6 +28,7 @@ def list_option(option, opt, value, parser):
     else:
         dest = [s for s in value.split(',')]
     setattr(parser.values, option.dest, dest)
+
 
 class Command(LabelCommand):
     help = ('Inspects the given OGR-compatible data source (e.g., a shapefile) and outputs\n'
@@ -67,9 +72,9 @@ class Command(LabelCommand):
                     'determined, the SRID of the data source is used.'),
         make_option('--mapping', action='store_true', dest='mapping',
                     help='Generate mapping dictionary for use with `LayerMapping`.')
-        )
+    )
 
-    requires_model_validation = False
+    requires_system_checks = False
 
     def handle(self, *args, **options):
         try:
@@ -80,39 +85,33 @@ class Command(LabelCommand):
         if not gdal.HAS_GDAL:
             raise CommandError('GDAL is required to inspect geospatial data sources.')
 
-        # Removing options with `None` values.
-        options = dict([(k, v) for k, v in options.items() if not v is None])
-
         # Getting the OGR DataSource from the string parameter.
         try:
             ds = gdal.DataSource(data_source)
         except gdal.OGRException as msg:
             raise CommandError(msg)
 
-        # Whether the user wants to generate the LayerMapping dictionary as well.
-        show_mapping = options.pop('mapping', False)
-
-        # Getting rid of settings that `_ogrinspect` doesn't like.
-        verbosity = options.pop('verbosity', False)
-        settings = options.pop('settings', False)
-
         # Returning the output of ogrinspect with the given arguments
         # and options.
         from django.contrib.gis.utils.ogrinspect import _ogrinspect, mapping
-        output = [s for s in _ogrinspect(ds, model_name, **options)]
-        if show_mapping:
+        # Filter options to params accepted by `_ogrinspect`
+        ogr_options = dict((k, v) for k, v in options.items()
+                           if k in inspect.getargspec(_ogrinspect).args and v is not None)
+        output = [s for s in _ogrinspect(ds, model_name, **ogr_options)]
+
+        if options['mapping']:
             # Constructing the keyword arguments for `mapping`, and
             # calling it on the data source.
-            kwargs = {'geom_name' : options['geom_name'],
-                      'layer_key' : options['layer_key'],
-                      'multi_geom' : options['multi_geom'],
+            kwargs = {'geom_name': options['geom_name'],
+                      'layer_key': options['layer_key'],
+                      'multi_geom': options['multi_geom'],
                       }
             mapping_dict = mapping(ds, **kwargs)
             # This extra legwork is so that the dictionary definition comes
             # out in the same order as the fields in the model definition.
-            rev_mapping = dict([(v, k) for k, v in mapping_dict.items()])
+            rev_mapping = dict((v, k) for k, v in mapping_dict.items())
             output.extend(['', '# Auto-generated `LayerMapping` dictionary for %s model' % model_name,
                            '%s_mapping = {' % model_name.lower()])
-            output.extend(["    '%s' : '%s'," % (rev_mapping[ogr_fld], ogr_fld) for ogr_fld in ds[options['layer_key']].fields])
-            output.extend(["    '%s' : '%s'," % (options['geom_name'], mapping_dict[options['geom_name']]), '}'])
+            output.extend("    '%s' : '%s'," % (rev_mapping[ogr_fld], ogr_fld) for ogr_fld in ds[options['layer_key']].fields)
+            output.extend("    '%s' : '%s'," % (options['geom_name'], mapping_dict[options['geom_name']]), '}')
         return '\n'.join(output) + '\n'

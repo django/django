@@ -47,4 +47,3 @@ class CustomManagersRegressTestCase(TestCase):
         obj = RelatedModel.objects.get(name="xyzzy")
         obj.delete()
         self.assertEqual(len(OneToOneRestrictedModel.plain_manager.all()), 0)
-

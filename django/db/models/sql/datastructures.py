@@ -4,6 +4,30 @@ the SQL domain.
 """
 
 
+class Col(object):
+    def __init__(self, alias, target, source):
+        self.alias, self.target, self.source = alias, target, source
+
+    def as_sql(self, qn, connection):
+        return "%s.%s" % (qn(self.alias), qn(self.target.column)), []
+
+    @property
+    def output_type(self):
+        return self.source
+
+    def relabeled_clone(self, relabels):
+        return self.__class__(relabels.get(self.alias, self.alias), self.target, self.source)
+
+    def get_group_by_cols(self):
+        return [(self.alias, self.target.column)]
+
+    def get_lookup(self, name):
+        return self.output_type.get_lookup(name)
+
+    def prepare(self):
+        return self
+
+
 class EmptyResultSet(Exception):
     pass
 
@@ -37,7 +61,7 @@ class Date(object):
 
     def as_sql(self, qn, connection):
         if isinstance(self.col, (list, tuple)):
-            col = '%s.%s' % tuple([qn(c) for c in self.col])
+            col = '%s.%s' % tuple(qn(c) for c in self.col)
         else:
             col = self.col
         return connection.ops.date_trunc_sql(self.lookup_type, col), []
@@ -57,7 +81,7 @@ class DateTime(object):
 
     def as_sql(self, qn, connection):
         if isinstance(self.col, (list, tuple)):
-            col = '%s.%s' % tuple([qn(c) for c in self.col])
+            col = '%s.%s' % tuple(qn(c) for c in self.col)
         else:
             col = self.col
         return connection.ops.datetime_trunc_sql(self.lookup_type, col, self.tzname)

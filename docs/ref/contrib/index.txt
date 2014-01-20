@@ -14,8 +14,8 @@ those packages have.
 
     For most of these add-ons -- specifically, the add-ons that include either
     models or template tags -- you'll need to add the package name (e.g.,
-    ``'django.contrib.admin'``) to your :setting:`INSTALLED_APPS` setting and
-    re-run ``manage.py syncdb``.
+    ``'django.contrib.redirects'``) to your :setting:`INSTALLED_APPS` setting
+    and re-run ``manage.py migrate``.
 
 .. _"batteries included" philosophy: http://docs.python.org/tutorial/stdlib.html#batteries-included
 
@@ -177,6 +177,4 @@ Other add-ons
 =============
 
 If you have an idea for functionality to include in ``contrib``, let us know!
-Code it up, and post it to the `django-users mailing list`_.
-
-.. _django-users mailing list: http://groups.google.com/group/django-users
+Code it up, and post it to the |django-users| mailing list.

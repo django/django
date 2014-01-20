@@ -77,11 +77,11 @@
 TEMPLATE_EXTENSIONS = [
     ".html",
     ".htm",
-    ]
+]
 
 PYTHON_SOURCE_EXTENSIONS = [
     ".py",
-    ]
+]
 
 TEMPLATE_ENCODING = "UTF-8"
 
@@ -137,6 +137,7 @@ _POST_FORM_RE = \
 _FORM_CLOSE_RE = re.compile(r'</form\s*>')
 _TOKEN_RE = re.compile('\{% csrf_token')
 
+
 def get_template_dirs():
     """
     Returns a set of all directories that contain project templates.
@@ -144,14 +145,15 @@ def get_template_dirs():
     from django.conf import settings
     dirs = set()
     if ('django.template.loaders.filesystem.load_template_source' in settings.TEMPLATE_LOADERS
-        or  'django.template.loaders.filesystem.Loader' in settings.TEMPLATE_LOADERS):
+            or 'django.template.loaders.filesystem.Loader' in settings.TEMPLATE_LOADERS):
         dirs.update(map(unicode, settings.TEMPLATE_DIRS))
 
     if ('django.template.loaders.app_directories.load_template_source' in settings.TEMPLATE_LOADERS
-        or 'django.template.loaders.app_directories.Loader' in settings.TEMPLATE_LOADERS):
+            or 'django.template.loaders.app_directories.Loader' in settings.TEMPLATE_LOADERS):
         from django.template.loaders.app_directories import app_template_dirs
         dirs.update(app_template_dirs)
     return dirs
+
 
 def make_template_info(filename, root_dirs):
     """
@@ -159,7 +161,7 @@ def make_template_info(filename, root_dirs):
     relative_filenames from the supplied filename and root template directories
     """
     return Template(filename,
-                    [filename[len(d)+1:] for d in root_dirs if filename.startswith(d)])
+                    [filename[len(d) + 1:] for d in root_dirs if filename.startswith(d)])
 
 
 class Template(object):
@@ -241,6 +243,7 @@ class Template(object):
     def __hash__(self):
         return hash(self.absolute_filename)
 
+
 def get_templates(dirs):
     """
     Returns all files in dirs that have template extensions, as Template
@@ -256,6 +259,7 @@ def get_templates(dirs):
                     t.all_templates = templates
                     templates.add(t)
     return templates
+
 
 def get_python_code(paths):
     """
@@ -275,6 +279,7 @@ def get_python_code(paths):
                     retval.append((fn, content))
     return retval
 
+
 def search_python_list(python_code, template_names):
     """
     Searches python code for a list of template names.
@@ -285,6 +290,7 @@ def search_python_list(python_code, template_names):
     for tn in template_names:
         retval.update(search_python(python_code, tn))
     return sorted(retval)
+
 
 def search_python(python_code, template_name):
     """
@@ -299,6 +305,7 @@ def search_python(python_code, template_name):
                ((u"'%s'" % template_name) in line):
                 retval.append((fn, ln + 1))
     return retval
+
 
 def main(pythonpaths):
     template_dirs = get_template_dirs()
