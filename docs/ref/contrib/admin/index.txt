@@ -140,14 +140,14 @@ The admin needs to be instructed to look for ``admin.py`` files in your project.
 The easiest solution is to put ``'django.contrib.admin.apps.AdminConfig'`` in
 your :setting:`INSTALLED_APPS` setting.
 
-.. class:: django.contrib.admin.apps.AdminConfig
+.. class:: apps.AdminConfig
 
     .. versionadded:: 1.7
 
     This class calls :func:`~django.contrib.admin.autodiscover()` when Django
     starts.
 
-.. function:: django.contrib.admin.autodiscover
+.. function:: autodiscover
 
     This function attempts to import an ``admin`` module in each installed
     application. Such modules are expected to register models with the admin.
