@@ -218,7 +218,7 @@ class OperationTests(MigrationTestBase):
         self.assertEqual(field.default, NOT_PROVIDED)
         # Test the database alteration
         project_state.render().get_model("test_adflpd", "pony").objects.create(
-            weight = 4,
+            weight=4,
         )
         self.assertColumnNotExists("test_adflpd_pony", "height")
         with connection.schema_editor() as editor:

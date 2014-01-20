@@ -35,6 +35,7 @@ class StateTests(TestCase):
 
         class SubAuthor(Author):
             width = models.FloatField(null=True)
+
             class Meta:
                 app_label = "migrations"
                 apps = new_apps

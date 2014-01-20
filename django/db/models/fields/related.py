@@ -18,7 +18,6 @@ from django.utils.deprecation import RenameMethodsBase
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry, cached_property
 from django.core import exceptions
-from django.apps import apps
 from django import forms
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
