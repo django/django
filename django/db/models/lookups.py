@@ -120,16 +120,22 @@ class Lookup(RegisterLookupMixin):
 
 
 class BuiltinLookup(Lookup):
-    def as_sql(self, qn, connection):
-        lhs_sql, params = self.process_lhs(qn, connection)
+    def process_lhs(self, qn, connection, lhs=None):
+        lhs_sql, params = super(BuiltinLookup, self).process_lhs(
+            qn, connection, lhs)
         field_internal_type = self.lhs.output_type.get_internal_type()
         db_type = self.lhs.output_type.db_type(connection=connection)
-        lhs_sql = connection.ops.field_cast_sql(db_type, field_internal_type) % lhs_sql
+        lhs_sql = connection.ops.field_cast_sql(
+            db_type, field_internal_type) % lhs_sql
         lhs_sql = connection.ops.lookup_cast(self.lookup_name) % lhs_sql
+        return lhs_sql, params
+
+    def as_sql(self, qn, connection):
+        lhs_sql, params = self.process_lhs(qn, connection)
         rhs_sql, rhs_params = self.process_rhs(qn, connection)
         params.extend(rhs_params)
-        operator_plus_rhs = self.get_rhs_op(connection, rhs_sql)
-        return '%s %s' % (lhs_sql, operator_plus_rhs), params
+        rhs_sql = self.get_rhs_op(connection, rhs_sql)
+        return '%s %s' % (lhs_sql, rhs_sql), params
 
     def get_rhs_op(self, connection, rhs):
         return connection.operators[self.lookup_name] % rhs
@@ -276,8 +282,8 @@ default_lookups['range'] = Range
 
 class DateLookup(BuiltinLookup):
 
-    def process_lhs(self, qn, connection):
-        lhs, params = super(DateLookup, self).process_lhs(qn, connection)
+    def process_lhs(self, qn, connection, lhs=None):
+        lhs, params = super(DateLookup, self).process_lhs(qn, connection, lhs)
         tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
         sql, tz_params = connection.ops.datetime_extract_sql(self.extract_type, lhs, tzname)
         return connection.ops.lookup_cast(self.lookup_name) % sql, tz_params
@@ -341,9 +347,18 @@ default_lookups['search'] = Search
 
 class Regex(BuiltinLookup):
     lookup_name = 'regex'
+
+    def as_sql(self, qn, connection):
+        if self.lookup_name in connection.operators:
+            return super(Regex, self).as_sql(qn, connection)
+        else:
+            lhs, lhs_params = self.process_lhs(qn, connection)
+            rhs, rhs_params = self.process_rhs(qn, connection)
+            sql_template = connection.ops.regex_lookup(self.lookup_name)
+            return sql_template % (lhs, rhs), lhs_params + rhs_params
 default_lookups['regex'] = Regex
 
 
-class IRegex(BuiltinLookup):
+class IRegex(Regex):
     lookup_name = 'iregex'
 default_lookups['iregex'] = IRegex
