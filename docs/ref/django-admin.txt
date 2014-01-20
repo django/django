@@ -113,7 +113,7 @@ Custom checks may be introduced by other libraries and applications.
 By default, all apps will be checked. You can check a subset of apps by providing
 a list of app labels as arguments::
 
-    python manage.py auth admin myapp
+    python manage.py check auth admin myapp
 
 If you do not specify any app, all apps will be checked.
 
@@ -124,7 +124,7 @@ types of checks. These check types are categorized with tags. You can use these 
 to restrict the checks performed to just those in a particular category. For example,
 to perform only security and compatibility checks, you would run::
 
-    python manage.py --tag security --tag compatibility
+    python manage.py check --tag security --tag compatibility
 
 compilemessages
 ---------------
