@@ -110,7 +110,7 @@ your installed models or your admin registrations. It will also provide warnings
 of common compatibility problems introduced by upgrading Django to a new version.
 Custom checks may be introduced by other libraries and applications.
 
-By default, all apps will be checkd. You can check a subset of apps by providing
+By default, all apps will be checked. You can check a subset of apps by providing
 a list of app labels as arguments::
 
     python manage.py auth admin myapp
