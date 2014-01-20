@@ -182,7 +182,8 @@ class SchemaTests(TransactionTestCase):
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         self.assertEqual(columns['surname'][0], "CharField")
-        self.assertEqual(columns['surname'][1][6], False)
+        self.assertEqual(columns['surname'][1][6],
+                         connection.features.interprets_empty_strings_as_nulls)
 
     def test_alter(self):
         """

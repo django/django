@@ -1,11 +1,14 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+import unittest
+
 from django.core.checks import Error
 from django.core.exceptions import ImproperlyConfigured
-from django.db import models
+from django.db import connection, models
 
 from .base import IsolatedModelsTestCase
+
 
 
 class AutoFieldTests(IsolatedModelsTestCase):
@@ -176,6 +179,8 @@ class CharFieldTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    @unittest.skipUnless(connection.vendor == 'mysql',
+                         "Test valid only for MySQL")
     def test_too_long_char_field_under_mysql(self):
         from django.db.backends.mysql.validation import DatabaseValidation
 
