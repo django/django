@@ -10,7 +10,6 @@ from django.db import connection, models
 from .base import IsolatedModelsTestCase
 
 
-
 class AutoFieldTests(IsolatedModelsTestCase):
 
     def test_valid_case(self):
