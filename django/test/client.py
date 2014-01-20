@@ -550,9 +550,6 @@ class Client(RequestFactory):
         not available.
         """
         user = self.auth_module.authenticate(**credentials)
-        if user and user.is_active \
-                and 'django.contrib.sessions' in settings.INSTALLED_APPS:
-        user = self.auth_module.authenticate(**credentials)
         if (user and user.is_active and
                 apps.is_installed('django.contrib.sessions')):
             engine = import_module(settings.SESSION_ENGINE)
