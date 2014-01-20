@@ -10,7 +10,6 @@ from io import BytesIO
 
 from django.apps import apps
 from django.conf import settings
-from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import (request_started, request_finished,
@@ -23,6 +22,7 @@ from django.utils.functional import curry
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
+from django.utils.module_loading import import_by_path
 from django.utils import six
 from django.utils.six.moves.urllib.parse import unquote, urlparse, urlsplit
 from django.test.utils import ContextList
@@ -374,10 +374,11 @@ class Client(RequestFactory):
     contexts and templates produced by a view, rather than the
     HTML rendered to the end-user.
     """
-    def __init__(self, enforce_csrf_checks=False, **defaults):
+    def __init__(self, enforce_csrf_checks=False, auth_module_name='django.contrib.auth', **defaults):
         super(Client, self).__init__(**defaults)
         self.handler = ClientHandler(enforce_csrf_checks)
         self.exc_info = None
+        self.auth_module = import_by_path(auth_module_name)
 
     def store_exc_info(self, **kwargs):
         """
@@ -548,7 +549,7 @@ class Client(RequestFactory):
         are incorrect, or the user is inactive, or if the sessions framework is
         not available.
         """
-        user = authenticate(**credentials)
+        user = self.auth_module.authenticate(**credentials)
         if (user and user.is_active and
                 apps.is_installed('django.contrib.sessions')):
             engine = import_module(settings.SESSION_ENGINE)
@@ -560,7 +561,7 @@ class Client(RequestFactory):
                 request.session = self.session
             else:
                 request.session = engine.SessionStore()
-            login(request, user)
+            self.auth_module.login(request, user)
 
             # Save the session values.
             request.session.save()
@@ -591,7 +592,7 @@ class Client(RequestFactory):
         request = self.request().wsgi_request
 
         engine = import_module(settings.SESSION_ENGINE)
-        UserModel = get_user_model()
+        UserModel = self.auth_module.get_user_model()
         if self.session:
             request.session = self.session
             uid = self.session.get("_auth_user_id")
@@ -599,7 +600,7 @@ class Client(RequestFactory):
                 request.user = UserModel._default_manager.get(pk=uid)
         else:
             request.session = engine.SessionStore()
-        logout(request)
+        self.auth_module.logout(request)
         self.cookies = SimpleCookie()
 
     def _handle_redirects(self, response, **extra):
