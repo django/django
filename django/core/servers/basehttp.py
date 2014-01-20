@@ -16,9 +16,11 @@ import traceback
 from wsgiref import simple_server
 from wsgiref.util import FileWrapper   # NOQA: for backwards compatibility
 
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
 from django.core.wsgi import get_wsgi_application
-from django.utils.module_loading import import_by_path
+from django.utils import six
+from django.utils.module_loading import import_string
 from django.utils.six.moves import socketserver
 
 __all__ = ('WSGIServer', 'WSGIRequestHandler', 'MAX_SOCKET_CHUNK_SIZE')
@@ -50,10 +52,15 @@ def get_internal_wsgi_application():
     if app_path is None:
         return get_wsgi_application()
 
-    return import_by_path(
-        app_path,
-        error_prefix="WSGI application '%s' could not be loaded; " % app_path
-    )
+    error_prefix = "WSGI application '%s' could not be loaded; " % app_path
+    try:
+        app = import_string(app_path)
+    except ImportError as e:
+        msg = '%sError importing module %s: "%s"' % (error_prefix, app_path, e)
+        six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg),
+                    sys.exc_info()[2])
+
+    return app
 
 
 class ServerHandler(simple_server.ServerHandler, object):

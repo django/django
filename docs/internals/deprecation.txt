@@ -116,6 +116,9 @@ details on these changes.
 * ``django.db.backends.DatabaseValidation.validate_field`` will be removed in
   favor of the ``check_field`` method.
 
+* ``django.utils.module_loading.import_by_path`` will be removed in favor of
+  ``django.utils.module_loading.import_string``.
+
 .. _deprecation-removed-in-1.8:
 
 1.8

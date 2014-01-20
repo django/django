@@ -14,7 +14,7 @@ from django.template.defaultfilters import force_escape, pprint
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
 from django.utils.encoding import force_bytes, smart_text
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 from django.utils import six
 
 HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|PROFANITIES_LIST|SIGNATURE')
@@ -85,7 +85,7 @@ def get_exception_reporter_filter(request):
     global default_exception_reporter_filter
     if default_exception_reporter_filter is None:
         # Load the default filter for the first time and cache it.
-        default_exception_reporter_filter = import_by_path(
+        default_exception_reporter_filter = import_string(
             settings.DEFAULT_EXCEPTION_REPORTER_FILTER)()
     if request:
         return getattr(request, 'exception_reporter_filter', default_exception_reporter_filter)

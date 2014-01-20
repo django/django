@@ -788,11 +788,11 @@ class TestMiscFinder(TestCase):
             finders.FileSystemFinder)
 
     def test_get_finder_bad_classname(self):
-        self.assertRaises(ImproperlyConfigured, finders.get_finder,
+        self.assertRaises(ImportError, finders.get_finder,
                           'django.contrib.staticfiles.finders.FooBarFinder')
 
     def test_get_finder_bad_module(self):
-        self.assertRaises(ImproperlyConfigured,
+        self.assertRaises(ImportError,
             finders.get_finder, 'foo.bar.FooBarFinder')
 
     def test_cache(self):

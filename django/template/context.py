@@ -1,5 +1,5 @@
 from copy import copy
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 
 # Cache of actual callables.
 _standard_context_processors = None
@@ -162,7 +162,7 @@ def get_standard_processors():
         collect.extend(_builtin_context_processors)
         collect.extend(settings.TEMPLATE_CONTEXT_PROCESSORS)
         for path in collect:
-            func = import_by_path(path)
+            func = import_string(path)
             processors.append(func)
         _standard_context_processors = tuple(processors)
     return _standard_context_processors
