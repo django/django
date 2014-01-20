@@ -281,12 +281,15 @@ default_lookups['range'] = Range
 
 
 class DateLookup(BuiltinLookup):
-
     def process_lhs(self, qn, connection, lhs=None):
+        from django.db.models import DateTimeField
         lhs, params = super(DateLookup, self).process_lhs(qn, connection, lhs)
-        tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
-        sql, tz_params = connection.ops.datetime_extract_sql(self.extract_type, lhs, tzname)
-        return connection.ops.lookup_cast(self.lookup_name) % sql, tz_params
+        if isinstance(self.lhs.output_type, DateTimeField):
+            tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
+            sql, tz_params = connection.ops.datetime_extract_sql(self.extract_type, lhs, tzname)
+            return connection.ops.lookup_cast(self.lookup_name) % sql, tz_params
+        else:
+            return connection.ops.date_extract_sql(self.lookup_name, lhs), []
 
     def get_rhs_op(self, connection, rhs):
         return '= %s' % rhs
