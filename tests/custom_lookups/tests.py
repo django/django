@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from datetime import date
 import unittest
 
@@ -16,6 +18,12 @@ class Div3Lookup(models.Lookup):
         params.extend(rhs_params)
         return '%s %%%% 3 = %s' % (lhs, rhs), params
 
+    def as_oracle(self, qn, connection):
+        lhs, params = self.process_lhs(qn, connection)
+        rhs, rhs_params = self.process_rhs(qn, connection)
+        params.extend(rhs_params)
+        return 'mod(%s, 3) = %s' % (lhs, rhs), params
+
 
 class Div3Transform(models.Transform):
     lookup_name = 'div3'
@@ -23,6 +31,10 @@ class Div3Transform(models.Transform):
     def as_sql(self, qn, connection):
         lhs, lhs_params = qn.compile(self.lhs)
         return '%s %%%% 3' % (lhs,), lhs_params
+
+    def as_oracle(self, qn, connection):
+        lhs, lhs_params = qn.compile(self.lhs)
+        return 'mod(%s, 3)' % lhs, lhs_params
 
 
 class YearTransform(models.Transform):
