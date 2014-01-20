@@ -16,7 +16,7 @@ class Command(BaseCommand):
     help = 'Runs a development server with data from the given fixture(s).'
     args = '[fixture ...]'
 
-    requires_model_validation = False
+    requires_system_checks = False
 
     def handle(self, *fixture_labels, **options):
         from django.core.management import call_command

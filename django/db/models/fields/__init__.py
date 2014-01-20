@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import collections
@@ -15,16 +16,18 @@ from django.db.models.lookups import default_lookups, RegisterLookupMixin
 from django.db.models.query_utils import QueryWrapper
 from django.conf import settings
 from django import forms
-from django.core import exceptions, validators
+from django.core import exceptions, validators, checks
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.functional import curry, total_ordering, Promise
 from django.utils.text import capfirst
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_text, force_text, force_bytes
+from django.utils.encoding import (smart_text, force_text, force_bytes,
+    python_2_unicode_compatible)
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
+from django.utils.itercompat import is_iterable
 
 # Avoid "TypeError: Item in ``from list'' not a string" -- unicode_literals
 # makes these strings unicode
@@ -81,6 +84,7 @@ def _empty(of_cls):
 
 
 @total_ordering
+@python_2_unicode_compatible
 class Field(RegisterLookupMixin):
     """Base class for all field types"""
 
@@ -158,6 +162,111 @@ class Field(RegisterLookupMixin):
         messages.update(error_messages or {})
         self._error_messages = error_messages  # Store for deconstruction later
         self.error_messages = messages
+
+    def __str__(self):
+        """ Return "app_label.model_label.field_name". """
+        model = self.model
+        app = model._meta.app_label
+        return '%s.%s.%s' % (app, model._meta.object_name, self.name)
+
+    def __repr__(self):
+        """
+        Displays the module, class and name of the field.
+        """
+        path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
+        name = getattr(self, 'name', None)
+        if name is not None:
+            return '<%s: %s>' % (path, name)
+        return '<%s>' % path
+
+    def check(self, **kwargs):
+        errors = []
+        errors.extend(self._check_field_name())
+        errors.extend(self._check_choices())
+        errors.extend(self._check_db_index())
+        errors.extend(self._check_null_allowed_for_primary_keys())
+        errors.extend(self._check_backend_specific_checks(**kwargs))
+        return errors
+
+    def _check_field_name(self):
+        """ Check if field name is valid (i. e. not ending with an underscore).
+        """
+        if self.name.endswith('_'):
+            return [
+                checks.Error(
+                    'Field names must not end with underscores.',
+                    hint=None,
+                    obj=self,
+                    id='E001',
+                )
+            ]
+        else:
+            return []
+
+    def _check_choices(self):
+        if self.choices:
+            if (isinstance(self.choices, six.string_types) or
+                    not is_iterable(self.choices)):
+                return [
+                    checks.Error(
+                        '"choices" must be an iterable (e.g., a list or tuple).',
+                        hint=None,
+                        obj=self,
+                        id='E033',
+                    )
+                ]
+            elif any(isinstance(choice, six.string_types) or
+                     not is_iterable(choice) or len(choice) != 2
+                     for choice in self.choices):
+                return [
+                    checks.Error(
+                        ('All "choices" elements must be a tuple of two '
+                         'elements (the first one is the actual value '
+                         'to be stored and the second element is '
+                         'the human-readable name).'),
+                        hint=None,
+                        obj=self,
+                        id='E034',
+                    )
+                ]
+            else:
+                return []
+        else:
+            return []
+
+    def _check_db_index(self):
+        if self.db_index not in (None, True, False):
+            return [
+                checks.Error(
+                    '"db_index" must be either None, True or False.',
+                    hint=None,
+                    obj=self,
+                    id='E035',
+                )
+            ]
+        else:
+            return []
+
+    def _check_null_allowed_for_primary_keys(self):
+        if (self.primary_key and self.null and
+                not connection.features.interprets_empty_strings_as_nulls):
+            # We cannot reliably check this for backends like Oracle which
+            # consider NULL and '' to be equal (and thus set up
+            # character-based fields a little differently).
+            return [
+                checks.Error(
+                    'Primary keys must not have null=True.',
+                    hint=('Set null=False on the field or '
+                          'remove primary_key=True argument.'),
+                    obj=self,
+                    id='E036',
+                )
+            ]
+        else:
+            return []
+
+    def _check_backend_specific_checks(self, **kwargs):
+        return connection.validation.check_field(self, **kwargs)
 
     def deconstruct(self):
         """
@@ -708,16 +817,6 @@ class Field(RegisterLookupMixin):
         """
         return getattr(obj, self.attname)
 
-    def __repr__(self):
-        """
-        Displays the module, class and name of the field.
-        """
-        path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
-        name = getattr(self, 'name', None)
-        if name is not None:
-            return '<%s: %s>' % (path, name)
-        return '<%s>' % path
-
 
 class AutoField(Field):
     description = _("Integer")
@@ -728,10 +827,26 @@ class AutoField(Field):
     }
 
     def __init__(self, *args, **kwargs):
-        assert kwargs.get('primary_key', False) is True, \
-            "%ss must have primary_key=True." % self.__class__.__name__
         kwargs['blank'] = True
         super(AutoField, self).__init__(*args, **kwargs)
+
+    def check(self, **kwargs):
+        errors = super(AutoField, self).check(**kwargs)
+        errors.extend(self._check_primary_key())
+        return errors
+
+    def _check_primary_key(self):
+        if not self.primary_key:
+            return [
+                checks.Error(
+                    'The field must have primary_key=True, because it is an AutoField.',
+                    hint=None,
+                    obj=self,
+                    id='E048',
+                ),
+            ]
+        else:
+            return []
 
     def deconstruct(self):
         name, path, args, kwargs = super(AutoField, self).deconstruct()
@@ -791,6 +906,24 @@ class BooleanField(Field):
         kwargs['blank'] = True
         super(BooleanField, self).__init__(*args, **kwargs)
 
+    def check(self, **kwargs):
+        errors = super(BooleanField, self).check(**kwargs)
+        errors.extend(self._check_null(**kwargs))
+        return errors
+
+    def _check_null(self, **kwargs):
+        if getattr(self, 'null', False):
+            return [
+                checks.Error(
+                    'BooleanFields do not acceps null values.',
+                    hint='Use a NullBooleanField instead.',
+                    obj=self,
+                    id='E037',
+                )
+            ]
+        else:
+            return []
+
     def deconstruct(self):
         name, path, args, kwargs = super(BooleanField, self).deconstruct()
         del kwargs['blank']
@@ -848,6 +981,37 @@ class CharField(Field):
     def __init__(self, *args, **kwargs):
         super(CharField, self).__init__(*args, **kwargs)
         self.validators.append(validators.MaxLengthValidator(self.max_length))
+
+    def check(self, **kwargs):
+        errors = super(CharField, self).check(**kwargs)
+        errors.extend(self._check_max_length_attibute(**kwargs))
+        return errors
+
+    def _check_max_length_attibute(self, **kwargs):
+        try:
+            max_length = int(self.max_length)
+            if max_length <= 0:
+                raise ValueError()
+        except TypeError:
+            return [
+                checks.Error(
+                    'The field must have "max_length" attribute.',
+                    hint=None,
+                    obj=self,
+                    id='E038',
+                )
+            ]
+        except ValueError:
+            return [
+                checks.Error(
+                    '"max_length" must be a positive integer.',
+                    hint=None,
+                    obj=self,
+                    id='E039',
+                )
+            ]
+        else:
+            return []
 
     def get_internal_type(self):
         return "CharField"
@@ -1114,6 +1278,77 @@ class DecimalField(Field):
         self.max_digits, self.decimal_places = max_digits, decimal_places
         super(DecimalField, self).__init__(verbose_name, name, **kwargs)
 
+    def check(self, **kwargs):
+        errors = super(DecimalField, self).check(**kwargs)
+        errors.extend(self._check_decimal_places_and_max_digits(**kwargs))
+        return errors
+
+    def _check_decimal_places_and_max_digits(self, **kwargs):
+        errors = self.__check_decimal_places()
+        errors += self.__check_max_digits()
+        if not errors and int(self.decimal_places) > int(self.max_digits):
+            errors.append(
+                checks.Error(
+                    '"max_digits" must be greater or equal to "decimal_places".',
+                    hint=None,
+                    obj=self,
+                    id='E040',
+                )
+            )
+        return errors
+
+    def __check_decimal_places(self):
+        try:
+            decimal_places = int(self.decimal_places)
+            if decimal_places < 0:
+                raise ValueError()
+        except TypeError:
+            return [
+                checks.Error(
+                    'The field requires a "decimal_places" attribute.',
+                    hint=None,
+                    obj=self,
+                    id='E041',
+                )
+            ]
+        except ValueError:
+            return [
+                checks.Error(
+                    '"decimal_places" attribute must be a non-negative integer.',
+                    hint=None,
+                    obj=self,
+                    id='E042',
+                )
+            ]
+        else:
+            return []
+
+    def __check_max_digits(self):
+        try:
+            max_digits = int(self.max_digits)
+            if max_digits <= 0:
+                raise ValueError()
+        except TypeError:
+            return [
+                checks.Error(
+                    'The field requires a "max_digits" attribute.',
+                    hint=None,
+                    obj=self,
+                    id='E043',
+                )
+            ]
+        except ValueError:
+            return [
+                checks.Error(
+                    '"max_digits" attribute must be a positive integer.',
+                    hint=None,
+                    obj=self,
+                    id='E044',
+                )
+            ]
+        else:
+            return []
+
     def deconstruct(self):
         name, path, args, kwargs = super(DecimalField, self).deconstruct()
         if self.max_digits:
@@ -1211,6 +1446,23 @@ class FilePathField(Field):
         self.allow_files, self.allow_folders = allow_files, allow_folders
         kwargs['max_length'] = kwargs.get('max_length', 100)
         super(FilePathField, self).__init__(verbose_name, name, **kwargs)
+
+    def check(self, **kwargs):
+        errors = super(FilePathField, self).check(**kwargs)
+        errors.extend(self._check_allowing_files_or_folders(**kwargs))
+        return errors
+
+    def _check_allowing_files_or_folders(self, **kwargs):
+        if not self.allow_files and not self.allow_folders:
+            return [
+                checks.Error(
+                    'The field must have either "allow_files" or "allow_folders" set to True.',
+                    hint=None,
+                    obj=self,
+                    id='E045',
+                )
+            ]
+        return []
 
     def deconstruct(self):
         name, path, args, kwargs = super(FilePathField, self).deconstruct()
@@ -1372,6 +1624,24 @@ class GenericIPAddressField(Field):
         kwargs['max_length'] = 39
         super(GenericIPAddressField, self).__init__(verbose_name, name, *args,
                                                     **kwargs)
+
+    def check(self, **kwargs):
+        errors = super(GenericIPAddressField, self).check(**kwargs)
+        errors.extend(self._check_blank_and_null_values(**kwargs))
+        return errors
+
+    def _check_blank_and_null_values(self, **kwargs):
+        if not getattr(self, 'null', False) and getattr(self, 'blank', False):
+            return [
+                checks.Error(
+                    ('The field cannot accept blank values if null values '
+                     'are not allowed, as blank values are stored as null.'),
+                    hint=None,
+                    obj=self,
+                    id='E046',
+                )
+            ]
+        return []
 
     def deconstruct(self):
         name, path, args, kwargs = super(GenericIPAddressField, self).deconstruct()

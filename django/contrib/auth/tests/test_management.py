@@ -3,17 +3,18 @@ from datetime import date
 
 from django.apps import apps
 from django.contrib.auth import models, management
+from django.contrib.auth.checks import check_user_model
 from django.contrib.auth.management import create_permissions
 from django.contrib.auth.management.commands import changepassword
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
+from django.core import checks
 from django.core import exceptions
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.core.management.validation import get_validation_errors
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, override_system_checks
 from django.utils import six
 from django.utils.six import StringIO
 
@@ -161,7 +162,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             email="joe@somewhere.org",
             date_of_birth="1976-04-01",
             stdout=new_io,
-            skip_validation=True
+            skip_checks=True
         )
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, 'Superuser created successfully.')
@@ -185,7 +186,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
                 username="joe@somewhere.org",
                 stdout=new_io,
                 stderr=new_io,
-                skip_validation=True
+                skip_checks=True
             )
 
         self.assertEqual(CustomUser._default_manager.count(), 0)
@@ -193,25 +194,81 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
 class CustomUserModelValidationTestCase(TestCase):
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonListRequiredFields')
+    @override_system_checks([check_user_model])
     def test_required_fields_is_list(self):
         "REQUIRED_FIELDS should be a list."
-        new_io = StringIO()
-        get_validation_errors(new_io, apps.get_app_config('auth'))
-        self.assertIn("The REQUIRED_FIELDS must be a list or tuple.", new_io.getvalue())
+
+        from .custom_user import CustomUserNonListRequiredFields
+        errors = checks.run_checks()
+        expected = [
+            checks.Error(
+                'The REQUIRED_FIELDS must be a list or tuple.',
+                hint=None,
+                obj=CustomUserNonListRequiredFields,
+                id='auth.E001',
+            ),
+        ]
+        self.assertEqual(errors, expected)
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserBadRequiredFields')
+    @override_system_checks([check_user_model])
     def test_username_not_in_required_fields(self):
         "USERNAME_FIELD should not appear in REQUIRED_FIELDS."
-        new_io = StringIO()
-        get_validation_errors(new_io, apps.get_app_config('auth'))
-        self.assertIn("The field named as the USERNAME_FIELD should not be included in REQUIRED_FIELDS on a swappable User model.", new_io.getvalue())
+
+        from .custom_user import CustomUserBadRequiredFields
+        errors = checks.run_checks()
+        expected = [
+            checks.Error(
+                ('The field named as the USERNAME_FIELD must not be included '
+                 'in REQUIRED_FIELDS on a custom user model.'),
+                hint=None,
+                obj=CustomUserBadRequiredFields,
+                id='auth.E002',
+            ),
+        ]
+        self.assertEqual(errors, expected)
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonUniqueUsername')
+    @override_system_checks([check_user_model])
     def test_username_non_unique(self):
         "A non-unique USERNAME_FIELD should raise a model validation error."
-        new_io = StringIO()
-        get_validation_errors(new_io, apps.get_app_config('auth'))
-        self.assertIn("The USERNAME_FIELD must be unique. Add unique=True to the field parameters.", new_io.getvalue())
+
+        from .custom_user import CustomUserNonUniqueUsername
+        errors = checks.run_checks()
+        expected = [
+            checks.Error(
+                ('The CustomUserNonUniqueUsername.username field must be '
+                 'unique because it is pointed to by USERNAME_FIELD.'),
+                hint=None,
+                obj=CustomUserNonUniqueUsername,
+                id='auth.E003',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+    @override_settings(AUTH_USER_MODEL='auth.CustomUserNonUniqueUsername',
+                       AUTHENTICATION_BACKENDS=[
+                           'my.custom.backend',
+                       ])
+    @override_system_checks([check_user_model])
+    def test_username_non_unique_with_custom_backend(self):
+        """ A non-unique USERNAME_FIELD should raise an error only if we use the
+        default authentication backend. Otherwise, an warning should be raised.
+        """
+
+        from .custom_user import CustomUserNonUniqueUsername
+        errors = checks.run_checks()
+        expected = [
+            checks.Warning(
+                ('The CustomUserNonUniqueUsername.username field is pointed to '
+                 'by USERNAME_FIELD, but it is not unique.'),
+                hint=('Ensure that your authentication backend can handle '
+                      'non-unique usernames.'),
+                obj=CustomUserNonUniqueUsername,
+                id='auth.W004',
+            )
+        ]
+        self.assertEqual(errors, expected)
 
 
 class PermissionTestCase(TestCase):

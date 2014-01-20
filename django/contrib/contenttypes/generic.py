@@ -6,10 +6,12 @@ from __future__ import unicode_literals
 from collections import defaultdict
 from functools import partial
 
+from django.core import checks
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db import models, router, transaction, DEFAULT_DB_ALIAS
-from django.db.models import signals
+from django.db.models import signals, FieldDoesNotExist
+from django.db.models.base import ModelBase
 from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.related import PathInfo
 from django.db.models.sql.datastructures import Col
@@ -20,7 +22,7 @@ from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
 from django.contrib.contenttypes.models import ContentType
 from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_text, python_2_unicode_compatible
 
 
 class RenameGenericForeignKeyMethods(RenameMethodsBase):
@@ -29,6 +31,7 @@ class RenameGenericForeignKeyMethods(RenameMethodsBase):
     )
 
 
+@python_2_unicode_compatible
 class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
     """
     Provides a generic relation to any object through content-type/object-id
@@ -52,6 +55,52 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
             signals.pre_init.connect(self.instance_pre_init, sender=cls)
 
         setattr(cls, name, self)
+
+    def __str__(self):
+        model = self.model
+        app = model._meta.app_label
+        return '%s.%s.%s' % (app, model._meta.object_name, self.name)
+
+    def check(self, **kwargs):
+        errors = []
+        errors.extend(self._check_content_type_field())
+        errors.extend(self._check_object_id_field())
+        errors.extend(self._check_field_name())
+        return errors
+
+    def _check_content_type_field(self):
+        return _check_content_type_field(
+            model=self.model,
+            field_name=self.ct_field,
+            checked_object=self)
+
+    def _check_object_id_field(self):
+        try:
+            self.model._meta.get_field(self.fk_field)
+        except FieldDoesNotExist:
+            return [
+                checks.Error(
+                    'The field refers to "%s" field which is missing.' % self.fk_field,
+                    hint=None,
+                    obj=self,
+                    id='contenttypes.E001',
+                )
+            ]
+        else:
+            return []
+
+    def _check_field_name(self):
+        if self.name.endswith("_"):
+            return [
+                checks.Error(
+                    'Field names must not end with underscores.',
+                    hint=None,
+                    obj=self,
+                    id='contenttypes.E002',
+                )
+            ]
+        else:
+            return []
 
     def instance_pre_init(self, signal, sender, args, kwargs, **_kwargs):
         """
@@ -185,6 +234,72 @@ class GenericRelation(ForeignObject):
             to, to_fields=[],
             from_fields=[self.object_id_field_name], **kwargs)
 
+    def check(self, **kwargs):
+        errors = super(GenericRelation, self).check(**kwargs)
+        errors.extend(self._check_content_type_field())
+        errors.extend(self._check_object_id_field())
+        errors.extend(self._check_generic_foreign_key_existence())
+        return errors
+
+    def _check_content_type_field(self):
+        target = self.rel.to
+        if isinstance(target, ModelBase):
+            return _check_content_type_field(
+                model=target,
+                field_name=self.content_type_field_name,
+                checked_object=self)
+        else:
+            return []
+
+    def _check_object_id_field(self):
+        target = self.rel.to
+        if isinstance(target, ModelBase):
+            opts = target._meta
+            try:
+                opts.get_field(self.object_id_field_name)
+            except FieldDoesNotExist:
+                return [
+                    checks.Error(
+                        'The field refers to %s.%s field which is missing.' % (
+                            opts.object_name, self.object_id_field_name
+                        ),
+                        hint=None,
+                        obj=self,
+                        id='contenttypes.E003',
+                    )
+                ]
+            else:
+                return []
+        else:
+            return []
+
+    def _check_generic_foreign_key_existence(self):
+        target = self.rel.to
+        if isinstance(target, ModelBase):
+            # Using `vars` is very ugly approach, but there is no better one,
+            # because GenericForeignKeys are not considered as fields and,
+            # therefore, are not included in `target._meta.local_fields`.
+            fields = target._meta.virtual_fields
+            if any(isinstance(field, GenericForeignKey) and
+                    field.ct_field == self.content_type_field_name and
+                    field.fk_field == self.object_id_field_name
+                    for field in fields):
+                return []
+            else:
+                return [
+                    checks.Warning(
+                        ('The field defines a generic relation with the model '
+                         '%s.%s, but the model lacks GenericForeignKey.') % (
+                            target._meta.app_label, target._meta.object_name
+                        ),
+                        hint=None,
+                        obj=self,
+                        id='contenttypes.E004',
+                    )
+                ]
+        else:
+            return []
+
     def resolve_related_fields(self):
         self.to_fields = [self.model._meta.pk.name]
         return [(self.rel.to._meta.get_field_by_name(self.object_id_field_name)[0],
@@ -250,6 +365,54 @@ class GenericRelation(ForeignObject):
                 self.model, for_concrete_model=self.for_concrete_model).pk,
             "%s__in" % self.object_id_field_name: [obj.pk for obj in objs]
         })
+
+
+def _check_content_type_field(model, field_name, checked_object):
+    """ Check if field named `field_name` in model `model` exists and is
+    valid content_type field (is a ForeignKey to ContentType). """
+
+    try:
+        field = model._meta.get_field(field_name)
+    except FieldDoesNotExist:
+        return [
+            checks.Error(
+                'The field refers to %s.%s field which is missing.' % (
+                    model._meta.object_name, field_name
+                ),
+                hint=None,
+                obj=checked_object,
+                id='contenttypes.E005',
+            )
+        ]
+    else:
+        if not isinstance(field, models.ForeignKey):
+            return [
+                checks.Error(
+                    ('"%s" field is used by a %s '
+                     'as content type field and therefore it must be '
+                     'a ForeignKey.') % (
+                        field_name, checked_object.__class__.__name__
+                    ),
+                    hint=None,
+                    obj=checked_object,
+                    id='contenttypes.E006',
+                )
+            ]
+        elif field.rel.to != ContentType:
+            return [
+                checks.Error(
+                    ('"%s" field is used by a %s '
+                     'as content type field and therefore it must be '
+                     'a ForeignKey to ContentType.') % (
+                        field_name, checked_object.__class__.__name__
+                    ),
+                    hint=None,
+                    obj=checked_object,
+                    id='contenttypes.E007',
+                )
+            ]
+        else:
+            return []
 
 
 class ReverseGenericRelatedObjectsDescriptor(object):

@@ -9,6 +9,7 @@ from django.apps import apps
 from django.apps.base import MODELS_MODULE_NAME
 import django.db.models.manager  # NOQA: Imported to register signal handler.
 from django.conf import settings
+from django.core import checks
 from django.core.exceptions import (ObjectDoesNotExist,
     MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
 from django.db.models.fields import AutoField, FieldDoesNotExist
@@ -1029,6 +1030,308 @@ class Model(six.with_metaclass(ModelBase)):
 
         if errors:
             raise ValidationError(errors)
+
+    @classmethod
+    def check(cls, **kwargs):
+        errors = []
+        errors.extend(cls._check_swappable())
+        errors.extend(cls._check_managers(**kwargs))
+        if not cls._meta.swapped:
+            errors.extend(cls._check_fields(**kwargs))
+            errors.extend(cls._check_m2m_through_same_relationship())
+            errors.extend(cls._check_id_field())
+            errors.extend(cls._check_column_name_clashes())
+            errors.extend(cls._check_index_together())
+            errors.extend(cls._check_unique_together())
+            errors.extend(cls._check_ordering())
+
+        return errors
+
+    @classmethod
+    def _check_swappable(cls):
+        """ Check if the swapped model exists. """
+
+        errors = []
+        if cls._meta.swapped:
+            try:
+                app_label, model_name = cls._meta.swapped.split('.')
+            except ValueError:
+                errors.append(
+                    checks.Error(
+                        '"%s" is not of the form "app_label.app_name".' % cls._meta.swappable,
+                        hint=None,
+                        obj=cls,
+                        id='E002',
+                    )
+                )
+            else:
+                try:
+                    apps.get_model(app_label, model_name)
+                except LookupError:
+                    errors.append(
+                        checks.Error(
+                            ('The model has been swapped out for %s.%s '
+                             'which has not been installed or is abstract.') % (
+                                app_label, model_name
+                            ),
+                            hint=('Ensure that you did not misspell the model '
+                                  'name and the app name as well as the model '
+                                  'is not abstract. Does your INSTALLED_APPS '
+                                  'setting contain the "%s" app?') % app_label,
+                            obj=cls,
+                            id='E003',
+                        )
+                    )
+        return errors
+
+    @classmethod
+    def _check_managers(cls, **kwargs):
+        """ Perform all manager checks. """
+
+        errors = []
+        managers = cls._meta.concrete_managers + cls._meta.abstract_managers
+        for (_, _, manager) in managers:
+            errors.extend(manager.check(**kwargs))
+        return errors
+
+    @classmethod
+    def _check_fields(cls, **kwargs):
+        """ Perform all field checks. """
+
+        errors = []
+        for field in cls._meta.local_fields:
+            errors.extend(field.check(**kwargs))
+        for field in cls._meta.local_many_to_many:
+            errors.extend(field.check(from_model=cls, **kwargs))
+        return errors
+
+    @classmethod
+    def _check_m2m_through_same_relationship(cls):
+        """ Check if no relationship model is used by more than one m2m field.
+        """
+
+        errors = []
+        seen_intermediary_signatures = []
+
+        fields = cls._meta.local_many_to_many
+
+        # Skip when the target model wasn't found.
+        fields = (f for f in fields if isinstance(f.rel.to, ModelBase))
+
+        # Skip when the relationship model wasn't found.
+        fields = (f for f in fields if isinstance(f.rel.through, ModelBase))
+
+        for f in fields:
+            signature = (f.rel.to, cls, f.rel.through)
+            if signature in seen_intermediary_signatures:
+                errors.append(
+                    checks.Error(
+                        ('The model has two many-to-many relations through '
+                         'the intermediary %s model, which is not permitted.') % (
+                            f.rel.through._meta.object_name
+                        ),
+                        hint=None,
+                        obj=cls,
+                        id='E004',
+                    )
+                )
+            else:
+                seen_intermediary_signatures.append(signature)
+        return errors
+
+    @classmethod
+    def _check_id_field(cls):
+        """ Check if `id` field is a primary key. """
+
+        fields = list(f for f in cls._meta.local_fields
+            if f.name == 'id' and f != cls._meta.pk)
+        # fields is empty or consists of the invalid "id" field
+        if fields and not fields[0].primary_key and cls._meta.pk.name == 'id':
+            return [
+                checks.Error(
+                    ('You cannot use "id" as a field name, because each model '
+                     'automatically gets an "id" field if none '
+                     'of the fields have primary_key=True.'),
+                    hint=('Remove or rename "id" field '
+                          'or add primary_key=True to a field.'),
+                    obj=cls,
+                    id='E005',
+                )
+            ]
+        else:
+            return []
+
+    @classmethod
+    def _check_column_name_clashes(cls):
+        # Store a list of column names which have already been used by other fields.
+        used_column_names = []
+        errors = []
+
+        for f in cls._meta.local_fields:
+            _, column_name = f.get_attname_column()
+
+            # Ensure the column name is not already in use.
+            if column_name and column_name in used_column_names:
+                errors.append(
+                    checks.Error(
+                        'Field "%s" has column name "%s" that is already used.' % (f.name, column_name),
+                        hint=None,
+                        obj=cls,
+                    )
+                )
+            else:
+                used_column_names.append(column_name)
+
+        return errors
+
+    @classmethod
+    def _check_index_together(cls):
+        """ Check the value of "index_together" option. """
+        if not isinstance(cls._meta.index_together, (tuple, list)):
+            return [
+                checks.Error(
+                    '"index_together" must be a list or tuple.',
+                    hint=None,
+                    obj=cls,
+                    id='E006',
+                )
+            ]
+
+        elif any(not isinstance(fields, (tuple, list))
+                for fields in cls._meta.index_together):
+            return [
+                checks.Error(
+                    'All "index_together" elements must be lists or tuples.',
+                    hint=None,
+                    obj=cls,
+                    id='E007',
+                )
+            ]
+
+        else:
+            errors = []
+            for fields in cls._meta.index_together:
+                errors.extend(cls._check_local_fields(fields, "index_together"))
+            return errors
+
+    @classmethod
+    def _check_unique_together(cls):
+        """ Check the value of "unique_together" option. """
+        if not isinstance(cls._meta.unique_together, (tuple, list)):
+            return [
+                checks.Error(
+                    '"unique_together" must be a list or tuple.',
+                    hint=None,
+                    obj=cls,
+                    id='E008',
+                )
+            ]
+
+        elif any(not isinstance(fields, (tuple, list))
+                for fields in cls._meta.unique_together):
+            return [
+                checks.Error(
+                    'All "unique_together" elements must be lists or tuples.',
+                    hint=None,
+                    obj=cls,
+                    id='E009',
+                )
+            ]
+
+        else:
+            errors = []
+            for fields in cls._meta.unique_together:
+                errors.extend(cls._check_local_fields(fields, "unique_together"))
+            return errors
+
+    @classmethod
+    def _check_local_fields(cls, fields, option):
+        from django.db import models
+
+        errors = []
+        for field_name in fields:
+            try:
+                field = cls._meta.get_field(field_name,
+                    many_to_many=True)
+            except models.FieldDoesNotExist:
+                errors.append(
+                    checks.Error(
+                        '"%s" points to a missing field named "%s".' % (option, field_name),
+                        hint='Ensure that you did not misspell the field name.',
+                        obj=cls,
+                        id='E010',
+                    )
+                )
+            else:
+                if isinstance(field.rel, models.ManyToManyRel):
+                    errors.append(
+                        checks.Error(
+                            ('"%s" refers to a m2m "%s" field, but '
+                             'ManyToManyFields are not supported in "%s".') % (
+                                option, field_name, option
+                            ),
+                            hint=None,
+                            obj=cls,
+                            id='E011',
+                        )
+                    )
+        return errors
+
+    @classmethod
+    def _check_ordering(cls):
+        """ Check "ordering" option -- is it a list of lists and do all fields
+        exist? """
+
+        from django.db.models import FieldDoesNotExist
+
+        if not cls._meta.ordering:
+            return []
+
+        if not isinstance(cls._meta.ordering, (list, tuple)):
+            return [
+                checks.Error(
+                    ('"ordering" must be a tuple or list '
+                     '(even if you want to order by only one field).'),
+                    hint=None,
+                    obj=cls,
+                    id='E012',
+                )
+            ]
+
+        errors = []
+
+        fields = cls._meta.ordering
+
+        # Skip '?' fields.
+        fields = (f for f in fields if f != '?')
+
+        # Convert "-field" to "field".
+        fields = ((f[1:] if f.startswith('-') else f) for f in fields)
+
+        fields = (f for f in fields if
+            f != '_order' or not cls._meta.order_with_respect_to)
+
+        # Skip ordering in the format field1__field2 (FIXME: checking
+        # this format would be nice, but it's a little fiddly).
+        fields = (f for f in fields if '__' not in f)
+
+        # Skip ordering on pk. This is always a valid order_by field
+        # but is an alias and therefore won't be found by opts.get_field.
+        fields = (f for f in fields if f != 'pk')
+
+        for field_name in fields:
+            try:
+                cls._meta.get_field(field_name, many_to_many=False)
+            except FieldDoesNotExist:
+                errors.append(
+                    checks.Error(
+                        '"ordering" pointing to a missing "%s" field.' % field_name,
+                        hint='Ensure that you did not misspell the field name.',
+                        obj=cls,
+                        id='E013',
+                    )
+                )
+        return errors
 
 
 ############################################

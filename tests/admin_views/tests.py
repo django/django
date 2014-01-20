@@ -8,6 +8,7 @@ import unittest
 
 from django.conf import settings, global_settings
 from django.core import mail
+from django.core.checks import Error
 from django.core.files import temp as tempfile
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, NoReverseMatch
@@ -4675,17 +4676,27 @@ class AdminViewOnSiteTests(TestCase):
             self.assertEqual(['Children must share a family name with their parents in this contrived test case'],
                              error_set.get('__all__'))
 
-    def test_validate(self):
+    def test_check(self):
         "Ensure that the view_on_site value is either a boolean or a callable"
-        CityAdmin.view_on_site = True
-        CityAdmin.validate(City)
-        CityAdmin.view_on_site = False
-        CityAdmin.validate(City)
-        CityAdmin.view_on_site = lambda obj: obj.get_absolute_url()
-        CityAdmin.validate(City)
-        CityAdmin.view_on_site = []
-        with self.assertRaisesMessage(ImproperlyConfigured, 'CityAdmin.view_on_site is not a callable or a boolean value.'):
-            CityAdmin.validate(City)
+        try:
+            CityAdmin.view_on_site = True
+            self.assertEqual(CityAdmin.check(City), [])
+            CityAdmin.view_on_site = False
+            self.assertEqual(CityAdmin.check(City), [])
+            CityAdmin.view_on_site = lambda obj: obj.get_absolute_url()
+            self.assertEqual(CityAdmin.check(City), [])
+            CityAdmin.view_on_site = []
+            self.assertEqual(CityAdmin.check(City), [
+                Error(
+                    '"view_on_site" is not a callable or a boolean value.',
+                    hint=None,
+                    obj=CityAdmin,
+                    id='admin.E025',
+                ),
+            ])
+        finally:
+            # Restore the original values for the benefit of other tests.
+            CityAdmin.view_on_site = True
 
     def test_false(self):
         "Ensure that the 'View on site' button is not displayed if view_on_site is False"

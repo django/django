@@ -95,18 +95,36 @@ documentation for the :djadminopt:`--verbosity` option.
 Available commands
 ==================
 
-check
------
+check <appname appname ...>
+---------------------------
 
 .. django-admin:: check
 
-.. versionadded:: 1.6
+.. versionchanged:: 1.7
 
-Performs a series of checks to verify a given setup (settings/application code)
-is compatible with the current version of Django.
+Uses the :doc:`system check framework </ref/checks>` to inspect
+the entire Django project for common problems.
 
-Upon finding things that are incompatible or require notifying the user, it
-issues a series of warnings.
+The system check framework will confirm that there aren't any problems with
+your installed models or your admin registrations. It will also provide warnings
+of common compatibility problems introduced by upgrading Django to a new version.
+Custom checks may be introduced by other libraries and applications.
+
+By default, all apps will be checkd. You can check a subset of apps by providing
+a list of app labels as arguments::
+
+    python manage.py auth admin myapp
+
+If you do not specify any app, all apps will be checked.
+
+.. django-admin-option:: --tag <tagname>
+
+The :doc:`system check framework </ref/checks>` performs many different
+types of checks. These check types are categorized with tags. You can use these tags
+to restrict the checks performed to just those in a particular category. For example,
+to perform only security and compatibility checks, you would run::
+
+    python manage.py --tag security -tag compatibility
 
 compilemessages
 ---------------
@@ -810,9 +828,9 @@ reduction.
     ``pyinotify`` support was added.
 
 When you start the server, and each time you change Python code while the
-server is running, the server will validate all of your installed models. (See
-the :djadmin:`validate` command below.) If the validator finds errors, it will
-print them to standard output, but it won't stop the server.
+server is running, the server will check your entire Django project for errors (see
+the :djadmin:`check` command). If any errors are found, they will be printed
+to standard output, but it won't stop the server.
 
 You can run as many servers as you want, as long as they're on separate ports.
 Just execute ``django-admin.py runserver`` more than once.
@@ -1309,6 +1327,9 @@ validate
 --------
 
 .. django-admin:: validate
+
+.. deprecated:: 1.7
+    Replaced by the :djadmin:`check` command.
 
 Validates all installed models (according to the :setting:`INSTALLED_APPS`
 setting) and prints validation errors to standard output.

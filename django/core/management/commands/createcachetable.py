@@ -19,7 +19,7 @@ class Command(BaseCommand):
                 'Defaults to the "default" database.'),
     )
 
-    requires_model_validation = False
+    requires_system_checks = False
 
     def handle(self, *tablenames, **options):
         db = options.get('database')
