@@ -124,7 +124,7 @@ types of checks. These check types are categorized with tags. You can use these 
 to restrict the checks performed to just those in a particular category. For example,
 to perform only security and compatibility checks, you would run::
 
-    python manage.py --tag security -tag compatibility
+    python manage.py --tag security --tag compatibility
 
 compilemessages
 ---------------
