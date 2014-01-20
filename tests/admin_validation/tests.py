@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ImproperlyConfigured
@@ -41,13 +43,18 @@ class ValidationTestCase(TestCase):
                     "fields": ["title", "original_release"],
                 }),
             ]
-        SongAdmin.validate(Song)
+
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            SongAdmin.validate(Song)
 
     def test_custom_modelforms_with_fields_fieldsets(self):
         """
         # Regression test for #8027: custom ModelForms with fields/fieldsets
         """
-        ValidFields.validate(Song)
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            ValidFields.validate(Song)
 
     def test_custom_get_form_with_fieldsets(self):
         """
@@ -55,7 +62,9 @@ class ValidationTestCase(TestCase):
         is overridden.
         Refs #19445.
         """
-        ValidFormFieldsets.validate(Song)
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            ValidFormFieldsets.validate(Song)
 
     def test_exclude_values(self):
         """
@@ -63,6 +72,7 @@ class ValidationTestCase(TestCase):
         """
         class ExcludedFields1(admin.ModelAdmin):
             exclude = ('foo')
+
         self.assertRaisesMessage(ImproperlyConfigured,
             "'ExcludedFields1.exclude' must be a list or tuple.",
             ExcludedFields1.validate,
@@ -71,6 +81,7 @@ class ValidationTestCase(TestCase):
     def test_exclude_duplicate_values(self):
         class ExcludedFields2(admin.ModelAdmin):
             exclude = ('name', 'name')
+
         self.assertRaisesMessage(ImproperlyConfigured,
             "There are duplicate field(s) in ExcludedFields2.exclude",
             ExcludedFields2.validate,
@@ -115,10 +126,12 @@ class ValidationTestCase(TestCase):
         class RawIdNonexistingAdmin(admin.ModelAdmin):
             raw_id_fields = ('nonexisting',)
 
-        self.assertRaisesMessage(ImproperlyConfigured,
-            "'RawIdNonexistingAdmin.raw_id_fields' refers to field 'nonexisting' that is missing from model 'admin_validation.Album'.",
-            RawIdNonexistingAdmin.validate,
-            Album)
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            self.assertRaisesMessage(ImproperlyConfigured,
+                "'RawIdNonexistingAdmin.raw_id_fields' refers to field 'nonexisting' that is missing from model 'admin_validation.Album'.",
+                RawIdNonexistingAdmin.validate,
+                Album)
 
     def test_fk_exclusion(self):
         """
@@ -133,7 +146,10 @@ class ValidationTestCase(TestCase):
 
         class MyAdmin(admin.ModelAdmin):
             inlines = [TwoAlbumFKAndAnEInline]
-        MyAdmin.validate(Album)
+
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            MyAdmin.validate(Album)
 
     def test_inline_self_validation(self):
         class TwoAlbumFKAndAnEInline(admin.TabularInline):
@@ -153,13 +169,18 @@ class ValidationTestCase(TestCase):
 
         class MyAdmin(admin.ModelAdmin):
             inlines = [TwoAlbumFKAndAnEInline]
-        MyAdmin.validate(Album)
+
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            MyAdmin.validate(Album)
 
     def test_readonly(self):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ("title",)
 
-        SongAdmin.validate(Song)
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            SongAdmin.validate(Song)
 
     def test_readonly_on_method(self):
         def my_function(obj):
@@ -168,7 +189,9 @@ class ValidationTestCase(TestCase):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = (my_function,)
 
-        SongAdmin.validate(Song)
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            SongAdmin.validate(Song)
 
     def test_readonly_on_modeladmin(self):
         class SongAdmin(admin.ModelAdmin):
@@ -177,13 +200,17 @@ class ValidationTestCase(TestCase):
             def readonly_method_on_modeladmin(self, obj):
                 pass
 
-        SongAdmin.validate(Song)
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            SongAdmin.validate(Song)
 
     def test_readonly_method_on_model(self):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ("readonly_method_on_model",)
 
-        SongAdmin.validate(Song)
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            SongAdmin.validate(Song)
 
     def test_nonexistant_field(self):
         class SongAdmin(admin.ModelAdmin):
@@ -212,13 +239,18 @@ class ValidationTestCase(TestCase):
                 if instance.title == "Born to Run":
                     return "Best Ever!"
                 return "Status unknown."
-        SongAdmin.validate(Song)
+
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            SongAdmin.validate(Song)
 
     def test_readonly_lambda(self):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = (lambda obj: "test",)
 
-        SongAdmin.validate(Song)
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            SongAdmin.validate(Song)
 
     def test_graceful_m2m_fail(self):
         """
@@ -241,6 +273,7 @@ class ValidationTestCase(TestCase):
                 ('Header 1', {'fields': ('name',)}),
                 ('Header 2', {'fields': ('authors',)}),
             )
+
         self.assertRaisesMessage(ImproperlyConfigured,
             "'FieldsetBookAdmin.fieldsets[1][1]['fields']' can't include the ManyToManyField field 'authors' because 'authors' manually specifies a 'through' model.",
             FieldsetBookAdmin.validate,
@@ -249,14 +282,20 @@ class ValidationTestCase(TestCase):
     def test_nested_fields(self):
         class NestedFieldsAdmin(admin.ModelAdmin):
             fields = ('price', ('name', 'subtitle'))
-        NestedFieldsAdmin.validate(Book)
+
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            NestedFieldsAdmin.validate(Book)
 
     def test_nested_fieldsets(self):
         class NestedFieldsetAdmin(admin.ModelAdmin):
             fieldsets = (
                 ('Main', {'fields': ('price', ('name', 'subtitle'))}),
             )
-        NestedFieldsetAdmin.validate(Book)
+
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            NestedFieldsetAdmin.validate(Book)
 
     def test_explicit_through_override(self):
         """
@@ -273,7 +312,9 @@ class ValidationTestCase(TestCase):
 
         # If the through model is still a string (and hasn't been resolved to a model)
         # the validation will fail.
-        BookAdmin.validate(Book)
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            BookAdmin.validate(Book)
 
     def test_non_model_fields(self):
         """
@@ -287,7 +328,9 @@ class ValidationTestCase(TestCase):
             form = SongForm
             fields = ['title', 'extra_data']
 
-        FieldsOnFormOnlyAdmin.validate(Song)
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            FieldsOnFormOnlyAdmin.validate(Song)
 
     def test_non_model_first_field(self):
         """
@@ -305,4 +348,6 @@ class ValidationTestCase(TestCase):
             form = SongForm
             fields = ['extra_data', 'title']
 
-        FieldsOnFormOnlyAdmin.validate(Song)
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            FieldsOnFormOnlyAdmin.validate(Song)

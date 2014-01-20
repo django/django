@@ -6,7 +6,6 @@ A series of tests to establish that the command-line managment tools work as
 advertised - especially with regards to the handling of the DJANGO_SETTINGS_MODULE
 and default settings.py files.
 """
-from __future__ import unicode_literals
 
 import codecs
 import os
@@ -16,6 +15,7 @@ import socket
 import subprocess
 import sys
 import unittest
+import warnings
 
 import django
 from django import conf, get_version
@@ -1556,8 +1556,10 @@ class CommandTypes(AdminScriptTestCase):
         self.assertOutput(out, str_prefix("EXECUTE:LabelCommand label=anotherlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
 
     def test_requires_model_validation_and_requires_system_checks_both_defined(self):
-        from .management.commands.validation_command import InvalidCommand
-        self.assertRaises(ImproperlyConfigured, InvalidCommand)
+        with warnings.catch_warnings(record=True):
+            warnings.filterwarnings('ignore', module='django.core.management.base')
+            from .management.commands.validation_command import InvalidCommand
+            self.assertRaises(ImproperlyConfigured, InvalidCommand)
 
 
 class Discovery(TestCase):
