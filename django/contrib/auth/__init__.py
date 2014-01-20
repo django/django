@@ -4,7 +4,7 @@ import re
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 from django.middleware.csrf import rotate_token
 
 from .signals import user_logged_in, user_logged_out, user_login_failed
@@ -15,7 +15,7 @@ REDIRECT_FIELD_NAME = 'next'
 
 
 def load_backend(path):
-    return import_by_path(path)()
+    return import_string(path)()
 
 
 def get_backends():

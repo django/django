@@ -58,7 +58,7 @@ class RemoteUserMiddleware(object):
                         auth.BACKEND_SESSION_KEY, ''))
                     if isinstance(stored_backend, RemoteUserBackend):
                         auth.logout(request)
-                except ImproperlyConfigured:
+                except ImportError:
                     # backend failed to load
                     auth.logout(request)
             return

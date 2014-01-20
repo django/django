@@ -12,7 +12,7 @@ from django.utils.crypto import get_random_string
 from django.utils.crypto import salted_hmac
 from django.utils import timezone
 from django.utils.encoding import force_bytes, force_text
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 
 from django.contrib.sessions.exceptions import SuspiciousSession
 
@@ -40,7 +40,7 @@ class SessionBase(object):
         self._session_key = session_key
         self.accessed = False
         self.modified = False
-        self.serializer = import_by_path(settings.SESSION_SERIALIZER)
+        self.serializer = import_string(settings.SESSION_SERIALIZER)
 
     def __contains__(self, key):
         return key in self._session

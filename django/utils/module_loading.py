@@ -5,9 +5,31 @@ import imp
 from importlib import import_module
 import os
 import sys
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
+
+
+def import_string(dotted_path):
+    """
+    Import a dotted module path and return the attribute/class designated by the
+    last name in the path. Raise ImportError if the import failed.
+    """
+    try:
+        module_path, class_name = dotted_path.rsplit('.', 1)
+    except ValueError:
+        msg = "%s doesn't look like a module path" % dotted_path
+        six.reraise(ImportError, ImportError(msg), sys.exc_info()[2])
+
+    module = import_module(module_path)
+
+    try:
+        return getattr(module, class_name)
+    except AttributeError:
+        msg = 'Module "%s" does not define a "%s" attribute/class' % (
+            dotted_path, class_name)
+        six.reraise(ImportError, ImportError(msg), sys.exc_info()[2])
 
 
 def import_by_path(dotted_path, error_prefix=''):
@@ -15,23 +37,16 @@ def import_by_path(dotted_path, error_prefix=''):
     Import a dotted module path and return the attribute/class designated by the
     last name in the path. Raise ImproperlyConfigured if something goes wrong.
     """
+    warnings.warn(
+        'import_by_path() has been deprecated. Use import_string() instead.',
+        PendingDeprecationWarning, stacklevel=2)
     try:
-        module_path, class_name = dotted_path.rsplit('.', 1)
-    except ValueError:
-        raise ImproperlyConfigured("%s%s doesn't look like a module path" % (
-            error_prefix, dotted_path))
-    try:
-        module = import_module(module_path)
+        attr = import_string(dotted_path)
     except ImportError as e:
         msg = '%sError importing module %s: "%s"' % (
-            error_prefix, module_path, e)
+            error_prefix, dotted_path, e)
         six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg),
                     sys.exc_info()[2])
-    try:
-        attr = getattr(module, class_name)
-    except AttributeError:
-        raise ImproperlyConfigured('%sModule "%s" does not define a "%s" attribute/class' % (
-            error_prefix, module_path, class_name))
     return attr
 
 
