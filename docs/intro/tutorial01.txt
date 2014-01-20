@@ -140,7 +140,7 @@ You'll see the following output on the command line:
 
 .. parsed-literal::
 
-    Validating models...
+    Performing system checks...
 
     0 errors found
     |today| - 15:50:53
@@ -545,8 +545,8 @@ Note the following:
   changes.
 
 If you're interested, you can also run
-:djadmin:`python manage.py validate <validate>`; this checks for any errors in
-your models without making migrations or touching the database.
+:djadmin:`python manage.py check <check>`; this checks for any problems in
+your project without making migrations or touching the database.
 
 Now, run :djadmin:`migrate` again to create those model tables in your database:
 

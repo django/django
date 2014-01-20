@@ -203,7 +203,7 @@ class Command(NoArgsCommand):
 "applications) directory.\n\nYou must run this command with one of either the "
 "--locale or --all options.")
 
-    requires_model_validation = False
+    requires_system_checks = False
     leave_locale_alone = True
 
     def handle_noargs(self, *args, **options):

@@ -99,7 +99,6 @@ class Settings(BaseSettings):
             )
 
         tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS")
-
         for setting in dir(mod):
             if setting.isupper():
                 setting_value = getattr(mod, setting)
@@ -158,5 +157,6 @@ class UserSettingsHolder(BaseSettings):
 
     def __dir__(self):
         return list(self.__dict__) + dir(self.default_settings)
+
 
 settings = LazySettings()

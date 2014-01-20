@@ -140,6 +140,17 @@ Using a custom manager when traversing reverse relations
 It is now possible to :ref:`specify a custom manager
 <using-custom-reverse-manager>` when traversing a reverse relationship.
 
+New system check framework
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We've added a new :doc:`System check framework </ref/checks>` for
+detecting common problems (like invalid models) and providing hints for
+resolving those problems. The framework is extensible so you can add your
+own checks for your own apps and libraries.
+
+To perform system checks, you use the :djadmin:`check` management command.
+This command replaces the older :djadmin:`validate` management command.
+
 New ``Prefetch`` object for advanced ``prefetch_related`` operations.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -993,7 +1004,7 @@ considered a bug and has been addressed.
 ``syncdb``
 ~~~~~~~~~~
 
-The ``syncdb`` command has been deprecated in favour of the new ``migrate``
+The :djadmin:`syncdb` command has been deprecated in favor of the new :djadmin:`migrate`
 command. ``migrate`` takes the same arguments as ``syncdb`` used to plus a few
 more, so it's safe to just change the name you're calling and nothing else.
 
@@ -1103,3 +1114,32 @@ remove the setting from your configuration at your convenience.
 ``SplitDateTimeWidget`` support in :class:`~django.forms.DateTimeField` is
 deprecated, use ``SplitDateTimeWidget`` with
 :class:`~django.forms.SplitDateTimeField` instead.
+
+``validate``
+~~~~~~~~~~~~
+
+:djadmin:`validate` command is deprecated in favor of :djadmin:`check` command.
+
+``django.core.management.BaseCommand``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``requires_model_validation`` is deprecated in favor of a new
+``requires_system_checks`` flag. If the latter flag is missing, then the
+value of the former flag is used. Defining both ``requires_system_checks`` and
+``requires_model_validation`` results in an error.
+
+The ``check()`` method has replaced the old ``validate()`` method.
+
+``ModelAdmin.validator``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+``ModelAdmin.validator`` is deprecated in favor of new ``checks`` attribute.
+
+``django.db.backends.DatabaseValidation.validate_field``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This method is deprecated in favor of a new ``check_field`` method.
+The functionality required by ``check_field()`` is the same as that provided
+by ``validate_field()``, but the output format is different. Third-party database
+backends needing this functionality should modify their backends to provide an
+implementation of ``check_field()``.

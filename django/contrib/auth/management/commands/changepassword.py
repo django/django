@@ -15,7 +15,7 @@ class Command(BaseCommand):
     )
     help = "Change a user's password for django.contrib.auth."
 
-    requires_model_validation = False
+    requires_system_checks = False
 
     def _get_pass(self, prompt="Password: "):
         p = getpass.getpass(prompt=prompt)

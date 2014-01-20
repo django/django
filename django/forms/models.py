@@ -927,9 +927,13 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
             if not isinstance(fk, ForeignKey) or \
                     (fk.rel.to != parent_model and
                      fk.rel.to not in parent_model._meta.get_parent_list()):
-                raise Exception("fk_name '%s' is not a ForeignKey to %s" % (fk_name, parent_model))
+                raise ValueError(
+                    "fk_name '%s' is not a ForeignKey to '%s.%'."
+                    % (fk_name, parent_model._meta.app_label, parent_model._meta.object_name))
         elif len(fks_to_parent) == 0:
-            raise Exception("%s has no field named '%s'" % (model, fk_name))
+            raise ValueError(
+                "'%s.%s' has no field named '%s'."
+                % (model._meta.app_label, model._meta.object_name, fk_name))
     else:
         # Try to discover what the ForeignKey from model to parent_model is
         fks_to_parent = [
@@ -943,9 +947,13 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
         elif len(fks_to_parent) == 0:
             if can_fail:
                 return
-            raise Exception("%s has no ForeignKey to %s" % (model, parent_model))
+            raise ValueError(
+                "'%s.%s' has no ForeignKey to '%s.%s'."
+                % (model._meta.app_label, model._meta.object_name, parent_model._meta.app_label, parent_model._meta.object_name))
         else:
-            raise Exception("%s has more than 1 ForeignKey to %s" % (model, parent_model))
+            raise ValueError(
+                "'%s.%s' has more than one ForeignKey to '%s.%s'."
+                % (model._meta.app_label, model._meta.object_name, parent_model._meta.app_label, parent_model._meta.object_name))
     return fk
 
 

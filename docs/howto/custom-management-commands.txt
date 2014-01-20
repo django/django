@@ -227,7 +227,22 @@ All attributes can be set in your derived class and can be used in
   wrapped with ``BEGIN;`` and ``COMMIT;``. Default value is
   ``False``.
 
+.. attribute:: BaseCommand.requires_system_checks
+
+.. versionadded:: 1.7
+
+  A boolean; if ``True``, the entire Django project will be checked for
+  potential problems prior to executing the command. If
+  ``requires_system_checks`` is missing, the value of
+  ``requires_model_validation`` is used. If the latter flag is missing
+  as well, the default value (``True``) is used. Defining both
+  ``requires_system_checks`` and ``requires_model_validation`` will result
+  in an error.
+
 .. attribute:: BaseCommand.requires_model_validation
+
+.. deprecated:: 1.7
+    Replaced by ``requires_system_checks``
 
   A boolean; if ``True``, validation of installed models will be
   performed prior to executing the command. Default value is
@@ -299,12 +314,23 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
     The actual logic of the command. Subclasses must implement this method.
 
+.. method:: BaseCommand.check(app_configs=None, tags=None, display_num_errors=False)
+
+.. versionadded:: 1.7
+
+    Uses the system check framework to inspect the entire Django project for
+    potential problems. Serious problems are raised as a :class:`CommandError`;
+    warnings are output to stderr; minor notifications are output to stdout.
+
+    If ``apps`` and ``tags`` are both None, all system checks are performed.
+    ``tags`` can be a list of check tags, like ``compatibility`` or ``models``.
+
 .. method:: BaseCommand.validate(app=None, display_num_errors=False)
 
-    Validates the given app, raising :class:`CommandError` for any errors.
+.. deprecated:: 1.7
+    Replaced with the :djadmin:`check` command
 
-    If ``app`` is None, then all installed apps are validated.
-
+    If ``app`` is None, then all installed apps are checked for errors.
 
 .. _ref-basecommand-subclasses:
 

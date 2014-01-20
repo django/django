@@ -30,7 +30,7 @@ class Command(BaseCommand):
     help = ('Discover and run tests in the specified modules or the current directory.')
     args = '[path.to.modulename|path.to.modulename.TestCase|path.to.modulename.TestCase.test_method]...'
 
-    requires_model_validation = False
+    requires_system_checks = False
 
     def __init__(self):
         self.test_runner = None

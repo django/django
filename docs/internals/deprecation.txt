@@ -234,6 +234,16 @@ these changes.
 
 * Passing callable arguments to querysets will no longer be possible.
 
+* ``BaseCommand.requires_model_validation`` will be removed in favor of
+  ``requires_system_checks``. Admin validators will be replaced by admin
+  checks.
+
+* ``ModelAdmin.validator`` will be removed in favor of the new ``checks``
+  attribute.
+
+* ``django.db.backends.DatabaseValidation.validate_field`` will be removed in
+  favor of the ``check_field`` method.
+
 2.0
 ---
 
