@@ -1334,6 +1334,7 @@ class Query(object):
         """
         path, names_with_path = [], []
         for pos, name in enumerate(names):
+            cur_names_with_path = (name, [])
             if name == 'pk':
                 name = opts.pk.name
             try:
@@ -1359,19 +1360,22 @@ class Query(object):
                         targets = (final_field.rel.get_related_field(),)
                         opts = int_model._meta
                         path.append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
+                        cur_names_with_path[1].append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
             if hasattr(field, 'get_path_info'):
                 pathinfos = field.get_path_info()
                 if not allow_many:
                     for inner_pos, p in enumerate(pathinfos):
                         if p.m2m:
-                            names_with_path.append((name, pathinfos[0:inner_pos + 1]))
+                            cur_names_with_path[1].extend(pathinfos[0:inner_pos + 1])
+                            names_with_path.append(cur_names_with_path)
                             raise MultiJoin(pos + 1, names_with_path)
                 last = pathinfos[-1]
                 path.extend(pathinfos)
                 final_field = last.join_field
                 opts = last.to_opts
                 targets = last.target_fields
-                names_with_path.append((name, pathinfos))
+                cur_names_with_path[1].extend(pathinfos)
+                names_with_path.append(cur_names_with_path)
             else:
                 # Local non-relational field.
                 final_field = field
