@@ -181,14 +181,48 @@ class ConnectionHandler(object):
         conn.setdefault('TIME_ZONE', 'UTC' if settings.USE_TZ else settings.TIME_ZONE)
         for setting in ['NAME', 'USER', 'PASSWORD', 'HOST', 'PORT']:
             conn.setdefault(setting, '')
-        for setting in ['TEST_CHARSET', 'TEST_COLLATION', 'TEST_NAME', 'TEST_MIRROR']:
-            conn.setdefault(setting, None)
+
+    TEST_SETTING_RENAMES = {
+        'CREATE': 'CREATE_DB',
+        'USER_CREATE': 'CREATE_USER',
+        'PASSWD': 'PASSWORD',
+    }
+
+    def prepare_test_settings(self, alias):
+        """
+        Makes sure the test settings are available in the 'TEST' sub-dictionary.
+        """
+        try:
+            conn = self.databases[alias]
+        except KeyError:
+            raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
+
+        test_settings = conn.setdefault('TEST', {})
+        for key, value in six.iteritems(conn):
+            if key.startswith('TEST_'):
+                new_key = key[5:]
+                new_key = self.TEST_SETTING_RENAMES.get(new_key, new_key)
+                if new_key in test_settings:
+                    raise ImproperlyConfigured("Connection %s has both %s and TEST[%s] specified." %
+                                               (alias, key, new_key))
+                warnings.warn("In Django 1.9 the %s connection setting will be moved "
+                              "to a %s entry in the TEST setting" % (key, new_key),
+                              RemovedInDjango19Warning, stacklevel=2)
+                test_settings[new_key] = value
+        # Check that they didn't just use the old name with 'TEST_' removed
+        for key, new_key in six.iteritems(self.TEST_SETTING_RENAMES):
+            if key in test_settings:
+                warnings.warn("Test setting %s was renamed to %s; specified value (%s) ignored" %
+                              (key, new_key, test_settings[key]), stacklevel=2)
+        for key in ['CHARSET', 'COLLATION', 'NAME', 'MIRROR']:
+            test_settings.setdefault(key, None)
 
     def __getitem__(self, alias):
         if hasattr(self._connections, alias):
             return getattr(self._connections, alias)
 
         self.ensure_defaults(alias)
+        self.prepare_test_settings(alias)
         db = self.databases[alias]
         backend = load_backend(db['ENGINE'])
         conn = backend.DatabaseWrapper(db, alias)

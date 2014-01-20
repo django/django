@@ -121,6 +121,9 @@ details on these changes.
 
 * ``django.utils.text.javascript_quote`` will be removed.
 
+* Database test settings as independent entries in the database settings,
+  prefixed by ``TEST_``, will no longer be supported.
+
 .. _deprecation-removed-in-1.8:
 
 1.8

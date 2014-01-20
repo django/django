@@ -391,8 +391,8 @@ class BaseDatabaseCreation(object):
         _create_test_db() and when no external munging is done with the 'NAME'
         or 'TEST_NAME' settings.
         """
-        if self.connection.settings_dict['TEST_NAME']:
-            return self.connection.settings_dict['TEST_NAME']
+        if self.connection.settings_dict['TEST']['NAME']:
+            return self.connection.settings_dict['TEST']['NAME']
         return TEST_DATABASE_PREFIX + self.connection.settings_dict['NAME']
 
     def _create_test_db(self, verbosity, autoclobber):
