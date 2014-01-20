@@ -238,23 +238,9 @@ class FileField(Field):
 
     def check(self, **kwargs):
         errors = super(FileField, self).check(**kwargs)
-        #errors.extend(self._check_upload_to())
         errors.extend(self._check_unique())
         errors.extend(self._check_primary_key())
         return errors
-
-    def _check_upload_to(self):
-        if not self.upload_to:
-            return [
-                checks.Error(
-                    'The field requires an "upload_to" attribute.',
-                    hint=None,
-                    obj=self,
-                    id='E031',
-                )
-            ]
-        else:
-            return []
 
     def _check_unique(self):
         if self._unique_set_explicitly:

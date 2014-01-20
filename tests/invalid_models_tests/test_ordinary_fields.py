@@ -302,22 +302,6 @@ class FileFieldTests(IsolatedModelsTestCase):
         expected = []
         self.assertEqual(errors, expected)
 
-    # def test_missing_upload_to(self):
-    #     class Model(models.Model):
-    #         field = models.FileField()
-
-    #     field = Model._meta.get_field('field')
-    #     errors = field.check()
-    #     expected = [
-    #         Error(
-    #             'The field requires an "upload_to" attribute.',
-    #             hint=None,
-    #             obj=field,
-    #             id='E031',
-    #         ),
-    #     ]
-    #     self.assertEqual(errors, expected)
-
     def test_unique(self):
         class Model(models.Model):
             field = models.FileField(unique=False, upload_to='somewhere')
