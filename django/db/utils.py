@@ -7,7 +7,7 @@ import warnings
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import cached_property
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 from django.utils._os import upath
 from django.utils import six
 
@@ -221,7 +221,7 @@ class ConnectionRouter(object):
         routers = []
         for r in self._routers:
             if isinstance(r, six.string_types):
-                router = import_by_path(r)()
+                router = import_string(r)()
             else:
                 router = r
             routers.append(router)

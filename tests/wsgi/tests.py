@@ -101,6 +101,6 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
     def test_bad_name(self):
         with six.assertRaisesRegex(self,
                 ImproperlyConfigured,
-                r"^WSGI application 'wsgi.wsgi.noexist' could not be loaded; Module.*"):
+                r"^WSGI application 'wsgi.wsgi.noexist' could not be loaded; Error importing.*"):
 
             get_internal_wsgi_application()

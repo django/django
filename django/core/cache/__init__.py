@@ -20,7 +20,7 @@ from django.core import signals
 from django.core.cache.backends.base import (
     InvalidCacheBackendError, CacheKeyWarning, BaseCache)
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 
 
 __all__ = [
@@ -69,8 +69,8 @@ def _create_cache(backend, **kwargs):
         except KeyError:
             try:
                 # Trying to import the given backend, in case it's a dotted path
-                import_by_path(backend)
-            except ImproperlyConfigured as e:
+                import_string(backend)
+            except ImportError as e:
                 raise InvalidCacheBackendError("Could not find backend '%s': %s" % (
                     backend, e))
             location = kwargs.pop('LOCATION', '')
@@ -80,8 +80,8 @@ def _create_cache(backend, **kwargs):
             params.update(kwargs)
             backend = params.pop('BACKEND')
             location = params.pop('LOCATION', '')
-        backend_cls = import_by_path(backend)
-    except (AttributeError, ImportError, ImproperlyConfigured) as e:
+        backend_cls = import_string(backend)
+    except ImportError as e:
         raise InvalidCacheBackendError(
             "Could not find backend '%s': %s" % (backend, e))
     return backend_cls(location, params)

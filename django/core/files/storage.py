@@ -9,7 +9,7 @@ from django.core.files import locks, File
 from django.core.files.move import file_move_safe
 from django.utils.encoding import force_text, filepath_to_uri
 from django.utils.functional import LazyObject
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.text import get_valid_filename
 from django.utils._os import safe_join, abspathu
@@ -301,7 +301,7 @@ class FileSystemStorage(Storage):
 
 
 def get_storage_class(import_path=None):
-    return import_by_path(import_path or settings.DEFAULT_FILE_STORAGE)
+    return import_string(import_path or settings.DEFAULT_FILE_STORAGE)
 
 
 class DefaultStorage(LazyObject):
