@@ -43,7 +43,7 @@ class TestFilenameGenerator(TestCase):
         finally:
             os.chdir(old_cwd)
 
-    @override_settings(INSTALLED_APPS=['django.contrib.admin'])
+    @override_settings(INSTALLED_APPS=['django.contrib.admin.apps.AdminConfig'])
     def test_app_locales(self):
         """
         Test that gen_filenames also yields from locale dirs in installed apps.
