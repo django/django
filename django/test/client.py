@@ -10,7 +10,6 @@ from io import BytesIO
 
 from django.apps import apps
 from django.conf import settings
-from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import (request_started, request_finished,
@@ -548,6 +547,7 @@ class Client(RequestFactory):
         are incorrect, or the user is inactive, or if the sessions framework is
         not available.
         """
+        from django.contrib.auth import authenticate, login
         user = authenticate(**credentials)
         if (user and user.is_active and
                 apps.is_installed('django.contrib.sessions')):
@@ -587,6 +587,7 @@ class Client(RequestFactory):
 
         Causes the authenticated user to be logged out.
         """
+        from django.contrib.auth import get_user_model, logout
         # Create a fake request that goes through request middleware
         request = self.request().wsgi_request
 
