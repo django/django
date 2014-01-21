@@ -12,23 +12,21 @@ class DatabaseValidation(BaseDatabaseValidation):
         from django.db import connection
 
         errors = super(DatabaseValidation, self).check_field(field, **kwargs)
-        try:
-            field_type = field.db_type(connection)
-        except AttributeError:
-            # If the field is a relative field and the target model is
-            # missing, then field.rel.to is not a model and doesn't have
-            # `_meta` attribute.
-            field_type = ''
 
-        if (field_type.startswith('varchar') and field.unique
-                and (field.max_length is None or int(field.max_length) > 255)):
-            errors.append(
-                checks.Error(
-                    ('Under mysql backend, the field cannot have a "max_length" '
-                     'greated than 255 when it is unique.'),
-                    hint=None,
-                    obj=field,
-                    id='E047',
+        # Ignore any related fields.
+        if getattr(field, 'rel', None) is None:
+            field_type = field.db_type(connection)
+
+            if (field_type.startswith('varchar')  # Look for CharFields...
+                    and field.unique  # ... that are unique
+                    and (field.max_length is None or int(field.max_length) > 255)):
+                errors.append(
+                    checks.Error(
+                        ('Under mysql backend, the field cannot have a "max_length" '
+                         'greated than 255 when it is unique.'),
+                        hint=None,
+                        obj=field,
+                        id='E047',
+                    )
                 )
-            )
         return errors
