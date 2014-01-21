@@ -185,7 +185,7 @@ skip_selenium = not os.environ.get('DJANGO_SELENIUM_TESTS', False)
 class JavascriptI18nTests(LiveServerTestCase):
 
     # The test cases use translations from these apps.
-    available_apps = ['django.contrib.admin.apps.AdminConfig', 'view_tests']
+    available_apps = ['django.contrib.admin', 'view_tests']
     urls = 'view_tests.urls'
 
     @classmethod

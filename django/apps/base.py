@@ -1,5 +1,4 @@
 from importlib import import_module
-import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import module_has_submodule
@@ -73,16 +72,6 @@ class AppConfig(object):
 
         if module is not None:
             if hasattr(module, 'default_app_config'):
-                warnings.warn(
-                    'App %s now requires the use of an AppConfig. '
-                    'It has been configured using %s. '
-                    'You should replace %s in your INSTALLED_APPS with %s. ' % (
-                        module.__name__,
-                        module.default_app_config,
-                        module.__name__,
-                        module.default_app_config,
-                    ),
-                    PendingDeprecationWarning, stacklevel=2)
                 entry = module.default_app_config
             else:
                 # Entry is a path to an app module, use the default config
