@@ -156,10 +156,14 @@ class NestedObjects(Collector):
     def add_edge(self, source, target):
         self.edges.setdefault(source, []).append(target)
 
-    def collect(self, objs, source_attr=None, **kwargs):
+    def collect(self, objs, source=None, source_attr=None, **kwargs):
         for obj in objs:
             if source_attr:
-                self.add_edge(getattr(obj, source_attr), obj)
+                related_name = source_attr % {
+                    'class': source._meta.model_name,
+                    'app_label': source._meta.app_label,
+                }
+                self.add_edge(getattr(obj, related_name), obj)
             else:
                 self.add_edge(None, obj)
         try:
