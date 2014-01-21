@@ -47,3 +47,18 @@ class Guest(models.Model):
 
 class EventGuide(models.Model):
     event = models.ForeignKey(Event, on_delete=models.DO_NOTHING)
+
+
+class Vehicle(models.Model):
+    pass
+
+
+class VehicleMixin(Vehicle):
+    vehicle = models.OneToOneField(Vehicle, parent_link=True, related_name='vehicle_%(app_label)s_%(class)s')
+
+    class Meta:
+        abstract = True
+
+
+class Car(VehicleMixin):
+    pass

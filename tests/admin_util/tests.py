@@ -16,7 +16,7 @@ from django.utils.formats import localize
 from django.utils.safestring import mark_safe
 from django.utils import six
 
-from .models import Article, Count, Event, Location, EventGuide
+from .models import Article, Count, Event, Location, EventGuide, Vehicle, Car
 
 
 class NestedObjectsTests(TestCase):
@@ -79,6 +79,16 @@ class NestedObjectsTests(TestCase):
         with self.assertNumQueries(2):
             # One for Location, one for Guest, and no query for EventGuide
             n.collect(objs)
+
+    def test_relation_on_abstract(self):
+        """
+        #21846 -- Check that `NestedObjects.collect()` doesn't trip
+        (AttributeError) on the special notation for relations on abstract
+        models (related_name that contains %(app_label)s and/or %(class)s).
+        """
+        n = NestedObjects(using=DEFAULT_DB_ALIAS)
+        Car.objects.create()
+        n.collect([Vehicle.objects.first()])
 
 
 class UtilTests(SimpleTestCase):
