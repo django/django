@@ -16,8 +16,7 @@ class AdminConfig(AppConfig):
         self.module.autodiscover()
 
     def install_checks(self):
-        if not checks.tag_exists('admin'):
-            checks.register('admin')(check_admin_app)
+        checks.register('admin')(check_admin_app)
 
 
 class PlainAdminConfig(AdminConfig):

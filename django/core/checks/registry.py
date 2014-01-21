@@ -29,7 +29,8 @@ class CheckRegistry(object):
 
         def inner(check):
             check.tags = tags
-            self.registered_checks.append(check)
+            if check not in self.registered_checks:
+                self.registered_checks.append(check)
             return check
 
         return inner
