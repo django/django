@@ -44,7 +44,7 @@ setup(
     packages=find_packages(exclude=EXCLUDE_FROM_PACKAGES),
     include_package_data=True,
     entry_points={'console_scripts': [
-        'django-admin = django.core.management:execute_from_command_line',
+        'django-admin.py = django.core.management:execute_from_command_line',
     ]},
     zip_safe=False,
     classifiers=[
