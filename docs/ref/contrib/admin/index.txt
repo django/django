@@ -23,12 +23,7 @@ The admin is enabled in the default project template used by
 
 For reference, here are the requirements:
 
-1. Add ``'django.contrib.admin.apps.AdminConfig'`` to your
-   :setting:`INSTALLED_APPS` setting.
-
-   .. versionchanged:: 1.7
-
-       :setting:`INSTALLED_APPS` used to contain ``'django.contrib.admin'``.
+1. Add ``'django.contrib.admin'`` to your :setting:`INSTALLED_APPS` setting.
 
 2. The admin has four dependencies - :mod:`django.contrib.auth`,
    :mod:`django.contrib.contenttypes`,
@@ -137,8 +132,8 @@ Discovery of admin files
 ------------------------
 
 The admin needs to be instructed to look for ``admin.py`` files in your project.
-The easiest solution is to put ``'django.contrib.admin.apps.AdminConfig'`` in
-your :setting:`INSTALLED_APPS` setting.
+By default, this happens automatically when you put
+``'django.contrib.admin'`` in your :setting:`INSTALLED_APPS` setting.
 
 .. class:: apps.AdminConfig
 
@@ -146,6 +141,14 @@ your :setting:`INSTALLED_APPS` setting.
 
     This class calls :func:`~django.contrib.admin.autodiscover()` when Django
     starts.
+
+.. class:: apps.PlainAdminConfig
+
+    .. versionadded:: 1.7
+
+    This class performs other work done by `AdminConfig`, such as registering
+    checks and providing a translatable verbose name, but does not call
+    ``autodiscover()``.
 
 .. function:: autodiscover
 
@@ -160,7 +163,8 @@ your :setting:`INSTALLED_APPS` setting.
 
 If you are using a custom ``AdminSite``, it is common to import all of the
 ``ModelAdmin`` subclasses into your code and register them to the custom
-``AdminSite``. In that case, simply put ``'django.contrib.admin'`` in your
+``AdminSite``. In that case, put
+``'django.contrib.admin.apps.PlainAdminConfig'`` in your
 :setting:`INSTALLED_APPS` setting, as you don't need autodiscovery.
 
 ``ModelAdmin`` options

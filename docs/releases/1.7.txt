@@ -95,10 +95,11 @@ Improvements thus far include:
 
 * The admin has an :class:`~django.contrib.admin.apps.AdminConfig` application
   configuration class. When Django starts, this class takes care of calling
-  :func:`~django.contrib.admin.autodiscover()`. To use it, simply replace
-  ``'django.contrib.admin'`` in :setting:`INSTALLED_APPS` with
-  ``'django.contrib.admin.apps.AdminConfig'`` and remove
-  ``admin.autodiscover()`` from your URLconf.
+  :func:`~django.contrib.admin.autodiscover()`. You can consequently remove the
+  line from your ``urls.py``. If you do not wish to use the ``autodiscover()``
+  behaviour, simply, simply replace ``'django.contrib.admin'`` in
+  :setting:`INSTALLED_APPS` with
+  :class:`django.contrib.admin.apps.PlainAdminConfig`.
 
 New method on Field subclasses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -697,6 +698,11 @@ regressions cannot be ruled out. You may encounter the following exceptions:
   executing code at import time, you can move it into a function and cache its
   results. The code will be executed when you first need its results. This
   concept is known as "lazy evaluation".
+
+* ``django.contrib.admin`` will now automatically perform autodiscovery if you
+  do not specifically set your :setting:`INSTALLED_APPS` to contain
+  :class:`django.contrib.admin.apps.PlainAdminConfig` instead of
+  ``django.contrib.admin``.
 
 Standalone scripts
 ^^^^^^^^^^^^^^^^^^
