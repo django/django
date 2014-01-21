@@ -2430,11 +2430,11 @@ In this example, we register the ``AdminSite`` instance
         (r'^myadmin/', include(admin_site.urls)),
     )
 
-Note that you don't need autodiscovery of ``admin`` modules when using your
+Note that you don't want autodiscovery of ``admin`` modules when using your
 own ``AdminSite`` instance since you will likely be importing all the per-app
-``admin`` modules in your ``myproject.admin`` module. This means you likely do
-not need ``'django.contrib.admin.app.AdminConfig'`` in your
-:setting:`INSTALLED_APPS` and can just use ``'django.contrib.admin'``.
+``admin`` modules in your ``myproject.admin`` module. This means you need to
+change your :setting:`INSTALLED_APPS` to
+``'django.contrib.admin.app.PlainAdminConfig'``.
 
 Multiple admin sites in the same URLconf
 ----------------------------------------
