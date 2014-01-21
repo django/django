@@ -1333,6 +1333,9 @@ class Model(six.with_metaclass(ModelBase)):
                 )
         return errors
 
+    def get_again(self):
+        return self.__class__.objects.get(pk=self.pk)
+
 
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #
