@@ -43,8 +43,9 @@ setup(
     license='BSD',
     packages=find_packages(exclude=EXCLUDE_FROM_PACKAGES),
     include_package_data=True,
+    scripts=['django/bin/django-admin.py'],
     entry_points={'console_scripts': [
-        'django-admin.py = django.core.management:execute_from_command_line',
+        'django-admin = django.core.management:execute_from_command_line',
     ]},
     zip_safe=False,
     classifiers=[
