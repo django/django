@@ -144,16 +144,3 @@ class AllowsNullGFK(models.Model):
     content_type = models.ForeignKey(ContentType, null=True)
     object_id = models.PositiveIntegerField(null=True)
     content_object = generic.GenericForeignKey()
-
-
-# Used by test of fix for #19774, name 'Site' of the second model is important:
-class GenericAtom(models.Model):
-    name = models.CharField(max_length=20)
-    content_type = models.ForeignKey(ContentType)
-    object_id = models.PositiveIntegerField()
-
-    content_object = generic.GenericForeignKey()
-
-
-class Site(models.Model):
-    name = models.CharField(max_length=20)

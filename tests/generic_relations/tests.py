@@ -3,15 +3,13 @@ from __future__ import unicode_literals
 from django import forms
 from django.contrib.contenttypes.generic import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import get_models
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.utils import six
 
 from .models import (TaggedItem, ValuableTaggedItem, Comparison, Animal,
                      Vegetable, Mineral, Gecko, Rock, ManualPK,
                      ForProxyModelModel, ForConcreteModelModel,
                      ProxyRelatedModel, ConcreteRelatedModel, AllowsNullGFK)
-                     #GenericAtom)
 
 
 class GenericRelationsTests(TestCase):
@@ -458,13 +456,3 @@ class TestInitWithNoneArgument(TestCase):
         # AllowsNullGFK doesn't require a content_type, so None argument should
         # also be allowed.
         AllowsNullGFK(content_object=None)
-
-
-# TODO: Work in progress
-@override_settings(INSTALLED_APPS=['django.contrib.contenttypes'])
-class SeparateGenericModelAndAdmin(TestCase):
-    def test_users_site_model_isnt_masked_by_djangos(self):
-        """Using GFKs doesn't pollute user's Site model."""
-        from .models import GenericAtom
-        model_classes = ['%s.%s' % (m.__module__, m.__name__) for m in get_models()]
-        self.assertNotIn('django.contrib.sites.models.Site', model_classes)
