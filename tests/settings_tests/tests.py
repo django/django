@@ -1,8 +1,10 @@
 import os
+import sys
+from types import ModuleType
 import unittest
 import warnings
 
-from django.conf import settings
+from django.conf import LazySettings, Settings, settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.test import (SimpleTestCase, TransactionTestCase, TestCase,
@@ -404,3 +406,31 @@ class SecureProxySslHeaderTest(TestCase):
         req = HttpRequest()
         req.META['HTTP_X_FORWARDED_PROTOCOL'] = 'https'
         self.assertEqual(req.is_secure(), True)
+
+
+
+class IsOverriddenTest(TestCase):
+    def test_configure(self):
+        s = LazySettings()
+        s.configure(SECRET_KEY='foo')
+
+        self.assertTrue(s.is_overridden('SECRET_KEY'))
+
+
+    def test_module(self):
+        settings_module = ModuleType('fake_settings_module')
+        settings_module.SECRET_KEY = 'foo'
+        sys.modules['fake_settings_module'] = settings_module
+        try:
+            s = Settings('fake_settings_module')
+
+            self.assertTrue(s.is_overridden('SECRET_KEY'))
+            self.assertFalse(s.is_overridden('TEMPLATE_LOADERS'))
+        finally:
+            del sys.modules['fake_settings_module']
+
+
+    def test_override(self):
+        self.assertFalse(settings.is_overridden('TEMPLATE_LOADERS'))
+        with override_settings(TEMPLATE_LOADERS=[]):
+            self.assertTrue(settings.is_overridden('TEMPLATE_LOADERS'))

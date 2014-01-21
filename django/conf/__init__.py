@@ -108,7 +108,6 @@ class Settings(BaseSettings):
                         isinstance(setting_value, six.string_types)):
                     raise ImproperlyConfigured("The %s setting must be a tuple. "
                             "Please fix your settings." % setting)
-
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
@@ -164,9 +163,9 @@ class UserSettingsHolder(BaseSettings):
         return list(self.__dict__) + dir(self.default_settings)
 
     def is_overridden(self, setting):
-        if setting in self._deleted:
-            return False
-        else:
-            return self.default_settings.is_overridden(setting)
+        deleted = (setting in self._deleted)
+        set_locally = (setting in self.__dict__)
+        set_on_default = getattr(self.default_settings, 'is_overridden', lambda s: False)(setting)
+        return (deleted or set_locally or set_on_default)
 
 settings = LazySettings()
