@@ -1,4 +1,5 @@
 from __future__ import absolute_import, unicode_literals
+import warnings
 
 from django.apps import apps
 from django.apps.registry import Apps
@@ -7,6 +8,7 @@ from django.db import models
 from django.test import TestCase, override_settings
 from django.utils import six
 
+from .default_config_app.apps import CustomConfig
 from .models import TotallyNormal, SoAlternative, new_apps
 
 
@@ -81,6 +83,13 @@ class AppsTests(TestCase):
         with self.assertRaises(ImportError):
             with self.settings(INSTALLED_APPS=['apps.apps.NoSuchConfig']):
                 pass
+
+    def test_default_app_config(self):
+        with warnings.catch_warnings(record=True) as w:
+            with self.settings(INSTALLED_APPS=['apps.default_config_app']):
+                config = apps.get_app_config('default_config_app')
+            self.assertIsInstance(config, CustomConfig)
+            self.assertTrue(issubclass(w[0].category, PendingDeprecationWarning))
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_app_configs(self):
