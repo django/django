@@ -78,6 +78,14 @@ to determine which application this configuration applies to. You can define
 any attributes documented in the :class:`~django.apps.AppConfig` API
 reference.
 
+.. note::
+
+    It is recommended to tell users to add the full path to the ``AppConfig``
+    subclass. However, it is possible to force a particular default
+    ``AppConfig`` subclass by setting a variable ``default_app_config`` in the
+    ``__init__.py`` to be a string representing a dotted path to the
+    ``AppConfig`` subclass.
+
 For application users
 ---------------------
 
