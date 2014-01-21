@@ -94,9 +94,12 @@ class Django_1_6_0_CompatibilityChecks(TestCase):
         self.assertEqual(errors, [])
 
     def test_test_runner_not_set_explicitly(self):
+        # If TEST_RUNNER was set explicitly, temporarily pretend it wasn't
+        test_runner_overridden = False
+        if 'TEST_RUNNER' in settings._wrapped._explicit_settings:
+            test_runner_overridden = True
+            settings._wrapped._explicit_settings.remove('TEST_RUNNER')
         # We remove some settings to make this look like a project generated under Django 1.5.
-        old_test_runner = settings._wrapped.TEST_RUNNER
-        del settings._wrapped.TEST_RUNNER
         settings._wrapped._explicit_settings.add('MANAGERS')
         settings._wrapped._explicit_settings.add('ADMINS')
         try:
@@ -116,7 +119,8 @@ class Django_1_6_0_CompatibilityChecks(TestCase):
             self.assertEqual(errors, expected)
         finally:
             # Restore settings value
-            settings._wrapped.TEST_RUNNER = old_test_runner
+            if test_runner_overridden:
+                settings._wrapped._explicit_settings.add('TEST_RUNNER')
             settings._wrapped._explicit_settings.remove('MANAGERS')
             settings._wrapped._explicit_settings.remove('ADMINS')
 
