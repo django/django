@@ -3,6 +3,8 @@ from __future__ import unicode_literals, absolute_import
 from functools import partial
 
 from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
+from django.forms import ALL_FIELDS
+from django.forms.models import modelform_defines_fields
 
 from .generic import BaseGenericInlineFormSet, generic_inlineformset_factory
 
@@ -13,10 +15,10 @@ class GenericInlineModelAdmin(InlineModelAdmin):
     formset = BaseGenericInlineFormSet
 
     def get_formset(self, request, obj=None, **kwargs):
-        if self.declared_fieldsets:
-            fields = flatten_fieldsets(self.declared_fieldsets)
+        if 'fields' in kwargs:
+            fields = kwargs.pop('fields')
         else:
-            fields = None
+            fields = flatten_fieldsets(self.get_fieldsets(request, obj))
         if self.exclude is None:
             exclude = []
         else:
@@ -42,6 +44,10 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             "exclude": exclude
         }
         defaults.update(kwargs)
+
+        if defaults['fields'] is None and not modelform_defines_fields(defaults['form']):
+            defaults['fields'] = ALL_FIELDS
+
         return generic_inlineformset_factory(self.model, **defaults)
 
 
