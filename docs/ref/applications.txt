@@ -80,11 +80,9 @@ reference.
 
 .. note::
 
-    It is recommended to tell users to add the full path to the ``AppConfig``
-    subclass. However, it is possible to ensure a particular default
-    ``AppConfig`` subclass by setting a variable ``default_app_config`` in the
-    ``__init__.py`` to be a string representing a dotted path to the
-    ``AppConfig`` subclass.
+    It is possible to ensure a particular default ``AppConfig`` subclass by
+    setting a variable ``default_app_config`` in the ``__init__.py`` to be a
+    string representing a dotted path to the ``AppConfig`` subclass.
 
 For application users
 ---------------------
