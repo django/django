@@ -37,7 +37,7 @@ SUBDIRS_TO_SKIP = [
 
 ALWAYS_INSTALLED_APPS = [
     'django.contrib.contenttypes',
-    'django.contrib.auth',
+    'django.contrib.auth.apps.AuthConfig',
     'django.contrib.sites',
     'django.contrib.flatpages',
     'django.contrib.redirects',

@@ -67,9 +67,8 @@ Creating superusers
 -------------------
 
 :djadmin:`manage.py migrate <migrate>` prompts you to create a superuser the
-first time you run it with ``'django.contrib.auth'`` in your
-:setting:`INSTALLED_APPS`. If you need to create a superuser at a later date,
-you can use a command line utility::
+first time you run it with ``'django.contrib.auth'`` installed. If you need to
+create a superuser at a later date, you can use a command line utility::
 
     $ python manage.py createsuperuser --username=joe --email=joe@example.com
 
