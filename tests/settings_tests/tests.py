@@ -408,14 +408,12 @@ class SecureProxySslHeaderTest(TestCase):
         self.assertEqual(req.is_secure(), True)
 
 
-
 class IsOverriddenTest(TestCase):
     def test_configure(self):
         s = LazySettings()
         s.configure(SECRET_KEY='foo')
 
         self.assertTrue(s.is_overridden('SECRET_KEY'))
-
 
     def test_module(self):
         settings_module = ModuleType('fake_settings_module')
@@ -428,7 +426,6 @@ class IsOverriddenTest(TestCase):
             self.assertFalse(s.is_overridden('TEMPLATE_LOADERS'))
         finally:
             del sys.modules['fake_settings_module']
-
 
     def test_override(self):
         self.assertFalse(settings.is_overridden('TEMPLATE_LOADERS'))
