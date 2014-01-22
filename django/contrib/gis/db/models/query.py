@@ -646,7 +646,7 @@ class GeoQuerySet(QuerySet):
             # been transformed via the `transform` GeoQuerySet method.
             if self.query.transformed_srid:
                 u, unit_name, s = get_srid_info(self.query.transformed_srid, connection)
-                geodetic = unit_name in geo_field.geodetic_units
+                geodetic = unit_name.lower() in geo_field.geodetic_units
 
             if backend.spatialite and geodetic:
                 raise ValueError('SQLite does not support linear distance calculations on geodetic coordinate systems.')
