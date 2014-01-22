@@ -117,7 +117,7 @@ your function. Example:
 Registering custom filters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: django.template.Library.filter
+.. method:: django.template.Library.filter()
 
 Once you've written your filter definition, you need to register it with
 your ``Library`` instance, to make it available to Django's template language:
@@ -156,7 +156,7 @@ are described in :ref:`filters and auto-escaping <filters-auto-escaping>` and
 Template filters that expect strings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: django.template.defaultfilters.stringfilter
+.. method:: django.template.defaultfilters.stringfilter()
 
 If you're writing a template filter that only expects a string as the first
 argument, you should use the decorator ``stringfilter``. This will
@@ -733,7 +733,7 @@ cannot resolve the string passed to it in the current context of the page.
 Simple tags
 ~~~~~~~~~~~
 
-.. method:: django.template.Library.simple_tag
+.. method:: django.template.Library.simple_tag()
 
 Many template tags take a number of arguments -- strings or template variables
 -- and return a string after doing some processing based solely on

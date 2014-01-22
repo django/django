@@ -210,7 +210,7 @@ models with an instance of the subclass.
     :func:`moderator.unregister` methods detailed above, the following methods
     on :class:`Moderator` can be overridden to achieve customized behavior:
 
-    .. method:: connect
+    .. method:: connect()
 
         Determines how moderation is set up globally. The base
         implementation in

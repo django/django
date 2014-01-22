@@ -1365,7 +1365,7 @@ If ``multi_db=True``, fixtures are loaded into all databases.
 Overriding settings
 ~~~~~~~~~~~~~~~~~~~
 
-.. method:: TestCase.settings
+.. method:: TestCase.settings()
 
 .. versionadded:: 1.4
 

@@ -110,7 +110,7 @@ default templates.
 Advanced ``FormPreview`` methods
 ================================
 
-.. method:: FormPreview.process_preview
+.. method:: FormPreview.process_preview()
 
     Given a validated form, performs any extra processing before displaying the
     preview page, and saves any extra data in context.

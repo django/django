@@ -106,7 +106,7 @@ Methods
 
     Override this method in order to customize template rendering.
 
-.. method:: SimpleTemplateResponse.add_post_render_callback
+.. method:: SimpleTemplateResponse.add_post_render_callback()
 
     Add a callback that will be invoked after rendering has taken
     place. This hook can be used to defer certain processing

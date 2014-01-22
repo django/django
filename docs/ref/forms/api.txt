@@ -324,7 +324,7 @@ a form object, and each rendering method returns a Unicode object.
 ``as_p()``
 ~~~~~~~~~~
 
-.. method:: Form.as_p
+.. method:: Form.as_p()
 
     ``as_p()`` renders the form as a series of ``<p>`` tags, with each ``<p>``
     containing one field::
@@ -341,7 +341,7 @@ a form object, and each rendering method returns a Unicode object.
 ``as_ul()``
 ~~~~~~~~~~~
 
-.. method:: Form.as_ul
+.. method:: Form.as_ul()
 
     ``as_ul()`` renders the form as a series of ``<li>`` tags, with each
     ``<li>`` containing one field. It does *not* include the ``<ul>`` or
@@ -360,7 +360,7 @@ a form object, and each rendering method returns a Unicode object.
 ``as_table()``
 ~~~~~~~~~~~~~~
 
-.. method:: Form.as_table
+.. method:: Form.as_table()
 
     Finally, ``as_table()`` outputs the form as an HTML ``<table>``. This is
     exactly the same as ``print``. In fact, when you ``print`` a form object,
@@ -752,7 +752,7 @@ form data *and* file data::
 Testing for multipart forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Form.is_multipart
+.. method:: Form.is_multipart()
 
 If you're writing reusable views or templates, you may not know ahead of time
 whether your form is a multipart form or not. The ``is_multipart()`` method
