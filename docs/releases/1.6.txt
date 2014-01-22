@@ -904,8 +904,8 @@ Miscellaneous
   from a method when rendering a template, it is not silenced. For example,
   ``{{ obj.view_href }}`` will cause template rendering to fail if
   ``view_href()`` raises ``NoReverseMatch``. There is no change to the
-  ``{% url %}`` tag, it causes template rendering to fail like always when
-  ``NoReverseMatch`` is raised.
+  :ttag:`{% url %}<url>` tag, it causes template rendering to fail like always
+  when ``NoReverseMatch`` is raised.
 
 * :meth:`django.test.Client.logout` now calls
   :meth:`django.contrib.auth.logout` which will send the
