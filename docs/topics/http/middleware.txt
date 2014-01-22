@@ -85,7 +85,7 @@ Python class that defines one or more of the following methods:
 ``process_request``
 -------------------
 
-.. method:: process_request(self, request)
+.. method:: process_request(request)
 
 ``request`` is an :class:`~django.http.HttpRequest` object.
 
@@ -106,7 +106,7 @@ return the result.
 ``process_view``
 ----------------
 
-.. method:: process_view(self, request, view_func, view_args, view_kwargs)
+.. method:: process_view(request, view_func, view_args, view_kwargs)
 
 ``request`` is an :class:`~django.http.HttpRequest` object. ``view_func`` is
 the Python function that Django is about to use. (It's the actual function
@@ -146,7 +146,7 @@ view; it'll apply response middleware to that
 ``process_template_response``
 -----------------------------
 
-.. method:: process_template_response(self, request, response)
+.. method:: process_template_response(request, response)
 
 ``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is
 the :class:`~django.template.response.TemplateResponse` object (or equivalent)
@@ -173,7 +173,7 @@ includes ``process_template_response()``.
 ``process_response``
 --------------------
 
-.. method:: process_response(self, request, response)
+.. method:: process_response(request, response)
 
 ``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is
 the :class:`~django.http.HttpResponse` or
@@ -235,7 +235,7 @@ must test for streaming responses and adjust their behavior accordingly::
 ``process_exception``
 ---------------------
 
-.. method:: process_exception(self, request, exception)
+.. method:: process_exception(request, exception)
 
 ``request`` is an :class:`~django.http.HttpRequest` object. ``exception`` is an
 ``Exception`` object raised by the view function.

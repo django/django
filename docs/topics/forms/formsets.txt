@@ -166,7 +166,7 @@ the expected error message appears for the second item.
 
 .. currentmodule:: django.forms.formsets.BaseFormSet
 
-.. method:: total_error_count(self)
+.. method:: total_error_count()
 
 .. versionadded:: 1.6
 
