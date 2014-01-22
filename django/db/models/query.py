@@ -7,6 +7,7 @@ import itertools
 import sys
 
 from django.conf import settings
+from django.core import exceptions
 from django.core.exceptions import UnpickleException
 from django.db import connections, router, transaction, IntegrityError
 from django.db.models.constants import LOOKUP_SEP
