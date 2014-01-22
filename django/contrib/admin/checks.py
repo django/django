@@ -744,10 +744,10 @@ class ModelAdminChecks(BaseModelAdminChecks):
         if not isinstance(cls.list_editable, (list, tuple)):
             return must_be('a list or tuple', option='list_editable', obj=cls, id='admin.E121')
         else:
-            return list(chain(*[
+            return list(chain(*filter(None, [
                 self._check_list_editable_item(cls, model, item, "list_editable[%d]" % index)
                 for index, item in enumerate(cls.list_editable)
-            ]))
+            ])))
 
     def _check_list_editable_item(self, cls, model, field_name, label):
         try:
