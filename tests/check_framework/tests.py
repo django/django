@@ -7,7 +7,7 @@ import sys
 from django.apps import apps
 from django.conf import settings
 from django.core import checks
-from django.core.checks import Error
+from django.core.checks import Error, Warning
 from django.core.checks.registry import CheckRegistry
 from django.core.checks.compatibility.django_1_6_0 import check_1_6_compatibility
 from django.core.management.base import CommandError
@@ -195,12 +195,22 @@ class CheckCommandTests(TestCase):
         self.assertRaises(CommandError, call_command, 'check', tags=['missingtag'])
 
 
-def custom_system_check(app_configs, **kwargs):
+def custom_error_system_check(app_configs, **kwargs):
     return [
         Error(
             'Error',
             hint=None,
-            id='mycheck.E001',
+            id='myerrorcheck.E001',
+        )
+    ]
+
+
+def custom_warning_system_check(app_configs, **kwargs):
+    return [
+        Warning(
+            'Warning',
+            hint=None,
+            id='mywarningcheck.E001',
         )
     ]
 
@@ -209,15 +219,39 @@ class SilencingCheckTests(TestCase):
 
     def setUp(self):
         self.old_stdout, self.old_stderr = sys.stdout, sys.stderr
-        sys.stdout, sys.stderr = StringIO(), StringIO()
+        self.stdout, self.stderr = StringIO(), StringIO()
+        sys.stdout, sys.stderr = self.stdout, self.stderr
 
     def tearDown(self):
         sys.stdout, sys.stderr = self.old_stdout, self.old_stderr
 
-    @override_settings(SILENCED_SYSTEM_CHECKS=['mycheck.E001'])
-    @override_system_checks([custom_system_check])
-    def test_simple(self):
+    @override_settings(SILENCED_SYSTEM_CHECKS=['myerrorcheck.E001'])
+    @override_system_checks([custom_error_system_check])
+    def test_silenced_error(self):
+        out = StringIO()
+        err = StringIO()
         try:
-            call_command('check')
+            call_command('check', stdout=out, stderr=err)
         except CommandError:
             self.fail("The mycheck.E001 check should be silenced.")
+        self.assertEqual(out.getvalue(), '')
+        self.assertEqual(
+            err.getvalue(),
+            'System check identified some issues:\n\n'
+            'ERRORS:\n'
+            '?: (myerrorcheck.E001) Error\n\n'
+            'System check identified 1 issue (0 silenced).\n'
+        )
+
+    @override_settings(SILENCED_SYSTEM_CHECKS=['mywarningcheck.E001'])
+    @override_system_checks([custom_warning_system_check])
+    def test_silenced_warning(self):
+        out = StringIO()
+        err = StringIO()
+        try:
+            call_command('check', stdout=out, stderr=err)
+        except CommandError:
+            self.fail("The mycheck.E001 check should be silenced.")
+
+        self.assertEqual(out.getvalue(), 'System check identified no issues (1 silenced).\n')
+        self.assertEqual(err.getvalue(), '')
