@@ -193,7 +193,7 @@ card values plus their suits; 104 characters in total.
     you want your fields to be more strict about the options they select, or to
     use the simpler, more permissive behavior of the current fields.
 
-.. method:: Field.__init__
+.. method:: Field.__init__()
 
 The :meth:`~django.db.models.Field.__init__` method takes the following
 parameters:

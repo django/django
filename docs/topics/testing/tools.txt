@@ -1036,7 +1036,7 @@ If ``multi_db=True``, fixtures are loaded into all databases.
 Overriding settings
 ~~~~~~~~~~~~~~~~~~~
 
-.. method:: SimpleTestCase.settings
+.. method:: SimpleTestCase.settings()
 
 For testing purposes it's often useful to change a setting temporarily and
 revert to the original value after running the testing code. For this use case
@@ -1061,7 +1061,7 @@ Django provides a standard Python context manager (see :pep:`343`) called
 This example will override the :setting:`LOGIN_URL` setting for the code
 in the ``with`` block and reset its value to the previous state afterwards.
 
-.. method:: SimpleTestCase.modify_settings
+.. method:: SimpleTestCase.modify_settings()
 
 .. versionadded:: 1.7
 
