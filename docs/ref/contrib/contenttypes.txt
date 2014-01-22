@@ -232,7 +232,7 @@ lookup::
     >>> user_type
     <ContentType: user>
 
-.. module:: django.contrib.contenttypes.generic
+.. module:: django.contrib.contenttypes.fields
 
 .. _generic-relations:
 
@@ -250,14 +250,14 @@ generic (sometimes called "polymorphic") relationships between models.
 A simple example is a tagging system, which might look like this::
 
     from django.db import models
+    from django.contrib.contenttypes.fields import GenericForeignKey
     from django.contrib.contenttypes.models import ContentType
-    from django.contrib.contenttypes import generic
 
     class TaggedItem(models.Model):
         tag = models.SlugField()
         content_type = models.ForeignKey(ContentType)
         object_id = models.PositiveIntegerField()
-        content_object = generic.GenericForeignKey('content_type', 'object_id')
+        content_object = GenericForeignKey('content_type', 'object_id')
 
         # On Python 3: def __str__(self):
         def __unicode__(self):
@@ -274,7 +274,7 @@ model:
 .. class:: GenericForeignKey
 
     There are three parts to setting up a
-    :class:`~django.contrib.contenttypes.generic.GenericForeignKey`:
+    :class:`~django.contrib.contenttypes.fields.GenericForeignKey`:
 
     1. Give your model a :class:`~django.db.models.ForeignKey`
        to :class:`~django.contrib.contenttypes.models.ContentType`. The usual
@@ -286,11 +286,11 @@ model:
        for this field is "object_id".
 
     3. Give your model a
-       :class:`~django.contrib.contenttypes.generic.GenericForeignKey`, and
+       :class:`~django.contrib.contenttypes.fields.GenericForeignKey`, and
        pass it the names of the two fields described above. If these fields
        are named "content_type" and "object_id", you can omit this -- those
        are the default field names
-       :class:`~django.contrib.contenttypes.generic.GenericForeignKey` will
+       :class:`~django.contrib.contenttypes.fields.GenericForeignKey` will
        look for.
 
     .. attribute:: GenericForeignKey.for_concrete_model
@@ -300,6 +300,10 @@ model:
        If ``False``, the field will be able to reference proxy models. Default
        is ``True``. This mirrors the ``for_concrete_model`` argument to
        :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model`.
+
+    .. versionchanged:: 1.7
+
+        This class used to be defined in ``django.contrib.contenttypes.generic``.
 
 
 .. admonition:: Primary key type compatibility
@@ -347,10 +351,10 @@ creating a ``TaggedItem``::
     >>> t.content_object
     <User: Guido>
 
-Due to the way :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
+Due to the way :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
 is implemented, you cannot use such fields directly with filters (``filter()``
 and ``exclude()``, for example) via the database API. Because a
-:class:`~django.contrib.contenttypes.generic.GenericForeignKey` isn't a
+:class:`~django.contrib.contenttypes.fields.GenericForeignKey` isn't a
 normal field object, these examples will *not* work::
 
     # This will fail
@@ -358,7 +362,7 @@ normal field object, these examples will *not* work::
     # This will also fail
     >>> TaggedItem.objects.get(content_object=guido)
 
-Likewise, :class:`~django.contrib.contenttypes.generic.GenericForeignKey`\s
+Likewise, :class:`~django.contrib.contenttypes.fields.GenericForeignKey`\s
 does not appear in :class:`~django.forms.ModelForm`\s.
 
 Reverse generic relations
@@ -366,12 +370,16 @@ Reverse generic relations
 
 .. class:: GenericRelation
 
+    .. versionchanged:: 1.7
+
+        This class used to be defined in ``django.contrib.contenttypes.generic``.
+
 If you know which models you'll be using most often, you can also add
 a "reverse" generic relationship to enable an additional API. For example::
 
     class Bookmark(models.Model):
         url = models.URLField()
-        tags = generic.GenericRelation(TaggedItem)
+        tags = GenericRelation(TaggedItem)
 
 ``Bookmark`` instances will each have a ``tags`` attribute, which can
 be used to retrieve their associated ``TaggedItems``::
@@ -385,10 +393,10 @@ be used to retrieve their associated ``TaggedItems``::
     >>> b.tags.all()
     [<TaggedItem: django>, <TaggedItem: python>]
 
-Just as :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
+Just as :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
 accepts the names of the content-type and object-ID fields as
 arguments, so too does
-:class:`~django.contrib.contenttypes.generic.GenericRelation`;
+:class:`~django.contrib.contenttypes.fields.GenericRelation`;
 if the model which has the generic foreign key is using non-default names
 for those fields, you must pass the names of the fields when setting up a
 :class:`.GenericRelation` to it. For example, if the ``TaggedItem`` model
@@ -396,9 +404,9 @@ referred to above used fields named ``content_type_fk`` and
 ``object_primary_key`` to create its generic foreign key, then a
 :class:`.GenericRelation` back to it would need to be defined like so::
 
-    tags = generic.GenericRelation(TaggedItem,
-                                   content_type_field='content_type_fk',
-                                   object_id_field='object_primary_key')
+    tags = GenericRelation(TaggedItem,
+                           content_type_field='content_type_fk',
+                           object_id_field='object_primary_key')
 
 Of course, if you don't add the reverse relationship, you can do the
 same types of lookups manually::
@@ -410,29 +418,29 @@ same types of lookups manually::
     [<TaggedItem: django>, <TaggedItem: python>]
 
 Note that if the model in a
-:class:`~django.contrib.contenttypes.generic.GenericRelation` uses a
+:class:`~django.contrib.contenttypes.fields.GenericRelation` uses a
 non-default value for ``ct_field`` or ``fk_field`` in its
-:class:`~django.contrib.contenttypes.generic.GenericForeignKey` (e.g. the
+:class:`~django.contrib.contenttypes.fields.GenericForeignKey` (e.g. the
 :mod:`django.contrib.comments` app uses ``ct_field="object_pk"``),
 you'll need to set ``content_type_field`` and/or ``object_id_field`` in
-the :class:`~django.contrib.contenttypes.generic.GenericRelation` to
+the :class:`~django.contrib.contenttypes.fields.GenericRelation` to
 match the ``ct_field`` and ``fk_field``, respectively, in the
-:class:`~django.contrib.contenttypes.generic.GenericForeignKey`::
+:class:`~django.contrib.contenttypes.fields.GenericForeignKey`::
 
-    comments = generic.GenericRelation(Comment, object_id_field="object_pk")
+    comments = fields.GenericRelation(Comment, object_id_field="object_pk")
 
 Note also, that if you delete an object that has a
-:class:`~django.contrib.contenttypes.generic.GenericRelation`, any objects
-which have a :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
+:class:`~django.contrib.contenttypes.fields.GenericRelation`, any objects
+which have a :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
 pointing at it will be deleted as well. In the example above, this means that
 if a ``Bookmark`` object were deleted, any ``TaggedItem`` objects pointing at
 it would be deleted at the same time.
 
 Unlike :class:`~django.db.models.ForeignKey`,
-:class:`~django.contrib.contenttypes.generic.GenericForeignKey` does not accept
+:class:`~django.contrib.contenttypes.fields.GenericForeignKey` does not accept
 an :attr:`~django.db.models.ForeignKey.on_delete` argument to customize this
 behavior; if desired, you can avoid the cascade-deletion simply by not using
-:class:`~django.contrib.contenttypes.generic.GenericRelation`, and alternate
+:class:`~django.contrib.contenttypes.fields.GenericRelation`, and alternate
 behavior can be provided via the :data:`~django.db.models.signals.pre_delete`
 signal.
 
@@ -441,7 +449,7 @@ Generic relations and aggregation
 
 :doc:`Django's database aggregation API </topics/db/aggregation>`
 doesn't work with a
-:class:`~django.contrib.contenttypes.generic.GenericRelation`. For example, you
+:class:`~django.contrib.contenttypes.fields.GenericRelation`. For example, you
 might be tempted to try something like::
 
     Bookmark.objects.aggregate(Count('tags'))
@@ -452,47 +460,23 @@ to the queryset to ensure the correct content type, but the
 into account. For now, if you need aggregates on generic relations, you'll
 need to calculate them without using the aggregation API.
 
-Generic relations in forms and admin
-------------------------------------
 
-The :mod:`django.contrib.contenttypes.generic` module provides:
+.. module:: django.contrib.contenttypes.forms
 
-* ``BaseGenericInlineFormSet``
-* :class:`~django.contrib.contenttypes.generic.GenericTabularInline`
-  and :class:`~django.contrib.contenttypes.generic.GenericStackedInline`
-  (subclasses of
-  :class:`~django.contrib.contenttypes.generic.GenericInlineModelAdmin`)
+Generic relation in forms
+-------------------------
+
+The :mod:`django.contrib.contenttypes.forms` module provides:
+
+* :class:`BaseGenericInlineFormSet`
 * A formset factory, :func:`generic_inlineformset_factory`, for use with
-  :class:`GenericForeignKey`
+  :class:`~django.contrib.contenttypes.fields.GenericForeignKey`.
 
-These classes and functions enable the use of generic relations in forms
-and the admin. See the :doc:`model formset </topics/forms/modelforms>` and
-:ref:`admin <using-generic-relations-as-an-inline>` documentation for more
-information.
+.. class:: BaseGenericInlineFormSet
 
-.. class:: GenericInlineModelAdmin
+    .. versionchanged:: 1.7
 
-    The :class:`~django.contrib.contenttypes.generic.GenericInlineModelAdmin`
-    class inherits all properties from an
-    :class:`~django.contrib.admin.InlineModelAdmin` class. However,
-    it adds a couple of its own for working with the generic relation:
-
-    .. attribute:: ct_field
-
-        The name of the
-        :class:`~django.contrib.contenttypes.models.ContentType` foreign key
-        field on the model. Defaults to ``content_type``.
-
-    .. attribute:: ct_fk_field
-
-        The name of the integer field that represents the ID of the related
-        object. Defaults to ``object_id``.
-
-.. class:: GenericTabularInline
-.. class:: GenericStackedInline
-
-    Subclasses of :class:`GenericInlineModelAdmin` with stacked and tabular
-    layouts, respectively.
+        This class used to be defined in ``django.contrib.contenttypes.generic``.
 
 .. function:: generic_inlineformset_factory(model, form=ModelForm, formset=BaseGenericInlineFormSet, ct_field="content_type", fk_field="object_id", fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, validate_max=False, for_concrete_model=True)
 
@@ -508,5 +492,57 @@ information.
     .. versionadded:: 1.6
 
         The ``for_concrete_model`` argument corresponds to the
-        :class:`~django.contrib.contenttypes.generic.GenericForeignKey.for_concrete_model`
+        :class:`~django.contrib.contenttypes.fields.GenericForeignKey.for_concrete_model`
         argument on ``GenericForeignKey``.
+
+    .. versionchanged:: 1.7
+
+        This function used to be defined in ``django.contrib.contenttypes.generic``.
+
+
+.. module:: django.contrib.contenttypes.admin
+
+Generic relations in admin
+------------------------------------
+
+The :mod:`django.contrib.contenttypes.admin` module provides
+:class:`~django.contrib.contenttypes.admin.GenericTabularInline` and
+:class:`~django.contrib.contenttypes.admin.GenericStackedInline` (subclasses of
+:class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`)
+
+These classes and functions enable the use of generic relations in forms
+and the admin. See the :doc:`model formset </topics/forms/modelforms>` and
+:ref:`admin <using-generic-relations-as-an-inline>` documentation for more
+information.
+
+.. class:: GenericInlineModelAdmin
+
+    The :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`
+    class inherits all properties from an
+    :class:`~django.contrib.admin.InlineModelAdmin` class. However,
+    it adds a couple of its own for working with the generic relation:
+
+    .. attribute:: ct_field
+
+        The name of the
+        :class:`~django.contrib.contenttypes.models.ContentType` foreign key
+        field on the model. Defaults to ``content_type``.
+
+    .. attribute:: ct_fk_field
+
+        The name of the integer field that represents the ID of the related
+        object. Defaults to ``object_id``.
+
+    .. versionchanged:: 1.7
+
+        This class used to be defined in ``django.contrib.contenttypes.generic``.
+
+.. class:: GenericTabularInline
+.. class:: GenericStackedInline
+
+    Subclasses of :class:`GenericInlineModelAdmin` with stacked and tabular
+    layouts, respectively.
+
+    .. versionchanged:: 1.7
+
+        These classes used to be defined in ``django.contrib.contenttypes.generic``.

@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -10,7 +12,7 @@ class Review(models.Model):
     source = models.CharField(max_length=100)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey()
+    content_object = GenericForeignKey()
 
     def __str__(self):
         return self.source
@@ -57,7 +59,7 @@ class Book(models.Model):
     published = models.DateField()
     authors = models.ManyToManyField(Person)
     editor = models.ForeignKey(Person, null=True, related_name='edited')
-    reviews = generic.GenericRelation(Review)
+    reviews = GenericRelation(Review)
     pages = models.IntegerField(default=100)
 
     def __str__(self):

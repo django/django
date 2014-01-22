@@ -1,4 +1,6 @@
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
@@ -7,7 +9,7 @@ class Award(models.Model):
     name = models.CharField(max_length=25)
     object_id = models.PositiveIntegerField()
     content_type = models.ForeignKey(ContentType)
-    content_object = generic.GenericForeignKey()
+    content_object = GenericForeignKey()
 
 
 class AwardNote(models.Model):
@@ -17,7 +19,7 @@ class AwardNote(models.Model):
 
 class Person(models.Model):
     name = models.CharField(max_length=25)
-    awards = generic.GenericRelation(Award)
+    awards = GenericRelation(Award)
 
 
 class Book(models.Model):

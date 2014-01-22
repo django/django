@@ -9,7 +9,7 @@ in the application directory, or in one of the directories named in the
 """
 
 from django.contrib.auth.models import Permission
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -55,8 +55,7 @@ class Tag(models.Model):
     name = models.CharField(max_length=100)
     tagged_type = models.ForeignKey(ContentType, related_name="fixtures_tag_set")
     tagged_id = models.PositiveIntegerField(default=0)
-    tagged = generic.GenericForeignKey(ct_field='tagged_type',
-                                       fk_field='tagged_id')
+    tagged = GenericForeignKey(ct_field='tagged_type', fk_field='tagged_id')
 
     def __str__(self):
         return '<%s: %s> tagged "%s"' % (self.tagged.__class__.__name__,

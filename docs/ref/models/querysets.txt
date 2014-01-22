@@ -798,8 +798,8 @@ relationship, and does the 'joining' in Python. This allows it to prefetch
 many-to-many and many-to-one objects, which cannot be done using
 ``select_related``, in addition to the foreign key and one-to-one relationships
 that are supported by ``select_related``. It also supports prefetching of
-:class:`~django.contrib.contenttypes.generic.GenericRelation` and
-:class:`~django.contrib.contenttypes.generic.GenericForeignKey`.
+:class:`~django.contrib.contenttypes.fields.GenericRelation` and
+:class:`~django.contrib.contenttypes.fields.GenericForeignKey`.
 
 For example, suppose you have these models::
 

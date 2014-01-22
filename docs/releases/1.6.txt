@@ -302,11 +302,9 @@ Minor features
   :class:`~django.views.generic.base.RedirectView` now support HTTP ``PATCH``
   method.
 
-* :class:`GenericForeignKey <django.contrib.contenttypes.generic.GenericForeignKey>`
-  now takes an optional
-  :attr:`~django.contrib.contenttypes.generic.GenericForeignKey.for_concrete_model`
-  argument, which when set to ``False`` allows the field to reference proxy
-  models. The default is ``True`` to retain the old behavior.
+* ``GenericForeignKey`` now takes an optional ``for_concrete_model`` argument,
+  which when set to ``False`` allows the field to reference proxy models. The
+  default is ``True`` to retain the old behavior.
 
 * The :class:`~django.middleware.locale.LocaleMiddleware` now stores the active
   language in session if it is not present there. This prevents loss of

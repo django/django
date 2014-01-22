@@ -23,12 +23,12 @@ The built-in comment models
 
     .. attribute:: content_object
 
-        A :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
+        A :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
         attribute pointing to the object the comment is attached to. You can use
         this to get at the related object (i.e. ``my_comment.content_object``).
 
         Since this field is a
-        :class:`~django.contrib.contenttypes.generic.GenericForeignKey`, it's
+        :class:`~django.contrib.contenttypes.fields.GenericForeignKey`, it's
         actually syntactic sugar on top of two underlying attributes, described
         below.
 
