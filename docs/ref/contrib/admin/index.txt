@@ -2187,30 +2187,32 @@ It is possible to use an inline with generically related objects. Let's say
 you have the following models::
 
     from django.db import models
+    from django.contrib.contenttypes.fields import GenericForeignKey
 
     class Image(models.Model):
         image = models.ImageField(upload_to="images")
         content_type = models.ForeignKey(ContentType)
         object_id = models.PositiveIntegerField()
-        content_object = generic.GenericForeignKey("content_type", "object_id")
+        content_object = GenericForeignKey("content_type", "object_id")
 
     class Product(models.Model):
         name = models.CharField(max_length=100)
 
 If you want to allow editing and creating ``Image`` instance on the ``Product``
-add/change views you can use ``GenericTabularInline`` or
-``GenericStackedInline`` (both subclasses of ``GenericInlineModelAdmin``)
-provided by ``django.contrib.contenttypes.generic``, they implement tabular and
+add/change views you can use :class:`~django.contrib.contenttypes.admin.GenericTabularInline`
+or :class:`~django.contrib.contenttypes.admin.GenericStackedInline` (both
+subclasses of :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`)
+provided by :mod:`~django.contrib.contenttypes.admin`, they implement tabular and
 stacked visual layouts for the forms representing the inline objects
 respectively just like their non-generic counterparts and behave just like any
 other inline. In your ``admin.py`` for this example app::
 
     from django.contrib import admin
-    from django.contrib.contenttypes import generic
+    from django.contrib.contenttypes.admin import GenericTabularInline
 
     from myproject.myapp.models import Image, Product
 
-    class ImageInline(generic.GenericTabularInline):
+    class ImageInline(GenericTabularInline):
         model = Image
 
     class ProductAdmin(admin.ModelAdmin):

@@ -6,7 +6,7 @@ from django.apps import apps
 
 
 def check_generic_foreign_keys(**kwargs):
-    from .generic import GenericForeignKey
+    from .fields import GenericForeignKey
 
     errors = []
     fields = (obj

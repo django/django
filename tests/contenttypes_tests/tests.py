@@ -2,7 +2,9 @@
 from __future__ import absolute_import, unicode_literals
 
 from django.apps.registry import Apps, apps
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks
 from django.db import models
@@ -90,7 +92,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
 
     def test_str(self):
         class Model(models.Model):
-            field = generic.GenericForeignKey()
+            field = GenericForeignKey()
         expected = "contenttypes_tests.Model.field"
         actual = force_str(Model.field)
         self.assertEqual(expected, actual)
@@ -99,7 +101,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         class TaggedItem(models.Model):
             # no content_type field
             object_id = models.PositiveIntegerField()
-            content_object = generic.GenericForeignKey()
+            content_object = GenericForeignKey()
 
         errors = TaggedItem.content_object.check()
         expected = [
@@ -116,7 +118,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         class Model(models.Model):
             content_type = models.IntegerField()  # should be ForeignKey
             object_id = models.PositiveIntegerField()
-            content_object = generic.GenericForeignKey(
+            content_object = GenericForeignKey(
                 'content_type', 'object_id')
 
         errors = Model.content_object.check()
@@ -136,7 +138,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         class Model(models.Model):
             content_type = models.ForeignKey('self')  # should point to ContentType
             object_id = models.PositiveIntegerField()
-            content_object = generic.GenericForeignKey(
+            content_object = GenericForeignKey(
                 'content_type', 'object_id')
 
         errors = Model.content_object.check()
@@ -156,7 +158,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         class TaggedItem(models.Model):
             content_type = models.ForeignKey(ContentType)
             # missing object_id field
-            content_object = generic.GenericForeignKey()
+            content_object = GenericForeignKey()
 
         errors = TaggedItem.content_object.check()
         expected = [
@@ -173,7 +175,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         class Model(models.Model):
             content_type = models.ForeignKey(ContentType)
             object_id = models.PositiveIntegerField()
-            content_object_ = generic.GenericForeignKey(
+            content_object_ = GenericForeignKey(
                 'content_type', 'object_id')
 
         errors = Model.content_object_.check()
@@ -188,7 +190,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
     def test_generic_foreign_key_checks_are_performed(self):
-        class MyGenericForeignKey(generic.GenericForeignKey):
+        class MyGenericForeignKey(GenericForeignKey):
             def check(self, **kwargs):
                 return ['performed!']
 
@@ -205,10 +207,10 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         class TaggedItem(models.Model):
             content_type = models.ForeignKey(ContentType)
             object_id = models.PositiveIntegerField()
-            content_object = generic.GenericForeignKey()
+            content_object = GenericForeignKey()
 
         class Bookmark(models.Model):
-            tags = generic.GenericRelation('TaggedItem')
+            tags = GenericRelation('TaggedItem')
 
         errors = Bookmark.tags.field.check()
         self.assertEqual(errors, [])
@@ -217,11 +219,11 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         class TaggedItem(models.Model):
             custom_content_type = models.ForeignKey(ContentType)
             custom_object_id = models.PositiveIntegerField()
-            content_object = generic.GenericForeignKey(
+            content_object = GenericForeignKey(
                 'custom_content_type', 'custom_object_id')
 
         class Bookmark(models.Model):
-            tags = generic.GenericRelation('TaggedItem',
+            tags = GenericRelation('TaggedItem',
                 content_type_field='custom_content_type',
                 object_id_field='custom_object_id')
 
@@ -230,7 +232,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
 
     def test_pointing_to_missing_model(self):
         class Model(models.Model):
-            rel = generic.GenericRelation('MissingModel')
+            rel = GenericRelation('MissingModel')
 
         errors = Model.rel.field.check()
         expected = [
@@ -248,10 +250,10 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
 
     def test_valid_self_referential_generic_relationship(self):
         class Model(models.Model):
-            rel = generic.GenericRelation('Model')
+            rel = GenericRelation('Model')
             content_type = models.ForeignKey(ContentType)
             object_id = models.PositiveIntegerField()
-            content_object = generic.GenericForeignKey(
+            content_object = GenericForeignKey(
                 'content_type', 'object_id')
 
         errors = Model.rel.field.check()
@@ -261,10 +263,10 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         class TaggedItem(models.Model):
             # no content_type field
             object_id = models.PositiveIntegerField()
-            content_object = generic.GenericForeignKey()
+            content_object = GenericForeignKey()
 
         class Bookmark(models.Model):
-            tags = generic.GenericRelation('TaggedItem')
+            tags = GenericRelation('TaggedItem')
 
         errors = Bookmark.tags.field.check()
         expected = [
@@ -281,10 +283,10 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         class TaggedItem(models.Model):
             content_type = models.ForeignKey(ContentType)
             # missing object_id field
-            content_object = generic.GenericForeignKey()
+            content_object = GenericForeignKey()
 
         class Bookmark(models.Model):
-            tags = generic.GenericRelation('TaggedItem')
+            tags = GenericRelation('TaggedItem')
 
         errors = Bookmark.tags.field.check()
         expected = [
@@ -303,7 +305,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
             object_id = models.PositiveIntegerField()
 
         class Bookmark(models.Model):
-            tags = generic.GenericRelation('TaggedItem')
+            tags = GenericRelation('TaggedItem')
 
         errors = Bookmark.tags.field.check()
         expected = [
@@ -326,13 +328,13 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         class SwappedModel(models.Model):
             content_type = models.ForeignKey(ContentType)
             object_id = models.PositiveIntegerField()
-            content_object = generic.GenericForeignKey()
+            content_object = GenericForeignKey()
 
             class Meta:
                 swappable = 'TEST_SWAPPED_MODEL'
 
         class Model(models.Model):
-            rel = generic.GenericRelation('SwappedModel')
+            rel = GenericRelation('SwappedModel')
 
         errors = Model.rel.field.check()
         expected = [
@@ -351,10 +353,10 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         class TaggedItem(models.Model):
             content_type = models.ForeignKey(ContentType)
             object_id = models.PositiveIntegerField()
-            content_object = generic.GenericForeignKey()
+            content_object = GenericForeignKey()
 
         class InvalidBookmark(models.Model):
-            tags_ = generic.GenericRelation('TaggedItem')
+            tags_ = GenericRelation('TaggedItem')
 
         errors = InvalidBookmark.tags_.field.check()
         expected = [

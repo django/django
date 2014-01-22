@@ -1030,6 +1030,25 @@ API, it will go through a regular deprecation path. This attribute was mostly
 used by methods that bypassed ``ModelAdmin.get_fieldsets()`` but this was
 considered a bug and has been addressed.
 
+Reorganization of ``django.contrib.contenttypes``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Since ``django.contrib.contenttypes.generic`` defined both admin and model
+related objects an import of this module could trigger unexpected side effects.
+As a consequence, its contents were split into :mod:`~django.contrib.contenttypes`
+submodules and the ``django.contrib.contenttypes.generic`` module is deprecated:
+
+* :class:`~django.contrib.contenttypes.fields.GenericForeignKey` and
+  :class:`~django.contrib.contenttypes.fields.GenericRelation` now live in
+  :mod:`~django.contrib.contenttypes.fields`.
+* :class:`~django.contrib.contenttypes.forms.BaseGenericInlineFormSet` and
+  :func:`~django.contrib.contenttypes.forms.generic_inlineformset_factory` now
+  live in :mod:`~django.contrib.contenttypes.forms`.
+* :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`,
+  :class:`~django.contrib.contenttypes.admin.GenericStackedInline` and
+  :class:`~django.contrib.contenttypes.admin.GenericTabularInline` now live in
+  :mod:`~django.contrib.contenttypes.admin`.
+
 ``syncdb``
 ~~~~~~~~~~
 
