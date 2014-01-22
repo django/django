@@ -215,7 +215,7 @@ storage backend that uses the :setting:`STATIC_ROOT` setting as the base
 file system location and the :setting:`STATIC_URL` setting respectively
 as the base URL.
 
-.. method:: post_process(paths, **options)
+.. method:: storage.StaticFilesStorage.post_process(paths, **options)
 
 This method is called by the :djadmin:`collectstatic` management command
 after each run and gets passed the local storages and paths of found
@@ -282,7 +282,7 @@ hashed names for all processed files in a file called ``staticfiles.json``.
 This happens once when you run the :djadmin:`collectstatic` management
 command.
 
-.. method:: file_hash(name, content=None)
+.. method:: storage.ManifestStaticFilesStorage.file_hash(name, content=None)
 
 The method that is used when creating the hashed name of a file.
 Needs to return a hash for the given file name and content.
