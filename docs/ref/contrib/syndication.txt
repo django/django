@@ -137,7 +137,7 @@ into those elements.
 
   See `a complex example`_ below that uses a description template.
 
-  .. method:: Feed.get_context_data(self, **kwargs)
+  .. method:: Feed.get_context_data(**kwargs)
 
     .. versionadded:: 1.6
 

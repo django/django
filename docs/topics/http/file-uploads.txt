@@ -386,7 +386,7 @@ Required methods
 
 Custom file upload handlers **must** define the following methods:
 
-.. method:: FileUploadHandler.receive_data_chunk(self, raw_data, start)
+.. method:: FileUploadHandler.receive_data_chunk(raw_data, start)
 
     Receives a "chunk" of data from the file upload.
 
@@ -407,7 +407,7 @@ Custom file upload handlers **must** define the following methods:
     If you raise a ``StopUpload`` or a ``SkipFile`` exception, the upload
     will abort or the file will be completely skipped.
 
-.. method:: FileUploadHandler.file_complete(self, file_size)
+.. method:: FileUploadHandler.file_complete(file_size)
 
     Called when a file has finished uploading.
 
@@ -434,7 +434,7 @@ attributes:
 
     The default is 64*2\ :sup:`10` bytes, or 64 KB.
 
-.. method:: FileUploadHandler.new_file(self, field_name, file_name, content_type, content_length, charset, content_type_extra)
+.. method:: FileUploadHandler.new_file(field_name, file_name, content_type, content_length, charset, content_type_extra)
 
     Callback signaling that a new file upload is starting. This is called
     before any data has been fed to any upload handlers.
@@ -463,11 +463,11 @@ attributes:
 
         The ``content_type_extra`` parameter was added.
 
-.. method:: FileUploadHandler.upload_complete(self)
+.. method:: FileUploadHandler.upload_complete()
 
     Callback signaling that the entire upload (all files) has completed.
 
-.. method:: FileUploadHandler.handle_raw_input(self, input_data, META, content_length, boundary, encoding)
+.. method:: FileUploadHandler.handle_raw_input(input_data, META, content_length, boundary, encoding)
 
     Allows the handler to completely override the parsing of the raw
     HTTP input.

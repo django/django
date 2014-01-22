@@ -421,7 +421,7 @@ approximately decreasing order of importance, so start from the top.
 Custom database types
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Field.db_type(self, connection)
+.. method:: Field.db_type(connection)
 
 Returns the database column data type for the :class:`~django.db.models.Field`,
 taking into account the connection object, and the settings associated with it.
@@ -510,7 +510,7 @@ get out of the way.
 Converting database values to Python objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Field.to_python(self, value)
+.. method:: Field.to_python(value)
 
 Converts a value as returned by your database (or a serializer) to a Python
 object.
@@ -571,7 +571,7 @@ automatically.
 Converting Python objects to query values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Field.get_prep_value(self, value)
+.. method:: Field.get_prep_value(value)
 
 This is the reverse of :meth:`.to_python` when working with the
 database backends (as opposed to serialization). The ``value``
@@ -596,7 +596,7 @@ For example::
 Converting query values to database values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Field.get_db_prep_value(self, value, connection, prepared=False)
+.. method:: Field.get_db_prep_value(value, connection, prepared=False)
 
 Some data types (for example, dates) need to be in a specific format
 before they can be used by a database backend.
@@ -612,7 +612,7 @@ already been passed through :meth:`.get_prep_value` conversions. When
 initial data conversions before performing any database-specific
 processing.
 
-.. method:: Field.get_db_prep_save(self, value, connection)
+.. method:: Field.get_db_prep_save(value, connection)
 
 Same as the above, but called when the Field value must be *saved* to
 the database. As the default implementation just calls
@@ -624,7 +624,7 @@ parameters (which is implemented by :meth:`.get_db_prep_value`).
 Preprocessing values before saving
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Field.pre_save(self, model_instance, add)
+.. method:: Field.pre_save(model_instance, add)
 
 This method is called just prior to :meth:`.get_db_prep_save` and should return
 the value of the appropriate attribute from ``model_instance`` for this field.
@@ -650,7 +650,7 @@ Preparing values for use in database lookups
 As with value conversions, preparing a value for database lookups is a
 two phase process.
 
-.. method:: Field.get_prep_lookup(self, lookup_type, value)
+.. method:: Field.get_prep_lookup(lookup_type, value)
 
 :meth:`.get_prep_lookup` performs the first phase of lookup preparation,
 performing generic data validity checks
@@ -704,7 +704,7 @@ accepted lookup types to ``exact`` and ``in``::
             else:
                 raise TypeError('Lookup type %r not supported.' % lookup_type)
 
-.. method:: Field.get_db_prep_lookup(self, lookup_type, value, connection, prepared=False)
+.. method:: Field.get_db_prep_lookup(lookup_type, value, connection, prepared=False)
 
 Performs any database-specific data conversions required by a lookup.
 As with :meth:`.get_db_prep_value`, the specific connection that will
@@ -715,7 +715,7 @@ prepared with :meth:`.get_prep_lookup`.
 Specifying the form field for a model field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Field.formfield(self, form_class=None, choices_form_class=None, **kwargs)
+.. method:: Field.formfield(form_class=None, choices_form_class=None, **kwargs)
 
 Returns the default form field to use when this model field is displayed in a
 form.  This method is called by the :class:`~django.forms.ModelForm` helper.
@@ -755,7 +755,7 @@ fields.
 Emulating built-in field types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Field.get_internal_type(self)
+.. method:: Field.get_internal_type()
 
 Returns a string giving the name of the :class:`~django.db.models.Field`
 subclass we are emulating at the database level. This is used to determine the
@@ -790,7 +790,7 @@ output in some other place, outside of Django.
 Converting field data for serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Field.value_to_string(self, obj)
+.. method:: Field.value_to_string(obj)
 
 This method is used by the serializers to convert the field into a string for
 output. Calling ``Field._get_val_from_obj(obj)`` is the best way to get the
