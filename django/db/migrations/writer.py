@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import datetime
 import inspect
 import decimal
+import collections
 from importlib import import_module
 import os
 import types
@@ -257,6 +258,16 @@ class MigrationWriter(object):
             if hasattr(value, "__module__"):
                 module = value.__module__
                 return "%s.%s" % (module, value.__name__), set(["import %s" % module])
+        # Other iterables
+        elif isinstance(value, collections.Iterable):
+            imports = set()
+            strings = []
+            for item in value:
+                item_string, item_imports = cls.serialize(item)
+                imports.update(item_imports)
+                strings.append(item_string)
+            format = "(%s)" if len(strings) > 1 else "(%s,)"
+            return format % (", ".join(strings)), imports
         # Uh oh.
         else:
             raise ValueError("Cannot serialize: %r\nThere are some values Django cannot serialize into migration files.\nFor more, see https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing" % value)
