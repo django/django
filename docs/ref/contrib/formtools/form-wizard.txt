@@ -229,7 +229,7 @@ Here's a full example template:
 Hooking the wizard into a URLconf
 ---------------------------------
 
-.. method:: WizardView.as_view
+.. method:: WizardView.as_view()
 
 Finally, we need to specify which forms to use in the wizard, and then
 deploy the new :class:`WizardView` object at a URL in the ``urls.py``. The

@@ -1039,7 +1039,7 @@ If ``multi_db=True``, fixtures are loaded into all databases.
 Overriding settings
 ~~~~~~~~~~~~~~~~~~~
 
-.. method:: SimpleTestCase.settings
+.. method:: SimpleTestCase.settings()
 
 For testing purposes it's often useful to change a setting temporarily and
 revert to the original value after running the testing code. For this use case
