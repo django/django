@@ -51,7 +51,7 @@ class GeometryField(Field):
     form_class = forms.GeometryField
 
     # Geodetic units.
-    geodetic_units = ('Decimal Degree', 'degree')
+    geodetic_units = ('decimal degree', 'degree')
 
     description = _("The base GIS field -- maps to the OpenGIS Specification Geometry type.")
 
@@ -147,7 +147,7 @@ class GeometryField(Field):
         Returns true if this field's SRID corresponds with a coordinate
         system that uses non-projected units (e.g., latitude/longitude).
         """
-        return self.units_name(connection) in self.geodetic_units
+        return self.units_name(connection).lower() in self.geodetic_units
 
     def get_distance(self, value, lookup_type, connection):
         """
