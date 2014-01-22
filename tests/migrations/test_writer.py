@@ -102,6 +102,13 @@ class WriterTests(TestCase):
                 set(["from django.conf import settings"]),
             )
         )
+        self.assertSerializedResultEqual(
+            ((x, x*x) for x in range(3)),
+            (
+                "((0, 0), (1, 1), (2, 4))",
+                set(),
+            )
+        )
 
     def test_simple_migration(self):
         """
