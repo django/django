@@ -1488,7 +1488,7 @@ your test suite.
     failure. Similar to unittest's :meth:`~unittest.TestCase.assertRaisesRegexp`
     with the difference that ``expected_message`` isn't a regular expression.
 
-.. method:: SimpleTestCase.assertFieldOutput(self, fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value=u'')
+.. method:: SimpleTestCase.assertFieldOutput(fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value=u'')
 
     .. versionadded:: 1.4
 

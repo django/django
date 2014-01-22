@@ -216,7 +216,7 @@ foundation for custom widgets.
         The 'value' given is not guaranteed to be valid input, therefore
         subclass implementations should program defensively.
 
-    .. method:: value_from_datadict(self, data, files, name)
+    .. method:: value_from_datadict(data, files, name)
 
         Given a dictionary of data and this widget's name, returns the value
         of this widget. Returns ``None`` if a value wasn't provided.

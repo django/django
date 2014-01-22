@@ -873,7 +873,7 @@ systems and coordinate transformation::
    A string representing this envelope as a polygon in WKT format.
 
 
-   .. method:: expand_to_include(self, *args)
+   .. method:: expand_to_include(*args)
 
 Coordinate System Objects
 =========================
