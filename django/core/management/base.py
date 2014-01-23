@@ -344,7 +344,7 @@ class BaseCommand(object):
                         self.stdout.write(self.style.SQL_KEYWORD(connection.ops.start_transaction_sql()))
                 self.stdout.write(output)
                 if self.output_transaction:
-                    self.stdout.write('\n' + self.style.SQL_KEYWORD("COMMIT;"))
+                    self.stdout.write('\n' + self.style.SQL_KEYWORD(connection.ops.end_transaction_sql()))
         finally:
             if saved_locale is not None:
                 translation.activate(saved_locale)
