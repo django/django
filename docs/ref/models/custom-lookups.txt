@@ -162,7 +162,7 @@ The implementation is::
           lhs, lhs_params = qn.compile(self.lhs.lhs)
           rhs, rhs_params = self.process_rhs(qn, connection)
           params = lhs_params + rhs_params + lhs_params + rhs_params
-          return '%s > %s AND %s < -%s' % (lhs, rhs, lhs, rhs), params
+          return '%s < %s AND %s > -%s' % (lhs, rhs, lhs, rhs), params
 
   AbsoluteValue.register_lookup(AbsoluteValueLessThan)
 
