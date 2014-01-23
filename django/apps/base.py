@@ -40,6 +40,10 @@ class AppConfig(object):
         if not hasattr(self, 'path'):
             try:
                 self.path = upath(app_module.__path__[0])
+            except TypeError:
+                # Starting with Python 3.3 the NamespacePath object doesn't
+                # support indexing so it has to be converted into a list
+                self.path = upath(list(app_module.__path__)[0])
             except AttributeError:
                 self.path = None
 
