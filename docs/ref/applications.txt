@@ -80,9 +80,12 @@ reference.
 
 .. note::
 
-    It is possible to ensure a particular default ``AppConfig`` subclass by
-    setting a variable ``default_app_config`` in the ``__init__.py`` to be a
-    string representing a dotted path to the ``AppConfig`` subclass.
+    You can make this AppConfig subclass the default for your app by setting
+    ``default_app_config = 'rock_n_roll.apps.RockNRollConfig'`` in
+    ``rocknroll/__init__.py`` -- that will cause this ``AppConfig`` to be used
+    if a user has just ``"rocknroll"`` in their ``INSTALLED_APPS``. Alternatively,
+    you can tell your users to put ``"rocknroll.apps.RockNRollConfig"`` in
+    their ``INSTALLED_APPS``.
 
 For application users
 ---------------------
