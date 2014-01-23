@@ -356,3 +356,22 @@ available at the top level of a module it is not serializable.
 
 Django will write out the value as an instatiation of your class with the
 given arguments, similar to the way it writes out references to Django fields.
+
+
+Upgrading from South
+--------------------
+
+If you already have pre-existing migrations created with
+`South 0.x <http://south.aeracode.org>`_, then the upgrade process to use
+``django.db.migrations`` is quite simple:
+
+* Ensure all installs are fully up-to-date with their migrations
+* Delete all your (numbered) migration files, but not the directory or __init__.py - make sure you remove the ``.pyc`` files too.
+* Run ``python manage.py makemigrations``. Django should see the empty migration directories and make new initial migrations in the new format.
+* Run ``python manage.py migrate``. Django will see that the tables for the initial migrations already exist and mark them as applied without running them.
+
+That's it! The only complication is if you have a circular dependency loop
+of foreign keys; in this case, ``makemigrations`` might make more than one
+initial migration, and you'll need to mark them all as applied using::
+
+    python manage.py migrate --fake yourappnamehere
