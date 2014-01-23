@@ -1578,6 +1578,12 @@ class BigIntegerField(IntegerField):
     def get_internal_type(self):
         return "BigIntegerField"
 
+    def to_python(self, value):
+        # Get the type before calling the super
+        # This prevents a long from being casted to an int for stability
+        initial_type = type(value)
+        return initial_type(super(BigIntegerField, self).to_python(value))
+
     def formfield(self, **kwargs):
         defaults = {'min_value': -BigIntegerField.MAX_BIGINT - 1,
                     'max_value': BigIntegerField.MAX_BIGINT}

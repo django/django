@@ -419,6 +419,16 @@ class BigIntegerFieldTests(test.TestCase):
         b = BigInt.objects.get(value='10')
         self.assertEqual(b.value, 10)
 
+    def test_type_stability_int(self):
+        b = BigInt(value=10)
+        b.full_clean()
+        self.assertIsInstance(b.value, int)
+
+    @unittest.skipIf(six.PY3, 'This test only runs in python2 as long does not exist in python3')
+    def test_type_stability_long(self):
+        b = BigInt(value=long(10))
+        b.full_clean()
+        self.assertIsInstance(b.value, long)
 
 class TypeCoercionTests(test.TestCase):
     """
