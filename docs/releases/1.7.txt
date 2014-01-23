@@ -97,7 +97,7 @@ Improvements thus far include:
   configuration class. When Django starts, this class takes care of calling
   :func:`~django.contrib.admin.autodiscover()`. You can consequently remove the
   line from your ``urls.py``. If you do not wish to use the ``autodiscover()``
-  behaviour, simply replace ``'django.contrib.admin'`` in
+  behavior, simply replace ``'django.contrib.admin'`` in
   :setting:`INSTALLED_APPS` with
   :class:`django.contrib.admin.apps.PlainAdminConfig`.
 
