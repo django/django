@@ -58,6 +58,9 @@ for several versions of Django:
   Django 1.3. Upon the release of Django 1.5, Django 1.3's security
   support will end.
 
+* :ref:`Long-term support (LTS) releases <lts-releases>` will receive
+  security updates for a specified period.
+
 When new releases are issued for security reasons, the accompanying
 notice will include a list of affected versions. This list is
 comprised solely of *supported* versions of Django: older versions may
