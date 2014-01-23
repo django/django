@@ -144,7 +144,7 @@ the pace of releases afterwards.
 
 The follow releases have been designated for long-term support:
 
-    * Django 1.4, supported until at least March 2015.
+* Django 1.4, supported until at least March 2015.
 
 .. _release-process:
 
