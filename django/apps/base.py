@@ -67,10 +67,9 @@ class AppConfig(object):
             module = import_module(entry)
 
         except ImportError as e:
-            module = None
             exception = e
 
-        if module is not None:
+        else:
             if hasattr(module, 'default_app_config'):
                 entry = module.default_app_config
             else:
