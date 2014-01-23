@@ -292,6 +292,10 @@ Minor features
   <django.contrib.admin.ModelAdmin.view_on_site>` to control whether or not to
   display the "View on site" link.
 
+* You can specify a descending ordering for a :attr:`ModelAdmin.list_display
+  <django.contrib.admin.ModelAdmin.list_display>` value by prefixing the
+  ``admin_order_field`` value with a hyphen.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 

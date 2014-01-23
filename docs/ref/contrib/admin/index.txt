@@ -664,6 +664,14 @@ subclass::
       The above will tell Django to order by the ``first_name`` field when
       trying to sort by ``colored_first_name`` in the admin.
 
+      .. versionadded:: 1.7
+
+      To indicate descending order with ``admin_model_field`` you can use a
+      hyphen prefix on the field name. Using the above example, this would
+      look like::
+
+          colored_first_name.admin_order_field = '-first_name'
+
     * Elements of ``list_display`` can also be properties. Please note however,
       that due to the way properties work in Python, setting
       ``short_description`` on a property is only possible when using the
