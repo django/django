@@ -783,7 +783,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             elif not field.editable:
                 return [
                     checks.Error(
-                        '"%s" refers to field "%s", whih is not editable through the admin.' % (
+                        '"%s" refers to field "%s", which is not editable through the admin.' % (
                             label, field_name
                         ),
                         hint=None,
