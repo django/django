@@ -2,8 +2,6 @@ import inspect
 import re
 
 from django.conf import settings
-from django.contrib.auth.checks import check_user_model
-from django.core import checks
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.utils.module_loading import import_by_path
 from django.middleware.csrf import rotate_token
@@ -13,10 +11,6 @@ from .signals import user_logged_in, user_logged_out, user_login_failed
 SESSION_KEY = '_auth_user_id'
 BACKEND_SESSION_KEY = '_auth_user_backend'
 REDIRECT_FIELD_NAME = 'next'
-
-
-# Register the user model checks
-checks.register('models')(check_user_model)
 
 
 def load_backend(path):
@@ -164,3 +158,6 @@ def get_permission_codename(action, opts):
     Returns the codename of the permission for the specified action.
     """
     return '%s_%s' % (action, opts.model_name)
+
+
+default_app_config = 'django.contrib.auth.apps.AuthConfig'

@@ -44,7 +44,7 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.comments',
-    'django.contrib.admin',
+    'django.contrib.admin.apps.PlainAdminConfig',
     'django.contrib.admindocs',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
@@ -171,8 +171,9 @@ def setup(verbosity, test_labels):
         if module_found_in_labels:
             if verbosity >= 2:
                 print("Importing application %s" % module_name)
-            # HACK.
-            if module_label not in installed_app_names:
+            if module_label in installed_app_names:
+                continue
+            else:
                 settings.INSTALLED_APPS.append(module_label)
             app_config = AppConfig.create(module_label)
             apps.app_configs[app_config.label] = app_config

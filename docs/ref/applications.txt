@@ -78,6 +78,15 @@ to determine which application this configuration applies to. You can define
 any attributes documented in the :class:`~django.apps.AppConfig` API
 reference.
 
+.. note::
+
+    You can make this AppConfig subclass the default for your app by setting
+    ``default_app_config = 'rock_n_roll.apps.RockNRollConfig'`` in
+    ``rocknroll/__init__.py`` -- that will cause this ``AppConfig`` to be used
+    if a user has just ``"rocknroll"`` in their ``INSTALLED_APPS``. Alternatively,
+    you can tell your users to put ``"rocknroll.apps.RockNRollConfig"`` in
+    their ``INSTALLED_APPS``.
+
 For application users
 ---------------------
 
