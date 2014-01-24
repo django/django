@@ -64,7 +64,7 @@ class SystemChecksTestCase(TestCase):
         expected = [
             checks.Error(
                 ('"list_editable[0]" refers to field "original_release", '
-                    'whih is not editable through the admin.'),
+                    'which is not editable through the admin.'),
                 hint=None,
                 obj=SongAdmin,
                 id='admin.E126',
