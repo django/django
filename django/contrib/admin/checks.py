@@ -791,6 +791,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
                         id='admin.E126',
                     )
                 ]
+            else:
+                return []
 
     def _check_search_fields(self, cls, model):
         """ Check search_fields is a sequence. """

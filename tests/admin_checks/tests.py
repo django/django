@@ -52,6 +52,30 @@ class SystemChecksTestCase(TestCase):
     def test_readonly_and_editable(self):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ["original_release"]
+            list_display = ["pk", "original_release"]
+            list_editable = ["original_release"]
+            fieldsets = [
+                (None, {
+                    "fields": ["title", "original_release"],
+                }),
+            ]
+
+        errors = SongAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                ('"list_editable[0]" refers to field "original_release", '
+                    'whih is not editable through the admin.'),
+                hint=None,
+                obj=SongAdmin,
+                id='admin.E126',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_editable(self):
+        class SongAdmin(admin.ModelAdmin):
+            list_display = ["pk", "title"]
+            list_editable = ["title"]
             fieldsets = [
                 (None, {
                     "fields": ["title", "original_release"],
