@@ -161,7 +161,7 @@ class AdminSite(object):
         installed, as well as the auth context processor.
         """
         if not apps.is_installed('django.contrib.admin'):
-            raise ImproperlyConfigured("Put 'django.contrib.admin.apps.AdminConfig' in "
+            raise ImproperlyConfigured("Put 'django.contrib.admin' in "
                 "your INSTALLED_APPS setting in order to use the admin application.")
         if not apps.is_installed('django.contrib.contenttypes'):
             raise ImproperlyConfigured("Put 'django.contrib.contenttypes' in "

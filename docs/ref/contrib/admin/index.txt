@@ -23,12 +23,7 @@ The admin is enabled in the default project template used by
 
 For reference, here are the requirements:
 
-1. Add ``'django.contrib.admin.apps.AdminConfig'`` to your
-   :setting:`INSTALLED_APPS` setting.
-
-   .. versionchanged:: 1.7
-
-       :setting:`INSTALLED_APPS` used to contain ``'django.contrib.admin'``.
+1. Add ``'django.contrib.admin'`` to your :setting:`INSTALLED_APPS` setting.
 
 2. The admin has four dependencies - :mod:`django.contrib.auth`,
    :mod:`django.contrib.contenttypes`,
@@ -136,16 +131,23 @@ The register decorator
 Discovery of admin files
 ------------------------
 
-The admin needs to be instructed to look for ``admin.py`` files in your project.
-The easiest solution is to put ``'django.contrib.admin.apps.AdminConfig'`` in
-your :setting:`INSTALLED_APPS` setting.
+When you put ``'django.contrib.admin'`` in your :setting:`INSTALLED_APPS`
+setting, Django automatically looks for an ``admin`` module in each
+application and imports it.
 
 .. class:: apps.AdminConfig
 
     .. versionadded:: 1.7
 
-    This class calls :func:`~django.contrib.admin.autodiscover()` when Django
-    starts.
+    This is the default :class:`~django.apps.AppConfig` class for the admin.
+    It calls :func:`~django.contrib.admin.autodiscover()` when Django starts.
+
+.. class:: apps.SimpleAdminConfig
+
+    .. versionadded:: 1.7
+
+    This class works like :class:`~django.contrib.admin.apps.AdminConfig`,
+    except it doesn't call :func:`~django.contrib.admin.autodiscover()`.
 
 .. function:: autodiscover
 
@@ -155,13 +157,23 @@ your :setting:`INSTALLED_APPS` setting.
     .. versionchanged:: 1.7
 
         Previous versions of Django recommended calling this function directly
-        in the URLconf. :class:`~django.contrib.admin.apps.AdminConfig`
-        replaces that mechanism and is more robust.
+        in the URLconf. As of Django 1.7 this isn't needed anymore.
+        :class:`~django.contrib.admin.apps.AdminConfig` takes care of running
+        the auto-discovery automatically.
 
 If you are using a custom ``AdminSite``, it is common to import all of the
 ``ModelAdmin`` subclasses into your code and register them to the custom
-``AdminSite``. In that case, simply put ``'django.contrib.admin'`` in your
-:setting:`INSTALLED_APPS` setting, as you don't need autodiscovery.
+``AdminSite``. In that case, in order to disable auto-discovery, you should
+put ``'django.contrib.admin.apps.SimpleAdminConfig'`` instead of
+``'django.contrib.admin'`` in your :setting:`INSTALLED_APPS` setting.
+
+.. versionchanged:: 1.7
+
+    In previous versions, the admin needed to be instructed to look for
+    ``admin.py`` files with :func:`~django.contrib.admin.autodiscover()`.
+    As of Django 1.7, auto-discovery is enabled by default and must be
+    explicitly disabled when it's undesirable.
+
 
 ``ModelAdmin`` options
 ----------------------
@@ -2426,11 +2438,12 @@ In this example, we register the ``AdminSite`` instance
         (r'^myadmin/', include(admin_site.urls)),
     )
 
-Note that you don't need autodiscovery of ``admin`` modules when using your
+Note that you may not want autodiscovery of ``admin`` modules when using your
 own ``AdminSite`` instance since you will likely be importing all the per-app
-``admin`` modules in your ``myproject.admin`` module. This means you likely do
-not need ``'django.contrib.admin.app.AdminConfig'`` in your
-:setting:`INSTALLED_APPS` and can just use ``'django.contrib.admin'``.
+``admin`` modules in your ``myproject.admin`` module. This means you need to
+put ``'django.contrib.admin.app.SimpleAdminConfig'`` instead of
+``'django.contrib.admin'`` in your :setting:`INSTALLED_APPS` setting.
+
 
 Multiple admin sites in the same URLconf
 ----------------------------------------

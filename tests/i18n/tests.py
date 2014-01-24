@@ -1049,7 +1049,7 @@ class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):
             # Doesn't work because it's added later in the list.
             self.assertUgettext('Date/time', 'Datum/Zeit')
 
-            with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.admin'}):
+            with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.admin.apps.SimpleAdminConfig'}):
                 self.flush_caches()
                 activate('de')
 

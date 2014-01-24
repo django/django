@@ -61,13 +61,12 @@ class AppConfig(object):
         Factory that creates an app config from an entry in INSTALLED_APPS.
         """
         try:
-            # If import_module succeeds, entry is a path to an app module.
+            # If import_module succeeds, entry is a path to an app module,
+            # which may specify an app config class with default_app_config.
             # Otherwise, entry is a path to an app config class or an error.
             module = import_module(entry)
 
         except ImportError:
-            # Avoid django.utils.module_loading.import_by_path because it
-            # masks errors -- it reraises ImportError as ImproperlyConfigured.
             mod_path, _, cls_name = entry.rpartition('.')
 
             # Raise the original exception when entry cannot be a path to an
@@ -75,39 +74,51 @@ class AppConfig(object):
             if not mod_path:
                 raise
 
-            mod = import_module(mod_path)
-            try:
-                cls = getattr(mod, cls_name)
-            except AttributeError:
-                # Emulate the error that "from <mod_path> import <cls_name>"
-                # would raise when <mod_path> exists but not <cls_name>, with
-                # more context (Python just says "cannot import name ...").
-                raise ImportError(
-                    "cannot import name '%s' from '%s'" % (cls_name, mod_path))
-
-            # Check for obvious errors. (This check prevents duck typing, but
-            # it could be removed if it became a problem in practice.)
-            if not issubclass(cls, AppConfig):
-                raise ImproperlyConfigured(
-                    "'%s' isn't a subclass of AppConfig." % entry)
-
-            # Obtain app name here rather than in AppClass.__init__ to keep
-            # all error checking for entries in INSTALLED_APPS in one place.
-            try:
-                app_name = cls.name
-            except AttributeError:
-                raise ImproperlyConfigured(
-                    "'%s' must supply a name attribute." % entry)
-
-            # Ensure app_name points to a valid module.
-            app_module = import_module(app_name)
-
-            # Entry is a path to an app config class.
-            return cls(app_name, app_module)
-
         else:
-            # Entry is a path to an app module.
-            return cls(entry, module)
+            try:
+                # If this works, the app module specifies an app config class.
+                entry = module.default_app_config
+            except AttributeError:
+                # Otherwise, it simply uses the default app config class.
+                return cls(entry, module)
+            else:
+                mod_path, _, cls_name = entry.rpartition('.')
+
+        # If we're reaching this point, we must load the app config class
+        # located at <mod_path>.<cls_name>.
+
+        # Avoid django.utils.module_loading.import_by_path because it
+        # masks errors -- it reraises ImportError as ImproperlyConfigured.
+        mod = import_module(mod_path)
+        try:
+            cls = getattr(mod, cls_name)
+        except AttributeError:
+            # Emulate the error that "from <mod_path> import <cls_name>"
+            # would raise when <mod_path> exists but not <cls_name>, with
+            # more context (Python just says "cannot import name ...").
+            raise ImportError(
+                "cannot import name '%s' from '%s'" % (cls_name, mod_path))
+
+        # Check for obvious errors. (This check prevents duck typing, but
+        # it could be removed if it became a problem in practice.)
+        if not issubclass(cls, AppConfig):
+            raise ImproperlyConfigured(
+                "'%s' isn't a subclass of AppConfig." % entry)
+
+        # Obtain app name here rather than in AppClass.__init__ to keep
+        # all error checking for entries in INSTALLED_APPS in one place.
+        try:
+            app_name = cls.name
+        except AttributeError:
+            raise ImproperlyConfigured(
+                "'%s' must supply a name attribute." % entry)
+
+        # Ensure app_name points to a valid module.
+        app_module = import_module(app_name)
+
+        # Entry is a path to an app config class.
+        return cls(app_name, app_module)
+
 
     def get_model(self, model_name):
         """
