@@ -204,8 +204,7 @@ class Apps(object):
         It's safe to call this method at import time, even while the registry
         is being populated. It returns False for apps that aren't loaded yet.
         """
-        app_config = self.app_configs.get(app_name.rpartition(".")[2])
-        return app_config is not None and app_config.name == app_name
+        return any(ac.name == app_name for ac in self.app_configs.values())
 
     def get_containing_app_config(self, object_name):
         """

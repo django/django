@@ -109,6 +109,7 @@ class AppsTests(TestCase):
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_is_installed(self):
         self.assertTrue(apps.is_installed('django.contrib.admin'))
+        self.assertTrue(apps.is_installed('django.contrib.auth'))
         self.assertTrue(apps.is_installed('django.contrib.staticfiles'))
         self.assertFalse(apps.is_installed('django.contrib.webdesign'))
 
