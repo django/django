@@ -435,7 +435,7 @@ look like this:
     :filename: mysite/settings.py
 
     INSTALLED_APPS = (
-        'django.contrib.admin.apps.AdminConfig',
+        'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
@@ -443,13 +443,6 @@ look like this:
         'django.contrib.staticfiles',
         'polls',
     )
-
-.. admonition:: Doesn't match what you see?
-
-    If you're seeing ``'django.contrib.admin'`` instead of
-    ``'django.contrib.admin.apps.AdminConfig'``, you're probably using a
-    version of Django that doesn't match this tutorial version.  You'll want
-    to either switch to the older tutorial or the newer Django version.
 
 Now Django knows to include the ``polls`` app. Let's run another command:
 

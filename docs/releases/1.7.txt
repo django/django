@@ -89,16 +89,13 @@ Improvements thus far include:
 * The name of applications can be customized in the admin with the
   :attr:`~django.apps.AppConfig.verbose_name` of application configurations.
 
+* The admin automatically calls :func:`~django.contrib.admin.autodiscover()`
+  when Django starts. You can consequently remove this line from your
+  URLconf.
+
 * Django imports all application configurations and models as soon as it
   starts, through a deterministic and straightforward process. This should
   make it easier to diagnose import issues such as import loops.
-
-* The admin has an :class:`~django.contrib.admin.apps.AdminConfig` application
-  configuration class. When Django starts, this class takes care of calling
-  :func:`~django.contrib.admin.autodiscover()`. To use it, simply replace
-  ``'django.contrib.admin'`` in :setting:`INSTALLED_APPS` with
-  ``'django.contrib.admin.apps.AdminConfig'`` and remove
-  ``admin.autodiscover()`` from your URLconf.
 
 New method on Field subclasses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -697,6 +694,12 @@ regressions cannot be ruled out. You may encounter the following exceptions:
   executing code at import time, you can move it into a function and cache its
   results. The code will be executed when you first need its results. This
   concept is known as "lazy evaluation".
+
+* ``django.contrib.admin`` will now automatically perform autodiscovery of
+  ``admin`` modules in installed applications. To prevent it, change your
+  :setting:`INSTALLED_APPS` to contain
+  ``'django.contrib.admin.apps.SimpleAdminConfig'`` instead of
+  ``'django.contrib.admin'``.
 
 Standalone scripts
 ^^^^^^^^^^^^^^^^^^

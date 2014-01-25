@@ -115,7 +115,7 @@ In addition, modify the :setting:`INSTALLED_APPS` setting to include
 and ``world`` (your newly created application)::
 
     INSTALLED_APPS = (
-        'django.contrib.admin.apps.AdminConfig',
+        'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',

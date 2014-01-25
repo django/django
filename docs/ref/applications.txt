@@ -49,9 +49,15 @@ Configuring applications
 To configure an application, subclass :class:`~django.apps.AppConfig` and put
 the dotted path to that subclass in :setting:`INSTALLED_APPS`.
 
-Django uses the default :class:`~django.apps.AppConfig` class when
-:setting:`INSTALLED_APPS` simply contains the dotted path to an application
-module.
+When :setting:`INSTALLED_APPS` simply contains the dotted path to an
+application module, Django checks for a ``default_app_config`` variable in
+that module.
+
+If it's defined, it's the dotted path to the :class:`~django.apps.AppConfig`
+subclass for that application.
+
+If there is no ``default_app_config``, Django uses the base
+:class:`~django.apps.AppConfig` class.
 
 For application authors
 -----------------------
@@ -67,8 +73,23 @@ would provide a proper name for the admin::
         name = 'rock_n_roll'
         verbose_name = "Rock ’n’ roll"
 
-You would then tell your users to add ``'rock_n_roll.apps.RockNRollConfig'``
-to their :setting:`INSTALLED_APPS`.
+You can make your application load this :class:`~django.apps.AppConfig`
+subclass by default as follows::
+
+    # rock_n_roll/__init__.py
+
+    default_app_config = 'rock_n_roll.apps.RockNRollConfig'
+
+That will cause ``RockNRollConfig`` to be used when :setting:`INSTALLED_APPS`
+just contains ``'rock_n_roll'``. This allows you to make use of
+:class:`~django.apps.AppConfig` features without requiring your users to
+update their :setting:`INSTALLED_APPS` setting.
+
+Of course, you can also tell your users to put
+``'rock_n_roll.apps.RockNRollConfig'`` in their :setting:`INSTALLED_APPS`
+setting. You can even provide several different
+:class:`~django.apps.AppConfig` subclasses with different behaviors and allow
+your users to choose one via their :setting:`INSTALLED_APPS` setting.
 
 The recommended convention is to put the configuration class in a submodule of
 the application called ``apps``. However, this isn't enforced by Django.
@@ -87,7 +108,7 @@ configuration::
 
     # anthology/apps.py
 
-    from rock_n_roll.app import RockNRollConfig
+    from rock_n_roll.apps import RockNRollConfig
 
     class GypsyJazzConfig(RockNRollConfig):
         verbose_name = "Gypsy jazz"
@@ -213,7 +234,7 @@ Application registry
 .. method:: apps.is_installed(app_name)
 
     Checks whether an application with the given name exists in the registry.
-    ``app_name`` is the full name of the app, e.g. 'django.contrib.admin'.
+    ``app_name`` is the full name of the app, e.g. ``'django.contrib.admin'``.
 
     Unlike :meth:`~django.apps.apps.get_app_config`, this method can be called
     safely at import time. If the registry is still being populated, it may
