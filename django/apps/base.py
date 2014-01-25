@@ -39,9 +39,18 @@ class AppConfig(object):
         # egg. Otherwise it's a unicode on Python 2 and a str on Python 3.
         if not hasattr(self, 'path'):
             try:
-                self.path = upath(app_module.__path__[0])
+                paths = app_module.__path__
             except AttributeError:
                 self.path = None
+            else:
+                # Convert paths to list because Python 3.3 _NamespacePath does
+                # not support indexing.
+                paths = list(paths)
+                if len(paths) > 1:
+                    raise ImproperlyConfigured(
+                        "The namespace package app %r has multiple locations, "
+                        "which is not supported: %r" % (app_name, paths))
+                self.path = upath(paths[0])
 
         # Module containing models eg. <module 'django.contrib.admin.models'
         # from 'django/contrib/admin/models.pyc'>. Set by import_models().

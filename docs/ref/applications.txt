@@ -188,6 +188,26 @@ Methods
         def ready(self):
             MyModel = self.get_model('MyModel')
 
+Namespace packages as apps (Python 3.3+)
+----------------------------------------
+
+Python versions 3.3 and later support Python packages without an
+``__init__.py`` file. These packages are known as "namespace packages" and may
+be spread across multiple directories at different locations on ``sys.path``
+(see :pep:`420`).
+
+Django applications require a single base filesystem path where Django
+(depending on configuration) will search for templates, static assets,
+etc. Thus, namespace packages may only be Django applications if one of the
+following is true:
+
+1. The namespace package actually has only a single location (i.e. is not
+   spread across more than one directory.)
+
+2. The :class:`~django.apps.AppConfig` class used to configure the application
+   has a ``path`` class attribute, which is the absolute directory path Django
+   will use as the single base path for the application.
+
 Application registry
 ====================
 
