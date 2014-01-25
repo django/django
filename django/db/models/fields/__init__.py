@@ -329,6 +329,10 @@ class Field(RegisterLookupMixin):
         equals_comparison = set(["choices", "validators", "db_tablespace"])
         for name, default in possibles.items():
             value = getattr(self, attr_overrides.get(name, name))
+            # Unroll anything iterable for choices into a concrete list
+            if name == "choices" and isinstance(value, collections.Iterable):
+                value = list(value)
+            # Do correct kind of comparison
             if name in equals_comparison:
                 if value != default:
                     keywords[name] = value
