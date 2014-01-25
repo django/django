@@ -191,7 +191,7 @@ class NamespacePackageAppTests(TestCase):
 
     @contextmanager
     def add_to_path(self, *paths):
-        """Context manager to temporarily add relative paths to sys.path."""
+        """Context manager to temporarily add paths to sys.path."""
         _orig_sys_path = sys.path[:]
         sys.path.extend(paths)
         try:
@@ -217,7 +217,7 @@ class NamespacePackageAppTests(TestCase):
 
         """
         # Temporarily add two directories to sys.path that both contain
-        # components of the "nsapp" app.
+        # components of the "nsapp" package.
         with self.add_to_path(self.base_location, self.other_location):
             with self.assertRaises(ImproperlyConfigured):
                 with self.settings(INSTALLED_APPS=['nsapp']):
@@ -228,7 +228,7 @@ class NamespacePackageAppTests(TestCase):
         Multiple locations are ok only if app-config has explicit path.
         """
         # Temporarily add two directories to sys.path that both contain
-        # components of the "nsapp" app.
+        # components of the "nsapp" package.
         with self.add_to_path(self.base_location, self.other_location):
             with self.settings(INSTALLED_APPS=['nsapp.apps.NSAppConfig']):
                 app_config = apps.get_app_config('nsapp')
