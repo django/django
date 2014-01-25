@@ -12,14 +12,15 @@ Managing database transactions
 Django's default transaction behavior
 -------------------------------------
 
-Django's default behavior is to run in autocommit mode. Each query is
-immediately committed to the database. :ref:`See below for details
-<autocommit-details>`.
+Django's default behavior is to run in autocommit mode. Any query not
+inside a transaction is automatically committed to the database when
+evaluated. :ref:`See below for details <autocommit-details>`.
 
 Django uses transactions or savepoints automatically to guarantee the
 integrity of ORM operations that require multiple queries, especially
 :ref:`delete() <topics-db-queries-delete>` and :ref:`update()
-<topics-db-queries-update>` queries.
+<topics-db-queries-update>` queries. Django's :class:`~django.test.TestCase`
+class also wraps its tests in transactions.
 
 .. versionchanged:: 1.6
 
@@ -231,13 +232,15 @@ Why Django uses autocommit
 --------------------------
 
 In the SQL standards, each SQL query starts a transaction, unless one is
-already in progress. Such transactions must then be committed or rolled back.
+already in progress. Such transactions must then be manually committed or
+rolled back.
 
 This isn't always convenient for application developers. To alleviate this
 problem, most databases provide an autocommit mode. When autocommit is turned
-on, each SQL query is wrapped in its own transaction. In other words, the
-transaction is not only automatically started, but also automatically
-committed.
+on, any SQL query not already inside a transaction automatically gets wrapped
+in its own transaction. In particular, each such query not only starts a
+transaction automatically, but also gets committed (or rolled back)
+automatically.
 
 :pep:`249`, the Python Database API Specification v2.0, requires autocommit to
 be initially turned off. Django overrides this default and turns autocommit
