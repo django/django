@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 from collections import OrderedDict
 import hashlib
-from importlib import import_module
 import os
 import posixpath
 import re
@@ -16,7 +15,6 @@ from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import LazyObject
 from django.utils.six.moves.urllib.parse import unquote, urlsplit, urlunsplit, urldefrag
-from django.utils._os import upath
 
 from django.contrib.staticfiles.utils import check_settings, matches_patterns
 
@@ -381,25 +379,6 @@ class ManifestStaticFilesStorage(ManifestFilesMixin, StaticFilesStorage):
     hashed copies of the files it saves.
     """
     pass
-
-
-class AppStaticStorage(FileSystemStorage):
-    """
-    A file system storage backend that takes an app module and works
-    for the ``static`` directory of it.
-    """
-    prefix = None
-    source_dir = 'static'
-
-    def __init__(self, app, *args, **kwargs):
-        """
-        Returns a static file storage if available in the given app.
-        """
-        # app is the actual app module
-        mod = import_module(app)
-        mod_path = os.path.dirname(upath(mod.__file__))
-        location = os.path.join(mod_path, self.source_dir)
-        super(AppStaticStorage, self).__init__(location, *args, **kwargs)
 
 
 class ConfiguredStorage(LazyObject):
