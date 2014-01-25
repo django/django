@@ -1,12 +1,16 @@
 from __future__ import unicode_literals
 
 import string
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.db.models.signals import pre_save, pre_delete
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import python_2_unicode_compatible
+
+from .requests import RequestSite as RealRequestSite
+from .shortcuts import get_current_site as real_get_current_site
 
 
 SITE_CACHE = {}
@@ -74,38 +78,19 @@ class Site(models.Model):
         return self.domain
 
 
-@python_2_unicode_compatible
-class RequestSite(object):
-    """
-    A class that shares the primary interface of Site (i.e., it has
-    ``domain`` and ``name`` attributes) but gets its data from a Django
-    HttpRequest object rather than from a database.
-
-    The save() and delete() methods raise NotImplementedError.
-    """
-    def __init__(self, request):
-        self.domain = self.name = request.get_host()
-
-    def __str__(self):
-        return self.domain
-
-    def save(self, force_insert=False, force_update=False):
-        raise NotImplementedError('RequestSite cannot be saved.')
-
-    def delete(self):
-        raise NotImplementedError('RequestSite cannot be deleted.')
+class RequestSite(RealRequestSite):
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "Please import RequestSite from django.contrib.sites.requests.",
+            PendingDeprecationWarning, stacklevel=2)
+        super(RequestSite, self).__init__(*args, **kwargs)
 
 
 def get_current_site(request):
-    """
-    Checks if contrib.sites is installed and returns either the current
-    ``Site`` object or a ``RequestSite`` object based on the request.
-    """
-    if Site._meta.installed:
-        current_site = Site.objects.get_current()
-    else:
-        current_site = RequestSite(request)
-    return current_site
+    warnings.warn(
+        "Please import get_current_site from django.contrib.sites.shortcuts.",
+        PendingDeprecationWarning, stacklevel=2)
+    return real_get_current_site(request)
 
 
 def clear_site_cache(sender, **kwargs):

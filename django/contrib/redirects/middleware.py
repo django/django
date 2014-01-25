@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.apps import apps
 from django.conf import settings
 from django.contrib.redirects.models import Redirect
-from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured
 from django import http
 

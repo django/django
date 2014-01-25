@@ -4,7 +4,8 @@ import os
 import re
 
 from django.conf import global_settings, settings
-from django.contrib.sites.models import Site, RequestSite
+from django.contrib.sites.models import Site
+from django.contrib.sites.requests import RequestSite
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
 from django.core import mail

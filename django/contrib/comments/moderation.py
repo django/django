@@ -62,7 +62,7 @@ from django.contrib.comments import signals
 from django.db.models.base import ModelBase
 from django.template import Context, loader
 from django.contrib import comments
-from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 from django.utils import timezone
 
 class AlreadyModerated(Exception):
