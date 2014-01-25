@@ -4,7 +4,7 @@ import unittest
 
 from django.test import TransactionTestCase
 from django.db import connection, DatabaseError, IntegrityError, OperationalError
-from django.db.models.fields import IntegerField, TextField, CharField, SlugField
+from django.db.models.fields import IntegerField, TextField, CharField, SlugField, BooleanField
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.transaction import atomic
 from .models import (Author, AuthorWithM2M, Book, BookWithLongName,
@@ -184,6 +184,32 @@ class SchemaTests(TransactionTestCase):
         self.assertEqual(columns['surname'][0], "CharField")
         self.assertEqual(columns['surname'][1][6],
                          connection.features.interprets_empty_strings_as_nulls)
+
+    def test_add_field_temp_default_boolean(self):
+        """
+        Tests adding fields to models with a temporary default where
+        the default is False. (#21783)
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Ensure there's no age field
+        columns = self.column_classes(Author)
+        self.assertNotIn("age", columns)
+        # Add some rows of data
+        Author.objects.create(name="Andrew", height=30)
+        Author.objects.create(name="Andrea")
+        # Add a not-null field
+        new_field = BooleanField(default=False)
+        new_field.set_attributes_from_name("awesome")
+        with connection.schema_editor() as editor:
+            editor.add_field(
+                Author,
+                new_field,
+            )
+        # Ensure the field is right afterwards
+        columns = self.column_classes(Author)
+        self.assertEqual(columns['awesome'][0], "BooleanField")
 
     def test_alter(self):
         """

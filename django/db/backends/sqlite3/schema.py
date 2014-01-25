@@ -30,7 +30,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         for field in create_fields:
             body[field.name] = field
             # If there's a default, insert it into the copy map
-            if field.get_default():
+            if field.has_default():
                 mapping[field.column] = self.connection.ops.quote_parameter(
                     field.get_default()
                 )
