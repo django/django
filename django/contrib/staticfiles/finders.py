@@ -11,7 +11,6 @@ from django.utils._os import safe_join
 from django.utils import six, lru_cache
 
 from django.contrib.staticfiles import utils
-from django.contrib.staticfiles.storage import AppStaticStorage
 
 
 class BaseFinder(object):
@@ -110,24 +109,27 @@ class FileSystemFinder(BaseFinder):
 class AppDirectoriesFinder(BaseFinder):
     """
     A static files finder that looks in the directory of each app as
-    specified in the source_dir attribute of the given storage class.
+    specified in the source_dir attribute.
     """
-    storage_class = AppStaticStorage
+    storage_class = FileSystemStorage
+    source_dir = 'static'
 
     def __init__(self, app_names=None, *args, **kwargs):
         # The list of apps that are handled
         self.apps = []
         # Mapping of app names to storage instances
         self.storages = OrderedDict()
-        if app_names is None:
-            app_configs = apps.get_app_configs()
-            app_names = [app_config.name for app_config in app_configs]
-        for app in app_names:
-            app_storage = self.storage_class(app)
+        app_configs = apps.get_app_configs()
+        if app_names:
+            app_names = set(app_names)
+            app_configs = [ac for ac in app_configs if ac.name in app_names]
+        for app_config in app_configs:
+            app_storage = self.storage_class(
+                os.path.join(app_config.path, self.source_dir))
             if os.path.isdir(app_storage.location):
-                self.storages[app] = app_storage
-                if app not in self.apps:
-                    self.apps.append(app)
+                self.storages[app_config.name] = app_storage
+                if app_config.name not in self.apps:
+                    self.apps.append(app_config.name)
         super(AppDirectoriesFinder, self).__init__(*args, **kwargs)
 
     def list(self, ignore_patterns):
@@ -158,11 +160,6 @@ class AppDirectoriesFinder(BaseFinder):
         """
         storage = self.storages.get(app, None)
         if storage:
-            if storage.prefix:
-                prefix = '%s%s' % (storage.prefix, os.sep)
-                if not path.startswith(prefix):
-                    return None
-                path = path[len(prefix):]
             # only try to find a file if the source dir actually exists
             if storage.exists(path):
                 matched_path = storage.path(path)

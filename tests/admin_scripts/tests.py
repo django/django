@@ -1113,7 +1113,7 @@ class ManageCheck(AdminScriptTestCase):
             apps=[
                 'admin_scripts.complex_app',
                 'admin_scripts.simple_app',
-                'django.contrib.admin',
+                'django.contrib.admin.apps.SimpleAdminConfig',
                 'django.contrib.auth',
                 'django.contrib.contenttypes',
             ],

@@ -209,7 +209,13 @@ class SchemaTests(TransactionTestCase):
             )
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
-        self.assertEqual(columns['awesome'][0], "BooleanField")
+        # BooleanField are stored as TINYINT(1) on MySQL.
+        field_type, field_info = columns['awesome']
+        if connection.vendor == 'mysql':
+            self.assertEqual(field_type, 'IntegerField')
+            self.assertEqual(field_info.precision, 1)
+        else:
+            self.assertEqual(field_type, 'BooleanField')
 
     def test_alter(self):
         """
