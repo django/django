@@ -1,0 +1,15 @@
+==========================
+Django 1.5.6 release notes
+==========================
+
+*Under development*
+
+Django's vendored version of six, :mod:`django.utils.six`, has been upgraded to
+the latest release (1.5.2).
+
+Bugfixes
+========
+
+* Fixed :class:`~django.contrib.auth.backends.ModelBackend` raising
+  ``UnboundLocalError`` if :func:`~django.contrib.auth.get_user_model`
+  raised an error (#21439).
