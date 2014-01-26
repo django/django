@@ -2,16 +2,14 @@
 from __future__ import unicode_literals
 
 from django.apps import apps
+from django.conf import settings
 from django.core import checks
 
 
 def check_user_model(**kwargs):
-    from django.conf import settings
-
     errors = []
-    app_name, model_name = settings.AUTH_USER_MODEL.split('.')
 
-    cls = apps.get_model(app_name, model_name)
+    cls = apps.get_model(settings.AUTH_USER_MODEL)
 
     # Check that REQUIRED_FIELDS is a list
     if not isinstance(cls.REQUIRED_FIELDS, (list, tuple)):

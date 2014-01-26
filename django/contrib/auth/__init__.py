@@ -1,6 +1,7 @@
 import inspect
 import re
 
+from django.apps import apps as django_apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.utils.module_loading import import_by_path
@@ -123,17 +124,12 @@ def get_user_model():
     """
     Returns the User model that is active in this project.
     """
-    from django.apps import apps
-
     try:
-        app_label, model_name = settings.AUTH_USER_MODEL.split('.')
+        return django_apps.get_model(settings.AUTH_USER_MODEL)
     except ValueError:
         raise ImproperlyConfigured("AUTH_USER_MODEL must be of the form 'app_label.model_name'")
-    try:
-        user_model = apps.get_model(app_label, model_name)
     except LookupError:
         raise ImproperlyConfigured("AUTH_USER_MODEL refers to model '%s' that has not been installed" % settings.AUTH_USER_MODEL)
-    return user_model
 
 
 def get_user(request):

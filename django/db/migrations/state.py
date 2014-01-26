@@ -194,7 +194,7 @@ class ModelState(object):
         # Then, work out our bases
         try:
             bases = tuple(
-                (apps.get_model(*base.split(".", 1)) if isinstance(base, six.string_types) else base)
+                (apps.get_model(base) if isinstance(base, six.string_types) else base)
                 for base in self.bases
             )
         except LookupError:

@@ -277,12 +277,11 @@ class Deserializer(base.Deserializer):
                 "<%s> node is missing the required '%s' attribute"
                 % (node.nodeName, attr))
         try:
-            Model = apps.get_model(*model_identifier.split("."))
+            return apps.get_model(model_identifier)
         except (LookupError, TypeError):
             raise base.DeserializationError(
                 "<%s> node has invalid model identifier: '%s'"
                 % (node.nodeName, model_identifier))
-        return Model
 
 
 def getInnerText(node):
