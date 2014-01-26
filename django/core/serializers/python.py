@@ -153,7 +153,6 @@ def _get_model(model_identifier):
     Helper to look up a model from an "app_label.model_name" string.
     """
     try:
-        Model = apps.get_model(*model_identifier.split("."))
+        return apps.get_model(model_identifier)
     except (LookupError, TypeError):
         raise base.DeserializationError("Invalid model identifier: '%s'" % model_identifier)
-    return Model

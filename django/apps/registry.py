@@ -170,16 +170,22 @@ class Apps(object):
                 include_auto_created, include_deferred, include_swapped)))
         return result
 
-    def get_model(self, app_label, model_name):
+    def get_model(self, app_label, model_name=None):
         """
         Returns the model matching the given app_label and model_name.
+
+        As a shortcut, this function also accepts a single argument in the
+        form <app_label>.<model_name>.
 
         model_name is case-insensitive.
 
         Raises LookupError if no application exists with this label, or no
-        model exists with this name in the application.
+        model exists with this name in the application. Raises ValueError if
+        called with a single argument that doesn't contain exactly one dot.
         """
         self.check_ready()
+        if model_name is None:
+            app_label, model_name = app_label.split('.')
         return self.get_app_config(app_label).get_model(model_name.lower())
 
     def register_model(self, app_label, model):
