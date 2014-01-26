@@ -6,6 +6,9 @@ Django 1.6.2 release notes
 
 This is Django 1.6.2, a bugfix release for Django 1.6.
 
+Django's vendored version of six, :mod:`django.utils.six` has been upgraded to
+the latest release (1.5.2).
+
 Bug fixes
 =========
 
@@ -18,4 +21,15 @@ Bug fixes
 * The :djadmin:`collectstatic` command will raise an error rather than
   default to using the current working directory if :setting:`STATIC_ROOT` is
   not set. Combined with the ``--clear`` option, the previous behavior could
-  wipe anything below the current working directory.
+  wipe anything below the current working directory (#21581).
+
+* Fixed mail encoding on Python 3.3.3+ (#21093).
+
+* Fixed an issue where when
+  ``settings.DATABASES['default']['AUTOCOMMIT'] = False``, the connection
+  wasn't in autocommit mode but Django pretended it was.
+
+* Fixed a regression in multiple-table inheritance ``exclude()`` queries
+  (#21787).
+
+* Added missing items to ``django.utils.timezone.__all__`` (#21880).
