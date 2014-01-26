@@ -184,6 +184,9 @@ these changes.
 
 * ``AppCommand.handle_app()`` will no longer be supported.
 
+* ``RequestSite`` will be located in ``django.contrib.sites.requests`` and
+  ``get_current_site`` in ``django.contrib.sites.shortcuts``.
+
 * FastCGI support via the ``runfcgi`` management command will be
   removed. Please deploy your project using WSGI.
 

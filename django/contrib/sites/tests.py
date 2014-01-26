@@ -1,10 +1,13 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.contrib.sites.models import Site, RequestSite, get_current_site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpRequest
 from django.test import TestCase, modify_settings, override_settings
+
+from .models import Site
+from .requests import RequestSite
+from .shortcuts import get_current_site
 
 
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'})

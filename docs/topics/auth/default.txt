@@ -648,7 +648,7 @@ patterns.
     * ``site``: The current :class:`~django.contrib.sites.models.Site`,
       according to the :setting:`SITE_ID` setting. If you don't have the
       site framework installed, this will be set to an instance of
-      :class:`~django.contrib.sites.models.RequestSite`, which derives the
+      :class:`~django.contrib.sites.requests.RequestSite`, which derives the
       site name and domain from the current
       :class:`~django.http.HttpRequest`.
 
@@ -744,7 +744,7 @@ patterns.
     * ``site``: The current :class:`~django.contrib.sites.models.Site`,
       according to the :setting:`SITE_ID` setting. If you don't have the
       site framework installed, this will be set to an instance of
-      :class:`~django.contrib.sites.models.RequestSite`, which derives the
+      :class:`~django.contrib.sites.requests.RequestSite`, which derives the
       site name and domain from the current
       :class:`~django.http.HttpRequest`.
 

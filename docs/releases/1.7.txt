@@ -1009,6 +1009,19 @@ than simply ``myapp/models.py``, Django would look for :ref:`initial SQL data
 will search ``myapp/sql/`` as documented. The old location will continue to
 work until Django 1.9.
 
+Reorganization of ``django.contrib.sites``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.contrib.sites`` provides reduced functionality when it isn't in
+:setting:`INSTALLED_APPS`. The app-loading refactor adds some constraints in
+that situation. As a consequence, two objects were moved, and the old
+locations are deprecated:
+
+* :class:`~django.contrib.sites.requests.RequestSite` now lives in
+  ``django.contrib.sites.requests``.
+* :func:`~django.contrib.sites.shortcuts.get_current_site` now lives in
+  ``django.contrib.sites.shortcuts``.
+
 ``declared_fieldsets`` attribute on ``ModelAdmin``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

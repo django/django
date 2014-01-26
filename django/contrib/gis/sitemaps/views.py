@@ -5,7 +5,7 @@ import warnings
 from django.apps import apps
 from django.http import HttpResponse, Http404
 from django.template import loader
-from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 from django.core import urlresolvers
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.contrib.gis.db.models.fields import GeometryField
