@@ -7,6 +7,7 @@ from zipimport import zipimporter
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase, modify_settings
+from django.test.utils import extend_sys_path
 from django.utils import six
 from django.utils.module_loading import autodiscover_modules, import_by_path, module_has_submodule
 from django.utils._os import upath
@@ -54,11 +55,9 @@ class DefaultLoader(unittest.TestCase):
 
 class EggLoader(unittest.TestCase):
     def setUp(self):
-        self.old_path = sys.path[:]
         self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
 
     def tearDown(self):
-        sys.path = self.old_path
         sys.path_importer_cache.clear()
 
         sys.modules.pop('egg_module.sub1.sub2.bad_module', None)
@@ -72,40 +71,40 @@ class EggLoader(unittest.TestCase):
     def test_shallow_loader(self):
         "Module existence can be tested inside eggs"
         egg_name = '%s/test_egg.egg' % self.egg_dir
-        sys.path.append(egg_name)
-        egg_module = import_module('egg_module')
+        with extend_sys_path(egg_name):
+            egg_module = import_module('egg_module')
 
-        # An importable child
-        self.assertTrue(module_has_submodule(egg_module, 'good_module'))
-        mod = import_module('egg_module.good_module')
-        self.assertEqual(mod.content, 'Good Module')
+            # An importable child
+            self.assertTrue(module_has_submodule(egg_module, 'good_module'))
+            mod = import_module('egg_module.good_module')
+            self.assertEqual(mod.content, 'Good Module')
 
-        # A child that exists, but will generate an import error if loaded
-        self.assertTrue(module_has_submodule(egg_module, 'bad_module'))
-        self.assertRaises(ImportError, import_module, 'egg_module.bad_module')
+            # A child that exists, but will generate an import error if loaded
+            self.assertTrue(module_has_submodule(egg_module, 'bad_module'))
+            self.assertRaises(ImportError, import_module, 'egg_module.bad_module')
 
-        # A child that doesn't exist
-        self.assertFalse(module_has_submodule(egg_module, 'no_such_module'))
-        self.assertRaises(ImportError, import_module, 'egg_module.no_such_module')
+            # A child that doesn't exist
+            self.assertFalse(module_has_submodule(egg_module, 'no_such_module'))
+            self.assertRaises(ImportError, import_module, 'egg_module.no_such_module')
 
     def test_deep_loader(self):
         "Modules deep inside an egg can still be tested for existence"
         egg_name = '%s/test_egg.egg' % self.egg_dir
-        sys.path.append(egg_name)
-        egg_module = import_module('egg_module.sub1.sub2')
+        with extend_sys_path(egg_name):
+            egg_module = import_module('egg_module.sub1.sub2')
 
-        # An importable child
-        self.assertTrue(module_has_submodule(egg_module, 'good_module'))
-        mod = import_module('egg_module.sub1.sub2.good_module')
-        self.assertEqual(mod.content, 'Deep Good Module')
+            # An importable child
+            self.assertTrue(module_has_submodule(egg_module, 'good_module'))
+            mod = import_module('egg_module.sub1.sub2.good_module')
+            self.assertEqual(mod.content, 'Deep Good Module')
 
-        # A child that exists, but will generate an import error if loaded
-        self.assertTrue(module_has_submodule(egg_module, 'bad_module'))
-        self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.bad_module')
+            # A child that exists, but will generate an import error if loaded
+            self.assertTrue(module_has_submodule(egg_module, 'bad_module'))
+            self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.bad_module')
 
-        # A child that doesn't exist
-        self.assertFalse(module_has_submodule(egg_module, 'no_such_module'))
-        self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.no_such_module')
+            # A child that doesn't exist
+            self.assertFalse(module_has_submodule(egg_module, 'no_such_module'))
+            self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.no_such_module')
 
 
 class ModuleImportTestCase(unittest.TestCase):

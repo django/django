@@ -22,7 +22,8 @@ from django.template import (base as template_base, loader, Context,
 from django.template.loaders import app_directories, filesystem, cached
 from django.test import RequestFactory, TestCase
 from django.test.utils import (setup_test_template_loader,
-    restore_template_loaders, override_settings, TransRealMixin)
+    restore_template_loaders, override_settings, TransRealMixin,
+    extend_sys_path)
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
 from django.utils._os import upath
@@ -1857,13 +1858,11 @@ class TemplateTests(TransRealMixin, TestCase):
 class TemplateTagLoading(TestCase):
 
     def setUp(self):
-        self.old_path = sys.path[:]
         self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
         self.old_tag_modules = template_base.templatetags_modules
         template_base.templatetags_modules = []
 
     def tearDown(self):
-        sys.path = self.old_path
         template_base.templatetags_modules = self.old_tag_modules
 
     def test_load_error(self):
@@ -1878,23 +1877,23 @@ class TemplateTagLoading(TestCase):
     def test_load_error_egg(self):
         ttext = "{% load broken_egg %}"
         egg_name = '%s/tagsegg.egg' % self.egg_dir
-        sys.path.append(egg_name)
-        with self.assertRaises(template.TemplateSyntaxError):
-            with self.settings(INSTALLED_APPS=['tagsegg']):
-                template.Template(ttext)
-        try:
-            with self.settings(INSTALLED_APPS=['tagsegg']):
-                template.Template(ttext)
-        except template.TemplateSyntaxError as e:
-            self.assertTrue('ImportError' in e.args[0])
-            self.assertTrue('Xtemplate' in e.args[0])
+        with extend_sys_path(egg_name):
+            with self.assertRaises(template.TemplateSyntaxError):
+                with self.settings(INSTALLED_APPS=['tagsegg']):
+                    template.Template(ttext)
+            try:
+                with self.settings(INSTALLED_APPS=['tagsegg']):
+                    template.Template(ttext)
+            except template.TemplateSyntaxError as e:
+                self.assertTrue('ImportError' in e.args[0])
+                self.assertTrue('Xtemplate' in e.args[0])
 
     def test_load_working_egg(self):
         ttext = "{% load working_egg %}"
         egg_name = '%s/tagsegg.egg' % self.egg_dir
-        sys.path.append(egg_name)
-        with self.settings(INSTALLED_APPS=['tagsegg']):
-            template.Template(ttext)
+        with extend_sys_path(egg_name):
+            with self.settings(INSTALLED_APPS=['tagsegg']):
+                template.Template(ttext)
 
 
 class RequestContextTests(unittest.TestCase):

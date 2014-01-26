@@ -1,6 +1,5 @@
 from __future__ import absolute_import, unicode_literals
 
-from contextlib import contextmanager
 import os
 import sys
 from unittest import skipUnless
@@ -10,6 +9,7 @@ from django.apps.registry import Apps
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.test import TestCase, override_settings
+from django.test.utils import extend_sys_path
 from django.utils._os import upath
 from django.utils import six
 
@@ -189,21 +189,11 @@ class NamespacePackageAppTests(TestCase):
     other_location = os.path.join(HERE, 'namespace_package_other_base')
     app_path = os.path.join(base_location, 'nsapp')
 
-    @contextmanager
-    def add_to_path(self, *paths):
-        """Context manager to temporarily add paths to sys.path."""
-        _orig_sys_path = sys.path[:]
-        sys.path.extend(paths)
-        try:
-            yield
-        finally:
-            sys.path = _orig_sys_path
-
     def test_single_path(self):
         """
         A Py3.3+ namespace package can be an app if it has only one path.
         """
-        with self.add_to_path(self.base_location):
+        with extend_sys_path(self.base_location):
             with self.settings(INSTALLED_APPS=['nsapp']):
                 app_config = apps.get_app_config('nsapp')
                 self.assertEqual(app_config.path, upath(self.app_path))
@@ -218,7 +208,7 @@ class NamespacePackageAppTests(TestCase):
         """
         # Temporarily add two directories to sys.path that both contain
         # components of the "nsapp" package.
-        with self.add_to_path(self.base_location, self.other_location):
+        with extend_sys_path(self.base_location, self.other_location):
             with self.assertRaises(ImproperlyConfigured):
                 with self.settings(INSTALLED_APPS=['nsapp']):
                     pass
@@ -229,7 +219,7 @@ class NamespacePackageAppTests(TestCase):
         """
         # Temporarily add two directories to sys.path that both contain
         # components of the "nsapp" package.
-        with self.add_to_path(self.base_location, self.other_location):
+        with extend_sys_path(self.base_location, self.other_location):
             with self.settings(INSTALLED_APPS=['nsapp.apps.NSAppConfig']):
                 app_config = apps.get_app_config('nsapp')
                 self.assertEqual(app_config.path, upath(self.app_path))
