@@ -274,5 +274,10 @@ Application registry
 .. method:: apps.get_model(app_label, model_name)
 
     Returns the :class:`~django.db.models.Model` with the given ``app_label``
-    and ``model_name``. Raises :exc:`~exceptions.LookupError` if no such
-    application or model exists. ``model_name`` is case-insensitive.
+    and ``model_name``. As a shortcut, this method also accepts a single
+    argument in the form ``app_label.model_name``. ``model_name`` is case-
+    insensitive.
+
+    Raises :exc:`~exceptions.LookupError` if no such application or model
+    exists. Raises :exc:`~exceptions.ValueError` when called with a single
+    argument that doesn't contain exactly one dot.

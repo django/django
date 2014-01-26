@@ -6,6 +6,7 @@ from unittest import skipUnless
 
 from django.apps import apps
 from django.apps.registry import Apps
+from django.contrib.admin.models import LogEntry
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.test import TestCase, override_settings
@@ -99,7 +100,7 @@ class AppsTests(TestCase):
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_app_configs(self):
         """
-        Tests get_app_configs().
+        Tests apps.get_app_configs().
         """
         app_configs = apps.get_app_configs()
         self.assertListEqual(
@@ -109,7 +110,7 @@ class AppsTests(TestCase):
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_app_config(self):
         """
-        Tests get_app_config().
+        Tests apps.get_app_config().
         """
         app_config = apps.get_app_config('admin')
         self.assertEqual(app_config.name, 'django.contrib.admin')
@@ -122,10 +123,34 @@ class AppsTests(TestCase):
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_is_installed(self):
+        """
+        Tests apps.is_installed().
+        """
         self.assertTrue(apps.is_installed('django.contrib.admin'))
         self.assertTrue(apps.is_installed('django.contrib.auth'))
         self.assertTrue(apps.is_installed('django.contrib.staticfiles'))
         self.assertFalse(apps.is_installed('django.contrib.webdesign'))
+
+    @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
+    def test_get_model(self):
+        """
+        Tests apps.get_model().
+        """
+        self.assertEqual(apps.get_model('admin', 'LogEntry'), LogEntry)
+        with self.assertRaises(LookupError):
+            apps.get_model('admin', 'LogExit')
+
+        # App label is case-sensitive, Model name is case-insensitive.
+        self.assertEqual(apps.get_model('admin', 'loGentrY'), LogEntry)
+        with self.assertRaises(LookupError):
+            apps.get_model('Admin', 'LogEntry')
+
+        # A single argument is accepted.
+        self.assertEqual(apps.get_model('admin.LogEntry'), LogEntry)
+        with self.assertRaises(LookupError):
+            apps.get_model('admin.LogExit')
+        with self.assertRaises(ValueError):
+            apps.get_model('admin_LogEntry')
 
     @override_settings(INSTALLED_APPS=['apps.apps.RelabeledAppsConfig'])
     def test_relabeling(self):
