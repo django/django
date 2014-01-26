@@ -33,15 +33,15 @@ def update_installed_apps(**kwargs):
         # Rebuild any AppDirectoriesFinder instance.
         from django.contrib.staticfiles.finders import get_finder
         get_finder.cache_clear()
-        # Rebuild app_template_dirs cache.
-        from django.template.loaders import app_directories as mod
-        mod.app_template_dirs = mod.calculate_app_template_dirs()
-        # Rebuild templatetags module cache.
-        from django.template import base
-        base.templatetags_modules[:] = []
         # Rebuild management commands cache
         from django.core.management import get_commands
         get_commands.cache_clear()
+        # Rebuild templatetags module cache.
+        from django.template import base as mod
+        mod.templatetags_modules = []
+        # Rebuild app_template_dirs cache.
+        from django.template.loaders import app_directories as mod
+        mod.app_template_dirs = mod.calculate_app_template_dirs()
 
 
 @receiver(setting_changed)
