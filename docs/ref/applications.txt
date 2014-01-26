@@ -171,8 +171,7 @@ Configurable attributes
     required; for instance if the app package is a `namespace package`_ with
     multiple paths.
 
-    It may be ``None`` if the application isn't stored in a directory, for
-    instance if it's loaded from an egg.
+    It may be ``None`` if the application isn't stored in a directory.
 
 Read-only attributes
 --------------------
