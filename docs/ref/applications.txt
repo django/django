@@ -160,16 +160,22 @@ Configurable attributes
 
     This attribute defaults to ``label.title()``.
 
-Read-only attributes
---------------------
-
 .. attribute:: AppConfig.path
 
     Filesystem path to the application directory, e.g.
     ``'/usr/lib/python2.7/dist-packages/django/contrib/admin'``.
 
+    In most cases, Django can automatically detect and set this, but you can
+    also provide an explicit override as a class attribute on your
+    :class:`~django.apps.AppConfig` subclass. In a few situations this is
+    required; for instance if the app package is a `namespace package`_ with
+    multiple paths.
+
     It may be ``None`` if the application isn't stored in a directory, for
     instance if it's loaded from an egg.
+
+Read-only attributes
+--------------------
 
 .. attribute:: AppConfig.module
 
@@ -208,6 +214,32 @@ Methods
 
         def ready(self):
             MyModel = self.get_model('MyModel')
+
+.. _namespace package:
+
+Namespace packages as apps (Python 3.3+)
+----------------------------------------
+
+Python versions 3.3 and later support Python packages without an
+``__init__.py`` file. These packages are known as "namespace packages" and may
+be spread across multiple directories at different locations on ``sys.path``
+(see :pep:`420`).
+
+Django applications require a single base filesystem path where Django
+(depending on configuration) will search for templates, static assets,
+etc. Thus, namespace packages may only be Django applications if one of the
+following is true:
+
+1. The namespace package actually has only a single location (i.e. is not
+   spread across more than one directory.)
+
+2. The :class:`~django.apps.AppConfig` class used to configure the application
+   has a :attr:`~django.apps.AppConfig.path` class attribute, which is the
+   absolute directory path Django will use as the single base path for the
+   application.
+
+If neither of these conditions is met, Django will raise
+:exc:`~django.core.exceptions.ImproperlyConfigured`.
 
 Application registry
 ====================
