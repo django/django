@@ -240,7 +240,7 @@ back.
 This isn't always convenient for application developers. To alleviate this
 problem, most databases provide an autocommit mode. When autocommit is turned
 on and no transaction is active, each SQL query gets wrapped in its own
-transaction. In other words, not only does each such query starts a
+transaction. In other words, not only does each such query start a
 transaction, but the transaction also gets automatically committed or rolled
 back, depending on whether the query succeeded.
 
