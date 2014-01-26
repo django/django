@@ -2,7 +2,6 @@ from contextlib import contextmanager
 import logging
 import re
 import sys
-from threading import local
 import time
 from unittest import skipUnless
 import warnings
@@ -500,22 +499,6 @@ def patch_logger(logger_name, log_level):
         yield calls
     finally:
         setattr(logger, log_level, orig)
-
-
-class TransRealMixin(object):
-    """This is the only way to reset the translation machinery. Otherwise
-    the test suite occasionally fails because of global state pollution
-    between tests."""
-    def flush_caches(self):
-        from django.utils.translation import trans_real
-        trans_real._translations = {}
-        trans_real._active = local()
-        trans_real._default = None
-        trans_real.check_for_language.cache_clear()
-
-    def tearDown(self):
-        self.flush_caches()
-        super(TransRealMixin, self).tearDown()
 
 
 # On OSes that don't provide tzset (Windows), we can't set the timezone
