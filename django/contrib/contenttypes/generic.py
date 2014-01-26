@@ -1,10 +1,10 @@
 """
 Classes allowing "generic" relations through ContentType and object-id fields.
 """
-from __future__ import unicode_literals
+from __future__ import unicode_literals, absolute_import
 
 from collections import defaultdict
-from functools import partial
+import warnings
 
 from django.core import checks
 from django.core.exceptions import ObjectDoesNotExist
@@ -15,10 +15,8 @@ from django.db.models.base import ModelBase
 from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.related import PathInfo
 from django.db.models.sql.datastructures import Col
-from django.forms import ModelForm, ALL_FIELDS
-from django.forms.models import (BaseModelFormSet, modelformset_factory,
-    modelform_defines_fields)
-from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
+from django.forms import ModelForm
+from django.forms.models import BaseModelFormSet, modelformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
@@ -665,47 +663,21 @@ def generic_inlineformset_factory(model, form=ModelForm,
     FormSet.for_concrete_model = for_concrete_model
     return FormSet
 
+from .admin_tools import (GenericInlineModelAdmin as _gima,
+                            GenericStackedInline as _gsi,
+                            GenericTabularInline as _gti)
 
-class GenericInlineModelAdmin(InlineModelAdmin):
-    ct_field = "content_type"
-    ct_fk_field = "object_id"
-    formset = BaseGenericInlineFormSet
 
-    def get_formset(self, request, obj=None, **kwargs):
-        if 'fields' in kwargs:
-            fields = kwargs.pop('fields')
-        else:
-            fields = flatten_fieldsets(self.get_fieldsets(request, obj))
-        if self.exclude is None:
-            exclude = []
-        else:
-            exclude = list(self.exclude)
-        exclude.extend(self.get_readonly_fields(request, obj))
-        if self.exclude is None and hasattr(self.form, '_meta') and self.form._meta.exclude:
-            # Take the custom ModelForm's Meta.exclude into account only if the
-            # GenericInlineModelAdmin doesn't define its own.
-            exclude.extend(self.form._meta.exclude)
-        exclude = exclude or None
-        can_delete = self.can_delete and self.has_delete_permission(request, obj)
-        defaults = {
-            "ct_field": self.ct_field,
-            "fk_field": self.ct_fk_field,
-            "form": self.form,
-            "formfield_callback": partial(self.formfield_for_dbfield, request=request),
-            "formset": self.formset,
-            "extra": self.extra,
-            "can_delete": can_delete,
-            "can_order": False,
-            "fields": fields,
-            "max_num": self.max_num,
-            "exclude": exclude
-        }
-        defaults.update(kwargs)
+MSG = "%s has moved. Subclass from the equally-named replacement located at django.contrib.contentt.admin_tools"
 
-        if defaults['fields'] is None and not modelform_defines_fields(defaults['form']):
-            defaults['fields'] = ALL_FIELDS
+class GenericInlineModelAdmin(_gima):
 
-        return generic_inlineformset_factory(self.model, **defaults)
+    def __init__(self, *args, **kwargs):
+        for b in self.__class__.__bases__:
+            if b in (GenericStackedInline, GenericTabularInline):
+                cname = b.__name__
+                warnings.warn(MSG % cname, PendingDeprecationWarning, stacklevel=1)
+        super(GenericInlineModelAdmin, self).__init__(*args, **kwargs)
 
 
 class GenericStackedInline(GenericInlineModelAdmin):
