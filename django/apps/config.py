@@ -128,7 +128,6 @@ class AppConfig(object):
         # Entry is a path to an app config class.
         return cls(app_name, app_module)
 
-
     def get_model(self, model_name):
         """
         Returns the model with the given case-insensitive model_name.

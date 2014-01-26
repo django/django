@@ -201,7 +201,6 @@ class AppsTests(TestCase):
         self.assertEqual(new_apps.get_model("apps", "SouthPonies"), temp_model)
 
 
-
 @skipUnless(
     sys.version_info > (3, 3, 0),
     "Namespace packages sans __init__.py were added in Python 3.3")

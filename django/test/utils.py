@@ -528,7 +528,6 @@ requires_tz_support = skipUnless(TZ_SUPPORT,
         "time zone, but your operating system isn't able to do that.")
 
 
-
 @contextmanager
 def extend_sys_path(*paths):
     """Context manager to temporarily add paths to sys.path."""
