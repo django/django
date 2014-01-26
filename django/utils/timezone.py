@@ -18,9 +18,12 @@ from django.conf import settings
 from django.utils import six
 
 __all__ = [
-    'utc', 'get_default_timezone', 'get_current_timezone',
+    'utc',
+    'get_default_timezone', 'get_default_timezone_name',
+    'get_current_timezone', 'get_current_timezone_name',
     'activate', 'deactivate', 'override',
-    'is_naive', 'is_aware', 'make_aware', 'make_naive',
+    'localtime', 'now',
+    'is_aware', 'is_naive', 'make_aware', 'make_naive',
 ]
 
 
