@@ -6,7 +6,7 @@ from functools import update_wrapper
 import warnings
 
 from django.apps import apps
-from django.apps.base import MODELS_MODULE_NAME
+from django.apps.config import MODELS_MODULE_NAME
 import django.db.models.manager  # NOQA: Imported to register signal handler.
 from django.conf import settings
 from django.core import checks

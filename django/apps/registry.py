@@ -8,7 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils import lru_cache
 from django.utils._os import upath
 
-from .base import AppConfig
+from .config import AppConfig
 
 
 class Apps(object):
