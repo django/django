@@ -1,6 +1,6 @@
 """Utilities for writing code that runs on Python 2 and 3"""
 
-# Copyright (c) 2010-2013 Benjamin Peterson
+# Copyright (c) 2010-2014 Benjamin Peterson
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ import sys
 import types
 
 __author__ = "Benjamin Peterson <benjamin@python.org>"
-__version__ = "1.4.0"
+__version__ = "1.5.2"
 
 
 # Useful for very coarse version differentiation.
@@ -84,9 +84,9 @@ class _LazyDescr(object):
 
     def __get__(self, obj, tp):
         result = self._resolve()
-        setattr(obj, self.name, result)
+        setattr(obj, self.name, result) # Invokes __set__.
         # This is a bit ugly, but it avoids running this again.
-        delattr(tp, self.name)
+        delattr(obj.__class__, self.name)
         return result
 
 
@@ -103,6 +103,35 @@ class MovedModule(_LazyDescr):
 
     def _resolve(self):
         return _import_module(self.mod)
+
+    def __getattr__(self, attr):
+        # Hack around the Django autoreloader. The reloader tries to get
+        # __file__ or __name__ of every module in sys.modules. This doesn't work
+        # well if this MovedModule is for an module that is unavailable on this
+        # machine (like winreg on Unix systems). Thus, we pretend __file__ and
+        # __name__ don't exist if the module hasn't been loaded yet. See issues
+        # #51 and #53.
+        if attr in ("__file__", "__name__") and self.mod not in sys.modules:
+            raise AttributeError
+        _module = self._resolve()
+        value = getattr(_module, attr)
+        setattr(self, attr, value)
+        return value
+
+
+class _LazyModule(types.ModuleType):
+
+    def __init__(self, name):
+        super(_LazyModule, self).__init__(name)
+        self.__doc__ = self.__class__.__doc__
+
+    def __dir__(self):
+        attrs = ["__doc__", "__name__"]
+        attrs += [attr.name for attr in self._moved_attributes]
+        return attrs
+
+    # Subclasses should override this
+    _moved_attributes = []
 
 
 class MovedAttribute(_LazyDescr):
@@ -131,7 +160,7 @@ class MovedAttribute(_LazyDescr):
 
 
 
-class _MovedItems(types.ModuleType):
+class _MovedItems(_LazyModule):
     """Lazy loading of moved objects"""
 
 
@@ -153,6 +182,7 @@ _moved_attributes = [
     MovedModule("builtins", "__builtin__"),
     MovedModule("configparser", "ConfigParser"),
     MovedModule("copyreg", "copy_reg"),
+    MovedModule("dbm_gnu", "gdbm", "dbm.gnu"),
     MovedModule("http_cookiejar", "cookielib", "http.cookiejar"),
     MovedModule("http_cookies", "Cookie", "http.cookies"),
     MovedModule("html_entities", "htmlentitydefs", "html.entities"),
@@ -168,12 +198,14 @@ _moved_attributes = [
     MovedModule("queue", "Queue"),
     MovedModule("reprlib", "repr"),
     MovedModule("socketserver", "SocketServer"),
+    MovedModule("_thread", "thread", "_thread"),
     MovedModule("tkinter", "Tkinter"),
     MovedModule("tkinter_dialog", "Dialog", "tkinter.dialog"),
     MovedModule("tkinter_filedialog", "FileDialog", "tkinter.filedialog"),
     MovedModule("tkinter_scrolledtext", "ScrolledText", "tkinter.scrolledtext"),
     MovedModule("tkinter_simpledialog", "SimpleDialog", "tkinter.simpledialog"),
     MovedModule("tkinter_tix", "Tix", "tkinter.tix"),
+    MovedModule("tkinter_ttk", "ttk", "tkinter.ttk"),
     MovedModule("tkinter_constants", "Tkconstants", "tkinter.constants"),
     MovedModule("tkinter_dnd", "Tkdnd", "tkinter.dnd"),
     MovedModule("tkinter_colorchooser", "tkColorChooser",
@@ -185,21 +217,25 @@ _moved_attributes = [
     MovedModule("tkinter_messagebox", "tkMessageBox", "tkinter.messagebox"),
     MovedModule("tkinter_tksimpledialog", "tkSimpleDialog",
                 "tkinter.simpledialog"),
-    MovedModule("urllib_parse", "six.moves.urllib_parse", "urllib.parse"),
-    MovedModule("urllib_error", "six.moves.urllib_error", "urllib.error"),
-    MovedModule("urllib", "six.moves.urllib", "six.moves.urllib"),
+    MovedModule("urllib_parse", __name__ + ".moves.urllib_parse", "urllib.parse"),
+    MovedModule("urllib_error", __name__ + ".moves.urllib_error", "urllib.error"),
+    MovedModule("urllib", __name__ + ".moves.urllib", __name__ + ".moves.urllib"),
     MovedModule("urllib_robotparser", "robotparser", "urllib.robotparser"),
+    MovedModule("xmlrpc_client", "xmlrpclib", "xmlrpc.client"),
     MovedModule("winreg", "_winreg"),
 ]
 for attr in _moved_attributes:
     setattr(_MovedItems, attr.name, attr)
+    if isinstance(attr, MovedModule):
+        sys.modules[__name__ + ".moves." + attr.name] = attr
 del attr
 
-moves = sys.modules[__name__ + ".moves"] = _MovedItems("moves")
+_MovedItems._moved_attributes = _moved_attributes
+
+moves = sys.modules[__name__ + ".moves"] = _MovedItems(__name__ + ".moves")
 
 
-
-class Module_six_moves_urllib_parse(types.ModuleType):
+class Module_six_moves_urllib_parse(_LazyModule):
     """Lazy loading of moved objects in six.moves.urllib_parse"""
 
 
@@ -223,11 +259,12 @@ for attr in _urllib_parse_moved_attributes:
     setattr(Module_six_moves_urllib_parse, attr.name, attr)
 del attr
 
-sys.modules[__name__ + ".moves.urllib_parse"] = Module_six_moves_urllib_parse("six.moves.urllib_parse")
-sys.modules[__name__ + ".moves.urllib.parse"] = Module_six_moves_urllib_parse("six.moves.urllib.parse")
+Module_six_moves_urllib_parse._moved_attributes = _urllib_parse_moved_attributes
+
+sys.modules[__name__ + ".moves.urllib_parse"] = sys.modules[__name__ + ".moves.urllib.parse"] = Module_six_moves_urllib_parse(__name__ + ".moves.urllib_parse")
 
 
-class Module_six_moves_urllib_error(types.ModuleType):
+class Module_six_moves_urllib_error(_LazyModule):
     """Lazy loading of moved objects in six.moves.urllib_error"""
 
 
@@ -240,11 +277,12 @@ for attr in _urllib_error_moved_attributes:
     setattr(Module_six_moves_urllib_error, attr.name, attr)
 del attr
 
-sys.modules[__name__ + ".moves.urllib_error"] = Module_six_moves_urllib_error("six.moves.urllib_error")
-sys.modules[__name__ + ".moves.urllib.error"] = Module_six_moves_urllib_error("six.moves.urllib.error")
+Module_six_moves_urllib_error._moved_attributes = _urllib_error_moved_attributes
+
+sys.modules[__name__ + ".moves.urllib_error"] = sys.modules[__name__ + ".moves.urllib.error"] = Module_six_moves_urllib_error(__name__ + ".moves.urllib.error")
 
 
-class Module_six_moves_urllib_request(types.ModuleType):
+class Module_six_moves_urllib_request(_LazyModule):
     """Lazy loading of moved objects in six.moves.urllib_request"""
 
 
@@ -281,16 +319,18 @@ _urllib_request_moved_attributes = [
     MovedAttribute("urlcleanup", "urllib", "urllib.request"),
     MovedAttribute("URLopener", "urllib", "urllib.request"),
     MovedAttribute("FancyURLopener", "urllib", "urllib.request"),
+    MovedAttribute("proxy_bypass", "urllib", "urllib.request"),
 ]
 for attr in _urllib_request_moved_attributes:
     setattr(Module_six_moves_urllib_request, attr.name, attr)
 del attr
 
-sys.modules[__name__ + ".moves.urllib_request"] = Module_six_moves_urllib_request("six.moves.urllib_request")
-sys.modules[__name__ + ".moves.urllib.request"] = Module_six_moves_urllib_request("six.moves.urllib.request")
+Module_six_moves_urllib_request._moved_attributes = _urllib_request_moved_attributes
+
+sys.modules[__name__ + ".moves.urllib_request"] = sys.modules[__name__ + ".moves.urllib.request"] = Module_six_moves_urllib_request(__name__ + ".moves.urllib.request")
 
 
-class Module_six_moves_urllib_response(types.ModuleType):
+class Module_six_moves_urllib_response(_LazyModule):
     """Lazy loading of moved objects in six.moves.urllib_response"""
 
 
@@ -304,11 +344,12 @@ for attr in _urllib_response_moved_attributes:
     setattr(Module_six_moves_urllib_response, attr.name, attr)
 del attr
 
-sys.modules[__name__ + ".moves.urllib_response"] = Module_six_moves_urllib_response("six.moves.urllib_response")
-sys.modules[__name__ + ".moves.urllib.response"] = Module_six_moves_urllib_response("six.moves.urllib.response")
+Module_six_moves_urllib_response._moved_attributes = _urllib_response_moved_attributes
+
+sys.modules[__name__ + ".moves.urllib_response"] = sys.modules[__name__ + ".moves.urllib.response"] = Module_six_moves_urllib_response(__name__ + ".moves.urllib.response")
 
 
-class Module_six_moves_urllib_robotparser(types.ModuleType):
+class Module_six_moves_urllib_robotparser(_LazyModule):
     """Lazy loading of moved objects in six.moves.urllib_robotparser"""
 
 
@@ -319,8 +360,9 @@ for attr in _urllib_robotparser_moved_attributes:
     setattr(Module_six_moves_urllib_robotparser, attr.name, attr)
 del attr
 
-sys.modules[__name__ + ".moves.urllib_robotparser"] = Module_six_moves_urllib_robotparser("six.moves.urllib_robotparser")
-sys.modules[__name__ + ".moves.urllib.robotparser"] = Module_six_moves_urllib_robotparser("six.moves.urllib.robotparser")
+Module_six_moves_urllib_robotparser._moved_attributes = _urllib_robotparser_moved_attributes
+
+sys.modules[__name__ + ".moves.urllib_robotparser"] = sys.modules[__name__ + ".moves.urllib.robotparser"] = Module_six_moves_urllib_robotparser(__name__ + ".moves.urllib.robotparser")
 
 
 class Module_six_moves_urllib(types.ModuleType):
@@ -331,8 +373,11 @@ class Module_six_moves_urllib(types.ModuleType):
     response = sys.modules[__name__ + ".moves.urllib_response"]
     robotparser = sys.modules[__name__ + ".moves.urllib_robotparser"]
 
+    def __dir__(self):
+        return ['parse', 'error', 'request', 'response', 'robotparser']
 
-sys.modules[__name__ + ".moves.urllib"] = Module_six_moves_urllib("six.moves.urllib")
+
+sys.modules[__name__ + ".moves.urllib"] = Module_six_moves_urllib(__name__ + ".moves.urllib")
 
 
 def add_move(move):
@@ -464,8 +509,9 @@ if PY3:
 else:
     def b(s):
         return s
+    # Workaround for standalone backslash
     def u(s):
-        return unicode(s, "unicode_escape")
+        return unicode(s.replace(r'\\', r'\\\\'), "unicode_escape")
     unichr = unichr
     int2byte = chr
     def byte2int(bs):
@@ -481,18 +527,13 @@ _add_doc(u, """Text literal""")
 
 
 if PY3:
-    import builtins
-    exec_ = getattr(builtins, "exec")
+    exec_ = getattr(moves.builtins, "exec")
 
 
     def reraise(tp, value, tb=None):
         if value.__traceback__ is not tb:
             raise value.with_traceback(tb)
         raise value
-
-
-    print_ = getattr(builtins, "print")
-    del builtins
 
 else:
     def exec_(_code_, _globs_=None, _locs_=None):
@@ -513,14 +554,24 @@ else:
 """)
 
 
+print_ = getattr(moves.builtins, "print", None)
+if print_ is None:
     def print_(*args, **kwargs):
-        """The new-style print function."""
+        """The new-style print function for Python 2.4 and 2.5."""
         fp = kwargs.pop("file", sys.stdout)
         if fp is None:
             return
         def write(data):
             if not isinstance(data, basestring):
                 data = str(data)
+            # If the file has an encoding, encode unicode with it.
+            if (isinstance(fp, file) and
+                isinstance(data, unicode) and
+                fp.encoding is not None):
+                errors = getattr(fp, "errors", None)
+                if errors is None:
+                    errors = "strict"
+                data = data.encode(fp.encoding, errors)
             fp.write(data)
         want_unicode = False
         sep = kwargs.pop("sep", None)
@@ -571,8 +622,12 @@ def add_metaclass(metaclass):
         orig_vars = cls.__dict__.copy()
         orig_vars.pop('__dict__', None)
         orig_vars.pop('__weakref__', None)
-        for slots_var in orig_vars.get('__slots__', ()):
-            orig_vars.pop(slots_var)
+        slots = orig_vars.get('__slots__')
+        if slots is not None:
+            if isinstance(slots, str):
+                slots = [slots]
+            for slots_var in slots:
+                orig_vars.pop(slots_var)
         return metaclass(cls.__name__, cls.__bases__, orig_vars)
     return wrapper
 
@@ -581,12 +636,26 @@ def add_metaclass(metaclass):
 
 if PY3:
     _assertRaisesRegex = "assertRaisesRegex"
+    _assertRegex = "assertRegex"
+    memoryview = memoryview
 else:
     _assertRaisesRegex = "assertRaisesRegexp"
+    _assertRegex = "assertRegexpMatches"
+    # memoryview and buffer are not stricly equivalent, but should be fine for
+    # django core usage (mainly BinaryField). However, Jython doesn't support
+    # buffer (see http://bugs.jython.org/issue1521), so we have to be careful.
+    if sys.platform.startswith('java'):
+        memoryview = memoryview
+    else:
+        memoryview = buffer
 
 
 def assertRaisesRegex(self, *args, **kwargs):
     return getattr(self, _assertRaisesRegex)(*args, **kwargs)
+
+
+def assertRegex(self, *args, **kwargs):
+    return getattr(self, _assertRegex)(*args, **kwargs)
 
 
 add_move(MovedModule("_dummy_thread", "dummy_thread"))
