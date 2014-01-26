@@ -1,10 +1,16 @@
 from __future__ import absolute_import, unicode_literals
 
+from contextlib import contextmanager
+import os
+import sys
+from unittest import skipUnless
+
 from django.apps import apps
 from django.apps.registry import Apps
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.test import TestCase, override_settings
+from django.utils._os import upath
 from django.utils import six
 
 from .default_config_app.apps import CustomConfig
@@ -27,6 +33,8 @@ SOME_INSTALLED_APPS_NAMES = [
     'django.contrib.admin',
     'django.contrib.auth',
 ] + SOME_INSTALLED_APPS[2:]
+
+HERE = os.path.dirname(__file__)
 
 
 class AppsTests(TestCase):
@@ -166,3 +174,62 @@ class AppsTests(TestCase):
         with self.assertRaises(LookupError):
             apps.get_model("apps", "SouthPonies")
         self.assertEqual(new_apps.get_model("apps", "SouthPonies"), temp_model)
+
+
+
+@skipUnless(
+    sys.version_info > (3, 3, 0),
+    "Namespace packages sans __init__.py were added in Python 3.3")
+class NamespacePackageAppTests(TestCase):
+    # We need nsapp to be top-level so our multiple-paths tests can add another
+    # location for it (if its inside a normal package with an __init__.py that
+    # isn't possible). In order to avoid cluttering the already-full tests/ dir
+    # (which is on sys.path), we add these new entries to sys.path temporarily.
+    base_location = os.path.join(HERE, 'namespace_package_base')
+    other_location = os.path.join(HERE, 'namespace_package_other_base')
+    app_path = os.path.join(base_location, 'nsapp')
+
+    @contextmanager
+    def add_to_path(self, *paths):
+        """Context manager to temporarily add paths to sys.path."""
+        _orig_sys_path = sys.path[:]
+        sys.path.extend(paths)
+        try:
+            yield
+        finally:
+            sys.path = _orig_sys_path
+
+    def test_single_path(self):
+        """
+        A Py3.3+ namespace package can be an app if it has only one path.
+        """
+        with self.add_to_path(self.base_location):
+            with self.settings(INSTALLED_APPS=['nsapp']):
+                app_config = apps.get_app_config('nsapp')
+                self.assertEqual(app_config.path, upath(self.app_path))
+
+    def test_multiple_paths(self):
+        """
+        A Py3.3+ namespace package with multiple locations cannot be an app.
+
+        (Because then we wouldn't know where to load its templates, static
+        assets, etc from.)
+
+        """
+        # Temporarily add two directories to sys.path that both contain
+        # components of the "nsapp" package.
+        with self.add_to_path(self.base_location, self.other_location):
+            with self.assertRaises(ImproperlyConfigured):
+                with self.settings(INSTALLED_APPS=['nsapp']):
+                    pass
+
+    def test_multiple_paths_explicit_path(self):
+        """
+        Multiple locations are ok only if app-config has explicit path.
+        """
+        # Temporarily add two directories to sys.path that both contain
+        # components of the "nsapp" package.
+        with self.add_to_path(self.base_location, self.other_location):
+            with self.settings(INSTALLED_APPS=['nsapp.apps.NSAppConfig']):
+                app_config = apps.get_app_config('nsapp')
+                self.assertEqual(app_config.path, upath(self.app_path))
