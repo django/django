@@ -463,3 +463,17 @@ class SystemChecksTestCase(TestCase):
                 )
             ]
             self.assertEqual(errors, expected)
+
+    def test_check_list_editable(self):
+        """
+        Regression to avoid TypeError in Python 2.7 introduced by #2181
+        """
+        class EditableFieldsOnFormAdmin(admin.ModelAdmin):
+            form = SongForm
+
+            list_display = ('title', 'album', )
+            list_display_links = ('album', )
+            list_editable = ('title', )
+
+        errors = EditableFieldsOnFormAdmin.check(model=Song)
+        self.assertEqual(errors, [])
