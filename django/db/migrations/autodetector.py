@@ -72,8 +72,13 @@ class MigrationAutodetector(object):
                 if field.rel:
                     if field.rel.to:
                         related_fields.append((field.name, field.rel.to._meta.app_label, field.rel.to._meta.model_name))
-                    if hasattr(field.rel, "through") and not field.rel.though._meta.auto_created:
+                    if hasattr(field.rel, "through") and not field.rel.through._meta.auto_created:
                         related_fields.append((field.name, field.rel.through._meta.app_label, field.rel.through._meta.model_name))
+            for field in new_apps.get_model(app_label, model_name)._meta.local_many_to_many:
+                if field.rel.to:
+                    related_fields.append((field.name, field.rel.to._meta.app_label, field.rel.to._meta.model_name))
+                if hasattr(field.rel, "through") and not field.rel.through._meta.auto_created:
+                    related_fields.append((field.name, field.rel.through._meta.app_label, field.rel.through._meta.model_name))
             if related_fields:
                 pending_add[app_label, model_name] = related_fields
             else:
