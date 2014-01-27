@@ -3243,3 +3243,39 @@ class ForeignKeyToBaseExcludeTests(TestCase):
             SpecialCategory.objects.filter(categoryitem__id=c1.pk),
             [sc1], lambda x: x
         )
+
+
+# A custom node that can be used in .filter() calls.
+class CustomFilterNode(object):
+    # In reality one would need a bit more hooks here (for example
+    # relabeled_clone() is needed if labels are ever relabeled).
+    def add_to_query(self, query, used_aliases):
+        return self, []
+
+    def as_sql(self, qn, connection):
+        return "CustomNodeAdded", []
+
+    def get_group_by_cols(self):
+        return []
+
+    def contains_aggregate(self, aggregates):
+        return False
+
+
+class FilterAddToQueryTests(TestCase):
+    def test_basic_add_to_query(self):
+        # Note that we are testing internal API here.
+        self.assertIn(
+            'CustomNodeAdded',
+            str(Author.objects.filter(CustomFilterNode()).query))
+
+    def test_or_add_to_query(self):
+        self.assertIn(
+            'CustomNodeAdded OR', str(Author.objects.filter(
+                Q(CustomFilterNode()) | Q(name='foobar')).query))
+
+    def test_aggregation_add_to_query(self):
+        query = str(Author.objects.annotate(cnt_name=Count('name')).filter(
+            Q(CustomFilterNode()) | Q(cnt_name=1)).query)
+        self.assertNotIn(' WHERE ', query)
+        self.assertIn('HAVING (CustomNodeAdded OR COUNT(', query)

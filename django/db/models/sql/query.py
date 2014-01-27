@@ -1231,9 +1231,15 @@ class Query(object):
         if not self._aggregates:
             return False
         if not isinstance(obj, Node):
-            return (refs_aggregate(obj[0].split(LOOKUP_SEP), self.aggregates)[0]
-                    or (hasattr(obj[1], 'contains_aggregate')
-                        and obj[1].contains_aggregate(self.aggregates)))
+            # Private API hook for add_to_query() objects.
+            if hasattr(obj, 'contains_aggregate'):
+                return obj.contains_aggregate(self.aggregates)
+            else:
+                lookup, value = obj
+                return (
+                    refs_aggregate(lookup.split(LOOKUP_SEP), self.aggregates)[0]
+                    or (hasattr(value, 'contains_aggregate')
+                        and value.contains_aggregate(self.aggregates)))
         return any(self.need_having(c) for c in obj.children)
 
     def split_having_parts(self, q_object, negated=False):
@@ -1309,12 +1315,14 @@ class Query(object):
                 child_clause, needed_inner = self._add_q(
                     child, used_aliases, branch_negated,
                     current_negated)
-                joinpromoter.add_votes(needed_inner)
+            elif hasattr(child, 'add_to_query'):
+                child_clause, needed_inner = child.add_to_query(
+                    self, used_aliases)
             else:
                 child_clause, needed_inner = self.build_filter(
                     child, can_reuse=used_aliases, branch_negated=branch_negated,
                     current_negated=current_negated, connector=connector)
-                joinpromoter.add_votes(needed_inner)
+            joinpromoter.add_votes(needed_inner)
             target_clause.add(child_clause, connector)
         needed_inner = joinpromoter.update_join_types(self)
         return target_clause, needed_inner
