@@ -4,7 +4,7 @@ import os
 import sys
 from unittest import skipUnless
 
-from django.apps import apps
+from django.apps import apps, AppConfig
 from django.apps.registry import Apps
 from django.contrib.admin.models import LogEntry
 from django.core.exceptions import ImproperlyConfigured
@@ -199,6 +199,71 @@ class AppsTests(TestCase):
         with self.assertRaises(LookupError):
             apps.get_model("apps", "SouthPonies")
         self.assertEqual(new_apps.get_model("apps", "SouthPonies"), temp_model)
+
+
+class Stub(object):
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
+
+
+class AppConfigTests(TestCase):
+    """Unit tests for AppConfig class."""
+    def test_path_set_explicitly(self):
+        """If subclass sets path as class attr, no module attributes needed."""
+        class MyAppConfig(AppConfig):
+            path = 'foo'
+
+        ac = MyAppConfig('label', Stub())
+
+        self.assertEqual(ac.path, 'foo')
+
+    def test_explicit_path_overrides(self):
+        """If path set as class attr, overrides __path__ and __file__."""
+        class MyAppConfig(AppConfig):
+            path = 'foo'
+
+        ac = MyAppConfig('label', Stub(__path__=['a'], __file__='b/__init__.py'))
+
+        self.assertEqual(ac.path, 'foo')
+
+    def test_dunder_path(self):
+        """If single element in __path__, use it (in preference to __file__)."""
+        ac = AppConfig('label', Stub(__path__=['a'], __file__='b/__init__.py'))
+
+        self.assertEqual(ac.path, 'a')
+
+    def test_no_dunder_path_fallback_to_dunder_file(self):
+        """If there is no __path__ attr, use __file__."""
+        ac = AppConfig('label', Stub(__file__='b/__init__.py'))
+
+        self.assertEqual(ac.path, 'b')
+
+    def test_empty_dunder_path_fallback_to_dunder_file(self):
+        """If the __path__ attr is empty, use __file__ if set."""
+        ac = AppConfig('label', Stub(__path__=[], __file__='b/__init__.py'))
+
+        self.assertEqual(ac.path, 'b')
+
+    def test_multiple_dunder_path_fallback_to_dunder_file(self):
+        """If the __path__ attr is length>1, use __file__ if set."""
+        ac = AppConfig('label', Stub(__path__=['a', 'b'], __file__='c/__init__.py'))
+
+        self.assertEqual(ac.path, 'c')
+
+    def test_no_dunder_path_or_dunder_file(self):
+        """If there is no __path__ or __file__, raise ImproperlyConfigured."""
+        with self.assertRaises(ImproperlyConfigured):
+            AppConfig('label', Stub())
+
+    def test_empty_dunder_path_no_dunder_file(self):
+        """If the __path__ attr is empty and there is no __file__, raise."""
+        with self.assertRaises(ImproperlyConfigured):
+            AppConfig('label', Stub(__path__=[]))
+
+    def test_multiple_dunder_path_no_dunder_file(self):
+        """If the __path__ attr is length>1 and there is no __file__, raise."""
+        with self.assertRaises(ImproperlyConfigured):
+            AppConfig('label', Stub(__path__=['a', 'b']))
 
 
 @skipUnless(
