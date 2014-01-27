@@ -1,4 +1,5 @@
 from importlib import import_module
+import os
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import module_has_submodule
@@ -34,23 +35,10 @@ class AppConfig(object):
             self.verbose_name = self.label.title()
 
         # Filesystem path to the application directory eg.
-        # u'/usr/lib/python2.7/dist-packages/django/contrib/admin'. May be
-        # None if the application isn't a bona fide package eg. if it's an
-        # egg. Otherwise it's a unicode on Python 2 and a str on Python 3.
+        # u'/usr/lib/python2.7/dist-packages/django/contrib/admin'. Unicode on
+        # Python 2 and a str on Python 3.
         if not hasattr(self, 'path'):
-            try:
-                paths = app_module.__path__
-            except AttributeError:
-                self.path = None
-            else:
-                # Convert paths to list because Python 3.3 _NamespacePath does
-                # not support indexing.
-                paths = list(paths)
-                if len(paths) > 1:
-                    raise ImproperlyConfigured(
-                        "The namespace package app %r has multiple locations, "
-                        "which is not supported: %r" % (app_name, paths))
-                self.path = upath(paths[0])
+            self.path = self._path_from_module(app_module)
 
         # Module containing models eg. <module 'django.contrib.admin.models'
         # from 'django/contrib/admin/models.pyc'>. Set by import_models().
@@ -63,6 +51,29 @@ class AppConfig(object):
 
     def __repr__(self):
         return '<%s: %s>' % (self.__class__.__name__, self.label)
+
+    def _path_from_module(self, module):
+        """Attempt to determine app's filesystem path from its module."""
+        # See #21874 for extended discussion of the behavior of this method in
+        # various cases.
+        # Convert paths to list because Python 3.3 _NamespacePath does not
+        # support indexing.
+        paths = list(getattr(module, '__path__', []))
+        if len(paths) != 1:
+            filename = getattr(module, '__file__', None)
+            if filename is not None:
+                paths = [os.path.dirname(filename)]
+        if len(paths) > 1:
+            raise ImproperlyConfigured(
+                "The app module %r has multiple filesystem locations (%r); "
+                "you must configure this app with an AppConfig subclass "
+                "with a 'path' class attribute." % (module, paths))
+        elif not paths:
+            raise ImproperlyConfigured(
+                "The app module %r has no filesystem location, "
+                "you must configure this app with an AppConfig subclass "
+                "with a 'path' class attribute." % (module,))
+        return upath(paths[0])
 
     @classmethod
     def create(cls, entry):

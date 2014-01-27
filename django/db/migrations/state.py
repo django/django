@@ -73,8 +73,11 @@ class ProjectState(object):
 
 class AppConfigStub(AppConfig):
     """
-    Stubs a Django AppConfig. Only provides a label and a dict of models.
+    Stubs a Django AppConfig. Only provides a label, and a dict of models.
     """
+    # Not used, but required by AppConfig.__init__
+    path = ''
+
     def __init__(self, label):
         super(AppConfigStub, self).__init__(label, None)
 
