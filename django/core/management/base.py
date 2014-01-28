@@ -365,11 +365,12 @@ class BaseCommand(object):
         Raises CommandError for any serious message (error or critical errors).
         If there are only light messages (like warnings), they are printed to
         stderr and no exception is raised.
-
         """
         all_issues = checks.run_checks(app_configs=app_configs, tags=tags)
 
         msg = ""
+        visible_issue_count = 0  # excludes silenced warnings
+
         if all_issues:
             debugs = [e for e in all_issues if e.level < checks.INFO and not e.is_silenced()]
             infos = [e for e in all_issues if checks.INFO <= e.level < checks.WARNING and not e.is_silenced()]
@@ -386,6 +387,7 @@ class BaseCommand(object):
 
             for issues, group_name in sorted_issues:
                 if issues:
+                    visible_issue_count += len(issues)
                     formatted = (
                         color_style().ERROR(force_str(e))
                         if e.is_serious()
@@ -393,21 +395,22 @@ class BaseCommand(object):
                         for e in issues)
                     formatted = "\n".join(sorted(formatted))
                     msg += '\n%s:\n%s\n' % (group_name, formatted)
-
-            msg = "System check identified some issues:\n%s" % msg
+            if msg:
+                msg = "System check identified some issues:\n%s" % msg
 
         if display_num_errors:
             if msg:
                 msg += '\n'
-            msg += "System check identified %s." % (
-                "no issues" if len(all_issues) == 0 else
-                "1 issue" if len(all_issues) == 1 else
-                "%s issues" % len(all_issues)
+            msg += "System check identified %s (%s silenced)." % (
+                "no issues" if visible_issue_count == 0 else
+                "1 issue" if visible_issue_count == 1 else
+                "%s issues" % visible_issue_count,
+                len(all_issues) - visible_issue_count,
             )
 
         if any(e.is_serious() and not e.is_silenced() for e in all_issues):
             raise CommandError(msg)
-        elif msg and all_issues:
+        elif msg and visible_issue_count:
             self.stderr.write(msg)
         elif msg:
             self.stdout.write(msg)

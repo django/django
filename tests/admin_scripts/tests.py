@@ -1124,7 +1124,7 @@ class ManageCheck(AdminScriptTestCase):
         args = ['check']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertEqual(out, 'System check identified no issues.\n')
+        self.assertEqual(out, 'System check identified no issues (0 silenced).\n')
 
     def test_app_with_import(self):
         """ manage.py check does not raise errors when an app imports a base
@@ -1139,7 +1139,7 @@ class ManageCheck(AdminScriptTestCase):
         args = ['check']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertEqual(out, 'System check identified no issues.\n')
+        self.assertEqual(out, 'System check identified no issues (0 silenced).\n')
 
     def test_output_format(self):
         """ All errors/warnings should be sorted by level and by message. """
@@ -1163,7 +1163,7 @@ class ManageCheck(AdminScriptTestCase):
             "obj: First warning\n"
             "\tHINT: Hint\n"
             "\n"
-            "System check identified 3 issues.\n"
+            "System check identified 3 issues (0 silenced).\n"
         )
         self.assertEqual(err, expected_err)
         self.assertNoOutput(out)
@@ -1191,7 +1191,7 @@ class ManageCheck(AdminScriptTestCase):
             "WARNINGS:\n"
             "?: A warning\n"
             "\n"
-            "System check identified 1 issue.\n"
+            "System check identified 1 issue (0 silenced).\n"
         )
         self.assertEqual(err, expected_err)
         self.assertNoOutput(out)

@@ -333,7 +333,7 @@ class SettingsConfigTest(AdminScriptTestCase):
         # validate is just an example command to trigger settings configuration
         out, err = self.run_manage(['validate'])
         self.assertNoOutput(err)
-        self.assertOutput(out, "System check identified no issues.")
+        self.assertOutput(out, "System check identified no issues (0 silenced).")
 
 
 def dictConfig(config):
