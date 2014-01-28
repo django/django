@@ -269,10 +269,10 @@ Here's what the view code might look like::
     from django.http import HttpResponseRedirect
     from django.contrib.formtools.wizard.views import SessionWizardView
 
-    FORMS = [("address", myapp.forms.AddressForm),
-             ("paytype", myapp.forms.PaymentChoiceForm),
-             ("cc", myapp.forms.CreditCardForm),
-             ("confirmation", myapp.forms.OrderForm)]
+    FORMS = [("address", "myapp.forms.AddressForm"),
+             ("paytype", "myapp.forms.PaymentChoiceForm"),
+             ("cc", "myapp.forms.CreditCardForm"),
+             ("confirmation", "myapp.forms.OrderForm")]
 
     TEMPLATES = {"address": "checkout/billingaddress.html",
                  "paytype": "checkout/paymentmethod.html",
