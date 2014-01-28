@@ -5,6 +5,7 @@ import inspect
 from django.conf import settings
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django.utils.six.moves import xrange
 
 
 class RegisterLookupMixin(object):
