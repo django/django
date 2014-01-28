@@ -314,6 +314,9 @@ class RegexURLResolver(LocaleRegexProvider):
 
     def resolve(self, path):
         path = force_text(path)  # path may be a reverse_lazy object
+        prefix = get_script_prefix()
+        if path.startswith(prefix):
+           path = path[len(prefix)-1:]
         tried = []
         match = self.regex.search(path)
         if match:
