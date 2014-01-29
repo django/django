@@ -33,16 +33,19 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_field_type(self, data_type, description):
         # If it's a NUMBER with scale == 0, consider it an IntegerField
-        if data_type == cx_Oracle.NUMBER and description[5] == 0:
-            if description[4] > 11:
-                return 'BigIntegerField'
-            elif description[4]==1:
-                return 'BooleanField'
-            else:
-                return 'IntegerField'
-        else:
-            return super(DatabaseIntrospection, self).get_field_type(
-                data_type, description)
+        if data_type == cx_Oracle.NUMBER:
+            precision, scale = description[4:6]
+            if scale == 0:
+                if precision > 11:
+                    return 'BigIntegerField'
+                elif precision == 1:
+                    return 'BooleanField'
+                else:
+                    return 'IntegerField'
+            elif scale == -127:
+                return 'FloatField'
+
+        return super(DatabaseIntrospection, self).get_field_type(data_type, description)
 
     def get_table_list(self, cursor):
         "Returns a list of table names in the current database."
