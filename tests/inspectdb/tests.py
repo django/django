@@ -30,10 +30,8 @@ class InspectDBTestCase(TestCase):
         # inspected
         self.assertNotIn("class DjangoContentType(models.Model):", out.getvalue(), msg=error_message)
 
-    # Inspecting oracle DB doesn't produce correct results, see #19884
-    @expectedFailureOnOracle
-    def test_field_types(self):
-        """Test introspection of various Django field types"""
+    def make_field_type_asserter(self):
+        """Call inspectdb and return a function to validate a field type in its output"""
         out = StringIO()
         call_command('inspectdb',
                      table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'),
@@ -43,6 +41,37 @@ class InspectDBTestCase(TestCase):
         def assertFieldType(name, definition):
             out_def = re.search(r'^\s*%s = (models.*)$' % name, output, re.MULTILINE).groups()[0]
             self.assertEqual(definition, out_def)
+
+        return assertFieldType
+
+    # Inspecting oracle DB doesn't produce correct results, see #19884
+    @expectedFailureOnOracle
+    def test_field_types(self):
+        """Test introspection of various Django field types"""
+        assertFieldType = self.make_field_type_asserter()
+
+        assertFieldType('char_field', "models.CharField(max_length=10)")
+        assertFieldType('comma_separated_int_field', "models.CharField(max_length=99)")
+        assertFieldType('date_field', "models.DateField()")
+        assertFieldType('date_time_field', "models.DateTimeField()")
+        assertFieldType('email_field', "models.CharField(max_length=75)")
+        assertFieldType('file_field', "models.CharField(max_length=100)")
+        assertFieldType('file_path_field', "models.CharField(max_length=100)")
+        if connection.vendor == 'postgresql':
+            # Only PostgreSQL has a specific type
+            assertFieldType('ip_address_field', "models.GenericIPAddressField()")
+            assertFieldType('gen_ip_adress_field', "models.GenericIPAddressField()")
+        else:
+            assertFieldType('ip_address_field', "models.CharField(max_length=15)")
+            assertFieldType('gen_ip_adress_field', "models.CharField(max_length=39)")
+        assertFieldType('slug_field', "models.CharField(max_length=50)")
+        assertFieldType('text_field', "models.TextField()")
+        assertFieldType('time_field', "models.TimeField()")
+        assertFieldType('url_field', "models.CharField(max_length=200)")
+
+    def test_number_field_types(self):
+        """Test introspection of various Django field types"""
+        assertFieldType = self.make_field_type_asserter()
 
         if not connection.features.can_introspect_autofield:
             assertFieldType('id', "models.IntegerField(primary_key=True)  # AutoField?")
@@ -54,28 +83,15 @@ class InspectDBTestCase(TestCase):
         else:
             assertFieldType('bool_field', "models.BooleanField()")
             assertFieldType('null_bool_field', "models.NullBooleanField()")
-        assertFieldType('char_field', "models.CharField(max_length=10)")
-        assertFieldType('comma_separated_int_field', "models.CharField(max_length=99)")
-        assertFieldType('date_field', "models.DateField()")
-        assertFieldType('date_time_field', "models.DateTimeField()")
         if connection.vendor == 'sqlite':
             # Guessed arguments, see #5014
             assertFieldType('decimal_field', "models.DecimalField(max_digits=10, decimal_places=5)  "
-                "# max_digits and decimal_places have been guessed, as this database handles decimal fields as float")
+                                             "# max_digits and decimal_places have been guessed, "
+                                             "as this database handles decimal fields as float")
         else:
             assertFieldType('decimal_field', "models.DecimalField(max_digits=6, decimal_places=1)")
-        assertFieldType('email_field', "models.CharField(max_length=75)")
-        assertFieldType('file_field', "models.CharField(max_length=100)")
-        assertFieldType('file_path_field', "models.CharField(max_length=100)")
         assertFieldType('float_field', "models.FloatField()")
         assertFieldType('int_field', "models.IntegerField()")
-        if connection.vendor == 'postgresql':
-            # Only PostgreSQL has a specific type
-            assertFieldType('ip_address_field', "models.GenericIPAddressField()")
-            assertFieldType('gen_ip_adress_field', "models.GenericIPAddressField()")
-        else:
-            assertFieldType('ip_address_field', "models.CharField(max_length=15)")
-            assertFieldType('gen_ip_adress_field', "models.CharField(max_length=39)")
         if connection.vendor == 'sqlite':
             assertFieldType('pos_int_field', "models.PositiveIntegerField()")
             assertFieldType('pos_small_int_field', "models.PositiveSmallIntegerField()")
@@ -86,14 +102,10 @@ class InspectDBTestCase(TestCase):
                 assertFieldType('pos_small_int_field', "models.SmallIntegerField()")
             else:
                 assertFieldType('pos_small_int_field', "models.IntegerField()")
-        assertFieldType('slug_field', "models.CharField(max_length=50)")
         if connection.vendor in ('sqlite', 'postgresql'):
             assertFieldType('small_int_field', "models.SmallIntegerField()")
         else:
             assertFieldType('small_int_field', "models.IntegerField()")
-        assertFieldType('text_field', "models.TextField()")
-        assertFieldType('time_field', "models.TimeField()")
-        assertFieldType('url_field', "models.CharField(max_length=200)")
 
     @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_attribute_name_not_python_keyword(self):
@@ -110,11 +122,11 @@ class InspectDBTestCase(TestCase):
         self.assertNotIn("from = models.ForeignKey(InspectdbPeople)", output, msg=error_message)
         # As InspectdbPeople model is defined after InspectdbMessage, it should be quoted
         self.assertIn("from_field = models.ForeignKey('InspectdbPeople', db_column='from_id')",
-            output)
+                      output)
         self.assertIn("people_pk = models.ForeignKey(InspectdbPeople, primary_key=True)",
-            output)
+                      output)
         self.assertIn("people_unique = models.ForeignKey(InspectdbPeople, unique=True)",
-            output)
+                      output)
 
     def test_digits_column_name_introspection(self):
         """Introspection of column names consist/start with digits (#16536/#17676)"""
@@ -167,7 +179,7 @@ class InspectDBTestCase(TestCase):
         self.assertIn("        managed = False", output, msg='inspectdb should generate unmanaged models.')
 
     @skipUnless(connection.vendor == 'sqlite',
-        "Only patched sqlite's DatabaseIntrospection.data_types_reverse for this test")
+                "Only patched sqlite's DatabaseIntrospection.data_types_reverse for this test")
     def test_custom_fields(self):
         """
         Introspection of columns with a custom field (#21090)
