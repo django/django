@@ -279,7 +279,7 @@ from django.db import models, migrations
 %(imports)s
 
 class Migration(migrations.Migration):
-    %(replaces_str)s
+%(replaces_str)s
     dependencies = [
 %(dependencies)s\
     ]
