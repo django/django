@@ -265,8 +265,61 @@ class LazyObject(object):
         """
         raise NotImplementedError('subclasses of LazyObject must provide a _setup() method')
 
+    # Because we have messed with __class__ below, we confuse pickle as to what
+    # class we are pickling. It also appears to stop __reduce__ from being
+    # called. So, we define __getstate__ in a way that cooperates with the way
+    # that pickle interprets this class.  This fails when the wrapped class is
+    # a builtin, but it is better than nothing.
+    def __getstate__(self):
+        if self._wrapped is empty:
+            self._setup()
+        return self._wrapped.__dict__
+
+    # Python 3.3 will call __reduce__ when pickling; this method is needed
+    # to serialize and deserialize correctly.
+    @classmethod
+    def __newobj__(cls, *args):
+        return cls.__new__(cls, *args)
+
+    def __reduce_ex__(self, proto):
+        if proto >= 2:
+            # On Py3, since the default protocol is 3, pickle uses the
+            # ``__newobj__`` method (& more efficient opcodes) for writing.
+            return (self.__newobj__, (self.__class__,), self.__getstate__())
+        else:
+            # On Py2, the default protocol is 0 (for back-compat) & the above
+            # code fails miserably (see regression test). Instead, we return
+            # exactly what's returned if there's no ``__reduce__`` method at
+            # all.
+            return (copyreg._reconstructor, (self.__class__, object, None), self.__getstate__())
+
+    def __deepcopy__(self, memo):
+        if self._wrapped is empty:
+            # We have to use type(self), not self.__class__, because the
+            # latter is proxied.
+            result = type(self)()
+            memo[id(self)] = result
+            return result
+        return copy.deepcopy(self._wrapped, memo)
+
+    if six.PY3:
+        __bytes__ = new_method_proxy(bytes)
+        __str__ = new_method_proxy(str)
+        __bool__ = new_method_proxy(bool)
+    else:
+        __str__ = new_method_proxy(str)
+        __unicode__ = new_method_proxy(unicode)
+        __nonzero__ = new_method_proxy(bool)
+
     # Introspection support
     __dir__ = new_method_proxy(dir)
+
+    # Need to pretend to be the wrapped class, for the sake of objects that
+    # care about this (especially in equality tests)
+    __class__ = property(new_method_proxy(operator.attrgetter("__class__")))
+    __eq__ = new_method_proxy(operator.eq)
+    __ne__ = new_method_proxy(operator.ne)
+    __hash__ = new_method_proxy(hash)
 
     # Dictionary methods support
     __getitem__ = new_method_proxy(operator.getitem)
@@ -303,51 +356,6 @@ class SimpleLazyObject(LazyObject):
     def _setup(self):
         self._wrapped = self._setupfunc()
 
-    if six.PY3:
-        __bytes__ = new_method_proxy(bytes)
-        __str__ = new_method_proxy(str)
-    else:
-        __str__ = new_method_proxy(str)
-        __unicode__ = new_method_proxy(unicode)
-
-    def __deepcopy__(self, memo):
-        if self._wrapped is empty:
-            # We have to use SimpleLazyObject, not self.__class__, because the
-            # latter is proxied.
-            result = SimpleLazyObject(self._setupfunc)
-            memo[id(self)] = result
-            return result
-        else:
-            return copy.deepcopy(self._wrapped, memo)
-
-    # Because we have messed with __class__ below, we confuse pickle as to what
-    # class we are pickling. It also appears to stop __reduce__ from being
-    # called. So, we define __getstate__ in a way that cooperates with the way
-    # that pickle interprets this class.  This fails when the wrapped class is
-    # a builtin, but it is better than nothing.
-    def __getstate__(self):
-        if self._wrapped is empty:
-            self._setup()
-        return self._wrapped.__dict__
-
-    # Python 3.3 will call __reduce__ when pickling; this method is needed
-    # to serialize and deserialize correctly.
-    @classmethod
-    def __newobj__(cls, *args):
-        return cls.__new__(cls, *args)
-
-    def __reduce_ex__(self, proto):
-        if proto >= 2:
-            # On Py3, since the default protocol is 3, pickle uses the
-            # ``__newobj__`` method (& more efficient opcodes) for writing.
-            return (self.__newobj__, (self.__class__,), self.__getstate__())
-        else:
-            # On Py2, the default protocol is 0 (for back-compat) & the above
-            # code fails miserably (see regression test). Instead, we return
-            # exactly what's returned if there's no ``__reduce__`` method at
-            # all.
-            return (copyreg._reconstructor, (self.__class__, object, None), self.__getstate__())
-
     # Return a meaningful representation of the lazy object for debugging
     # without evaluating the wrapped object.
     def __repr__(self):
@@ -355,16 +363,16 @@ class SimpleLazyObject(LazyObject):
             repr_attr = self._setupfunc
         else:
             repr_attr = self._wrapped
-        return '<SimpleLazyObject: %r>' % repr_attr
+        return '<%s: %r>' % (type(self).__name__, repr_attr)
 
-    # Need to pretend to be the wrapped class, for the sake of objects that
-    # care about this (especially in equality tests)
-    __class__ = property(new_method_proxy(operator.attrgetter("__class__")))
-    __eq__ = new_method_proxy(operator.eq)
-    __ne__ = new_method_proxy(operator.ne)
-    __hash__ = new_method_proxy(hash)
-    __bool__ = new_method_proxy(bool)       # Python 3
-    __nonzero__ = __bool__                  # Python 2
+    def __deepcopy__(self, memo):
+        if self._wrapped is empty:
+            # We have to use type(self), not self.__class__, because the
+            # latter is proxied.
+            result = SimpleLazyObject(self._setupfunc)
+            memo[id(self)] = result
+            return result
+        return copy.deepcopy(self._wrapped, memo)
 
 
 class lazy_property(property):
