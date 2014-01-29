@@ -146,7 +146,7 @@ We can run the test suite by simply ``cd``-ing into the Django ``tests/``
 directory and, if you're using GNU/Linux, Mac OS X or some other flavor of
 Unix, run::
 
-    PYTHONPATH=.. python runtests.py --settings=test_sqlite
+    PYTHONPATH=.. ./runtests.py
 
 If you're on Windows, the above should work provided that you are using
 "Git Bash" provided by the default Git install. GitHub has a `nice tutorial`__.
@@ -159,6 +159,12 @@ __ https://help.github.com/articles/set-up-git#platform-windows
     the tests. This instructs Python to look for Django in the parent directory
     of ``tests``. ``virtualenv`` puts your copy of Django on the ``PYTHONPATH``
     automatically.
+
+.. note::
+
+    As of Django 1.7, runtests.py uses ``test_sqlite`` by default if settings
+    aren’t provided through either ``--settings`` or
+    :envvar:`DJANGO_SETTINGS_MODULE`.
 
 Now sit back and relax. Django's entire test suite has over 4800 different
 tests, so it can take anywhere from 5 to 15 minutes to run, depending on the
@@ -300,7 +306,7 @@ tests in the ``model_forms_regress`` folder to make sure that's really what
 happens. From the command line, ``cd`` into the Django ``tests/`` directory
 and run::
 
-    PYTHONPATH=.. python runtests.py --settings=test_sqlite admin_widgets
+    PYTHONPATH=.. ./runtests.py admin_widgets
 
 If the tests ran correctly, you should see three failures corresponding to each
 of the test methods we added. If all of the tests passed, then you'll want to
@@ -339,7 +345,7 @@ earlier pass, so we can see whether the code we wrote above is working
 correctly. To run the tests in the ``admin_widgets`` folder, ``cd`` into the
 Django ``tests/`` directory and run::
 
-    PYTHONPATH=.. python runtests.py --settings=test_sqlite admin_widgets
+    PYTHONPATH=.. ./runtests.py admin_widgets
 
 Oops, good thing we wrote those tests! You should still see 3 failures with
 the following exception::
@@ -370,7 +376,7 @@ help identify many bugs and regressions that might otherwise go unnoticed.
 To run the entire Django test suite, ``cd`` into the Django ``tests/``
 directory and run::
 
-    PYTHONPATH=.. python runtests.py --settings=test_sqlite
+    PYTHONPATH=.. ./runtests.py
 
 As long as you don't see any failures, you're good to go. Note that this fix
 also made a `small CSS change`__ to format the new widget. You can make the
