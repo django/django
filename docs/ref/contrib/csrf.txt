@@ -448,7 +448,7 @@ should be the innermost decorator).
 View needs protection for one path
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A view needs CRSF protection under one set of conditions only, and mustn't have
+A view needs CSRF protection under one set of conditions only, and mustn't have
 it for the rest of the time.
 
 Solution: use :func:`~django.views.decorators.csrf.csrf_exempt` for the whole
