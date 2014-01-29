@@ -36,6 +36,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         if data_type == cx_Oracle.NUMBER and description[5] == 0:
             if description[4] > 11:
                 return 'BigIntegerField'
+            elif description[4]==1:
+                return 'BooleanField'
             else:
                 return 'IntegerField'
         else:
