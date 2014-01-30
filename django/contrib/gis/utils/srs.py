@@ -1,4 +1,5 @@
 from django.contrib.gis.gdal import SpatialReference
+from django.db import connections, DEFAULT_DB_ALIAS
 
 
 def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
@@ -30,10 +31,9 @@ def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
 
      database:
       The name of the database connection to use; the default is the value
-      of `django.db.DEFAULT_DB_ALIAS` (at the time of this writing, it's value
+      of `django.db.DEFAULT_DB_ALIAS` (at the time of this writing, its value
       is 'default').
     """
-    from django.db import connections, DEFAULT_DB_ALIAS
     if not database:
         database = DEFAULT_DB_ALIAS
     connection = connections[database]
