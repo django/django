@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from datetime import date
+import warnings
 
 from django import forms
 from django.contrib.admin.options import (ModelAdmin, TabularInline,
@@ -14,7 +15,6 @@ from django.core.checks import Error
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
-from django.utils import six
 from django.test import TestCase
 
 from .models import Band, Concert, ValidationTestModel, ValidationTestInlineModel
@@ -794,13 +794,10 @@ class FilterHorizontalCheckTests(CheckTestCase):
         class ValidationTestModelAdmin(ModelAdmin):
             filter_horizontal = 10
 
-        six.assertRaisesRegex(
-            self,
-            ImproperlyConfigured,
-            "'ValidationTestModelAdmin.filter_horizontal' must be a list or tuple.",
-            ValidationTestModelAdmin.validate,
-            ValidationTestModel,
-        )
+        self.assertIsInvalid(
+            ValidationTestModelAdmin, ValidationTestModel,
+            '"filter_horizontal" must be a list or tuple.',
+            'admin.E018')
 
     def test_missing_field(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -932,13 +929,10 @@ class ListDisplayTests(CheckTestCase):
         class ValidationTestModelAdmin(ModelAdmin):
             list_display = 10
 
-        six.assertRaisesRegex(
-            self,
-            ImproperlyConfigured,
-            "'ValidationTestModelAdmin.list_display' must be a list or tuple.",
-            ValidationTestModelAdmin.validate,
-            ValidationTestModel,
-        )
+        self.assertIsInvalid(
+            ValidationTestModelAdmin, ValidationTestModel,
+            '"list_display" must be a list or tuple.',
+            'admin.E107')
 
     def test_missing_field(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -1470,11 +1464,14 @@ class FormsetCheckTests(CheckTestCase):
 class CustomModelAdminTests(CheckTestCase):
     def test_deprecation(self):
         "Deprecated Custom Validator definitions still work with the check framework."
-        class CustomValidator(ModelAdminValidator):
-            def validate_me(self, model_admin, model):
-                raise ImproperlyConfigured('error!')
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=PendingDeprecationWarning)
 
-        class CustomModelAdmin(ModelAdmin):
-            validator_class = CustomValidator
+            class CustomValidator(ModelAdminValidator):
+                def validate_me(self, model_admin, model):
+                    raise ImproperlyConfigured('error!')
 
-        self.assertIsInvalid(CustomModelAdmin, ValidationTestModel, 'error!')
+            class CustomModelAdmin(ModelAdmin):
+                validator_class = CustomValidator
+
+            self.assertIsInvalid(CustomModelAdmin, ValidationTestModel, 'error!')
