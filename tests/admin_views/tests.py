@@ -1297,11 +1297,11 @@ class AdminViewPermissionsTest(TestCase):
         superuser.is_active = False
         superuser.save()
 
-        response = self.client.get('/test_admin/admin/')
+        response = self.client.get('/test_admin/admin/', follow=True)
         self.assertContains(response, 'id="login-form"')
         self.assertNotContains(response, 'Log out')
 
-        response = self.client.get('/test_admin/admin/secure-view/')
+        response = self.client.get('/test_admin/admin/secure-view/', follow=True)
         self.assertContains(response, 'id="login-form"')
 
     def testDisabledStaffPermissionsWhenLoggedIn(self):
@@ -1310,11 +1310,11 @@ class AdminViewPermissionsTest(TestCase):
         superuser.is_staff = False
         superuser.save()
 
-        response = self.client.get('/test_admin/admin/')
+        response = self.client.get('/test_admin/admin/', follow=True)
         self.assertContains(response, 'id="login-form"')
         self.assertNotContains(response, 'Log out')
 
-        response = self.client.get('/test_admin/admin/secure-view/')
+        response = self.client.get('/test_admin/admin/secure-view/', follow=True)
         self.assertContains(response, 'id="login-form"')
 
     def testAppIndexFailEarly(self):
@@ -1337,6 +1337,25 @@ class AdminViewPermissionsTest(TestCase):
         change_user.user_permissions.add(permission)
         response = self.client.get('/test_admin/admin/admin_views/')
         self.assertEqual(response.status_code, 200)
+
+    def test_shortcut_view_only_available_to_staff(self):
+        """
+        Only admin users should be able to use the admin shortcut view.
+        """
+        model_ctype = ContentType.objects.get_for_model(ModelWithStringPrimaryKey)
+        obj = ModelWithStringPrimaryKey.objects.create(string_pk='foo')
+        shortcut_url = "/test_admin/admin/r/%s/%s/" % (model_ctype.pk, obj.pk)
+
+        # Not logged in: we should see the login page.
+        response = self.client.get(shortcut_url, follow=False)
+        self.assertTemplateUsed(response, 'admin/login.html')
+
+        # Logged in? Redirect.
+        self.client.login(username='super', password='secret')
+        response = self.client.get(shortcut_url, follow=False)
+        # Can't use self.assertRedirects() because User.get_absolute_url() is silly.
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, 'http://example.com/dummy/foo/')
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -1625,162 +1644,25 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SecureViewTests(TestCase):
+    """
+    Test behaviour of a view protected by the staff_member_required decorator.
+    """
     urls = "admin_views.urls"
     fixtures = ['admin-views-users.xml']
-
-    def setUp(self):
-        # login POST dicts
-        self.super_login = {
-            LOGIN_FORM_KEY: 1,
-            REDIRECT_FIELD_NAME: '/test_admin/admin/secure-view/',
-            'username': 'super',
-            'password': 'secret',
-        }
-        self.super_email_login = {
-            LOGIN_FORM_KEY: 1,
-            REDIRECT_FIELD_NAME: '/test_admin/admin/secure-view/',
-            'username': 'super@example.com',
-            'password': 'secret',
-        }
-        self.super_email_bad_login = {
-            LOGIN_FORM_KEY: 1,
-            REDIRECT_FIELD_NAME: '/test_admin/admin/secure-view/',
-            'username': 'super@example.com',
-            'password': 'notsecret',
-        }
-        self.adduser_login = {
-            LOGIN_FORM_KEY: 1,
-            REDIRECT_FIELD_NAME: '/test_admin/admin/secure-view/',
-            'username': 'adduser',
-            'password': 'secret',
-        }
-        self.changeuser_login = {
-            LOGIN_FORM_KEY: 1,
-            REDIRECT_FIELD_NAME: '/test_admin/admin/secure-view/',
-            'username': 'changeuser',
-            'password': 'secret',
-        }
-        self.deleteuser_login = {
-            LOGIN_FORM_KEY: 1,
-            REDIRECT_FIELD_NAME: '/test_admin/admin/secure-view/',
-            'username': 'deleteuser',
-            'password': 'secret',
-        }
-        self.joepublic_login = {
-            LOGIN_FORM_KEY: 1,
-            REDIRECT_FIELD_NAME: '/test_admin/admin/secure-view/',
-            'username': 'joepublic',
-            'password': 'secret',
-        }
 
     def tearDown(self):
         self.client.logout()
 
     def test_secure_view_shows_login_if_not_logged_in(self):
-        "Ensure that we see the login form"
-        response = self.client.get('/test_admin/admin/secure-view/')
+        """
+        Ensure that we see the admin login form.
+        """
+        secure_url = '/test_admin/admin/secure-view/'
+        response = self.client.get(secure_url)
+        self.assertRedirects(response, '%s?next=%s' % (reverse('admin:login'), secure_url))
+        response = self.client.get(secure_url, follow=True)
         self.assertTemplateUsed(response, 'admin/login.html')
-
-    def test_secure_view_login_successfully_redirects_to_original_url(self):
-        response = self.client.get('/test_admin/admin/secure-view/')
-        self.assertEqual(response.status_code, 200)
-        query_string = 'the-answer=42'
-        redirect_url = '/test_admin/admin/secure-view/?%s' % query_string
-        new_next = {REDIRECT_FIELD_NAME: redirect_url}
-        login = self.client.post('/test_admin/admin/secure-view/', dict(self.super_login, **new_next), QUERY_STRING=query_string)
-        self.assertRedirects(login, redirect_url)
-
-    def test_staff_member_required_decorator_works_as_per_admin_login(self):
-        """
-        Make sure only staff members can log in.
-
-        Successful posts to the login page will redirect to the orignal url.
-        Unsuccessfull attempts will continue to render the login page with
-        a 200 status code.
-        """
-        # Super User
-        response = self.client.get('/test_admin/admin/secure-view/')
-        self.assertEqual(response.status_code, 200)
-        login = self.client.post('/test_admin/admin/secure-view/', self.super_login)
-        self.assertRedirects(login, '/test_admin/admin/secure-view/')
-        self.assertFalse(login.context)
-        self.client.get('/test_admin/admin/logout/')
-        # make sure the view removes test cookie
-        self.assertEqual(self.client.session.test_cookie_worked(), False)
-
-        # Test if user enters email address
-        response = self.client.get('/test_admin/admin/secure-view/')
-        self.assertEqual(response.status_code, 200)
-        login = self.client.post('/test_admin/admin/secure-view/', self.super_email_login)
-        self.assertContains(login, ERROR_MESSAGE)
-        # only correct passwords get a username hint
-        login = self.client.post('/test_admin/admin/secure-view/', self.super_email_bad_login)
-        self.assertContains(login, ERROR_MESSAGE)
-        new_user = User(username='jondoe', password='secret', email='super@example.com')
-        new_user.save()
-        # check to ensure if there are multiple email addresses a user doesn't get a 500
-        login = self.client.post('/test_admin/admin/secure-view/', self.super_email_login)
-        self.assertContains(login, ERROR_MESSAGE)
-
-        # Add User
-        response = self.client.get('/test_admin/admin/secure-view/')
-        self.assertEqual(response.status_code, 200)
-        login = self.client.post('/test_admin/admin/secure-view/', self.adduser_login)
-        self.assertRedirects(login, '/test_admin/admin/secure-view/')
-        self.assertFalse(login.context)
-        self.client.get('/test_admin/admin/logout/')
-
-        # Change User
-        response = self.client.get('/test_admin/admin/secure-view/')
-        self.assertEqual(response.status_code, 200)
-        login = self.client.post('/test_admin/admin/secure-view/', self.changeuser_login)
-        self.assertRedirects(login, '/test_admin/admin/secure-view/')
-        self.assertFalse(login.context)
-        self.client.get('/test_admin/admin/logout/')
-
-        # Delete User
-        response = self.client.get('/test_admin/admin/secure-view/')
-        self.assertEqual(response.status_code, 200)
-        login = self.client.post('/test_admin/admin/secure-view/', self.deleteuser_login)
-        self.assertRedirects(login, '/test_admin/admin/secure-view/')
-        self.assertFalse(login.context)
-        self.client.get('/test_admin/admin/logout/')
-
-        # Regular User should not be able to login.
-        response = self.client.get('/test_admin/admin/secure-view/')
-        self.assertEqual(response.status_code, 200)
-        login = self.client.post('/test_admin/admin/secure-view/', self.joepublic_login)
-        self.assertEqual(login.status_code, 200)
-        # Login.context is a list of context dicts we just need to check the first one.
-        self.assertContains(login, ERROR_MESSAGE)
-
-        # 8509 - if a normal user is already logged in, it is possible
-        # to change user into the superuser without error
-        login = self.client.login(username='joepublic', password='secret')
-        # Check and make sure that if user expires, data still persists
-        self.client.get('/test_admin/admin/secure-view/')
-        self.client.post('/test_admin/admin/secure-view/', self.super_login)
-        # make sure the view removes test cookie
-        self.assertEqual(self.client.session.test_cookie_worked(), False)
-
-    def test_shortcut_view_only_available_to_staff(self):
-        """
-        Only admin users should be able to use the admin shortcut view.
-        """
-        model_ctype = ContentType.objects.get_for_model(ModelWithStringPrimaryKey)
-        obj = ModelWithStringPrimaryKey.objects.create(string_pk='foo')
-        shortcut_url = "/test_admin/admin/r/%s/%s/" % (model_ctype.pk, obj.pk)
-
-        # Not logged in: we should see the login page.
-        response = self.client.get(shortcut_url, follow=False)
-        self.assertTemplateUsed(response, 'admin/login.html')
-
-        # Logged in? Redirect.
-        self.client.login(username='super', password='secret')
-        response = self.client.get(shortcut_url, follow=False)
-        # Can't use self.assertRedirects() because User.get_absolute_url() is silly.
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, 'http://example.com/dummy/foo/')
+        self.assertEqual(response.context[REDIRECT_FIELD_NAME], secure_url)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
