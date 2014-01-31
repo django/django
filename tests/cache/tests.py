@@ -1968,12 +1968,12 @@ class TestEtagWithAdmin(TestCase):
     def test_admin(self):
         with self.settings(USE_ETAGS=False):
             response = self.client.get('/test_admin/admin/')
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
             self.assertFalse(response.has_header('ETag'))
 
         with self.settings(USE_ETAGS=True):
             response = self.client.get('/test_admin/admin/')
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
             self.assertTrue(response.has_header('ETag'))
 
 

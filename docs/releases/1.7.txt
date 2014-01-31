@@ -830,6 +830,8 @@ a :exc:`~exceptions.ValueError` when encountering them, you will have to
 install pytz_. You may be affected by this problem if you use Django's time
 zone-related date formats or :mod:`django.contrib.syndication`.
 
+.. _pytz: https://pypi.python.org/pypi/pytz/
+
 ``remove()`` and ``clear()`` methods of related managers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -858,7 +860,15 @@ Fixing the issues introduced some backward incompatible changes:
   may not be an issue depending on your database and your data itself.
   See :ref:`this note <nested-queries-performance>` for more details.
 
-.. _pytz: https://pypi.python.org/pypi/pytz/
+Admin login redirection strategy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Historically, the Django admin site passed the request from an unauthorized or
+unauthenticated user directly to the login view, without HTTP redirection. In
+Django 1.7, this behavior changed to conform to a more traditional workflow
+where any unauthorized request to an admin page will be redirected (by HTTP
+status code 302) to the login page, with the ``next`` parameter set to the
+referring path. The user will be redirected there after a successful login.
 
 Miscellaneous
 ~~~~~~~~~~~~~
