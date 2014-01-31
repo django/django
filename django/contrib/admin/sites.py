@@ -3,6 +3,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth import logout as auth_logout, REDIRECT_FIELD_NAME
+from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes import views as contenttype_views
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
@@ -200,7 +201,10 @@ class AdminSite(object):
                 if request.path == reverse('admin:logout', current_app=self.name):
                     index_path = reverse('admin:index', current_app=self.name)
                     return HttpResponseRedirect(index_path)
-                return self.login(request)
+                return redirect_to_login(
+                    request.get_full_path(),
+                    reverse('admin:login', current_app=self.name)
+                )
             return view(request, *args, **kwargs)
         if not cacheable:
             inner = never_cache(inner)
@@ -327,7 +331,13 @@ class AdminSite(object):
         """
         Displays the login form for the given HttpRequest.
         """
+        if request.method == 'GET' and self.has_permission(request):
+            # Already logged-in, redirect to admin index
+            index_path = reverse('admin:index', current_app=self.name)
+            return HttpResponseRedirect(index_path)
+
         from django.contrib.auth.views import login
+
         context = dict(self.each_context(),
             title=_('Log in'),
             app_path=request.get_full_path(),
