@@ -226,6 +226,7 @@ class AdminSite(object):
         # Admin-site-wide views.
         urlpatterns = patterns('',
             url(r'^$', wrap(self.index), name='index'),
+            url(r'^login/$', self.login, name='login'),
             url(r'^logout/$', wrap(self.logout), name='logout'),
             url(r'^password_change/$', wrap(self.password_change, cacheable=True), name='password_change'),
             url(r'^password_change/done/$', wrap(self.password_change_done, cacheable=True), name='password_change_done'),
@@ -337,7 +338,9 @@ class AdminSite(object):
             title=_('Log in'),
             app_path=request.get_full_path(),
         )
-        context[REDIRECT_FIELD_NAME] = request.get_full_path()
+        if (REDIRECT_FIELD_NAME not in request.GET and
+                REDIRECT_FIELD_NAME not in request.POST):
+            context[REDIRECT_FIELD_NAME] = request.get_full_path()
         context.update(extra_context or {})
 
         defaults = {
