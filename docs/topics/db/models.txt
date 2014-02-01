@@ -328,7 +328,7 @@ whatever you want. For example::
 
     For sample code, see the `Many-to-one relationship model tests`_.
 
-    .. _Many-to-one relationship model tests: http://code.djangoproject.com/browser/django/trunk/tests/modeltests/many_to_one
+    .. _Many-to-one relationship model tests: https://github.com/django/django/tree/stable/1.3.x/tests/modeltests/many_to_one
 
 Many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
