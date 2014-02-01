@@ -170,7 +170,7 @@ function MapWidget(options) {
     // Mapping from OGRGeomType name to OpenLayers.Geometry name
     if (options['geom_name'] == 'Unknown') options['geom_type'] = OpenLayers.Geometry;
     else if (options['geom_name'] == 'GeometryCollection') options['geom_type'] = OpenLayers.Geometry.Collection;
-    else options['geom_type'] = eval('OpenLayers.Geometry' + options['geom_name']);
+    else options['geom_type'] = eval('OpenLayers.Geometry.' + options['geom_name']);
 
     // Default options
     this.options = {
@@ -178,7 +178,7 @@ function MapWidget(options) {
         default_lat: 0,
         default_lon: 0,
         default_zoom: 4,
-        is_collection: options['geom_type'] instanceof OpenLayers.Geometry.Collection,
+        is_collection: new options['geom_type']() instanceof OpenLayers.Geometry.Collection,
         layerswitcher: false,
         map_options: {},
         map_srid: 4326,
@@ -359,13 +359,13 @@ MapWidget.prototype.getControls = function(layer) {
     this.controls = [new OpenLayers.Control.Navigation()];
     if (!this.options.modifiable && layer.features.length)
         return;
-    if (this.options.geom_name == 'LineString' || this.options.geom_name == 'Unknown') {
+    if (this.options.geom_name.indexOf('LineString') >= 0 || this.options.geom_name == 'Unknown') {
         this.controls.push(new OpenLayers.Control.DrawFeature(layer, OpenLayers.Handler.Path, {'displayClass': 'olControlDrawFeaturePath'}));
     }
-    if (this.options.geom_name == 'Polygon' || this.options.geom_name == 'Unknown') {
+    if (this.options.geom_name.indexOf('Polygon') >= 0 || this.options.geom_name == 'Unknown') {
         this.controls.push(new OpenLayers.Control.DrawFeature(layer, OpenLayers.Handler.Polygon, {'displayClass': 'olControlDrawFeaturePolygon'}));
     }
-    if (this.options.geom_name == 'Point' || this.options.geom_name == 'Unknown') {
+    if (this.options.geom_name.indexOf('Point') >= 0 || this.options.geom_name == 'Unknown') {
         this.controls.push(new OpenLayers.Control.DrawFeature(layer, OpenLayers.Handler.Point, {'displayClass': 'olControlDrawFeaturePoint'}));
     }
     if (this.options.modifiable) {

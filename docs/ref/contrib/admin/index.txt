@@ -23,8 +23,7 @@ The admin is enabled in the default project template used by
 
 For reference, here are the requirements:
 
-1. Add ``'django.contrib.admin'`` to your :setting:`INSTALLED_APPS`
-   setting.
+1. Add ``'django.contrib.admin'`` to your :setting:`INSTALLED_APPS` setting.
 
 2. The admin has four dependencies - :mod:`django.contrib.auth`,
    :mod:`django.contrib.contenttypes`,
@@ -76,7 +75,7 @@ Other topics
 .. class:: ModelAdmin
 
     The ``ModelAdmin`` class is the representation of a model in the admin
-    interface. These are stored in a file named ``admin.py`` in your
+    interface. Usually, these are stored in a file named ``admin.py`` in your
     application. Let's take a look at a very simple example of
     the ``ModelAdmin``::
 
@@ -128,6 +127,53 @@ The register decorator
         @admin.register(Author, Reader, Editor, site=custom_admin_site)
         class PersonAdmin(admin.ModelAdmin):
             pass
+
+Discovery of admin files
+------------------------
+
+When you put ``'django.contrib.admin'`` in your :setting:`INSTALLED_APPS`
+setting, Django automatically looks for an ``admin`` module in each
+application and imports it.
+
+.. class:: apps.AdminConfig
+
+    .. versionadded:: 1.7
+
+    This is the default :class:`~django.apps.AppConfig` class for the admin.
+    It calls :func:`~django.contrib.admin.autodiscover()` when Django starts.
+
+.. class:: apps.SimpleAdminConfig
+
+    .. versionadded:: 1.7
+
+    This class works like :class:`~django.contrib.admin.apps.AdminConfig`,
+    except it doesn't call :func:`~django.contrib.admin.autodiscover()`.
+
+.. function:: autodiscover
+
+    This function attempts to import an ``admin`` module in each installed
+    application. Such modules are expected to register models with the admin.
+
+    .. versionchanged:: 1.7
+
+        Previous versions of Django recommended calling this function directly
+        in the URLconf. As of Django 1.7 this isn't needed anymore.
+        :class:`~django.contrib.admin.apps.AdminConfig` takes care of running
+        the auto-discovery automatically.
+
+If you are using a custom ``AdminSite``, it is common to import all of the
+``ModelAdmin`` subclasses into your code and register them to the custom
+``AdminSite``. In that case, in order to disable auto-discovery, you should
+put ``'django.contrib.admin.apps.SimpleAdminConfig'`` instead of
+``'django.contrib.admin'`` in your :setting:`INSTALLED_APPS` setting.
+
+.. versionchanged:: 1.7
+
+    In previous versions, the admin needed to be instructed to look for
+    ``admin.py`` files with :func:`~django.contrib.admin.autodiscover()`.
+    As of Django 1.7, auto-discovery is enabled by default and must be
+    explicitly disabled when it's undesirable.
+
 
 ``ModelAdmin`` options
 ----------------------
@@ -1168,7 +1214,7 @@ templates used by the :class:`ModelAdmin` views:
     save/delete the object, they are not for veto purposes, rather they allow
     you to perform extra operations.
 
-.. method:: ModelAdmin.save_model(self, request, obj, form, change)
+.. method:: ModelAdmin.save_model(request, obj, form, change)
 
     The ``save_model`` method is given the ``HttpRequest``, a model instance,
     a ``ModelForm`` instance and a boolean value based on whether it is adding
@@ -1183,12 +1229,12 @@ templates used by the :class:`ModelAdmin` views:
                 obj.user = request.user
                 obj.save()
 
-.. method:: ModelAdmin.delete_model(self, request, obj)
+.. method:: ModelAdmin.delete_model(request, obj)
 
     The ``delete_model`` method is given the ``HttpRequest`` and a model
     instance. Use this method to do pre- or post-delete operations.
 
-.. method:: ModelAdmin.save_formset(self, request, form, formset, change)
+.. method:: ModelAdmin.save_formset(request, form, formset, change)
 
     The ``save_formset`` method is given the ``HttpRequest``, the parent
     ``ModelForm`` instance and a boolean value based on whether it is adding or
@@ -1205,7 +1251,7 @@ templates used by the :class:`ModelAdmin` views:
                     instance.save()
                 formset.save_m2m()
 
-.. method:: ModelAdmin.get_ordering(self, request)
+.. method:: ModelAdmin.get_ordering(request)
 
     The ``get_ordering`` method takes a``request`` as parameter and
     is expected to return a ``list`` or ``tuple`` for ordering similar
@@ -1219,7 +1265,7 @@ templates used by the :class:`ModelAdmin` views:
                 else:
                     return ['name']
 
-.. method:: ModelAdmin.get_search_results(self, request, queryset, search_term)
+.. method:: ModelAdmin.get_search_results(request, queryset, search_term)
 
     .. versionadded:: 1.6
 
@@ -1252,7 +1298,7 @@ templates used by the :class:`ModelAdmin` views:
                     pass
                 return queryset, use_distinct
 
-.. method:: ModelAdmin.save_related(self, request, form, formsets, change)
+.. method:: ModelAdmin.save_related(request, form, formsets, change)
 
     The ``save_related`` method is given the ``HttpRequest``, the parent
     ``ModelForm`` instance, the list of inline formsets and a boolean value
@@ -1260,28 +1306,28 @@ templates used by the :class:`ModelAdmin` views:
     pre- or post-save operations for objects related to the parent. Note
     that at this point the parent object and its form have already been saved.
 
-.. method:: ModelAdmin.get_readonly_fields(self, request, obj=None)
+.. method:: ModelAdmin.get_readonly_fields(request, obj=None)
 
     The ``get_readonly_fields`` method is given the ``HttpRequest`` and the
     ``obj`` being edited (or ``None`` on an add form) and is expected to return
     a ``list`` or ``tuple`` of field names that will be displayed as read-only,
     as described above in the :attr:`ModelAdmin.readonly_fields` section.
 
-.. method:: ModelAdmin.get_prepopulated_fields(self, request, obj=None)
+.. method:: ModelAdmin.get_prepopulated_fields(request, obj=None)
 
     The ``get_prepopulated_fields`` method is given the ``HttpRequest`` and the
     ``obj`` being edited (or ``None`` on an add form) and is expected to return
     a ``dictionary``, as described above in the :attr:`ModelAdmin.prepopulated_fields`
     section.
 
-.. method:: ModelAdmin.get_list_display(self, request)
+.. method:: ModelAdmin.get_list_display(request)
 
     The ``get_list_display`` method is given the ``HttpRequest`` and is
     expected to return a ``list`` or ``tuple`` of field names that will be
     displayed on the changelist view as described above in the
     :attr:`ModelAdmin.list_display` section.
 
-.. method:: ModelAdmin.get_list_display_links(self, request, list_display)
+.. method:: ModelAdmin.get_list_display_links(request, list_display)
 
     The ``get_list_display_links`` method is given the ``HttpRequest`` and
     the ``list`` or ``tuple`` returned by :meth:`ModelAdmin.get_list_display`.
@@ -1293,7 +1339,7 @@ templates used by the :class:`ModelAdmin` views:
 
         ``None`` was added as a valid ``get_list_display_links()`` return value.
 
-.. method:: ModelAdmin.get_fields(self, request, obj=None)
+.. method:: ModelAdmin.get_fields(request, obj=None)
 
     .. versionadded:: 1.7
 
@@ -1301,20 +1347,20 @@ templates used by the :class:`ModelAdmin` views:
     being edited (or ``None`` on an add form) and is expected to return a list
     of fields, as described above in the :attr:`ModelAdmin.fields` section.
 
-.. method:: ModelAdmin.get_fieldsets(self, request, obj=None)
+.. method:: ModelAdmin.get_fieldsets(request, obj=None)
 
     The ``get_fieldsets`` method is given the ``HttpRequest`` and the ``obj``
     being edited (or ``None`` on an add form) and is expected to return a list
     of two-tuples, in which each two-tuple represents a ``<fieldset>`` on the
     admin form page, as described above in the :attr:`ModelAdmin.fieldsets` section.
 
-.. method:: ModelAdmin.get_list_filter(self, request)
+.. method:: ModelAdmin.get_list_filter(request)
 
     The ``get_list_filter`` method is given the ``HttpRequest`` and is expected
     to return the same kind of sequence type as for the
     :attr:`~ModelAdmin.list_filter` attribute.
 
-.. method:: ModelAdmin.get_search_fields(self, request)
+.. method:: ModelAdmin.get_search_fields(request)
 
     .. versionadded:: 1.7
 
@@ -1322,7 +1368,7 @@ templates used by the :class:`ModelAdmin` views:
     to return the same kind of sequence type as for the
     :attr:`~ModelAdmin.search_fields` attribute.
 
-.. method:: ModelAdmin.get_inline_instances(self, request, obj=None)
+.. method:: ModelAdmin.get_inline_instances(request, obj=None)
 
     The ``get_inline_instances`` method is given the ``HttpRequest`` and the
     ``obj`` being edited (or ``None`` on an add form) and is expected to return
@@ -1330,7 +1376,7 @@ templates used by the :class:`ModelAdmin` views:
     objects, as described below in the :class:`~django.contrib.admin.InlineModelAdmin`
     section.
 
-.. method:: ModelAdmin.get_urls(self)
+.. method:: ModelAdmin.get_urls()
 
     The ``get_urls`` method on a ``ModelAdmin`` returns the URLs to be used for
     that ModelAdmin in the same way as a URLconf.  Therefore you can extend
@@ -1395,7 +1441,7 @@ templates used by the :class:`ModelAdmin` views:
 
         (r'^my_view/$', self.admin_site.admin_view(self.my_view, cacheable=True))
 
-.. method:: ModelAdmin.get_form(self, request, obj=None, **kwargs)
+.. method:: ModelAdmin.get_form(request, obj=None, **kwargs)
 
     Returns a :class:`~django.forms.ModelForm` class for use in the admin add
     and change views, see :meth:`add_view` and :meth:`change_view`.
@@ -1410,7 +1456,7 @@ templates used by the :class:`ModelAdmin` views:
                     self.exclude.append('field_to_hide')
                 return super(MyModelAdmin, self).get_form(request, obj, **kwargs)
 
-.. method:: ModelAdmin.get_formsets(self, request, obj=None)
+.. method:: ModelAdmin.get_formsets(request, obj=None)
 
     .. deprecated:: 1.7
         Use :meth:`get_formsets_with_inlines()` instead.
@@ -1430,7 +1476,7 @@ templates used by the :class:`ModelAdmin` views:
                         continue
                     yield inline.get_formset(request, obj)
 
-.. method:: ModelAdmin.get_formsets_with_inlines(self, request, obj=None)
+.. method:: ModelAdmin.get_formsets_with_inlines(request, obj=None)
 
     Yields (``FormSet``, :class:`InlineModelAdmin`) pairs for use in admin add
     and change views.
@@ -1448,7 +1494,7 @@ templates used by the :class:`ModelAdmin` views:
                         continue
                     yield inline.get_formset(request, obj), inline
 
-.. method:: ModelAdmin.formfield_for_foreignkey(self, db_field, request, **kwargs)
+.. method:: ModelAdmin.formfield_for_foreignkey(db_field, request, **kwargs)
 
     The ``formfield_for_foreignkey`` method on a ``ModelAdmin`` allows you to
     override the default formfield for a foreign keys field. For example, to
@@ -1463,7 +1509,7 @@ templates used by the :class:`ModelAdmin` views:
     This uses the ``HttpRequest`` instance to filter the ``Car`` foreign key
     field to only display the cars owned by the ``User`` instance.
 
-.. method:: ModelAdmin.formfield_for_manytomany(self, db_field, request, **kwargs)
+.. method:: ModelAdmin.formfield_for_manytomany(db_field, request, **kwargs)
 
     Like the ``formfield_for_foreignkey`` method, the
     ``formfield_for_manytomany`` method can be overridden to change the
@@ -1478,7 +1524,7 @@ templates used by the :class:`ModelAdmin` views:
                     kwargs["queryset"] = Car.objects.filter(owner=request.user)
                 return super(MyModelAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
-.. method:: ModelAdmin.formfield_for_choice_field(self, db_field, request, **kwargs)
+.. method:: ModelAdmin.formfield_for_choice_field(db_field, request, **kwargs)
 
     Like the ``formfield_for_foreignkey`` and ``formfield_for_manytomany``
     methods, the ``formfield_for_choice_field`` method can be overridden to
@@ -1506,13 +1552,13 @@ templates used by the :class:`ModelAdmin` views:
         a :exc:`~django.core.exceptions.ValidationError` when the model itself
         is validated before saving.
 
-.. method:: ModelAdmin.get_changelist(self, request, **kwargs)
+.. method:: ModelAdmin.get_changelist(request, **kwargs)
 
     Returns the ``Changelist`` class to be used for listing. By default,
     ``django.contrib.admin.views.main.ChangeList`` is used. By inheriting this
     class you can change the behavior of the listing.
 
-.. method:: ModelAdmin.get_changelist_form(self, request, **kwargs)
+.. method:: ModelAdmin.get_changelist_form(request, **kwargs)
 
     Returns a :class:`~django.forms.ModelForm` class for use in the ``Formset``
     on the changelist page. To use a custom form, for example::
@@ -1538,7 +1584,7 @@ templates used by the :class:`ModelAdmin` views:
         omit the ``Meta.model`` attribute, since ``ModelAdmin`` will provide the
         correct model to use.
 
-.. method::  ModelAdmin.get_changelist_formset(self, request, **kwargs)
+.. method::  ModelAdmin.get_changelist_formset(request, **kwargs)
 
     Returns a :ref:`ModelFormSet <model-formsets>` class for use on the
     changelist page if :attr:`~ModelAdmin.list_editable` is used. To use a
@@ -1554,12 +1600,12 @@ templates used by the :class:`ModelAdmin` views:
                 kwargs['formset'] = MyAdminFormSet
                 return super(MyModelAdmin, self).get_changelist_formset(request, **kwargs)
 
-.. method:: ModelAdmin.has_add_permission(self, request)
+.. method:: ModelAdmin.has_add_permission(request)
 
     Should return ``True`` if adding an object is permitted, ``False``
     otherwise.
 
-.. method:: ModelAdmin.has_change_permission(self, request, obj=None)
+.. method:: ModelAdmin.has_change_permission(request, obj=None)
 
     Should return ``True`` if editing obj is permitted, ``False`` otherwise.
     If obj is ``None``, should return ``True`` or ``False`` to indicate whether
@@ -1567,7 +1613,7 @@ templates used by the :class:`ModelAdmin` views:
     will be interpreted as meaning that the current user is not permitted to
     edit any object of this type).
 
-.. method:: ModelAdmin.has_delete_permission(self, request, obj=None)
+.. method:: ModelAdmin.has_delete_permission(request, obj=None)
 
     Should return ``True`` if deleting obj is permitted, ``False`` otherwise.
     If obj is ``None``, should return ``True`` or ``False`` to indicate whether
@@ -1575,7 +1621,7 @@ templates used by the :class:`ModelAdmin` views:
     be interpreted as meaning that the current user is not permitted to delete
     any object of this type).
 
-.. method:: ModelAdmin.get_queryset(self, request)
+.. method:: ModelAdmin.get_queryset(request)
 
     The ``get_queryset`` method on a ``ModelAdmin`` returns a
     :class:`~django.db.models.query.QuerySet` of all model instances that
@@ -1610,7 +1656,7 @@ templates used by the :class:`ModelAdmin` views:
     Returns an instance of the paginator to use for this view. By default,
     instantiates an instance of :attr:`paginator`.
 
-.. method:: ModelAdmin.response_add(self, request, obj, post_url_continue=None)
+.. method:: ModelAdmin.response_add(request, obj, post_url_continue=None)
 
     Determines the :class:`~django.http.HttpResponse` for the
     :meth:`add_view` stage.
@@ -1620,7 +1666,7 @@ templates used by the :class:`ModelAdmin` views:
     been created and saved. You can override it to change the default behavior
     after the object has been created.
 
-.. method:: ModelAdmin.response_change(self, request, obj)
+.. method:: ModelAdmin.response_change(request, obj)
 
     Determines the :class:`~django.http.HttpResponse` for the
     :meth:`change_view` stage.
@@ -1630,7 +1676,7 @@ templates used by the :class:`ModelAdmin` views:
     been saved. You can override it to change the default
     behavior after the object has been changedn.
 
-.. method:: ModelAdmin.response_delete(self, request, obj_display)
+.. method:: ModelAdmin.response_delete(request, obj_display)
 
     .. versionadded:: 1.7
 
@@ -1647,25 +1693,25 @@ templates used by the :class:`ModelAdmin` views:
 Other methods
 ~~~~~~~~~~~~~
 
-.. method:: ModelAdmin.add_view(self, request, form_url='', extra_context=None)
+.. method:: ModelAdmin.add_view(request, form_url='', extra_context=None)
 
     Django view for the model instance addition page. See note below.
 
-.. method:: ModelAdmin.change_view(self, request, object_id, form_url='', extra_context=None)
+.. method:: ModelAdmin.change_view(request, object_id, form_url='', extra_context=None)
 
     Django view for the model instance edition page. See note below.
 
-.. method:: ModelAdmin.changelist_view(self, request, extra_context=None)
+.. method:: ModelAdmin.changelist_view(request, extra_context=None)
 
     Django view for the model instances change list/actions page. See note
     below.
 
-.. method:: ModelAdmin.delete_view(self, request, object_id, extra_context=None)
+.. method:: ModelAdmin.delete_view(request, object_id, extra_context=None)
 
     Django view for the model instance(s) deletion confirmation page. See note
     below.
 
-.. method:: ModelAdmin.history_view(self, request, object_id, extra_context=None)
+.. method:: ModelAdmin.history_view(request, object_id, extra_context=None)
 
     Django view for the page that shows the modification history for a given
     model instance.
@@ -1942,13 +1988,13 @@ The ``InlineModelAdmin`` class adds:
     Specifies whether or not inline objects can be deleted in the inline.
     Defaults to ``True``.
 
-.. method:: InlineModelAdmin.get_formset(self, request, obj=None, **kwargs)
+.. method:: InlineModelAdmin.get_formset(request, obj=None, **kwargs)
 
     Returns a :class:`~django.forms.models.BaseInlineFormSet` class for use in
     admin add/change views. See the example for
     :class:`ModelAdmin.get_formsets`.
 
-.. method:: InlineModelAdmin.get_extra(self, request, obj=None, **kwargs)
+.. method:: InlineModelAdmin.get_extra(request, obj=None, **kwargs)
 
     .. versionadded:: 1.6
 
@@ -1968,7 +2014,7 @@ The ``InlineModelAdmin`` class adds:
                     return extra - obj.binarytree_set.count()
                 return extra
 
-.. method:: InlineModelAdmin.get_max_num(self, request, obj=None, **kwargs)
+.. method:: InlineModelAdmin.get_max_num(request, obj=None, **kwargs)
 
     .. versionadded:: 1.6
 
@@ -2141,30 +2187,32 @@ It is possible to use an inline with generically related objects. Let's say
 you have the following models::
 
     from django.db import models
+    from django.contrib.contenttypes.fields import GenericForeignKey
 
     class Image(models.Model):
         image = models.ImageField(upload_to="images")
         content_type = models.ForeignKey(ContentType)
         object_id = models.PositiveIntegerField()
-        content_object = generic.GenericForeignKey("content_type", "object_id")
+        content_object = GenericForeignKey("content_type", "object_id")
 
     class Product(models.Model):
         name = models.CharField(max_length=100)
 
 If you want to allow editing and creating ``Image`` instance on the ``Product``
-add/change views you can use ``GenericTabularInline`` or
-``GenericStackedInline`` (both subclasses of ``GenericInlineModelAdmin``)
-provided by ``django.contrib.contenttypes.generic``, they implement tabular and
+add/change views you can use :class:`~django.contrib.contenttypes.admin.GenericTabularInline`
+or :class:`~django.contrib.contenttypes.admin.GenericStackedInline` (both
+subclasses of :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`)
+provided by :mod:`~django.contrib.contenttypes.admin`, they implement tabular and
 stacked visual layouts for the forms representing the inline objects
 respectively just like their non-generic counterparts and behave just like any
 other inline. In your ``admin.py`` for this example app::
 
     from django.contrib import admin
-    from django.contrib.contenttypes import generic
+    from django.contrib.contenttypes.admin import GenericTabularInline
 
     from myproject.myapp.models import Image, Product
 
-    class ImageInline(generic.GenericTabularInline):
+    class ImageInline(GenericTabularInline):
         model = Image
 
     class ProductAdmin(admin.ModelAdmin):
@@ -2377,14 +2425,9 @@ In this example, we register the default ``AdminSite`` instance
     from django.conf.urls import patterns, include
     from django.contrib import admin
 
-    admin.autodiscover()
-
     urlpatterns = patterns('',
         (r'^admin/', include(admin.site.urls)),
     )
-
-Above we used ``admin.autodiscover()`` to automatically load the
-:setting:`INSTALLED_APPS` admin.py modules.
 
 In this example, we register the ``AdminSite`` instance
 ``myproject.admin.admin_site`` at the URL ``/myadmin/`` ::
@@ -2397,9 +2440,12 @@ In this example, we register the ``AdminSite`` instance
         (r'^myadmin/', include(admin_site.urls)),
     )
 
-There is really no need to use autodiscover when using your own ``AdminSite``
-instance since you will likely be importing all the per-app admin.py modules
-in your ``myproject.admin`` module.
+Note that you may not want autodiscovery of ``admin`` modules when using your
+own ``AdminSite`` instance since you will likely be importing all the per-app
+``admin`` modules in your ``myproject.admin`` module. This means you need to
+put ``'django.contrib.admin.app.SimpleAdminConfig'`` instead of
+``'django.contrib.admin'`` in your :setting:`INSTALLED_APPS` setting.
+
 
 Multiple admin sites in the same URLconf
 ----------------------------------------

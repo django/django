@@ -223,12 +223,12 @@ class DatabaseOperations(BaseDatabaseOperations):
         except _sqlite3.ProgrammingError:
             pass
         # Manual emulation of SQLite parameter quoting
-        if isinstance(value, six.integer_types):
+        if isinstance(value, type(True)):
+            return str(int(value))
+        elif isinstance(value, six.integer_types):
             return str(value)
         elif isinstance(value, six.string_types):
-            return six.text_type(value)
-        elif isinstance(value, type(True)):
-            return str(int(value))
+            return '"%s"' % six.text_type(value)
         elif value is None:
             return "NULL"
         else:
@@ -332,6 +332,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'endswith': "LIKE %s ESCAPE '\\'",
         'istartswith': "LIKE %s ESCAPE '\\'",
         'iendswith': "LIKE %s ESCAPE '\\'",
+    }
+
+    pattern_ops = {
+        'startswith': "LIKE %s || '%%%%'",
+        'istartswith': "LIKE UPPER(%s) || '%%%%'",
     }
 
     Database = Database

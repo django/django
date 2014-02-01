@@ -49,7 +49,7 @@ def post_comment(request, next=None, using=None):
     if ctype is None or object_pk is None:
         return CommentPostBadRequest("Missing content_type or object_pk field.")
     try:
-        model = apps.get_model(*ctype.split(".", 1))
+        model = apps.get_model(ctype)
         target = model._default_manager.using(using).get(pk=object_pk)
     except TypeError:
         return CommentPostBadRequest(

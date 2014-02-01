@@ -89,6 +89,10 @@ Improvements thus far include:
 * The name of applications can be customized in the admin with the
   :attr:`~django.apps.AppConfig.verbose_name` of application configurations.
 
+* The admin automatically calls :func:`~django.contrib.admin.autodiscover()`
+  when Django starts. You can consequently remove this line from your
+  URLconf.
+
 * Django imports all application configurations and models as soon as it
   starts, through a deterministic and straightforward process. This should
   make it easier to diagnose import issues such as import loops.
@@ -132,6 +136,17 @@ Using a custom manager when traversing reverse relations
 
 It is now possible to :ref:`specify a custom manager
 <using-custom-reverse-manager>` when traversing a reverse relationship.
+
+New system check framework
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We've added a new :doc:`System check framework </ref/checks>` for
+detecting common problems (like invalid models) and providing hints for
+resolving those problems. The framework is extensible so you can add your
+own checks for your own apps and libraries.
+
+To perform system checks, you use the :djadmin:`check` management command.
+This command replaces the older :djadmin:`validate` management command.
 
 New ``Prefetch`` object for advanced ``prefetch_related`` operations.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -179,6 +194,27 @@ for the following, instead of backend specific behavior.
         c.execute(...)
     finally:
         c.close()
+
+Custom lookups
+~~~~~~~~~~~~~~
+
+It is now possible to write custom lookups and transforms for the ORM.
+Custom lookups work just like Django's inbuilt lookups (e.g. ``lte``,
+``icontains``) while transforms are a new concept.
+
+The :class:`django.db.models.Lookup` class provides a way to add lookup
+operators for model fields. As an example it is possible to add ``day_lte``
+operator for ``DateFields``.
+
+The :class:`django.db.models.Transform` class allows transformations of
+database values prior to the final lookup. For example it is possible to
+write a ``year`` transform that extracts year from the field's value.
+Transforms allow for chaining. After the ``year`` transform has been added
+to ``DateField`` it is possible to filter on the transformed value, for
+example ``qs.filter(author__birthdate__year__lte=1981)``.
+
+For more information about both custom lookups and transforms refer to
+:doc:`custom lookups </ref/models/custom-lookups>` documentation.
 
 Minor features
 ~~~~~~~~~~~~~~
@@ -300,6 +336,19 @@ Minor features
   :attr:`~django.core.files.storage.FileSystemStorage.file_permissions_mode`
   and :attr:`~django.core.files.storage.FileSystemStorage.directory_permissions_mode`
   parameters. See :djadmin:`collectstatic` for example usage.
+
+* The :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+  backend gets a sibling class called
+  :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
+  that doesn't use the cache system at all but instead a JSON file called
+  ``staticfiles.json`` for storing the mapping between the original file name
+  (e.g. ``css/styles.css``) and the hashed file name (e.g.
+  ``css/styles.55e7cbb9ba48.css``. The ``staticfiles.json`` file is created
+  when running the :djadmin:`collectstatic` management command and should
+  be a less expensive alternative for remote storages such as Amazon S3.
+
+  See the :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
+  docs for more information.
 
 :mod:`django.contrib.syndication`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -646,6 +695,12 @@ regressions cannot be ruled out. You may encounter the following exceptions:
   results. The code will be executed when you first need its results. This
   concept is known as "lazy evaluation".
 
+* ``django.contrib.admin`` will now automatically perform autodiscovery of
+  ``admin`` modules in installed applications. To prevent it, change your
+  :setting:`INSTALLED_APPS` to contain
+  ``'django.contrib.admin.apps.SimpleAdminConfig'`` instead of
+  ``'django.contrib.admin'``.
+
 Standalone scripts
 ^^^^^^^^^^^^^^^^^^
 
@@ -813,7 +868,7 @@ Miscellaneous
   have a custom :class:`~django.core.files.uploadhandler.FileUploadHandler`
   that implements ``new_file()``, be sure it accepts this new parameter.
 
-* :class:`ModelFormSet<django.forms.models.BaseModelFormSet>`’s no longer
+* :class:`ModelFormSet<django.forms.models.BaseModelFormSet>`\s no longer
   delete instances when ``save(commit=False)`` is called. See
   :attr:`~django.forms.formsets.BaseFormSet.can_delete` for instructions on how
   to manually delete objects from deleted forms.
@@ -954,6 +1009,19 @@ than simply ``myapp/models.py``, Django would look for :ref:`initial SQL data
 will search ``myapp/sql/`` as documented. The old location will continue to
 work until Django 1.9.
 
+Reorganization of ``django.contrib.sites``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.contrib.sites`` provides reduced functionality when it isn't in
+:setting:`INSTALLED_APPS`. The app-loading refactor adds some constraints in
+that situation. As a consequence, two objects were moved, and the old
+locations are deprecated:
+
+* :class:`~django.contrib.sites.requests.RequestSite` now lives in
+  ``django.contrib.sites.requests``.
+* :func:`~django.contrib.sites.shortcuts.get_current_site` now lives in
+  ``django.contrib.sites.shortcuts``.
+
 ``declared_fieldsets`` attribute on ``ModelAdmin``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -962,10 +1030,29 @@ API, it will go through a regular deprecation path. This attribute was mostly
 used by methods that bypassed ``ModelAdmin.get_fieldsets()`` but this was
 considered a bug and has been addressed.
 
+Reorganization of ``django.contrib.contenttypes``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Since ``django.contrib.contenttypes.generic`` defined both admin and model
+related objects an import of this module could trigger unexpected side effects.
+As a consequence, its contents were split into :mod:`~django.contrib.contenttypes`
+submodules and the ``django.contrib.contenttypes.generic`` module is deprecated:
+
+* :class:`~django.contrib.contenttypes.fields.GenericForeignKey` and
+  :class:`~django.contrib.contenttypes.fields.GenericRelation` now live in
+  :mod:`~django.contrib.contenttypes.fields`.
+* :class:`~django.contrib.contenttypes.forms.BaseGenericInlineFormSet` and
+  :func:`~django.contrib.contenttypes.forms.generic_inlineformset_factory` now
+  live in :mod:`~django.contrib.contenttypes.forms`.
+* :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`,
+  :class:`~django.contrib.contenttypes.admin.GenericStackedInline` and
+  :class:`~django.contrib.contenttypes.admin.GenericTabularInline` now live in
+  :mod:`~django.contrib.contenttypes.admin`.
+
 ``syncdb``
 ~~~~~~~~~~
 
-The ``syncdb`` command has been deprecated in favour of the new ``migrate``
+The :djadmin:`syncdb` command has been deprecated in favor of the new :djadmin:`migrate`
 command. ``migrate`` takes the same arguments as ``syncdb`` used to plus a few
 more, so it's safe to just change the name you're calling and nothing else.
 
@@ -1075,3 +1162,32 @@ remove the setting from your configuration at your convenience.
 ``SplitDateTimeWidget`` support in :class:`~django.forms.DateTimeField` is
 deprecated, use ``SplitDateTimeWidget`` with
 :class:`~django.forms.SplitDateTimeField` instead.
+
+``validate``
+~~~~~~~~~~~~
+
+:djadmin:`validate` command is deprecated in favor of :djadmin:`check` command.
+
+``django.core.management.BaseCommand``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``requires_model_validation`` is deprecated in favor of a new
+``requires_system_checks`` flag. If the latter flag is missing, then the
+value of the former flag is used. Defining both ``requires_system_checks`` and
+``requires_model_validation`` results in an error.
+
+The ``check()`` method has replaced the old ``validate()`` method.
+
+``ModelAdmin.validator``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+``ModelAdmin.validator`` is deprecated in favor of new ``checks`` attribute.
+
+``django.db.backends.DatabaseValidation.validate_field``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This method is deprecated in favor of a new ``check_field`` method.
+The functionality required by ``check_field()`` is the same as that provided
+by ``validate_field()``, but the output format is different. Third-party database
+backends needing this functionality should modify their backends to provide an
+implementation of ``check_field()``.

@@ -85,7 +85,7 @@ class MigrationExecutor(object):
             self.progress_callback("apply_start", migration, fake)
         if not fake:
             # Test to see if this is an already-applied initial migration
-            if not migration.dependencies and self.detect_soft_applied(migration):
+            if self.detect_soft_applied(migration):
                 fake = True
             else:
                 # Alright, do it normally
@@ -135,4 +135,6 @@ class MigrationExecutor(object):
                 model = apps.get_model(migration.app_label, operation.name)
                 if model._meta.db_table not in self.connection.introspection.get_table_list(self.connection.cursor()):
                     return False
+            else:
+                return False
         return True

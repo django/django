@@ -27,7 +27,7 @@ from .models import (
     BaseA, FK1, Identifier, Program, Channel, Page, Paragraph, Chapter, Book,
     MyObject, Order, OrderItem, SharedConnection, Task, Staff, StaffUser,
     CategoryRelationship, Ticket21203Parent, Ticket21203Child, Person,
-    Company, Employment)
+    Company, Employment, CustomPk, CustomPkTag)
 
 
 class BaseQuerysetTest(TestCase):
@@ -2632,8 +2632,15 @@ class WhereNodeTest(TestCase):
         def as_sql(self, qn, connection):
             return 'dummy', []
 
+    class MockCompiler(object):
+        def compile(self, node):
+            return node.as_sql(self, connection)
+
+        def __call__(self, name):
+            return connection.ops.quote_name(name)
+
     def test_empty_full_handling_conjunction(self):
-        qn = connection.ops.quote_name
+        qn = WhereNodeTest.MockCompiler()
         w = WhereNode(children=[EverythingNode()])
         self.assertEqual(w.as_sql(qn, connection), ('', []))
         w.negate()
@@ -2658,7 +2665,7 @@ class WhereNodeTest(TestCase):
         self.assertEqual(w.as_sql(qn, connection), ('', []))
 
     def test_empty_full_handling_disjunction(self):
-        qn = connection.ops.quote_name
+        qn = WhereNodeTest.MockCompiler()
         w = WhereNode(children=[EverythingNode()], connector='OR')
         self.assertEqual(w.as_sql(qn, connection), ('', []))
         w.negate()
@@ -2685,7 +2692,7 @@ class WhereNodeTest(TestCase):
         self.assertEqual(w.as_sql(qn, connection), ('NOT (dummy)', []))
 
     def test_empty_nodes(self):
-        qn = connection.ops.quote_name
+        qn = WhereNodeTest.MockCompiler()
         empty_w = WhereNode()
         w = WhereNode(children=[empty_w, empty_w])
         self.assertEqual(w.as_sql(qn, connection), (None, []))
@@ -3218,3 +3225,34 @@ class ValuesJoinPromotionTests(TestCase):
         self.assertEqual(qs.count(), 1)
         tblname = connection.ops.quote_name(ObjectB._meta.db_table)
         self.assertTrue(' LEFT OUTER JOIN %s' % tblname in str(qs.query))
+
+
+class ForeignKeyToBaseExcludeTests(TestCase):
+    def test_ticket_21787(self):
+        sc1 = SpecialCategory.objects.create(special_name='sc1', name='sc1')
+        sc2 = SpecialCategory.objects.create(special_name='sc2', name='sc2')
+        sc3 = SpecialCategory.objects.create(special_name='sc3', name='sc3')
+        c1 = CategoryItem.objects.create(category=sc1)
+        CategoryItem.objects.create(category=sc2)
+        self.assertQuerysetEqual(
+            SpecialCategory.objects.exclude(
+                categoryitem__id=c1.pk).order_by('name'),
+            [sc2, sc3], lambda x: x
+        )
+        self.assertQuerysetEqual(
+            SpecialCategory.objects.filter(categoryitem__id=c1.pk),
+            [sc1], lambda x: x
+        )
+
+
+class ReverseM2MCustomPkTests(TestCase):
+    def test_ticket_21879(self):
+        cpt1 = CustomPkTag.objects.create(id='cpt1', tag='cpt1')
+        cp1 = CustomPk.objects.create(name='cp1', extra='extra')
+        cp1.custompktag_set.add(cpt1)
+        self.assertQuerysetEqual(
+            CustomPk.objects.filter(custompktag=cpt1), [cp1],
+            lambda x: x)
+        self.assertQuerysetEqual(
+            CustomPkTag.objects.filter(custom_pk=cp1), [cpt1],
+            lambda x: x)

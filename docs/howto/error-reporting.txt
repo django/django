@@ -250,24 +250,24 @@ following methods:
 
 .. class:: SafeExceptionReporterFilter
 
-.. method:: SafeExceptionReporterFilter.is_active(self, request)
+.. method:: SafeExceptionReporterFilter.is_active(request)
 
     Returns ``True`` to activate the filtering operated in the other methods.
     By default the filter is active if :setting:`DEBUG` is ``False``.
 
-.. method:: SafeExceptionReporterFilter.get_request_repr(self, request)
+.. method:: SafeExceptionReporterFilter.get_request_repr(request)
 
     Returns the representation string of the request object, that is, the
     value that would be returned by ``repr(request)``, except it uses the
     filtered dictionary of POST parameters as determined by
     :meth:`SafeExceptionReporterFilter.get_post_parameters`.
 
-.. method:: SafeExceptionReporterFilter.get_post_parameters(self, request)
+.. method:: SafeExceptionReporterFilter.get_post_parameters(request)
 
     Returns the filtered dictionary of POST parameters. By default it replaces
     the values of sensitive parameters with stars (`**********`).
 
-.. method:: SafeExceptionReporterFilter.get_traceback_frame_variables(self, request, tb_frame)
+.. method:: SafeExceptionReporterFilter.get_traceback_frame_variables(request, tb_frame)
 
     Returns the filtered dictionary of local variables for the given traceback
     frame. By default it replaces the values of sensitive variables with stars

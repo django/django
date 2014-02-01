@@ -62,6 +62,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_combined_alters = True
     nulls_order_largest = True
     closed_cursor_error_class = InterfaceError
+    has_case_insensitive_like = False
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
@@ -81,6 +82,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'endswith': 'LIKE %s',
         'istartswith': 'LIKE UPPER(%s)',
         'iendswith': 'LIKE UPPER(%s)',
+    }
+
+    pattern_ops = {
+        'startswith': "LIKE %s || '%%%%'",
+        'istartswith': "LIKE UPPER(%s) || '%%%%'",
     }
 
     Database = Database

@@ -33,15 +33,18 @@ def update_installed_apps(**kwargs):
         # Rebuild any AppDirectoriesFinder instance.
         from django.contrib.staticfiles.finders import get_finder
         get_finder.cache_clear()
-        # Rebuild app_template_dirs cache.
-        from django.template.loaders import app_directories as mod
-        mod.app_template_dirs = mod.calculate_app_template_dirs()
-        # Rebuild templatetags module cache.
-        from django.template import base
-        base.templatetags_modules[:] = []
         # Rebuild management commands cache
         from django.core.management import get_commands
         get_commands.cache_clear()
+        # Rebuild templatetags module cache.
+        from django.template import base as mod
+        mod.templatetags_modules = []
+        # Rebuild app_template_dirs cache.
+        from django.template.loaders import app_directories as mod
+        mod.app_template_dirs = mod.calculate_app_template_dirs()
+        # Rebuild translations cache.
+        from django.utils.translation import trans_real
+        trans_real._translations = {}
 
 
 @receiver(setting_changed)
@@ -97,11 +100,14 @@ def clear_serializers_cache(**kwargs):
 
 @receiver(setting_changed)
 def language_changed(**kwargs):
-    if kwargs['setting'] in ('LOCALE_PATHS', 'LANGUAGE_CODE'):
+    if kwargs['setting'] in {'LANGUAGES', 'LANGUAGE_CODE', 'LOCALE_PATHS'}:
         from django.utils.translation import trans_real
         trans_real._default = None
-        if kwargs['setting'] == 'LOCALE_PATHS':
-            trans_real._translations = {}
+        trans_real._active = threading.local()
+    if kwargs['setting'] in {'LANGUAGES', 'LOCALE_PATHS'}:
+        from django.utils.translation import trans_real
+        trans_real._translations = {}
+        trans_real.check_for_language.cache_clear()
 
 
 @receiver(setting_changed)

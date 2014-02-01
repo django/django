@@ -99,7 +99,7 @@ class Settings(BaseSettings):
             )
 
         tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS")
-
+        self._explicit_settings = set()
         for setting in dir(mod):
             if setting.isupper():
                 setting_value = getattr(mod, setting)
@@ -108,8 +108,8 @@ class Settings(BaseSettings):
                         isinstance(setting_value, six.string_types)):
                     raise ImproperlyConfigured("The %s setting must be a tuple. "
                             "Please fix your settings." % setting)
-
                 setattr(self, setting, setting_value)
+                self._explicit_settings.add(setting)
 
         if not self.SECRET_KEY:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
@@ -125,6 +125,9 @@ class Settings(BaseSettings):
             # we don't do this unconditionally (breaks Windows).
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
+
+    def is_overridden(self, setting):
+        return setting in self._explicit_settings
 
 
 class UserSettingsHolder(BaseSettings):
@@ -158,5 +161,11 @@ class UserSettingsHolder(BaseSettings):
 
     def __dir__(self):
         return list(self.__dict__) + dir(self.default_settings)
+
+    def is_overridden(self, setting):
+        deleted = (setting in self._deleted)
+        set_locally = (setting in self.__dict__)
+        set_on_default = getattr(self.default_settings, 'is_overridden', lambda s: False)(setting)
+        return (deleted or set_locally or set_on_default)
 
 settings = LazySettings()

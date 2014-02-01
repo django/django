@@ -184,6 +184,9 @@ these changes.
 
 * ``AppCommand.handle_app()`` will no longer be supported.
 
+* ``RequestSite`` will be located in ``django.contrib.sites.requests`` and
+  ``get_current_site`` in ``django.contrib.sites.shortcuts``.
+
 * FastCGI support via the ``runfcgi`` management command will be
   removed. Please deploy your project using WSGI.
 
@@ -233,6 +236,16 @@ these changes.
 * ``django.db.models.loading`` will be removed.
 
 * Passing callable arguments to querysets will no longer be possible.
+
+* ``BaseCommand.requires_model_validation`` will be removed in favor of
+  ``requires_system_checks``. Admin validators will be replaced by admin
+  checks.
+
+* ``ModelAdmin.validator`` will be removed in favor of the new ``checks``
+  attribute.
+
+* ``django.db.backends.DatabaseValidation.validate_field`` will be removed in
+  favor of the ``check_field`` method.
 
 2.0
 ---

@@ -30,13 +30,18 @@ def normalize_unique_together(unique_together):
     tuple of two strings. Normalize it to a tuple of tuples, so that
     calling code can uniformly expect that.
     """
-    if not unique_together:
-        return ()
-    first_element = next(iter(unique_together))
-    if not isinstance(first_element, (tuple, list)):
-        unique_together = (unique_together,)
-    # Normalize everything to tuples
-    return tuple(tuple(ut) for ut in unique_together)
+    try:
+        if not unique_together:
+            return ()
+        first_element = next(iter(unique_together))
+        if not isinstance(first_element, (tuple, list)):
+            unique_together = (unique_together,)
+        # Normalize everything to tuples
+        return tuple(tuple(ut) for ut in unique_together)
+    except TypeError:
+        # If the value of unique_together isn't valid, return it
+        # verbatim; this will be picked up by the check framework later.
+        return unique_together
 
 
 @python_2_unicode_compatible

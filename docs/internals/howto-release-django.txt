@@ -329,7 +329,7 @@ You're almost done! All that's left to do now is:
    example, after releasing 1.5.1, update ``VERSION`` to
    ``VERSION = (1, 5, 2, 'alpha', 0)``.
 
-#. For the first alpha release of a new version (when we create the
+#. For the first beta release of a new version (when we create the
    ``stable/1.?.x`` git branch), you'll want to create a new
    ``DocumentRelease`` object in the ``docs.djangoproject.com`` database for
    the new version's docs, and update the ``docs/fixtures/doc_releases.json``
@@ -340,10 +340,10 @@ You're almost done! All that's left to do now is:
    default if it's a final release). Not all versions are declared;
    take example on previous releases.
 
-.. _Trac's versions list: https://code.djangoproject.com/admin/ticket/versions
-
 #. On the master branch, remove the ``UNDER DEVELOPMENT`` header in the notes
    of the release that's just been pushed out.
+
+.. _Trac's versions list: https://code.djangoproject.com/admin/ticket/versions
 
 Notes on setting the VERSION tuple
 ==================================

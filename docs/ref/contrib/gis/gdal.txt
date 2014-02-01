@@ -459,19 +459,19 @@ systems and coordinate transformation::
 
    Constructs a :class:`Polygon` from the given bounding-box (a 4-tuple).
 
-   .. method:: __len__
+   .. method:: __len__()
 
    Returns the number of points in a :class:`LineString`, the
    number of rings in a :class:`Polygon`, or the number of geometries in a
    :class:`GeometryCollection`. Not applicable to other geometry types.
 
-   .. method:: __iter__
+   .. method:: __iter__()
 
    Iterates over the points in a :class:`LineString`, the rings in a
    :class:`Polygon`, or the geometries in a :class:`GeometryCollection`.
    Not applicable to other geometry types.
 
-   .. method:: __getitem__
+   .. method:: __getitem__()
 
    Returns the point at the specified index for a :class:`LineString`, the
    interior ring at the specified index for a :class:`Polygon`, or the geometry
@@ -677,7 +677,7 @@ systems and coordinate transformation::
    Returns ``True`` if this geometry overlaps the other, otherwise returns
    ``False``.
 
-   .. method:: boundary
+   .. method:: boundary()
 
    The boundary of this geometry, as a new :class:`OGRGeometry` object.
 
@@ -686,22 +686,22 @@ systems and coordinate transformation::
    The smallest convex polygon that contains this geometry, as a new
    :class:`OGRGeometry` object.
 
-   .. method:: difference
+   .. method:: difference()
 
    Returns the region consisting of the difference of this geometry and
    the other, as a new :class:`OGRGeometry` object.
 
-   .. method:: intersection
+   .. method:: intersection()
 
    Returns the region consisting of the intersection of this geometry and
    the other, as a new :class:`OGRGeometry` object.
 
-   .. method:: sym_difference
+   .. method:: sym_difference()
 
    Returns the region consisting of the symmetric difference of this
    geometry and the other, as a new :class:`OGRGeometry` object.
 
-   .. method:: union
+   .. method:: union()
 
    Returns the region consisting of the union of this geometry and
    the other, as a new :class:`OGRGeometry` object.
@@ -873,7 +873,7 @@ systems and coordinate transformation::
    A string representing this envelope as a polygon in WKT format.
 
 
-   .. method:: expand_to_include(self, *args)
+   .. method:: expand_to_include(*args)
 
 Coordinate System Objects
 =========================

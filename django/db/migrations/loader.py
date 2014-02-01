@@ -223,7 +223,7 @@ class MigrationLoader(object):
                         self.graph.add_node(parent, new_migration)
                         self.applied_migrations.add(parent)
                     elif parent[0] in self.migrated_apps:
-                        parent = (parent[0], list(self.graph.root_nodes(parent[0]))[0])
+                        parent = list(self.graph.root_nodes(parent[0]))[0]
                     else:
                         raise ValueError("Dependency on unknown app %s" % parent[0])
                 self.graph.add_dependency(key, parent)

@@ -45,9 +45,6 @@ class NullQueriesTests(TestCase):
         # Can't use None on anything other than __exact and __iexact
         self.assertRaises(ValueError, Choice.objects.filter, id__gt=None)
 
-        # Can't use None on anything other than __exact and __iexact
-        self.assertRaises(ValueError, Choice.objects.filter, foo__gt=None)
-
         # Related managers use __exact=None implicitly if the object hasn't been saved.
         p2 = Poll(question="How?")
         self.assertEqual(repr(p2.choice_set.all()), '[]')

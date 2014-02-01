@@ -2,7 +2,6 @@ from contextlib import contextmanager
 import logging
 import re
 import sys
-from threading import local
 import time
 from unittest import skipUnless
 import warnings
@@ -300,6 +299,26 @@ class modify_settings(override_settings):
         super(modify_settings, self).enable()
 
 
+def override_system_checks(new_checks):
+    """ Acts as a decorator. Overrides list of registered system checks.
+    Useful when you override `INSTALLED_APPS`, e.g. if you exclude `auth` app,
+    you also need to exclude its system checks. """
+
+    from django.core.checks.registry import registry
+
+    def outer(test_func):
+        @wraps(test_func)
+        def inner(*args, **kwargs):
+            old_checks = registry.registered_checks
+            registry.registered_checks = new_checks
+            try:
+                return test_func(*args, **kwargs)
+            finally:
+                registry.registered_checks = old_checks
+        return inner
+    return outer
+
+
 def compare_xml(want, got):
     """Tries to do a 'xml-comparison' of want and got.  Plain string
     comparison doesn't always work because, for example, attribute
@@ -482,22 +501,6 @@ def patch_logger(logger_name, log_level):
         setattr(logger, log_level, orig)
 
 
-class TransRealMixin(object):
-    """This is the only way to reset the translation machinery. Otherwise
-    the test suite occasionally fails because of global state pollution
-    between tests."""
-    def flush_caches(self):
-        from django.utils.translation import trans_real
-        trans_real._translations = {}
-        trans_real._active = local()
-        trans_real._default = None
-        trans_real.check_for_language.cache_clear()
-
-    def tearDown(self):
-        self.flush_caches()
-        super(TransRealMixin, self).tearDown()
-
-
 # On OSes that don't provide tzset (Windows), we can't set the timezone
 # in which the program runs. As a consequence, we must skip tests that
 # don't enforce a specific timezone (with timezone.override or equivalent),
@@ -506,3 +509,14 @@ class TransRealMixin(object):
 requires_tz_support = skipUnless(TZ_SUPPORT,
         "This test relies on the ability to run a program in an arbitrary "
         "time zone, but your operating system isn't able to do that.")
+
+
+@contextmanager
+def extend_sys_path(*paths):
+    """Context manager to temporarily add paths to sys.path."""
+    _orig_sys_path = sys.path[:]
+    sys.path.extend(paths)
+    try:
+        yield
+    finally:
+        sys.path = _orig_sys_path

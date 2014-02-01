@@ -108,8 +108,7 @@ different strategy and broader scope,
 ``QuerySet`` that will prefetch each of the specified related lookups in a
 single batch as soon as the query begins to be evaluated. Unlike
 ``select_related``, it does the joins in Python, not in the database, and
-supports many-to-many relationships,
-:class:`~django.contrib.contenttypes.generic.GenericForeignKey` and more. This
+supports many-to-many relationships, ``GenericForeignKey`` and more. This
 allows you to fix a very common performance problem in which your code ends up
 doing O(n) database queries (or worse) if objects on your primary ``QuerySet``
 each have many related objects that you also need.

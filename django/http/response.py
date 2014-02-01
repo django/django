@@ -141,7 +141,7 @@ class HttpResponseBase(six.Iterator):
         """Converts headers key/value to ascii/latin-1 native strings.
 
         `charset` must be 'ascii' or 'latin-1'. If `mime_encode` is True and
-        `value` value can't be represented in the given charset, MIME-encoding
+        `value` can't be represented in the given charset, MIME-encoding
         is applied.
         """
         if not isinstance(value, (bytes, six.text_type)):

@@ -1,4 +1,6 @@
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -124,15 +126,15 @@ class TaggedItem(models.Model):
     tag = models.SlugField()
     content_type = models.ForeignKey(ContentType, related_name="taggeditem_set2")
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
     created_by_ct = models.ForeignKey(ContentType, null=True,
                                       related_name='taggeditem_set3')
     created_by_fkey = models.PositiveIntegerField(null=True)
-    created_by = generic.GenericForeignKey('created_by_ct', 'created_by_fkey',)
+    created_by = GenericForeignKey('created_by_ct', 'created_by_fkey',)
     favorite_ct = models.ForeignKey(ContentType, null=True,
                                     related_name='taggeditem_set4')
     favorite_fkey = models.CharField(max_length=64, null=True)
-    favorite = generic.GenericForeignKey('favorite_ct', 'favorite_fkey')
+    favorite = GenericForeignKey('favorite_ct', 'favorite_fkey')
 
     def __str__(self):
         return self.tag
@@ -143,8 +145,8 @@ class TaggedItem(models.Model):
 
 class Bookmark(models.Model):
     url = models.URLField()
-    tags = generic.GenericRelation(TaggedItem, related_name='bookmarks')
-    favorite_tags = generic.GenericRelation(TaggedItem,
+    tags = GenericRelation(TaggedItem, related_name='bookmarks')
+    favorite_tags = GenericRelation(TaggedItem,
                                     content_type_field='favorite_ct',
                                     object_id_field='favorite_fkey',
                                     related_name='favorite_bookmarks')
@@ -159,7 +161,7 @@ class Comment(models.Model):
     # Content-object field
     content_type = models.ForeignKey(ContentType)
     object_pk = models.TextField()
-    content_object = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
+    content_object = GenericForeignKey(ct_field="content_type", fk_field="object_pk")
 
     class Meta:
         ordering = ['id']

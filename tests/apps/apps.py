@@ -10,6 +10,7 @@ class MyAdmin(AppConfig):
 
 class MyAuth(AppConfig):
     name = 'django.contrib.auth'
+    label = 'myauth'
     verbose_name = "All your password are belong to us."
 
 

@@ -49,7 +49,7 @@ class DebugViewTests(TestCase):
         # Ensure no 403.html template exists to test the default case.
         setup_test_template_loader({})
         try:
-            response = self.client.get('/views/raises403/')
+            response = self.client.get('/raises403/')
             self.assertContains(response, '<h1>403 Forbidden</h1>', status_code=403)
         finally:
             restore_template_loaders()
@@ -60,13 +60,13 @@ class DebugViewTests(TestCase):
             {'403.html': 'This is a test template for a 403 Forbidden error.'}
         )
         try:
-            response = self.client.get('/views/raises403/')
+            response = self.client.get('/raises403/')
             self.assertContains(response, 'test template', status_code=403)
         finally:
             restore_template_loaders()
 
     def test_404(self):
-        response = self.client.get('/views/raises404/')
+        response = self.client.get('/raises404/')
         self.assertEqual(response.status_code, 404)
 
     def test_view_exceptions(self):
@@ -79,7 +79,7 @@ class DebugViewTests(TestCase):
         Numeric IDs and fancy traceback context blocks line numbers shouldn't be localized.
         """
         with self.settings(DEBUG=True, USE_L10N=True):
-            response = self.client.get('/views/raises500/')
+            response = self.client.get('/raises500/')
             # We look for a HTML fragment of the form
             # '<div class="context" id="c38123208">', not '<div class="context" id="c38,123,208"'
             self.assertContains(response, '<div class="context" id="', status_code=500)
@@ -518,6 +518,7 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
     Ensure that sensitive information can be filtered out of error reports.
     Refs #14614.
     """
+    urls = 'view_tests.urls'
     rf = RequestFactory()
 
     def test_non_sensitive_request(self):
@@ -640,7 +641,7 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
         def callable_setting():
             return "This should not be displayed"
         with self.settings(DEBUG=True, FOOBAR=callable_setting):
-            response = self.client.get('/views/raises500/')
+            response = self.client.get('/raises500/')
             self.assertNotContains(response, "This should not be displayed", status_code=500)
 
     def test_dict_setting_with_non_str_key(self):
@@ -649,7 +650,7 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
         debug page (#12744).
         """
         with self.settings(DEBUG=True, FOOBAR={42: None}):
-            response = self.client.get('/views/raises500/')
+            response = self.client.get('/raises500/')
             self.assertContains(response, 'FOOBAR', status_code=500)
 
     def test_sensitive_settings(self):
@@ -665,7 +666,7 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
         ]
         for setting in sensitive_settings:
             with self.settings(DEBUG=True, **{setting: "should not be displayed"}):
-                response = self.client.get('/views/raises500/')
+                response = self.client.get('/raises500/')
                 self.assertNotContains(response, 'should not be displayed', status_code=500)
 
     def test_settings_with_sensitive_keys(self):
@@ -685,7 +686,7 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
                 'recursive': {setting: "should not be displayed"},
             }
             with self.settings(DEBUG=True, FOOBAR=FOOBAR):
-                response = self.client.get('/views/raises500/')
+                response = self.client.get('/raises500/')
                 self.assertNotContains(response, 'should not be displayed', status_code=500)
 
 

@@ -131,13 +131,13 @@ into those elements.
     representing the current site. This is useful for ``{{ site.domain
     }}`` or ``{{ site.name }}``. If you do *not* have the Django sites
     framework installed, this will be set to a
-    :class:`django.contrib.sites.models.RequestSite` object. See the
+    :class:`~django.contrib.sites.requests.RequestSite` object. See the
     :ref:`RequestSite section of the sites framework documentation
     <requestsite-objects>` for more.
 
   See `a complex example`_ below that uses a description template.
 
-  .. method:: Feed.get_context_data(self, **kwargs)
+  .. method:: Feed.get_context_data(**kwargs)
 
     .. versionadded:: 1.6
 

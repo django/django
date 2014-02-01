@@ -127,3 +127,10 @@ class Migration(object):
         to_run.reverse()
         for operation, to_state, from_state in to_run:
             operation.database_backwards(self.app_label, schema_editor, from_state, to_state)
+
+
+def swappable_dependency(value):
+    """
+    Turns a setting value into a dependency.
+    """
+    return (value.split(".", 1)[0], "__first__")

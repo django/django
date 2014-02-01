@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.views import shortcut
-from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 from django.db import models
 from django.http import HttpRequest, Http404
 from django.test import TestCase, override_settings

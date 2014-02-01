@@ -28,6 +28,7 @@ from .models import Band
 
 
 class CommonMiddlewareTest(TestCase):
+    urls = 'middleware.urls'
 
     def _get_request(self, path):
         request = HttpRequest()
@@ -35,7 +36,7 @@ class CommonMiddlewareTest(TestCase):
             'SERVER_NAME': 'testserver',
             'SERVER_PORT': 80,
         }
-        request.path = request.path_info = "/middleware/%s" % path
+        request.path = request.path_info = "/%s" % path
         return request
 
     @override_settings(APPEND_SLASH=True)
@@ -70,7 +71,7 @@ class CommonMiddlewareTest(TestCase):
         request = self._get_request('slash')
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
-        self.assertEqual(r.url, 'http://testserver/middleware/slash/')
+        self.assertEqual(r.url, 'http://testserver/slash/')
 
     @override_settings(APPEND_SLASH=True, DEBUG=True)
     def test_append_slash_no_redirect_on_POST_in_DEBUG(self):
@@ -103,7 +104,7 @@ class CommonMiddlewareTest(TestCase):
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
             r.url,
-            'http://testserver/middleware/needsquoting%23/')
+            'http://testserver/needsquoting%23/')
 
     @override_settings(APPEND_SLASH=False, PREPEND_WWW=True)
     def test_prepend_www(self):
@@ -112,7 +113,7 @@ class CommonMiddlewareTest(TestCase):
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
             r.url,
-            'http://www.testserver/middleware/path/')
+            'http://www.testserver/path/')
 
     @override_settings(APPEND_SLASH=True, PREPEND_WWW=True)
     def test_prepend_www_append_slash_have_slash(self):
@@ -120,7 +121,7 @@ class CommonMiddlewareTest(TestCase):
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url,
-            'http://www.testserver/middleware/slash/')
+            'http://www.testserver/slash/')
 
     @override_settings(APPEND_SLASH=True, PREPEND_WWW=True)
     def test_prepend_www_append_slash_slashless(self):
@@ -128,7 +129,7 @@ class CommonMiddlewareTest(TestCase):
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url,
-            'http://www.testserver/middleware/slash/')
+            'http://www.testserver/slash/')
 
     # The following tests examine expected behavior given a custom urlconf that
     # overrides the default one through the request object.
@@ -171,7 +172,7 @@ class CommonMiddlewareTest(TestCase):
         self.assertFalse(r is None,
             "CommonMiddlware failed to return APPEND_SLASH redirect using request.urlconf")
         self.assertEqual(r.status_code, 301)
-        self.assertEqual(r.url, 'http://testserver/middleware/customurlconf/slash/')
+        self.assertEqual(r.url, 'http://testserver/customurlconf/slash/')
 
     @override_settings(APPEND_SLASH=True, DEBUG=True)
     def test_append_slash_no_redirect_on_POST_in_DEBUG_custom_urlconf(self):
@@ -209,7 +210,7 @@ class CommonMiddlewareTest(TestCase):
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
             r.url,
-            'http://testserver/middleware/customurlconf/needsquoting%23/')
+            'http://testserver/customurlconf/needsquoting%23/')
 
     @override_settings(APPEND_SLASH=False, PREPEND_WWW=True)
     def test_prepend_www_custom_urlconf(self):
@@ -219,7 +220,7 @@ class CommonMiddlewareTest(TestCase):
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
             r.url,
-            'http://www.testserver/middleware/customurlconf/path/')
+            'http://www.testserver/customurlconf/path/')
 
     @override_settings(APPEND_SLASH=True, PREPEND_WWW=True)
     def test_prepend_www_append_slash_have_slash_custom_urlconf(self):
@@ -228,7 +229,7 @@ class CommonMiddlewareTest(TestCase):
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url,
-            'http://www.testserver/middleware/customurlconf/slash/')
+            'http://www.testserver/customurlconf/slash/')
 
     @override_settings(APPEND_SLASH=True, PREPEND_WWW=True)
     def test_prepend_www_append_slash_slashless_custom_urlconf(self):
@@ -237,7 +238,7 @@ class CommonMiddlewareTest(TestCase):
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url,
-            'http://www.testserver/middleware/customurlconf/slash/')
+            'http://www.testserver/customurlconf/slash/')
 
     # Legacy tests for the 404 error reporting via email (to be removed in 1.8)
 

@@ -1,2 +1,2 @@
-from .base import AppConfig     # NOQA
+from .config import AppConfig   # NOQA
 from .registry import apps      # NOQA

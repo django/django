@@ -27,7 +27,15 @@ class AddField(Operation):
         from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
         if router.allow_migrate(schema_editor.connection.alias, to_model):
-            schema_editor.add_field(from_model, to_model._meta.get_field_by_name(self.name)[0])
+            field = to_model._meta.get_field_by_name(self.name)[0]
+            if not self.preserve_default:
+                field.default = self.field.default
+            schema_editor.add_field(
+                from_model,
+                field,
+            )
+            if not self.preserve_default:
+                field.default = NOT_PROVIDED
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.render().get_model(app_label, self.model_name)

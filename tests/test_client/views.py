@@ -67,7 +67,7 @@ def redirect_view(request):
         query = '?' + urlencode(request.GET, True)
     else:
         query = ''
-    return HttpResponseRedirect('/test_client/get_view/' + query)
+    return HttpResponseRedirect('/get_view/' + query)
 
 
 def view_with_secure(request):
@@ -80,7 +80,7 @@ def view_with_secure(request):
 
 def double_redirect_view(request):
     "A view that redirects all requests to a redirection view"
-    return HttpResponseRedirect('/test_client/permanent_redirect_view/')
+    return HttpResponseRedirect('/permanent_redirect_view/')
 
 
 def bad_view(request):

@@ -167,7 +167,7 @@ As we can see, ``formset.errors`` is a list whose entries correspond to the
 forms in the formset. Validation was performed for each of the two forms, and
 the expected error message appears for the second item.
 
-.. method:: BaseFormSet.total_error_count(self)
+.. method:: BaseFormSet.total_error_count()
 
 .. versionadded:: 1.6
 

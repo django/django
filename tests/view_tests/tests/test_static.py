@@ -18,13 +18,14 @@ from ..urls import media_dir
 class StaticTests(SimpleTestCase):
     """Tests django views in django/views/static.py"""
 
+    urls = 'view_tests.urls'
     prefix = 'site_media'
 
     def test_serve(self):
         "The static view can serve static media"
         media_files = ['file.txt', 'file.txt.gz']
         for filename in media_files:
-            response = self.client.get('/views/%s/%s' % (self.prefix, filename))
+            response = self.client.get('/%s/%s' % (self.prefix, filename))
             response_content = b''.join(response)
             file_path = path.join(media_dir, filename)
             with open(file_path, 'rb') as fp:
@@ -33,19 +34,19 @@ class StaticTests(SimpleTestCase):
             self.assertEqual(mimetypes.guess_type(file_path)[1], response.get('Content-Encoding', None))
 
     def test_unknown_mime_type(self):
-        response = self.client.get('/views/%s/file.unknown' % self.prefix)
+        response = self.client.get('/%s/file.unknown' % self.prefix)
         self.assertEqual('application/octet-stream', response['Content-Type'])
 
     def test_copes_with_empty_path_component(self):
         file_name = 'file.txt'
-        response = self.client.get('/views/%s//%s' % (self.prefix, file_name))
+        response = self.client.get('/%s//%s' % (self.prefix, file_name))
         response_content = b''.join(response)
         with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response_content)
 
     def test_is_modified_since(self):
         file_name = 'file.txt'
-        response = self.client.get('/views/%s/%s' % (self.prefix, file_name),
+        response = self.client.get('/%s/%s' % (self.prefix, file_name),
             HTTP_IF_MODIFIED_SINCE='Thu, 1 Jan 1970 00:00:00 GMT')
         response_content = b''.join(response)
         with open(path.join(media_dir, file_name), 'rb') as fp:
@@ -54,7 +55,7 @@ class StaticTests(SimpleTestCase):
     def test_not_modified_since(self):
         file_name = 'file.txt'
         response = self.client.get(
-            '/views/%s/%s' % (self.prefix, file_name),
+            '/%s/%s' % (self.prefix, file_name),
             HTTP_IF_MODIFIED_SINCE='Mon, 18 Jan 2038 05:14:07 GMT'
             # This is 24h before max Unix time. Remember to fix Django and
             # update this test well before 2038 :)
@@ -69,7 +70,7 @@ class StaticTests(SimpleTestCase):
         """
         file_name = 'file.txt'
         invalid_date = 'Mon, 28 May 999999999999 28:25:26 GMT'
-        response = self.client.get('/views/%s/%s' % (self.prefix, file_name),
+        response = self.client.get('/%s/%s' % (self.prefix, file_name),
                                    HTTP_IF_MODIFIED_SINCE=invalid_date)
         response_content = b''.join(response)
         with open(path.join(media_dir, file_name), 'rb') as fp:
@@ -84,7 +85,7 @@ class StaticTests(SimpleTestCase):
         """
         file_name = 'file.txt'
         invalid_date = ': 1291108438, Wed, 20 Oct 2010 14:05:00 GMT'
-        response = self.client.get('/views/%s/%s' % (self.prefix, file_name),
+        response = self.client.get('/%s/%s' % (self.prefix, file_name),
                                    HTTP_IF_MODIFIED_SINCE=invalid_date)
         response_content = b''.join(response)
         with open(path.join(media_dir, file_name), 'rb') as fp:
@@ -92,7 +93,7 @@ class StaticTests(SimpleTestCase):
         self.assertEqual(len(response_content), int(response['Content-Length']))
 
     def test_404(self):
-        response = self.client.get('/views/%s/non_existing_resource' % self.prefix)
+        response = self.client.get('/%s/non_existing_resource' % self.prefix)
         self.assertEqual(404, response.status_code)
 
 

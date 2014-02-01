@@ -185,11 +185,11 @@ class ModelDetailView(BaseAdminDocsView):
     def get_context_data(self, **kwargs):
         # Get the model class.
         try:
-            apps.get_app_config(self.kwargs['app_label'])
+            app_config = apps.get_app_config(self.kwargs['app_label'])
         except LookupError:
             raise Http404(_("App %(app_label)r not found") % self.kwargs)
         try:
-            model = apps.get_model(self.kwargs['app_label'], self.kwargs['model_name'])
+            model = app_config.get_model(self.kwargs['model_name'])
         except LookupError:
             raise Http404(_("Model %(model_name)r not found in app %(app_label)r") % self.kwargs)
 

@@ -15,10 +15,11 @@ def refs_aggregate(lookup_parts, aggregates):
     default annotation names we must check each prefix of the lookup_parts
     for match.
     """
-    for i in range(len(lookup_parts) + 1):
-        if LOOKUP_SEP.join(lookup_parts[0:i]) in aggregates:
-            return True
-    return False
+    for n in range(len(lookup_parts) + 1):
+        level_n_lookup = LOOKUP_SEP.join(lookup_parts[0:n])
+        if level_n_lookup in aggregates:
+            return aggregates[level_n_lookup], lookup_parts[n:]
+    return False, ()
 
 
 class Aggregate(object):

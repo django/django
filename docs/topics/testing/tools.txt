@@ -129,7 +129,7 @@ Use the ``django.test.Client`` class to make requests.
     Once you have a ``Client`` instance, you can call any of the following
     methods:
 
-    .. method:: Client.get(path, data={}, follow=False, secure=False, **extra)
+    .. method:: Client.get(path, data=None, follow=False, secure=False, **extra)
 
         .. versionadded:: 1.7
 
@@ -192,7 +192,7 @@ Use the ``django.test.Client`` class to make requests.
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
 
-    .. method:: Client.post(path, data={}, content_type=MULTIPART_CONTENT, follow=False, secure=False, **extra)
+    .. method:: Client.post(path, data=None, content_type=MULTIPART_CONTENT, follow=False, secure=False, **extra)
 
         Makes a POST request on the provided ``path`` and returns a
         ``Response`` object, which is documented below.
@@ -269,7 +269,7 @@ Use the ``django.test.Client`` class to make requests.
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
 
-    .. method:: Client.head(path, data={}, follow=False, secure=False, **extra)
+    .. method:: Client.head(path, data=None, follow=False, secure=False, **extra)
 
         Makes a HEAD request on the provided ``path`` and returns a
         ``Response`` object. This method works just like :meth:`Client.get`,
@@ -1036,7 +1036,7 @@ If ``multi_db=True``, fixtures are loaded into all databases.
 Overriding settings
 ~~~~~~~~~~~~~~~~~~~
 
-.. method:: SimpleTestCase.settings
+.. method:: SimpleTestCase.settings()
 
 For testing purposes it's often useful to change a setting temporarily and
 revert to the original value after running the testing code. For this use case
@@ -1061,7 +1061,7 @@ Django provides a standard Python context manager (see :pep:`343`) called
 This example will override the :setting:`LOGIN_URL` setting for the code
 in the ``with`` block and reset its value to the previous state afterwards.
 
-.. method:: SimpleTestCase.modify_settings
+.. method:: SimpleTestCase.modify_settings()
 
 .. versionadded:: 1.7
 
@@ -1241,7 +1241,7 @@ your test suite.
     failure. Similar to unittest's :meth:`~unittest.TestCase.assertRaisesRegexp`
     with the difference that ``expected_message`` isn't a regular expression.
 
-.. method:: SimpleTestCase.assertFieldOutput(self, fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value=u'')
+.. method:: SimpleTestCase.assertFieldOutput(fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value=u'')
 
     Asserts that a form field behaves correctly with various inputs.
 

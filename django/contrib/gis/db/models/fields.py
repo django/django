@@ -2,6 +2,8 @@ from django.db.models.fields import Field
 from django.db.models.sql.expressions import SQLEvaluator
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.gis import forms
+from django.contrib.gis.db.models.constants import GIS_LOOKUPS
+from django.contrib.gis.db.models.lookups import GISLookup
 from django.contrib.gis.db.models.proxy import GeometryProxy
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
 from django.utils import six
@@ -49,7 +51,7 @@ class GeometryField(Field):
     form_class = forms.GeometryField
 
     # Geodetic units.
-    geodetic_units = ('Decimal Degree', 'degree')
+    geodetic_units = ('decimal degree', 'degree')
 
     description = _("The base GIS field -- maps to the OpenGIS Specification Geometry type.")
 
@@ -145,7 +147,7 @@ class GeometryField(Field):
         Returns true if this field's SRID corresponds with a coordinate
         system that uses non-projected units (e.g., latitude/longitude).
         """
-        return self.units_name(connection) in self.geodetic_units
+        return self.units_name(connection).lower() in self.geodetic_units
 
     def get_distance(self, value, lookup_type, connection):
         """
@@ -283,6 +285,10 @@ class GeometryField(Field):
         given value.
         """
         return connection.ops.get_geom_placeholder(self, value)
+
+for lookup_name in GIS_LOOKUPS:
+    lookup = type(lookup_name, (GISLookup,), {'lookup_name': lookup_name})
+    GeometryField.register_lookup(lookup)
 
 
 # The OpenGIS Geometry Type Fields

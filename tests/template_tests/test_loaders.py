@@ -9,9 +9,9 @@ from django.conf import settings
 if __name__ == '__main__':
     settings.configure()
 
-import imp
 import os.path
 import sys
+import types
 import unittest
 
 try:
@@ -41,8 +41,10 @@ def create_egg(name, resources):
     name: The name of the module.
     resources: A dictionary of resources. Keys are the names and values the data.
     """
-    egg = imp.new_module(name)
+    egg = types.ModuleType(name)
     egg.__loader__ = MockLoader()
+    egg.__path__ = ['/some/bogus/path/']
+    egg.__file__ = '/some/bogus/path/__init__.pyc'
     egg._resources = resources
     sys.modules[name] = egg
 
@@ -67,6 +69,9 @@ class EggLoaderTest(TestCase):
 
             def _get(self, path):
                 return self.module._resources[path].read()
+
+            def _fn(self, base, resource_name):
+                return resource_name
 
         pkg_resources._provider_factories[MockLoader] = MockProvider
 

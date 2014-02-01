@@ -85,6 +85,11 @@ class BasicFieldTests(test.TestCase):
         klass = forms.TypedMultipleChoiceField
         self.assertIsInstance(field.formfield(choices_form_class=klass), klass)
 
+    def test_field_str(self):
+        from django.utils.encoding import force_str
+        f = Foo._meta.get_field('a')
+        self.assertEqual(force_str(f), "model_fields.Foo.a")
+
 
 class DecimalFieldTests(test.TestCase):
     def test_to_python(self):
