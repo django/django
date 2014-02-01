@@ -742,11 +742,11 @@ class Field(RegisterLookupMixin):
             lst = [(getattr(x, self.rel.get_related_field().attname),
                    smart_text(x))
                    for x in rel_model._default_manager.complex_filter(
-                       self.rel.limit_choices_to)]
+                       self.get_limit_choices_to())]
         else:
             lst = [(x._get_pk_val(), smart_text(x))
                    for x in rel_model._default_manager.complex_filter(
-                       self.rel.limit_choices_to)]
+                       self.get_limit_choices_to())]
         return first_choice + lst
 
     def get_choices_default(self):

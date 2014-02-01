@@ -52,7 +52,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
     Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage,
     Telegram, Pizza, Topping, FilteredManager, City, Restaurant, Worker,
-    ParentWithDependentChildren)
+    ParentWithDependentChildren, Character)
 from .admin import site, site2, CityAdmin
 
 
@@ -3659,6 +3659,33 @@ class ReadonlyTest(TestCase):
         pizza.toppings.add(topping)
         response = self.client.get('/test_admin/admin/admin_views/topping/add/')
         self.assertEqual(response.status_code, 200)
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class LimitChoicesToInAdminTest(TestCase):
+    urls = "admin_views.urls"
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_limit_choices_to_as_callable(self):
+        """Test for ticket 2445 changes to admin."""
+        threepwood = Character.objects.create(
+            username='threepwood',
+            last_action=datetime.datetime.today() + datetime.timedelta(days=1),
+        )
+        marley = Character.objects.create(
+            username='marley',
+            last_action=datetime.datetime.today() - datetime.timedelta(days=1),
+        )
+        response = self.client.get('/test_admin/admin/admin_views/stumpjoke/add/')
+        # The allowed option should appear twice; the limited option should not appear.
+        self.assertContains(response, threepwood.username, count=2)
+        self.assertNotContains(response, marley.username)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))

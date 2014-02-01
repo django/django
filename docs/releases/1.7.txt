@@ -608,6 +608,10 @@ Models
 * It is now possible to use ``None`` as a query value for the :lookup:`iexact`
   lookup.
 
+* It is now possible to pass a callable as value for the attribute
+  :attr:`ForeignKey.limit_choices_to` when defining a ``ForeignKey`` or
+  ``ManyToManyField``.
+
 Signals
 ^^^^^^^
 

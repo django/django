@@ -8,6 +8,7 @@ words, most of these tests should be rewritten.
 """
 from __future__ import unicode_literals
 
+import datetime
 import os
 import tempfile
 
@@ -71,7 +72,6 @@ class Article(models.Model):
     status = models.PositiveIntegerField(choices=ARTICLE_STATUS, blank=True, null=True)
 
     def save(self):
-        import datetime
         if not self.id:
             self.created = datetime.date.today()
         return super(Article, self).save()
@@ -329,3 +329,21 @@ class CustomErrorMessage(models.Model):
     def clean(self):
         if self.name1 == 'FORBIDDEN_VALUE':
             raise ValidationError({'name1': [ValidationError('Model.clean() error messages.')]})
+
+
+def today_callable_dict():
+    return {"last_action__gte": datetime.datetime.today()}
+
+
+def today_callable_q():
+    return models.Q(last_action__gte=datetime.datetime.today())
+
+
+class Character(models.Model):
+    username = models.CharField(max_length=100)
+    last_action = models.DateTimeField()
+
+
+class StumpJoke(models.Model):
+    most_recently_fooled = models.ForeignKey(Character, limit_choices_to=today_callable_dict, related_name="+")
+    has_fooled_today = models.ManyToManyField(Character, limit_choices_to=today_callable_q, related_name="+")

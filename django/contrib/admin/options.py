@@ -240,7 +240,7 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         if related_admin is not None:
             ordering = related_admin.get_ordering(request)
             if ordering is not None and ordering != ():
-                return db_field.rel.to._default_manager.using(db).order_by(*ordering).complex_filter(db_field.rel.limit_choices_to)
+                return db_field.rel.to._default_manager.using(db).order_by(*ordering)
         return None
 
     def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
@@ -383,6 +383,9 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         # ForeignKeyRawIdWidget, on the basis of ForeignKey.limit_choices_to,
         # are allowed to work.
         for l in model._meta.related_fkey_lookups:
+            # As ``limit_choices_to`` can be a callable, invoke it here.
+            if callable(l):
+                l = l()
             for k, v in widgets.url_params_from_lookup_dict(l).items():
                 if k == lookup and v == value:
                     return True

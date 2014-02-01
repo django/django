@@ -309,6 +309,35 @@ class RelatedField(Field):
         if not cls._meta.abstract:
             self.contribute_to_related_class(other, self.related)
 
+    def get_limit_choices_to(self):
+        """Returns 'limit_choices_to' for this model field.
+
+        If it is a callable, it will be invoked and the result will be
+        returned.
+        """
+        if callable(self.rel.limit_choices_to):
+            return self.rel.limit_choices_to()
+        return self.rel.limit_choices_to
+
+    def formfield(self, **kwargs):
+        """Passes ``limit_choices_to`` to field being constructed.
+
+        Only passes it if there is a type that supports related fields.
+        This is a similar strategy used to pass the ``queryset`` to the field
+        being constructed.
+        """
+        defaults = {}
+        if hasattr(self.rel, 'get_related_field'):
+            # If this is a callable, do not invoke it here. Just pass
+            # it in the defaults for when the form class will later be
+            # instantiated.
+            limit_choices_to = self.rel.limit_choices_to
+            defaults.update({
+                'limit_choices_to': limit_choices_to,
+            })
+        defaults.update(kwargs)
+        return super(RelatedField, self).formfield(**defaults)
+
     def related_query_name(self):
         # This method defines the name that can be used to identify this
         # related object in a table-spanning query. It uses the lower-cased
@@ -1525,6 +1554,9 @@ class ForeignObject(RelatedField):
         # and swapped models don't get a related descriptor.
         if not self.rel.is_hidden() and not related.model._meta.swapped:
             setattr(cls, related.get_accessor_name(), self.related_accessor_class(related))
+            # While 'limit_choices_to' might be a callable, simply pass
+            # it along for later - this is too early because it's still
+            # model load time.
             if self.rel.limit_choices_to:
                 cls._meta.related_fkey_lookups.append(self.rel.limit_choices_to)
 
@@ -1633,7 +1665,7 @@ class ForeignKey(ForeignObject):
         qs = self.rel.to._default_manager.using(using).filter(
             **{self.rel.field_name: value}
         )
-        qs = qs.complex_filter(self.rel.limit_choices_to)
+        qs = qs.complex_filter(self.get_limit_choices_to())
         if not qs.exists():
             raise exceptions.ValidationError(
                 self.error_messages['invalid'],
@@ -1691,7 +1723,7 @@ class ForeignKey(ForeignObject):
                              (self.name, self.rel.to))
         defaults = {
             'form_class': forms.ModelChoiceField,
-            'queryset': self.rel.to._default_manager.using(db).complex_filter(self.rel.limit_choices_to),
+            'queryset': self.rel.to._default_manager.using(db),
             'to_field_name': self.rel.field_name,
         }
         defaults.update(kwargs)
@@ -2127,7 +2159,7 @@ class ManyToManyField(RelatedField):
         db = kwargs.pop('using', None)
         defaults = {
             'form_class': forms.ModelMultipleChoiceField,
-            'queryset': self.rel.to._default_manager.using(db).complex_filter(self.rel.limit_choices_to)
+            'queryset': self.rel.to._default_manager.using(db),
         }
         defaults.update(kwargs)
         # If initial is passed in, it's a list of related objects, but the

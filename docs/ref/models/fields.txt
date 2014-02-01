@@ -1078,21 +1078,45 @@ define the details of how the relation works.
 
 .. attribute:: ForeignKey.limit_choices_to
 
-    A dictionary of lookup arguments and values (see :doc:`/topics/db/queries`)
-    that limit the available admin or :class:`ModelForm <django.forms.ModelForm>`
-    choices for this object. For example::
+    Sets a limit to the available choices for this field when this field is
+    rendered using a ``ModelForm`` or the admin (by default, all objects
+    in the queryset are available to choose). Either a dictionary, a
+    :class:`~django.db.models.Q` object, or a callable returning a
+    dictionary or :class:`~django.db.models.Q` object can be used.
+
+    For example::
 
         staff_member = models.ForeignKey(User, limit_choices_to={'is_staff': True})
 
     causes the corresponding field on the ``ModelForm`` to list only ``Users``
-    that have ``is_staff=True``.
+    that have ``is_staff=True``. This may be helpful in the Django admin.
 
-    Instead of a dictionary this can also be a :class:`Q object
-    <django.db.models.Q>` for more :ref:`complex queries
-    <complex-lookups-with-q>`. However, if ``limit_choices_to`` is a :class:`Q
-    object <django.db.models.Q>` then it will only have an effect on the
-    choices available in the admin when the field is not listed in
-    ``raw_id_fields`` in the ``ModelAdmin`` for the model.
+    The callable form can be helpful, for instance, when used in conjunction
+    with the Python ``datetime`` module to limit selections by date range. For
+    example::
+
+        limit_choices_to = lambda: {'pub_date__lte': datetime.date.utcnow()}
+
+    If ``limit_choices_to`` is or returns a :class:`Q object
+    <django.db.models.Q>`, which is useful for :ref:`complex queries
+    <complex-lookups-with-q>`, then it will only have an effect on the choices
+    available in the admin when the field is not listed in
+    :attr:`~django.contrib.admin.ModelAdmin.raw_id_fields` in the
+    ``ModelAdmin`` for the model.
+
+    .. versionchanged:: 1.7
+
+        Previous versions of Django do not allow passing a callable as a value
+        for ``limit_choices_to``.
+
+    .. note::
+
+        If a callable is used for ``limit_choices_to``, it will be invoked
+        every time a new form is instantiated. It may also be invoked when a
+        model is validated, for example by management commands or the admin.
+        The admin constructs querysets to validate its form inputs in various
+        edge cases multiple times, so there is a possibility your callable may
+        be invoked several times.
 
 .. attribute:: ForeignKey.related_name
 

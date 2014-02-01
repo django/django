@@ -22,7 +22,8 @@ from .models import (Article, ArticleStatus, BetterWriter, BigInt, Book,
     DerivedPost, ExplicitPK, FlexibleDatePost, ImprovedArticle,
     ImprovedArticleWithParentLink, Inventory, Post, Price,
     Product, TextFile, Writer, WriterProfile, Colour, ColourfulItem,
-    ArticleStatusNote, DateTimePost, CustomErrorMessage, test_images)
+    ArticleStatusNote, DateTimePost, CustomErrorMessage, test_images,
+    StumpJoke, Character)
 
 if test_images:
     from .models import ImageFile, OptionalImageFile
@@ -519,6 +520,12 @@ class FieldOverridesTroughFormMetaForm(forms.ModelForm):
                 )
             }
         }
+
+
+class StumpJokeForm(forms.ModelForm):
+    class Meta:
+        model = StumpJoke
+        fields = '__all__'
 
 
 class TestFieldOverridesTroughFormMeta(TestCase):
@@ -1921,3 +1928,34 @@ class ModelFormInheritanceTests(TestCase):
         self.assertEqual(list(type(str('NewForm'), (ModelForm, Mixin, Form), {})().fields.keys()), ['name'])
         self.assertEqual(list(type(str('NewForm'), (ModelForm, Form, Mixin), {})().fields.keys()), ['name', 'age'])
         self.assertEqual(list(type(str('NewForm'), (ModelForm, Form), {'age': None})().fields.keys()), ['name'])
+
+
+class LimitChoicesToTest(TestCase):
+    """
+    Tests the functionality of ``limit_choices_to``.
+    """
+    def setUp(self):
+        self.threepwood = Character.objects.create(
+            username='threepwood',
+            last_action=datetime.datetime.today() + datetime.timedelta(days=1),
+        )
+        self.marley = Character.objects.create(
+            username='marley',
+            last_action=datetime.datetime.today() - datetime.timedelta(days=1),
+        )
+
+    def test_limit_choices_to_callable_for_fk_rel(self):
+        """
+        A ForeignKey relation can use ``limit_choices_to`` as a callable, re #2554.
+        """
+        stumpjokeform = StumpJokeForm()
+        self.assertIn(self.threepwood, stumpjokeform.fields['most_recently_fooled'].queryset)
+        self.assertNotIn(self.marley, stumpjokeform.fields['most_recently_fooled'].queryset)
+
+    def test_limit_choices_to_callable_for_m2m_rel(self):
+        """
+        A ManyToMany relation can use ``limit_choices_to`` as a callable, re #2554.
+        """
+        stumpjokeform = StumpJokeForm()
+        self.assertIn(self.threepwood, stumpjokeform.fields['has_fooled_today'].queryset)
+        self.assertNotIn(self.marley, stumpjokeform.fields['has_fooled_today'].queryset)
