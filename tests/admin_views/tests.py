@@ -53,8 +53,9 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
     Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage,
     Telegram, Pizza, Topping, FilteredManager, City, Restaurant, Worker,
-    ParentWithDependentChildren)
+    ParentWithDependentChildren, StumpJoke)
 from .admin import site, site2, CityAdmin
+from .forms import StumpJokeForm
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \
@@ -4779,3 +4780,34 @@ class AdminGenericRelationTests(TestCase):
             validator.validate_list_filter(GenericFKAdmin, Plot)
         except ImproperlyConfigured:
             self.fail("Couldn't validate a GenericRelation -> FK path in ModelAdmin.list_filter")
+
+
+class LimitChoicesToTest(TestCase):
+    """
+    Tests the functionality of ``limit_choices_to``.
+    """
+    def setUp(self):
+        self.user1 = User.objects.create_user('threepwood')
+        self.user2 = User.objects.create_user('marley')
+
+        self.user1.date_joined = datetime.datetime.today() + datetime.timedelta(days=1)
+        self.user1.save()
+
+        self.user2.date_joined = datetime.datetime.today() - datetime.timedelta(days=1)
+        self.user2.save()
+
+    def test_limit_choices_to_callable_for_fk_rel(self):
+        """
+        A ForeignKey relation can use ``limit_choices_to`` as a callable.
+        """
+        stumpjokeform = StumpJokeForm()
+        self.assertIn(self.user1, stumpjokeform.fields['most_recently_fooled'].queryset)
+        self.assertNotIn(self.user2, stumpjokeform.fields['most_recently_fooled'].queryset)
+
+    def test_limit_choices_to_callable_for_m2m_rel(self):
+        """
+        A ManyToMany relation can use ``limit_choices_to`` as a callable.
+        """
+        stumpjokeform = StumpJokeForm()
+        self.assertIn(self.user1, stumpjokeform.fields['has_fooled_today'].queryset)
+        self.assertNotIn(self.user2, stumpjokeform.fields['has_fooled_today'].queryset)
