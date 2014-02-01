@@ -132,7 +132,7 @@ def setup(verbosity, test_labels):
     )
     warnings.filterwarnings(
         'ignore',
-        'Model class django.contrib.comments.models.*supported in Django 1.9.',
+        'Model class django.contrib.comments.models.* Django 1.9.',
         PendingDeprecationWarning
     )
     # Load all the ALWAYS_INSTALLED_APPS.
