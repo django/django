@@ -1,9 +1,7 @@
 from functools import update_wrapper
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.admin import ModelAdmin, actions
-from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth import logout as auth_logout, REDIRECT_FIELD_NAME
-from django.contrib.contenttypes import views as contenttype_views
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
 from django.apps import apps
@@ -212,6 +210,10 @@ class AdminSite(object):
 
     def get_urls(self):
         from django.conf.urls import patterns, url, include
+        # Since this module gets imported in the application's root package,
+        # it cannot import models from other applications at the module level,
+        # and django.contrib.contenttypes.views imports ContentType.
+        from django.contrib.contenttypes import views as contenttype_views
 
         if settings.DEBUG:
             self.check_dependencies()
@@ -327,6 +329,10 @@ class AdminSite(object):
         Displays the login form for the given HttpRequest.
         """
         from django.contrib.auth.views import login
+        # Since this module gets imported in the application's root package,
+        # it cannot import models from other applications at the module level,
+        # and django.contrib.admin.forms eventually imports User.
+        from django.contrib.admin.forms import AdminAuthenticationForm
         context = dict(self.each_context(),
             title=_('Log in'),
             app_path=request.get_full_path(),

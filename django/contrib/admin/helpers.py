@@ -4,7 +4,6 @@ from django import forms
 from django.contrib.admin.utils import (flatten_fieldsets, lookup_field,
     display_for_field, label_for_field, help_text_for_field)
 from django.contrib.admin.templatetags.admin_static import static
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.related import ManyToManyRel
 from django.forms.utils import flatatt
@@ -257,6 +256,9 @@ class InlineAdminForm(AdminForm):
         self.model_admin = model_admin
         self.original = original
         if original is not None:
+            # Since this module gets imported in the application's root package,
+            # it cannot import models from other applications at the module level.
+            from django.contrib.contenttypes.models import ContentType
             self.original_content_type_id = ContentType.objects.get_for_model(original).pk
         self.show_url = original and view_on_site_url is not None
         self.absolute_url = view_on_site_url

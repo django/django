@@ -17,7 +17,6 @@ from django.contrib.admin.utils import (unquote, flatten_fieldsets,
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.auth import get_permission_codename
-from django.contrib.contenttypes.models import ContentType
 from django.core import checks
 from django.core.exceptions import PermissionDenied, ValidationError, FieldError, ImproperlyConfigured
 from django.core.paginator import Paginator
@@ -53,6 +52,13 @@ TO_FIELD_VAR = '_to_field'
 
 
 HORIZONTAL, VERTICAL = 1, 2
+
+
+def get_content_type_for_model(obj):
+    # Since this module gets imported in the application's root package,
+    # it cannot import models from other applications at the module level.
+    from django.contrib.contenttypes.models import ContentType
+    return ContentType.objects.get_for_model(obj)
 
 
 def get_ul_class(radio_style):
@@ -291,7 +297,7 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         elif self.view_on_site and hasattr(obj, 'get_absolute_url'):
             # use the ContentType lookup if view_on_site is True
             return reverse('admin:view_on_site', kwargs={
-                'content_type_id': ContentType.objects.get_for_model(obj).pk,
+                'content_type_id': get_content_type_for_model(obj).pk,
                 'object_id': obj.pk
             })
 
@@ -728,7 +734,7 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.models import LogEntry, ADDITION
         LogEntry.objects.log_action(
             user_id=request.user.pk,
-            content_type_id=ContentType.objects.get_for_model(object).pk,
+            content_type_id=get_content_type_for_model(object).pk,
             object_id=object.pk,
             object_repr=force_text(object),
             action_flag=ADDITION
@@ -743,7 +749,7 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.models import LogEntry, CHANGE
         LogEntry.objects.log_action(
             user_id=request.user.pk,
-            content_type_id=ContentType.objects.get_for_model(object).pk,
+            content_type_id=get_content_type_for_model(object).pk,
             object_id=object.pk,
             object_repr=force_text(object),
             action_flag=CHANGE,
@@ -760,7 +766,7 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.models import LogEntry, DELETION
         LogEntry.objects.log_action(
             user_id=request.user.pk,
-            content_type_id=ContentType.objects.get_for_model(self.model).pk,
+            content_type_id=get_content_type_for_model(self.model).pk,
             object_id=object.pk,
             object_repr=object_repr,
             action_flag=DELETION
@@ -1042,7 +1048,7 @@ class ModelAdmin(BaseModelAdmin):
             'absolute_url': view_on_site_url,
             'form_url': form_url,
             'opts': opts,
-            'content_type_id': ContentType.objects.get_for_model(self.model).id,
+            'content_type_id': get_content_type_for_model(self.model).pk,
             'save_as': self.save_as,
             'save_on_top': self.save_on_top,
             'to_field_var': TO_FIELD_VAR,
@@ -1660,7 +1666,7 @@ class ModelAdmin(BaseModelAdmin):
         app_label = opts.app_label
         action_list = LogEntry.objects.filter(
             object_id=unquote(object_id),
-            content_type=ContentType.objects.get_for_model(model)
+            content_type=get_content_type_for_model(model)
         ).select_related().order_by('action_time')
 
         context = dict(self.admin_site.each_context(),
