@@ -94,7 +94,7 @@ class OracleChecks(unittest.TestCase):
     def test_client_encoding(self):
         # If the backend is Oracle, test that the client encoding is set
         # correctly.  This was broken under Cygwin prior to r14781.
-        self.connection.ensure_connection()
+        connection.ensure_connection()
         self.assertEqual(connection.connection.encoding, "UTF-8")
         self.assertEqual(connection.connection.nencoding, "UTF-8")
 
