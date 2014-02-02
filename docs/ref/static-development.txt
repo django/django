@@ -1,15 +1,6 @@
-==============
-Built-in Views
-==============
-
-.. module:: django.views
-   :synopsis: Django's built-in views.
-
-Several of Django's built-in views are documented in
-:doc:`/topics/http/views` as well as elsewhere in the documentation.
-
+============================
 Serving files in development
-----------------------------
+============================
 
 .. function:: static.serve(request, path, document_root, show_indexes=False)
 
