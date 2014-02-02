@@ -349,11 +349,12 @@ class OperationTests(MigrationTestBase):
         self.assertIsInstance(project_state.models["test_alflpkfk", "pony"].get_field_by_name("id"), models.AutoField)
         self.assertIsInstance(new_state.models["test_alflpkfk", "pony"].get_field_by_name("id"), models.FloatField)
 
-        def assertIdTypeEqualsFkType(self):
+        def assertIdTypeEqualsFkType():
             with connection.cursor() as cursor:
                 id_type = [c.type_code for c in connection.introspection.get_table_description(cursor, "test_alflpkfk_pony") if c.name == "id"][0]
                 fk_type = [c.type_code for c in connection.introspection.get_table_description(cursor, "test_alflpkfk_rider") if c.name == "pony_id"][0]
             self.assertEqual(id_type, fk_type)
+
         assertIdTypeEqualsFkType()
         # Test the database alteration
         with connection.schema_editor() as editor:
