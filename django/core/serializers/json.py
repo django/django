@@ -25,7 +25,7 @@ class Serializer(PythonSerializer):
     internal_use_only = False
 
     def start_serialization(self):
-        if json.__version__.split('.') >= ['2', '1', '3']:
+        if json.__version__.split('.') >= ('2', '1', '3'):
             # Use JS strings to represent Python Decimal instances (ticket #16850)
             self.options.update({'use_decimal': False})
         self._current = None
@@ -81,32 +81,42 @@ def Deserializer(stream_or_string, **options):
         six.reraise(DeserializationError, DeserializationError(e), sys.exc_info()[2])
 
 
+def _encode_datetime(self, o):
+    r = o.isoformat()
+    if o.microsecond:
+        r = r[:23] + r[26:]
+    if r[-6:] == '+00:00':
+        r = r[:-6] + 'Z'
+    return r
+
+
+def _encode_time(self, o):
+    if is_aware(o):
+        raise ValueError("JSON can't represent timezone-aware times.")
+    r = o.isoformat()
+    if o.microsecond:
+        r = r[:12]
+    return r
+
+
 class DjangoJSONEncoder(json.JSONEncoder):
     """
     JSONEncoder subclass that knows how to encode date/time and decimal types.
     """
+    _encoder_by_type = {
+        datetime.datetime: _encode_datetime,
+        datetime.time: _encode_time,
+        datetime.date: lambda o: o.isoformat(),
+        decimal.Decimal: str,
+    }
+
     def default(self, o):
         # See "Date Time String Format" in the ECMA-262 specification.
-        if isinstance(o, datetime.datetime):
-            r = o.isoformat()
-            if o.microsecond:
-                r = r[:23] + r[26:]
-            if r.endswith('+00:00'):
-                r = r[:-6] + 'Z'
-            return r
-        elif isinstance(o, datetime.date):
-            return o.isoformat()
-        elif isinstance(o, datetime.time):
-            if is_aware(o):
-                raise ValueError("JSON can't represent timezone-aware times.")
-            r = o.isoformat()
-            if o.microsecond:
-                r = r[:12]
-            return r
-        elif isinstance(o, decimal.Decimal):
-            return str(o)
-        else:
+        try:
+            encoder = self._encoder_by_type[type(o)]
+        except KeyError:
             return super(DjangoJSONEncoder, self).default(o)
+        return encoder(o)
 
 # Older, deprecated class name (for backwards compatibility purposes).
 DateTimeAwareJSONEncoder = DjangoJSONEncoder
