@@ -104,7 +104,8 @@ to know about views via the links below:
   :doc:`Decorators <topics/http/decorators>`
 
 * **Reference:**
-  :doc:`Built-in Views <ref/views>` |
+  :doc:`Built-in Views <ref/class-based-views/index>` |
+  :doc:`Serving files in development <ref/static-development>` |
   :doc:`Request/response objects <ref/request-response>` |
   :doc:`TemplateResponse objects <ref/template-response>`
 
