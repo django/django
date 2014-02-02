@@ -3,7 +3,6 @@ import unittest
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.tests.utils import (no_mysql, oracle, postgis,
     spatialite, HAS_SPATIALREFSYS, SpatialRefSys)
-from django.contrib.gis.utils import add_srs_entry
 from django.db import connection
 from django.utils import six
 
@@ -109,6 +108,8 @@ class SpatialRefSysTest(unittest.TestCase):
         Test adding a new entry in the SpatialRefSys model using the
         add_srs_entry utility.
         """
+        from django.contrib.gis.utils import add_srs_entry
+
         add_srs_entry(900913)
         self.assertTrue(
             SpatialRefSys.objects.filter(srid=900913).exists()
