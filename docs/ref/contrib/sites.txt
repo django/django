@@ -464,7 +464,7 @@ the ``domain`` and ``name`` by looking at the request's domain. It has
 =============================
 
 Finally, to avoid repetitive fallback code, the framework provides a
-:func:`django.contrib.sites.shortcut.get_current_site` function.
+:func:`django.contrib.sites.shortcuts.get_current_site` function.
 
 .. function:: shortcuts.get_current_site
 
