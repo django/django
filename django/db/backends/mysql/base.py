@@ -152,6 +152,14 @@ class CursorWrapper(object):
     def __iter__(self):
         return iter(self.cursor)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        # Ticket #17671 - Close instead of passing thru to avoid backend
+        # specific behavior.
+        self.close()
+
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
@@ -461,7 +469,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn
 
     def init_connection_state(self):
-        with self.connection.cursor() as cursor:
+        with self.cursor() as cursor:
             # SQL_AUTO_IS_NULL in MySQL controls whether an AUTO_INCREMENT column
             # on a recently-inserted row will return when the field is tested for
             # NULL.  Disabling this value brings this aspect of MySQL in line with
