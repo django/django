@@ -870,6 +870,10 @@ where any unauthorized request to an admin page will be redirected (by HTTP
 status code 302) to the login page, with the ``next`` parameter set to the
 referring path. The user will be redirected there after a successful login.
 
+Note also that the admin login form has been updated to not contain the
+``this_is_the_login_form`` field (now unused) and the ``ValidationError`` code
+has been set to the more regular ``invalid_login`` key.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
