@@ -15,8 +15,6 @@ from django.utils.translation import ugettext_lazy, ugettext as _
 from django.views.decorators.cache import never_cache
 from django.conf import settings
 
-LOGIN_FORM_KEY = 'this_is_the_login_form'
-
 
 class AlreadyRegistered(Exception):
     pass
@@ -193,8 +191,6 @@ class AdminSite(object):
         cacheable=True.
         """
         def inner(request, *args, **kwargs):
-            if LOGIN_FORM_KEY in request.POST and request.user.is_authenticated():
-                auth_logout(request)
             if not self.has_permission(request):
                 if request.path == reverse('admin:logout', current_app=self.name):
                     index_path = reverse('admin:index', current_app=self.name)

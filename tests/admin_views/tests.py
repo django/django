@@ -17,7 +17,6 @@ from django.contrib.auth import get_permission_codename
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import LogEntry, DELETION
-from django.contrib.admin.sites import LOGIN_FORM_KEY
 from django.contrib.admin.utils import quote
 from django.contrib.admin.validation import ModelAdminValidator
 from django.contrib.admin.views.main import IS_POPUP_VAR
@@ -769,7 +768,6 @@ class CustomModelAdminTest(AdminViewBasicTestCase):
         self.assertEqual(response.status_code, 200)
         login = self.client.post('/test_admin/admin2/login/', {
             REDIRECT_FIELD_NAME: '/test_admin/admin2/',
-            LOGIN_FORM_KEY: 1,
             'username': 'customform',
             'password': 'secret',
         }, follow=True)
@@ -874,49 +872,41 @@ class AdminViewPermissionsTest(TestCase):
         # login POST dicts
         self.super_login = {
             REDIRECT_FIELD_NAME: '/test_admin/admin/',
-            LOGIN_FORM_KEY: 1,
             'username': 'super',
             'password': 'secret',
         }
         self.super_email_login = {
             REDIRECT_FIELD_NAME: '/test_admin/admin/',
-            LOGIN_FORM_KEY: 1,
             'username': 'super@example.com',
             'password': 'secret',
         }
         self.super_email_bad_login = {
             REDIRECT_FIELD_NAME: '/test_admin/admin/',
-            LOGIN_FORM_KEY: 1,
             'username': 'super@example.com',
             'password': 'notsecret',
         }
         self.adduser_login = {
             REDIRECT_FIELD_NAME: '/test_admin/admin/',
-            LOGIN_FORM_KEY: 1,
             'username': 'adduser',
             'password': 'secret',
         }
         self.changeuser_login = {
             REDIRECT_FIELD_NAME: '/test_admin/admin/',
-            LOGIN_FORM_KEY: 1,
             'username': 'changeuser',
             'password': 'secret',
         }
         self.deleteuser_login = {
             REDIRECT_FIELD_NAME: '/test_admin/admin/',
-            LOGIN_FORM_KEY: 1,
             'username': 'deleteuser',
             'password': 'secret',
         }
         self.joepublic_login = {
             REDIRECT_FIELD_NAME: '/test_admin/admin/',
-            LOGIN_FORM_KEY: 1,
             'username': 'joepublic',
             'password': 'secret',
         }
         self.no_username_login = {
             REDIRECT_FIELD_NAME: '/test_admin/admin/',
-            LOGIN_FORM_KEY: 1,
             'password': 'secret',
         }
 
@@ -1391,7 +1381,6 @@ class AdminViewsNoUrlTest(TestCase):
         # login POST dict
         self.changeuser_login = {
             REDIRECT_FIELD_NAME: '/test_admin/admin/',
-            LOGIN_FORM_KEY: 1,
             'username': 'changeuser',
             'password': 'secret',
         }
@@ -2600,7 +2589,6 @@ class AdminCustomQuerysetTest(TestCase):
         self.pks = [EmptyModel.objects.create().id for i in range(3)]
         self.super_login = {
             REDIRECT_FIELD_NAME: '/test_admin/admin/',
-            LOGIN_FORM_KEY: 1,
             'username': 'super',
             'password': 'secret',
         }
