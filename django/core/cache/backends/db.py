@@ -59,11 +59,11 @@ class DatabaseCache(BaseDatabaseCache):
         self.validate_key(key)
         db = router.db_for_read(self.cache_model_class)
         table = connections[db].ops.quote_name(self._table)
-        cursor = connections[db].cursor()
 
-        cursor.execute("SELECT cache_key, value, expires FROM %s "
-                       "WHERE cache_key = %%s" % table, [key])
-        row = cursor.fetchone()
+        with connections[db].cursor() as cursor:
+            cursor.execute("SELECT cache_key, value, expires FROM %s "
+                           "WHERE cache_key = %%s" % table, [key])
+            row = cursor.fetchone()
         if row is None:
             return default
         now = timezone.now()
@@ -75,9 +75,9 @@ class DatabaseCache(BaseDatabaseCache):
             expires = typecast_timestamp(str(expires))
         if expires < now:
             db = router.db_for_write(self.cache_model_class)
-            cursor = connections[db].cursor()
-            cursor.execute("DELETE FROM %s "
-                           "WHERE cache_key = %%s" % table, [key])
+            with connections[db].cursor() as cursor:
+                cursor.execute("DELETE FROM %s "
+                               "WHERE cache_key = %%s" % table, [key])
             return default
         value = connections[db].ops.process_clob(row[1])
         return pickle.loads(base64.b64decode(force_bytes(value)))
@@ -96,55 +96,55 @@ class DatabaseCache(BaseDatabaseCache):
         timeout = self.get_backend_timeout(timeout)
         db = router.db_for_write(self.cache_model_class)
         table = connections[db].ops.quote_name(self._table)
-        cursor = connections[db].cursor()
 
-        cursor.execute("SELECT COUNT(*) FROM %s" % table)
-        num = cursor.fetchone()[0]
-        now = timezone.now()
-        now = now.replace(microsecond=0)
-        if timeout is None:
-            exp = datetime.max
-        elif settings.USE_TZ:
-            exp = datetime.utcfromtimestamp(timeout)
-        else:
-            exp = datetime.fromtimestamp(timeout)
-        exp = exp.replace(microsecond=0)
-        if num > self._max_entries:
-            self._cull(db, cursor, now)
-        pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
-        b64encoded = base64.b64encode(pickled)
-        # The DB column is expecting a string, so make sure the value is a
-        # string, not bytes. Refs #19274.
-        if six.PY3:
-            b64encoded = b64encoded.decode('latin1')
-        try:
-            # Note: typecasting for datetimes is needed by some 3rd party
-            # database backends. All core backends work without typecasting,
-            # so be careful about changes here - test suite will NOT pick
-            # regressions.
-            with transaction.atomic(using=db):
-                cursor.execute("SELECT cache_key, expires FROM %s "
-                               "WHERE cache_key = %%s" % table, [key])
-                result = cursor.fetchone()
-                if result:
-                    current_expires = result[1]
-                    if (connections[db].features.needs_datetime_string_cast and not
-                            isinstance(current_expires, datetime)):
-                        current_expires = typecast_timestamp(str(current_expires))
-                exp = connections[db].ops.value_to_db_datetime(exp)
-                if result and (mode == 'set' or (mode == 'add' and current_expires < now)):
-                    cursor.execute("UPDATE %s SET value = %%s, expires = %%s "
-                                   "WHERE cache_key = %%s" % table,
-                                   [b64encoded, exp, key])
-                else:
-                    cursor.execute("INSERT INTO %s (cache_key, value, expires) "
-                                   "VALUES (%%s, %%s, %%s)" % table,
-                                   [key, b64encoded, exp])
-        except DatabaseError:
-            # To be threadsafe, updates/inserts are allowed to fail silently
-            return False
-        else:
-            return True
+        with connections[db].cursor() as cursor:
+            cursor.execute("SELECT COUNT(*) FROM %s" % table)
+            num = cursor.fetchone()[0]
+            now = timezone.now()
+            now = now.replace(microsecond=0)
+            if timeout is None:
+                exp = datetime.max
+            elif settings.USE_TZ:
+                exp = datetime.utcfromtimestamp(timeout)
+            else:
+                exp = datetime.fromtimestamp(timeout)
+            exp = exp.replace(microsecond=0)
+            if num > self._max_entries:
+                self._cull(db, cursor, now)
+            pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+            b64encoded = base64.b64encode(pickled)
+            # The DB column is expecting a string, so make sure the value is a
+            # string, not bytes. Refs #19274.
+            if six.PY3:
+                b64encoded = b64encoded.decode('latin1')
+            try:
+                # Note: typecasting for datetimes is needed by some 3rd party
+                # database backends. All core backends work without typecasting,
+                # so be careful about changes here - test suite will NOT pick
+                # regressions.
+                with transaction.atomic(using=db):
+                    cursor.execute("SELECT cache_key, expires FROM %s "
+                                   "WHERE cache_key = %%s" % table, [key])
+                    result = cursor.fetchone()
+                    if result:
+                        current_expires = result[1]
+                        if (connections[db].features.needs_datetime_string_cast and not
+                                isinstance(current_expires, datetime)):
+                            current_expires = typecast_timestamp(str(current_expires))
+                    exp = connections[db].ops.value_to_db_datetime(exp)
+                    if result and (mode == 'set' or (mode == 'add' and current_expires < now)):
+                        cursor.execute("UPDATE %s SET value = %%s, expires = %%s "
+                                       "WHERE cache_key = %%s" % table,
+                                       [b64encoded, exp, key])
+                    else:
+                        cursor.execute("INSERT INTO %s (cache_key, value, expires) "
+                                       "VALUES (%%s, %%s, %%s)" % table,
+                                       [key, b64encoded, exp])
+            except DatabaseError:
+                # To be threadsafe, updates/inserts are allowed to fail silently
+                return False
+            else:
+                return True
 
     def delete(self, key, version=None):
         key = self.make_key(key, version=version)
@@ -152,9 +152,9 @@ class DatabaseCache(BaseDatabaseCache):
 
         db = router.db_for_write(self.cache_model_class)
         table = connections[db].ops.quote_name(self._table)
-        cursor = connections[db].cursor()
 
-        cursor.execute("DELETE FROM %s WHERE cache_key = %%s" % table, [key])
+        with connections[db].cursor() as cursor:
+            cursor.execute("DELETE FROM %s WHERE cache_key = %%s" % table, [key])
 
     def has_key(self, key, version=None):
         key = self.make_key(key, version=version)
@@ -162,17 +162,18 @@ class DatabaseCache(BaseDatabaseCache):
 
         db = router.db_for_read(self.cache_model_class)
         table = connections[db].ops.quote_name(self._table)
-        cursor = connections[db].cursor()
 
         if settings.USE_TZ:
             now = datetime.utcnow()
         else:
             now = datetime.now()
         now = now.replace(microsecond=0)
-        cursor.execute("SELECT cache_key FROM %s "
-                       "WHERE cache_key = %%s and expires > %%s" % table,
-                       [key, connections[db].ops.value_to_db_datetime(now)])
-        return cursor.fetchone() is not None
+
+        with connections[db].cursor() as cursor:
+            cursor.execute("SELECT cache_key FROM %s "
+                           "WHERE cache_key = %%s and expires > %%s" % table,
+                           [key, connections[db].ops.value_to_db_datetime(now)])
+            return cursor.fetchone() is not None
 
     def _cull(self, db, cursor, now):
         if self._cull_frequency == 0:
@@ -197,8 +198,8 @@ class DatabaseCache(BaseDatabaseCache):
     def clear(self):
         db = router.db_for_write(self.cache_model_class)
         table = connections[db].ops.quote_name(self._table)
-        cursor = connections[db].cursor()
-        cursor.execute('DELETE FROM %s' % table)
+        with connections[db].cursor() as cursor:
+            cursor.execute('DELETE FROM %s' % table)
 
 
 # For backwards compatibility

@@ -100,10 +100,9 @@ class Command(BaseCommand):
             if sequence_sql:
                 if self.verbosity >= 2:
                     self.stdout.write("Resetting sequences\n")
-                cursor = connection.cursor()
-                for line in sequence_sql:
-                    cursor.execute(line)
-                cursor.close()
+                with connection.cursor() as cursor:
+                    for line in sequence_sql:
+                        cursor.execute(line)
 
         if self.verbosity >= 1:
             if self.fixture_object_count == self.loaded_object_count:

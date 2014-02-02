@@ -33,9 +33,9 @@ def create_default_site(app_config, verbosity=2, interactive=True, db=DEFAULT_DB
         if sequence_sql:
             if verbosity >= 2:
                 print("Resetting sequence")
-            cursor = connections[db].cursor()
-            for command in sequence_sql:
-                cursor.execute(command)
+            with connections[db].cursor() as cursor:
+                for command in sequence_sql:
+                    cursor.execute(command)
 
         Site.objects.clear_cache()
 

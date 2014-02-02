@@ -725,7 +725,7 @@ class DatabaseConnectionHandlingTests(TransactionTestCase):
         # request_finished signal.
         response = self.client.get('/')
         # Make sure there is an open connection
-        connection.cursor()
+        self.connection.ensure_connection()
         connection.enter_transaction_management()
         signals.request_finished.send(sender=response._handler_class)
         self.assertEqual(len(connection.transaction_state), 0)
