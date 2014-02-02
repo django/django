@@ -1,5 +1,4 @@
 import datetime
-import sys
 
 from django.conf import settings
 from django.core.exceptions import FieldError
