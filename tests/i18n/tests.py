@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
+import gettext as gettext_module
 from importlib import import_module
 import os
 import pickle
@@ -1322,3 +1323,24 @@ class CountrySpecificLanguageTests(TestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt-pt,en-US;q=0.8,en;q=0.6,ru;q=0.4'}
         lang = get_language_from_request(r)
         self.assertEqual('pt-br', lang)
+
+class TranslationFilesMissing(TestCase):
+
+    def setUp(self):
+        super(TranslationFilesMissing, self).setUp()
+        self.gettext_find_builtin = gettext_module.find
+
+    def tearDown(self):
+        gettext_module.find = self.gettext_find_builtin
+        super(TranslationFilesMissing, self).tearDown()
+
+    def patchGettextFind(self):
+        gettext_module.find = lambda *args, **kw: None
+
+    def test_failure_finding_po_files(self):
+        '''
+        Innapropriate IOError excpetion results in downstream AttributeError.
+        Refs: #18192
+        '''
+        self.patchGettextFind()
+        self.assertRaises(IOError, activate, 'en-br')
