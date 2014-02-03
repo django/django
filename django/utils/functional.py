@@ -162,7 +162,7 @@ def lazy(func, *resultclasses):
             def __wrapper__(self, *args, **kw):
                 # Automatically triggers the evaluation of a lazy value and
                 # applies the given magic method of the result type.
-                res = func(*self._args, **self._kwargs)
+                res = self._eval()
                 for t in type(res).mro():
                     if t in self._dispatch:
                         return self._dispatch[t][funcname](res, *args, **kw)
@@ -171,11 +171,15 @@ def lazy(func, *resultclasses):
             cls._dispatch[klass][funcname] = method
             return __wrapper__
 
-        def _text_cast(self):
+        def _eval(self):
+            """Evaluate the wrapped function."""
             return func(*self._args, **self._kwargs)
 
+        def _text_cast(self):
+            return self._eval()
+
         def _bytes_cast(self):
-            return bytes(func(*self._args, **self._kwargs))
+            return bytes(self._eval())
 
         def _cast(self):
             if self._delegate_bytes:
@@ -183,7 +187,7 @@ def lazy(func, *resultclasses):
             elif self._delegate_text:
                 return self._text_cast()
             else:
-                return func(*self._args, **self._kwargs)
+                return self._eval()
 
         def __ne__(self, other):
             if isinstance(other, Promise):
