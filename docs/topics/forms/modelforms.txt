@@ -259,7 +259,9 @@ The model's ``clean()`` method will be called before any uniqueness checks are
 made. See :ref:`Validating objects <validating-objects>` for more information
 on the model's ``clean()`` hook.
 
-Considerations regarding fields' ``error_messages``
+.. _considerations-regarding-model-errormessages:
+
+Considerations regarding model's ``error_messages``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Error messages defined at the
@@ -267,11 +269,26 @@ Error messages defined at the
 :ref:`form Meta <modelforms-overriding-default-fields>` level always take
 precedence over the error messages defined at the
 :attr:`model field <django.db.models.Field.error_messages>` level.
+
 Error messages  defined on :attr:`model fields
 <django.db.models.Field.error_messages>` are only used when the
 ``ValidationError`` is raised during the :ref:`model validation
 <validating-objects>` step and no corresponding error messages are defined at
 the form level.
+
+.. versionadded:: 1.7
+
+You can override the error messages from ``NON_FIELD_ERRORS`` raised by model
+validation by adding the :data:`~django.core.exceptions.NON_FIELD_ERRORS` key
+to the ``error_messages`` dictionary of the ``ModelForm``’s inner ``Meta`` class::
+
+    class ArticleForm(ModelForm):
+        class Meta:
+            error_messages = {
+                NON_FIELD_ERRORS: {
+                    'unique_together': "%(model_name)s's %(field_labels)s are not unique.",
+                }
+            }
 
 The ``save()`` method
 ---------------------

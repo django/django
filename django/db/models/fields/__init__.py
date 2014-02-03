@@ -105,6 +105,8 @@ class Field(RegisterLookupMixin):
         'blank': _('This field cannot be blank.'),
         'unique': _('%(model_name)s with this %(field_label)s '
                     'already exists.'),
+        'unique_for_date': _("%(field_label)s must be unique for "
+                             "%(date_field_label)s %(lookup_type)s."),
     }
     class_lookups = default_lookups.copy()
 
