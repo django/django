@@ -233,8 +233,12 @@ field will raise. Pass in a dictionary with keys matching the error messages you
 want to override.
 
 Error message keys include ``null``, ``blank``, ``invalid``, ``invalid_choice``,
-and ``unique``. Additional error message keys are specified for each field in
-the `Field types`_ section below.
+``unique``, and ``unique_for_date``. Additional error message keys are
+specified for each field in the `Field types`_ section below.
+
+.. versionadded:: 1.7
+
+The ``unique_for_date`` error message key was added.
 
 ``help_text``
 -------------

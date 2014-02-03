@@ -941,36 +941,52 @@ class Model(six.with_metaclass(ModelBase)):
                 )
         return errors
 
-    def date_error_message(self, lookup_type, field, unique_for):
+    def date_error_message(self, lookup_type, field_name, unique_for):
         opts = self._meta
-        return _("%(field_name)s must be unique for %(date_field)s %(lookup)s.") % {
-            'field_name': six.text_type(capfirst(opts.get_field(field).verbose_name)),
-            'date_field': six.text_type(capfirst(opts.get_field(unique_for).verbose_name)),
-            'lookup': lookup_type,
-        }
+        field = opts.get_field(field_name)
+        return ValidationError(
+            message=field.error_messages['unique_for_date'],
+            code='unique_for_date',
+            params={
+                'model': self,
+                'model_name': six.text_type(capfirst(opts.verbose_name)),
+                'lookup_type': lookup_type,
+                'field': field_name,
+                'field_label': six.text_type(capfirst(field.verbose_name)),
+                'date_field': unique_for,
+                'date_field_label': six.text_type(capfirst(opts.get_field(unique_for).verbose_name)),
+            }
+        )
 
     def unique_error_message(self, model_class, unique_check):
         opts = model_class._meta
-        model_name = capfirst(opts.verbose_name)
+
+        params = {
+            'model': self,
+            'model_class': model_class,
+            'model_name': six.text_type(capfirst(opts.verbose_name)),
+            'unique_check': unique_check,
+        }
 
         # A unique field
         if len(unique_check) == 1:
-            field_name = unique_check[0]
-            field = opts.get_field(field_name)
-            field_label = capfirst(field.verbose_name)
-            # Insert the error into the error dict, very sneaky
-            return field.error_messages['unique'] % {
-                'model_name': six.text_type(model_name),
-                'field_label': six.text_type(field_label)
-            }
+            field = opts.get_field(unique_check[0])
+            params['field_label'] = six.text_type(capfirst(field.verbose_name))
+            return ValidationError(
+                message=field.error_messages['unique'],
+                code='unique',
+                params=params,
+            )
+
         # unique_together
         else:
             field_labels = [capfirst(opts.get_field(f).verbose_name) for f in unique_check]
-            field_labels = get_text_list(field_labels, _('and'))
-            return _("%(model_name)s with this %(field_label)s already exists.") % {
-                'model_name': six.text_type(model_name),
-                'field_label': six.text_type(field_labels)
-            }
+            params['field_labels'] = six.text_type(get_text_list(field_labels, _('and')))
+            return ValidationError(
+                message=_("%(model_name)s with this %(field_labels)s already exists."),
+                code='unique_together',
+                params=params,
+            )
 
     def full_clean(self, exclude=None, validate_unique=True):
         """

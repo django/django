@@ -484,6 +484,14 @@ Forms
   that maps fields to their original errors, complete with all metadata
   (error code and params), the latter returns the errors serialized as json.
 
+* It's now possible to customize the error messages for ``ModelForm``’s
+  ``unique``, ``unique_for_date``, and ``unique_together`` constraints.
+  In order to support ``unique_together`` or any other ``NON_FIELD_ERROR``,
+  ``ModelForm`` now looks for the ``NON_FIELD_ERROR`` key in the
+  ``error_messages`` dictionary of the ``ModelForm``’s inner ``Meta`` class.
+  See :ref:`considerations regarding model's error_messages
+  <considerations-regarding-model-errormessages>` for more details.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 

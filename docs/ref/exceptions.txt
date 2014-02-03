@@ -124,6 +124,15 @@ ValidationError
     :ref:`Model Field Validation <validating-objects>` and the
     :doc:`Validator Reference </ref/validators>`.
 
+NON_FIELD_ERRORS
+~~~~~~~~~~~~~~~~
+.. data:: NON_FIELD_ERRORS
+
+``ValidationError``\s that don't belong to a particular field in a form
+or model are classified as ``NON_FIELD_ERRORS``. This constant is used
+as a key in dictonaries that otherwise map fields to their respective
+list of errors.
+
 .. currentmodule:: django.core.urlresolvers
 
 URL Resolver exceptions
