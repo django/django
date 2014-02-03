@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.gis.geos import fromstr, Point, LineString, LinearRing, Polygon
 from django.utils.functional import total_ordering
 from django.utils.safestring import mark_safe
