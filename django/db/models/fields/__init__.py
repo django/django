@@ -582,7 +582,7 @@ class Field(RegisterLookupMixin):
         Perform preliminary non-db specific value checks and conversions.
         """
         if isinstance(value, Promise):
-            value = value._proxy____cast()
+            value = value._cast()
         return value
 
     def get_db_prep_value(self, value, connection, prepared=False):

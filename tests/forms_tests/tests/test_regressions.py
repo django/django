@@ -8,7 +8,9 @@ from django.forms import (
     ModelMultipleChoiceField, MultipleChoiceField, RadioSelect, Select,
     TextInput,
 )
+from django.template import Context, Template
 from django.test import TestCase
+from django.utils.safestring import mark_safe
 from django.utils import translation
 from django.utils.translation import gettext_lazy, ugettext_lazy
 
@@ -153,3 +155,13 @@ class FormsRegressionsTestCase(TestCase):
         obj = form.save()
         obj.name = 'Camembert'
         obj.full_clean()
+
+    def test_regression_21882(self):
+        class FooForm(Form):
+            foo = IntegerField(label=mark_safe(ugettext_lazy("<em>Foo</em>")))
+
+        f = FooForm()
+        self.assertEqual(f.fields['foo'].label, '<em>Foo</em>')
+        tpl = Template('{{ f.foo.label_tag }}')
+        context = Context({'f': f})
+        self.assertEqual(tpl.render(context), '<label for="id_foo"><em>Foo</em>:</label>')

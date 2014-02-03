@@ -4,7 +4,7 @@ without further escaping in HTML. Marking something as a "safe string" means
 that the producer of the string has already turned characters that should not
 be interpreted by the HTML engine (e.g. '<') into the appropriate entities.
 """
-from django.utils.functional import curry, Promise, allow_lazy
+from django.utils.functional import curry, Promise
 from django.utils import six
 
 
@@ -16,14 +16,14 @@ class EscapeBytes(bytes, EscapeData):
     """
     A byte string that should be HTML-escaped when output.
     """
-    __new__ = allow_lazy(bytes.__new__, bytes)
+    pass
 
 
 class EscapeText(six.text_type, EscapeData):
     """
     A unicode string object that should be HTML-escaped when output.
     """
-    __new__ = allow_lazy(six.text_type.__new__, six.text_type)
+    pass
 
 if six.PY3:
     EscapeString = EscapeText
@@ -31,6 +31,16 @@ else:
     EscapeString = EscapeBytes
     # backwards compatibility for Python 2
     EscapeUnicode = EscapeText
+
+
+class BaseEscapeDataPromise(Promise, EscapeData):
+    def _text_cast(self):
+        text = super(BaseEscapeDataPromise, self)._text_cast()
+        return EscapeText(text)
+
+    def _bytes_cast(self):
+        bytes = super(BaseEscapeDataPromise, self)._bytes_cast()
+        return EscapeBytes(bytes)
 
 
 class SafeData(object):
@@ -48,8 +58,6 @@ class SafeBytes(bytes, SafeData):
     A bytes subclass that has been specifically marked as "safe" (requires no
     further escaping) for HTML output purposes.
     """
-    __new__ = allow_lazy(bytes.__new__, bytes)
-
     def __add__(self, rhs):
         """
         Concatenating a safe byte string with another safe byte string or safe
@@ -83,8 +91,6 @@ class SafeText(six.text_type, SafeData):
     A unicode (Python 2) / str (Python 3) subclass that has been specifically
     marked as "safe" for HTML output purposes.
     """
-    __new__ = allow_lazy(six.text_type.__new__, six.text_type)
-
     def __add__(self, rhs):
         """
         Concatenating a safe unicode string with another safe byte string or
@@ -118,6 +124,26 @@ else:
     SafeUnicode = SafeText
 
 
+class BaseSafeDataPromise(Promise, SafeData):
+    def _text_cast(self):
+        text = super(BaseSafeDataPromise, self)._text_cast()
+        return SafeText(text)
+
+    def _bytes_cast(self):
+        bytes = super(BaseSafeDataPromise, self)._bytes_cast()
+        return SafeBytes(bytes)
+
+    def __add__(self, rhs):
+        if isinstance(rhs, Promise):
+            rhs = rhs._cast()
+        t = self._cast() + rhs
+        if not isinstance(rhs, SafeData):
+            return t
+        if self._delegate_bytes:
+            return SafeBytes(t)
+        return SafeText(t)
+
+
 def mark_safe(s):
     """
     Explicitly mark a string as safe for (HTML) output purposes. The returned
@@ -127,10 +153,14 @@ def mark_safe(s):
     """
     if isinstance(s, SafeData):
         return s
-    if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_bytes):
+    if isinstance(s, bytes):
         return SafeBytes(s)
-    if isinstance(s, (six.text_type, Promise)):
+    if isinstance(s, six.text_type):
         return SafeText(s)
+    if isinstance(s, Promise):
+        attrs = {'_func': staticmethod(s._func), '_resultclasses': s._resultclasses}
+        promise_cls = type('SafeDataPromise', (BaseSafeDataPromise,), attrs)
+        return promise_cls(s._args, s._kwargs)
     return SafeString(str(s))
 
 
@@ -144,8 +174,12 @@ def mark_for_escaping(s):
     """
     if isinstance(s, (SafeData, EscapeData)):
         return s
-    if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_bytes):
+    if isinstance(s, bytes):
         return EscapeBytes(s)
-    if isinstance(s, (six.text_type, Promise)):
+    if isinstance(s, six.text_type):
         return EscapeText(s)
+    if isinstance(s, Promise):
+        attrs = {'_func': staticmethod(s._func), '_resultclasses': s._resultclasses}
+        promise_cls = type('EscapeDataPromise', (BaseEscapeDataPromise,), attrs)
+        return promise_cls(s._args, s._kwargs)
     return EscapeBytes(bytes(s))
