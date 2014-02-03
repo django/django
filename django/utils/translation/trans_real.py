@@ -151,15 +151,8 @@ def translation(language):
 
         loc = to_locale(lang)
 
-        def _translation(path):
-            try:
-                t = gettext_module.translation('django', path, [loc], DjangoTranslation)
-                t.set_language(lang)
-                return t
-            except IOError:
-                return None
-
-        res = _translation(globalpath)
+        res = gettext_module.translation('django', globalpath, [loc], DjangoTranslation)
+        res.set_language(lang)
 
         # We want to ensure that, for example,  "en-gb" and "en-us" don't share
         # the same translation object (thus, merging en-us with a local update
@@ -171,12 +164,10 @@ def translation(language):
             res._catalog = res._catalog.copy()
 
         def _merge(path):
-            t = _translation(path)
-            if t is not None:
-                if res is None:
-                    return t
-                else:
-                    res.merge(t)
+            t = gettext_module.translation('django', path, [loc], DjangoTranslation, True)
+            if isinstance(t, gettext_module.NullTranslations):
+                t._catalog = {}
+            res.merge(t)
             return res
 
         for app_config in reversed(list(apps.get_app_configs())):
