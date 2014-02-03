@@ -33,6 +33,16 @@ else:
     EscapeUnicode = EscapeText
 
 
+class BaseEscapeDataPromise(Promise, EscapeData):
+    def _text_cast(self):
+        text = super(BaseEscapeDataPromise, self)._text_cast()
+        return EscapeText(text)
+
+    def _bytes_cast(self):
+        bytes = super(BaseEscapeDataPromise, self)._bytes_cast()
+        return EscapeBytes(bytes)
+
+
 class SafeData(object):
     def __html__(self):
         """
@@ -114,6 +124,26 @@ else:
     SafeUnicode = SafeText
 
 
+class BaseSafeDataPromise(Promise, SafeData):
+    def _text_cast(self):
+        text = super(BaseSafeDataPromise, self)._text_cast()
+        return SafeText(text)
+
+    def _bytes_cast(self):
+        bytes = super(BaseSafeDataPromise, self)._bytes_cast()
+        return SafeBytes(bytes)
+
+    def __add__(self, rhs):
+        if isinstance(rhs, Promise):
+            rhs = rhs._cast()
+        t = self._cast() + rhs
+        if not isinstance(rhs, SafeData):
+            return t
+        if self._delegate_bytes:
+            return SafeBytes(t)
+        return SafeText(t)
+
+
 def mark_safe(s):
     """
     Explicitly mark a string as safe for (HTML) output purposes. The returned
@@ -123,10 +153,14 @@ def mark_safe(s):
     """
     if isinstance(s, SafeData):
         return s
-    if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_bytes):
+    if isinstance(s, bytes):
         return SafeBytes(s)
-    if isinstance(s, (six.text_type, Promise)):
+    if isinstance(s, six.text_type):
         return SafeText(s)
+    if isinstance(s, Promise):
+        attrs = {'_func': staticmethod(s._func), '_resultclasses': s._resultclasses}
+        promise_cls = type('SafeDataPromise', (BaseSafeDataPromise,), attrs)
+        return promise_cls(s._args, s._kwargs)
     return SafeString(str(s))
 
 
@@ -140,8 +174,12 @@ def mark_for_escaping(s):
     """
     if isinstance(s, (SafeData, EscapeData)):
         return s
-    if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_bytes):
+    if isinstance(s, bytes):
         return EscapeBytes(s)
-    if isinstance(s, (six.text_type, Promise)):
+    if isinstance(s, six.text_type):
         return EscapeText(s)
+    if isinstance(s, Promise):
+        attrs = {'_func': staticmethod(s._func), '_resultclasses': s._resultclasses}
+        promise_cls = type('EscapeDataPromise', (BaseEscapeDataPromise,), attrs)
+        return promise_cls(s._args, s._kwargs)
     return EscapeBytes(bytes(s))
