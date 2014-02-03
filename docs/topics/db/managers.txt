@@ -150,23 +150,23 @@ models.
 
 For example::
 
-    class MaleManager(models.Manager):
+    class AuthorManager(models.Manager):
         def get_queryset(self):
-            return super(MaleManager, self).get_queryset().filter(sex='M')
+            return super(AuthorManager, self).get_queryset().filter(role='A')
 
-    class FemaleManager(models.Manager):
+    class EditorManager(models.Manager):
         def get_queryset(self):
-            return super(FemaleManager, self).get_queryset().filter(sex='F')
+            return super(EditorManager, self).get_queryset().filter(role='E')
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
-        sex = models.CharField(max_length=1, choices=(('M', 'Male'), ('F', 'Female')))
+        role = models.CharField(max_length=1, choices=(('A', _('Author')), ('E', _('Editor'))))
         people = models.Manager()
-        men = MaleManager()
-        women = FemaleManager()
+        authors = AuthorManager()
+        editors = EditorManager()
 
-This example allows you to request ``Person.men.all()``, ``Person.women.all()``,
+This example allows you to request ``Person.authors.all()``, ``Person.editors.all()``,
 and ``Person.people.all()``, yielding predictable results.
 
 If you use custom ``Manager`` objects, take note that the first ``Manager``
@@ -211,29 +211,29 @@ the ``Manager``, this is only the case for the extra methods defined on a
 custom ``QuerySet`` if you also implement them on the ``Manager``::
 
     class PersonQuerySet(models.QuerySet):
-        def male(self):
-            return self.filter(sex='M')
+        def authors(self):
+            return self.filter(role='A')
 
-        def female(self):
-            return self.filter(sex='F')
+        def editors(self):
+            return self.filter(role='E')
 
     class PersonManager(models.Manager):
         def get_queryset(self):
             return PersonQuerySet(self.model, using=self._db)
 
-        def male(self):
-            return self.get_queryset().male()
+        def authors(self):
+            return self.get_queryset().authors()
 
-        def female(self):
-            return self.get_queryset().female()
+        def editors(self):
+            return self.get_queryset().editors()
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
-        sex = models.CharField(max_length=1, choices=(('M', 'Male'), ('F', 'Female')))
+        role = models.CharField(max_length=1, choices=(('A', _('Author')), ('E', _('Editor'))))
         people = PersonManager()
 
-This example allows you to call both ``male()`` and ``female()`` directly from
+This example allows you to call both ``authors()`` and ``editors()`` directly from
 the manager ``Person.people``.
 
 .. _create-manager-with-queryset-methods:
