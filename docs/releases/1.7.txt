@@ -7,7 +7,7 @@ Welcome to Django 1.7!
 These release notes cover the `new features`_, as well as some `backwards
 incompatible changes`_ you'll want to be aware of when upgrading from Django
 1.6 or older versions. We've also dropped some features, which are detailed in
-:doc:`our deprecation plan </internals/deprecation>`, and we've `begun the
+:ref:`our deprecation plan <deprecation-removed-in-1.7>`, and we've `begun the
 deprecation process for some features`_.
 
 .. _`new features`: `What's new in Django 1.7`_
@@ -958,6 +958,8 @@ Miscellaneous
   autocommit mode (unless you set :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>`
   to ``False``). If you maintain a custom database backend, you should check
   that method.
+
+.. _deprecated-features-1.7:
 
 Features deprecated in 1.7
 ==========================
