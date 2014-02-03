@@ -100,17 +100,14 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     This class sets up the GNUTranslations context with regard to output
     charset.
     """
-    def __init__(self, *args, **kw):
-        gettext_module.GNUTranslations.__init__(self, *args, **kw)
+    def __init__(self, language):
+        gettext_module.GNUTranslations.__init__(self)
         self.set_output_charset('utf-8')
-        self.__language = '??'
+        self.__language = language
+        self.__to_language = to_language(language)
 
     def merge(self, other):
         self._catalog.update(other._catalog)
-
-    def set_language(self, language):
-        self.__language = language
-        self.__to_language = to_language(language)
 
     def language(self):
         return self.__language
