@@ -124,13 +124,11 @@ class Promise(object):
         for resultclass in cls._resultclasses:
             for type_ in reversed(resultclass.mro()):
                 for (k, v) in type_.__dict__.items():
-                    # All wrapped methods return the same wrapper method,
-                    # but they also do setup, inserting the method into the
-                    # dispatch dict.
-                    meth = cls._method_wrapper(resultclass, k, v)
+                    # Register the method for the given type
+                    cls._dispatch[resultclass][k] = v
                     if hasattr(cls, k):
                         continue
-                    setattr(cls, k, meth)
+                    setattr(cls, k, cls._method_wrapper(resultclass, k, v))
         cls._delegate_bytes = bytes in cls._resultclasses
         cls._delegate_text = six.text_type in cls._resultclasses
         assert not (cls._delegate_bytes and cls._delegate_text), "Cannot call lazy() with both bytes and text return types."
@@ -147,9 +145,8 @@ class Promise(object):
 
     @classmethod
     def _method_wrapper(cls, klass, funcname, method):
-        # Builds a wrapper around some magic method and registers that
-        # magic method for the given type and method name.
-        def __wrapper__(self, *args, **kw):
+        """Builds a wrapper around some magic method."""
+        def wrapper(self, *args, **kw):
             # Automatically triggers the evaluation of a lazy value and
             # applies the given magic method of the result type.
             res = self._eval()
@@ -158,8 +155,7 @@ class Promise(object):
                     return self._dispatch[t][funcname](res, *args, **kw)
             raise TypeError("Lazy object returned unexpected type.")
 
-        cls._dispatch[klass][funcname] = method
-        return __wrapper__
+        return wrapper
 
     def _eval(self):
         """Evaluate the wrapped function."""
