@@ -14,6 +14,18 @@ GOOGLE_MAPS_API_KEY = 'XXXX'
 class GoogleMapsTest(TestCase):
 
     @override_settings(GOOGLE_MAPS_API_KEY=GOOGLE_MAPS_API_KEY)
+    def test_google_map_scripts(self):
+        """
+        Testing GoogleMap.scripts() output. See #20773.
+        """
+        from django.contrib.gis.maps.google.gmap import GoogleMap
+
+        google_map = GoogleMap()
+        scripts = google_map.scripts
+        self.assertIn(GOOGLE_MAPS_API_KEY, scripts)
+        self.assertIn("new GMap2", scripts)
+
+    @override_settings(GOOGLE_MAPS_API_KEY=GOOGLE_MAPS_API_KEY)
     def test_unicode_in_google_maps(self):
         """
         Test that GoogleMap doesn't crash with non-ascii content.
