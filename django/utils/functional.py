@@ -114,30 +114,30 @@ def lazy(func, *resultclasses):
         called on the result of that function. The function is not evaluated
         until one of the methods on the result is called.
         """
-        __dispatch = None
+        _dispatch = None
 
-        def __init__(self, args, kw):
-            self.__args = args
-            self.__kw = kw
-            if self.__dispatch is None:
-                self.__prepare_class__()
+        def __init__(self, args, kwargs):
+            self._args = args
+            self._kwargs = kwargs
+            if self._dispatch is None:
+                self._prepare_class()
 
         def __reduce__(self):
             return (
                 _lazy_proxy_unpickle,
-                (func, self.__args, self.__kw) + resultclasses
+                (func, self._args, self._kwargs) + resultclasses
             )
 
         @classmethod
-        def __prepare_class__(cls):
-            cls.__dispatch = defaultdict(dict)
+        def _prepare_class(cls):
+            cls._dispatch = defaultdict(dict)
             for resultclass in resultclasses:
                 for type_ in reversed(resultclass.mro()):
                     for (k, v) in type_.__dict__.items():
-                        # All __promise__ return the same wrapper method, but
-                        # they also do setup, inserting the method into the
+                        # All wrapped methods return the same wrapper method,
+                        # but they also do setup, inserting the method into the
                         # dispatch dict.
-                        meth = cls.__promise__(resultclass, k, v)
+                        meth = cls._method_wrapper(resultclass, k, v)
                         if hasattr(cls, k):
                             continue
                         setattr(cls, k, meth)
@@ -146,69 +146,69 @@ def lazy(func, *resultclasses):
             assert not (cls._delegate_bytes and cls._delegate_text), "Cannot call lazy() with both bytes and text return types."
             if cls._delegate_text:
                 if six.PY3:
-                    cls.__str__ = cls.__text_cast
+                    cls.__str__ = cls._text_cast
                 else:
-                    cls.__unicode__ = cls.__text_cast
+                    cls.__unicode__ = cls._text_cast
             elif cls._delegate_bytes:
                 if six.PY3:
-                    cls.__bytes__ = cls.__bytes_cast
+                    cls.__bytes__ = cls._bytes_cast
                 else:
-                    cls.__str__ = cls.__bytes_cast
+                    cls.__str__ = cls._bytes_cast
 
         @classmethod
-        def __promise__(cls, klass, funcname, method):
+        def _method_wrapper(cls, klass, funcname, method):
             # Builds a wrapper around some magic method and registers that
             # magic method for the given type and method name.
             def __wrapper__(self, *args, **kw):
                 # Automatically triggers the evaluation of a lazy value and
                 # applies the given magic method of the result type.
-                res = func(*self.__args, **self.__kw)
+                res = func(*self._args, **self._kwargs)
                 for t in type(res).mro():
-                    if t in self.__dispatch:
-                        return self.__dispatch[t][funcname](res, *args, **kw)
+                    if t in self._dispatch:
+                        return self._dispatch[t][funcname](res, *args, **kw)
                 raise TypeError("Lazy object returned unexpected type.")
 
-            cls.__dispatch[klass][funcname] = method
+            cls._dispatch[klass][funcname] = method
             return __wrapper__
 
-        def __text_cast(self):
-            return func(*self.__args, **self.__kw)
+        def _text_cast(self):
+            return func(*self._args, **self._kwargs)
 
-        def __bytes_cast(self):
-            return bytes(func(*self.__args, **self.__kw))
+        def _bytes_cast(self):
+            return bytes(func(*self._args, **self._kwargs))
 
-        def __cast(self):
+        def _cast(self):
             if self._delegate_bytes:
-                return self.__bytes_cast()
+                return self._bytes_cast()
             elif self._delegate_text:
-                return self.__text_cast()
+                return self._text_cast()
             else:
-                return func(*self.__args, **self.__kw)
+                return func(*self._args, **self._kwargs)
 
         def __ne__(self, other):
             if isinstance(other, Promise):
-                other = other.__cast()
-            return self.__cast() != other
+                other = other._cast()
+            return self._cast() != other
 
         def __eq__(self, other):
             if isinstance(other, Promise):
-                other = other.__cast()
-            return self.__cast() == other
+                other = other._cast()
+            return self._cast() == other
 
         def __lt__(self, other):
             if isinstance(other, Promise):
-                other = other.__cast()
-            return self.__cast() < other
+                other = other._cast()
+            return self._cast() < other
 
         def __hash__(self):
-            return hash(self.__cast())
+            return hash(self._cast())
 
         def __mod__(self, rhs):
             if self._delegate_bytes and six.PY2:
                 return bytes(self) % rhs
             elif self._delegate_text:
                 return six.text_type(self) % rhs
-            return self.__cast() % rhs
+            return self._cast() % rhs
 
         def __deepcopy__(self, memo):
             # Instances of this class are effectively immutable. It's just a
@@ -218,11 +218,11 @@ def lazy(func, *resultclasses):
             return self
 
     @wraps(func)
-    def __wrapper__(*args, **kw):
+    def wrapper(*args, **kw):
         # Creates the proxy object, instead of the actual value.
         return __proxy__(args, kw)
 
-    return __wrapper__
+    return wrapper
 
 
 def _lazy_proxy_unpickle(func, args, kwargs, *resultclasses):
