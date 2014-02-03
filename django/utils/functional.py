@@ -115,6 +115,8 @@ def lazy(func, *resultclasses):
         until one of the methods on the result is called.
         """
         _dispatch = None
+        _func = func
+        _resultclasses = resultclasses
 
         def __init__(self, args, kwargs):
             self._args = args
@@ -125,13 +127,13 @@ def lazy(func, *resultclasses):
         def __reduce__(self):
             return (
                 _lazy_proxy_unpickle,
-                (func, self._args, self._kwargs) + resultclasses
+                (self._func, self._args, self._kwargs) + self._resultclasses
             )
 
         @classmethod
         def _prepare_class(cls):
             cls._dispatch = defaultdict(dict)
-            for resultclass in resultclasses:
+            for resultclass in cls._resultclasses:
                 for type_ in reversed(resultclass.mro()):
                     for (k, v) in type_.__dict__.items():
                         # All wrapped methods return the same wrapper method,
@@ -141,8 +143,8 @@ def lazy(func, *resultclasses):
                         if hasattr(cls, k):
                             continue
                         setattr(cls, k, meth)
-            cls._delegate_bytes = bytes in resultclasses
-            cls._delegate_text = six.text_type in resultclasses
+            cls._delegate_bytes = bytes in cls._resultclasses
+            cls._delegate_text = six.text_type in cls._resultclasses
             assert not (cls._delegate_bytes and cls._delegate_text), "Cannot call lazy() with both bytes and text return types."
             if cls._delegate_text:
                 if six.PY3:
@@ -173,7 +175,7 @@ def lazy(func, *resultclasses):
 
         def _eval(self):
             """Evaluate the wrapped function."""
-            return func(*self._args, **self._kwargs)
+            return self._func(*self._args, **self._kwargs)
 
         def _text_cast(self):
             return self._eval()
