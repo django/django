@@ -1,3 +1,4 @@
+from collections import defaultdict
 import copy
 from functools import wraps
 import operator
@@ -129,9 +130,8 @@ def lazy(func, *resultclasses):
 
         @classmethod
         def __prepare_class__(cls):
-            cls.__dispatch = {}
+            cls.__dispatch = defaultdict(dict)
             for resultclass in resultclasses:
-                cls.__dispatch[resultclass] = {}
                 for type_ in reversed(resultclass.mro()):
                     for (k, v) in type_.__dict__.items():
                         # All __promise__ return the same wrapper method, but
@@ -168,8 +168,6 @@ def lazy(func, *resultclasses):
                         return self.__dispatch[t][funcname](res, *args, **kw)
                 raise TypeError("Lazy object returned unexpected type.")
 
-            if klass not in cls.__dispatch:
-                cls.__dispatch[klass] = {}
             cls.__dispatch[klass][funcname] = method
             return __wrapper__
 
