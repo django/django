@@ -71,7 +71,7 @@ class EggLoaderTest(TestCase):
                 return self.module._resources[path].read()
 
             def _fn(self, base, resource_name):
-                return resource_name
+                return os.path.normcase(resource_name)
 
         pkg_resources._provider_factories[MockLoader] = MockProvider
 
