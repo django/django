@@ -148,11 +148,9 @@ the 'type' attribute to take advantage of the new HTML5 input types.  To do
 this, you use the :attr:`Widget.attrs` argument when creating the widget::
 
     class CommentForm(forms.Form):
-        name = forms.CharField(
-                    widget=forms.TextInput(attrs={'class':'special'}))
+        name = forms.CharField(widget=forms.TextInput(attrs={'class': 'special'}))
         url = forms.URLField()
-        comment = forms.CharField(
-                   widget=forms.TextInput(attrs={'size':'40'}))
+        comment = forms.CharField(widget=forms.TextInput(attrs={'size': '40'}))
 
 Django will then include the extra attributes in the rendered output:
 
