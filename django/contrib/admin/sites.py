@@ -1,7 +1,7 @@
 from functools import update_wrapper
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.admin import ModelAdmin, actions
-from django.contrib.auth import logout as auth_logout, REDIRECT_FIELD_NAME
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.views import redirect_to_login
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
