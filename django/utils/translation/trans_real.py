@@ -112,28 +112,38 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self.set_output_charset('utf-8')
         self.__language = language
         self.__to_language = to_language(language)
-        self.locale = to_locale(language)
+        self.__locale = to_locale(language)
 
         self.mo_files = []
-        self._add_global_translations()
+        self._add_django_translations()
         self._add_installed_apps_translations()
         self._add_mo_local_translations()
 
         self._add_fallback()
         self._add_to_global()
 
-    def _add_global_translations(self):
-        globalpath = os.path.join(os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
-        gettext_module.translation('django', globalpath, [loc], DjangoTranslation)
+    def _add_django_translations(self):
+        settingsfile = upath(sys.modules[settings.__module__].__file__)
+        localedir = os.path.join(os.path.dirname(settingsfile), 'locale')
+        translation = gettext_module.translation(
+            domain='django',
+            localedir=localedir,
+            languages=[self.__locale])
+        translation = self._subvert_caching(translation)
+        self.merge(translation)
 
+    def _subvert_caching(self, translation):
+        global _translations
+        lang = self.__language
         # We want to ensure that, for example,  "en-gb" and "en-us" don't share
         # the same translation object (thus, merging en-us with a local update
         # doesn't affect en-gb), even though they will both use the core "en"
         # translation. So we have to subvert Python's internal gettext caching.
         base_lang = lambda x: x.split('-', 1)[0]
         if base_lang(lang) in [base_lang(trans) for trans in list(_translations)]:
-            res._info = res._info.copy()
-            res._catalog = res._catalog.copy()
+            translation._info = translation._info.copy()
+            translation._catalog = translation._catalog.copy()
+        return translation
 
     def _add_installed_apps_translations(self):
         for app_config in reversed(list(apps.get_app_configs())):
