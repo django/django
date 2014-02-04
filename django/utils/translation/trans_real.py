@@ -114,10 +114,9 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self.__to_language = to_language(language)
         self.__locale = to_locale(language)
 
-        self.mo_files = []
         self._add_django_translations()
         self._add_installed_apps_translations()
-        self._add_mo_local_translations()
+        self._add_local_translations()
 
         self._add_fallback()
         self._add_to_global()
@@ -155,7 +154,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
                 fallback=True)
             self.merge(translation)
 
-    def _add_mo_local_translations(self):
+    def _add_local_translations(self):
         for localedir in reversed(settings.LOCALE_PATHS):
             translation = gettext_module.translation(
                 domain='django',
@@ -172,7 +171,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _add_to_global(self):
         global _translations
-        _translations[language] = self
+        _translations[self.__language] = self
 
     def merge(self, other):
         if isinstance(other, gettext_module.NullTranslations):
