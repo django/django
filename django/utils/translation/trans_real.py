@@ -103,6 +103,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     """
     def __init__(self, language):
         gettext_module.GNUTranslations.__init__(self)
+
         self.set_output_charset('utf-8')
         self.__language = language
         self.__to_language = to_language(language)
@@ -112,6 +113,9 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self._add_global_translations()
         self._add_installed_apps_translations()
         self._add_mo_local_translations()
+
+        self._add_fallback()
+        self._add_to_global()
 
     def _add_global_translations(self):
         globalpath = os.path.join(os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
@@ -139,6 +143,16 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             if os.path.isdir(localepath):
                 res.merge(localepath)
 
+    def _add_fallback(self):
+        if self.language == settings.LANGUAGE_CODE:
+            return
+        default_translation = DjangoTranslation(settings.LANGUAGE_CODE)
+        self.add_fallback(default_translation)
+
+    def _add_to_global(self):
+        global _translations
+        _translations[language] = self
+
     def merge(self, other):
         if isinstance(other, gettext_module.NullTranslations):
             return
@@ -164,30 +178,7 @@ def translation(language):
     different from the requested language.
     """
     global _translations
-
-    t = _translations.get(language, None)
-    if t is not None:
-        return t
-
-    def _fetch(lang, fallback=None):
-
-        global _translations
-
-        res = _translations.get(lang, None)
-        if res is not None:
-            return res
-
-        res = DjangoTranslation(lang)
-
-        if res._catalog:
-            _translations[lang] = res
-
-        return res
-
-    default_translation = _fetch(settings.LANGUAGE_CODE)
-    current_translation = _fetch(language, fallback=default_translation)
-
-    return current_translation
+    return _translations.get(language, DjangoTranslation(language))
 
 
 def activate(language):
