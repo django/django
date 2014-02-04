@@ -100,6 +100,11 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     """
     This class sets up the GNUTranslations context with regard to output
     charset.
+
+    This translation object will be constructed out of multiple GNUTranslations
+    objects by merging their catalogs. It will construct a object for the
+    requested language and add a fallback to the default language, if it's
+    different from the requested language.
     """
     def __init__(self, language):
         gettext_module.GNUTranslations.__init__(self)
@@ -171,11 +176,6 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 def translation(language):
     """
     Returns a translation object.
-
-    This translation object will be constructed out of multiple GNUTranslations
-    objects by merging their catalogs. It will construct a object for the
-    requested language and add a fallback to the default language, if it's
-    different from the requested language.
     """
     global _translations
     return _translations.get(language, DjangoTranslation(language))
