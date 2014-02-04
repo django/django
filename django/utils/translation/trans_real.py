@@ -11,6 +11,7 @@ from threading import local
 import warnings
 
 from django.apps import apps
+from django.conf import settings
 from django.dispatch import receiver
 from django.test.signals import setting_changed
 from django.utils.encoding import force_str, force_text
@@ -105,8 +106,42 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self.set_output_charset('utf-8')
         self.__language = language
         self.__to_language = to_language(language)
+        self.locale = to_locale(language)
+
+        self.mo_files = []
+        self._add_global_translations()
+        self._add_installed_apps_translations()
+        self._add_mo_local_translations()
+
+    def _add_global_translations(self):
+        globalpath = os.path.join(os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
+        gettext_module.translation('django', globalpath, [loc], DjangoTranslation)
+
+        # We want to ensure that, for example,  "en-gb" and "en-us" don't share
+        # the same translation object (thus, merging en-us with a local update
+        # doesn't affect en-gb), even though they will both use the core "en"
+        # translation. So we have to subvert Python's internal gettext caching.
+        base_lang = lambda x: x.split('-', 1)[0]
+        if base_lang(lang) in [base_lang(trans) for trans in list(_translations)]:
+            res._info = res._info.copy()
+            res._catalog = res._catalog.copy()
+
+    def _add_installed_apps_translations(self):
+        for app_config in reversed(list(apps.get_app_configs())):
+            t = gettext_module.translation('django', path, [loc], DjangoTranslation, True)
+            apppath = os.path.join(app_config.path, 'locale')
+            if os.path.isdir(apppath):
+                res = _merge(apppath)
+
+    def _add_mo_local_translations(self):
+        for localepath in reversed(settings.LOCALE_PATHS):
+            res = gettext_module.translation('django', path, [loc], DjangoTranslation, True)
+            if os.path.isdir(localepath):
+                res.merge(localepath)
 
     def merge(self, other):
+        if isinstance(other, gettext_module.NullTranslations):
+            return
         self._catalog.update(other._catalog)
 
     def language(self):
@@ -134,10 +169,6 @@ def translation(language):
     if t is not None:
         return t
 
-    from django.conf import settings
-
-    globalpath = os.path.join(os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
-
     def _fetch(lang, fallback=None):
 
         global _translations
@@ -146,42 +177,11 @@ def translation(language):
         if res is not None:
             return res
 
-        loc = to_locale(lang)
+        res = DjangoTranslation(lang)
 
-        res = gettext_module.translation('django', globalpath, [loc], DjangoTranslation)
-        res.set_language(lang)
+        if res._catalog:
+            _translations[lang] = res
 
-        # We want to ensure that, for example,  "en-gb" and "en-us" don't share
-        # the same translation object (thus, merging en-us with a local update
-        # doesn't affect en-gb), even though they will both use the core "en"
-        # translation. So we have to subvert Python's internal gettext caching.
-        base_lang = lambda x: x.split('-', 1)[0]
-        if base_lang(lang) in [base_lang(trans) for trans in list(_translations)]:
-            res._info = res._info.copy()
-            res._catalog = res._catalog.copy()
-
-        def _merge(path):
-            t = gettext_module.translation('django', path, [loc], DjangoTranslation, True)
-            if isinstance(t, gettext_module.NullTranslations):
-                t._catalog = {}
-            res.merge(t)
-            return res
-
-        for app_config in reversed(list(apps.get_app_configs())):
-            apppath = os.path.join(app_config.path, 'locale')
-            if os.path.isdir(apppath):
-                res = _merge(apppath)
-
-        for localepath in reversed(settings.LOCALE_PATHS):
-            if os.path.isdir(localepath):
-                res = _merge(localepath)
-
-        if res is None:
-            if fallback is not None:
-                res = fallback
-            else:
-                return gettext_module.NullTranslations()
-        _translations[lang] = res
         return res
 
     default_translation = _fetch(settings.LANGUAGE_CODE)
