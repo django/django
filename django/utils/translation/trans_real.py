@@ -147,10 +147,13 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _add_installed_apps_translations(self):
         for app_config in reversed(list(apps.get_app_configs())):
-            t = gettext_module.translation('django', path, [loc], DjangoTranslation, True)
-            apppath = os.path.join(app_config.path, 'locale')
-            if os.path.isdir(apppath):
-                res = _merge(apppath)
+            # fallback=True, returns a NullTranslations if no mo's found
+            translation = gettext_module.translation(
+                domain='django',
+                localedir=os.path.join(app_config.path, 'locale'),
+                languages=[self.__locale],
+                fallback=True)
+            self.merge(translation)
 
     def _add_mo_local_translations(self):
         for localepath in reversed(settings.LOCALE_PATHS):
