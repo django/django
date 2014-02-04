@@ -156,10 +156,13 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             self.merge(translation)
 
     def _add_mo_local_translations(self):
-        for localepath in reversed(settings.LOCALE_PATHS):
-            res = gettext_module.translation('django', path, [loc], DjangoTranslation, True)
-            if os.path.isdir(localepath):
-                res.merge(localepath)
+        for localedir in reversed(settings.LOCALE_PATHS):
+            translation = gettext_module.translation(
+                domain='django',
+                localedir=localedir,
+                languages=[self.__locale],
+                fallback=True)
+            self.merge(translation)
 
     def _add_fallback(self):
         if self.language == settings.LANGUAGE_CODE:
