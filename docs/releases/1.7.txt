@@ -127,9 +127,40 @@ to call the method on the superclass and simply add or remove extra arguments.
 Calling custom ``QuerySet`` methods from the ``Manager``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Historically, the recommended way to make reusable model queries was to create
+methods on a custom ``Manager`` class. The problem with this approach was that
+after the first method call, you'd get back a ``QuerySet`` instance and
+couldn't call additional custom manager methods.
+
+Though not documented, it was common to work around this issue by creating a
+custom ``QuerySet`` so that custom methods could be chained; but the solution
+had a number of drawbacks:
+
+* The custom ``QuerySet`` and its custom methods were lost after the first
+  call to ``values()`` or ``values_list()``.
+
+* Writing a custom ``Manager`` was still necessary to return the custom
+  ``QuerySet`` class and all methods that were desired on the ``Manager``
+  had to be proxied to the ``QuerySet``. The whole process went against
+  the DRY principle.
+
 The :meth:`QuerySet.as_manager() <django.db.models.query.QuerySet.as_manager>`
-class method has been added to :ref:`create Manager with QuerySet methods
-<create-manager-with-queryset-methods>`.
+class method can now directly :ref:`create Manager with QuerySet methods
+<create-manager-with-queryset-methods>`::
+
+    class FoodQuerySet(models.QuerySet):
+        def pizzas(self):
+            return self.filter(kind='pizza')
+
+        def vegetarian(self):
+            return self.filter(vegetarian=True)
+
+    class Food(models.Model):
+        kind = models.CharField(max_length=50)
+        vegetarian = models.BooleanField()
+        objects = FoodQuerySet.as_manager()
+
+    Food.objects.pizzas().vegetarian()
 
 Using a custom manager when traversing reverse relations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
