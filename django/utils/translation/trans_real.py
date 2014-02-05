@@ -128,7 +128,6 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         refernces to 'fallback'.
 
         """
-        return gettext_module.translation(
         translation = gettext_module.translation(
             domain='django',
             localedir=localedir,
@@ -151,10 +150,6 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             # gettext will raise an IOError (refs #18192).
             use_null_fallback = False
         translation = self._new_gnu_trans(localedir, use_null_fallback)
-        self._copy(translation)
-
-    def _copy(self, translation):
-        """Copies the GNUTranslations() catalog and properties."""
         self._info = translation._info.copy()
         self._catalog = translation._catalog.copy()
 
@@ -180,8 +175,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def merge(self, other):
         """Merge another translation into this catalog."""
-        if hasattr(other, '_catalog'):
-            self._catalog.update(other._catalog)
+        self._catalog.update(other._catalog)
 
     def language(self):
         """Returns the translation language."""
