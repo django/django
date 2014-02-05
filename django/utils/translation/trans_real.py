@@ -169,9 +169,8 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self.add_fallback(default_translation)
 
     def merge(self, other):
-        if isinstance(other, gettext_module.NullTranslations):
-            return
-        self._catalog.update(other._catalog)
+        if hasattr(other, '_catalog'):
+            self._catalog.update(other._catalog)
 
     def language(self):
         return self.__language
