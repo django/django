@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from unittest import skipUnless
 
-from django.contrib.gis.geos import HAS_GEOS, Point
+from django.contrib.gis.geos import HAS_GEOS
 from django.test import TestCase
 from django.test.utils import override_settings
 
@@ -30,6 +30,7 @@ class GoogleMapsTest(TestCase):
         """
         Test that GoogleMap doesn't crash with non-ascii content.
         """
+        from django.contrib.gis.geos import Point
         from django.contrib.gis.maps.google.gmap import GoogleMap, GMarker
 
         center = Point(6.146805, 46.227574)
