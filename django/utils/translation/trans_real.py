@@ -107,6 +107,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     different from the requested language.
     """
     def __init__(self, language):
+        """Create a GNUTranslations() using many locale directories"""
         gettext_module.GNUTranslations.__init__(self)
 
         self.__language = language
@@ -119,6 +120,13 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self._add_fallback()
 
     def _new_gnu_trans(self, localedir, use_null_fallback=True):
+        """Returns an gettext.GNUTranslations instance.
+
+        A convinience wrapper.  By default gettext uses 'fallback=False'.
+        Using param `use_null_fallback` to avoid confusion with any other
+        refernces to 'fallback'.
+
+        """
         return gettext_module.translation(
             domain='django',
             localedir=localedir,
@@ -127,8 +135,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             fallback=use_null_fallback)
 
     def _init_translation_catalog(self):
-        """
-        Creates a base catalog using global django translations.
+        """Creates a base catalog using global django translations.
 
         Always expecting Django's translation .mo files to be present, and if
         missing, when gettext parses it will throw an IOError (refs #18192).
@@ -146,33 +153,40 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self.plural = translation.plural
 
     def _add_installed_apps_translations(self):
+        """Merges translations from each installed app."""
         for app_config in reversed(list(apps.get_app_configs())):
             localedir = os.path.join(app_config.path, 'locale')
             translation = self._new_gnu_trans(localedir)
             self.merge(translation)
 
     def _add_local_translations(self):
+        """Merges translations defined in LOCALE_PATHS."""
         for localedir in reversed(settings.LOCALE_PATHS):
             translation = self._new_gnu_trans(localedir)
             self.merge(translation)
 
     def _add_fallback(self):
+        """Sets the GNUTranslations() fallback with the default language."""
         if self.__language == settings.LANGUAGE_CODE:
             return
         default_translation = translation(settings.LANGUAGE_CODE)
         self.add_fallback(default_translation)
 
     def merge(self, other):
+        """Merge another translation into this catalog."""
         if hasattr(other, '_catalog'):
             self._catalog.update(other._catalog)
 
     def language(self):
+        """Returns the translation language."""
         return self.__language
 
     def to_language(self):
+        """Returns the translation language name."""
         return self.__to_language
 
     def __repr__(self):
+        """Returns a string representation."""
         return "<DjangoTranslation lang:%s>" % self.__language
 
 
@@ -184,6 +198,7 @@ def translation(language):
     if not language in _translations:
         _translations[language] = DjangoTranslation(language)
     return _translations[language]
+
 
 def activate(language):
     """
