@@ -4,9 +4,8 @@ from __future__ import absolute_import, unicode_literals
 from django.template import Template, Context
 from django.test import TestCase
 from django.utils.encoding import force_text, force_bytes
-from django.utils.functional import lazy, Promise
-from django.utils.html import escape, conditional_escape
-from django.utils.safestring import mark_safe, mark_for_escaping
+from django.utils.functional import lazy
+from django.utils.safestring import mark_safe, mark_for_escaping, SafeData, EscapeData
 from django.utils import six
 from django.utils import translation
 
@@ -30,8 +29,8 @@ class SafeStringTest(TestCase):
         s = lazystr('a&b')
         b = lazybytes(b'a&b')
 
-        self.assertIsInstance(mark_safe(s), Promise)
-        self.assertIsInstance(mark_safe(b), Promise)
+        self.assertIsInstance(mark_safe(s), SafeData)
+        self.assertIsInstance(mark_safe(b), SafeData)
         self.assertRenderEqual('{{ s }}', 'a&b', s=mark_safe(s))
 
     def test_mark_for_escaping(self):
@@ -43,11 +42,6 @@ class SafeStringTest(TestCase):
         s = lazystr('a&b')
         b = lazybytes(b'a&b')
 
-        self.assertIsInstance(mark_for_escaping(s), Promise)
-        self.assertIsInstance(mark_for_escaping(b), Promise)
+        self.assertIsInstance(mark_for_escaping(s), EscapeData)
+        self.assertIsInstance(mark_for_escaping(b), EscapeData)
         self.assertRenderEqual('{% autoescape off %}{{ s }}{% endautoescape %}', 'a&amp;b', s=mark_for_escaping(s))
-
-    def test_regression_20296(self):
-        s = mark_safe(translation.ugettext_lazy("username"))
-        with translation.override('fr'):
-            self.assertRenderEqual('{{ s }}', "nom d'utilisateur", s=s)
