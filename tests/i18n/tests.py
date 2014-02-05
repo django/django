@@ -1337,10 +1337,11 @@ class TranslationFilesMissing(TestCase):
     def patchGettextFind(self):
         gettext_module.find = lambda *args, **kw: None
 
-    def test_failure_finding_po_files(self):
+    def test_failure_finding_default_mo_files(self):
         '''
-        Innapropriate IOError excpetion results in downstream AttributeError.
+        Ensure IOError is raised if the default language is unparseable.
         Refs: #18192
         '''
         self.patchGettextFind()
-        self.assertRaises(IOError, activate, 'en-br')
+        trans_real._translations = {}
+        self.assertRaises(IOError, activate, 'en')

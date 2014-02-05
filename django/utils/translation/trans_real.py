@@ -121,7 +121,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self._add_fallback()
 
     def _new_gnu_trans(self, localedir, use_null_fallback=True):
-        """Returns an gettext.GNUTranslations instance.
+        """Returns a mergeable gettext.GNUTranslations instance.
 
         A convinience wrapper.  By default gettext uses 'fallback=False'.
         Using param `use_null_fallback` to avoid confusion with any other
@@ -129,22 +129,28 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
         """
         return gettext_module.translation(
+        translation = gettext_module.translation(
             domain='django',
             localedir=localedir,
             languages=[self.__locale],
             codeset='utf-8',
             fallback=use_null_fallback)
+        if not hasattr(translation, '_catalog'):
+            # provides merge support for NullTranslations()
+            translation._catalog = {}
+            translation._info = {}
+        return translation
 
     def _init_translation_catalog(self):
-        """Creates a base catalog using global django translations.
-
-        Always expecting Django's translation .mo files to be present, and if
-        missing, when gettext parses it will throw an IOError (refs #18192).
-
-        """
+        """Creates a base catalog using global django translations."""
         settingsfile = upath(sys.modules[settings.__module__].__file__)
         localedir = os.path.join(os.path.dirname(settingsfile), 'locale')
-        translation = self._new_gnu_trans(localedir, use_null_fallback=False)
+        use_null_fallback = True
+        if self.__language == settings.LANGUAGE_CODE:
+            # default lang should be present and parseable, if not
+            # gettext will raise an IOError (refs #18192).
+            use_null_fallback = False
+        translation = self._new_gnu_trans(localedir, use_null_fallback)
         self._copy(translation)
 
     def _copy(self, translation):
