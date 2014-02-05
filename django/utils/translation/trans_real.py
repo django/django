@@ -119,7 +119,6 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self._add_local_translations()
 
         self._add_fallback()
-        self._add_to_global()
 
     def _add_django_translations(self):
         settingsfile = upath(sys.modules[settings.__module__].__file__)
@@ -169,10 +168,6 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         default_translation = DjangoTranslation(settings.LANGUAGE_CODE)
         self.add_fallback(default_translation)
 
-    def _add_to_global(self):
-        global _translations
-        _translations[self.__language] = self
-
     def merge(self, other):
         if isinstance(other, gettext_module.NullTranslations):
             return
@@ -193,8 +188,9 @@ def translation(language):
     Returns a translation object.
     """
     global _translations
-    return _translations.get(language, DjangoTranslation(language))
-
+    if not language in _translations:
+        _translations[language] = DjangoTranslation(language)
+    return _translations[language]
 
 def activate(language):
     """
