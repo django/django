@@ -197,13 +197,12 @@ class ConnectionHandler(object):
                 if new_key in test_settings:
                     raise ImproperlyConfigured("Connection %s has both %s and TEST[%s] specified." %
                                                (alias, key, new_key))
-                warnings.warn(PendingDeprecationWarning("In Django 1.9 the %s connection setting "
-                                                        "will be moved to a %s entry in the "
-                                                        "TEST setting" %(key, new_key)))
+                test_settings_warning = ("In Django 1.9 the %s connection setting will be moved "
+                                         "to a %s entry in the TEST setting")
+                warnings.warn(PendingDeprecationWarning(test_settings_warning % (key, new_key)))
                 test_settings[new_key] = value
         for key in ['CHARSET', 'COLLATION', 'NAME', 'MIRROR']:
             test_settings.setdefault(key, None)
-        
 
     def __getitem__(self, alias):
         if hasattr(self._connections, alias):

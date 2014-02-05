@@ -120,7 +120,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         real_settings['SAVED_USER'] = self.connection.settings_dict['SAVED_USER'] = self.connection.settings_dict['USER']
         real_settings['SAVED_PASSWORD'] = self.connection.settings_dict['SAVED_PASSWORD'] = self.connection.settings_dict['PASSWORD']
         real_test_settings = real_settings['TEST']
-        test_settings =  self.connection.settings_dict['TEST']
+        test_settings = self.connection.settings_dict['TEST']
         real_test_settings['USER'] = real_settings['USER'] = test_settings['USER'] = self.connection.settings_dict['USER'] = TEST_USER
         real_settings['PASSWORD'] = self.connection.settings_dict['PASSWORD'] = TEST_PASSWD
 
@@ -218,8 +218,12 @@ class DatabaseCreation(BaseDatabaseCreation):
                 sys.stderr.write("Failed (%s)\n" % (err))
                 raise
 
-    def _test_settings_get(self, key, prefixed=None, default=None):
-        "Return a value from the settings dict, or a given default, or a prefixed settings entry"
+    def _test_settings_get(self, key, default=None, prefixed=None):
+        """
+        Return a value from the test settings dict,
+        or a given default,
+        or a prefixed entry from the main settings dict
+        """
         settings_dict = self.connection.settings_dict
         val = settings_dict['TEST'].get(key, default)
         if val is None:
