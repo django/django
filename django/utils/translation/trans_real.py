@@ -163,9 +163,9 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             self.merge(translation)
 
     def _add_fallback(self):
-        if self.language == settings.LANGUAGE_CODE:
+        if self.__language == settings.LANGUAGE_CODE:
             return
-        default_translation = DjangoTranslation(settings.LANGUAGE_CODE)
+        default_translation = translation(settings.LANGUAGE_CODE)
         self.add_fallback(default_translation)
 
     def merge(self, other):
