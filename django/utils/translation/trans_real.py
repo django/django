@@ -113,6 +113,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self.__language = language
         self.__to_language = to_language(language)
         self.__locale = to_locale(language)
+        self.plural = lambda n: int(n != 1)
 
         self._init_translation_catalog()
         self._add_installed_apps_translations()
@@ -150,7 +151,6 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         """Copies the GNUTranslations() catalog and properties."""
         self._info = translation._info.copy()
         self._catalog = translation._catalog.copy()
-        self.plural = translation.plural
 
     def _add_installed_apps_translations(self):
         """Merges translations from each installed app."""
