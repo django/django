@@ -33,3 +33,7 @@ Bug fixes
   (#21787).
 
 * Added missing items to ``django.utils.timezone.__all__`` (#21880).
+
+* Fixed an issue where lazy objects weren't actually marked as safe when passed
+  through :func:`~django.utils.safestring.mark_safe` and could end up being
+  double-escaped (#21882).
