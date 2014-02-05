@@ -6,7 +6,6 @@ from django.utils.encoding import force_text, force_bytes
 from django.utils.functional import lazy
 from django.utils.safestring import mark_safe, mark_for_escaping, SafeData, EscapeData
 from django.utils import six
-from django.utils import translation
 
 lazystr = lazy(force_text, six.text_type)
 lazybytes = lazy(force_bytes, bytes)
