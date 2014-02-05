@@ -109,7 +109,6 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     def __init__(self, language):
         gettext_module.GNUTranslations.__init__(self)
 
-        self.set_output_charset('utf-8')
         self.__language = language
         self.__to_language = to_language(language)
         self.__locale = to_locale(language)
@@ -117,16 +116,20 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self._add_django_translations()
         self._add_installed_apps_translations()
         self._add_local_translations()
-
         self._add_fallback()
+
+    def _new_gnu_trans(self, localedir, use_null_fallback=True):
+        return gettext_module.translation(
+            domain='django',
+            localedir=localedir,
+            languages=[self.__locale],
+            codeset='utf-8',
+            fallback=use_null_fallback)
 
     def _add_django_translations(self):
         settingsfile = upath(sys.modules[settings.__module__].__file__)
         localedir = os.path.join(os.path.dirname(settingsfile), 'locale')
-        translation = gettext_module.translation(
-            domain='django',
-            localedir=localedir,
-            languages=[self.__locale])
+        translation = self._new_gnu_trans(localedir, use_null_fallback=False)
         translation = self._subvert_caching(translation)
         self.merge(translation)
 
@@ -145,21 +148,13 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _add_installed_apps_translations(self):
         for app_config in reversed(list(apps.get_app_configs())):
-            # fallback=True, returns a NullTranslations if no mo's found
-            translation = gettext_module.translation(
-                domain='django',
-                localedir=os.path.join(app_config.path, 'locale'),
-                languages=[self.__locale],
-                fallback=True)
+            localedir = os.path.join(app_config.path, 'locale')
+            translation = self._new_gnu_trans(localedir)
             self.merge(translation)
 
     def _add_local_translations(self):
         for localedir in reversed(settings.LOCALE_PATHS):
-            translation = gettext_module.translation(
-                domain='django',
-                localedir=localedir,
-                languages=[self.__locale],
-                fallback=True)
+            translation = self._new_gnu_trans(localedir)
             self.merge(translation)
 
     def _add_fallback(self):
