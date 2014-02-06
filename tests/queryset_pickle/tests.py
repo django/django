@@ -3,7 +3,9 @@ from __future__ import unicode_literals
 import pickle
 import datetime
 
+from django.core.exceptions import UnpickleException
 from django.test import TestCase
+from django.utils.version import get_major_version
 
 from .models import Group, Event, Happening, Container, M2MModel
 
@@ -108,3 +110,18 @@ class PickleabilityTestCase(TestCase):
         # Second pickling
         groups = pickle.loads(pickle.dumps(groups))
         self.assertQuerysetEqual(groups, [g], lambda x: x)
+
+    def test_missing_django_version_unpickling(self):
+        # test greaceful handling of unpickling of QuerySets pickled
+        # in Django version < 1.7
+        # See ticket 21430 and associated PR
+        qs = Group.missing_django_version_objects.all()
+        state = qs.__getstate__()
+        # Shouldn't raise KeyError
+        self.assertRaises(UnpickleException, pickle.loads, pickle.dumps(qs))
+
+    def test_unsupported_unpickle_exception(self):
+        # ticket 21430
+        # NOTE: The Group object has a custom Manager defined in models.py
+        qs = Group.previous_django_version_objects.all()
+        self.assertRaises(UnpickleException, pickle.loads, pickle.dumps(qs))

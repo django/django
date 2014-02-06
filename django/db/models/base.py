@@ -10,7 +10,7 @@ from django.apps.config import MODELS_MODULE_NAME
 import django.db.models.manager  # NOQA: Imported to register signal handler.
 from django.conf import settings
 from django.core import checks
-from django.core.exceptions import (ObjectDoesNotExist,
+from django.core.exceptions import (ObjectDoesNotExist, UnpickleException,
     MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
@@ -28,6 +28,7 @@ from django.utils.encoding import force_str, force_text
 from django.utils import six
 from django.utils.six.moves import zip
 from django.utils.text import get_text_list, capfirst
+from django.utils.version import get_major_version
 
 
 def subclass_exception(name, parents, module, attached_to=None):
@@ -504,6 +505,7 @@ class Model(six.with_metaclass(ModelBase)):
         only module-level classes can be pickled by the default path.
         """
         data = self.__dict__
+        data['django_version'] = get_major_version()
         if not self._deferred:
             class_id = self._meta.app_label, self._meta.object_name
             return model_unpickle, (class_id, [], simple_class_factory), data
@@ -515,6 +517,19 @@ class Model(six.with_metaclass(ModelBase)):
         model = self._meta.proxy_for_model
         class_id = model._meta.app_label, model._meta.object_name
         return (model_unpickle, (class_id, defers, deferred_class_factory), data)
+
+    def __setstate__(self, state):
+        version = state.get('django_version')
+        if get_major_version() != version:
+            if version:
+                raise UnpickleException("Pickled Model instance's django major version "
+                                        "%s does not match with current major version %s"
+                                        %(state['django_version'], get_major_version()))
+            else:
+                raise UnpickleException("Pickled Model instance's django major version "
+                                "does not match with current major version %s" %version)
+
+        self.__dict__ = state
 
     def _get_pk_val(self, meta=None):
         if not meta:

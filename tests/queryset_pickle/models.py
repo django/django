@@ -1,7 +1,9 @@
 import datetime
 
+from django.core.exceptions import UnpickleException
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils.version import get_major_version
 
 
 def standalone_number():
@@ -22,9 +24,24 @@ class Numbers(object):
 
 nn = Numbers()
 
+class PreviousDjangoVersionQuerySet(models.QuerySet):
+    def __getstate__(self):
+        state = super(PreviousDjangoVersionQuerySet, self).__getstate__()
+        state['django_version'] = str(float(state['django_version']) - 0.1)  # previous major version
+        return state
+
+class MissingDjangoVersionQuerySet(models.QuerySet):
+    def __getstate__(self):
+        state = super(MissingDjangoVersionQuerySet, self).__getstate__()
+        del state['django_version']
+        return state
+
 
 class Group(models.Model):
     name = models.CharField(_('name'), max_length=100)
+    objects = models.Manager()
+    previous_django_version_objects = PreviousDjangoVersionQuerySet.as_manager()
+    missing_django_version_objects = MissingDjangoVersionQuerySet.as_manager()
 
 
 class Event(models.Model):

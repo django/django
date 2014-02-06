@@ -575,6 +575,10 @@ Models
 * It is now possible to use ``None`` as a query value for the :lookup:`iexact`
   lookup.
 
+* Unpickling ``Model`` instances and `QuerySets`` across django major versions
+  raises ``UnpickleException``.
+
+
 Signals
 ^^^^^^^
 

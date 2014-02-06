@@ -113,8 +113,9 @@ described here.
     Pickles of ``QuerySets`` are only valid for the version of Django that
     was used to generate them. If you generate a pickle using Django
     version N, there is no guarantee that pickle will be readable with
-    Django version N+1. Pickles should not be used as part of a long-term
-    archival strategy.
+    Django version N+1. Trying to unpickle ``QuerySets`` across major versions
+    of django will raise ``UnpickleException``. Pickles should not
+    be used as part of a long-term archival strategy.
 
 .. _queryset-api:
 
