@@ -34,6 +34,14 @@ Bug fixes
 
 * Added missing items to ``django.utils.timezone.__all__`` (#21880).
 
+* Fixed a field misalignment issue with ``select_related()`` and model
+  inheritance (#21413).
+
+* Fixed join promotion for negated ``AND`` conditions (#21748).
+
+* Oracle database introspection now works with boolean and float fields
+  (#19884).
+
 * Fixed an issue where lazy objects weren't actually marked as safe when passed
   through :func:`~django.utils.safestring.mark_safe` and could end up being
   double-escaped (#21882).
