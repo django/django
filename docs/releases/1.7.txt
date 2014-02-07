@@ -675,6 +675,12 @@ Validators
   ``schemes`` argument which allows customization of the accepted URI schemes
   (instead of the defaults ``http(s)`` and ``ftp(s)``).
 
+* The ``reverse`` argument was added to the
+  :meth:`RegexValidator.__init__()
+  <django.core.validators.RegexValidator.__init__>` method to determine if
+  the :exc:`~django.core.exceptions.ValidationError` should be raised when the
+  regular expression pattern matches or does not match the provided ``value``.
+
 Backwards incompatible changes in 1.7
 =====================================
 
