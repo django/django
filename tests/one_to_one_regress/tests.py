@@ -98,8 +98,8 @@ class OneToOneRegressionTests(TestCase):
 
         # Creation using keyword argument and unsaved related instance (#8070).
         p = Place()
-        r = Restaurant(place=p)
-        self.assertTrue(r.place is p)
+        with self.assertRaises(ValueError):
+            r = Restaurant(place=p)
 
         # Creation using attname keyword argument and an id will cause the related
         # object to be fetched.

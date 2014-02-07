@@ -66,8 +66,8 @@ class ManyToOneRegressionTests(TestCase):
 
         # Creation using keyword argument and unsaved related instance (#8070).
         p = Parent()
-        c = Child(parent=p)
-        self.assertTrue(c.parent is p)
+        with self.assertRaises(ValueError):
+            c = Child(parent=p)
 
         # Creation using attname keyword argument and an id will cause the
         # related object to be fetched.
