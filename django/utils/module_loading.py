@@ -18,16 +18,17 @@ def import_string(dotted_path):
     """
     try:
         module_path, class_name = dotted_path.rsplit('.', 1)
-        module = import_module(module_path)
-        attr = getattr(module, class_name)
-        return attr
-    except AttributeError:
-        _, class_name = dotted_path.rsplit('.', 1)
-        msg = 'Module "%s" does not define a "%s" attribute/class' % (
-            dotted_path, class_name)
-        six.reraise(ImportError, ImportError(msg), sys.exc_info()[2])
     except ValueError:
         msg = "%s doesn't look like a module path" % dotted_path
+        six.reraise(ImportError, ImportError(msg), sys.exc_info()[2])
+
+    module = import_module(module_path)
+
+    try:
+        return getattr(module, class_name)
+    except AttributeError:
+        msg = 'Module "%s" does not define a "%s" attribute/class' % (
+            dotted_path, class_name)
         six.reraise(ImportError, ImportError(msg), sys.exc_info()[2])
 
 
@@ -36,8 +37,9 @@ def import_by_path(dotted_path, error_prefix=''):
     Import a dotted module path and return the attribute/class designated by the
     last name in the path. Raise ImproperlyConfigured if something goes wrong.
     """
-    msg = 'import_by_path() has been deprecated. Use import_string() instead.'
-    warnings.warn(msg, PendingDeprecationWarning, stacklevel=2)
+    warnings.warn(
+        'import_by_path() has been deprecated. Use import_string() instead.',
+        PendingDeprecationWarning, stacklevel=2)
     try:
         attr = import_string(dotted_path)
     except ImportError as e:

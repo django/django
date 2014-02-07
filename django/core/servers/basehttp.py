@@ -52,15 +52,18 @@ def get_internal_wsgi_application():
     if app_path is None:
         return get_wsgi_application()
 
-    error_prefix = "WSGI application '%s' could not be loaded; " % app_path
     try:
-        app = import_string(app_path)
+        return import_string(app_path)
     except ImportError as e:
-        msg = '%sError importing module %s: "%s"' % (error_prefix, app_path, e)
+        msg = (
+            "WSGI application '%(app_path)s' could not be loaded; "
+            "Error importing module: '%(exception)s'" % ({
+                'app_path': app_path,
+                'exception': e,
+            })
+        )
         six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg),
                     sys.exc_info()[2])
-
-    return app
 
 
 class ServerHandler(simple_server.ServerHandler, object):
