@@ -535,6 +535,19 @@ in Python`_).
 
 .. _is forbidden in Python: http://docs.python.org/reference/datamodel.html#object.__hash__
 
+``get_again``
+--------------------
+
+.. method:: Model.get_again()
+
+The ``get_again()`` method returns a copy of the current model, using
+the latest values from the database.
+
+.. note::
+   ``get_again`` uses the ``.pk`` attribute to identify models. Explicitly
+   setting this attribute will prevent ``.get_again()`` returning the original
+   database row.
+
 ``get_absolute_url``
 --------------------
 
