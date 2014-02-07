@@ -5,7 +5,7 @@ import time
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured, DjangoRuntimeWarning
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 
 
 class InvalidCacheBackendError(ImproperlyConfigured):
@@ -45,7 +45,7 @@ def get_key_func(key_func):
         if callable(key_func):
             return key_func
         else:
-            return import_by_path(key_func)
+            return import_string(key_func)
     return default_key_func
 
 

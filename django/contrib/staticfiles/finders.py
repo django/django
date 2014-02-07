@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import default_storage, Storage, FileSystemStorage
 from django.utils.functional import empty, LazyObject
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 from django.utils._os import safe_join
 from django.utils import six, lru_cache
 
@@ -257,7 +257,7 @@ def get_finder(import_path):
     Imports the staticfiles finder class described by import_path, where
     import_path is the full Python path to the class.
     """
-    Finder = import_by_path(import_path)
+    Finder = import_string(import_path)
     if not issubclass(Finder, BaseFinder):
         raise ImproperlyConfigured('Finder "%s" is not a subclass of "%s"' %
                                    (Finder, BaseFinder))

@@ -5,7 +5,7 @@ import warnings
 from django.conf import settings
 from django.core import mail
 from django.core.mail import get_connection
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 from django.views.debug import ExceptionReporter, get_exception_reporter_filter
 
 # Imports kept for backwards-compatibility in Django 1.7.
@@ -73,7 +73,7 @@ def configure_logging(logging_config, logging_settings):
 
     if logging_config:
          # First find the logging configuration function ...
-        logging_config_func = import_by_path(logging_config)
+        logging_config_func = import_string(logging_config)
 
         logging_config_func(DEFAULT_LOGGING)
 
