@@ -467,3 +467,22 @@ aggregate that author count, referencing the annotation field::
     >>> from django.db.models import Count, Avg
     >>> Book.objects.annotate(num_authors=Count('authors')).aggregate(Avg('num_authors'))
     {'num_authors__avg': 1.66}
+
+Operations on aggregates
+------------------------
+
+You can do simple arithmatic operations (ie, +, -, *, /) on two aggregate objects
+or an aggregate object and a number (of int or float type). The resultant object has
+same type as the first aggregate object but also has the information about the
+additional operations and can further be operated on. While passing such an
+object to ``aggregate()`` or `annotate()`` function, an alias must be provided,
+otherwise ``ValueError`` would be raised.
+ 
+For example, if you want to calculate sum of ``price`` per sum of ``rating`` per cent for
+all ``Book``, you can do::
+
+    Book.objects.aggregate(result=Sum('price') / Sum('rating') * 100)
+
+Or if you want to do the above calculation for each ``publisher``, you can do:
+    
+    Book.objects.values('publisher').annotate(result=Sum('price') / Sum('rating') * 100)

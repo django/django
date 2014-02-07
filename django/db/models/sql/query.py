@@ -981,10 +981,7 @@ class Query(object):
                 self.unref_alias(alias)
         self.included_inherited_models = {}
 
-    def add_aggregate(self, aggregate, model, alias, is_summary):
-        """
-        Adds a single aggregate expression to the Query
-        """
+    def get_column_and_source_for_aggrgate(self, aggregate, model, is_summary):
         opts = model._meta
         field_list = aggregate.lookup.split(LOOKUP_SEP)
         if len(field_list) == 1 and self._aggregates and aggregate.lookup in self.aggregates:
@@ -1023,11 +1020,20 @@ class Query(object):
             field_name = field_list[0]
             source = opts.get_field(field_name)
             col = field_name
+
+        return col, source
+
+    def add_aggregate(self, aggregate, model, alias, is_summary):
+        """
+        Adds a single aggregate expression to the Query
+        """
+        col, source = self.get_column_and_source_for_aggrgate(aggregate, model, is_summary)
+
         # We want to have the alias in SELECT clause even if mask is set.
         self.append_aggregate_mask([alias])
 
         # Add the aggregate to the query
-        aggregate.add_to_query(self, alias, col=col, source=source, is_summary=is_summary)
+        aggregate.add_to_query(self, alias, col=col, source=source, is_summary=is_summary, model=model)
 
     def prepare_lookup_value(self, value, lookups, can_reuse):
         # Default lookup if none given is exact.
