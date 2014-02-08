@@ -990,6 +990,18 @@ class CreateCacheTableForDBCacheTests(TestCase):
             router.routers = old_routers
 
 
+class PicklingSideEffect(object):
+
+    def __init__(self, cache):
+        self.cache = cache
+        self.locked = False
+
+    def __getstate__(self):
+        if self.cache._lock.active_writers:
+            self.locked = True
+        return {}
+
+
 @override_settings(CACHES=caches_setting_for_tests(
     BACKEND='django.core.cache.backends.locmem.LocMemCache',
 ))
@@ -1024,6 +1036,15 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         cache.set('value', 42)
         self.assertEqual(caches['default'].get('value'), 42)
         self.assertEqual(caches['other'].get('value'), None)
+
+    def test_locking_on_pickle(self):
+        """#20613/#18541 -- Ensures pickling is done outside of the lock."""
+        bad_obj = PicklingSideEffect(cache)
+        cache.set('set', bad_obj)
+        self.assertFalse(bad_obj.locked, "Cache was locked during pickling")
+
+        cache.add('add', bad_obj)
+        self.assertFalse(bad_obj.locked, "Cache was locked during pickling")
 
     def test_incr_decr_timeout(self):
         """incr/decr does not modify expiry time (matches memcached behavior)"""
