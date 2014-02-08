@@ -959,7 +959,7 @@ of some other value.  You can do this automatically in the admin using
 .. class:: SmallIntegerField([**options])
 
 Like an :class:`IntegerField`, but only allows values under a certain
-(database-dependent) point. Values from ``-32768`` to ``32767``` are safe in all
+(database-dependent) point. Values from ``-32768`` to ``32767`` are safe in all
 databases supported by Django.
 
 ``TextField``
