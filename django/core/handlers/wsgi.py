@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import cgi
 import codecs
 import logging
 import sys
@@ -95,7 +96,7 @@ class WSGIRequest(http.HttpRequest):
         self.META['PATH_INFO'] = path_info
         self.META['SCRIPT_NAME'] = script_name
         self.method = environ['REQUEST_METHOD'].upper()
-        _, content_params = self._parse_content_type(environ.get('CONTENT_TYPE', ''))
+        _, content_params = cgi.parse_header(environ.get('CONTENT_TYPE', ''))
         if 'charset' in content_params:
             try:
                 codecs.lookup(content_params['charset'])
@@ -114,21 +115,6 @@ class WSGIRequest(http.HttpRequest):
 
     def _get_scheme(self):
         return self.environ.get('wsgi.url_scheme')
-
-    def _parse_content_type(self, ctype):
-        """
-        Media Types parsing according to RFC 2616, section 3.7.
-
-        Returns the data type and parameters. For example:
-        Input: "text/plain; charset=iso-8859-1"
-        Output: ('text/plain', {'charset': 'iso-8859-1'})
-        """
-        content_type, _, params = ctype.partition(';')
-        content_params = {}
-        for parameter in params.split(';'):
-            k, _, v = parameter.strip().partition('=')
-            content_params[k] = v
-        return content_type, content_params
 
     def _get_request(self):
         warnings.warn('`request.REQUEST` is deprecated, use `request.GET` or '
