@@ -63,6 +63,7 @@ LANGUAGES = (
     ('de', gettext_noop('German')),
     ('el', gettext_noop('Greek')),
     ('en', gettext_noop('English')),
+    ('en-au', gettext_noop('Australian English')),
     ('en-gb', gettext_noop('British English')),
     ('eo', gettext_noop('Esperanto')),
     ('es', gettext_noop('Spanish')),
