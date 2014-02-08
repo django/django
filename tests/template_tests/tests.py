@@ -1507,6 +1507,8 @@ class TemplateTests(TestCase):
             'invalidstr04_2': ('{% if var|default:"Foo" %}Yes{% else %}No{% endif %}', {}, 'Yes'),
             'invalidstr05': ('{{ var }}', {}, ('', ('INVALID %s', 'var'))),
             'invalidstr06': ('{{ var.prop }}', {'var': {}}, ('', ('INVALID %s', 'var.prop'))),
+            'invalidstr07': ('{% load i18n %}{% blocktrans %}{{ var }}{% endblocktrans %}',
+                             {}, ('', ('INVALID %s', 'var'))),
 
             ### MULTILINE #############################################################
 
