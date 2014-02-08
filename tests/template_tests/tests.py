@@ -1668,6 +1668,8 @@ class TemplateTests(TestCase):
 
             'widthratio18': ('{% widthratio a b 100 as %}', {}, template.TemplateSyntaxError),
             'widthratio19': ('{% widthratio a b 100 not_as variable %}', {}, template.TemplateSyntaxError),
+            'widthratio20': ('{% widthratio a b 100 %}', {'a': float('inf'), 'b': float('inf')}, ''),
+            'widthratio21': ('{% widthratio a b 100 %}', {'a': float('inf'), 'b': 2}, ''),
 
             ### WITH TAG ########################################################
             'with01': ('{% with key=dict.key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, '50'),
