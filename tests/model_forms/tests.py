@@ -7,7 +7,7 @@ from unittest import skipUnless
 import warnings
 
 from django import forms
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, NON_FIELD_ERRORS
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import ValidationError
 from django.db import connection
@@ -791,6 +791,49 @@ class UniqueTest(TestCase):
         form = FlexDatePostForm({'subtitle': "Finally", "title": "Django 1.0 is released",
             "slug": "Django 1.0"}, instance=p)
         self.assertTrue(form.is_valid())
+
+    def test_override_unique_message(self):
+        class CustomProductForm(ProductForm):
+            class Meta(ProductForm.Meta):
+                error_messages = {
+                    'slug': {
+                        'unique': "%(model_name)s's %(field_label)s not unique.",
+                    }
+                }
+
+        Product.objects.create(slug='teddy-bear-blue')
+        form = CustomProductForm({'slug': 'teddy-bear-blue'})
+        self.assertEqual(len(form.errors), 1)
+        self.assertEqual(form.errors['slug'], ["Product's Slug not unique."])
+
+    def test_override_unique_together_message(self):
+        class CustomPriceForm(PriceForm):
+            class Meta(PriceForm.Meta):
+                error_messages = {
+                    NON_FIELD_ERRORS: {
+                        'unique_together': "%(model_name)s's %(field_labels)s not unique.",
+                    }
+                }
+
+        Price.objects.create(price=6.00, quantity=1)
+        form = CustomPriceForm({'price': '6.00', 'quantity': '1'})
+        self.assertEqual(len(form.errors), 1)
+        self.assertEqual(form.errors[NON_FIELD_ERRORS], ["Price's Price and Quantity not unique."])
+
+    def test_override_unique_for_date_message(self):
+        class CustomPostForm(PostForm):
+            class Meta(PostForm.Meta):
+                error_messages = {
+                    'title': {
+                        'unique_for_date': "%(model_name)s's %(field_label)s not unique for %(date_field_label)s date.",
+                    }
+                }
+
+        Post.objects.create(title="Django 1.0 is released",
+            slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
+        form = CustomPostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
+        self.assertEqual(len(form.errors), 1)
+        self.assertEqual(form.errors['title'], ["Post's Title not unique for Posted date."])
 
 
 class ModelToDictTests(TestCase):
