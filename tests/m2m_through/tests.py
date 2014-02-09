@@ -68,12 +68,24 @@ class M2mThroughTests(TestCase):
 
     def test_forward_descriptors(self):
         # Due to complications with adding via an intermediary model,
-        # the add method is not provided.
-        self.assertRaises(AttributeError, lambda: self.rock.members.add(self.bob))
+        # the add method raises an error.
+        self.assertRaisesMessage(
+            AttributeError,
+            'Cannot use add() on a ManyToManyField which specifies an intermediary model',
+            lambda: self.rock.members.add(self.bob)
+        )
         # Create is also disabled as it suffers from the same problems as add.
-        self.assertRaises(AttributeError, lambda: self.rock.members.create(name='Anne'))
-        # Remove has similar complications, and is not provided either.
-        self.assertRaises(AttributeError, lambda: self.rock.members.remove(self.jim))
+        self.assertRaisesMessage(
+            AttributeError,
+            'Cannot use create() on a ManyToManyField which specifies an intermediary model',
+            lambda: self.rock.members.create(name='Anne')
+        )
+        # Remove has similar complications, and it also raises an error.
+        self.assertRaisesMessage(
+            AttributeError,
+            'Cannot use remove() on a ManyToManyField which specifies an intermediary model',
+            lambda: self.rock.members.remove(self.jim)
+        )
 
         m1 = Membership.objects.create(person=self.jim, group=self.rock)
         m2 = Membership.objects.create(person=self.jane, group=self.rock)
@@ -93,9 +105,17 @@ class M2mThroughTests(TestCase):
             []
         )
 
-        # Assignment should not work with models specifying a through model for many of
-        # the same reasons as adding.
-        self.assertRaises(AttributeError, setattr, self.rock, "members", backup)
+        # Assignment should not work with models specifying a through model for
+        # many of the same reasons as adding.
+        self.assertRaisesMessage(
+            AttributeError,
+            'Cannot set values on a ManyToManyField which specifies an intermediary model',
+            setattr,
+            self.rock,
+            "members",
+            backup
+        )
+
         # Let's re-save those instances that we've cleared.
         m1.save()
         m2.save()
@@ -111,11 +131,25 @@ class M2mThroughTests(TestCase):
     def test_reverse_descriptors(self):
         # Due to complications with adding via an intermediary model,
         # the add method is not provided.
-        self.assertRaises(AttributeError, lambda: self.bob.group_set.add(self.rock))
+        self.assertRaisesMessage(
+            AttributeError,
+            'Cannot use add() on a ManyToManyField which specifies an intermediary model',
+            lambda: self.bob.group_set.add(self.rock)
+        )
+
         # Create is also disabled as it suffers from the same problems as add.
-        self.assertRaises(AttributeError, lambda: self.bob.group_set.create(name="funk"))
+        self.assertRaisesMessage(
+            AttributeError,
+            'Cannot use create() on a ManyToManyField which specifies an intermediary model',
+            lambda: self.bob.group_set.create(name="funk")
+        )
+
         # Remove has similar complications, and is not provided either.
-        self.assertRaises(AttributeError, lambda: self.jim.group_set.remove(self.rock))
+        self.assertRaisesMessage(
+            AttributeError,
+            'Cannot use remove() on a ManyToManyField which specifies an intermediary model',
+            lambda: self.jim.group_set.remove(self.rock)
+        )
 
         m1 = Membership.objects.create(person=self.jim, group=self.rock)
         m2 = Membership.objects.create(person=self.jim, group=self.roll)
@@ -133,11 +167,18 @@ class M2mThroughTests(TestCase):
             self.jim.group_set.all(),
             []
         )
-        # Assignment should not work with models specifying a through model for many of
-        # the same reasons as adding.
-        self.assertRaises(AttributeError, setattr, self.jim, "group_set", backup)
-        # Let's re-save those instances that we've cleared.
+        # Assignment should not work with models specifying a through model for
+        # many of the same reasons as adding.
+        self.assertRaisesMessage(
+            AttributeError,
+            'Cannot set values on a ManyToManyField which specifies an intermediary model',
+            setattr,
+            self.jim,
+            "group_set",
+            backup
+        )
 
+        # Let's re-save those instances that we've cleared.
         m1.save()
         m2.save()
         # Verifying that those instances were re-saved successfully.
