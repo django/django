@@ -212,7 +212,12 @@ class MigrationWriter(object):
                 strings.append((k_string, v_string))
             return "{%s}" % (", ".join("%s: %s" % (k, v) for k, v in strings)), imports
         # Datetimes
-        elif isinstance(value, (datetime.datetime, datetime.date)):
+        elif isinstance(value, datetime.datetime):
+            if value.tzinfo is not None:
+                raise ValueError("Cannot serialize datetime values with timezones. Either use a callable value for default or remove the timezone.")
+            return repr(value), set(["import datetime"])
+        # Dates
+        elif isinstance(value, datetime.date):
             return repr(value), set(["import datetime"])
         # Settings references
         elif isinstance(value, SettingsReference):
