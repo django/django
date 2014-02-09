@@ -758,15 +758,15 @@ class ModelAdmin(BaseModelAdmin):
 
     def log_deletion(self, request, object, object_repr):
         """
-        Log that an object will be deleted. Note that this method is called
-        before the deletion.
+        Log that an object will be deleted. Note that this method must be
+        called before the deletion.
 
         The default implementation creates an admin LogEntry object.
         """
         from django.contrib.admin.models import LogEntry, DELETION
         LogEntry.objects.log_action(
             user_id=request.user.pk,
-            content_type_id=get_content_type_for_model(self.model).pk,
+            content_type_id=get_content_type_for_model(object).pk,
             object_id=object.pk,
             object_repr=object_repr,
             action_flag=DELETION
