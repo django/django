@@ -569,6 +569,20 @@ class AssertContainsTest(SimpleTestCase):
             self.assertContains(response, 'thing', count=6)
 
 
+class AssertContainsIntegrationTest(TestCase):
+    """ For the paranoid, test that a "real" response from the test client works """
+    urls = 'test_utils.urls'
+
+    def test_passing_case(self):
+        response = self.client.get("/test_utils/text_response/")
+        self.assertContains(response, 'some response text')
+
+    def test_failure_case(self):
+        response = self.client.get("/test_utils/text_response/")
+        with self.assertRaises(AssertionError):
+            self.assertContains(response, 'this will not be in the response')
+
+
 class XMLEqualTests(TestCase):
     def test_simple_equal(self):
         xml1 = "<elem attr1='a' attr2='b' />"
