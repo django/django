@@ -109,22 +109,15 @@ class RunPython(Operation):
 
     def __init__(self, code, reverse_code=None):
         # Forwards code
-        if isinstance(code, six.string_types):
-            # Trim any leading whitespace that is at the start of all code lines
-            # so users can nicely indent code in migration files
-            code = textwrap.dedent(code)
-            # Run the code through a parser first to make sure it's at least
-            # syntactically correct
-            self.code = compile(code, "<string>", "exec")
-        else:
-            self.code = code
+        if not callable(code):
+            raise ValueError("RunPython must be supplied with a callable")
+        self.code = code
         # Reverse code
         if reverse_code is None:
             self.reverse_code = None
-        elif isinstance(reverse_code, six.string_types):
-            reverse_code = textwrap.dedent(reverse_code)
-            self.reverse_code = compile(reverse_code, "<string>", "exec")
         else:
+            if not callable(reverse_code):
+                raise ValueError("RunPython must be supplied with callable arguments")
             self.reverse_code = reverse_code
 
     def state_forwards(self, app_label, state):

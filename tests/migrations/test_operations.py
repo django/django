@@ -479,13 +479,11 @@ class OperationTests(MigrationTestBase):
 
         project_state = self.set_up_test_model("test_runpython")
         # Create the operation
-        operation = migrations.RunPython(
-            """
+        def inner_method(models, schema_editor):
             Pony = models.get_model("test_runpython", "Pony")
-            Pony.objects.create(pink=2, weight=4.55)
-            Pony.objects.create(weight=1)
-            """,
-        )
+            Pony.objects.create(pink=1, weight=3.55)
+            Pony.objects.create(weight=5)
+        operation = migrations.RunPython(inner_method)
         # Test the state alteration does nothing
         new_state = project_state.clone()
         operation.state_forwards("test_runpython", new_state)
@@ -498,16 +496,9 @@ class OperationTests(MigrationTestBase):
         # And test reversal fails
         with self.assertRaises(NotImplementedError):
             operation.database_backwards("test_runpython", None, new_state, project_state)
-        # Now test we can do it with a callable
-
-        def inner_method(models, schema_editor):
-            Pony = models.get_model("test_runpython", "Pony")
-            Pony.objects.create(pink=1, weight=3.55)
-            Pony.objects.create(weight=5)
-        operation = migrations.RunPython(inner_method)
-        with connection.schema_editor() as editor:
-            operation.database_forwards("test_runpython", editor, project_state, new_state)
-        self.assertEqual(project_state.render().get_model("test_runpython", "Pony").objects.count(), 4)
+        # Now test we can't use a string
+        with self.assertRaises(ValueError):
+            operation = migrations.RunPython("print 'ahahaha'")
 
 
 class MigrateNothingRouter(object):
