@@ -867,20 +867,29 @@ def create_many_related_manager(superclass, rel):
                     False,
                     self.prefetch_cache_name)
 
-        # If the ManyToMany relation has an intermediary model,
-        # the add and remove methods do not exist.
-        if rel.through._meta.auto_created:
-            def add(self, *objs):
-                self._add_items(self.source_field_name, self.target_field_name, *objs)
+        def add(self, *objs):
+            if not rel.through._meta.auto_created:
+                opts = self.through._meta
+                raise AttributeError(
+                    "Cannot use add() on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." %
+                    (opts.app_label, opts.object_name)
+                )
+            self._add_items(self.source_field_name, self.target_field_name, *objs)
 
-                # If this is a symmetrical m2m relation to self, add the mirror entry in the m2m table
-                if self.symmetrical:
-                    self._add_items(self.target_field_name, self.source_field_name, *objs)
-            add.alters_data = True
+            # If this is a symmetrical m2m relation to self, add the mirror entry in the m2m table
+            if self.symmetrical:
+                self._add_items(self.target_field_name, self.source_field_name, *objs)
+        add.alters_data = True
 
-            def remove(self, *objs):
-                self._remove_items(self.source_field_name, self.target_field_name, *objs)
-            remove.alters_data = True
+        def remove(self, *objs):
+            if not rel.through._meta.auto_created:
+                opts = self.through._meta
+                raise AttributeError(
+                    "Cannot use remove() on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." %
+                    (opts.app_label, opts.object_name)
+                )
+            self._remove_items(self.source_field_name, self.target_field_name, *objs)
+        remove.alters_data = True
 
         def clear(self):
             db = router.db_for_write(self.through, instance=self.instance)
