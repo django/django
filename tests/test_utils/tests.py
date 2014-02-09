@@ -543,6 +543,32 @@ class HTMLEqualTests(TestCase):
         self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>', html=True)
 
 
+class AssertContainsTest(SimpleTestCase):
+
+    def test_string_contained_passes(self):
+        response = HttpResponse('This is some response text.')
+        self.assertContains(response, 'some response text')
+
+    def test_string_not_contained_fails(self):
+        response = HttpResponse('This is some response text.')
+        with self.assertRaises(AssertionError):
+            self.assertContains(response, 'this will not be in the response')
+
+    def test_count_correct_passes(self):
+        response = HttpResponse('a thing' * 5)
+        self.assertContains(response, 'thing', count=5)
+
+    def test_count_too_low_fails(self):
+        response = HttpResponse('a thing' * 5)
+        with self.assertRaises(AssertionError):
+            self.assertContains(response, 'thing', count=4)
+
+    def test_count_too_high_fails(self):
+        response = HttpResponse('a thing' * 5)
+        with self.assertRaises(AssertionError):
+            self.assertContains(response, 'thing', count=6)
+
+
 class XMLEqualTests(TestCase):
     def test_simple_equal(self):
         xml1 = "<elem attr1='a' attr2='b' />"
