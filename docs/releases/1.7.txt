@@ -59,6 +59,9 @@ but a few of the key features are:
   will still work, but that method name is deprecated and you should change
   it as soon as possible (nothing more than renaming is required).
 
+* ``initial_data`` fixtures are no longer loaded for apps with migrations; if
+  you want to load initial data for an app, we suggest you do it in a migration.
+
 App-loading refactor
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -713,6 +716,19 @@ For apps with migrations, ``allow_migrate`` will now get passed
 :ref:`historical models <historical-models>`, which are special versioned models
 without custom attributes, methods or managers. Make sure your ``allow_migrate``
 methods are only referring to fields or other items in ``model._meta``.
+
+initial_data
+~~~~~~~~~~~~
+
+Apps with migrations will not load ``initial_data`` fixtures when they have
+finished migrating. Apps without migrations will continue to load these fixtures
+during the phase of ``migrate`` which emulates the old ``syncdb`` behaviour,
+but any new apps will not have this support.
+
+Instead, you are encouraged to load initial data in migrations if you need it
+(using the ``RunPython`` operation and your model classes);
+this has the added advantage that your initial data will not need updating
+every time you change the schema.
 
 App-loading changes
 ~~~~~~~~~~~~~~~~~~~

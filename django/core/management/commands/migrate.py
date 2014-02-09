@@ -278,7 +278,8 @@ class Command(BaseCommand):
 
         # Load initial_data fixtures (unless that has been disabled)
         if self.load_initial_data:
-            call_command('loaddata', 'initial_data', verbosity=self.verbosity, database=connection.alias, skip_validation=True)
+            for app_label in app_labels:
+                call_command('loaddata', 'initial_data', verbosity=self.verbosity, database=connection.alias, skip_validation=True, app_label=app_label, hide_empty=True)
 
         return created_models
 
