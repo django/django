@@ -390,6 +390,10 @@ Minor features
   See the :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
   docs for more information.
 
+* :djadmin:`findstatic` now accepts verbosity flag level 2, meaning it will
+  show the relative paths of the directories it searched. See
+  :djadmin:`findstatic` for example output.
+
 :mod:`django.contrib.syndication`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1050,10 +1054,6 @@ Miscellaneous
   It's ``True`` for all database backends included with Django except MySQL
   which does allow primary keys with value 0. It only forbids *autoincrement*
   primary keys with value 0.
-
-* :djadmin:`findstatic` now accepts verbosity flag level 2, meaning it will
-  show the directories on which it searched the relative paths. See
-  :djadmin:`findstatic` for example output.
 
 .. _deprecated-features-1.7:
 

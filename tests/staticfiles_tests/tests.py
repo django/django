@@ -236,19 +236,19 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
         self.assertIn('apps', force_text(lines[2]))
         self.assertIn("Looking in the following locations:", force_text(lines[3]))
         searched_locations = ', '.join(lines[4:])
-        #AppDirectoriesFinder searched locations
+        # AppDirectoriesFinder searched locations
         self.assertIn(os.path.join('staticfiles_tests', 'apps', 'test', 'static'),
                       searched_locations)
         self.assertIn(os.path.join('staticfiles_tests', 'apps', 'no_label', 'static'),
                       searched_locations)
         self.assertIn(os.path.join('django', 'contrib', 'admin', 'static'),
                       searched_locations)
-        self.assertIn(os.path.join('django', 'tests', 'servers', 'another_app', 'static'),
+        self.assertIn(os.path.join('tests', 'servers', 'another_app', 'static'),
                       searched_locations)
-        #FileSystemFinder searched locations
+        # FileSystemFinder searched locations
         self.assertIn(TEST_SETTINGS['STATICFILES_DIRS'][1][1], searched_locations)
         self.assertIn(TEST_SETTINGS['STATICFILES_DIRS'][0], searched_locations)
-        #DefaultStorageFinder searched locations
+        # DefaultStorageFinder searched locations
         self.assertIn(os.path.join('staticfiles_tests', 'project', 'site_media', 'media'),
                       searched_locations)
 
