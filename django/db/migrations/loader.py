@@ -135,7 +135,7 @@ class MigrationLoader(object):
         else:
             return self.disk_migrations[results[0]]
 
-    def build_graph(self):
+    def build_graph(self, ignore_unmigrated=False):
         """
         Builds a migration dependency graph using both the disk and database.
         You'll need to rebuild the graph if you apply migrations. This isn't
@@ -200,33 +200,38 @@ class MigrationLoader(object):
                 # even have migrations.
                 if parent[1] == "__first__" and parent not in self.graph:
                     if parent[0] in self.unmigrated_apps:
-                        # This app isn't migrated, but something depends on it.
-                        # We'll add a fake initial migration for it into the
-                        # graph.
-                        app_config = apps.get_app_config(parent[0])
-                        ops = []
-                        for model in app_config.get_models():
-                            model_state = ModelState.from_model(model)
-                            ops.append(
-                                operations.CreateModel(
-                                    name=model_state.name,
-                                    fields=model_state.fields,
-                                    options=model_state.options,
-                                    bases=model_state.bases,
+                        if ignore_unmigrated:
+                            migration.dependencies.remove(parent)
+                            parent = None
+                        else:
+                            # This app isn't migrated, but something depends on it.
+                            # We'll add a fake initial migration for it into the
+                            # graph.
+                            app_config = apps.get_app_config(parent[0])
+                            ops = []
+                            for model in app_config.get_models():
+                                model_state = ModelState.from_model(model)
+                                ops.append(
+                                    operations.CreateModel(
+                                        name=model_state.name,
+                                        fields=model_state.fields,
+                                        options=model_state.options,
+                                        bases=model_state.bases,
+                                    )
                                 )
-                            )
-                        new_migration = type(
-                            "FakeInitialMigration",
-                            (Migration, ),
-                            {"operations": ops},
-                        )(parent[1], parent[0])
-                        self.graph.add_node(parent, new_migration)
-                        self.applied_migrations.add(parent)
+                            new_migration = type(
+                                "FakeInitialMigration",
+                                (Migration, ),
+                                {"operations": ops},
+                            )(parent[1], parent[0])
+                            self.graph.add_node(parent, new_migration)
+                            self.applied_migrations.add(parent)
                     elif parent[0] in self.migrated_apps:
                         parent = list(self.graph.root_nodes(parent[0]))[0]
                     else:
                         raise ValueError("Dependency on unknown app %s" % parent[0])
-                self.graph.add_dependency(key, parent)
+                if parent is not None:
+                    self.graph.add_dependency(key, parent)
 
     def detect_conflicts(self):
         """
