@@ -1,7 +1,5 @@
 import re
-import textwrap
 from .base import Operation
-from django.utils import six
 
 
 class SeparateDatabaseAndState(Operation):

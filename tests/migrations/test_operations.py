@@ -478,6 +478,7 @@ class OperationTests(MigrationTestBase):
         """
 
         project_state = self.set_up_test_model("test_runpython")
+
         # Create the operation
         def inner_method(models, schema_editor):
             Pony = models.get_model("test_runpython", "Pony")

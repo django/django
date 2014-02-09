@@ -174,6 +174,7 @@ def myattr2_dec(func):
 
 myattr2_dec_m = method_decorator(myattr2_dec)
 
+
 class ClsDec(object):
     def __init__(self, myattr):
         self.myattr = myattr
@@ -233,7 +234,7 @@ class MethodDecoratorTests(TestCase):
 
         # t = Test()
         self.assertEqual(Test().method(), False)
-        
+
 
 class XFrameOptionsDecoratorsTests(TestCase):
     """

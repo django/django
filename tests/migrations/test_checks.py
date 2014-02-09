@@ -1,7 +1,7 @@
 # encoding: utf8
 from django.core import checks
 from django.core.checks.migrations import check_migrations
-from django.test import TestCase, override_settings
+from django.test import override_settings
 
 from .test_base import MigrationTestBase
 
