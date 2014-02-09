@@ -12,6 +12,7 @@ from django.core.checks import Error
 from django.core.files import temp as tempfile
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.files.uploadedfile import SimpleUploadedFile
 # Register auth models with the admin.
 from django.contrib.auth import get_permission_codename
 from django.contrib.admin import ModelAdmin
@@ -755,6 +756,33 @@ class SaveAsTests(TestCase):
         post_data = {'_saveasnew': '', 'name': 'John M', 'gender': 3, 'alive': 'checked'}
         response = self.client.post('/test_admin/admin/admin_views/person/1/', post_data)
         self.assertEqual(response.context['form_url'], '/test_admin/admin/admin_views/person/add/')
+
+    def test_save_as_filefield_identical(self):
+        gallery = Gallery.objects.create(name="Test Gallery")
+        picture = gallery.pictures.create(name="pic", image="image.jpg")
+        post_data = {'_saveasnew': '', 'name': 'pic', 'gallery': gallery.pk,
+                'image': '',
+                }
+        response = self.client.post(
+                '/test_admin/admin/admin_views/picture/%d/' % picture.pk,
+                data=post_data)
+        self.assertEqual(gallery.pictures.count(), 2)
+        new_picture = gallery.pictures.all()[1]
+        self.assertEqual(new_picture.image.name, 'image.jpg')
+
+    def test_save_as_filefield_override(self):
+        gallery = Gallery.objects.create(name="Test Gallery")
+        picture = gallery.pictures.create(name="pic", image="image.jpg")
+        uploaded_file = SimpleUploadedFile('new.jpg', b'a' * (2 ** 21))
+        post_data = {'_saveasnew': '', 'name': 'pic', 'gallery': gallery.pk,
+                'image': uploaded_file, }
+        response = self.client.post(
+                '/test_admin/admin/admin_views/picture/%d/' % picture.pk,
+                data=post_data)
+        self.assertEqual(gallery.pictures.count(), 2)
+        new_picture = gallery.pictures.all()[1]
+        self.assertEqual(new_picture.image.name, 'test_upload/new.jpg')
+        new_picture.image.delete(save=False)
 
 
 class CustomModelAdminTest(AdminViewBasicTestCase):
