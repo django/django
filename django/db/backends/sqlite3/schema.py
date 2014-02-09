@@ -88,11 +88,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Special-case implicit M2M tables
         if isinstance(field, ManyToManyField) and field.rel.through._meta.auto_created:
             return self.create_model(field.rel.through)
-        # Detect bad field combinations
-        if (not field.null and
-           (not field.has_default() or field.get_default() is None) and
-           not field.empty_strings_allowed):
-            raise ValueError("You cannot add a null=False column without a default value on SQLite.")
         self._remake_table(model, create_fields=[field])
 
     def remove_field(self, model, field):
