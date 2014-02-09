@@ -812,17 +812,16 @@ For example, suppose you have these models::
         name = models.CharField(max_length=50)
         toppings = models.ManyToManyField(Topping)
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
-            return u"%s (%s)" % (self.name, u", ".join([topping.name
-                                                        for topping in self.toppings.all()]))
+        def __str__(self):              # __unicode__ on Python 2
+            return "%s (%s)" % (self.name, ", ".join([topping.name
+                                                      for topping in self.toppings.all()]))
 
 and run::
 
     >>> Pizza.objects.all()
-    [u"Hawaiian (ham, pineapple)", u"Seafood (prawns, smoked salmon)"...
+    ["Hawaiian (ham, pineapple)", "Seafood (prawns, smoked salmon)"...
 
-The problem with this is that every time ``Pizza.__unicode__()`` asks for
+The problem with this is that every time ``Pizza.__str__()`` asks for
 ``self.toppings.all()`` it has to query the database, so
 ``Pizza.objects.all()`` will run a query on the Toppings table for **every**
 item in the Pizza ``QuerySet``.

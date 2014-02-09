@@ -984,8 +984,7 @@ authentication app::
             # The user is identified by their email address
             return self.email
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.email
 
         def has_perm(self, perm, obj=None):

@@ -463,9 +463,29 @@ the conversion to string objects when required.
 
 .. method:: Model.__str__()
 
-The ``__str__()`` method is called whenever you call ``str()`` on an object. The main use for this method directly inside Django is when the ``repr()`` output of a model is displayed anywhere (for example, in debugging output).
-Thus, you should return a nice, human-readable string for the object's
-``__str__()``.  It isn't required to put ``__str__()`` methods everywhere if you have sensible :meth:`~Model.__unicode__()` methods.
+The ``__str__()`` method is called whenever you call ``str()`` on an
+object. In Python 3, Django uses ``str(obj)`` in a number of
+places. Most notably, to display an object in the Django admin site
+and as the value inserted into a template when it displays an
+object. Thus, you should always return a nice, human-readable
+representation of the model from the ``__str__()`` method.
+
+For example::
+
+    from django.db import models
+
+    class Person(models.Model):
+        first_name = models.CharField(max_length=50)
+        last_name = models.CharField(max_length=50)
+
+        def __str__(self):
+            return '%s %s' % (self.first_name, self.last_name)
+
+In Python 2, the main use of ``__str__`` directly inside Django is
+when the ``repr()`` output of a model is displayed anywhere (for
+example, in debugging output). It isn't required to put ``__str__()``
+methods everywhere if you have sensible :meth:`~Model.__unicode__()`
+methods.
 
 The previous :meth:`~Model.__unicode__()` example could be similarly written
 using ``__str__()`` like this::

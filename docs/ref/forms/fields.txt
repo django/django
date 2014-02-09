@@ -1047,7 +1047,7 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
         initial value, no empty choice is created (regardless of the value
         of ``empty_label``).
 
-    The ``__unicode__`` (``__str__`` on Python 3) method of the model will be
+    The ``__str__`` (``__unicode__`` on Python 2) method of the model will be
     called to generate string representations of the objects for use in the
     field's choices; to provide customized representations, subclass
     ``ModelChoiceField`` and override ``label_from_instance``. This method will
