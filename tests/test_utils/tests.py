@@ -544,6 +544,7 @@ class HTMLEqualTests(TestCase):
 
 
 class AssertContainsTest(SimpleTestCase):
+    longMessage = False  # defaults vary between Python 2 and 3, affects error messages
 
     def test_string_contained_passes(self):
         response = HttpResponse('This is some response text.')
@@ -554,14 +555,18 @@ class AssertContainsTest(SimpleTestCase):
         with self.assertRaises(AssertionError):
             self.assertContains(response, 'this will not be in the response')
 
-    def test_string_not_contained_error_message(self):
+    def test_string_not_contained_failure_message(self):
         response = HttpResponse('This is some response text.')
         with self.assertRaises(AssertionError) as mgr:
             self.assertContains(response, 'foo')
         self.assertEqual(
-            mgr.exception.message,
+            str(mgr.exception),
             "Couldn't find 'foo' in response"
         )
+
+    def test_with_bytestring(self):
+        response = HttpResponse('This is some response text.')
+        self.assertContains(response, b'some response text')
 
     def test_count_correct_passes(self):
         response = HttpResponse('a thing' * 5)
