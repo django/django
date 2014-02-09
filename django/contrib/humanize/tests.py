@@ -8,7 +8,6 @@ try:
 except ImportError:
     pytz = None
 
-from django.conf import settings
 from django.contrib.humanize.templatetags import humanize
 from django.template import Template, Context, defaultfilters
 from django.test import TestCase, override_settings
