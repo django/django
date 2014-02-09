@@ -512,7 +512,7 @@ subclass::
         list_display = ('first_name', 'last_name')
 
     If you don't set ``list_display``, the admin site will display a single
-    column that displays the ``__unicode__()`` (``__str__()`` on Python 3)
+    column that displays the ``__str__()`` (``__unicode__()`` on Python 2)
     representation of each object.
 
     You have four possible values that can be used in ``list_display``:
@@ -563,7 +563,7 @@ subclass::
     A few special cases to note about ``list_display``:
 
     * If the field is a ``ForeignKey``, Django will display the
-      ``__unicode__()`` (``__str__()`` on Python 3) of the related object.
+      ``__str__()`` (``__unicode__()`` on Python 2) of the related object.
 
     * ``ManyToManyField`` fields aren't supported, because that would
       entail executing a separate SQL statement for each row in the table.
@@ -626,11 +626,11 @@ subclass::
               list_display = ('name', 'born_in_fifties')
 
 
-    * The ``__str__()`` and ``__unicode__()`` methods are just as valid in
-      ``list_display`` as any other model method, so it's perfectly OK to
-      do this::
+    * The ``__str__()`` (``__unicode__()`` on Python 2) method is just
+      as valid in ``list_display`` as any other model method, so it's
+      perfectly OK to do this::
 
-          list_display = ('__unicode__', 'some_other_field')
+          list_display = ('__str__', 'some_other_field')
 
     * Usually, elements of ``list_display`` that aren't actual database
       fields can't be used in sorting (because Django does all the sorting

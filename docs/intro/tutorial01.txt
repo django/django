@@ -727,7 +727,7 @@ Save these changes and start a new Python interactive shell by running
 
     >>> from polls.models import Question, Choice
 
-    # Make sure our __unicode__() addition worked.
+    # Make sure our __str__() addition worked.
     >>> Question.objects.all()
     [<Question: What's up?>]
 

@@ -23,16 +23,14 @@ models, which comprise a Weblog application:
         name = models.CharField(max_length=100)
         tagline = models.TextField()
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.name
 
     class Author(models.Model):
         name = models.CharField(max_length=50)
         email = models.EmailField()
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.name
 
     class Entry(models.Model):
@@ -46,8 +44,7 @@ models, which comprise a Weblog application:
         n_pingbacks = models.IntegerField()
         rating = models.IntegerField()
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.headline
 
 Creating objects

@@ -15,17 +15,15 @@ To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`.
         last_name = models.CharField(max_length=30)
         email = models.EmailField()
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
-            return u"%s %s" % (self.first_name, self.last_name)
+        def __str__(self):              # __unicode__ on Python 2
+            return "%s %s" % (self.first_name, self.last_name)
 
     class Article(models.Model):
         headline = models.CharField(max_length=100)
         pub_date = models.DateField()
         reporter = models.ForeignKey(Reporter)
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.headline
 
         class Meta:

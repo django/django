@@ -16,26 +16,23 @@ In this example, a ``Place`` optionally can be a ``Restaurant``:
         name = models.CharField(max_length=50)
         address = models.CharField(max_length=80)
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
-            return u"%s the place" % self.name
+        def __str__(self):              # __unicode__ on Python 2
+            return "%s the place" % self.name
 
     class Restaurant(models.Model):
         place = models.OneToOneField(Place, primary_key=True)
         serves_hot_dogs = models.BooleanField()
         serves_pizza = models.BooleanField()
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
-            return u"%s the restaurant" % self.place.name
+        def __str__(self):              # __unicode__ on Python 2
+            return "%s the restaurant" % self.place.name
 
     class Waiter(models.Model):
         restaurant = models.ForeignKey(Restaurant)
         name = models.CharField(max_length=50)
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
-            return u"%s the waiter at %s" % (self.name, self.restaurant)
+        def __str__(self):              # __unicode__ on Python 2
+            return "%s the waiter at %s" % (self.name, self.restaurant)
 
 What follows are examples of operations that can be performed using the Python
 API facilities.
