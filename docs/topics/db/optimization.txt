@@ -36,11 +36,13 @@ Use standard DB optimization techniques
 
 ...including:
 
-* Indexes. This is a number one priority, *after* you have determined from
+* Indexes_. This is a number one priority, *after* you have determined from
   profiling what indexes should be added. Use
   :attr:`django.db.models.Field.db_index` or
   :attr:`Meta.index_together <django.db.models.Options.index_together>` to add
   these from Django.
+
+.. _Indexes: http://en.wikipedia.org/wiki/Database_index
 
 * Appropriate use of field types.
 
