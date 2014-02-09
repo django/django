@@ -114,11 +114,11 @@ anywhere in your codebase, but convention is to put it in :file:`views.py`.
 The only requirement on this subclass is that it implement a
 :meth:`~WizardView.done()` method.
 
-.. method:: WizardView.done(form_list)
+.. method:: WizardView.done(form_list, form_dict, **kwargs)
 
     This method specifies what should happen when the data for *every* form is
-    submitted and validated. This method is passed a list of validated
-    :class:`~django.forms.Form` instances.
+    submitted and validated. This method is passed a list and dictionary of
+    validated :class:`~django.forms.Form` instances.
 
     In this simplistic example, rather than performing any database operation,
     the method simply renders a template of the validated data::
@@ -143,6 +143,21 @@ The only requirement on this subclass is that it implement a
             def done(self, form_list, **kwargs):
                 do_something_with_the_form_data(form_list)
                 return HttpResponseRedirect('/page-to-redirect-to-when-done/')
+
+    In addition to ``form_list``, the :meth:`~WizardView.done` method
+    is passed a ``form_dict``, which allows you to access the wizard's
+    forms based on their step names. This is especially useful when using
+    :class:`NamedUrlWizardView`, for example::
+
+        def done(self, form_list, form_dict, **kwargs):
+            user = form_dict['user'].save()
+            credit_card = form_dict['credit_card'].save()
+            # ...
+
+    .. versionchanged:: 1.7
+
+        Previously, the ``form_dict`` argument wasn't passed to the
+        ``done`` method.
 
 See the section :ref:`Advanced WizardView methods <wizardview-advanced-methods>`
 below to learn about more :class:`WizardView` hooks.

@@ -310,6 +310,13 @@ Minor features
   ``html_email_template_name`` parameter used to send a multipart HTML email
   for password resets.
 
+:mod:`django.contrib.formtools`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Calls to :meth:`WizardView.done()
+  <django.contrib.formtools.wizard.views.WizardView.done>` now include a
+  ``form_dict`` to allow easier access to forms by their step name.
+
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
