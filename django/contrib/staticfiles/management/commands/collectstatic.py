@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import os
-import sys
 from collections import OrderedDict
 from optparse import make_option
 
@@ -82,12 +81,8 @@ class Command(NoArgsCommand):
 
         Split off from handle_noargs() to facilitate testing.
         """
-        if self.symlink:
-            if sys.platform == 'win32':
-                raise CommandError("Symlinking is not supported by this "
-                                   "platform (%s)." % sys.platform)
-            if not self.local:
-                raise CommandError("Can't symlink to a remote destination.")
+        if self.symlink and not self.local:
+            raise CommandError("Can't symlink to a remote destination.")
 
         if self.clear:
             self.clear_dir('')
@@ -279,7 +274,18 @@ class Command(NoArgsCommand):
                 os.makedirs(os.path.dirname(full_path))
             except OSError:
                 pass
-            os.symlink(source_path, full_path)
+            try:
+                os.symlink(source_path, full_path)
+            except AttributeError:
+                import platform
+                raise CommandError("Symlinking is not supported by Python %s." %
+                                   platform.python_version())
+            except NotImplementedError:
+                import platform
+                raise CommandError("Symlinking is not supported in this "
+                                   "platform (%s)." % platform.platform())
+            except OSError as e:
+                raise CommandError(e)
         if prefixed_path not in self.symlinked_files:
             self.symlinked_files.append(prefixed_path)
 

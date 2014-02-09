@@ -1,6 +1,7 @@
 import os
 import stat
 import sys
+import tempfile
 from os.path import join, normcase, normpath, abspath, isabs, sep, dirname
 
 from django.utils.encoding import force_text
@@ -99,3 +100,24 @@ def rmtree_errorhandler(func, path, exc_info):
     os.chmod(path, stat.S_IWRITE)
     # use the original function to repeat the operation
     func(path)
+
+
+def symlinks_supported():
+    """
+    A function to check if creating symlinks are supported in the
+    host platform and/or if they are allowed to be created (e.g.
+    on Windows it requires admin permissions).
+    """
+    tmpdir = tempfile.mkdtemp()
+    original_path = os.path.join(tmpdir, 'original')
+    symlink_path = os.path.join(tmpdir, 'symlink')
+    os.makedirs(original_path)
+    try:
+        os.symlink(original_path, symlink_path)
+        supported = True
+    except (OSError, NotImplementedError, AttributeError):
+        supported = False
+    else:
+        os.remove(symlink_path)
+    finally:
+        return supported

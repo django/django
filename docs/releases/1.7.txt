@@ -565,6 +565,9 @@ Management Commands
 * Management commands can now produce syntax colored output under Windows if
   the ANSICON third-party tool is installed and active.
 
+* :djadmin:`collectstatic` command with symlink option is now supported on
+  Windows NT 6 (Windows Vista and newer).
+
 Models
 ^^^^^^
 
