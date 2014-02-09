@@ -1292,6 +1292,18 @@ class ModelAdmin(BaseModelAdmin):
                 "admin/delete_confirmation.html"
             ], context, current_app=self.admin_site.name)
 
+    def get_inline_formsets(self, request, formsets, inline_instances,
+                            obj=None):
+        inline_admin_formsets = []
+        for inline, formset in zip(inline_instances, formsets):
+            fieldsets = list(inline.get_fieldsets(request, obj))
+            readonly = list(inline.get_readonly_fields(request, obj))
+            prepopulated = dict(inline.get_prepopulated_fields(request, obj))
+            inline_admin_formset = helpers.InlineAdminFormSet(inline, formset,
+                fieldsets, prepopulated, readonly, model_admin=self)
+            inline_admin_formsets.append(inline_admin_formset)
+        return inline_admin_formsets
+
     @csrf_protect_m
     @transaction.atomic
     def add_view(self, request, form_url='', extra_context=None):
@@ -1331,21 +1343,17 @@ class ModelAdmin(BaseModelAdmin):
             form = ModelForm(initial=initial)
             formsets, inline_instances = self._create_formsets(request, self.model())
 
-        adminForm = helpers.AdminForm(form, list(self.get_fieldsets(request)),
+        adminForm = helpers.AdminForm(
+            form,
+            list(self.get_fieldsets(request)),
             self.get_prepopulated_fields(request),
             self.get_readonly_fields(request),
             model_admin=self)
         media = self.media + adminForm.media
 
-        inline_admin_formsets = []
-        for inline, formset in zip(inline_instances, formsets):
-            fieldsets = list(inline.get_fieldsets(request))
-            readonly = list(inline.get_readonly_fields(request))
-            prepopulated = dict(inline.get_prepopulated_fields(request))
-            inline_admin_formset = helpers.InlineAdminFormSet(inline, formset,
-                fieldsets, prepopulated, readonly, model_admin=self)
-            inline_admin_formsets.append(inline_admin_formset)
-            media = media + inline_admin_formset.media
+        inline_formsets = self.get_inline_formsets(request, formsets, inline_instances)
+        for inline_formset in inline_formsets:
+            media = media + inline_formset.media
 
         context = dict(self.admin_site.each_context(),
             title=_('Add %s') % force_text(opts.verbose_name),
@@ -1355,7 +1363,7 @@ class ModelAdmin(BaseModelAdmin):
             to_field=request.POST.get(TO_FIELD_VAR,
                                       request.GET.get(TO_FIELD_VAR)),
             media=media,
-            inline_admin_formsets=inline_admin_formsets,
+            inline_admin_formsets=inline_formsets,
             errors=helpers.AdminErrorList(form, formsets),
             preserved_filters=self.get_preserved_filters(request),
         )
@@ -1409,15 +1417,9 @@ class ModelAdmin(BaseModelAdmin):
             model_admin=self)
         media = self.media + adminForm.media
 
-        inline_admin_formsets = []
-        for inline, formset in zip(inline_instances, formsets):
-            fieldsets = list(inline.get_fieldsets(request, obj))
-            readonly = list(inline.get_readonly_fields(request, obj))
-            prepopulated = dict(inline.get_prepopulated_fields(request, obj))
-            inline_admin_formset = helpers.InlineAdminFormSet(inline, formset,
-                fieldsets, prepopulated, readonly, model_admin=self)
-            inline_admin_formsets.append(inline_admin_formset)
-            media = media + inline_admin_formset.media
+        inline_formsets = self.get_inline_formsets(request, formsets, inline_instances, obj)
+        for inline_formset in inline_formsets:
+            media = media + inline_formset.media
 
         context = dict(self.admin_site.each_context(),
             title=_('Change %s') % force_text(opts.verbose_name),
@@ -1429,7 +1431,7 @@ class ModelAdmin(BaseModelAdmin):
             to_field=request.POST.get(TO_FIELD_VAR,
                                       request.GET.get(TO_FIELD_VAR)),
             media=media,
-            inline_admin_formsets=inline_admin_formsets,
+            inline_admin_formsets=inline_formsets,
             errors=helpers.AdminErrorList(form, formsets),
             app_label=opts.app_label,
             preserved_filters=self.get_preserved_filters(request),
