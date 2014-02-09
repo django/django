@@ -769,17 +769,18 @@ class BaseDatabaseSchemaEditor(object):
         # Else generate the name for the index using a different algorithm
         table_name = model._meta.db_table.replace('"', '').replace('.', '_')
         index_unique_name = '_%x' % abs(hash((table_name, ','.join(column_names))))
+        max_length = self.connection.ops.max_name_length() or 200
         # If the index name is too long, truncate it
         index_name = ('%s_%s%s%s' % (table_name, column_names[0], index_unique_name, suffix)).replace('"', '').replace('.', '_')
-        if len(index_name) > self.connection.features.max_index_name_length:
+        if len(index_name) > max_length:
             part = ('_%s%s%s' % (column_names[0], index_unique_name, suffix))
-            index_name = '%s%s' % (table_name[:(self.connection.features.max_index_name_length - len(part))], part)
+            index_name = '%s%s' % (table_name[:(max_length - len(part))], part)
         # It shouldn't start with an underscore (Oracle hates this)
         if index_name[0] == "_":
             index_name = index_name[1:]
         # If it's STILL too long, just hash it down
-        if len(index_name) > self.connection.features.max_index_name_length:
-            index_name = hashlib.md5(force_bytes(index_name)).hexdigest()[:self.connection.features.max_index_name_length]
+        if len(index_name) > max_length:
+            index_name = hashlib.md5(force_bytes(index_name)).hexdigest()[:max_length]
         # It can't start with a number on Oracle, so prepend D if we need to
         if index_name[0].isdigit():
             index_name = "D%s" % index_name[:-1]

@@ -654,9 +654,6 @@ class BaseDatabaseFeatures(object):
     # Can we issue more than one ALTER COLUMN clause in an ALTER TABLE?
     supports_combined_alters = False
 
-    # What's the maximum length for index names?
-    max_index_name_length = 63
-
     # Does it support foreign keys?
     supports_foreign_keys = True
 

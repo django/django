@@ -99,7 +99,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_sequence_reset = False
     atomic_transactions = False
     supports_combined_alters = False
-    max_index_name_length = 30
     nulls_order_largest = True
     requires_literal_defaults = True
     connection_persists_old_columns = True
