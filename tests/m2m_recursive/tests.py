@@ -13,10 +13,10 @@ class RecursiveM2MTests(TestCase):
             Person.objects.create(name=name)
             for name in ["Anne", "Bill", "Chuck", "David"]
         ]
-        
+
         # Anne is friends with Bill and Chuck
         self.a.friends.add(self.b, self.c)
-        
+
         # David is friends with Anne and Chuck - add in reverse direction
         self.d.friends.add(self.a, self.c)
 
@@ -57,10 +57,10 @@ class RecursiveM2MTests(TestCase):
             attrgetter("name"),
             ordered=False
         )
-        
+
     def test_recursive_m2m_reverse_add(self):
         """ Test reverse m2m relation is consistent """
-        
+
         # Bill is already friends with Anne - add Anne again, but in the
         # reverse direction
         self.b.friends.add(self.a)
@@ -82,13 +82,13 @@ class RecursiveM2MTests(TestCase):
             ],
             attrgetter("name")
         )
-        
+
     def test_recursive_m2m_remove(self):
         """ Test that we can remove items from an m2m relationship """
 
         # Remove Anne from Bill's friends
         self.b.friends.remove(self.a)
-        
+
         # Who is friends with Anne?
         self.assertQuerysetEqual(
             self.a.friends.all(), [
@@ -108,12 +108,12 @@ class RecursiveM2MTests(TestCase):
 
         # Clear Anne's group of friends
         self.a.friends.clear()
-        
+
         # Who is friends with Anne?
         self.assertQuerysetEqual(
             self.a.friends.all(), []
         )
-        
+
         # Reverse relationships should also be gone
         # Who is friends with Chuck?
         self.assertQuerysetEqual(
@@ -122,7 +122,7 @@ class RecursiveM2MTests(TestCase):
             ],
             attrgetter("name")
         )
-        
+
         # Who is friends with David?
         self.assertQuerysetEqual(
             self.d.friends.all(), [
@@ -133,7 +133,7 @@ class RecursiveM2MTests(TestCase):
 
     def test_recursive_m2m_add_via_related_name(self):
         """ Tests that we can add m2m relations via the related_name attribute """
-        
+
         # David is idolized by Anne and Chuck - add in reverse direction
         self.d.stalkers.add(self.a)
 
@@ -150,16 +150,16 @@ class RecursiveM2MTests(TestCase):
             self.a.stalkers.all(), [],
             attrgetter("name")
         )
-        
+
     def test_recursive_m2m_add_in_both_directions(self):
         """ Check that adding the same relation twice results in a single relation """
-        
+
         # Ann idolizes David
         self.a.idols.add(self.d)
-        
+
         # David is idolized by Anne
         self.d.stalkers.add(self.a)
-        
+
         # Who are Anne's idols?
         self.assertQuerysetEqual(
             self.a.idols.all(), [
@@ -170,14 +170,14 @@ class RecursiveM2MTests(TestCase):
         )
         # As the assertQuerysetEqual uses a set for comparrison,
         # check we've only got David listed once
-        self.assertEqual(self.a.idols.all().count(),1)
-        
+        self.assertEqual(self.a.idols.all().count(), 1)
+
     def test_recursive_m2m_related_to_self(self):
         """ Check the expected behaviour when an instance is related to itself """
-        
+
         # Ann idolizes herself
         self.a.idols.add(self.a)
-        
+
         # Who are Anne's idols?
         self.assertQuerysetEqual(
             self.a.idols.all(), [
