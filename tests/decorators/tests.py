@@ -1,4 +1,4 @@
-from functools import wraps
+from functools import wraps, update_wrapper
 from unittest import TestCase
 import warnings
 
@@ -174,6 +174,16 @@ def myattr2_dec(func):
 
 myattr2_dec_m = method_decorator(myattr2_dec)
 
+class ClsDec(object):
+    def __init__(self, myattr):
+        self.myattr = myattr
+
+    def __call__(self, f):
+
+        def wrapped():
+            return f() and self.myattr
+        return update_wrapper(wrapped, f)
+
 
 class MethodDecoratorTests(TestCase):
     """
@@ -214,6 +224,16 @@ class MethodDecoratorTests(TestCase):
         self.assertEqual(Test.method.__doc__, 'A method')
         self.assertEqual(Test.method.__name__, 'method')
 
+    # Test for argumented decorator
+    def test_argumented(self):
+        class Test(object):
+            @method_decorator(ClsDec(False))
+            def method(self):
+                return True
+
+        # t = Test()
+        self.assertEqual(Test().method(), False)
+        
 
 class XFrameOptionsDecoratorsTests(TestCase):
     """
