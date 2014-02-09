@@ -326,16 +326,6 @@ WHEN (new.%(col_name)s IS NULL)
         name = name.replace('%', '%%')
         return name.upper()
 
-    def quote_parameter(self, value):
-        if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
-            return "'%s'" % value
-        elif isinstance(value, six.string_types):
-            return repr(value)
-        elif isinstance(value, bool):
-            return "1" if value else "0"
-        else:
-            return str(value)
-
     def random_function_sql(self):
         return "DBMS_RANDOM.RANDOM"
 

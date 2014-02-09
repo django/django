@@ -975,15 +975,6 @@ class BaseDatabaseOperations(object):
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a quote_name() method')
 
-    def quote_parameter(self, value):
-        """
-        Returns a quoted version of the value so it's safe to use in an SQL
-        string. This should NOT be used to prepare SQL statements to send to
-        the database; it is meant for outputting SQL statements to a file
-        or the console for later execution by a developer/DBA.
-        """
-        raise NotImplementedError()
-
     def random_function_sql(self):
         """
         Returns an SQL expression that returns a random value.

@@ -311,11 +311,6 @@ class DatabaseOperations(BaseDatabaseOperations):
             return name  # Quoting once is enough.
         return "`%s`" % name
 
-    def quote_parameter(self, value):
-        # Inner import to allow module to fail to load gracefully
-        import MySQLdb.converters
-        return MySQLdb.escape(value, MySQLdb.converters.conversions)
-
     def random_function_sql(self):
         return 'RAND()'
 

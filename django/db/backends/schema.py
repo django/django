@@ -89,7 +89,7 @@ class BaseDatabaseSchemaEditor(object):
         # Log the command we're running, then run it
         logger.debug("%s; (params %r)" % (sql, params))
         if self.collect_sql:
-            self.collected_sql.append((sql % tuple(map(self.connection.ops.quote_parameter, params))) + ";")
+            self.collected_sql.append((sql % tuple(map(self.quote_value, params))) + ";")
         else:
             with self.connection.cursor() as cursor:
                 cursor.execute(sql, params)
@@ -165,6 +165,16 @@ class BaseDatabaseSchemaEditor(object):
         if callable(default):
             default = default()
         return default
+
+    def quote_value(self, value):
+        """
+        Returns a quoted version of the value so it's safe to use in an SQL
+        string. This is not safe against injection from user code; it is
+        intended only for use in making SQL scripts or preparing default values
+        for particularly tricky backends (defaults are not user-defined, though,
+        so this is safe).
+        """
+        raise NotImplementedError()
 
     # Actions
 

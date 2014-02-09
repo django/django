@@ -7,6 +7,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_sequence = "DROP SEQUENCE IF EXISTS %(sequence)s CASCADE"
     sql_set_sequence_max = "SELECT setval('%(sequence)s', MAX(%(column)s)) FROM %(table)s"
 
+    def quote_value(self, value):
+        # Inner import so backend fails nicely if it's not present
+        import psycopg2
+        return psycopg2.extensions.adapt(value)
+
     def _alter_column_type_sql(self, table, column, type):
         """
         Makes ALTER TYPE with SERIAL make sense.

@@ -1,3 +1,4 @@
+from django.utils import six
 from django.apps.registry import Apps
 from django.db.backends.schema import BaseDatabaseSchemaEditor
 from django.db.models.fields.related import ManyToManyField
@@ -7,6 +8,25 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     sql_delete_table = "DROP TABLE %(table)s"
     sql_create_inline_fk = "REFERENCES %(to_table)s (%(to_column)s)"
+
+    def quote_value(self, value):
+        # Inner import to allow nice failure for backend if not present
+        import _sqlite3
+        try:
+            value = _sqlite3.adapt(value)
+        except _sqlite3.ProgrammingError:
+            pass
+        # Manual emulation of SQLite parameter quoting
+        if isinstance(value, type(True)):
+            return str(int(value))
+        elif isinstance(value, six.integer_types):
+            return str(value)
+        elif isinstance(value, six.string_types):
+            return '"%s"' % six.text_type(value)
+        elif value is None:
+            return "NULL"
+        else:
+            raise ValueError("Cannot quote parameter value %r" % value)
 
     def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[], rename_fields=[], override_uniques=None):
         """
@@ -31,7 +51,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             body[field.name] = field
             # If there's a default, insert it into the copy map
             if field.has_default():
-                mapping[field.column] = self.connection.ops.quote_parameter(
+                mapping[field.column] = self.quote_value(
                     field.get_default()
                 )
         # Add in any altered fields
