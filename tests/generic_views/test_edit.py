@@ -9,7 +9,7 @@ from django import forms
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.views.generic.base import View
-from django.views.generic.edit import FormMixin, CreateView
+from django.views.generic.edit import FormMixin, ModelFormMixin, CreateView
 
 from . import views
 from .models import Artist, Author
@@ -54,6 +54,12 @@ class ModelFormMixinTests(TestCase):
     def test_get_form(self):
         form_class = views.AuthorGetQuerySetFormView().get_form_class()
         self.assertEqual(form_class._meta.model, Author)
+
+    def test_get_form_checks_for_object(self):
+        mixin = ModelFormMixin()
+        mixin.request = RequestFactory().get('/')
+        self.assertEqual({'initial': {}, 'prefix': None},
+                         mixin.get_form_kwargs())
 
 
 class CreateViewTests(TestCase):
