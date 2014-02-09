@@ -1052,7 +1052,8 @@ class ModelAdmin(BaseModelAdmin):
             'save_as': self.save_as,
             'save_on_top': self.save_on_top,
             'to_field_var': TO_FIELD_VAR,
-            'is_popup_var': IS_POPUP_VAR
+            'is_popup_var': IS_POPUP_VAR,
+            'app_label': app_label,
         })
         if add and self.add_form_template is not None:
             form_template = self.add_form_template
@@ -1292,95 +1293,45 @@ class ModelAdmin(BaseModelAdmin):
                 "admin/delete_confirmation.html"
             ], context, current_app=self.admin_site.name)
 
-    @csrf_protect_m
-    @transaction.atomic
-    def add_view(self, request, form_url='', extra_context=None):
-        "The 'add' admin view for this model."
-        model = self.model
-        opts = model._meta
-
-        if not self.has_add_permission(request):
-            raise PermissionDenied
-
-        ModelForm = self.get_form(request)
-        if request.method == 'POST':
-            form = ModelForm(request.POST, request.FILES)
-            if form.is_valid():
-                new_object = self.save_form(request, form, change=False)
-                form_validated = True
-            else:
-                form_validated = False
-                new_object = form.instance
-            formsets, inline_instances = self._create_formsets(request, new_object)
-            if all_valid(formsets) and form_validated:
-                self.save_model(request, new_object, form, False)
-                self.save_related(request, form, formsets, False)
-                self.log_addition(request, new_object)
-                return self.response_add(request, new_object)
-        else:
-            # Prepare the dict of initial data from the request.
-            # We have to special-case M2Ms as a list of comma-separated PKs.
-            initial = dict(request.GET.items())
-            for k in initial:
-                try:
-                    f = opts.get_field(k)
-                except models.FieldDoesNotExist:
-                    continue
-                if isinstance(f, models.ManyToManyField):
-                    initial[k] = initial[k].split(",")
-            form = ModelForm(initial=initial)
-            formsets, inline_instances = self._create_formsets(request, self.model())
-
-        adminForm = helpers.AdminForm(form, list(self.get_fieldsets(request)),
-            self.get_prepopulated_fields(request),
-            self.get_readonly_fields(request),
-            model_admin=self)
-        media = self.media + adminForm.media
-
+    def get_inline_formsets(self, request, formsets, inline_instances,
+                            obj=None):
         inline_admin_formsets = []
         for inline, formset in zip(inline_instances, formsets):
-            fieldsets = list(inline.get_fieldsets(request))
-            readonly = list(inline.get_readonly_fields(request))
-            prepopulated = dict(inline.get_prepopulated_fields(request))
+            fieldsets = list(inline.get_fieldsets(request, obj))
+            readonly = list(inline.get_readonly_fields(request, obj))
+            prepopulated = dict(inline.get_prepopulated_fields(request, obj))
             inline_admin_formset = helpers.InlineAdminFormSet(inline, formset,
                 fieldsets, prepopulated, readonly, model_admin=self)
             inline_admin_formsets.append(inline_admin_formset)
-            media = media + inline_admin_formset.media
-
-        context = dict(self.admin_site.each_context(),
-            title=_('Add %s') % force_text(opts.verbose_name),
-            adminform=adminForm,
-            is_popup=(IS_POPUP_VAR in request.POST or
-                      IS_POPUP_VAR in request.GET),
-            to_field=request.POST.get(TO_FIELD_VAR,
-                                      request.GET.get(TO_FIELD_VAR)),
-            media=media,
-            inline_admin_formsets=inline_admin_formsets,
-            errors=helpers.AdminErrorList(form, formsets),
-            preserved_filters=self.get_preserved_filters(request),
-        )
-        context.update(extra_context or {})
-        return self.render_change_form(request, context, form_url=form_url, add=True)
+        return inline_admin_formsets
 
     @csrf_protect_m
     @transaction.atomic
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        "The 'change' admin view for this model."
+    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+
         model = self.model
         opts = model._meta
+        add = object_id is None
 
-        obj = self.get_object(request, unquote(object_id))
+        if add:
+            if not self.has_add_permission(request):
+                raise PermissionDenied
+            obj = None
 
-        if not self.has_change_permission(request, obj):
-            raise PermissionDenied
+        else:
+            obj = self.get_object(request, unquote(object_id))
 
-        if obj is None:
-            raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {'name': force_text(opts.verbose_name), 'key': escape(object_id)})
+            if not self.has_change_permission(request, obj):
+                raise PermissionDenied
 
-        if request.method == 'POST' and "_saveasnew" in request.POST:
-            return self.add_view(request, form_url=reverse('admin:%s_%s_add' % (
-                opts.app_label, opts.model_name),
-                current_app=self.admin_site.name))
+            if obj is None:
+                raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
+                    'name': force_text(opts.verbose_name), 'key': escape(object_id)})
+
+            if request.method == 'POST' and "_saveasnew" in request.POST:
+                return self.add_view(request, form_url=reverse('admin:%s_%s_add' % (
+                    opts.app_label, opts.model_name),
+                    current_app=self.admin_site.name))
 
         ModelForm = self.get_form(request, obj)
         if request.method == 'POST':
@@ -1395,29 +1346,40 @@ class ModelAdmin(BaseModelAdmin):
             if all_valid(formsets) and form_validated:
                 self.save_model(request, new_object, form, True)
                 self.save_related(request, form, formsets, True)
-                change_message = self.construct_change_message(request, form, formsets)
-                self.log_change(request, new_object, change_message)
-                return self.response_change(request, new_object)
-
+                if add:
+                    self.log_addition(request, new_object)
+                    return self.response_add(request, new_object)
+                else:
+                    change_message = self.construct_change_message(request, form, formsets)
+                    self.log_change(request, new_object, change_message)
+                    return self.response_change(request, new_object)
         else:
-            form = ModelForm(instance=obj)
-            formsets, inline_instances = self._create_formsets(request, obj)
+            if add:
+                initial = dict(request.GET.items())
+                for k in initial:
+                    try:
+                        f = opts.get_field(k)
+                    except models.FieldDoesNotExist:
+                        continue
+                    if isinstance(f, models.ManyToManyField):
+                        initial[k] = initial[k].split(",")
+                form = ModelForm(initial=initial)
+                formsets, inline_instances = self._create_formsets(request, self.model())
+            else:
+                form = ModelForm(instance=obj)
+                formsets, inline_instances = self._create_formsets(request, obj)
 
-        adminForm = helpers.AdminForm(form, self.get_fieldsets(request, obj),
+        adminForm = helpers.AdminForm(
+            form,
+            list(self.get_fieldsets(request, obj)),
             self.get_prepopulated_fields(request, obj),
             self.get_readonly_fields(request, obj),
             model_admin=self)
         media = self.media + adminForm.media
 
-        inline_admin_formsets = []
-        for inline, formset in zip(inline_instances, formsets):
-            fieldsets = list(inline.get_fieldsets(request, obj))
-            readonly = list(inline.get_readonly_fields(request, obj))
-            prepopulated = dict(inline.get_prepopulated_fields(request, obj))
-            inline_admin_formset = helpers.InlineAdminFormSet(inline, formset,
-                fieldsets, prepopulated, readonly, model_admin=self)
-            inline_admin_formsets.append(inline_admin_formset)
-            media = media + inline_admin_formset.media
+        inline_formsets = self.get_inline_formsets(request, formsets, inline_instances, obj)
+        for inline_formset in inline_formsets:
+            media = media + inline_formset.media
 
         context = dict(self.admin_site.each_context(),
             title=_('Change %s') % force_text(opts.verbose_name),
@@ -1429,13 +1391,20 @@ class ModelAdmin(BaseModelAdmin):
             to_field=request.POST.get(TO_FIELD_VAR,
                                       request.GET.get(TO_FIELD_VAR)),
             media=media,
-            inline_admin_formsets=inline_admin_formsets,
+            inline_admin_formsets=inline_formsets,
             errors=helpers.AdminErrorList(form, formsets),
-            app_label=opts.app_label,
             preserved_filters=self.get_preserved_filters(request),
         )
+
         context.update(extra_context or {})
-        return self.render_change_form(request, context, change=True, obj=obj, form_url=form_url)
+
+        return self.render_change_form(request, context, add=add, change=not add, obj=obj, form_url=form_url)
+
+    def add_view(self, request, form_url='', extra_context=None):
+        return self.changeform_view(request, None, form_url, extra_context)
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        return self.changeform_view(request, object_id, form_url, extra_context)
 
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
