@@ -22,7 +22,7 @@ def method_decorator(decorator):
         def _wrapper(self, *args, **kwargs):
             @decorator
             def bound_func(*args2, **kwargs2):
-                return func(self, *args2, **kwargs2)
+                return func.__get__(self, type(self))(*args2, **kwargs2)
             # bound_func has the signature that 'decorator' expects i.e.  no
             # 'self' argument, but it is a closure over self so it can call
             # 'func' correctly.
