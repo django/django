@@ -74,7 +74,7 @@ Django quotes column and table names behind the scenes.
 
 .. admonition:: Table name quoting for Oracle
 
-   In order to to meet the 30-char limitation Oracle has on table names,
+   In order to meet the 30-char limitation Oracle has on table names,
    and match the usual conventions for Oracle databases, Django may shorten
    table names and turn them all-uppercase. To prevent such transformations,
    use a quoted name as the value for ``db_table``::
