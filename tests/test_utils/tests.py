@@ -554,6 +554,15 @@ class AssertContainsTest(SimpleTestCase):
         with self.assertRaises(AssertionError):
             self.assertContains(response, 'this will not be in the response')
 
+    def test_string_not_contained_error_message(self):
+        response = HttpResponse('This is some response text.')
+        with self.assertRaises(AssertionError) as mgr:
+            self.assertContains(response, 'foo')
+        self.assertEqual(
+            mgr.exception.message,
+            "Couldn't find 'foo' in response"
+        )
+
     def test_count_correct_passes(self):
         response = HttpResponse('a thing' * 5)
         self.assertContains(response, 'thing', count=5)
