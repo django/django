@@ -275,6 +275,8 @@ class Command(NoArgsCommand):
             except OSError:
                 pass
             try:
+                if os.path.lexists(full_path):
+                    os.unlink(full_path)
                 os.symlink(source_path, full_path)
             except AttributeError:
                 import platform
