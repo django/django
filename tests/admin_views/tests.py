@@ -53,9 +53,8 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
     Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage,
     Telegram, Pizza, Topping, FilteredManager, City, Restaurant, Worker,
-    ParentWithDependentChildren, StumpJoke)
+    ParentWithDependentChildren, Character)
 from .admin import site, site2, CityAdmin
-from .forms import StumpJokeForm
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \
@@ -3710,6 +3709,34 @@ class ReadonlyTest(TestCase):
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class LimitChoicesToInAdminTest(TestCase):
+    urls = "admin_views.urls"
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_limit_choices_to_as_callable(self):
+        """Test for ticket 2445 changes to admin."""
+        character1 = Character(username='threepwood')
+        character2 = Character(username='marley')
+
+        character1.last_action = datetime.datetime.today() + datetime.timedelta(days=1)
+        character1.save()
+
+        character2.last_action = datetime.datetime.today() - datetime.timedelta(days=1)
+        character2.save()
+
+        response = self.client.get('/test_admin/admin/admin_views/stumpjoke/add/')
+        # The allowed option should appear twice; the limited option should not appear.
+        self.assertEqual(response.content.count('threepwood'), 2)
+        self.assertNotIn('marley', response.content)
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class RawIdFieldsTest(TestCase):
     urls = "admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -4780,34 +4807,3 @@ class AdminGenericRelationTests(TestCase):
             validator.validate_list_filter(GenericFKAdmin, Plot)
         except ImproperlyConfigured:
             self.fail("Couldn't validate a GenericRelation -> FK path in ModelAdmin.list_filter")
-
-
-class LimitChoicesToTest(TestCase):
-    """
-    Tests the functionality of ``limit_choices_to``.
-    """
-    def setUp(self):
-        self.user1 = User.objects.create_user('threepwood')
-        self.user2 = User.objects.create_user('marley')
-
-        self.user1.date_joined = datetime.datetime.today() + datetime.timedelta(days=1)
-        self.user1.save()
-
-        self.user2.date_joined = datetime.datetime.today() - datetime.timedelta(days=1)
-        self.user2.save()
-
-    def test_limit_choices_to_callable_for_fk_rel(self):
-        """
-        A ForeignKey relation can use ``limit_choices_to`` as a callable.
-        """
-        stumpjokeform = StumpJokeForm()
-        self.assertIn(self.user1, stumpjokeform.fields['most_recently_fooled'].queryset)
-        self.assertNotIn(self.user2, stumpjokeform.fields['most_recently_fooled'].queryset)
-
-    def test_limit_choices_to_callable_for_m2m_rel(self):
-        """
-        A ManyToMany relation can use ``limit_choices_to`` as a callable.
-        """
-        stumpjokeform = StumpJokeForm()
-        self.assertIn(self.user1, stumpjokeform.fields['has_fooled_today'].queryset)
-        self.assertNotIn(self.user2, stumpjokeform.fields['has_fooled_today'].queryset)

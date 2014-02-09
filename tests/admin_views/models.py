@@ -11,7 +11,6 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.storage import FileSystemStorage
-from django.db.models import Q
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -172,6 +171,33 @@ class Sketch(models.Model):
 
     def __str__(self):
         return self.title
+
+
+def today_callable_dict():
+    return {"last_action__gte": datetime.datetime.today()}
+
+
+def today_callable_q():
+    return models.Q(last_action__gte=datetime.datetime.today())
+
+
+@python_2_unicode_compatible
+class Character(models.Model):
+    username = models.CharField(max_length=100)
+    last_action = models.DateTimeField()
+
+    def __str__(self):
+        return self.username
+
+
+@python_2_unicode_compatible
+class StumpJoke(models.Model):
+    variation = models.CharField(max_length=100)
+    most_recently_fooled = models.ForeignKey(Character, limit_choices_to=today_callable_dict, related_name="+")
+    has_fooled_today = models.ManyToManyField(Character, limit_choices_to=today_callable_q, related_name="+")
+
+    def __str__(self):
+        return self.variation
 
 
 class Fabric(models.Model):
@@ -531,19 +557,6 @@ class Answer(models.Model):
 
     def __str__(self):
         return self.answer
-
-
-def today_callable_dict():
-    return {"date_joined__gte": datetime.datetime.today()}
-
-
-def today_callable_q():
-    return Q(date_joined__gte=datetime.datetime.today())
-
-
-class StumpJoke(models.Model):
-    most_recently_fooled = models.ForeignKey(User, limit_choices_to=today_callable_dict, related_name="+")
-    has_fooled_today = models.ManyToManyField(User, limit_choices_to=today_callable_q, related_name="+")
 
 
 class Reservation(models.Model):

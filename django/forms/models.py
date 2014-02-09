@@ -324,8 +324,7 @@ class BaseModelForm(BaseForm):
         self._validate_unique = False
         super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
                                             error_class, label_suffix, empty_permitted)
-        # This form instance should now have its own set of fields in
-        # ``self.fields``. Apply the attribute 'limit_choices_to', if applicable.
+        # Apply ``limit_choices_to`` to each field.
         for field_name in self.fields:
             formfield = self.fields[field_name]
             if hasattr(formfield, 'queryset'):
