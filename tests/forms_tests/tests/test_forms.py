@@ -1574,7 +1574,7 @@ class FormsTestCase(TestCase):
         self.assertHTMLEqual(my_function('POST', {'username': 'this-is-a-long-username', 'password1': 'foo', 'password2': 'bar'}), """<form action="" method="post">
 <table>
 <tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
-<tr><th>Username:</th><td><ul class="errorlist"><li>Ensure this value has at most 10 characters (it has 23).</li></ul><input type="text" name="username" value="this-is-a-long-username" maxlength="10" /></td></tr>
+<tr><th>Username:</th><td><ul class="errorlist"><li>Ensure this value has at most 10 characters (&quot;this-is-a-long-username&quot; has 23).</li></ul><input type="text" name="username" value="this-is-a-long-username" maxlength="10" /></td></tr>
 <tr><th>Password1:</th><td><input type="password" name="password1" /></td></tr>
 <tr><th>Password2:</th><td><input type="password" name="password2" /></td></tr>
 </table>
@@ -1839,8 +1839,8 @@ class FormsTestCase(TestCase):
         self.assertEqual(form.errors, {'name': ['bad value not allowed']})
         form = NameForm(data={'name': ['should be overly', 'long for the field names']})
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors, {'name': ['Ensure this value has at most 10 characters (it has 16).',
-                                                'Ensure this value has at most 10 characters (it has 24).']})
+        self.assertEqual(form.errors, {'name': ['Ensure this value has at most 10 characters ("should be overly" has 16).',
+                                                'Ensure this value has at most 10 characters ("long for the field names" has 24).']})
         form = NameForm(data={'name': ['fname', 'lname']})
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data, {'name': 'fname lname'})

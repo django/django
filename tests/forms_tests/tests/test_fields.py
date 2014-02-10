@@ -109,14 +109,14 @@ class FieldsTests(SimpleTestCase):
         f = CharField(max_length=10, required=False)
         self.assertEqual('12345', f.clean('12345'))
         self.assertEqual('1234567890', f.clean('1234567890'))
-        self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 10 characters (it has 11).'", f.clean, '1234567890a')
+        self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 10 characters (\"1234567890a\" has 11).'", f.clean, '1234567890a')
         self.assertEqual(f.max_length, 10)
         self.assertEqual(f.min_length, None)
 
     def test_charfield_4(self):
         f = CharField(min_length=10, required=False)
         self.assertEqual('', f.clean(''))
-        self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 10 characters (it has 5).'", f.clean, '12345')
+        self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 10 characters (\"12345\" has 5).'", f.clean, '12345')
         self.assertEqual('1234567890', f.clean('1234567890'))
         self.assertEqual('1234567890a', f.clean('1234567890a'))
         self.assertEqual(f.max_length, None)
@@ -125,7 +125,7 @@ class FieldsTests(SimpleTestCase):
     def test_charfield_5(self):
         f = CharField(min_length=10, required=True)
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
-        self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 10 characters (it has 5).'", f.clean, '12345')
+        self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 10 characters (\"12345\" has 5).'", f.clean, '12345')
         self.assertEqual('1234567890', f.clean('1234567890'))
         self.assertEqual('1234567890a', f.clean('1234567890a'))
         self.assertEqual(f.max_length, None)
@@ -620,11 +620,11 @@ class FieldsTests(SimpleTestCase):
 
     def test_regexfield_5(self):
         f = RegexField('^\d+$', min_length=5, max_length=10)
-        self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 5 characters (it has 3).'", f.clean, '123')
-        six.assertRaisesRegex(self, ValidationError, "'Ensure this value has at least 5 characters \(it has 3\)\.', u?'Enter a valid value\.'", f.clean, 'abc')
+        self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 5 characters (\"123\" has 3).'", f.clean, '123')
+        six.assertRaisesRegex(self, ValidationError, "'Ensure this value has at least 5 characters \(\"abc\" has 3\)\.', u?'Enter a valid value\.'", f.clean, 'abc')
         self.assertEqual('12345', f.clean('12345'))
         self.assertEqual('1234567890', f.clean('1234567890'))
-        self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 10 characters (it has 11).'", f.clean, '12345678901')
+        self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 10 characters (\"12345678901\" has 11).'", f.clean, '12345678901')
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, '12345a')
 
     def test_regexfield_6(self):
@@ -672,9 +672,9 @@ class FieldsTests(SimpleTestCase):
     def test_emailfield_min_max_length(self):
         f = EmailField(min_length=10, max_length=15)
         self.assertWidgetRendersTo(f, '<input id="id_f" type="email" name="f" maxlength="15" />')
-        self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 10 characters (it has 9).'", f.clean, 'a@foo.com')
+        self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 10 characters (\"a@foo.com\" has 9).'", f.clean, 'a@foo.com')
         self.assertEqual('alf@foo.com', f.clean('alf@foo.com'))
-        self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 15 characters (it has 20).'", f.clean, 'alf123456788@foo.com')
+        self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 15 characters (\"alf123456788@foo.com\" has 20).'", f.clean, 'alf123456788@foo.com')
 
     # FileField ##################################################################
 
@@ -785,11 +785,12 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://.com')
 
     def test_urlfield_5(self):
+        # ticket #16617
         f = URLField(min_length=15, max_length=20)
         self.assertWidgetRendersTo(f, '<input id="id_f" type="url" name="f" maxlength="20" />')
-        self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 15 characters (it has 13).'", f.clean, 'http://f.com')
+        self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 15 characters (\"http://f.com/\" has 13).'", f.clean, 'http://f.com')
         self.assertEqual('http://example.com/', f.clean('http://example.com'))
-        self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 20 characters (it has 38).'", f.clean, 'http://abcdefghijklmnopqrstuvwxyz.com')
+        self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 20 characters (\"http://abcdefghijklmnopqrstuvwxyz.com/\" has 38).'", f.clean, 'http://abcdefghijklmnopqrstuvwxyz.com')
 
     def test_urlfield_6(self):
         f = URLField(required=False)
@@ -1154,7 +1155,7 @@ class FieldsTests(SimpleTestCase):
     def test_combofield_1(self):
         f = ComboField(fields=[CharField(max_length=20), EmailField()])
         self.assertEqual('test@example.com', f.clean('test@example.com'))
-        self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 20 characters (it has 28).'", f.clean, 'longemailaddress@example.com')
+        self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 20 characters (\"longemailaddress@example.com\" has 28).'", f.clean, 'longemailaddress@example.com')
         self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'not an email')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
@@ -1162,7 +1163,7 @@ class FieldsTests(SimpleTestCase):
     def test_combofield_2(self):
         f = ComboField(fields=[CharField(max_length=20), EmailField()], required=False)
         self.assertEqual('test@example.com', f.clean('test@example.com'))
-        self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 20 characters (it has 28).'", f.clean, 'longemailaddress@example.com')
+        self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 20 characters (\"longemailaddress@example.com\" has 28).'", f.clean, 'longemailaddress@example.com')
         self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'not an email')
         self.assertEqual('', f.clean(''))
         self.assertEqual('', f.clean(None))
