@@ -1443,7 +1443,7 @@ your test suite.
 
     Output in case of error can be customized with the ``msg`` argument.
 
-.. method:: TransactionTestCase.assertQuerysetEqual(qs, values, transform=repr, ordered=True)
+.. method:: TransactionTestCase.assertQuerysetEqual(qs, values, transform=repr, ordered=True, msg=None)
 
     Asserts that a queryset ``qs`` returns a particular list of values ``values``.
 
@@ -1456,12 +1456,19 @@ your test suite.
     provide an implicit ordering, you can set the ``ordered`` parameter to
     ``False``, which turns the comparison into a Python set comparison.
 
+    Output in case of error can be customized with the ``msg`` argument.
+
     .. versionchanged:: 1.6
 
         The method now checks for undefined order and raises ``ValueError``
         if undefined order is spotted. The ordering is seen as undefined if
         the given ``qs`` isn't ordered and the comparison is against more
         than one ordered values.
+
+    .. versionchanged:: 1.7
+
+        The method now accepts a ``msg`` parameter to allow customization of
+        error message
 
 .. method:: TransactionTestCase.assertNumQueries(num, func, *args, **kwargs)
 
