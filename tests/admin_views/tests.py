@@ -58,6 +58,7 @@ from .admin import site, site2, CityAdmin
 
 ERROR_MESSAGE = "Please enter the correct username and password \
 for a staff account. Note that both fields may be case-sensitive."
+ADMIN_VIEW_TEMPLATES_DIR = settings.TEMPLATE_DIRS + (os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
@@ -648,6 +649,77 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             reverse('admin:app_list', args=('admin_views2',))
 
 
+@override_settings(TEMPLATE_DIRS=ADMIN_VIEW_TEMPLATES_DIR,)
+class AdminCustomTemplateTests(AdminViewBasicTestCase):
+    def testExtendedBodyclassTemplateAddUser(self):
+        """
+        Ensure that the /admin/change_form.html template uses block.super in the bodyclass block.
+        """
+        response = self.client.get('/test_admin/%s/admin_views/section/add/' % self.urlbit)
+        self.assertContains(response, 'bodyclass_constitency_check ')
+
+    def testExtendedBodyclassTemplateChangepass(self):
+        """
+        Ensure that the auth/user/change_password.html template uses block.super in the bodyclass block.
+        """
+        user = User.objects.get(username='super')
+        response = self.client.get('/test_admin/%s/auth/user/%s/password/' % (self.urlbit, user.id))
+        self.assertContains(response, 'bodyclass_constitency_check ')
+
+    def testExtendedBodyclassTemplateIndex(self):
+        """
+        Ensure that the templates/admin/index.html template uses block.super in the bodyclass block.
+        """
+        response = self.client.get('/test_admin/%s/' % self.urlbit)
+        self.assertContains(response, 'bodyclass_constitency_check ')
+
+    def testExtendedBodyclassModelname(self):
+        """
+        Ensure that the templates /admin/index.html templates uses block.super in bodyclass block
+        """
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit)
+        self.assertContains(response, 'bodyclass_constitency_check ')
+
+    def testExtendedBodyclassTemplatLogin(self):
+        """
+        Ensure that the templates templates/admin/login.html templates uses block.super in bodyclass block
+        """
+        self.client.logout()
+        response = self.client.get('/test_admin/%s/login/' % self.urlbit)
+        self.assertContains(response, 'bodyclass_constitency_check ')
+        self.client.login(username='super', password='secret')
+
+    def testExtendedBodyclassTemplatDelete(self):
+        """
+        Ensure that the templates templates/admin/delete_confirmation.html templates uses block.super in bodyclass block
+        """
+        group = Group.objects.create(name="foogroup")
+        response = self.client.get('/test_admin/%s/auth/group/%s/delete/' % (self.urlbit, group.id))
+        self.assertContains(response, 'bodyclass_constitency_check ')
+
+    def testExtendedBodyclassTemplatSelectedDelete(self):
+        """
+        Ensure that the templates templates/admin/delete_selected_confirmation.html templates uses block.super in bodyclass block
+        """
+        group = Group.objects.create(name="foogroup")
+        post_data = {
+            'action': 'delete_selected',
+            'selected_accross': '0',
+            'index': '0',
+            '_selected_action': group.id
+        }
+        response = self.client.post('/test_admin/%s/auth/group/' % (self.urlbit), post_data)
+        self.assertContains(response, 'bodyclass_constitency_check ')
+
+    def test_filter_with_custom_template(self):
+        """
+        Ensure that one can use a custom template to render an admin filter.
+        Refs #17515.
+        """
+        response = self.client.get("/test_admin/admin/admin_views/color2/")
+        self.assertTemplateUsed(response, 'custom_filter_template.html')
+
+
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewFormUrlTest(TestCase):
     urls = "admin_views.urls"
@@ -667,17 +739,6 @@ class AdminViewFormUrlTest(TestCase):
         response = self.client.get('/test_admin/%s/admin_views/section/1/' % self.urlbit)
         self.assertTrue('form_url' in response.context, msg='form_url not present in response.context')
         self.assertEqual(response.context['form_url'], 'pony')
-
-    def test_filter_with_custom_template(self):
-        """
-        Ensure that one can use a custom template to render an admin filter.
-        Refs #17515.
-        """
-        template_dirs = settings.TEMPLATE_DIRS + (
-            os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
-        with self.settings(TEMPLATE_DIRS=template_dirs):
-            response = self.client.get("/test_admin/admin/admin_views/color2/")
-            self.assertTemplateUsed(response, 'custom_filter_template.html')
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
