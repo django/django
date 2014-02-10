@@ -23,6 +23,7 @@ class GeoIPRecord(Structure):
                 ('continent_code', c_char_p),
                 ]
 geoip_char_fields = [name for name, ctype in GeoIPRecord._fields_ if ctype is c_char_p]
+GEOIP_DEFAULT_ENCODING = 'iso-8859-1'
 geoip_encodings = {
     0: 'iso-8859-1',
     1: 'utf8',
@@ -100,7 +101,7 @@ def check_string(result, func, cargs):
         free(result)
     else:
         s = ''
-    return s.decode()
+    return s.decode(GEOIP_DEFAULT_ENCODING)
 
 GeoIP_database_info = lgeoip.GeoIP_database_info
 GeoIP_database_info.restype = geoip_char_p
@@ -111,7 +112,7 @@ GeoIP_database_info.errcheck = check_string
 def string_output(func):
     def _err_check(result, func, cargs):
         if result:
-            return result.decode()
+            return result.decode(GEOIP_DEFAULT_ENCODING)
         return result
     func.restype = c_char_p
     func.errcheck = _err_check
