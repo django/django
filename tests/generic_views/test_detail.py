@@ -18,6 +18,13 @@ class DetailViewTest(TestCase):
         self.assertIsInstance(res.context['view'], View)
         self.assertTemplateUsed(res, 'generic_views/detail.html')
 
+    def test_detail_single_by_pk(self):
+        res = self.client.get('/detail/single/author/1/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object'], Author.objects.get(pk=1))
+        self.assertEqual(res.context['author'], Author.objects.get(pk=1))
+        self.assertTemplateUsed(res, 'generic_views/detail.html')
+
     def test_detail_by_pk(self):
         res = self.client.get('/detail/author/1/')
         self.assertEqual(res.status_code, 200)
