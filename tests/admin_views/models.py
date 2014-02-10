@@ -17,7 +17,6 @@ from django.utils.encoding import python_2_unicode_compatible
 
 class Section(models.Model):
     """
-
     A simple section that links to articles, to test linking to related items
     in admin views.
     """
