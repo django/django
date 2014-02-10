@@ -1222,6 +1222,21 @@ For example::
 
 If ``value`` is ``"django"``, the output will be ``"Django"``.
 
+.. templatefilter:: wordcap
+
+wordcap
+^^^^^^^
+
+Capitalizes the first character of each word, it converts a string into
+titlecase by making words start with an uppercase character and keep the
+remaining characters.
+
+For example::
+
+    {{ value|wordcap }}
+
+If ``value`` is ``"joel SMS content"``, the output will be ``"Joel SMS Content"``.
+
 .. templatefilter:: center
 
 center

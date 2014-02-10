@@ -14,7 +14,7 @@ from django.template.defaultfilters import (
     phone2numeric_filter, pluralize, removetags, rjust, slice_filter, slugify,
     stringformat, striptags, time, timesince_filter, timeuntil_filter, title,
     truncatewords, truncatewords_html, unordered_list, upper, urlencode,
-    urlize, urlizetrunc, wordcount, wordwrap, yesno,
+    urlize, urlizetrunc, wordcount, wordwrap, yesno, wordcap,
 )
 from django.test import TestCase
 from django.utils import six
@@ -109,6 +109,9 @@ class DefaultFiltersTests(TestCase):
 
     def test_capfirst(self):
         self.assertEqual(capfirst('hello world'), 'Hello world')
+
+    def test_wordcap(self):
+        self.assertEqual(wordcap('send SMS'), 'Send SMS')
 
     def test_escapejs(self):
         self.assertEqual(escapejs_filter('"double quotes" and \'single quotes\''),
