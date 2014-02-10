@@ -191,8 +191,9 @@ class Field(RegisterLookupMixin):
         return errors
 
     def _check_field_name(self):
-        """ Check if field name is valid (i. e. not ending with an underscore).
-        """
+        """ Check if field name is valid, i.e. 1) does not end with an
+        underscore, 2) does not contain "__" and 3) is not "pk". """
+
         if self.name.endswith('_'):
             return [
                 checks.Error(
@@ -200,6 +201,24 @@ class Field(RegisterLookupMixin):
                     hint=None,
                     obj=self,
                     id='E001',
+                )
+            ]
+        elif '__' in self.name:
+            return [
+                checks.Error(
+                    'Field names must not contain "__".',
+                    hint=None,
+                    obj=self,
+                    id='E052',
+                )
+            ]
+        elif self.name == 'pk':
+            return [
+                checks.Error(
+                    'Cannot use "pk" as a field name since it is a reserved name.',
+                    hint=None,
+                    obj=self,
+                    id='E051',
                 )
             ]
         else:

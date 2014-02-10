@@ -1055,8 +1055,12 @@ class Model(six.with_metaclass(ModelBase)):
         if not cls._meta.swapped:
             errors.extend(cls._check_fields(**kwargs))
             errors.extend(cls._check_m2m_through_same_relationship())
-            errors.extend(cls._check_id_field())
-            errors.extend(cls._check_column_name_clashes())
+            clash_errors = cls._check_id_field() + cls._check_field_name_clashes()
+            errors.extend(clash_errors)
+            # If there are field name clashes, hide consequent column name
+            # clashes.
+            if not clash_errors:
+                errors.extend(cls._check_column_name_clashes())
             errors.extend(cls._check_index_together())
             errors.extend(cls._check_unique_together())
             errors.extend(cls._check_ordering())
@@ -1174,6 +1178,61 @@ class Model(six.with_metaclass(ModelBase)):
             ]
         else:
             return []
+
+    @classmethod
+    def _check_field_name_clashes(cls):
+        """ Ref #17673. """
+
+        errors = []
+        used_fields = {}  # name or attname -> field
+
+        # Check that multi-inheritance doesn't cause field name shadowing.
+        for parent in cls._meta.parents:
+            for f in parent._meta.local_fields:
+                clash = used_fields.get(f.name) or used_fields.get(f.attname) or None
+                if clash:
+                    errors.append(
+                        checks.Error(
+                            ('The field "%s" from parent model '
+                             '%s clashes with the field "%s" '
+                             'from parent model %s.') % (
+                                clash.name, clash.model._meta,
+                                f.name, f.model._meta
+                            ),
+                            hint=None,
+                            obj=cls,
+                            id='E053',
+                        )
+                    )
+                used_fields[f.name] = f
+                used_fields[f.attname] = f
+
+        # Check that fields defined in the model don't clash with fields from
+        # parents.
+        for f in cls._meta.local_fields:
+            clash = used_fields.get(f.name) or used_fields.get(f.attname) or None
+            # Note that we may detect clash between user-defined non-unique
+            # field "id" and automatically added unique field "id", both
+            # defined at the same model. This special case is considered in
+            # _check_id_field and here we ignore it.
+            id_conflict = (f.name == "id" and
+                clash and clash.name == "id" and clash.model == cls)
+            if clash and not id_conflict:
+                errors.append(
+                    checks.Error(
+                        ('The field clashes with the field "%s" '
+                         'from model %s.') % (
+                            clash.name, clash.model._meta
+                        ),
+                        hint=None,
+                        obj=f,
+                        id='E054',
+                    )
+                )
+            used_fields[f.name] = f
+            used_fields[f.attname] = f
+
+        return errors
 
     @classmethod
     def _check_column_name_clashes(cls):
