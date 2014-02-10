@@ -122,7 +122,8 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         Returns the keyword arguments for instantiating the form.
         """
         kwargs = super(ModelFormMixin, self).get_form_kwargs()
-        kwargs.update({'instance': self.object})
+        if hasattr(self, 'object'):
+            kwargs.update({'instance': self.object})
         return kwargs
 
     def get_success_url(self):

@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpRequest
 from django.test import TestCase, modify_settings, override_settings
 
+from .middleware import CurrentSiteMiddleware
 from .models import Site
 from .requests import RequestSite
 from .shortcuts import get_current_site
@@ -79,3 +80,13 @@ class SitesFrameworkTests(TestCase):
         self.assertRaises(ValidationError, site.full_clean)
         site.domain = "test\ntest"
         self.assertRaises(ValidationError, site.full_clean)
+
+
+class MiddlewareTest(TestCase):
+
+    def test_request(self):
+        """ Makes sure that the request has correct `site` attribute. """
+        middleware = CurrentSiteMiddleware()
+        request = HttpRequest()
+        middleware.process_request(request)
+        self.assertEqual(request.site.id, settings.SITE_ID)

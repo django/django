@@ -3,13 +3,15 @@ from importlib import import_module
 import os
 import sys
 import unittest
+import warnings
 from zipimport import zipimporter
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase, modify_settings
-from django.test.utils import extend_sys_path
+from django.test.utils import IgnorePendingDeprecationWarningsMixin, extend_sys_path
 from django.utils import six
-from django.utils.module_loading import autodiscover_modules, import_by_path, module_has_submodule
+from django.utils.module_loading import (autodiscover_modules, import_by_path, import_string,
+                                         module_has_submodule)
 from django.utils._os import upath
 
 
@@ -107,15 +109,13 @@ class EggLoader(unittest.TestCase):
             self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.no_such_module')
 
 
-class ModuleImportTestCase(unittest.TestCase):
+class ModuleImportTestCase(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
     def test_import_by_path(self):
-        cls = import_by_path(
-            'django.utils.module_loading.import_by_path')
+        cls = import_by_path('django.utils.module_loading.import_by_path')
         self.assertEqual(cls, import_by_path)
 
         # Test exceptions raised
-        for path in ('no_dots_in_path', 'unexistent.path',
-                'utils_tests.unexistent'):
+        for path in ('no_dots_in_path', 'unexistent.path', 'utils_tests.unexistent'):
             self.assertRaises(ImproperlyConfigured, import_by_path, path)
 
         with self.assertRaises(ImproperlyConfigured) as cm:
@@ -131,6 +131,24 @@ class ModuleImportTestCase(unittest.TestCase):
 
         self.assertIsNotNone(traceback.tb_next.tb_next,
             'Should have more than the calling frame in the traceback.')
+
+    def test_import_by_path_pending_deprecation_warning(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always', category=PendingDeprecationWarning)
+            cls = import_by_path('django.utils.module_loading.import_by_path')
+            self.assertEqual(cls, import_by_path)
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[-1].category, PendingDeprecationWarning))
+            self.assertIn('deprecated', str(w[-1].message))
+
+    def test_import_string(self):
+        cls = import_string('django.utils.module_loading.import_string')
+        self.assertEqual(cls, import_string)
+
+        # Test exceptions raised
+        self.assertRaises(ImportError, import_string, 'no_dots_in_path')
+        self.assertRaises(ImportError, import_string, 'utils_tests.unexistent')
+        self.assertRaises(ImportError, import_string, 'unexistent.path')
 
 
 @modify_settings(INSTALLED_APPS={'append': 'utils_tests.test_module'})

@@ -13,6 +13,7 @@ from django.conf import settings
 from django.utils import six
 from django.utils.deconstruct import deconstructible
 from django.utils.translation import ugettext_lazy as _
+from django.utils.timezone import get_default_timezone
 
 
 class WriterTests(TestCase):
@@ -78,6 +79,8 @@ class WriterTests(TestCase):
         self.assertSerializedEqual(datetime.datetime.today)
         self.assertSerializedEqual(datetime.date.today())
         self.assertSerializedEqual(datetime.date.today)
+        with self.assertRaises(ValueError):
+            self.assertSerializedEqual(datetime.datetime(2012, 1, 1, 1, 1, tzinfo=get_default_timezone()))
         # Classes
         validator = RegexValidator(message="hello")
         string, imports = MigrationWriter.serialize(validator)

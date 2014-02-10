@@ -239,6 +239,21 @@ class TestInline(TestCase):
             '<input class="vIntegerField" id="id_editablepkbook_set-2-0-manual_pk" name="editablepkbook_set-2-0-manual_pk" type="text" />',
              html=True, count=1)
 
+    def test_stacked_inline_edit_form_contains_has_original_class(self):
+        holder = Holder.objects.create(dummy=1)
+        holder.inner_set.create(dummy=1)
+        response = self.client.get('/admin/admin_inlines/holder/%s/' % holder.pk)
+        self.assertContains(
+            response,
+            '<div class="inline-related has_original" id="inner_set-0">',
+            count=1
+        )
+        self.assertContains(
+            response,
+            '<div class="inline-related" id="inner_set-1">',
+            count=1
+        )
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class TestInlineMedia(TestCase):

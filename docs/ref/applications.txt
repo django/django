@@ -99,6 +99,15 @@ to determine which application this configuration applies to. You can define
 any attributes documented in the :class:`~django.apps.AppConfig` API
 reference.
 
+.. note::
+
+    If your code imports the application registry in an application's
+    ``__init__.py``, the name ``apps`` will clash with the ``apps`` submodule.
+    The best practice is to move that code to a submodule and import it. A
+    workaround is to import the registry under a different name::
+
+        from django.apps import apps as django_apps
+
 For application users
 ---------------------
 

@@ -373,15 +373,21 @@ class BaseModelForm(BaseForm):
 
     def _update_errors(self, errors):
         # Override any validation error messages defined at the model level
-        # with those defined on the form fields.
+        # with those defined at the form level.
+        opts = self._meta
         for field, messages in errors.error_dict.items():
-            if field not in self.fields:
+            if (field == NON_FIELD_ERRORS and opts.error_messages and
+                    NON_FIELD_ERRORS in opts.error_messages):
+                error_messages = opts.error_messages[NON_FIELD_ERRORS]
+            elif field in self.fields:
+                error_messages = self.fields[field].error_messages
+            else:
                 continue
-            field = self.fields[field]
+
             for message in messages:
                 if (isinstance(message, ValidationError) and
-                        message.code in field.error_messages):
-                    message.message = field.error_messages[message.code]
+                        message.code in error_messages):
+                    message.message = error_messages[message.code]
 
         self.add_error(None, errors)
 

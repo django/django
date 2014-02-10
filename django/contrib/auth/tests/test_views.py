@@ -3,8 +3,8 @@ import itertools
 import os
 import re
 
+from django.apps import apps
 from django.conf import global_settings, settings
-from django.contrib.sites.models import Site
 from django.contrib.sites.requests import RequestSite
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
@@ -446,7 +446,8 @@ class LoginTest(AuthViewsTestCase):
     def test_current_site_in_context_after_login(self):
         response = self.client.get(reverse('login'))
         self.assertEqual(response.status_code, 200)
-        if Site._meta.installed:
+        if apps.is_installed('django.contrib.sites'):
+            Site = apps.get_model('sites.Site')
             site = Site.objects.get_current()
             self.assertEqual(response.context['site'], site)
             self.assertEqual(response.context['site_name'], site.name)

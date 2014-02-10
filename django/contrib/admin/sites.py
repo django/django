@@ -1,9 +1,8 @@
 from functools import update_wrapper
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.admin import ModelAdmin, actions
-from django.contrib.admin.forms import AdminAuthenticationForm
-from django.contrib.auth import logout as auth_logout, REDIRECT_FIELD_NAME
-from django.contrib.contenttypes import views as contenttype_views
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.views import redirect_to_login
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
 from django.apps import apps
@@ -15,8 +14,6 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, ugettext as _
 from django.views.decorators.cache import never_cache
 from django.conf import settings
-
-LOGIN_FORM_KEY = 'this_is_the_login_form'
 
 
 class AlreadyRegistered(Exception):
@@ -194,13 +191,14 @@ class AdminSite(object):
         cacheable=True.
         """
         def inner(request, *args, **kwargs):
-            if LOGIN_FORM_KEY in request.POST and request.user.is_authenticated():
-                auth_logout(request)
             if not self.has_permission(request):
                 if request.path == reverse('admin:logout', current_app=self.name):
                     index_path = reverse('admin:index', current_app=self.name)
                     return HttpResponseRedirect(index_path)
-                return self.login(request)
+                return redirect_to_login(
+                    request.get_full_path(),
+                    reverse('admin:login', current_app=self.name)
+                )
             return view(request, *args, **kwargs)
         if not cacheable:
             inner = never_cache(inner)
@@ -212,6 +210,10 @@ class AdminSite(object):
 
     def get_urls(self):
         from django.conf.urls import patterns, url, include
+        # Since this module gets imported in the application's root package,
+        # it cannot import models from other applications at the module level,
+        # and django.contrib.contenttypes.views imports ContentType.
+        from django.contrib.contenttypes import views as contenttype_views
 
         if settings.DEBUG:
             self.check_dependencies()
@@ -224,6 +226,7 @@ class AdminSite(object):
         # Admin-site-wide views.
         urlpatterns = patterns('',
             url(r'^$', wrap(self.index), name='index'),
+            url(r'^login/$', self.login, name='login'),
             url(r'^logout/$', wrap(self.logout), name='logout'),
             url(r'^password_change/$', wrap(self.password_change, cacheable=True), name='password_change'),
             url(r'^password_change/done/$', wrap(self.password_change_done, cacheable=True), name='password_change_done'),
@@ -326,12 +329,23 @@ class AdminSite(object):
         """
         Displays the login form for the given HttpRequest.
         """
+        if request.method == 'GET' and self.has_permission(request):
+            # Already logged-in, redirect to admin index
+            index_path = reverse('admin:index', current_app=self.name)
+            return HttpResponseRedirect(index_path)
+
         from django.contrib.auth.views import login
+        # Since this module gets imported in the application's root package,
+        # it cannot import models from other applications at the module level,
+        # and django.contrib.admin.forms eventually imports User.
+        from django.contrib.admin.forms import AdminAuthenticationForm
         context = dict(self.each_context(),
             title=_('Log in'),
             app_path=request.get_full_path(),
         )
-        context[REDIRECT_FIELD_NAME] = request.get_full_path()
+        if (REDIRECT_FIELD_NAME not in request.GET and
+                REDIRECT_FIELD_NAME not in request.POST):
+            context[REDIRECT_FIELD_NAME] = request.get_full_path()
         context.update(extra_context or {})
 
         defaults = {

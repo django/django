@@ -13,7 +13,7 @@ from django.utils.encoding import force_bytes, force_str, force_text
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.crypto import (
     pbkdf2, constant_time_compare, get_random_string)
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_noop as _
 
 
@@ -92,7 +92,7 @@ def load_hashers(password_hashers=None):
     if not password_hashers:
         password_hashers = settings.PASSWORD_HASHERS
     for backend in password_hashers:
-        hasher = import_by_path(backend)()
+        hasher = import_string(backend)()
         if not getattr(hasher, 'algorithm'):
             raise ImproperlyConfigured("hasher doesn't specify an "
                                        "algorithm name: %s" % backend)

@@ -233,8 +233,12 @@ field will raise. Pass in a dictionary with keys matching the error messages you
 want to override.
 
 Error message keys include ``null``, ``blank``, ``invalid``, ``invalid_choice``,
-and ``unique``. Additional error message keys are specified for each field in
-the `Field types`_ section below.
+``unique``, and ``unique_for_date``. Additional error message keys are
+specified for each field in the `Field types`_ section below.
+
+.. versionadded:: 1.7
+
+The ``unique_for_date`` error message key was added.
 
 ``help_text``
 -------------
@@ -955,7 +959,7 @@ of some other value.  You can do this automatically in the admin using
 .. class:: SmallIntegerField([**options])
 
 Like an :class:`IntegerField`, but only allows values under a certain
-(database-dependent) point. Values from ``-32768`` to ``32767``` are safe in all
+(database-dependent) point. Values from ``-32768`` to ``32767`` are safe in all
 databases supported by Django.
 
 ``TextField``

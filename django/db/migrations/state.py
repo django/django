@@ -3,7 +3,7 @@ from django.apps.registry import Apps
 from django.db import models
 from django.db.models.options import DEFAULT_NAMES, normalize_unique_together
 from django.utils import six
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 
 
 class InvalidBasesError(ValueError):
@@ -115,7 +115,7 @@ class ModelState(object):
         fields = []
         for field in model._meta.local_fields:
             name, path, args, kwargs = field.deconstruct()
-            field_class = import_by_path(path)
+            field_class = import_string(path)
             try:
                 fields.append((name, field_class(*args, **kwargs)))
             except TypeError as e:
@@ -127,7 +127,7 @@ class ModelState(object):
                 ))
         for field in model._meta.local_many_to_many:
             name, path, args, kwargs = field.deconstruct()
-            field_class = import_by_path(path)
+            field_class = import_string(path)
             try:
                 fields.append((name, field_class(*args, **kwargs)))
             except TypeError as e:
@@ -175,7 +175,7 @@ class ModelState(object):
         fields = []
         for name, field in self.fields:
             _, path, args, kwargs = field.deconstruct()
-            field_class = import_by_path(path)
+            field_class = import_string(path)
             fields.append((name, field_class(*args, **kwargs)))
         # Now make a copy
         return self.__class__(

@@ -194,13 +194,16 @@ class BaseDatabaseWrapper(object):
     ##### Backend-specific savepoint management methods #####
 
     def _savepoint(self, sid):
-        self.cursor().execute(self.ops.savepoint_create_sql(sid))
+        with self.cursor() as cursor:
+            cursor.execute(self.ops.savepoint_create_sql(sid))
 
     def _savepoint_rollback(self, sid):
-        self.cursor().execute(self.ops.savepoint_rollback_sql(sid))
+        with self.cursor() as cursor:
+            cursor.execute(self.ops.savepoint_rollback_sql(sid))
 
     def _savepoint_commit(self, sid):
-        self.cursor().execute(self.ops.savepoint_commit_sql(sid))
+        with self.cursor() as cursor:
+            cursor.execute(self.ops.savepoint_commit_sql(sid))
 
     def _savepoint_allowed(self):
         # Savepoints cannot be created outside a transaction
@@ -610,8 +613,8 @@ class BaseDatabaseFeatures(object):
     # Is there a 1000 item limit on query parameters?
     supports_1000_query_parameters = True
 
-    # Can an object have a primary key of 0? MySQL says No.
-    allows_primary_key_0 = True
+    # Can an object have an autoincrement primary key of 0? MySQL says No.
+    allows_auto_pk_0 = True
 
     # Do we need to NULL a ForeignKey out, or can the constraint check be
     # deferred
@@ -651,9 +654,6 @@ class BaseDatabaseFeatures(object):
     # Can we issue more than one ALTER COLUMN clause in an ALTER TABLE?
     supports_combined_alters = False
 
-    # What's the maximum length for index names?
-    max_index_name_length = 63
-
     # Does it support foreign keys?
     supports_foreign_keys = True
 
@@ -688,15 +688,15 @@ class BaseDatabaseFeatures(object):
             # otherwise autocommit will cause the confimation to
             # fail.
             self.connection.enter_transaction_management()
-            cursor = self.connection.cursor()
-            cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
-            self.connection.commit()
-            cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
-            self.connection.rollback()
-            cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
-            count, = cursor.fetchone()
-            cursor.execute('DROP TABLE ROLLBACK_TEST')
-            self.connection.commit()
+            with self.connection.cursor() as cursor:
+                cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
+                self.connection.commit()
+                cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
+                self.connection.rollback()
+                cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
+                count, = cursor.fetchone()
+                cursor.execute('DROP TABLE ROLLBACK_TEST')
+                self.connection.commit()
         finally:
             self.connection.leave_transaction_management()
         return count == 0
@@ -975,15 +975,6 @@ class BaseDatabaseOperations(object):
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a quote_name() method')
 
-    def quote_parameter(self, value):
-        """
-        Returns a quoted version of the value so it's safe to use in an SQL
-        string. This should NOT be used to prepare SQL statements to send to
-        the database; it is meant for outputting SQL statements to a file
-        or the console for later execution by a developer/DBA.
-        """
-        raise NotImplementedError()
-
     def random_function_sql(self):
         """
         Returns an SQL expression that returns a random value.
@@ -1253,7 +1244,8 @@ class BaseDatabaseIntrospection(object):
         in sorting order between databases.
         """
         if cursor is None:
-            cursor = self.connection.cursor()
+            with self.connection.cursor() as cursor:
+                return sorted(self.get_table_list(cursor))
         return sorted(self.get_table_list(cursor))
 
     def get_table_list(self, cursor):

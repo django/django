@@ -498,11 +498,11 @@ class WidthRatioNode(Node):
             value = float(value)
             max_value = float(max_value)
             ratio = (value / max_value) * max_width
+            result = str(int(round(ratio)))
         except ZeroDivisionError:
             return '0'
-        except (ValueError, TypeError):
+        except (ValueError, TypeError, OverflowError):
             return ''
-        result = str(int(round(ratio)))
 
         if self.asvar:
             context[self.asvar] = result

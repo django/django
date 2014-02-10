@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.gis.geos import GEOSGeometry, LinearRing, Polygon, Point
 from django.contrib.gis.maps.google.gmap import GoogleMapException
 from django.utils.six.moves import xrange

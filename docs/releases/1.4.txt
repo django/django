@@ -9,9 +9,9 @@ Welcome to Django 1.4!
 These release notes cover the `new features`_, as well
 as some `backwards incompatible changes`_ you'll want to be aware of
 when upgrading from Django 1.3 or older versions. We've also dropped some
-features, which are detailed in :doc:`our deprecation plan
-</internals/deprecation>`, and we've `begun the deprecation process for some
-features`_.
+features, which are detailed in :ref:`our deprecation plan
+<deprecation-removed-in-1.4>`, and we've `begun the deprecation process for
+some features`_.
 
 .. _`new features`: `What's new in Django 1.4`_
 .. _`backwards incompatible changes`: `Backwards incompatible changes in 1.4`_
@@ -1174,6 +1174,8 @@ In Django 1.3, the ``get_initial`` method of the
 class ``initial`` dictionary. This has been fixed to return a copy of this
 dictionary, so form instances can modify their initial data without messing
 with the class variable.
+
+.. _deprecated-features-1.4:
 
 Features deprecated in 1.4
 ==========================

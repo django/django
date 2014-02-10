@@ -86,14 +86,13 @@ class BaseDatabaseSchemaEditor(object):
         """
         Executes the given SQL statement, with optional parameters.
         """
-        # Get the cursor
-        cursor = self.connection.cursor()
         # Log the command we're running, then run it
         logger.debug("%s; (params %r)" % (sql, params))
         if self.collect_sql:
-            self.collected_sql.append((sql % tuple(map(self.connection.ops.quote_parameter, params))) + ";")
+            self.collected_sql.append((sql % tuple(map(self.quote_value, params))) + ";")
         else:
-            cursor.execute(sql, params)
+            with self.connection.cursor() as cursor:
+                cursor.execute(sql, params)
 
     def quote_name(self, name):
         return self.connection.ops.quote_name(name)
@@ -166,6 +165,16 @@ class BaseDatabaseSchemaEditor(object):
         if callable(default):
             default = default()
         return default
+
+    def quote_value(self, value):
+        """
+        Returns a quoted version of the value so it's safe to use in an SQL
+        string. This is not safe against injection from user code; it is
+        intended only for use in making SQL scripts or preparing default values
+        for particularly tricky backends (defaults are not user-defined, though,
+        so this is safe).
+        """
+        raise NotImplementedError()
 
     # Actions
 
@@ -770,17 +779,18 @@ class BaseDatabaseSchemaEditor(object):
         # Else generate the name for the index using a different algorithm
         table_name = model._meta.db_table.replace('"', '').replace('.', '_')
         index_unique_name = '_%x' % abs(hash((table_name, ','.join(column_names))))
+        max_length = self.connection.ops.max_name_length() or 200
         # If the index name is too long, truncate it
         index_name = ('%s_%s%s%s' % (table_name, column_names[0], index_unique_name, suffix)).replace('"', '').replace('.', '_')
-        if len(index_name) > self.connection.features.max_index_name_length:
+        if len(index_name) > max_length:
             part = ('_%s%s%s' % (column_names[0], index_unique_name, suffix))
-            index_name = '%s%s' % (table_name[:(self.connection.features.max_index_name_length - len(part))], part)
+            index_name = '%s%s' % (table_name[:(max_length - len(part))], part)
         # It shouldn't start with an underscore (Oracle hates this)
         if index_name[0] == "_":
             index_name = index_name[1:]
         # If it's STILL too long, just hash it down
-        if len(index_name) > self.connection.features.max_index_name_length:
-            index_name = hashlib.md5(force_bytes(index_name)).hexdigest()[:self.connection.features.max_index_name_length]
+        if len(index_name) > max_length:
+            index_name = hashlib.md5(force_bytes(index_name)).hexdigest()[:max_length]
         # It can't start with a number on Oracle, so prepend D if we need to
         if index_name[0].isdigit():
             index_name = "D%s" % index_name[:-1]
@@ -791,7 +801,8 @@ class BaseDatabaseSchemaEditor(object):
         Returns all constraint names matching the columns and conditions
         """
         column_names = list(column_names) if column_names else None
-        constraints = self.connection.introspection.get_constraints(self.connection.cursor(), model._meta.db_table)
+        with self.connection.cursor() as cursor:
+            constraints = self.connection.introspection.get_constraints(cursor, model._meta.db_table)
         result = []
         for name, infodict in constraints.items():
             if column_names is None or column_names == infodict['columns']:

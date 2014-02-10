@@ -896,10 +896,9 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         management.call_command('createcachetable', verbosity=0, interactive=False)
 
     def drop_table(self):
-        cursor = connection.cursor()
-        table_name = connection.ops.quote_name('test cache table')
-        cursor.execute('DROP TABLE %s' % table_name)
-        cursor.close()
+        with connection.cursor() as cursor:
+            table_name = connection.ops.quote_name('test cache table')
+            cursor.execute('DROP TABLE %s' % table_name)
 
     def test_zero_cull(self):
         self._perform_cull_test(caches['zero_cull'], 50, 18)
@@ -991,6 +990,18 @@ class CreateCacheTableForDBCacheTests(TestCase):
             router.routers = old_routers
 
 
+class PicklingSideEffect(object):
+
+    def __init__(self, cache):
+        self.cache = cache
+        self.locked = False
+
+    def __getstate__(self):
+        if self.cache._lock.active_writers:
+            self.locked = True
+        return {}
+
+
 @override_settings(CACHES=caches_setting_for_tests(
     BACKEND='django.core.cache.backends.locmem.LocMemCache',
 ))
@@ -1025,6 +1036,15 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         cache.set('value', 42)
         self.assertEqual(caches['default'].get('value'), 42)
         self.assertEqual(caches['other'].get('value'), None)
+
+    def test_locking_on_pickle(self):
+        """#20613/#18541 -- Ensures pickling is done outside of the lock."""
+        bad_obj = PicklingSideEffect(cache)
+        cache.set('set', bad_obj)
+        self.assertFalse(bad_obj.locked, "Cache was locked during pickling")
+
+        cache.add('add', bad_obj)
+        self.assertFalse(bad_obj.locked, "Cache was locked during pickling")
 
     def test_incr_decr_timeout(self):
         """incr/decr does not modify expiry time (matches memcached behavior)"""
@@ -1969,12 +1989,12 @@ class TestEtagWithAdmin(TestCase):
     def test_admin(self):
         with self.settings(USE_ETAGS=False):
             response = self.client.get('/test_admin/admin/')
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
             self.assertFalse(response.has_header('ETag'))
 
         with self.settings(USE_ETAGS=True):
             response = self.client.get('/test_admin/admin/')
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
             self.assertTrue(response.has_header('ETag'))
 
 

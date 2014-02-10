@@ -8,7 +8,6 @@ try:
 except ImportError:
     pytz = None
 
-from django.conf import settings
 from django.contrib.humanize.templatetags import humanize
 from django.template import Template, Context, defaultfilters
 from django.test import TestCase, override_settings
@@ -162,8 +161,7 @@ class HumanizeTests(TestCase):
         # As 24h of difference they will never be the same
         self.assertNotEqual(naturalday_one, naturalday_two)
 
-    @skipIf(settings.TIME_ZONE != "America/Chicago" and pytz is None,
-            "this test requires pytz when a non-default time zone is set")
+    @skipIf(pytz is None, "this test requires pytz")
     def test_naturalday_uses_localtime(self):
         # Regression for #18504
         # This is 2012-03-08HT19:30:00-06:00 in America/Chicago

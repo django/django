@@ -2,7 +2,7 @@ import os
 from unittest import SkipTest
 
 from django.contrib.staticfiles.testing import StaticLiveServerCase
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
 
 
@@ -22,7 +22,7 @@ class AdminSeleniumWebDriverTestCase(StaticLiveServerCase):
         if not os.environ.get('DJANGO_SELENIUM_TESTS', False):
             raise SkipTest('Selenium tests not requested')
         try:
-            cls.selenium = import_by_path(cls.webdriver_class)()
+            cls.selenium = import_string(cls.webdriver_class)()
         except Exception as e:
             raise SkipTest('Selenium webdriver "%s" not installed or not '
                            'operational: %s' % (cls.webdriver_class, str(e)))

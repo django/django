@@ -19,15 +19,15 @@ class OperationTests(MigrationTestBase):
         Creates a test model state and database table.
         """
         # Delete the tables if they already exist
-        cursor = connection.cursor()
-        try:
-            cursor.execute("DROP TABLE %s_pony" % app_label)
-        except:
-            pass
-        try:
-            cursor.execute("DROP TABLE %s_stable" % app_label)
-        except:
-            pass
+        with connection.cursor() as cursor:
+            try:
+                cursor.execute("DROP TABLE %s_pony" % app_label)
+            except:
+                pass
+            try:
+                cursor.execute("DROP TABLE %s_stable" % app_label)
+            except:
+                pass
         # Make the "current" state
         operations = [migrations.CreateModel(
             "Pony",
@@ -348,21 +348,22 @@ class OperationTests(MigrationTestBase):
         operation.state_forwards("test_alflpkfk", new_state)
         self.assertIsInstance(project_state.models["test_alflpkfk", "pony"].get_field_by_name("id"), models.AutoField)
         self.assertIsInstance(new_state.models["test_alflpkfk", "pony"].get_field_by_name("id"), models.FloatField)
+
+        def assertIdTypeEqualsFkType():
+            with connection.cursor() as cursor:
+                id_type = [c.type_code for c in connection.introspection.get_table_description(cursor, "test_alflpkfk_pony") if c.name == "id"][0]
+                fk_type = [c.type_code for c in connection.introspection.get_table_description(cursor, "test_alflpkfk_rider") if c.name == "pony_id"][0]
+            self.assertEqual(id_type, fk_type)
+
+        assertIdTypeEqualsFkType()
         # Test the database alteration
-        id_type = [c.type_code for c in connection.introspection.get_table_description(connection.cursor(), "test_alflpkfk_pony") if c.name == "id"][0]
-        fk_type = [c.type_code for c in connection.introspection.get_table_description(connection.cursor(), "test_alflpkfk_rider") if c.name == "pony_id"][0]
-        self.assertEqual(id_type, fk_type)
         with connection.schema_editor() as editor:
             operation.database_forwards("test_alflpkfk", editor, project_state, new_state)
-        id_type = [c.type_code for c in connection.introspection.get_table_description(connection.cursor(), "test_alflpkfk_pony") if c.name == "id"][0]
-        fk_type = [c.type_code for c in connection.introspection.get_table_description(connection.cursor(), "test_alflpkfk_rider") if c.name == "pony_id"][0]
-        self.assertEqual(id_type, fk_type)
+        assertIdTypeEqualsFkType()
         # And test reversal
         with connection.schema_editor() as editor:
             operation.database_backwards("test_alflpkfk", editor, new_state, project_state)
-        id_type = [c.type_code for c in connection.introspection.get_table_description(connection.cursor(), "test_alflpkfk_pony") if c.name == "id"][0]
-        fk_type = [c.type_code for c in connection.introspection.get_table_description(connection.cursor(), "test_alflpkfk_rider") if c.name == "pony_id"][0]
-        self.assertEqual(id_type, fk_type)
+        assertIdTypeEqualsFkType()
 
     def test_rename_field(self):
         """
@@ -400,24 +401,24 @@ class OperationTests(MigrationTestBase):
         self.assertEqual(len(project_state.models["test_alunto", "pony"].options.get("unique_together", set())), 0)
         self.assertEqual(len(new_state.models["test_alunto", "pony"].options.get("unique_together", set())), 1)
         # Make sure we can insert duplicate rows
-        cursor = connection.cursor()
-        cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (1, 1, 1)")
-        cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (2, 1, 1)")
-        cursor.execute("DELETE FROM test_alunto_pony")
-        # Test the database alteration
-        with connection.schema_editor() as editor:
-            operation.database_forwards("test_alunto", editor, project_state, new_state)
-        cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (1, 1, 1)")
-        with self.assertRaises(IntegrityError):
-            with atomic():
-                cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (2, 1, 1)")
-        cursor.execute("DELETE FROM test_alunto_pony")
-        # And test reversal
-        with connection.schema_editor() as editor:
-            operation.database_backwards("test_alunto", editor, new_state, project_state)
-        cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (1, 1, 1)")
-        cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (2, 1, 1)")
-        cursor.execute("DELETE FROM test_alunto_pony")
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (1, 1, 1)")
+            cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (2, 1, 1)")
+            cursor.execute("DELETE FROM test_alunto_pony")
+            # Test the database alteration
+            with connection.schema_editor() as editor:
+                operation.database_forwards("test_alunto", editor, project_state, new_state)
+            cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (1, 1, 1)")
+            with self.assertRaises(IntegrityError):
+                with atomic():
+                    cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (2, 1, 1)")
+            cursor.execute("DELETE FROM test_alunto_pony")
+            # And test reversal
+            with connection.schema_editor() as editor:
+                operation.database_backwards("test_alunto", editor, new_state, project_state)
+            cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (1, 1, 1)")
+            cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (2, 1, 1)")
+            cursor.execute("DELETE FROM test_alunto_pony")
         # Test flat unique_together
         operation = migrations.AlterUniqueTogether("Pony", ("pink", "weight"))
         operation.state_forwards("test_alunto", new_state)
@@ -477,14 +478,13 @@ class OperationTests(MigrationTestBase):
         """
 
         project_state = self.set_up_test_model("test_runpython")
+
         # Create the operation
-        operation = migrations.RunPython(
-            """
+        def inner_method(models, schema_editor):
             Pony = models.get_model("test_runpython", "Pony")
-            Pony.objects.create(pink=2, weight=4.55)
-            Pony.objects.create(weight=1)
-            """,
-        )
+            Pony.objects.create(pink=1, weight=3.55)
+            Pony.objects.create(weight=5)
+        operation = migrations.RunPython(inner_method)
         # Test the state alteration does nothing
         new_state = project_state.clone()
         operation.state_forwards("test_runpython", new_state)
@@ -497,16 +497,9 @@ class OperationTests(MigrationTestBase):
         # And test reversal fails
         with self.assertRaises(NotImplementedError):
             operation.database_backwards("test_runpython", None, new_state, project_state)
-        # Now test we can do it with a callable
-
-        def inner_method(models, schema_editor):
-            Pony = models.get_model("test_runpython", "Pony")
-            Pony.objects.create(pink=1, weight=3.55)
-            Pony.objects.create(weight=5)
-        operation = migrations.RunPython(inner_method)
-        with connection.schema_editor() as editor:
-            operation.database_forwards("test_runpython", editor, project_state, new_state)
-        self.assertEqual(project_state.render().get_model("test_runpython", "Pony").objects.count(), 4)
+        # Now test we can't use a string
+        with self.assertRaises(ValueError):
+            operation = migrations.RunPython("print 'ahahaha'")
 
 
 class MigrateNothingRouter(object):

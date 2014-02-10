@@ -329,6 +329,17 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             management.call_command('loaddata', 'invalid.json', verbosity=0)
             self.assertIn("Could not load fixtures.Article(pk=1):", cm.exception.args[0])
 
+    def test_loaddata_app_option(self):
+        """
+        Verifies that the --app option works.
+        """
+        management.call_command('loaddata', 'db_fixture_1', verbosity=0, app_label="someotherapp")
+        self.assertQuerysetEqual(Article.objects.all(), [])
+        management.call_command('loaddata', 'db_fixture_1', verbosity=0, app_label="fixtures")
+        self.assertQuerysetEqual(Article.objects.all(), [
+            '<Article: Who needs more than one database?>',
+        ])
+
     def test_loading_using(self):
         # Load db fixtures 1 and 2. These will load using the 'default' database identifier explicitly
         management.call_command('loaddata', 'db_fixture_1', verbosity=0, using='default')

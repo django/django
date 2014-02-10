@@ -38,7 +38,7 @@ class AdminDocViewTests(TestCase):
 
     def test_index(self):
         self.client.logout()
-        response = self.client.get(reverse('django-admindocs-docroot'))
+        response = self.client.get(reverse('django-admindocs-docroot'), follow=True)
         # Should display the login screen
         self.assertContains(response,
             '<input type="hidden" name="next" value="/admindocs/" />', html=True)

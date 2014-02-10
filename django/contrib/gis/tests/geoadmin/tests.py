@@ -4,15 +4,13 @@ from unittest import skipUnless
 
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 if HAS_GEOS and HAS_SPATIAL_DB:
     from django.contrib.gis import admin
     from django.contrib.gis.geos import Point
 
     from .models import City
-
-GOOGLE_MAPS_API_KEY = 'XXXX'
 
 
 @skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
@@ -59,15 +57,3 @@ class GeoAdminTest(TestCase):
         self.assertFalse(has_changed(initial, data_same))
         self.assertFalse(has_changed(initial, data_almost_same))
         self.assertTrue(has_changed(initial, data_changed))
-
-    @override_settings(GOOGLE_MAPS_API_KEY=GOOGLE_MAPS_API_KEY)
-    def test_google_map_scripts(self):
-        """
-        Testing GoogleMap.scripts() output. See #20773.
-        """
-        from django.contrib.gis.maps.google.gmap import GoogleMap
-
-        google_map = GoogleMap()
-        scripts = google_map.scripts
-        self.assertIn(GOOGLE_MAPS_API_KEY, scripts)
-        self.assertIn("new GMap2", scripts)

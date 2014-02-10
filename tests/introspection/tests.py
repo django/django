@@ -23,17 +23,17 @@ class IntrospectionTests(TestCase):
                      "'%s' isn't in table_list()." % Article._meta.db_table)
 
     def test_django_table_names(self):
-        cursor = connection.cursor()
-        cursor.execute('CREATE TABLE django_ixn_test_table (id INTEGER);')
-        tl = connection.introspection.django_table_names()
-        cursor.execute("DROP TABLE django_ixn_test_table;")
-        self.assertTrue('django_ixn_testcase_table' not in tl,
-                     "django_table_names() returned a non-Django table")
+        with connection.cursor() as cursor:
+            cursor.execute('CREATE TABLE django_ixn_test_table (id INTEGER);')
+            tl = connection.introspection.django_table_names()
+            cursor.execute("DROP TABLE django_ixn_test_table;")
+            self.assertTrue('django_ixn_testcase_table' not in tl,
+                         "django_table_names() returned a non-Django table")
 
     def test_django_table_names_retval_type(self):
         # Ticket #15216
-        cursor = connection.cursor()
-        cursor.execute('CREATE TABLE django_ixn_test_table (id INTEGER);')
+        with connection.cursor() as cursor:
+            cursor.execute('CREATE TABLE django_ixn_test_table (id INTEGER);')
 
         tl = connection.introspection.django_table_names(only_existing=True)
         self.assertIs(type(tl), list)
@@ -53,14 +53,14 @@ class IntrospectionTests(TestCase):
                      'Reporter sequence not found in sequence_list()')
 
     def test_get_table_description_names(self):
-        cursor = connection.cursor()
-        desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
+        with connection.cursor() as cursor:
+            desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
         self.assertEqual([r[0] for r in desc],
                          [f.column for f in Reporter._meta.fields])
 
     def test_get_table_description_types(self):
-        cursor = connection.cursor()
-        desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
+        with connection.cursor() as cursor:
+            desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
         # The MySQL exception is due to the cursor.description returning the same constant for
         # text and blob columns. TODO: use information_schema database to retrieve the proper
         # field type on MySQL
@@ -75,8 +75,8 @@ class IntrospectionTests(TestCase):
     # inspect the length of character columns).
     @expectedFailureOnOracle
     def test_get_table_description_col_lengths(self):
-        cursor = connection.cursor()
-        desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
+        with connection.cursor() as cursor:
+            desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
         self.assertEqual(
             [r[3] for r in desc if datatype(r[1], r) == 'CharField'],
             [30, 30, 75]
@@ -87,8 +87,8 @@ class IntrospectionTests(TestCase):
     # so its idea about null_ok in cursor.description is different from ours.
     @skipIfDBFeature('interprets_empty_strings_as_nulls')
     def test_get_table_description_nullable(self):
-        cursor = connection.cursor()
-        desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
+        with connection.cursor() as cursor:
+            desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
         self.assertEqual(
             [r[6] for r in desc],
             [False, False, False, False, True, True]
@@ -97,15 +97,15 @@ class IntrospectionTests(TestCase):
     # Regression test for #9991 - 'real' types in postgres
     @skipUnlessDBFeature('has_real_datatype')
     def test_postgresql_real_type(self):
-        cursor = connection.cursor()
-        cursor.execute("CREATE TABLE django_ixn_real_test_table (number REAL);")
-        desc = connection.introspection.get_table_description(cursor, 'django_ixn_real_test_table')
-        cursor.execute('DROP TABLE django_ixn_real_test_table;')
+        with connection.cursor() as cursor:
+            cursor.execute("CREATE TABLE django_ixn_real_test_table (number REAL);")
+            desc = connection.introspection.get_table_description(cursor, 'django_ixn_real_test_table')
+            cursor.execute('DROP TABLE django_ixn_real_test_table;')
         self.assertEqual(datatype(desc[0][1], desc[0]), 'FloatField')
 
     def test_get_relations(self):
-        cursor = connection.cursor()
-        relations = connection.introspection.get_relations(cursor, Article._meta.db_table)
+        with connection.cursor() as cursor:
+            relations = connection.introspection.get_relations(cursor, Article._meta.db_table)
 
         # Older versions of MySQL don't have the chops to report on this stuff,
         # so just skip it if no relations come back. If they do, though, we
@@ -117,21 +117,21 @@ class IntrospectionTests(TestCase):
 
     @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_get_key_columns(self):
-        cursor = connection.cursor()
-        key_columns = connection.introspection.get_key_columns(cursor, Article._meta.db_table)
+        with connection.cursor() as cursor:
+            key_columns = connection.introspection.get_key_columns(cursor, Article._meta.db_table)
         self.assertEqual(
             set(key_columns),
             set([('reporter_id', Reporter._meta.db_table, 'id'),
                  ('response_to_id', Article._meta.db_table, 'id')]))
 
     def test_get_primary_key_column(self):
-        cursor = connection.cursor()
-        primary_key_column = connection.introspection.get_primary_key_column(cursor, Article._meta.db_table)
+        with connection.cursor() as cursor:
+            primary_key_column = connection.introspection.get_primary_key_column(cursor, Article._meta.db_table)
         self.assertEqual(primary_key_column, 'id')
 
     def test_get_indexes(self):
-        cursor = connection.cursor()
-        indexes = connection.introspection.get_indexes(cursor, Article._meta.db_table)
+        with connection.cursor() as cursor:
+            indexes = connection.introspection.get_indexes(cursor, Article._meta.db_table)
         self.assertEqual(indexes['reporter_id'], {'unique': False, 'primary_key': False})
 
     def test_get_indexes_multicol(self):
@@ -139,8 +139,8 @@ class IntrospectionTests(TestCase):
         Test that multicolumn indexes are not included in the introspection
         results.
         """
-        cursor = connection.cursor()
-        indexes = connection.introspection.get_indexes(cursor, Reporter._meta.db_table)
+        with connection.cursor() as cursor:
+            indexes = connection.introspection.get_indexes(cursor, Reporter._meta.db_table)
         self.assertNotIn('first_name', indexes)
         self.assertIn('id', indexes)
 

@@ -27,7 +27,7 @@ Welcome to Django 1.6!
 These release notes cover the `new features`_, as well as some `backwards
 incompatible changes`_ you'll want to be aware of when upgrading from Django
 1.5 or older versions. We've also dropped some features, which are detailed in
-:doc:`our deprecation plan </internals/deprecation>`, and we've `begun the
+:ref:`our deprecation plan <deprecation-removed-in-1.6>`, and we've `begun the
 deprecation process for some features`_.
 
 .. _`new features`: `What's new in Django 1.6`_
@@ -954,6 +954,8 @@ Miscellaneous
   Any unnamed captured group will now be passed to ``get_redirect_url()``
   which may result in a ``TypeError`` if you don't update the signature of your
   custom method.
+
+.. _deprecated-features-1.6:
 
 Features deprecated in 1.6
 ==========================

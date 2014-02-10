@@ -1,8 +1,9 @@
-from django.contrib.sites.models import Site
+from django.apps import apps as django_apps
 from django.core import urlresolvers, paginator
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.six.moves.urllib.parse import urlencode
 from django.utils.six.moves.urllib.request import urlopen
+
 
 PING_URL = "http://www.google.com/webmasters/tools/ping"
 
@@ -32,6 +33,9 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
     if sitemap_url is None:
         raise SitemapNotFound("You didn't provide a sitemap_url, and the sitemap URL couldn't be auto-detected.")
 
+    if not django_apps.is_installed('django.contrib.sites'):
+        raise ImproperlyConfigured("ping_google requires django.contrib.sites, which isn't installed.")
+    Site = django_apps.get_model('sites.Site')
     current_site = Site.objects.get_current()
     url = "http://%s%s" % (current_site.domain, sitemap_url)
     params = urlencode({'sitemap': url})
@@ -75,7 +79,8 @@ class Sitemap(object):
 
         # Determine domain
         if site is None:
-            if Site._meta.installed:
+            if django_apps.is_installed('django.contrib.sites'):
+                Site = django_apps.get_model('sites.Site')
                 try:
                     site = Site.objects.get_current()
                 except Site.DoesNotExist:
@@ -111,6 +116,9 @@ class Sitemap(object):
 
 class FlatPageSitemap(Sitemap):
     def items(self):
+        if not django_apps.is_installed('django.contrib.sites'):
+            raise ImproperlyConfigured("ping_google requires django.contrib.sites, which isn't installed.")
+        Site = django_apps.get_model('sites.Site')
         current_site = Site.objects.get_current()
         return current_site.flatpage_set.filter(registration_required=False)
 
