@@ -118,3 +118,5 @@ class GeoIPTest(unittest.TestCase):
         g = GeoIP()
         d = g.city("www.osnabrueck.de")
         self.assertEqual('Osnabrück', d['city'])
+        d = g.country('200.7.49.81')
+        self.assertEqual('Curaçao', d['country_name'])
