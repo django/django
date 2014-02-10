@@ -310,6 +310,13 @@ Minor features
   ``html_email_template_name`` parameter used to send a multipart HTML email
   for password resets.
 
+:mod:`django.contrib.formtools`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Calls to :meth:`WizardView.done()
+  <django.contrib.formtools.wizard.views.WizardView.done>` now include a
+  ``form_dict`` to allow easier access to forms by their step name.
+
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -696,6 +703,12 @@ Tests
 
 Validators
 ^^^^^^^^^^
+
+* :class:`~django.core.validators.RegexValidator` now accepts an optional
+  Boolean :attr:`~django.core.validators.RegexValidator.inverse_match` argument
+  which determines if the :exc:`~django.core.exceptions.ValidationError` should
+  be raised when the regular expression pattern matches (``True``) or does not
+  match (``False``, by default) the provided ``value``.
 
 * :class:`~django.core.validators.URLValidator` now accepts an optional
   ``schemes`` argument which allows customization of the accepted URI schemes

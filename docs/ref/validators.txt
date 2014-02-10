@@ -59,20 +59,22 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``RegexValidator``
 ------------------
-.. class:: RegexValidator([regex=None, message=None, code=None])
+.. class:: RegexValidator([regex=None, message=None, code=None, inverse_match=None])
 
     :param regex: If not ``None``, overrides :attr:`regex`. Can be a regular
         expression string or a pre-compiled regular expression.
     :param message: If not ``None``, overrides :attr:`.message`.
     :param code: If not ``None``, overrides :attr:`code`.
+    :param inverse_match: If not ``None``, overrides :attr:`inverse_match`.
 
     .. attribute:: regex
 
         The regular expression pattern to search for the provided ``value``,
         or a pre-compiled regular expression. Raises a
         :exc:`~django.core.exceptions.ValidationError` with :attr:`message`
-        and :attr:`code` if no match is found. By default, matches any string
-        (including an empty string).
+        and :attr:`code` if :attr:`inverse_match` is ``False`` and a match is
+        found, or if :attr:`inverse_match` is ``True`` and a match is not found.
+        By default, matches any string (including an empty string).
 
     .. attribute:: message
 
@@ -84,6 +86,12 @@ to, or in lieu of custom ``field.clean()`` methods.
 
         The error code used by :exc:`~django.core.exceptions.ValidationError`
         if validation fails. Defaults to ``"invalid"``.
+
+    .. attribute:: inverse_match
+
+        .. versionadded:: 1.7
+
+        The match mode for :attr:`regex`. Defaults to ``False``.
 
 ``URLValidator``
 ----------------

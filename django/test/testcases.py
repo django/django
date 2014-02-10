@@ -825,17 +825,17 @@ class TransactionTestCase(SimpleTestCase):
                          allow_cascade=self.available_apps is not None,
                          inhibit_post_migrate=self.available_apps is not None)
 
-    def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True):
+    def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True, msg=None):
         items = six.moves.map(transform, qs)
         if not ordered:
-            return self.assertEqual(set(items), set(values))
+            return self.assertEqual(set(items), set(values), msg=msg)
         values = list(values)
         # For example qs.iterator() could be passed as qs, but it does not
         # have 'ordered' attribute.
         if len(values) > 1 and hasattr(qs, 'ordered') and not qs.ordered:
             raise ValueError("Trying to compare non-ordered queryset "
                              "against more than one ordered values")
-        return self.assertEqual(list(items), values)
+        return self.assertEqual(list(items), values, msg=msg)
 
     def assertNumQueries(self, num, func=None, *args, **kwargs):
         using = kwargs.pop("using", DEFAULT_DB_ALIAS)
