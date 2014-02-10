@@ -1,0 +1,10 @@
+==========================
+Django 1.6.3 release notes
+==========================
+
+*Under development*
+
+This is Django 1.6.3, a bugfix release for Django 1.6. Django 1.6.3 fixes
+several bugs in 1.6.2:
+
+* ...
