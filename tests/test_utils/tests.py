@@ -568,6 +568,19 @@ class AssertContainsTest(SimpleTestCase):
         response = HttpResponse('This is some response text.')
         self.assertContains(response, b'some response text')
 
+    def test_raw_bytes(self):
+        response = HttpResponse(b'\1\2\3\4')
+        self.assertContains(response, b'\2\3')
+        with self.assertRaises(AssertionError):
+            self.assertContains(response, b'\5')
+
+    def test_raw_bytes_failure_message_has_nice_repr(self):
+        response = HttpResponse(b'\1\2\3\4')
+        self.assertContains(response, b'\2\3')
+        with self.assertRaises(AssertionError) as mgr:
+            self.assertContains(response, b'\5')
+        self.assertIn('\\x05', str(mgr.exception))
+
     def test_count_correct_passes(self):
         response = HttpResponse('a thing' * 5)
         self.assertContains(response, 'thing', count=5)
