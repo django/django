@@ -324,6 +324,15 @@ class BaseModelForm(BaseForm):
         self._validate_unique = False
         super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
                                             error_class, label_suffix, empty_permitted)
+        # Apply ``limit_choices_to`` to each field.
+        for field_name in self.fields:
+            formfield = self.fields[field_name]
+            if hasattr(formfield, 'queryset'):
+                limit_choices_to = formfield.limit_choices_to
+                if limit_choices_to is not None:
+                    if callable(limit_choices_to):
+                        limit_choices_to = limit_choices_to()
+                    formfield.queryset = formfield.queryset.complex_filter(limit_choices_to)
 
     def _get_validation_exclusions(self):
         """
@@ -1082,7 +1091,8 @@ class ModelChoiceField(ChoiceField):
 
     def __init__(self, queryset, empty_label="---------", cache_choices=False,
                  required=True, widget=None, label=None, initial=None,
-                 help_text='', to_field_name=None, *args, **kwargs):
+                 help_text='', to_field_name=None, limit_choices_to=None,
+                 *args, **kwargs):
         if required and (initial is not None):
             self.empty_label = None
         else:
@@ -1094,6 +1104,7 @@ class ModelChoiceField(ChoiceField):
         Field.__init__(self, required, widget, label, initial, help_text,
                        *args, **kwargs)
         self.queryset = queryset
+        self.limit_choices_to = limit_choices_to   # limit the queryset later.
         self.choice_cache = None
         self.to_field_name = to_field_name
 

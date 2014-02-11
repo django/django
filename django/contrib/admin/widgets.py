@@ -180,7 +180,10 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         return mark_safe(''.join(output))
 
     def base_url_parameters(self):
-        return url_params_from_lookup_dict(self.rel.limit_choices_to)
+        limit_choices_to = self.rel.limit_choices_to
+        if callable(limit_choices_to):
+            limit_choices_to = limit_choices_to()
+        return url_params_from_lookup_dict(limit_choices_to)
 
     def url_parameters(self):
         from django.contrib.admin.views.main import TO_FIELD_VAR
