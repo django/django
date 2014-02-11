@@ -8,9 +8,9 @@ words, most of these tests should be rewritten.
 """
 from __future__ import unicode_literals
 
+import datetime
 import os
 import tempfile
-import datetime
 
 from django.core import validators
 from django.core.exceptions import ImproperlyConfigured, ValidationError

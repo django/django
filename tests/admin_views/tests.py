@@ -3721,19 +3721,18 @@ class LimitChoicesToInAdminTest(TestCase):
 
     def test_limit_choices_to_as_callable(self):
         """Test for ticket 2445 changes to admin."""
-        character1 = Character(username='threepwood')
-        character2 = Character(username='marley')
-
-        character1.last_action = datetime.datetime.today() + datetime.timedelta(days=1)
-        character1.save()
-
-        character2.last_action = datetime.datetime.today() - datetime.timedelta(days=1)
-        character2.save()
-
+        threepwood = Character.objects.create(
+            username='threepwood',
+            last_action=datetime.datetime.today() + datetime.timedelta(days=1),
+        )
+        marley = Character.objects.create(
+            username='marley',
+            last_action=datetime.datetime.today() - datetime.timedelta(days=1),
+        )
         response = self.client.get('/test_admin/admin/admin_views/stumpjoke/add/')
         # The allowed option should appear twice; the limited option should not appear.
-        self.assertEqual(response.content.count('threepwood'), 2)
-        self.assertNotIn('marley', response.content)
+        self.assertEqual(str(response.content).count(threepwood.username), 2)
+        self.assertNotIn(marley.username, str(response.content))
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))

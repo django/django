@@ -1892,27 +1892,27 @@ class LimitChoicesToTest(TestCase):
     Tests the functionality of ``limit_choices_to``.
     """
     def setUp(self):
-        self.user1 = Character(username='threepwood')
-        self.user2 = Character(username='marley')
-
-        self.user1.last_action = datetime.datetime.today() + datetime.timedelta(days=1)
-        self.user1.save()
-
-        self.user2.last_action = datetime.datetime.today() - datetime.timedelta(days=1)
-        self.user2.save()
+        self.threepwood = Character.objects.create(
+            username='threepwood',
+            last_action=datetime.datetime.today() + datetime.timedelta(days=1),
+        )
+        self.marley = Character.objects.create(
+            username='marley',
+            last_action=datetime.datetime.today() - datetime.timedelta(days=1),
+        )
 
     def test_limit_choices_to_callable_for_fk_rel(self):
         """
         A ForeignKey relation can use ``limit_choices_to`` as a callable, re #2554.
         """
         stumpjokeform = StumpJokeForm()
-        self.assertIn(self.user1, stumpjokeform.fields['most_recently_fooled'].queryset)
-        self.assertNotIn(self.user2, stumpjokeform.fields['most_recently_fooled'].queryset)
+        self.assertIn(self.threepwood, stumpjokeform.fields['most_recently_fooled'].queryset)
+        self.assertNotIn(self.marley, stumpjokeform.fields['most_recently_fooled'].queryset)
 
     def test_limit_choices_to_callable_for_m2m_rel(self):
         """
         A ManyToMany relation can use ``limit_choices_to`` as a callable, re #2554.
         """
         stumpjokeform = StumpJokeForm()
-        self.assertIn(self.user1, stumpjokeform.fields['has_fooled_today'].queryset)
-        self.assertNotIn(self.user2, stumpjokeform.fields['has_fooled_today'].queryset)
+        self.assertIn(self.threepwood, stumpjokeform.fields['has_fooled_today'].queryset)
+        self.assertNotIn(self.marley, stumpjokeform.fields['has_fooled_today'].queryset)
