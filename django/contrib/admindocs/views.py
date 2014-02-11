@@ -257,6 +257,9 @@ class ModelDetailView(BaseAdminDocsView):
         # Gather related objects
         for rel in opts.get_all_related_objects() + opts.get_all_related_many_to_many_objects():
             verbose = _("related `%(app_label)s.%(object_name)s` objects") % {'app_label': rel.opts.app_label, 'object_name': rel.opts.object_name}
+            # If related_name ends with '+', backwards relations are explicitly disabled.
+            if rel.field.rel.is_hidden():
+                continue
             accessor = rel.get_accessor_name()
             fields.append({
                 'name': "%s.all" % accessor,
