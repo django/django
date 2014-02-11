@@ -102,8 +102,13 @@ class Command(BaseCommand):
                         raise CommandError("Unknown model: %s.%s" % (app_label, model_label))
 
                     app_list_value = app_list.setdefault(app_config, [])
-                    if model not in app_list_value:
-                        app_list_value.append(model)
+
+                    # We may have previously seen a "all-models" request for
+                    # this app (no model qualifier was given). In this case
+                    # there is no need adding specific models to the list.
+                    if app_list_value is not None:
+                        if model not in app_list_value:
+                            app_list_value.append(model)
                 except ValueError:
                     if primary_keys:
                         raise CommandError("You can only use --pks option with one model")
