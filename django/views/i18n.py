@@ -8,6 +8,9 @@ from django.apps import apps
 from django.conf import settings
 from django.template import Context, Template
 from django.utils.translation import check_for_language, to_locale, get_language
+from django.utils.translation.trans_real import (compile_messages,
+    needs_compilation, has_reload_i18n_setting, purge_i18n_caches)
+
 from django.utils.encoding import smart_text
 from django.utils.formats import get_format_modules, get_format
 from django.utils._os import upath
@@ -187,6 +190,9 @@ def render_javascript_catalog(catalog=None, plural=None):
 
 
 def get_javascript_catalog(locale, domain, packages):
+    if has_reload_i18n_setting():
+        purge_i18n_caches()
+
     default_locale = to_locale(settings.LANGUAGE_CODE)
     app_configs = apps.get_app_configs()
     allowable_packages = set(app_config.name for app_config in app_configs)
@@ -206,6 +212,8 @@ def get_javascript_catalog(locale, domain, packages):
     # first load all english languages files for defaults
     for path in paths:
         try:
+            if needs_compilation(domain, path, 'en'):
+                compile_messages(domain, path, 'en')
             catalog = gettext_module.translation(domain, path, ['en'])
             t.update(catalog._catalog)
         except IOError:
@@ -219,6 +227,8 @@ def get_javascript_catalog(locale, domain, packages):
     if default_locale != 'en':
         for path in paths:
             try:
+                if needs_compilation(domain, path, default_locale):
+                    compile_messages(domain, path, default_locale)
                 catalog = gettext_module.translation(domain, path, [default_locale])
             except IOError:
                 catalog = None
@@ -236,6 +246,8 @@ def get_javascript_catalog(locale, domain, packages):
             locale_t = {}
             for path in paths:
                 try:
+                    if needs_compilation(domain, path, locale):
+                        compile_messages(domain, path, locale)
                     catalog = gettext_module.translation(domain, path, [locale])
                 except IOError:
                     catalog = None

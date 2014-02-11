@@ -1,17 +1,21 @@
 # -*- coding:utf-8 -*-
 import gettext
 import os
+import shutil
 from os import path
 import unittest
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.core.management.utils import find_command
 from django.test import (
     LiveServerTestCase, TestCase, modify_settings, override_settings)
-from django.utils import six
+from django.utils import six, translation
 from django.utils._os import upath
-from django.utils.translation import override
+from django.utils.translation import override, trans_real
 from django.utils.text import javascript_quote
+
+from threading import local
 
 try:
     from selenium.webdriver.firefox import webdriver as firefox
@@ -19,6 +23,8 @@ except ImportError:
     firefox = None
 
 from ..urls import locale_dir
+
+has_msgfmt = find_command('msgfmt')
 
 
 class I18NTests(TestCase):
@@ -214,3 +220,41 @@ class JavascriptI18nTests(LiveServerTestCase):
         self.assertEqual(elem.text, "1 Resultat")
         elem = self.selenium.find_element_by_id("npgettext_plur")
         self.assertEqual(elem.text, "455 Resultate")
+
+
+@unittest.skipUnless(has_msgfmt, 'msgfmt is mandatory for compilation tests')
+class RecompileForJSTests(TestCase):
+    test_dir = os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), ''))
+    test_locale = [os.path.join(test_dir, 'locale')]
+    urls = 'view_tests.urls'
+
+    PO_FILE = 'locale/xx/LC_MESSAGES/djangojs.po'
+    MO_FILE = 'locale/xx/LC_MESSAGES/djangojs.mo'
+    BACKUP_FILE = 'locale/xx/LC_MESSAGES/backup.po'
+    NEW_FILE = 'locale/xx/LC_MESSAGES/replacement.po'
+
+    def setUp(self):
+        self._cwd = os.getcwd()
+        self.addCleanup(os.chdir, self._cwd)
+        os.chdir(self.test_dir)
+
+    def rmfile(self, filepath):
+        if os.path.exists(filepath):
+            os.remove(filepath)
+
+    def tearDown(self):
+        os.remove(self.MO_FILE)
+        shutil.copyfile(self.BACKUP_FILE, self.PO_FILE)
+
+    @override_settings(LOCALE_PATHS=test_locale, I18N_RELOAD_ON_CHANGE=True, LANGUAGE_CODE="xx")
+    def test_new_values(self):
+        trans_real._active = local()
+        trans_real._translations = {}
+        with translation.override('xx'):
+            response = self.client.get('/jsi18n/')
+            self.assertContains(response, "Find Value")
+
+        shutil.copyfile(self.NEW_FILE, self.PO_FILE)
+        with translation.override('xx'):
+            response = self.client.get('/jsi18n/')
+            self.assertContains(response, "Find new Value")

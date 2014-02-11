@@ -1,27 +1,15 @@
 from __future__ import unicode_literals
 
-import codecs
 import os
 from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
-from django.core.management.utils import find_command, popen_wrapper
-from django.utils._os import npath, upath
-
-
-def has_bom(fn):
-    with open(fn, 'rb') as f:
-        sample = f.read(4)
-    return sample[:3] == b'\xef\xbb\xbf' or \
-        sample.startswith(codecs.BOM_UTF16_LE) or \
-        sample.startswith(codecs.BOM_UTF16_BE)
+from django.utils._os import upath
+from django.utils.translation.trans_real import (compile_message_file,
+                                                TranslationError)
 
 
 def compile_messages(stdout, locale=None):
-    program = 'msgfmt'
-    if find_command(program) is None:
-        raise CommandError("Can't find %s. Make sure you have GNU gettext tools 0.15 or newer installed." % program)
-
     basedirs = [os.path.join('conf', 'locale'), 'locale']
     if os.environ.get('DJANGO_SETTINGS_MODULE'):
         from django.conf import settings
@@ -45,17 +33,10 @@ def compile_messages(stdout, locale=None):
                         continue
                     stdout.write('processing file %s in %s\n' % (f, dirpath))
                     fn = os.path.join(dirpath, f)
-                    if has_bom(fn):
-                        raise CommandError("The %s file has a BOM (Byte Order Mark). Django only supports .po files encoded in UTF-8 and without any BOM." % fn)
-                    pf = os.path.splitext(fn)[0]
-                    args = [program, '--check-format', '-o', npath(pf + '.mo'), npath(pf + '.po')]
-                    output, errors, status = popen_wrapper(args)
-                    if status:
-                        if errors:
-                            msg = "Execution of %s failed: %s" % (program, errors)
-                        else:
-                            msg = "Execution of %s failed" % program
-                        raise CommandError(msg)
+                    try:
+                        compile_message_file(fn)
+                    except TranslationError as ex:
+                        raise CommandError(ex.msg)
 
 
 class Command(BaseCommand):
