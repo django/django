@@ -1338,14 +1338,14 @@ class ModelAdmin(BaseModelAdmin):
             form = ModelForm(request.POST, request.FILES, instance=obj)
             if form.is_valid():
                 form_validated = True
-                new_object = self.save_form(request, form, change=True)
+                new_object = self.save_form(request, form, change=not add)
             else:
                 form_validated = False
                 new_object = form.instance
             formsets, inline_instances = self._create_formsets(request, new_object)
             if all_valid(formsets) and form_validated:
-                self.save_model(request, new_object, form, True)
-                self.save_related(request, form, formsets, True)
+                self.save_model(request, new_object, form, not add)
+                self.save_related(request, form, formsets, not add)
                 if add:
                     self.log_addition(request, new_object)
                     return self.response_add(request, new_object)
@@ -1355,6 +1355,8 @@ class ModelAdmin(BaseModelAdmin):
                     return self.response_change(request, new_object)
         else:
             if add:
+                # Prepare the dict of initial data from the request.
+                # We have to special-case M2Ms as a list of comma-separated PKs.
                 initial = dict(request.GET.items())
                 for k in initial:
                     try:
@@ -1382,7 +1384,7 @@ class ModelAdmin(BaseModelAdmin):
             media = media + inline_formset.media
 
         context = dict(self.admin_site.each_context(),
-            title=_('Change %s') % force_text(opts.verbose_name),
+            title=(_('Add %s') if add else _('Change %s')) % force_text(opts.verbose_name),
             adminform=adminForm,
             object_id=object_id,
             original=obj,
