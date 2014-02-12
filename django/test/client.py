@@ -157,16 +157,24 @@ def encode_multipart(boundary, data):
         if is_file(value):
             lines.extend(encode_file(boundary, key, value))
         elif not isinstance(value, six.string_types) and is_iterable(value):
-            for item in value:
-                if is_file(item):
-                    lines.extend(encode_file(boundary, key, item))
-                else:
-                    lines.extend([to_bytes(val) for val in [
-                        '--%s' % boundary,
-                        'Content-Disposition: form-data; name="%s"' % key,
-                        '',
-                        item
-                    ]])
+            if len(value):
+                for item in value:
+                    if is_file(item):
+                        lines.extend(encode_file(boundary, key, item))
+                    else:
+                        lines.extend([to_bytes(val) for val in [
+                            '--%s' % boundary,
+                            'Content-Disposition: form-data; name="%s"' % key,
+                            '',
+                            item
+                        ]])
+            else:
+                lines.extend([to_bytes(val) for val in [
+                    '--%s' % boundary,
+                    'Content-Disposition: form-data; name="%s"' % key,
+                    '',
+                    ''
+                ]])
         else:
             lines.extend([to_bytes(val) for val in [
                 '--%s' % boundary,
