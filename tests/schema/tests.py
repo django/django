@@ -2,11 +2,13 @@ from __future__ import absolute_import
 import datetime
 import unittest
 
-from django.test import TransactionTestCase
+from django.apps.registry import Apps
 from django.db import connection, DatabaseError, IntegrityError, OperationalError
+from django.db.models import Model
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField, BooleanField
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.transaction import atomic
+from django.test import TransactionTestCase
 from .models import (Author, AuthorWithM2M, Book, BookWithLongName,
     BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
     UniqueTest, Thing)
@@ -780,3 +782,63 @@ class SchemaTests(TransactionTestCase):
             DatabaseError,
             lambda: list(Thing.objects.all()),
         )
+
+
+class NaiveCITextField(TextField):
+    def db_parameters(self, connection):
+        params = super(NaiveCITextField, self).db_parameters(connection)
+        params['pre_create_sql'] = 'CREATE EXTENSION IF NOT EXISTS citext'
+        params['type'] = 'CITEXT'
+        return params
+
+
+@unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific SQL used")
+class PreCreateSQLTests(TransactionTestCase):
+    available_apps = []
+
+    def setup(self):
+        with connection.cursor() as cursor:
+            cursor.execute('DROP EXTENSION IF EXISTS citext')
+            cursor.connection.commit()
+
+    def test_create_model(self):
+        class CITextModel(Model):
+            text = NaiveCITextField()
+
+            class Meta:
+                apps = Apps()
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            try:
+                editor.create_model(CITextModel)
+            except OperationalError as e:
+                self.fail("Errors when applying initial migration for a model "
+                          "with custom create_sql: %s" % e)
+
+        # Check that it's there
+        list(CITextModel.objects.all())
+        # Clean up that table
+        with connection.schema_editor() as editor:
+            editor.delete_model(CITextModel)
+        # Check that it's gone
+        self.assertRaises(
+            DatabaseError,
+            lambda: list(CITextModel.objects.all()),
+        )
+
+    def test_add_field(self):
+        """
+        Tests adding fields to models
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        new_field = NaiveCITextField(null=True)
+        new_field.set_attributes_from_name("text")
+        with connection.schema_editor() as editor:
+            editor.add_field(
+                Author,
+                new_field,
+            )
+            editor.delete_model(Author)
