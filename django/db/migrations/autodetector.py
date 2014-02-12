@@ -31,7 +31,7 @@ class MigrationAutodetector(object):
         to try and restrict to (restriction is not guaranteed)
         """
         changes = self._detect_changes()
-        changes = self._arrange_for_graph(changes, graph)
+        changes = self.arrange_for_graph(changes, graph)
         if trim_to_apps:
             changes = self._trim_to_apps(changes, trim_to_apps)
         return changes
@@ -299,7 +299,7 @@ class MigrationAutodetector(object):
         dependency = ("__setting__", setting_name)
         self.migrations[app_label][-1].dependencies.append(dependency)
 
-    def _arrange_for_graph(self, changes, graph):
+    def arrange_for_graph(self, changes, graph):
         """
         Takes in a result from changes() and a MigrationGraph,
         and fixes the names and dependencies of the changes so they
@@ -388,8 +388,9 @@ class MigrationAutodetector(object):
                 return "%s_%s" % (ops[0].model_name.lower(), ops[0].name.lower())
             elif isinstance(ops[0], operations.RemoveField):
                 return "remove_%s_%s" % (ops[0].model_name.lower(), ops[0].name.lower())
-        elif all(isinstance(o, operations.CreateModel) for o in ops):
-            return "_".join(sorted(o.name.lower() for o in ops))
+        elif len(ops) > 1:
+            if all(isinstance(o, operations.CreateModel) for o in ops):
+                return "_".join(sorted(o.name.lower() for o in ops))
         return "auto_%s" % datetime.datetime.now().strftime("%Y%m%d_%H%M")
 
     @classmethod

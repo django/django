@@ -54,7 +54,7 @@ class AutodetectorTests(TestCase):
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Run through arrange_for_graph
-        changes = autodetector._arrange_for_graph(changes, graph)
+        changes = autodetector.arrange_for_graph(changes, graph)
         # Make sure there's a new name, deps match, etc.
         self.assertEqual(changes["testapp"][0].name, "0003_author")
         self.assertEqual(changes["testapp"][0].dependencies, [("testapp", "0002_foobar")])
@@ -70,7 +70,7 @@ class AutodetectorTests(TestCase):
         changes = autodetector._detect_changes()
         # Run through arrange_for_graph
         graph = MigrationGraph()
-        changes = autodetector._arrange_for_graph(changes, graph)
+        changes = autodetector.arrange_for_graph(changes, graph)
         changes["testapp"][0].dependencies.append(("otherapp", "0001_initial"))
         changes = autodetector._trim_to_apps(changes, set(["testapp"]))
         # Make sure there's the right set of migrations
