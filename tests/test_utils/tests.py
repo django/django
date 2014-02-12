@@ -4,7 +4,8 @@ import warnings
 
 from django.db import connection
 from django.forms import EmailField, IntegerField
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
+from django.template.response import TemplateResponse
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.html import HTMLParseError, parse_html
@@ -594,6 +595,18 @@ class AssertContainsTest(SimpleTestCase):
         response = HttpResponse('a thing' * 5)
         with self.assertRaises(AssertionError):
             self.assertContains(response, 'thing', count=6)
+
+    def test_streaming_response(self):
+        response = StreamingHttpResponse(['response content'])
+        self.assertContains(response, 'content')
+        with self.assertRaises(AssertionError):
+            self.assertContains(response, 'not this')
+
+    def test_template_response(self):
+        response = TemplateResponse(request=HttpRequest(), template='template.html')
+        self.assertContains(response, 'template content')
+        with self.assertRaises(AssertionError):
+            self.assertContains(response, 'not this')
 
 
 class AssertContainsIntegrationTest(TestCase):
