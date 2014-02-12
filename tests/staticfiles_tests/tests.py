@@ -22,6 +22,9 @@ from django.utils import six
 
 from django.contrib.staticfiles import finders, storage
 
+from .storage import DummyStorage
+
+
 TEST_ROOT = os.path.dirname(upath(__file__))
 TEST_SETTINGS = {
     'DEBUG': True,
@@ -232,6 +235,29 @@ class TestConfiguration(StaticFilesTestCase):
                         self, ImproperlyConfigured,
                         'without having set the STATIC_ROOT setting to a filesystem path'):
                     call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
+
+    def test_local_storage_detection_helper(self):
+        staticfiles_storage = storage.staticfiles_storage
+        try:
+            storage.staticfiles_storage._wrapped = empty
+            with override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.StaticFilesStorage'):
+                command = collectstatic.Command()
+                self.assertTrue(command.is_local_storage())
+
+            storage.staticfiles_storage._wrapped = empty
+            with override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.DummyStorage'):
+                command = collectstatic.Command()
+                self.assertFalse(command.is_local_storage())
+
+            storage.staticfiles_storage = storage.FileSystemStorage()
+            command = collectstatic.Command()
+            self.assertTrue(command.is_local_storage())
+
+            storage.staticfiles_storage = DummyStorage()
+            command = collectstatic.Command()
+            self.assertFalse(command.is_local_storage())
+        finally:
+            storage.staticfiles_storage = staticfiles_storage
 
 
 class TestCollection(CollectionTestCase, TestDefaults):
