@@ -6,6 +6,7 @@ from optparse import make_option
 from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections, DEFAULT_DB_ALIAS, migrations
+from django.db.migrations.migration import Migration
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.questioner import MigrationQuestioner, InteractiveMigrationQuestioner
@@ -20,6 +21,8 @@ class Command(BaseCommand):
             help="Just show what migrations would be made; don't actually write them."),
         make_option('--merge', action='store_true', dest='merge', default=False,
             help="Enable fixing of migration conflicts."),
+        make_option('--empty', action='store_true', dest='empty', default=False,
+            help="Create an empty migration."),
     )
 
     help = "Creates new migration(s) for apps."
@@ -31,6 +34,7 @@ class Command(BaseCommand):
         self.interactive = options.get('interactive')
         self.dry_run = options.get('dry_run', False)
         self.merge = options.get('merge', False)
+        self.empty = options.get('empty', False)
 
         # Make sure the app they asked for exists
         app_labels = set(app_labels)
@@ -71,12 +75,27 @@ class Command(BaseCommand):
         if self.merge and conflicts:
             return self.handle_merge(loader, conflicts)
 
-        # Detect changes
+        # Set up autodetector
         autodetector = MigrationAutodetector(
             loader.graph.project_state(),
             ProjectState.from_apps(apps),
             InteractiveMigrationQuestioner(specified_apps=app_labels),
         )
+
+        # If they want to make an empty migration, make one for each app
+        if self.empty:
+            if not app_labels:
+                raise CommandError("You must supply at least one app label when using --empty.")
+            # Make a fake changes() result we can pass to arrange_for_graph
+            changes = dict(
+                (app, [Migration("custom", app)])
+                for app in app_labels
+            )
+            changes = autodetector.arrange_for_graph(changes, loader.graph)
+            self.write_migration_files(changes)
+            return
+
+        # Detect changes
         changes = autodetector.changes(graph=loader.graph, trim_to_apps=app_labels or None)
 
         # No changes? Tell them.
@@ -89,6 +108,12 @@ class Command(BaseCommand):
                 self.stdout.write("No changes detected")
             return
 
+        self.write_migration_files(changes)
+
+    def write_migration_files(self, changes):
+        """
+        Takes a changes dict and writes them out as migration files.
+        """
         directory_created = {}
         for app_label, app_migrations in changes.items():
             if self.verbosity >= 1:
