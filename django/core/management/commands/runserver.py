@@ -14,6 +14,7 @@ from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.migrations.executor import MigrationExecutor
 from django.utils import autoreload
 from django.utils import six
+from django.core.exceptions import ImproperlyConfigured
 
 naiveip_re = re.compile(r"""^(?:
 (?P<addr>
@@ -101,7 +102,10 @@ class Command(BaseCommand):
 
         self.stdout.write("Performing system checks...\n\n")
         self.validate(display_num_errors=True)
-        self.check_migrations()
+        try:
+            self.check_migrations()
+        except ImproperlyConfigured:
+            pass
         now = datetime.now().strftime('%B %d, %Y - %X')
         if six.PY2:
             now = now.decode('utf-8')
