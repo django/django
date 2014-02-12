@@ -73,7 +73,9 @@ manipulating the data of your Web application. Learn more about it below:
   :doc:`Accessing related objects <ref/models/relations>`
 
 * **Migrations:**
-  :doc:`Introduction to Migrations<topics/migrations>`
+  :doc:`Introduction to Migrations<topics/migrations>` |
+  :doc:`Operations reference <ref/migration-operations>` |
+  :doc:`SchemaEditor <ref/schema-editor>`
 
 * **Advanced:**
   :doc:`Managers <topics/db/managers>` |

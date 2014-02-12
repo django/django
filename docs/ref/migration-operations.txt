@@ -1,0 +1,320 @@
+====================
+Migration Operations
+====================
+
+Migration files are composed of one or more Operations, objects that
+declaratively record what the migration should do to your database.
+
+Django also uses these Operation objects to work out what your models
+looked like historically, and to calculate what changes you've made to
+your models since the last migration so it can automatically write
+your migrations; that's why they're declarative, as it means Django can
+easily load them all into memory and run through them without touching
+the database to work out what your project should look like.
+
+There are also more specialised Operation objects which are for things like
+:ref:`data migrations <data-migrations>` and for advanced manual database
+manipulation. You can also write your own Operation classes if you want
+to encapsulate a custom change you commonly make.
+
+If you need an empty migration file to write your own Operation objects
+into, just use ``python manage.py makemigrations --empty yourappname``,
+but be aware that manually adding schema-altering operations can confuse the
+migration autodetector and make resulting runs of ``makemigrations`` output
+incorrect code.
+
+All of the core Django operations are available from the
+``django.db.migrations.operations`` module.
+
+
+Schema Operations
+=================
+
+CreateModel
+-----------
+::
+
+    CreateModel(name, fields, options=None, bases=None)
+
+Creates a new model in the project history and a corresponding table in the
+database to match it.
+
+``name`` is the model name, as would be written in the ``models.py`` file.
+
+``fields`` is a list of 2-tuples of ``(field_name, field_instance)``.
+The field instance should be an unbound field (so just ``models.CharField()``,
+rather than a field takes from another model).
+
+``options`` is an optional dictionary of values from the model's ``Meta`` class.
+
+``bases`` is an optional list of other classes to have this model inheirit from;
+it can contain both class objects as well as strings in the format
+``"appname.ModelName"`` if you want to depend on another model (so you inherit
+from the historical version). If it's not supplied, it defaults to just
+inheriting from the standard ``models.Model``.
+
+
+DeleteModel
+-----------
+::
+
+    DeleteModel(name)
+
+Deletes the model from the project history and its table from the database.
+
+
+RenameModel
+-----------
+::
+
+    RenameModel(old_name, new_name)
+
+Renames the model from an old name to a new one.
+
+You may have to manually add
+this if you change the model's name and quite a few of its fields at once; to
+the autodetector, this will look like you deleted a model with the old name
+and added a new one with a different name, and the migration it creates will
+lose any data in the old table.
+
+
+AlterModelTable
+---------------
+::
+
+    AlterModelTable(name, table)
+
+Changes the model's table name (the ``db_table`` option on the ``Meta`` subclass)
+
+
+AlterUniqueTogether
+-------------------
+::
+
+    AlterUniqueTogether(name, unique_together)
+
+Changes the model's set of unique constraints
+(the ``unique_together`` option on the ``Meta`` subclass)
+
+
+AlterIndexTogether
+------------------
+::
+
+    AlterIndexTogether(name, index_together)
+
+Changes the model's set of custom indexes
+(the ``index_together`` option on the ``Meta`` subclass)
+
+
+AddField
+--------
+::
+
+    AddField(model_name, name, field, preserve_default=True)
+
+Adds a field to a model. ``model_name`` is the model's name, ``name`` is
+the field's name, and ``field`` is an unbound Field instance (the thing
+you would put in the field declaration in ``models.py`` - for example,
+``models.IntegerField(null=True)``.
+
+The ``preserve_default`` argument indicates whether the field's default
+value is permanent and should be baked into the project state (``True``),
+or if it is temporary and just for this migration (``False``) - usually
+because the migration is adding a non-nullable field to a table and needs
+a default value to put into existing rows. It does not effect the behaviour
+of setting defaults in the database directly - Django never sets database
+defaults, and always applies them in the Django ORM code.
+
+
+RemoveField
+-----------
+::
+
+    RemoveField(model_name, name)
+
+Removes a field from a model.
+
+Bear in mind that when reversed this is actually adding a field to a model;
+if the field is not nullable this may make this operation irreversible (apart
+from any data loss, which of course is irreversible).
+
+
+AlterField
+----------
+::
+
+    AlterField(model_name, name, field)
+
+Alters a field's definition, including changes to its type, ``null``, ``unique``,
+``db_column`` and other field attributes.
+
+Note that not all changes are possible on all databases - for example, you
+cannot change a text-type field like ``models.TextField()`` into a number-type
+field like ``models.IntegerField()`` on most databases.
+
+
+RenameField
+-----------
+::
+
+    RenameField(model_name, old_name, new_name)
+
+Changes a field's name (and, unless ``db_column`` is set, its column name).
+
+
+
+Special Operations
+==================
+
+RunSQL
+------
+
+::
+
+    RunSQL(sql, reverse_sql=None, state_operations=None, multiple=False)
+
+Allows runnning of arbitrary SQL on the database - useful for more advanced
+features of database backends that Django doesn't support directly, like
+partial indexes.
+
+``sql``, and ``reverse_sql`` if provided, should be strings of SQL to run on the
+database. They will be passed to the database as a single SQL statement unless
+``multiple`` is set to ``True``, in which case they will be split into separate
+statements manually by the operation before being passed through.
+
+In some extreme cases, the built-in statement splitter may not be able to split
+correctly, in which case you should manually split the SQL into multiple calls
+to ``RunSQL``.
+
+The ``state_operations`` argument is so you can supply operations that are
+equivalent to the SQL in terms of project state; for example, if you are 
+manually creating a column, you should pass in a list containing an ``AddField``
+operation here so that the autodetector still has an up-to-date state of the
+model (otherwise, when you next run ``makemigrations``, it won't see any
+operation that adds that field and so will try to run it again).
+
+
+.. _operation-run-python:
+
+RunPython
+---------
+
+::
+
+    RunPython(code, reverse_code=None)
+
+Runs custom Python code in a historical context. ``code`` (and ``reverse_code``
+if supplied) should be callable objects that accept two arguments; the first is
+an instance of ``django.apps.registry.Apps`` containing historical models that
+match the operation's place in the project history, and the second is an
+instance of SchemaEditor.
+
+You are advised to write the code as a separate function above the ``Migration``
+class in the migration file, and just pass it to ``RunPython``.
+
+
+SeparateDatabaseAndState
+------------------------
+
+::
+
+    SeparateDatabaseAndState(database_operations=None, state_operations=None)
+
+A highly specalist operation that let you mix and match the database
+(schema-changing) and state (autodetector-powering) aspects of operations.
+
+It accepts two list of operations, and when asked to apply state will use the
+state list, and when asked to apply changes to the database will use the database
+list. Do not use this operation unless you're very sure you know what you're doing.
+
+
+Writing your own
+================
+
+Operations have a relatively simple API, and they're designed so that you can
+easily write your own to supplement the built-in Django ones. The basic structure
+of an Operation looks like this::
+
+    from django.db.migrations.operations.base import Operation
+
+    class MyCustomOperation(Operation):
+
+        # If this is False, it means that this operation will be ignored by
+        # sqlmigrate; if true, it will be run and the SQL collected for its output.
+        reduces_to_sql = False
+
+        # If this is False, Django will refuse to reverse past this operation.
+        reversible = False
+
+        def __init__(self, arg1, arg2):
+            # Operations are usually instantiated with arguments in migration
+            # files. Store the values of them on self for later use.
+            pass
+
+        def state_forwards(self, app_label, state):
+            # The Operation should take the 'state' parameter (an instance of
+            # django.db.migrations.state.ProjectState) and mutate it to match
+            # any schema changes that have occurred.
+            pass
+
+        def database_forwards(self, app_label, schema_editor, from_state, to_state):
+            # The Operation should use schema_editor to apply any changes it
+            # wants to make to the database.
+            pass
+
+        def database_backwards(self, app_label, schema_editor, from_state, to_state):
+            # If reversible is True, this is called when the operation is reversed.
+            pass
+
+        def describe(self):
+            # This is used to describe what the operation does in console output.
+            return "Custom Operation"
+
+You can take this template and work from it, though we suggest looking at the
+built-in Django operations in ``django.db.migrations.operations`` - they're
+easy to read and cover a lot of the example usage of semi-internal aspects
+of the migration framework like ``ProjectState`` and the patterns used to get
+historical models.
+
+Some things to note:
+
+* You don't need to learn too much about ProjectState to just write simple
+  migrations; just know that it has a ``.render()`` method that turns it into
+  an app registry (which you can then call ``get_model`` on).
+
+* ``database_forwards`` and ``database_backwards`` both get two states passed
+  to them; these just represent the difference the ``state_forwards`` method
+  would have applied, but are given to you for convenience and speed reasons.
+
+* ``to_state`` in the database_backwards method is the *older* state; that is,
+  the one that will be the current state once the migration has finished reversing.
+
+* You might see implementations of ``references_model`` on the built-in
+  operations; this is part of the autodetection code and does not matter for
+  custom operations.
+
+As a simple example, let's make an operation that loads PostgreSQL extensions
+(which contain some of PostgreSQL's more exciting features). It's simple enough;
+there's no model state changes, and all it does is run one command::
+
+    from django.db.migrations.operations.base import Operation
+
+    class LoadExtension(Operation):
+
+        reversible = True
+
+        def __init__(self, name):
+            self.name = name
+
+        def state_forwards(self, app_label, state):
+            pass
+
+        def database_forwards(self, app_label, schema_editor, from_state, to_state):
+            schema_editor.execute("CREATE EXTENSION IF NOT EXISTS %s" % self.name)
+
+        def database_backwards(self, app_label, schema_editor, from_state, to_state):
+            schema_editor.execute("DROP EXTENSION %s" % self.name)
+
+        def describe(self):
+            return "Creates extension %s" % self.name

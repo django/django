@@ -60,7 +60,7 @@ Backend Support
 
 Migrations are supported on all backends that Django ships with, as well
 as any third-party backends if they have programmed in support for schema
-alteration (done via the ``SchemaEditor`` class).
+alteration (done via the :doc:`SchemaEditor </ref/schema-editor>` class).
 
 However, some databases are more capable than others when it comes to
 schema migrations; some of the caveats are covered below.
@@ -309,6 +309,84 @@ so you must always keep base classes around for as long as there is a migration
 that contains a reference to them. On the plus side, methods and managers
 from these base classes inherit normally, so if you absolutely need access
 to these you can opt to move them into a superclass.
+
+
+.. _data-migrations:
+
+Data Migrations
+---------------
+
+As well as changing the database schema, you can also use migrations to change
+the data in the database itself, in conjunction with the schema if you want.
+
+Migrations that alter data are usually called "data migrations"; they're best
+written as separate migrations, sitting alongside your schema migrations.
+
+Django can't automatically generate data migrations for you, as it does with
+schema migrations, but it's not very hard to write them. Migration files in
+Django are made up of :doc:`Operations </ref/migration-operations>`, and
+the main operation you use for data migrations is
+:ref:`RunPython <operation-run-python>`.
+
+To start, make an empty migration file you can work from (Django will put
+the file in the right place, suggest a name, and add dependencies for you)::
+
+    python manage.py makemigrations --empty yourappname
+
+Then, open up the file; it should look something like this::
+
+    # encoding: utf8
+    from django.db import models, migrations
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ('yourappname', '0001_initial'),
+        ]
+
+        operations = [
+        ]
+
+Now, all you need to do is create a new function and have RunPython use it.
+RunPython expects a callable as its argument which takes two arguments - the
+first is an :doc:`app registry </ref/applications/>` that has the historical
+versions of all your models loaded into it to match where in your history the
+migration sits, and the second is a :doc:`SchemaEditor </ref/schema-editor>`,
+which you can use to manually effect database schema changes (but beware,
+doing this can confuse the migration autodetector!)
+
+Let's write a simple migration that populates our new ``name`` field with the
+combined values of ``first_name`` and ``last_name`` (we've come to our senses
+and realised that not everyone has first and last names). All we
+need to do is use the historical model and iterate over the rows::
+
+    # encoding: utf8
+    from django.db import models, migrations
+
+    def combine_names(apps, schema_editor):
+        # We can't import the Person model directly as it may be a newer
+        # version than this migration expects. We use the historical version.
+        Person = apps.get_model("yourappname", "Person")
+        for person in Person.objects.all():
+            person.name = "%s %s" % (person.first_name, person.last_name)
+            person.save()
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ('yourappname', '0001_initial'),
+        ]
+
+        operations = [
+            migrations.RunPython(combine_names),
+        ]
+
+Once that's done, we can just run ``python manage.py migrate`` as normal and
+the data migration will run in place alongside other migrations.
+
+If you're interested in the more advanced migration operations, or want
+to be able to write your own, see our
+:doc:`migration operations reference </ref/migration-operations>`.
 
 
 .. _migration-serializing:
