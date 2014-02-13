@@ -233,7 +233,8 @@ class MigrationAutodetector(object):
                         field=field,
                     )
                 )
-                swappable_setting = new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0].swappable_setting
+                new_field = new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
+                swappable_setting = getattr(new_field, 'swappable_setting', None)
                 if swappable_setting is not None:
                     self.add_swappable_dependency(app_label, swappable_setting)
         # Old fields
