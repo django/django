@@ -1,5 +1,5 @@
 (function($) {
-	var _actions_icnt, lastChecked;
+	var lastChecked;
 
 	$.fn.actions = function(opts) {
 		var options = $.extend({}, $.fn.actions.defaults, opts);
