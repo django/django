@@ -29,6 +29,7 @@ class AutodetectorTests(TestCase):
     book = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))])
     book_unique = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("author", "title")]})
     book_unique_2 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("title", "author")]})
+    book_unique_3 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("newfield", models.IntegerField()), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("title", "newfield")]})
     edition = ModelState("thirdapp", "Edition", [("id", models.AutoField(primary_key=True)), ("book", models.ForeignKey("otherapp.Book"))])
     custom_user = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))])
 
@@ -332,6 +333,24 @@ class AutodetectorTests(TestCase):
         self.assertEqual(action.__class__.__name__, "AlterUniqueTogether")
         self.assertEqual(action.name, "book")
         self.assertEqual(action.unique_together, set([("title", "author")]))
+
+    def test_add_field_and_unique_together(self):
+        "Tests that added fields will be created before using them in unique together"
+        before = self.make_project_state([self.author_empty, self.book])
+        after = self.make_project_state([self.author_empty, self.book_unique_3])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['otherapp']), 1)
+        # Right number of actions?
+        migration = changes['otherapp'][0]
+        self.assertEqual(len(migration.operations), 2)
+        # Right actions order?
+        action1 = migration.operations[0]
+        action2 = migration.operations[1]
+        self.assertEqual(action1.__class__.__name__, "AddField")
+        self.assertEqual(action2.__class__.__name__, "AlterUniqueTogether")
+        self.assertEqual(action2.unique_together, set([("title", "newfield")]))
 
     def test_proxy_ignorance(self):
         "Tests that the autodetector correctly ignores proxy models"
