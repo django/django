@@ -128,6 +128,19 @@ instances.
     {'sender': [ValidationError(['Enter a valid email address.'])],
     'subject': [ValidationError(['This field is required.'])]}
 
+Use-cases for this method include, serializing the errors in a custom
+format (i.e. XML), identifying a given error to remove it or rewrite
+its error message, or basically, anytime it's needed to answer the
+question: "what is this error?".
+
+The name ``as_data()`` may sound a little contrived, but it's explained by the
+desire to remain backward compatible. Previously ``ValidationError`` instances
+were lost as soon as their **rendered** error messages were added to the
+``Form.errors`` dictionary. Ideally ``Form.errors`` would have stored
+``ValidationError`` instances, and methods with an ``as_`` prefix could render
+them, but it had to be done the other way around in order not to break code
+that expects rendered error messages in ``Form.errors``.
+
 .. method:: Form.errors.as_json()
 
 .. versionadded:: 1.7
