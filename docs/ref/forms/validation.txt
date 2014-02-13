@@ -179,6 +179,13 @@ to override your error message you can still opt for the less verbose::
 
     ValidationError(_('Invalid value: %s') % value)
 
+.. versionadded:: 1.7
+
+The :meth:`Form.errors.as_data() <django.forms.Form.errors.as_data()>` and
+:meth:`Form.errors.as_json() <django.forms.Form.errors.as_json()>` methods
+greatly benefit from fully featured ``ValidationError``\s (with a ``code`` name
+and a ``params`` dictionary).
+
 Raising multiple errors
 ~~~~~~~~~~~~~~~~~~~~~~~
 

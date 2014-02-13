@@ -128,6 +128,20 @@ instances.
     {'sender': [ValidationError(['Enter a valid email address.'])],
     'subject': [ValidationError(['This field is required.'])]}
 
+Use this method anytime you need to identify an error by its ``code``. This
+enables things like rewriting the error's message or writing custom logic in a
+view when a given error is present. It can also be used to serialize the errors
+in a custom format (e.g. XML); for instance, :meth:`~Form.errors.as_json()`
+relies on ``as_data()``.
+
+The need for the ``as_data()`` method is due to backwards compatibility.
+Previously ``ValidationError`` instances were lost as soon as their
+**rendered** error messages were added to the ``Form.errors`` dictionary.
+Ideally ``Form.errors`` would have stored ``ValidationError`` instances
+and methods with an ``as_`` prefix could render them, but it had to be done
+the other way around in order not to break code that expects rendered error
+messages in ``Form.errors``.
+
 .. method:: Form.errors.as_json()
 
 .. versionadded:: 1.7
