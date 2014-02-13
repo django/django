@@ -801,6 +801,15 @@ For each field, we describe the default widget used if you don't specify
    This field is intended for use in representing a model
    :class:`~django.db.models.SlugField` in forms.
 
+    Takes one optional argument:
+
+        .. attribute:: unicode
+
+        .. versionadded:: 1.7
+
+        A boolean iinstructing the field to accept unicode letters.
+        Defaults to ``False``.
+
 ``TimeField``
 ~~~~~~~~~~~~~
 

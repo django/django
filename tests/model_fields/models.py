@@ -53,6 +53,10 @@ class BigS(models.Model):
     s = models.SlugField(max_length=255)
 
 
+class UnicodeSlugField(models.Model):
+    s = models.SlugField(unicode=True)
+
+
 class BigInt(models.Model):
     value = models.BigIntegerField()
     null_value = models.BigIntegerField(null=True, blank=True)

@@ -947,6 +947,13 @@ about database portability and :attr:`~CharField.max_length` in that section,
 too). If :attr:`~CharField.max_length` is not specified, Django will use a
 default length of 50.
 
+.. attribute:: SlugField.unicode
+
+    .. versionadded:: 1.7
+
+    Allows the field to accept unicode letters.
+    Accepted values are ``False`` (default) or ``True``.
+
 Implies setting :attr:`Field.db_index` to ``True``.
 
 It is often useful to automatically prepopulate a SlugField based on the value

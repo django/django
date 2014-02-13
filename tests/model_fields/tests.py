@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import datetime
@@ -21,8 +22,8 @@ from django.utils import six
 from django.utils.functional import lazy
 
 from .models import (
-    Foo, Bar, Whiz, BigD, BigS, BigInt, Post, NullBooleanModel,
-    BooleanModel, DataModel, Document, RenamedField,
+    Foo, Bar, Whiz, BigD, BigS, UnicodeSlugField, BigInt, Post,
+    NullBooleanModel, BooleanModel, DataModel, Document, RenamedField,
     VerboseNameField, FksToBooleans)
 
 
@@ -324,6 +325,14 @@ class SlugFieldTests(test.TestCase):
         bs = BigS.objects.create(s='slug' * 50)
         bs = BigS.objects.get(pk=bs.pk)
         self.assertEqual(bs.s, 'slug' * 50)
+
+    def test_slugfield_unicode(self):
+        """
+        Make sure SlugField  with unicode=True honors max_length (#9706)
+        """
+        bs = UnicodeSlugField.objects.create(s='你好你好' * 50)
+        bs = UnicodeSlugField.objects.get(pk=bs.pk)
+        self.assertEqual(bs.s, '你好你好' * 50)
 
 
 class ValidationTest(test.TestCase):

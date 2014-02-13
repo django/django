@@ -155,6 +155,9 @@ validate_email = EmailValidator()
 slug_re = re.compile(r'^[-a-zA-Z0-9_]+$')
 validate_slug = RegexValidator(slug_re, _("Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."), 'invalid')
 
+slug_unicode_re = re.compile(r'^[-\w]+$', re.U)
+validate_unicode_slug = RegexValidator(slug_unicode_re, _("Enter a valid 'slug' consisting of unicode letters, numbers, underscores or hyphens."), 'invalid')
+
 ipv4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$')
 validate_ipv4_address = RegexValidator(ipv4_re, _('Enter a valid IPv4 address.'), 'invalid')
 
