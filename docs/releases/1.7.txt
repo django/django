@@ -609,8 +609,8 @@ Models
   lookup.
 
 * It is now possible to pass a callable as value for the attribute
-  :attr:`ForeignKey.limit_choices_to` when defining a ``ForeignKey`` or
-  ``ManyToManyField``.
+  :attr:`~django.db.models.ForeignKey.limit_choices_to` when defining a
+  ``ForeignKey`` or ``ManyToManyField``.
 
 Signals
 ^^^^^^^
