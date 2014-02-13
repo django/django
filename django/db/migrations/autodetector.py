@@ -169,6 +169,7 @@ class MigrationAutodetector(object):
         kept_models = set(old_model_keys).intersection(new_model_keys)
         old_fields = set()
         new_fields = set()
+        unique_together_operations = []
         for app_label, model_name in kept_models:
             old_model_state = self.from_state.models[app_label, model_name]
             new_model_state = self.to_state.models[app_label, model_name]
@@ -176,15 +177,16 @@ class MigrationAutodetector(object):
             # always come before AlterFields even on separate models)
             old_fields.update((app_label, model_name, x) for x, y in old_model_state.fields)
             new_fields.update((app_label, model_name, x) for x, y in new_model_state.fields)
-            # Unique_together changes
+            # Unique_together changes. Operations will be added to migration a
+            # bit later, after fields creation. See ticket #22035.
             if old_model_state.options.get("unique_together", set()) != new_model_state.options.get("unique_together", set()):
-                self.add_to_migration(
+                unique_together_operations.append((
                     app_label,
                     operations.AlterUniqueTogether(
                         name=model_name,
                         unique_together=new_model_state.options.get("unique_together", set()),
                     )
-                )
+                ))
         # New fields
         for app_label, model_name, field_name in new_fields - old_fields:
             old_model_state = self.from_state.models[app_label, model_name]
@@ -263,6 +265,8 @@ class MigrationAutodetector(object):
                         field=new_model_state.get_field_by_name(field_name),
                     )
                 )
+        for app_label, operation in unique_together_operations:
+            self.add_to_migration(app_label, operation)
         # Alright, now add internal dependencies
         for app_label, migrations in self.migrations.items():
             for m1, m2 in zip(migrations, migrations[1:]):
