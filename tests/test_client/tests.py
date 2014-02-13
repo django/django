@@ -79,6 +79,19 @@ class ClientTest(TestCase):
         self.assertEqual(response.templates[0].name, 'POST Template')
         self.assertContains(response, 'Data received')
 
+    def test_post_should_not_strip_empty_list(self):
+        "POST some data to a view"
+        post_data = {
+            'value': [],
+        }
+        response = self.client.post('/post_view/', post_data)
+
+        # Check some response details
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['data'], '')
+        self.assertEqual(response.templates[0].name, 'POST Template')
+        self.assertContains(response, 'Data received')
+
     def test_response_headers(self):
         "Check the value of HTTP headers returned in a response"
         response = self.client.get("/header_view/")
