@@ -24,7 +24,7 @@ msgstr ""
 
 #: conf/global_settings.py:48
 msgid "Afrikaans"
-msgstr "Африканська"
+msgstr "Африкаанс"
 
 #: conf/global_settings.py:49
 msgid "Arabic"
