@@ -5,6 +5,7 @@ from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import generic
+from django.views.generic.detail import SingleObjectMixin
 
 from .test_forms import AuthorForm, ContactForm
 from .models import Artist, Author, Book, Page, BookSigning
@@ -17,6 +18,16 @@ class CustomTemplateView(generic.TemplateView):
         context = super(CustomTemplateView, self).get_context_data(**kwargs)
         context.update({'key': 'value'})
         return context
+
+
+class SingleAuthorDetail(SingleObjectMixin, generic.TemplateView):
+    template_name = 'generic_views/detail.html'
+
+    queryset = Author.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data()
+        return self.render_to_response(context)
 
 
 class ObjectDetail(generic.DetailView):

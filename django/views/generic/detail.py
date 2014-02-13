@@ -97,6 +97,10 @@ class SingleObjectMixin(ContextMixin):
         Insert the single object into the context dict.
         """
         context = {}
+
+        if not hasattr(self, 'object'):
+            self.object = self.get_object()
+
         if self.object:
             context['object'] = self.object
             context_object_name = self.get_context_object_name(self.object)
