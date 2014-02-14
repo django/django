@@ -21,6 +21,16 @@ class ResolveUrlTests(TestCase):
         """
         self.assertEqual('/something/', resolve_url('/something/'))
 
+    def test_relative_path(self):
+        """
+        Tests that passing a relative URL path to ``resolve_url`` will result
+        in the same url.
+        """
+        self.assertEqual('../', resolve_url('../'))
+        self.assertEqual('../relative/', resolve_url('../relative/'))
+        self.assertEqual('./', resolve_url('./'))
+        self.assertEqual('./relative/', resolve_url('./relative/'))
+
     def test_full_url(self):
         """
         Tests that passing a full URL to ``resolve_url`` will result in the

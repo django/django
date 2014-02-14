@@ -677,6 +677,9 @@ Requests
 * The new :attr:`HttpRequest.scheme <django.http.HttpRequest.scheme>` attribute
   specifies the scheme of the request (``http`` or ``https`` normally).
 
+* The shortcut :func:`redirect() <django.shortcuts.redirect>` now supports
+  relative URLs.
+
 Tests
 ^^^^^
 

@@ -203,10 +203,15 @@ If you want to override the :setting:`TEMPLATE_DIRS` setting, use the
      <django.core.urlresolvers.reverse>` will be used to reverse-resolve the
      name.
 
-   * A URL, which will be used as-is for the redirect location.
+   * An absolute or relative URL, which will be used as-is for the redirect
+     location.
 
    By default issues a temporary redirect; pass ``permanent=True`` to issue a
-   permanent redirect
+   permanent redirect.
+
+   .. versionchanged:: 1.7
+
+       The ability to use relative URLs was added.
 
 Examples
 --------
