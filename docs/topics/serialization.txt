@@ -216,6 +216,8 @@ the auth.User model has such a relation to the auth.Permission model::
 
 This example links the given user with the permission models with PKs 46 and 47.
 
+.. _serialization-formats-json:
+
 JSON
 ~~~~
 

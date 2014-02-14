@@ -36,7 +36,7 @@ All attributes should be considered read-only, unless stated otherwise below.
 
    .. versionadded:: 1.7
 
-   A string representing the scheme of the request (``http`` or ``https`` 
+   A string representing the scheme of the request (``http`` or ``https``
    usually).
 
 .. attribute:: HttpRequest.body
@@ -822,6 +822,74 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     method, Django will treat it as emulating a
     :class:`~django.template.response.SimpleTemplateResponse`, and the
     ``render`` method must itself return a valid response object.
+
+JsonResponse objects
+====================
+
+.. versionadded:: 1.7
+
+.. class:: JsonResponse
+
+.. method:: JsonResponse.__init__(data, encoder=DjangoJSONEncoder, safe=True, **kwargs)
+
+   An :class:`HttpResponse` subclass that helps to create a JSON-encoded
+   response. It inherits most behavior from its superclass with a couple
+   differences:
+
+   Its default ``Content-Type`` header is set to ``application/json``.
+
+   The first parameter, ``data``, should be a ``dict`` instance. If the ``safe``
+   parameter is set to ``False`` (see below) it can be any JSON-serializable
+   object.
+
+   The ``encoder``, which defaults to
+   ``django.core.serializers.json.DjangoJSONEncoder``, will be used to
+   serialize the data. See :ref:`JSON serialization
+   <serialization-formats-json>` for more details about this serializer.
+
+   The ``safe`` boolean parameter defaults to ``True``. If it's set to ``False``,
+   any object can be passed for serialization (otherwise only ``dict`` instances
+   are allowed). If ``safe`` is ``True`` and a non-``dict`` object is passed as
+   the first argument, a :exc:`~exceptions.TypeError` will be raised.
+
+Usage
+-----
+
+Typical usage could look like::
+
+    >>> from django.http import JsonResponse
+    >>> response = JsonResponse({'foo': 'bar'})
+    >>> response.content
+    '{"foo": "bar"}'
+
+
+Serializing non-dictionary objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to serialize objects other than ``dict`` you must set the ``safe``
+parameter to ``False``::
+
+    >>> response = JsonResponse([1, 2, 3], safe=False)
+
+Without passing ``safe=False``, a :exc:`~exceptions.TypeError` will be raised.
+
+.. warning::
+
+    Before the `5th edition of EcmaScript
+    <http://www.ecma-international.org/publications/standards/Ecma-262.htm>`_
+    it was possible to poison the JavaScript ``Array`` constructor. For this
+    reason, Django does not allow passing non-dict objects to the
+    :class:`~django.http.JsonResponse` constructor by default.  However, most
+    modern browsers implement EcmaScript 5 which removes this attack vector.
+    Therefore it is possible to disable this security precaution.
+
+Changing the default JSON encoder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you need to use a differ JSON encoder class you can pass the ``encoder``
+parameter to the constructor method::
+
+    >>> response = JsonResponse(data, encoder=MyJSONEncoder)
 
 .. _httpresponse-streaming:
 

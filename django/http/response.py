@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 
 import datetime
-import time
+import json
 import sys
+import time
 from email.header import Header
 try:
     from urllib.parse import urlparse
@@ -13,6 +14,7 @@ from django.conf import settings
 from django.core import signals
 from django.core import signing
 from django.core.exceptions import DisallowedRedirect
+from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import six, timezone
 from django.utils.encoding import force_bytes, force_text, iri_to_uri
@@ -456,3 +458,25 @@ class HttpResponseServerError(HttpResponse):
 
 class Http404(Exception):
     pass
+
+
+class JsonResponse(HttpResponse):
+    """
+    An HTTP response class that consumes data to be serialized to JSON.
+
+    :param data: Data to be dumped into json. By default only ``dict`` objects
+      are allowed to be passed due to a security flaw before EcmaScript 5. See
+      the ``safe`` parameter for more information.
+    :param encoder: Should be an json encoder class. Defaults to
+      ``django.core.serializers.json.DjangoJSONEncoder``.
+    :param safe: Controls if only ``dict`` objects may be serialized. Defaults
+      to ``True``.
+    """
+
+    def __init__(self, data, encoder=DjangoJSONEncoder, safe=True, **kwargs):
+        if safe and not isinstance(data, dict):
+            raise TypeError('In order to allow non-dict objects to be '
+                'serialized set the safe parameter to False')
+        kwargs.setdefault('content_type', 'application/json')
+        data = json.dumps(data, cls=encoder)
+        super(JsonResponse, self).__init__(content=data, **kwargs)

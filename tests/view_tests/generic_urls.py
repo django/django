@@ -56,3 +56,8 @@ urlpatterns += patterns('view_tests.views',
     (r'^shortcuts/render/dirs/$', 'render_with_dirs'),
     (r'^shortcuts/render/current_app_conflict/$', 'render_view_with_current_app_conflict'),
 )
+
+# json response
+urlpatterns += patterns('view_tests.views',
+    (r'^json/response/$', 'json_response_view'),
+)

@@ -671,14 +671,18 @@ Templates
 * The new :tfilter:`truncatechars_html` filter truncates a string to be no
   longer than the specified number of characters, taking HTML into account.
 
-Requests
-^^^^^^^^
+Requests and Responses
+^^^^^^^^^^^^^^^^^^^^^^
 
 * The new :attr:`HttpRequest.scheme <django.http.HttpRequest.scheme>` attribute
   specifies the scheme of the request (``http`` or ``https`` normally).
 
+
 * The shortcut :func:`redirect() <django.shortcuts.redirect>` now supports
   relative URLs.
+
+* The new :class:`~django.http.JsonResponse` subclass of
+  :class:`~django.http.HttpResponse` helps easily create JSON-encoded responses.
 
 Tests
 ^^^^^
