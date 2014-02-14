@@ -825,6 +825,73 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
 .. _httpresponse-streaming:
 
+JsonResponse objects
+====================
+
+.. versionadded:: 1.7
+
+.. class:: JsonResponse
+
+.. method:: JsonResponse.__init__(data, encoder=None, safe=True, **kwargs)
+
+   :class:`HttpResponse` subclass that helps to create JSON-encoded response.
+   It inherits most behavior from its superclass with a couple differences:
+
+   Its default ``Content-Type`` header is set to ``application/json``.
+
+   The first parameter,``data``, should be a ``dict`` instance. If the ``safe``
+   parameter is set to ``False`` (see below) it can be any JSON-serializable
+   object.
+
+   The ``encoder`` will be used to serialize the data. Defaults to
+   ``django.core.serializers.json.DjangoJSONEncoder``
+
+   .. seealso:: :ref:`JSON serialization <serialization-formats_json>`
+
+   The ``safe`` boolean parameter defaults to ``True``. If it's set to ``False``,
+   any object can be passed for serialization (otherwise only ``dict`` instances
+   are allowed). If ``safe`` is ``True`` and a non-``dict`` object is passed as
+   the first argument, a :exc:`~exceptions.TypeError` will be raised.
+
+Usage
+-----
+
+Typical usage could look like::
+
+    >>> from django.http.response import JsonResponse
+    >>> response = JsonResponse({'foo': 'bar'})
+    >>> response.content
+    '{"foo": "bar"}'
+
+
+Serializing non-dictionary objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to serialize objects other than ``dict`` you must set the ``safe``
+parameter to ``False``::
+
+    >>> response = JsonResponse([1, 2, 3], safe=False)
+
+Without passing ``safe=False``, a :exc:`~exceptions.TypeError` will be raised.
+
+.. warning::
+
+    Before the `5th edition of EcmaScript
+    <http://www.ecma-international.org/publications/standards/Ecma-262.htm>`_
+    it was possible to poison the Javascript ``Array`` constructor. For this
+    reason, Django does not allow passing non-dict objects to the
+    :class:`django.http.JsonResponse` constructor by default.  However, most
+    modern browsers implement EcmaScript 5 which removes this attack vector.
+    Therefore it is possible to disable this security check.
+
+Changing default JSON encoder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you need to use non-default encoder class you can pass the ``encoder``
+parameter to the constructor method::
+
+    >>> response = JsonResponse(data, encoder=MyJSONEncoder)
+
 StreamingHttpResponse objects
 =============================
 
