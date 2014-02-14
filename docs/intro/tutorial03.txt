@@ -62,7 +62,10 @@ Write your first view
 =====================
 
 Let's write the first view. Open the file ``polls/views.py``
-and put the following Python code in it::
+and put the following Python code in it:
+
+.. snippet::
+    :filename: polls/views.py
 
     from django.http import HttpResponse
 
