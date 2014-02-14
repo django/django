@@ -8,7 +8,8 @@ from django.forms import (
     CharField, DateField, EmailField, FileField, Form, GenericIPAddressField,
     HiddenInput, ImageField, IPAddressField, MultipleChoiceField,
     MultiValueField, MultiWidget, PasswordInput, SelectMultiple, SlugField,
-    SplitDateTimeField, SplitDateTimeWidget, TextInput, URLField,
+    SplitDateTimeField, SplitDateTimeWidget, TextInput, UnicodeSlugField,
+    URLField,
 )
 from django.forms.extras import SelectDateWidget
 from django.forms.utils import ErrorList
@@ -523,6 +524,14 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
     def test_slugfield_normalization(self):
         f = SlugField()
         self.assertEqual(f.clean('    aa-bb-cc    '), 'aa-bb-cc')
+
+    def test_slugfield_unicode(self):
+        f = UnicodeSlugField()
+        self.assertEqual(f.clean('a'), 'a')
+        self.assertEqual(f.clean('1'), '1')
+        self.assertEqual(f.clean('a1'), 'a1')
+        self.assertEqual(f.clean('你好'), '你好')
+        self.assertEqual(f.clean('  你-好  '), '你-好')
 
     def test_urlfield_normalization(self):
         f = URLField()

@@ -38,7 +38,8 @@ __all__ = [str(x) for x in (
     'FieldDoesNotExist', 'FilePathField', 'FloatField',
     'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
     'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
-    'SlugField', 'SmallIntegerField', 'TextField', 'TimeField', 'URLField',
+    'SlugField', 'SmallIntegerField', 'TextField', 'TimeField',
+    'UnicodeSlugField', 'URLField',
 )]
 
 
@@ -1826,6 +1827,15 @@ class SlugField(CharField):
         defaults = {'form_class': forms.SlugField}
         defaults.update(kwargs)
         return super(SlugField, self).formfield(**defaults)
+
+
+class UnicodeSlugField(SlugField):
+    default_validators = [validators.validate_unicode_slug]
+
+    def formfield(self, **kwargs):
+        defaults = {'form_class': forms.UnicodeSlugField}
+        defaults.update(kwargs)
+        return super(UnicodeSlugField, self).formfield(**defaults)
 
 
 class SmallIntegerField(IntegerField):
