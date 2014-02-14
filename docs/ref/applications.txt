@@ -255,9 +255,10 @@ Application registry
     The application registry provides the following public API. Methods that
     aren't listed below are considered private and may change without notice.
 
-.. method:: apps.ready()
+.. attribute:: apps.ready
 
-    Returns ``True`` if the registry is fully populated.
+    Boolean attribute that is set to ``True`` when the registry is fully
+    populated.
 
 .. method:: apps.get_app_configs()
 
