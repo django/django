@@ -172,10 +172,18 @@ class DeferTests(TestCase):
     def test_defer_proxy_related_field(self):
         related = Secondary.objects.create(first='x1', second='x2')
         PrimaryProxy.objects.create(name='p1', value='xx', related=related)
+        ### Defer fields with only()
         objs = PrimaryProxy.objects.all().select_related().only('related__first')
         self.assertEqual(len(objs), 1)
         obj = objs[0]
-        self.assert_delayed(obj, 3)
+        ## name and value
+        self.assert_delayed(obj, 2)
+        ### Defer fields with defer()
+        objs = PrimaryProxy.objects.all().select_related().defer('name', 'related__first')
+        self.assertEqual(len(objs), 1)
+        obj = objs[0]
+        ## value
+        self.assert_delayed(obj, 1)
 
     def test_defer_inheritance_pk_chaining(self):
         """
