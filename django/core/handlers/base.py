@@ -128,7 +128,8 @@ class BaseHandler(object):
                     view_name = callback.__name__
                 else:                                           # CBV
                     view_name = callback.__class__.__name__ + '.__call__'
-                raise ValueError("The view %s.%s didn't return an HttpResponse object." % (callback.__module__, view_name))
+                raise ValueError("The view %s.%s didn't return an HttpResponse object. It returned None instead."
+                                 % (callback.__module__, view_name))
 
             # If the response supports deferred rendering, apply template
             # response middleware and then render the response
