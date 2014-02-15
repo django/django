@@ -196,6 +196,11 @@ advanced settings.
     your tests. *It is a bad idea to have such import-time database queries in
     your code* anyway - rewrite your code so that it doesn't do this.
 
+    .. versionadded:: 1.7
+
+        This also applies to customized implementations of
+        :meth:`~django.apps.AppConfig.ready()`.
+
 .. seealso::
 
     The :ref:`advanced multi-db testing topics <topics-testing-advanced-multidb>`.

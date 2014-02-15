@@ -221,6 +221,19 @@ Methods
         def ready(self):
             MyModel = self.get_model('MyModel')
 
+    .. warning::
+
+        Although you can access model classes as described above, avoid
+        interacting with the database in your :meth:`ready()` implementation.
+        This includes model methods that execute queries
+        (:meth:`~django.db.models.Model.save()`,
+        :meth:`~django.db.models.Model.delete()`, manager methods etc.), and
+        also raw SQL queries via ``django.db.connection``. Your
+        :meth:`ready()` method will run during startup of every management
+        command. For example, even though the test database configuration is
+        separate from the production settings, ``manage.py test`` would still
+        execute some queries against your **production** database!
+
 .. _namespace package:
 
 Namespace packages as apps (Python 3.3+)
