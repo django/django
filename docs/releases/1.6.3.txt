@@ -10,3 +10,7 @@ several bugs in 1.6.2:
 * Content retrieved from the GeoIP library is now properly decoded from its
   default ``iso-8859-1`` encoding
   (`#21996 <http://code.djangoproject.com/ticket/21996>`_).
+
+* Fixed ``AttributeError`` when using
+  :meth:`~django.db.models.query.QuerySet.bulk_create` with ``ForeignObject``
+  (`#21566 <http://code.djangoproject.com/ticket/21566>`_).
