@@ -100,7 +100,6 @@ class BaseContext(object):
     def __eq__(self, other):
         """
         Compares two contexts by comparing theirs 'dicts' attributes.
-        Also you can compare Context against dictionary
         """
         if isinstance(other, BaseContext):
             return self.dicts == other.dicts
