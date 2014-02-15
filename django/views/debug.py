@@ -477,7 +477,7 @@ def technical_404_response(request, exception):
     try:
         error_url = exception.args[0]['path']
     except (IndexError, TypeError, KeyError):
-        error_url = request.path_info[1:] # Trim leading slash
+        error_url = request.path_info[1:]  # Trim leading slash
 
     try:
         tried = exception.args[0]['tried']

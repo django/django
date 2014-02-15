@@ -72,7 +72,6 @@ class Resolver404(Http404):
     pass
 
 
-
 class NoReverseMatch(Exception):
     pass
 
