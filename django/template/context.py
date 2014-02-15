@@ -103,14 +103,14 @@ class BaseContext(object):
         """
         if isinstance(other, BaseContext):
             # because dictionaries can be put in different order
-            # we have to flat them like in templates
-            def flat(dicts):
+            # we have to flatten them like in templates
+            def flatten(dicts):
                 flat = {}
                 for d in dicts:
                     flat.update(d)
                 return flat
 
-            return flat(self.dicts) == flat(other.dicts)
+            return flatten(self.dicts) == flatten(other.dicts)
 
         # if it's not comparable return false
         return False
