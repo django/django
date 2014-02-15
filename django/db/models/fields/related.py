@@ -183,7 +183,7 @@ class RelatedField(Field):
         # Check clashes between accessor or reverse query name of `field`
         # and any other field name -- i. e. accessor for Model.foreign is
         # model_set and it clashes with Target.model_set.
-        potential_clashes = rel_opts.fields + rel_opts.local_many_to_many
+        potential_clashes = rel_opts.fields + rel_opts.many_to_many
         for clash_field in potential_clashes:
             clash_name = "%s.%s" % (rel_opts.object_name,
                 clash_field.name)  # i. e. "Target.model_set"
