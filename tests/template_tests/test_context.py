@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from django.template import Context, Variable, VariableDoesNotExist
+from django.template import Context, RequestContext, Variable, VariableDoesNotExist
 from django.template.context import RenderContext
 
 
@@ -49,3 +49,21 @@ class ContextTests(TestCase):
         with self.assertRaises(KeyError):
             test_context['fruit']
         self.assertIsNone(test_context.get('fruit'))
+
+    def test_context_comparable(self):
+        # fill and compare same contexts
+        test_data = {'x': 'y', 'v': 'z', 'd': {'o': object, 'a': 'b'}}
+        test_data2 = {'v': 'z', 'x': 'y', 'd': {'a': 'b', 'o': object}}
+        self.assertEquals(test_data, test_data2)
+
+        # test comparing Context
+        test_context = Context(test_data)
+        test_context2 = Context(test_data2)
+
+        self.assertEquals(test_context, test_context2)
+
+        # test comparing RequestContext
+        test_context = RequestContext({}).update(test_data)
+        test_context2 = RequestContext({}).update(test_data2)
+
+        self.assertEquals(test_context, test_context2)
