@@ -57,7 +57,7 @@ def raises403(request):
 
 def raises404(request):
     resolver = get_resolver(None)
-    resolver.resolve('')
+    resolver.resolve('/not-in-urls')
 
 
 def redirect(request):

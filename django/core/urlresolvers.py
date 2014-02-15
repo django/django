@@ -69,8 +69,11 @@ class ResolverMatch(object):
 
 
 class Resolver404(Http404):
-    pass
 
+    def __init__(self, path, tried=None):
+        super(Resolver404, self).__init__()
+        self.path = path
+        self.tried = tried
 
 class NoReverseMatch(Exception):
     pass
@@ -322,7 +325,7 @@ class RegexURLResolver(LocaleRegexProvider):
                 try:
                     sub_match = pattern.resolve(new_path)
                 except Resolver404 as e:
-                    sub_tried = e.args[0].get('tried')
+                    sub_tried = e.tried
                     if sub_tried is not None:
                         tried.extend([pattern] + t for t in sub_tried)
                     else:
@@ -333,8 +336,8 @@ class RegexURLResolver(LocaleRegexProvider):
                         sub_match_dict.update(sub_match.kwargs)
                         return ResolverMatch(sub_match.func, sub_match.args, sub_match_dict, sub_match.url_name, self.app_name or sub_match.app_name, [self.namespace] + sub_match.namespaces)
                     tried.append([pattern])
-            raise Resolver404({'tried': tried, 'path': new_path})
-        raise Resolver404({'path': path})
+            raise Resolver404(new_path, tried=tried)
+        raise Resolver404(path)
 
     @property
     def urlconf_module(self):
