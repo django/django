@@ -97,6 +97,20 @@ class BaseContext(object):
         new_context._reset_dicts(values)
         return new_context
 
+    def __eq__(self, other):
+        """
+        Compares two contexts by comparing theirs 'dicts' attributes.
+        Also you can compare Context against dictionary
+        """
+        if isinstance(other, BaseContext):
+            return self.dicts == other.dicts
+        else:
+            flat_dict = {}
+            # skip builtins dict [True, False, None]
+            for d in self.dicts[1:]:
+                flat_dict.update(d)
+            return flat_dict == other
+
 
 class Context(BaseContext):
     "A stack container for variable context"
