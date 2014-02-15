@@ -78,7 +78,7 @@ class DataSourceTest(unittest.TestCase):
                 self.assertEqual(source.nfld, layer.num_fields)
                 self.assertEqual(source.nfld, len(layer.fields))
 
-                # Testing the layer's extent (an Envelope), and it's properties
+                # Testing the layer's extent (an Envelope), and its properties
                 if source.driver == 'VRT' and (GDAL_VERSION >= (1, 7, 0) and GDAL_VERSION < (1, 7, 3)):
                     # There's a known GDAL regression with retrieving the extent
                     # of a VRT layer in versions 1.7.0-1.7.2:
