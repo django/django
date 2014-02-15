@@ -475,9 +475,11 @@ class ExceptionReporter(object):
 def technical_404_response(request, exception):
     "Create a technical 404 error response. The exception should be the Http404."
     try:
-        tried = exception.args[0]['tried']
-    except (IndexError, TypeError, KeyError):
+        tried = exception.tried
+        error_url = exception.path
+    except AttributeError:
         tried = []
+        error_url = request.path_info[1:] # Trim leading slash
     else:
         if (not tried                           # empty URLconf
             or (request.path == '/'
@@ -494,7 +496,7 @@ def technical_404_response(request, exception):
     c = Context({
         'urlconf': urlconf,
         'root_urlconf': settings.ROOT_URLCONF,
-        'request_path': request.path_info[1:],  # Trim leading slash
+        'request_path': error_url,
         'urlpatterns': tried,
         'reason': force_bytes(exception, errors='replace'),
         'request': request,
