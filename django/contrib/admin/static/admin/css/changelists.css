@@ -19,12 +19,7 @@
     min-height: 400px;
 }
 
-.change-list .filtered {
-    background: white url(../img/changelist-bg.gif) top right repeat-y !important;
-}
-
 .change-list .filtered .results, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {
-    margin-right: 160px !important;
     width: auto !important;
 }
 
@@ -50,6 +45,12 @@
 
 .change-list .filtered .paginator {
     border-right: 1px solid #ddd;
+}
+
+.hidden_state {
+  display: inline-block;
+  margin-left: 4px;
+  line-height: 24px;
 }
 
 /* CHANGELIST TABLES */
@@ -113,6 +114,7 @@
     z-index: 1000;
     width: 160px;
     border-left: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
     background: #efefef;
     margin: 0;
 }
@@ -233,7 +235,6 @@
 /* ACTIONS */
 
 .filtered .actions {
-    margin-right: 160px !important;
     border-right: 1px solid #ddd;
 }
 

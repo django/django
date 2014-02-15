@@ -3387,6 +3387,59 @@ class PrePopulatedTest(TestCase):
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class SeleniumAdminFilterToggleFirefoxTests(AdminSeleniumWebDriverTestCase):
+    available_apps = ['admin_views'] + AdminSeleniumWebDriverTestCase.available_apps
+    fixtures = ['admin-views-users.xml']
+    urls = "admin_views.urls"
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+
+
+    def load_elements(self):
+        return (self.selenium.find_element_by_id('changelist-filter'),
+                self.selenium.find_element_by_css_selector('.results'))
+
+    def assert_collapsed(self):
+        filter_bar_div, filter_result_div = self.load_elements()
+        # filter should be collapsed, so height is smaller than initial
+        self.assertTrue(filter_bar_div.size['height'] < self.initial_filter_bar_height)
+        # and filter result width is bigger, because filter is collapsed
+        self.assertTrue(filter_result_div.size['width'] > self.initial_filter_result_width)
+        self.assertEqual(filter_result_div.value_of_css_property('margin-right'), '0px')
+
+    def test_filter_toggle(self):
+        self.admin_login(username='super', password='secret', login_url='/test_admin/admin/')
+        self.selenium.get('%s%s' % (self.live_server_url, '/test_admin/admin/admin_views/article/'))
+
+        # when filter is displayed
+        toggle_link = self.selenium.find_element_by_css_selector('.hidden_state')
+        self.assertEqual(toggle_link.tag_name, 'span')
+
+        filter_bar_div, filter_result_div = self.load_elements()
+
+        self.initial_filter_bar_height = filter_bar_div.size['height']
+        self.initial_filter_result_width = filter_result_div.size['width']
+
+        # when filter is hidden
+        toggle_link.click()
+
+        self.assert_collapsed()
+
+        # see if filter is hidden after re-visiting the page (cookie)
+        self.selenium.get('%s%s' % (self.live_server_url, '/test_admin/admin/admin_views/'))
+        self.selenium.get('%s%s' % (self.live_server_url, '/test_admin/admin/admin_views/article'))
+
+        self.assert_collapsed()
+
+
+class SeleniumAdminFilterToggleChromeTests(SeleniumAdminFilterToggleFirefoxTests):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+
+class SeleniumAdminFilterToggleIETests(SeleniumAdminFilterToggleFirefoxTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
 
     available_apps = ['admin_views'] + AdminSeleniumWebDriverTestCase.available_apps

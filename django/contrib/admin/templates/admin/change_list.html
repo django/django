@@ -7,7 +7,7 @@
   {% if cl.formset %}
     <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />
   {% endif %}
-  {% if cl.formset or action_form %}
+  {% if cl.formset or action_form or cl.has_filters %}
     <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
   {% endif %}
   {{ media.css }}
@@ -30,6 +30,16 @@
 })(django.jQuery);
 </script>
 {% endif %}{% endif %}
+
+{% if cl.has_filters %}
+<script type="text/javascript" src="{% static 'admin/js/hidefilters.js' %}"></script>
+<script type="text/javascript">
+    django.jQuery(document).ready(function() {
+        toggleFilter(gettext("show"), gettext("hide"), 7);
+    });
+</script>
+{% endif %}
+
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-list{% endblock %}
