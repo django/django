@@ -272,10 +272,10 @@ class ResolverTests(unittest.TestCase):
             self.fail('resolve did not raise a 404')
         except Resolver404 as e:
             # make sure we at least matched the root ('/') url resolver:
-            self.assertTrue(hasattr(e, 'tried'))
-            tried = e.tried
-            self.assertEqual(len(tried), len(url_types_names), 'Wrong number of tried URLs returned.  Expected %s, got %s.' % (len(url_types_names), len(tried)))
-            for tried, expected in zip(tried, url_types_names):
+            self.assertTrue('tried' in e.args[0])
+            tried = e.args[0]['tried']
+            self.assertEqual(len(e.args[0]['tried']), len(url_types_names), 'Wrong number of tried URLs returned.  Expected %s, got %s.' % (len(url_types_names), len(e.args[0]['tried'])))
+            for tried, expected in zip(e.args[0]['tried'], url_types_names):
                 for t, e in zip(tried, expected):
                     self.assertIsInstance(t, e['type']), str('%s is not an instance of %s') % (t, e['type'])
                     if 'name' in e:
