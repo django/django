@@ -102,7 +102,15 @@ class BaseContext(object):
         Compares two contexts by comparing theirs 'dicts' attributes.
         """
         if isinstance(other, BaseContext):
-            return self.dicts[-1] == other.dicts[-1]
+            # because dictionaries can be put in different order
+            # we have to flatten them like in templates
+            def flatten(dicts):
+                flat = {}
+                for d in dicts:
+                    flat.update(d)
+                return flat
+
+            return flatten(self.dicts) == flatten(other.dicts)
 
         # if it's not comparable return false
         return False
