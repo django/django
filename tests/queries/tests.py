@@ -1275,6 +1275,16 @@ class Queries3Tests(BaseQuerysetTest):
             Item.objects.datetimes, 'name', 'month'
         )
 
+    def test_ticket22023(self):
+        # only() and defer() are not applicable for ValuesQuerySet
+        with self.assertRaisesMessage(NotImplementedError,
+                "ValuesQuerySet does not implement only()"):
+            Valid.objects.values().only()
+
+        with self.assertRaisesMessage(NotImplementedError,
+                "ValuesQuerySet does not implement defer()"):
+            Valid.objects.values().defer()
+
 
 class Queries4Tests(BaseQuerysetTest):
     def setUp(self):

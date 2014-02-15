@@ -502,14 +502,23 @@ A few subtleties that are worth mentioning:
   made after a ``values()`` call will have its extra selected fields
   ignored.
 
+* Calling :meth:`only()` and :meth:`defer()` after ``values()`` doesn't make
+  sense, so doing so will raise a ``NotImplementedError``.
+
+.. versionadded:: 1.7
+
+    The last point above is new. Previously, calling :meth:`only()` and
+    :meth:`defer()` after ``values()`` was allowed, but it either crashed or
+    returned incorrect results.
+
 A ``ValuesQuerySet`` is useful when you know you're only going to need values
 from a small number of the available fields and you won't need the
 functionality of a model instance object. It's more efficient to select only
 the fields you need to use.
 
-Finally, note a ``ValuesQuerySet`` is a subclass of ``QuerySet``, so it has all
-methods of ``QuerySet``. You can call ``filter()`` on it, or ``order_by()``, or
-whatever. Yes, that means these two calls are identical::
+Finally, note that a ``ValuesQuerySet`` is a subclass of ``QuerySet`` and it
+implements most of the same methods. You can call ``filter()`` on it,
+``order_by()``, etc. That means that these two calls are identical::
 
     Blog.objects.values().order_by('id')
     Blog.objects.order_by('id').values()

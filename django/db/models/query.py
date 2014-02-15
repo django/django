@@ -1060,6 +1060,12 @@ class ValuesQuerySet(QuerySet):
         # QuerySet.clone() will also set up the _fields attribute with the
         # names of the model fields to select.
 
+    def only(self, *fields):
+        raise NotImplementedError("ValuesQuerySet does not implement only()")
+
+    def defer(self, *fields):
+        raise NotImplementedError("ValuesQuerySet does not implement defer()")
+
     def iterator(self):
         # Purge any extra columns that haven't been explicitly asked for
         extra_names = list(self.query.extra_select)
