@@ -33,6 +33,7 @@ class DiscoverRunner(object):
         self.top_level = top_level
 
         self.verbosity = verbosity
+        TestCase.__utils_verbosity__ = verbosity
         self.interactive = interactive
         self.failfast = failfast
 
