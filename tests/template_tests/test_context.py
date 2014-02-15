@@ -2,10 +2,8 @@
 
 from unittest import TestCase
 
-from django.template import Context, RequestContext, Variable, VariableDoesNotExist
+from django.template import Context, Variable, VariableDoesNotExist
 from django.template.context import RenderContext
-from django.test.client import RequestFactory
-from django.test.utils import override_settings
 
 
 class ContextTests(TestCase):
