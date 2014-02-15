@@ -1060,6 +1060,16 @@ class ValuesQuerySet(QuerySet):
         # QuerySet.clone() will also set up the _fields attribute with the
         # names of the model fields to select.
 
+    def only(self, *fields):
+        return self.values(*fields)
+
+    def defer(self, *fields):
+        if fields == (None,):
+            field_names = [f.attname for f in self.model._meta.concrete_fields]
+        else:
+            field_names = list(set(self.field_names).difference(set(fields)))
+        return self.values(*field_names)
+
     def iterator(self):
         # Purge any extra columns that haven't been explicitly asked for
         extra_names = list(self.query.extra_select)
