@@ -4,6 +4,8 @@ from unittest import TestCase
 
 from django.template import Context, RequestContext, Variable, VariableDoesNotExist
 from django.template.context import RenderContext
+from django.test.client import RequestFactory
+from django.test.utils import override_settings
 
 
 class ContextTests(TestCase):
@@ -50,20 +52,21 @@ class ContextTests(TestCase):
             test_context['fruit']
         self.assertIsNone(test_context.get('fruit'))
 
+    @override_settings(TEMPLATE_CONTEXT_PROCESSORS=())
     def test_context_comparable(self):
-        # fill and compare same contexts
         test_data = {'x': 'y', 'v': 'z', 'd': {'o': object, 'a': 'b'}}
-        test_data2 = {'v': 'z', 'x': 'y', 'd': {'a': 'b', 'o': object}}
-        self.assertEquals(test_data, test_data2)
 
         # test comparing Context
         test_context = Context(test_data)
-        test_context2 = Context(test_data2)
+        test_context2 = Context(test_data)
 
         self.assertEquals(test_context, test_context2)
 
-        # test comparing RequestContext
-        test_context = RequestContext({}).update(test_data)
-        test_context2 = RequestContext({}).update(test_data2)
+        # test comparing RequestContext to prevent problems if somebody
+        # adds __eq__ in the future
+        request = RequestFactory().get('/')
+
+        test_context = RequestContext(request, dict_=test_data)
+        test_context2 = RequestContext(request, dict_=test_data)
 
         self.assertEquals(test_context, test_context2)

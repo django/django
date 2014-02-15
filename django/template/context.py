@@ -102,7 +102,7 @@ class BaseContext(object):
         Compares two contexts by comparing theirs 'dicts' attributes.
         """
         if isinstance(other, BaseContext):
-            return self.dicts == other.dicts
+            return self.dicts[-1] == other.dicts[-1]
 
         # if it's not comparable return false
         return False
