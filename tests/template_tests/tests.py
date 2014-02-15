@@ -1928,6 +1928,19 @@ class RequestContextTests(unittest.TestCase):
         # [builtins, supplied context, context processor]
         self.assertEqual(len(ctx.dicts), 3)
 
+    @override_settings(TEMPLATE_CONTEXT_PROCESSORS=())
+    def test_context_comparable(self):
+        test_data = {'x': 'y', 'v': 'z', 'd': {'o': object, 'a': 'b'}}
+
+        # test comparing RequestContext to prevent problems if somebody
+        # adds __eq__ in the future
+        request = RequestFactory().get('/')
+
+        self.assertEquals(
+            RequestContext(request, dict_=test_data),
+            RequestContext(request, dict_=test_data)
+        )
+
 
 class SSITests(TestCase):
     def setUp(self):

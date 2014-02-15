@@ -52,21 +52,7 @@ class ContextTests(TestCase):
             test_context['fruit']
         self.assertIsNone(test_context.get('fruit'))
 
-    @override_settings(TEMPLATE_CONTEXT_PROCESSORS=())
     def test_context_comparable(self):
         test_data = {'x': 'y', 'v': 'z', 'd': {'o': object, 'a': 'b'}}
 
-        # test comparing Context
-        test_context = Context(test_data)
-        test_context2 = Context(test_data)
-
-        self.assertEquals(test_context, test_context2)
-
-        # test comparing RequestContext to prevent problems if somebody
-        # adds __eq__ in the future
-        request = RequestFactory().get('/')
-
-        test_context = RequestContext(request, dict_=test_data)
-        test_context2 = RequestContext(request, dict_=test_data)
-
-        self.assertEquals(test_context, test_context2)
+        self.assertEquals(Context(test_data), Context(test_data))
