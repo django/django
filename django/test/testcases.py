@@ -744,7 +744,7 @@ class TransactionTestCase(SimpleTestCase):
             cache.set_available_apps(self.available_apps)
             for db_name in self._databases_names(include_mirrors=False):
                 flush.Command.emit_post_syncdb(
-                    verbosity=0,
+                    verbosity=self._utils_verbosity(),
                     interactive=False,
                     database=db_name
                 )
@@ -788,7 +788,7 @@ class TransactionTestCase(SimpleTestCase):
                 call_command(
                     'loaddata',
                     *self.fixtures,
-                    **{'verbosity': 0,
+                    **{'verbosity': self._utils_verbosity(),
                         'database': db_name,
                         'skip_validation': True}
                 )
@@ -820,7 +820,7 @@ class TransactionTestCase(SimpleTestCase):
         for db_name in self._databases_names(include_mirrors=False):
             call_command(
                 'flush',
-                verbosity=0,
+                verbosity=self._utils_verbosity(),
                 interactive=False,
                 database=db_name,
                 skip_validation=True,
@@ -896,7 +896,7 @@ class TestCase(TransactionTestCase):
                 try:
                     call_command('loaddata', *self.fixtures,
                                  **{
-                                    'verbosity': 0,
+                                    'verbosity': self._utils_verbosity(),
                                     'commit': False,
                                     'database': db_name,
                                     'skip_validation': True,
