@@ -49,3 +49,8 @@ class ContextTests(TestCase):
         with self.assertRaises(KeyError):
             test_context['fruit']
         self.assertIsNone(test_context.get('fruit'))
+
+    def test_context_comparable(self):
+        test_data = {'x': 'y', 'v': 'z', 'd': {'o': object, 'a': 'b'}}
+
+        self.assertEquals(Context(test_data), Context(test_data))
