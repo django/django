@@ -343,7 +343,7 @@ def javascript_quote(s, quote_double_quotes=False):
     s = s.replace('</', '<\\/')
     if quote_double_quotes:
         s = s.replace('"', '&quot;')
-    return str(ustring_re.sub(fix, s))
+    return ustring_re.sub(fix, s)
 javascript_quote = allow_lazy(javascript_quote, six.text_type)
 
 # Expression to match some_token and some_token="with spaces" (and similarly

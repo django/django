@@ -155,3 +155,8 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(text.javascript_quote(input), '"Text"')
         self.assertEqual(text.javascript_quote(input, quote_double_quotes=True),
                          '&quot;Text&quot;')
+
+    def test_javascript_quote_unicode(self):
+        input = "<script>alert('Hello \\xff.\n Wel𝕃come\there\r');</script>"
+        output = r"<script>alert(\'Hello \\xff.\n Wel𝕃come\there\r\');<\/script>"
+        self.assertEqual(text.javascript_quote(input), output)
