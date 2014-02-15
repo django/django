@@ -10,6 +10,7 @@ from django.db.models.base import ModelBase
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.core import urlresolvers
+from django.utils import six
 
 
 def render_to_response(*args, **kwargs):
@@ -146,6 +147,11 @@ def resolve_url(to, *args, **kwargs):
     # If it's a model, use get_absolute_url()
     if hasattr(to, 'get_absolute_url'):
         return to.get_absolute_url()
+
+    if isinstance(to, six.string_types):
+        # Handle relative URLs
+        if any(to.startswith(path) for path in ('./', '../')):
+            return to
 
     # Next try a reverse URL resolution.
     try:

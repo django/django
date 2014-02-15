@@ -383,10 +383,6 @@ class RegexURLResolver(LocaleRegexProvider):
         text_args = [force_text(v) for v in args]
         text_kwargs = dict((k, force_text(v)) for (k, v) in kwargs.items())
 
-        if isinstance(lookup_view, six.string_types):
-            # Handle relative URLs
-            if any(lookup_view.startswith(path) for path in ('./', '../')):
-                return lookup_view
         try:
             lookup_view = get_callable(lookup_view, True)
         except (ImportError, AttributeError) as e:
