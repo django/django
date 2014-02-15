@@ -583,6 +583,35 @@ class AccessorClashTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_m2m_to_m2m_with_inheritance(self):
+        """ Ref #22047. """
+
+        class Target(models.Model):
+            pass
+
+        class Model(models.Model):
+            children = models.ManyToManyField('Child',
+                related_name="m2m_clash", related_query_name="no_clash")
+
+        class Parent(models.Model):
+            m2m_clash = models.ManyToManyField('Target')
+
+        class Child(Parent):
+            pass
+
+        errors = Model.check()
+        expected = [
+            Error(
+                'Accessor for field Model.children clashes with field Child.m2m_clash.',
+                hint=('Rename field Child.m2m_clash or add/change '
+                      'a related_name argument to the definition '
+                      'for field Model.children.'),
+                obj=Model._meta.get_field('children'),
+                id='E014',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
 
 class ReverseQueryNameClashTests(IsolatedModelsTestCase):
 
