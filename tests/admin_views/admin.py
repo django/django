@@ -76,7 +76,8 @@ class ChapterXtra1Admin(admin.ModelAdmin):
 
 
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('content', 'date', callable_year, 'model_year', 'modeladmin_year')
+    list_display = ('content', 'date', callable_year, 'model_year',
+                    'modeladmin_year', 'model_year_reversed')
     list_filter = ('date', 'section')
     view_on_site = False
     fieldsets = (

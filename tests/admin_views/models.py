@@ -41,6 +41,11 @@ class Article(models.Model):
     model_year.admin_order_field = 'date'
     model_year.short_description = ''
 
+    def model_year_reversed(self):
+        return self.date.year
+    model_year_reversed.admin_order_field = '-date'
+    model_year_reversed.short_description = ''
+
 
 @python_2_unicode_compatible
 class Book(models.Model):

@@ -260,12 +260,31 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     def testChangeListSortingModelAdmin(self):
         """
         Ensure we can sort on a list_display field that is a ModelAdmin method
-        (colunn 4 is 'modeladmin_year' in ArticleAdmin)
+        (column 4 is 'modeladmin_year' in ArticleAdmin)
         """
         response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'o': '4'})
         self.assertContentBefore(response, 'Oldest content', 'Middle content',
             "Results of sorting on ModelAdmin method are out of order.")
         self.assertContentBefore(response, 'Middle content', 'Newest content',
+            "Results of sorting on ModelAdmin method are out of order.")
+
+    def testChangeListSortingModelAdminReverse(self):
+        """
+        Ensure we can sort on a list_display field that is a ModelAdmin
+        method in reverse order (i.e. admin_order_field uses the '-' prefix)
+        (column 6 is 'model_year_reverse' in ArticleAdmin)
+        """
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'o': '6'})
+        self.assertContentBefore(response, '2009', '2008',
+            "Results of sorting on ModelAdmin method are out of order.")
+        self.assertContentBefore(response, '2008', '2000',
+            "Results of sorting on ModelAdmin method are out of order.")
+        # Let's make sure the ordering is right and that we don't get a
+        # FieldError when we change to descending order
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'o': '-6'})
+        self.assertContentBefore(response, '2000', '2008',
+            "Results of sorting on ModelAdmin method are out of order.")
+        self.assertContentBefore(response, '2008', '2009',
             "Results of sorting on ModelAdmin method are out of order.")
 
     def testChangeListSortingMultiple(self):
