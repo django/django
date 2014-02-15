@@ -5,6 +5,8 @@ other serializers.
 """
 from __future__ import unicode_literals
 
+from collections import OrderedDict
+
 from django.apps import apps
 from django.conf import settings
 from django.core.serializers import base
@@ -28,7 +30,7 @@ class Serializer(base.Serializer):
         pass
 
     def start_object(self, obj):
-        self._current = {}
+        self._current = OrderedDict()
 
     def end_object(self, obj):
         self.objects.append(self.get_dump_object(obj))

@@ -564,6 +564,20 @@ class YamlSerializerTestCase(SerializersTestBase, TestCase):
                     ret_list.append(str(field_value))
         return ret_list
 
+    def test_serialize_yaml_is_sorted(self):
+        Category.objects.create(name="Sports")
+        stream = StringIO()
+        serializers.serialize("yaml", Category.objects.filter(name="Sports"), stream=stream)
+        content = stream.getvalue()
+        expected = """- model: serializers.category
+  pk: 1
+  fields: {name: Sports}
+- model: serializers.category
+  pk: 4
+  fields: {name: Sports}
+"""
+        self.assertEqual(content, expected)
+
 
 @unittest.skipUnless(HAS_YAML, "No yaml library detected")
 class YamlSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
