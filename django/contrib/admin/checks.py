@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from itertools import chain
 
-from django.contrib.admin.utils import get_fields_from_path, NotRelationField
+from django.contrib.admin.utils import get_fields_from_path, NotRelationField, flatten
 from django.core import checks
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
@@ -84,7 +84,8 @@ class BaseModelAdminChecks(object):
                     id='admin.E005',
                 )
             ]
-        elif len(cls.fields) != len(set(cls.fields)):
+        fields = flatten(cls.fields)
+        if len(fields) != len(set(fields)):
             return [
                 checks.Error(
                     'There are duplicate field(s) in "fields".',
@@ -93,11 +94,11 @@ class BaseModelAdminChecks(object):
                     id='admin.E006',
                 )
             ]
-        else:
-            return list(chain(*[
+
+        return list(chain(*[
                 self._check_field_spec(cls, model, field_name, 'fields')
                 for field_name in cls.fields
-            ]))
+        ]))
 
     def _check_fieldsets(self, cls, model):
         """ Check that fieldsets is properly formatted and doesn't contain
@@ -132,7 +133,9 @@ class BaseModelAdminChecks(object):
                     id='admin.E011',
                 )
             ]
-        elif len(fieldset[1]['fields']) != len(set(fieldset[1]['fields'])):
+
+        fields = flatten(fieldset[1]['fields'])
+        if len(fields) != len(set(fields)):
             return [
                 checks.Error(
                     'There are duplicate field(s) in "%s[1]".' % label,
@@ -141,11 +144,10 @@ class BaseModelAdminChecks(object):
                     id='admin.E012',
                 )
             ]
-        else:
-            return list(chain(*[
-                self._check_field_spec(cls, model, fields, '%s[1][\'fields\']' % label)
-                for fields in fieldset[1]['fields']
-            ]))
+        return list(chain(*[
+            self._check_field_spec(cls, model, fields, '%s[1][\'fields\']' % label)
+            for fields in fieldset[1]['fields']
+        ]))
 
     def _check_field_spec(self, cls, model, fields, label):
         """ `fields` should be an item of `fields` or an item of

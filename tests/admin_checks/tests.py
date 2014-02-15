@@ -463,3 +463,37 @@ class SystemChecksTestCase(TestCase):
                 )
             ]
             self.assertEqual(errors, expected)
+
+    def test_check_sublists_for_duplicates(self):
+        class MyModelAdmin(admin.ModelAdmin):
+            fields = ['state', ['state']]
+
+        errors = MyModelAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                'There are duplicate field(s) in "fields".',
+                hint=None,
+                obj=MyModelAdmin,
+                id='admin.E006'
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_check_fieldset_sublists_for_duplicates(self):
+        class MyModelAdmin(admin.ModelAdmin):
+            fieldsets = [
+                (None, {
+                    'fields': ['title', 'album', ('title', 'album')]
+                }),
+            ]
+
+        errors = MyModelAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                'There are duplicate field(s) in "fieldsets[0][1]".',
+                hint=None,
+                obj=MyModelAdmin,
+                id='admin.E012'
+            )
+        ]
+        self.assertEqual(errors, expected)
