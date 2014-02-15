@@ -22,8 +22,8 @@ from django.utils.functional import lazy
 
 from .models import (
     Foo, Bar, Whiz, BigD, BigS, BigInt, Post, NullBooleanModel,
-    BooleanModel, DataModel, Document, RenamedField,
-    VerboseNameField, FksToBooleans)
+    BooleanModel, PrimaryKeyCharModel, DataModel, Document, RenamedField,
+    VerboseNameField, FksToBooleans, FkToChar)
 
 
 class BasicFieldTests(test.TestCase):
@@ -145,6 +145,17 @@ class ForeignKeyTests(test.TestCase):
         a = Foo.objects.create(id=1, a='abc', d=Decimal("12.34"))
         b = Bar.objects.create(b="bcd")
         self.assertEqual(b.a, a)
+
+    @test.skipIfDBFeature('interprets_empty_strings_as_nulls')
+    def test_empty_string_fk(self):
+        """
+        Test that foreign key values to empty strings don't get converted
+        to None (#19299)
+        """
+        char_model_empty = PrimaryKeyCharModel.objects.create(string='')
+        fk_model_empty = FkToChar.objects.create(out=char_model_empty)
+        fk_model_empty = FkToChar.objects.select_related('out').get(id=fk_model_empty.pk)
+        self.assertEqual(fk_model_empty.out, char_model_empty)
 
 
 class DateTimeFieldTests(unittest.TestCase):
