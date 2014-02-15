@@ -96,8 +96,8 @@ class BaseModelAdminChecks(object):
             ]
 
         return list(chain(*[
-                self._check_field_spec(cls, model, field_name, 'fields')
-                for field_name in cls.fields
+            self._check_field_spec(cls, model, field_name, 'fields')
+            for field_name in cls.fields
         ]))
 
     def _check_fieldsets(self, cls, model):
@@ -145,8 +145,8 @@ class BaseModelAdminChecks(object):
                 )
             ]
         return list(chain(*[
-            self._check_field_spec(cls, model, fields, '%s[1][\'fields\']' % label)
-            for fields in fieldset[1]['fields']
+            self._check_field_spec(cls, model, fieldset_fields, '%s[1][\'fields\']' % label)
+            for fieldset_fields in fieldset[1]['fields']
         ]))
 
     def _check_field_spec(self, cls, model, fields, label):

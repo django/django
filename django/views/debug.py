@@ -479,7 +479,7 @@ def technical_404_response(request, exception):
         error_url = exception.path
     except AttributeError:
         tried = []
-        error_url = request.path_info[1:] # Trim leading slash
+        error_url = request.path_info[1:]  # Trim leading slash
     else:
         if (not tried                           # empty URLconf
             or (request.path == '/'

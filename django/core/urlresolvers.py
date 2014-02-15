@@ -75,6 +75,7 @@ class Resolver404(Http404):
         self.path = path
         self.tried = tried
 
+
 class NoReverseMatch(Exception):
     pass
 
