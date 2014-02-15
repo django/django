@@ -616,6 +616,12 @@ Models
   :attr:`~django.db.models.ForeignKey.limit_choices_to` when defining a
   ``ForeignKey`` or ``ManyToManyField``.
 
+* Calling :meth:`only() <django.db.models.query.QuerySet.only>` and
+  :meth:`defer() <django.db.models.query.QuerySet.defer>` on the result of
+  :meth:`QuerySet.values() <django.db.models.query.QuerySet.values>` now raises
+  an error (before that, it would either result in a database error or
+  incorrect data).
+
 Signals
 ^^^^^^^
 

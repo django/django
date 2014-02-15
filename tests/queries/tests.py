@@ -1275,6 +1275,10 @@ class Queries3Tests(BaseQuerysetTest):
             Item.objects.datetimes, 'name', 'month'
         )
 
+    def test_ticket22023(self):
+        self.assertRaises(NotImplementedError, Valid.objects.values().only)
+        self.assertRaises(NotImplementedError, Valid.objects.values().defer)
+
 
 class Queries4Tests(BaseQuerysetTest):
     def setUp(self):
