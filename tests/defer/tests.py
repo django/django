@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.db.models.query_utils import DeferredAttribute, InvalidQuery
 from django.test import TestCase
 
-from .models import Secondary, Primary, Child, BigChild, ChildProxy
+from .models import Secondary, Primary, Child, BigChild, ChildProxy, PrimaryProxy
 
 
 class DeferTests(TestCase):
@@ -168,6 +168,14 @@ class DeferTests(TestCase):
         self.assert_delayed(child, 2)
         self.assertEqual(child.name, 'p1')
         self.assertEqual(child.value, 'xx')
+
+    def test_defer_proxy_related_field(self):
+        related = Secondary.objects.create(first='x1', second='x2')
+        PrimaryProxy.objects.create(name='p1', value='xx', related=related)
+        objs = PrimaryProxy.objects.all().select_related().only('related__first')
+        self.assertEqual(len(objs), 1)
+        obj = objs[0]
+        self.assert_delayed(obj, 3)
 
     def test_defer_inheritance_pk_chaining(self):
         """
