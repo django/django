@@ -828,6 +828,15 @@ class TransactionTestCase(SimpleTestCase):
                 allow_cascade=self.available_apps is not None,
                 inhibit_post_syncdb=self.available_apps is not None)
 
+    def _utils_verbosity(self):
+        """We won't change default output, because someone may relay on it.
+        On the other hand side if someone would like to get verbose output
+        he should get it from all resources."""
+        verbosity = getattr(TestCase, '__utils_verbosity__', 0)
+        if verbosity == 1:
+            verbosity = 0
+        return verbosity
+
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True):
         items = six.moves.map(transform, qs)
         if not ordered:
