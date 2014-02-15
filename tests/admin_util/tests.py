@@ -5,8 +5,8 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
-from django.contrib.admin.utils import (display_for_field, flatten_fieldsets,
-    label_for_field, lookup_field, NestedObjects)
+from django.contrib.admin.utils import (display_for_field, flatten,
+    flatten_fieldsets, label_for_field, lookup_field, NestedObjects)
 from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 from django.contrib.sites.models import Site
 from django.db import models, DEFAULT_DB_ALIAS
@@ -322,6 +322,17 @@ class UtilTests(SimpleTestCase):
                              '<label for="id_text" class="required inline">&amp;text:</label>')
         self.assertHTMLEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
                              '<label for="id_cb" class="vCheckboxLabel required inline">&amp;cb</label>')
+
+    def test_flatten(self):
+        flat_all = ['url', 'title', 'content', 'sites']
+        inputs = (
+            ((), []),
+            (('url', 'title', ('content', 'sites')), flat_all),
+            (('url', 'title', 'content', 'sites'), flat_all),
+            ((('url', 'title'), ('content', 'sites')), flat_all)
+        )
+        for orig, expected in inputs:
+            self.assertEqual(flatten(orig), expected)
 
     def test_flatten_fieldsets(self):
         """
