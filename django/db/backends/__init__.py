@@ -278,7 +278,7 @@ class BaseDatabaseWrapper(object):
         when no current block is running).
 
         If you switch off transaction management and there is a pending
-        commit/rollback, the data will be commited, unless "forced" is True.
+        commit/rollback, the data will be committed, unless "forced" is True.
         """
         self.validate_no_atomic_block()
 

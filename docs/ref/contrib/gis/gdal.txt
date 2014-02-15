@@ -1015,7 +1015,7 @@ Coordinate System Objects
    and will automatically determines whether to return the linear
    or angular units.
 
-   .. attribute:: ellisoid
+   .. attribute:: ellipsoid
 
    Returns a tuple of the ellipsoid parameters for this spatial
    reference: (semimajor axis, semiminor axis, and inverse flattening)

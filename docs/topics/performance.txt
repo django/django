@@ -67,7 +67,7 @@ report on cache performance and template rendering times.
 Third-party services
 ^^^^^^^^^^^^^^^^^^^^
 
-There are a number of free services that will analyse and report on the
+There are a number of free services that will analyze and report on the
 performance of your site's pages from the perspective of a remote HTTP client,
 in effect simulating the experience of an actual user.
 

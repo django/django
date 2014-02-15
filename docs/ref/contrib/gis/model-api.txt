@@ -168,7 +168,7 @@ field.
 This option may be used for customizing the coordinate dimension of the
 geometry field.  By default, it is set to 2, for representing two-dimensional
 geometries.  For spatial backends that support it, it may be set to 3 for
-three-dimensonal support.
+three-dimensional support.
 
 .. note::
 
