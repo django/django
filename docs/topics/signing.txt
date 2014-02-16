@@ -145,7 +145,7 @@ If you wish to protect a list, tuple or dictionary you can do so using the
 signing module's ``dumps`` and ``loads`` functions. These imitate Python's
 pickle module, but use JSON serialization under the hood. JSON ensures that
 even if your :setting:`SECRET_KEY` is stolen an attacker will not be able
-to execute arbitrary commands by exploiting the pickle format.::
+to execute arbitrary commands by exploiting the pickle format::
 
     >>> from django.core import signing
     >>> value = signing.dumps({"foo": "bar"})
@@ -153,6 +153,15 @@ to execute arbitrary commands by exploiting the pickle format.::
     'eyJmb28iOiJiYXIifQ:1NMg1b:zGcDE4-TCkaeGzLeW9UQwZesciI'
     >>> signing.loads(value)
     {'foo': 'bar'}
+
+Because of the nature of JSON (there is no native distinction between lists
+and tuples) if you pass in a tuple, you will get a list from
+``signing.loads(object)``::
+
+    >>> from django.core import signing
+    >>> value = signing.dumps(('a','b','c'))
+    >>> signing.loads(value)
+    ['a', 'b', 'c']
 
 .. function:: dumps(obj, key=None, salt='django.core.signing', compress=False)
 
