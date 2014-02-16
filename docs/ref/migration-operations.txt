@@ -221,7 +221,7 @@ SeparateDatabaseAndState
 
     SeparateDatabaseAndState(database_operations=None, state_operations=None)
 
-A highly specialist operation that let you mix and match the database
+A highly specialized operation that let you mix and match the database
 (schema-changing) and state (autodetector-powering) aspects of operations.
 
 It accepts two list of operations, and when asked to apply state will use the
