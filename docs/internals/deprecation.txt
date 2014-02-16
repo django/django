@@ -12,9 +12,6 @@ about each item can often be found in the release notes of two versions prior.
 2.0
 ---
 
-* ``ssi`` and ``url`` template tags will be removed from the ``future`` template
-  tag library (used during the 1.3/1.4 deprecation period).
-
 .. _deprecation-removed-in-1.9:
 
 1.9
@@ -118,6 +115,9 @@ details on these changes.
 
 * ``django.utils.module_loading.import_by_path`` will be removed in favor of
   ``django.utils.module_loading.import_string``.
+
+* ``ssi`` and ``url`` template tags will be removed from the ``future`` template
+  tag library (used during the 1.3/1.4 deprecation period).
 
 .. _deprecation-removed-in-1.8:
 
