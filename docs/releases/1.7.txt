@@ -1337,3 +1337,12 @@ The functionality required by ``check_field()`` is the same as that provided
 by ``validate_field()``, but the output format is different. Third-party database
 backends needing this functionality should modify their backends to provide an
 implementation of ``check_field()``.
+
+Loading ``ssi`` and ``url`` template tags from ``future`` library
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.3 introduced ``{% load ssi from future %}`` and
+``{% load url from future %}`` syntax for forward compatibility of the
+:ttag:`ssi` and :ttag:`url` template tags. This syntax is now deprecated and
+will be removed in Django 1.9. You can simply remove the
+``{% load ... from future %}`` tags.

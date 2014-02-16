@@ -548,17 +548,6 @@ defined in your url configurations by using the ``{% url %}`` template tag:
 
     <li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
 
-.. note::
-
-    If ``{% url 'detail' question.id %}`` (with quotes) doesn't work, but
-    ``{% url detail question.id %}`` (without quotes) does, that means you're
-    using a version of Django < 1.5. In this case, add the following
-    declaration at the top of your template:
-
-    .. code-block:: html+django
-
-        {% load url from future %}
-
 The way this works is by looking up the URL definition as specified in the
 ``polls.urls`` module. You can see exactly where the URL name of 'detail' is
 defined below::
