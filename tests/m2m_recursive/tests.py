@@ -168,7 +168,7 @@ class RecursiveM2MTests(TestCase):
             attrgetter("name"),
             ordered=False
         )
-        # As the assertQuerysetEqual uses a set for comparrison,
+        # As the assertQuerysetEqual uses a set for comparison,
         # check we've only got David listed once
         self.assertEqual(self.a.idols.all().count(), 1)
 

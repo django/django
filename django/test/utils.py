@@ -259,7 +259,7 @@ class modify_settings(override_settings):
     """
     def __init__(self, *args, **kwargs):
         if args:
-            # Hack used when instaciating from SimpleTestCase._pre_setup.
+            # Hack used when instantiating from SimpleTestCase._pre_setup.
             assert not kwargs
             self.operations = args[0]
         else:

@@ -109,7 +109,7 @@ class DeferredAttribute(object):
             val = self._check_parent_chain(instance, name)
             if val is None:
                 # We use only() instead of values() here because we want the
-                # various data coersion methods (to_python(), etc.) to be
+                # various data coercion methods (to_python(), etc.) to be
                 # called here.
                 val = getattr(
                     non_deferred_model._base_manager.only(name).using(

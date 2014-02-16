@@ -76,7 +76,7 @@ class OGRInspectTest(TestCase):
         self.assertEqual(model_def, '\n'.join(expected))
 
     def test_time_field(self):
-        # Only possible to test this on PostGIS at the momemnt.  MySQL
+        # Only possible to test this on PostGIS at the moment.  MySQL
         # complains about permissions, and SpatiaLite/Oracle are
         # insanely difficult to get support compiled in for in GDAL.
         if not connections['default'].ops.postgis:

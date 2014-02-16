@@ -68,7 +68,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
         # Because pointers have been set to NULL, an exception should be
         # raised when we try to access it.  Raising an exception is
-        # preferrable to a segmentation fault that commonly occurs when
+        # preferable to a segmentation fault that commonly occurs when
         # a C method is given a NULL memory reference.
         for fg in (fg1, fg2):
             # Equivalent to `fg.ptr`
@@ -167,7 +167,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         "Testing creation from HEX."
         for g in self.geometries.hex_wkt:
             geom_h = GEOSGeometry(g.hex)
-            # we need to do this so decimal places get normalised
+            # we need to do this so decimal places get normalized
             geom_t = fromstr(g.wkt)
             self.assertEqual(geom_t.wkt, geom_h.wkt)
 
@@ -176,7 +176,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         for g in self.geometries.hex_wkt:
             wkb = memoryview(a2b_hex(g.hex.encode()))
             geom_h = GEOSGeometry(wkb)
-            # we need to do this so decimal places get normalised
+            # we need to do this so decimal places get normalized
             geom_t = fromstr(g.wkt)
             self.assertEqual(geom_t.wkt, geom_h.wkt)
 
@@ -788,7 +788,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         ls = LineString((0, 0), (1, 1))
         self.assertAlmostEqual(1.41421356237, ls.length, 11)
 
-        # Should be circumfrence of Polygon
+        # Should be circumference of Polygon
         poly = Polygon(LinearRing((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
         self.assertEqual(4.0, poly.length)
 

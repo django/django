@@ -64,7 +64,7 @@ class TestFixtures(TestCase):
     def test_loaddata_not_found_fields_not_ignore(self):
         """
         Test for ticket #9279 -- Error is raised for entries in
-        the serialised data for fields that have been removed
+        the serialized data for fields that have been removed
         from the database when not ignored.
         """
         with self.assertRaises(DeserializationError):
@@ -77,7 +77,7 @@ class TestFixtures(TestCase):
     def test_loaddata_not_found_fields_ignore(self):
         """
         Test for ticket #9279 -- Ignores entries in
-        the serialised data for fields that have been removed
+        the serialized data for fields that have been removed
         from the database.
         """
         management.call_command(
@@ -90,7 +90,7 @@ class TestFixtures(TestCase):
 
     def test_loaddata_not_found_fields_ignore_xml(self):
         """
-        Test for ticket #19998 -- Ignore entries in the XML serialised data
+        Test for ticket #19998 -- Ignore entries in the XML serialized data
         for fields that have been removed from the model definition.
         """
         management.call_command(

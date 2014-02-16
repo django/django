@@ -39,7 +39,7 @@ class CustomField(TestCase):
         # Custom fields still have normal field's attributes.
         self.assertEqual(m._meta.get_field("data").verbose_name, "small field")
 
-        # The m.data attribute has been initialised correctly. It's a Small
+        # The m.data attribute has been initialized correctly. It's a Small
         # object.
         self.assertEqual((m.data.first, m.data.second), (1, 2))
 

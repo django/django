@@ -116,7 +116,7 @@ class SpatiaLiteCreation(DatabaseCreation):
 
     def spatialite_init_file(self):
         # SPATIALITE_SQL may be placed in settings to tell GeoDjango
-        # to use a specific path to the SpatiaLite initilization SQL.
+        # to use a specific path to the SpatiaLite initialization SQL.
         return getattr(settings, 'SPATIALITE_SQL',
                        'init_spatialite-%s.%s.sql' %
                        self.connection.ops.spatial_version[:2])

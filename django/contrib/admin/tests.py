@@ -96,7 +96,7 @@ class AdminSeleniumWebDriverTestCase(StaticLiveServerCase):
             # Wait for the next page to be loaded
             self.wait_loaded_tag('body')
         except TimeoutException:
-            # IE7 occasionnally returns an error "Internet Explorer cannot
+            # IE7 occasionally returns an error "Internet Explorer cannot
             # display the webpage" and doesn't load the next page. We just
             # ignore it.
             pass

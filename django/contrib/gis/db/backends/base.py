@@ -148,7 +148,7 @@ class BaseSpatialOperations(object):
 class SpatialRefSysMixin(object):
     """
     The SpatialRefSysMixin is a class used by the database-dependent
-    SpatialRefSys objects to reduce redundnant code.
+    SpatialRefSys objects to reduce redundant code.
     """
     # For pulling out the spheroid from the spatial reference string. This
     # regular expression is used only if the user does not have GDAL installed.

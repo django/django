@@ -137,7 +137,7 @@ class GeoQuerySet(QuerySet):
 
     def geojson(self, precision=8, crs=False, bbox=False, **kwargs):
         """
-        Returns a GeoJSON representation of the geomtry field in a `geojson`
+        Returns a GeoJSON representation of the geometry field in a `geojson`
         attribute on each element of the GeoQuerySet.
 
         The `crs` and `bbox` keywords may be set to True if the user wants

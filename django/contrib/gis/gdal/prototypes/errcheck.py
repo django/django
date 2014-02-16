@@ -12,7 +12,7 @@ from django.utils import six
 # Helper routines for retrieving pointers and/or values from
 # arguments passed in by reference.
 def arg_byref(args, offset=-1):
-    "Returns the pointer argument's by-refernece value."
+    "Returns the pointer argument's by-reference value."
     return args[offset]._obj.value
 
 
@@ -131,7 +131,7 @@ def check_str_arg(result, func, cargs):
     """
     This is for the OSRGet[Angular|Linear]Units functions, which
     require that the returned string pointer not be freed.  This
-    returns both the double and tring values.
+    returns both the double and string values.
     """
     dbl = result
     ptr = cargs[-1]._obj

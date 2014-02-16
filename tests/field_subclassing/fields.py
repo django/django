@@ -59,7 +59,7 @@ class SmallerField(SmallField):
 
 class JSONField(six.with_metaclass(models.SubfieldBase, models.TextField)):
 
-    description = ("JSONField automatically serializes and desializes values to "
+    description = ("JSONField automatically serializes and deserializes values to "
         "and from JSON.")
 
     def to_python(self, value):

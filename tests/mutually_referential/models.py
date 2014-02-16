@@ -17,5 +17,5 @@ class Parent(models.Model):
 class Child(models.Model):
     name = models.CharField(max_length=100)
 
-    # You can also explicitally specify the related app.
+    # You can also explicitly specify the related app.
     parent = models.ForeignKey("mutually_referential.Parent")

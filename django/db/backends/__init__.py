@@ -665,7 +665,7 @@ class BaseDatabaseFeatures(object):
     # supported by the Python driver
     supports_paramstyle_pyformat = True
 
-    # Does the backend require literal defaults, rather than parameterised ones?
+    # Does the backend require literal defaults, rather than parameterized ones?
     requires_literal_defaults = False
 
     # Does the backend require a connection reset after each material schema change?
@@ -1387,7 +1387,7 @@ class BaseDatabaseClient(object):
 
 class BaseDatabaseValidation(object):
     """
-    This class encapsualtes all backend-specific model validation.
+    This class encapsulates all backend-specific model validation.
     """
     def __init__(self, connection):
         self.connection = connection

@@ -189,7 +189,7 @@ class HttpResponseBase(six.Iterator):
         return self._headers[header.lower()][1]
 
     def __getstate__(self):
-        # SimpleCookie is not pickeable with pickle.HIGHEST_PROTOCOL, so we
+        # SimpleCookie is not pickleable with pickle.HIGHEST_PROTOCOL, so we
         # serialize to a string instead
         state = self.__dict__.copy()
         state['cookies'] = str(state['cookies'])

@@ -942,7 +942,7 @@ class Queries1Tests(BaseQuerysetTest):
 
     def test_ticket_10790_2(self):
         # Querying across several tables should strip only the last outer join,
-        # while preserving the preceeding inner joins.
+        # while preserving the preceding inner joins.
         q = Tag.objects.filter(parent__parent__isnull=False)
 
         self.assertQuerysetEqual(

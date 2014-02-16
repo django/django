@@ -1292,7 +1292,7 @@ class CacheUtils(TestCase):
 
     def test_cache_key_varies_by_url(self):
         """
-        get_cache_key keys differ by fully-qualfied URL instead of path
+        get_cache_key keys differ by fully-qualified URL instead of path
         """
         request1 = self.factory.get(self.path, HTTP_HOST='sub-1.example.com')
         learn_cache_key(request1, HttpResponse())

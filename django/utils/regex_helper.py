@@ -169,7 +169,7 @@ def normalize(pattern):
                 count, ch = get_quantifier(ch, pattern_iter)
                 if ch:
                     # We had to look ahead, but it wasn't need to compute the
-                    # quanitifer, so use this character next time around the
+                    # quantifier, so use this character next time around the
                     # main loop.
                     consume_next = False
 

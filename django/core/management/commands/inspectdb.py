@@ -96,7 +96,7 @@ class Command(NoArgsCommand):
                             field_type = "ForeignKey('%s'" % rel_to
                     else:
                         # Calling `get_field_type` to get the field type string and any
-                        # additional paramters and notes.
+                        # additional parameters and notes.
                         field_type, field_params, field_notes = self.get_field_type(connection, table_name, row)
                         extra_params.update(field_params)
                         comment_notes.extend(field_notes)

@@ -268,7 +268,7 @@ class Sqlite3InMemoryTestDbs(TestCase):
                 other = db.connections['other']
                 runner.DiscoverRunner(verbosity=0).setup_databases()
                 msg = "DATABASES setting '%s' option set to sqlite3's ':memory:' value shouldn't interfere with transaction support detection." % option
-                # Transaction support should be properly initialised for the 'other' DB
+                # Transaction support should be properly initialized for the 'other' DB
                 self.assertTrue(other.features.supports_transactions, msg)
                 # And all the DBs should report that they support transactions
                 self.assertTrue(connections_support_transactions(), msg)

@@ -48,13 +48,13 @@ class FlatpageMiddlewareTests(TestCase):
         self.assertContains(response, "<p>Isn't it sekrit!</p>")
 
     def test_fallback_flatpage(self):
-        "A flatpage can be served by the fallback middlware"
+        "A flatpage can be served by the fallback middleware"
         response = self.client.get('/flatpage/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<p>Isn't it flat!</p>")
 
     def test_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage raises a 404 when served by the fallback middlware"
+        "A non-existent flatpage raises a 404 when served by the fallback middleware"
         response = self.client.get('/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 
@@ -116,12 +116,12 @@ class FlatpageMiddlewareAppendSlashTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_redirect_fallback_flatpage(self):
-        "A flatpage can be served by the fallback middlware and should add a slash"
+        "A flatpage can be served by the fallback middleware and should add a slash"
         response = self.client.get('/flatpage')
         self.assertRedirects(response, '/flatpage/', status_code=301)
 
     def test_redirect_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage raises a 404 when served by the fallback middlware and should not add a slash"
+        "A non-existent flatpage raises a 404 when served by the fallback middleware and should not add a slash"
         response = self.client.get('/no_such_flatpage')
         self.assertEqual(response.status_code, 404)
 
