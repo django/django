@@ -76,7 +76,8 @@ def base64_hmac(salt, value, key):
 
 def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
     Signer = import_string(settings.SIGNING_BACKEND)
-    return Signer('django.http.cookies' + settings.SECRET_KEY, salt=salt)
+    key = force_bytes(settings.SECRET_KEY)
+    return Signer(b'django.http.cookies' + key, salt=salt)
 
 
 class JSONSerializer(object):
@@ -148,9 +149,9 @@ class Signer(object):
 
     def __init__(self, key=None, sep=':', salt=None):
         # Use of native strings in all versions of Python
-        self.sep = str(sep)
-        self.key = str(key or settings.SECRET_KEY)
-        self.salt = str(salt or
+        self.sep = force_str(sep)
+        self.key = key or settings.SECRET_KEY
+        self.salt = force_str(salt or
             '%s.%s' % (self.__class__.__module__, self.__class__.__name__))
 
     def signature(self, value):

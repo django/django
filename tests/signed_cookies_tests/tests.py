@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import time
 
+from django.conf import settings
 from django.core import signing
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase
@@ -62,3 +63,18 @@ class SignedCookieTest(TestCase):
                 request.get_signed_cookie, 'c', max_age=10)
         finally:
             time.time = _time
+
+    def test_signed_cookies_with_binary_key(self):
+        def restore_secret_key(prev):
+            settings.SECRET_KEY = prev
+
+        self.addCleanup(restore_secret_key, settings.SECRET_KEY)
+
+        settings.SECRET_KEY = b'\xe7'
+
+        response = HttpResponse()
+        response.set_signed_cookie('c', 'hello')
+
+        request = HttpRequest()
+        request.COOKIES['c'] = response.cookies['c'].value
+        self.assertEqual(request.get_signed_cookie('c'), 'hello')

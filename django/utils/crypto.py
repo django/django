@@ -36,10 +36,13 @@ def salted_hmac(key_salt, value, secret=None):
     if secret is None:
         secret = settings.SECRET_KEY
 
+    key_salt = force_bytes(key_salt)
+    secret = force_bytes(secret)
+
     # We need to generate a derived key from our base key.  We can do this by
     # passing the key_salt and our base key through a pseudo-random function and
     # SHA1 works nicely.
-    key = hashlib.sha1((key_salt + secret).encode('utf-8')).digest()
+    key = hashlib.sha1(key_salt + secret).digest()
 
     # If len(key_salt + secret) > sha_constructor().block_size, the above
     # line is redundant and could be replaced by key = key_salt + secret, since
