@@ -342,8 +342,10 @@ model, do the following::
     class MyThing(models.Model):
         name = models.CharField(help_text=_('This is the help text'))
 
-You can mark names of ``ForeignKey``, ``ManyToManyField`` or ``OneToOneField``
-relationship as translatable by using their ``verbose_name`` options::
+You can mark names of :class:`~django.db.models.ForeignKey`,
+:class:`~django.db.models.ManyToManyField` or
+:class:`~django.db.models.OneToOneField` relationship as translatable by using
+their :attr:`~django.db.models.Options.verbose_name` options::
 
     class MyThing(models.Model):
         kind = models.ForeignKey(ThingKind, related_name='kinds',
