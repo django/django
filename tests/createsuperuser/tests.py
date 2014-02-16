@@ -56,6 +56,37 @@ class MultiDBCreatesuperuserTestCase(TestCase):
         new_io.close()
 
 
+class CreateSuperUserReadFromStdin(TestCase):
+
+    def setUp(self):
+        self.user = models.User.objects.create_user(username='joe', password='qwerty')
+        self.stdout = StringIO()
+
+    def tearDown(self):
+        self.stdout.close()
+
+    def test_change_password_reading_from_stdin_works(self):
+        class MyStdin(object):
+            stdin = [None, 'not qwerty', 'not qwerty']
+            def read(self):
+                self.stdin = self.stdin[1:]
+                if not len(self.stdin):
+                    raise EOFError
+                return self.stdin[0]
+
+        self.assertTrue(self.user.check_password('qwerty'))
+        command = changepassword.Command()
+        command.execute(
+            "joe",
+            stdout=self.stdout,
+            read_stdin=True,
+            stdin=MyStdin()
+        )
+        command_output = self.stdout.getvalue().strip()
+        self.assertEqual(command_output, "Changing password for user 'joe'\nPassword changed successfully for user 'joe'")
+        self.assertTrue(models.User.objects.get(username="joe").check_password("not qwerty"))
+
+
 class CreateSuperUserInTTYShouldSkip(TestCase):
 
     def test_createsuperuser_no_tty(self):

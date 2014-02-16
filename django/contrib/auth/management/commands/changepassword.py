@@ -12,25 +12,34 @@ class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--database', action='store', dest='database',
             default=DEFAULT_DB_ALIAS, help='Specifies the database to use. Default is "default".'),
+        make_option('--read-stdin', action='store', dest='read_stdin',
+            default=False, help='Read data from stdin')
     )
     help = "Change a user's password for django.contrib.auth."
 
     requires_system_checks = False
 
-    def _get_pass(self, prompt="Password: "):
-        p = getpass.getpass(prompt=prompt)
-        if not p:
-            raise CommandError("aborted")
-        return p
+    def _get_pass(self, read_stdin, prompt="Password: "):
+        if not read_stdin:
+            p = getpass.getpass(prompt=prompt)
+            if not p:
+                raise CommandError("aborted")
+            return p
+        else:
+            return self.stdin.read()
 
     def handle(self, *args, **options):
         if len(args) > 1:
             raise CommandError("need exactly one or zero arguments for username")
 
+        read_stdin = options.get('read_stdin')
         if args:
             username, = args
         else:
-            username = getpass.getuser()
+            if not read_stdin:
+                username = getpass.getuser()
+            else:
+                username = self.stdin.read()
 
         UserModel = get_user_model()
 
@@ -47,8 +56,8 @@ class Command(BaseCommand):
         count = 0
         p1, p2 = 1, 2  # To make them initially mismatch.
         while p1 != p2 and count < MAX_TRIES:
-            p1 = self._get_pass()
-            p2 = self._get_pass("Password (again): ")
+            p1 = self._get_pass(read_stdin)
+            p2 = self._get_pass(read_stdin, "Password (again): ")
             if p1 != p2:
                 self.stdout.write("Passwords do not match. Please try again.\n")
                 count = count + 1
