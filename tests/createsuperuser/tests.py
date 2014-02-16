@@ -54,3 +54,30 @@ class MultiDBCreatesuperuserTestCase(TestCase):
         self.assertEqual(u.email, 'joe@somewhere.org')
 
         new_io.close()
+
+
+class CreateSuperUserInTTYShouldSkip(TestCase):
+
+    def test_createsuperuser_no_tty(self):
+        # Ticket Ref: 7423
+        class MyStdin(object):
+
+            def isatty(self):
+                return False
+
+        new_io = StringIO()
+
+        call_command(
+            "createsuperuser",
+            stdin=MyStdin(),
+            stdout=new_io,
+            interactive=True
+        )
+        command_output = new_io.getvalue().strip()
+        output = "Superuser creation skipped due to " \
+                 "not running in a TTY. You can run `manage.py " \
+                 "createsuperuser` in your project to create o" \
+                 "ne manually."
+
+        self.assertEqual(command_output, output)
+        new_io.close()
