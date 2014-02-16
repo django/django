@@ -135,9 +135,18 @@ class Command(BaseCommand):
             except KeyboardInterrupt:
                 self.stderr.write("\nOperation cancelled.")
                 sys.exit(1)
+            except NotRunningInTTYException:
+                self.stdout.write(
+                    "Superuser creation skipped due to "
+                    "not running in a TTY. You can run `manage.py "
+                    "createsuperuser` in your project to create o"
+                    "ne manually."
+                )
+                self.stdout.flush()
 
-        user_data[self.UserModel.USERNAME_FIELD] = username
-        user_data['password'] = password
-        self.UserModel._default_manager.db_manager(database).create_superuser(**user_data)
-        if verbosity >= 1:
-            self.stdout.write("Superuser created successfully.")
+        if username:
+            user_data[self.UserModel.USERNAME_FIELD] = username
+            user_data['password'] = password
+            self.UserModel._default_manager.db_manager(database).create_superuser(**user_data)
+            if verbosity >= 1:
+                self.stdout.write("Superuser created successfully.")
