@@ -92,6 +92,15 @@ Create local PostgreSQL database
 
 3. Start this database ``pg_ctl -D /path/to/user/db start``
 
+Create a database using PostGIS version 2
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When testing projects using :ref:`PostGIS 2 <spatialdb_template91>`,
+the test database is created using the ``CREATE EXTENSION postgis``
+instruction, provided that no template ``template_postgis`` (or named
+accordingly to :setting:`POSTGIS_TEMPLATE`) exists in the current
+database.
+
 Windows
 -------
 
