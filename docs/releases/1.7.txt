@@ -636,6 +636,14 @@ Templates
   parameters that are passed to the ``dict`` constructor used to build the new
   context level.
 
+* The new :meth:`Context.flatten() <django.template.Context.flatten>` method
+  returns a ``Context``'s stack as one flat dictionary.
+
+* ``Context`` objects can now be compared for equality (internally, this
+  uses :meth:`Context.flatten() <django.template.Context.flatten>` so the
+  internal structure of each ``Context``'s stack doesn't matter as long as their
+  flattened version is identical).
+
 * The :ttag:`widthratio` template tag now accepts an "as" parameter to capture
   the result in a variable.
 
