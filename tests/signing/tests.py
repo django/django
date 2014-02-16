@@ -105,6 +105,12 @@ class TestSigner(TestCase):
             self.assertRaises(
                 signing.BadSignature, signing.loads, transform(encoded))
 
+    def test_works_with_non_ascii_keys(self):
+        binary_key = b'\xe7'  # Set some binary (non-ASCII key)
+
+        s = signing.Signer(binary_key)
+        self.assertEquals('foo:6NB0fssLW5RQvZ3Y-MTerq2rX7w', s.sign('foo'))
+
 
 class TestTimestampSigner(TestCase):
 
