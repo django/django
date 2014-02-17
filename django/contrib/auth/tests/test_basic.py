@@ -1,11 +1,7 @@
-# -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
-
-import locale
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
-from django.contrib.auth.management.commands import createsuperuser
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
@@ -15,8 +11,6 @@ from django.dispatch import receiver
 from django.test import TestCase, override_settings
 from django.test.signals import setting_changed
 from django.utils import translation
-from django.utils.encoding import force_str
-from django.utils.six import binary_type, PY2, StringIO
 
 
 @receiver(setting_changed)
@@ -27,46 +21,6 @@ def user_model_swapped(**kwargs):
         setattr(User, 'objects', User._default_manager)
         ensure_default_manager(User)
         apps.clear_cache()
-
-
-def mock_inputs(inputs):
-    """
-    Decorator to temporarily replace input/getpass to allow interactive
-    createsuperuser.
-    """
-    def inner(test_func):
-        def wrapped(*args):
-            class mock_getpass:
-                @staticmethod
-                def getpass(prompt=b'Password: ', stream=None):
-                    if PY2:
-                        # getpass on Windows only supports prompt as bytestring (#19807)
-                        assert isinstance(prompt, binary_type)
-                    return inputs['password']
-
-            def mock_input(prompt):
-                # prompt should be encoded in Python 2. This line will raise an
-                # Exception if prompt contains unencoded non-ascii on Python 2.
-                prompt = str(prompt)
-                assert str('__proxy__') not in prompt
-                response = ''
-                for key, val in inputs.items():
-                    if force_str(key) in prompt.lower():
-                        response = val
-                        break
-                return response
-
-            old_getpass = createsuperuser.getpass
-            old_input = createsuperuser.input
-            createsuperuser.getpass = mock_getpass
-            createsuperuser.input = mock_input
-            try:
-                test_func(*args)
-            finally:
-                createsuperuser.getpass = old_getpass
-                createsuperuser.input = old_input
-        return wrapped
-    return inner
 
 
 @skipIfCustomUser
@@ -126,107 +80,6 @@ class BasicTestCase(TestCase):
         self.assertTrue(super.is_superuser)
         self.assertTrue(super.is_active)
         self.assertTrue(super.is_staff)
-
-    def test_createsuperuser_management_command(self):
-        "Check the operation of the createsuperuser management command"
-        # We can use the management command to create a superuser
-        new_io = StringIO()
-        call_command(
-            "createsuperuser",
-            interactive=False,
-            username="joe",
-            email="joe@somewhere.org",
-            stdout=new_io
-        )
-        command_output = new_io.getvalue().strip()
-        self.assertEqual(command_output, 'Superuser created successfully.')
-        u = User.objects.get(username="joe")
-        self.assertEqual(u.email, 'joe@somewhere.org')
-
-        # created password should be unusable
-        self.assertFalse(u.has_usable_password())
-
-        # We can supress output on the management command
-        new_io = StringIO()
-        call_command(
-            "createsuperuser",
-            interactive=False,
-            username="joe2",
-            email="joe2@somewhere.org",
-            verbosity=0,
-            stdout=new_io
-        )
-        command_output = new_io.getvalue().strip()
-        self.assertEqual(command_output, '')
-        u = User.objects.get(username="joe2")
-        self.assertEqual(u.email, 'joe2@somewhere.org')
-        self.assertFalse(u.has_usable_password())
-
-        call_command(
-            "createsuperuser",
-            interactive=False,
-            username="joe+admin@somewhere.org",
-            email="joe@somewhere.org",
-            verbosity=0
-        )
-        u = User.objects.get(username="joe+admin@somewhere.org")
-        self.assertEqual(u.email, 'joe@somewhere.org')
-        self.assertFalse(u.has_usable_password())
-
-    @mock_inputs({'password': "nopasswd"})
-    def test_createsuperuser_nolocale(self):
-        """
-        Check that createsuperuser does not break when no locale is set. See
-        ticket #16017.
-        """
-
-        old_getdefaultlocale = locale.getdefaultlocale
-        try:
-            # Temporarily remove locale information
-            locale.getdefaultlocale = lambda: (None, None)
-
-            # Call the command in this new environment
-            call_command(
-                "createsuperuser",
-                interactive=True,
-                username="nolocale@somewhere.org",
-                email="nolocale@somewhere.org",
-                verbosity=0
-            )
-
-        except TypeError:
-            self.fail("createsuperuser fails if the OS provides no information about the current locale")
-
-        finally:
-            # Re-apply locale information
-            locale.getdefaultlocale = old_getdefaultlocale
-
-        # If we were successful, a user should have been created
-        u = User.objects.get(username="nolocale@somewhere.org")
-        self.assertEqual(u.email, 'nolocale@somewhere.org')
-
-    @mock_inputs({
-        'password': "nopasswd",
-        'uživatel': 'foo',  # username (cz)
-        'email': 'nolocale@somewhere.org'})
-    def test_createsuperuser_non_ascii_verbose_name(self):
-        # Aliased so the string doesn't get extracted
-        from django.utils.translation import ugettext_lazy as ulazy
-        username_field = User._meta.get_field('username')
-        old_verbose_name = username_field.verbose_name
-        username_field.verbose_name = ulazy('uživatel')
-        new_io = StringIO()
-        try:
-            call_command(
-                "createsuperuser",
-                interactive=True,
-                stdout=new_io
-            )
-        finally:
-            username_field.verbose_name = old_verbose_name
-
-        command_output = new_io.getvalue().strip()
-        self.assertEqual(command_output, 'Superuser created successfully.')
 
     def test_get_user_model(self):
         "The current user model can be retrieved"
