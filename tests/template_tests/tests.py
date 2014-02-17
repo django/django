@@ -1938,7 +1938,7 @@ class RequestContextTests(unittest.TestCase):
         # adds __eq__ in the future
         request = RequestFactory().get('/')
 
-        self.assertEquals(
+        self.assertEqual(
             RequestContext(request, dict_=test_data),
             RequestContext(request, dict_=test_data)
         )
