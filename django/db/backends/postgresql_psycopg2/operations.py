@@ -220,10 +220,12 @@ class DatabaseOperations(BaseDatabaseOperations):
         return None
 
     def return_insert_id(self):
-        return self.return_values(nvars=1)
+        return self.return_values([])
 
-    def return_values(self, nvars=1, fields=None):
-        assert nvars > 0
+    def return_values(self, fields, include_id=True):
+        nvars = len(fields)
+        if include_id:
+            nvars += 1
         vars_string = ", ".join(["%s"] * nvars)
         return "RETURNING " + vars_string, ()
 

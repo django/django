@@ -963,7 +963,7 @@ class BaseDatabaseOperations(object):
         """
         pass
 
-    def return_values(self):
+    def return_values(self, *args, **kwargs):
         """
         For backends that support the RETURNING clause as part
         of a query, this method returns the SQL and params to

@@ -851,14 +851,12 @@ class SQLInsertCompiler(SQLCompiler):
         if self.returning_fields:
             if self.connection.features.can_return_multiple_fields:
                 fetch_func = self.connection.ops.return_values
-                fetch_kwargs = {
-                    'nvars': len(self.returning_fields) + 1,
-                    'fields': self.returning_fields
-                }
+                fetch_kwargs = {'fields': self.returning_fields}
         elif self.return_id:
             if self.connection.features.can_return_id_from_insert:
                 fetch_func = self.connection.ops.return_insert_id
                 fetch_kwargs = {}
+
         if fetch_func:
             params = params[0]
             col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
@@ -877,6 +875,7 @@ class SQLInsertCompiler(SQLCompiler):
                 )
                 params += r_params
             return [(" ".join(result), tuple(params))]
+
         if can_bulk:
             result.append(self.connection.ops.bulk_insert_sql(fields, len(values)))
             return [(" ".join(result), tuple(v for val in values for v in val))]
@@ -969,8 +968,7 @@ class SQLUpdateCompiler(SQLCompiler):
 
         if self.connection.features.can_return_multiple_fields and self.returning_fields:
             r_fmt, r_params = self.connection.ops.return_values(
-                nvars=len(self.returning_fields),
-                fields=self.returning_fields
+                fields=self.returning_fields, include_id=False
             )
             if r_fmt:
                 extra_fields = []
