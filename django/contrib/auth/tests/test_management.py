@@ -62,6 +62,15 @@ def mock_inputs(inputs):
     return inner
 
 
+class MockTTY(object):
+    """
+    A fake stdin object that pretends to be a TTY to be used in conjunction
+    with mock_inputs.
+    """
+    def isatty(self):
+        return True
+
+
 @skipIfCustomUser
 class GetDefaultUsernameTestCase(TestCase):
 
@@ -180,7 +189,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
                 interactive=True,
                 username="nolocale@somewhere.org",
                 email="nolocale@somewhere.org",
-                verbosity=0
+                verbosity=0,
+                stdin=MockTTY(),
             )
 
         except TypeError:
@@ -209,7 +219,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             call_command(
                 "createsuperuser",
                 interactive=True,
-                stdout=new_io
+                stdout=new_io,
+                stdin=MockTTY(),
             )
         finally:
             username_field.verbose_name = old_verbose_name
