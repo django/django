@@ -362,6 +362,10 @@ if __name__ == "__main__":
         default=False,
         help='Run the Selenium tests as well (if Selenium is installed)')
     options, args = parser.parse_args()
+    
+    #Ticket_22068
+    args = [os.path.normpath(labels) for labels in args]
+    
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
     else:
