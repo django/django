@@ -50,6 +50,10 @@ class Command(BaseCommand):
     option_list = BaseCommand.option_list
     help = 'Used to create a superuser.'
 
+    def execute(self, *args, **options):
+        self.stdin = options.get('stdin', sys.stdin)  # Used for testing
+        return super(Command, self).execute(*args, **options)
+
     def handle(self, *args, **options):
         username = options.get(self.UserModel.USERNAME_FIELD, None)
         interactive = options.get('interactive')
@@ -84,7 +88,7 @@ class Command(BaseCommand):
             default_username = get_default_username()
             try:
 
-                if not self.stdin.isatty():
+                if hasattr(self.stdin, 'isatty') and not self.stdin.isatty():
                     raise NotRunningInTTYException("Not running in a TTY")
 
                 # Get a username

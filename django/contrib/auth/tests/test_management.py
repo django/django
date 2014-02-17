@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from datetime import date
 import locale
+import sys
 
 from django.apps import apps
 from django.contrib.auth import models, management
@@ -308,6 +309,34 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         self.assertEqual(User._default_manager.count(), 0)
         self.assertIn("Superuser creation skipped", out.getvalue())
+
+    def test_passing_stdin(self):
+        """
+        You can pass a stdin object as an option and it should be
+        available on self.stdin.
+        If no such option is passed, it defaults to sys.stdin.
+        """
+
+        user_data = {'username': 'foo', 'email': 'foo@example.com'}
+        sentinel = object()
+        command = createsuperuser.Command()
+        command.execute(
+            stdin=sentinel,
+            stdout=six.StringIO(),
+            interactive=False,
+            username='janet',
+            email='janet@example.com',
+        )
+        self.assertIs(command.stdin, sentinel)
+
+        command = createsuperuser.Command()
+        command.execute(
+            stdout=six.StringIO(),
+            interactive=False,
+            username='joe',
+            email='joe@example.com',
+        )
+        self.assertIs(command.stdin, sys.stdin)
 
 
 class CustomUserModelValidationTestCase(TestCase):
