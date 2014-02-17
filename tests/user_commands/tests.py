@@ -61,32 +61,6 @@ class CommandTests(SimpleTestCase):
             management.call_command('leave_locale_alone_true', stdout=out)
             self.assertEqual(out.getvalue(), "pl\n")
 
-    def test_passing_stdin(self):
-        """
-        You can pass a stdin object to a command's options and it should be
-        available on self.stdin.
-        """
-        class CustomCommand(BaseCommand):
-            def handle(self, *args, **kwargs):
-                pass
-
-        sentinel = object()
-        command = CustomCommand()
-        command.execute(stdin=sentinel, stdout=StringIO())
-        self.assertIs(command.stdin, sentinel)
-
-    def test_passing_stdin_default(self):
-        """
-        If stdin is not passed as an option, the default should be sys.stdin.
-        """
-        class CustomCommand(BaseCommand):
-            def handle(self, *args, **kwargs):
-                return 'OK'
-
-        command = CustomCommand()
-        command.execute(stdout=StringIO())
-        self.assertIs(command.stdin, sys.stdin)
-
 
 class UtilsTests(SimpleTestCase):
 
