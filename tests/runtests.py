@@ -200,6 +200,10 @@ def teardown(state):
 
 def django_tests(verbosity, interactive, failfast, test_labels):
     from django.conf import settings
+
+    #Ticket_22068
+    test_labels = [os.path.normpath(labels) for labels in test_labels]
+
     state = setup(verbosity, test_labels)
     extra_tests = []
 
