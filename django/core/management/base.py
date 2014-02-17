@@ -306,6 +306,9 @@ class BaseCommand(object):
             self.stderr = OutputWrapper(options.get('stderr', sys.stderr))
         else:
             self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
+        # Options may contain stdin simply because it makes certain
+        # things easier to test.
+        self.stdin = options.get('stdin', sys.stdin)
 
         if self.can_import_settings:
             from django.conf import settings  # NOQA

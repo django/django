@@ -17,6 +17,10 @@ from django.utils.six.moves import input
 from django.utils.text import capfirst
 
 
+class NotRunningInTTYException(Exception):
+    pass
+
+
 class Command(BaseCommand):
 
     def __init__(self, *args, **kwargs):
@@ -80,6 +84,9 @@ class Command(BaseCommand):
             default_username = get_default_username()
             try:
 
+                if not self.stdin.isatty():
+                    raise NotRunningInTTYException("Not running in a TTY")
+
                 # Get a username
                 verbose_field_name = self.username_field.verbose_name
                 while username is None:
@@ -135,9 +142,18 @@ class Command(BaseCommand):
             except KeyboardInterrupt:
                 self.stderr.write("\nOperation cancelled.")
                 sys.exit(1)
+            except NotRunningInTTYException:
+                self.stdout.write(
+                    "Superuser creation skipped due to "
+                    "not running in a TTY. You can run `manage.py "
+                    "createsuperuser` in your project to create o"
+                    "ne manually."
+                )
+                self.stdout.flush()
 
-        user_data[self.UserModel.USERNAME_FIELD] = username
-        user_data['password'] = password
-        self.UserModel._default_manager.db_manager(database).create_superuser(**user_data)
-        if verbosity >= 1:
-            self.stdout.write("Superuser created successfully.")
+        if username:
+            user_data[self.UserModel.USERNAME_FIELD] = username
+            user_data['password'] = password
+            self.UserModel._default_manager.db_manager(database).create_superuser(**user_data)
+            if verbosity >= 1:
+                self.stdout.write("Superuser created successfully.")

@@ -1,9 +1,11 @@
 import sys
 
+from django.core.management.base import BaseCommand
 from django.core import management
 from django.core.management import CommandError
 from django.core.management.utils import popen_wrapper
 from django.test import SimpleTestCase
+from django.test import TestCase
 from django.utils import translation
 from django.utils.six import StringIO
 
@@ -65,3 +67,25 @@ class UtilsTests(SimpleTestCase):
 
     def test_no_existent_external_program(self):
         self.assertRaises(CommandError, popen_wrapper, ['a_42_command_that_doesnt_exist_42'])
+
+
+class Sentinel(object):
+    pass
+
+class C(BaseCommand):
+    def handle(self, *args, **kwargs):
+        pass
+
+class PassingStdinToCommandsTest(TestCase):
+
+    def test_passing_stdin(self):
+        sentinel = Sentinel()
+        command = C()
+        command.execute(stdin=sentinel)
+        self.assertIs(command.stdin, sentinel)
+
+    def test_passing_stdin_default(self):
+        sentinal = Sentinel()
+        command = C()
+        command.execute()
+        self.assertIs(command.stdin, sys.stdin)
