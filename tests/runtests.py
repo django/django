@@ -200,10 +200,6 @@ def teardown(state):
 
 def django_tests(verbosity, interactive, failfast, test_labels):
     from django.conf import settings
-
-    #Ticket_22068
-    test_labels = [os.path.normpath(labels) for labels in test_labels]
-
     state = setup(verbosity, test_labels)
     extra_tests = []
 
@@ -366,6 +362,10 @@ if __name__ == "__main__":
         default=False,
         help='Run the Selenium tests as well (if Selenium is installed)')
     options, args = parser.parse_args()
+    
+    #Ticket_22068
+    args = [os.path.normpath(labels) for labels in args]
+    
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
     else:
