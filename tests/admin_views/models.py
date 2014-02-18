@@ -438,6 +438,13 @@ class Post(models.Model):
         return "Very awesome."
 
 
+# Proxy model to test overridden fields attrs on Post model so as not to
+# interfere with other tests.
+class FieldOverridePost(Post):
+    class Meta:
+        proxy = True
+
+
 @python_2_unicode_compatible
 class Gadget(models.Model):
     name = models.CharField(max_length=100)
