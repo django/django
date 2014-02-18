@@ -5,14 +5,10 @@ import copy
 
 from django.db.models.fields import IntegerField, FloatField
 from django.db.models.lookups import RegisterLookupMixin
+from django.utils.functional import cached_property
 
 
 __all__ = ['Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance']
-
-
-# Fake fields used to identify aggregate types in data-conversion operations.
-ordinal_aggregate_field = IntegerField()
-computed_aggregate_field = FloatField()
 
 
 class Aggregate(RegisterLookupMixin):
@@ -61,13 +57,22 @@ class Aggregate(RegisterLookupMixin):
 
         while tmp and isinstance(tmp, Aggregate):
             if getattr(tmp, 'is_ordinal', False):
-                tmp = ordinal_aggregate_field
+                tmp = self._ordinal_aggregate_field
             elif getattr(tmp, 'is_computed', False):
-                tmp = computed_aggregate_field
+                tmp = self._computed_aggregate_field
             else:
                 tmp = tmp.source
 
         self.field = tmp
+
+    # Two fake fields used to identify aggregate types in data-conversion operations.
+    @cached_property
+    def _ordinal_aggregate_field(self):
+        return IntegerField()
+
+    @cached_property
+    def _computed_aggregate_field(self):
+        return FloatField()
 
     def relabeled_clone(self, change_map):
         clone = copy.copy(self)

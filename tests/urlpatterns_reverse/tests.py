@@ -15,6 +15,8 @@ from django.shortcuts import redirect
 from django.test import TestCase, override_settings
 from django.utils import six
 
+from admin_scripts.tests import AdminScriptTestCase
+
 from . import urlconf_outer, middleware, views
 from .views import empty_view
 
@@ -299,6 +301,24 @@ class ReverseLazyTest(TestCase):
         self.client.login(username='alfred', password='testpw')
         response = self.client.get('/login_required_view/')
         self.assertEqual(response.status_code, 200)
+
+
+class ReverseLazySettingsTest(AdminScriptTestCase):
+    """
+    Test that reverse_lazy can be used in settings without causing a circular
+    import error.
+    """
+    def setUp(self):
+        self.write_settings('settings.py', extra="""
+from django.core.urlresolvers import reverse_lazy
+LOGIN_URL = reverse_lazy('login')""")
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_lazy_in_settings(self):
+        out, err = self.run_manage(['test'])
+        self.assertOutput(err, "Ran 0 tests")
 
 
 class ReverseShortcutTests(TestCase):
