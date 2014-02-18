@@ -56,7 +56,7 @@ class ErrorDict(dict):
         return {f: e.as_data() for f, e in self.items()}
 
     def as_json(self, escape_html=False):
-        errors = {f: json.loads(e.as_json(escape_html)) for f, e in self.items()}
+        errors = {f: json.loads(e.as_json(escape_html=escape_html)) for f, e in self.items()}
         return json.dumps(errors)
 
     def as_ul(self):
@@ -89,9 +89,10 @@ class ErrorList(UserList, list):
     def as_json(self, escape_html=False):
         errors = []
         for error in ValidationError(self.data).error_list:
+            message = list(error)[0]
             errors.append({
-                'message': escape(list(error)[0]) if escape_html else list(error)[0],
-                'code': error.code or ''
+                'message': escape(message) if escape_html else message,
+                'code': error.code or '',
             })
         return json.dumps(errors)
 
