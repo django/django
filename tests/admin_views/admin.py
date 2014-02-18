@@ -34,7 +34,7 @@ from .models import (Article, Chapter, Child, Parent, Picture, Widget,
     UnchangeableObject, UserMessenger, Simple, Choice, ShortMessage, Telegram,
     FilteredManager, EmptyModelHidden, EmptyModelVisible, EmptyModelMixin,
     State, City, Restaurant, Worker, ParentWithDependentChildren,
-    DependentChild, StumpJoke)
+    DependentChild, StumpJoke, FieldOverridePost)
 
 
 def callable_year(dt_value):
@@ -428,6 +428,22 @@ class PostAdmin(admin.ModelAdmin):
         return "Multiline\ntest\nstring"
 
     value.short_description = 'Value in $US'
+
+
+class FieldOverridePostForm(forms.ModelForm):
+    model = FieldOverridePost
+
+    class Meta:
+        help_texts = {
+            'posted': 'Overridden help text for the date'
+        }
+        labels = {
+            'public': 'Overridden public label'
+        }
+
+
+class FieldOverridePostAdmin(PostAdmin):
+    form = FieldOverridePostForm
 
 
 class CustomChangeList(ChangeList):
@@ -824,6 +840,7 @@ site.register(Recommender)
 site.register(Collector, CollectorAdmin)
 site.register(Category, CategoryAdmin)
 site.register(Post, PostAdmin)
+site.register(FieldOverridePost, FieldOverridePostAdmin)
 site.register(Gadget, GadgetAdmin)
 site.register(Villain)
 site.register(SuperVillain)
