@@ -2,7 +2,6 @@ import sys
 
 from django.core import management
 from django.core.management import CommandError
-from django.core.management.base import BaseCommand
 from django.core.management.utils import popen_wrapper
 from django.test import SimpleTestCase
 from django.utils import translation

@@ -6,7 +6,6 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management import call_command
 from django.dispatch import receiver
 from django.test import TestCase, override_settings
 from django.test.signals import setting_changed

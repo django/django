@@ -327,8 +327,6 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         available on self.stdin.
         If no such option is passed, it defaults to sys.stdin.
         """
-
-        user_data = {'username': 'foo', 'email': 'foo@example.com'}
         sentinel = object()
         command = createsuperuser.Command()
         command.execute(
