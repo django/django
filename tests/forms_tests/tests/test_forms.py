@@ -2071,17 +2071,24 @@ class FormsTestCase(TestCase):
         }
         self.assertEqual(errors, control)
 
+    def test_error_dict_as_json_escape_html(self):
         """#21962 - adding html escape flag to ErrorDict"""
-        class MyHtmlForm(MyForm):
+        class MyForm(Form):
+            foo = CharField()
+            bar = CharField()
 
             def clean(self):
                 raise ValidationError('<p>Non-field error.</p>',
                                       code='secret',
                                       params={'a': 1, 'b': 2})
 
-        control['__all__'] = [{'code': 'secret', 'message': '<p>Non-field error.</p>'}]
+        control = {
+            'foo': [{'code': 'required', 'message': 'This field is required.'}],
+            'bar': [{'code': 'required', 'message': 'This field is required.'}],
+            '__all__': [{'code': 'secret', 'message': '<p>Non-field error.</p>'}]
+        }
 
-        form = MyHtmlForm({})
+        form = MyForm({})
         self.assertFalse(form.is_valid())
 
         errors = json.loads(form.errors.as_json())
