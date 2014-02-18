@@ -8,6 +8,24 @@ class PostGISCreation(DatabaseCreation):
     geom_index_ops = 'GIST_GEOMETRY_OPS'
     geom_index_ops_nd = 'GIST_GEOMETRY_OPS_ND'
 
+    data_types = {
+        'GeometryField': '%(gistype)s(GEOMETRY,%(srid)s)',
+        'PointField': '%(gistype)s(POINT,%(srid)s)',
+        'LineStringField': '%(gistype)s(LINESTRING,%(srid)s)',
+        'PolygonField': '%(gistype)s(POLYGON,%(srid)s)',
+        'MultiPointField': '%(gistype)s(MULTIPOINT,%(srid)s)',
+        'MultiLineStringField': '%(gistype)s(MULTILINESTRING,%(srid)s)',
+        'MultiPolygonField': '%(gistype)s(MULTIPOLYGON,%(srid)s)',
+        'GeometryCollectionField': '%(gistype)s(GEOMETRYCOLLECTION,%(srid)s)',
+    }
+    data_types.update(DatabaseCreation.data_types)
+
+    def get_column_type(self, field_name, field_attrs):
+        field_attrs['gistype'] = 'geometry'
+        if field_attrs.get('geography') and self.connection.ops.geometry:
+            field_attrs['gistype'] = 'geography'
+        return self.data_types[field_name] % field_attrs
+
     @cached_property
     def template_postgis(self):
         template_postgis = getattr(settings, 'POSTGIS_TEMPLATE', 'template_postgis')

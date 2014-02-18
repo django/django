@@ -540,7 +540,7 @@ class Field(RegisterLookupMixin):
         """
         data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
         try:
-            type_string = connection.creation.data_types[self.get_internal_type()] % data
+            type_string = connection.creation.get_column_type(self.get_internal_type(), data)
         except KeyError:
             type_string = None
         try:
