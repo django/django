@@ -5,10 +5,9 @@ import sys
 import warnings
 
 from django.conf import settings
-from django.utils.html import format_html, format_html_join, escape, conditional_escape
+from django.utils.html import format_html, format_html_join, escape
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils import timezone
-from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six
 
