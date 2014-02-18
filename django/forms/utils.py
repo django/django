@@ -5,7 +5,7 @@ import sys
 import warnings
 
 from django.conf import settings
-from django.utils.html import format_html, format_html_join
+from django.utils.html import format_html, format_html_join, escape
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -55,8 +55,8 @@ class ErrorDict(dict):
     def as_data(self):
         return {f: e.as_data() for f, e in self.items()}
 
-    def as_json(self):
-        errors = {f: json.loads(e.as_json()) for f, e in self.items()}
+    def as_json(self, escape_html=False):
+        errors = {f: json.loads(e.as_json(escape_html=escape_html)) for f, e in self.items()}
         return json.dumps(errors)
 
     def as_ul(self):
@@ -86,11 +86,12 @@ class ErrorList(UserList, list):
     def as_data(self):
         return self.data
 
-    def as_json(self):
+    def as_json(self, escape_html=False):
         errors = []
         for error in ValidationError(self.data).error_list:
+            message = list(error)[0]
             errors.append({
-                'message': list(error)[0],
+                'message': escape(message) if escape_html else message,
                 'code': error.code or '',
             })
         return json.dumps(errors)
