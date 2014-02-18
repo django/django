@@ -317,8 +317,8 @@ LOGIN_URL = reverse_lazy('login')""")
         self.remove_settings('settings.py')
 
     def test_lazy_in_settings(self):
-        out, err = self.run_manage(['test'])
-        self.assertOutput(err, "Ran 0 tests")
+        out, err = self.run_manage(['sqlall', 'auth'])
+        self.assertNoOutput(err)
 
 
 class ReverseShortcutTests(TestCase):
