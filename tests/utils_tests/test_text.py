@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from unittest import skipUnless
+
 from django.test import SimpleTestCase
 from django.utils import six, text
+
+IS_WIDE_BUILD = (len('\U0001F4A9') == 1)
 
 
 class TestUtilsText(SimpleTestCase):
@@ -156,6 +160,7 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(text.javascript_quote(input, quote_double_quotes=True),
                          '&quot;Text&quot;')
 
+    @skipUnless(IS_WIDE_BUILD)
     def test_javascript_quote_unicode(self):
         input = "<script>alert('Hello \\xff.\n Wel𝕃come\there\r');</script>"
         output = r"<script>alert(\'Hello \\xff.\n Wel𝕃come\there\r\');<\/script>"
