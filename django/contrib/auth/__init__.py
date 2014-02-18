@@ -138,15 +138,17 @@ def get_user(request):
     If no user is retrieved an instance of `AnonymousUser` is returned.
     """
     from .models import AnonymousUser
+    user = None
     try:
         user_id = request.session[SESSION_KEY]
         backend_path = request.session[BACKEND_SESSION_KEY]
-        assert backend_path in settings.AUTHENTICATION_BACKENDS
-        backend = load_backend(backend_path)
-        user = backend.get_user(user_id) or AnonymousUser()
-    except (KeyError, AssertionError):
-        user = AnonymousUser()
-    return user
+    except KeyError:
+        pass
+    else:
+        if backend_path in settings.AUTHENTICATION_BACKENDS:
+            backend = load_backend(backend_path)
+            user = backend.get_user(user_id)
+    return user or AnonymousUser()
 
 
 def get_permission_codename(action, opts):
