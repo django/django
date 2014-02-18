@@ -36,6 +36,11 @@ js_info_dict_admin = {
     'packages': ('django.contrib.admin', 'view_tests'),
 }
 
+js_info_dict_app5 = {
+    'domain': 'djangojs',
+    'packages': ('view_tests.app5',),
+}
+
 urlpatterns = patterns('',
     (r'^$', views.index_page),
 
@@ -54,6 +59,7 @@ urlpatterns = patterns('',
     # i18n views
     (r'^i18n/', include('django.conf.urls.i18n')),
     (r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
+    (r'^jsi18n/app5/$', 'django.views.i18n.javascript_catalog', js_info_dict_app5),
     (r'^jsi18n_english_translation/$', 'django.views.i18n.javascript_catalog', js_info_dict_english_translation),
     (r'^jsi18n_multi_packages1/$', 'django.views.i18n.javascript_catalog', js_info_dict_multi_packages1),
     (r'^jsi18n_multi_packages2/$', 'django.views.i18n.javascript_catalog', js_info_dict_multi_packages2),
