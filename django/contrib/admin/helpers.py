@@ -136,7 +136,6 @@ class AdminField(object):
 
 class AdminReadonlyField(object):
     def __init__(self, form, field, is_first, model_admin=None):
-        label = label_for_field(field, form._meta.model, model_admin)
         # Make self.field look a little bit like a field. This means that
         # {{ field.name }} must be a useful class name to identify the field.
         # For convenience, store other field-related data here too.
@@ -144,11 +143,22 @@ class AdminReadonlyField(object):
             class_name = field.__name__ if field.__name__ != '<lambda>' else ''
         else:
             class_name = field
+
+        if form._meta.labels and class_name in form._meta.labels:
+            label = form._meta.labels[class_name]
+        else:
+            label = label_for_field(field, form._meta.model, model_admin)
+
+        if form._meta.help_texts and class_name in form._meta.help_texts:
+            help_text = form._meta.help_texts[class_name]
+        else:
+            help_text = help_text_for_field(class_name, form._meta.model)
+
         self.field = {
             'name': class_name,
             'label': label,
+            'help_text': help_text,
             'field': field,
-            'help_text': help_text_for_field(class_name, form._meta.model)
         }
         self.form = form
         self.model_admin = model_admin
