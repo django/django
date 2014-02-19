@@ -544,6 +544,8 @@ Internationalization
   any extracted strings will now be automatically distributed to the proper
   app or project message file. See :ref:`how-to-create-language-files` for
   details.
+  
+* Added :ref:`format definitions <format-localization>` for Esperanto.
 
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
