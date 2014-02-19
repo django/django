@@ -1,0 +1,1232 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Tran  <hongdiepkien@gmail.com>, 2011.
+# Tran Van <vantxm@yahoo.co.uk>, 2011.
+# Vuong Nguyen <autalpha@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-01-01 16:10+0100\n"
+"PO-Revision-Date: 2013-01-02 08:47+0000\n"
+"Last-Translator: Tran Van <vantxm@yahoo.co.uk>\n"
+"Language-Team: Vietnamese (http://www.transifex.com/projects/p/django/"
+"language/vi/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: vi\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: conf/global_settings.py:48
+msgid "Afrikaans"
+msgstr ""
+
+#: conf/global_settings.py:49
+msgid "Arabic"
+msgstr "Tiếng Ả Rập"
+
+#: conf/global_settings.py:50
+msgid "Azerbaijani"
+msgstr "Azerbaijan"
+
+#: conf/global_settings.py:51
+msgid "Bulgarian"
+msgstr "Tiếng Bun-ga-ri"
+
+#: conf/global_settings.py:52
+msgid "Belarusian"
+msgstr ""
+
+#: conf/global_settings.py:53
+msgid "Bengali"
+msgstr "Bengali"
+
+#: conf/global_settings.py:54
+msgid "Breton"
+msgstr ""
+
+#: conf/global_settings.py:55
+msgid "Bosnian"
+msgstr "Tiếng Bosnia"
+
+#: conf/global_settings.py:56
+msgid "Catalan"
+msgstr "Catalan"
+
+#: conf/global_settings.py:57
+msgid "Czech"
+msgstr "Séc"
+
+#: conf/global_settings.py:58
+msgid "Welsh"
+msgstr "Xứ Wales"
+
+#: conf/global_settings.py:59
+msgid "Danish"
+msgstr "Tiếng Đan Mạch"
+
+#: conf/global_settings.py:60
+msgid "German"
+msgstr "Tiếng Đức"
+
+#: conf/global_settings.py:61
+msgid "Greek"
+msgstr "Tiếng Hy Lạp"
+
+#: conf/global_settings.py:62
+msgid "English"
+msgstr "Tiếng Anh"
+
+#: conf/global_settings.py:63
+msgid "British English"
+msgstr "British English"
+
+#: conf/global_settings.py:64
+msgid "Esperanto"
+msgstr ""
+
+#: conf/global_settings.py:65
+msgid "Spanish"
+msgstr "Tiếng Tây Ban Nha"
+
+#: conf/global_settings.py:66
+msgid "Argentinian Spanish"
+msgstr "Argentinian Spanish"
+
+#: conf/global_settings.py:67
+msgid "Mexican Spanish"
+msgstr "Mexican Spanish"
+
+#: conf/global_settings.py:68
+msgid "Nicaraguan Spanish"
+msgstr "Tiếng Tây Ban Nha-Nicaragua"
+
+#: conf/global_settings.py:69
+msgid "Venezuelan Spanish"
+msgstr ""
+
+#: conf/global_settings.py:70
+msgid "Estonian"
+msgstr "Tiếng Estonia"
+
+#: conf/global_settings.py:71
+msgid "Basque"
+msgstr "Tiếng Baxcơ"
+
+#: conf/global_settings.py:72
+msgid "Persian"
+msgstr "Tiếng Ba Tư"
+
+#: conf/global_settings.py:73
+msgid "Finnish"
+msgstr "Tiếng Phần Lan"
+
+#: conf/global_settings.py:74
+msgid "French"
+msgstr "Tiếng Pháp"
+
+#: conf/global_settings.py:75
+msgid "Frisian"
+msgstr "Tiếng Frisco"
+
+#: conf/global_settings.py:76
+msgid "Irish"
+msgstr "Tiếng Ai-len"
+
+#: conf/global_settings.py:77
+msgid "Galician"
+msgstr "Tiếng Pháp cổ"
+
+#: conf/global_settings.py:78
+msgid "Hebrew"
+msgstr "Tiếng Do Thái cổ"
+
+#: conf/global_settings.py:79
+msgid "Hindi"
+msgstr "Tiếng Hindi"
+
+#: conf/global_settings.py:80
+msgid "Croatian"
+msgstr "Tiếng Croatia"
+
+#: conf/global_settings.py:81
+msgid "Hungarian"
+msgstr "Tiếng Hung-ga-ri"
+
+#: conf/global_settings.py:82
+msgid "Interlingua"
+msgstr ""
+
+#: conf/global_settings.py:83
+msgid "Indonesian"
+msgstr "Tiếng In-đô-nê-xi-a"
+
+#: conf/global_settings.py:84
+msgid "Icelandic"
+msgstr "Tiếng Aixơlen"
+
+#: conf/global_settings.py:85
+msgid "Italian"
+msgstr "Tiếng Ý"
+
+#: conf/global_settings.py:86
+msgid "Japanese"
+msgstr "Tiếng Nhật Bản"
+
+#: conf/global_settings.py:87
+msgid "Georgian"
+msgstr "Georgian"
+
+#: conf/global_settings.py:88
+msgid "Kazakh"
+msgstr ""
+
+#: conf/global_settings.py:89
+msgid "Khmer"
+msgstr "Tiếng Khơ-me"
+
+#: conf/global_settings.py:90
+msgid "Kannada"
+msgstr "Tiếng Kannada"
+
+#: conf/global_settings.py:91
+msgid "Korean"
+msgstr "Tiếng Hàn Quốc"
+
+#: conf/global_settings.py:92
+msgid "Luxembourgish"
+msgstr ""
+
+#: conf/global_settings.py:93
+msgid "Lithuanian"
+msgstr "Tiếng Lat-vi"
+
+#: conf/global_settings.py:94
+msgid "Latvian"
+msgstr "Ngôn ngữ vùng Bantic"
+
+#: conf/global_settings.py:95
+msgid "Macedonian"
+msgstr "Tiếng Maxêđôni"
+
+#: conf/global_settings.py:96
+msgid "Malayalam"
+msgstr "Tiếng Malayalam"
+
+#: conf/global_settings.py:97
+msgid "Mongolian"
+msgstr "Tiếng Mông Cổ"
+
+#: conf/global_settings.py:98
+msgid "Norwegian Bokmal"
+msgstr "Tiếng Na Uy Bokmål"
+
+#: conf/global_settings.py:99
+msgid "Nepali"
+msgstr ""
+
+#: conf/global_settings.py:100
+msgid "Dutch"
+msgstr "Tiếng Hà Lan"
+
+#: conf/global_settings.py:101
+msgid "Norwegian Nynorsk"
+msgstr "Tiếng Na Uy Nynorsk"
+
+#: conf/global_settings.py:102
+msgid "Punjabi"
+msgstr "Punjabi"
+
+#: conf/global_settings.py:103
+msgid "Polish"
+msgstr "Tiếng Ba lan"
+
+#: conf/global_settings.py:104
+msgid "Portuguese"
+msgstr "Tiếng Bồ Đào Nha"
+
+#: conf/global_settings.py:105
+msgid "Brazilian Portuguese"
+msgstr "Brazilian Portuguese"
+
+#: conf/global_settings.py:106
+msgid "Romanian"
+msgstr "Tiếng Ru-ma-ni"
+
+#: conf/global_settings.py:107
+msgid "Russian"
+msgstr "Tiếng Nga"
+
+#: conf/global_settings.py:108
+msgid "Slovak"
+msgstr "Ngôn ngữ Slô-vac"
+
+#: conf/global_settings.py:109
+msgid "Slovenian"
+msgstr "Tiếng Slôven"
+
+#: conf/global_settings.py:110
+msgid "Albanian"
+msgstr "Tiếng Albania"
+
+#: conf/global_settings.py:111
+msgid "Serbian"
+msgstr "Tiếng Xéc-bi"
+
+#: conf/global_settings.py:112
+msgid "Serbian Latin"
+msgstr "Serbian Latin"
+
+#: conf/global_settings.py:113
+msgid "Swedish"
+msgstr "Tiếng Thụy Điển"
+
+#: conf/global_settings.py:114
+msgid "Swahili"
+msgstr ""
+
+#: conf/global_settings.py:115
+msgid "Tamil"
+msgstr "Tiếng Ta-min"
+
+#: conf/global_settings.py:116
+msgid "Telugu"
+msgstr "Telugu"
+
+#: conf/global_settings.py:117
+msgid "Thai"
+msgstr "Tiếng Thái"
+
+#: conf/global_settings.py:118
+msgid "Turkish"
+msgstr "Tiếng Thổ Nhĩ Kỳ"
+
+#: conf/global_settings.py:119
+msgid "Tatar"
+msgstr ""
+
+#: conf/global_settings.py:120
+msgid "Udmurt"
+msgstr ""
+
+#: conf/global_settings.py:121
+msgid "Ukrainian"
+msgstr "Tiếng Ukraina"
+
+#: conf/global_settings.py:122
+msgid "Urdu"
+msgstr "Urdu"
+
+#: conf/global_settings.py:123
+msgid "Vietnamese"
+msgstr "Tiếng Việt Nam"
+
+#: conf/global_settings.py:124
+msgid "Simplified Chinese"
+msgstr "Tiếng Trung Hoa giản thể"
+
+#: conf/global_settings.py:125
+msgid "Traditional Chinese"
+msgstr "Tiếng Trung Hoa truyền thống"
+
+#: core/validators.py:21 forms/fields.py:52
+msgid "Enter a valid value."
+msgstr "Nhập một giá trị hợp lệ."
+
+#: core/validators.py:104 forms/fields.py:464
+msgid "Enter a valid email address."
+msgstr ""
+
+#: core/validators.py:107 forms/fields.py:1013
+msgid ""
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr "Nhập một 'slug' hợp lệ gồm chữ cái, số, gạch dưới và gạch nối."
+
+#: core/validators.py:110 core/validators.py:129 forms/fields.py:987
+msgid "Enter a valid IPv4 address."
+msgstr "Nhập một địa chỉ IPv4 hợp lệ."
+
+#: core/validators.py:115 core/validators.py:130
+msgid "Enter a valid IPv6 address."
+msgstr ""
+
+#: core/validators.py:125 core/validators.py:128
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr ""
+
+#: core/validators.py:151 db/models/fields/__init__.py:655
+msgid "Enter only digits separated by commas."
+msgstr "Chỉ nhập chữ số, cách nhau bằng dấu phẩy."
+
+#: core/validators.py:157
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr "Đảm bảo giá trị này là %(limit_value)s  (nó là %(show_value)s )."
+
+#: core/validators.py:176 forms/fields.py:210 forms/fields.py:263
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "Đảm bảo giá trị này là nhỏ hơn hoặc bằng với %(limit_value)s ."
+
+#: core/validators.py:182 forms/fields.py:211 forms/fields.py:264
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "Đảm bảo giá trị này lớn hơn hoặc bằng với %(limit_value)s ."
+
+#: core/validators.py:189
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr ""
+"Đảm bảo giá trị này có ít nhất %(limit_value)d ký tự (nó có %(show_value)d)."
+
+#: core/validators.py:196
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr ""
+"Đảm bảo giá trị này có nhiều nhất %(limit_value)d ký tự (nó có "
+"%(show_value)d)."
+
+#: db/models/base.py:857
+#, python-format
+msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
+msgstr " %(field_name)s  phải là duy nhất cho %(date_field)s  %(lookup)s ."
+
+#: db/models/base.py:880 forms/models.py:573
+msgid "and"
+msgstr "và"
+
+#: db/models/base.py:881 db/models/fields/__init__.py:70
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s có %(field_label)s đã tồn tại."
+
+#: db/models/fields/__init__.py:67
+#, python-format
+msgid "Value %r is not a valid choice."
+msgstr "Lựa chọn giá trị %r là không hợp lệ"
+
+#: db/models/fields/__init__.py:68
+msgid "This field cannot be null."
+msgstr "Trường này không thể để trống."
+
+#: db/models/fields/__init__.py:69
+msgid "This field cannot be blank."
+msgstr "Trường này không được để trắng."
+
+#: db/models/fields/__init__.py:76
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "Trường thuộc dạng: %(field_type)s "
+
+#: db/models/fields/__init__.py:517 db/models/fields/__init__.py:985
+msgid "Integer"
+msgstr "Số nguyên"
+
+#: db/models/fields/__init__.py:521 db/models/fields/__init__.py:983
+#, python-format
+msgid "'%s' value must be an integer."
+msgstr ""
+
+#: db/models/fields/__init__.py:569
+#, python-format
+msgid "'%s' value must be either True or False."
+msgstr ""
+
+#: db/models/fields/__init__.py:571
+msgid "Boolean (Either True or False)"
+msgstr "Boolean (hoặc là Đúng hoặc là Sai)"
+
+#: db/models/fields/__init__.py:622
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Chuỗi (dài đến %(max_length)s ký tự )"
+
+#: db/models/fields/__init__.py:650
+msgid "Comma-separated integers"
+msgstr "Các số nguyên được phân cách bằng dấu phẩy"
+
+#: db/models/fields/__init__.py:664
+#, python-format
+msgid "'%s' value has an invalid date format. It must be in YYYY-MM-DD format."
+msgstr ""
+
+#: db/models/fields/__init__.py:666 db/models/fields/__init__.py:754
+#, python-format
+msgid ""
+"'%s' value has the correct format (YYYY-MM-DD) but it is an invalid date."
+msgstr ""
+
+#: db/models/fields/__init__.py:669
+msgid "Date (without time)"
+msgstr "Ngày (không có giờ)"
+
+#: db/models/fields/__init__.py:752
+#, python-format
+msgid ""
+"'%s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
+
+#: db/models/fields/__init__.py:756
+#, python-format
+msgid ""
+"'%s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) but "
+"it is an invalid date/time."
+msgstr ""
+
+#: db/models/fields/__init__.py:760
+msgid "Date (with time)"
+msgstr "Ngày (có giờ)"
+
+#: db/models/fields/__init__.py:849
+#, python-format
+msgid "'%s' value must be a decimal number."
+msgstr ""
+
+#: db/models/fields/__init__.py:851
+msgid "Decimal number"
+msgstr "Số thập phân"
+
+#: db/models/fields/__init__.py:908
+msgid "Email address"
+msgstr "Địa chỉ email"
+
+#: db/models/fields/__init__.py:927
+msgid "File path"
+msgstr "Đường dẫn tắt tới file"
+
+#: db/models/fields/__init__.py:954
+#, python-format
+msgid "'%s' value must be a float."
+msgstr ""
+
+#: db/models/fields/__init__.py:956
+msgid "Floating point number"
+msgstr "Giá trị dấu chấm động"
+
+#: db/models/fields/__init__.py:1017
+msgid "Big (8 byte) integer"
+msgstr "Big (8 byte) integer"
+
+#: db/models/fields/__init__.py:1031
+msgid "IPv4 address"
+msgstr ""
+
+#: db/models/fields/__init__.py:1047
+msgid "IP address"
+msgstr "Địa chỉ IP"
+
+#: db/models/fields/__init__.py:1090
+#, python-format
+msgid "'%s' value must be either None, True or False."
+msgstr ""
+
+#: db/models/fields/__init__.py:1092
+msgid "Boolean (Either True, False or None)"
+msgstr "Luận lý (Có thể Đúng, Sai hoặc Không cái nào đúng)"
+
+#: db/models/fields/__init__.py:1141
+msgid "Positive integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:1152
+msgid "Positive small integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:1163
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr ""
+
+#: db/models/fields/__init__.py:1181
+msgid "Small integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:1187
+msgid "Text"
+msgstr "Đoạn văn"
+
+#: db/models/fields/__init__.py:1205
+#, python-format
+msgid ""
+"'%s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] format."
+msgstr ""
+
+#: db/models/fields/__init__.py:1207
+#, python-format
+msgid ""
+"'%s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an invalid "
+"time."
+msgstr ""
+
+#: db/models/fields/__init__.py:1210
+msgid "Time"
+msgstr "Giờ"
+
+#: db/models/fields/__init__.py:1272
+msgid "URL"
+msgstr "Đường dẫn URL"
+
+#: db/models/fields/files.py:216
+msgid "File"
+msgstr ""
+
+#: db/models/fields/files.py:323
+msgid "Image"
+msgstr ""
+
+#: db/models/fields/related.py:979
+#, python-format
+msgid "Model %(model)s with pk %(pk)r does not exist."
+msgstr "Model %(model)s  với %(pk)r không tồn tại."
+
+#: db/models/fields/related.py:981
+msgid "Foreign Key (type determined by related field)"
+msgstr "Khóa ngoại (kiểu được xác định bởi trường liên hệ)"
+
+#: db/models/fields/related.py:1111
+msgid "One-to-one relationship"
+msgstr "Mối quan hệ một-một"
+
+#: db/models/fields/related.py:1178
+msgid "Many-to-many relationship"
+msgstr "Mối quan hệ nhiều-nhiều"
+
+#: db/models/fields/related.py:1203
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "Giữ \"Control\", hoặc \"Command\" trên Mac, để chọn nhiều hơn một."
+
+#: forms/fields.py:51
+msgid "This field is required."
+msgstr "Trường này là bắt buộc."
+
+#: forms/fields.py:209
+msgid "Enter a whole number."
+msgstr "Nhập một số tổng thể."
+
+#: forms/fields.py:241 forms/fields.py:262
+msgid "Enter a number."
+msgstr "Nhập một số."
+
+#: forms/fields.py:265
+#, python-format
+msgid "Ensure that there are no more than %s digits in total."
+msgstr "Hãy chắc chắn rằng tổng cộng không nhiều hơn %s chữ số."
+
+#: forms/fields.py:266
+#, python-format
+msgid "Ensure that there are no more than %s decimal places."
+msgstr "Hãy chắc chắn rằng không có nhiều hơn %s chữ số thập phân."
+
+#: forms/fields.py:267
+#, python-format
+msgid "Ensure that there are no more than %s digits before the decimal point."
+msgstr ""
+"Hãy chắc chắn rằng không có nhiều hơn %s chữ số trước dấu phẩy thập phân."
+
+#: forms/fields.py:355 forms/fields.py:953
+msgid "Enter a valid date."
+msgstr "Nhập một ngày hợp lệ."
+
+#: forms/fields.py:378 forms/fields.py:954
+msgid "Enter a valid time."
+msgstr "Nhập một thời gian hợp lệ."
+
+#: forms/fields.py:399
+msgid "Enter a valid date/time."
+msgstr "Nhập một ngày/thời gian hợp lệ."
+
+#: forms/fields.py:475
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "Không có tập tin nào được gửi. Hãy kiểm tra kiểu mã hóa của biểu mẫu."
+
+#: forms/fields.py:476
+msgid "No file was submitted."
+msgstr "Không có tập tin nào được gửi."
+
+#: forms/fields.py:477
+msgid "The submitted file is empty."
+msgstr "Tập tin được gửi là rỗng."
+
+#: forms/fields.py:478
+#, python-format
+msgid ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr ""
+"Đảm bảo tên tập tin này có nhiều nhất %(max)d ký tự (nó có %(length)d ký tự)."
+
+#: forms/fields.py:479
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr "Vui lòng gửi một tập tin hoặc để ô chọn trắng, không chọn cả hai."
+
+#: forms/fields.py:534
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Hãy tải lên một hình ảnh hợp lệ. Tập tin mà bạn đã tải không phải là hình "
+"ảnh hoặc đã bị hư hỏng."
+
+#: forms/fields.py:580
+msgid "Enter a valid URL."
+msgstr "Nhập một URL hợp lệ."
+
+#: forms/fields.py:666 forms/fields.py:746
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr ""
+"Hãy chọn một lựa chọn hợp lệ. %(value)s không phải là một trong các lựa chọn "
+"khả thi."
+
+#: forms/fields.py:747 forms/fields.py:835 forms/models.py:1002
+msgid "Enter a list of values."
+msgstr "Nhập một danh sách giá trị."
+
+#: forms/formsets.py:324 forms/formsets.py:326
+msgid "Order"
+msgstr "Thứ tự"
+
+#: forms/formsets.py:328
+msgid "Delete"
+msgstr "Xóa"
+
+#: forms/models.py:567
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Hãy sửa các dữ liệu trùng lặp cho %(field)s ."
+
+#: forms/models.py:571
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr "Hãy sửa các dữ liệu trùng lặp cho %(field)s, mà phải là duy nhất."
+
+#: forms/models.py:577
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+"Hãy sửa các dữ liệu trùng lặp cho %(field_name)s  mà phải là duy nhất cho "
+"%(lookup)s tại %(date_field)s ."
+
+#: forms/models.py:585
+msgid "Please correct the duplicate values below."
+msgstr "Hãy sửa các giá trị trùng lặp dưới đây."
+
+#: forms/models.py:852
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr "Khóa ngoại không tương ứng với khóa chính của đối tượng cha."
+
+#: forms/models.py:913
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr ""
+"Hãy chọn một lựa chọn hợp lệ. Lựa chọn đó không phải là một trong các lựa "
+"chọn khả thi."
+
+#: forms/models.py:1003
+#, python-format
+msgid "Select a valid choice. %s is not one of the available choices."
+msgstr "Hãy chọn một giá trị hợp lệ. %s không phải là lựa chọn phù hợp."
+
+#: forms/models.py:1005
+#, python-format
+msgid "\"%s\" is not a valid value for a primary key."
+msgstr "\"%s\" không phải là giá trị hợp lệ cho một khóa chính."
+
+#: forms/util.py:81
+#, python-format
+msgid ""
+"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+
+#: forms/widgets.py:336
+msgid "Currently"
+msgstr "Hiện nay"
+
+#: forms/widgets.py:337
+msgid "Change"
+msgstr "Thay đổi"
+
+#: forms/widgets.py:338
+msgid "Clear"
+msgstr "Xóa"
+
+#: forms/widgets.py:594
+msgid "Unknown"
+msgstr "Chưa xác định"
+
+#: forms/widgets.py:595
+msgid "Yes"
+msgstr "Có"
+
+#: forms/widgets.py:596
+msgid "No"
+msgstr "Không"
+
+#: template/defaultfilters.py:794
+msgid "yes,no,maybe"
+msgstr "Có, Không, Có thể"
+
+#: template/defaultfilters.py:822 template/defaultfilters.py:833
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] "%(size)d byte"
+
+#: template/defaultfilters.py:835
+#, python-format
+msgid "%s KB"
+msgstr "%s KB"
+
+#: template/defaultfilters.py:837
+#, python-format
+msgid "%s MB"
+msgstr "%s MB"
+
+#: template/defaultfilters.py:839
+#, python-format
+msgid "%s GB"
+msgstr "%s GB"
+
+#: template/defaultfilters.py:841
+#, python-format
+msgid "%s TB"
+msgstr "%s TB"
+
+#: template/defaultfilters.py:842
+#, python-format
+msgid "%s PB"
+msgstr "%s PB"
+
+#: utils/dateformat.py:47
+msgid "p.m."
+msgstr "p.m."
+
+#: utils/dateformat.py:48
+msgid "a.m."
+msgstr "a.m."
+
+#: utils/dateformat.py:53
+msgid "PM"
+msgstr "chiều"
+
+#: utils/dateformat.py:54
+msgid "AM"
+msgstr "sáng"
+
+#: utils/dateformat.py:103
+msgid "midnight"
+msgstr "Nửa đêm"
+
+#: utils/dateformat.py:105
+msgid "noon"
+msgstr "Buổi trưa"
+
+#: utils/dates.py:6
+msgid "Monday"
+msgstr "Thứ 2"
+
+#: utils/dates.py:6
+msgid "Tuesday"
+msgstr "Thứ 3"
+
+#: utils/dates.py:6
+msgid "Wednesday"
+msgstr "Thứ 4"
+
+#: utils/dates.py:6
+msgid "Thursday"
+msgstr "Thứ 5"
+
+#: utils/dates.py:6
+msgid "Friday"
+msgstr "Thứ 6"
+
+#: utils/dates.py:7
+msgid "Saturday"
+msgstr "Thứ 7"
+
+#: utils/dates.py:7
+msgid "Sunday"
+msgstr "Chủ nhật"
+
+#: utils/dates.py:10
+msgid "Mon"
+msgstr "Thứ 2"
+
+#: utils/dates.py:10
+msgid "Tue"
+msgstr "Thứ 3"
+
+#: utils/dates.py:10
+msgid "Wed"
+msgstr "Thứ 4"
+
+#: utils/dates.py:10
+msgid "Thu"
+msgstr "Thứ 5"
+
+#: utils/dates.py:10
+msgid "Fri"
+msgstr "Thứ 6"
+
+#: utils/dates.py:11
+msgid "Sat"
+msgstr "Thứ 7"
+
+#: utils/dates.py:11
+msgid "Sun"
+msgstr "Chủ nhật"
+
+#: utils/dates.py:18
+msgid "January"
+msgstr "Tháng 1"
+
+#: utils/dates.py:18
+msgid "February"
+msgstr "Tháng 2"
+
+#: utils/dates.py:18
+msgid "March"
+msgstr "Tháng 3"
+
+#: utils/dates.py:18
+msgid "April"
+msgstr "Tháng 4"
+
+#: utils/dates.py:18
+msgid "May"
+msgstr "Tháng 5"
+
+#: utils/dates.py:18
+msgid "June"
+msgstr "Tháng 6"
+
+#: utils/dates.py:19
+msgid "July"
+msgstr "Tháng 7"
+
+#: utils/dates.py:19
+msgid "August"
+msgstr "Tháng 8"
+
+#: utils/dates.py:19
+msgid "September"
+msgstr "Tháng 9"
+
+#: utils/dates.py:19
+msgid "October"
+msgstr "Tháng 10"
+
+#: utils/dates.py:19
+msgid "November"
+msgstr "Tháng 11"
+
+#: utils/dates.py:20
+msgid "December"
+msgstr "Tháng 12"
+
+#: utils/dates.py:23
+msgid "jan"
+msgstr "Tháng 1"
+
+#: utils/dates.py:23
+msgid "feb"
+msgstr "Tháng 2"
+
+#: utils/dates.py:23
+msgid "mar"
+msgstr "Tháng 3"
+
+#: utils/dates.py:23
+msgid "apr"
+msgstr "Tháng 4"
+
+#: utils/dates.py:23
+msgid "may"
+msgstr "Tháng 5"
+
+#: utils/dates.py:23
+msgid "jun"
+msgstr "Tháng 6"
+
+#: utils/dates.py:24
+msgid "jul"
+msgstr "Tháng 7"
+
+#: utils/dates.py:24
+msgid "aug"
+msgstr "Tháng 8"
+
+#: utils/dates.py:24
+msgid "sep"
+msgstr "Tháng 9"
+
+#: utils/dates.py:24
+msgid "oct"
+msgstr "Tháng 10"
+
+#: utils/dates.py:24
+msgid "nov"
+msgstr "Tháng 11"
+
+#: utils/dates.py:24
+msgid "dec"
+msgstr "Tháng 12"
+
+#: utils/dates.py:31
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr "Tháng 1."
+
+#: utils/dates.py:32
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr "Tháng 2."
+
+#: utils/dates.py:33
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "Tháng ba"
+
+#: utils/dates.py:34
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "Tháng tư"
+
+#: utils/dates.py:35
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "Tháng năm"
+
+#: utils/dates.py:36
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "Tháng sáu"
+
+#: utils/dates.py:37
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "Tháng bảy"
+
+#: utils/dates.py:38
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr "Tháng 8."
+
+#: utils/dates.py:39
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr "Tháng 9."
+
+#: utils/dates.py:40
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr "Tháng 10."
+
+#: utils/dates.py:41
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr "Tháng 11."
+
+#: utils/dates.py:42
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr "Tháng 12."
+
+#: utils/dates.py:45
+msgctxt "alt. month"
+msgid "January"
+msgstr "Tháng một"
+
+#: utils/dates.py:46
+msgctxt "alt. month"
+msgid "February"
+msgstr "Tháng hai"
+
+#: utils/dates.py:47
+msgctxt "alt. month"
+msgid "March"
+msgstr "Tháng ba"
+
+#: utils/dates.py:48
+msgctxt "alt. month"
+msgid "April"
+msgstr "Tháng tư"
+
+#: utils/dates.py:49
+msgctxt "alt. month"
+msgid "May"
+msgstr "Tháng năm"
+
+#: utils/dates.py:50
+msgctxt "alt. month"
+msgid "June"
+msgstr "Tháng sáu"
+
+#: utils/dates.py:51
+msgctxt "alt. month"
+msgid "July"
+msgstr "Tháng bảy"
+
+#: utils/dates.py:52
+msgctxt "alt. month"
+msgid "August"
+msgstr "Tháng tám"
+
+#: utils/dates.py:53
+msgctxt "alt. month"
+msgid "September"
+msgstr "Tháng Chín"
+
+#: utils/dates.py:54
+msgctxt "alt. month"
+msgid "October"
+msgstr "Tháng Mười"
+
+#: utils/dates.py:55
+msgctxt "alt. month"
+msgid "November"
+msgstr "Tháng mười một"
+
+#: utils/dates.py:56
+msgctxt "alt. month"
+msgid "December"
+msgstr "Tháng mười hai"
+
+#: utils/text.py:70
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s..."
+msgstr ""
+
+#: utils/text.py:239
+msgid "or"
+msgstr "hoặc"
+
+#. Translators: This string is used as a separator between list elements
+#: utils/text.py:256
+msgid ", "
+msgstr ", "
+
+#: utils/timesince.py:22
+msgid "year"
+msgid_plural "years"
+msgstr[0] "năm"
+
+#: utils/timesince.py:23
+msgid "month"
+msgid_plural "months"
+msgstr[0] "tháng"
+
+#: utils/timesince.py:24
+msgid "week"
+msgid_plural "weeks"
+msgstr[0] "tuần"
+
+#: utils/timesince.py:25
+msgid "day"
+msgid_plural "days"
+msgstr[0] "ngày"
+
+#: utils/timesince.py:26
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] "giờ"
+
+#: utils/timesince.py:27
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "phút"
+
+#: utils/timesince.py:43
+msgid "minutes"
+msgstr "phút"
+
+#: utils/timesince.py:48
+#, python-format
+msgid "%(number)d %(type)s"
+msgstr "%(number)d %(type)s"
+
+#: utils/timesince.py:54
+#, python-format
+msgid ", %(number)d %(type)s"
+msgstr ", %(number)d %(type)s"
+
+#: views/static.py:56
+msgid "Directory indexes are not allowed here."
+msgstr ""
+
+#: views/static.py:58
+#, python-format
+msgid "\"%(path)s\" does not exist"
+msgstr ""
+
+#: views/static.py:98
+#, python-format
+msgid "Index of %(directory)s"
+msgstr ""
+
+#: views/generic/dates.py:42
+msgid "No year specified"
+msgstr "Không có năm xác định"
+
+#: views/generic/dates.py:98
+msgid "No month specified"
+msgstr "Không có tháng xác định"
+
+#: views/generic/dates.py:157
+msgid "No day specified"
+msgstr "Không có ngày xác định"
+
+#: views/generic/dates.py:213
+msgid "No week specified"
+msgstr "Không có tuần xác định"
+
+#: views/generic/dates.py:368 views/generic/dates.py:393
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "Không có %(verbose_name_plural)s  phù hợp"
+
+#: views/generic/dates.py:646
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+"%(verbose_name_plural)s trong tương lai không có sẵn vì %(class_name)s."
+"allow_future là False."
+
+#: views/generic/dates.py:678
+#, python-format
+msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgstr "Chuỗi ngày không hợp lệ ' %(datestr)s' định dạng bởi '%(format)s'"
+
+#: views/generic/detail.py:54
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "Không có %(verbose_name)s tìm thấy phù hợp với truy vấn"
+
+#: views/generic/list.py:51
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr ""
+"Trang không phải là 'nhất', và cũng không nó có thể được chuyển đổi sang int."
+
+#: views/generic/list.py:56
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr ""
+
+#: views/generic/list.py:137
+#, python-format
+msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgstr "Danh sách rỗng và '%(class_name)s.allow_empty' là sai."

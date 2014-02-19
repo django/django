@@ -1,0 +1,54 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block extrahead %}
+{{ block.super }}
+<style type="text/css">
+.module table { width:100%; }
+.module table p { padding: 0; margin: 0; }
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% trans 'Documentation' %}</a>
+&rsaquo; <a href="{% url 'django-admindocs-models-index' %}">{% trans 'Models' %}</a>
+&rsaquo; {{ name }}
+</div>
+{% endblock %}
+
+{% block title %}{% blocktrans %}Model: {{ name }}{% endblocktrans %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+<h1>{{ summary }}</h1>
+
+{% if description %}
+  <p>{% filter linebreaksbr %}{% trans description %}{% endfilter %}</p>
+{% endif %}
+
+<div class="module">
+<table class="model">
+<thead>
+<tr>
+    <th>{% trans 'Field' %}</th>
+    <th>{% trans 'Type' %}</th>
+    <th>{% trans 'Description' %}</th>
+</tr>
+</thead>
+<tbody>
+{% for field in fields|dictsort:"name" %}
+<tr>
+    <td>{{ field.name }}</td>
+    <td>{{ field.data_type }}</td>
+    <td>{{ field.verbose }}{% if field.help_text %} - {{ field.help_text|safe }}{% endif %}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+<p class="small"><a href="{% url 'django-admindocs-models-index' %}">&lsaquo; {% trans 'Back to Model Documentation' %}</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+[
+    {
+        "pk": "1",
+        "model": "auth.customuser",
+        "fields": {
+            "password": "sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161",
+            "last_login": "2006-12-17 07:03:31",
+            "email": "staffmember@example.com",
+            "is_active": true,
+            "is_admin": false,
+            "date_of_birth": "1976-11-08"
+       }
+    }
+]

@@ -1,0 +1,94 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Kowit Charoenratchatabhan <kowito@gmail.com>, 2012.
+# Vichai Vongvorakul <vongvichai@gmail.com>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-03-09 04:19+0000\n"
+"Last-Translator: Kowit Charoenratchatabhan <kowit.s.c@gmail.com>\n"
+"Language-Team: Thai (http://www.transifex.com/projects/p/django/language/"
+"th/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: th\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: views.py:9
+msgid "No feeds are registered."
+msgstr "ไม่มีฟีดที่ลงทะเบียน"
+
+#: views.py:19
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr "Slug %r ไม่ได้ลงทะเบียน"
+
+#: db/models/fields.py:51
+msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
+msgstr "เขตข้อมูล GIS ฐาน -- แผนที่ไปยังประเภท OpenGIS เรขาคณิตจำเพาะ"
+
+#: db/models/fields.py:271
+msgid "Point"
+msgstr "จุด"
+
+#: db/models/fields.py:275
+msgid "Line string"
+msgstr "สายสตริง"
+
+#: db/models/fields.py:279
+msgid "Polygon"
+msgstr "รูปหลายเหลี่ยม"
+
+#: db/models/fields.py:283
+msgid "Multi-point"
+msgstr "หลาย ๆ จุด"
+
+#: db/models/fields.py:287
+msgid "Multi-line string"
+msgstr "สตริงหลายบรรทัด"
+
+#: db/models/fields.py:291
+msgid "Multi polygon"
+msgstr "รูปหลายเหลี่ยมหลายรูป"
+
+#: db/models/fields.py:295
+msgid "Geometry collection"
+msgstr "คอลเลกชันรูปทรงเรขาคณิต"
+
+#: forms/fields.py:19
+msgid "No geometry value provided."
+msgstr "ไม่พบข้อมูลพิกัด"
+
+#: forms/fields.py:20
+msgid "Invalid geometry value."
+msgstr "ค่าพิกัดผิดพลาด "
+
+#: forms/fields.py:21
+msgid "Invalid geometry type."
+msgstr "ขนิดข้อมูลพิกัดผิดพลาด"
+
+#: forms/fields.py:22
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr "ข้อผิดพลาดที่เกิดขึ้นเมื่อการเปลี่ยนรูปทรงเรขาคณิตที่ SRID ของเขตข้อมูลฟอร์มเรขาคณิต"
+
+#: sitemaps/views.py:46
+#, python-format
+msgid "No sitemap available for section: %r"
+msgstr "ไม่มีแผนผังไซต์บริการสำหรับส่วน: %r"
+
+#: sitemaps/views.py:60
+#, python-format
+msgid "Page %s empty"
+msgstr "หน้า %s ที่ว่างเปล่า"
+
+#: sitemaps/views.py:62
+#, python-format
+msgid "No page '%s'"
+msgstr "ไม่มีหน้า '%s'"

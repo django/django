@@ -1,0 +1,307 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-02-14 13:24+0000\n"
+"Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
+"Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
+"language/mn/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: mn\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:25
+msgid "Content"
+msgstr "Агуулга"
+
+#: admin.py:28
+msgid "Metadata"
+msgstr "Мета өгөгдөл"
+
+#: admin.py:55
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "тэгдэглсэн"
+msgstr[1] "тэгдэглсэн"
+
+#: admin.py:56
+msgid "Flag selected comments"
+msgstr "Сонгосон сэтгэгдэлүүдийг тэмдэглэ"
+
+#: admin.py:60
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "зөвшөөрөх"
+msgstr[1] "зөвшөөрөх"
+
+#: admin.py:61
+msgid "Approve selected comments"
+msgstr "Сонгосон сэтгэгдэлүүдийг зөвшөөрөх"
+
+#: admin.py:65
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "устгасан"
+msgstr[1] "устгасан"
+
+#: admin.py:66
+msgid "Remove selected comments"
+msgstr "Сонгосон сэтгэгдэлүүдийг утсгах"
+
+#: admin.py:78
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] "%(count)s сэтгэгдэлийг амжилттай %(action)s."
+msgstr[1] "%(count)s сэтгэгдэлүүдийг амжилттай %(action)s."
+
+#: feeds.py:14
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "%(site_name)s сэтгэгдэлүүд"
+
+#: feeds.py:20
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr " %(site_name)s сүүлийн сэтгэгдэлүүд"
+
+#: forms.py:96
+msgid "Name"
+msgstr "Нэр"
+
+#: forms.py:97
+msgid "Email address"
+msgstr "Цахим шуудангийн хаяг"
+
+#: forms.py:98
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:99
+msgid "Comment"
+msgstr "Сэтгэгдэл"
+
+#: forms.py:177
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Соёлтой байна уу! %s гэсэн үг оруулах хориотой."
+msgstr[1] "Соёлтой байна уу! %s гэсэн үгүүд оруулах хориотой."
+
+#: forms.py:181 templates/comments/preview.html:16
+msgid "and"
+msgstr "ба"
+
+#: forms.py:186
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+"Та энэ хэсэгт ямар нэг зүйл оруулбал таний сэтгэгдэлийг  спам гэж үзэх болно."
+
+#: models.py:23
+msgid "content type"
+msgstr "агуулгын төрөл"
+
+#: models.py:25
+msgid "object ID"
+msgstr "объектийн ID"
+
+#: models.py:53 models.py:177
+msgid "user"
+msgstr "хэрэглэгч "
+
+#: models.py:55
+msgid "user's name"
+msgstr "хэрэглэгчийн нэр"
+
+#: models.py:56
+msgid "user's email address"
+msgstr "хэрэглэгчийн цахим шуудангийн хаяг"
+
+#: models.py:57
+msgid "user's URL"
+msgstr "хэрэглэгчийн URL"
+
+#: models.py:59 models.py:79 models.py:178
+msgid "comment"
+msgstr "сэтгэгдэл"
+
+#: models.py:62
+msgid "date/time submitted"
+msgstr "оруулсан огноо/цаг"
+
+#: models.py:63
+msgid "IP address"
+msgstr "IP хаяг"
+
+#: models.py:64
+msgid "is public"
+msgstr "нийтийн"
+
+#: models.py:65
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+"Сайтаас санал сэтгэгдлийг байнга устгахын тулд энэ хайрцагны өмнөх чагтыг "
+"авна уу."
+
+#: models.py:67
+msgid "is removed"
+msgstr "устлаа"
+
+#: models.py:68
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Ирсэн санал сэтгэгдэл зүй зохисгүй бол энэ хайрцгийг чагтла. Ингэснээр "
+"тухайн санал сэтгэгдлийн оронд \"Энэ санал сэтгэгдлийг устгалаа\" гэсэн "
+"бичиг гарч ирнэ."
+
+#: models.py:80
+msgid "comments"
+msgstr "сэтгэгдэлүүд"
+
+#: models.py:124
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Энэ санал сэтгэгдлийг баталгаажсан хэрэглэгч оруулсан учир зөвхөн нэрийг нь "
+"харж болно."
+
+#: models.py:134
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Энэ санал сэтгэгдлийг баталгаажсан хэрэглэгч оруулсан учир зөвхөн цахим "
+"шууданг нь харж болно."
+
+#: models.py:160
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"%(date)s-д %(user)s дараах санал сэтгэгдлийг үлдээжээ\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:179
+msgid "flag"
+msgstr "тэмдэг"
+
+#: models.py:180
+msgid "date"
+msgstr "огноо"
+
+#: models.py:190
+msgid "comment flag"
+msgstr "Тайлбарын тэмдэг"
+
+#: models.py:191
+msgid "comment flags"
+msgstr "тайлбарын тэмдэгүүд"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Сэтгэгдэл зөвшөөрөх"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Үнэхээр энэ сэтгэгдэлийн нийтийн болгох гэж байна у?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Зөвшөөрөх"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Зөвшөөрсөнд баяраллаа"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+"Манай сайтанд цаг гаргаж хэлэлцүүлэгийг сонирхолтой болгосонд баяраллаа."
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Үнэхээр энэ сэтгэдэлийг"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Үнхээр энэ сэтгэдэлийг устгах уу?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Устгах"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Устгасанд баяраллаа"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Энэ сэтгэгдэлийг тэмлэглэ"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Үнэхээр энэ сэтгэдэлийг тэмдэглэх үү?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Тэмдэг"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Тэмдэглсэнд баяраллаа"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "Бичлэг"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Урьдчилан харах"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Сэтгэгдэл үлдээсэнд баяраллаа"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Сэтгэгдэл үлдээсэн таньд баяраллаа"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "Өөрийн сэтгэгдэлээ урьдчилан харах"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Доорх алдааг засна у"
+msgstr[1] "Доорх алдаануудыг засна у"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Сэтгэгдэл оруулах"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "эсвэл засвар хийх"

@@ -179,13 +179,6 @@ to override your error message you can still opt for the less verbose::
 
     ValidationError(_('Invalid value: %s') % value)
 
-.. versionadded:: 1.7
-
-The :meth:`Form.errors.as_data() <django.forms.Form.errors.as_data()>` and
-:meth:`Form.errors.as_json() <django.forms.Form.errors.as_json()>` methods
-greatly benefit from fully featured ``ValidationError``\s (with a ``code`` name
-and a ``params`` dictionary).
-
 Raising multiple errors
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -255,6 +248,8 @@ a :class:`~django.core.validators.RegexValidator` constructed with the first
 argument being the pattern: ``^[-a-zA-Z0-9_]+$``. See the section on
 :doc:`writing validators </ref/validators>` to see a list of what is already
 available and for an example of how to write a validator.
+
+.. _form-field-default-cleaning:
 
 Form field default cleaning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -338,7 +333,7 @@ from , which is turned into a form-wide error that is available through the
 Cleaning and validating fields that depend on each other
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: django.forms.Form.clean()
+.. :noindex:method:: django.forms.Form.clean
 
 Suppose we add another requirement to our contact form: if the ``cc_myself``
 field is ``True``, the ``subject`` must contain the word ``"help"``. We are

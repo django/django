@@ -1,0 +1,304 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-02-14 13:24+0000\n"
+"Last-Translator: Baptiste <baptiste+transifex@darthenay.fr>\n"
+"Language-Team: Esperanto (http://www.transifex.com/projects/p/django/"
+"language/eo/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: eo\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:25
+msgid "Content"
+msgstr "Enhavo"
+
+#: admin.py:28
+msgid "Metadata"
+msgstr "Metadatumo"
+
+#: admin.py:55
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "markita"
+msgstr[1] "markitaj"
+
+#: admin.py:56
+msgid "Flag selected comments"
+msgstr "Marki elektitajn komentojn"
+
+#: admin.py:60
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "aprobita"
+msgstr[1] "aprobitaj"
+
+#: admin.py:61
+msgid "Approve selected comments"
+msgstr "Aprobi elektitajn komentojn"
+
+#: admin.py:65
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "forigita"
+msgstr[1] "forigitaj"
+
+#: admin.py:66
+msgid "Remove selected comments"
+msgstr "Forigi elektitajn komentojn"
+
+#: admin.py:78
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] "1 komento estis suksese %(action)s."
+msgstr[1] "%(count)s komentoj estis suksese %(action)s."
+
+#: feeds.py:14
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "%(site_name)s komentoj"
+
+#: feeds.py:20
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "Lastaj komentoj ĉe %(site_name)s"
+
+#: forms.py:96
+msgid "Name"
+msgstr "Nomo"
+
+#: forms.py:97
+msgid "Email address"
+msgstr "Retpoŝtadreso"
+
+#: forms.py:98
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:99
+msgid "Comment"
+msgstr "Komento"
+
+#: forms.py:177
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Atentu via lingvaĵo! La vorto %s ne estas permisita ĉi-tie."
+msgstr[1] "Atentu via lingvaĵo! La vortoj %s ne estas permisitaj ĉi-tie."
+
+#: forms.py:181 templates/comments/preview.html:16
+msgid "and"
+msgstr "kaj"
+
+#: forms.py:186
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+"Se vi enigas ion-ajn en ĉi-tiu kampo, via komento estos traktita kiel spamo"
+
+#: models.py:23
+msgid "content type"
+msgstr "enhava tipo"
+
+#: models.py:25
+msgid "object ID"
+msgstr "objekta identigaĵo"
+
+#: models.py:53 models.py:177
+msgid "user"
+msgstr "uzanto"
+
+#: models.py:55
+msgid "user's name"
+msgstr "uzanta nomo"
+
+#: models.py:56
+msgid "user's email address"
+msgstr "uzanta retpoŝtadreso"
+
+#: models.py:57
+msgid "user's URL"
+msgstr "uzanta URL"
+
+#: models.py:59 models.py:79 models.py:178
+msgid "comment"
+msgstr "komento"
+
+#: models.py:62
+msgid "date/time submitted"
+msgstr "dato kaj horo transsenditaj"
+
+#: models.py:63
+msgid "IP address"
+msgstr "IP-adreso"
+
+#: models.py:64
+msgid "is public"
+msgstr "estas publika"
+
+#: models.py:65
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+"Malŝaltu ĉi-tiun markobutonon por definitive malaperigi la komenton el la "
+"retejo."
+
+#: models.py:67
+msgid "is removed"
+msgstr "estas forigita"
+
+#: models.py:68
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Ŝaltu ĉi-tiun markobutonon se la komento estas nekonvena. La mesaĝo \"Ĉi-tiu "
+"komento estis forigita\" estos montrita anstataŭe."
+
+#: models.py:80
+msgid "comments"
+msgstr "komentoj"
+
+#: models.py:124
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Ĉi-tiu komento estis afiŝita de aŭtentigita uzanto, do tiel la nomo estas "
+"nurlega."
+
+#: models.py:134
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Ĉi-tiu komento estis afiŝita de aŭtentigita uzanto, do tiel la nomo kaj "
+"retpoŝtadreo estas nurlegaj."
+
+#: models.py:160
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Afiŝita de %(user)s - %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:179
+msgid "flag"
+msgstr "marko"
+
+#: models.py:180
+msgid "date"
+msgstr "dato"
+
+#: models.py:190
+msgid "comment flag"
+msgstr "komenta marko"
+
+#: models.py:191
+msgid "comment flags"
+msgstr "komentaj markoj"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Aprobi komenton"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Ĉu certe publikigi ĉi-tiun komenton?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Aprobi"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Dankon por la aprobo"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+"Dankon por trapasi tempon por plibonigi la diskutan kvaliton ĉe nia retejo"
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Forigi komenton"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Ĉu certe forigi ĉi-tiun komenton?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Forigu"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Dankon por la forigo"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Marki ĉi-tiun komenton"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Ĉu certe marki ĉi-tiun komenton?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Marki"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Dankon por la marko"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "Afiŝi"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Antaŭrigardo"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Dankon por al komentado"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Dankon por via komento"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "Antaŭrigardi vian komenton"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Bonvolu ĝustigi la eraron sube."
+msgstr[1] "Bonvolu ĝustigi la erarojn sube."
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Publikigi vian komenton"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "aŭ lin redakti"

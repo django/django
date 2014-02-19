@@ -1,0 +1,17 @@
+{% extends "gis/openlayers.html" %}
+{% load l10n %}
+
+{% block map_options %}var map_options = {
+    maxExtend: new OpenLayers.Bounds(-20037508,-20037508,20037508,20037508),
+    maxResolution: 156543.0339,
+    numZoomLevels: 20,
+    units: 'm'
+};{% endblock %}
+
+{% block options %}{{ block.super }}
+options['scale_text'] = true;
+options['mouse_position'] = true;
+options['default_lon'] = {{ default_lon|unlocalize }};
+options['default_lat'] = {{ default_lat|unlocalize }};
+options['base_layer'] = new OpenLayers.Layer.OSM.Mapnik("OpenStreetMap (Mapnik)");
+{% endblock %}

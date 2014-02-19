@@ -1,0 +1,862 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+#   <dudanogueira@gmail.com>, 2012.
+# Eduardo Carvalho <eduardocereto@gmail.com>, 2011-2012.
+# Guilherme Gondim <semente@taurinus.org>, 2012-2013.
+# Guilherme Gondim <semente+transifex@taurinus.org>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-01-01 16:10+0100\n"
+"PO-Revision-Date: 2013-01-05 12:55+0000\n"
+"Last-Translator: Guilherme Gondim <semente@taurinus.org>\n"
+"Language-Team: Portuguese (Brazil) <django-l10n-portuguese@googlegroups."
+"com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: actions.py:48
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "Removido %(count)d %(items)s com sucesso."
+
+#: actions.py:60 options.py:1347
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "Não é possível excluir %(name)s "
+
+#: actions.py:62 options.py:1349
+msgid "Are you sure?"
+msgstr "Tem certeza?"
+
+#: actions.py:83
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Remover %(verbose_name_plural)s selecionados"
+
+#: filters.py:101 filters.py:197 filters.py:237 filters.py:274 filters.py:380
+msgid "All"
+msgstr "Todos"
+
+#: filters.py:238
+msgid "Yes"
+msgstr "Sim"
+
+#: filters.py:239
+msgid "No"
+msgstr "Não"
+
+#: filters.py:253
+msgid "Unknown"
+msgstr "Desconhecido"
+
+#: filters.py:308
+msgid "Any date"
+msgstr "Qualquer data"
+
+#: filters.py:309
+msgid "Today"
+msgstr "Hoje"
+
+#: filters.py:313
+msgid "Past 7 days"
+msgstr "Últimos 7 dias"
+
+#: filters.py:317
+msgid "This month"
+msgstr "Este mês"
+
+#: filters.py:321
+msgid "This year"
+msgstr "Este ano"
+
+#: forms.py:9
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+"Por favor, insira um %(username)s e senha corretos para uma conta de equipe. "
+"Note que ambos campos são sensíveis a maiúsculas e minúsculas."
+
+#: forms.py:19
+msgid "Please log in again, because your session has expired."
+msgstr "Por favor acesse novamente, pois sua sessão expirou."
+
+#: helpers.py:23
+msgid "Action:"
+msgstr "Ação:"
+
+#: models.py:24
+msgid "action time"
+msgstr "hora da ação"
+
+#: models.py:27
+msgid "object id"
+msgstr "id do objeto"
+
+#: models.py:28
+msgid "object repr"
+msgstr "repr do objeto"
+
+#: models.py:29
+msgid "action flag"
+msgstr "flag de ação"
+
+#: models.py:30
+msgid "change message"
+msgstr "modificar mensagem"
+
+#: models.py:35
+msgid "log entry"
+msgstr "entrada de log"
+
+#: models.py:36
+msgid "log entries"
+msgstr "entradas de log"
+
+#: models.py:45
+#, python-format
+msgid "Added \"%(object)s\"."
+msgstr "Adicionado \"%(object)s\"."
+
+#: models.py:47
+#, python-format
+msgid "Changed \"%(object)s\" - %(changes)s"
+msgstr "Modificado \"%(object)s\" - %(changes)s"
+
+#: models.py:52
+#, python-format
+msgid "Deleted \"%(object)s.\""
+msgstr "Removido \"%(object)s.\""
+
+#: models.py:54
+msgid "LogEntry Object"
+msgstr "Objeto LogEntry"
+
+#: options.py:156 options.py:172
+msgid "None"
+msgstr "Nenhum"
+
+#: options.py:684
+#, python-format
+msgid "Changed %s."
+msgstr "Modificado %s."
+
+#: options.py:684 options.py:694
+msgid "and"
+msgstr "e"
+
+#: options.py:689
+#, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "Adicionado %(name)s \"%(object)s\""
+
+#: options.py:693
+#, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr "Modificado %(list)s para %(name)s \"%(object)s\"."
+
+#: options.py:698
+#, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "Deletado %(name)s \"%(object)s\"."
+
+#: options.py:702
+msgid "No fields changed."
+msgstr "Nenhum campo modificado."
+
+#: options.py:807 options.py:860
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+"%(name)s \"%(obj)s\": adicionado com sucesso. Você pode editar novamente "
+"abaixo."
+
+#: options.py:835
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may add another "
+"%(name)s below."
+msgstr ""
+"%(name)s \"%(obj)s\" adicionado com sucesso. Você pode adicionar um outro "
+"%(name)s abaixo."
+
+#: options.py:839
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\": adicionado com sucesso."
+
+#: options.py:853
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"below."
+msgstr ""
+"%(name)s \"%(obj)s\" modificado com sucesso. Você pode editá-lo novamente "
+"abaixo."
+
+#: options.py:867
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
+"%(name)s below."
+msgstr ""
+"%(name)s \"%(obj)s\" alterado com sucesso. Você pode adicionar um outro "
+"%(name)s abaixo."
+
+#: options.py:873
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\": modificado com sucesso."
+
+#: options.py:951 options.py:1211
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"Os itens devem ser selecionados a fim de executar ações sobre eles. Nenhum "
+"item foi modificado."
+
+#: options.py:970
+msgid "No action selected."
+msgstr "Nenhuma ação selecionada."
+
+#: options.py:1050
+#, python-format
+msgid "Add %s"
+msgstr "Adicionar %s"
+
+#: options.py:1074 options.py:1319
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Objeto %(name)s com chave primária %(key)r não existe."
+
+#: options.py:1140
+#, python-format
+msgid "Change %s"
+msgstr "Modificar %s"
+
+#: options.py:1190
+msgid "Database error"
+msgstr "Erro no banco de dados"
+
+#: options.py:1253
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s modificado com sucesso."
+msgstr[1] "%(count)s %(name)s modificados com sucesso."
+
+#: options.py:1280
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s selecionado"
+msgstr[1] "Todos %(total_count)s selecionados"
+
+#: options.py:1285
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "0 de %(cnt)s selecionados"
+
+#: options.py:1335
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\": excluído com sucesso."
+
+#: options.py:1382
+#, python-format
+msgid "Change history: %s"
+msgstr "Histórico de modificações: %s"
+
+#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#: templates/registration/password_reset_complete.html:19
+#: views/decorators.py:24
+msgid "Log in"
+msgstr "Acessar"
+
+#: sites.py:388
+msgid "Site administration"
+msgstr "Administração do Site"
+
+#: sites.py:440
+#, python-format
+msgid "%s administration"
+msgstr "Administração de %s"
+
+#: widgets.py:90
+msgid "Date:"
+msgstr "Data:"
+
+#: widgets.py:91
+msgid "Time:"
+msgstr "Hora:"
+
+#: widgets.py:165
+msgid "Lookup"
+msgstr "Olhar"
+
+#: widgets.py:271
+msgid "Add Another"
+msgstr "Adicionar Outro(a)"
+
+#: widgets.py:316
+msgid "Currently:"
+msgstr "Atualmente:"
+
+#: widgets.py:317
+msgid "Change:"
+msgstr "Alterar:"
+
+#: templates/admin/404.html:4 templates/admin/404.html.py:8
+msgid "Page not found"
+msgstr "Página não encontrada"
+
+#: templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Desculpe, mas a página requisitada não pode ser encontrada."
+
+#: templates/admin/500.html:6 templates/admin/app_index.html:7
+#: templates/admin/base.html:47 templates/admin/change_form.html:19
+#: templates/admin/change_list.html:41
+#: templates/admin/delete_confirmation.html:7
+#: templates/admin/delete_selected_confirmation.html:7
+#: templates/admin/invalid_setup.html:6 templates/admin/object_history.html:7
+#: templates/admin/auth/user/change_password.html:13
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:6
+#: templates/registration/password_change_form.html:7
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_confirm.html:6
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_form.html:6
+msgid "Home"
+msgstr "Início"
+
+#: templates/admin/500.html:7
+msgid "Server error"
+msgstr "Erro no servidor"
+
+#: templates/admin/500.html:11
+msgid "Server error (500)"
+msgstr "Erro no servidor (500)"
+
+#: templates/admin/500.html:14
+msgid "Server Error <em>(500)</em>"
+msgstr "Erro no Servidor <em>(500)</em>"
+
+#: templates/admin/500.html:15
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Houve um erro, que já foi reportado aos administradores do site por email e "
+"deverá ser consertado em breve. Obrigado pela sua paciência."
+
+#: templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr "Executar ação selecionada"
+
+#: templates/admin/actions.html:4
+msgid "Go"
+msgstr "Ir"
+
+#: templates/admin/actions.html:11
+msgid "Click here to select the objects across all pages"
+msgstr "Clique aqui para selecionar os objetos de todas as páginas"
+
+#: templates/admin/actions.html:11
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Selecionar todos %(total_count)s %(module_name)s"
+
+#: templates/admin/actions.html:13
+msgid "Clear selection"
+msgstr "Limpar seleção"
+
+#: templates/admin/app_index.html:10 templates/admin/index.html:21
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: templates/admin/base.html:28
+msgid "Welcome,"
+msgstr "Bem-vindo(a),"
+
+#: templates/admin/base.html:33
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
+msgid "Documentation"
+msgstr "Documentação"
+
+#: templates/admin/base.html:36
+#: templates/admin/auth/user/change_password.html:17
+#: templates/admin/auth/user/change_password.html:51
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
+msgid "Change password"
+msgstr "Alterar senha"
+
+#: templates/admin/base.html:38
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
+msgid "Log out"
+msgstr "Encerrar sessão"
+
+#: templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Site de administração do Django"
+
+#: templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Administração do Django"
+
+#: templates/admin/change_form.html:22 templates/admin/index.html:33
+msgid "Add"
+msgstr "Adicionar"
+
+#: templates/admin/change_form.html:32 templates/admin/object_history.html:11
+msgid "History"
+msgstr "Histórico"
+
+#: templates/admin/change_form.html:33
+#: templates/admin/edit_inline/stacked.html:9
+#: templates/admin/edit_inline/tabular.html:30
+msgid "View on site"
+msgstr "Ver no site"
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Por favor, corrija o erro abaixo."
+msgstr[1] "Por favor, corrija os erros abaixo."
+
+#: templates/admin/change_list.html:58
+#, python-format
+msgid "Add %(name)s"
+msgstr "Adicionar %(name)s"
+
+#: templates/admin/change_list.html:78
+msgid "Filter"
+msgstr "Filtro"
+
+#: templates/admin/change_list_results.html:17
+msgid "Remove from sorting"
+msgstr "Remover da ordenação"
+
+#: templates/admin/change_list_results.html:18
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Prioridade da ordenação: %(priority_number)s"
+
+#: templates/admin/change_list_results.html:19
+msgid "Toggle sorting"
+msgstr "Alternar ordenção"
+
+#: templates/admin/delete_confirmation.html:11
+#: templates/admin/submit_line.html:4
+msgid "Delete"
+msgstr "Apagar"
+
+#: templates/admin/delete_confirmation.html:18
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"A remoção de '%(object_name)s' %(escaped_object)s pode resultar na remoção "
+"de objetos relacionados, mas sua conta não tem a permissão para remoção dos "
+"seguintes tipos de objetos:"
+
+#: templates/admin/delete_confirmation.html:26
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"Excluir o %(object_name)s  ' %(escaped_object)s ' exigiria excluir os "
+"seguintes objetos protegidos relacionados:"
+
+#: templates/admin/delete_confirmation.html:34
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Você tem certeza que quer remover %(object_name)s \"%(escaped_object)s\"? "
+"Todos os seguintes itens relacionados serão removidos:"
+
+#: templates/admin/delete_confirmation.html:39
+#: templates/admin/delete_selected_confirmation.html:44
+msgid "Yes, I'm sure"
+msgstr "Sim, tenho certeza"
+
+#: templates/admin/delete_selected_confirmation.html:10
+msgid "Delete multiple objects"
+msgstr "Remover múltiplos objetos"
+
+#: templates/admin/delete_selected_confirmation.html:17
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Excluir o %(objects_name)s selecionado pode resultar na remoção de objetos "
+"relacionados, mas sua conta não tem permissão para excluir os seguintes "
+"tipos de objetos:"
+
+#: templates/admin/delete_selected_confirmation.html:25
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"Excluir o %(objects_name)s selecionado exigiria excluir os seguintes objetos "
+"relacionados protegidos:"
+
+#: templates/admin/delete_selected_confirmation.html:33
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"Tem certeza de que deseja apagar o %(objects_name)s selecionado? Todos os "
+"seguintes objetos e seus itens relacionados serão removidos:"
+
+#: templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "Por %(filter_title)s "
+
+#: templates/admin/index.html:20
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modelos na aplicação %(name)s"
+
+#: templates/admin/index.html:39
+msgid "Change"
+msgstr "Modificar"
+
+#: templates/admin/index.html:49
+msgid "You don't have permission to edit anything."
+msgstr "Você não tem permissão para edição."
+
+#: templates/admin/index.html:57
+msgid "Recent Actions"
+msgstr "Ações Recentes"
+
+#: templates/admin/index.html:58
+msgid "My Actions"
+msgstr "Minhas Ações"
+
+#: templates/admin/index.html:62
+msgid "None available"
+msgstr "Nenhum disponível"
+
+#: templates/admin/index.html:76
+msgid "Unknown content"
+msgstr "Conteúdo desconhecido"
+
+#: templates/admin/invalid_setup.html:12
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Alguma coisa está errada com a instalação do banco de dados. Certifique-se "
+"que as tabelas necessárias foram criadas e que o banco de dados pode ser "
+"acessado pelo usuário apropriado."
+
+#: templates/admin/login.html:37
+msgid "Password:"
+msgstr "Senha:"
+
+#: templates/admin/login.html:44
+msgid "Forgotten your password or username?"
+msgstr "Esqueceu sua senha ou nome de usuário?"
+
+#: templates/admin/object_history.html:23
+msgid "Date/time"
+msgstr "Data/hora"
+
+#: templates/admin/object_history.html:24
+msgid "User"
+msgstr "Usuário"
+
+#: templates/admin/object_history.html:25
+msgid "Action"
+msgstr "Ação"
+
+#: templates/admin/object_history.html:39
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Este objeto não tem um histórico de alterações. Ele provavelmente não foi "
+"adicionado por este site de administração."
+
+#: templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "Mostrar tudo"
+
+#: templates/admin/pagination.html:11 templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "Salvar"
+
+#: templates/admin/search_form.html:7
+msgid "Search"
+msgstr "Pesquisar"
+
+#: templates/admin/search_form.html:9
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s resultado"
+msgstr[1] "%(counter)s resultados"
+
+#: templates/admin/search_form.html:9
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s total"
+
+#: templates/admin/submit_line.html:5
+msgid "Save as new"
+msgstr "Salvar como novo"
+
+#: templates/admin/submit_line.html:6
+msgid "Save and add another"
+msgstr "Salvar e adicionar outro(a)"
+
+#: templates/admin/submit_line.html:7
+msgid "Save and continue editing"
+msgstr "Salvar e continuar editando"
+
+#: templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"Primeiro, informe um nome de usuário e senha. Depois você será capaz de "
+"editar mais opções do usuário."
+
+#: templates/admin/auth/user/add_form.html:8
+msgid "Enter a username and password."
+msgstr "Digite um nome de usuário e senha."
+
+#: templates/admin/auth/user/change_password.html:31
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Informe uma nova senha para o usuário <strong>%(username)s</strong>."
+
+#: templates/admin/auth/user/change_password.html:38
+msgid "Password"
+msgstr "Senha"
+
+#: templates/admin/auth/user/change_password.html:44
+#: templates/registration/password_change_form.html:42
+msgid "Password (again)"
+msgstr "Senha (novamente)"
+
+#: templates/admin/auth/user/change_password.html:45
+msgid "Enter the same password as above, for verification."
+msgstr "Informe a mesma senha digitada acima, para verificação."
+
+#: templates/admin/edit_inline/stacked.html:26
+#: templates/admin/edit_inline/tabular.html:76
+msgid "Remove"
+msgstr "Remover"
+
+#: templates/admin/edit_inline/stacked.html:27
+#: templates/admin/edit_inline/tabular.html:75
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Adicionar outro(a) %(verbose_name)s"
+
+#: templates/admin/edit_inline/tabular.html:17
+msgid "Delete?"
+msgstr "Apagar?"
+
+#: templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Obrigado por visitar nosso Web site hoje."
+
+#: templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Acessar novamente"
+
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_change_form.html:12
+#: templates/registration/password_change_form.html:24
+msgid "Password change"
+msgstr "Alterar senha"
+
+#: templates/registration/password_change_done.html:11
+#: templates/registration/password_change_done.html:15
+msgid "Password change successful"
+msgstr "Senha alterada com sucesso"
+
+#: templates/registration/password_change_done.html:17
+msgid "Your password was changed."
+msgstr "Sua senha foi alterada."
+
+#: templates/registration/password_change_form.html:26
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Por favor, informe sua senha antiga, por segurança, e então informe sua nova "
+"senha duas vezes para que possamos verificar se você digitou corretamente."
+
+#: templates/registration/password_change_form.html:32
+msgid "Old password"
+msgstr "Senha antiga"
+
+#: templates/registration/password_change_form.html:37
+msgid "New password"
+msgstr "Nova senha"
+
+#: templates/registration/password_change_form.html:48
+#: templates/registration/password_reset_confirm.html:26
+msgid "Change my password"
+msgstr "Alterar minha senha"
+
+#: templates/registration/password_reset_complete.html:7
+#: templates/registration/password_reset_confirm.html:11
+#: templates/registration/password_reset_done.html:7
+#: templates/registration/password_reset_form.html:7
+#: templates/registration/password_reset_form.html:11
+#: templates/registration/password_reset_form.html:15
+msgid "Password reset"
+msgstr "Recuperar senha"
+
+#: templates/registration/password_reset_complete.html:11
+#: templates/registration/password_reset_complete.html:15
+msgid "Password reset complete"
+msgstr "Recuperação de senha completa"
+
+#: templates/registration/password_reset_complete.html:17
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "Sua senha foi definida. Você pode prosseguir e se autenticar agora."
+
+#: templates/registration/password_reset_confirm.html:7
+msgid "Password reset confirmation"
+msgstr "Confirmação de recuperação de senha"
+
+#: templates/registration/password_reset_confirm.html:17
+msgid "Enter new password"
+msgstr "Insira a nova senha"
+
+#: templates/registration/password_reset_confirm.html:19
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Por favor, informe sua nova senha duas vezes para que possamos verificar se "
+"você a digitou corretamente."
+
+#: templates/registration/password_reset_confirm.html:23
+msgid "New password:"
+msgstr "Nova senha:"
+
+#: templates/registration/password_reset_confirm.html:25
+msgid "Confirm password:"
+msgstr "Confirme a senha:"
+
+#: templates/registration/password_reset_confirm.html:31
+msgid "Password reset unsuccessful"
+msgstr "Recuperação de senha sem sucesso"
+
+#: templates/registration/password_reset_confirm.html:33
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"O link para a recuperação de senha era inválido, possivelmente porque jã foi "
+"utilizado. Por favor, solicite uma nova recuperação de senha."
+
+#: templates/registration/password_reset_done.html:11
+#: templates/registration/password_reset_done.html:15
+msgid "Password reset successful"
+msgstr "Senha recuperada com sucesso"
+
+#: templates/registration/password_reset_done.html:17
+msgid ""
+"We've emailed you instructions for setting your password to the email "
+"address you submitted. You should be receiving it shortly."
+msgstr ""
+"Nós te enviamos as instruções para definição da a sua senha para o endereço "
+"de email fornecido. Você receberá a mensagem em breve."
+
+#: templates/registration/password_reset_email.html:2
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"Você está recebendo este email porque solicitou a redefinição da senha da "
+"sua conta em %(site_name)s."
+
+#: templates/registration/password_reset_email.html:4
+msgid "Please go to the following page and choose a new password:"
+msgstr "Por favor, acesse a seguinte página e escolha uma nova senha:"
+
+#: templates/registration/password_reset_email.html:8
+msgid "Your username, in case you've forgotten:"
+msgstr "Seu nome de usuário, caso tenha esquecido:"
+
+#: templates/registration/password_reset_email.html:10
+msgid "Thanks for using our site!"
+msgstr "Obrigado por usar nosso site!"
+
+#: templates/registration/password_reset_email.html:12
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "Equipe %(site_name)s"
+
+#: templates/registration/password_reset_form.html:17
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll email "
+"instructions for setting a new one."
+msgstr ""
+"Esqueceu a senha? Forneça o seu endereço de email abaixo e te enviaremos "
+"instruções para definir uma nova."
+
+#: templates/registration/password_reset_form.html:21
+msgid "Email address:"
+msgstr "Endereço de email:"
+
+#: templates/registration/password_reset_form.html:21
+msgid "Reset my password"
+msgstr "Reinicializar minha senha"
+
+#: templatetags/admin_list.py:344
+msgid "All dates"
+msgstr "Todas as datas"
+
+#: views/main.py:33
+msgid "(None)"
+msgstr "(Nenhum)"
+
+#: views/main.py:76
+#, python-format
+msgid "Select %s"
+msgstr "Selecione %s"
+
+#: views/main.py:78
+#, python-format
+msgid "Select %s to change"
+msgstr "Selecione %s para modificar"

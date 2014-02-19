@@ -1,0 +1,98 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Gašper Žejn <zejn@kiberpipa.org>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+#   <zejn@kiberpipa.org>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-10-31 19:06+0000\n"
+"Last-Translator: mateju <>\n"
+"Language-Team: Slovenian (http://www.transifex.com/projects/p/django/"
+"language/sl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sl\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
+"%100==4 ? 2 : 3);\n"
+
+#: views.py:9
+msgid "No feeds are registered."
+msgstr "Ni vpisanih virov."
+
+#: views.py:19
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr "Okrajšava %r ni vpisana."
+
+#: db/models/fields.py:51
+msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"Osnovno polje GIS -- se preslika v vrsto Geometry po določilih OpenGIS."
+
+#: db/models/fields.py:271
+msgid "Point"
+msgstr "Točka"
+
+#: db/models/fields.py:275
+msgid "Line string"
+msgstr "Črtni niz"
+
+#: db/models/fields.py:279
+msgid "Polygon"
+msgstr "Mnogokotnik"
+
+#: db/models/fields.py:283
+msgid "Multi-point"
+msgstr "Več-točkovi predmet"
+
+#: db/models/fields.py:287
+msgid "Multi-line string"
+msgstr "Več črtni niz"
+
+#: db/models/fields.py:291
+msgid "Multi polygon"
+msgstr "Večkratni mnogokotnikov"
+
+#: db/models/fields.py:295
+msgid "Geometry collection"
+msgstr "Zbirka likov"
+
+#: forms/fields.py:19
+msgid "No geometry value provided."
+msgstr "Ni navdene geometrijske vrednosti."
+
+#: forms/fields.py:20
+msgid "Invalid geometry value."
+msgstr "Neveljavna geometrijska vrednost."
+
+#: forms/fields.py:21
+msgid "Invalid geometry type."
+msgstr "Neveljavna vrsta geometrije."
+
+#: forms/fields.py:22
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+"Med pretvarjanjem geometrijskega zapisa v SRID geometrijskega polja je "
+"prišlo do napake."
+
+#: sitemaps/views.py:46
+#, python-format
+msgid "No sitemap available for section: %r"
+msgstr "Za odsek %r ni zemljevida strani."
+
+#: sitemaps/views.py:60
+#, python-format
+msgid "Page %s empty"
+msgstr "Stran %s je prazna"
+
+#: sitemaps/views.py:62
+#, python-format
+msgid "No page '%s'"
+msgstr "Ni strani '%s'"

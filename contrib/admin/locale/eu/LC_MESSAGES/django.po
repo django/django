@@ -1,0 +1,857 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Translators:
+# Aitzol Naberan <anaberan@codesyntax.com>, 2011-2013.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+#  <julenx@gmail.com>, 2013.
+#   <julenx@gmail.com>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-01-01 16:10+0100\n"
+"PO-Revision-Date: 2013-01-16 11:21+0000\n"
+"Last-Translator: julen <julenx@gmail.com>\n"
+"Language-Team: Basque (http://www.transifex.com/projects/p/django/language/"
+"eu/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: eu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: actions.py:48
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "%(count)d %(items)s elementu ezabatu dira."
+
+#: actions.py:60 options.py:1347
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "Ezin da %(name)s ezabatu"
+
+#: actions.py:62 options.py:1349
+msgid "Are you sure?"
+msgstr "Ziur zaude?"
+
+#: actions.py:83
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Ezabatu aukeratutako %(verbose_name_plural)s"
+
+#: filters.py:101 filters.py:197 filters.py:237 filters.py:274 filters.py:380
+msgid "All"
+msgstr "Dena"
+
+#: filters.py:238
+msgid "Yes"
+msgstr "Bai"
+
+#: filters.py:239
+msgid "No"
+msgstr "Ez"
+
+#: filters.py:253
+msgid "Unknown"
+msgstr "Ezezaguna"
+
+#: filters.py:308
+msgid "Any date"
+msgstr "Edozein data"
+
+#: filters.py:309
+msgid "Today"
+msgstr "Gaur"
+
+#: filters.py:313
+msgid "Past 7 days"
+msgstr "Aurreko 7 egunak"
+
+#: filters.py:317
+msgid "This month"
+msgstr "Hilabete hau"
+
+#: filters.py:321
+msgid "This year"
+msgstr "Urte hau"
+
+#: forms.py:9
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+"Idatzi kudeaketa gunerako %(username)s eta pasahitz zuzena. Kontuan izan "
+"biek maiuskula/minuskulak desberdintzen dituztela."
+
+#: forms.py:19
+msgid "Please log in again, because your session has expired."
+msgstr "Hasi saioa berriro, zure sesioa iraungitu egin da."
+
+#: helpers.py:23
+msgid "Action:"
+msgstr "Ekintza:"
+
+#: models.py:24
+msgid "action time"
+msgstr "Ekintza hordua"
+
+#: models.py:27
+msgid "object id"
+msgstr "Objetuaren id-a"
+
+#: models.py:28
+msgid "object repr"
+msgstr "Objeturaren aurkezpena"
+
+#: models.py:29
+msgid "action flag"
+msgstr "Ekintza botoia"
+
+#: models.py:30
+msgid "change message"
+msgstr "Mezua aldatu"
+
+#: models.py:35
+msgid "log entry"
+msgstr "Log sarrera"
+
+#: models.py:36
+msgid "log entries"
+msgstr "log sarrerak"
+
+#: models.py:45
+#, python-format
+msgid "Added \"%(object)s\"."
+msgstr "\"%(object)s\" gehituta."
+
+#: models.py:47
+#, python-format
+msgid "Changed \"%(object)s\" - %(changes)s"
+msgstr "\"%(object)s\" aldatuta - %(changes)s"
+
+#: models.py:52
+#, python-format
+msgid "Deleted \"%(object)s.\""
+msgstr "\"%(object)s\" ezabatuta."
+
+#: models.py:54
+msgid "LogEntry Object"
+msgstr "LogEntry objektua"
+
+#: options.py:156 options.py:172
+msgid "None"
+msgstr "Bat ere ez"
+
+#: options.py:684
+#, python-format
+msgid "Changed %s."
+msgstr "%s aldatuta."
+
+#: options.py:684 options.py:694
+msgid "and"
+msgstr "eta"
+
+#: options.py:689
+#, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "%(name)s \"%(object)s\" gehituta."
+
+#: options.py:693
+#, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr "Changed %(list)s for %(name)s \"%(object)s\"."
+
+#: options.py:698
+#, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "%(name)s \"%(object)s\" ezabatuta."
+
+#: options.py:702
+msgid "No fields changed."
+msgstr "Ez da eremurik aldatu."
+
+#: options.py:807 options.py:860
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr "%(name)s \"%(obj)s\" ondo gehitu da. Jarraian aldatu dezakezu berriro."
+
+#: options.py:835
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may add another "
+"%(name)s below."
+msgstr ""
+"%(name)s \"%(obj)s\" ondo gehitu da. Beste %(name)s bat gehitu dezakezu "
+"jarraian."
+
+#: options.py:839
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" ondo gehitu da."
+
+#: options.py:853
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"below."
+msgstr ""
+"%(name)s \"%(obj)s\" ondo aldatu da. Aldaketa gehiago egin ditzazkezu "
+"jarraian."
+
+#: options.py:867
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
+"%(name)s below."
+msgstr ""
+"%(name)s \"%(obj)s\" ondo aldatu da. Beste %(name)s bat gehitu dezakezu "
+"jarraian."
+
+#: options.py:873
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" ondo aldatu da."
+
+#: options.py:951 options.py:1211
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"Elementuak aukeratu behar dira beraien gain ekintzak burutzeko. Ez da "
+"elementurik aldatu."
+
+#: options.py:970
+msgid "No action selected."
+msgstr "Ez dago ekintzarik aukeratuta."
+
+#: options.py:1050
+#, python-format
+msgid "Add %s"
+msgstr "Gehitu %s"
+
+#: options.py:1074 options.py:1319
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Ez dago %(key)r gakodun %(name)s objekturik."
+
+#: options.py:1140
+#, python-format
+msgid "Change %s"
+msgstr "Aldatu %s"
+
+#: options.py:1190
+msgid "Database error"
+msgstr "Datu-basearen errorea"
+
+#: options.py:1253
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(name)s %(count)s  ondo aldatu da."
+msgstr[1] "%(count)s %(name)s ondo aldatu dira."
+
+#: options.py:1280
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "Guztira %(total_count)s aukeratuta"
+msgstr[1] "Guztira %(total_count)s aukeratuta"
+
+#: options.py:1285
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "Guztira %(cnt)s, 0 aukeratuta"
+
+#: options.py:1335
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" ondo ezabatu da."
+
+#: options.py:1382
+#, python-format
+msgid "Change history: %s"
+msgstr "Aldaketen historia: %s"
+
+#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#: templates/registration/password_reset_complete.html:19
+#: views/decorators.py:24
+msgid "Log in"
+msgstr "Sartu"
+
+#: sites.py:388
+msgid "Site administration"
+msgstr "Webgunearen kudeaketa"
+
+#: sites.py:440
+#, python-format
+msgid "%s administration"
+msgstr "%s kudeaketa"
+
+#: widgets.py:90
+msgid "Date:"
+msgstr "Data:"
+
+#: widgets.py:91
+msgid "Time:"
+msgstr "Ordua:"
+
+#: widgets.py:165
+msgid "Lookup"
+msgstr "Lookup"
+
+#: widgets.py:271
+msgid "Add Another"
+msgstr "Beste bat gehitu"
+
+#: widgets.py:316
+msgid "Currently:"
+msgstr "Oraingoa:"
+
+#: widgets.py:317
+msgid "Change:"
+msgstr "Aldatu:"
+
+#: templates/admin/404.html:4 templates/admin/404.html.py:8
+msgid "Page not found"
+msgstr "Ez da orririk aurkitu"
+
+#: templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Barkatu, eskatutako orria ezin daiteke aurkitu"
+
+#: templates/admin/500.html:6 templates/admin/app_index.html:7
+#: templates/admin/base.html:47 templates/admin/change_form.html:19
+#: templates/admin/change_list.html:41
+#: templates/admin/delete_confirmation.html:7
+#: templates/admin/delete_selected_confirmation.html:7
+#: templates/admin/invalid_setup.html:6 templates/admin/object_history.html:7
+#: templates/admin/auth/user/change_password.html:13
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:6
+#: templates/registration/password_change_form.html:7
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_confirm.html:6
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_form.html:6
+msgid "Home"
+msgstr "Hasiera"
+
+#: templates/admin/500.html:7
+msgid "Server error"
+msgstr "Zerbitzariaren errorea"
+
+#: templates/admin/500.html:11
+msgid "Server error (500)"
+msgstr "Zerbitzariaren errorea (500)"
+
+#: templates/admin/500.html:14
+msgid "Server Error <em>(500)</em>"
+msgstr "Zerbitzariaren errorea <em>(500)</em>"
+
+#: templates/admin/500.html:15
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Errore bat gertatu da. Errorea guneko kudeatzaileari jakinarazi zaio email "
+"bidez eta laister egon beharko luke konponduta. Barkatu eragozpenak."
+
+#: templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr "Burutu hautatutako ekintza"
+
+#: templates/admin/actions.html:4
+msgid "Go"
+msgstr "Joan"
+
+#: templates/admin/actions.html:11
+msgid "Click here to select the objects across all pages"
+msgstr "Egin klik hemen orri guztietako objektuak aukeratzeko"
+
+#: templates/admin/actions.html:11
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Hautatu %(total_count)s %(module_name)s guztiak"
+
+#: templates/admin/actions.html:13
+msgid "Clear selection"
+msgstr "Garbitu hautapena"
+
+#: templates/admin/app_index.html:10 templates/admin/index.html:21
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: templates/admin/base.html:28
+msgid "Welcome,"
+msgstr "Ongi etorri,"
+
+#: templates/admin/base.html:33
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
+msgid "Documentation"
+msgstr "Dokumentazioa"
+
+#: templates/admin/base.html:36
+#: templates/admin/auth/user/change_password.html:17
+#: templates/admin/auth/user/change_password.html:51
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
+msgid "Change password"
+msgstr "Aldatu pasahitza"
+
+#: templates/admin/base.html:38
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
+msgid "Log out"
+msgstr "Irten"
+
+#: templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django kudeaketa gunea"
+
+#: templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Django kudeaketa"
+
+#: templates/admin/change_form.html:22 templates/admin/index.html:33
+msgid "Add"
+msgstr "Gehitu"
+
+#: templates/admin/change_form.html:32 templates/admin/object_history.html:11
+msgid "History"
+msgstr "Historia"
+
+#: templates/admin/change_form.html:33
+#: templates/admin/edit_inline/stacked.html:9
+#: templates/admin/edit_inline/tabular.html:30
+msgid "View on site"
+msgstr "Ikusi gunean"
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Zuzendu azpiko errorea."
+msgstr[1] "Zuzendu azpiko erroreak."
+
+#: templates/admin/change_list.html:58
+#, python-format
+msgid "Add %(name)s"
+msgstr "Gehitu  %(name)s"
+
+#: templates/admin/change_list.html:78
+msgid "Filter"
+msgstr "Iragazkia"
+
+#: templates/admin/change_list_results.html:17
+msgid "Remove from sorting"
+msgstr "Kendu ordenaziotik"
+
+#: templates/admin/change_list_results.html:18
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Ordenatzeko lehentasuna: %(priority_number)s"
+
+#: templates/admin/change_list_results.html:19
+msgid "Toggle sorting"
+msgstr "Txandakatu ordenazioa"
+
+#: templates/admin/delete_confirmation.html:11
+#: templates/admin/submit_line.html:4
+msgid "Delete"
+msgstr "Ezabatu"
+
+#: templates/admin/delete_confirmation.html:18
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"%(object_name)s ezabatzean bere '%(escaped_object)s' ere ezabatzen dira, "
+"baina zure kontuak ez dauka baimenik objetu mota hauek ezabatzeko:"
+
+#: templates/admin/delete_confirmation.html:26
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"%(object_name)s '%(escaped_object)s' ezabatzeak erlazionatutako objektu "
+"babestu hauek ezabatzea eskatzen du:"
+
+#: templates/admin/delete_confirmation.html:34
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Ziur zaude %(object_name)s \"%(escaped_object)s\" ezabatu nahi dituzula? "
+"Erlazionaturik dauden hurrengo elementuak ere ezabatuko dira:"
+
+#: templates/admin/delete_confirmation.html:39
+#: templates/admin/delete_selected_confirmation.html:44
+msgid "Yes, I'm sure"
+msgstr "Bai, ziur nago"
+
+#: templates/admin/delete_selected_confirmation.html:10
+msgid "Delete multiple objects"
+msgstr "Ezabatu hainbat objektu"
+
+#: templates/admin/delete_selected_confirmation.html:17
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Hautatutako %(objects_name)s ezabatzeak erlazionatutako objektuak ezabatzea "
+"eskatzen du baina zure kontuak ez dauka baimen nahikorik objektu mota hauek "
+"ezabatzeko: "
+
+#: templates/admin/delete_selected_confirmation.html:25
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"Hautatutako %(objects_name)s ezabatzeak erlazionatutako objektu babestu "
+"hauek ezabatzea eskatzen du:"
+
+#: templates/admin/delete_selected_confirmation.html:33
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"Ziur zaude hautatutako %(objects_name)s ezabatu nahi duzula? Objektu guzti "
+"hauek eta erlazionatutako elementu guztiak ezabatuko dira:"
+
+#: templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "Irizpidea: %(filter_title)s"
+
+#: templates/admin/index.html:20
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s aplikazioaren modeloak"
+
+#: templates/admin/index.html:39
+msgid "Change"
+msgstr "Aldatu"
+
+#: templates/admin/index.html:49
+msgid "You don't have permission to edit anything."
+msgstr "Ez daukazu ezer aldatzeko baimenik."
+
+#: templates/admin/index.html:57
+msgid "Recent Actions"
+msgstr "Azken ekintzak"
+
+#: templates/admin/index.html:58
+msgid "My Actions"
+msgstr "Nire ekintzak"
+
+#: templates/admin/index.html:62
+msgid "None available"
+msgstr "Ez dago ezer"
+
+#: templates/admin/index.html:76
+msgid "Unknown content"
+msgstr "Eduki ezezaguna"
+
+#: templates/admin/invalid_setup.html:12
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Zerbait gaizki dago zure datu-basearekin. Ziurtatu datu-baseko taulak sortu "
+"direla eta erabiltzaile egokiak irakurtzeko baimena duela."
+
+#: templates/admin/login.html:37
+msgid "Password:"
+msgstr "Pasahitza:"
+
+#: templates/admin/login.html:44
+msgid "Forgotten your password or username?"
+msgstr "Pasahitza edo erabiltzaile-izena ahaztu duzu?"
+
+#: templates/admin/object_history.html:23
+msgid "Date/time"
+msgstr "Data/ordua"
+
+#: templates/admin/object_history.html:24
+msgid "User"
+msgstr "Erabiltzailea"
+
+#: templates/admin/object_history.html:25
+msgid "Action"
+msgstr "Ekintza"
+
+#: templates/admin/object_history.html:39
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Objektu honek ez dauka aldaketen historiarik. Ziurrenik kudeaketa gunetik "
+"kanpo gehituko zen."
+
+#: templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "Erakutsi dena"
+
+#: templates/admin/pagination.html:11 templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "Gorde"
+
+#: templates/admin/search_form.html:7
+msgid "Search"
+msgstr "Bilatu"
+
+#: templates/admin/search_form.html:9
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "Emaitza %(counter)s "
+msgstr[1] "%(counter)s emaitza"
+
+#: templates/admin/search_form.html:9
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s guztira"
+
+#: templates/admin/submit_line.html:5
+msgid "Save as new"
+msgstr "Gorde berri gisa"
+
+#: templates/admin/submit_line.html:6
+msgid "Save and add another"
+msgstr "Gorde eta gehitu beste bat"
+
+#: templates/admin/submit_line.html:7
+msgid "Save and continue editing"
+msgstr "Gorde eta jarraitu editatzen"
+
+#: templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"Lehenik idatzi erabiltzaile-izena eta pasahitza. Gero erabiltzaile-aukera "
+"gehiago aldatu ahal izango dituzu."
+
+#: templates/admin/auth/user/add_form.html:8
+msgid "Enter a username and password."
+msgstr "Idatzi erabiltzaile-izen eta pasahitza."
+
+#: templates/admin/auth/user/change_password.html:31
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
+"Idatzi pasahitz berria <strong>%(username)s</strong> erabiltzailearentzat."
+
+#: templates/admin/auth/user/change_password.html:38
+msgid "Password"
+msgstr "Pasahitza"
+
+#: templates/admin/auth/user/change_password.html:44
+#: templates/registration/password_change_form.html:42
+msgid "Password (again)"
+msgstr "Pasahitza (berriro)"
+
+#: templates/admin/auth/user/change_password.html:45
+msgid "Enter the same password as above, for verification."
+msgstr "Idatzi goiko pasahitz bera, egiaztapenerako."
+
+#: templates/admin/edit_inline/stacked.html:26
+#: templates/admin/edit_inline/tabular.html:76
+msgid "Remove"
+msgstr "Kendu"
+
+#: templates/admin/edit_inline/stacked.html:27
+#: templates/admin/edit_inline/tabular.html:75
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Gehitu beste %(verbose_name)s bat"
+
+#: templates/admin/edit_inline/tabular.html:17
+msgid "Delete?"
+msgstr "Ezabatu?"
+
+#: templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Eskerrik asko webguneari zure probetxuzko denbora eskaintzeagatik."
+
+#: templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Hasi saioa berriro"
+
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_change_form.html:12
+#: templates/registration/password_change_form.html:24
+msgid "Password change"
+msgstr "Aldatu pasahitza"
+
+#: templates/registration/password_change_done.html:11
+#: templates/registration/password_change_done.html:15
+msgid "Password change successful"
+msgstr "Pasahitza ondo aldatu da"
+
+#: templates/registration/password_change_done.html:17
+msgid "Your password was changed."
+msgstr "Zure pasahitza aldatu egin da."
+
+#: templates/registration/password_change_form.html:26
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Idatzi pasahitz zaharra segurtasun arrazoiengatik eta gero pasahitz berria "
+"bi aldiz, akatsik egiten ez duzula ziurta dezagun."
+
+#: templates/registration/password_change_form.html:32
+msgid "Old password"
+msgstr "Pasahitz zaharra"
+
+#: templates/registration/password_change_form.html:37
+msgid "New password"
+msgstr "Pasahitz berria"
+
+#: templates/registration/password_change_form.html:48
+#: templates/registration/password_reset_confirm.html:26
+msgid "Change my password"
+msgstr "Aldatu nire pasahitza"
+
+#: templates/registration/password_reset_complete.html:7
+#: templates/registration/password_reset_confirm.html:11
+#: templates/registration/password_reset_done.html:7
+#: templates/registration/password_reset_form.html:7
+#: templates/registration/password_reset_form.html:11
+#: templates/registration/password_reset_form.html:15
+msgid "Password reset"
+msgstr "Berrezarri pasahitza"
+
+#: templates/registration/password_reset_complete.html:11
+#: templates/registration/password_reset_complete.html:15
+msgid "Password reset complete"
+msgstr "Pasahitza berrezartzea burutu da"
+
+#: templates/registration/password_reset_complete.html:17
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "Zure pasahitza ezarri da. Orain aurrera egin eta sartu zaitezke."
+
+#: templates/registration/password_reset_confirm.html:7
+msgid "Password reset confirmation"
+msgstr "Pasahitza berrezartzeko berrespena"
+
+#: templates/registration/password_reset_confirm.html:17
+msgid "Enter new password"
+msgstr "Idatzi pasahitz berria"
+
+#: templates/registration/password_reset_confirm.html:19
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr "Idatzi pasahitz berria birritan ondo idatzita dagoela ziurta dezagun."
+
+#: templates/registration/password_reset_confirm.html:23
+msgid "New password:"
+msgstr "Pasahitz berria:"
+
+#: templates/registration/password_reset_confirm.html:25
+msgid "Confirm password:"
+msgstr "Berretsi pasahitza:"
+
+#: templates/registration/password_reset_confirm.html:31
+msgid "Password reset unsuccessful"
+msgstr "Pasahitza ez da berrezarri"
+
+#: templates/registration/password_reset_confirm.html:33
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"Pasahitza berrezartzeko loturak baliogabea dirudi. Baliteke lotura aurretik "
+"erabilita egotea. Eskatu berriro pasahitza berrezartzea."
+
+#: templates/registration/password_reset_done.html:11
+#: templates/registration/password_reset_done.html:15
+msgid "Password reset successful"
+msgstr "Pasahitza ondo berrezarri da"
+
+#: templates/registration/password_reset_done.html:17
+msgid ""
+"We've emailed you instructions for setting your password to the email "
+"address you submitted. You should be receiving it shortly."
+msgstr ""
+"Emandako helbide elektronikora bidali dizkizugu pasahitza berrezartzeko "
+"jarraibideak. Epe laburrean jaso behar zenuke."
+
+#: templates/registration/password_reset_email.html:2
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"Mezu hau %(site_name)s webgunean pasahitza berrezartzea eskatu duzulako jaso "
+"duzu"
+
+#: templates/registration/password_reset_email.html:4
+msgid "Please go to the following page and choose a new password:"
+msgstr "Zoaz hurrengo orrira eta aukeratu pasahitz berria:"
+
+#: templates/registration/password_reset_email.html:8
+msgid "Your username, in case you've forgotten:"
+msgstr "Zure erabiltzaile-izena (ahaztu baduzu):"
+
+#: templates/registration/password_reset_email.html:10
+msgid "Thanks for using our site!"
+msgstr "Mila esker gure webgunea erabiltzeagatik!"
+
+#: templates/registration/password_reset_email.html:12
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s webguneko taldea"
+
+#: templates/registration/password_reset_form.html:17
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll email "
+"instructions for setting a new one."
+msgstr ""
+"Pasahitza ahaztu duzu? Idatzi zure helbide elektronikoa eta berri bat "
+"ezartzeko jarraibideak bidaliko dizkizugu."
+
+#: templates/registration/password_reset_form.html:21
+msgid "Email address:"
+msgstr "Helbide elektronikoa:"
+
+#: templates/registration/password_reset_form.html:21
+msgid "Reset my password"
+msgstr "Berrezarri pasahitza"
+
+#: templatetags/admin_list.py:344
+msgid "All dates"
+msgstr "Data guztiak"
+
+#: views/main.py:33
+msgid "(None)"
+msgstr "(Bat ere ez)"
+
+#: views/main.py:76
+#, python-format
+msgid "Select %s"
+msgstr "Hautatu %s"
+
+#: views/main.py:78
+#, python-format
+msgid "Select %s to change"
+msgstr "Hautatu %s aldatzeko"

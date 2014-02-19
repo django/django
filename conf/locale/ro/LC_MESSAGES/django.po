@@ -1,0 +1,1269 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+#   <contact@mesimian.com>, 2011.
+# Daniel Ursache-Dogariu <contact@danniel.net>, 2011.
+# Denis Darii <sinednx@gmail.com>, 2011.
+#   <ionel.mc@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-01-01 16:10+0100\n"
+"PO-Revision-Date: 2013-01-02 08:47+0000\n"
+"Last-Translator: Ionel Cristian Mărieș <ionel.mc@gmail.com>\n"
+"Language-Team: Romanian (http://www.transifex.com/projects/p/django/language/"
+"ro/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ro\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
+"2:1));\n"
+
+#: conf/global_settings.py:48
+msgid "Afrikaans"
+msgstr ""
+
+#: conf/global_settings.py:49
+msgid "Arabic"
+msgstr "Arabă"
+
+#: conf/global_settings.py:50
+msgid "Azerbaijani"
+msgstr "Azeră"
+
+#: conf/global_settings.py:51
+msgid "Bulgarian"
+msgstr "Bulgară"
+
+#: conf/global_settings.py:52
+msgid "Belarusian"
+msgstr ""
+
+#: conf/global_settings.py:53
+msgid "Bengali"
+msgstr "Bengaleză"
+
+#: conf/global_settings.py:54
+msgid "Breton"
+msgstr ""
+
+#: conf/global_settings.py:55
+msgid "Bosnian"
+msgstr "Bosniacă"
+
+#: conf/global_settings.py:56
+msgid "Catalan"
+msgstr "Catalană"
+
+#: conf/global_settings.py:57
+msgid "Czech"
+msgstr "Cehă"
+
+#: conf/global_settings.py:58
+msgid "Welsh"
+msgstr "Galeză"
+
+#: conf/global_settings.py:59
+msgid "Danish"
+msgstr "Daneză"
+
+#: conf/global_settings.py:60
+msgid "German"
+msgstr "Germană"
+
+#: conf/global_settings.py:61
+msgid "Greek"
+msgstr "Greacă"
+
+#: conf/global_settings.py:62
+msgid "English"
+msgstr "Engleză"
+
+#: conf/global_settings.py:63
+msgid "British English"
+msgstr "Engleză britanică"
+
+#: conf/global_settings.py:64
+msgid "Esperanto"
+msgstr ""
+
+#: conf/global_settings.py:65
+msgid "Spanish"
+msgstr "Spaniolă"
+
+#: conf/global_settings.py:66
+msgid "Argentinian Spanish"
+msgstr "Spaniolă Argentiniană"
+
+#: conf/global_settings.py:67
+msgid "Mexican Spanish"
+msgstr "Spaniolă Mexicană"
+
+#: conf/global_settings.py:68
+msgid "Nicaraguan Spanish"
+msgstr "Spaniolă Nicaragua"
+
+#: conf/global_settings.py:69
+msgid "Venezuelan Spanish"
+msgstr ""
+
+#: conf/global_settings.py:70
+msgid "Estonian"
+msgstr "Estonă"
+
+#: conf/global_settings.py:71
+msgid "Basque"
+msgstr "Bască"
+
+#: conf/global_settings.py:72
+msgid "Persian"
+msgstr "Persană"
+
+#: conf/global_settings.py:73
+msgid "Finnish"
+msgstr "Finlandeză"
+
+#: conf/global_settings.py:74
+msgid "French"
+msgstr "Franceză"
+
+#: conf/global_settings.py:75
+msgid "Frisian"
+msgstr "Frizian"
+
+#: conf/global_settings.py:76
+msgid "Irish"
+msgstr "Irlandeză"
+
+#: conf/global_settings.py:77
+msgid "Galician"
+msgstr "Galiciană"
+
+#: conf/global_settings.py:78
+msgid "Hebrew"
+msgstr "Ebraică"
+
+#: conf/global_settings.py:79
+msgid "Hindi"
+msgstr "Hindi"
+
+#: conf/global_settings.py:80
+msgid "Croatian"
+msgstr "Croată"
+
+#: conf/global_settings.py:81
+msgid "Hungarian"
+msgstr "Ungară"
+
+#: conf/global_settings.py:82
+msgid "Interlingua"
+msgstr ""
+
+#: conf/global_settings.py:83
+msgid "Indonesian"
+msgstr "Indoneză"
+
+#: conf/global_settings.py:84
+msgid "Icelandic"
+msgstr "Islandeză"
+
+#: conf/global_settings.py:85
+msgid "Italian"
+msgstr "Italiană"
+
+#: conf/global_settings.py:86
+msgid "Japanese"
+msgstr "Japoneză"
+
+#: conf/global_settings.py:87
+msgid "Georgian"
+msgstr "Georgiană"
+
+#: conf/global_settings.py:88
+msgid "Kazakh"
+msgstr ""
+
+#: conf/global_settings.py:89
+msgid "Khmer"
+msgstr "Khmeră"
+
+#: conf/global_settings.py:90
+msgid "Kannada"
+msgstr "Limba kannada"
+
+#: conf/global_settings.py:91
+msgid "Korean"
+msgstr "Koreană"
+
+#: conf/global_settings.py:92
+msgid "Luxembourgish"
+msgstr ""
+
+#: conf/global_settings.py:93
+msgid "Lithuanian"
+msgstr "Lituaniană"
+
+#: conf/global_settings.py:94
+msgid "Latvian"
+msgstr "Letonă"
+
+#: conf/global_settings.py:95
+msgid "Macedonian"
+msgstr "Macedoneană"
+
+#: conf/global_settings.py:96
+msgid "Malayalam"
+msgstr "Malayalam"
+
+#: conf/global_settings.py:97
+msgid "Mongolian"
+msgstr "Mongolă"
+
+#: conf/global_settings.py:98
+msgid "Norwegian Bokmal"
+msgstr "Norvegiană Bokmal"
+
+#: conf/global_settings.py:99
+msgid "Nepali"
+msgstr ""
+
+#: conf/global_settings.py:100
+msgid "Dutch"
+msgstr "Olandeză"
+
+#: conf/global_settings.py:101
+msgid "Norwegian Nynorsk"
+msgstr "Norvegiană Nynorsk"
+
+#: conf/global_settings.py:102
+msgid "Punjabi"
+msgstr "Punjabi"
+
+#: conf/global_settings.py:103
+msgid "Polish"
+msgstr "Poloneză"
+
+#: conf/global_settings.py:104
+msgid "Portuguese"
+msgstr "Portugheză"
+
+#: conf/global_settings.py:105
+msgid "Brazilian Portuguese"
+msgstr "Portugheză braziliană"
+
+#: conf/global_settings.py:106
+msgid "Romanian"
+msgstr "Română"
+
+#: conf/global_settings.py:107
+msgid "Russian"
+msgstr "Rusă"
+
+#: conf/global_settings.py:108
+msgid "Slovak"
+msgstr "Slovacă"
+
+#: conf/global_settings.py:109
+msgid "Slovenian"
+msgstr "Slovenă"
+
+#: conf/global_settings.py:110
+msgid "Albanian"
+msgstr "Albaneză"
+
+#: conf/global_settings.py:111
+msgid "Serbian"
+msgstr "Sârbă"
+
+#: conf/global_settings.py:112
+msgid "Serbian Latin"
+msgstr "Sârbă latină"
+
+#: conf/global_settings.py:113
+msgid "Swedish"
+msgstr "Suedeză"
+
+#: conf/global_settings.py:114
+msgid "Swahili"
+msgstr ""
+
+#: conf/global_settings.py:115
+msgid "Tamil"
+msgstr "Limba tamila"
+
+#: conf/global_settings.py:116
+msgid "Telugu"
+msgstr "Limba telugu"
+
+#: conf/global_settings.py:117
+msgid "Thai"
+msgstr "Tailandeză"
+
+#: conf/global_settings.py:118
+msgid "Turkish"
+msgstr "Turcă"
+
+#: conf/global_settings.py:119
+msgid "Tatar"
+msgstr ""
+
+#: conf/global_settings.py:120
+msgid "Udmurt"
+msgstr ""
+
+#: conf/global_settings.py:121
+msgid "Ukrainian"
+msgstr "Ucraineană"
+
+#: conf/global_settings.py:122
+msgid "Urdu"
+msgstr "Urdu"
+
+#: conf/global_settings.py:123
+msgid "Vietnamese"
+msgstr "Vietnameză"
+
+#: conf/global_settings.py:124
+msgid "Simplified Chinese"
+msgstr "Chineză simplificată"
+
+#: conf/global_settings.py:125
+msgid "Traditional Chinese"
+msgstr "Chineză tradițională"
+
+#: core/validators.py:21 forms/fields.py:52
+msgid "Enter a valid value."
+msgstr "Introduceți o valoare validă."
+
+#: core/validators.py:104 forms/fields.py:464
+msgid "Enter a valid email address."
+msgstr ""
+
+#: core/validators.py:107 forms/fields.py:1013
+msgid ""
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Introduceți un 'slug' valabil, compus numai din litere, numere, underscore "
+"sau cratime."
+
+#: core/validators.py:110 core/validators.py:129 forms/fields.py:987
+msgid "Enter a valid IPv4 address."
+msgstr "Introduceţi o adresă IPv4 validă."
+
+#: core/validators.py:115 core/validators.py:130
+msgid "Enter a valid IPv6 address."
+msgstr "Intoduceți o adresă IPv6 validă."
+
+#: core/validators.py:125 core/validators.py:128
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr "Introduceți o adresă IPv4 sau IPv6 validă."
+
+#: core/validators.py:151 db/models/fields/__init__.py:655
+msgid "Enter only digits separated by commas."
+msgstr "Introduceţi numai numere separate de virgule."
+
+#: core/validators.py:157
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr ""
+"Asiguraţi-vă că această valoare este %(limit_value)s  (este %(show_value)s )."
+
+#: core/validators.py:176 forms/fields.py:210 forms/fields.py:263
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr ""
+"Asiguraţi-vă că această valoare este mai mică sau egală cu %(limit_value)s ."
+
+#: core/validators.py:182 forms/fields.py:211 forms/fields.py:264
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr ""
+"Asiguraţi-vă că această valoare este mai mare sau egală cu %(limit_value)s ."
+
+#: core/validators.py:189
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr ""
+"Asiguraţi-vă că această valoare are cel puţin%(limit_value)d caractere "
+"(aceasta are %(show_value)d)."
+
+#: core/validators.py:196
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr ""
+"Asiguraţi-vă că această valoare are cel mult %(limit_value)d caractere "
+"(aceasta are %(show_value)d)."
+
+#: db/models/base.py:857
+#, python-format
+msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
+msgstr "%(field_name)s trebuie să fie unic pentru %(date_field)s %(lookup)s."
+
+#: db/models/base.py:880 forms/models.py:573
+msgid "and"
+msgstr "și"
+
+#: db/models/base.py:881 db/models/fields/__init__.py:70
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s cu %(field_label)s deja există."
+
+#: db/models/fields/__init__.py:67
+#, python-format
+msgid "Value %r is not a valid choice."
+msgstr "Valoarea %r nu este o alegere valabilă."
+
+#: db/models/fields/__init__.py:68
+msgid "This field cannot be null."
+msgstr "Câmpul nu poate fi gol."
+
+#: db/models/fields/__init__.py:69
+msgid "This field cannot be blank."
+msgstr "Acest câmp nu poate fi gol."
+
+#: db/models/fields/__init__.py:76
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "Câmp de tip: %(field_type)s"
+
+#: db/models/fields/__init__.py:517 db/models/fields/__init__.py:985
+msgid "Integer"
+msgstr "Întreg"
+
+#: db/models/fields/__init__.py:521 db/models/fields/__init__.py:983
+#, python-format
+msgid "'%s' value must be an integer."
+msgstr "Valoarea '%s' trebuie să fie un număr întreg."
+
+#: db/models/fields/__init__.py:569
+#, python-format
+msgid "'%s' value must be either True or False."
+msgstr "Valoarea '%s' trebuie sa fie doar True sau False."
+
+#: db/models/fields/__init__.py:571
+msgid "Boolean (Either True or False)"
+msgstr "Boolean (adevărat sau fals)"
+
+#: db/models/fields/__init__.py:622
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Şir de caractere (cel mult %(max_length)s caractere)"
+
+#: db/models/fields/__init__.py:650
+msgid "Comma-separated integers"
+msgstr "Numere întregi separate de virgule"
+
+#: db/models/fields/__init__.py:664
+#, python-format
+msgid "'%s' value has an invalid date format. It must be in YYYY-MM-DD format."
+msgstr ""
+"Valoarea '%s' este o dată invalidă. Trebuie sa fie in forma YYYY-MM-DD."
+
+#: db/models/fields/__init__.py:666 db/models/fields/__init__.py:754
+#, python-format
+msgid ""
+"'%s' value has the correct format (YYYY-MM-DD) but it is an invalid date."
+msgstr "Valoarea '%s' are forma corectă (YYYY-MM-DD) dar este o dată invalidă."
+
+#: db/models/fields/__init__.py:669
+msgid "Date (without time)"
+msgstr "Dată (fară oră)"
+
+#: db/models/fields/__init__.py:752
+#, python-format
+msgid ""
+"'%s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
+"Valoarea '%s' este invalidă. Trebuie sa fie in forma YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ]."
+
+#: db/models/fields/__init__.py:756
+#, python-format
+msgid ""
+"'%s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) but "
+"it is an invalid date/time."
+msgstr ""
+"Valoarea '%s' are forma corectă (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) dar "
+"sunt dată/timp invalide."
+
+#: db/models/fields/__init__.py:760
+msgid "Date (with time)"
+msgstr "Dată (cu oră)"
+
+#: db/models/fields/__init__.py:849
+#, python-format
+msgid "'%s' value must be a decimal number."
+msgstr "Valoarea \"%s\" trebuie să fie un număr zecimal."
+
+#: db/models/fields/__init__.py:851
+msgid "Decimal number"
+msgstr "Număr zecimal"
+
+#: db/models/fields/__init__.py:908
+msgid "Email address"
+msgstr "Adresă e-mail"
+
+#: db/models/fields/__init__.py:927
+msgid "File path"
+msgstr "Calea fisierului"
+
+#: db/models/fields/__init__.py:954
+#, python-format
+msgid "'%s' value must be a float."
+msgstr "'%s' value must be a float."
+
+#: db/models/fields/__init__.py:956
+msgid "Floating point number"
+msgstr "Număr cu virgulă"
+
+#: db/models/fields/__init__.py:1017
+msgid "Big (8 byte) integer"
+msgstr "Întreg mare (8 octeți)"
+
+#: db/models/fields/__init__.py:1031
+msgid "IPv4 address"
+msgstr "Adresă IPv4"
+
+#: db/models/fields/__init__.py:1047
+msgid "IP address"
+msgstr "Adresă IP"
+
+#: db/models/fields/__init__.py:1090
+#, python-format
+msgid "'%s' value must be either None, True or False."
+msgstr "Valoarea '%s' trebuie să fie doar None, True sau False."
+
+#: db/models/fields/__init__.py:1092
+msgid "Boolean (Either True, False or None)"
+msgstr "Boolean (adevărat, fals sau niciuna)"
+
+#: db/models/fields/__init__.py:1141
+msgid "Positive integer"
+msgstr "Întreg pozitiv"
+
+#: db/models/fields/__init__.py:1152
+msgid "Positive small integer"
+msgstr "Întreg pozitiv mic"
+
+#: db/models/fields/__init__.py:1163
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr "Slug (până la %(max_length)s)"
+
+#: db/models/fields/__init__.py:1181
+msgid "Small integer"
+msgstr "Întreg mic"
+
+#: db/models/fields/__init__.py:1187
+msgid "Text"
+msgstr "Text"
+
+#: db/models/fields/__init__.py:1205
+#, python-format
+msgid ""
+"'%s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] format."
+msgstr ""
+"Valoarea '%s' are o formă invalida. Ea trebuie să fie in forma HH:MM[:ss[."
+"uuuuuu]]."
+
+#: db/models/fields/__init__.py:1207
+#, python-format
+msgid ""
+"'%s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an invalid "
+"time."
+msgstr ""
+"Valoarea '%s' are forma corectă (HH:MM[:ss[.uuuuuu]]) dar este un timp "
+"invalid."
+
+#: db/models/fields/__init__.py:1210
+msgid "Time"
+msgstr "Timp"
+
+#: db/models/fields/__init__.py:1272
+msgid "URL"
+msgstr "URL"
+
+#: db/models/fields/files.py:216
+msgid "File"
+msgstr "Fișier"
+
+#: db/models/fields/files.py:323
+msgid "Image"
+msgstr "Imagine"
+
+#: db/models/fields/related.py:979
+#, python-format
+msgid "Model %(model)s with pk %(pk)r does not exist."
+msgstr "Modelul %(model)s cu pk %(pk)r nu există."
+
+#: db/models/fields/related.py:981
+msgid "Foreign Key (type determined by related field)"
+msgstr "Foreign Key (tipul determinat de către câmpul relativ)"
+
+#: db/models/fields/related.py:1111
+msgid "One-to-one relationship"
+msgstr "Relaţie unul-la-unul"
+
+#: db/models/fields/related.py:1178
+msgid "Many-to-many relationship"
+msgstr "Relație multe-la-multe"
+
+#: db/models/fields/related.py:1203
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+" Ţine apăsat \"Control\", sau \"Command\" pe un Mac, pentru selecție "
+"multiplă."
+
+#: forms/fields.py:51
+msgid "This field is required."
+msgstr "Acest câmp este obligatoriu."
+
+#: forms/fields.py:209
+msgid "Enter a whole number."
+msgstr "Introduceţi un număr întreg."
+
+#: forms/fields.py:241 forms/fields.py:262
+msgid "Enter a number."
+msgstr "Introduceţi un număr."
+
+#: forms/fields.py:265
+#, python-format
+msgid "Ensure that there are no more than %s digits in total."
+msgstr "Asigurați-vă că nu exista mai mult de %s cifre în total."
+
+#: forms/fields.py:266
+#, python-format
+msgid "Ensure that there are no more than %s decimal places."
+msgstr "Asigurați-vă că nu exista mai mult de %s spații zecimale."
+
+#: forms/fields.py:267
+#, python-format
+msgid "Ensure that there are no more than %s digits before the decimal point."
+msgstr "Asigurați-vă că nu exista mai mult de %s cifre înainte de virgulă."
+
+#: forms/fields.py:355 forms/fields.py:953
+msgid "Enter a valid date."
+msgstr "Introduceți o dată validă."
+
+#: forms/fields.py:378 forms/fields.py:954
+msgid "Enter a valid time."
+msgstr "Introduceți o oră validă."
+
+#: forms/fields.py:399
+msgid "Enter a valid date/time."
+msgstr "Introduceți o dată/oră validă."
+
+#: forms/fields.py:475
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "Nici un fișier nu a fost trimis. Verificați tipul fișierului."
+
+#: forms/fields.py:476
+msgid "No file was submitted."
+msgstr "Nici un fișier nu a fost trimis."
+
+#: forms/fields.py:477
+msgid "The submitted file is empty."
+msgstr "Fișierul încărcat este gol."
+
+#: forms/fields.py:478
+#, python-format
+msgid ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr ""
+"Asiguraţi-vă că acest nume de fişier are cel mult %(max)d caractere (acesta "
+"are %(length)d)."
+
+#: forms/fields.py:479
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr "Fie indicați un fişier, fie bifaţi caseta de selectare, nu ambele."
+
+#: forms/fields.py:534
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Încărcaţi o imagine validă. Fişierul încărcat nu era o imagine sau era o "
+"imagine coruptă."
+
+#: forms/fields.py:580
+msgid "Enter a valid URL."
+msgstr "Introduceți un URL valid."
+
+#: forms/fields.py:666 forms/fields.py:746
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr ""
+"Selectați o opțiune validă. %(value)s nu face parte din opțiunile "
+"disponibile."
+
+#: forms/fields.py:747 forms/fields.py:835 forms/models.py:1002
+msgid "Enter a list of values."
+msgstr "Introduceți o listă de valori."
+
+#: forms/formsets.py:324 forms/formsets.py:326
+msgid "Order"
+msgstr "Ordine"
+
+#: forms/formsets.py:328
+msgid "Delete"
+msgstr "Șterge"
+
+#: forms/models.py:567
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Corectaţi datele duplicate pentru %(field)s."
+
+#: forms/models.py:571
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr "Corectaţi datele duplicate pentru %(field)s , ce trebuie să fie unic."
+
+#: forms/models.py:577
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+"Corectaţi datele duplicate pentru %(field_name)s , care trebuie să fie unice "
+"pentru %(lookup)s  în %(date_field)s ."
+
+#: forms/models.py:585
+msgid "Please correct the duplicate values below."
+msgstr "Corectaţi valorile duplicate de mai jos."
+
+#: forms/models.py:852
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr ""
+"Foreign key-ul inline nu se potrivește cu cheia primară a istanței mamă."
+
+#: forms/models.py:913
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr ""
+"Selectați o opțiune validă. Această opțiune nu face parte din opțiunile "
+"disponibile."
+
+#: forms/models.py:1003
+#, python-format
+msgid "Select a valid choice. %s is not one of the available choices."
+msgstr ""
+"Selectați o opțiune validă. %s nu face parte din opțiunile disponibile."
+
+#: forms/models.py:1005
+#, python-format
+msgid "\"%s\" is not a valid value for a primary key."
+msgstr "\"%s\" nu este o valoare valabilă pentru o cheie primară."
+
+#: forms/util.py:81
+#, python-format
+msgid ""
+"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+"%(datetime)s nu poate fi interpetat in fusul orar %(current_timezone)s; este "
+"ambiguu sau nu există."
+
+#: forms/widgets.py:336
+msgid "Currently"
+msgstr "În prezent"
+
+#: forms/widgets.py:337
+msgid "Change"
+msgstr "Schimbă"
+
+#: forms/widgets.py:338
+msgid "Clear"
+msgstr "Șterge"
+
+#: forms/widgets.py:594
+msgid "Unknown"
+msgstr "Necunoscut"
+
+#: forms/widgets.py:595
+msgid "Yes"
+msgstr "Da"
+
+#: forms/widgets.py:596
+msgid "No"
+msgstr "Nu"
+
+#: template/defaultfilters.py:794
+msgid "yes,no,maybe"
+msgstr "da,nu,poate"
+
+#: template/defaultfilters.py:822 template/defaultfilters.py:833
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] "%(size)d byte"
+msgstr[1] "%(size)d bytes"
+msgstr[2] "%(size)d bytes"
+
+#: template/defaultfilters.py:835
+#, python-format
+msgid "%s KB"
+msgstr "%s KO"
+
+#: template/defaultfilters.py:837
+#, python-format
+msgid "%s MB"
+msgstr "%s MO"
+
+#: template/defaultfilters.py:839
+#, python-format
+msgid "%s GB"
+msgstr "%s GO"
+
+#: template/defaultfilters.py:841
+#, python-format
+msgid "%s TB"
+msgstr "%s TO"
+
+#: template/defaultfilters.py:842
+#, python-format
+msgid "%s PB"
+msgstr "%s PO"
+
+#: utils/dateformat.py:47
+msgid "p.m."
+msgstr "p.m."
+
+#: utils/dateformat.py:48
+msgid "a.m."
+msgstr "a.m."
+
+#: utils/dateformat.py:53
+msgid "PM"
+msgstr "PM"
+
+#: utils/dateformat.py:54
+msgid "AM"
+msgstr "AM"
+
+#: utils/dateformat.py:103
+msgid "midnight"
+msgstr "miezul nopții"
+
+#: utils/dateformat.py:105
+msgid "noon"
+msgstr "amiază"
+
+#: utils/dates.py:6
+msgid "Monday"
+msgstr "Luni"
+
+#: utils/dates.py:6
+msgid "Tuesday"
+msgstr "Marți"
+
+#: utils/dates.py:6
+msgid "Wednesday"
+msgstr "Miercuri"
+
+#: utils/dates.py:6
+msgid "Thursday"
+msgstr "Joi"
+
+#: utils/dates.py:6
+msgid "Friday"
+msgstr "Vineri"
+
+#: utils/dates.py:7
+msgid "Saturday"
+msgstr "Sâmbătă"
+
+#: utils/dates.py:7
+msgid "Sunday"
+msgstr "Duminică"
+
+#: utils/dates.py:10
+msgid "Mon"
+msgstr "Lun"
+
+#: utils/dates.py:10
+msgid "Tue"
+msgstr "Mar"
+
+#: utils/dates.py:10
+msgid "Wed"
+msgstr "Mie"
+
+#: utils/dates.py:10
+msgid "Thu"
+msgstr "Joi"
+
+#: utils/dates.py:10
+msgid "Fri"
+msgstr "Vin"
+
+#: utils/dates.py:11
+msgid "Sat"
+msgstr "Sâm"
+
+#: utils/dates.py:11
+msgid "Sun"
+msgstr "Dum"
+
+#: utils/dates.py:18
+msgid "January"
+msgstr "Ianuarie"
+
+#: utils/dates.py:18
+msgid "February"
+msgstr "Februarie"
+
+#: utils/dates.py:18
+msgid "March"
+msgstr "Martie"
+
+#: utils/dates.py:18
+msgid "April"
+msgstr "Aprilie"
+
+#: utils/dates.py:18
+msgid "May"
+msgstr "Mai"
+
+#: utils/dates.py:18
+msgid "June"
+msgstr "Iunie"
+
+#: utils/dates.py:19
+msgid "July"
+msgstr "Iulie"
+
+#: utils/dates.py:19
+msgid "August"
+msgstr "August"
+
+#: utils/dates.py:19
+msgid "September"
+msgstr "Septembrie"
+
+#: utils/dates.py:19
+msgid "October"
+msgstr "Octombrie"
+
+#: utils/dates.py:19
+msgid "November"
+msgstr "Noiembrie"
+
+#: utils/dates.py:20
+msgid "December"
+msgstr "Decembrie"
+
+#: utils/dates.py:23
+msgid "jan"
+msgstr "ian"
+
+#: utils/dates.py:23
+msgid "feb"
+msgstr "feb"
+
+#: utils/dates.py:23
+msgid "mar"
+msgstr "mar"
+
+#: utils/dates.py:23
+msgid "apr"
+msgstr "apr"
+
+#: utils/dates.py:23
+msgid "may"
+msgstr "mai"
+
+#: utils/dates.py:23
+msgid "jun"
+msgstr "iun"
+
+#: utils/dates.py:24
+msgid "jul"
+msgstr "iul"
+
+#: utils/dates.py:24
+msgid "aug"
+msgstr "aug"
+
+#: utils/dates.py:24
+msgid "sep"
+msgstr "sep"
+
+#: utils/dates.py:24
+msgid "oct"
+msgstr "oct"
+
+#: utils/dates.py:24
+msgid "nov"
+msgstr "noi"
+
+#: utils/dates.py:24
+msgid "dec"
+msgstr "dec"
+
+#: utils/dates.py:31
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr "Ian."
+
+#: utils/dates.py:32
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr "Feb."
+
+#: utils/dates.py:33
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "Martie"
+
+#: utils/dates.py:34
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "Aprilie"
+
+#: utils/dates.py:35
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "Mai"
+
+#: utils/dates.py:36
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "Iunie"
+
+#: utils/dates.py:37
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "Iulie"
+
+#: utils/dates.py:38
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr "Aug."
+
+#: utils/dates.py:39
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr "Sept."
+
+#: utils/dates.py:40
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr "Oct."
+
+#: utils/dates.py:41
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr "Noie."
+
+#: utils/dates.py:42
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr "Dec."
+
+#: utils/dates.py:45
+msgctxt "alt. month"
+msgid "January"
+msgstr "Ianuarie"
+
+#: utils/dates.py:46
+msgctxt "alt. month"
+msgid "February"
+msgstr "Februarie"
+
+#: utils/dates.py:47
+msgctxt "alt. month"
+msgid "March"
+msgstr "Martie"
+
+#: utils/dates.py:48
+msgctxt "alt. month"
+msgid "April"
+msgstr "Aprilie"
+
+#: utils/dates.py:49
+msgctxt "alt. month"
+msgid "May"
+msgstr "Mai"
+
+#: utils/dates.py:50
+msgctxt "alt. month"
+msgid "June"
+msgstr "Iunie"
+
+#: utils/dates.py:51
+msgctxt "alt. month"
+msgid "July"
+msgstr "Iulie"
+
+#: utils/dates.py:52
+msgctxt "alt. month"
+msgid "August"
+msgstr "August"
+
+#: utils/dates.py:53
+msgctxt "alt. month"
+msgid "September"
+msgstr "Septembrie"
+
+#: utils/dates.py:54
+msgctxt "alt. month"
+msgid "October"
+msgstr "Octombrie"
+
+#: utils/dates.py:55
+msgctxt "alt. month"
+msgid "November"
+msgstr "Noiembrie"
+
+#: utils/dates.py:56
+msgctxt "alt. month"
+msgid "December"
+msgstr "Decembrie"
+
+#: utils/text.py:70
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s..."
+msgstr "%(truncated_text)s..."
+
+#: utils/text.py:239
+msgid "or"
+msgstr "sau"
+
+#. Translators: This string is used as a separator between list elements
+#: utils/text.py:256
+msgid ", "
+msgstr ", "
+
+#: utils/timesince.py:22
+msgid "year"
+msgid_plural "years"
+msgstr[0] "an"
+msgstr[1] "ani"
+msgstr[2] "de ani"
+
+#: utils/timesince.py:23
+msgid "month"
+msgid_plural "months"
+msgstr[0] "lună"
+msgstr[1] "luni"
+msgstr[2] "de luni"
+
+#: utils/timesince.py:24
+msgid "week"
+msgid_plural "weeks"
+msgstr[0] "săptămână"
+msgstr[1] "săptămâni"
+msgstr[2] "de săptămâni"
+
+#: utils/timesince.py:25
+msgid "day"
+msgid_plural "days"
+msgstr[0] "zi"
+msgstr[1] "zile"
+msgstr[2] "de zile"
+
+#: utils/timesince.py:26
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] "oră"
+msgstr[1] "ore"
+msgstr[2] "de ore"
+
+#: utils/timesince.py:27
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "minut"
+msgstr[1] "minute"
+msgstr[2] "de minute"
+
+#: utils/timesince.py:43
+msgid "minutes"
+msgstr "minute"
+
+#: utils/timesince.py:48
+#, python-format
+msgid "%(number)d %(type)s"
+msgstr "%(number)d %(type)s"
+
+#: utils/timesince.py:54
+#, python-format
+msgid ", %(number)d %(type)s"
+msgstr ", %(number)d %(type)s"
+
+#: views/static.py:56
+msgid "Directory indexes are not allowed here."
+msgstr "Aici nu sunt permise indexuri la directoare"
+
+#: views/static.py:58
+#, python-format
+msgid "\"%(path)s\" does not exist"
+msgstr "\"%(path)s\" nu există"
+
+#: views/static.py:98
+#, python-format
+msgid "Index of %(directory)s"
+msgstr "Index pentru %(directory)s"
+
+#: views/generic/dates.py:42
+msgid "No year specified"
+msgstr "Niciun an specificat"
+
+#: views/generic/dates.py:98
+msgid "No month specified"
+msgstr "Nicio lună specificată"
+
+#: views/generic/dates.py:157
+msgid "No day specified"
+msgstr "Nicio zi specificată"
+
+#: views/generic/dates.py:213
+msgid "No week specified"
+msgstr "Nicio săptămîna specificată"
+
+#: views/generic/dates.py:368 views/generic/dates.py:393
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "%(verbose_name_plural)s nu e disponibil"
+
+#: views/generic/dates.py:646
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+"Viitorul %(verbose_name_plural)s nu e disponibil deoarece %(class_name)s ."
+"allow_future este Fals."
+
+#: views/generic/dates.py:678
+#, python-format
+msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgstr "Dată incorectă '%(datestr)s' considerând formatul '%(format)s'"
+
+#: views/generic/detail.py:54
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "Niciun rezultat pentru %(verbose_name)s care se potrivesc interogării"
+
+#: views/generic/list.py:51
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr ""
+"Pagina nu este \"ultima\" și nici nu poate fi convertită într-un întreg."
+
+#: views/generic/list.py:56
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr ""
+
+#: views/generic/list.py:137
+#, python-format
+msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgstr "Listă goală și '%(class_name)s.allow_empty' este Fals."

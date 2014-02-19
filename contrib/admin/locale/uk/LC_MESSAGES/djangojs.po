@@ -1,0 +1,186 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Boryslav Larin <brabadu@gmail.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Sergey Lysach <sergikoff88@gmail.com>, 2011, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-23 02:35+0100\n"
+"PO-Revision-Date: 2012-03-11 16:41+0000\n"
+"Last-Translator: Sergey Lysach <sergikoff88@gmail.com>\n"
+"Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
+"language/uk/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: uk\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: static/admin/js/SelectFilter2.js:45
+#, c-format
+msgid "Available %s"
+msgstr "В наявності %s"
+
+#: static/admin/js/SelectFilter2.js:46
+#, c-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"Це список всіх доступних %s. Ви можете обрати деякі з них, виділивши їх у "
+"полі нижче і натиснувшт кнопку \"Обрати\"."
+
+#: static/admin/js/SelectFilter2.js:53
+#, c-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr ""
+"Почніть вводити текст в цьому полі щоб відфільтрувати список доступних %s."
+
+#: static/admin/js/SelectFilter2.js:57
+msgid "Filter"
+msgstr "Фільтр"
+
+#: static/admin/js/SelectFilter2.js:61
+msgid "Choose all"
+msgstr "Обрати всі"
+
+#: static/admin/js/SelectFilter2.js:61
+#, c-format
+msgid "Click to choose all %s at once."
+msgstr "Натисніть щоб обрати всі %s відразу."
+
+#: static/admin/js/SelectFilter2.js:67
+msgid "Choose"
+msgstr "Обрати"
+
+#: static/admin/js/SelectFilter2.js:69
+msgid "Remove"
+msgstr "Видалити"
+
+#: static/admin/js/SelectFilter2.js:75
+#, c-format
+msgid "Chosen %s"
+msgstr "Обрано %s"
+
+#: static/admin/js/SelectFilter2.js:76
+#, c-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"Це список обраних %s. Ви можете видалити деякі з них, виділивши їх у полі "
+"нижче і натиснувши кнопку \"Видалити\"."
+
+#: static/admin/js/SelectFilter2.js:80
+msgid "Remove all"
+msgstr "Видалити все"
+
+#: static/admin/js/SelectFilter2.js:80
+#, c-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Натисніть щоб видалити всі обрані %s відразу."
+
+#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "Обрано %(sel)s з %(cnt)s"
+msgstr[1] "Обрано %(sel)s з %(cnt)s"
+msgstr[2] "Обрано %(sel)s з %(cnt)s"
+
+#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Ви зробили якісь зміни у деяких полях. Якщо Ви виконаєте цю дію, всі "
+"незбережені зміни буде втрачено."
+
+#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Ви обрали дію, але не зберегли зміни в окремих полях. Будь ласка, натисніть "
+"ОК, щоб зберегти. Вам доведеться повторно запустити дію."
+
+#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Ви обрали дію і не зробили жодних змін у полях. Ви, напевно, шукаєте кнопку "
+"\"Виконати\", а не \"Зберегти\"."
+
+#: static/admin/js/calendar.js:26
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Січень Лютий Березень Квітень Травень Червень Липень Серпень Вересень "
+"Жовтень Листопад Грудень"
+
+#: static/admin/js/calendar.js:27
+msgid "S M T W T F S"
+msgstr "Нд Пн Вт Ср Чт Пт Сб"
+
+#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
+#: static/admin/js/collapse.min.js:1
+msgid "Show"
+msgstr "Показати"
+
+#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
+msgid "Hide"
+msgstr "Сховати"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:49
+#: static/admin/js/admin/DateTimeShortcuts.js:85
+msgid "Now"
+msgstr "Зараз"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:53
+msgid "Clock"
+msgstr "Годинник"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:81
+msgid "Choose a time"
+msgstr "Оберіть час"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:86
+msgid "Midnight"
+msgstr "Північ"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:87
+msgid "6 a.m."
+msgstr "6"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:88
+msgid "Noon"
+msgstr "Полудень"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:92
+#: static/admin/js/admin/DateTimeShortcuts.js:204
+msgid "Cancel"
+msgstr "Відмінити"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:144
+#: static/admin/js/admin/DateTimeShortcuts.js:197
+msgid "Today"
+msgstr "Сьогодні"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:148
+msgid "Calendar"
+msgstr "Календар"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:195
+msgid "Yesterday"
+msgstr "Вчора"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:199
+msgid "Tomorrow"
+msgstr "Завтра"

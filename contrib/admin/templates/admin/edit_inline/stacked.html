@@ -1,0 +1,30 @@
+{% load i18n admin_static %}
+<div class="inline-group" id="{{ inline_admin_formset.formset.prefix }}-group">
+  <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2>
+{{ inline_admin_formset.formset.management_form }}
+{{ inline_admin_formset.formset.non_form_errors }}
+
+{% for inline_admin_form in inline_admin_formset %}<div class="inline-related{% if inline_admin_form.original or inline_admin_form.show_url %} has_original{% endif %}{% if forloop.last %} empty-form last-related{% endif %}" id="{{ inline_admin_formset.formset.prefix }}-{% if not forloop.last %}{{ forloop.counter0 }}{% else %}empty{% endif %}">
+  <h3><b>{{ inline_admin_formset.opts.verbose_name|capfirst }}:</b>&nbsp;<span class="inline_label">{% if inline_admin_form.original %}{{ inline_admin_form.original }}{% else %}#{{ forloop.counter }}{% endif %}</span>
+      {% if inline_admin_form.show_url %}<a href="{{ inline_admin_form.absolute_url }}">{% trans "View on site" %}</a>{% endif %}
+    {% if inline_admin_formset.formset.can_delete and inline_admin_form.original %}<span class="delete">{{ inline_admin_form.deletion_field.field }} {{ inline_admin_form.deletion_field.label_tag }}</span>{% endif %}
+  </h3>
+  {% if inline_admin_form.form.non_field_errors %}{{ inline_admin_form.form.non_field_errors }}{% endif %}
+  {% for fieldset in inline_admin_form %}
+    {% include "admin/includes/fieldset.html" %}
+  {% endfor %}
+  {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
+  {{ inline_admin_form.fk_field.field }}
+</div>{% endfor %}
+</div>
+
+<script type="text/javascript">
+(function($) {
+  $("#{{ inline_admin_formset.formset.prefix }}-group .inline-related").stackedFormset({
+    prefix: '{{ inline_admin_formset.formset.prefix }}',
+    adminStaticPrefix: '{% static "admin/" %}',
+    deleteText: "{% trans "Remove" %}",
+    addText: "{% blocktrans with verbose_name=inline_admin_formset.opts.verbose_name|capfirst %}Add another {{ verbose_name }}{% endblocktrans %}"
+  });
+})(django.jQuery);
+</script>

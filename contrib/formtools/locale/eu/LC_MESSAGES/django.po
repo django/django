@@ -1,0 +1,38 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Aitzol Naberan <anaberan@codesyntax.com>, 2011, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-03-08 21:22+0000\n"
+"Last-Translator: Aitzol Naberan <anaberan@codesyntax.com>\n"
+"Language-Team: Basque (http://www.transifex.com/projects/p/django/language/"
+"eu/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: eu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: templates/formtools/wizard/wizard_form.html:15
+msgid "first step"
+msgstr "lehen pausua"
+
+#: templates/formtools/wizard/wizard_form.html:16
+msgid "prev step"
+msgstr "aurreko pausua"
+
+#: templates/formtools/wizard/wizard_form.html:18
+msgid "submit"
+msgstr "bidali"
+
+#: wizard/legacy.py:159
+msgid ""
+"We apologize, but your form has expired. Please continue filling out the "
+"form from this page."
+msgstr ""
+"Sentitzen dugu, baina zure formularioa iraungitu da. Mesedez jarraitu orri "
+"honetako formularioa batetzen."

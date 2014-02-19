@@ -1,0 +1,97 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Rajeesh Nair <rajeeshrnair@gmail.com>, 2011, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-10-18 10:56+0000\n"
+"Last-Translator: Rajeesh Nair <rajeeshrnair@gmail.com>\n"
+"Language-Team: Malayalam (http://www.transifex.com/projects/p/django/"
+"language/ml/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ml\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:10
+msgid "Advanced options"
+msgstr "ഉന്നത സൗകര്യങ്ങള്‍"
+
+#: forms.py:7 models.py:11
+msgid "URL"
+msgstr "URL(വെബ്-വിലാസം)"
+
+#: forms.py:8
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "ഉദാ: '/about/contact/'. ആദ്യവും അവസാനവും സ്ളാഷുകള്‍ നിര്‍ബന്ധം."
+
+#: forms.py:10
+msgid ""
+"This value must contain only letters, numbers, dots, underscores, dashes, "
+"slashes or tildes."
+msgstr ""
+"ഈ വിലയില്‍ അക്ഷരങ്ങള്‍, അക്കങ്ങള്‍, വിരാമം (ബിന്ദു), അടിവര (അണ്ടര്‍സ്കോര്‍), വരകള്‍ (ഡാഷ്), സ്ളാഷ്"
+"(/), ടില്ഡ് (~) എന്നിവ മാത്രമേ പാടുള്ളൂ."
+
+#: forms.py:19
+msgid "URL is missing a leading slash."
+msgstr "URLന്റെ മുന്‍വശത്ത് ഒരു സ്ലാഷിന്റെ കുറവുണ്ട്."
+
+#: forms.py:23
+msgid "URL is missing a trailing slash."
+msgstr "URLന്റെ പിന്‍വശത്ത് ഒരു സ്ലാഷിന്റെ കുറവുണ്ട്."
+
+#: forms.py:38
+#, python-format
+msgid "Flatpage with url %(url)s already exists for site %(site)s"
+msgstr "%(site)s എന്ന സൈറ്റിനു %(url)s എന്ന url ഉള്ള ഫ്ലാറ്റ്പേജ് നിലവിലുണ്ട്"
+
+#: models.py:12
+msgid "title"
+msgstr "ശീര്‍ഷകം"
+
+#: models.py:13
+msgid "content"
+msgstr "ഉള്ളടക്കം"
+
+#: models.py:14
+msgid "enable comments"
+msgstr "അഭിപ്രായങ്ങള്‍ അനുവദിക്കുക"
+
+#: models.py:15
+msgid "template name"
+msgstr "ടെമ്പ്ലേറ്റിന്റെ പേര്"
+
+#: models.py:16
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+"ഉദാ: 'flatpages/contact_page.html'. ഇതു നല്കിയില്ലെങ്കില്‍, 'flatpages/default."
+"html' എന്ന വിലാസം ഉപയോഗിക്കപ്പെടും."
+
+#: models.py:17
+msgid "registration required"
+msgstr "രജിസ്ട്രേഷന്‍ ആവശ്യമാണ്"
+
+#: models.py:17
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "ഇതു ടിക് ചെയ്താല്‍ പിന്നെ ലോഗ്-ഇന്‍ ചെയ്ത യൂസര്‍ക്കു മാത്രമേ ഈ പേജ് കാണാന്‍ കഴിയൂ."
+
+#: models.py:22
+msgid "flat page"
+msgstr "ഫ്ളാറ്റ് പേജ്"
+
+#: models.py:23
+msgid "flat pages"
+msgstr "ഫ്ളാറ്റ് പേജുകള്‍"
+
+#: tests/forms.py:97
+msgid "This field is required."
+msgstr "ഈ കള്ളി(ഫീല്‍ഡ്) നിര്‍ബന്ധമാണ്."

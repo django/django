@@ -1,0 +1,189 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Michael Thornhill <michael@maithu.com>, 2011, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-23 02:35+0100\n"
+"PO-Revision-Date: 2012-03-16 12:28+0000\n"
+"Last-Translator: Michael Thornhill <michael@maithu.com>\n"
+"Language-Team: Irish (http://www.transifex.com/projects/p/django/language/"
+"ga/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ga\n"
+"Plural-Forms: nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : "
+"4);\n"
+
+#: static/admin/js/SelectFilter2.js:45
+#, c-format
+msgid "Available %s"
+msgstr "%s ar fáil"
+
+#: static/admin/js/SelectFilter2.js:46
+#, c-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"Is é seo an liosta %s ar fáil. Is féidir leat a roghnú roinnt ag roghnú acu "
+"sa bhosca thíos agus ansin cliceáil ar an saighead \"Roghnaigh\" idir an dá "
+"boscaí."
+
+#: static/admin/js/SelectFilter2.js:53
+#, c-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr ""
+"Scríobh isteach sa bhosca seo a scagadh síos ar an liosta de %s ar fáil."
+
+#: static/admin/js/SelectFilter2.js:57
+msgid "Filter"
+msgstr "Scagaire"
+
+#: static/admin/js/SelectFilter2.js:61
+msgid "Choose all"
+msgstr "Roghnaigh iomlán"
+
+#: static/admin/js/SelectFilter2.js:61
+#, c-format
+msgid "Click to choose all %s at once."
+msgstr "Cliceáil anseo chun %s go léir a roghnú."
+
+#: static/admin/js/SelectFilter2.js:67
+msgid "Choose"
+msgstr "Roghnaigh"
+
+#: static/admin/js/SelectFilter2.js:69
+msgid "Remove"
+msgstr "Bain amach"
+
+#: static/admin/js/SelectFilter2.js:75
+#, c-format
+msgid "Chosen %s"
+msgstr "Roghnófar %s"
+
+#: static/admin/js/SelectFilter2.js:76
+#, c-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"Is é seo an liosta de %s roghnaithe. Is féidir leat iad a bhaint amach má "
+"roghnaionn tú cuid acu sa bhosca thíos agus ansin cliceáil ar an saighead "
+"\"Bain\" idir an dá boscaí."
+
+#: static/admin/js/SelectFilter2.js:80
+msgid "Remove all"
+msgstr "Scrois gach ceann"
+
+#: static/admin/js/SelectFilter2.js:80
+#, c-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Cliceáil anseo chun %s go léir roghnaithe a scroiseadh."
+
+#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s de %(cnt)s  roghnaithe"
+msgstr[1] "%(sel)s de %(cnt)s  roghnaithe"
+msgstr[2] "%(sel)s de %(cnt)s  roghnaithe"
+msgstr[3] "%(sel)s de %(cnt)s  roghnaithe"
+msgstr[4] "%(sel)s de %(cnt)s  roghnaithe"
+
+#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Tá aithrithe nach bhfuil sabhailte ar chuid do na réimse.  Má ritheann tú "
+"gníomh, caillfidh tú do chuid aithrithe."
+
+#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Tá gníomh roghnaithe agat, ach níl do aithrithe sabhailte ar cuid de na "
+"réímse. Clic OK chun iad a sábháil.  Caithfidh tú an gníomh a rith arís."
+
+#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Tá gníomh roghnaithe agat, ach níl do aithrithe sabhailte ar cuid de na "
+"réímse. Is dócha go bhfuil tú ag iarraidh an cnaipe Té ná an cnaipe Sábháil."
+
+#: static/admin/js/calendar.js:26
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Eanair Feabhra Márta Aibreán Bealtaine Meitheamh Iúil Lúnasa Mean Fómhair "
+"Deireadh Fómhair Nollaig"
+
+#: static/admin/js/calendar.js:27
+msgid "S M T W T F S"
+msgstr "D L M C D A S"
+
+#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
+#: static/admin/js/collapse.min.js:1
+msgid "Show"
+msgstr "Taispeán"
+
+#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
+msgid "Hide"
+msgstr "Folaigh"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:49
+#: static/admin/js/admin/DateTimeShortcuts.js:85
+msgid "Now"
+msgstr "Anois"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:53
+msgid "Clock"
+msgstr "Clog"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:81
+msgid "Choose a time"
+msgstr "Roghnaigh am"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:86
+msgid "Midnight"
+msgstr "Meán oíche"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:87
+msgid "6 a.m."
+msgstr "6 a.m."
+
+#: static/admin/js/admin/DateTimeShortcuts.js:88
+msgid "Noon"
+msgstr "Nóin"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:92
+#: static/admin/js/admin/DateTimeShortcuts.js:204
+msgid "Cancel"
+msgstr "Cealaigh"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:144
+#: static/admin/js/admin/DateTimeShortcuts.js:197
+msgid "Today"
+msgstr "Inniu"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:148
+msgid "Calendar"
+msgstr "Féilire"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:195
+msgid "Yesterday"
+msgstr "Inné"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:199
+msgid "Tomorrow"
+msgstr "Amárach"

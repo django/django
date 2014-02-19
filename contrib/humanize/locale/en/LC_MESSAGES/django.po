@@ -1,0 +1,296 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-05-18 23:10+0200\n"
+"PO-Revision-Date: 2010-05-13 15:35+0200\n"
+"Last-Translator: Django team\n"
+"Language-Team: English <en@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: tests.py:135 templatetags/humanize.py:168
+msgid "today"
+msgstr ""
+
+#: tests.py:135 templatetags/humanize.py:172
+msgid "yesterday"
+msgstr ""
+
+#: tests.py:135 templatetags/humanize.py:170
+msgid "tomorrow"
+msgstr ""
+
+#: templatetags/humanize.py:26
+msgid "th"
+msgstr ""
+
+#: templatetags/humanize.py:26
+msgid "st"
+msgstr ""
+
+#: templatetags/humanize.py:26
+msgid "nd"
+msgstr ""
+
+#: templatetags/humanize.py:26
+msgid "rd"
+msgstr ""
+
+#: templatetags/humanize.py:55
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:56
+#, python-format
+msgid "%(value)s million"
+msgid_plural "%(value)s million"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:59
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value)s billion"
+msgid_plural "%(value)s billion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:63
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:64
+#, python-format
+msgid "%(value)s trillion"
+msgid_plural "%(value)s trillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:67
+#, python-format
+msgid "%(value).1f quadrillion"
+msgid_plural "%(value).1f quadrillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:68
+#, python-format
+msgid "%(value)s quadrillion"
+msgid_plural "%(value)s quadrillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:71
+#, python-format
+msgid "%(value).1f quintillion"
+msgid_plural "%(value).1f quintillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:72
+#, python-format
+msgid "%(value)s quintillion"
+msgid_plural "%(value)s quintillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:75
+#, python-format
+msgid "%(value).1f sextillion"
+msgid_plural "%(value).1f sextillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:76
+#, python-format
+msgid "%(value)s sextillion"
+msgid_plural "%(value)s sextillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:79
+#, python-format
+msgid "%(value).1f septillion"
+msgid_plural "%(value).1f septillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:80
+#, python-format
+msgid "%(value)s septillion"
+msgid_plural "%(value)s septillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:83
+#, python-format
+msgid "%(value).1f octillion"
+msgid_plural "%(value).1f octillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:84
+#, python-format
+msgid "%(value)s octillion"
+msgid_plural "%(value)s octillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:87
+#, python-format
+msgid "%(value).1f nonillion"
+msgid_plural "%(value).1f nonillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:88
+#, python-format
+msgid "%(value)s nonillion"
+msgid_plural "%(value)s nonillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:91
+#, python-format
+msgid "%(value).1f decillion"
+msgid_plural "%(value).1f decillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:92
+#, python-format
+msgid "%(value)s decillion"
+msgid_plural "%(value)s decillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:95
+#, python-format
+msgid "%(value).1f googol"
+msgid_plural "%(value).1f googol"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:96
+#, python-format
+msgid "%(value)s googol"
+msgid_plural "%(value)s googol"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:145
+msgid "one"
+msgstr ""
+
+#: templatetags/humanize.py:145
+msgid "two"
+msgstr ""
+
+#: templatetags/humanize.py:145
+msgid "three"
+msgstr ""
+
+#: templatetags/humanize.py:145
+msgid "four"
+msgstr ""
+
+#: templatetags/humanize.py:145
+msgid "five"
+msgstr ""
+
+#: templatetags/humanize.py:145
+msgid "six"
+msgstr ""
+
+#: templatetags/humanize.py:145
+msgid "seven"
+msgstr ""
+
+#: templatetags/humanize.py:145
+msgid "eight"
+msgstr ""
+
+#: templatetags/humanize.py:145
+msgid "nine"
+msgstr ""
+
+#: templatetags/humanize.py:191
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s ago"
+msgstr ""
+
+#: templatetags/humanize.py:194 templatetags/humanize.py:219
+msgid "now"
+msgstr ""
+
+#. Translators: \\u00a0 is non-breaking space
+#: templatetags/humanize.py:198
+#, python-format
+msgid "a second ago"
+msgid_plural "%(count)s\\u00a0seconds ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: \\u00a0 is non-breaking space
+#: templatetags/humanize.py:204
+#, python-format
+msgid "a minute ago"
+msgid_plural "%(count)s\\u00a0minutes ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: \\u00a0 is non-breaking space
+#: templatetags/humanize.py:210
+#, python-format
+msgid "an hour ago"
+msgid_plural "%(count)s\\u00a0hours ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:216
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s from now"
+msgstr ""
+
+#. Translators: \\u00a0 is non-breaking space
+#: templatetags/humanize.py:223
+#, python-format
+msgid "a second from now"
+msgid_plural "%(count)s\\u00a0seconds from now"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: \\u00a0 is non-breaking space
+#: templatetags/humanize.py:229
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s\\u00a0minutes from now"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: \\u00a0 is non-breaking space
+#: templatetags/humanize.py:235
+#, python-format
+msgid "an hour from now"
+msgid_plural "%(count)s\\u00a0hours from now"
+msgstr[0] ""
+msgstr[1] ""

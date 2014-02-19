@@ -1,0 +1,860 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Christian Joergensen <christian@gmta.info>, 2012.
+# Dimitris Glezos <glezos@transifex.com>, 2012.
+# Erik Wognsen <r4mses@gmail.com>, 2011-2013.
+# Finn Gruwier <finn@gruwier.dk>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-01-01 16:10+0100\n"
+"PO-Revision-Date: 2013-01-13 04:48+0000\n"
+"Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
+"Language-Team: Danish (http://www.transifex.com/projects/p/django/language/"
+"da/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: da\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: actions.py:48
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "%(count)d %(items)s blev slettet."
+
+#: actions.py:60 options.py:1347
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "Kan ikke slette %(name)s "
+
+#: actions.py:62 options.py:1349
+msgid "Are you sure?"
+msgstr "Er du sikker?"
+
+#: actions.py:83
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Slet valgte %(verbose_name_plural)s"
+
+#: filters.py:101 filters.py:197 filters.py:237 filters.py:274 filters.py:380
+msgid "All"
+msgstr "Alle"
+
+#: filters.py:238
+msgid "Yes"
+msgstr "Ja"
+
+#: filters.py:239
+msgid "No"
+msgstr "Nej"
+
+#: filters.py:253
+msgid "Unknown"
+msgstr "Ukendt"
+
+#: filters.py:308
+msgid "Any date"
+msgstr "Når som helst"
+
+#: filters.py:309
+msgid "Today"
+msgstr "I dag"
+
+#: filters.py:313
+msgid "Past 7 days"
+msgstr "De sidste 7 dage"
+
+#: filters.py:317
+msgid "This month"
+msgstr "Denne måned"
+
+#: filters.py:321
+msgid "This year"
+msgstr "Dette år"
+
+#: forms.py:9
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+"Indtast venligst det korrekte %(username)s og adgangskode for en "
+"personalekonto. Bemærk at begge felter kan være versalfølsomme."
+
+#: forms.py:19
+msgid "Please log in again, because your session has expired."
+msgstr "Log venligst ind igen, da din session er udløbet."
+
+#: helpers.py:23
+msgid "Action:"
+msgstr "Handling"
+
+#: models.py:24
+msgid "action time"
+msgstr "handlingstid"
+
+#: models.py:27
+msgid "object id"
+msgstr "objekt-ID"
+
+#: models.py:28
+msgid "object repr"
+msgstr "objekt repr"
+
+#: models.py:29
+msgid "action flag"
+msgstr "handlingsflag"
+
+#: models.py:30
+msgid "change message"
+msgstr "ændringsmeddelelse"
+
+#: models.py:35
+msgid "log entry"
+msgstr "logmeddelelse"
+
+#: models.py:36
+msgid "log entries"
+msgstr "logmeddelelser"
+
+#: models.py:45
+#, python-format
+msgid "Added \"%(object)s\"."
+msgstr "Tilføjede \"%(object)s\"."
+
+#: models.py:47
+#, python-format
+msgid "Changed \"%(object)s\" - %(changes)s"
+msgstr "Ændrede \"%(object)s\" - %(changes)s"
+
+#: models.py:52
+#, python-format
+msgid "Deleted \"%(object)s.\""
+msgstr "Slettede \"%(object)s\"."
+
+#: models.py:54
+msgid "LogEntry Object"
+msgstr "LogEntry-objekt"
+
+#: options.py:156 options.py:172
+msgid "None"
+msgstr "Ingen"
+
+#: options.py:684
+#, python-format
+msgid "Changed %s."
+msgstr "Ændrede %s."
+
+#: options.py:684 options.py:694
+msgid "and"
+msgstr "og"
+
+#: options.py:689
+#, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "Tilføjede %(name)s \"%(object)s\"."
+
+#: options.py:693
+#, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr "Ændrede %(list)s for %(name)s \"%(object)s\"."
+
+#: options.py:698
+#, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "Slettede %(name)s \"%(object)s\"."
+
+#: options.py:702
+msgid "No fields changed."
+msgstr "Ingen felter ændret."
+
+#: options.py:807 options.py:860
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+"%(name)s \"%(obj)s\" blev tilføjet. Du kan redigere den/det igen herunder."
+
+#: options.py:835
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may add another "
+"%(name)s below."
+msgstr ""
+"%(name)s \"%(obj)s\" blev tilføjet. Du kan endnu en/et %(name)s herunder."
+
+#: options.py:839
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" blev tilføjet."
+
+#: options.py:853
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"below."
+msgstr ""
+"%(name)s \"%(obj)s\" blev ændret. Du kan redigere den/det igen herunder."
+
+#: options.py:867
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
+"%(name)s below."
+msgstr ""
+"%(name)s \"%(obj)s\" blev ændret. Du kan tilføje endnu en/et %(name)s "
+"herunder."
+
+#: options.py:873
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" blev ændret."
+
+#: options.py:951 options.py:1211
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"Der skal være valgt nogle emner for at man kan udføre handlinger på dem. "
+"Ingen emner er blev ændret."
+
+#: options.py:970
+msgid "No action selected."
+msgstr "Ingen handling valgt."
+
+#: options.py:1050
+#, python-format
+msgid "Add %s"
+msgstr "Tilføj %s"
+
+#: options.py:1074 options.py:1319
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Der findes ikke et %(name)s-objekt med primærnøgle %(key)r."
+
+#: options.py:1140
+#, python-format
+msgid "Change %s"
+msgstr "Ret %s"
+
+#: options.py:1190
+msgid "Database error"
+msgstr "databasefejl"
+
+#: options.py:1253
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s blev ændret."
+msgstr[1] "%(count)s %(name)s blev ændret."
+
+#: options.py:1280
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s valgt"
+msgstr[1] "Alle %(total_count)s valgt"
+
+#: options.py:1285
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "0 af %(cnt)s valgt"
+
+#: options.py:1335
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" blev slettet."
+
+#: options.py:1382
+#, python-format
+msgid "Change history: %s"
+msgstr "Ændringshistorik: %s"
+
+#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#: templates/registration/password_reset_complete.html:19
+#: views/decorators.py:24
+msgid "Log in"
+msgstr "Log ind"
+
+#: sites.py:388
+msgid "Site administration"
+msgstr "Website-administration"
+
+#: sites.py:440
+#, python-format
+msgid "%s administration"
+msgstr "Administration af %s"
+
+#: widgets.py:90
+msgid "Date:"
+msgstr "Dato:"
+
+#: widgets.py:91
+msgid "Time:"
+msgstr "Tid:"
+
+#: widgets.py:165
+msgid "Lookup"
+msgstr "Slå op"
+
+#: widgets.py:271
+msgid "Add Another"
+msgstr "Tilføj endnu en"
+
+#: widgets.py:316
+msgid "Currently:"
+msgstr "Nuværende:"
+
+#: widgets.py:317
+msgid "Change:"
+msgstr "Ændring:"
+
+#: templates/admin/404.html:4 templates/admin/404.html.py:8
+msgid "Page not found"
+msgstr "Siden blev ikke fundet"
+
+#: templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Vi beklager, men den ønskede side kunne ikke findes"
+
+#: templates/admin/500.html:6 templates/admin/app_index.html:7
+#: templates/admin/base.html:47 templates/admin/change_form.html:19
+#: templates/admin/change_list.html:41
+#: templates/admin/delete_confirmation.html:7
+#: templates/admin/delete_selected_confirmation.html:7
+#: templates/admin/invalid_setup.html:6 templates/admin/object_history.html:7
+#: templates/admin/auth/user/change_password.html:13
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:6
+#: templates/registration/password_change_form.html:7
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_confirm.html:6
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_form.html:6
+msgid "Home"
+msgstr "Hjem"
+
+#: templates/admin/500.html:7
+msgid "Server error"
+msgstr "Serverfejl"
+
+#: templates/admin/500.html:11
+msgid "Server error (500)"
+msgstr "Serverfejl (500)"
+
+#: templates/admin/500.html:14
+msgid "Server Error <em>(500)</em>"
+msgstr "Serverfejl <em>(500)</em>"
+
+#: templates/admin/500.html:15
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Der opstod en fejl. Fejlen er rapporteret til website-administratoren via e-"
+"mail, og vil blive rettet hurtigst muligt. Tak for din tålmodighed."
+
+#: templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr "Udfør den valgte handling"
+
+#: templates/admin/actions.html:4
+msgid "Go"
+msgstr "Udfør"
+
+#: templates/admin/actions.html:11
+msgid "Click here to select the objects across all pages"
+msgstr "Klik her for at vælge objekter på tværs af alle sider"
+
+#: templates/admin/actions.html:11
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Vælg alle %(total_count)s  %(module_name)s "
+
+#: templates/admin/actions.html:13
+msgid "Clear selection"
+msgstr "Ryd valg"
+
+#: templates/admin/app_index.html:10 templates/admin/index.html:21
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: templates/admin/base.html:28
+msgid "Welcome,"
+msgstr "Velkommen,"
+
+#: templates/admin/base.html:33
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
+msgid "Documentation"
+msgstr "Dokumentation"
+
+#: templates/admin/base.html:36
+#: templates/admin/auth/user/change_password.html:17
+#: templates/admin/auth/user/change_password.html:51
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
+msgid "Change password"
+msgstr "Skift adgangskode"
+
+#: templates/admin/base.html:38
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
+msgid "Log out"
+msgstr "Log ud"
+
+#: templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django website-administration"
+
+#: templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Django administration"
+
+#: templates/admin/change_form.html:22 templates/admin/index.html:33
+msgid "Add"
+msgstr "Tilføj"
+
+#: templates/admin/change_form.html:32 templates/admin/object_history.html:11
+msgid "History"
+msgstr "Historik"
+
+#: templates/admin/change_form.html:33
+#: templates/admin/edit_inline/stacked.html:9
+#: templates/admin/edit_inline/tabular.html:30
+msgid "View on site"
+msgstr "Se på website"
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Ret venligst fejlen herunder."
+msgstr[1] "Ret venligst fejlene herunder."
+
+#: templates/admin/change_list.html:58
+#, python-format
+msgid "Add %(name)s"
+msgstr "Tilføj %(name)s"
+
+#: templates/admin/change_list.html:78
+msgid "Filter"
+msgstr "Filtrer"
+
+#: templates/admin/change_list_results.html:17
+msgid "Remove from sorting"
+msgstr "Fjern fra sortering"
+
+#: templates/admin/change_list_results.html:18
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Sorteringsprioritet: %(priority_number)s"
+
+#: templates/admin/change_list_results.html:19
+msgid "Toggle sorting"
+msgstr "Skift sortering"
+
+#: templates/admin/delete_confirmation.html:11
+#: templates/admin/submit_line.html:4
+msgid "Delete"
+msgstr "Slet"
+
+#: templates/admin/delete_confirmation.html:18
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"Hvis du sletter %(object_name)s '%(escaped_object)s', vil du også slette  "
+"relaterede objekter, men din konto har ikke rettigheder til at slette "
+"følgende objekttyper:"
+
+#: templates/admin/delete_confirmation.html:26
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"Sletning af %(object_name)s  ' %(escaped_object)s ' vil kræve sletning af "
+"følgende beskyttede relaterede objekter:"
+
+#: templates/admin/delete_confirmation.html:34
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Er du sikker på du vil slette %(object_name)s \"%(escaped_object)s\"? Alle "
+"de følgende relaterede objekter vil blive slettet:"
+
+#: templates/admin/delete_confirmation.html:39
+#: templates/admin/delete_selected_confirmation.html:44
+msgid "Yes, I'm sure"
+msgstr "Ja, jeg er sikker"
+
+#: templates/admin/delete_selected_confirmation.html:10
+msgid "Delete multiple objects"
+msgstr "Slet flere objekter"
+
+#: templates/admin/delete_selected_confirmation.html:17
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Sletning af de valgte %(objects_name)s  ville resultere i sletning af "
+"relaterede objekter, men din konto har ikke tilladelse til at slette "
+"følgende typer af objekter:"
+
+#: templates/admin/delete_selected_confirmation.html:25
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"Sletning af de valgte %(objects_name)s  vil kræve sletning af følgende "
+"beskyttede relaterede objekter:"
+
+#: templates/admin/delete_selected_confirmation.html:33
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"Er du sikker på du vil slette de valgte %(objects_name)s? Alle de følgende "
+"objekter og deres relaterede emner vil blive slettet:"
+
+#: templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " Efter %(filter_title)s "
+
+#: templates/admin/index.html:20
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modeller i applikationen %(name)s"
+
+#: templates/admin/index.html:39
+msgid "Change"
+msgstr "Ret"
+
+#: templates/admin/index.html:49
+msgid "You don't have permission to edit anything."
+msgstr "Du har ikke rettigheder til at foretage ændringer."
+
+#: templates/admin/index.html:57
+msgid "Recent Actions"
+msgstr "Seneste handlinger"
+
+#: templates/admin/index.html:58
+msgid "My Actions"
+msgstr "Mine handlinger"
+
+#: templates/admin/index.html:62
+msgid "None available"
+msgstr "Ingen tilgængelige"
+
+#: templates/admin/index.html:76
+msgid "Unknown content"
+msgstr "Ukendt indhold"
+
+#: templates/admin/invalid_setup.html:12
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Der er noget galt med databaseinstallationen. Kontroller om "
+"databasetabellerne er blevet oprettet og at databasen er læsbar for den "
+"pågældende bruger."
+
+#: templates/admin/login.html:37
+msgid "Password:"
+msgstr "Adgangskode:"
+
+#: templates/admin/login.html:44
+msgid "Forgotten your password or username?"
+msgstr "Har du glemt dit password eller brugernavn?"
+
+#: templates/admin/object_history.html:23
+msgid "Date/time"
+msgstr "Dato/tid"
+
+#: templates/admin/object_history.html:24
+msgid "User"
+msgstr "Bruger"
+
+#: templates/admin/object_history.html:25
+msgid "Action"
+msgstr "Funktion"
+
+#: templates/admin/object_history.html:39
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Dette objekt har ingen ændringshistorik. Det blev formentlig ikke tilføjet "
+"via dette administrations-site"
+
+#: templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "Vis alle"
+
+#: templates/admin/pagination.html:11 templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "Gem"
+
+#: templates/admin/search_form.html:7
+msgid "Search"
+msgstr "Søg"
+
+#: templates/admin/search_form.html:9
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s resultat"
+msgstr[1] "%(counter)s resultater"
+
+#: templates/admin/search_form.html:9
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s i alt"
+
+#: templates/admin/submit_line.html:5
+msgid "Save as new"
+msgstr "Gem som ny"
+
+#: templates/admin/submit_line.html:6
+msgid "Save and add another"
+msgstr "Gem og tilføj endnu en"
+
+#: templates/admin/submit_line.html:7
+msgid "Save and continue editing"
+msgstr "Gem og fortsæt med at redigere"
+
+#: templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"Indtast først et brugernavn og en adgangskode. Derefter får du yderligere "
+"redigeringsmuligheder."
+
+#: templates/admin/auth/user/add_form.html:8
+msgid "Enter a username and password."
+msgstr "Indtast et brugernavn og en adgangskode."
+
+#: templates/admin/auth/user/change_password.html:31
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Indtast en ny adgangskode for brugeren <strong>%(username)s</strong>."
+
+#: templates/admin/auth/user/change_password.html:38
+msgid "Password"
+msgstr "Adgangskode"
+
+#: templates/admin/auth/user/change_password.html:44
+#: templates/registration/password_change_form.html:42
+msgid "Password (again)"
+msgstr "Adgangskode (igen)"
+
+#: templates/admin/auth/user/change_password.html:45
+msgid "Enter the same password as above, for verification."
+msgstr "Indtast den samme adgangskode som ovenfor for verifikation."
+
+#: templates/admin/edit_inline/stacked.html:26
+#: templates/admin/edit_inline/tabular.html:76
+msgid "Remove"
+msgstr "Fjern"
+
+#: templates/admin/edit_inline/stacked.html:27
+#: templates/admin/edit_inline/tabular.html:75
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Tilføj endnu en %(verbose_name)s"
+
+#: templates/admin/edit_inline/tabular.html:17
+msgid "Delete?"
+msgstr "Slet?"
+
+#: templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Tak for den kvalitetstid du brugte på websitet i dag."
+
+#: templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Log ind igen"
+
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_change_form.html:12
+#: templates/registration/password_change_form.html:24
+msgid "Password change"
+msgstr "Skift adgangskode"
+
+#: templates/registration/password_change_done.html:11
+#: templates/registration/password_change_done.html:15
+msgid "Password change successful"
+msgstr "Adgangskoden blev ændret"
+
+#: templates/registration/password_change_done.html:17
+msgid "Your password was changed."
+msgstr "Din adgangskode blev ændret."
+
+#: templates/registration/password_change_form.html:26
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Indtast venligst din gamle adgangskode for en sikkerheds skyld og indtast så "
+"din nye adgangskode to gange, så vi kan være sikre på, at den er indtastet "
+"korrekt."
+
+#: templates/registration/password_change_form.html:32
+msgid "Old password"
+msgstr "Gammel adgangskode"
+
+#: templates/registration/password_change_form.html:37
+msgid "New password"
+msgstr "Ny adgangskode"
+
+#: templates/registration/password_change_form.html:48
+#: templates/registration/password_reset_confirm.html:26
+msgid "Change my password"
+msgstr "Skift min adgangskode"
+
+#: templates/registration/password_reset_complete.html:7
+#: templates/registration/password_reset_confirm.html:11
+#: templates/registration/password_reset_done.html:7
+#: templates/registration/password_reset_form.html:7
+#: templates/registration/password_reset_form.html:11
+#: templates/registration/password_reset_form.html:15
+msgid "Password reset"
+msgstr "Nulstil adgangskode"
+
+#: templates/registration/password_reset_complete.html:11
+#: templates/registration/password_reset_complete.html:15
+msgid "Password reset complete"
+msgstr "Adgangskoden blev nulstillet"
+
+#: templates/registration/password_reset_complete.html:17
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "Din adgangskode er blevet sat. Du kan logge ind med den nu."
+
+#: templates/registration/password_reset_confirm.html:7
+msgid "Password reset confirmation"
+msgstr "Bekræftelse for nulstilling af adgangskode"
+
+#: templates/registration/password_reset_confirm.html:17
+msgid "Enter new password"
+msgstr "Indtast ny adgangskode"
+
+#: templates/registration/password_reset_confirm.html:19
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Indtast venligst din nye adgangskode to gange, så vi kan være sikre på, at "
+"den er indtastet korrekt."
+
+#: templates/registration/password_reset_confirm.html:23
+msgid "New password:"
+msgstr "Ny adgangskode:"
+
+#: templates/registration/password_reset_confirm.html:25
+msgid "Confirm password:"
+msgstr "Bekræft ny adgangskode:"
+
+#: templates/registration/password_reset_confirm.html:31
+msgid "Password reset unsuccessful"
+msgstr "Adgangskoden blev ikke nulstillet"
+
+#: templates/registration/password_reset_confirm.html:33
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"Linket for nulstilling af adgangskoden er ugyldigt, måske fordi det allerede "
+"har været brugt. Anmod venligst påny om nulstilling af adgangskoden."
+
+#: templates/registration/password_reset_done.html:11
+#: templates/registration/password_reset_done.html:15
+msgid "Password reset successful"
+msgstr "Adgangskoden blev nulstillet"
+
+#: templates/registration/password_reset_done.html:17
+msgid ""
+"We've emailed you instructions for setting your password to the email "
+"address you submitted. You should be receiving it shortly."
+msgstr ""
+"Vi har sendt en e-mail til den adresse, du angav, med instruktioner i at "
+"vælge en ny adgangskode . Du skulle modtage e-mailen om kort tid."
+
+#: templates/registration/password_reset_email.html:2
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"Du modtager denne e-mail, fordi du har anmodet om en nulstilling af "
+"adgangskoden til din brugerkonto ved %(site_name)s ."
+
+#: templates/registration/password_reset_email.html:4
+msgid "Please go to the following page and choose a new password:"
+msgstr "Gå venligst til denne side og vælg en ny adgangskode:"
+
+#: templates/registration/password_reset_email.html:8
+msgid "Your username, in case you've forgotten:"
+msgstr "For det tilfælde at du skulle have glemt dit brugernavn er det:"
+
+#: templates/registration/password_reset_email.html:10
+msgid "Thanks for using our site!"
+msgstr "Tak fordi du brugte vores website!"
+
+#: templates/registration/password_reset_email.html:12
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "Med venlig hilsen %(site_name)s"
+
+#: templates/registration/password_reset_form.html:17
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll email "
+"instructions for setting a new one."
+msgstr ""
+"Har du glemt din adgangskode? Skriv din e-mail-adresse herunder, så sender "
+"vi dig instruktioner i at vælge en ny adgangskode."
+
+#: templates/registration/password_reset_form.html:21
+msgid "Email address:"
+msgstr "E-mail-adresse:"
+
+#: templates/registration/password_reset_form.html:21
+msgid "Reset my password"
+msgstr "Nulstil min adgangskode"
+
+#: templatetags/admin_list.py:344
+msgid "All dates"
+msgstr "Alle datoer"
+
+#: views/main.py:33
+msgid "(None)"
+msgstr "(Ingen)"
+
+#: views/main.py:76
+#, python-format
+msgid "Select %s"
+msgstr "Vælg %s"
+
+#: views/main.py:78
+#, python-format
+msgid "Select %s to change"
+msgstr "Vælg %s, der skal ændres"

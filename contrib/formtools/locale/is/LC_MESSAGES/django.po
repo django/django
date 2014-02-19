@@ -1,0 +1,39 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Hafsteinn Einarsson <haffi67@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-02-15 13:34+0000\n"
+"Last-Translator: Hafsteinn Einarsson <haffi67@gmail.com>\n"
+"Language-Team: Icelandic (http://www.transifex.com/projects/p/django/"
+"language/is/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: is\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: templates/formtools/wizard/wizard_form.html:15
+msgid "first step"
+msgstr "fyrsta skref"
+
+#: templates/formtools/wizard/wizard_form.html:16
+msgid "prev step"
+msgstr "fyrra skref"
+
+#: templates/formtools/wizard/wizard_form.html:18
+msgid "submit"
+msgstr "Senda"
+
+#: wizard/legacy.py:159
+msgid ""
+"We apologize, but your form has expired. Please continue filling out the "
+"form from this page."
+msgstr ""
+"Því miður er formið runnið út. Vinsamlegast haltu áfram að fylla út formið á "
+"þessari síðu."

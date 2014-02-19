@@ -1,0 +1,186 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Dimitris Glezos <glezos@transifex.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Juraj Bubniak <>, 2012.
+# Marian Andre <marian@andre.sk>, 2012.
+# Martin Kosír <martin@martinkosir.net>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-23 02:35+0100\n"
+"PO-Revision-Date: 2012-07-16 12:08+0000\n"
+"Last-Translator: Juraj Bubniak <translations@jbub.eu>\n"
+"Language-Team: Slovak (http://www.transifex.com/projects/p/django/language/"
+"sk/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sk\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+#: static/admin/js/SelectFilter2.js:45
+#, c-format
+msgid "Available %s"
+msgstr "Dostupné %s"
+
+#: static/admin/js/SelectFilter2.js:46
+#, c-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"Toto je zoznam dostupných %s. Pre výber je potrebné označiť ich v poli a "
+"následne kliknutím na šípku \"Vybrať\" presunúť."
+
+#: static/admin/js/SelectFilter2.js:53
+#, c-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "Píšte do tohto poľa pre vyfiltrovanie dostupných %s."
+
+#: static/admin/js/SelectFilter2.js:57
+msgid "Filter"
+msgstr "Filtrovať"
+
+#: static/admin/js/SelectFilter2.js:61
+msgid "Choose all"
+msgstr "Vybrať všetko"
+
+#: static/admin/js/SelectFilter2.js:61
+#, c-format
+msgid "Click to choose all %s at once."
+msgstr "Kliknite sem pre vybratie všetkých %s naraz."
+
+#: static/admin/js/SelectFilter2.js:67
+msgid "Choose"
+msgstr "Vybrať"
+
+#: static/admin/js/SelectFilter2.js:69
+msgid "Remove"
+msgstr "Odstrániť"
+
+#: static/admin/js/SelectFilter2.js:75
+#, c-format
+msgid "Chosen %s"
+msgstr "Vybrané %s"
+
+#: static/admin/js/SelectFilter2.js:76
+#, c-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"Toto je zoznam dostupných %s. Pre vymazanie je potrebné označiť ich v poli a "
+"následne kliknutím na šípku \"Vymazať\" vymazať."
+
+#: static/admin/js/SelectFilter2.js:80
+msgid "Remove all"
+msgstr "Odstrániť všetky"
+
+#: static/admin/js/SelectFilter2.js:80
+#, c-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Kliknite sem pre vymazanie vybratých %s naraz."
+
+#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s z %(cnt)s vybrané"
+msgstr[1] "%(sel)s z %(cnt)s vybrané"
+msgstr[2] "%(sel)s z %(cnt)s vybraných"
+
+#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Vrámci jednotlivých editovateľných polí máte neuložené zmeny. Ak vykonáte "
+"akciu, vaše zmeny budú stratené."
+
+#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Vybrali ste akciu, ale neuložili ste jednotlivé polia. Prosím, uložte zmeny "
+"kliknutím na OK. Akciu budete musieť vykonať znova."
+
+#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Vybrali ste akciu, ale neurobili ste žiadne zmeny v jednotlivých poliach. "
+"Pravdepodobne ste chceli použiť tlačidlo vykonať namiesto uložiť."
+
+#: static/admin/js/calendar.js:26
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"január február marec apríl máj jún júl august september október november "
+"december"
+
+#: static/admin/js/calendar.js:27
+msgid "S M T W T F S"
+msgstr "N P U S Š P S"
+
+#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
+#: static/admin/js/collapse.min.js:1
+msgid "Show"
+msgstr "Zobraziť"
+
+#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
+msgid "Hide"
+msgstr "Skryť"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:49
+#: static/admin/js/admin/DateTimeShortcuts.js:85
+msgid "Now"
+msgstr "Teraz"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:53
+msgid "Clock"
+msgstr "Hodiny"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:81
+msgid "Choose a time"
+msgstr "Vybrať čas"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:86
+msgid "Midnight"
+msgstr "Polnoc"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:87
+msgid "6 a.m."
+msgstr "6:00"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:88
+msgid "Noon"
+msgstr "Poludnie"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:92
+#: static/admin/js/admin/DateTimeShortcuts.js:204
+msgid "Cancel"
+msgstr "Zrušiť"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:144
+#: static/admin/js/admin/DateTimeShortcuts.js:197
+msgid "Today"
+msgstr "Dnes"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:148
+msgid "Calendar"
+msgstr "Kalendár"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:195
+msgid "Yesterday"
+msgstr "Včera"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:199
+msgid "Tomorrow"
+msgstr "Zajtra"

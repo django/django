@@ -1,0 +1,50 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
+"PO-Revision-Date: 2012-02-14 13:40+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
+"tr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: tr\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: models.py:9
+msgid "redirect from"
+msgstr "eski adres"
+
+#: models.py:10
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Buraya tam dosya yolu, alan adı kullanılmadan yazılmalı. Örnek: '/events/"
+"search/'."
+
+#: models.py:11
+msgid "redirect to"
+msgstr "yeni adres"
+
+#: models.py:12
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Buraya tam dosya yolu (yukarıdaki gibi), ya da 'http://' ile başlayan tam "
+"adres yazılmalı."
+
+#: models.py:15
+msgid "redirect"
+msgstr "yönlendirme"
+
+#: models.py:16
+msgid "redirects"
+msgstr "yönlendirmeler"

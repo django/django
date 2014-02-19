@@ -1,0 +1,39 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# rodin <romihardiyanto@gmail.com>, 2011.
+#   <romihardiyanto@gmail.com>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-03-06 20:07+0000\n"
+"Last-Translator: rodin <romihardiyanto@gmail.com>\n"
+"Language-Team: Indonesian (http://www.transifex.com/projects/p/django/"
+"language/id/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: id\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: templates/formtools/wizard/wizard_form.html:15
+msgid "first step"
+msgstr "langkah pertama"
+
+#: templates/formtools/wizard/wizard_form.html:16
+msgid "prev step"
+msgstr "langkah pertama"
+
+#: templates/formtools/wizard/wizard_form.html:18
+msgid "submit"
+msgstr "langkah sebelumnya"
+
+#: wizard/legacy.py:159
+msgid ""
+"We apologize, but your form has expired. Please continue filling out the "
+"form from this page."
+msgstr ""
+"Maaf, formulir Anda sudah kedaluwarsa. Silakan lanjutkan mengisi formulir "
+"pada laman ini."

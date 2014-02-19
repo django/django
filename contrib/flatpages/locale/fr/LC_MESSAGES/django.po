@@ -1,0 +1,103 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+#   <charette.s@gmail.com>, 2012.
+#   <claude@2xlibre.net>, 2011-2012.
+# claudep <claude@2xlibre.net>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-10-18 10:56+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
+"Language-Team: French (http://www.transifex.com/projects/p/django/language/"
+"fr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: admin.py:10
+msgid "Advanced options"
+msgstr "Options avancées"
+
+#: forms.py:7 models.py:11
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:8
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"Par exemple, « /a_propos/contact/ ». Vérifiez la présence du caractère « / » "
+"en début et en fin de chaîne."
+
+#: forms.py:10
+msgid ""
+"This value must contain only letters, numbers, dots, underscores, dashes, "
+"slashes or tildes."
+msgstr ""
+"Cette valeur ne peut contenir que des lettres, des chiffres, des points, des "
+"soulignés, des tirets, des barres obliques ou des tildes."
+
+#: forms.py:19
+msgid "URL is missing a leading slash."
+msgstr "Le caractère « / » n'est pas présent en début de chaîne."
+
+#: forms.py:23
+msgid "URL is missing a trailing slash."
+msgstr "Le caractère « / » n'est pas présent en fin de chaîne."
+
+#: forms.py:38
+#, python-format
+msgid "Flatpage with url %(url)s already exists for site %(site)s"
+msgstr "La page statique à l'URL %(url)s existe déjà pour le site %(site)s"
+
+#: models.py:12
+msgid "title"
+msgstr "titre"
+
+#: models.py:13
+msgid "content"
+msgstr "contenu"
+
+#: models.py:14
+msgid "enable comments"
+msgstr "autoriser les commentaires"
+
+#: models.py:15
+msgid "template name"
+msgstr "nom du template"
+
+#: models.py:16
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+"Par exemple, « flatpages/contact_page.html ». Sans définition, le système "
+"utilisera « flatpages/default.html »."
+
+#: models.py:17
+msgid "registration required"
+msgstr "enregistrement requis"
+
+#: models.py:17
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Si coché, seuls les utilisateurs connectés auront la possibilité de voir "
+"cette page."
+
+#: models.py:22
+msgid "flat page"
+msgstr "page statique"
+
+#: models.py:23
+msgid "flat pages"
+msgstr "pages statiques"
+
+#: tests/forms.py:97
+msgid "This field is required."
+msgstr "Ce champ est obligatoire."

@@ -1,0 +1,99 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Eduardo Carvalho <eduardocereto@gmail.com>, 2011.
+# Guilherme Gondim <semente+transifex@taurinus.org>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-10-18 10:56+0000\n"
+"Last-Translator: Guilherme Gondim <semente@taurinus.org>\n"
+"Language-Team: Portuguese (Brazil) <django-l10n-portuguese@googlegroups."
+"com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: admin.py:10
+msgid "Advanced options"
+msgstr "Opções avançadas"
+
+#: forms.py:7 models.py:11
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:8
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "Exemplo: '/sobre/contato/'. Lembre-se das barras no começo e no final."
+
+#: forms.py:10
+msgid ""
+"This value must contain only letters, numbers, dots, underscores, dashes, "
+"slashes or tildes."
+msgstr ""
+"Este valor deve conter apenas letras, números, pontos, sublinhados, traços, "
+"barras ou til."
+
+#: forms.py:19
+msgid "URL is missing a leading slash."
+msgstr "Está faltando uma barra no início da URL."
+
+#: forms.py:23
+msgid "URL is missing a trailing slash."
+msgstr "Está faltando uma barra no final da URL."
+
+#: forms.py:38
+#, python-format
+msgid "Flatpage with url %(url)s already exists for site %(site)s"
+msgstr "Uma Flatpage com a URL %(url)s já existe para o site %(site)s "
+
+#: models.py:12
+msgid "title"
+msgstr "título"
+
+#: models.py:13
+msgid "content"
+msgstr "conteúdo"
+
+#: models.py:14
+msgid "enable comments"
+msgstr "habilitar comentários"
+
+#: models.py:15
+msgid "template name"
+msgstr "nome do template"
+
+#: models.py:16
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+"Exemplo: 'flatpages/contact_page.html'. Se não for informado, será utilizado "
+"'flatpages/default.html'."
+
+#: models.py:17
+msgid "registration required"
+msgstr "registro obrigatório"
+
+#: models.py:17
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Se estiver assinalado, apenas usuários autenticados poderão ver a página."
+
+#: models.py:22
+msgid "flat page"
+msgstr "página plana"
+
+#: models.py:23
+msgid "flat pages"
+msgstr "páginas planas"
+
+#: tests/forms.py:97
+msgid "This field is required."
+msgstr "Este campo é obrigatório."

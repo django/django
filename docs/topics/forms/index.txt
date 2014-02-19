@@ -140,6 +140,8 @@ Handling file uploads with a form
 To see how to handle file uploads with your form, see
 :ref:`binding-uploaded-files`.
 
+.. _processing-the-data-from-a-form:
+
 Processing the data from a form
 -------------------------------
 

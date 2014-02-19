@@ -1,0 +1,324 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Janos Guljas <janos@resenje.org>, 2011, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
+"PO-Revision-Date: 2012-02-20 15:05+0000\n"
+"Last-Translator: Janos Guljas <janos@resenje.org>\n"
+"Language-Team: Serbian (http://www.transifex.com/projects/p/django/language/"
+"sr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sr\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: tests.py:125 templatetags/humanize.py:167
+msgid "today"
+msgstr "десет"
+
+#: tests.py:125 templatetags/humanize.py:171
+msgid "yesterday"
+msgstr "јуче"
+
+#: tests.py:125 templatetags/humanize.py:169
+msgid "tomorrow"
+msgstr "сутра"
+
+#: templatetags/humanize.py:25
+msgid "th"
+msgstr "-и"
+
+#: templatetags/humanize.py:25
+msgid "st"
+msgstr "-ви"
+
+#: templatetags/humanize.py:25
+msgid "nd"
+msgstr "-и"
+
+#: templatetags/humanize.py:25
+msgid "rd"
+msgstr "-и"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f милион"
+msgstr[1] "%(value).1f милиона"
+msgstr[2] "%(value).1f милиона"
+
+#: templatetags/humanize.py:55
+#, python-format
+msgid "%(value)s million"
+msgid_plural "%(value)s million"
+msgstr[0] "%(value)s милион"
+msgstr[1] "%(value)s милиона"
+msgstr[2] "%(value)s милиона"
+
+#: templatetags/humanize.py:58
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f билион"
+msgstr[1] "%(value).1f билиона"
+msgstr[2] "%(value).1f билиона"
+
+#: templatetags/humanize.py:59
+#, python-format
+msgid "%(value)s billion"
+msgid_plural "%(value)s billion"
+msgstr[0] "%(value)s билион"
+msgstr[1] "%(value)s билиона"
+msgstr[2] "%(value)s билиона"
+
+#: templatetags/humanize.py:62
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f трилион"
+msgstr[1] "%(value).1f трилиона"
+msgstr[2] "%(value).1f трилиона"
+
+#: templatetags/humanize.py:63
+#, python-format
+msgid "%(value)s trillion"
+msgid_plural "%(value)s trillion"
+msgstr[0] "%(value)s трилион"
+msgstr[1] "%(value)s трилиона"
+msgstr[2] "%(value)s трилиона"
+
+#: templatetags/humanize.py:66
+#, python-format
+msgid "%(value).1f quadrillion"
+msgid_plural "%(value).1f quadrillion"
+msgstr[0] "%(value).1f квадрилион"
+msgstr[1] "%(value).1f квадрилиона"
+msgstr[2] "%(value).1f квадрилиона"
+
+#: templatetags/humanize.py:67
+#, python-format
+msgid "%(value)s quadrillion"
+msgid_plural "%(value)s quadrillion"
+msgstr[0] "%(value)s квадрилион"
+msgstr[1] "%(value)s квадрилиона"
+msgstr[2] "%(value)s квадрилиона"
+
+#: templatetags/humanize.py:70
+#, python-format
+msgid "%(value).1f quintillion"
+msgid_plural "%(value).1f quintillion"
+msgstr[0] "%(value).1f квинтилион"
+msgstr[1] "%(value).1f квинтилиона"
+msgstr[2] "%(value).1f квинтилиона"
+
+#: templatetags/humanize.py:71
+#, python-format
+msgid "%(value)s quintillion"
+msgid_plural "%(value)s quintillion"
+msgstr[0] "%(value)s квинтилион"
+msgstr[1] "%(value)s квинтилиона"
+msgstr[2] "%(value)s квинтилиона"
+
+#: templatetags/humanize.py:74
+#, python-format
+msgid "%(value).1f sextillion"
+msgid_plural "%(value).1f sextillion"
+msgstr[0] "%(value).1f секстилион"
+msgstr[1] "%(value).1f секстилиона"
+msgstr[2] "%(value).1f секстилиона"
+
+#: templatetags/humanize.py:75
+#, python-format
+msgid "%(value)s sextillion"
+msgid_plural "%(value)s sextillion"
+msgstr[0] "%(value)s секстилион"
+msgstr[1] "%(value)s секстилиона"
+msgstr[2] "%(value)s секстилиона"
+
+#: templatetags/humanize.py:78
+#, python-format
+msgid "%(value).1f septillion"
+msgid_plural "%(value).1f septillion"
+msgstr[0] "%(value).1f септилион"
+msgstr[1] "%(value).1f септилиона"
+msgstr[2] "%(value).1f септилиона"
+
+#: templatetags/humanize.py:79
+#, python-format
+msgid "%(value)s septillion"
+msgid_plural "%(value)s septillion"
+msgstr[0] "%(value)s септилион"
+msgstr[1] "%(value)s септилиона"
+msgstr[2] "%(value)s септилиона"
+
+#: templatetags/humanize.py:82
+#, python-format
+msgid "%(value).1f octillion"
+msgid_plural "%(value).1f octillion"
+msgstr[0] "%(value).1f окталион"
+msgstr[1] "%(value).1f окталиона"
+msgstr[2] "%(value).1f окталиона"
+
+#: templatetags/humanize.py:83
+#, python-format
+msgid "%(value)s octillion"
+msgid_plural "%(value)s octillion"
+msgstr[0] "%(value)s окталион"
+msgstr[1] "%(value)s окталиона"
+msgstr[2] "%(value)s окталиона"
+
+#: templatetags/humanize.py:86
+#, python-format
+msgid "%(value).1f nonillion"
+msgid_plural "%(value).1f nonillion"
+msgstr[0] "%(value).1f нонилион"
+msgstr[1] "%(value).1f нонилиона"
+msgstr[2] "%(value).1f нонилиона"
+
+#: templatetags/humanize.py:87
+#, python-format
+msgid "%(value)s nonillion"
+msgid_plural "%(value)s nonillion"
+msgstr[0] "%(value)s нонилион"
+msgstr[1] "%(value)s нонилиона"
+msgstr[2] "%(value)s нонилиона"
+
+#: templatetags/humanize.py:90
+#, python-format
+msgid "%(value).1f decillion"
+msgid_plural "%(value).1f decillion"
+msgstr[0] "%(value).1f дектилион"
+msgstr[1] "%(value).1f дектилиона"
+msgstr[2] "%(value).1f дектилиона"
+
+#: templatetags/humanize.py:91
+#, python-format
+msgid "%(value)s decillion"
+msgid_plural "%(value)s decillion"
+msgstr[0] "%(value)s дектилион"
+msgstr[1] "%(value)s дектилиона"
+msgstr[2] "%(value)s дектилиона"
+
+#: templatetags/humanize.py:94
+#, python-format
+msgid "%(value).1f googol"
+msgid_plural "%(value).1f googol"
+msgstr[0] "%(value).1f гугол"
+msgstr[1] "%(value).1f гугола"
+msgstr[2] "%(value).1f гугола"
+
+#: templatetags/humanize.py:95
+#, python-format
+msgid "%(value)s googol"
+msgid_plural "%(value)s googol"
+msgstr[0] "%(value)s гугол"
+msgstr[1] "%(value)s гугола"
+msgstr[2] "%(value)s гугола"
+
+#: templatetags/humanize.py:144
+msgid "one"
+msgstr "један"
+
+#: templatetags/humanize.py:144
+msgid "two"
+msgstr "два"
+
+#: templatetags/humanize.py:144
+msgid "three"
+msgstr "три"
+
+#: templatetags/humanize.py:144
+msgid "four"
+msgstr "четири"
+
+#: templatetags/humanize.py:144
+msgid "five"
+msgstr "пет"
+
+#: templatetags/humanize.py:144
+msgid "six"
+msgstr "шест"
+
+#: templatetags/humanize.py:144
+msgid "seven"
+msgstr "седам"
+
+#: templatetags/humanize.py:144
+msgid "eight"
+msgstr "осам"
+
+#: templatetags/humanize.py:144
+msgid "nine"
+msgstr "девет"
+
+#: templatetags/humanize.py:190
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s ago"
+msgstr "пре %(delta)s"
+
+#: templatetags/humanize.py:193 templatetags/humanize.py:215
+msgid "now"
+msgstr "сада"
+
+#: templatetags/humanize.py:196
+#, python-format
+msgid "a second ago"
+msgid_plural "%(count)s seconds ago"
+msgstr[0] "пре једне секунде"
+msgstr[1] "пре %(count)s секунде"
+msgstr[2] "пре %(count)s секунди"
+
+#: templatetags/humanize.py:201
+#, python-format
+msgid "a minute ago"
+msgid_plural "%(count)s minutes ago"
+msgstr[0] "пре једног минута"
+msgstr[1] "пре %(count)s минута"
+msgstr[2] "пре %(count)s минута"
+
+#: templatetags/humanize.py:206
+#, python-format
+msgid "an hour ago"
+msgid_plural "%(count)s hours ago"
+msgstr[0] "пре једног сата"
+msgstr[1] "пре %(count)s сата"
+msgstr[2] "пре %(count)s сати"
+
+#: templatetags/humanize.py:212
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s from now"
+msgstr "за %(delta)s"
+
+#: templatetags/humanize.py:218
+#, python-format
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] "за једну секунду"
+msgstr[1] "за %(count)s секунде"
+msgstr[2] "за %(count)s секунди"
+
+#: templatetags/humanize.py:223
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s minutes from now"
+msgstr[0] "за један минут"
+msgstr[1] "за %(count)s минута"
+msgstr[2] "за %(count)s минута"
+
+#: templatetags/humanize.py:228
+#, python-format
+msgid "an hour from now"
+msgid_plural "%(count)s hours from now"
+msgstr[0] "за један сат"
+msgstr[1] "за %(count)s сата"
+msgstr[2] "за %(count)s сати"

@@ -1,0 +1,306 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Translators:
+# Gökmen Görgen <gokmen@alageek.com>, 2013.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Metin Amiroff <amiroff@gmail.com>, 2012.
+# Murat Çorlu <muratcorlu@gmail.com>, 2012.
+# Ozan  <uobasar@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-12-15 23:27+0100\n"
+"PO-Revision-Date: 2013-02-23 14:50+0000\n"
+"Last-Translator: Gökmen Görgen <gokmen@alageek.com>\n"
+"Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
+"tr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: tr\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: admin.py:41
+msgid "Personal info"
+msgstr "Kişisel bilgiler"
+
+#: admin.py:42
+msgid "Permissions"
+msgstr "İzinler"
+
+#: admin.py:44
+msgid "Important dates"
+msgstr "Önemli tarihler"
+
+#: admin.py:126
+msgid "Password changed successfully."
+msgstr "Şifre başarı ile değiştirildi."
+
+#: admin.py:136
+#, python-format
+msgid "Change password: %s"
+msgstr "Şifre değiştir: %s"
+
+#: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
+msgid "No password set."
+msgstr "Şifre tanımlanmadı."
+
+#: forms.py:37 tests/forms.py:261 tests/forms.py:267
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Yanlış şifre formatı veya bilinmeyen şifreleme algoritması."
+
+#: forms.py:67
+msgid "A user with that username already exists."
+msgstr "Bu isimde bir kullanıcı zaten mevcuttur."
+
+#: forms.py:68 forms.py:269 forms.py:329
+msgid "The two password fields didn't match."
+msgstr "İki şifre alanı uyuşmuyor."
+
+#: forms.py:70 forms.py:115
+msgid "Username"
+msgstr "Kullanıcı adı"
+
+#: forms.py:72 forms.py:116
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Zorunlu alan. 30 karakter ya da az olmalı. Harf, rakam ve @/./+/-/_ "
+"karakterleri kullanılabilir."
+
+#: forms.py:75 forms.py:119
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "Bu değer sadece harf, rakam ve @/./+/-/_ karakterlerini içerebilir."
+
+#: forms.py:77 forms.py:121 forms.py:148 forms.py:331
+msgid "Password"
+msgstr "Şifre"
+
+#: forms.py:79
+msgid "Password confirmation"
+msgstr "Şifre onayı"
+
+#: forms.py:81
+msgid "Enter the same password as above, for verification."
+msgstr "Onaylamak için, yukarıdaki şifrenin aynısını girin."
+
+#: forms.py:122
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+"Ham şifreler saklanmadığından kullanıcıların şifrelerini görmenin yolu "
+"yoktur, fakat <a href=\"password/\">buradaki form</a> aracılığıyla şifreyi "
+"değiştirebilirsiniz."
+
+#: forms.py:151
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Lütfen %(username)s için geçerli parolayı giriniz. Tüm alanlar büyük/küçük "
+"harfe duyarlıdır."
+
+#: forms.py:153
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"Web tarayıcınızın çerezleri desteklemediği görülüyor. Çerezler giriş için "
+"gerekli."
+
+#: forms.py:155
+msgid "This account is inactive."
+msgstr "Bu hesap aktif değil."
+
+#: forms.py:206
+msgid ""
+"That email address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"Belirtilen eposta adresi ile ilişkili kullanıcı hesabı bulunmamaktadır. "
+"Kayıt olduğunuzdan emin misiniz?"
+
+#: forms.py:208 tests/forms.py:374
+msgid ""
+"The user account associated with this email address cannot reset the "
+"password."
+msgstr ""
+"Belirtilen eposta adresi ile ilişkili olan kullanıcı hesabının şifreyi "
+"sıfırlama yetkisi bulunmamaktadır."
+
+#: forms.py:211
+msgid "Email"
+msgstr "Eposta"
+
+#: forms.py:271
+msgid "New password"
+msgstr "Yeni şifre"
+
+#: forms.py:273
+msgid "New password confirmation"
+msgstr "Yeni şifre tekrarı"
+
+#: forms.py:302
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Eski şifreniz hatalı. Lütfen tekrar girin."
+
+#: forms.py:305
+msgid "Old password"
+msgstr "Eski şifre"
+
+#: forms.py:333
+msgid "Password (again)"
+msgstr "Şifre (tekrar)"
+
+#: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
+#: hashers.py:412
+msgid "algorithm"
+msgstr "algoritma"
+
+#: hashers.py:242
+msgid "iterations"
+msgstr "iterasyonlar"
+
+#: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
+msgid "salt"
+msgstr "tuz"
+
+#: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
+msgid "hash"
+msgstr "hash"
+
+#: hashers.py:293
+msgid "work factor"
+msgstr "iş faktörü"
+
+#: hashers.py:295
+msgid "checksum"
+msgstr "sağlama"
+
+#: models.py:72 models.py:121
+msgid "name"
+msgstr "isim"
+
+#: models.py:74
+msgid "codename"
+msgstr "takma ad"
+
+#: models.py:78
+msgid "permission"
+msgstr "izin"
+
+#: models.py:79 models.py:123
+msgid "permissions"
+msgstr "izinler"
+
+#: models.py:128
+msgid "group"
+msgstr "grup"
+
+#: models.py:129 models.py:301
+msgid "groups"
+msgstr "gruplar"
+
+#: models.py:200
+msgid "password"
+msgstr "şifre"
+
+#: models.py:201
+msgid "last login"
+msgstr "son ziyaret"
+
+#: models.py:298
+msgid "superuser status"
+msgstr "süper kullanıcı"
+
+#: models.py:299
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Kullanıcıya ayrı ayrı izin atamasına gerek kalmadan tüm hakların verilip "
+"verilmeyeceğini belirler."
+
+#: models.py:302
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
+msgstr ""
+"Bu kullanıcının bağlı olduğu gruplar. Bir kullanıcı bağlı bulunduğu gruba "
+"atanan tüm yetkilere sahip olur."
+
+#: models.py:306
+msgid "user permissions"
+msgstr "kullanıcı izinleri"
+
+#: models.py:377
+msgid "username"
+msgstr "kullanıcı adı"
+
+#: models.py:378
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr ""
+"Zorunlu alan. 30 karakter ya da az olmalı. Harf, rakam ve @/./+/-/_ "
+"karakterleri kullanılabilir"
+
+#: models.py:381
+msgid "Enter a valid username."
+msgstr "Geçerli bir kullanıcı adı giriniz."
+
+#: models.py:383
+msgid "first name"
+msgstr "isim"
+
+#: models.py:384
+msgid "last name"
+msgstr "soyisim"
+
+#: models.py:385
+msgid "email address"
+msgstr "eposta adresi"
+
+#: models.py:386
+msgid "staff status"
+msgstr "yönetici"
+
+#: models.py:387
+msgid "Designates whether the user can log into this admin site."
+msgstr "Kullanıcının yönetim (admin) paneline girip giremeyeceğini belirler."
+
+#: models.py:389
+msgid "active"
+msgstr "aktif"
+
+#: models.py:390
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Kullanıcının aktif olup olmadığını belirler. Kullanıcı hesabını silmek "
+"yerine bu işareti kaldırın."
+
+#: models.py:392
+msgid "date joined"
+msgstr "kayıt tarihi"
+
+#: models.py:400
+msgid "user"
+msgstr "kullanıcı"
+
+#: models.py:401
+msgid "users"
+msgstr "kullanıcılar"
+
+#: views.py:94
+msgid "Logged out"
+msgstr "Çıkış yapıldı"
+
+#: templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Parola resetlemesi %(site_name)s"

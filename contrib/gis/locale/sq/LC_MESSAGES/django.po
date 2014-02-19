@@ -1,0 +1,95 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Besnik <besnik@programeshqip.org>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-11-25 19:28+0000\n"
+"Last-Translator: Besnik <besnik@programeshqip.org>\n"
+"Language-Team: Albanian (http://www.transifex.com/projects/p/django/language/"
+"sq/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sq\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: views.py:9
+msgid "No feeds are registered."
+msgstr "Nuk ka prurje të regjistruara."
+
+#: views.py:19
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr "Identifikuesi %r nuk është i regjistruar."
+
+#: db/models/fields.py:51
+msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"Fusha bazë GIS -- skiconi sipas llojit Gjeometri me Specifikime OpenGIS."
+
+#: db/models/fields.py:271
+msgid "Point"
+msgstr "Pikë"
+
+#: db/models/fields.py:275
+msgid "Line string"
+msgstr "Varg vije"
+
+#: db/models/fields.py:279
+msgid "Polygon"
+msgstr "Shumëkëndësh"
+
+#: db/models/fields.py:283
+msgid "Multi-point"
+msgstr "Multi-pika"
+
+#: db/models/fields.py:287
+msgid "Multi-line string"
+msgstr "Varg multi-vijë"
+
+#: db/models/fields.py:291
+msgid "Multi polygon"
+msgstr "Multi shumëkëndësh"
+
+#: db/models/fields.py:295
+msgid "Geometry collection"
+msgstr "Përmbledhje gjeometrie"
+
+#: forms/fields.py:19
+msgid "No geometry value provided."
+msgstr "Nuk u dha vlerë gjeometrie."
+
+#: forms/fields.py:20
+msgid "Invalid geometry value."
+msgstr "Vlerë e pavlefshme gjeometrie."
+
+#: forms/fields.py:21
+msgid "Invalid geometry type."
+msgstr "Lloj i pavlefshëm gjeometrie."
+
+#: forms/fields.py:22
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+"Ndodhi një gabim gjatë shndërrimit të gjeometrisë në fushë SRID formulari "
+"gjeometrie."
+
+#: sitemaps/views.py:46
+#, python-format
+msgid "No sitemap available for section: %r"
+msgstr "Nuk ka të passhme hartë site-i për ndarjen: %r"
+
+#: sitemaps/views.py:60
+#, python-format
+msgid "Page %s empty"
+msgstr "Faqe %s e zbrazët"
+
+#: sitemaps/views.py:62
+#, python-format
+msgid "No page '%s'"
+msgstr "Nuk ka faqe '%s'"
