@@ -468,6 +468,7 @@ class OperationTests(MigrationTestBase):
             operation.database_forwards("test_runsql", editor, project_state, new_state)
         self.assertTableExists("i_love_ponies")
         # And test reversal
+        self.assertTrue(operation.reversible)
         with connection.schema_editor() as editor:
             operation.database_backwards("test_runsql", editor, new_state, project_state)
         self.assertTableNotExists("i_love_ponies")
@@ -484,7 +485,11 @@ class OperationTests(MigrationTestBase):
             Pony = models.get_model("test_runpython", "Pony")
             Pony.objects.create(pink=1, weight=3.55)
             Pony.objects.create(weight=5)
-        operation = migrations.RunPython(inner_method)
+        def inner_method_reverse(models, schema_editor):
+            Pony = models.get_model("test_runpython", "Pony")
+            Pony.objects.filter(pink=1, weight=3.55).delete()
+            Pony.objects.filter(weight=5).delete()
+        operation = migrations.RunPython(inner_method, reverse_code=inner_method_reverse)
         # Test the state alteration does nothing
         new_state = project_state.clone()
         operation.state_forwards("test_runpython", new_state)
@@ -494,12 +499,23 @@ class OperationTests(MigrationTestBase):
         with connection.schema_editor() as editor:
             operation.database_forwards("test_runpython", editor, project_state, new_state)
         self.assertEqual(project_state.render().get_model("test_runpython", "Pony").objects.count(), 2)
-        # And test reversal fails
-        with self.assertRaises(NotImplementedError):
-            operation.database_backwards("test_runpython", None, new_state, project_state)
+        # Now test reversal
+        self.assertTrue(operation.reversible)
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_runpython", editor, project_state, new_state)
+        self.assertEqual(project_state.render().get_model("test_runpython", "Pony").objects.count(), 0)
         # Now test we can't use a string
         with self.assertRaises(ValueError):
             operation = migrations.RunPython("print 'ahahaha'")
+
+        # Also test reversal fails, with an operation identical to above but without reverse_code set
+        no_reverse_operation = migrations.RunPython(inner_method)
+        self.assertFalse(no_reverse_operation.reversible)
+        with connection.schema_editor() as editor:
+            no_reverse_operation.database_forwards("test_runpython", editor, project_state, new_state)
+            with self.assertRaises(NotImplementedError):
+                no_reverse_operation.database_backwards("test_runpython", editor, new_state, project_state)
+
 
 
 class MigrateNothingRouter(object):
