@@ -103,7 +103,6 @@ class RunPython(Operation):
     """
 
     reduces_to_sql = False
-    reversible = False
 
     def __init__(self, code, reverse_code=None):
         # Forwards code
@@ -117,6 +116,10 @@ class RunPython(Operation):
             if not callable(reverse_code):
                 raise ValueError("RunPython must be supplied with callable arguments")
             self.reverse_code = reverse_code
+
+    @property
+    def reversible(self):
+        return self.reverse_code is not None
 
     def state_forwards(self, app_label, state):
         # RunPython objects have no state effect. To add some, combine this
