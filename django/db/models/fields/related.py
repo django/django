@@ -1250,9 +1250,12 @@ class OneToOneRel(ManyToOneRel):
 
 class ManyToManyRel(object):
     def __init__(self, to, related_name=None, limit_choices_to=None,
-                 symmetrical=True, through=None, db_constraint=True, related_query_name=None):
+                 symmetrical=True, through=None, through_fields=None,
+                 db_constraint=True, related_query_name=None):
         if through and not db_constraint:
             raise ValueError("Can't supply a through model and db_constraint=False")
+        if through_fields and not through:
+            raise ValueError("Cannot specify through_fields without a through model")
         self.to = to
         self.related_name = related_name
         self.related_query_name = related_query_name
@@ -1262,6 +1265,7 @@ class ManyToManyRel(object):
         self.symmetrical = symmetrical
         self.multiple = True
         self.through = through
+        self.through_fields = through_fields
         self.db_constraint = db_constraint
 
     def is_hidden(self):
@@ -1849,6 +1853,7 @@ class ManyToManyField(RelatedField):
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             symmetrical=kwargs.pop('symmetrical', to == RECURSIVE_RELATIONSHIP_CONSTANT),
             through=kwargs.pop('through', None),
+            through_fields=kwargs.pop('through_fields', None),
             db_constraint=db_constraint,
         )
 
@@ -1878,6 +1883,12 @@ class ManyToManyField(RelatedField):
         return []
 
     def _check_relationship_model(self, from_model=None, **kwargs):
+        if hasattr(self.rel.through, '_meta'):
+            qualified_model_name = "%s.%s" % (
+                self.rel.through._meta.app_label, self.rel.through.__name__)
+        else:
+            qualified_model_name = self.rel.through
+
         errors = []
 
         if self.rel.through not in apps.get_models(include_auto_created=True):
@@ -1885,12 +1896,27 @@ class ManyToManyField(RelatedField):
             errors.append(
                 checks.Error(
                     ("Field specifies a many-to-many relation through model "
-                     "'%s', which has not been installed.") % self.rel.through,
+                     "'%s', which has not been installed.") %
+                    qualified_model_name,
                     hint=None,
                     obj=self,
                     id='fields.E331',
                 )
             )
+
+        elif self.rel.through_fields is not None:
+            if not len(self.rel.through_fields) >= 2 or not (self.rel.through_fields[0] and self.rel.through_fields[1]):
+                errors.append(
+                    checks.Error(
+                        ("The field is given an iterable for through_fields, "
+                         "which does not provide the names for both link fields "
+                         "that Django should use for the relation through model "
+                         "'%s'.") % qualified_model_name,
+                        hint=None,
+                        obj=self,
+                        id='fields.E337',
+                    )
+                )
 
         elif not isinstance(self.rel.through, six.string_types):
 
@@ -1926,13 +1952,16 @@ class ManyToManyField(RelatedField):
                 seen_self = sum(from_model == getattr(field.rel, 'to', None)
                     for field in self.rel.through._meta.fields)
 
-                if seen_self > 2:
+                if seen_self > 2 and not self.rel.through_fields:
                     errors.append(
                         checks.Error(
                             ("The model is used as an intermediate model by "
                              "'%s', but it has more than two foreign keys "
-                             "to '%s', which is ambiguous.") % (self, from_model_name),
-                            hint=None,
+                             "to '%s', which is ambiguous. You must specify "
+                             "which two foreign keys Django should use via the "
+                             "through_fields keyword argument.") % (self, from_model_name),
+                            hint=("Use through_fields to specify which two "
+                                  "foreign keys Django should use."),
                             obj=self.rel.through,
                             id='fields.E333',
                         )
@@ -1945,12 +1974,14 @@ class ManyToManyField(RelatedField):
                 seen_to = sum(to_model == getattr(field.rel, 'to', None)
                     for field in self.rel.through._meta.fields)
 
-                if seen_from > 1:
+                if seen_from > 1 and not self.rel.through_fields:
                     errors.append(
                         checks.Error(
                             ("The model is used as an intermediate model by "
                              "'%s', but it has more than one foreign key "
-                             "from '%s', which is ambiguous.") % (self, from_model_name),
+                             "from '%s', which is ambiguous. You must specify "
+                             "which foreign key Django should use via the "
+                             "through_fields keyword argument.") % (self, from_model_name),
                             hint=('If you want to create a recursive relationship, '
                                   'use ForeignKey("self", symmetrical=False, '
                                   'through="%s").') % relationship_model_name,
@@ -1959,12 +1990,14 @@ class ManyToManyField(RelatedField):
                         )
                     )
 
-                if seen_to > 1:
+                if seen_to > 1 and not self.rel.through_fields:
                     errors.append(
                         checks.Error(
                             ("The model is used as an intermediate model by "
                              "'%s', but it has more than one foreign key "
-                             "to '%s', which is ambiguous.") % (self, to_model_name),
+                             "to '%s', which is ambiguous. You must specify "
+                             "which foreign key Django should use via the "
+                             "through_fields keyword argument.") % (self, to_model_name),
                             hint=('If you want to create a recursive '
                                   'relationship, use ForeignKey("self", '
                                   'symmetrical=False, through="%s").') % relationship_model_name,
@@ -2057,10 +2090,18 @@ class ManyToManyField(RelatedField):
         cache_attr = '_m2m_%s_cache' % attr
         if hasattr(self, cache_attr):
             return getattr(self, cache_attr)
+        if self.rel.through_fields is not None:
+            link_field_name = self.rel.through_fields[0]
+        else:
+            link_field_name = None
         for f in self.rel.through._meta.fields:
-            if hasattr(f, 'rel') and f.rel and f.rel.to == related.model:
+            if hasattr(f, 'rel') and f.rel and f.rel.to == related.model and \
+                    (link_field_name is None or link_field_name == f.name):
                 setattr(self, cache_attr, getattr(f, attr))
                 return getattr(self, cache_attr)
+        # We only reach here if we're given an invalid field name via the
+        # `through_fields` argument
+        raise FieldDoesNotExist(link_field_name)
 
     def _get_m2m_reverse_attr(self, related, attr):
         "Function that can be curried to provide the related accessor or DB column name for the m2m table"
@@ -2068,9 +2109,13 @@ class ManyToManyField(RelatedField):
         if hasattr(self, cache_attr):
             return getattr(self, cache_attr)
         found = False
+        if self.rel.through_fields is not None:
+            link_field_name = self.rel.through_fields[1]
+        else:
+            link_field_name = None
         for f in self.rel.through._meta.fields:
             if hasattr(f, 'rel') and f.rel and f.rel.to == related.parent_model:
-                if related.model == related.parent_model:
+                if link_field_name is None and related.model == related.parent_model:
                     # If this is an m2m-intermediate to self,
                     # the first foreign key you find will be
                     # the source column. Keep searching for
@@ -2080,10 +2125,15 @@ class ManyToManyField(RelatedField):
                         break
                     else:
                         found = True
-                else:
+                elif link_field_name is None or link_field_name == f.name:
                     setattr(self, cache_attr, getattr(f, attr))
                     break
-        return getattr(self, cache_attr)
+        try:
+            return getattr(self, cache_attr)
+        except AttributeError:
+            # We only reach here if we're given an invalid reverse field
+            # name via the `through_fields` argument
+            raise FieldDoesNotExist(link_field_name)
 
     def value_to_string(self, obj):
         data = ''

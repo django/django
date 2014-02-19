@@ -77,3 +77,39 @@ class Friendship(models.Model):
     first = models.ForeignKey(PersonSelfRefM2M, related_name="rel_from_set")
     second = models.ForeignKey(PersonSelfRefM2M, related_name="rel_to_set")
     date_friended = models.DateTimeField()
+
+
+# Custom through link fields
+@python_2_unicode_compatible
+class Event(models.Model):
+    title = models.CharField(max_length=50)
+    invitees = models.ManyToManyField(Person, through='Invitation', through_fields=('event', 'invitee'), related_name='events_invited')
+
+    def __str__(self):
+        return self.title
+
+
+class Invitation(models.Model):
+    event = models.ForeignKey(Event, related_name='invitations')
+    # field order is deliberately inverted. the target field is "invitee".
+    inviter = models.ForeignKey(Person, related_name='invitations_sent')
+    invitee = models.ForeignKey(Person, related_name='invitations')
+
+
+@python_2_unicode_compatible
+class Employee(models.Model):
+    name = models.CharField(max_length=5)
+    subordinates = models.ManyToManyField('self', through="Relationship", through_fields=('source', 'target'), symmetrical=False)
+
+    class Meta:
+        ordering = ('pk',)
+
+    def __str__(self):
+        return self.name
+
+
+class Relationship(models.Model):
+    # field order is deliberately inverted.
+    another = models.ForeignKey(Employee, related_name="rel_another_set", null=True)
+    target = models.ForeignKey(Employee, related_name="rel_target_set")
+    source = models.ForeignKey(Employee, related_name="rel_source_set")

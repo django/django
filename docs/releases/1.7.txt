@@ -658,6 +658,12 @@ Models
 * You can use a single list for :attr:`~django.db.models.Options.index_together`
   (rather than a list of lists) when specifying a single set of fields.
 
+* Custom intermediate models having more than one foreign key to any of the
+  models participating in a many-to-many relationship are now permitted,
+  provided you explicitly specify which foreign keys should be used by setting
+  the new :attr:`ManyToManyField.through_fields <django.db.models.ManyToManyField.through_fields>`
+  argument.
+
 Signals
 ^^^^^^^
 

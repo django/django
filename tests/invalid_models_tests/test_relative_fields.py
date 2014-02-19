@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.core.checks import Error
 from django.db import models
+from django.db.models.fields import FieldDoesNotExist
 from django.test.utils import override_settings
 from django.test.testcases import skipIfDBFeature
 
@@ -81,7 +82,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             Error(
                 ("The model is used as an intermediate model by "
                  "'invalid_models_tests.Group.field', but it has more than one "
-                 "foreign key to 'Person', which is ambiguous."),
+                 "foreign key to 'Person', which is ambiguous. You must specify "
+                 "which foreign key Django should use via the through_fields "
+                 "keyword argument."),
                 hint=('If you want to create a recursive relationship, use '
                       'ForeignKey("self", symmetrical=False, '
                       'through="AmbiguousRelationship").'),
@@ -205,8 +208,10 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             Error(
                 ("The model is used as an intermediate model by "
                  "'invalid_models_tests.Person.friends', but it has more than two "
-                 "foreign keys to 'Person', which is ambiguous."),
-                hint=None,
+                 "foreign keys to 'Person', which is ambiguous. You must specify "
+                 "which two foreign keys Django should use via the through_fields "
+                 "keyword argument."),
+                hint='Use through_fields to specify which two foreign keys Django should use.',
                 obj=InvalidRelationship,
                 id='fields.E333',
             ),
@@ -1051,3 +1056,84 @@ class ComplexClashTests(IsolatedModelsTestCase):
             ),
         ]
         self.assertEqual(errors, expected)
+
+
+class M2mThroughFieldsTests(IsolatedModelsTestCase):
+    def test_m2m_field_argument_validation(self):
+        """
+        Tests that ManyToManyField accepts the ``through_fields`` kwarg
+        only if an intermediary table is specified.
+        """
+        class Fan(models.Model):
+            pass
+
+        self.assertRaisesMessage(
+            ValueError, 'Cannot specify through_fields without a through model',
+            models.ManyToManyField, Fan, through_fields=('f1', 'f2'))
+
+    def test_invalid_m2m_field(self):
+        """
+        Tests that providing invalid source field name to ManyToManyField.through_fields
+        raises FieldDoesNotExist.
+        """
+        class Fan(models.Model):
+            pass
+
+        class Event(models.Model):
+            invitees = models.ManyToManyField(Fan, through='Invitation', through_fields=('invalid_field', 'invitee'))
+
+        class Invitation(models.Model):
+            event = models.ForeignKey(Event)
+            invitee = models.ForeignKey(Fan)
+            inviter = models.ForeignKey(Fan, related_name='+')
+
+        with self.assertRaisesMessage(FieldDoesNotExist, 'invalid_field'):
+            Event().invitees.all()
+
+    def test_invalid_m2m_reverse_field(self):
+        """
+        Tests that providing invalid reverse field name to ManyToManyField.through_fields
+        raises FieldDoesNotExist.
+        """
+        class Fan(models.Model):
+            pass
+
+        class Event(models.Model):
+            invitees = models.ManyToManyField(Fan, through='Invitation', through_fields=('event', 'invalid_field'))
+
+        class Invitation(models.Model):
+            event = models.ForeignKey(Event)
+            invitee = models.ForeignKey(Fan)
+            inviter = models.ForeignKey(Fan, related_name='+')
+
+        with self.assertRaisesMessage(FieldDoesNotExist, 'invalid_field'):
+            Event().invitees.all()
+
+    def test_explicit_field_names(self):
+        """
+        Tests that if ``through_fields`` kwarg is given, it must specify both
+        link fields of the intermediary table.
+        """
+        class Fan(models.Model):
+            pass
+
+        class Event(models.Model):
+            invitees = models.ManyToManyField(Fan, through='Invitation', through_fields=(None, 'invitee'))
+
+        class Invitation(models.Model):
+            event = models.ForeignKey(Event)
+            invitee = models.ForeignKey(Fan)
+            inviter = models.ForeignKey(Fan, related_name='+')
+
+        field = Event._meta.get_field('invitees')
+        errors = field.check(from_model=Event)
+        expected = [
+            Error(
+                ("The field is given an iterable for through_fields, "
+                 "which does not provide the names for both link fields "
+                 "that Django should use for the relation through model "
+                 "'invalid_models_tests.Invitation'."),
+                hint=None,
+                obj=field,
+                id='fields.E337')]
+        self.assertEqual(expected, errors)

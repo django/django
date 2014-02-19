@@ -1337,6 +1337,55 @@ that control how the relationship functions.
     :ref:`extra data with a many-to-many relationship
     <intermediary-manytomany>`.
 
+.. attribute:: ManyToManyField.through_fields
+
+    .. versionadded:: 1.7
+
+    Only used when a custom intermediary model is specified. Django will
+    normally determine which fields of the intermediary model to use in order
+    to establish a many-to-many relationship automatically. However,
+    consider the following models::
+
+        from django.db import models
+
+        class Person(models.Model):
+            name = models.CharField(max_length=50)
+
+        class Group(models.Model):
+            name = models.CharField(max_length=128)
+            members = models.ManyToManyField(Person, through='Membership', through_fields=('person', 'group'))
+
+        class Membership(models.Model):
+            person = models.ForeignKey(Person)
+            group = models.ForeignKey(Group)
+            inviter = models.ForeignKey(Person, related_name="membership_invites")
+            invite_reason = models.CharField(max_length=64)
+
+    ``Membership`` has *two* foreign keys to ``Person`` (``person`` and
+    ``inviter``), which makes the relationship ambiguous and Django can't know
+    which one to use. In this case, you must explicitly specify which
+    foreign keys Django should use using ``through_fields``, as in the example
+    above.
+
+    ``through_fields`` accepts a 2-tuple ``('field1', 'field2')``, where
+    ``field1`` is the name of the foreign key to the target model (``person``
+    in this case), and ``field2`` the name of the foreign key to the model the
+    :class:`ManyToManyField` is defined on (``group`` in this case).
+
+    When you have more than one foreign key on an intermediary model to any
+    (or even both) of the models participating in a many-to-many relationship,
+    you *must* specify ``through_fields``. This also applies to
+    :ref:`recursive relationships <recursive-relationships>`
+    when an intermediary model is used and there are more than two
+    foreign keys to the model, or you want to explicitly specify which two
+    Django should use.
+
+    Recursive relationships using an intermediary model are always defined as
+    non-symmetrical -- that is, with :attr:`symmetrical=False <ManyToManyField.symmetrical>`
+    -- therefore, there is the concept of a "source" and a "target". In that
+    case ``'field1'`` will be treated as the "source" of the relationship and
+    ``'field2'`` as the "target".
+
 .. attribute:: ManyToManyField.db_table
 
     The name of the table to create for storing the many-to-many data. If this
