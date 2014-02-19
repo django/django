@@ -6,7 +6,7 @@ from operator import attrgetter
 from django.test import TestCase
 
 from .models import (Person, Group, Membership, CustomMembership,
-    PersonSelfRefM2M, Friendship)
+    PersonSelfRefM2M, Friendship, Event, Invitation, Employee, Relationship)
 
 
 class M2mThroughTests(TestCase):
@@ -275,6 +275,33 @@ class M2mThroughTests(TestCase):
             ],
             attrgetter("name")
         )
+
+    def test_through_fields(self):
+        """
+        Tests that relations with intermediary tables with multiple FKs
+        to the M2M's ``to`` model are possible.
+        """
+        event = Event.objects.create(title='Rockwhale 2014')
+        Invitation.objects.create(event=event, inviter=self.bob, invitee=self.jim)
+        Invitation.objects.create(event=event, inviter=self.bob, invitee=self.jane)
+        self.assertQuerysetEqual(event.invitees.all(), [
+            'Jane',
+            'Jim',
+        ], attrgetter('name'))
+
+    def test_through_fields_self_referential(self):
+        john = Employee.objects.create(name='john')
+        peter = Employee.objects.create(name='peter')
+        mary = Employee.objects.create(name='mary')
+        harry = Employee.objects.create(name='harry')
+        Relationship.objects.create(source=john, target=peter, another=None)
+        Relationship.objects.create(source=john, target=mary, another=None)
+        Relationship.objects.create(source=john, target=harry, another=peter)
+        self.assertQuerysetEqual(john.subordinates.all(), [
+            'peter',
+            'mary',
+            'harry',
+        ], attrgetter('name'))
 
     def test_query_tests(self):
         Membership.objects.create(person=self.jim, group=self.rock)
