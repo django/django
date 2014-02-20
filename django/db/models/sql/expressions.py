@@ -109,11 +109,7 @@ class SQLEvaluator(object):
             return '%s.%s' % (qn(col[0]), qn(col[1])), []
 
     def evaluate_date_modifier_node(self, node, qn, connection):
-        timedelta = node.children.pop()
         sql, params = self.evaluate_node(node, qn, connection)
-        node.children.append(timedelta)
-
-        if (timedelta.days == timedelta.seconds == timedelta.microseconds == 0):
+        if (node.timedelta.days == node.timedelta.seconds == node.timedelta.microseconds == 0):
             return sql, params
-
-        return connection.ops.date_interval_sql(sql, node.connector, timedelta), params
+        return connection.ops.date_interval_sql(sql, node.connector, node.timedelta), params
