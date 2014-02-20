@@ -86,7 +86,7 @@ had ``Person`` data in it, you could easily map it into ``Person`` instances::
     >>> Person.objects.raw('''SELECT first AS first_name,
     ...                              last AS last_name,
     ...                              bd AS birth_date,
-    ...                              pk as id,
+    ...                              pk AS id,
     ...                       FROM some_other_table''')
 
 As long as the names match, the model instances will be created correctly.
@@ -247,7 +247,7 @@ Note that if you want to include literal percent signs in the query, you have to
 double them in the case you are passing parameters::
 
      cursor.execute("SELECT foo FROM bar WHERE baz = '30%'")
-     cursor.execute("SELECT foo FROM bar WHERE baz = '30%%' and id = %s", [self.id])
+     cursor.execute("SELECT foo FROM bar WHERE baz = '30%%' AND id = %s", [self.id])
 
 If you are using :doc:`more than one database </topics/db/multi-db>`, you can
 use ``django.db.connections`` to obtain the connection (and cursor) for a
