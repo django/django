@@ -185,6 +185,7 @@ class DateModifierNode(ExpressionNode):
             raise TypeError('Second child must be a timedelta.')
         if connector not in (self.ADD, self.SUB):
             raise TypeError('Connector must be + or -, not %s' % connector)
+        self.timedelta = children.pop()
         super(DateModifierNode, self).__init__(children, connector, negated)
 
     def evaluate(self, evaluator, qn, connection):

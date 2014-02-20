@@ -2730,6 +2730,15 @@ class IteratorExceptionsTest(TestCase):
         self.assertRaises(FieldError, list, qs)
 
 
+class DateModifierNodeCloneTest(TestCase):
+    def test_ticket_22101(self):
+        qs = Article.objects.filter(
+            created__gte=F('created')-datetime.timedelta(minutes=1))
+        qs2 = qs.all()
+        list(qs)
+        list(qs2)
+
+
 class NullJoinPromotionOrTest(TestCase):
     def setUp(self):
         self.d1 = ModelD.objects.create(name='foo')
