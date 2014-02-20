@@ -103,7 +103,7 @@ class File(FileProxyMixin):
 
                 # If this is the end of a line, yield
                 # otherwise, wait for the next round
-                if line[-1] in ('\n', '\r'):
+                if line[-1:] in (b'\n', b'\r'):
                     yield line
                 else:
                     buffer_ = line
