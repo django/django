@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; {% trans 'Documentation' %}
+</div>
+{% endblock %}
+{% block title %}{% trans 'Please install docutils' %}{% endblock %}
+
+{% block content %}
+
+<h1>{% trans 'Documentation' %}</h1>
+
+<div id="content-main">
+  <h3>{% blocktrans with "http://docutils.sf.net/" as link %}The admin documentation system requires Python's <a href="{{ link }}">docutils</a> library.{% endblocktrans %}</h3>
+
+  <p>{% blocktrans with "http://docutils.sf.net/" as link %}Please ask your administrators to install <a href="{{ link }}">docutils</a>.{% endblocktrans %}</p>
+</div>
+
+{% endblock %}

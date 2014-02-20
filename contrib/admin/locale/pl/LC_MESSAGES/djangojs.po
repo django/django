@@ -1,0 +1,186 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# angularcircle <angular.circle@gmail.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# konryd <konryd@gmail.com>, 2011.
+# Roman Barczyński <rombar@gmail.com>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-23 02:35+0100\n"
+"PO-Revision-Date: 2012-03-19 16:08+0000\n"
+"Last-Translator: Roman Barczyński <rombar@gmail.com>\n"
+"Language-Team: Polish (http://www.transifex.com/projects/p/django/language/"
+"pl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pl\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+
+#: static/admin/js/SelectFilter2.js:45
+#, c-format
+msgid "Available %s"
+msgstr "Dostępne %s"
+
+#: static/admin/js/SelectFilter2.js:46
+#, c-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"To jest lista dostępnych %s. Aby wybrać pozycje zaznacz je i kliknij "
+"strzałkę \"Wybierz\" pomiędzy listami."
+
+#: static/admin/js/SelectFilter2.js:53
+#, c-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "Pisz tutaj aby wyfiltrować listę dostępnych %s."
+
+#: static/admin/js/SelectFilter2.js:57
+msgid "Filter"
+msgstr "Filtr"
+
+#: static/admin/js/SelectFilter2.js:61
+msgid "Choose all"
+msgstr "Wybierz wszystko"
+
+#: static/admin/js/SelectFilter2.js:61
+#, c-format
+msgid "Click to choose all %s at once."
+msgstr "Kliknij aby wybrać wszystkie %s na raz."
+
+#: static/admin/js/SelectFilter2.js:67
+msgid "Choose"
+msgstr "Wybierz"
+
+#: static/admin/js/SelectFilter2.js:69
+msgid "Remove"
+msgstr "Usuń"
+
+#: static/admin/js/SelectFilter2.js:75
+#, c-format
+msgid "Chosen %s"
+msgstr "Wybrano %s"
+
+#: static/admin/js/SelectFilter2.js:76
+#, c-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"To jest lista wybranych %s. Aby usunąć zaznacz pozycje wybrane do usunięcia "
+"i kliknij strzałkę \"Usuń\" pomiędzy listami."
+
+#: static/admin/js/SelectFilter2.js:80
+msgid "Remove all"
+msgstr "Usuń wszystkie"
+
+#: static/admin/js/SelectFilter2.js:80
+#, c-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Kliknij aby usunąć wszystkie wybrane %s na raz."
+
+#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "Zaznaczono %(sel)s z %(cnt)s"
+msgstr[1] "Zaznaczono %(sel)s z %(cnt)s"
+msgstr[2] "Zaznaczono %(sel)s z %(cnt)s"
+
+#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Zmiany w niektórych polach nie zostały zachowane. Po wykonaniu akcji zmiany "
+"te zostaną utracone."
+
+#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Wybrano akcję, lecz część zmian w polach nie została zachowana. Kliknij OK "
+"aby zapisać. Aby wykonać akcję, należy ją ponownie uruchomić."
+
+#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Wybrano akcję, lecz nie dokonano żadnych zmian. Prawdopodobnie szukasz "
+"przycisku \"Wykonaj\" (a nie \"Zapisz\")"
+
+#: static/admin/js/calendar.js:26
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Styczeń Luty Marzec Kwiecień Maj Czerwiec Lipiec Sierpień Wrzesień "
+"Październik Listopad Grudzień"
+
+#: static/admin/js/calendar.js:27
+msgid "S M T W T F S"
+msgstr "N Pn Wt Śr Cz Pt So"
+
+#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
+#: static/admin/js/collapse.min.js:1
+msgid "Show"
+msgstr "Pokaż"
+
+#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
+msgid "Hide"
+msgstr "Ukryj"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:49
+#: static/admin/js/admin/DateTimeShortcuts.js:85
+msgid "Now"
+msgstr "Teraz"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:53
+msgid "Clock"
+msgstr "Zegar"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:81
+msgid "Choose a time"
+msgstr "Wybierz czas"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:86
+msgid "Midnight"
+msgstr "Północ"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:87
+msgid "6 a.m."
+msgstr "6 rano"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:88
+msgid "Noon"
+msgstr "Południe"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:92
+#: static/admin/js/admin/DateTimeShortcuts.js:204
+msgid "Cancel"
+msgstr "Anuluj"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:144
+#: static/admin/js/admin/DateTimeShortcuts.js:197
+msgid "Today"
+msgstr "Dzisiaj"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:148
+msgid "Calendar"
+msgstr "Kalendarz"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:195
+msgid "Yesterday"
+msgstr "Wczoraj"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:199
+msgid "Tomorrow"
+msgstr "Jutro"

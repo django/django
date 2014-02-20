@@ -1,0 +1,183 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Translators:
+# Soslan Khubulov <soslanx@gmail.com>, 2013.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-23 02:35+0100\n"
+"PO-Revision-Date: 2013-02-24 06:21+0000\n"
+"Last-Translator: Soslan Khubulov <soslanx@gmail.com>\n"
+"Language-Team: Ossetic (http://www.transifex.com/projects/p/django/language/"
+"os/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: os\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: static/admin/js/SelectFilter2.js:45
+#, c-format
+msgid "Available %s"
+msgstr "Уӕвӕг %s"
+
+#: static/admin/js/SelectFilter2.js:46
+#, c-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"Уӕвӕг %s-ты номхыгъд. Дӕ бон у искӕцытӕ дзы рауӕлдай кӕнай, куы сӕ равзарай "
+"бындӕр къӕртты ӕмӕ дыууӕ къӕртты ӕхсӕн \"Равзарын\"-ы ӕгънӕгыл куы ныххӕцай, "
+"уӕд."
+
+#: static/admin/js/SelectFilter2.js:53
+#, c-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "Бафысс ацы къӕртты, уӕвӕг %s-ты номхыгъд фӕрсудзынӕн."
+
+#: static/admin/js/SelectFilter2.js:57
+msgid "Filter"
+msgstr "Фӕрсудзӕн"
+
+#: static/admin/js/SelectFilter2.js:61
+msgid "Choose all"
+msgstr "Равзарын алкӕцыдӕр"
+
+#: static/admin/js/SelectFilter2.js:61
+#, c-format
+msgid "Click to choose all %s at once."
+msgstr "Ныххӕц, алы %s равзарынӕн."
+
+#: static/admin/js/SelectFilter2.js:67
+msgid "Choose"
+msgstr "Равзарын"
+
+#: static/admin/js/SelectFilter2.js:69
+msgid "Remove"
+msgstr "Схафын"
+
+#: static/admin/js/SelectFilter2.js:75
+#, c-format
+msgid "Chosen %s"
+msgstr "Ӕвзӕрст %s"
+
+#: static/admin/js/SelectFilter2.js:76
+#, c-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"Ай у ӕвзӕрст %s-ты номхыгъд. Сӕ хафынӕн сӕ дӕ бон у бындӕр къӕртты равзарын "
+"ӕмӕ дыууӕ ӕгънӕджы ӕхсӕн \"Схфын\"-ыл ныххӕцын."
+
+#: static/admin/js/SelectFilter2.js:80
+msgid "Remove all"
+msgstr "Схафын алкӕцыдӕр"
+
+#: static/admin/js/SelectFilter2.js:80
+#, c-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Ныххӕц, алы ӕвзӕрст %s схафынӕн."
+
+#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(cnt)s-ӕй %(sel)s ӕвзӕрст"
+msgstr[1] "%(cnt)s-ӕй %(sel)s ӕвзӕрст"
+
+#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Ӕнӕвӕрд ивдтытӕ баззадысты ивыны бынӕтты. Кӕд исты ми саразай, уӕд дӕ "
+"ӕнӕвӕрд ивдтытӕ фесӕфдзысты."
+
+#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Ды равзӕрстай цыдӕр ми, фӕлӕ ивӕн бынӕтты цы фӕивтай, уыдон нӕ бавӕрдтай. Дӕ "
+"хорзӕхӕй, ныххӕц Хорзыл цӕмӕй бавӕрд уой. Стӕй дын хъӕудзӕн ацы ми ногӕй "
+"бакӕнын."
+
+#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Ды равзӕртай цыдӕр ми, фӕлӕ ивӕн бынӕтты ницы баивтай. Уӕццӕгӕн дӕ Ацӕуыны "
+"ӕгънӕг хъӕуы, Бавӕрыны нӕ фӕлӕ."
+
+#: static/admin/js/calendar.js:26
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Январь Февраль Мартъи Апрель Июнь Июль Август Сентябрь Октябрь Ноябрь Декабрь"
+
+#: static/admin/js/calendar.js:27
+msgid "S M T W T F S"
+msgstr "Х К Д Ӕ Ц М С"
+
+#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
+#: static/admin/js/collapse.min.js:1
+msgid "Show"
+msgstr "Равдисын"
+
+#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
+msgid "Hide"
+msgstr "Айсын"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:49
+#: static/admin/js/admin/DateTimeShortcuts.js:85
+msgid "Now"
+msgstr "Ныр"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:53
+msgid "Clock"
+msgstr "Сахат"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:81
+msgid "Choose a time"
+msgstr "Рӕстӕг равзарын"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:86
+msgid "Midnight"
+msgstr "Ӕмбисӕхсӕв"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:87
+msgid "6 a.m."
+msgstr "6 ӕ.р."
+
+#: static/admin/js/admin/DateTimeShortcuts.js:88
+msgid "Noon"
+msgstr "Ӕмбисбон"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:92
+#: static/admin/js/admin/DateTimeShortcuts.js:204
+msgid "Cancel"
+msgstr "Раздӕхын"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:144
+#: static/admin/js/admin/DateTimeShortcuts.js:197
+msgid "Today"
+msgstr "Абон"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:148
+msgid "Calendar"
+msgstr "Къӕлиндар"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:195
+msgid "Yesterday"
+msgstr "Знон"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:199
+msgid "Tomorrow"
+msgstr "Сом"

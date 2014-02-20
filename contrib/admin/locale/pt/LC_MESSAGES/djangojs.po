@@ -1,0 +1,183 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Nuno Mariz <nmariz@gmail.com>, 2011, 2012.
+# Paulo Köch <paulo.koch@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-23 02:35+0100\n"
+"PO-Revision-Date: 2012-04-02 14:38+0000\n"
+"Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
+"Language-Team: Portuguese (http://www.transifex.com/projects/p/django/"
+"language/pt/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pt\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: static/admin/js/SelectFilter2.js:45
+#, c-format
+msgid "Available %s"
+msgstr "Disponível %s"
+
+#: static/admin/js/SelectFilter2.js:46
+#, c-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"Esta é a lista de %s disponíveis. Poderá escolher alguns, selecionando-os na "
+"caixa abaixo e clicando na seta \"Escolher\" entre as duas caixas."
+
+#: static/admin/js/SelectFilter2.js:53
+#, c-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "Digite nesta caixa para filtrar a lista de %s disponíveis."
+
+#: static/admin/js/SelectFilter2.js:57
+msgid "Filter"
+msgstr "Filtrar"
+
+#: static/admin/js/SelectFilter2.js:61
+msgid "Choose all"
+msgstr "Escolher todos"
+
+#: static/admin/js/SelectFilter2.js:61
+#, c-format
+msgid "Click to choose all %s at once."
+msgstr "Clique para escolher todos os %s de uma vez."
+
+#: static/admin/js/SelectFilter2.js:67
+msgid "Choose"
+msgstr "Escolher"
+
+#: static/admin/js/SelectFilter2.js:69
+msgid "Remove"
+msgstr "Remover"
+
+#: static/admin/js/SelectFilter2.js:75
+#, c-format
+msgid "Chosen %s"
+msgstr "Escolhido %s"
+
+#: static/admin/js/SelectFilter2.js:76
+#, c-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"Esta é a lista de %s escolhidos. Poderá remover alguns, selecionando-os na "
+"caixa abaixo e clicando na seta \"Remover\" entre as duas caixas."
+
+#: static/admin/js/SelectFilter2.js:80
+msgid "Remove all"
+msgstr "Remover todos"
+
+#: static/admin/js/SelectFilter2.js:80
+#, c-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Clique para remover todos os %s escolhidos de uma vez."
+
+#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s de %(cnt)s selecionado"
+msgstr[1] "%(sel)s de %(cnt)s selecionados"
+
+#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Tem mudanças por guardar nos campos individuais. Se usar uma ação, as suas "
+"mudanças por guardar serão perdidas."
+
+#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Selecionou uma ação mas ainda não guardou as mudanças dos campos "
+"individuais. Carregue em OK para gravar. Precisará de correr de novo a ação."
+
+#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Selecionou uma ação mas ainda não guardou as mudanças dos campos "
+"individuais. Provavelmente quererá o botão Ir ao invés do botão Guardar."
+
+#: static/admin/js/calendar.js:26
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Janeiro Fevereiro Março Abril Maio Junho Julho Agosto Setembro Outubro "
+"Novembro Dezembro"
+
+#: static/admin/js/calendar.js:27
+msgid "S M T W T F S"
+msgstr "D S T Q Q S S"
+
+#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
+#: static/admin/js/collapse.min.js:1
+msgid "Show"
+msgstr "Mostrar"
+
+#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
+msgid "Hide"
+msgstr "Ocultar"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:49
+#: static/admin/js/admin/DateTimeShortcuts.js:85
+msgid "Now"
+msgstr "Agora"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:53
+msgid "Clock"
+msgstr "Relógio"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:81
+msgid "Choose a time"
+msgstr "Escolha a hora"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:86
+msgid "Midnight"
+msgstr "Meia-noite"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:87
+msgid "6 a.m."
+msgstr "6 a.m."
+
+#: static/admin/js/admin/DateTimeShortcuts.js:88
+msgid "Noon"
+msgstr "Meio-dia"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:92
+#: static/admin/js/admin/DateTimeShortcuts.js:204
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:144
+#: static/admin/js/admin/DateTimeShortcuts.js:197
+msgid "Today"
+msgstr "Hoje"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:148
+msgid "Calendar"
+msgstr "Calendário"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:195
+msgid "Yesterday"
+msgstr "Ontem"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:199
+msgid "Tomorrow"
+msgstr "Amanhã"

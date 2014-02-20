@@ -1,0 +1,302 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# madisvain <madisvain@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-02-14 13:24+0000\n"
+"Last-Translator: madisvain <madisvain@gmail.com>\n"
+"Language-Team: Estonian (http://www.transifex.com/projects/p/django/language/"
+"et/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: et\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:25
+msgid "Content"
+msgstr "Sisu"
+
+#: admin.py:28
+msgid "Metadata"
+msgstr "Meta-andmed"
+
+#: admin.py:55
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "märgistatud"
+msgstr[1] "märgistatud"
+
+#: admin.py:56
+msgid "Flag selected comments"
+msgstr "Märgista valitud kommentaarid"
+
+#: admin.py:60
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "heaks kiidetud"
+msgstr[1] "heaks kiidetud"
+
+#: admin.py:61
+msgid "Approve selected comments"
+msgstr "Kiida heaks valitud kommentaarid"
+
+#: admin.py:65
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "eemaldatud"
+msgstr[1] "eemaldatud"
+
+#: admin.py:66
+msgid "Remove selected comments"
+msgstr "Eemalda valitud kommentaarid"
+
+#: admin.py:78
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] "%(count)s comments were successfully %(action)s."
+msgstr[1] "%(count)s comments were successfully %(action)s."
+
+#: feeds.py:14
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "Saidi %(site_name)s kommentaarid"
+
+#: feeds.py:20
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "Viimased kommentaarid saidil %(site_name)s"
+
+#: forms.py:96
+msgid "Name"
+msgstr "Nimi"
+
+#: forms.py:97
+msgid "Email address"
+msgstr "E-posti aadress"
+
+#: forms.py:98
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:99
+msgid "Comment"
+msgstr "Kommentaar"
+
+#: forms.py:177
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Jälgige oma keelekasutust. Sõna %s ei ole lubatud."
+msgstr[1] "Jälgige oma keelekasutust. Sõnad %s ei ole lubatud."
+
+#: forms.py:181 templates/comments/preview.html:16
+msgid "and"
+msgstr "ja"
+
+#: forms.py:186
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "Kui sisestate sellesse lahtrisse midagi, loetakse kommentaar rämpsuks"
+
+#: models.py:23
+msgid "content type"
+msgstr "sisutüüp"
+
+#: models.py:25
+msgid "object ID"
+msgstr "objekti ID"
+
+#: models.py:53 models.py:177
+msgid "user"
+msgstr "kasutaja"
+
+#: models.py:55
+msgid "user's name"
+msgstr "kasutaja pärisnimi"
+
+#: models.py:56
+msgid "user's email address"
+msgstr "kasutaja e-posti aadress"
+
+#: models.py:57
+msgid "user's URL"
+msgstr "kasutaja URL"
+
+#: models.py:59 models.py:79 models.py:178
+msgid "comment"
+msgstr "kommentaar"
+
+#: models.py:62
+msgid "date/time submitted"
+msgstr "loomise kuupäev/kellaaeg"
+
+#: models.py:63
+msgid "IP address"
+msgstr "IP aadress"
+
+#: models.py:64
+msgid "is public"
+msgstr "on avalik"
+
+#: models.py:65
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "Eemaldage siit linnuke, et varjata kommentaar saidilt."
+
+#: models.py:67
+msgid "is removed"
+msgstr "on eemaldatud"
+
+#: models.py:68
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Märkige siia linnuke, kui see kommentaar on ebasobiv. Kommentaari asemel "
+"kuvatakse kirja \"Kommentaar on kustutatud\"."
+
+#: models.py:80
+msgid "comments"
+msgstr "kommentaarid"
+
+#: models.py:124
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Selle kommentaari postitas sisselogitud kasutaja, mistõttu ei ole nimetus "
+"muudetav."
+
+#: models.py:134
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Selle kommentaari postitas sisselogitud kasutaja, mistõttu ei ole e-posti "
+"aadress muudetav."
+
+#: models.py:160
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Postitatud kasutaja %(user)s poolt %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:179
+msgid "flag"
+msgstr "märge"
+
+#: models.py:180
+msgid "date"
+msgstr "kuupäev"
+
+#: models.py:190
+msgid "comment flag"
+msgstr "kommentaari märge"
+
+#: models.py:191
+msgid "comment flags"
+msgstr "kommentaari märked"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Märgi kommentaar sobivaks"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Oled kindel, et soovid teha selle kommentaari avalikuks?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Sobib"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Aitäh, et märkisid kommentaari sobivaks"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr "Aitäh, et leidsid aega parandamaks arutelude kvaliteeti meie lehel"
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Eemalda kommentaar"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Oled kindel, et soovid selle kommentaari eemaldada?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Eemalda"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Aitäh, et eemaldasid kommentaari"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Märgi see kommentaar"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Oled kindel, et soovid selle kommentaari märkida?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Märge"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Aitäh, et märkisid kommentaari"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "Postita"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Eelvaade"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Tänan kommenteerimast"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Aitäh kommentaari eest"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "Kommentaari eelvaade"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Palun parandage allolev viga"
+msgstr[1] "Palun parandage allolevad vead"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Postita kommentaar"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "või tee muudatused"

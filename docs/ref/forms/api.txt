@@ -70,6 +70,40 @@ should consider its data immutable, whether it has data or not.
 
 Using forms to validate data
 ----------------------------
+.. method:: Form.clean()
+
+Use ``Form.clean()`` when you must validate fields that are interdependent.
+
+	>>> class ContactForm(forms.Form):
+	>>> 	def clean(self):
+	>>> 	cleaned_data = super(ContactForm, self).clean()
+	>>> 	cc_myself = cleaned_data.get("cc_myself")
+	>>> 	subject = cleaned_data.get("subject")
+
+When using ``Form.clean()`` you must account for fields that may
+not have passed ``Field.clean()`` validation. For more information about ``Field.clean()`` see :ref:`form-field-default-cleaning`. Additionally, when this method raises a ``ValidationError`` it will associate by 
+default with the meta field ``__all__``.
+
+	>>> if cc_myself and subject: 
+	>>> 	# Only do something if both fields are valid so far.
+	>>> 	if "help" not in subject:
+	>>> 	raise forms.ValidationError("Did not send for 'help' in "
+	... 		"the subject despite CC'ing yourself.")
+
+However, errors may be associated with particular fields with 
+:meth:`~django.forms.Form.add_error()` or by passing a dictionary that maps
+fields to one or more errors.
+
+	>>> if cc_myself and subject and "help" not in subject:
+	>>> 	msg = u"Must put 'help' in subject when cc'ing yourself."
+	>>> 	self.add_error('cc_myself', msg)
+	>>> 	self.add_error('subject', msg)
+
+| For more information:
+| :doc:`../../topics/forms/index` 
+| :ref:`raising-validation-error` 
+| :ref:`cleaning-and-validating-fields-that-depend-on-each-other`
+
 
 .. method:: Form.is_valid()
 
@@ -127,20 +161,6 @@ instances.
     >>> f.errors.as_data()
     {'sender': [ValidationError(['Enter a valid email address.'])],
     'subject': [ValidationError(['This field is required.'])]}
-
-Use this method anytime you need to identify an error by its ``code``. This
-enables things like rewriting the error's message or writing custom logic in a
-view when a given error is present. It can also be used to serialize the errors
-in a custom format (e.g. XML); for instance, :meth:`~Form.errors.as_json()`
-relies on ``as_data()``.
-
-The need for the ``as_data()`` method is due to backwards compatibility.
-Previously ``ValidationError`` instances were lost as soon as their
-**rendered** error messages were added to the ``Form.errors`` dictionary.
-Ideally ``Form.errors`` would have stored ``ValidationError`` instances
-and methods with an ``as_`` prefix could render them, but it had to be done
-the other way around in order not to break code that expects rendered error
-messages in ``Form.errors``.
 
 .. method:: Form.errors.as_json()
 
@@ -667,16 +687,16 @@ Customizing the error list format
 
 By default, forms use ``django.forms.utils.ErrorList`` to format validation
 errors. If you'd like to use an alternate class for displaying errors, you can
-pass that in at construction time (replace ``__str__`` by ``__unicode__`` on
-Python 2)::
+pass that in at construction time (replace ``__unicode__`` by ``__str__`` on
+Python 3)::
 
     >>> from django.forms.utils import ErrorList
     >>> class DivErrorList(ErrorList):
-    ...     def __str__(self):              # __unicode__ on Python 2
+    ...     def __unicode__(self):
     ...         return self.as_divs()
     ...     def as_divs(self):
-    ...         if not self: return ''
-    ...         return '<div class="errorlist">%s</div>' % ''.join(['<div class="error">%s</div>' % e for e in self])
+    ...         if not self: return u''
+    ...         return u'<div class="errorlist">%s</div>' % ''.join([u'<div class="error">%s</div>' % e for e in self])
     >>> f = ContactForm(data, auto_id=False, error_class=DivErrorList)
     >>> f.as_p()
     <div class="errorlist"><div class="error">This field is required.</div></div>
@@ -701,8 +721,8 @@ lazy developers -- they're not the only way a form object can be displayed.
    Used to display HTML or access attributes for a single field of a
    :class:`Form` instance.
 
-   The ``__str__()`` (``__unicode__`` on Python 2) method of this
-   object displays the HTML for this field.
+   The ``__unicode__()`` and ``__str__()`` methods of this object displays
+   the HTML for this field.
 
 To retrieve a single ``BoundField``, use dictionary lookup syntax on your form
 using the field's name as the key::

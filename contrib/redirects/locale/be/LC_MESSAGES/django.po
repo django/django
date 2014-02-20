@@ -1,0 +1,49 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
+"PO-Revision-Date: 2012-08-11 11:08+0000\n"
+"Last-Translator: Павал Клёк <yehekim@gmail.com>\n"
+"Language-Team: Belarusian (http://www.transifex.com/projects/p/django/"
+"language/be/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: be\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: models.py:9
+msgid "redirect from"
+msgstr "накіраваць з"
+
+#: models.py:10
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Тут мусіць быць поўны шлях бяз назвы дамэна. Прыклад: «/events/search/»."
+
+#: models.py:11
+msgid "redirect to"
+msgstr "накіраваць да"
+
+#: models.py:12
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Тут, як і ўверсе, мусіць быць поўны шлях, або поўная сеціўная спасылка, якая "
+"пачынаецца з «http://»."
+
+#: models.py:15
+msgid "redirect"
+msgstr "накіраваньне"
+
+#: models.py:16
+msgid "redirects"
+msgstr "накіраваньні"

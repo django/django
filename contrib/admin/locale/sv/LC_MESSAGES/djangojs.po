@@ -1,0 +1,186 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Andreas Pelme <andreas@pelme.se>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Mattias Jansson <mattias@colourandcode.se>, 2011.
+# Samuel Linde <samuel@linde.im>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-23 02:35+0100\n"
+"PO-Revision-Date: 2012-03-08 10:42+0000\n"
+"Last-Translator: Andreas Pelme <andreas@pelme.se>\n"
+"Language-Team: Swedish (http://www.transifex.com/projects/p/django/language/"
+"sv/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sv\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: static/admin/js/SelectFilter2.js:45
+#, c-format
+msgid "Available %s"
+msgstr "Tillgängliga %s"
+
+#: static/admin/js/SelectFilter2.js:46
+#, c-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"Detta är listan med tillgängliga %s. Du kan välja ut vissa genom att markera "
+"dem i rutan nedan och sedan klicka på \"Välj\"-knapparna mellan de två "
+"rutorna."
+
+#: static/admin/js/SelectFilter2.js:53
+#, c-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "Skriv i denna ruta för att filtrera listan av tillgängliga %s."
+
+#: static/admin/js/SelectFilter2.js:57
+msgid "Filter"
+msgstr "Filter"
+
+#: static/admin/js/SelectFilter2.js:61
+msgid "Choose all"
+msgstr "Välj alla"
+
+#: static/admin/js/SelectFilter2.js:61
+#, c-format
+msgid "Click to choose all %s at once."
+msgstr "Klicka för att välja alla %s på en gång."
+
+#: static/admin/js/SelectFilter2.js:67
+msgid "Choose"
+msgstr "Välj"
+
+#: static/admin/js/SelectFilter2.js:69
+msgid "Remove"
+msgstr "Ta bort"
+
+#: static/admin/js/SelectFilter2.js:75
+#, c-format
+msgid "Chosen %s"
+msgstr "Välj %s"
+
+#: static/admin/js/SelectFilter2.js:76
+#, c-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"Detta är listan med utvalda %s. Du kan ta bort vissa genom att markera dem i "
+"rutan nedan och sedan klicka på \"Ta bort\"-pilen mellan de två rutorna."
+
+#: static/admin/js/SelectFilter2.js:80
+msgid "Remove all"
+msgstr "Ta bort alla"
+
+#: static/admin/js/SelectFilter2.js:80
+#, c-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Klicka för att ta bort alla valda %s på en gång."
+
+#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s av %(cnt)s markerade"
+msgstr[1] "%(sel)s av %(cnt)s markerade"
+
+#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Du har ändringar som inte sparats i enskilda redigerbara fält. Om du kör en "
+"operation kommer de ändringar som inte sparats att gå förlorade."
+
+#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Du har markerat en operation, men du har inte sparat sparat dina ändringar "
+"till enskilda fält ännu. Var vänlig klicka OK för att spara. Du kommer att "
+"behöva köra operationen på nytt."
+
+#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Du har markerat en operation och du har inte gjort några ändringar i "
+"enskilda fält. Du letar antagligen efter Utför-knappen snarare än Spara."
+
+#: static/admin/js/calendar.js:26
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Januari Februari Mars April Maj Juni Juli Augusti September Oktober November "
+"December"
+
+#: static/admin/js/calendar.js:27
+msgid "S M T W T F S"
+msgstr "S M T O T F L"
+
+#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
+#: static/admin/js/collapse.min.js:1
+msgid "Show"
+msgstr "Visa"
+
+#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
+msgid "Hide"
+msgstr "Göm"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:49
+#: static/admin/js/admin/DateTimeShortcuts.js:85
+msgid "Now"
+msgstr "Nu"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:53
+msgid "Clock"
+msgstr "Klocka"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:81
+msgid "Choose a time"
+msgstr "Välj en tidpunkt"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:86
+msgid "Midnight"
+msgstr "Midnatt"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:87
+msgid "6 a.m."
+msgstr "06:00"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:88
+msgid "Noon"
+msgstr "Middag"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:92
+#: static/admin/js/admin/DateTimeShortcuts.js:204
+msgid "Cancel"
+msgstr "Avbryt"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:144
+#: static/admin/js/admin/DateTimeShortcuts.js:197
+msgid "Today"
+msgstr "I dag"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:148
+msgid "Calendar"
+msgstr "Kalender"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:195
+msgid "Yesterday"
+msgstr "I går"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:199
+msgid "Tomorrow"
+msgstr "I morgon"

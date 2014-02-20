@@ -1,0 +1,264 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2010-05-13 15:35+0200\n"
+"Last-Translator: Django team\n"
+"Language-Team: English <en@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: admin.py:41
+msgid "Personal info"
+msgstr ""
+
+#: admin.py:42
+msgid "Permissions"
+msgstr ""
+
+#: admin.py:44
+msgid "Important dates"
+msgstr ""
+
+#: admin.py:132
+msgid "Password changed successfully."
+msgstr ""
+
+#: admin.py:142
+#, python-format
+msgid "Change password: %s"
+msgstr ""
+
+#: forms.py:33 tests/test_forms.py:261 tests/test_forms.py:266
+#: tests/test_forms.py:407
+msgid "No password set."
+msgstr ""
+
+#: forms.py:39 tests/test_forms.py:271 tests/test_forms.py:277
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr ""
+
+#: forms.py:72
+msgid "A user with that username already exists."
+msgstr ""
+
+#: forms.py:73 forms.py:254 forms.py:314
+msgid "The two password fields didn't match."
+msgstr ""
+
+#: forms.py:75 forms.py:120
+msgid "Username"
+msgstr ""
+
+#: forms.py:77 forms.py:121
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+
+#: forms.py:80 forms.py:124
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr ""
+
+#: forms.py:82 forms.py:126 forms.py:153 forms.py:316
+msgid "Password"
+msgstr ""
+
+#: forms.py:84
+msgid "Password confirmation"
+msgstr ""
+
+#: forms.py:86
+msgid "Enter the same password as above, for verification."
+msgstr ""
+
+#: forms.py:127
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+
+#: forms.py:156
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+
+#: forms.py:158
+msgid "This account is inactive."
+msgstr ""
+
+#: forms.py:206
+msgid "Email"
+msgstr ""
+
+#: forms.py:256
+msgid "New password"
+msgstr ""
+
+#: forms.py:258
+msgid "New password confirmation"
+msgstr ""
+
+#: forms.py:287
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+
+#: forms.py:290
+msgid "Old password"
+msgstr ""
+
+#: forms.py:318
+msgid "Password (again)"
+msgstr ""
+
+#: hashers.py:243 hashers.py:317 hashers.py:365 hashers.py:393 hashers.py:426
+#: hashers.py:459 hashers.py:493
+msgid "algorithm"
+msgstr ""
+
+#: hashers.py:244
+msgid "iterations"
+msgstr ""
+
+#: hashers.py:245 hashers.py:319 hashers.py:366 hashers.py:394 hashers.py:494
+msgid "salt"
+msgstr ""
+
+#: hashers.py:246 hashers.py:367 hashers.py:395 hashers.py:427 hashers.py:460
+#: hashers.py:495
+msgid "hash"
+msgstr ""
+
+#: hashers.py:318
+msgid "work factor"
+msgstr ""
+
+#: hashers.py:320
+msgid "checksum"
+msgstr ""
+
+#: models.py:72 models.py:121
+msgid "name"
+msgstr ""
+
+#: models.py:74
+msgid "codename"
+msgstr ""
+
+#: models.py:78
+msgid "permission"
+msgstr ""
+
+#: models.py:79 models.py:123
+msgid "permissions"
+msgstr ""
+
+#: models.py:128
+msgid "group"
+msgstr ""
+
+#: models.py:129 models.py:294
+msgid "groups"
+msgstr ""
+
+#: models.py:200
+msgid "password"
+msgstr ""
+
+#: models.py:201
+msgid "last login"
+msgstr ""
+
+#: models.py:291
+msgid "superuser status"
+msgstr ""
+
+#: models.py:292
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+
+#: models.py:295
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
+msgstr ""
+
+#: models.py:299
+msgid "user permissions"
+msgstr ""
+
+#: models.py:366
+msgid "username"
+msgstr ""
+
+#: models.py:367
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr ""
+
+#: models.py:370
+msgid "Enter a valid username."
+msgstr ""
+
+#: models.py:372
+msgid "first name"
+msgstr ""
+
+#: models.py:373
+msgid "last name"
+msgstr ""
+
+#: models.py:374
+msgid "email address"
+msgstr ""
+
+#: models.py:375
+msgid "staff status"
+msgstr ""
+
+#: models.py:376
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+
+#: models.py:378
+msgid "active"
+msgstr ""
+
+#: models.py:379
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+
+#: models.py:381
+msgid "date joined"
+msgstr ""
+
+#: models.py:389
+msgid "user"
+msgstr ""
+
+#: models.py:390
+msgid "users"
+msgstr ""
+
+#: views.py:89
+msgid "Logged out"
+msgstr ""
+
+#: templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr ""
+
+#: tests/test_forms.py:325
+msgid "Enter a valid email address."
+msgstr ""

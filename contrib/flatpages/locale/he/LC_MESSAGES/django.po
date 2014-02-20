@@ -1,0 +1,99 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Alex Gaynor <alex.gaynor@gmail.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Meir Kriheli <mkriheli@gmail.com>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-10-21 10:44+0000\n"
+"Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
+"Language-Team: Hebrew (http://www.transifex.com/projects/p/django/language/"
+"he/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: he\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:10
+msgid "Advanced options"
+msgstr "אפשרויות מתקדמות"
+
+#: forms.py:7 models.py:11
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:8
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"לדוגמא: '/about/contact/'. יש לוודא הימצאות הקווים הנטויים בהתחלה ובסוף."
+
+#: forms.py:10
+msgid ""
+"This value must contain only letters, numbers, dots, underscores, dashes, "
+"slashes or tildes."
+msgstr ""
+"הערך הזאת חייב להכיל רק אותיות, מספרים, נקודות, מקפים, קווים תחתונים, חתכים "
+"או סימני טילדה בלבד."
+
+#: forms.py:19
+msgid "URL is missing a leading slash."
+msgstr "חסר קו נטוי בתחילת URL."
+
+#: forms.py:23
+msgid "URL is missing a trailing slash."
+msgstr "חסר קו נטוי בסוף URL."
+
+#: forms.py:38
+#, python-format
+msgid "Flatpage with url %(url)s already exists for site %(site)s"
+msgstr "קיים כבר דף פשוט עם  url %(url)s עבור אתר %(site)s"
+
+#: models.py:12
+msgid "title"
+msgstr "כותרת"
+
+#: models.py:13
+msgid "content"
+msgstr "תוכן"
+
+#: models.py:14
+msgid "enable comments"
+msgstr "אפשר תגובות"
+
+#: models.py:15
+msgid "template name"
+msgstr "שם תבנית"
+
+#: models.py:16
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+"דוגמא: 'flatpages/contact_page.html'. אם לא צויין, המערכת תשתמש ב-'flatpages/"
+"default.html'."
+
+#: models.py:17
+msgid "registration required"
+msgstr "הרשמה נדרשת"
+
+#: models.py:17
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "אם מסומן, רק משתמשים מחוברים יוכלו לצפות בדף."
+
+#: models.py:22
+msgid "flat page"
+msgstr "דף פשוט"
+
+#: models.py:23
+msgid "flat pages"
+msgstr "דפים פשוטים"
+
+#: tests/forms.py:97
+msgid "This field is required."
+msgstr "יש להזין תוכן בשדה זה."

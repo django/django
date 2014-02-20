@@ -1,0 +1,35 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Tran  <hongdiepkien@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
+"PO-Revision-Date: 2012-02-14 13:49+0000\n"
+"Last-Translator: Tran <hongdiepkien@gmail.com>\n"
+"Language-Team: Vietnamese (http://www.transifex.com/projects/p/django/"
+"language/vi/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: vi\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: models.py:39
+msgid "domain name"
+msgstr "Tên miền"
+
+#: models.py:40
+msgid "display name"
+msgstr "Tên hiển thị"
+
+#: models.py:45
+msgid "site"
+msgstr "trang web"
+
+#: models.py:46
+msgid "sites"
+msgstr "các trang web"

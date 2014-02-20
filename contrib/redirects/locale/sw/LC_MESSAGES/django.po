@@ -1,0 +1,48 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
+"PO-Revision-Date: 2012-03-16 18:53+0000\n"
+"Last-Translator: machaku <bmachaku@gmail.com>\n"
+"Language-Team: Swahili (http://www.transifex.com/projects/p/django/language/"
+"sw/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sw\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: models.py:9
+msgid "redirect from"
+msgstr "elekeza upya kutoka"
+
+#: models.py:10
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Hii inatakiwa kuwa njia kamili, ukiondo jina la domeini. Mfano:'/matukio/"
+"tafuta/'."
+
+#: models.py:11
+msgid "redirect to"
+msgstr "elekeza upya kwenda"
+
+#: models.py:12
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Hii inaweza kuwa njia kamili (kama hapo juu) or URL kamili yenye 'http://'."
+
+#: models.py:15
+msgid "redirect"
+msgstr "maelekezo upya"
+
+#: models.py:16
+msgid "redirects"
+msgstr "maelekezo upya"

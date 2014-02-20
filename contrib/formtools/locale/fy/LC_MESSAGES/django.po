@@ -1,0 +1,33 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-23 02:38+0100\n"
+"PO-Revision-Date: 2011-03-15 15:47+0000\n"
+"Last-Translator: Django team\n"
+"Language-Team: English <en@li.org>\n"
+"Language: fy_NL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: templates/formtools/wizard/wizard_form.html:15
+msgid "first step"
+msgstr ""
+
+#: templates/formtools/wizard/wizard_form.html:16
+msgid "prev step"
+msgstr ""
+
+#: templates/formtools/wizard/wizard_form.html:18
+msgid "submit"
+msgstr ""
+
+#: wizard/legacy.py:159
+msgid ""
+"We apologize, but your form has expired. Please continue filling out the "
+"form from this page."
+msgstr ""

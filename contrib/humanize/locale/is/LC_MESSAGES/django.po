@@ -1,0 +1,296 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+#   <gudmundur.bjarni@gmail.com>, 2012.
+# Hafsteinn Einarsson <haffi67@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
+"PO-Revision-Date: 2012-02-17 18:46+0000\n"
+"Last-Translator: gudmundur <gudmundur.bjarni@gmail.com>\n"
+"Language-Team: Icelandic (http://www.transifex.com/projects/p/django/"
+"language/is/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: is\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: tests.py:125 templatetags/humanize.py:167
+msgid "today"
+msgstr "í dag"
+
+#: tests.py:125 templatetags/humanize.py:171
+msgid "yesterday"
+msgstr "gærdagur"
+
+#: tests.py:125 templatetags/humanize.py:169
+msgid "tomorrow"
+msgstr "morgundagur"
+
+#: templatetags/humanize.py:25
+msgid "th"
+msgstr "."
+
+#: templatetags/humanize.py:25
+msgid "st"
+msgstr "."
+
+#: templatetags/humanize.py:25
+msgid "nd"
+msgstr "."
+
+#: templatetags/humanize.py:25
+msgid "rd"
+msgstr "."
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f milljón"
+msgstr[1] "%(value).1f milljónir"
+
+#: templatetags/humanize.py:55
+#, python-format
+msgid "%(value)s million"
+msgid_plural "%(value)s million"
+msgstr[0] "%(value)s milljón"
+msgstr[1] "%(value)s milljónir"
+
+#: templatetags/humanize.py:58
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f milljarður"
+msgstr[1] "%(value).1f milljarðar"
+
+#: templatetags/humanize.py:59
+#, python-format
+msgid "%(value)s billion"
+msgid_plural "%(value)s billion"
+msgstr[0] "%(value)s milljarður"
+msgstr[1] "%(value)s milljarðar"
+
+#: templatetags/humanize.py:62
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f billjarður"
+msgstr[1] "%(value).1f billjónir"
+
+#: templatetags/humanize.py:63
+#, python-format
+msgid "%(value)s trillion"
+msgid_plural "%(value)s trillion"
+msgstr[0] "%(value)s billjón"
+msgstr[1] "%(value)s billjónir"
+
+#: templatetags/humanize.py:66
+#, python-format
+msgid "%(value).1f quadrillion"
+msgid_plural "%(value).1f quadrillion"
+msgstr[0] "%(value).1f billjarður"
+msgstr[1] "%(value).1f billjarðar"
+
+#: templatetags/humanize.py:67
+#, python-format
+msgid "%(value)s quadrillion"
+msgid_plural "%(value)s quadrillion"
+msgstr[0] "%(value)s billjarður"
+msgstr[1] "%(value)s billjarðar"
+
+#: templatetags/humanize.py:70
+#, python-format
+msgid "%(value).1f quintillion"
+msgid_plural "%(value).1f quintillion"
+msgstr[0] "%(value).1f trilljón"
+msgstr[1] "%(value).1f trilljónir"
+
+#: templatetags/humanize.py:71
+#, python-format
+msgid "%(value)s quintillion"
+msgid_plural "%(value)s quintillion"
+msgstr[0] "%(value)s trilljón"
+msgstr[1] "%(value)s trilljónir"
+
+#: templatetags/humanize.py:74
+#, python-format
+msgid "%(value).1f sextillion"
+msgid_plural "%(value).1f sextillion"
+msgstr[0] "%(value).1f trilljarður"
+msgstr[1] "%(value).1f trilljarðar"
+
+#: templatetags/humanize.py:75
+#, python-format
+msgid "%(value)s sextillion"
+msgid_plural "%(value)s sextillion"
+msgstr[0] "%(value)s trilljarður"
+msgstr[1] "%(value)s trilljarðar"
+
+#: templatetags/humanize.py:78
+#, python-format
+msgid "%(value).1f septillion"
+msgid_plural "%(value).1f septillion"
+msgstr[0] "%(value).1f kvaðrilljón"
+msgstr[1] "%(value).1f kvaðrilljónir"
+
+#: templatetags/humanize.py:79
+#, python-format
+msgid "%(value)s septillion"
+msgid_plural "%(value)s septillion"
+msgstr[0] "%(value)s kvaðrilljón"
+msgstr[1] "%(value)s kvaðrilljónir"
+
+#: templatetags/humanize.py:82
+#, python-format
+msgid "%(value).1f octillion"
+msgid_plural "%(value).1f octillion"
+msgstr[0] "%(value).1f kvaðrilljarður"
+msgstr[1] "%(value).1f kvaðrilljarðar"
+
+#: templatetags/humanize.py:83
+#, python-format
+msgid "%(value)s octillion"
+msgid_plural "%(value)s octillion"
+msgstr[0] "%(value)s kvaðrilljarður"
+msgstr[1] "%(value)s kvaðrilljarðar"
+
+#: templatetags/humanize.py:86
+#, python-format
+msgid "%(value).1f nonillion"
+msgid_plural "%(value).1f nonillion"
+msgstr[0] "%(value).1f kvintilljón"
+msgstr[1] "%(value).1f kvintilljónir"
+
+#: templatetags/humanize.py:87
+#, python-format
+msgid "%(value)s nonillion"
+msgid_plural "%(value)s nonillion"
+msgstr[0] "%(value)s kvintilljón"
+msgstr[1] "%(value)s kvintilljónir"
+
+#: templatetags/humanize.py:90
+#, python-format
+msgid "%(value).1f decillion"
+msgid_plural "%(value).1f decillion"
+msgstr[0] "%(value).1f kvintilljarður"
+msgstr[1] "%(value).1f kvintilljarðar"
+
+#: templatetags/humanize.py:91
+#, python-format
+msgid "%(value)s decillion"
+msgid_plural "%(value)s decillion"
+msgstr[0] "%(value)s kvintilljarður"
+msgstr[1] "%(value)s kvintilljarðar"
+
+#: templatetags/humanize.py:94
+#, python-format
+msgid "%(value).1f googol"
+msgid_plural "%(value).1f googol"
+msgstr[0] "%(value).1f googol"
+msgstr[1] "%(value).1f googol"
+
+#: templatetags/humanize.py:95
+#, python-format
+msgid "%(value)s googol"
+msgid_plural "%(value)s googol"
+msgstr[0] "%(value)s googol"
+msgstr[1] "%(value)s googol"
+
+#: templatetags/humanize.py:144
+msgid "one"
+msgstr "einn"
+
+#: templatetags/humanize.py:144
+msgid "two"
+msgstr "tveir"
+
+#: templatetags/humanize.py:144
+msgid "three"
+msgstr "þrír"
+
+#: templatetags/humanize.py:144
+msgid "four"
+msgstr "fjórir"
+
+#: templatetags/humanize.py:144
+msgid "five"
+msgstr "fimm"
+
+#: templatetags/humanize.py:144
+msgid "six"
+msgstr "sex"
+
+#: templatetags/humanize.py:144
+msgid "seven"
+msgstr "sjö"
+
+#: templatetags/humanize.py:144
+msgid "eight"
+msgstr "átta"
+
+#: templatetags/humanize.py:144
+msgid "nine"
+msgstr "níu"
+
+#: templatetags/humanize.py:190
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s ago"
+msgstr "%(delta)s síðan"
+
+#: templatetags/humanize.py:193 templatetags/humanize.py:215
+msgid "now"
+msgstr "núna"
+
+#: templatetags/humanize.py:196
+#, python-format
+msgid "a second ago"
+msgid_plural "%(count)s seconds ago"
+msgstr[0] "fyrir sekúndu síðan"
+msgstr[1] "%(count)s sekúndum síðan"
+
+#: templatetags/humanize.py:201
+#, python-format
+msgid "a minute ago"
+msgid_plural "%(count)s minutes ago"
+msgstr[0] "fyrir mínútu síðan"
+msgstr[1] "%(count)s mínútum síðan"
+
+#: templatetags/humanize.py:206
+#, python-format
+msgid "an hour ago"
+msgid_plural "%(count)s hours ago"
+msgstr[0] "fyrir klukkustund"
+msgstr[1] "fyrir %(count)s klukkustundum"
+
+#: templatetags/humanize.py:212
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s from now"
+msgstr "eftir %(delta)s"
+
+#: templatetags/humanize.py:218
+#, python-format
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] "eftir sekúndu"
+msgstr[1] "eftir %(count)s sekúndur"
+
+#: templatetags/humanize.py:223
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s minutes from now"
+msgstr[0] "eftir mínútu"
+msgstr[1] "eftir %(count)s mínútur"
+
+#: templatetags/humanize.py:228
+#, python-format
+msgid "an hour from now"
+msgid_plural "%(count)s hours from now"
+msgstr[0] "eftir klukkustund"
+msgstr[1] "eftir %(count)s klukkustundir"

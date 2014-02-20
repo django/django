@@ -1,0 +1,176 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Mansoorulhaq Mansoor <mansoorulhaq1986@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-23 02:35+0100\n"
+"PO-Revision-Date: 2012-03-08 10:42+0000\n"
+"Last-Translator: Mansoorulhaq Mansoor <mansoorulhaq1986@gmail.com>\n"
+"Language-Team: Urdu (http://www.transifex.com/projects/p/django/language/"
+"ur/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ur\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: static/admin/js/SelectFilter2.js:45
+#, c-format
+msgid "Available %s"
+msgstr "دستیاب %s"
+
+#: static/admin/js/SelectFilter2.js:46
+#, c-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+
+#: static/admin/js/SelectFilter2.js:53
+#, c-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr ""
+
+#: static/admin/js/SelectFilter2.js:57
+msgid "Filter"
+msgstr "چھانٹیں"
+
+#: static/admin/js/SelectFilter2.js:61
+msgid "Choose all"
+msgstr "سب منتخب کریں"
+
+#: static/admin/js/SelectFilter2.js:61
+#, c-format
+msgid "Click to choose all %s at once."
+msgstr ""
+
+#: static/admin/js/SelectFilter2.js:67
+msgid "Choose"
+msgstr ""
+
+#: static/admin/js/SelectFilter2.js:69
+msgid "Remove"
+msgstr "خارج کریں"
+
+#: static/admin/js/SelectFilter2.js:75
+#, c-format
+msgid "Chosen %s"
+msgstr "منتخب شدہ %s"
+
+#: static/admin/js/SelectFilter2.js:76
+#, c-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+
+#: static/admin/js/SelectFilter2.js:80
+msgid "Remove all"
+msgstr ""
+
+#: static/admin/js/SelectFilter2.js:80
+#, c-format
+msgid "Click to remove all chosen %s at once."
+msgstr ""
+
+#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(cnt)s میں سے %(sel)s منتخب کیا گیا"
+msgstr[1] "%(cnt)s میں سے %(sel)s منتخب کیے گئے"
+
+#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"آپ کے پاس ذاتی قابل تدوین خانوں میں غیر محفوظ تبدیلیاں موجود ھیں۔ اگر آپ "
+"کوئی کاروائی کریں گے تو آپ کی غیر محفوظ تبدیلیاں ضائع ھو جائیں گی۔"
+
+#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"آپ نے ایک کاروائی منتخب کی ھے لیکن ابھی تک آپ نے ذاتی خانوں میں اپنی "
+"تبدیلیاں محفوظ نہیں کی ہیں براہ مھربانی محفوط کرنے کے لئے OK پر کلک کریں۔ آپ "
+"کاوائی دوبارہ چلانے کی ضرورت ھوگی۔"
+
+#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"آپ نے ایک کاروائی منتخب کی ھے، اور آپ نے ذاتی خانوں میں کوئی تبدیلی نہیں کی "
+"غالباً آپ 'جاؤ' بٹن تلاش کر رھے ھیں بجائے 'مخفوظ کریں' بٹن کے۔"
+
+#: static/admin/js/calendar.js:26
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr "جنوری فروری مارچ اپریل مئی جون جولائی اگست ستمبر اکتوبر نومبر دسمبر"
+
+#: static/admin/js/calendar.js:27
+msgid "S M T W T F S"
+msgstr "ا س م ب ج جمعہ ھ"
+
+#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
+#: static/admin/js/collapse.min.js:1
+msgid "Show"
+msgstr "دکھائیں"
+
+#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
+msgid "Hide"
+msgstr "چھپائیں"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:49
+#: static/admin/js/admin/DateTimeShortcuts.js:85
+msgid "Now"
+msgstr "اب"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:53
+msgid "Clock"
+msgstr "گھڑی"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:81
+msgid "Choose a time"
+msgstr "وقت منتخب کریں"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:86
+msgid "Midnight"
+msgstr "نصف رات"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:87
+msgid "6 a.m."
+msgstr "6 ص"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:88
+msgid "Noon"
+msgstr "دوپھر"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:92
+#: static/admin/js/admin/DateTimeShortcuts.js:204
+msgid "Cancel"
+msgstr "منسوخ کریں"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:144
+#: static/admin/js/admin/DateTimeShortcuts.js:197
+msgid "Today"
+msgstr "آج"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:148
+msgid "Calendar"
+msgstr "تقویم"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:195
+msgid "Yesterday"
+msgstr "گزشتہ کل"
+
+#: static/admin/js/admin/DateTimeShortcuts.js:199
+msgid "Tomorrow"
+msgstr "آئندہ کل"

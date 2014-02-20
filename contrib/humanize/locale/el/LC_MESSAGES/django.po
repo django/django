@@ -1,0 +1,296 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Dimitris Glezos <glezos@indifex.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Kostas Papadimitriou <vinilios@gmail.com>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
+"PO-Revision-Date: 2012-03-12 19:02+0000\n"
+"Last-Translator: Kostas Papadimitriou <vinilios@gmail.com>\n"
+"Language-Team: Greek (http://www.transifex.com/projects/p/django/language/"
+"el/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: el\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: tests.py:125 templatetags/humanize.py:167
+msgid "today"
+msgstr "σήμερα"
+
+#: tests.py:125 templatetags/humanize.py:171
+msgid "yesterday"
+msgstr "χθες"
+
+#: tests.py:125 templatetags/humanize.py:169
+msgid "tomorrow"
+msgstr "αύριο"
+
+#: templatetags/humanize.py:25
+msgid "th"
+msgstr "η"
+
+#: templatetags/humanize.py:25
+msgid "st"
+msgstr "η"
+
+#: templatetags/humanize.py:25
+msgid "nd"
+msgstr "η"
+
+#: templatetags/humanize.py:25
+msgid "rd"
+msgstr "η"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f εκατομμύριο"
+msgstr[1] "%(value).1f εκατομμύρια"
+
+#: templatetags/humanize.py:55
+#, python-format
+msgid "%(value)s million"
+msgid_plural "%(value)s million"
+msgstr[0] " %(value)s  εκατομμύριο"
+msgstr[1] " %(value)s  εκατομμύρια"
+
+#: templatetags/humanize.py:58
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f δισεκατομμύριο"
+msgstr[1] "%(value).1f δισεκατομμύρια"
+
+#: templatetags/humanize.py:59
+#, python-format
+msgid "%(value)s billion"
+msgid_plural "%(value)s billion"
+msgstr[0] "%(value)s δισεκατομμύριο"
+msgstr[1] "%(value)s δισεκατομμύρια"
+
+#: templatetags/humanize.py:62
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f τρισεκατομμύριο"
+msgstr[1] "%(value).1f τρισεκατομμύρια"
+
+#: templatetags/humanize.py:63
+#, python-format
+msgid "%(value)s trillion"
+msgid_plural "%(value)s trillion"
+msgstr[0] "%(value)s τρισεκατομμύριο"
+msgstr[1] "%(value)s τρισεκατομμύρια"
+
+#: templatetags/humanize.py:66
+#, python-format
+msgid "%(value).1f quadrillion"
+msgid_plural "%(value).1f quadrillion"
+msgstr[0] "%(value).1f τετράκις εκατομμύριο"
+msgstr[1] "%(value).1f τετράκις εκατομμύρια"
+
+#: templatetags/humanize.py:67
+#, python-format
+msgid "%(value)s quadrillion"
+msgid_plural "%(value)s quadrillion"
+msgstr[0] "%(value)s τετράκις εκατομμύριο"
+msgstr[1] "%(value)s τετράκις εκατομμύρια"
+
+#: templatetags/humanize.py:70
+#, python-format
+msgid "%(value).1f quintillion"
+msgid_plural "%(value).1f quintillion"
+msgstr[0] "%(value).1f πεντάκις εκατομμύριo"
+msgstr[1] "%(value).1f πεντάκις εκατομμύρια"
+
+#: templatetags/humanize.py:71
+#, python-format
+msgid "%(value)s quintillion"
+msgid_plural "%(value)s quintillion"
+msgstr[0] "%(value)s πεντάκις εκατομμύριo"
+msgstr[1] "%(value)s πεντάκις εκατομμύρια"
+
+#: templatetags/humanize.py:74
+#, python-format
+msgid "%(value).1f sextillion"
+msgid_plural "%(value).1f sextillion"
+msgstr[0] "%(value).1f εξάκις εκατομμύριo"
+msgstr[1] "%(value).1f εξάκις εκατομμύρια"
+
+#: templatetags/humanize.py:75
+#, python-format
+msgid "%(value)s sextillion"
+msgid_plural "%(value)s sextillion"
+msgstr[0] "%(value)s εξάκις εκατομμύριo"
+msgstr[1] "%(value)s εξάκις εκατομμύρια"
+
+#: templatetags/humanize.py:78
+#, python-format
+msgid "%(value).1f septillion"
+msgid_plural "%(value).1f septillion"
+msgstr[0] "%(value).1f επτάκις εκατομμύριο"
+msgstr[1] "%(value).1f επτάκις εκατομμύρια"
+
+#: templatetags/humanize.py:79
+#, python-format
+msgid "%(value)s septillion"
+msgid_plural "%(value)s septillion"
+msgstr[0] "%(value)s επτάκις εκατομμύριο"
+msgstr[1] "%(value)s επτάκις εκατομμύρια"
+
+#: templatetags/humanize.py:82
+#, python-format
+msgid "%(value).1f octillion"
+msgid_plural "%(value).1f octillion"
+msgstr[0] "%(value).1f οκτάκις εκατομμύριο"
+msgstr[1] "%(value).1f οκτάκις εκατομμύρια"
+
+#: templatetags/humanize.py:83
+#, python-format
+msgid "%(value)s octillion"
+msgid_plural "%(value)s octillion"
+msgstr[0] "%(value)s οκτάκις εκατομμύριο"
+msgstr[1] "%(value)s οκτάκις εκατομμύρια"
+
+#: templatetags/humanize.py:86
+#, python-format
+msgid "%(value).1f nonillion"
+msgid_plural "%(value).1f nonillion"
+msgstr[0] "%(value).1f εννεάκις εκατομμύριο"
+msgstr[1] "%(value).1f εννεάκις εκατομμύρια"
+
+#: templatetags/humanize.py:87
+#, python-format
+msgid "%(value)s nonillion"
+msgid_plural "%(value)s nonillion"
+msgstr[0] "%(value)s εννεάκις εκατομμύριο"
+msgstr[1] "%(value)s εννεάκις εκατομμύρια"
+
+#: templatetags/humanize.py:90
+#, python-format
+msgid "%(value).1f decillion"
+msgid_plural "%(value).1f decillion"
+msgstr[0] "%(value).1f δεκάκις εκατομμύριο"
+msgstr[1] "%(value).1f δεκάκις εκατομμύρια"
+
+#: templatetags/humanize.py:91
+#, python-format
+msgid "%(value)s decillion"
+msgid_plural "%(value)s decillion"
+msgstr[0] "%(value)s δεκάκις εκατομμύριο"
+msgstr[1] "%(value)s δεκάκις εκατομμύρια"
+
+#: templatetags/humanize.py:94
+#, python-format
+msgid "%(value).1f googol"
+msgid_plural "%(value).1f googol"
+msgstr[0] "%(value).1f googol"
+msgstr[1] "%(value).1f googol"
+
+#: templatetags/humanize.py:95
+#, python-format
+msgid "%(value)s googol"
+msgid_plural "%(value)s googol"
+msgstr[0] "%(value)s googol"
+msgstr[1] "%(value)s googol"
+
+#: templatetags/humanize.py:144
+msgid "one"
+msgstr "ένα"
+
+#: templatetags/humanize.py:144
+msgid "two"
+msgstr "δύο"
+
+#: templatetags/humanize.py:144
+msgid "three"
+msgstr "τρία"
+
+#: templatetags/humanize.py:144
+msgid "four"
+msgstr "τέσσερα"
+
+#: templatetags/humanize.py:144
+msgid "five"
+msgstr "πέντε"
+
+#: templatetags/humanize.py:144
+msgid "six"
+msgstr "έξι"
+
+#: templatetags/humanize.py:144
+msgid "seven"
+msgstr "εφτά"
+
+#: templatetags/humanize.py:144
+msgid "eight"
+msgstr "οκτώ"
+
+#: templatetags/humanize.py:144
+msgid "nine"
+msgstr "εννιά"
+
+#: templatetags/humanize.py:190
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s ago"
+msgstr "πριν από %(delta)s"
+
+#: templatetags/humanize.py:193 templatetags/humanize.py:215
+msgid "now"
+msgstr "τώρα"
+
+#: templatetags/humanize.py:196
+#, python-format
+msgid "a second ago"
+msgid_plural "%(count)s seconds ago"
+msgstr[0] "πριν από ένα δευτερόλεπτο"
+msgstr[1] "πριν από %(count)s δευτερόλεπτα"
+
+#: templatetags/humanize.py:201
+#, python-format
+msgid "a minute ago"
+msgid_plural "%(count)s minutes ago"
+msgstr[0] "πριν από ένα λεπτό"
+msgstr[1] "πριν από %(count)s λεπτά"
+
+#: templatetags/humanize.py:206
+#, python-format
+msgid "an hour ago"
+msgid_plural "%(count)s hours ago"
+msgstr[0] "πριν από μια ώρα"
+msgstr[1] "πριν από %(count)s ώρες"
+
+#: templatetags/humanize.py:212
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s from now"
+msgstr "σε %(delta)s"
+
+#: templatetags/humanize.py:218
+#, python-format
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] "σε ένα δευτερόλεπτο"
+msgstr[1] "σε %(count)s δευτερόλεπτα"
+
+#: templatetags/humanize.py:223
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s minutes from now"
+msgstr[0] "σε ένα λεπτό"
+msgstr[1] "σε %(count)s λεπτά"
+
+#: templatetags/humanize.py:228
+#, python-format
+msgid "an hour from now"
+msgid_plural "%(count)s hours from now"
+msgstr[0] "σε μία ώρα"
+msgstr[1] "σε %(count)s ώρες"

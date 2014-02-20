@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Comment post not allowed (400)</title>
+  <meta name="robots" content="NONE,NOARCHIVE" />
+  <style type="text/css">
+  <![CDATA[
+    html * { padding:0; margin:0; }
+    body * { padding:10px 20px; }
+    body * * { padding:0; }
+    body { font:small sans-serif; background:#eee; }
+    body>div { border-bottom:1px solid #ddd; }
+    h1 { font-weight:normal; margin-bottom:.4em; }
+    h1 span { font-size:60%; color:#666; font-weight:normal; }
+    table { border:none; border-collapse: collapse; width:100%; }
+    td, th { vertical-align:top; padding:2px 3px; }
+    th { width:12em; text-align:right; color:#666; padding-right:.5em; }
+    #info { background:#f6f6f6; }
+    #info ol { margin: 0.5em 4em; }
+    #info ol li { font-family: monospace; }
+    #summary { background: #ffc; }
+    #explanation { background:#eee; border-bottom: 0px none; }
+  ]]>
+  </style>
+</head>
+<body>
+  <div id="summary">
+    <h1>Comment post not allowed <span>(400)</span></h1>
+    <table class="meta">
+      <tr>
+        <th>Why:</th>
+        <td>{{ why }}</td>
+      </tr>
+    </table>
+  </div>
+  <div id="info">
+    <p>
+    The comment you tried to post to this view wasn't saved because something
+    tampered with the security information in the comment form. The message
+    above should explain the problem, or you can check the <a
+    href="http://docs.djangoproject.com/en/dev/ref/contrib/comments/">comment
+    documentation</a> for more help.
+    </p>
+  </div>
+
+  <div id="explanation">
+    <p>
+      You're seeing this error because you have <code>DEBUG = True</code> in
+      your Django settings file. Change that to <code>False</code>, and Django
+      will display a standard 400 error page.
+    </p>
+  </div>
+</body>
+</html>

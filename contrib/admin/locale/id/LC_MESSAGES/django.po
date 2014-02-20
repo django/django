@@ -1,0 +1,849 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# rodin <romihardiyanto@gmail.com>, 2011.
+#  <romihardiyanto@gmail.com>, 2013.
+#   <romihardiyanto@gmail.com>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-01-01 16:10+0100\n"
+"PO-Revision-Date: 2013-02-20 12:10+0000\n"
+"Last-Translator: rodin <romihardiyanto@gmail.com>\n"
+"Language-Team: Indonesian (http://www.transifex.com/projects/p/django/"
+"language/id/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: id\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: actions.py:48
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "Sukes menghapus %(count)d %(items)s."
+
+#: actions.py:60 options.py:1347
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "Tidak dapat menghapus %(name)s"
+
+#: actions.py:62 options.py:1349
+msgid "Are you sure?"
+msgstr "Yakin?"
+
+#: actions.py:83
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Hapus %(verbose_name_plural)s yang dipilih"
+
+#: filters.py:101 filters.py:197 filters.py:237 filters.py:274 filters.py:380
+msgid "All"
+msgstr "Semua"
+
+#: filters.py:238
+msgid "Yes"
+msgstr "Ya"
+
+#: filters.py:239
+msgid "No"
+msgstr "Tidak"
+
+#: filters.py:253
+msgid "Unknown"
+msgstr "Tidak diketahui"
+
+#: filters.py:308
+msgid "Any date"
+msgstr "Kapanpun"
+
+#: filters.py:309
+msgid "Today"
+msgstr "Hari ini"
+
+#: filters.py:313
+msgid "Past 7 days"
+msgstr "Tujuh hari terakhir"
+
+#: filters.py:317
+msgid "This month"
+msgstr "Bulan ini"
+
+#: filters.py:321
+msgid "This year"
+msgstr "Tahun ini"
+
+#: forms.py:9
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+
+#: forms.py:19
+msgid "Please log in again, because your session has expired."
+msgstr "Anda harus mengulangi proses masuk karena sesi Anda telah habis."
+
+#: helpers.py:23
+msgid "Action:"
+msgstr "Aksi:"
+
+#: models.py:24
+msgid "action time"
+msgstr "waktu aksi"
+
+#: models.py:27
+msgid "object id"
+msgstr "id objek"
+
+#: models.py:28
+msgid "object repr"
+msgstr "representasi objek"
+
+#: models.py:29
+msgid "action flag"
+msgstr "jenis aksi"
+
+#: models.py:30
+msgid "change message"
+msgstr "ganti pesan"
+
+#: models.py:35
+msgid "log entry"
+msgstr "entri pencatatan"
+
+#: models.py:36
+msgid "log entries"
+msgstr "entri pencatatan"
+
+#: models.py:45
+#, python-format
+msgid "Added \"%(object)s\"."
+msgstr "\"%(object)s\" ditambahkan."
+
+#: models.py:47
+#, python-format
+msgid "Changed \"%(object)s\" - %(changes)s"
+msgstr "\"%(object)s\" diubah - %(changes)s"
+
+#: models.py:52
+#, python-format
+msgid "Deleted \"%(object)s.\""
+msgstr "\"%(object)s\" dihapus."
+
+#: models.py:54
+msgid "LogEntry Object"
+msgstr "Objek LogEntry"
+
+#: options.py:156 options.py:172
+msgid "None"
+msgstr "None"
+
+#: options.py:684
+#, python-format
+msgid "Changed %s."
+msgstr "%s diubah"
+
+#: options.py:684 options.py:694
+msgid "and"
+msgstr "dan"
+
+#: options.py:689
+#, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "%(name)s \"%(object)s\" ditambahkan."
+
+#: options.py:693
+#, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr "%(list)s untuk %(name)s \"%(object)s\" diubah."
+
+#: options.py:698
+#, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "%(name)s \"%(object)s\" dihapus."
+
+#: options.py:702
+msgid "No fields changed."
+msgstr "Tidak ada bidang yang berubah."
+
+#: options.py:807 options.py:860
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+"%(name)s \"%(obj)s\" berhasil ditambahkan. Anda dapat mengeditnya lagi di "
+"bawah ini."
+
+#: options.py:835
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may add another "
+"%(name)s below."
+msgstr ""
+
+#: options.py:839
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" berhasil ditambahkan."
+
+#: options.py:853
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"below."
+msgstr ""
+
+#: options.py:867
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
+"%(name)s below."
+msgstr ""
+
+#: options.py:873
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" berhasil diubah."
+
+#: options.py:951 options.py:1211
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"Objek harus dipilih sebelum dimanipulasi. Tidak ada objek yang berubah."
+
+#: options.py:970
+msgid "No action selected."
+msgstr "Tidak ada aksi yang dipilih."
+
+#: options.py:1050
+#, python-format
+msgid "Add %s"
+msgstr "Tambahkan %s"
+
+#: options.py:1074 options.py:1319
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Objek %(name)s dengan kunci utama %(key)r tidak ada."
+
+#: options.py:1140
+#, python-format
+msgid "Change %s"
+msgstr "Ubah %s"
+
+#: options.py:1190
+msgid "Database error"
+msgstr "Galat basis data"
+
+#: options.py:1253
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s berhasil diubah."
+
+#: options.py:1280
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s dipilih"
+
+#: options.py:1285
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "0 dari %(cnt)s dipilih"
+
+#: options.py:1335
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" berhasil dihapus."
+
+#: options.py:1382
+#, python-format
+msgid "Change history: %s"
+msgstr "Ubah riwayat: %s"
+
+#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#: templates/registration/password_reset_complete.html:19
+#: views/decorators.py:24
+msgid "Log in"
+msgstr "Masuk"
+
+#: sites.py:388
+msgid "Site administration"
+msgstr "Administrasi situs"
+
+#: sites.py:440
+#, python-format
+msgid "%s administration"
+msgstr "Administrasi %s"
+
+#: widgets.py:90
+msgid "Date:"
+msgstr "Tanggal:"
+
+#: widgets.py:91
+msgid "Time:"
+msgstr "Waktu:"
+
+#: widgets.py:165
+msgid "Lookup"
+msgstr "Cari"
+
+#: widgets.py:271
+msgid "Add Another"
+msgstr "Tambah Lagi"
+
+#: widgets.py:316
+msgid "Currently:"
+msgstr ""
+
+#: widgets.py:317
+msgid "Change:"
+msgstr ""
+
+#: templates/admin/404.html:4 templates/admin/404.html.py:8
+msgid "Page not found"
+msgstr "Laman tidak ditemukan"
+
+#: templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Maaf, laman yang Anda minta tidak ditemukan."
+
+#: templates/admin/500.html:6 templates/admin/app_index.html:7
+#: templates/admin/base.html:47 templates/admin/change_form.html:19
+#: templates/admin/change_list.html:41
+#: templates/admin/delete_confirmation.html:7
+#: templates/admin/delete_selected_confirmation.html:7
+#: templates/admin/invalid_setup.html:6 templates/admin/object_history.html:7
+#: templates/admin/auth/user/change_password.html:13
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:6
+#: templates/registration/password_change_form.html:7
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_confirm.html:6
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_form.html:6
+msgid "Home"
+msgstr "Beranda"
+
+#: templates/admin/500.html:7
+msgid "Server error"
+msgstr "Galat server"
+
+#: templates/admin/500.html:11
+msgid "Server error (500)"
+msgstr "Galat server (500)"
+
+#: templates/admin/500.html:14
+msgid "Server Error <em>(500)</em>"
+msgstr "Galat Server <em>(500)</em>"
+
+#: templates/admin/500.html:15
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Galat terjadi dan telah dilaporkan ke administrator situs lewat email untuk "
+"diperbaiki. Terima kasih atas pengertiannya."
+
+#: templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr "Jalankan aksi terpilih"
+
+#: templates/admin/actions.html:4
+msgid "Go"
+msgstr "Buka"
+
+#: templates/admin/actions.html:11
+msgid "Click here to select the objects across all pages"
+msgstr "Klik di sini untuk memilih semua objek pada semua laman"
+
+#: templates/admin/actions.html:11
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Pilih seluruh %(total_count)s %(module_name)s"
+
+#: templates/admin/actions.html:13
+msgid "Clear selection"
+msgstr "Bersihkan pilihan"
+
+#: templates/admin/app_index.html:10 templates/admin/index.html:21
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: templates/admin/base.html:28
+msgid "Welcome,"
+msgstr "Selamat datang,"
+
+#: templates/admin/base.html:33
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
+msgid "Documentation"
+msgstr "Dokumentasi"
+
+#: templates/admin/base.html:36
+#: templates/admin/auth/user/change_password.html:17
+#: templates/admin/auth/user/change_password.html:51
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
+msgid "Change password"
+msgstr "Ganti sandi"
+
+#: templates/admin/base.html:38
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
+msgid "Log out"
+msgstr "Keluar"
+
+#: templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Admin situs Django"
+
+#: templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Administrasi Django"
+
+#: templates/admin/change_form.html:22 templates/admin/index.html:33
+msgid "Add"
+msgstr "Tambah"
+
+#: templates/admin/change_form.html:32 templates/admin/object_history.html:11
+msgid "History"
+msgstr "Riwayat"
+
+#: templates/admin/change_form.html:33
+#: templates/admin/edit_inline/stacked.html:9
+#: templates/admin/edit_inline/tabular.html:30
+msgid "View on site"
+msgstr "Lihat di situs"
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Perbaiki galat di bawah ini."
+
+#: templates/admin/change_list.html:58
+#, python-format
+msgid "Add %(name)s"
+msgstr "Tambahkan %(name)s"
+
+#: templates/admin/change_list.html:78
+msgid "Filter"
+msgstr "Filter"
+
+#: templates/admin/change_list_results.html:17
+msgid "Remove from sorting"
+msgstr "Dihapus dari pengurutan"
+
+#: templates/admin/change_list_results.html:18
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Prioritas pengurutan: %(priority_number)s"
+
+#: templates/admin/change_list_results.html:19
+msgid "Toggle sorting"
+msgstr "Ubah pengurutan"
+
+#: templates/admin/delete_confirmation.html:11
+#: templates/admin/submit_line.html:4
+msgid "Delete"
+msgstr "Hapus"
+
+#: templates/admin/delete_confirmation.html:18
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"Menghapus %(object_name)s '%(escaped_object)s' akan menghapus objek lain "
+"yang terkait, tetapi akun Anda tidak memiliki izin untuk menghapus objek "
+"dengan tipe berikut:"
+
+#: templates/admin/delete_confirmation.html:26
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"Menghapus %(object_name)s '%(escaped_object)s' memerlukan penghapusan objek "
+"terlindungi yang terkait sebagai berikut:"
+
+#: templates/admin/delete_confirmation.html:34
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Yakin ingin menghapus %(object_name)s \"%(escaped_object)s\"? Semua objek "
+"lain yang terkait juga akan dihapus:"
+
+#: templates/admin/delete_confirmation.html:39
+#: templates/admin/delete_selected_confirmation.html:44
+msgid "Yes, I'm sure"
+msgstr "Ya, tentu saja"
+
+#: templates/admin/delete_selected_confirmation.html:10
+msgid "Delete multiple objects"
+msgstr "Hapus beberapa objek sekaligus"
+
+#: templates/admin/delete_selected_confirmation.html:17
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Menghapus %(objects_name)s terpilih akan menghapus objek yang terkait, "
+"tetapi akun Anda tidak memiliki izin untuk menghapus objek dengan tipe "
+"berikut:"
+
+#: templates/admin/delete_selected_confirmation.html:25
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"Menghapus %(objects_name)s terpilih memerlukan penghapusan objek terlindungi "
+"yang terkait sebagai berikut:"
+
+#: templates/admin/delete_selected_confirmation.html:33
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"Yakin akan menghapus %(objects_name)s terpilih? Semua objek berikut beserta "
+"objek terkait juga akan dihapus:"
+
+#: templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " Berdasarkan %(filter_title)s "
+
+#: templates/admin/index.html:20
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Model pada aplikasi %(name)s"
+
+#: templates/admin/index.html:39
+msgid "Change"
+msgstr "Ubah"
+
+#: templates/admin/index.html:49
+msgid "You don't have permission to edit anything."
+msgstr "Anda tidak memiliki izin untuk mengubah apapun."
+
+#: templates/admin/index.html:57
+msgid "Recent Actions"
+msgstr "Aktivitas Terbaru"
+
+#: templates/admin/index.html:58
+msgid "My Actions"
+msgstr "Aktivitas Saya"
+
+#: templates/admin/index.html:62
+msgid "None available"
+msgstr "Tidak ada yang tersedia"
+
+#: templates/admin/index.html:76
+msgid "Unknown content"
+msgstr "Konten tidak diketahui"
+
+#: templates/admin/invalid_setup.html:12
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Ada masalah dengan instalasi basis data Anda. Pastikan tabel yang sesuai "
+"pada basis data telah dibuat dan dapat dibaca oleh pengguna yang benar."
+
+#: templates/admin/login.html:37
+msgid "Password:"
+msgstr "Sandi:"
+
+#: templates/admin/login.html:44
+msgid "Forgotten your password or username?"
+msgstr "Lupa nama pengguna atau sandi?"
+
+#: templates/admin/object_history.html:23
+msgid "Date/time"
+msgstr "Tanggal/waktu"
+
+#: templates/admin/object_history.html:24
+msgid "User"
+msgstr "Pengguna"
+
+#: templates/admin/object_history.html:25
+msgid "Action"
+msgstr "Aksi"
+
+#: templates/admin/object_history.html:39
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Objek ini tidak memiliki riwayat perubahan. Kemungkinan objek ini tidak "
+"ditambahkan melalui situs administrasi ini."
+
+#: templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "Tampilkan semua"
+
+#: templates/admin/pagination.html:11 templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "Simpan"
+
+#: templates/admin/search_form.html:7
+msgid "Search"
+msgstr "Cari"
+
+#: templates/admin/search_form.html:9
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s buah"
+
+#: templates/admin/search_form.html:9
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s total"
+
+#: templates/admin/submit_line.html:5
+msgid "Save as new"
+msgstr "Simpan sebagai baru"
+
+#: templates/admin/submit_line.html:6
+msgid "Save and add another"
+msgstr "Simpan dan tambahkan lagi"
+
+#: templates/admin/submit_line.html:7
+msgid "Save and continue editing"
+msgstr "Simpan dan terus mengedit"
+
+#: templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"Pertama-tama, masukkan nama pengguna dan sandi. Anda akan dapat mengubah "
+"opsi pengguna lain setelah itu."
+
+#: templates/admin/auth/user/add_form.html:8
+msgid "Enter a username and password."
+msgstr "Masukkan nama pengguna dan sandi."
+
+#: templates/admin/auth/user/change_password.html:31
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Masukkan sandi baru untuk pengguna <strong>%(username)s</strong>."
+
+#: templates/admin/auth/user/change_password.html:38
+msgid "Password"
+msgstr "Sandi"
+
+#: templates/admin/auth/user/change_password.html:44
+#: templates/registration/password_change_form.html:42
+msgid "Password (again)"
+msgstr "Sandi (ulangi)"
+
+#: templates/admin/auth/user/change_password.html:45
+msgid "Enter the same password as above, for verification."
+msgstr "Masukkan sandi yang sama dengan di atas, untuk verifikasi."
+
+#: templates/admin/edit_inline/stacked.html:26
+#: templates/admin/edit_inline/tabular.html:76
+msgid "Remove"
+msgstr "Hapus"
+
+#: templates/admin/edit_inline/stacked.html:27
+#: templates/admin/edit_inline/tabular.html:75
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Tambahkan %(verbose_name)s lagi"
+
+#: templates/admin/edit_inline/tabular.html:17
+msgid "Delete?"
+msgstr "Hapus?"
+
+#: templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Terima kasih telah menggunakan situs ini hari ini."
+
+#: templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Masuk kembali"
+
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_change_form.html:12
+#: templates/registration/password_change_form.html:24
+msgid "Password change"
+msgstr "Ubah sandi"
+
+#: templates/registration/password_change_done.html:11
+#: templates/registration/password_change_done.html:15
+msgid "Password change successful"
+msgstr "Sandi berhasil diubah"
+
+#: templates/registration/password_change_done.html:17
+msgid "Your password was changed."
+msgstr "Sandi Anda telah diubah."
+
+#: templates/registration/password_change_form.html:26
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Dengan alasan keamanan, masukkan sandi lama Anda dua kali untuk memastikan "
+"Anda tidak salah mengetikkannya."
+
+#: templates/registration/password_change_form.html:32
+msgid "Old password"
+msgstr "Sandi lama"
+
+#: templates/registration/password_change_form.html:37
+msgid "New password"
+msgstr "Sandi baru"
+
+#: templates/registration/password_change_form.html:48
+#: templates/registration/password_reset_confirm.html:26
+msgid "Change my password"
+msgstr "Ubah sandi saya"
+
+#: templates/registration/password_reset_complete.html:7
+#: templates/registration/password_reset_confirm.html:11
+#: templates/registration/password_reset_done.html:7
+#: templates/registration/password_reset_form.html:7
+#: templates/registration/password_reset_form.html:11
+#: templates/registration/password_reset_form.html:15
+msgid "Password reset"
+msgstr "Setel ulang sandi"
+
+#: templates/registration/password_reset_complete.html:11
+#: templates/registration/password_reset_complete.html:15
+msgid "Password reset complete"
+msgstr "Sandi telah disetel ulang"
+
+#: templates/registration/password_reset_complete.html:17
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "Sandi Anda telah diperbarui. Silakan masuk."
+
+#: templates/registration/password_reset_confirm.html:7
+msgid "Password reset confirmation"
+msgstr "Konfirmasi penyetelan ulang sandi"
+
+#: templates/registration/password_reset_confirm.html:17
+msgid "Enter new password"
+msgstr "Masukkan sandi baru"
+
+#: templates/registration/password_reset_confirm.html:19
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Masukkan sandi baru dua kali untuk memastikan Anda tidak salah "
+"mengetikkannya."
+
+#: templates/registration/password_reset_confirm.html:23
+msgid "New password:"
+msgstr "Sandi baru:"
+
+#: templates/registration/password_reset_confirm.html:25
+msgid "Confirm password:"
+msgstr "Konfirmasi sandi:"
+
+#: templates/registration/password_reset_confirm.html:31
+msgid "Password reset unsuccessful"
+msgstr "Penyetelan ulang sandi gagal"
+
+#: templates/registration/password_reset_confirm.html:33
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"Tautan penyetelan ulang sandi tidak valid. Kemungkinan karena tautan "
+"tersebut telah dipakai sebelumnya. Ajukan permintaan penyetelan sandi sekali "
+"lagi."
+
+#: templates/registration/password_reset_done.html:11
+#: templates/registration/password_reset_done.html:15
+msgid "Password reset successful"
+msgstr "Penyetelan ulang sandi berhasil"
+
+#: templates/registration/password_reset_done.html:17
+msgid ""
+"We've emailed you instructions for setting your password to the email "
+"address you submitted. You should be receiving it shortly."
+msgstr ""
+"Kami telah mengirimkan email berisi petunjuk untuk menyetel ulang sandi pada "
+"alamat email yang Anda masukkan. Petunjuknya akan sampai dalam beberapa saat."
+
+#: templates/registration/password_reset_email.html:2
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"Anda menerima email ini karena Anda meminta penyetelan ulang sandi untuk "
+"akun pengguna di %(site_name)s."
+
+#: templates/registration/password_reset_email.html:4
+msgid "Please go to the following page and choose a new password:"
+msgstr "Kunjungi laman di bawah ini dan ketikkan sandi baru:"
+
+#: templates/registration/password_reset_email.html:8
+msgid "Your username, in case you've forgotten:"
+msgstr "Nama pengguna Anda, jika lupa:"
+
+#: templates/registration/password_reset_email.html:10
+msgid "Thanks for using our site!"
+msgstr "Terima kasih telah menggunakan situs kami!"
+
+#: templates/registration/password_reset_email.html:12
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "Tim %(site_name)s"
+
+#: templates/registration/password_reset_form.html:17
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll email "
+"instructions for setting a new one."
+msgstr ""
+"Lupa sandinya? Masukkan alamat email Anda di bawah ini agar kami dapat "
+"mengirimkan petunjuk untuk menyetel ulang sandinya."
+
+#: templates/registration/password_reset_form.html:21
+msgid "Email address:"
+msgstr "Alamat email:"
+
+#: templates/registration/password_reset_form.html:21
+msgid "Reset my password"
+msgstr "Setel ulang sandi saya"
+
+#: templatetags/admin_list.py:344
+msgid "All dates"
+msgstr "Semua tanggal"
+
+#: views/main.py:33
+msgid "(None)"
+msgstr "(Tidak ada)"
+
+#: views/main.py:76
+#, python-format
+msgid "Select %s"
+msgstr "Pilih %s"
+
+#: views/main.py:78
+#, python-format
+msgid "Select %s to change"
+msgstr "Pilih %s untuk diubah"

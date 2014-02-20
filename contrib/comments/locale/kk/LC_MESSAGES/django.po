@@ -1,0 +1,301 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+#   <germanilyin@gmail.com>, 2011.
+#   <zhazira.mt@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-02-14 13:24+0000\n"
+"Last-Translator: yun_man_ger <germanilyin@gmail.com>\n"
+"Language-Team: Kazakh (http://www.transifex.com/projects/p/django/language/"
+"kk/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: kk\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: admin.py:25
+msgid "Content"
+msgstr "Мазмұн"
+
+#: admin.py:28
+msgid "Metadata"
+msgstr "Метадата"
+
+#: admin.py:55
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "белгіленген"
+
+#: admin.py:56
+msgid "Flag selected comments"
+msgstr "Таңдалған коментарийлерді белгілеу"
+
+#: admin.py:60
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "Расталған"
+
+#: admin.py:61
+msgid "Approve selected comments"
+msgstr "Таңдалған аңғартпаларды бекіту"
+
+#: admin.py:65
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "өшірілген"
+
+#: admin.py:66
+msgid "Remove selected comments"
+msgstr "Таңдалған аңғартпаларды өшіру"
+
+#: admin.py:78
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+"one: 1 аңғартпа ойдағыдай %(action)s.\n"
+"other: %(count)s аңғартпа ойдағыдай %(action)s."
+
+#: feeds.py:14
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "%(site_name)s аңғартпалары"
+
+#: feeds.py:20
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "Соңғы %(site_name)s аңғартпалары"
+
+#: forms.py:96
+msgid "Name"
+msgstr "Атау"
+
+#: forms.py:97
+msgid "Email address"
+msgstr "Email адрес"
+
+#: forms.py:98
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:99
+msgid "Comment"
+msgstr "Аңғартпа"
+
+#: forms.py:177
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] ""
+"one: Байқап сөйлеңіз! Бұл жерде %s сөзіне тыйым салынған.\n"
+"\n"
+"other: Байқап сөйлеңіз! Бұл жерде %s сөздеріне тыйым салынған."
+
+#: forms.py:181 templates/comments/preview.html:16
+msgid "and"
+msgstr "және"
+
+#: forms.py:186
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+"Егер сіз бұл жолаққа қандай да бір нарсені енгізсеңіз, сіздің коментариіңіз "
+"спам ретінде белгіленеді."
+
+#: models.py:23
+msgid "content type"
+msgstr "мазмұн түрі"
+
+#: models.py:25
+msgid "object ID"
+msgstr "нысан ID"
+
+#: models.py:53 models.py:177
+msgid "user"
+msgstr "пайдаланушы"
+
+#: models.py:55
+msgid "user's name"
+msgstr "пайдаланушының есімі"
+
+#: models.py:56
+msgid "user's email address"
+msgstr "пайдаланушының email адресі"
+
+#: models.py:57
+msgid "user's URL"
+msgstr "пайдаланушының URLі"
+
+#: models.py:59 models.py:79 models.py:178
+msgid "comment"
+msgstr "аңғартпа"
+
+#: models.py:62
+msgid "date/time submitted"
+msgstr "жіберілген күні/уықыты"
+
+#: models.py:63
+msgid "IP address"
+msgstr "IP адрес"
+
+#: models.py:64
+msgid "is public"
+msgstr "ашық"
+
+#: models.py:65
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "Анғартпаның сайттан жоғалуы үшін құсбелгіні алып тастаңыз."
+
+#: models.py:67
+msgid "is removed"
+msgstr "өшірілген"
+
+#: models.py:68
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Анғартпа дұрыс болмаса құсбелгігі қойыңыз. Орнына  \"Бұл анғартпа өшірілді\" "
+"деген хабар көрінеді."
+
+#: models.py:80
+msgid "comments"
+msgstr "анғартпалар"
+
+#: models.py:124
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr "Бұл аңғартпа пайдаланушы орналастырған үшін аты өзгертілмейді."
+
+#: models.py:134
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr "Бұл аңғартпа пайдаланушы орналастырған үшін email өзгертілмейді."
+
+#: models.py:160
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"%(user)s %(date)s орналастырды\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:179
+msgid "flag"
+msgstr "жалауша"
+
+#: models.py:180
+msgid "date"
+msgstr "мерзім"
+
+#: models.py:190
+msgid "comment flag"
+msgstr "Аңғартпа жалаушасы"
+
+#: models.py:191
+msgid "comment flags"
+msgstr "Аңғартпа жалаушалары"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Аңғартпаны мақұлда"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Бұл аңғартпаны ашық қылуға сенімдісіз бе?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Мақұлдау"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Мақұлдау үшін рахмет"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr "Торпабымыздағы"
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Аңғартпаны өшір"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Аңғартпаны өшіруге сенімдісіз бе?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Өшір"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Өшіргеніңіз үшін рахмет"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Бұл аңғартпаға жалауша қой"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Бұл аңғартпаға жалауша қоюға сенімдісіз бе?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Жалауша"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Жалауша қойғаныңыз үшін рахмет"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "Орналастыру"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Алдын ала қарап алу"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Аңғартпаңыз үшін рахмет"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Аңғартпаңыз үшін рахмет"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "Аңғартпаны алдын ала қарап алу"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] ""
+"one: Төмендегі қатені түзеңіз\n"
+"other: Төмендегі қателерді түзеңіз"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Аңғартпаңызды орналастырыңыз"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "немесе өзгертіңіз"

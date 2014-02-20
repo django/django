@@ -1,0 +1,38 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Nurlan Rakhimzhanov <nurlan.rakhimzhanov@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-02-14 13:42+0000\n"
+"Last-Translator: Nurlan Rakhimzhanov <nurlan.rakhimzhanov@gmail.com>\n"
+"Language-Team: Kazakh (http://www.transifex.com/projects/p/django/language/"
+"kk/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: kk\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: templates/formtools/wizard/wizard_form.html:15
+msgid "first step"
+msgstr ""
+
+#: templates/formtools/wizard/wizard_form.html:16
+msgid "prev step"
+msgstr ""
+
+#: templates/formtools/wizard/wizard_form.html:18
+msgid "submit"
+msgstr ""
+
+#: wizard/legacy.py:159
+msgid ""
+"We apologize, but your form has expired. Please continue filling out the "
+"form from this page."
+msgstr ""
+"Кешірім сұраймыз, бірақ сіздің формаңыздың уақыты өтіп кеткен. Өтініш, "
+"форманы толтыруды осы беттен жалғастырыңыз."

@@ -1,0 +1,298 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# rodin <romihardiyanto@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-02-14 13:24+0000\n"
+"Last-Translator: rodin <romihardiyanto@gmail.com>\n"
+"Language-Team: Indonesian (http://www.transifex.com/projects/p/django/"
+"language/id/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: id\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: admin.py:25
+msgid "Content"
+msgstr "Isi"
+
+#: admin.py:28
+msgid "Metadata"
+msgstr "Metadata"
+
+#: admin.py:55
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "ditandai"
+
+#: admin.py:56
+msgid "Flag selected comments"
+msgstr "Tandai komentar terpilih"
+
+#: admin.py:60
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "disetujui"
+
+#: admin.py:61
+msgid "Approve selected comments"
+msgstr "Setujui komentar terpilih"
+
+#: admin.py:65
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "dihapus"
+
+#: admin.py:66
+msgid "Remove selected comments"
+msgstr "Hapus komentar terpilih"
+
+#: admin.py:78
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] "%(count)s komentar berhasil %(action)s."
+
+#: feeds.py:14
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "komentar pada %(site_name)s"
+
+#: feeds.py:20
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "Komentar terbaru pada %(site_name)s"
+
+#: forms.py:96
+msgid "Name"
+msgstr "Nama"
+
+#: forms.py:97
+msgid "Email address"
+msgstr "Alamat email"
+
+#: forms.py:98
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:99
+msgid "Comment"
+msgstr "Komentar"
+
+#: forms.py:177
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Awas! Kata %s tidak diizinkan di sini."
+
+#: forms.py:181 templates/comments/preview.html:16
+msgid "and"
+msgstr "dan"
+
+#: forms.py:186
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "Jika Anda mengisi bidang ini, komentar Anda akan dianggap sebagai spam"
+
+#: models.py:23
+msgid "content type"
+msgstr "tipe konten"
+
+#: models.py:25
+msgid "object ID"
+msgstr "ID objek"
+
+#: models.py:53 models.py:177
+msgid "user"
+msgstr "pengguna"
+
+#: models.py:55
+msgid "user's name"
+msgstr "nama pengguna"
+
+#: models.py:56
+msgid "user's email address"
+msgstr "alamat email pengguna"
+
+#: models.py:57
+msgid "user's URL"
+msgstr "URL pengguna"
+
+#: models.py:59 models.py:79 models.py:178
+msgid "comment"
+msgstr "komentar"
+
+#: models.py:62
+msgid "date/time submitted"
+msgstr "tanggal/waktu dikirim"
+
+#: models.py:63
+msgid "IP address"
+msgstr "alamat IP"
+
+#: models.py:64
+msgid "is public"
+msgstr "untuk umum"
+
+#: models.py:65
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+"Hapus centang pada kotak ini agar komentar tidak ditampilkan pada situs."
+
+#: models.py:67
+msgid "is removed"
+msgstr "telah dihapus"
+
+#: models.py:68
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Centang kotak ini jika komentar tidak pantas. Pesan \"Komentar ini telah "
+"dihapus\" akan ditampilkan sebagai penggantinya."
+
+#: models.py:80
+msgid "comments"
+msgstr "komentar"
+
+#: models.py:124
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Komentar ini dikirim oleh seorang pengguna terautentikasi sehingga nama "
+"pengguna tidak dapat diubah."
+
+#: models.py:134
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Komentar ini dikirim oleh seorang pengguna terautentikasi sehingga alamat "
+"email tidak dapat diubah."
+
+#: models.py:160
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Dikirim oleh %(user)s pada %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:179
+msgid "flag"
+msgstr "tanda"
+
+#: models.py:180
+msgid "date"
+msgstr "tanggal"
+
+#: models.py:190
+msgid "comment flag"
+msgstr "tanda komentar"
+
+#: models.py:191
+msgid "comment flags"
+msgstr "tanda komentar"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Setujui komentar"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Yakin ingin menampilkan komentar ini untuk umum?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Setujui"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Terima kasih telah menyetujui komentar"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+"Terima kasih telah membantu meningkatkan kualitas diskusi pada situs kami"
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Hapus komentar"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Yakin ingin menghapus komentar ini?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Hapus"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Terima kasih telah menghapus"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Tandai komentar ini"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Yakin ingin menandai komentar ini?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Tandai"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Terima kasih telah menandai"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "Kirim"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Pratinjau"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Terima kasih telah meninggalkan komentar"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Terima kasih atas komentar Anda"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "Pratinjau komentar Anda"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Mohon perbaiki kesalahan di bawah ini"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Kirim komentar Anda"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "atau lakukan perubahan"

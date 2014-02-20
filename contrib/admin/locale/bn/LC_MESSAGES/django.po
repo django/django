@@ -1,0 +1,830 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Translators:
+#  <anubhab91@gmail.com>, 2013.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+#   <rafi.tahmid@gmail.com>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-01-01 16:10+0100\n"
+"PO-Revision-Date: 2013-02-20 15:10+0000\n"
+"Last-Translator: anubhab91 <anubhab91@gmail.com>\n"
+"Language-Team: Bengali (http://www.transifex.com/projects/p/django/language/"
+"bn/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: bn\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: actions.py:48
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "%(count)d টি %(items)s সফলভাবে মুছে ফেলা হয়েছে"
+
+#: actions.py:60 options.py:1347
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "%(name)s ডিলিট করা সম্ভব নয়"
+
+#: actions.py:62 options.py:1349
+msgid "Are you sure?"
+msgstr "আপনি কি নিশ্চিত?"
+
+#: actions.py:83
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "চিহ্নিত অংশটি %(verbose_name_plural)s মুছে ফেলুন"
+
+#: filters.py:101 filters.py:197 filters.py:237 filters.py:274 filters.py:380
+msgid "All"
+msgstr "সকল"
+
+#: filters.py:238
+msgid "Yes"
+msgstr "হ্যাঁ"
+
+#: filters.py:239
+msgid "No"
+msgstr "না"
+
+#: filters.py:253
+msgid "Unknown"
+msgstr "অজানা"
+
+#: filters.py:308
+msgid "Any date"
+msgstr "যে কোন তারিখ"
+
+#: filters.py:309
+msgid "Today"
+msgstr "‍আজ"
+
+#: filters.py:313
+msgid "Past 7 days"
+msgstr "শেষ ৭ দিন"
+
+#: filters.py:317
+msgid "This month"
+msgstr "এ মাসে"
+
+#: filters.py:321
+msgid "This year"
+msgstr "এ বছরে"
+
+#: forms.py:9
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+
+#: forms.py:19
+msgid "Please log in again, because your session has expired."
+msgstr "অনুগ্রহ করে পুনরায় প্রবেশ করুন, কেননা আপনার সেশনের মেয়াদ শেষ।"
+
+#: helpers.py:23
+msgid "Action:"
+msgstr "কাজ:"
+
+#: models.py:24
+msgid "action time"
+msgstr "কার্য সময়"
+
+#: models.py:27
+msgid "object id"
+msgstr "অবজেক্ট আইডি"
+
+#: models.py:28
+msgid "object repr"
+msgstr "অবজেক্ট উপস্থাপক"
+
+#: models.py:29
+msgid "action flag"
+msgstr "কার্যচিহ্ন"
+
+#: models.py:30
+msgid "change message"
+msgstr "বার্তা পরিবর্তন করুন"
+
+#: models.py:35
+msgid "log entry"
+msgstr "লগ এন্ট্রি"
+
+#: models.py:36
+msgid "log entries"
+msgstr "লগ এন্ট্রিসমূহ"
+
+#: models.py:45
+#, python-format
+msgid "Added \"%(object)s\"."
+msgstr "%(object)s অ্যাড করা হয়েছে"
+
+#: models.py:47
+#, python-format
+msgid "Changed \"%(object)s\" - %(changes)s"
+msgstr ""
+
+#: models.py:52
+#, python-format
+msgid "Deleted \"%(object)s.\""
+msgstr "\"%(object)s\" ডিলিট করা হয়েছে"
+
+#: models.py:54
+msgid "LogEntry Object"
+msgstr "লগ-এন্ট্রি দ্রব্য"
+
+#: options.py:156 options.py:172
+msgid "None"
+msgstr "কিছু না"
+
+#: options.py:684
+#, python-format
+msgid "Changed %s."
+msgstr "%s পরিবর্তিত হয়েছে।"
+
+#: options.py:684 options.py:694
+msgid "and"
+msgstr "এবং"
+
+#: options.py:689
+#, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "%(name)s \"%(object)s\" যুক্ত হয়েছে।"
+
+#: options.py:693
+#, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr "%(name)s \"%(object)s\" এর জন্য %(list)s পরিবর্তিত হয়েছে।"
+
+#: options.py:698
+#, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "%(name)s \"%(object)s\" মোছা হয়েছে।"
+
+#: options.py:702
+msgid "No fields changed."
+msgstr "কোন ফিল্ড পরিবর্তন হয়নি।"
+
+#: options.py:807 options.py:860
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+"%(name)s \"%(obj)s\" সফলতার সাথে যুক্ত হয়েছে। আপনি নিচে থেকে এটি পুনরায় সম্পাদন "
+"করতে পারেন।"
+
+#: options.py:835
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may add another "
+"%(name)s below."
+msgstr ""
+
+#: options.py:839
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" সফলতার সাথে যুক্ত হয়েছে।"
+
+#: options.py:853
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"below."
+msgstr ""
+
+#: options.py:867
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
+"%(name)s below."
+msgstr ""
+
+#: options.py:873
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" সফলতার সাথে পরিবর্তিত হয়েছে।"
+
+#: options.py:951 options.py:1211
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr "কাজ করার আগে বস্তুগুলিকে অবশ্যই চিহ্নিত করতে হবে। কোনো বস্তু পরিবর্তিত হয়নি।"
+
+#: options.py:970
+msgid "No action selected."
+msgstr "কোনো কাজ "
+
+#: options.py:1050
+#, python-format
+msgid "Add %s"
+msgstr "%s যোগ করুন"
+
+#: options.py:1074 options.py:1319
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
+#: options.py:1140
+#, python-format
+msgid "Change %s"
+msgstr "%s পরিবর্তন করুন"
+
+#: options.py:1190
+msgid "Database error"
+msgstr "ডাটাবেস সমস্যা"
+
+#: options.py:1253
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] ""
+msgstr[1] ""
+
+#: options.py:1280
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#: options.py:1285
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "%(cnt)s টি থেকে ০ টি সিলেক্ট করা হয়েছে"
+
+#: options.py:1335
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" সফলতার সাথে মুছে ফেলা হয়েছে।"
+
+#: options.py:1382
+#, python-format
+msgid "Change history: %s"
+msgstr "ইতিহাস পরিবর্তনঃ %s"
+
+#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#: templates/registration/password_reset_complete.html:19
+#: views/decorators.py:24
+msgid "Log in"
+msgstr "প্রবেশ করুন"
+
+#: sites.py:388
+msgid "Site administration"
+msgstr "সাইট প্রশাসন"
+
+#: sites.py:440
+#, python-format
+msgid "%s administration"
+msgstr "%s প্রশাসন"
+
+#: widgets.py:90
+msgid "Date:"
+msgstr "তারিখঃ"
+
+#: widgets.py:91
+msgid "Time:"
+msgstr "সময়ঃ"
+
+#: widgets.py:165
+msgid "Lookup"
+msgstr "খুঁজুন"
+
+#: widgets.py:271
+msgid "Add Another"
+msgstr "আরেকটি যোগ করুন"
+
+#: widgets.py:316
+msgid "Currently:"
+msgstr "বর্তমান অবস্থা:"
+
+#: widgets.py:317
+msgid "Change:"
+msgstr "পরিবর্তন:"
+
+#: templates/admin/404.html:4 templates/admin/404.html.py:8
+msgid "Page not found"
+msgstr "পৃষ্ঠা পাওয়া যায়নি"
+
+#: templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "দুঃখিত, অনুরোধকৃত পাতাটি পাওয়া যায়নি।"
+
+#: templates/admin/500.html:6 templates/admin/app_index.html:7
+#: templates/admin/base.html:47 templates/admin/change_form.html:19
+#: templates/admin/change_list.html:41
+#: templates/admin/delete_confirmation.html:7
+#: templates/admin/delete_selected_confirmation.html:7
+#: templates/admin/invalid_setup.html:6 templates/admin/object_history.html:7
+#: templates/admin/auth/user/change_password.html:13
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:6
+#: templates/registration/password_change_form.html:7
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_confirm.html:6
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_form.html:6
+msgid "Home"
+msgstr "নীড়পাতা"
+
+#: templates/admin/500.html:7
+msgid "Server error"
+msgstr "সার্ভার সমস্যা"
+
+#: templates/admin/500.html:11
+msgid "Server error (500)"
+msgstr "সার্ভার সমস্যা (৫০০)"
+
+#: templates/admin/500.html:14
+msgid "Server Error <em>(500)</em>"
+msgstr "সার্ভার সমস্যা <em>(৫০০)</em>"
+
+#: templates/admin/500.html:15
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+
+#: templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr "চিহ্নিত কাজটি শুরু করুন"
+
+#: templates/admin/actions.html:4
+msgid "Go"
+msgstr "যান"
+
+#: templates/admin/actions.html:11
+msgid "Click here to select the objects across all pages"
+msgstr "সকল পৃষ্ঠার দ্রব্য পছন্দ করতে এখানে ক্লিক করুন"
+
+#: templates/admin/actions.html:11
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr ""
+
+#: templates/admin/actions.html:13
+msgid "Clear selection"
+msgstr "চিহ্নিত অংশের চিহ্ন মুছে ফেলুন"
+
+#: templates/admin/app_index.html:10 templates/admin/index.html:21
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: templates/admin/base.html:28
+msgid "Welcome,"
+msgstr "স্বাগতম,"
+
+#: templates/admin/base.html:33
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
+msgid "Documentation"
+msgstr "সহায়িকা"
+
+#: templates/admin/base.html:36
+#: templates/admin/auth/user/change_password.html:17
+#: templates/admin/auth/user/change_password.html:51
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
+msgid "Change password"
+msgstr "পাসওয়ার্ড বদলান"
+
+#: templates/admin/base.html:38
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
+msgid "Log out"
+msgstr "প্রস্থান"
+
+#: templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "জ্যাঙ্গো সাইট প্রশাসক"
+
+#: templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "জ্যাঙ্গো প্রশাসন"
+
+#: templates/admin/change_form.html:22 templates/admin/index.html:33
+msgid "Add"
+msgstr "যোগ করুন"
+
+#: templates/admin/change_form.html:32 templates/admin/object_history.html:11
+msgid "History"
+msgstr "ইতিহাস"
+
+#: templates/admin/change_form.html:33
+#: templates/admin/edit_inline/stacked.html:9
+#: templates/admin/edit_inline/tabular.html:30
+msgid "View on site"
+msgstr "সাইটে দেখুন"
+
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "অনুগ্রহ করে নিচের ভুলটি সংশোধন করুন।"
+msgstr[1] "অনুগ্রহ করে নিচের ভুলগুলো সংশোধন করুন।"
+
+#: templates/admin/change_list.html:58
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s যোগ করুন"
+
+#: templates/admin/change_list.html:78
+msgid "Filter"
+msgstr "ফিল্টার"
+
+#: templates/admin/change_list_results.html:17
+msgid "Remove from sorting"
+msgstr "ক্রমানুসারে সাজানো থেকে বিরত হোন"
+
+#: templates/admin/change_list_results.html:18
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr ""
+
+#: templates/admin/change_list_results.html:19
+msgid "Toggle sorting"
+msgstr "ক্রমানুসারে সাজানো চালু করুন/ বন্ধ করুন"
+
+#: templates/admin/delete_confirmation.html:11
+#: templates/admin/submit_line.html:4
+msgid "Delete"
+msgstr "মুছুন"
+
+#: templates/admin/delete_confirmation.html:18
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"%(object_name)s '%(escaped_object)s' মুছে ফেললে এর সম্পর্কিত অবজেক্টগুলোও মুছে "
+"যাবে, কিন্তু আপনার নিম্নবর্ণিত অবজেক্টগুলো মোছার অধিকার নেইঃ"
+
+#: templates/admin/delete_confirmation.html:26
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+
+#: templates/admin/delete_confirmation.html:34
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"আপনি কি %(object_name)s \"%(escaped_object)s\" মুছে ফেলার ব্যাপারে নিশ্চিত? "
+"নিম্নে বর্ণিত সকল আইটেম মুছে যাবেঃ"
+
+#: templates/admin/delete_confirmation.html:39
+#: templates/admin/delete_selected_confirmation.html:44
+msgid "Yes, I'm sure"
+msgstr "হ্যা়ঁ, আমি নিশ্চিত"
+
+#: templates/admin/delete_selected_confirmation.html:10
+msgid "Delete multiple objects"
+msgstr "একাধিক জিনিস মুছে ফেলুন"
+
+#: templates/admin/delete_selected_confirmation.html:17
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+
+#: templates/admin/delete_selected_confirmation.html:25
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+
+#: templates/admin/delete_selected_confirmation.html:33
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+
+#: templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " %(filter_title)s অনুযায়ী "
+
+#: templates/admin/index.html:20
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr ""
+
+#: templates/admin/index.html:39
+msgid "Change"
+msgstr "পরিবর্তন"
+
+#: templates/admin/index.html:49
+msgid "You don't have permission to edit anything."
+msgstr "কোন কিছু পরিবর্তনে আপনার অধিকার নেই।"
+
+#: templates/admin/index.html:57
+msgid "Recent Actions"
+msgstr "সাম্প্রতিক কার্যাবলী"
+
+#: templates/admin/index.html:58
+msgid "My Actions"
+msgstr "আমার কার্যাবলী"
+
+#: templates/admin/index.html:62
+msgid "None available"
+msgstr "কিছুই পাওয়া যায়নি"
+
+#: templates/admin/index.html:76
+msgid "Unknown content"
+msgstr "অজানা বিষয়"
+
+#: templates/admin/invalid_setup.html:12
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"আপনার ডাটাবেস ইনস্টলে সমস্যা হয়েছে। নিশ্চিত করুন যে, ডাটাবেস টেবিলগুলো সঠিকভাবে "
+"তৈরী হয়েছে, এবং যথাযথ সদস্যের ডাটাবেস পড়ার অধিকার রয়েছে।"
+
+#: templates/admin/login.html:37
+msgid "Password:"
+msgstr "পাসওয়ার্ডঃ"
+
+#: templates/admin/login.html:44
+msgid "Forgotten your password or username?"
+msgstr "ইউজার নেইম অথবা পাসওয়ার্ড ভুলে গেছেন?"
+
+#: templates/admin/object_history.html:23
+msgid "Date/time"
+msgstr "তারিখ/সময়"
+
+#: templates/admin/object_history.html:24
+msgid "User"
+msgstr "সদস্য"
+
+#: templates/admin/object_history.html:25
+msgid "Action"
+msgstr "কার্য"
+
+#: templates/admin/object_history.html:39
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr "এই অবজেক্টের কোন ইতিহাস নেই। সম্ভবত এটি প্রশাসন সাইট দিয়ে তৈরী করা হয়নি।"
+
+#: templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "সব দেখান"
+
+#: templates/admin/pagination.html:11 templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "সংরক্ষণ করুন"
+
+#: templates/admin/search_form.html:7
+msgid "Search"
+msgstr "সার্চ"
+
+#: templates/admin/search_form.html:9
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/search_form.html:9
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "মোট %(full_result_count)s"
+
+#: templates/admin/submit_line.html:5
+msgid "Save as new"
+msgstr "নতুনভাবে সংরক্ষণ করুন"
+
+#: templates/admin/submit_line.html:6
+msgid "Save and add another"
+msgstr "সংরক্ষণ করুন এবং আরেকটি যোগ করুন"
+
+#: templates/admin/submit_line.html:7
+msgid "Save and continue editing"
+msgstr "সংরক্ষণ করুন এবং সম্পাদনা চালিয়ে যান"
+
+#: templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"প্রথমে একটি সদস্যনাম ও পাসওয়ার্ড প্রবেশ করান। তারপরে আপনি ‍আরও সদস্য-অপশন যুক্ত করতে "
+"পারবেন।"
+
+#: templates/admin/auth/user/add_form.html:8
+msgid "Enter a username and password."
+msgstr "ইউজার নেইম এবং পাসওয়ার্ড টাইপ করুন।"
+
+#: templates/admin/auth/user/change_password.html:31
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "<strong>%(username)s</strong> সদস্যের জন্য নতুন পাসওয়ার্ড দিন।"
+
+#: templates/admin/auth/user/change_password.html:38
+msgid "Password"
+msgstr "পাসওয়ার্ড"
+
+#: templates/admin/auth/user/change_password.html:44
+#: templates/registration/password_change_form.html:42
+msgid "Password (again)"
+msgstr "পাসওয়ার্ড (পুনরায়)"
+
+#: templates/admin/auth/user/change_password.html:45
+msgid "Enter the same password as above, for verification."
+msgstr "উপরের পাসওয়ার্ডটি পুনরায় প্রবেশ করান, যাচাইয়ের জন্য।"
+
+#: templates/admin/edit_inline/stacked.html:26
+#: templates/admin/edit_inline/tabular.html:76
+msgid "Remove"
+msgstr "মুছে ফেলুন"
+
+#: templates/admin/edit_inline/stacked.html:27
+#: templates/admin/edit_inline/tabular.html:75
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr ""
+
+#: templates/admin/edit_inline/tabular.html:17
+msgid "Delete?"
+msgstr "মুছে ফেলুন?"
+
+#: templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "ওয়েবসাইটে কিছু সময় কাটানোর জন্য আপনাকে আন্তরিক ধন্যবাদ।"
+
+#: templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "পুনরায় প্রবেশ করুন"
+
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_change_form.html:12
+#: templates/registration/password_change_form.html:24
+msgid "Password change"
+msgstr "পাসওয়ার্ড বদলান"
+
+#: templates/registration/password_change_done.html:11
+#: templates/registration/password_change_done.html:15
+msgid "Password change successful"
+msgstr "পাসওয়ার্ড বদল সফল হয়েছে"
+
+#: templates/registration/password_change_done.html:17
+msgid "Your password was changed."
+msgstr "আপনার পাসওয়ার্ড বদলানো হয়েছে।"
+
+#: templates/registration/password_change_form.html:26
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"অনুগ্রহ করে আপনার পুরনো পাসওয়ার্ড প্রবেশ করান, নিরাপত্তার কাতিরে, এবং পরপর দু’বার "
+"নতুন পাসওয়ার্ড প্রবেশ করান, যাচাই করার জন্য।"
+
+#: templates/registration/password_change_form.html:32
+msgid "Old password"
+msgstr "পুরনো পাসওয়ার্ড"
+
+#: templates/registration/password_change_form.html:37
+msgid "New password"
+msgstr "নতুন পাসওয়ার্ড"
+
+#: templates/registration/password_change_form.html:48
+#: templates/registration/password_reset_confirm.html:26
+msgid "Change my password"
+msgstr "আমার পাসওয়ার্ড পরিবর্তন করুন"
+
+#: templates/registration/password_reset_complete.html:7
+#: templates/registration/password_reset_confirm.html:11
+#: templates/registration/password_reset_done.html:7
+#: templates/registration/password_reset_form.html:7
+#: templates/registration/password_reset_form.html:11
+#: templates/registration/password_reset_form.html:15
+msgid "Password reset"
+msgstr "পাসওয়ার্ড রিসেট করুন"
+
+#: templates/registration/password_reset_complete.html:11
+#: templates/registration/password_reset_complete.html:15
+msgid "Password reset complete"
+msgstr "পাসওয়ার্ড রিসেট সম্পন্ন হয়েছে"
+
+#: templates/registration/password_reset_complete.html:17
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "আপনার পাসওয়ার্ড দেয়া হয়েছে। আপনি এখন প্রবেশ (লগইন) করতে পারেন।"
+
+#: templates/registration/password_reset_confirm.html:7
+msgid "Password reset confirmation"
+msgstr "পাসওয়ার্ড রিসেট নিশ্চিত করুন"
+
+#: templates/registration/password_reset_confirm.html:17
+msgid "Enter new password"
+msgstr "নতুন পাসওয়ার্ড দিন"
+
+#: templates/registration/password_reset_confirm.html:19
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"অনুগ্রহ করে আপনার পাসওয়ার্ড দুবার প্রবেশ করান, যাতে আমরা যাচাই করতে পারি আপনি "
+"সঠিকভাবে টাইপ করেছেন।"
+
+#: templates/registration/password_reset_confirm.html:23
+msgid "New password:"
+msgstr "নতুন পাসওয়ার্ডঃ"
+
+#: templates/registration/password_reset_confirm.html:25
+msgid "Confirm password:"
+msgstr "পাসওয়ার্ড নিশ্চিতকরণঃ"
+
+#: templates/registration/password_reset_confirm.html:31
+msgid "Password reset unsuccessful"
+msgstr "পাসওয়ার্ড রিসেট সফল হয়নি"
+
+#: templates/registration/password_reset_confirm.html:33
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"পাসওয়ার্ড রিসেট লিঙ্কটি ঠিক নয়, হয়তো এটা ইতোমধ্যে ব্যবহৃত হয়েছে। পাসওয়ার্ড "
+"রিসেটের জন্য অনুগ্রহ করে নতুনভাবে আবেদন করুন।"
+
+#: templates/registration/password_reset_done.html:11
+#: templates/registration/password_reset_done.html:15
+msgid "Password reset successful"
+msgstr "পাসওয়ার্ড রিসেট সফল হয়েছে"
+
+#: templates/registration/password_reset_done.html:17
+msgid ""
+"We've emailed you instructions for setting your password to the email "
+"address you submitted. You should be receiving it shortly."
+msgstr ""
+
+#: templates/registration/password_reset_email.html:2
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+
+#: templates/registration/password_reset_email.html:4
+msgid "Please go to the following page and choose a new password:"
+msgstr "অনুগ্রহ করে নিচের পাতাটিতে যান এবং নতুন পাসওয়ার্ড বাছাই করুনঃ"
+
+#: templates/registration/password_reset_email.html:8
+msgid "Your username, in case you've forgotten:"
+msgstr "আপনার সদস্যনাম, যদি ভুলে গিয়ে থাকেনঃ"
+
+#: templates/registration/password_reset_email.html:10
+msgid "Thanks for using our site!"
+msgstr "আমাদের সাইট ব্যবহারের জন্য ধন্যবাদ!"
+
+#: templates/registration/password_reset_email.html:12
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s দল"
+
+#: templates/registration/password_reset_form.html:17
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll email "
+"instructions for setting a new one."
+msgstr ""
+
+#: templates/registration/password_reset_form.html:21
+msgid "Email address:"
+msgstr "ইমেইল ঠিকানা:"
+
+#: templates/registration/password_reset_form.html:21
+msgid "Reset my password"
+msgstr "আমার পাসওয়ার্ড রিসেট করুন"
+
+#: templatetags/admin_list.py:344
+msgid "All dates"
+msgstr "সকল তারিখ"
+
+#: views/main.py:33
+msgid "(None)"
+msgstr "(কিছুই না)"
+
+#: views/main.py:76
+#, python-format
+msgid "Select %s"
+msgstr "%s বাছাই করুন"
+
+#: views/main.py:78
+#, python-format
+msgid "Select %s to change"
+msgstr "%s পরিবর্তনের জন্য বাছাই করুন"

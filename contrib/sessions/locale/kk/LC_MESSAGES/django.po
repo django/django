@@ -1,0 +1,39 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+#   <germanilyin@gmail.com>, 2011.
+#   <zhazira.mt@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
+"PO-Revision-Date: 2012-02-14 13:40+0000\n"
+"Last-Translator: Zhazira <zhazira.mt@gmail.com>\n"
+"Language-Team: Kazakh (http://www.transifex.com/projects/p/django/language/"
+"kk/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: kk\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: models.py:38
+msgid "session key"
+msgstr "сессия кілті"
+
+#: models.py:40
+msgid "session data"
+msgstr "сессия деректері"
+
+#: models.py:41
+msgid "expire date"
+msgstr "істен шығу уақыты"
+
+#: models.py:46
+msgid "session"
+msgstr "сессия"
+
+#: models.py:47
+msgid "sessions"
+msgstr "сессиялар"

@@ -1,0 +1,309 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Dimitris Glezos <glezos@indifex.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Yorgos Pagles <y.pagles@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-02-14 13:24+0000\n"
+"Last-Translator: Yorgos Pagles <y.pagles@gmail.com>\n"
+"Language-Team: Greek (http://www.transifex.com/projects/p/django/language/"
+"el/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: el\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:25
+msgid "Content"
+msgstr "Περιεχόμενο"
+
+#: admin.py:28
+msgid "Metadata"
+msgstr "Μεταδεδομένα"
+
+#: admin.py:55
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "επισημασμένο"
+msgstr[1] "επισημασμένα"
+
+#: admin.py:56
+msgid "Flag selected comments"
+msgstr "Επισημανση των επιλεγμένων σχολίων"
+
+#: admin.py:60
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "εγκρίθηκε"
+msgstr[1] "εγκρίθηκαν"
+
+#: admin.py:61
+msgid "Approve selected comments"
+msgstr "Έγκριση των συγκεκριμένων σχολίων"
+
+#: admin.py:65
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "αφαιρέθηκε"
+msgstr[1] "αφαιρέθηκαν"
+
+#: admin.py:66
+msgid "Remove selected comments"
+msgstr "Αφαίρεση των επιλεγμένων σχολίων"
+
+#: admin.py:78
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+msgstr[1] "Πραγματοποιήθκε επιτυχημένα %(action)s στα %(count)s σχόλια."
+
+#: feeds.py:14
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "Σχόλια στο %(site_name)s"
+
+#: feeds.py:20
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "Τελευταία σχόλια στο %(site_name)s"
+
+#: forms.py:96
+msgid "Name"
+msgstr "Όνομα"
+
+#: forms.py:97
+msgid "Email address"
+msgstr "Ηλεκτρονική διεύθυνση"
+
+#: forms.py:98
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:99
+msgid "Comment"
+msgstr "Σχόλιο"
+
+#: forms.py:177
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Η λέξη %s δεν επιτρέπεται σε σχόλια."
+msgstr[1] "Η λέξεις %s δεν επιτρέπονται σε σχόλια."
+
+#: forms.py:181 templates/comments/preview.html:16
+msgid "and"
+msgstr "και"
+
+#: forms.py:186
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+"Αφήστε αυτό το πεδίο κενό. Αν εισάγετε κάτι τότε το σχόλιο θα θεωρηθεί spam "
+"και δεν θα εμφανιστεί."
+
+#: models.py:23
+msgid "content type"
+msgstr "τύπος περιεχομένου"
+
+#: models.py:25
+msgid "object ID"
+msgstr "ID αντικειμένου"
+
+#: models.py:53 models.py:177
+msgid "user"
+msgstr "χρήστης"
+
+#: models.py:55
+msgid "user's name"
+msgstr "όνομα χρήστη"
+
+#: models.py:56
+msgid "user's email address"
+msgstr "ηλεκτρονική διεύθυνση χρήστη"
+
+#: models.py:57
+msgid "user's URL"
+msgstr "διεύθυνση ιστοτόπου χρήστη"
+
+#: models.py:59 models.py:79 models.py:178
+msgid "comment"
+msgstr "σχόλιο"
+
+#: models.py:62
+msgid "date/time submitted"
+msgstr "ημερομηνία/ώρα υποβολής"
+
+#: models.py:63
+msgid "IP address"
+msgstr "διεύθυνση IP"
+
+#: models.py:64
+msgid "is public"
+msgstr "είναι δημόσιο"
+
+#: models.py:65
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+"Απεπιλέξτε αυτή την επιλογή για να κάνετε το σχόλιο να μην εμφανίζεται."
+
+#: models.py:67
+msgid "is removed"
+msgstr "είναι διαγραμμένο"
+
+#: models.py:68
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Επιλέξτε αυτή την επιλογή εάν το σχόλιο είναι ανάρμοστο. Ένα μήνυμα \"Αυτό "
+"το σχόλιο διαγράφηκε\" θα εμφανιστεί στη θέση του."
+
+#: models.py:80
+msgid "comments"
+msgstr "σχόλια"
+
+#: models.py:124
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Αυτό το σχόλιο πραγματοποιήθκε από πιστοποιημένο χρήστη και για τον λόγο "
+"αυτό δεν είναι είναι δυνατή η επεξεργασία του ονόματός του."
+
+#: models.py:134
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Αυτό το σχόλιο πραγματοποιήθκε από πιστοποιημένο χρήστη και για τον λόγο "
+"αυτό δεν είναι είναι δυνατή η επεξεργασία της διεύθυνσης του ηλεκτρονικού "
+"του ταχυδρομείου."
+
+#: models.py:160
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Σχόλιο από %(user)s στις %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:179
+msgid "flag"
+msgstr "επισήμανση"
+
+#: models.py:180
+msgid "date"
+msgstr "ημερομηνία"
+
+#: models.py:190
+msgid "comment flag"
+msgstr "επισήμανση σχολίου"
+
+#: models.py:191
+msgid "comment flags"
+msgstr "επισημάνσεις σχολίου"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Έγκριση σχολίου"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Επιβεβαιώστε ότι επιθυμείτε την δημόσια εμφάνιση του σχολίου."
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Έγκριση."
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Ευχαριστούμε για την έγκριση."
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+"Ευχαριστούμε για τον χρόνο που διαθέσατε για την βελτίωση της ποιότητας των "
+"σχολίων στον ιστότοπό μας."
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Αφαίρεση σχολίου"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Επιβεβαιώστε ότι επιθυμείτε την αφαίρεση του σχολίου."
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Αφαίρεση"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Ευχαριστούμε για την αφαίρεση"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Επισήμανση σχολίου"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Επιβεβαιώστε ότι επιθυμείτε την επισήμανσση του σχολίου."
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Επισήμανση"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Ευχαριστούμε για την επισήμανση"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "Δημοσίευση"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Προβολή:"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Ευχαριστούμε για το σχόλιό σας"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Ευχαριστούμε για το σχόλιό σας"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "Προβολή του σχολίου σας"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Παρακαλούμε διορθώστε το παρακάτω σφάλμα:"
+msgstr[1] "Παρακαλούμε διορθώστε τα παρακάτω σφάλματα:"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Δημοσιοποίηση του σχολίου σας"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "ή πραγματοποιήστε αλλαγές"
