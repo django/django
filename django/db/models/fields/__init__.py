@@ -1800,7 +1800,7 @@ class SmallIntegerField(IntegerField):
             'max_value': SmallIntegerField.MAX_SMALLINT,
         }
         defaults.update(kwargs)
-        return super(BigIntegerField, self).formfield(**defaults)
+        return super(SmallIntegerField, self).formfield(**defaults)
 
 
 class PositiveSmallIntegerField(IntegerField):
