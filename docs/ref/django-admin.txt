@@ -383,13 +383,16 @@ onto which the data will be loaded.
 
 .. django-admin-option:: --ignorenonexistent
 
-The :djadminopt:`--ignorenonexistent` option can be used to ignore fields that
-may have been removed from models since the fixture was originally generated.
-
+The :djadminopt:`--ignorenonexistent` option can be used to ignore fields and
+models that may have been removed since the fixture was originally generated.
 
 .. versionchanged:: 1.7
 
     ``--app`` was added.
+
+.. versionchanged:: 1.8
+
+    ``--ignorenonexistent`` also ignores non-existent models.
 
 .. django-admin-option:: --app
 

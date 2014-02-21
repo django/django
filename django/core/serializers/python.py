@@ -90,7 +90,13 @@ def Deserializer(object_list, **options):
 
     for d in object_list:
         # Look up the model and starting build a dict of data for it.
-        Model = _get_model(d["model"])
+        try:
+            Model = _get_model(d["model"])
+        except base.DeserializationError as e:
+            if ignore:
+                continue
+            else:
+                raise e
         data = {}
         if 'pk' in d:
             data[Model._meta.pk.attname] = Model._meta.pk.to_python(d.get("pk", None))
