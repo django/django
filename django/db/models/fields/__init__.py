@@ -1596,7 +1596,6 @@ class IntegerField(Field):
 
 
 class BigIntegerField(IntegerField):
-    empty_strings_allowed = False
     description = _("Big (8 byte) integer")
     MAX_BIGINT = 9223372036854775807
 
@@ -1604,8 +1603,10 @@ class BigIntegerField(IntegerField):
         return "BigIntegerField"
 
     def formfield(self, **kwargs):
-        defaults = {'min_value': -BigIntegerField.MAX_BIGINT - 1,
-                    'max_value': BigIntegerField.MAX_BIGINT}
+        defaults = {
+            'min_value': -BigIntegerField.MAX_BIGINT - 1,
+            'max_value': BigIntegerField.MAX_BIGINT,
+        }
         defaults.update(kwargs)
         return super(BigIntegerField, self).formfield(**defaults)
 
@@ -1786,6 +1787,22 @@ class PositiveIntegerField(IntegerField):
         return super(PositiveIntegerField, self).formfield(**defaults)
 
 
+class SmallIntegerField(IntegerField):
+    description = _("Small integer")
+    MAX_SMALLINT = 32767
+
+    def get_internal_type(self):
+        return "SmallIntegerField"
+
+    def formfield(self, **kwargs):
+        defaults = {
+            'min_value': -SmallIntegerField.MAX_SMALLINT - 1,
+            'max_value': SmallIntegerField.MAX_SMALLINT,
+        }
+        defaults.update(kwargs)
+        return super(BigIntegerField, self).formfield(**defaults)
+
+
 class PositiveSmallIntegerField(IntegerField):
     description = _("Positive small integer")
 
@@ -1793,7 +1810,10 @@ class PositiveSmallIntegerField(IntegerField):
         return "PositiveSmallIntegerField"
 
     def formfield(self, **kwargs):
-        defaults = {'min_value': 0}
+        defaults = {
+            'min_value': 0,
+            'max_value': SmallIntegerField.MAX_SMALLINT,
+        }
         defaults.update(kwargs)
         return super(PositiveSmallIntegerField, self).formfield(**defaults)
 
@@ -1826,13 +1846,6 @@ class SlugField(CharField):
         defaults = {'form_class': forms.SlugField}
         defaults.update(kwargs)
         return super(SlugField, self).formfield(**defaults)
-
-
-class SmallIntegerField(IntegerField):
-    description = _("Small integer")
-
-    def get_internal_type(self):
-        return "SmallIntegerField"
 
 
 class TextField(Field):
