@@ -2,6 +2,7 @@ import sys
 import threading
 import weakref
 
+from django.utils import six
 from django.utils.six.moves import xrange
 
 if sys.version_info < (3, 4):
@@ -95,12 +96,19 @@ class Signal(object):
             # try a couple different ways but in the end fall back on assuming
             # it is -- we don't want to prevent registration of valid but weird
             # callables.
+            if six.PY2:
+                getargspec = inspect.getargspec
+            else:
+                # The inspect.getargspec function throw ValueError if
+                # the receiver contains annotations or keyword-only arguments.
+                getargspec = inspect.getfullargspec
+
             try:
-                argspec = inspect.getargspec(receiver)
+                argspec = getargspec(receiver)
             except TypeError:
                 try:
-                    argspec = inspect.getargspec(receiver.__call__)
-                except (TypeError, AttributeError):
+                    argspec = getargspec(receiver.__call__)
+                except (TypeError, AttributeError, ValueError):
                     argspec = None
             if argspec:
                 assert argspec[2] is not None, \
