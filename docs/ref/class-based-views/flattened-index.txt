@@ -54,9 +54,10 @@ RedirectView
 **Attributes** (with optional accessor):
 
 * :attr:`~django.views.generic.base.View.http_method_names`
+* :attr:`~django.views.generic.base.RedirectView.pattern_name`
 * :attr:`~django.views.generic.base.RedirectView.permanent`
 * :attr:`~django.views.generic.base.RedirectView.query_string`
-* :attr:`~django.views.generic.base.RedirectView.url`
+* :attr:`~django.views.generic.base.RedirectView.url` [:meth:`~django.views.generic.base.RedirectView.get_redirect_url`]
 
 **Methods**
 
@@ -64,7 +65,6 @@ RedirectView
 * ``delete()``
 * :meth:`~django.views.generic.base.View.dispatch`
 * ``get()``
-* :meth:`~django.views.generic.base.RedirectView.get_redirect_url`
 * ``head()``
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
 * ``options()``
