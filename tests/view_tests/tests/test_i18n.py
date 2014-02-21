@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import gettext
+import json
 import os
 from os import path
 import unittest
@@ -11,7 +12,6 @@ from django.test import (
 from django.utils import six
 from django.utils._os import upath
 from django.utils.translation import override
-from django.utils.text import javascript_quote
 
 try:
     from selenium.webdriver.firefox import webdriver as firefox
@@ -63,8 +63,8 @@ class I18NTests(TestCase):
                 response = self.client.get('/jsi18n/')
                 # response content must include a line like:
                 # "this is to be translated": <value of trans_txt Python variable>
-                # javascript_quote is used to be able to check unicode strings
-                self.assertContains(response, javascript_quote(trans_txt), 1)
+                # json.dumps() is used to be able to check unicode strings
+                self.assertContains(response, json.dumps(trans_txt), 1)
                 if lang_code == 'fr':
                     # Message with context (msgctxt)
                     self.assertContains(response, r'"month name\u0004May": "mai"', 1)
@@ -120,7 +120,7 @@ class JsI18NTests(TestCase):
         """
         with self.settings(LANGUAGE_CODE='fr'), override('en-us'):
             response = self.client.get('/jsi18n_english_translation/')
-            self.assertContains(response, javascript_quote('this app0 string is to be translated'))
+            self.assertContains(response, 'this app0 string is to be translated')
 
     def testI18NLanguageNonEnglishFallback(self):
         """
@@ -165,7 +165,7 @@ class JsI18NTestsMultiPackage(TestCase):
         """
         with self.settings(LANGUAGE_CODE='en-us'), override('fr'):
             response = self.client.get('/jsi18n_multi_packages1/')
-            self.assertContains(response, javascript_quote('il faut traduire cette chaîne de caractères de app1'))
+            self.assertContains(response, 'il faut traduire cette cha\\u00eene de caract\\u00e8res de app1')
 
     @modify_settings(INSTALLED_APPS={'append': ['view_tests.app3', 'view_tests.app4']})
     def testI18NDifferentNonEnLangs(self):
@@ -175,7 +175,7 @@ class JsI18NTestsMultiPackage(TestCase):
         """
         with self.settings(LANGUAGE_CODE='fr'), override('es-ar'):
             response = self.client.get('/jsi18n_multi_packages2/')
-            self.assertContains(response, javascript_quote('este texto de app3 debe ser traducido'))
+            self.assertContains(response, 'este texto de app3 debe ser traducido')
 
     def testI18NWithLocalePaths(self):
         extended_locale_paths = settings.LOCALE_PATHS + (
@@ -185,7 +185,7 @@ class JsI18NTestsMultiPackage(TestCase):
             with override('es-ar'):
                 response = self.client.get('/jsi18n/')
                 self.assertContains(response,
-                    javascript_quote('este texto de app3 debe ser traducido'))
+                    'este texto de app3 debe ser traducido')
 
 
 skip_selenium = not os.environ.get('DJANGO_SELENIUM_TESTS', False)
