@@ -760,6 +760,9 @@ Validators
   ``schemes`` argument which allows customization of the accepted URI schemes
   (instead of the defaults ``http(s)`` and ``ftp(s)``).
 
+* :func:`~django.core.validators.validate_email` now accepts addresses with
+  IPv6 literals, like ``example@[2001:db8::1]``, as specified in RFC 5321.
+
 Backwards incompatible changes in 1.7
 =====================================
 
