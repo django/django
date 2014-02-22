@@ -1414,6 +1414,14 @@ your resulting ``User`` model will have the following attributes::
     >>> hasattr(user, 'supervisor_of')
     True
 
+Not every entry in the related table will be addressed by the model containing
+``OneToOneField``. In this case a ``DoesNotExist`` exception is raised::
+
+    >>> worker.supervisor_of
+    Traceback (most recent call last):
+        ...
+    DoesNotExist: User matching query does not exist.
+
 .. _onetoone-arguments:
 
 Additionally, ``OneToOneField`` accepts all of the extra arguments
