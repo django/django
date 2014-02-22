@@ -346,11 +346,15 @@ class RegexURLResolver(LocaleRegexProvider):
 
     @property
     def url_patterns(self):
+        # urlconf_module might be a valid set of patterns, so we default to it
         patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
         try:
             iter(patterns)
         except TypeError:
-            raise ImproperlyConfigured("The included urlconf %s doesn't have any patterns in it" % self.urlconf_name)
+            raise ImproperlyConfigured(
+                "The included urlconf '{name}' either does not "
+                "have any patterns in it or might be circularly "
+                "imported.".format(name=self.urlconf_name))
         return patterns
 
     def _resolve_special(self, view_type):
