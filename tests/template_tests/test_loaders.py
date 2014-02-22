@@ -171,6 +171,15 @@ class RenderToStringTest(TestCase):
             'No template names provided$',
             loader.select_template, [])
 
+    def test_empty_dict(self):
+        """#21741 -- Do not put an empty dictionary into the context when not
+        passed into render_to_string"""
+        class DummyContext(Context):
+            def push(self_, *args, **kwargs):
+                self.assertNotIn({}, args)
+
+        loader.render_to_string('test_context.html', context_instance=DummyContext())
+
 
 class TemplateDirsOverrideTest(unittest.TestCase):
 
