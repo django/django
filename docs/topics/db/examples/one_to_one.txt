@@ -64,10 +64,17 @@ A Place can access its restaurant, if available::
 
 p2 doesn't have an associated restaurant::
 
-    >>> p2.restaurant
-    Traceback (most recent call last):
-        ...
-    DoesNotExist: Restaurant matching query does not exist.
+    >>> from django.core.exceptions import ObjectDoesNotExist
+    >>> try:
+    >>>     p2.restaurant
+    >>> except ObjectDoesNotExist:
+    >>>     print("There is no restaurant here.")
+    There is no restaurant here.
+
+You can also use ``hasattr`` to avoid the need for exception catching::
+
+    >>> hasattr(p2, 'restaurant')
+    False
 
 Set the place using assignment notation. Because place is the primary key on
 Restaurant, the save will create a new restaurant::
