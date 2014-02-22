@@ -143,6 +143,11 @@ If the URL does not resolve, the function raises a
         i.e., if the namespace is ``foo:bar``, then namespaces will be
         ``['foo', 'bar']``.
 
+    .. attribute:: ResolverMatch.view_name
+
+        The name of the view that matches the URL, including the namespace if
+        there is one.
+
 A :class:`ResolverMatch` object can then be interrogated to provide
 information about the URL pattern that matches a URL::
 
