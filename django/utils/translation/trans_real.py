@@ -18,7 +18,7 @@ from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six, lru_cache
 from django.utils.six import StringIO
-from django.utils.translation import TranslatorCommentWarning, trim_whitespace
+from django.utils.translation import TranslatorCommentWarning, trim_whitespace, LANGUAGE_SESSION_KEY
 
 
 # Translations are cached in a dictionary for every language+app tuple.
@@ -478,7 +478,7 @@ def get_language_from_request(request, check_path=False):
 
     if hasattr(request, 'session'):
         # for backwards compatibility django_language is also checked (remove in 1.8)
-        lang_code = request.session.get('_language', request.session.get('django_language'))
+        lang_code = request.session.get(LANGUAGE_SESSION_KEY, request.session.get('django_language'))
         if lang_code in supported and lang_code is not None and check_for_language(lang_code):
             return lang_code
 
