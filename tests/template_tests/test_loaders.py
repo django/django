@@ -171,6 +171,18 @@ class RenderToStringTest(TestCase):
             'No template names provided$',
             loader.select_template, [])
 
+    def test_no_empty_dict_pushed_to_stack(self):
+        """
+        No empty dict should be pushed to the context stack when render_to_string
+        is called without any argument (#21741).
+        """
+
+        # The stack should have a length of 1, corresponding to the builtins
+        self.assertEqual('1',
+            loader.render_to_string('test_context_stack.html').strip())
+        self.assertEqual('1',
+            loader.render_to_string('test_context_stack.html', context_instance=Context()).strip())
+
 
 class TemplateDirsOverrideTest(unittest.TestCase):
 
