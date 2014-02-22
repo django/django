@@ -27,6 +27,14 @@ Python style
 * Use ``InitialCaps`` for class names (or for factory functions that
   return classes).
 
+* Use convenience imports whenever available. For example, do this::
+
+      from django.views.generic import View
+
+  Don't do this::
+
+      from django.views.generic.base import View
+
 * In docstrings, use "action words" such as::
 
       def foo():
