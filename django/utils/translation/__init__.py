@@ -23,6 +23,7 @@ __all__ = [
 
 LANGUAGE_SESSION_KEY = '_language'
 
+
 class TranslatorCommentWarning(SyntaxWarning):
     pass
 
