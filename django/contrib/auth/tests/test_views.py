@@ -14,6 +14,7 @@ from django.http import QueryDict, HttpRequest
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils.six.moves.urllib.parse import urlparse, ParseResult
+from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils._os import upath
 from django.test import TestCase, override_settings
 from django.test.utils import patch_logger
@@ -718,12 +719,12 @@ class LogoutTest(AuthViewsTestCase):
         # Create a new session with language
         engine = import_module(settings.SESSION_ENGINE)
         session = engine.SessionStore()
-        session['_language'] = 'pl'
+        session[LANGUAGE_SESSION_KEY] = 'pl'
         session.save()
         self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
 
         self.client.get('/logout/')
-        self.assertEqual(self.client.session['_language'], 'pl')
+        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'pl')
 
 
 @skipIfCustomUser

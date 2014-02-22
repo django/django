@@ -31,7 +31,7 @@ from django.utils.translation import (activate, deactivate,
     pgettext,
     npgettext, npgettext_lazy,
     check_for_language,
-    string_concat)
+    string_concat, LANGUAGE_SESSION_KEY)
 
 from .forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
 from .models import Company, TestModel
@@ -1267,7 +1267,7 @@ class LocaleMiddlewareTests(TestCase):
         session on every request."""
         # Regression test for #21473
         self.client.get('/fr/simple/')
-        self.assertNotIn('_language', self.client.session)
+        self.assertNotIn(LANGUAGE_SESSION_KEY, self.client.session)
 
 
 @override_settings(

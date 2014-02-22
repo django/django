@@ -21,6 +21,7 @@ __all__ = [
     'npgettext', 'npgettext_lazy',
 ]
 
+LANGUAGE_SESSION_KEY = '_language'
 
 class TranslatorCommentWarning(SyntaxWarning):
     pass

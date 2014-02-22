@@ -11,7 +11,7 @@ from django.test import (
     LiveServerTestCase, TestCase, modify_settings, override_settings)
 from django.utils import six
 from django.utils._os import upath
-from django.utils.translation import override
+from django.utils.translation import override, LANGUAGE_SESSION_KEY
 
 try:
     from selenium.webdriver.firefox import webdriver as firefox
@@ -35,7 +35,7 @@ class I18NTests(TestCase):
             post_data = dict(language=lang_code, next='/')
             response = self.client.post('/i18n/setlang/', data=post_data)
             self.assertRedirects(response, 'http://testserver/')
-            self.assertEqual(self.client.session['_language'], lang_code)
+            self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
 
     def test_setlang_unsafe_next(self):
         """
@@ -46,7 +46,7 @@ class I18NTests(TestCase):
         post_data = dict(language=lang_code, next='//unsafe/redirection/')
         response = self.client.post('/i18n/setlang/', data=post_data)
         self.assertEqual(response.url, 'http://testserver/')
-        self.assertEqual(self.client.session['_language'], lang_code)
+        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
 
     def test_setlang_reversal(self):
         self.assertEqual(reverse('set_language'), '/i18n/setlang/')
