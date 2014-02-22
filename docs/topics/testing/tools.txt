@@ -1181,6 +1181,10 @@ The decorator can also be applied to test case classes::
     the session backend in a test that uses cached sessions and overrides
     :setting:`CACHES`.
 
+    Finally, avoid aliasing your settings as module-level constants as
+    ``override_settings()`` won't work on such values since they are
+    only evaluated the first time the module is imported.
+
 You can also simulate the absence of a setting by deleting it after settings
 have been overridden, like this::
 
