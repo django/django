@@ -171,8 +171,8 @@ class SystemChecksTestCase(TestCase):
         class EggFKContentTypeAdmin(admin.ModelAdmin):
             inlines = [SongInline]
 
-        has_errors = bool(EggFKContentTypeAdmin.check(model=EggFKContentType))
-        self.assertFalse(has_errors)
+        errors = EggFKContentTypeAdmin.check(model=EggFKContentType)
+        self.assertEqual(errors, [])
 
     def test_exclude_inline_model_admin(self):
         """
