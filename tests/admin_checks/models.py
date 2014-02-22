@@ -2,6 +2,8 @@
 Tests of ModelAdmin system checks logic.
 """
 
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -55,3 +57,10 @@ class State(models.Model):
 
 class City(models.Model):
     state = models.ForeignKey(State)
+
+
+class EggFKContentType(models.Model):
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+

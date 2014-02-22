@@ -4,11 +4,13 @@ import warnings
 
 from django import forms
 from django.contrib import admin
+from django.contrib.contenttypes.admin import GenericStackedInline
 from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from .models import Song, Book, Album, TwoAlbumFKAndAnE, City, State
+from .models import Song, Book, Album, TwoAlbumFKAndAnE, City, State, \
+    EggFKContentType
 
 
 class SongForm(forms.ModelForm):
@@ -156,6 +158,21 @@ class SystemChecksTestCase(TestCase):
             )
         ]
         self.assertEqual(errors, expected)
+
+    def test_generic_inline_model_admin(self):
+        """
+        Testing if _check_fk_name skips adding errors for
+        generic InlineAdmin. #22034
+        """
+
+        class SongInline(GenericStackedInline):
+            model = Song
+
+        class EggFKContentTypeAdmin(admin.ModelAdmin):
+            inlines = [SongInline]
+
+        has_errors = bool(EggFKContentTypeAdmin.check(model=EggFKContentType))
+        self.assertFalse(has_errors)
 
     def test_exclude_inline_model_admin(self):
         """
