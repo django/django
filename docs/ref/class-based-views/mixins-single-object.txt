@@ -65,7 +65,7 @@ SingleObjectMixin
 
         Return the context variable name that will be used to contain the
         data that this view is manipulating. If :attr:`context_object_name` is
-        not set, the context name will be constructed from the ``object_name``
+        not set, the context name will be constructed from the ``model_name``
         of the model that the queryset is composed from. For example, the model
         ``Article`` would have context object named ``'article'``.
 
@@ -122,4 +122,4 @@ SingleObjectTemplateResponseMixin
         * the value of ``template_name`` on the view (if provided)
         * the contents of the ``template_name_field`` field on the
           object instance that the view is operating upon (if available)
-        * ``<app_label>/<object_name><template_name_suffix>.html``
+        * ``<app_label>/<model_name><template_name_suffix>.html``

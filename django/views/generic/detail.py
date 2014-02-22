@@ -124,7 +124,7 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
         * the value of ``template_name`` on the view (if provided)
         * the contents of the ``template_name_field`` field on the
           object instance that the view is operating upon (if available)
-        * ``<app_label>/<object_name><template_name_suffix>.html``
+        * ``<app_label>/<model_name><template_name_suffix>.html``
         """
         try:
             names = super(SingleObjectTemplateResponseMixin, self).get_template_names()

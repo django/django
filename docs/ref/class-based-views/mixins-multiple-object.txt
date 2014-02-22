@@ -148,7 +148,7 @@ MultipleObjectMixin
         the list of data that this view is manipulating. If
         ``object_list`` is a queryset of Django objects and
         :attr:`context_object_name` is not set,
-        the context name will be the ``object_name`` of the model that
+        the context name will be the ``model_name`` of the model that
         the queryset is composed from, with postfix ``'_list'``
         appended. For example, the model ``Article`` would have a
         context object named ``article_list``.
@@ -204,4 +204,4 @@ MultipleObjectTemplateResponseMixin
         Returns a list of candidate template names. Returns the following list:
 
         * the value of ``template_name`` on the view (if provided)
-        * ``<app_label>/<object_name><template_name_suffix>.html``
+        * ``<app_label>/<model_name><template_name_suffix>.html``
