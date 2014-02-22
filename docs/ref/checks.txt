@@ -68,6 +68,8 @@ Fields
 * **fields.E140**: FilePathFields must have either ``allow_files`` or ``allow_folders`` set to True.
 * **fields.E150**: GenericIPAddressFields cannot accept blank values if null values are not allowed, as blank values are stored as nulls.
 * **fields.E160**: The options ``auto_now``, ``auto_now_add``, and ``default`` are mutually exclusive. Only one of these options may be present.
+* **fields.W161**: Fixed default value provided.
+
 
 File Fields
 ~~~~~~~~~~~
