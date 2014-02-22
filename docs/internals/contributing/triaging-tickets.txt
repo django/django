@@ -102,8 +102,8 @@ Triage stages
 Below we describe in more detail the various stages that a ticket may flow
 through during its lifetime.
 
-Unreviewed
-~~~~~~~~~~
+Not reviewed
+~~~~~~~~~~~~
 
 The ticket has not been reviewed by anyone who felt qualified to make a
 judgment about whether the ticket contained a valid issue, a viable feature,

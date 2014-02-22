@@ -569,7 +569,7 @@ The following methods are available on any subclass of
         .. versionchanged:: 1.6
 
             In Django 1.4 and 1.5, a blank string was unintentionally stored
-            as an unsable password as well.
+            as an unusable password as well.
 
     .. method:: models.AbstractBaseUser.check_password(raw_password)
 

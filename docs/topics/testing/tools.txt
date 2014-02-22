@@ -1255,7 +1255,7 @@ your test suite.
     :param empty_value: the expected clean output for inputs in ``empty_values``.
 
     For example, the following code tests that an ``EmailField`` accepts
-    "a@a.com" as a valid email address, but rejects "aaa" with a reasonable
+    ``a@a.com`` as a valid email address, but rejects ``aaa`` with a reasonable
     error message::
 
         self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': [u'Enter a valid email address.']})
@@ -1412,7 +1412,7 @@ your test suite.
     comparison is based on XML semantics. Similarly to
     :meth:`~SimpleTestCase.assertHTMLEqual`, the comparison is
     made on parsed content, hence only semantic differences are considered, not
-    syntax differences. When unvalid XML is passed in any parameter, an
+    syntax differences. When invalid XML is passed in any parameter, an
     ``AssertionError`` is always raised, even if both string are identical.
 
     Output in case of error can be customized with the ``msg`` argument.

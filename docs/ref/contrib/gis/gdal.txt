@@ -7,7 +7,7 @@ GDAL API
 .. module:: django.contrib.gis.gdal
    :synopsis: GeoDjango's high-level interface to the GDAL library.
 
-`GDAL`__ stands for **G**\ eospatial **D**\ ata **A**\ bstraction **L**\ ibrary,
+`GDAL`__ stands for **Geospatial Data Abstraction Library**,
 and is a veritable "swiss army knife" of GIS data functionality.  A subset
 of GDAL is the `OGR`__ Simple Features Library, which specializes
 in reading and writing vector geographic data in a variety of standard

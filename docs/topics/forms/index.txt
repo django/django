@@ -115,7 +115,7 @@ There are three possible code paths here:
 +------------------+---------------+-----------------------------------------+
 | Form submitted?  | Data?         | What occurs                             |
 +==================+===============+=========================================+
-| Unsubmitted      | None yet      | Template gets passed unbound instance   |
+| Not submitted    | None yet      | Template gets passed unbound instance   |
 |                  |               | of ContactForm.                         |
 +------------------+---------------+-----------------------------------------+
 | Submitted        | Invalid data  | Template gets passed bound instance     |
