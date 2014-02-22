@@ -15,6 +15,8 @@ from django.shortcuts import redirect
 from django.test import TestCase, override_settings
 from django.utils import six
 
+from admin_scripts.tests import AdminScriptTestCase
+
 from . import urlconf_outer, middleware, views
 from .views import empty_view
 
@@ -159,8 +161,10 @@ class NoURLPatternsTests(TestCase):
         resolver = RegexURLResolver(r'^$', self.urls)
 
         self.assertRaisesMessage(ImproperlyConfigured,
-            "The included urlconf urlpatterns_reverse.no_urls "
-            "doesn't have any patterns in it", getattr, resolver, 'url_patterns')
+            "The included urlconf 'urlpatterns_reverse.no_urls' does not "
+            "appear to have any patterns in it. If you see valid patterns in "
+            "the file then the issue is probably caused by a circular import.",
+            getattr, resolver, 'url_patterns')
 
 
 class URLPatternReverse(TestCase):
@@ -299,6 +303,24 @@ class ReverseLazyTest(TestCase):
         self.client.login(username='alfred', password='testpw')
         response = self.client.get('/login_required_view/')
         self.assertEqual(response.status_code, 200)
+
+
+class ReverseLazySettingsTest(AdminScriptTestCase):
+    """
+    Test that reverse_lazy can be used in settings without causing a circular
+    import error.
+    """
+    def setUp(self):
+        self.write_settings('settings.py', extra="""
+from django.core.urlresolvers import reverse_lazy
+LOGIN_URL = reverse_lazy('login')""")
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_lazy_in_settings(self):
+        out, err = self.run_manage(['sqlall', 'auth'])
+        self.assertNoOutput(err)
 
 
 class ReverseShortcutTests(TestCase):

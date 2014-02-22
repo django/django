@@ -699,6 +699,17 @@ subclass::
       the HTML output, in the form of ``column-<field_name>`` on each ``<th>``
       element. This can be used to set column widths in a CSS file for example.
 
+    * Django will try to interpret every element of ``list_display`` in this
+      order:
+
+      * A field of the model.
+      * A callable.
+      * A string representing a ``ModelAdmin`` attribute.
+      * A string representing a model attribute.
+
+      For example if you have ``first_name`` as a model field and
+      as a ``ModelAdmin`` attribute, the model field will be used.
+
 
 .. attribute:: ModelAdmin.list_display_links
 

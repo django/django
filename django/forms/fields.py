@@ -191,6 +191,8 @@ class Field(object):
         initial_value = initial if initial is not None else ''
         try:
             data = self.to_python(data)
+            if hasattr(self, '_coerce'):
+                data = self._coerce(data)
         except ValidationError:
             return True
         data_value = data if data is not None else ''

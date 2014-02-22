@@ -140,12 +140,12 @@ will be served using mod_wsgi::
 
     <Directory /path/to/mysite.com/static>
     Order deny,allow
-    Allow from all
+    Require all granted
     </Directory>
 
     <Directory /path/to/mysite.com/media>
     Order deny,allow
-    Allow from all
+    Require all granted
     </Directory>
 
     WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
@@ -153,9 +153,12 @@ will be served using mod_wsgi::
     <Directory /path/to/mysite.com/mysite>
     <Files wsgi.py>
     Order allow,deny
-    Allow from all
+    Require all granted
     </Files>
     </Directory>
+
+If you are using a version of Apache older than 2.4, replace
+``Require all granted`` with ``Allow from all``.
 
 .. _lighttpd: http://www.lighttpd.net/
 .. _Nginx: http://wiki.nginx.org/Main

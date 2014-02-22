@@ -1539,6 +1539,24 @@ Default::
 
 A tuple of middleware classes to use. See :doc:`/topics/http/middleware`.
 
+.. setting:: MIGRATION_MODULES
+
+MIGRATION_MODULES
+-----------------
+
+Default::
+
+    {} # empty dictionary
+
+A dictionary specifying the package where migration modules can be found on a per-app basis. The default value
+of this setting is an empty dictionary, but the default package name for migration modules is ``migrations``.
+
+Example::
+
+    {'blog': 'blog.db_migrations'}
+
+In this case, migrations pertaining to the ``blog`` app will be contained in the ``blog.db_migrations`` package.
+
 .. setting:: MONTH_DAY_FORMAT
 
 MONTH_DAY_FORMAT
