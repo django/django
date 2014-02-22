@@ -173,6 +173,11 @@ There are a few settings which control Django's file upload behavior:
 
         **Always prefix the mode with a 0.**
 
+    .. note::
+
+        For security reasons, these permissions aren't applied to the
+        temporary files that are stored in `FILE_UPLOAD_TEMP_DIR`.
+
 :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`
     The numeric mode to apply to directories created in the process of
     uploading files. This value mirrors the functionality and caveats of
