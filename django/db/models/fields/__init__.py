@@ -1079,6 +1079,7 @@ class DateTimeCheckMixin(object):
     def check(self, **kwargs):
         errors = super(DateTimeCheckMixin, self).check(**kwargs)
         errors.extend(self._check_mutually_exclusive_options())
+        errors.extend(self._check_fix_default_value())
         return errors
 
     def _check_mutually_exclusive_options(self):
@@ -1103,6 +1104,9 @@ class DateTimeCheckMixin(object):
         else:
             return []
 
+    def _check_fix_default_value(self):
+        return []
+
 
 class DateField(DateTimeCheckMixin, Field):
     empty_strings_allowed = False
@@ -1121,6 +1125,49 @@ class DateField(DateTimeCheckMixin, Field):
             kwargs['editable'] = False
             kwargs['blank'] = True
         super(DateField, self).__init__(verbose_name, name, **kwargs)
+
+    def _check_fix_default_value(self):
+        """
+        Adds a warning to the checks framework stating, that using an actual
+        date or datetime value is probably wrong; it's only being evaluated on
+        server start-up.
+
+        For details see ticket #21905
+        """
+        if not self.has_default():
+            return []
+
+        now = timezone.now()
+        if not timezone.is_naive(now):
+            now = timezone.make_naive(now, timezone.utc)
+        value = self.default
+        if isinstance(value, datetime.datetime):
+            if not timezone.is_naive(value):
+                value = timezone.make_naive(value, timezone.utc)
+            value = value.date()
+        elif isinstance(value, datetime.date):
+            # Nothing to do, as dates don't have tz information
+            pass
+        else:
+            # No explicit date / datetime value -- no checks necessary
+            return []
+        offset = datetime.timedelta(days=1)
+        lower = (now - offset).date()
+        upper = (now + offset).date()
+        if lower <= value <= upper:
+            return [
+                checks.Warning(
+                    'Fixed default value provided.',
+                    hint='It seems you set a fixed date / time / datetime '
+                         'value as default for this field. This may not be '
+                         'what you want. If you want to have the current date '
+                         'as default, use `django.utils.timezone.now`',
+                    obj=self,
+                    id='fields.W161',
+                )
+            ]
+
+        return []
 
     def deconstruct(self):
         name, path, args, kwargs = super(DateField, self).deconstruct()
@@ -1225,6 +1272,52 @@ class DateTimeField(DateField):
     description = _("Date (with time)")
 
     # __init__ is inherited from DateField
+
+    def _check_fix_default_value(self):
+        """
+        Adds a warning to the checks framework stating, that using an actual
+        date or datetime value is probably wrong; it's only being evaluated on
+        server start-up.
+
+        For details see ticket #21905
+        """
+        if not self.has_default():
+            return []
+
+        now = timezone.now()
+        if not timezone.is_naive(now):
+            now = timezone.make_naive(now, timezone.utc)
+        value = self.default
+        if isinstance(value, datetime.datetime):
+            second_offset = datetime.timedelta(seconds=10)
+            lower = now - second_offset
+            upper = now + second_offset
+            if timezone.is_aware(value):
+                value = timezone.make_naive(value, timezone.utc)
+        elif isinstance(value, datetime.date):
+            second_offset = datetime.timedelta(seconds=10)
+            lower = now - second_offset
+            lower = datetime.datetime(lower.year, lower.month, lower.day)
+            upper = now + second_offset
+            upper = datetime.datetime(upper.year, upper.month, upper.day)
+            value = datetime.datetime(value.year, value.month, value.day)
+        else:
+            # No explicit date / datetime value -- no checks necessary
+            return []
+        if lower <= value <= upper:
+            return [
+                checks.Warning(
+                    'Fixed default value provided.',
+                    hint='It seems you set a fixed date / time / datetime '
+                         'value as default for this field. This may not be '
+                         'what you want. If you want to have the current date '
+                         'as default, use `django.utils.timezone.now`',
+                    obj=self,
+                    id='fields.W161',
+                )
+            ]
+
+        return []
 
     def get_internal_type(self):
         return "DateTimeField"
@@ -1934,6 +2027,52 @@ class TimeField(DateTimeCheckMixin, Field):
             kwargs['editable'] = False
             kwargs['blank'] = True
         super(TimeField, self).__init__(verbose_name, name, **kwargs)
+
+    def _check_fix_default_value(self):
+        """
+        Adds a warning to the checks framework stating, that using an actual
+        time or datetime value is probably wrong; it's only being evaluated on
+        server start-up.
+
+        For details see ticket #21905
+        """
+        if not self.has_default():
+            return []
+
+        now = timezone.now()
+        if not timezone.is_naive(now):
+            now = timezone.make_naive(now, timezone.utc)
+        value = self.default
+        if isinstance(value, datetime.datetime):
+            second_offset = datetime.timedelta(seconds=10)
+            lower = now - second_offset
+            upper = now + second_offset
+            if timezone.is_aware(value):
+                value = timezone.make_naive(value, timezone.utc)
+        elif isinstance(value, datetime.time):
+            second_offset = datetime.timedelta(seconds=10)
+            lower = now - second_offset
+            upper = now + second_offset
+            value = datetime.datetime.combine(now.date(), value)
+            if timezone.is_aware(value):
+                value = timezone.make_naive(value, timezone.utc).time()
+        else:
+            # No explicit time / datetime value -- no checks necessary
+            return []
+        if lower <= value <= upper:
+            return [
+                checks.Warning(
+                    'Fixed default value provided.',
+                    hint='It seems you set a fixed date / time / datetime '
+                         'value as default for this field. This may not be '
+                         'what you want. If you want to have the current date '
+                         'as default, use `django.utils.timezone.now`',
+                    obj=self,
+                    id='fields.W161',
+                )
+            ]
+
+        return []
 
     def deconstruct(self):
         name, path, args, kwargs = super(TimeField, self).deconstruct()

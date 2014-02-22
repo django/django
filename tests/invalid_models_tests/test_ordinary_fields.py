@@ -1,11 +1,12 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
-from datetime import datetime
 import unittest
 
-from django.core.checks import Error
+from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
+from django.test.utils import override_settings
+from django.utils.timezone import make_aware, now
 
 from .base import IsolatedModelsTestCase
 
@@ -196,6 +197,116 @@ class CharFieldTests(IsolatedModelsTestCase):
             )
         ]
         self.assertEqual(errors, expected)
+
+
+class DateFieldTests(IsolatedModelsTestCase):
+
+    def test_auto_now_and_auto_now_add_raise_error(self):
+        class Model(models.Model):
+            field0 = models.DateTimeField(auto_now=True, auto_now_add=True, default=now)
+            field1 = models.DateTimeField(auto_now=True, auto_now_add=False, default=now)
+            field2 = models.DateTimeField(auto_now=False, auto_now_add=True, default=now)
+            field3 = models.DateTimeField(auto_now=True, auto_now_add=True, default=None)
+            
+        expected = []
+        checks = []
+        for i in range(4):
+            field = Model._meta.get_field('field%d' % i)
+            expected.append(Error(
+                "The options auto_now, auto_now_add, and default "
+                "are mutually exclusive. Only one of these options "
+                "may be present.",
+                hint=None,
+                obj=field,
+                id='fields.E160',
+            ))
+            checks.extend(field.check())
+            self.assertEqual(checks, expected)
+
+    def test_fix_default_value(self):
+        class Model(models.Model):
+            field_dt = models.DateField(default=now())
+            field_d = models.DateField(default=now().date())
+            field_now = models.DateField(default=now)
+
+        field_dt = Model._meta.get_field('field_dt')
+        field_d = Model._meta.get_field('field_d')
+        field_now = Model._meta.get_field('field_now')
+        errors = field_dt.check()
+        errors.extend(field_d.check())
+        errors.extend(field_now.check())  # doesn't raise a warning
+        expected = [
+            DjangoWarning(
+                'Fixed default value provided.',
+                hint='It seems you set a fixed date / time / datetime '
+                     'value as default for this field. This may not be '
+                     'what you want. If you want to have the current date '
+                     'as default, use `django.utils.timezone.now`',
+                obj=field_dt,
+                id='fields.W161',
+            ),
+            DjangoWarning(
+                'Fixed default value provided.',
+                hint='It seems you set a fixed date / time / datetime '
+                     'value as default for this field. This may not be '
+                     'what you want. If you want to have the current date '
+                     'as default, use `django.utils.timezone.now`',
+                obj=field_d,
+                id='fields.W161',
+            )
+        ]
+        maxDiff = self.maxDiff
+        self.maxDiff = None
+        self.assertEqual(errors, expected)
+        self.maxDiff = maxDiff
+
+    @override_settings(USE_TZ=True)
+    def test_fix_default_value_tz(self):
+        self.test_fix_default_value()
+
+
+class DateTimeFieldTests(IsolatedModelsTestCase):
+
+    def test_fix_default_value(self):
+        class Model(models.Model):
+            field_dt = models.DateTimeField(default=now())
+            field_d = models.DateTimeField(default=now().date())
+            field_now = models.DateTimeField(default=now)
+
+        field_dt = Model._meta.get_field('field_dt')
+        field_d = Model._meta.get_field('field_d')
+        field_now = Model._meta.get_field('field_now')
+        errors = field_dt.check()
+        errors.extend(field_d.check())
+        errors.extend(field_now.check())  # doesn't raise a warning
+        expected = [
+            DjangoWarning(
+                'Fixed default value provided.',
+                hint='It seems you set a fixed date / time / datetime '
+                     'value as default for this field. This may not be '
+                     'what you want. If you want to have the current date '
+                     'as default, use `django.utils.timezone.now`',
+                obj=field_dt,
+                id='fields.W161',
+            ),
+            DjangoWarning(
+                'Fixed default value provided.',
+                hint='It seems you set a fixed date / time / datetime '
+                     'value as default for this field. This may not be '
+                     'what you want. If you want to have the current date '
+                     'as default, use `django.utils.timezone.now`',
+                obj=field_d,
+                id='fields.W161',
+            )
+        ]
+        maxDiff = self.maxDiff
+        self.maxDiff = None
+        self.assertEqual(errors, expected)
+        self.maxDiff = maxDiff
+
+    @override_settings(USE_TZ=True)
+    def test_fix_default_value_tz(self):
+        self.test_fix_default_value()
 
 
 class DecimalFieldTests(IsolatedModelsTestCase):
@@ -402,28 +513,45 @@ class ImageFieldTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class DateFieldTests(IsolatedModelsTestCase):
+class TimeFieldTests(IsolatedModelsTestCase):
 
-    def test_auto_now_and_auto_now_add_raise_error(self):
-            dn = datetime.now
-            mutually_exclusive_combinations = (
-                (True, True, dn),
-                (True, False, dn),
-                (False, True, dn),
-                (True, True, None)
+    def test_fix_default_value(self):
+        class Model(models.Model):
+            field_dt = models.TimeField(default=now())
+            field_t = models.TimeField(default=now().time())
+            field_now = models.DateField(default=now)
+
+        field_dt = Model._meta.get_field('field_dt')
+        field_t = Model._meta.get_field('field_t')
+        field_now = Model._meta.get_field('field_now')
+        errors = field_dt.check()
+        errors.extend(field_t.check())
+        errors.extend(field_now.check())  # doesn't raise a warning
+        expected = [
+            DjangoWarning(
+                'Fixed default value provided.',
+                hint='It seems you set a fixed date / time / datetime '
+                     'value as default for this field. This may not be '
+                     'what you want. If you want to have the current date '
+                     'as default, use `django.utils.timezone.now`',
+                obj=field_dt,
+                id='fields.W161',
+            ),
+            DjangoWarning(
+                'Fixed default value provided.',
+                hint='It seems you set a fixed date / time / datetime '
+                     'value as default for this field. This may not be '
+                     'what you want. If you want to have the current date '
+                     'as default, use `django.utils.timezone.now`',
+                obj=field_t,
+                id='fields.W161',
             )
+        ]
+        maxDiff = self.maxDiff
+        self.maxDiff = None
+        self.assertEqual(errors, expected)
+        self.maxDiff = maxDiff
 
-            for auto_now, auto_now_add, default in mutually_exclusive_combinations:
-                field = models.DateTimeField(name="field", auto_now=auto_now,
-                                             auto_now_add=auto_now_add,
-                                             default=default)
-                expected = [Error(
-                    "The options auto_now, auto_now_add, and default "
-                    "are mutually exclusive. Only one of these options "
-                    "may be present.",
-                    hint=None,
-                    obj=field,
-                    id='fields.E160',
-                )]
-                checks = field.check()
-                self.assertEqual(checks, expected)
+    @override_settings(USE_TZ=True)
+    def test_fix_default_value_tz(self):
+        self.test_fix_default_value()
