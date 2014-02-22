@@ -100,7 +100,7 @@ any time leading up to the actual release:
    are left for the upcoming release.
 
 #. Check with the other committers to make sure they don't have any
-   un-committed changes for the release.
+   uncommitted changes for the release.
 
 #. Proofread the release notes, including looking at the online
    version to catch any broken links or reST errors, and make sure the

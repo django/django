@@ -158,7 +158,7 @@ Widget classes
 
     ``OpenLayersWidget`` and :class:`OSMWidget` use the ``openlayers.js`` file
     hosted on the ``openlayers.org`` Web site. This works for basic usage
-    during development, but isn't appropropriate for a production deployment as
+    during development, but isn't appropriate for a production deployment as
     ``openlayers.org/api/`` has no guaranteed uptime and runs on a slow server.
     You are therefore advised to subclass these widgets in order to specify
     your own version of the ``openlayers.js`` file in the ``js`` property of

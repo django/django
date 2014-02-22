@@ -201,7 +201,7 @@ __ http://en.wikipedia.org/wiki/SQL_injection
 
     In Django 1.5 and earlier, you could pass parameters as dictionaries
     when using PostgreSQL or MySQL, although this wasn't documented. Now
-    you can also do this whem using Oracle, and it is officially supported.
+    you can also do this when using Oracle, and it is officially supported.
 
 
 .. _executing-custom-sql:

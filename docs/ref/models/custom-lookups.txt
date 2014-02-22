@@ -233,8 +233,8 @@ to this API.
     execute the query.
 
     Calling expression.as_sql() directly is usually incorrect - instead
-    qn.compile(expression) should be used. The qn.compile() method will take
-    care of calling vendor-specific methods of the expression.
+    ``qn.compile(expression)`` should be used. The ``qn.compile()`` method will
+    take care of calling vendor-specific methods of the expression.
 
 .. method:: get_lookup(lookup_name)
 

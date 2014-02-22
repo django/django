@@ -1120,7 +1120,7 @@ Miscellaneous
   primary keys with value 0.
 
 * Shadowing model fields defined in a parent model has been forbidden as this
-  creates amiguity in the expected model behavior. In addition, any clashing
+  creates ambiguity in the expected model behavior. In addition, any clashing
   fields in the model inheritance hierarchy results in a system check error.
   For example, if you use multi-inheritance, you need to define custom primary
   key fields on parent models, otherwise the default ``id`` fields will clash.

@@ -1785,7 +1785,7 @@ See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 SIGNING_BACKEND
 ---------------
 
-Default: 'django.core.signing.TimestampSigner'
+Default: ``'django.core.signing.TimestampSigner'``
 
 The backend used for signing cookies and other data.
 
