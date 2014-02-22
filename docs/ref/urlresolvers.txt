@@ -143,6 +143,10 @@ If the URL does not resolve, the function raises a
         i.e., if the namespace is ``foo:bar``, then namespaces will be
         ``['foo', 'bar']``.
 
+    .. attribute:: ResolverMatch.view_name
+
+        The name of the view that matches the URL.
+
 A :class:`ResolverMatch` object can then be interrogated to provide
 information about the URL pattern that matches a URL::
 
@@ -150,8 +154,6 @@ information about the URL pattern that matches a URL::
     match = resolve('/some/path/')
     # Print the URL pattern that matches the URL
     print(match.url_name)
-    # Print the name of the view that matches the URL
-    print(match.view_name)
 
 A :class:`ResolverMatch` object can also be assigned to a triple::
 
