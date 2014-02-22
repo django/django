@@ -51,6 +51,10 @@ of, its codebase. You should be making them once on your development machine
 and then running the same migrations on your colleagues' machines, your
 staging machines, and eventually your production machines.
 
+.. note::
+    It is possible to override the name of the package which contains the
+    migrations on a per-app basis by modifying the :setting:`MIGRATION_MODULES` setting.
+
 Migrations will run the same way every time and produce consistent results,
 meaning that what you see in development and staging is exactly what will
 happen in production - no unexpected surprises.
