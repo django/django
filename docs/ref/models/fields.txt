@@ -1469,6 +1469,15 @@ your resulting ``User`` model will have the following attributes::
     >>> hasattr(user, 'supervisor_of')
     True
 
+A ``DoesNotExist`` exception is raised when accessing the reverse relationship
+if an entry in the related table doesn't exist. For example, if a user doesn't
+have a supervisor designated by ``MySpecialUser``::
+
+    >>> user.supervisor_of
+    Traceback (most recent call last):
+        ...
+    DoesNotExist: User matching query does not exist.
+
 .. _onetoone-arguments:
 
 Additionally, ``OneToOneField`` accepts all of the extra arguments
