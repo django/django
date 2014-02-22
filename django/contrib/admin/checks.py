@@ -869,11 +869,12 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
         # Avoid circular import
         from django.contrib.contenttypes.admin import GenericInlineModelAdmin
         is_generic_inline_admin = issubclass(cls, GenericInlineModelAdmin)
-
         try:
-            if not is_generic_inline_admin:
-                _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name)
+            _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name)
         except ValueError as e:
+            # Check if generic, if not add error.
+            if is_generic_inline_admin:
+                return []
             return [checks.Error(e.args[0], hint=None, obj=cls, id='admin.E202')]
         else:
             return []
