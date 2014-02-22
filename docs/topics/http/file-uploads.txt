@@ -164,6 +164,9 @@ There are a few settings which control Django's file upload behavior:
     of ``0600``, and files saved from memory will be saved using the
     system's standard umask.
 
+    For security reasons, these permissions aren't applied to the temporary
+    files that are stored in :setting:`FILE_UPLOAD_TEMP_DIR`.
+
     .. warning::
 
         If you're not familiar with file modes, please note that the leading
