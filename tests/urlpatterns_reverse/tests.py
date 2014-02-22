@@ -161,8 +161,9 @@ class NoURLPatternsTests(TestCase):
         resolver = RegexURLResolver(r'^$', self.urls)
 
         self.assertRaisesMessage(ImproperlyConfigured,
-            "The included urlconf urlpatterns_reverse.no_urls "
-            "doesn't have any patterns in it", getattr, resolver, 'url_patterns')
+            "The included urlconf 'urlpatterns_reverse.no_urls' either does not "
+            "have any patterns in it or might be circularly imported.",
+            getattr, resolver, 'url_patterns')
 
 
 class URLPatternReverse(TestCase):
