@@ -129,6 +129,8 @@ go, include multiple arguments in the call to
 
 Django will complain if you try to assign or add an object of the wrong type.
 
+.. _retrieving-objects:
+
 Retrieving objects
 ==================
 
