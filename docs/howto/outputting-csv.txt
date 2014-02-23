@@ -64,7 +64,7 @@ handle the assembly and transmission of a large CSV file::
 
     import csv
     
-    from django.utils.six.moves import xrange
+    from django.utils.six.moves import range
     from django.http import StreamingHttpResponse
 
     class Echo(object):
@@ -80,7 +80,7 @@ handle the assembly and transmission of a large CSV file::
         # Generate a sequence of rows. The range is based on the maximum number of
         # rows that can be handled by a single sheet in most spreadsheet
         # applications.
-        rows = (["Row {0}".format(idx), str(idx)] for idx in xrange(65536))
+        rows = (["Row {0}".format(idx), str(idx)] for idx in range(65536))
         pseudo_buffer = Echo()
         writer = csv.writer(pseudo_buffer)
         response = StreamingHttpResponse((writer.writerow(row) for row in rows),
