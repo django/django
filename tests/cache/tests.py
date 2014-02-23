@@ -1177,7 +1177,7 @@ class CustomCacheKeyValidationTests(TestCase):
 class GetCacheTests(IgnorePendingDeprecationWarningsMixin, TestCase):
 
     def test_simple(self):
-        from django.core.cache import caches, DEFAULT_CACHE_ALIAS, get_cache
+        from django.core.cache import caches, get_cache
         self.assertIsInstance(
             caches[DEFAULT_CACHE_ALIAS],
             get_cache('default').__class__
