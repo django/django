@@ -56,14 +56,15 @@ mention:
 
 Streaming large files
 ~~~~~~~~~~~~~~~~~~~~~
-If you need to work with very large files, you might want to consider using Django's
+When dealing with views that generate very big responses, you might want to consider using Django's
 :class:`django.http.StreamingHttpResponse` objects instead.
 
 In this example, we want to make full use of Python generators to efficiently
-handle the assembly and transmission of a large CSV files::
+handle the assembly and transmission of a large CSV file::
 
     import csv
-
+    
+    from django.utils.six.moves import range
     from django.http import StreamingHttpResponse
 
     class Echo(object):
@@ -76,7 +77,10 @@ handle the assembly and transmission of a large CSV files::
 
     def some_streaming_csv_view(request):
         """A view that streams a large CSV file."""
-        rows = (["Row {0}".format(idx), str(idx)] for idx in xrange(100))
+        # Generate a sequence of rows. The range is based on the maximum number of
+        # rows that can be handled by a single sheet in most spreadsheet
+        # applications.
+        rows = (["Row {0}".format(idx), str(idx)] for idx in range(65536))
         pseudo_buffer = Echo()
         writer = csv.writer(pseudo_buffer)
         response = StreamingHttpResponse((writer.writerow(row) for row in rows),
