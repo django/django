@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 import os
 import re
+import copy
 import shutil
 import tempfile
 import threading
@@ -15,7 +16,8 @@ import warnings
 
 from django.conf import settings
 from django.core import management
-from django.core.cache import cache, caches, CacheKeyWarning, InvalidCacheBackendError
+from django.core.cache import (cache, caches, CacheKeyWarning,
+    InvalidCacheBackendError, DEFAULT_CACHE_ALIAS)
 from django.db import connection, router, transaction
 from django.core.cache.utils import make_template_fragment_key
 from django.http import HttpResponse, StreamingHttpResponse
@@ -1175,7 +1177,7 @@ class CustomCacheKeyValidationTests(TestCase):
 class GetCacheTests(IgnorePendingDeprecationWarningsMixin, TestCase):
 
     def test_simple(self):
-        from django.core.cache import caches, DEFAULT_CACHE_ALIAS, get_cache
+        from django.core.cache import caches, get_cache
         self.assertIsInstance(
             caches[DEFAULT_CACHE_ALIAS],
             get_cache('default').__class__
@@ -1202,6 +1204,82 @@ class GetCacheTests(IgnorePendingDeprecationWarningsMixin, TestCase):
         self.assertFalse(cache.closed)
         signals.request_finished.send(self.__class__)
         self.assertTrue(cache.closed)
+
+
+DEFAULT_MEMORY_CACHES_SETTINGS = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+NEVER_EXPIRING_CACHES_SETTINGS = copy.deepcopy(DEFAULT_MEMORY_CACHES_SETTINGS)
+NEVER_EXPIRING_CACHES_SETTINGS['default']['TIMEOUT'] = None
+
+
+class DefaultNonExpiringCacheKeyTests(TestCase):
+    """Tests that verify that settings having Cache arguments with a TIMEOUT
+    set to `None` will create Caches that will set non-expiring keys.
+
+    This fixes ticket #22085.
+    """
+    def setUp(self):
+        # The 5 minute (300 seconds) default expiration time for keys is
+        # defined in the implementation of the initializer method of the
+        # BaseCache type.
+        self.DEFAULT_TIMEOUT = caches[DEFAULT_CACHE_ALIAS].default_timeout
+
+    def tearDown(self):
+        del(self.DEFAULT_TIMEOUT)
+
+    def test_default_expiration_time_for_keys_is_5_minutes(self):
+        """The default expiration time of a cache key is 5 minutes.
+
+        This value is defined inside the __init__() method of the
+        :class:`django.core.cache.backends.base.BaseCache` type.
+        """
+        self.assertEquals(300, self.DEFAULT_TIMEOUT)
+
+    def test_caches_with_unset_timeout_has_correct_default_timeout(self):
+        """Caches that have the TIMEOUT parameter undefined in the default
+        settings will use the default 5 minute timeout.
+        """
+        cache = caches[DEFAULT_CACHE_ALIAS]
+        self.assertEquals(self.DEFAULT_TIMEOUT, cache.default_timeout)
+
+    @override_settings(CACHES=NEVER_EXPIRING_CACHES_SETTINGS)
+    def test_caches_set_with_timeout_as_none_has_correct_default_timeout(self):
+        """Memory caches that have the TIMEOUT parameter set to `None` in the
+        default settings with have `None` as the default timeout.
+
+        This means "no timeout".
+        """
+        cache = caches[DEFAULT_CACHE_ALIAS]
+        self.assertIs(None, cache.default_timeout)
+        self.assertEquals(None, cache.get_backend_timeout())
+
+    @override_settings(CACHES=DEFAULT_MEMORY_CACHES_SETTINGS)
+    def test_caches_with_unset_timeout_set_expiring_key(self):
+        """Memory caches that have the TIMEOUT parameter unset will set cache
+        keys having the default 5 minute timeout.
+        """
+        key = "my-key"
+        value = "my-value"
+        cache = caches[DEFAULT_CACHE_ALIAS]
+        cache.set(key, value)
+        cache_key = cache.make_key(key)
+        self.assertNotEquals(None, cache._expire_info[cache_key])
+
+    @override_settings(CACHES=NEVER_EXPIRING_CACHES_SETTINGS)
+    def text_caches_set_with_timeout_as_none_set_non_expiring_key(self):
+        """Memory caches that have the TIMEOUT parameter set to `None` will set
+        a non expiring key by default.
+        """
+        key = "another-key"
+        value = "another-value"
+        cache = caches[DEFAULT_CACHE_ALIAS]
+        cache.set(key, value)
+        cache_key = cache.make_key(key)
+        self.assertEquals(None, cache._expire_info[cache_key])
 
 
 @override_settings(

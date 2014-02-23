@@ -255,6 +255,10 @@ Default: 300
 
 The number of seconds before a cache entry is considered stale.
 
+.. versionadded:: 1.7
+
+If the value of this settings is ``None``, cache entries will not expire.
+
 .. setting:: CACHES-VERSION
 
 VERSION

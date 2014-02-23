@@ -363,9 +363,14 @@ Each cache backend can be given additional arguments to control caching
 behavior. These arguments are provided as additional keys in the
 :setting:`CACHES` setting. Valid arguments are as follows:
 
+
 * :setting:`TIMEOUT <CACHES-TIMEOUT>`: The default timeout, in
-  seconds, to use for the cache. This argument defaults to ``300``
-  seconds (5 minutes).
+  seconds, to use for the cache. This argument defaults to ``300`` seconds (5 minutes).
+
+  .. versionadded:: 1.7
+
+  You can set ``TIMEOUT`` to ``None`` so that, by default, cache keys never
+  expire.
 
 * :setting:`OPTIONS <CACHES-OPTIONS>`: Any options that should be
   passed to the cache backend. The list of valid options will vary

@@ -441,6 +441,11 @@ Cache
   thread-safe any more, as :data:`django.core.cache.caches` now yields
   different instances per thread.
 
+* Defining the :setting:`TIMEOUT <CACHES-TIMEOUT>` argument of the
+  :setting:`CACHES` setting as ``None`` will set the cache keys as
+  "non-expiring" by default. Previously, it was only possible to pass
+  ``timeout=None` to the cache backend's ``set()`` method.
+
 Email
 ^^^^^
 
