@@ -225,7 +225,7 @@ Post-render callbacks
 ---------------------
 
 Some operations -- such as caching -- cannot be performed on an
-not rendered template. They must be performed on a fully complete and
+unrendered template. They must be performed on a fully complete and
 rendered response.
 
 If you're using middleware, the solution is easy. Middleware provides
