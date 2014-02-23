@@ -1,4 +1,6 @@
 # -*- coding:utf-8 -*-
+from __future__ import unicode_literals
+
 import gettext
 import json
 import os
@@ -100,7 +102,7 @@ class I18NTests(TestCase):
                 self.assertContains(response, json.dumps(trans_txt), 1)
                 if lang_code == 'fr':
                     # Message with context (msgctxt)
-                    self.assertContains(response, r'"month name\u0004May": "mai"', 1)
+                    self.assertContains(response, '"month name\\u0004May": "mai"', 1)
 
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
@@ -269,6 +271,16 @@ class JavascriptI18nTests(LiveServerTestCase):
         self.assertEqual(elem.text, "1 Resultat")
         elem = self.selenium.find_element_by_id("npgettext_plur")
         self.assertEqual(elem.text, "455 Resultate")
+
+    @modify_settings(INSTALLED_APPS={'append': ['view_tests.app1', 'view_tests.app2']})
+    @override_settings(LANGUAGE_CODE='fr')
+    def test_multiple_catalogs(self):
+        self.selenium.get('%s%s' % (self.live_server_url, '/jsi18n_multi_catalogs/'))
+
+        elem = self.selenium.find_element_by_id('app1string')
+        self.assertEqual(elem.text, 'il faut traduire cette chaîne de caractères de app1')
+        elem = self.selenium.find_element_by_id('app2string')
+        self.assertEqual(elem.text, 'il faut traduire cette chaîne de caractères de app2')
 
 
 class JavascriptI18nChromeTests(JavascriptI18nTests):
