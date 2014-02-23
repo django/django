@@ -485,6 +485,7 @@ class OperationTests(MigrationTestBase):
             Pony = models.get_model("test_runpython", "Pony")
             Pony.objects.create(pink=1, weight=3.55)
             Pony.objects.create(weight=5)
+
         def inner_method_reverse(models, schema_editor):
             Pony = models.get_model("test_runpython", "Pony")
             Pony.objects.filter(pink=1, weight=3.55).delete()
@@ -515,7 +516,6 @@ class OperationTests(MigrationTestBase):
             no_reverse_operation.database_forwards("test_runpython", editor, project_state, new_state)
             with self.assertRaises(NotImplementedError):
                 no_reverse_operation.database_backwards("test_runpython", editor, new_state, project_state)
-
 
 
 class MigrateNothingRouter(object):
