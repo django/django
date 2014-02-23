@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from itertools import chain
 
 from django.contrib.admin.utils import get_fields_from_path, NotRelationField, flatten
-from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core import checks
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
@@ -870,11 +869,6 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
         try:
             _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name)
         except ValueError as e:
-            # Check if generic, if not add error.
-            is_generic_inline_admin = any(
-                isinstance(vf, GenericForeignKey) for vf in parent_model._meta.virtual_fields)
-            if is_generic_inline_admin:
-                return []
             return [checks.Error(e.args[0], hint=None, obj=cls, id='admin.E202')]
         else:
             return []

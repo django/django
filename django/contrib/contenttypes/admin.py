@@ -6,6 +6,7 @@ from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
 from django.contrib.contenttypes.forms import (
     BaseGenericInlineFormSet, generic_inlineformset_factory
 )
+from django.contrib.contenttypes.checks import GenericInlineModelAdminChecks
 from django.forms import ALL_FIELDS
 from django.forms.models import modelform_defines_fields
 
@@ -14,6 +15,9 @@ class GenericInlineModelAdmin(InlineModelAdmin):
     ct_field = "content_type"
     ct_fk_field = "object_id"
     formset = BaseGenericInlineFormSet
+
+    # Add new check class? So it;s possible to overide _check_fk_name
+    checks_class = GenericInlineModelAdminChecks
 
     def get_formset(self, request, obj=None, **kwargs):
         if 'fields' in kwargs:
