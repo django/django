@@ -952,6 +952,31 @@ different apps and this changes often and you don't want to pull in one big
 catalog file. As a security measure, these values can only be either
 ``django.conf`` or any package from the :setting:`INSTALLED_APPS` setting.
 
+You can also split the catalogs in multiple URLs and load them as you need in
+your sites::
+
+    js_info_dict_app = {
+        'packages': ('your.app.package',),
+    }
+
+    js_info_dict_other_app = {
+        'packages': ('your.other.app.package',),
+    }
+
+    urlpatterns = [
+        url(r'^jsi18n/app/$', javascript_catalog, js_info_dict_app),
+        url(r'^jsi18n/other_app/$', javascript_catalog, js_info_dict_other_app),
+    ]
+
+If you use more than one ``javascript_catalog`` on a site and some of them
+define the same strings, the strings in the catalog that was loaded last take
+precedence.
+
+.. versionchanged:: 1.9
+
+    Before Django 1.9, the catalogs completely overwrote each other and you
+    could only use one at a time.
+
 The JavaScript translations found in the paths listed in the
 :setting:`LOCALE_PATHS` setting are also always included. To keep consistency
 with the translations lookup order algorithm used for Python and templates, the
