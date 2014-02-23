@@ -24,6 +24,8 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
                 SetPasswordForm)
+# Needed so model is installed when tests are run independently:
+from django.contrib.auth.tests.custom_user import CustomUser  # NOQA
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.auth.views import login as login_view
 
