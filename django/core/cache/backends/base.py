@@ -52,10 +52,11 @@ def get_key_func(key_func):
 class BaseCache(object):
     def __init__(self, params):
         timeout = params.get('timeout', params.get('TIMEOUT', 300))
-        try:
-            timeout = int(timeout)
-        except (ValueError, TypeError):
-            timeout = 300
+        if timeout is not None:
+            try:
+                timeout = int(timeout)
+            except (ValueError, TypeError):
+                timeout = 300
         self.default_timeout = timeout
 
         options = params.get('OPTIONS', {})
