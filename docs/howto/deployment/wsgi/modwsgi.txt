@@ -74,7 +74,10 @@ Using a virtualenv
 If you install your project's Python dependencies inside a `virtualenv`_,
 you'll need to add the path to this virtualenv's ``site-packages`` directory to
 your Python path as well. To do this, add an additional path to your
-`WSGIPythonPath` directive, with multiple paths separated by a colon::
+``WSGIPythonPath`` directive, with multiple paths separated by a colon (``:``)
+if using a UNIX-like system, or a semicolon (``;``) if using Windows. If any
+part of a directory path contains a space character, the complete argument
+string to ``WSGIPythonPath`` must be quoted::
 
     WSGIPythonPath /path/to/mysite.com:/path/to/your/venv/lib/python2.X/site-packages
 
