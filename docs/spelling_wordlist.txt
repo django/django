@@ -1,9 +1,7 @@
 Aalto
 accessor
-accesss
 Aceh
 actionnable
-adaptor
 addslashes
 admin
 admindocs
@@ -12,14 +10,12 @@ aggregator
 Ai
 Alchin
 amet
-analagous
 Anssi
 api
 apnumber
 Apolloner
 app
 appname
-appplication
 appropriate
 apps
 architected
@@ -84,7 +80,6 @@ bytestrings
 cacheable
 cachetable
 callables
-Callables
 camelcase
 camelCase
 capfirst
@@ -119,7 +114,6 @@ contactdata
 ContentType
 contenttypes
 contrib
-Contrib
 coveredby
 Córdoba
 createcachetable
@@ -176,7 +170,6 @@ docstring
 docstrings
 doctests
 doctype
-Doctype
 documentational
 dos
 DoS
@@ -268,8 +261,8 @@ hardcoding
 hashable
 hashers
 headerlist
-hoerner
-holovaty
+Hoerner
+Holovaty
 Homebrew
 honeypot
 Honza
@@ -278,11 +271,8 @@ hostnames
 howto
 html
 http
-Http
 https
-HTTPS
 hyperlinks
-ibrary
 icontains
 Idan
 identifers
@@ -298,7 +288,6 @@ inbox
 Incompliance
 indices
 ing
-inheirit
 ini
 init
 inline
@@ -347,7 +336,6 @@ kwargs
 Kyngesburye
 latin
 lawrence
-layermapping
 lexer
 lhs
 libary
@@ -363,13 +351,11 @@ ljust
 loaddata
 localdomain
 localflavor
-Localflavor
 localflavors
 localhost
 localizable
 localtime
 lorem
-Lorem
 lt
 lte
 Magee
@@ -381,7 +367,6 @@ MBR
 memcache
 memcached
 mentorship
-Mentorship
 mercator
 metaclass
 metaclasses
@@ -473,7 +458,6 @@ postgres
 Postgres
 postgresql
 pq
-prameter
 pre
 preconfigured
 prefetch
@@ -570,7 +554,6 @@ shortcutted
 sid
 signup
 simultaneously
-simultaneuosly
 sitemap
 sitemaps
 sitewide
@@ -584,12 +567,10 @@ spaceless
 spam
 spammers
 spatialite
-Spatialite
 specalist
 specfication
 specialised
 specialises
-specifc
 Springmeyer
 sql
 sqlall
@@ -633,7 +614,6 @@ subtemplate
 subtemplates
 subviews
 subwidgets
-suppport
 symlink
 symlinking
 symlinks
@@ -682,8 +662,6 @@ ubuntu
 Ubuntuusers
 ul
 umask
-Umask
-un
 unapply
 unapplying
 uncheck
@@ -706,14 +684,13 @@ unmigrated
 unparseable
 unpickle
 unpickled
+unpythonic
 unregistration
 unrendered
 Unreviewed
 unsanitized
 unsets
-Unsets
 untar
-Untar
 url
 urlencode
 urlize
@@ -726,15 +703,12 @@ useable
 username
 usernames
 utc
-UTC
 UTF
 util
 utilised
 utils
-Utils
 uwsgi
 uWSGI
-validater
 validator
 validators
 validsite
