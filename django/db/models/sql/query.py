@@ -130,7 +130,7 @@ class Query(object):
         # subqueries...)
         self.select = []
         # The related_select_cols is used for columns needed for
-        # select_related - this is populated in compile stage.
+        # select_related - this is populated in the compile stage.
         self.related_select_cols = []
         self.tables = []    # Aliases in the order they are created.
         self.where = where()
