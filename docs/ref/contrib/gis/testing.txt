@@ -93,7 +93,7 @@ Create local PostgreSQL database
 3. Start this database ``pg_ctl -D /path/to/user/db start``
 
 
-Create a database using postgis version 2.0
+Create a database using PostGIS version 2.0
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 When testing projects using :ref:`PostGIS 2 <spatialdb_template91>`,
