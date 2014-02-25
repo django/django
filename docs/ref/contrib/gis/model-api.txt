@@ -123,7 +123,7 @@ calculations.
 
 .. note::
 
-    If you wish to peform arbitrary distance queries using non-point
+    If you wish to perform arbitrary distance queries using non-point
     geometries in WGS84, consider upgrading to PostGIS 1.5. For
     better performance, enable the :attr:`GeometryField.geography`
     keyword so that :ref:`geography database type <geography-type>`

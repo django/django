@@ -10,9 +10,9 @@ processing-overhead perspective, than your standard
 read-a-file-off-the-filesystem server arrangement.
 
 For most Web applications, this overhead isn't a big deal. Most Web
-applications aren't washingtonpost.com or slashdot.org; they're simply small-
-to medium-sized sites with so-so traffic. But for medium- to high-traffic
-sites, it's essential to cut as much overhead as possible.
+applications aren't ``washingtonpost.com`` or ``slashdot.org``; they're simply
+small- to medium-sized sites with so-so traffic. But for medium- to
+high-traffic sites, it's essential to cut as much overhead as possible.
 
 That's where caching comes in.
 
@@ -307,7 +307,7 @@ to ``"django.core.cache.backends.locmem.LocMemCache"``. For example::
     }
 
 The cache :setting:`LOCATION <CACHES-LOCATION>` is used to identify individual
-memory stores. If you only have one locmem cache, you can omit the
+memory stores. If you only have one ``locmem`` cache, you can omit the
 :setting:`LOCATION <CACHES-LOCATION>`; however, if you have more than one local
 memory cache, you will need to assign a name to at least one of them in
 order to keep them separate.
@@ -470,7 +470,7 @@ Additionally, the cache middleware automatically sets a few headers in each
 :class:`~django.http.HttpResponse`:
 
 * Sets the ``Last-Modified`` header to the current date/time when a fresh
-  (uncached) version of the page is requested.
+  (not cached) version of the page is requested.
 
 * Sets the ``Expires`` header to the current date/time plus the defined
   :setting:`CACHE_MIDDLEWARE_SECONDS`.

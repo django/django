@@ -537,7 +537,7 @@ details on these changes.
 * ``django.db.models.fields.XMLField`` will be removed. This was
   deprecated as part of the 1.3 release. An accelerated deprecation
   schedule has been used because the field hasn't performed any role
-  beyond that of a simple ``TextField`` since the removal of oldforms.
+  beyond that of a simple ``TextField`` since the removal of ``oldforms``.
   All uses of ``XMLField`` can be replaced with ``TextField``.
 
 * The undocumented ``mixin`` parameter to the ``open()`` method of

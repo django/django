@@ -638,7 +638,7 @@ Oracle      ``SDO_WITHIN_DISTANCE(poly, geom, 5)``
 =======================
 
 ``GeoQuerySet`` methods specify that a spatial operation be performed
-on each patial operation on each geographic
+on each spatial operation on each geographic
 field in the queryset and store its output in a new attribute on the model
 (which is generally the name of the ``GeoQuerySet`` method).
 
@@ -1103,7 +1103,7 @@ Aggregate Methods
 
 Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
 column.  This is analagous to a simplified version of the :meth:`GeoQuerySet.unionagg` method,
-except it can be several orders of magnitude faster than peforming a union because
+except it can be several orders of magnitude faster than performing a union because
 it simply rolls up geometries into a collection or multi object, not caring about
 dissolving boundaries.
 

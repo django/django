@@ -611,7 +611,7 @@ request_finished
 .. data:: django.core.signals.request_finished
    :module:
 
-Sent when Django finishes delvering an HTTP response to the client.
+Sent when Django finishes delivering an HTTP response to the client.
 
 .. note::
 

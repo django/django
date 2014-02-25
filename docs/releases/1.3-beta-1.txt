@@ -87,7 +87,7 @@ Introduction of STATIC_URL and STATIC_ROOT settings
 
 The newly introduced :mod:`~django.contrib.staticfiles` app -- which extends
 Django's abilities to handle static files for apps and projects -- required the
-additon of two new settings to refer to those files in templates and code,
+addition of two new settings to refer to those files in templates and code,
 especially in contrast to the :setting:`MEDIA_URL` and :setting:`MEDIA_ROOT`
 settings that refer to user-uploaded files.
 

@@ -1693,7 +1693,7 @@ templates used by the :class:`ModelAdmin` views:
     ``response_change`` is called after the admin form is submitted and
     just after the object and all the related instances have
     been saved. You can override it to change the default
-    behavior after the object has been changedn.
+    behavior after the object has been changed.
 
 .. method:: ModelAdmin.response_delete(request, obj_display)
 

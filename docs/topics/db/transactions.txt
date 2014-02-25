@@ -44,7 +44,7 @@ transaction. If the response is produced without problems, Django commits the
 transaction. If the view produces an exception, Django rolls back the
 transaction.
 
-You may perfom partial commits and rollbacks in your view code, typically with
+You may perform partial commits and rollbacks in your view code, typically with
 the :func:`atomic` context manager. However, at the end of the view, either
 all the changes will be committed, or none of them.
 
@@ -622,7 +622,7 @@ behavior is the same, there are two differences.
 With the previous API, it was possible to switch to autocommit or to commit
 explicitly anywhere inside a view. Since :setting:`ATOMIC_REQUESTS
 <DATABASE-ATOMIC_REQUESTS>` relies on :func:`atomic` which enforces atomicity,
-this isn't allowed any longer. However, at the toplevel, it's still possible
+this isn't allowed any longer. However, at the top level, it's still possible
 to avoid wrapping an entire view in a transaction. To achieve this, decorate
 the view with :func:`non_atomic_requests` instead of :func:`autocommit`.
 
