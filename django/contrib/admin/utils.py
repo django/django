@@ -83,15 +83,25 @@ def unquote(s):
     return "".join(res)
 
 
+def flatten(fields):
+    """Returns a list which is a single level of flattening of the
+    original list."""
+    flat = []
+    for field in fields:
+        if isinstance(field, (list, tuple)):
+            flat.extend(field)
+        else:
+            flat.append(field)
+    return flat
+
+
 def flatten_fieldsets(fieldsets):
     """Returns a list of field names from an admin fieldsets structure."""
     field_names = []
     for name, opts in fieldsets:
-        for field in opts['fields']:
-            if isinstance(field, (list, tuple)):
-                field_names.extend(field)
-            else:
-                field_names.append(field)
+        field_names.extend(
+            flatten(opts['fields'])
+        )
     return field_names
 
 
@@ -258,8 +268,10 @@ def lookup_field(name, obj, model_admin=None):
         if callable(name):
             attr = name
             value = attr(obj)
-        elif (model_admin is not None and hasattr(model_admin, name) and
-          not name == '__str__' and not name == '__unicode__'):
+        elif (model_admin is not None and
+                hasattr(model_admin, name) and
+                not name == '__str__' and
+                not name == '__unicode__'):
             attr = getattr(model_admin, name)
             value = attr(obj)
         else:

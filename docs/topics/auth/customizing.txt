@@ -569,7 +569,7 @@ The following methods are available on any subclass of
         .. versionchanged:: 1.6
 
             In Django 1.4 and 1.5, a blank string was unintentionally stored
-            as an unsable password as well.
+            as an unusable password as well.
 
     .. method:: models.AbstractBaseUser.check_password(raw_password)
 
@@ -1051,7 +1051,7 @@ code would be required in the app's ``admin.py`` file::
 
         class Meta:
             model = MyUser
-            fields = ['email', 'password', 'date_of_birth', 'is_active', 'is_admin']
+            fields = ('email', 'password', 'date_of_birth', 'is_active', 'is_admin')
 
         def clean_password(self):
             # Regardless of what the user provides, return the initial value.

@@ -110,7 +110,7 @@ class DistanceTest(TestCase):
                        138809.684197, 158309.246259, 212183.594374,
                        70870.188967, 165337.758878, 139196.085105]
         #  SELECT ST_Distance(point, ST_Transform(ST_GeomFromText('POINT(-96.876369 29.905320)', 4326), 2278)) FROM distapp_southtexascityft;
-        # Oracle 11 thinks this is not a projected coordinate system, so it's s
+        # Oracle 11 thinks this is not a projected coordinate system, so it's
         # not tested.
         ft_distances = [482528.79154625, 458103.408123001, 462231.860397575,
                         455411.438904354, 519386.252102563, 696139.009211594,

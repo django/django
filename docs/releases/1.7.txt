@@ -169,7 +169,19 @@ Using a custom manager when traversing reverse relations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It is now possible to :ref:`specify a custom manager
-<using-custom-reverse-manager>` when traversing a reverse relationship.
+<using-custom-reverse-manager>` when traversing a reverse relationship::
+
+    class Blog(models.Model):
+        pass
+
+    class Entry(models.Model):
+        blog = models.ForeignKey(Blog)
+
+        objects = models.Manager()  # Default Manager
+        entries = EntryManager()    # Custom Manager
+
+    b = Blog.objects.get(id=1)
+    b.entry_set(manager='entries').all()
 
 New system check framework
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -525,11 +537,13 @@ Internationalization
   attribute allows you to customize the redirects issued by the middleware.
 
 * The :class:`~django.middleware.locale.LocaleMiddleware` now stores the user's
-  selected language with the session key ``_language``. Previously it was
-  stored with the key ``django_language``, but keys reserved for Django should
-  start with an underscore. For backwards compatibility ``django_language`` is
-  still read from in 1.7. Sessions will be migrated to the new ``_language``
-  key as they are written.
+  selected language with the session key ``_language``. This should only be
+  accessed using the :data:`~django.utils.translation.LANGUAGE_SESSION_KEY`
+  constant. Previously it was stored with the key ``django_language`` and the
+  ``LANGUAGE_SESSION_KEY`` constant did not exist, but keys reserved for Django
+  should start with an underscore. For backwards compatibility ``django_language``
+  is still read from in 1.7. Sessions will be migrated to the new key
+  as they are written.
 
 * The :ttag:`blocktrans` now supports a ``trimmed`` option. This
   option will remove newline characters from the beginning and the end of the
@@ -544,6 +558,8 @@ Internationalization
   any extracted strings will now be automatically distributed to the proper
   app or project message file. See :ref:`how-to-create-language-files` for
   details.
+
+* Added :ref:`format definitions <format-localization>` for Esperanto.
 
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
@@ -616,6 +632,12 @@ Models
   :attr:`~django.db.models.ForeignKey.limit_choices_to` when defining a
   ``ForeignKey`` or ``ManyToManyField``.
 
+* Calling :meth:`only() <django.db.models.query.QuerySet.only>` and
+  :meth:`defer() <django.db.models.query.QuerySet.defer>` on the result of
+  :meth:`QuerySet.values() <django.db.models.query.QuerySet.values>` now raises
+  an error (before that, it would either result in a database error or
+  incorrect data).
+
 Signals
 ^^^^^^^
 
@@ -635,6 +657,14 @@ Templates
   Additionally, :meth:`push() <django.template.Context.push>` now accepts
   parameters that are passed to the ``dict`` constructor used to build the new
   context level.
+
+* The new :meth:`Context.flatten() <django.template.Context.flatten>` method
+  returns a ``Context``'s stack as one flat dictionary.
+
+* ``Context`` objects can now be compared for equality (internally, this
+  uses :meth:`Context.flatten() <django.template.Context.flatten>` so the
+  internal structure of each ``Context``'s stack doesn't matter as long as their
+  flattened version is identical).
 
 * The :ttag:`widthratio` template tag now accepts an "as" parameter to capture
   the result in a variable.
@@ -731,6 +761,9 @@ Validators
 * :class:`~django.core.validators.URLValidator` now accepts an optional
   ``schemes`` argument which allows customization of the accepted URI schemes
   (instead of the defaults ``http(s)`` and ``ftp(s)``).
+
+* :func:`~django.core.validators.validate_email` now accepts addresses with
+  IPv6 literals, like ``example@[2001:db8::1]``, as specified in RFC 5321.
 
 Backwards incompatible changes in 1.7
 =====================================
@@ -1087,7 +1120,7 @@ Miscellaneous
   primary keys with value 0.
 
 * Shadowing model fields defined in a parent model has been forbidden as this
-  creates amiguity in the expected model behavior. In addition, any clashing
+  creates ambiguity in the expected model behavior. In addition, any clashing
   fields in the model inheritance hierarchy results in a system check error.
   For example, if you use multi-inheritance, you need to define custom primary
   key fields on parent models, otherwise the default ``id`` fields will clash.
@@ -1337,3 +1370,24 @@ The functionality required by ``check_field()`` is the same as that provided
 by ``validate_field()``, but the output format is different. Third-party database
 backends needing this functionality should modify their backends to provide an
 implementation of ``check_field()``.
+
+Loading ``ssi`` and ``url`` template tags from ``future`` library
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.3 introduced ``{% load ssi from future %}`` and
+``{% load url from future %}`` syntax for forward compatibility of the
+:ttag:`ssi` and :ttag:`url` template tags. This syntax is now deprecated and
+will be removed in Django 1.9. You can simply remove the
+``{% load ... from future %}`` tags.
+
+``django.utils.text.javascript_quote``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``javascript_quote()`` was an undocumented function present in ``django.utils.text``.
+It was used internally in the :ref:`javascript_catalog view <javascript_catalog-view>`
+whose implementation was changed to make use of ``json.dumps()`` instead.
+If you were relying on this function to provide safe output from untrusted
+strings, you should use ``django.utils.html.escapejs`` or the
+:tfilter:`escapejs` template filter.
+If all you need is to generate valid javascript strings, you can simply use
+``json.dumps()``.

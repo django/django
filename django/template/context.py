@@ -97,6 +97,27 @@ class BaseContext(object):
         new_context._reset_dicts(values)
         return new_context
 
+    def flatten(self):
+        """
+        Returns self.dicts as one dictionary
+        """
+        flat = {}
+        for d in self.dicts:
+            flat.update(d)
+        return flat
+
+    def __eq__(self, other):
+        """
+        Compares two contexts by comparing theirs 'dicts' attributes.
+        """
+        if isinstance(other, BaseContext):
+            # because dictionaries can be put in different order
+            # we have to flatten them like in templates
+            return self.flatten() == other.flatten()
+
+        # if it's not comparable return false
+        return False
+
 
 class Context(BaseContext):
     "A stack container for variable context"

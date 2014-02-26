@@ -961,6 +961,7 @@ class FieldsTests(SimpleTestCase):
         # has_changed should not trigger required validation
         f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=True)
         self.assertFalse(f._has_changed(None, ''))
+        self.assertFalse(f._has_changed(1, '1'))
 
     def test_typedchoicefield_special_coerce(self):
         """

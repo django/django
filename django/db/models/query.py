@@ -1060,6 +1060,12 @@ class ValuesQuerySet(QuerySet):
         # QuerySet.clone() will also set up the _fields attribute with the
         # names of the model fields to select.
 
+    def only(self, *fields):
+        raise NotImplementedError("ValuesQuerySet does not implement only()")
+
+    def defer(self, *fields):
+        raise NotImplementedError("ValuesQuerySet does not implement defer()")
+
     def iterator(self):
         # Purge any extra columns that haven't been explicitly asked for
         extra_names = list(self.query.extra_select)
@@ -1416,9 +1422,12 @@ def get_cached_row(row, index_start, using, klass_info, offset=0,
     klass, field_names, field_count, related_fields, reverse_related_fields, pk_idx = klass_info
 
     fields = row[index_start:index_start + field_count]
-    # If the pk column is None (or the Oracle equivalent ''), then the related
+    # If the pk column is None (or the equivalent '' in the case the
+    # connection interprets empty strings as nulls), then the related
     # object must be non-existent - set the relation to None.
-    if fields[pk_idx] is None or fields[pk_idx] == '':
+    if (fields[pk_idx] is None or
+        (connections[using].features.interprets_empty_strings_as_nulls and
+         fields[pk_idx] == '')):
         obj = None
     elif field_names:
         fields = list(fields)

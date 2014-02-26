@@ -368,6 +368,43 @@ the stack instead of an empty one.
 Using a ``Context`` as a stack comes in handy in some custom template tags, as
 you'll see below.
 
+.. method:: Context.flatten()
+
+.. versionadded:: 1.7
+
+Using ``flatten()`` method you can get whole ``Context`` stack as one dictionary
+including builtin variables.
+
+    >>> c = Context()
+    >>> c['foo'] = 'first level'
+    >>> c.update({'bar': 'second level'})
+    {'bar': 'second level'}
+    >>> c.flatten()
+    {'True': True, 'None': None, 'foo': 'first level', 'False': False, 'bar': 'second level'}
+
+A ``flatten()`` method is also internally used to make ``Context`` objects comparable.
+
+    >>> c1 = Context()
+    >>> c1['foo'] = 'first level'
+    >>> c1['bar'] = 'second level'
+    >>> c2 = Context()
+    >>> c2.update({'bar': 'second level', 'foo': 'first level'})
+    {'foo': 'first level', 'bar': 'second level'}
+    >>> c1 == c2
+    True
+
+Result from ``flatten()`` can be useful in unit tests to compare ``Context``
+against ``dict``::
+
+    class ContextTest(unittest.TestCase):
+        def test_against_dictionary(self):
+            c1 = Context()
+            c1['update'] = 'value'
+            self.assertEqual(c1.flatten(), {
+                'True': True, 'None': None, 'False': False,
+                'update': 'value'})
+
+
 .. _subclassing-context-requestcontext:
 
 Subclassing Context: RequestContext

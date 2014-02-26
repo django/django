@@ -16,12 +16,14 @@ API Reference
    files/index
    forms/index
    middleware
+   migration-operations
    models/index
    request-response
-   template-response
+   schema-editor
    settings
    signals
    templates/index
+   template-response
    unicode
    urlresolvers
    urls

@@ -726,7 +726,7 @@ sessions and browser cookies respectively).
 To use the named urls, you have to change the ``urls.py``.
 
 Below you will see an example of a contact wizard with two steps, step 1 with
-"contactdata" as its name and step 2 with "leavemessage" as its name.
+``"contactdata"`` as its name and step 2 with ``"leavemessage"`` as its name.
 
 Additionally you have to pass two more arguments to the
 :meth:`~WizardView.as_view` method:

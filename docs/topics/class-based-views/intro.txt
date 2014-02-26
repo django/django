@@ -71,7 +71,7 @@ something like::
 In a class-based view, this would become::
 
     from django.http import HttpResponse
-    from django.views.generic.base import View
+    from django.views.generic import View
 
     class MyView(View):
         def get(self, request):
@@ -113,7 +113,7 @@ and methods in the subclass. So that if your parent class had an attribute
 ``greeting`` like this::
 
     from django.http import HttpResponse
-    from django.views.generic.base import View
+    from django.views.generic import View
 
     class GreetingView(View):
         greeting = "Good Day"
@@ -198,7 +198,7 @@ A similar class-based view might look like::
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render
-    from django.views.generic.base import View
+    from django.views.generic import View
 
     from .forms import MyForm
 

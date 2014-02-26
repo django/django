@@ -13,7 +13,7 @@ Background
 What is GEOS?
 -------------
 
-`GEOS`__ stands for **G**\ eometry **E**\ ngine - **O**\ pen **S**\ ource,
+`GEOS`__ stands for **Geometry Engine - Open Source**,
 and is a C++ library, ported from the  `Java Topology Suite`__.  GEOS
 implements the OpenGIS `Simple Features for SQL`__ spatial predicate functions
 and spatial operators. GEOS, now an OSGeo project, was initially developed and
@@ -500,7 +500,7 @@ This property returns the area of the Geometry.
 .. attribute:: GEOSGeometry.extent
 
 This property returns the extent of this geometry as a 4-tuple,
-consisting of (xmin, ymin, xmax, ymax).
+consisting of ``(xmin, ymin, xmax, ymax)``.
 
 .. method:: GEOSGeometry.clone()
 
@@ -625,7 +625,7 @@ is returned instead.
    .. classmethod:: from_bbox(bbox)
 
    Returns a polygon object from the given bounding-box, a 4-tuple
-   comprising (xmin, ymin, xmax, ymax).
+   comprising ``(xmin, ymin, xmax, ymax)``.
 
    .. attribute:: num_interior_rings
 

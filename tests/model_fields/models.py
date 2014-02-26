@@ -72,10 +72,19 @@ class BooleanModel(models.Model):
     string = models.CharField(max_length=10, default='abc')
 
 
+class PrimaryKeyCharModel(models.Model):
+    string = models.CharField(max_length=10, primary_key=True)
+
+
 class FksToBooleans(models.Model):
     """Model wih FKs to models with {Null,}BooleanField's, #15040"""
     bf = models.ForeignKey(BooleanModel)
     nbf = models.ForeignKey(NullBooleanModel)
+
+
+class FkToChar(models.Model):
+    """Model with FK to a model with a CharField primary key, #19299"""
+    out = models.ForeignKey(PrimaryKeyCharModel)
 
 
 class RenamedField(models.Model):

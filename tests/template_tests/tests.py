@@ -612,8 +612,10 @@ class TemplateTests(TestCase):
                             try:
                                 try:
                                     with warnings.catch_warnings():
-                                        # Ignore pending deprecations of the old syntax of the 'cycle' and 'firstof' tags.
+                                        # Ignore deprecations of the old syntax of the 'cycle' and 'firstof' tags.
                                         warnings.filterwarnings("ignore", category=DeprecationWarning, module='django.template.base')
+                                        # Ignore pending deprecations of loading 'ssi' and 'url' tags from future.
+                                        warnings.filterwarnings("ignore", category=PendingDeprecationWarning, module='django.templatetags.future')
                                         test_template = loader.get_template(name)
                                 except ShouldNotExecuteException:
                                     failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template loading invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
@@ -1927,6 +1929,19 @@ class RequestContextTests(unittest.TestCase):
         # The stack should now contain 3 items:
         # [builtins, supplied context, context processor]
         self.assertEqual(len(ctx.dicts), 3)
+
+    @override_settings(TEMPLATE_CONTEXT_PROCESSORS=())
+    def test_context_comparable(self):
+        test_data = {'x': 'y', 'v': 'z', 'd': {'o': object, 'a': 'b'}}
+
+        # test comparing RequestContext to prevent problems if somebody
+        # adds __eq__ in the future
+        request = RequestFactory().get('/')
+
+        self.assertEqual(
+            RequestContext(request, dict_=test_data),
+            RequestContext(request, dict_=test_data)
+        )
 
 
 class SSITests(TestCase):

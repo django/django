@@ -955,7 +955,8 @@ DEFAULT_FROM_EMAIL
 Default: ``'webmaster@localhost'``
 
 Default email address to use for various automated correspondence from the
-site manager(s).
+site manager(s). This doesn't include error messages sent to :setting:`ADMINS`
+and :setting:`MANAGERS`; for that, see :setting:`SERVER_EMAIL`.
 
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
@@ -1538,6 +1539,24 @@ Default::
 
 A tuple of middleware classes to use. See :doc:`/topics/http/middleware`.
 
+.. setting:: MIGRATION_MODULES
+
+MIGRATION_MODULES
+-----------------
+
+Default::
+
+    {} # empty dictionary
+
+A dictionary specifying the package where migration modules can be found on a per-app basis. The default value
+of this setting is an empty dictionary, but the default package name for migration modules is ``migrations``.
+
+Example::
+
+    {'blog': 'blog.db_migrations'}
+
+In this case, migrations pertaining to the ``blog`` app will be contained in the ``blog.db_migrations`` package.
+
 .. setting:: MONTH_DAY_FORMAT
 
 MONTH_DAY_FORMAT
@@ -1727,6 +1746,12 @@ Default: ``'root@localhost'``
 The email address that error messages come from, such as those sent to
 :setting:`ADMINS` and :setting:`MANAGERS`.
 
+.. admonition:: Why are my emails sent from a different address?
+
+    This address is used only for error messages. It is *not* the address that
+    regular email messages sent with :meth:`~django.core.mail.send_mail()`
+    come from; for that, see :setting:`DEFAULT_FROM_EMAIL`.
+
 .. setting:: SHORT_DATE_FORMAT
 
 SHORT_DATE_FORMAT
@@ -1760,7 +1785,7 @@ See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 SIGNING_BACKEND
 ---------------
 
-Default: 'django.core.signing.TimestampSigner'
+Default: ``'django.core.signing.TimestampSigner'``
 
 The backend used for signing cookies and other data.
 

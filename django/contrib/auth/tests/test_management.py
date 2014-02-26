@@ -1,11 +1,14 @@
 from __future__ import unicode_literals
+
 from datetime import date
+import locale
+import sys
 
 from django.apps import apps
 from django.contrib.auth import models, management
 from django.contrib.auth.checks import check_user_model
 from django.contrib.auth.management import create_permissions
-from django.contrib.auth.management.commands import changepassword
+from django.contrib.auth.management.commands import changepassword, createsuperuser
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
@@ -16,7 +19,56 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase, override_settings, override_system_checks
 from django.utils import six
-from django.utils.six import StringIO
+from django.utils.encoding import force_str
+
+
+def mock_inputs(inputs):
+    """
+    Decorator to temporarily replace input/getpass to allow interactive
+    createsuperuser.
+    """
+    def inner(test_func):
+        def wrapped(*args):
+            class mock_getpass:
+                @staticmethod
+                def getpass(prompt=b'Password: ', stream=None):
+                    if six.PY2:
+                        # getpass on Windows only supports prompt as bytestring (#19807)
+                        assert isinstance(prompt, six.binary_type)
+                    return inputs['password']
+
+            def mock_input(prompt):
+                # prompt should be encoded in Python 2. This line will raise an
+                # Exception if prompt contains unencoded non-ascii on Python 2.
+                prompt = str(prompt)
+                assert str('__proxy__') not in prompt
+                response = ''
+                for key, val in inputs.items():
+                    if force_str(key) in prompt.lower():
+                        response = val
+                        break
+                return response
+
+            old_getpass = createsuperuser.getpass
+            old_input = createsuperuser.input
+            createsuperuser.getpass = mock_getpass
+            createsuperuser.input = mock_input
+            try:
+                test_func(*args)
+            finally:
+                createsuperuser.getpass = old_getpass
+                createsuperuser.input = old_input
+        return wrapped
+    return inner
+
+
+class MockTTY(object):
+    """
+    A fake stdin object that pretends to be a TTY to be used in conjunction
+    with mock_inputs.
+    """
+    def isatty(self):
+        return True
 
 
 @skipIfCustomUser
@@ -53,8 +105,8 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
     def setUp(self):
         self.user = models.User.objects.create_user(username='joe', password='qwerty')
-        self.stdout = StringIO()
-        self.stderr = StringIO()
+        self.stdout = six.StringIO()
+        self.stderr = six.StringIO()
 
     def tearDown(self):
         self.stdout.close()
@@ -100,10 +152,10 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 @skipIfCustomUser
 class CreatesuperuserManagementCommandTestCase(TestCase):
 
-    def test_createsuperuser(self):
+    def test_basic_usage(self):
         "Check the operation of the createsuperuser management command"
         # We can use the management command to create a superuser
-        new_io = StringIO()
+        new_io = six.StringIO()
         call_command(
             "createsuperuser",
             interactive=False,
@@ -119,9 +171,66 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # created password should be unusable
         self.assertFalse(u.has_usable_password())
 
+    @mock_inputs({'password': "nopasswd"})
+    def test_nolocale(self):
+        """
+        Check that createsuperuser does not break when no locale is set. See
+        ticket #16017.
+        """
+
+        old_getdefaultlocale = locale.getdefaultlocale
+        try:
+            # Temporarily remove locale information
+            locale.getdefaultlocale = lambda: (None, None)
+
+            # Call the command in this new environment
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                username="nolocale@somewhere.org",
+                email="nolocale@somewhere.org",
+                verbosity=0,
+                stdin=MockTTY(),
+            )
+
+        except TypeError:
+            self.fail("createsuperuser fails if the OS provides no information about the current locale")
+
+        finally:
+            # Re-apply locale information
+            locale.getdefaultlocale = old_getdefaultlocale
+
+        # If we were successful, a user should have been created
+        u = User.objects.get(username="nolocale@somewhere.org")
+        self.assertEqual(u.email, 'nolocale@somewhere.org')
+
+    @mock_inputs({
+        'password': "nopasswd",
+        'u\u017eivatel': 'foo',  # username (cz)
+        'email': 'nolocale@somewhere.org'})
+    def test_non_ascii_verbose_name(self):
+        # Aliased so the string doesn't get extracted
+        from django.utils.translation import ugettext_lazy as ulazy
+        username_field = User._meta.get_field('username')
+        old_verbose_name = username_field.verbose_name
+        username_field.verbose_name = ulazy('u\u017eivatel')
+        new_io = six.StringIO()
+        try:
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                stdout=new_io,
+                stdin=MockTTY(),
+            )
+        finally:
+            username_field.verbose_name = old_verbose_name
+
+        command_output = new_io.getvalue().strip()
+        self.assertEqual(command_output, 'Superuser created successfully.')
+
     def test_verbosity_zero(self):
         # We can supress output on the management command
-        new_io = StringIO()
+        new_io = six.StringIO()
         call_command(
             "createsuperuser",
             interactive=False,
@@ -137,7 +246,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         self.assertFalse(u.has_usable_password())
 
     def test_email_in_username(self):
-        new_io = StringIO()
+        new_io = six.StringIO()
         call_command(
             "createsuperuser",
             interactive=False,
@@ -155,7 +264,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # We can use the management command to create a superuser
         # We skip validation because the temporary substitution of the
         # swappable User model messes with validation.
-        new_io = StringIO()
+        new_io = six.StringIO()
         call_command(
             "createsuperuser",
             interactive=False,
@@ -178,7 +287,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # We can use the management command to create a superuser
         # We skip validation because the temporary substitution of the
         # swappable User model messes with validation.
-        new_io = StringIO()
+        new_io = six.StringIO()
         with self.assertRaises(CommandError):
             call_command(
                 "createsuperuser",
@@ -190,6 +299,53 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             )
 
         self.assertEqual(CustomUser._default_manager.count(), 0)
+
+    def test_skip_if_not_in_TTY(self):
+        """
+        If the command is not called from a TTY, it should be skipped and a
+        message should be displayed (#7423).
+        """
+        class FakeStdin(object):
+            """A fake stdin object that has isatty() return False."""
+            def isatty(self):
+                return False
+
+        out = six.StringIO()
+        call_command(
+            "createsuperuser",
+            stdin=FakeStdin(),
+            stdout=out,
+            interactive=True,
+        )
+
+        self.assertEqual(User._default_manager.count(), 0)
+        self.assertIn("Superuser creation skipped", out.getvalue())
+
+    def test_passing_stdin(self):
+        """
+        You can pass a stdin object as an option and it should be
+        available on self.stdin.
+        If no such option is passed, it defaults to sys.stdin.
+        """
+        sentinel = object()
+        command = createsuperuser.Command()
+        command.execute(
+            stdin=sentinel,
+            stdout=six.StringIO(),
+            interactive=False,
+            username='janet',
+            email='janet@example.com',
+        )
+        self.assertIs(command.stdin, sentinel)
+
+        command = createsuperuser.Command()
+        command.execute(
+            stdout=six.StringIO(),
+            interactive=False,
+            username='joe',
+            email='joe@example.com',
+        )
+        self.assertIs(command.stdin, sys.stdin)
 
 
 class CustomUserModelValidationTestCase(TestCase):

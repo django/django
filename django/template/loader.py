@@ -164,13 +164,14 @@ def render_to_string(template_name, dictionary=None, context_instance=None,
     get_template, or it may be a tuple to use select_template to find one of
     the templates in the list. Returns a string.
     """
-    dictionary = dictionary or {}
     if isinstance(template_name, (list, tuple)):
         t = select_template(template_name, dirs)
     else:
         t = get_template(template_name, dirs)
     if not context_instance:
         return t.render(Context(dictionary))
+    if not dictionary:
+        return t.render(context_instance)
     # Add the dictionary to the context stack, ensuring it gets removed again
     # to keep the context_instance in the same state it started in.
     with context_instance.push(dictionary):

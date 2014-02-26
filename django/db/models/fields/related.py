@@ -183,7 +183,7 @@ class RelatedField(Field):
         # Check clashes between accessor or reverse query name of `field`
         # and any other field name -- i. e. accessor for Model.foreign is
         # model_set and it clashes with Target.model_set.
-        potential_clashes = rel_opts.fields + rel_opts.local_many_to_many
+        potential_clashes = rel_opts.fields + rel_opts.many_to_many
         for clash_field in potential_clashes:
             clash_name = "%s.%s" % (rel_opts.object_name,
                 clash_field.name)  # i. e. "Target.model_set"
@@ -1692,11 +1692,12 @@ class ForeignKey(ForeignObject):
         return field_default
 
     def get_db_prep_save(self, value, connection):
-        if value == '' or value is None:
+        if value is None or (value == '' and
+                             (not self.related_field.empty_strings_allowed or
+                              connection.features.interprets_empty_strings_as_nulls)):
             return None
         else:
-            return self.related_field.get_db_prep_save(value,
-                connection=connection)
+            return self.related_field.get_db_prep_save(value, connection=connection)
 
     def value_to_string(self, obj):
         if not obj:

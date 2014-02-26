@@ -1082,7 +1082,7 @@ which to generate the SQL.
 
 By default, the SQL created is for running the migration in the forwards
 direction. Pass ``--backwards`` to generate the SQL for
-un-applying the migration instead.
+unapplying the migration instead.
 
 sqlsequencereset <app_label app_label ...>
 ------------------------------------------

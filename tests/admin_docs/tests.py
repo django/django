@@ -3,9 +3,12 @@ import unittest
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.admindocs import utils
+from django.contrib.admindocs.views import get_return_data_type
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase, modify_settings, override_settings
+
+from .models import Person, Company
 
 
 class MiscTests(TestCase):
@@ -79,17 +82,6 @@ class AdminDocViewTests(TestCase):
     def test_model_index(self):
         response = self.client.get(reverse('django-admindocs-models-index'))
         self.assertContains(response, '<h2 id="app-auth">Auth</h2>', html=True)
-
-    def test_model_detail(self):
-        response = self.client.get(reverse('django-admindocs-models-detail',
-            args=['auth', 'user']))
-        # Check for attribute, many-to-many field
-        self.assertContains(response,
-            '<tr><td>email</td><td>Email address</td><td>email address</td></tr>', html=True)
-        self.assertContains(response,
-            '<tr><td>user_permissions.all</td><td>List</td><td>'
-            '<p>all related <a class="reference external" href="/admindocs/models/auth.permission/">'
-            'auth.Permission</a> objects</p></td></tr>', html=True)
 
     def test_template_detail(self):
         response = self.client.get(reverse('django-admindocs-templates',
@@ -189,3 +181,98 @@ class DefaultRoleTest(TestCase):
         markup = '<p>reST, <cite>interpreted text</cite>, default role.</p>\n'
         parts = docutils.core.publish_parts(source=source, writer_name="html4css1")
         self.assertEqual(parts['fragment'], markup)
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
+class TestModelDetailView(TestCase):
+    """
+    Tests that various details render correctly
+    """
+
+    fixtures = ['data.xml']
+    urls = 'admin_docs.urls'
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+        self.response = self.client.get(
+            reverse('django-admindocs-models-detail',
+                    args=['admin_docs', 'person']))
+
+    def test_method_excludes(self):
+        """
+        Test that methods that begin with strings defined in
+        ``django.contrib.admindocs.views.MODEL_METHODS_EXCLUDE``
+        do not get displayed in the admin docs
+        """
+        self.assertContains(self.response, "<td>get_full_name</td>")
+        self.assertNotContains(self.response, "<td>_get_full_name</td>")
+        self.assertNotContains(self.response, "<td>add_image</td>")
+        self.assertNotContains(self.response, "<td>delete_image</td>")
+        self.assertNotContains(self.response, "<td>set_status</td>")
+        self.assertNotContains(self.response, "<td>save_changes</td>")
+
+    def test_method_data_types(self):
+        """
+        We should be able to get a basic idea of the type returned
+        by a method
+        """
+        company = Company.objects.create(name="Django")
+        person = Person.objects.create(
+            first_name="Human",
+            last_name="User",
+            company=company
+        )
+
+        self.assertEqual(
+            get_return_data_type(person.get_status_count.__name__),
+            'Integer'
+        )
+
+        self.assertEqual(
+            get_return_data_type(person.get_groups_list.__name__),
+            'List'
+        )
+
+    def test_descriptions_render_correctly(self):
+        """
+        The ``description`` field should render correctly for each type of field
+        """
+        # help text in fields
+        self.assertContains(self.response, "<td>first name - The person's first name</td>")
+        self.assertContains(self.response, "<td>last name - The person's last name</td>")
+
+        # method docstrings
+        self.assertContains(self.response, "<p>Get the full name of the person</p>")
+
+        link = '<a class="reference external" href="/admindocs/models/%s/">%s</a>'
+        markup = '<p>the related %s object</p>'
+        company_markup = markup % (link % ("admin_docs.company", "admin_docs.Company"))
+
+        # foreign keys
+        self.assertContains(self.response, company_markup)
+
+        # foreign keys with help text
+        self.assertContains(self.response, "%s\n - place of work" % company_markup)
+
+        # many to many fields
+        self.assertContains(
+            self.response,
+            "number of related %s objects" % (link % ("admin_docs.group", "admin_docs.Group"))
+        )
+        self.assertContains(
+            self.response,
+            "all related %s objects" % (link % ("admin_docs.group", "admin_docs.Group"))
+        )
+
+    def test_model_with_no_backward_relations_render_only_relevant_fields(self):
+        """
+        A model with ``related_name`` of `+` should not show backward relationship
+        links in admin docs
+        """
+        response = self.client.get(
+            reverse('django-admindocs-models-detail',
+                    args=['admin_docs', 'family']))
+
+        fields = response.context_data.get('fields')
+        self.assertEqual(len(fields), 2)

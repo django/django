@@ -957,7 +957,7 @@ current page::
 The first parameter of ``ssi`` can be a quoted literal or any other context
 variable.
 
-If the optional "parsed" parameter is given, the contents of the included
+If the optional ``parsed`` parameter is given, the contents of the included
 file are evaluated as template code, within the current context::
 
     {% ssi '/home/html/ljworld.com/includes/right_generic.html' parsed %}
@@ -965,6 +965,13 @@ file are evaluated as template code, within the current context::
 Note that if you use ``{% ssi %}``, you'll need to define
 :setting:`ALLOWED_INCLUDE_ROOTS` in your Django settings, as a security
 measure.
+
+.. note::
+    With the :ttag:`ssi` tag and the ``parsed`` parameter
+    there is no shared state between files -- each include is a completely
+    independent rendering process. This means it's not possible for example to
+    define blocks or alter the context in the current page using the included
+    file.
 
 See also: :ttag:`{% include %}<include>`.
 

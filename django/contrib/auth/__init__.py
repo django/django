@@ -5,6 +5,7 @@ from django.apps import apps as django_apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.utils.module_loading import import_string
+from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.middleware.csrf import rotate_token
 
 from .signals import user_logged_in, user_logged_out, user_login_failed
@@ -108,12 +109,12 @@ def logout(request):
 
     # remember language choice saved to session
     # for backwards compatibility django_language is also checked (remove in 1.8)
-    language = request.session.get('_language', request.session.get('django_language'))
+    language = request.session.get(LANGUAGE_SESSION_KEY, request.session.get('django_language'))
 
     request.session.flush()
 
     if language is not None:
-        request.session['_language'] = language
+        request.session[LANGUAGE_SESSION_KEY] = language
 
     if hasattr(request, 'user'):
         from django.contrib.auth.models import AnonymousUser
@@ -138,15 +139,17 @@ def get_user(request):
     If no user is retrieved an instance of `AnonymousUser` is returned.
     """
     from .models import AnonymousUser
+    user = None
     try:
         user_id = request.session[SESSION_KEY]
         backend_path = request.session[BACKEND_SESSION_KEY]
-        assert backend_path in settings.AUTHENTICATION_BACKENDS
-        backend = load_backend(backend_path)
-        user = backend.get_user(user_id) or AnonymousUser()
-    except (KeyError, AssertionError):
-        user = AnonymousUser()
-    return user
+    except KeyError:
+        pass
+    else:
+        if backend_path in settings.AUTHENTICATION_BACKENDS:
+            backend = load_backend(backend_path)
+            user = backend.get_user(user_id)
+    return user or AnonymousUser()
 
 
 def get_permission_codename(action, opts):

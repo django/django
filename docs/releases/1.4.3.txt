@@ -26,7 +26,7 @@ header validation. Rather than attempt to accommodate all features HTTP
 supports here, Django's Host header validation attempts to support a smaller,
 but far more common, subset:
 
-* Hostnames must consist of characters [A-Za-z0-9] plus hyphen ('-') or dot
+* Hostnames must consist of characters ``[A-Za-z0-9]`` plus hyphen ('-') or dot
   ('.').
 * IP addresses -- both IPv4 and IPv6 -- are permitted.
 * Port, if specified, is numeric.
