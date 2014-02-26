@@ -1100,6 +1100,9 @@ Miscellaneous
   This widget now respects the form field's ``is_required`` attribute like
   other widgets.
 
+* ``Widget.is_hidden`` is now a read-only property, getting its value by
+  introspecting the presence of ``input_type == 'hidden'``.
+
 * :meth:`~django.db.models.query.QuerySet.select_related` now chains in the
   same way as other similar calls like ``prefetch_related``. That is,
   ``select_related('foo', 'bar')`` is equivalent to
