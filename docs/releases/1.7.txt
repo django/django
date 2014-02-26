@@ -308,6 +308,10 @@ Minor features
   <django.contrib.admin.ModelAdmin.list_display>` value by prefixing the
   ``admin_order_field`` value with a hyphen.
 
+* The :meth:`ModelAdmin.get_changeform_initial_data()
+  <django.contrib.admin.ModelAdmin.get_changeform_initial_data>` method may be
+  overridden to define custom behavior for setting initial change form data.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 

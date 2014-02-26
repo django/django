@@ -796,6 +796,10 @@ class RestaurantAdmin(admin.ModelAdmin):
     inlines = [WorkerInlineAdmin]
     view_on_site = False
 
+    def get_changeform_initial_data(self, request):
+        return {'name': 'overridden_value'}
+
+
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
