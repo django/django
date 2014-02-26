@@ -108,6 +108,7 @@ class SQLEvaluator(object):
     def evaluate_date_modifier_node(self, node, qn, connection):
         timedelta = node.children.pop()
         sql, params = self.evaluate_node(node, qn, connection)
+        node.children.append(timedelta)
 
         if timedelta.days == 0 and timedelta.seconds == 0 and \
                 timedelta.microseconds == 0:
