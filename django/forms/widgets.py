@@ -166,7 +166,6 @@ class SubWidget(object):
 
 
 class Widget(six.with_metaclass(MediaDefiningClass)):
-    is_hidden = False             # Determines whether this corresponds to an <input type="hidden">.
     needs_multipart_form = False  # Determines does this widget need multipart form
     is_localized = False
     is_required = False
@@ -182,6 +181,18 @@ class Widget(six.with_metaclass(MediaDefiningClass)):
         obj.attrs = self.attrs.copy()
         memo[id(self)] = obj
         return obj
+
+    @property
+    def is_hidden(self):
+        return self.input_type == 'hidden' if hasattr(self, 'input_type') else False
+
+    @is_hidden.setter
+    def is_hidden(self, *args):
+        warnings.warn(
+            "`is_hidden` property is now read-only (and checks `input_type`). "
+            "Please update your code.",
+            DeprecationWarning, stacklevel=2
+        )
 
     def subwidgets(self, name, value, attrs=None, choices=()):
         """
@@ -286,7 +297,6 @@ class PasswordInput(TextInput):
 
 class HiddenInput(Input):
     input_type = 'hidden'
-    is_hidden = True
 
 
 class MultipleHiddenInput(HiddenInput):
@@ -778,6 +788,10 @@ class MultiWidget(Widget):
         self.widgets = [w() if isinstance(w, type) else w for w in widgets]
         super(MultiWidget, self).__init__(attrs)
 
+    @property
+    def is_hidden(self):
+        return all(w.is_hidden for w in self.widgets)
+
     def render(self, name, value, attrs=None):
         if self.is_localized:
             for widget in self.widgets:
@@ -865,10 +879,7 @@ class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
     """
     A Widget that splits datetime input into two <input type="hidden"> inputs.
     """
-    is_hidden = True
-
     def __init__(self, attrs=None, date_format=None, time_format=None):
         super(SplitHiddenDateTimeWidget, self).__init__(attrs, date_format, time_format)
         for widget in self.widgets:
             widget.input_type = 'hidden'
-            widget.is_hidden = True
