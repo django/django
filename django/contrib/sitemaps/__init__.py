@@ -47,6 +47,9 @@ class Sitemap(object):
     # http://sitemaps.org/protocol.php#index.
     limit = 50000
 
+    def __init__(self, request=None):
+        self.request = request
+
     # If protocol is None, the URLs in the sitemap will use the protocol
     # with which the sitemap was requested.
     protocol = None
@@ -127,11 +130,12 @@ class GenericSitemap(Sitemap):
     priority = None
     changefreq = None
 
-    def __init__(self, info_dict, priority=None, changefreq=None):
+    def __init__(self, info_dict, priority=None, changefreq=None, request=None):
         self.queryset = info_dict['queryset']
         self.date_field = info_dict.get('date_field', None)
         self.priority = priority
         self.changefreq = changefreq
+        self.request = request
 
     def items(self):
         # Make sure to return a clone; we don't want premature evaluation.

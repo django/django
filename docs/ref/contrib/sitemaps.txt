@@ -126,6 +126,14 @@ Note:
   :attr:`~Sitemap.location()` calls ``get_absolute_url()`` on each object
   and returns the result.
 
+
+.. versionadded:: 1.7
+
+:class:`~django.contrib.sitemaps.Sitemap` classes store the request object as
+an instance attribute. If for whatever reason you want to use this object from
+within a method, like :attr:`~Sitemap.items()`, just obtain it using
+``self.request``.
+
 Sitemap class reference
 =======================
 

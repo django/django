@@ -42,6 +42,24 @@ class FixedLastmodMixedSitemap(Sitemap):
         return [o1, o2]
 
 
+class RequestSitemap(Sitemap):
+    # Test for issue 17802:
+    # ensure accessing self.request doesn't raise an exception.
+
+    def items(self):
+        # Having the request as instance attribute is useful to return a custom
+        # list of objects calculated on request's values.
+        
+        sitemap = []
+        if self.request is not None:
+            # dummy example:
+            # if self.request.environ['SERVER_NAME'] == 'example':
+            #     sitemap = [TestModel()]
+            pass
+
+        return sitemap
+
+
 simple_sitemaps = {
     'simple': SimpleSitemap,
 }
@@ -66,6 +84,10 @@ flatpage_sitemaps = {
     'flatpages': FlatPageSitemap,
 }
 
+request_sitemaps = {
+    'request': RequestSitemap,
+}
+
 urlpatterns = patterns('django.contrib.sitemaps.views',
     (r'^simple/index\.xml$', 'index', {'sitemaps': simple_sitemaps}),
     (r'^simple/custom-index\.xml$', 'index',
@@ -76,6 +98,7 @@ urlpatterns = patterns('django.contrib.sitemaps.views',
     (r'^simple/custom-sitemap\.xml$', 'sitemap',
         {'sitemaps': simple_sitemaps, 'template_name': 'custom_sitemap.xml'}),
     (r'^empty/sitemap\.xml$', 'sitemap', {'sitemaps': empty_sitemaps}),
+    (r'^request/sitemap\.xml$', 'sitemap', {'sitemaps': request_sitemaps}),
     (r'^lastmod/sitemap\.xml$', 'sitemap', {'sitemaps': fixed_lastmod_sitemaps}),
     (r'^lastmod-mixed/sitemap\.xml$', 'sitemap', {'sitemaps': fixed_lastmod__mixed_sitemaps}),
     (r'^generic/sitemap\.xml$', 'sitemap', {'sitemaps': generic_sitemaps}),
