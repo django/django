@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import datetime
-import inspect
 import decimal
 import collections
 from importlib import import_module
@@ -13,7 +12,7 @@ from django.db import models
 from django.db.migrations.loader import MigrationLoader
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
-from django.utils import six
+from django.utils import six, inspect
 
 
 class SettingsReference(str):

@@ -88,7 +88,7 @@ class Signal(object):
 
         # If DEBUG is on, check that we got a good receiver
         if settings.configured and settings.DEBUG:
-            import inspect
+            from django.utils import inspect
             assert callable(receiver), "Signal receivers must be callable."
 
             # Check for **kwargs
@@ -96,18 +96,11 @@ class Signal(object):
             # try a couple different ways but in the end fall back on assuming
             # it is -- we don't want to prevent registration of valid but weird
             # callables.
-            if six.PY2:
-                getargspec = inspect.getargspec
-            else:
-                # The inspect.getargspec function throw ValueError if
-                # the receiver contains annotations or keyword-only arguments.
-                getargspec = inspect.getfullargspec
-
             try:
-                argspec = getargspec(receiver)
+                argspec = inspect.getargspec(receiver)
             except TypeError:
                 try:
-                    argspec = getargspec(receiver.__call__)
+                    argspec = inspect.getargspec(receiver.__call__)
                 except (TypeError, AttributeError, ValueError):
                     argspec = None
             if argspec:

@@ -1,5 +1,4 @@
 from importlib import import_module
-import inspect
 import os
 import re
 import warnings
@@ -16,7 +15,7 @@ from django.core import urlresolvers
 from django.contrib.admindocs import utils
 from django.utils.decorators import method_decorator
 from django.utils._os import upath
-from django.utils import six
+from django.utils import six, inspect
 from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView
 
