@@ -74,7 +74,9 @@ def get_test_modules():
                     f == '__pycache__' or
                     f.startswith('sql') or
                     os.path.basename(f) in SUBDIRS_TO_SKIP or
-                    os.path.isfile(f)):
+                    os.path.isfile(f) or
+                    (os.path.isdir(f) and
+                     not os.path.exists(os.path.join(f, '__init__.py')))):
                 continue
             modules.append((modpath, f))
     return modules
