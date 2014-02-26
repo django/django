@@ -6,6 +6,7 @@ from gzip import GzipFile
 from io import BytesIO
 import warnings
 
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text
 from django.utils.functional import allow_lazy, SimpleLazyObject
 from django.utils import six
@@ -332,7 +333,7 @@ def javascript_quote(s, quote_double_quotes=False):
         "django.utils.text.javascript_quote() is deprecated. "
         "Use django.utils.html.escapejs() instead."
     )
-    warnings.warn(msg, PendingDeprecationWarning, stacklevel=2)
+    warnings.warn(msg, RemovedInDjango19Warning, stacklevel=2)
 
     def fix(match):
         return "\\u%04x" % ord(match.group(1))

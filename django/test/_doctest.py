@@ -51,10 +51,12 @@ details.
 """
 import warnings
 
+from django.utils.deprecation import RemovedInDjango18Warning
+
 warnings.warn(
     "The django.test._doctest module is deprecated; "
     "use the doctest module from the Python standard library instead.",
-    DeprecationWarning)
+    RemovedInDjango18Warning)
 
 
 __docformat__ = 'reStructuredText en'
@@ -2085,7 +2087,7 @@ class Tester:
 
         warnings.warn("class Tester is deprecated; "
                       "use class doctest.DocTestRunner instead",
-                      DeprecationWarning, stacklevel=2)
+                      RemovedInDjango18Warning, stacklevel=2)
         if mod is None and globs is None:
             raise TypeError("Tester.__init__: must specify mod or globs")
         if mod is not None and not inspect.ismodule(mod):

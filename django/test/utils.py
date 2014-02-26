@@ -17,8 +17,9 @@ from django.http import request
 from django.template import Template, loader, TemplateDoesNotExist
 from django.template.loaders import cached
 from django.test.signals import template_rendered, setting_changed
-from django.utils.encoding import force_str
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango18Warning, RemovedInDjango19Warning
+from django.utils.encoding import force_str
 from django.utils.translation import deactivate
 
 
@@ -457,8 +458,7 @@ class CaptureQueriesContext(object):
 
 
 class IgnoreDeprecationWarningsMixin(object):
-
-    warning_classes = [DeprecationWarning]
+    warning_classes = [RemovedInDjango18Warning]
 
     def setUp(self):
         super(IgnoreDeprecationWarningsMixin, self).setUp()
@@ -473,13 +473,11 @@ class IgnoreDeprecationWarningsMixin(object):
 
 
 class IgnorePendingDeprecationWarningsMixin(IgnoreDeprecationWarningsMixin):
-
-        warning_classes = [PendingDeprecationWarning]
+        warning_classes = [RemovedInDjango19Warning]
 
 
 class IgnoreAllDeprecationWarningsMixin(IgnoreDeprecationWarningsMixin):
-
-        warning_classes = [PendingDeprecationWarning, DeprecationWarning]
+        warning_classes = [RemovedInDjango19Warning, RemovedInDjango18Warning]
 
 
 @contextmanager

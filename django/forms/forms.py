@@ -12,8 +12,9 @@ from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.forms.fields import Field, FileField
 from django.forms.utils import flatatt, ErrorDict, ErrorList
 from django.forms.widgets import Media, MediaDefiningClass, TextInput, Textarea
-from django.utils.html import conditional_escape, format_html
+from django.utils.deprecation import RemovedInDjango18Warning, RemovedInDjango19Warning
 from django.utils.encoding import smart_text, force_text, python_2_unicode_compatible
+from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils import six
@@ -43,7 +44,7 @@ def get_declared_fields(bases, attrs, with_base_fields=True):
 
     warnings.warn(
         "get_declared_fields is deprecated and will be removed in Django 1.9.",
-        PendingDeprecationWarning,
+        RemovedInDjango19Warning,
         stacklevel=2,
     )
 
@@ -431,7 +432,7 @@ class BaseForm(object):
                 if hasattr(field.widget, '_has_changed'):
                     warnings.warn("The _has_changed method on widgets is deprecated,"
                         " define it at field level instead.",
-                        DeprecationWarning, stacklevel=2)
+                        RemovedInDjango18Warning, stacklevel=2)
                     if field.widget._has_changed(initial_value, data_value):
                         self._changed_data.append(name)
                 elif field._has_changed(initial_value, data_value):

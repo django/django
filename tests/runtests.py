@@ -11,8 +11,13 @@ import warnings
 
 import django
 from django import contrib
+from django.utils.deprecation import RemovedInDjango18Warning, RemovedInDjango19Warning
 from django.utils._os import upath
 from django.utils import six
+
+
+warnings.simplefilter("default", RemovedInDjango19Warning)
+warnings.simplefilter("default", RemovedInDjango18Warning)
 
 CONTRIB_MODULE_PATH = 'django.contrib'
 
@@ -124,12 +129,12 @@ def setup(verbosity, test_labels):
     warnings.filterwarnings(
         'ignore',
         'django.contrib.comments is deprecated and will be removed before Django 1.8.',
-        DeprecationWarning
+        RemovedInDjango18Warning
     )
     warnings.filterwarnings(
         'ignore',
         'Model class django.contrib.comments.models.* Django 1.9.',
-        PendingDeprecationWarning
+        RemovedInDjango19Warning
     )
     # Load all the ALWAYS_INSTALLED_APPS.
     django.setup()
@@ -216,7 +221,7 @@ def django_tests(verbosity, interactive, failfast, test_labels):
             'ignore',
             "Custom SQL location '<app_label>/models/sql' is deprecated, "
             "use '<app_label>/sql' instead.",
-            PendingDeprecationWarning
+            RemovedInDjango19Warning
         )
         failures = test_runner.run_tests(
             test_labels or get_installed(), extra_tests=extra_tests)

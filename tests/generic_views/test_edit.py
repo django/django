@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django import forms
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.utils.deprecation import RemovedInDjango18Warning
 from django.views.generic.base import View
 from django.views.generic.edit import FormMixin, ModelFormMixin, CreateView
 
@@ -152,7 +153,7 @@ class CreateViewTests(TestCase):
     def test_create_view_all_fields(self):
 
         with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", DeprecationWarning)
+            warnings.simplefilter("always", RemovedInDjango18Warning)
 
             class MyCreateView(CreateView):
                 model = Author
@@ -165,7 +166,7 @@ class CreateViewTests(TestCase):
     def test_create_view_without_explicit_fields(self):
 
         with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", DeprecationWarning)
+            warnings.simplefilter("always", RemovedInDjango18Warning)
 
             class MyCreateView(CreateView):
                 model = Author
@@ -176,7 +177,7 @@ class CreateViewTests(TestCase):
                              ['name', 'slug'])
 
         # but with a warning:
-        self.assertEqual(w[0].category, DeprecationWarning)
+        self.assertEqual(w[0].category, RemovedInDjango18Warning)
 
 
 class UpdateViewTests(TestCase):

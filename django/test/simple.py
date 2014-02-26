@@ -16,6 +16,7 @@ from django.test.utils import compare_xml, strip_quotes
 # django.utils.unittest is deprecated, but so is django.test.simple,
 # and the latter will be removed before the former.
 from django.utils import unittest
+from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.module_loading import module_has_submodule
 
 __all__ = ('DjangoTestSuiteRunner',)
@@ -23,7 +24,7 @@ __all__ = ('DjangoTestSuiteRunner',)
 warnings.warn(
     "The django.test.simple module and DjangoTestSuiteRunner are deprecated; "
     "use django.test.runner.DiscoverRunner instead.",
-    DeprecationWarning)
+    RemovedInDjango18Warning)
 
 # The module name for tests outside models.py
 TEST_MODULE = 'tests'

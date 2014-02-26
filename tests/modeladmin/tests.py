@@ -16,6 +16,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
 from django.test import TestCase
+from django.utils.deprecation import RemovedInDjango19Warning
 
 from .models import Band, Concert, ValidationTestModel, ValidationTestInlineModel
 
@@ -1479,7 +1480,7 @@ class CustomModelAdminTests(CheckTestCase):
     def test_deprecation(self):
         "Deprecated Custom Validator definitions still work with the check framework."
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=PendingDeprecationWarning)
+            warnings.simplefilter("ignore", category=RemovedInDjango19Warning)
 
             class CustomValidator(ModelAdminValidator):
                 def validate_me(self, model_admin, model):

@@ -20,6 +20,7 @@ from django.db import (
     connections, DEFAULT_DB_ALIAS,
     DatabaseError, ProgrammingError)
 from django.utils.decorators import available_attrs
+from django.utils.deprecation import RemovedInDjango18Warning
 
 
 class TransactionManagementError(ProgrammingError):
@@ -110,22 +111,22 @@ def set_clean(using=None):
 
 def is_managed(using=None):
     warnings.warn("'is_managed' is deprecated.",
-        DeprecationWarning, stacklevel=2)
+        RemovedInDjango18Warning, stacklevel=2)
 
 
 def managed(flag=True, using=None):
     warnings.warn("'managed' no longer serves a purpose.",
-        DeprecationWarning, stacklevel=2)
+        RemovedInDjango18Warning, stacklevel=2)
 
 
 def commit_unless_managed(using=None):
     warnings.warn("'commit_unless_managed' is now a no-op.",
-        DeprecationWarning, stacklevel=2)
+        RemovedInDjango18Warning, stacklevel=2)
 
 
 def rollback_unless_managed(using=None):
     warnings.warn("'rollback_unless_managed' is now a no-op.",
-        DeprecationWarning, stacklevel=2)
+        RemovedInDjango18Warning, stacklevel=2)
 
 
 ###############
@@ -450,7 +451,7 @@ def autocommit(using=None):
     your settings file and want the default behavior in some view functions.
     """
     warnings.warn("autocommit is deprecated in favor of set_autocommit.",
-        DeprecationWarning, stacklevel=2)
+        RemovedInDjango18Warning, stacklevel=2)
 
     def entering(using):
         enter_transaction_management(managed=False, using=using)
@@ -469,7 +470,7 @@ def commit_on_success(using=None):
     control in Web apps.
     """
     warnings.warn("commit_on_success is deprecated in favor of atomic.",
-        DeprecationWarning, stacklevel=2)
+        RemovedInDjango18Warning, stacklevel=2)
 
     def entering(using):
         enter_transaction_management(using=using)
@@ -500,7 +501,7 @@ def commit_manually(using=None):
     themselves.
     """
     warnings.warn("commit_manually is deprecated in favor of set_autocommit.",
-        DeprecationWarning, stacklevel=2)
+        RemovedInDjango18Warning, stacklevel=2)
 
     def entering(using):
         enter_transaction_management(using=using)

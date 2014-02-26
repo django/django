@@ -11,9 +11,7 @@ from collections import OrderedDict
 import copy
 import warnings
 
-from django.utils.encoding import force_text
-from django.utils.tree import Node
-from django.utils import six
+from django.core.exceptions import FieldError
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.aggregates import refs_aggregate
@@ -29,7 +27,10 @@ from django.db.models.sql.datastructures import EmptyResultSet, Empty, MultiJoin
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.where import (WhereNode, Constraint, EverythingNode,
     ExtraWhere, AND, OR, EmptyWhere)
-from django.core.exceptions import FieldError
+from django.utils import six
+from django.utils.deprecation import  RemovedInDjango19Warning
+from django.utils.encoding import force_text
+from django.utils.tree import Node
 
 __all__ = ['Query', 'RawQuery']
 
@@ -1043,7 +1044,7 @@ class Query(object):
         elif callable(value):
             warnings.warn(
                 "Passing callable arguments to queryset is deprecated.",
-                PendingDeprecationWarning, stacklevel=2)
+                RemovedInDjango19Warning, stacklevel=2)
             value = value()
         elif isinstance(value, ExpressionNode):
             # If value is a query expression, evaluate it
