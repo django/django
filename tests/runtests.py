@@ -25,10 +25,7 @@ TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
 SUBDIRS_TO_SKIP = [
-    'coverage_html',
     'data',
-    'requirements',
-    'templates',
     'test_discovery_sample',
     'test_discovery_sample2',
     'test_runner_deprecation_app',
@@ -70,11 +67,10 @@ def get_test_modules():
     for modpath, dirpath in discovery_paths:
         for f in os.listdir(dirpath):
             if ('.' in f or
-                    # Python 3 byte code dirs (PEP 3147)
-                    f == '__pycache__' or
                     f.startswith('sql') or
                     os.path.basename(f) in SUBDIRS_TO_SKIP or
-                    os.path.isfile(f)):
+                    os.path.isfile(f) or
+                    not os.path.exists(os.path.join(dirpath, f, '__init__.py'))):
                 continue
             modules.append((modpath, f))
     return modules
