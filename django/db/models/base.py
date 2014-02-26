@@ -22,12 +22,13 @@ from django.db.models.query_utils import DeferredAttribute, deferred_class_facto
 from django.db.models.deletion import Collector
 from django.db.models.options import Options
 from django.db.models import signals
-from django.utils.translation import ugettext_lazy as _
-from django.utils.functional import curry
-from django.utils.encoding import force_str, force_text
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils.encoding import force_str, force_text
+from django.utils.functional import curry
 from django.utils.six.moves import zip
 from django.utils.text import get_text_list, capfirst
+from django.utils.translation import ugettext_lazy as _
 
 
 def subclass_exception(name, parents, module, attached_to=None):
@@ -114,7 +115,7 @@ class ModelBase(type):
                     msg += "Its app_label will be set to None in Django 1.9."
                 else:
                     msg += "This will no longer be supported in Django 1.9."
-                warnings.warn(msg, PendingDeprecationWarning, stacklevel=2)
+                warnings.warn(msg, RemovedInDjango19Warning, stacklevel=2)
 
                 model_module = sys.modules[new_class.__module__]
                 package_components = model_module.__name__.split('.')

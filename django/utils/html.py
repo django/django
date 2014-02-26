@@ -5,9 +5,10 @@ from __future__ import unicode_literals
 import re
 import warnings
 
-from django.utils.safestring import SafeData, mark_safe
+from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import force_text, force_str
 from django.utils.functional import allow_lazy
+from django.utils.safestring import SafeData, mark_safe
 from django.utils import six
 from django.utils.six.moves.urllib.parse import quote, unquote, urlsplit, urlunsplit
 from django.utils.text import normalize_newlines
@@ -177,7 +178,7 @@ def fix_ampersands(value):
     """Returns the given HTML with all unencoded ampersands encoded correctly."""
     # As fix_ampersands is wrapped in allow_lazy, stacklevel 3 is more useful than 2.
     warnings.warn("The fix_ampersands function is deprecated and will be removed in Django 1.8.",
-                  DeprecationWarning, stacklevel=3)
+                  RemovedInDjango18Warning, stacklevel=3)
     return unencoded_ampersands_re.sub('&amp;', force_text(value))
 fix_ampersands = allow_lazy(fix_ampersands, six.text_type)
 
@@ -296,7 +297,7 @@ def clean_html(text):
     """
     # As clean_html is wrapped in allow_lazy, stacklevel 3 is more useful than 2.
     warnings.warn("The clean_html function is deprecated and will be removed in Django 1.8.",
-                  DeprecationWarning, stacklevel=3)
+                  RemovedInDjango18Warning, stacklevel=3)
     text = normalize_newlines(text)
     text = re.sub(r'<(/?)\s*b\s*>', '<\\1strong>', text)
     text = re.sub(r'<(/?)\s*i\s*>', '<\\1em>', text)

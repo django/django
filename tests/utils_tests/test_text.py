@@ -153,12 +153,12 @@ class TestUtilsText(SimpleTestCase):
     def test_javascript_quote(self):
         input = "<script>alert('Hello \\xff.\n Welcome\there\r');</script>"
         output = r"<script>alert(\'Hello \\xff.\n Welcome\there\r\');<\/script>"
-        with warnings.catch_warnings():
+        with warnings.catch_warnings(record=True):
             self.assertEqual(text.javascript_quote(input), output)
 
         # Exercising quote_double_quotes keyword argument
         input = '"Text"'
-        with warnings.catch_warnings():
+        with warnings.catch_warnings(record=True):
             self.assertEqual(text.javascript_quote(input), '"Text"')
             self.assertEqual(text.javascript_quote(input, quote_double_quotes=True),
                              '&quot;Text&quot;')

@@ -9,8 +9,9 @@ from django.core.exceptions import FieldError, ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.models import (modelform_factory, ModelChoiceField,
     fields_for_model, construct_instance, ModelFormMetaclass)
-from django.utils import six
 from django.test import TestCase
+from django.utils import six
+from django.utils.deprecation import RemovedInDjango18Warning
 
 from .models import (Person, RealPerson, Triple, FilePathModel, Article,
     Publication, CustomFF, Author, Author1, Homepage, Document, Edition)
@@ -593,10 +594,10 @@ class CustomMetaclassTestCase(TestCase):
 class TestTicket19733(TestCase):
     def test_modelform_factory_without_fields(self):
         with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", DeprecationWarning)
+            warnings.simplefilter("always", RemovedInDjango18Warning)
             # This should become an error once deprecation cycle is complete.
             modelform_factory(Person)
-        self.assertEqual(w[0].category, DeprecationWarning)
+        self.assertEqual(w[0].category, RemovedInDjango18Warning)
 
     def test_modelform_factory_with_all_fields(self):
         form = modelform_factory(Person, fields="__all__")

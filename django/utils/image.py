@@ -75,6 +75,7 @@ from __future__ import unicode_literals
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -147,7 +148,7 @@ def _detect_image_library():
         warnings.warn(
             "Support for the PIL will be removed in Django 1.8. Please " +
             "uninstall it & install Pillow instead.",
-            DeprecationWarning
+            RemovedInDjango18Warning
         )
 
     return PILImage, PIL_imaging, PILImageFile

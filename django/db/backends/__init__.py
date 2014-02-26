@@ -1402,7 +1402,7 @@ class BaseDatabaseValidation(object):
         # This is deliberately commented out. It exists as a marker to
         # remind us to remove this method, and the check_field() shim,
         # when the time comes.
-        # warnings.warn('"validate_field" has been deprecated", PendingDeprecationWarning)
+        # warnings.warn('"validate_field" has been deprecated", RemovedInDjango19Warning)
         pass
 
     def check_field(self, field, **kwargs):

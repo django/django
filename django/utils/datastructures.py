@@ -1,7 +1,9 @@
 import copy
 import warnings
 from collections import OrderedDict
+
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango19Warning
 
 
 class MergeDict(object):
@@ -14,7 +16,7 @@ class MergeDict(object):
     """
     def __init__(self, *dicts):
         warnings.warn('`MergeDict` is deprecated, use `dict.update()` '
-                      'instead.', PendingDeprecationWarning, 2)
+                      'instead.', RemovedInDjango19Warning, 2)
         self.dicts = dicts
 
     def __bool__(self):
@@ -131,7 +133,7 @@ class SortedDict(dict):
     def __init__(self, data=None):
         warnings.warn(
             "SortedDict is deprecated and will be removed in Django 1.9.",
-            PendingDeprecationWarning, stacklevel=2
+            RemovedInDjango19Warning, stacklevel=2
         )
         if data is None or isinstance(data, dict):
             data = data or []

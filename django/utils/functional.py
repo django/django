@@ -5,6 +5,7 @@ import sys
 import warnings
 
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.six.moves import copyreg
 
 
@@ -27,7 +28,7 @@ def memoize(func, cache, num_args):
     """
     warnings.warn("memoize wrapper is deprecated and will be removed in "
                   "Django 1.9. Use django.utils.lru_cache instead.",
-                  PendingDeprecationWarning, stacklevel=2)
+                  RemovedInDjango19Warning, stacklevel=2)
 
     @wraps(func)
     def wrapper(*args):
