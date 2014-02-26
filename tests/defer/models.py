@@ -32,8 +32,3 @@ class BigChild(Primary):
 class ChildProxy(Child):
     class Meta:
         proxy = True
-
-
-class PrimaryProxy(Primary):
-    class Meta:
-        proxy = True
