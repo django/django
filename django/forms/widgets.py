@@ -401,7 +401,7 @@ class ClearableFileInput(FileInput):
 
 class Textarea(Widget):
     def __init__(self, attrs=None):
-        # The 'rows' and 'cols' attributes are required for HTML correctness.
+        # Use slightly better defaults than HTML's 20x2 box
         default_attrs = {'cols': '40', 'rows': '10'}
         if attrs:
             default_attrs.update(attrs)
