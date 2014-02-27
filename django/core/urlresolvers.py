@@ -271,12 +271,10 @@ class RegexURLResolver(LocaleRegexProvider):
                     if pattern.app_name:
                         apps.setdefault(pattern.app_name, []).append(pattern.namespace)
                 else:
-                    parent = normalize(pattern.regex.pattern)
+                    parent_pat = pattern.regex.pattern
                     for name in pattern.reverse_dict:
                         for matches, pat, defaults in pattern.reverse_dict.getlist(name):
-                            new_matches = []
-                            for piece, p_args in parent:
-                                new_matches.extend((piece + suffix, p_args + args) for (suffix, args) in matches)
+                            new_matches = normalize(parent_pat + pat)
                             lookups.appendlist(name, (new_matches, p_pattern + pat, dict(defaults, **pattern.default_kwargs)))
                     for namespace, (prefix, sub_pattern) in pattern.namespace_dict.items():
                         namespaces[namespace] = (p_pattern + prefix, sub_pattern)
