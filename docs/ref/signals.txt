@@ -377,7 +377,7 @@ pre_migrate
    :module:
 
 Sent by the :djadmin:`migrate` command before it starts to install an
-application.
+application. It's not emitted for applications that lack a ``models`` module.
 
 Any handlers that listen to this signal need to be written in a particular
 place: a ``management`` module in one of your :setting:`INSTALLED_APPS`. If
@@ -469,7 +469,8 @@ post_migrate
    :module:
 
 Sent by the :djadmin:`migrate` command after it installs an application, and the
-:djadmin:`flush` command.
+:djadmin:`flush` command. It's not emitted for applications that lack a
+``models`` module.
 
 Any handlers that listen to this signal need to be written in a particular
 place: a ``management`` module in one of your :setting:`INSTALLED_APPS`. If
