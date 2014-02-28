@@ -403,7 +403,7 @@ query spans multiple tables, it's possible to get duplicate results when a
     and :meth:`values` together replacing :meth:`distinct`
     As a simple example let us consider I needed to get a list of blog 
     objects that had Time objects attached to them that had been updated 
-    by a specific user(User object attached to them). 
+    by a specific user (User object attached to them). 
     I wanted the list to be ordered by the most recently updated Time object 
     (as there are multiple time objects attached to one blog)
     Models::
@@ -429,13 +429,13 @@ query spans multiple tables, it's possible to get duplicate results when a
                 return self.title
 
         class Entry(models.Model):
-            name=modiels.ForeignKey(User)
-            title=models.ForeignKey(Blog)
+            name = modiels.ForeignKey(User)
+            title = models.ForeignKey(Blog)
             date = models.ForeignKey(Time)
 
     Here, the expected result can be got by::
-        >>u=get_object_or_404(User,name='User1')
-        >>e=Entry.objects.filter(name=u).values('title').annotate(models.Max('date')).order_by('date')
+        >>u = get_object_or_404(User, name='User1')
+        >>e = Entry.objects.filter(name=u).values('title').annotate(models.Max('date')).order_by('date')
         >>e
         [{'date__max': 2, 'title': 1L}, {'date__max': 5, 'title': 2L}]
 
