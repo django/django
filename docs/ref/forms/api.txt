@@ -142,7 +142,7 @@ and methods with an ``as_`` prefix could render them, but it had to be done
 the other way around in order not to break code that expects rendered error
 messages in ``Form.errors``.
 
-.. method:: Form.errors.as_json()
+.. method:: Form.errors.as_json(escape_html=False)
 
 .. versionadded:: 1.7
 
@@ -151,6 +151,9 @@ Returns the errors serialized as JSON.
     >>> f.errors.as_json()
     {"sender": [{"message": "Enter a valid email address.", "code": "invalid"}],
     "subject": [{"message": "This field is required.", "code": "required"}]}
+
+If the ``escape_html`` argument is set to True, any html tags in each error message
+will be escaped.
 
 .. method:: Form.add_error(field, error)
 
