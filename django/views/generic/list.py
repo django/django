@@ -21,6 +21,13 @@ class MultipleObjectMixin(ContextMixin):
     paginator_class = Paginator
     page_kwarg = 'page'
 
+    def get_model(self)
+        """
+        This allows for the model used to be overridden
+        depending on request variables and other factors.
+        """
+        return self.model
+
     def get_queryset(self):
         """
         Return the list of items for this view.
@@ -28,11 +35,12 @@ class MultipleObjectMixin(ContextMixin):
         The return value must be an iterable and may be an instance of
         `QuerySet` in which case `QuerySet` specific behavior will be enabled.
         """
+        model = self.get_model()
         if self.queryset is not None:
             queryset = self.queryset
             if isinstance(queryset, QuerySet):
                 queryset = queryset.all()
-        elif self.model is not None:
+        elif model is not None:
             queryset = self.model._default_manager.all()
         else:
             raise ImproperlyConfigured(
