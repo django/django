@@ -47,7 +47,7 @@ rather than a field takes from another model).
 
 ``options`` is an optional dictionary of values from the model's ``Meta`` class.
 
-``bases`` is an optional list of other classes to have this model inheirit from;
+``bases`` is an optional list of other classes to have this model inherit from;
 it can contain both class objects as well as strings in the format
 ``"appname.ModelName"`` if you want to depend on another model (so you inherit
 from the historical version). If it's not supplied, it defaults to just
@@ -122,7 +122,7 @@ The ``preserve_default`` argument indicates whether the field's default
 value is permanent and should be baked into the project state (``True``),
 or if it is temporary and just for this migration (``False``) - usually
 because the migration is adding a non-nullable field to a table and needs
-a default value to put into existing rows. It does not effect the behaviour
+a default value to put into existing rows. It does not effect the behavior
 of setting defaults in the database directly - Django never sets database
 defaults, and always applies them in the Django ORM code.
 
@@ -188,7 +188,7 @@ correctly, in which case you should manually split the SQL into multiple calls
 to ``RunSQL``.
 
 The ``state_operations`` argument is so you can supply operations that are
-equivalent to the SQL in terms of project state; for example, if you are 
+equivalent to the SQL in terms of project state; for example, if you are
 manually creating a column, you should pass in a list containing an ``AddField``
 operation here so that the autodetector still has an up-to-date state of the
 model (otherwise, when you next run ``makemigrations``, it won't see any

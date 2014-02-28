@@ -38,11 +38,11 @@ and Django's handling of database schema:
 It's worth noting that migrations are created and run on a per-app basis.
 In particular, it's possible to have apps that *do not use migrations* (these
 are referred to as "unmigrated" apps) - these apps will instead mimic the
-legacy behaviour of just adding new models.
+legacy behavior of just adding new models.
 
 You should think of migrations as a version control system for your database
 schema. ``makemigrations`` is responsible for packaging up your model changes
-into individual migration files - analagous to commits - and ``migrate`` is
+into individual migration files - analogous to commits - and ``migrate`` is
 responsible for applying those to your database.
 
 The migration files for each app live in a "migrations" directory inside
@@ -194,7 +194,7 @@ If this didn't happen, the migration would try to create the ForeignKey column
 without the table it's referencing existing and your database would
 throw an error.
 
-This dependency behaviour affects most migration operations where you
+This dependency behavior affects most migration operations where you
 restrict to a single app. Restricting to a single app (either in
 ``makemigrations`` or ``migrate``) is a best-efforts promise, and not
 a guarantee; any other apps that need to be used to get dependencies correct
@@ -361,7 +361,7 @@ doing this can confuse the migration autodetector!)
 
 Let's write a simple migration that populates our new ``name`` field with the
 combined values of ``first_name`` and ``last_name`` (we've come to our senses
-and realised that not everyone has first and last names). All we
+and realized that not everyone has first and last names). All we
 need to do is use the historical model and iterate over the rows::
 
     # encoding: utf8

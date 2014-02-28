@@ -303,7 +303,7 @@ object. In order to do this, we need to have two different querysets:
     Since both :class:`~django.views.generic.detail.SingleObjectMixin` and
     :class:`ListView` will
     put things in the context data under the value of
-    ``context_object_name`` if it's set, we'll instead explictly
+    ``context_object_name`` if it's set, we'll instead explicitly
     ensure the ``Publisher`` is in the context data. :class:`ListView`
     will add in the suitable ``page_obj`` and ``paginator`` for us
     providing we remember to call ``super()``.

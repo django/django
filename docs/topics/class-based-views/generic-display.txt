@@ -189,7 +189,7 @@ specifies the context variable to use::
 
     class PublisherList(ListView):
         model = Publisher
-        context_object_name = 'my_favourite_publishers'
+        context_object_name = 'my_favorite_publishers'
 
 Providing a useful ``context_object_name`` is always a good idea. Your
 coworkers who design templates will thank you.

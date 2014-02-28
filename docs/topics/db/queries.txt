@@ -447,8 +447,8 @@ probably use:
 
         >>> Blog.objects.get(name__iexact="beatles blog")
 
-    Would match a ``Blog`` titled "Beatles Blog", "beatles blog", or even
-    "BeAtlES blOG".
+    Would match a ``Blog`` titled ``"Beatles Blog"``, ``"beatles blog"``, or
+    even ``"BeAtlES blOG"``.
 
 :lookup:`contains`
     Case-sensitive containment test. For example::

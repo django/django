@@ -740,7 +740,7 @@ Accessing the cache
 .. function:: django.core.cache.get_cache(backend, **kwargs)
 
     .. deprecated:: 1.7
-        This function has been deprecated in favour of
+        This function has been deprecated in favor of
         :data:`~django.core.cache.caches`.
 
     Before Django 1.7 this function was the canonical way to obtain a cache

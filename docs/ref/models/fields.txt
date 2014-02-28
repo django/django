@@ -867,7 +867,7 @@ databases supported by Django. The default form widget for this field is a
 .. class:: IPAddressField([**options])
 
 .. deprecated:: 1.7
-    This field has been deprecated in favour of
+    This field has been deprecated in favor of
     :class:`~django.db.models.GenericIPAddressField`.
 
 An IP address, in string format (e.g. "192.0.2.30"). The default form widget

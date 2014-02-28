@@ -1239,8 +1239,8 @@ syncdb
 
 .. deprecated:: 1.7
 
-    This command has been deprecated in favour of the :djadmin:`migrate`
-    command, which performs both the old behaviour as well as executing
+    This command has been deprecated in favor of the :djadmin:`migrate`
+    command, which performs both the old behavior as well as executing
     migrations. It is now just an alias to that command.
 
 Alias for :djadmin:`migrate`.

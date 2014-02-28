@@ -793,7 +793,7 @@ initial_data
 
 Apps with migrations will not load ``initial_data`` fixtures when they have
 finished migrating. Apps without migrations will continue to load these fixtures
-during the phase of ``migrate`` which emulates the old ``syncdb`` behaviour,
+during the phase of ``migrate`` which emulates the old ``syncdb`` behavior,
 but any new apps will not have this support.
 
 Instead, you are encouraged to load initial data in migrations if you need it

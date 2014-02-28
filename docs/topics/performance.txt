@@ -286,7 +286,7 @@ memory.
 Static files
 ------------
 
-Static files, which by defintion are not dynamic, make an excellent target for
+Static files, which by definition are not dynamic, make an excellent target for
 optimization gains.
 
 :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
@@ -425,5 +425,5 @@ C implementations of Python libraries
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Some Python libraries are also implemented in C, and can be much faster. They
-aim to offer the same APIs. Note that compatibility issues and behaviour
+aim to offer the same APIs. Note that compatibility issues and behavior
 differences are not unknown (and not always immediately evident).

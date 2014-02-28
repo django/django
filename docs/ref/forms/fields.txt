@@ -666,7 +666,7 @@ For each field, we describe the default widget used if you don't specify
 .. class:: IPAddressField(**kwargs)
 
     .. deprecated:: 1.7
-        This field has been deprecated in favour of
+        This field has been deprecated in favor of
         :class:`~django.forms.GenericIPAddressField`.
 
     * Default widget: :class:`TextInput`

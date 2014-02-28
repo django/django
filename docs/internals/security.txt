@@ -92,7 +92,7 @@ email message, signed with the Django release key, containing:
 * The patch(es), if any, that will be applied to Django.
 
 * The date on which the Django team will apply these patches, issue
-  new releases and publicy disclose the issue.
+  new releases and publicly disclose the issue.
 
 Simultaneously, the reporter of the issue will receive notification of
 the date on which we plan to take the issue public.

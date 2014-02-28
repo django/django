@@ -357,7 +357,7 @@ Then, you can help out by:
 * Closing "Unreviewed" tickets as "invalid", "worksforme" or "duplicate."
 
 * Closing "Unreviewed" tickets as "needsinfo" when the description is too
-  sparse to be actionnable, or when they're feature requests requiring a
+  sparse to be actionable, or when they're feature requests requiring a
   discussion on |django-developers|.
 
 * Correcting the "Needs tests", "Needs documentation", or "Has patch"

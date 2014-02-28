@@ -1803,7 +1803,7 @@ in your own admin JavaScript without including a second copy, you can use the
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
-a specifc need. For example, if you require the jQuery library to be in the
+a specific need. For example, if you require the jQuery library to be in the
 global namespace (for example when using third-party jQuery plugins) or if you
 need a newer version of jQuery, you will have to include your own copy.
 
