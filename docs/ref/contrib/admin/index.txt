@@ -2259,7 +2259,10 @@ directory.
 
 In order to override one or more of them, first create an ``admin`` directory
 in your project's ``templates`` directory. This can be any of the directories
-you specified in :setting:`TEMPLATE_DIRS`.
+you specified in :setting:`TEMPLATE_DIRS`. Also ensure
+``django.template.loaders.filesystem.Loader`` is specified before
+``django.template.loaders.app_directories.Loader`` in
+:setting:`TEMPLATE_LOADERS`, which is the default.
 
 Within this ``admin`` directory, create sub-directories named after your app.
 Within these app subdirectories create sub-directories named after your models.
