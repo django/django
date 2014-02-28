@@ -1125,12 +1125,12 @@ Miscellaneous
   For example, if you use multi-inheritance, you need to define custom primary
   key fields on parent models, otherwise the default ``id`` fields will clash.
 
-* :meth:`~django.utils.translation.parse_accept_lang_header` now returns
+* ``django.utils.translation.parse_accept_lang_header()`` now returns
   lowercase locales, instead of the case as it was provided. As locales should
   be treated case-insensitive this allows us to speed up locale detection.
 
-* :meth:`~django.utils.translation.get_language_from_path` and
-  :meth:`~django.utils.translation.trans_real.get_supported_language_variant`
+* ``django.utils.translation.get_language_from_path()`` and
+  ``django.utils.translation.trans_real.get_supported_language_variant()``
   now no longer have a ``supported`` argument.
 
 .. _deprecated-features-1.7:
