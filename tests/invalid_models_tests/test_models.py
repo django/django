@@ -45,10 +45,7 @@ class IndexTogetherTests(IsolatedModelsTestCase):
     def test_list_containing_non_iterable(self):
         class Model(models.Model):
             class Meta:
-                index_together = [
-                    'non-iterable',
-                    'second-non-iterable',
-                ]
+                index_together = [('a', 'b'), 42]
 
         errors = Model.check()
         expected = [
@@ -135,6 +132,22 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
                 hint=None,
                 obj=Model,
                 id='E009',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_non_list(self):
+        class Model(models.Model):
+            class Meta:
+                unique_together = 'not-a-list'
+
+        errors = Model.check()
+        expected = [
+            Error(
+                '"unique_together" must be a list or tuple.',
+                hint=None,
+                obj=Model,
+                id='E008',
             ),
         ]
         self.assertEqual(errors, expected)
