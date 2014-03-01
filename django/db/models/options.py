@@ -24,24 +24,26 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'select_on_save')
 
 
-def normalize_unique_together(unique_together):
+def normalize_together(option_together):
     """
-    unique_together can be either a tuple of tuples, or a single
+    option_together can be either a tuple of tuples, or a single
     tuple of two strings. Normalize it to a tuple of tuples, so that
     calling code can uniformly expect that.
     """
     try:
-        if not unique_together:
+        if not option_together:
             return ()
-        first_element = next(iter(unique_together))
+        if not isinstance(option_together, (tuple, list)):
+            raise TypeError
+        first_element = next(iter(option_together))
         if not isinstance(first_element, (tuple, list)):
-            unique_together = (unique_together,)
+            option_together = (option_together,)
         # Normalize everything to tuples
-        return tuple(tuple(ut) for ut in unique_together)
+        return tuple(tuple(ot) for ot in option_together)
     except TypeError:
-        # If the value of unique_together isn't valid, return it
+        # If the value of option_together isn't valid, return it
         # verbatim; this will be picked up by the check framework later.
-        return unique_together
+        return option_together
 
 
 @python_2_unicode_compatible
@@ -140,7 +142,10 @@ class Options(object):
                     self.original_attrs[attr_name] = getattr(self, attr_name)
 
             ut = meta_attrs.pop('unique_together', self.unique_together)
-            self.unique_together = normalize_unique_together(ut)
+            self.unique_together = normalize_together(ut)
+
+            it = meta_attrs.pop('index_together', self.index_together)
+            self.index_together = normalize_together(it)
 
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
