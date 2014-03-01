@@ -2045,7 +2045,7 @@ Case-insensitive exact match.
 
 .. versionchanged:: 1.7
 
-    If the value provided for comparision is ``None``, it will be interpreted
+    If the value provided for comparison is ``None``, it will be interpreted
     as an SQL ``NULL`` (see :lookup:`isnull` for more details).
 
 Example::

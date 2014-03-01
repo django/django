@@ -12,7 +12,7 @@ your migrations; that's why they're declarative, as it means Django can
 easily load them all into memory and run through them without touching
 the database to work out what your project should look like.
 
-There are also more specialised Operation objects which are for things like
+There are also more specialized Operation objects which are for things like
 :ref:`data migrations <data-migrations>` and for advanced manual database
 manipulation. You can also write your own Operation classes if you want
 to encapsulate a custom change you commonly make.
@@ -221,7 +221,7 @@ SeparateDatabaseAndState
 
     SeparateDatabaseAndState(database_operations=None, state_operations=None)
 
-A highly specalist operation that let you mix and match the database
+A highly specialist operation that let you mix and match the database
 (schema-changing) and state (autodetector-powering) aspects of operations.
 
 It accepts two list of operations, and when asked to apply state will use the

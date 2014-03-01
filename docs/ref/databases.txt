@@ -554,7 +554,7 @@ are passed into the query. So the :lookup:`iexact` filter will behave exactly
 the same as the :lookup:`exact` filter in these cases.
 
 Some possible workarounds for this are `documented at sqlite.org`_, but they
-aren't utilised by the default SQLite backend in Django, as incorporating them
+aren't utilized by the default SQLite backend in Django, as incorporating them
 would be fairly difficult to do robustly. Thus, Django exposes the default
 SQLite behavior and you should be aware of this when doing case-insensitive or
 substring filtering.

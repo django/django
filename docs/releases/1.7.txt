@@ -433,7 +433,7 @@ Cache
   instance per thread. It supersedes :func:`django.core.cache.get_cache` which
   is now deprecated.
 
-* If you instanciate cache backends directly, be aware that they aren't
+* If you instantiate cache backends directly, be aware that they aren't
   thread-safe any more, as :data:`django.core.cache.caches` now yields
   different instances per thread.
 

@@ -97,7 +97,7 @@ wherever you would have historically used::
 
     import unittest
 
-If you want to continue to use the base unittest libary, you can --
+If you want to continue to use the base unittest library, you can --
 you just won't get any of the nice new unittest2 features.
 
 .. _unittest2: http://pypi.python.org/pypi/unittest2

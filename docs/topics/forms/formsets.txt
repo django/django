@@ -588,8 +588,8 @@ The ``manage_articles.html`` template might look like this:
         </table>
     </form>
 
-However the above can be slightly shortcutted and let the formset itself deal
-with the management form:
+However there's a slight shortcut for the above by letting the formset itself
+deal with the management form:
 
 .. code-block:: html+django
 

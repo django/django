@@ -219,7 +219,7 @@ processing to work on a particular object, identified from the URL,
 we'll want the functionality provided by
 :class:`~django.views.generic.detail.SingleObjectMixin`.
 
-We'll demonstrate this with the publisher modelling we used in the
+We'll demonstrate this with the publisher modeling we used in the
 :doc:`generic class-based views introduction<generic-display>`.
 
 .. code-block:: python

@@ -435,7 +435,7 @@ this case, we've set the :attr:`~django.db.models.Field.default` value of
 Finally, note a relationship is defined, using
 :class:`~django.db.models.ForeignKey`. That tells Django each ``Choice`` is related
 to a single ``Question``. Django supports all the common database relationships:
-many-to-ones, many-to-manys and one-to-ones.
+many-to-one, many-to-many and one-to-one.
 
 .. _`Python path`: http://docs.python.org/tutorial/modules.html#the-module-search-path
 
@@ -591,12 +591,12 @@ Now, run :djadmin:`migrate` again to create those model tables in your database:
 The :djadmin:`migrate` command takes all the migrations that haven't been
 applied (Django tracks which ones are applied using a special table in your
 database called ``django_migrations``) and runs them against your database -
-essentially, synchronising the changes you made to your models with the schema
+essentially, synchronizing the changes you made to your models with the schema
 in the database.
 
 Migrations are very powerful and let you change your models over time, as you
 develop your project, without the need to delete your database or tables and
-make new ones - it specialises in upgrading your database live, without
+make new ones - it specializes in upgrading your database live, without
 losing data. We'll cover them in more depth in a later part of the tutorial,
 but for now, remember the three-step guide to making model changes:
 

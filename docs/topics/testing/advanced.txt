@@ -354,7 +354,7 @@ Attributes
     the individual tests and format the results. By default it is set to
     ``unittest.TextTestRunner``. Despite the unfortunate similarity in
     naming conventions, this is not the same type of class as
-    ``DiscoverRunner``, which covers a broader set of responsibilites. You
+    ``DiscoverRunner``, which covers a broader set of responsibilities. You
     can override this attribute to modify the way tests are run and reported.
 
 .. attribute:: DiscoverRunner.test_loader

@@ -900,7 +900,7 @@ For a complete discussion on the usage of the following see the
     :func:`django.utils.translation.activate` to fetch the translation object
     for a given language, installing it as the translation object for the
     current thread and reinstall the previous active language on exit.
-    Optionally it can simply deinstall the temporary translation on exit with
+    Optionally it can simply uninstall the temporary translation on exit with
     :func:`django.utils.translation.deactivate` if the deactivate argument is
     True. If you pass None as the language argument, a NullTranslations()
     instance is installed while the context is active.

@@ -22,7 +22,7 @@ translating or add a language that isn't yet translated, here's what to do:
 
 * Make sure you read the notes about :ref:`specialties-of-django-i18n`.
 
-* Signup at `Transifex`_ and visit the `Django project page`_.
+* Sign up at `Transifex`_ and visit the `Django project page`_.
 
 * On the `Django project page`_, choose the language you want to work on,
   **or** -- in case the language doesn't exist yet --
@@ -37,7 +37,7 @@ translating or add a language that isn't yet translated, here's what to do:
 
 * Once you are a member of a team choose the translation resource you
   want to update on the team page. For example the "core" resource refers
-  to the translation catalogue that contains all non-contrib translations.
+  to the translation catalog that contains all non-contrib translations.
   Each of the contrib apps also have a resource (prefixed with "contrib").
 
   .. note::

@@ -157,7 +157,7 @@ Configurable attributes
 
     Short name for the application, e.g. ``'admin'``
 
-    This attribute allows relabelling an application when two applications
+    This attribute allows relabeling an application when two applications
     have conflicting labels. It defaults to the last component of ``name``.
     It should be a valid Python identifier.
 

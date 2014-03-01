@@ -784,7 +784,7 @@ Write stderr to the *FILE* file.
 
 ``umask=UMASK``
 
-Umask to use when daemonizing. The value is interpeted as an octal number
+Umask to use when daemonizing. The value is interpreted as an octal number
 (default value is ``022``).
 
 Example usage::

@@ -408,7 +408,7 @@ Anssi Kääriäinen
     Django as a great match for that use case.
 
     Anssi is interested in developing the object relational mapper (ORM) and
-    all related features. He's also a fan of benckmarking and he tries keep
+    all related features. He's also a fan of benchmarking and he tries keep
     Django as fast as possible.
 
 Florian Apolloner

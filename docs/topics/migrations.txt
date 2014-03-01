@@ -442,7 +442,7 @@ available at the top level of a module it is not serializable.
 ``kwargs`` should be a dict of keyword arguments to pass to your class'
 ``__init__`` method. Every value should itself be serializable.
 
-Django will write out the value as an instatiation of your class with the
+Django will write out the value as an instantiation of your class with the
 given arguments, similar to the way it writes out references to Django fields.
 
 
