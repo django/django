@@ -1582,6 +1582,9 @@ fix_ampersands
     This is rarely useful as ampersands are automatically escaped. See
     :tfilter:`escape` for more information.
 
+.. deprecated:: 1.7
+    This filter has been deprecated and will be removed in Django 1.8.
+
 Replaces ampersands with ``&amp;`` entities.
 
 For example::

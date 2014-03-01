@@ -209,6 +209,9 @@ details on these changes.
   (``django.contrib.gis.sitemaps.views.index`` and
   ``django.contrib.gis.sitemaps.views.sitemap``).
 
+* ``django.utils.html.fix_ampersands``, the ``fix_ampersands`` template filter and
+  ``django.utils.html.clean_html`` will be removed following an accelerated deprecation.
+
 .. _deprecation-removed-in-1.7:
 
 1.7

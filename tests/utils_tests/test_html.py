@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from datetime import datetime
 import os
 from unittest import TestCase
+import warnings
 
 from django.utils import html, safestring
 from django.utils._os import upath
@@ -130,25 +131,29 @@ class TestUtilsHtml(TestCase):
                 self.check_output(f, in_pattern % {'entity': entity}, output)
 
     def test_fix_ampersands(self):
-        f = html.fix_ampersands
-        # Strings without ampersands or with ampersands already encoded.
-        values = ("a&#1;", "b", "&a;", "&amp; &x; ", "asdf")
-        patterns = (
-            ("%s", "%s"),
-            ("&%s", "&amp;%s"),
-            ("&%s&", "&amp;%s&amp;"),
-        )
-        for value in values:
-            for in_pattern, out_pattern in patterns:
-                self.check_output(f, in_pattern % value, out_pattern % value)
-        # Strings with ampersands that need encoding.
-        items = (
-            ("&#;", "&amp;#;"),
-            ("&#875 ;", "&amp;#875 ;"),
-            ("&#4abc;", "&amp;#4abc;"),
-        )
-        for value, output in items:
-            self.check_output(f, value, output)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            f = html.fix_ampersands
+            # Strings without ampersands or with ampersands already encoded.
+            values = ("a&#1;", "b", "&a;", "&amp; &x; ", "asdf")
+            patterns = (
+                ("%s", "%s"),
+                ("&%s", "&amp;%s"),
+                ("&%s&", "&amp;%s&amp;"),
+            )
+
+            for value in values:
+                for in_pattern, out_pattern in patterns:
+                    self.check_output(f, in_pattern % value, out_pattern % value)
+
+            # Strings with ampersands that need encoding.
+            items = (
+                ("&#;", "&amp;#;"),
+                ("&#875 ;", "&amp;#875 ;"),
+                ("&#4abc;", "&amp;#4abc;"),
+            )
+            for value, output in items:
+                self.check_output(f, value, output)
 
     def test_escapejs(self):
         f = html.escapejs
@@ -171,8 +176,10 @@ class TestUtilsHtml(TestCase):
             # also a regression test for #7267: this used to raise an UnicodeDecodeError
             ('<p>* foo</p><p>* bar</p>', '<ul>\n<li> foo</li><li> bar</li>\n</ul>'),
         )
-        for value, output in items:
-            self.check_output(f, value, output)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            for value, output in items:
+                self.check_output(f, value, output)
 
     def test_remove_tags(self):
         f = html.remove_tags
