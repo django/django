@@ -235,7 +235,6 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     admin interface.
     """
     def __init__(self, widget, rel, admin_site, can_add_related=None):
-        self.is_hidden = widget.is_hidden
         self.needs_multipart_form = widget.needs_multipart_form
         self.attrs = widget.attrs
         self.choices = widget.choices
@@ -255,6 +254,10 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         obj.attrs = self.widget.attrs
         memo[id(self)] = obj
         return obj
+
+    @property
+    def is_hidden(self):
+        return self.widget.is_hidden
 
     @property
     def media(self):
