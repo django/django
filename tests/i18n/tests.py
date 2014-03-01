@@ -43,6 +43,7 @@ extended_locale_paths = settings.LOCALE_PATHS + (
     os.path.join(here, 'other', 'locale'),
 )
 
+
 @contextmanager
 def patch_formats(lang, **settings):
     from django.utils.formats import _format_cache
