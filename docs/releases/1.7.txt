@@ -642,6 +642,9 @@ Models
   an error (before that, it would either result in a database error or
   incorrect data).
 
+* You can use a single list for :attr:`~django.db.models.Options.index_together`
+  (rather than a list of lists) when specifying a single set of fields.
+
 Signals
 ^^^^^^^
 

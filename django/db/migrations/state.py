@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 from django.apps.registry import Apps
 from django.db import models
-from django.db.models.options import DEFAULT_NAMES, normalize_unique_together
+from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.utils import six
 from django.utils.module_loading import import_string
 
@@ -145,7 +145,10 @@ class ModelState(object):
             elif name in model._meta.original_attrs:
                 if name == "unique_together":
                     ut = model._meta.original_attrs["unique_together"]
-                    options[name] = set(normalize_unique_together(ut))
+                    options[name] = set(normalize_together(ut))
+                elif name == "index_together":
+                    it = model._meta.original_attrs["index_together"]
+                    options[name] = set(normalize_together(it))
                 else:
                     options[name] = model._meta.original_attrs[name]
         # Make our record
