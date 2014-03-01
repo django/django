@@ -14,3 +14,7 @@ several bugs in 1.6.2:
 * Fixed ``AttributeError`` when using
   :meth:`~django.db.models.query.QuerySet.bulk_create` with ``ForeignObject``
   (`#21566 <http://code.djangoproject.com/ticket/21566>`_).
+
+* Fixed crash of ``QuerySet``\s that use ``F() + timedelta()`` when their query
+  was compiled more once
+  (`#21643 <http://code.djangoproject.com/ticket/21643>`_).
