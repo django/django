@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import datetime
 import decimal
 import unittest
+import warnings
 
 from django.template.defaultfilters import (
     add, addslashes, capfirst, center, cut, date, default, default_if_none,
@@ -124,8 +125,11 @@ class DefaultFiltersTests(TestCase):
             'paragraph separator:\\u2029and line separator:\\u2028')
 
     def test_fix_ampersands(self):
-        self.assertEqual(fix_ampersands_filter('Jack & Jill & Jeroboam'),
-                         'Jack &amp; Jill &amp; Jeroboam')
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always", DeprecationWarning)
+            self.assertEqual(fix_ampersands_filter('Jack & Jill & Jeroboam'),
+                             'Jack &amp; Jill &amp; Jeroboam')
+        self.assertEqual(len(w), 1)
 
     def test_linenumbers(self):
         self.assertEqual(linenumbers('line 1\nline 2'),

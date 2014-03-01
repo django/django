@@ -1406,3 +1406,16 @@ strings, you should use ``django.utils.html.escapejs`` or the
 :tfilter:`escapejs` template filter.
 If all you need is to generate valid javascript strings, you can simply use
 ``json.dumps()``.
+
+``fix_ampersands`` utils method and template filter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``django.utils.html.fix_ampersands`` method and the :tfilter:`fix_ampersands`
+template filter are deprecated, as the escaping of ampersands is already taken care
+of by Django's standard HTML escaping features. Combining this with ``fix_ampersands``
+would either result in double escaping, or, if the output is assumed to be safe,
+a risk of introducing XSS vulnerabilities. Along with ``fix_ampersands``,
+``django.utils.html.clean_html`` is deprecated, an undocumented function that calls
+``fix_ampersands``.
+As this is an accelerated deprecation, ``fix_ampersands`` and ``clean_html``
+will be removed in Django 1.8.
