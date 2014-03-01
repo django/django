@@ -476,8 +476,9 @@ class LookupTests(TestCase):
             Article.objects.filter(headline__starts='Article')
             self.fail('FieldError not raised')
         except FieldError as ex:
-            self.assertEqual(str(ex), "Join on field 'headline' not permitted. "
-                             "Did you misspell 'starts' for the lookup type?")
+            self.assertEqual(
+                str(ex), "Unsupported lookup 'starts' for CharField "
+                "or join on the field not permitted.")
 
     def test_regex(self):
         # Create some articles with a bit more interesting headlines for testing field lookups:
