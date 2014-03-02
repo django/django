@@ -1,3 +1,4 @@
+import re
 from __future__ import unicode_literals
 
 from django import http
@@ -34,7 +35,7 @@ def shortcut(request, content_type_id, object_id):
     # if necessary.
 
     # If the object actually defines a domain, we're done.
-    if absurl.startswith('http://') or absurl.startswith('https://'):
+    if re.match(r'(https?:)?//', absurl):
         return http.HttpResponseRedirect(absurl)
 
     # Otherwise, we need to introspect the object's relationships for a
