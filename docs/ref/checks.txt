@@ -185,7 +185,7 @@ code snippet shows how you can implement this check::
                     self.min > self.max):
                 return [
                     checks.Error(
-                        'min greated than max.',
+                        'min greater than max.',
                         hint='Decrease min or increase max.',
                         obj=self,
                         id='myapp.E001',
