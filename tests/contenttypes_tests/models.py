@@ -24,3 +24,14 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+
+@python_2_unicode_compatible
+class SchemeIncludedURL(models.Model):
+    url = models.URLField(max_length=100)
+
+    def __str__(self):
+        return self.url
+
+    def get_absolute_url(self):
+        return self.url

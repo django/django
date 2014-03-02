@@ -12,7 +12,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_str
 
-from .models import Author, Article
+from .models import Author, Article, SchemeIncludedURL
 
 
 class ContentTypesViewsTests(TestCase):
@@ -26,6 +26,19 @@ class ContentTypesViewsTests(TestCase):
             response = self.client.get(short_url)
             self.assertRedirects(response, 'http://testserver%s' % obj.get_absolute_url(),
                                  status_code=302, target_status_code=404)
+
+    def test_shortcut_with_absolute_url_including_scheme(self):
+        """
+        Can view a shortcut when object's get_absolute_url returns a full URL
+        the tested URLs are in fixtures/testdata.json :
+        "http://...", "https://..." and "//..."
+        """
+        for obj in SchemeIncludedURL.objects.all():
+            short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(SchemeIncludedURL).id, obj.pk)
+            response = self.client.get(short_url)
+            self.assertRedirects(response, obj.get_absolute_url(),
+                                 status_code=302,
+                                 fetch_redirect_response=False)
 
     def test_shortcut_no_absolute_url(self):
         "Shortcuts for an object that has no get_absolute_url method raises 404"
