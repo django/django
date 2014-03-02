@@ -5,7 +5,7 @@ Measurement Objects
 ===================
 
 .. module:: django.contrib.gis.measure
-   :synopsis: GeoDjango's distance and area measurment objects.
+   :synopsis: GeoDjango's distance and area measurement objects.
 
 The :mod:`django.contrib.gis.measure` module contains objects that allow
 for convenient representation of distance and area units of measure. [#]_

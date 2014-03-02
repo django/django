@@ -1106,8 +1106,8 @@ Aggregate Methods
 *Availability*: PostGIS
 
 Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
-column.  This is analagous to a simplified version of the :meth:`GeoQuerySet.unionagg` method,
-except it can be several orders of magnitude faster than peforming a union because
+column. This is analogous to a simplified version of the :meth:`GeoQuerySet.unionagg` method,
+except it can be several orders of magnitude faster than performing a union because
 it simply rolls up geometries into a collection or multi object, not caring about
 dissolving boundaries.
 

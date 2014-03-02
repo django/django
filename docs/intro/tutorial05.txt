@@ -350,7 +350,7 @@ With that ready, we can ask the client to do some work for us::
     >>> response.status_code
     404
     >>> # on the other hand we should expect to find something at '/polls/'
-    >>> # we'll use 'reverse()' rather than a harcoded URL
+    >>> # we'll use 'reverse()' rather than a hardcoded URL
     >>> from django.core.urlresolvers import reverse
     >>> response = client.get(reverse('polls:index'))
     >>> response.status_code

@@ -19,7 +19,7 @@ ogrinspect <data_source> <model_name>
 
 .. django-admin:: ogrinspect
 
-The ``ogrinpsect`` management command will inspect the given OGR-compatible
+The ``ogrinspect`` management command will inspect the given OGR-compatible
 :class:`~django.contrib.gis.gdal.DataSource` (e.g., a shapefile) and will
 output a GeoDjango model with the given model name.  There's a detailed example
 of using ``ogrinspect`` :ref:`in the tutorial <ogrinspect-intro>`.
