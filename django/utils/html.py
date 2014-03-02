@@ -213,13 +213,13 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     Links can have trailing punctuation (periods, commas, close-parens) and
     leading punctuation (opening parens) and it'll still do the right thing.
 
-    If trim_url_limit is not None, the URLs in link text longer than this limit
-    will truncated to trim_url_limit-3 characters and appended with an elipsis.
+    If trim_url_limit is not None, the URLs in the link text longer than this
+    limit will be truncated to trim_url_limit-3 characters and appended with
+    an ellipsis.
 
-    If nofollow is True, the URLs in link text will get a rel="nofollow"
-    attribute.
+    If nofollow is True, the links will get a rel="nofollow" attribute.
 
-    If autoescape is True, the link text and URLs will get autoescaped.
+    If autoescape is True, the link text and URLs will be autoescaped.
     """
     def trim_url(x, limit=trim_url_limit):
         if limit is None or len(x) <= limit:

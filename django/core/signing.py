@@ -10,7 +10,7 @@ There are two components here, separated by a ':'. The first component is a
 URLsafe base64 encoded JSON of the object passed to dumps(). The second
 component is a base64 encoded hmac/SHA1 hash of "$first_component:$secret"
 
-signing.loads(s) checks the signature and returns the deserialised object.
+signing.loads(s) checks the signature and returns the deserialized object.
 If the signature fails, a BadSignature exception is raised.
 
 >>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk")

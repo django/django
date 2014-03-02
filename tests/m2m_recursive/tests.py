@@ -168,12 +168,12 @@ class RecursiveM2MTests(TestCase):
             attrgetter("name"),
             ordered=False
         )
-        # As the assertQuerysetEqual uses a set for comparrison,
+        # As the assertQuerysetEqual uses a set for comparison,
         # check we've only got David listed once
         self.assertEqual(self.a.idols.all().count(), 1)
 
     def test_recursive_m2m_related_to_self(self):
-        """ Check the expected behaviour when an instance is related to itself """
+        """ Check the expected behavior when an instance is related to itself """
 
         # Ann idolizes herself
         self.a.idols.add(self.a)

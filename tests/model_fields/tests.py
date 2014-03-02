@@ -300,7 +300,7 @@ class BooleanFieldTests(unittest.TestCase):
         old_default = boolean_field.default
         try:
             boolean_field.default = NOT_PROVIDED
-            # check patch was succcessful
+            # check patch was successful
             self.assertFalse(boolean_field.has_default())
             b = BooleanModel()
             self.assertIsNone(b.bfield)

@@ -304,7 +304,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         ])
 
     def test_ambiguous_compressed_fixture(self):
-        # The name "fixture5" is ambigous, so loading it will raise an error
+        # The name "fixture5" is ambiguous, so loading it will raise an error
         with self.assertRaises(management.CommandError) as cm:
             management.call_command('loaddata', 'fixture5', verbosity=0)
             self.assertIn("Multiple fixtures named 'fixture5'", cm.exception.args[0])

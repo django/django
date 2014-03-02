@@ -368,7 +368,7 @@ class WizardView(TemplateView):
     def get_form_initial(self, step):
         """
         Returns a dictionary which will be passed to the form for `step`
-        as `initial`. If no initial data was provied while initializing the
+        as `initial`. If no initial data was provided while initializing the
         form wizard, a empty dictionary will be returned.
         """
         return self.initial_dict.get(step, {})
@@ -376,7 +376,7 @@ class WizardView(TemplateView):
     def get_form_instance(self, step):
         """
         Returns a object which will be passed to the form for `step`
-        as `instance`. If no instance object was provied while initializing
+        as `instance`. If no instance object was provided while initializing
         the form wizard, None will be returned.
         """
         return self.instance_dict.get(step, None)

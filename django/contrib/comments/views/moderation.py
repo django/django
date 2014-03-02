@@ -90,7 +90,7 @@ def approve(request, comment_id, next=None):
             template.RequestContext(request)
         )
 
-# The following functions actually perform the various flag/aprove/delete
+# The following functions actually perform the various flag/approve/delete
 # actions. They've been broken out into separate functions to that they
 # may be called from admin actions.
 

@@ -426,7 +426,7 @@ def _transaction_func(entering, exiting, using):
     """
     Takes 3 things, an entering function (what to do to start this block of
     transaction management), an exiting function (what to do to end it, on both
-    success and failure, and using which can be: None, indiciating using is
+    success and failure, and using which can be: None, indicating using is
     DEFAULT_DB_ALIAS, a callable, indicating that using is DEFAULT_DB_ALIAS and
     to return the function already wrapped.
 

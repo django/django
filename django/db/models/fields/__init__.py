@@ -64,7 +64,7 @@ class FieldDoesNotExist(Exception):
 
 # A guide to Field parameters:
 #
-#   * name:      The name of the field specifed in the model.
+#   * name:      The name of the field specified in the model.
 #   * attname:   The attribute to use on the model object. This is the same as
 #                "name", except in the case of ForeignKeys, where "_id" is
 #                appended.
@@ -306,7 +306,7 @@ class Field(RegisterLookupMixin):
          * top-level classes, top-level functions - will be referenced by their full import path
          * Storage instances - these have their own deconstruct() method
 
-        This is because the values here must be serialised into a text format
+        This is because the values here must be serialized into a text format
         (possibly new Python code, possibly JSON) and these are the only types
         with encoding handlers defined.
 

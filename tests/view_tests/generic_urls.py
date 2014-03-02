@@ -35,7 +35,7 @@ urlpatterns = patterns('',
     url('^中文/target/$', 'view_tests.views.index_page'),
 )
 
-# rediriects, both temporary and permanent, with non-ASCII targets
+# redirects, both temporary and permanent, with non-ASCII targets
 urlpatterns += patterns('',
     ('^nonascii_redirect/$', RedirectView.as_view(
         url='/中文/target/', permanent=False)),

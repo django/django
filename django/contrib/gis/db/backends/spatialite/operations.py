@@ -233,7 +233,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
                 placeholder = '%s(%%s, %s)' % (self.transform, f.srid)
             else:
                 placeholder = '%s'
-            # No geometry value used for F expression, substitue in
+            # No geometry value used for F expression, substitute in
             # the column name instead.
             return placeholder % self.get_expression_column(value)
         else:
@@ -310,7 +310,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         """
         agg_name = agg.__class__.__name__
         if not self.check_aggregate_support(agg):
-            raise NotImplementedError('%s spatial aggregate is not implmented for this backend.' % agg_name)
+            raise NotImplementedError('%s spatial aggregate is not implemented for this backend.' % agg_name)
         agg_name = agg_name.lower()
         if agg_name == 'union':
             agg_name += 'agg'

@@ -122,7 +122,7 @@ def complex_setting_changed(**kwargs):
     if kwargs['enter'] and kwargs['setting'] in COMPLEX_OVERRIDE_SETTINGS:
         # Considering the current implementation of the signals framework,
         # stacklevel=5 shows the line containing the override_settings call.
-        warnings.warn("Overriding setting %s can lead to unexpected behaviour."
+        warnings.warn("Overriding setting %s can lead to unexpected behavior."
                       % kwargs['setting'], stacklevel=5)
 
 

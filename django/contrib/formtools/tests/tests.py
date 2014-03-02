@@ -58,7 +58,7 @@ class PreviewTests(TestCase):
         """
         Test contrib.formtools.preview form retrieval.
 
-        Use the client library to see if we can sucessfully retrieve
+        Use the client library to see if we can successfully retrieve
         the form (mostly testing the setup ROOT_URLCONF
         process). Verify that an additional  hidden input field
         is created to manage the stage.

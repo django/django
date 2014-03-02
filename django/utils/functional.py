@@ -282,7 +282,7 @@ _super = super
 
 class SimpleLazyObject(LazyObject):
     """
-    A lazy object initialised from any function.
+    A lazy object initialized from any function.
 
     Designed for compound objects of unknown type. For builtins or objects of
     known type, use django.utils.functional.lazy.

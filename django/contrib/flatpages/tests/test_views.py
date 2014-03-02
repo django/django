@@ -53,7 +53,7 @@ class FlatpageViewTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage won't be served if the fallback middlware is disabled"
+        "A non-existent flatpage won't be served if the fallback middleware is disabled"
         response = self.client.get('/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 
@@ -109,7 +109,7 @@ class FlatpageViewAppendSlashTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_redirect_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage won't be served if the fallback middlware is disabled and should not add a slash"
+        "A non-existent flatpage won't be served if the fallback middleware is disabled and should not add a slash"
         response = self.client.get('/no_such_flatpage')
         self.assertEqual(response.status_code, 404)
 

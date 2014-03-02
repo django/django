@@ -1287,14 +1287,14 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
     Helper function that recursively returns an information for a klass, to be
     used in get_cached_row.  It exists just to compute this information only
     once for entire queryset. Otherwise it would be computed for each row, which
-    leads to poor perfomance on large querysets.
+    leads to poor performance on large querysets.
 
     Arguments:
      * klass - the class to retrieve (and instantiate)
      * max_depth - the maximum depth to which a select_related()
        relationship should be explored.
      * cur_depth - the current depth in the select_related() tree.
-       Used in recursive calls to determin if we should dig deeper.
+       Used in recursive calls to determine if we should dig deeper.
      * requested - A dictionary describing the select_related() tree
        that is to be retrieved. keys are field names; values are
        dictionaries describing the keys on that related object that
@@ -1359,7 +1359,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
             field_names = [f.attname for f in klass._meta.concrete_fields
                            if f.model in non_seen_models]
             field_count = len(field_names)
-        # Try to avoid populating field_names variable for perfomance reasons.
+        # Try to avoid populating field_names variable for performance reasons.
         # If field_names variable is set, we use **kwargs based model init
         # which is slower than normal init.
         if field_count == len(klass._meta.concrete_fields):
@@ -1552,7 +1552,7 @@ class RawQuerySet(object):
             else:
                 model_cls = self.model
                 # All model's fields are present in the query. So, it is possible
-                # to use *args based model instantation. For each field of the model,
+                # to use *args based model instantiation. For each field of the model,
                 # record the query column position matching that field.
                 model_init_field_pos = []
                 for field in self.model._meta.fields:
@@ -1762,7 +1762,7 @@ def prefetch_related_objects(result_cache, related_lookups):
 
             # Descend down tree
 
-            # We assume that objects retrieved are homogenous (which is the premise
+            # We assume that objects retrieved are homogeneous (which is the premise
             # of prefetch_related), so what applies to first object applies to all.
             first_obj = obj_list[0]
             prefetcher, descriptor, attr_found, is_fetched = get_prefetcher(first_obj, through_attr)

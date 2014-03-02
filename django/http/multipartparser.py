@@ -253,7 +253,7 @@ class MultiPartParser(object):
 
     def handle_file_complete(self, old_field_name, counters):
         """
-        Handle all the signalling that takes place when a file is complete.
+        Handle all the signaling that takes place when a file is complete.
         """
         for i, handler in enumerate(self._upload_handlers):
             file_obj = handler.file_complete(counters[i])
@@ -484,7 +484,7 @@ class BoundaryIter(six.Iterator):
             self._done = True
             return chunk[:end]
         else:
-            # make sure we dont treat a partial boundary (and
+            # make sure we don't treat a partial boundary (and
             # its separators) as data
             if not chunk[:-rollback]:  # and len(chunk) >= (len(self._boundary) + 6):
                 # There's nothing left, we should just return and mark as done.
@@ -498,7 +498,7 @@ class BoundaryIter(six.Iterator):
         """
         Finds a multipart boundary in data.
 
-        Should no boundry exist in the data None is returned instead. Otherwise
+        Should no boundary exist in the data None is returned instead. Otherwise
         a tuple containing the indices of the following are returned:
 
          * the end of current encapsulation

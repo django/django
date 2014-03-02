@@ -732,7 +732,7 @@ class BaseDatabaseSchemaEditor(object):
 
     def _alter_column_type_sql(self, table, column, type):
         """
-        Hook to specialise column type alteration for different backends,
+        Hook to specialize column type alteration for different backends,
         for cases when a creation type is different to an alteration type
         (e.g. SERIAL in PostgreSQL, PostGIS fields).
 

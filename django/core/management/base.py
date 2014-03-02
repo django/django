@@ -208,7 +208,7 @@ class BaseCommand(object):
     def __init__(self):
         self.style = color_style()
 
-        # `requires_model_validation` is deprecated in favour of
+        # `requires_model_validation` is deprecated in favor of
         # `requires_system_checks`. If both options are present, an error is
         # raised. Otherwise the present option is used. If none of them is
         # defined, the default value (True) is used.
@@ -218,7 +218,7 @@ class BaseCommand(object):
         if has_old_option:
             warnings.warn(
                 '"requires_model_validation" is deprecated '
-                'in favour of "requires_system_checks".',
+                'in favor of "requires_system_checks".',
                 PendingDeprecationWarning)
         if has_old_option and has_new_option:
             raise ImproperlyConfigured(

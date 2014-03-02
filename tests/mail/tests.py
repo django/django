@@ -39,7 +39,7 @@ class HeadersCheckMixin(object):
         Check that :param message: has all :param headers: headers.
 
         :param message: can be an instance of an email.Message subclass or a
-        string with the contens of an email message.
+        string with the contents of an email message.
         :param headers: should be a set of (header-name, header-value) tuples.
         """
         if isinstance(message, binary_type):
@@ -103,7 +103,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_space_continuation(self):
         """
-        Test for space continuation character in long (ascii) subject headers (#7747)
+        Test for space continuation character in long (ASCII) subject headers (#7747)
         """
         email = EmailMessage('Long subject lines that get wrapped should contain a space continuation character to get expected behavior in Outlook and Thunderbird', 'Content', 'from@example.com', ['to@example.com'])
         message = email.message()
@@ -630,7 +630,7 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
 
     def test_close_connection(self):
         """
-        Test that connection can be closed (even when not explicitely opened)
+        Test that connection can be closed (even when not explicitly opened)
         """
         conn = mail.get_connection(username='', password='')
         try:

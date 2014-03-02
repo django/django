@@ -249,7 +249,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     def testChangeListSortingModel(self):
         """
         Ensure we can sort on a list_display field that is a Model method
-        (colunn 3 is 'model_year' in ArticleAdmin)
+        (column 3 is 'model_year' in ArticleAdmin)
         """
         response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'o': '-3'})
         self.assertContentBefore(response, 'Newest content', 'Middle content',
@@ -729,7 +729,7 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
         group = Group.objects.create(name="foogroup")
         post_data = {
             'action': 'delete_selected',
-            'selected_accross': '0',
+            'selected_across': '0',
             'index': '0',
             '_selected_action': group.id
         }
@@ -1185,7 +1185,7 @@ class AdminViewPermissionsTest(TestCase):
                        'date_0': '2008-03-18', 'date_1': '10:54:39',
                        'section': 1}
 
-        # add user shoud not be able to view the list of article or change any of them
+        # add user should not be able to view the list of article or change any of them
         self.client.get('/test_admin/admin/')
         self.client.post(login_url, self.adduser_login)
         response = self.client.get('/test_admin/admin/admin_views/article/')
@@ -1259,7 +1259,7 @@ class AdminViewPermissionsTest(TestCase):
 
         login_url = reverse('admin:login') + '?next=/test_admin/admin/'
 
-        # add user shoud not be able to view the list of article or change any of them
+        # add user should not be able to view the list of article or change any of them
         self.client.get('/test_admin/admin/')
         self.client.post(login_url, self.adduser_login)
         response = self.client.get('/test_admin/admin/admin_views/article/1/history/')
@@ -1366,7 +1366,7 @@ class AdminViewPermissionsTest(TestCase):
         login_url = reverse('admin:login') + '?next=/test_admin/admin/'
         delete_dict = {'post': 'yes'}
 
-        # add user shoud not be able to delete articles
+        # add user should not be able to delete articles
         self.client.get('/test_admin/admin/')
         self.client.post(login_url, self.adduser_login)
         response = self.client.get('/test_admin/admin/admin_views/article/1/delete/')
@@ -1749,7 +1749,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SecureViewTests(TestCase):
     """
-    Test behaviour of a view protected by the staff_member_required decorator.
+    Test behavior of a view protected by the staff_member_required decorator.
     """
     urls = "admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -1782,7 +1782,7 @@ class AdminViewUnicodeTest(TestCase):
 
     def testUnicodeEdit(self):
         """
-        A test to ensure that POST on edit_view handles non-ascii characters.
+        A test to ensure that POST on edit_view handles non-ASCII characters.
         """
         post_data = {
             "name": "Test lærdommer",
@@ -1815,7 +1815,7 @@ class AdminViewUnicodeTest(TestCase):
 
     def testUnicodeDelete(self):
         """
-        Ensure that the delete_view handles non-ascii characters
+        Ensure that the delete_view handles non-ASCII characters
         """
         delete_dict = {'post': 'yes'}
         response = self.client.get('/test_admin/admin/admin_views/book/1/delete/')
@@ -3995,7 +3995,7 @@ class CSSTest(TestCase):
 
     def testAppModelInFormBodyClass(self):
         """
-        Ensure app and model tag are correcly read by change_form template
+        Ensure app and model tag are correctly read by change_form template
         """
         response = self.client.get('/test_admin/admin/admin_views/section/add/')
         self.assertEqual(response.status_code, 200)
@@ -4004,7 +4004,7 @@ class CSSTest(TestCase):
 
     def testAppModelInListBodyClass(self):
         """
-        Ensure app and model tag are correcly read by change_list template
+        Ensure app and model tag are correctly read by change_list template
         """
         response = self.client.get('/test_admin/admin/admin_views/section/')
         self.assertEqual(response.status_code, 200)
@@ -4013,7 +4013,7 @@ class CSSTest(TestCase):
 
     def testAppModelInDeleteConfirmationBodyClass(self):
         """
-        Ensure app and model tag are correcly read by delete_confirmation
+        Ensure app and model tag are correctly read by delete_confirmation
         template
         """
         response = self.client.get(
@@ -4024,7 +4024,7 @@ class CSSTest(TestCase):
 
     def testAppModelInAppIndexBodyClass(self):
         """
-        Ensure app and model tag are correcly read by app_index template
+        Ensure app and model tag are correctly read by app_index template
         """
         response = self.client.get('/test_admin/admin/admin_views/')
         self.assertEqual(response.status_code, 200)
@@ -4032,7 +4032,7 @@ class CSSTest(TestCase):
 
     def testAppModelInDeleteSelectedConfirmationBodyClass(self):
         """
-        Ensure app and model tag are correcly read by
+        Ensure app and model tag are correctly read by
         delete_selected_confirmation template
         """
         action_data = {
@@ -4719,7 +4719,7 @@ class AdminViewOnSiteTests(TestCase):
                                )
 
     def test_true(self):
-        "Ensure that the default behaviour is followed if view_on_site is True"
+        "Ensure that the default behavior is followed if view_on_site is True"
         response = self.client.get('/test_admin/admin/admin_views/city/1/')
         content_type_pk = ContentType.objects.get_for_model(City).pk
         self.assertContains(response,

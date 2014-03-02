@@ -78,7 +78,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
             else:
                 raise ValueError('String or unicode input unrecognized as WKT EWKT, and HEXEWKB.')
         elif isinstance(geo_input, GEOM_PTR):
-            # When the input is a pointer to a geomtry (GEOM_PTR).
+            # When the input is a pointer to a geometry (GEOM_PTR).
             g = geo_input
         elif isinstance(geo_input, memoryview):
             # When the input is a buffer (WKB).
@@ -682,7 +682,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
     def length(self):
         """
         Returns the length of this Geometry (e.g., 0 for point, or the
-        circumfrence of a Polygon).
+        circumference of a Polygon).
         """
         return capi.geos_length(self.ptr, byref(c_double()))
 

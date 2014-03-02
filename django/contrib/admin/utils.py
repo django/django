@@ -108,7 +108,7 @@ def flatten_fieldsets(fieldsets):
 def get_deleted_objects(objs, opts, user, admin_site, using):
     """
     Find all objects related to ``objs`` that should also be deleted. ``objs``
-    must be a homogenous iterable of objects (e.g. a QuerySet).
+    must be a homogeneous iterable of objects (e.g. a QuerySet).
 
     Returns a nested list of strings suitable for display in the
     template with the ``unordered_list`` filter.

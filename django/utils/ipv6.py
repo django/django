@@ -14,7 +14,7 @@ def clean_ipv6_address(ip_str, unpack_ipv4=False,
     Validity is checked by calling is_valid_ipv6_address() - if an
     invalid address is passed, ValidationError is raised.
 
-    Replaces the longest continious zero-sequence with "::" and
+    Replaces the longest continuous zero-sequence with "::" and
     removes leading zeroes and makes sure all hextets are lowercase.
 
     Args:

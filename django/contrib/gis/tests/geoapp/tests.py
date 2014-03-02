@@ -345,7 +345,7 @@ class GeoLookupTest(TestCase):
         nmi = State.objects.create(name='Northern Mariana Islands', poly=None)
         self.assertEqual(nmi.poly, None)
 
-        # Assigning a geomery and saving -- then UPDATE back to NULL.
+        # Assigning a geometry and saving -- then UPDATE back to NULL.
         nmi.poly = 'POLYGON((0 0,1 0,1 1,1 0,0 0))'
         nmi.save()
         State.objects.filter(name='Northern Mariana Islands').update(poly=None)
@@ -359,7 +359,7 @@ class GeoLookupTest(TestCase):
         pnt1 = fromstr('POINT (649287.0363174 4177429.4494686)', srid=2847)
         pnt2 = fromstr('POINT(-98.4919715741052 29.4333344025053)', srid=4326)
 
-        # Not passing in a geometry as first param shoud
+        # Not passing in a geometry as first param should
         # raise a type error when initializing the GeoQuerySet
         self.assertRaises(ValueError, Country.objects.filter, mpoly__relate=(23, 'foo'))
 

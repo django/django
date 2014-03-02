@@ -291,7 +291,7 @@ class TestComplexSettingOverride(TestCase):
             self.assertEqual(os.path.splitext(w[0].filename)[0],
                              os.path.splitext(__file__)[0])
             self.assertEqual(str(w[0].message),
-                'Overriding setting TEST_WARN can lead to unexpected behaviour.')
+                'Overriding setting TEST_WARN can lead to unexpected behavior.')
 
 
 class TrailingSlashURLTests(TestCase):

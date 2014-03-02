@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 """
-A series of tests to establish that the command-line managment tools work as
+A series of tests to establish that the command-line management tools work as
 advertised - especially with regards to the handling of the DJANGO_SETTINGS_MODULE
 and default settings.py files.
 """
@@ -1474,7 +1474,7 @@ class CommandTypes(AdminScriptTestCase):
 
     def test_run_from_argv_non_ascii_error(self):
         """
-        Test that non-ascii message of CommandError does not raise any
+        Test that non-ASCII message of CommandError does not raise any
         UnicodeDecodeError in run_from_argv.
         """
         def raise_command_error(*args, **kwargs):

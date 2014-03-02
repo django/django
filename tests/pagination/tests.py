@@ -286,7 +286,7 @@ class ModelPaginationTests(TestCase):
 
     def test_page_getitem(self):
         """
-        Tests proper behaviour of a paginator page __getitem__ (queryset
+        Tests proper behavior of a paginator page __getitem__ (queryset
         evaluation, slicing, exception raised).
         """
         paginator = Paginator(Article.objects.all(), 5)

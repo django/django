@@ -567,7 +567,7 @@ def cycle(parser, token, escape=False):
         {% endfor %}
 
     Outside of a loop, give the values a unique name the first time you call
-    it, then use that name each sucessive time through::
+    it, then use that name each successive time through::
 
             <tr class="{% cycle 'row1' 'row2' 'row3' as rowcolors %}">...</tr>
             <tr class="{% cycle rowcolors %}">...</tr>
@@ -944,7 +944,7 @@ def do_if(parser, token):
         {% endif %}
 
         {% if athlete_list and coach_list %}
-            Both atheletes and coaches are available.
+            Both athletes and coaches are available.
         {% endif %}
 
         {% if not athlete_list or coach_list %}
