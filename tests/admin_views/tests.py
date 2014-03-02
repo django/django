@@ -729,7 +729,7 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
         group = Group.objects.create(name="foogroup")
         post_data = {
             'action': 'delete_selected',
-            'selected_accross': '0',
+            'selected_across': '0',
             'index': '0',
             '_selected_action': group.id
         }
@@ -1736,7 +1736,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SecureViewTests(TestCase):
     """
-    Test behaviour of a view protected by the staff_member_required decorator.
+    Test behavior of a view protected by the staff_member_required decorator.
     """
     urls = "admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -1769,7 +1769,7 @@ class AdminViewUnicodeTest(TestCase):
 
     def testUnicodeEdit(self):
         """
-        A test to ensure that POST on edit_view handles non-ascii characters.
+        A test to ensure that POST on edit_view handles non-ASCII characters.
         """
         post_data = {
             "name": "Test lærdommer",
@@ -1802,7 +1802,7 @@ class AdminViewUnicodeTest(TestCase):
 
     def testUnicodeDelete(self):
         """
-        Ensure that the delete_view handles non-ascii characters
+        Ensure that the delete_view handles non-ASCII characters
         """
         delete_dict = {'post': 'yes'}
         response = self.client.get('/test_admin/admin/admin_views/book/1/delete/')
@@ -4706,7 +4706,7 @@ class AdminViewOnSiteTests(TestCase):
                                )
 
     def test_true(self):
-        "Ensure that the default behaviour is followed if view_on_site is True"
+        "Ensure that the default behavior is followed if view_on_site is True"
         response = self.client.get('/test_admin/admin/admin_views/city/1/')
         content_type_pk = ContentType.objects.get_for_model(City).pk
         self.assertContains(response,

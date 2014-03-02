@@ -11,7 +11,7 @@ class Parent(models.Model):
     name = models.CharField(max_length=100)
 
     # Use a simple string for forward declarations.
-    bestchild = models.ForeignKey("Child", null=True, related_name="favoured_by")
+    bestchild = models.ForeignKey("Child", null=True, related_name="favored_by")
 
 
 class Child(models.Model):

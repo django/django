@@ -229,7 +229,7 @@ class RawQueryTests(TestCase):
 
     def test_inheritance(self):
         # date is the end of the Cuban Missile Crisis, I have no idea when
-        # Wesley was bron
+        # Wesley was born
         f = FriendlyAuthor.objects.create(first_name="Wesley", last_name="Chun",
             dob=date(1962, 10, 28))
         query = "SELECT * FROM raw_query_friendlyauthor"

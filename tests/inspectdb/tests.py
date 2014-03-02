@@ -44,7 +44,7 @@ class InspectDBTestCase(TestCase):
 
         return assertFieldType
 
-    # Inspecting oracle DB doesn't produce correct results, see #19884
+    # Inspecting Oracle DB doesn't produce correct results, see #19884
     @expectedFailureOnOracle
     def test_field_types(self):
         """Test introspection of various Django field types"""
@@ -163,7 +163,7 @@ class InspectDBTestCase(TestCase):
         self.assertIn("field_field_1 = models.IntegerField(db_column='__field')", output)
         self.assertIn("prc_x = models.IntegerField(db_column='prc(%) x')", output)
         if PY3:
-            # Python 3 allows non-ascii identifiers
+            # Python 3 allows non-ASCII identifiers
             self.assertIn("tamaño = models.IntegerField()", output)
         else:
             self.assertIn("tama_o = models.IntegerField(db_column='tama\\xf1o')", output)

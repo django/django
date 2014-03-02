@@ -1474,7 +1474,7 @@ class CommandTypes(AdminScriptTestCase):
 
     def test_run_from_argv_non_ascii_error(self):
         """
-        Test that non-ascii message of CommandError does not raise any
+        Test that non-ASCII message of CommandError does not raise any
         UnicodeDecodeError in run_from_argv.
         """
         def raise_command_error(*args, **kwargs):

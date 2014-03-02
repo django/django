@@ -54,7 +54,7 @@ class BooleanFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                'BooleanFields do not acceps null values.',
+                'BooleanFields do not accept null values.',
                 hint='Use a NullBooleanField instead.',
                 obj=field,
                 id='E037',

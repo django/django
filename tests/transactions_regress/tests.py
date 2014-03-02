@@ -199,7 +199,7 @@ class TestTransactionClosing(IgnoreDeprecationWarningsMixin, TransactionTestCase
         "Cannot establish two connections to an in-memory SQLite database.")
 class TestNewConnection(IgnoreDeprecationWarningsMixin, TransactionTestCase):
     """
-    Check that new connections don't have special behaviour.
+    Check that new connections don't have special behavior.
     """
 
     available_apps = ['transactions_regress']

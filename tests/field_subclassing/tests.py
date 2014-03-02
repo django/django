@@ -100,7 +100,7 @@ class CustomField(TestCase):
         http://users.rcn.com/python/download/Descriptor.htm#properties
         """
         # Even when looking for totally different properties, SubfieldBase's
-        # non property like behaviour made inspect crash. Refs #12568.
+        # non property like behavior made inspect crash. Refs #12568.
         data = dict(inspect.getmembers(MyModel))
         self.assertIn('__module__', data)
         self.assertEqual(data['__module__'], 'field_subclassing.models')

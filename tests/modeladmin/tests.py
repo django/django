@@ -127,7 +127,7 @@ class ModelAdminTests(TestCase):
     def test_field_arguments_restricted_on_form(self):
         # If we specify fields or fieldsets, it should exclude fields on the Form class
         # to the fields specified. This may cause errors to be raised in the db layer if
-        # required model fields arent in fields/fieldsets, but that's preferable to
+        # required model fields aren't in fields/fieldsets, but that's preferable to
         # ghost errors where you have a field in your Form class that isn't being
         # displayed because you forgot to add it to fields/fieldsets
 

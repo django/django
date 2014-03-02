@@ -233,7 +233,7 @@ class TemplateLoaderTests(TestCase):
             self.assertTrue(template_name.endswith(load_name),
                 'Template loaded by filesystem loader has incorrect name for debug page: %s' % template_name)
 
-            # Aso test the cached loader, since it overrides load_template
+            # Also test the cached loader, since it overrides load_template
             cache_loader = cached.Loader(('',))
             cache_loader._cached_loaders = loader.template_source_loaders
             loader.template_source_loaders = (cache_loader,)

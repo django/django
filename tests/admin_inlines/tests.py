@@ -109,7 +109,7 @@ class TestInline(TestCase):
         self.assertEqual(response.status_code, 200)
         # Add parent object view should have the child inlines section
         self.assertContains(response, '<div class="inline-group" id="question_set-group">')
-        # The right callabe should be used for the inline readonly_fields
+        # The right callable should be used for the inline readonly_fields
         # column cells
         self.assertContains(response, '<p>Callable in QuestionInline</p>')
 

@@ -2266,7 +2266,7 @@ class ConditionalTests(BaseQuerysetTest):
         # for the related field).
         self.assertEqual(len(Tag.objects.order_by('parent')), 5)
 
-        # ... but you can still order in a non-recursive fashion amongst linked
+        # ... but you can still order in a non-recursive fashion among linked
         # fields (the previous test failed because the default ordering was
         # recursive).
         self.assertQuerysetEqual(
