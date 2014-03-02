@@ -10,6 +10,10 @@ warnings.warn(
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
         'load_app', 'app_cache_ready')
 
+# Backwards-compatibility for private APIs during the deprecation period.
+UnavailableApp = LookupError
+cache = apps
+
 # These methods were always module level, so are kept that way for backwards
 # compatibility.
 get_apps = apps.get_apps
