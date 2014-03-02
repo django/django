@@ -29,7 +29,7 @@ Essentially, Django does two things:
   their preferences.
 
 Obviously, translation depends on the target language, and formatting usually
-depends on the target country. These informations are provided by browsers in
+depends on the target country. This information is provided by browsers in
 the ``Accept-Language`` header. However, the time zone isn't readily available.
 
 Definitions

@@ -29,8 +29,8 @@ into account when building its cache key. Requests with the same path but
 different header content for headers named in ``Vary`` need to get different
 cache keys to prevent delivery of wrong content.
 
-For example, :doc:`internationalization </topics/i18n/index>` middleware would need
-to distinguish caches by the ``Accept-language`` header.
+For example, :doc:`internationalization </topics/i18n/index>` middleware would
+need to distinguish caches by the ``Accept-language`` header.
 
 .. function:: patch_cache_control(response, **kwargs)
 
@@ -289,7 +289,8 @@ The functions defined in this module share the following properties:
 ==============================
 
 .. module:: django.utils.feedgenerator
-   :synopsis: Syndication feed generation library -- used for generating RSS, etc.
+   :synopsis: Syndication feed generation library -- used for generating RSS,
+   etc.
 
 Sample usage::
 
@@ -485,15 +486,16 @@ Atom1Feed
 
 .. function:: allow_lazy(func, *resultclasses)
 
-    Django offers many utility functions (particularly in ``django.utils``) that
-    take a string as their first argument and do something to that string. These
-    functions are used by template filters as well as directly in other code.
+    Django offers many utility functions (particularly in ``django.utils``)
+    that take a string as their first argument and do something to that string.
+    These functions are used by template filters as well as directly in other
+    code.
 
     If you write your own similar functions and deal with translations, you'll
-    face the problem of what to do when the first argument is a lazy translation
-    object. You don't want to convert it to a string immediately, because you might
-    be using this function outside of a view (and hence the current thread's locale
-    setting will not be correct).
+    face the problem of what to do when the first argument is a lazy
+    translation object. You don't want to convert it to a string immediately,
+    because you might be using this function outside of a view (and hence the
+    current thread's locale setting will not be correct).
 
     For cases like this, use the ``django.utils.functional.allow_lazy()``
     decorator. It modifies the function so that *if* it's called with a lazy
@@ -510,15 +512,15 @@ Atom1Feed
         # Replace unicode by str on Python 3
         fancy_utility_function = allow_lazy(fancy_utility_function, unicode)
 
-    The ``allow_lazy()`` decorator takes, in addition to the function to decorate,
-    a number of extra arguments (``*args``) specifying the type(s) that the
-    original function can return. Usually, it's enough to include ``unicode``
-    (or ``str`` on Python 3) here and ensure that your function returns only
-    Unicode strings.
+    The ``allow_lazy()`` decorator takes, in addition to the function to
+    decorate, a number of extra arguments (``*args``) specifying the type(s)
+    that the original function can return. Usually, it's enough to include
+    ``unicode`` (or ``str`` on Python 3) here and ensure that your function
+    returns only Unicode strings.
 
     Using this decorator means you can write your function and assume that the
-    input is a proper string, then add support for lazy translation objects at the
-    end.
+    input is a proper string, then add support for lazy translation objects at
+    the end.
 
 ``django.utils.html``
 =====================
@@ -540,8 +542,8 @@ escaping HTML.
 
 .. function:: conditional_escape(text)
 
-    Similar to ``escape()``, except that it doesn't operate on pre-escaped strings,
-    so it will not double escape.
+    Similar to ``escape()``, except that it doesn't operate on pre-escaped
+    strings, so it will not double escape.
 
 .. function:: format_html(format_string, *args, **kwargs)
 
@@ -601,9 +603,9 @@ escaping HTML.
 
         strip_tags(value)
 
-    If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
-    return value will be ``"Joel is a slug"``. Note that ``strip_tags`` result
-    may still contain unsafe HTML content, so you might use
+    If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"``
+    the return value will be ``"Joel is a slug"``. Note that ``strip_tags``
+    result may still contain unsafe HTML content, so you might use
     :func:`~django.utils.html.escape` to make it a safe string.
 
     .. versionchanged:: 1.6
@@ -618,13 +620,13 @@ escaping HTML.
 
         remove_tags(value, "b span")
 
-    If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
-    return value will be ``"Joel <button>is</button> a slug"``.
+    If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"``
+    the return value will be ``"Joel <button>is</button> a slug"``.
 
     Note that this filter is case-sensitive.
 
-    If ``value`` is ``"<B>Joel</B> <button>is</button> a <span>slug</span>"`` the
-    return value will be ``"<B>Joel</B> <button>is</button> a slug"``.
+    If ``value`` is ``"<B>Joel</B> <button>is</button> a <span>slug</span>"``
+    the return value will be ``"<B>Joel</B> <button>is</button> a slug"``.
 
 .. _str.format: http://docs.python.org/library/stdtypes.html#str.format
 
@@ -738,7 +740,8 @@ Functions for working with Python modules.
 ===========================
 
 .. module:: django.utils.safestring
-   :synopsis: Functions and classes for working with strings that can be displayed safely without further escaping in HTML.
+   :synopsis: Functions and classes for working with strings that can be
+   displayed safely without further escaping in HTML.
 
 Functions and classes for working with "safe strings": strings that can be
 displayed safely without further escaping in HTML. Marking something as a "safe
@@ -801,14 +804,15 @@ appropriate entities.
 .. function:: slugify
 
     Converts to lowercase, removes non-word characters (alphanumerics and
-    underscores) and converts spaces to hyphens. Also strips leading and trailing
-    whitespace.
+    underscores) and converts spaces to hyphens. Also strips leading and
+    trailing whitespace.
 
     For example::
 
         slugify(value)
 
-    If ``value`` is ``"Joel is a slug"``, the output will be ``"joel-is-a-slug"``.
+    If ``value`` is ``"Joel is a slug"``, the output will be
+    ``"joel-is-a-slug"``.
 
 ``django.utils.translation``
 ============================
@@ -880,30 +884,30 @@ For a complete discussion on the usage of the following see the
 
 .. function:: activate(language)
 
-    Fetches the translation object for a given language and installs it as
+    Fetches the translation object for a given language and activates it as
     the current translation object for the current thread.
 
 .. function:: deactivate()
 
-    De-installs the currently active translation object so that further _ calls
+    Deactivates the currently active translation object so that further _ calls
     will resolve against the default translation object, again.
 
 .. function:: deactivate_all()
 
-    Makes the active translation object a NullTranslations() instance. This is
-    useful when we want delayed translations to appear as the original string
-    for some reason.
+    Makes the active translation object a ``NullTranslations()`` instance.
+    This is useful when we want delayed translations to appear as the original
+    string for some reason.
 
 .. function:: override(language, deactivate=False)
 
     A Python context manager that uses
     :func:`django.utils.translation.activate` to fetch the translation object
-    for a given language, installing it as the translation object for the
-    current thread and reinstall the previous active language on exit.
-    Optionally it can simply uninstall the temporary translation on exit with
-    :func:`django.utils.translation.deactivate` if the deactivate argument is
-    True. If you pass None as the language argument, a NullTranslations()
-    instance is installed while the context is active.
+    for a given language, activates it as the translation object for the
+    current thread and reactivates the previous active language on exit.
+    Optionally, it can simply deactivate the temporary translation on exit with
+    :func:`django.utils.translation.deactivate` if the ``deactivate`` argument
+    is ``True``. If you pass ``None`` as the language argument, a
+    ``NullTranslations()`` instance is activated within the context.
 
 .. function:: get_language()
 
@@ -918,10 +922,10 @@ For a complete discussion on the usage of the following see the
 
 .. function:: get_language_from_request(request, check_path=False)
 
-    Analyzes the request to find what language the user wants the system to show.
-    Only languages listed in settings.LANGUAGES are taken into account. If the user
-    requests a sublanguage where we have a main language, we send out the main
-    language.
+    Analyzes the request to find what language the user wants the system to
+    show. Only languages listed in settings.LANGUAGES are taken into account.
+    If the user requests a sublanguage where we have a main language, we send
+    out the main language.
 
     If ``check_path`` is ``True``, the function first checks the requested URL
     for whether its path begins with a language code listed in the
@@ -933,13 +937,14 @@ For a complete discussion on the usage of the following see the
 
 .. function:: templatize(src)
 
-    Turns a Django template into something that is understood by xgettext. It does
-    so by translating the Django translation tags into standard gettext function
-    invocations.
+    Turns a Django template into something that is understood by ``xgettext``.
+    It does so by translating the Django translation tags into standard
+    ``gettext`` function invocations.
 
 .. data:: LANGUAGE_SESSION_KEY
 
-    Session key under which the active language for the current session is stored.
+    Session key under which the active language for the current session is
+    stored.
 
 .. _time-zone-selection-functions:
 
@@ -1062,7 +1067,8 @@ For a complete discussion on the usage of the following see the
     Use :mod:`~django.utils.timezone` instead.
 
 .. module:: django.utils.tzinfo
-   :synopsis: Implementation of ``tzinfo`` classes for use with ``datetime.datetime``.
+   :synopsis: Implementation of ``tzinfo`` classes for use with
+   ``datetime.datetime``.
 
 .. class:: FixedOffset
 

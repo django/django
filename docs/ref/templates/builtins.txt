@@ -641,7 +641,7 @@ will be displayed if the value has not changed::
                 {% ifchanged match.ballot_id %}
                     {% cycle "red" "blue" %}
                 {% else %}
-                    grey
+                    gray
                 {% endifchanged %}
             ">{{ match }}</div>
         {% endfor %}
