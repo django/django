@@ -39,7 +39,7 @@ def mock_inputs(inputs):
 
             def mock_input(prompt):
                 # prompt should be encoded in Python 2. This line will raise an
-                # Exception if prompt contains unencoded non-ascii on Python 2.
+                # Exception if prompt contains unencoded non-ASCII on Python 2.
                 prompt = str(prompt)
                 assert str('__proxy__') not in prompt
                 response = ''

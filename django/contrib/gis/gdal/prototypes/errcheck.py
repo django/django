@@ -56,8 +56,8 @@ def check_string(result, func, cargs, offset=-1, str_result=False):
         ptr = ptr_byref(cargs, offset)
         # Getting the string value
         s = ptr.value
-    # Correctly freeing the allocated memory beind GDAL pointer
-    # w/the VSIFree routine.
+    # Correctly freeing the allocated memory behind GDAL pointer
+    # with the VSIFree routine.
     if ptr:
         lgdal.VSIFree(ptr)
     return s

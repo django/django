@@ -944,7 +944,7 @@ def do_if(parser, token):
         {% endif %}
 
         {% if athlete_list and coach_list %}
-            Both atheletes and coaches are available.
+            Both athletes and coaches are available.
         {% endif %}
 
         {% if not athlete_list or coach_list %}

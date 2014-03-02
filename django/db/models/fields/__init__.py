@@ -940,7 +940,7 @@ class BooleanField(Field):
         if getattr(self, 'null', False):
             return [
                 checks.Error(
-                    'BooleanFields do not acceps null values.',
+                    'BooleanFields do not accept null values.',
                     hint='Use a NullBooleanField instead.',
                     obj=self,
                     id='E037',

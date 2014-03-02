@@ -196,7 +196,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         else:
             dist_param = value
 
-        # dwithin lookups on oracle require a special string parameter
+        # dwithin lookups on Oracle require a special string parameter
         # that starts with "distance=".
         if lookup_type == 'dwithin':
             dist_param = 'distance=%s' % dist_param

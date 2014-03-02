@@ -304,7 +304,7 @@ class SpatialRefSysMixin(object):
     def get_units(cls, wkt):
         """
         Class method used by GeometryField on initialization to
-        retrive the units on the given WKT, without having to use
+        retrieve the units on the given WKT, without having to use
         any of the database fields.
         """
         if gdal.HAS_GDAL:

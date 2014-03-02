@@ -54,7 +54,7 @@ class AdminSeleniumWebDriverTestCase(StaticLiveServerCase):
 
     def wait_for(self, css_selector, timeout=10):
         """
-        Helper function that blocks until an css selector is found on the page.
+        Helper function that blocks until a CSS selector is found on the page.
         """
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support import expected_conditions as ec
@@ -65,7 +65,7 @@ class AdminSeleniumWebDriverTestCase(StaticLiveServerCase):
 
     def wait_for_text(self, css_selector, text, timeout=10):
         """
-        Helper function that blocks until the text is found in the css selector.
+        Helper function that blocks until the text is found in the CSS selector.
         """
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support import expected_conditions as ec
@@ -77,7 +77,7 @@ class AdminSeleniumWebDriverTestCase(StaticLiveServerCase):
 
     def wait_for_value(self, css_selector, text, timeout=10):
         """
-        Helper function that blocks until the value is found in the css selector.
+        Helper function that blocks until the value is found in the CSS selector.
         """
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support import expected_conditions as ec

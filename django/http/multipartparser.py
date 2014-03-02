@@ -484,7 +484,7 @@ class BoundaryIter(six.Iterator):
             self._done = True
             return chunk[:end]
         else:
-            # make sure we dont treat a partial boundary (and
+            # make sure we don't treat a partial boundary (and
             # its separators) as data
             if not chunk[:-rollback]:  # and len(chunk) >= (len(self._boundary) + 6):
                 # There's nothing left, we should just return and mark as done.

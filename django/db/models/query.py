@@ -1287,7 +1287,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
     Helper function that recursively returns an information for a klass, to be
     used in get_cached_row.  It exists just to compute this information only
     once for entire queryset. Otherwise it would be computed for each row, which
-    leads to poor perfomance on large querysets.
+    leads to poor performance on large querysets.
 
     Arguments:
      * klass - the class to retrieve (and instantiate)
@@ -1359,7 +1359,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
             field_names = [f.attname for f in klass._meta.concrete_fields
                            if f.model in non_seen_models]
             field_count = len(field_names)
-        # Try to avoid populating field_names variable for perfomance reasons.
+        # Try to avoid populating field_names variable for performance reasons.
         # If field_names variable is set, we use **kwargs based model init
         # which is slower than normal init.
         if field_count == len(klass._meta.concrete_fields):

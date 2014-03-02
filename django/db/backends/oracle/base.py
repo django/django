@@ -575,7 +575,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # these are set in single statement it isn't clear what is supposed
         # to happen.
         cursor.execute("ALTER SESSION SET NLS_TERRITORY = 'AMERICA'")
-        # Set oracle date to ansi date format.  This only needs to execute
+        # Set Oracle date to ANSI date format.  This only needs to execute
         # once when we create a new connection. We also set the Territory
         # to 'AMERICA' which forces Sunday to evaluate to a '1' in
         # TO_CHAR().
@@ -730,7 +730,7 @@ class OracleParam(object):
 class VariableWrapper(object):
     """
     An adapter class for cursor variables that prevents the wrapped object
-    from being converted into a string when used to instanciate an OracleParam.
+    from being converted into a string when used to instantiate an OracleParam.
     This can be used generally for any other object that should be passed into
     Cursor.execute as-is.
     """

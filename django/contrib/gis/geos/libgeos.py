@@ -121,7 +121,7 @@ def get_pointer_arr(n):
     return GeomArr()
 
 # Returns the string version of the GEOS library. Have to set the restype
-# explicitly to c_char_p to ensure compatibility accross 32 and 64-bit platforms.
+# explicitly to c_char_p to ensure compatibility across 32 and 64-bit platforms.
 geos_version = lgeos.GEOSversion
 geos_version.argtypes = None
 geos_version.restype = c_char_p
