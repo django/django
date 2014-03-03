@@ -105,7 +105,7 @@ def _check_boolean_field_default_value(app_configs=None, **kwargs):
 
     return [
         Warning(
-            "BooleanField does not have a default value. ",
+            "BooleanField does not have a default value.",
             hint=("Django 1.6 changed the default value of BooleanField from False to None. "
                   "See https://docs.djangoproject.com/en/1.6/ref/models/fields/#booleanfield "
                   "for more information."),
