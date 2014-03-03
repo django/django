@@ -423,6 +423,15 @@ Atom1Feed
 .. module:: django.utils.functional
     :synopsis: Functional programming tools.
 
+It is important to note that these tools were by and large created to provide
+some useful utilities for use within the codebase of Django itself. They exist
+chiefly because they serve the needs of Django internals and are not all
+necessarily the best way to meet the needs of your own application. Other
+Python libraries may exist that provide the same functionality more robustly.
+
+Classes
+-------
+
 .. class:: cached_property(object)
 
     The ``@cached_property`` decorator caches the result of a method with a
@@ -483,6 +492,109 @@ Atom1Feed
     database by some other process in the brief interval between subsequent
     invocations of a method on the same instance.
 
+.. class:: LazyObject
+
+    ``LazyObject`` is the base class for lazy objects, including
+    :class:`~SimpleLazyObject` below. Subclass ``LazyObject`` for your object
+    if you need to intercept and manage its instantiation manually; otherwise,
+    subclass :class:`~SimpleLazyObject`.
+
+.. class:: SimpleLazyObject
+
+    A ``SimpleLazyObject`` resists instantiation until it's required.
+
+    ``SimpleLazyObject`` can be used as the base for a new class, as in the
+    case of ``django.utils.text.Truncator``.
+
+    It can also be used to create any object lazily::
+
+        lazy_object = SimpleLazyObject(lambda: some_function(*args))
+
+    ``SimpleLazyObject`` is for compound objects of arbitrary type. For Python
+    built-ins, or objects whose type is known, use
+    :func:`~lazy`.
+
+.. class:: lazy_property(fget=None, fset=None, fdel=None, doc=None)
+
+    ``lazy_property`` creates a property whose instantiation will be delayed.
+
+    A ``lazy_property`` can be created with arguments referring to functions
+    that will get, set, and delete the property's value.
+
+    For example::
+
+        class Person(models.Model):
+
+            # define the methods to get and set the property's value
+            def _get_whereabouts(self):
+                ...
+
+            def _set_whereabouts(self):
+                ...
+
+            # define the lazy_property
+            whereabouts = lazy_property(_get_whereabouts, _set_whereabouts)
+
+Functions
+---------
+
+.. function:: memoize(func, cache, num_args)
+
+    Wraps a function ``func``, so that its output is saved in the dictionary
+    ``cache``. ``memoize`` uses the function's first ``num_args`` arguments as
+    a key for the cache.
+
+    An example::
+
+        # an expensive function we want to cache
+        def solve(crises=(), when="today")
+            ...
+            return solutions
+
+        # create a cache dictionary
+        solution_cache = {}
+
+        # wrap solve(), using both arguments as the cache key
+        solve = memoize(solve, solution_cache, 2)
+
+    The first time the wapped ``solve()`` function is called with particular
+    values of the ``crises`` and ``when`` arguments, it will execute normally
+    and save the output in the ``solution_cache`` dictionary. On subsequent
+    occasions, it will hit the cache instead. If it's called with new values of
+    either ``crises`` or ``when``, it will execute and save the output in the
+    cache with a new key.
+
+    Any arguments that are to be used in this way must therefore be usable as
+    dictionary keys. If one of the arguments were itself a dictionary (and
+    therefore not possible as a dictionary key) it would need to be excluded.
+    In this example, the function takes the dictionary ``agencies`` as an
+    argument::
+
+        # an expensive function we want to cache
+        def solve(crises=(), when="today", agencies={})
+            ...
+            return solutions
+
+        # create a cache dictionary
+        solution_cache = {}
+
+        # wrap solve(), using only first 2 arguments as the cache key
+        solve = memoize(solve, solution_cache, 2)
+
+    Any arguments that don't affect the output of the function can also be
+    excluded.
+
+.. function:: lazy(func, *resultclasses)
+
+    ``lazy()`` returns a lazy version of any callable, that resists evaluation
+    until required . This is used by for example
+    :func:`django.core.urlresolvers.reverse_lazy`, a `lazily evaluated
+    <understanding_laziness>`_ version of
+    :func:`django.core.urlresolvers.reverse`.
+
+    The ``*resultclasses`` argument is used to cast the return values of the
+    orginal function into the correct type(s).
+
 .. function:: allow_lazy(func, *resultclasses)
 
     Django offers many utility functions (particularly in ``django.utils``) that
@@ -490,10 +602,10 @@ Atom1Feed
     functions are used by template filters as well as directly in other code.
 
     If you write your own similar functions and deal with translations, you'll
-    face the problem of what to do when the first argument is a lazy translation
-    object. You don't want to convert it to a string immediately, because you might
-    be using this function outside of a view (and hence the current thread's locale
-    setting will not be correct).
+    face the problem of what to do when the first argument is a lazy
+    translation object. You don't want to convert it to a string immediately,
+    because you might be using this function outside of a view (and hence the
+    current thread's locale setting will not be correct).
 
     For cases like this, use the ``django.utils.functional.allow_lazy()``
     decorator. It modifies the function so that *if* it's called with a lazy
@@ -510,15 +622,26 @@ Atom1Feed
         # Replace unicode by str on Python 3
         fancy_utility_function = allow_lazy(fancy_utility_function, unicode)
 
-    The ``allow_lazy()`` decorator takes, in addition to the function to decorate,
-    a number of extra arguments (``*args``) specifying the type(s) that the
-    original function can return. Usually, it's enough to include ``unicode``
-    (or ``str`` on Python 3) here and ensure that your function returns only
-    Unicode strings.
+    The ``allow_lazy()`` decorator takes, in addition to the function to
+    decorate, a number of extra arguments (``*resultclasses``) specifying the
+    type(s) that the original function can return. Usually, it's enough to
+    include ``unicode`` (or ``str`` on Python 3) here and ensure that your
+    function returns only Unicode strings.
 
     Using this decorator means you can write your function and assume that the
-    input is a proper string, then add support for lazy translation objects at the
-    end.
+    input is a proper string, then add support for lazy translation objects at
+    the end.
+
+.. function:: partition(predicate, values)
+
+    ``partition`` splits a collection of values into two sets, based on whether
+    the ``predicate`` evaluates as ``True`` or ``False`` when supplied with
+    that value.
+
+    For example::
+
+        >>> partition(lambda x: x > 3, range(5))
+        [0, 1, 2, 3], [4]
 
 ``django.utils.html``
 =====================

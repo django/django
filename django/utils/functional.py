@@ -19,11 +19,10 @@ def curry(_curried_func, *args, **kwargs):
 
 def memoize(func, cache, num_args):
     """
-    Wrap a function so that results for any argument tuple are stored in
-    'cache'. Note that the args to the function must be usable as dictionary
-    keys.
-
-    Only the first num_args are considered when creating the key.
+    Wraps a function 'func' so that its results are stored in a cache
+    dictionary 'cache'. A tuple of the function's first num_args arguments
+    will be used as the cache key. All of these arguments must be usable as
+    dictionary keys.
     """
     warnings.warn("memoize wrapper is deprecated and will be removed in "
                   "Django 1.9. Use django.utils.lru_cache instead.",

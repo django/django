@@ -183,6 +183,8 @@ method to a property.
 Certain Django components also have their own caching functionality; these are
 discussed below in the sections related to those components.
 
+.. _understanding_laziness:
+
 Understanding laziness
 ======================
 
@@ -222,6 +224,11 @@ On the other hand, :ref:`certain operations will force the evaluation of a
 QuerySet <when-querysets-are-evaluated>`. Avoiding the premature evaluation of
 a ``QuerySet`` can save making an expensive and unnecessary trip to the
 database.
+
+Laziness-related utility functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+:meth:`~django.utils.functional.lazy` creates a lazy version of any callable.
 
 Django also offers an :meth:`~django.utils.functional.allow_lazy` decorator.
 This allows a function that has been called with a lazy argument to behave
