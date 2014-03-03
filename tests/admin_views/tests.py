@@ -4687,7 +4687,7 @@ class AdminViewOnSiteTests(TestCase):
             CityAdmin.view_on_site = []
             self.assertEqual(CityAdmin.check(City), [
                 Error(
-                    '"view_on_site" is not a callable or a boolean value.',
+                    "The value of 'view_on_site' must be a callable or a boolean value.",
                     hint=None,
                     obj=CityAdmin,
                     id='admin.E025',

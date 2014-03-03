@@ -63,11 +63,11 @@ class SystemChecksTestCase(TestCase):
         errors = SongAdmin.check(model=Song)
         expected = [
             checks.Error(
-                ('"list_editable[0]" refers to field "original_release", '
-                    'which is not editable through the admin.'),
+                ("The value of 'list_editable[0]' refers to 'original_release', "
+                 "which is not editable through the admin."),
                 hint=None,
                 obj=SongAdmin,
-                id='admin.E126',
+                id='admin.E125',
             )
         ]
         self.assertEqual(errors, expected)
@@ -114,7 +114,7 @@ class SystemChecksTestCase(TestCase):
         errors = ExcludedFields1.check(model=Book)
         expected = [
             checks.Error(
-                '"exclude" must be a list or tuple.',
+                "The value of 'exclude' must be a list or tuple.",
                 hint=None,
                 obj=ExcludedFields1,
                 id='admin.E014',
@@ -129,7 +129,7 @@ class SystemChecksTestCase(TestCase):
         errors = ExcludedFields2.check(model=Book)
         expected = [
             checks.Error(
-                '"exclude" contains duplicate field(s).',
+                "The value of 'exclude' contains duplicate field(s).",
                 hint=None,
                 obj=ExcludedFields2,
                 id='admin.E015',
@@ -149,7 +149,7 @@ class SystemChecksTestCase(TestCase):
         errors = ExcludedFieldsAlbumAdmin.check(model=Album)
         expected = [
             checks.Error(
-                '"exclude" must be a list or tuple.',
+                "The value of 'exclude' must be a list or tuple.",
                 hint=None,
                 obj=ExcludedFieldsInline,
                 id='admin.E014',
@@ -174,8 +174,8 @@ class SystemChecksTestCase(TestCase):
         errors = AlbumAdmin.check(model=Album)
         expected = [
             checks.Error(
-                ('Cannot exclude the field "album", because it is the foreign key '
-                 'to the parent model admin_checks.Album.'),
+                ("Cannot exclude the field 'album', because it is the foreign key "
+                 "to the parent model 'admin_checks.Album'."),
                 hint=None,
                 obj=SongInline,
                 id='admin.E201',
@@ -194,8 +194,8 @@ class SystemChecksTestCase(TestCase):
         errors = RawIdNonexistingAdmin.check(model=Album)
         expected = [
             checks.Error(
-                ('"raw_id_fields[0]" refers to field "nonexisting", which is '
-                 'missing from model admin_checks.Album.'),
+                ("The value of 'raw_id_fields[0]' refers to 'nonexisting', which is "
+                 "not an attribute of 'admin_checks.Album'."),
                 hint=None,
                 obj=RawIdNonexistingAdmin,
                 id='admin.E002',
@@ -291,8 +291,8 @@ class SystemChecksTestCase(TestCase):
         errors = SongAdmin.check(model=Song)
         expected = [
             checks.Error(
-                ('"readonly_fields[1]" is neither a callable nor an attribute '
-                 'of "SongAdmin" nor found in the model admin_checks.Song.'),
+                ("The value of 'readonly_fields[1]' is not a callable, an attribute "
+                 "of 'SongAdmin', or an attribute of 'admin_checks.Song'."),
                 hint=None,
                 obj=SongAdmin,
                 id='admin.E035',
@@ -308,8 +308,8 @@ class SystemChecksTestCase(TestCase):
         errors = CityInline.check(State)
         expected = [
             checks.Error(
-                ('"readonly_fields[0]" is neither a callable nor an attribute '
-                 'of "CityInline" nor found in the model admin_checks.City.'),
+                ("The value of 'readonly_fields[0]' is not a callable, an attribute "
+                 "of 'CityInline', or an attribute of 'admin_checks.City'."),
                 hint=None,
                 obj=CityInline,
                 id='admin.E035',
@@ -347,8 +347,8 @@ class SystemChecksTestCase(TestCase):
         errors = BookAdmin.check(model=Book)
         expected = [
             checks.Error(
-                ('"fields" cannot include the ManyToManyField "authors", '
-                 'because "authors" manually specifies relationship model.'),
+                ("The value of 'fields' cannot include the ManyToManyField 'authors', "
+                 "because that field manually specifies a relationship model."),
                 hint=None,
                 obj=BookAdmin,
                 id='admin.E013',
@@ -366,8 +366,8 @@ class SystemChecksTestCase(TestCase):
         errors = FieldsetBookAdmin.check(model=Book)
         expected = [
             checks.Error(
-                ('"fieldsets[1][1][\'fields\']" cannot include the ManyToManyField '
-                 '"authors", because "authors" manually specifies relationship model.'),
+                ("The value of 'fieldsets[1][1][\"fields\"]' cannot include the ManyToManyField "
+                 "'authors', because that field manually specifies a relationship model."),
                 hint=None,
                 obj=FieldsetBookAdmin,
                 id='admin.E013',
@@ -471,7 +471,7 @@ class SystemChecksTestCase(TestCase):
         errors = MyModelAdmin.check(model=Song)
         expected = [
             checks.Error(
-                'There are duplicate field(s) in "fields".',
+                "The value of 'fields' contains duplicate field(s).",
                 hint=None,
                 obj=MyModelAdmin,
                 id='admin.E006'
@@ -490,7 +490,7 @@ class SystemChecksTestCase(TestCase):
         errors = MyModelAdmin.check(model=Song)
         expected = [
             checks.Error(
-                'There are duplicate field(s) in "fieldsets[0][1]".',
+                "There are duplicate field(s) in 'fieldsets[0][1]'.",
                 hint=None,
                 obj=MyModelAdmin,
                 id='admin.E012'
