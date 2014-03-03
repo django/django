@@ -55,24 +55,16 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
 
     def check(self, **kwargs):
         errors = []
-        errors.extend(self._check_content_type_field())
-        errors.extend(self._check_object_id_field())
         errors.extend(self._check_field_name())
+        errors.extend(self._check_object_id_field())
+        errors.extend(self._check_content_type_field())
         return errors
 
-    def _check_content_type_field(self):
-        return _check_content_type_field(
-            model=self.model,
-            field_name=self.ct_field,
-            checked_object=self)
-
-    def _check_object_id_field(self):
-        try:
-            self.model._meta.get_field(self.fk_field)
-        except FieldDoesNotExist:
+    def _check_field_name(self):
+        if self.name.endswith("_"):
             return [
                 checks.Error(
-                    'The field refers to "%s" field which is missing.' % self.fk_field,
+                    'Field names must not end with an underscore.',
                     hint=None,
                     obj=self,
                     id='contenttypes.E001',
@@ -81,11 +73,13 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
         else:
             return []
 
-    def _check_field_name(self):
-        if self.name.endswith("_"):
+    def _check_object_id_field(self):
+        try:
+            self.model._meta.get_field(self.fk_field)
+        except FieldDoesNotExist:
             return [
                 checks.Error(
-                    'Field names must not end with underscores.',
+                    "The GenericForeignKey object ID references the non-existent field '%s'." % self.fk_field,
                     hint=None,
                     obj=self,
                     id='contenttypes.E002',
@@ -93,6 +87,49 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
             ]
         else:
             return []
+
+    def _check_content_type_field(self):
+        """ Check if field named `field_name` in model `model` exists and is
+        valid content_type field (is a ForeignKey to ContentType). """
+
+        try:
+            field = self.model._meta.get_field(self.ct_field)
+        except FieldDoesNotExist:
+            return [
+                checks.Error(
+                    "The GenericForeignKey content type references the non-existent field '%s.%s'." % (
+                        self.model._meta.object_name, self.ct_field
+                    ),
+                    hint=None,
+                    obj=self,
+                    id='contenttypes.E003',
+                )
+            ]
+        else:
+            if not isinstance(field, models.ForeignKey):
+                return [
+                    checks.Error(
+                        "'%s.%s' is not a ForeignKey." % (
+                            self.model._meta.object_name, self.ct_field
+                        ),
+                        hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
+                        obj=self,
+                        id='contenttypes.E004',
+                    )
+                ]
+            elif field.rel.to != ContentType:
+                return [
+                    checks.Error(
+                        "'%s.%s' is not a ForeignKey to 'contenttypes.ContentType'." % (
+                            self.model._meta.object_name, self.ct_field
+                        ),
+                        hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
+                        obj=self,
+                        id='contenttypes.E005',
+                    )
+                ]
+            else:
+                return []
 
     def instance_pre_init(self, signal, sender, args, kwargs, **_kwargs):
         """
@@ -228,42 +265,8 @@ class GenericRelation(ForeignObject):
 
     def check(self, **kwargs):
         errors = super(GenericRelation, self).check(**kwargs)
-        errors.extend(self._check_content_type_field())
-        errors.extend(self._check_object_id_field())
         errors.extend(self._check_generic_foreign_key_existence())
         return errors
-
-    def _check_content_type_field(self):
-        target = self.rel.to
-        if isinstance(target, ModelBase):
-            return _check_content_type_field(
-                model=target,
-                field_name=self.content_type_field_name,
-                checked_object=self)
-        else:
-            return []
-
-    def _check_object_id_field(self):
-        target = self.rel.to
-        if isinstance(target, ModelBase):
-            opts = target._meta
-            try:
-                opts.get_field(self.object_id_field_name)
-            except FieldDoesNotExist:
-                return [
-                    checks.Error(
-                        'The field refers to %s.%s field which is missing.' % (
-                            opts.object_name, self.object_id_field_name
-                        ),
-                        hint=None,
-                        obj=self,
-                        id='contenttypes.E003',
-                    )
-                ]
-            else:
-                return []
-        else:
-            return []
 
     def _check_generic_foreign_key_existence(self):
         target = self.rel.to
@@ -280,8 +283,8 @@ class GenericRelation(ForeignObject):
             else:
                 return [
                     checks.Warning(
-                        ('The field defines a generic relation with the model '
-                         '%s.%s, but the model lacks GenericForeignKey.') % (
+                        ("The GenericRelation defines a relation with the model "
+                         "'%s.%s', but that model does not have a GenericForeignKey.") % (
                             target._meta.app_label, target._meta.object_name
                         ),
                         hint=None,
@@ -357,54 +360,6 @@ class GenericRelation(ForeignObject):
                 self.model, for_concrete_model=self.for_concrete_model).pk,
             "%s__in" % self.object_id_field_name: [obj.pk for obj in objs]
         })
-
-
-def _check_content_type_field(model, field_name, checked_object):
-    """ Check if field named `field_name` in model `model` exists and is
-    valid content_type field (is a ForeignKey to ContentType). """
-
-    try:
-        field = model._meta.get_field(field_name)
-    except FieldDoesNotExist:
-        return [
-            checks.Error(
-                'The field refers to %s.%s field which is missing.' % (
-                    model._meta.object_name, field_name
-                ),
-                hint=None,
-                obj=checked_object,
-                id='contenttypes.E005',
-            )
-        ]
-    else:
-        if not isinstance(field, models.ForeignKey):
-            return [
-                checks.Error(
-                    ('"%s" field is used by a %s '
-                     'as content type field and therefore it must be '
-                     'a ForeignKey.') % (
-                        field_name, checked_object.__class__.__name__
-                    ),
-                    hint=None,
-                    obj=checked_object,
-                    id='contenttypes.E006',
-                )
-            ]
-        elif field.rel.to != ContentType:
-            return [
-                checks.Error(
-                    ('"%s" field is used by a %s '
-                     'as content type field and therefore it must be '
-                     'a ForeignKey to ContentType.') % (
-                        field_name, checked_object.__class__.__name__
-                    ),
-                    hint=None,
-                    obj=checked_object,
-                    id='contenttypes.E007',
-                )
-            ]
-        else:
-            return []
 
 
 class ReverseGenericRelatedObjectsDescriptor(object):
