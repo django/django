@@ -11,9 +11,10 @@ import warnings
 from django.conf import settings
 from django.forms.utils import flatatt, to_current_timezone
 from django.utils.datastructures import MultiValueDict, MergeDict
+from django.utils.deprecation import RemovedInDjango18Warning
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html import conditional_escape, format_html
 from django.utils.translation import ugettext_lazy
-from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils import formats, six
 from django.utils.six.moves.urllib.parse import urljoin
@@ -191,7 +192,7 @@ class Widget(six.with_metaclass(MediaDefiningClass)):
         warnings.warn(
             "`is_hidden` property is now read-only (and checks `input_type`). "
             "Please update your code.",
-            DeprecationWarning, stacklevel=2
+            RemovedInDjango18Warning, stacklevel=2
         )
 
     def subwidgets(self, name, value, attrs=None, choices=()):
@@ -636,7 +637,7 @@ class RadioChoiceInput(ChoiceInput):
 class RadioInput(RadioChoiceInput):
     def __init__(self, *args, **kwargs):
         msg = "RadioInput has been deprecated. Use RadioChoiceInput instead."
-        warnings.warn(msg, DeprecationWarning, stacklevel=2)
+        warnings.warn(msg, RemovedInDjango18Warning, stacklevel=2)
         super(RadioInput, self).__init__(*args, **kwargs)
 
 

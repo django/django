@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.mail import mail_managers
 from django.core import urlresolvers
 from django import http
+from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils import six
@@ -110,7 +111,7 @@ class CommonMiddleware(object):
         if settings.SEND_BROKEN_LINK_EMAILS:
             warnings.warn("SEND_BROKEN_LINK_EMAILS is deprecated. "
                 "Use BrokenLinkEmailsMiddleware instead.",
-                DeprecationWarning, stacklevel=2)
+                RemovedInDjango18Warning, stacklevel=2)
             BrokenLinkEmailsMiddleware().process_response(request, response)
 
         if settings.USE_ETAGS:

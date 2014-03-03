@@ -2,6 +2,7 @@ import warnings
 
 from django.template import Library
 from django.template import defaulttags
+from django.utils.deprecation import RemovedInDjango19Warning
 
 register = Library()
 
@@ -11,7 +12,7 @@ def ssi(parser, token):
     warnings.warn(
         "Loading the `ssi` tag from the `future` library is deprecated and "
         "will be removed in Django 1.9. Use the default `ssi` tag instead.",
-        PendingDeprecationWarning)
+        RemovedInDjango19Warning)
     return defaulttags.ssi(parser, token)
 
 
@@ -20,7 +21,7 @@ def url(parser, token):
     warnings.warn(
         "Loading the `url` tag from the `future` library is deprecated and "
         "will be removed in Django 1.9. Use the default `url` tag instead.",
-        PendingDeprecationWarning)
+        RemovedInDjango19Warning)
     return defaulttags.url(parser, token)
 
 

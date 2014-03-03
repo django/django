@@ -7,6 +7,7 @@ from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
 from django.db import router, DEFAULT_DB_ALIAS
+from django.utils.deprecation import RemovedInDjango19Warning
 
 
 class Command(BaseCommand):
@@ -50,7 +51,7 @@ class Command(BaseCommand):
         use_natural_keys = options.get('use_natural_keys')
         if use_natural_keys:
             warnings.warn("``--natural`` is deprecated; use ``--natural-foreign`` instead.",
-                PendingDeprecationWarning)
+                RemovedInDjango19Warning)
         use_natural_foreign_keys = options.get('use_natural_foreign_keys') or use_natural_keys
         use_natural_primary_keys = options.get('use_natural_primary_keys')
         use_base_manager = options.get('use_base_manager')

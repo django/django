@@ -6,6 +6,7 @@ import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import RemovedInDjango18Warning, RemovedInDjango19Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils._os import upath
@@ -169,7 +170,7 @@ class ConnectionHandler(object):
         if settings.TRANSACTIONS_MANAGED:
             warnings.warn(
                 "TRANSACTIONS_MANAGED is deprecated. Use AUTOCOMMIT instead.",
-                DeprecationWarning, stacklevel=2)
+                RemovedInDjango18Warning, stacklevel=2)
             conn.setdefault('AUTOCOMMIT', False)
         conn.setdefault('AUTOCOMMIT', True)
         conn.setdefault('ENGINE', 'django.db.backends.dummy')
@@ -272,7 +273,7 @@ class ConnectionRouter(object):
                     warnings.warn(
                         'Router.allow_syncdb has been deprecated and will stop working in Django 1.9. '
                         'Rename the method to allow_migrate.',
-                        PendingDeprecationWarning, stacklevel=2)
+                        RemovedInDjango19Warning, stacklevel=2)
             except AttributeError:
                 # If the router doesn't have a method, skip to the next one.
                 pass

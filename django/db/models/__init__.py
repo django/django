@@ -19,6 +19,7 @@ from django.db.models.deletion import (  # NOQA
     CASCADE, PROTECT, SET, SET_NULL, SET_DEFAULT, DO_NOTHING, ProtectedError)
 from django.db.models.lookups import Lookup, Transform  # NOQA
 from django.db.models import signals  # NOQA
+from django.utils.deprecation import RemovedInDjango19Warning
 
 
 def permalink(func):
@@ -47,7 +48,7 @@ def make_alias(function_name):
     def alias(*args, **kwargs):
         warnings.warn(
             "django.db.models.%s is deprecated." % function_name,
-            PendingDeprecationWarning, stacklevel=2)
+            RemovedInDjango19Warning, stacklevel=2)
         # This raises a second warning.
         from . import loading
         return getattr(loading, function_name)(*args, **kwargs)
