@@ -109,7 +109,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
                 "The GenericForeignKey content type references the non-existent field 'TaggedItem.content_type'.",
                 hint=None,
                 obj=TaggedItem.content_object,
-                id='contenttypes.E003',
+                id='contenttypes.E002',
             )
         ]
         self.assertEqual(errors, expected)
@@ -127,7 +127,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
                 "'Model.content_type' is not a ForeignKey.",
                 hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
                 obj=Model.content_object,
-                id='contenttypes.E004',
+                id='contenttypes.E003',
             )
         ]
         self.assertEqual(errors, expected)
@@ -145,7 +145,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
                 "'Model.content_type' is not a ForeignKey to 'contenttypes.ContentType'.",
                 hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
                 obj=Model.content_object,
-                id='contenttypes.E005',
+                id='contenttypes.E004',
             )
         ]
         self.assertEqual(errors, expected)
@@ -162,7 +162,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
                 "The GenericForeignKey object ID references the non-existent field 'object_id'.",
                 hint=None,
                 obj=TaggedItem.content_object,
-                id='contenttypes.E002',
+                id='contenttypes.E001',
             )
         ]
         self.assertEqual(errors, expected)
@@ -180,7 +180,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
                 'Field names must not end with an underscore.',
                 hint=None,
                 obj=Model.content_object_,
-                id='contenttypes.E001',
+                id='fields.E001',
             )
         ]
         self.assertEqual(errors, expected)
@@ -265,7 +265,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
 
         errors = Bookmark.tags.field.check()
         expected = [
-            checks.Warning(
+            checks.Error(
                 ("The GenericRelation defines a relation with the model "
                  "'contenttypes_tests.TaggedItem', but that model does not have a "
                  "GenericForeignKey."),

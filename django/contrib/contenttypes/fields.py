@@ -67,7 +67,7 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
                     'Field names must not end with an underscore.',
                     hint=None,
                     obj=self,
-                    id='contenttypes.E001',
+                    id='fields.E001',
                 )
             ]
         else:
@@ -82,7 +82,7 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
                     "The GenericForeignKey object ID references the non-existent field '%s'." % self.fk_field,
                     hint=None,
                     obj=self,
-                    id='contenttypes.E002',
+                    id='contenttypes.E001',
                 )
             ]
         else:
@@ -102,7 +102,7 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
                     ),
                     hint=None,
                     obj=self,
-                    id='contenttypes.E003',
+                    id='contenttypes.E002',
                 )
             ]
         else:
@@ -114,7 +114,7 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
                         ),
                         hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
                         obj=self,
-                        id='contenttypes.E004',
+                        id='contenttypes.E003',
                     )
                 ]
             elif field.rel.to != ContentType:
@@ -125,7 +125,7 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
                         ),
                         hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
                         obj=self,
-                        id='contenttypes.E005',
+                        id='contenttypes.E004',
                     )
                 ]
             else:
@@ -282,7 +282,7 @@ class GenericRelation(ForeignObject):
                 return []
             else:
                 return [
-                    checks.Warning(
+                    checks.Error(
                         ("The GenericRelation defines a relation with the model "
                          "'%s.%s', but that model does not have a GenericForeignKey.") % (
                             target._meta.app_label, target._meta.object_name
