@@ -165,7 +165,7 @@ For example::
 
 .. warning::
 
-    There's a `known bug`_ in Safari/Webkit which causes the named anchor to be
+    There's a `known bug`_ in Safari/WebKit which causes the named anchor to be
     forgotten following a redirect. The practical impact for comments is that
     the Safari/webkit browsers will arrive at the correct page but will not
     scroll to the named anchor.

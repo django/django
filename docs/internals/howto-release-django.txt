@@ -7,7 +7,7 @@ be driving a release, you should follow these instructions to get the
 package out.
 
 **Please, keep these instructions up-to-date if you make changes!** The point
-here is to be descriptive, not proscriptive, so feel free to streamline or
+here is to be descriptive, not prescriptive, so feel free to streamline or
 otherwise make changes, but **update this document accordingly!**
 
 Overview

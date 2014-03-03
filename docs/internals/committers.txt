@@ -463,7 +463,7 @@ Jeremy Dunck
     .. _Preston Holmes: http://www.ptone.com/
 
 `Simon Charette`_
-    Simon is a mathematic student who discovered Django while searching for a
+    Simon is a mathematics student who discovered Django while searching for a
     replacement framework to an in-house PHP entity. Since that faithful day
     Django has been a big part of his life. So far, he's been involved in some
     ORM and forms API fixes.
