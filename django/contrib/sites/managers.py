@@ -27,8 +27,7 @@ class CurrentSiteManager(models.Manager):
             return [
                 checks.Error(
                     "CurrentSiteManager could not find a field named '%s'." % field_name,
-                    hint=('Ensure that you did not misspell the field name. '
-                         'Does the field exist?'),
+                    hint=None,
                     obj=self,
                     id='sites.E001',
                 )
@@ -37,8 +36,7 @@ class CurrentSiteManager(models.Manager):
         if not isinstance(field, (models.ForeignKey, models.ManyToManyField)):
             return [
                 checks.Error(
-                    "CurrentSiteManager requires that '%s.%s' must be a "
-                    "ForeignKey or ManyToManyField." % (
+                    "CurrentSiteManager cannot use '%s.%s' as it is not a ForeignKey or ManyToManyField." % (
                         self.model._meta.object_name, field_name
                     ),
                     hint=None,

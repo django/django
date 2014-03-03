@@ -51,8 +51,7 @@ class SitesFrameworkTestCase(TestCase):
             checks.Error(
                 ("CurrentSiteManager could not find a field named "
                  "'places_this_article_should_appear'."),
-                hint=('Ensure that you did not misspell the field name. '
-                      'Does the field exist?'),
+                hint=None,
                 obj=InvalidArticle.on_site,
                 id='sites.E001',
             )
@@ -67,7 +66,7 @@ class SitesFrameworkTestCase(TestCase):
         errors = ConfusedArticle.check()
         expected = [
             checks.Error(
-                "CurrentSiteManager requires that 'ConfusedArticle.site' must be a ForeignKey or ManyToManyField.",
+                "CurrentSiteManager cannot use 'ConfusedArticle.site' as it is not a ForeignKey or ManyToManyField.",
                 hint=None,
                 obj=ConfusedArticle.on_site,
                 id='sites.E002',
