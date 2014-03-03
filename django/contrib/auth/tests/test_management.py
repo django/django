@@ -358,7 +358,7 @@ class CustomUserModelValidationTestCase(TestCase):
         errors = checks.run_checks()
         expected = [
             checks.Error(
-                'The REQUIRED_FIELDS must be a list or tuple.',
+                "'REQUIRED_FIELDS' must be a list or tuple.",
                 hint=None,
                 obj=CustomUserNonListRequiredFields,
                 id='auth.E001',
@@ -375,8 +375,8 @@ class CustomUserModelValidationTestCase(TestCase):
         errors = checks.run_checks()
         expected = [
             checks.Error(
-                ('The field named as the USERNAME_FIELD must not be included '
-                 'in REQUIRED_FIELDS on a custom user model.'),
+                ("The field named as the 'USERNAME_FIELD' for a custom user model "
+                 "must not be included in 'REQUIRED_FIELDS'."),
                 hint=None,
                 obj=CustomUserBadRequiredFields,
                 id='auth.E002',
@@ -393,8 +393,8 @@ class CustomUserModelValidationTestCase(TestCase):
         errors = checks.run_checks()
         expected = [
             checks.Error(
-                ('The CustomUserNonUniqueUsername.username field must be '
-                 'unique because it is pointed to by USERNAME_FIELD.'),
+                ("'CustomUserNonUniqueUsername.username' must be "
+                 "unique because it is named as the 'USERNAME_FIELD'."),
                 hint=None,
                 obj=CustomUserNonUniqueUsername,
                 id='auth.E003',
@@ -416,9 +416,9 @@ class CustomUserModelValidationTestCase(TestCase):
         errors = checks.run_checks()
         expected = [
             checks.Warning(
-                ('The CustomUserNonUniqueUsername.username field is pointed to '
-                 'by USERNAME_FIELD, but it is not unique.'),
-                hint=('Ensure that your authentication backend can handle '
+                ("'CustomUserNonUniqueUsername.username' is named as "
+                 "the 'USERNAME_FIELD', but it is not unique."),
+                hint=('Ensure that your authentication backend(s) can handle '
                       'non-unique usernames.'),
                 obj=CustomUserNonUniqueUsername,
                 id='auth.W004',
