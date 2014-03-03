@@ -32,7 +32,7 @@ class ModelValidationTest(TestCase):
         errors = run_checks()
         expected = [
             Error(
-                "The `on_post_init` function was connected to the `post_init` "
+                "The 'on_post_init' function was connected to the 'post_init' "
                 "signal with a lazy reference to the 'missing-app.Model' "
                 "sender, which has not been installed.",
                 hint=None,
@@ -40,8 +40,8 @@ class ModelValidationTest(TestCase):
                 id='signals.E001',
             ),
             Error(
-                "An instance of the `OnPostInit` class was connected to "
-                "the `post_init` signal with a lazy reference to the "
+                "An instance of the 'OnPostInit' class was connected to "
+                "the 'post_init' signal with a lazy reference to the "
                 "'missing-app.Model' sender, which has not been installed.",
                 hint=None,
                 obj='model_validation.tests',

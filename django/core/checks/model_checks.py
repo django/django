@@ -31,9 +31,9 @@ def check_model_signals(app_configs=None, **kwargs):
                     # The receiver is either a function or an instance of class
                     # defining a `__call__` method.
                     if isinstance(receiver, types.FunctionType):
-                        description = "The `%s` function" % receiver.__name__
+                        description = "The '%s' function" % receiver.__name__
                     else:
-                        description = "An instance of the `%s` class" % receiver.__class__.__name__
+                        description = "An instance of the '%s' class" % receiver.__class__.__name__
                     errors.append(
                         Error(
                             "%s was connected to the '%s' signal "
