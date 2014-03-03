@@ -109,6 +109,9 @@ Forms
 * Form widgets now render attributes with a value of ``True`` or ``False``
   as HTML5 boolean attributes.
 
+* If ``required_css_class`` is defined in a ``form`` and field is required,
+  then ``<label>`` tag will have this class present in its attributes.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
