@@ -552,6 +552,20 @@ class CheckTestCase(TestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def assertIsInvalidRegexp(self, model_admin, model, msg,
+            id=None, hint=None, invalid_obj=None):
+        """
+        Same as assertIsInvalid but treats the given msg as a regexp.
+        """
+        invalid_obj = invalid_obj or model_admin
+        errors = model_admin.check(model=model)
+        self.assertEqual(len(errors), 1)
+        error = errors[0]
+        self.assertEqual(error.hint, hint)
+        self.assertEqual(error.obj, invalid_obj)
+        self.assertEqual(error.id, id)
+        self.assertRegexpMatches(error.msg, msg)
+
     def assertIsValid(self, model_admin, model):
         errors = model_admin.check(model=model)
         expected = []
@@ -1302,9 +1316,9 @@ class InlinesCheckTests(CheckTestCase):
         class ValidationTestModelAdmin(ModelAdmin):
             inlines = [ValidationTestInline]
 
-        self.assertIsInvalid(
+        self.assertIsInvalidRegexp(
             ValidationTestModelAdmin, ValidationTestModel,
-            "'modeladmin.tests.ValidationTestInline' must inherit from 'BaseModelAdmin'.",
+            r"'.*\.ValidationTestInline' must inherit from 'BaseModelAdmin'\.",
             'admin.E104')
 
     def test_missing_model_field(self):
@@ -1314,9 +1328,9 @@ class InlinesCheckTests(CheckTestCase):
         class ValidationTestModelAdmin(ModelAdmin):
             inlines = [ValidationTestInline]
 
-        self.assertIsInvalid(
+        self.assertIsInvalidRegexp(
             ValidationTestModelAdmin, ValidationTestModel,
-            "'modeladmin.tests.ValidationTestInline' must have a 'model' attribute.",
+            r"'.*\.ValidationTestInline' must have a 'model' attribute\.",
             'admin.E105')
 
     def test_invalid_model_type(self):
@@ -1332,9 +1346,9 @@ class InlinesCheckTests(CheckTestCase):
         class ValidationTestModelAdmin(ModelAdmin):
             inlines = [ValidationTestInline]
 
-        self.assertIsInvalid(
+        self.assertIsInvalidRegexp(
             ValidationTestModelAdmin, ValidationTestModel,
-            "The value of 'modeladmin.tests.ValidationTestInline.model' must be a Model.",
+            r"The value of '.*\.ValidationTestInline.model' must be a Model\.",
             'admin.E106')
 
     def test_valid_case(self):
