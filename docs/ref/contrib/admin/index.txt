@@ -1709,6 +1709,22 @@ templates used by the :class:`ModelAdmin` views:
     ``obj_display`` is a string with the name of the deleted
     object.
 
+.. method:: ModelAdmin.get_changeform_initial_data(request)
+
+    .. versionadded:: 1.7
+
+    A hook for the initial data on admin change forms.
+    By default, fields can be given an initial value from GET parameters.
+    For instance, ``?name=initial_value`` will set the ``name`` field's initial
+    value to be ``initial_value``.
+
+    This method should return a dictionary in the form: ``fieldname: fieldval``.
+
+    .. code-block:: python
+
+        def get_changeform_initial_data(self, request):
+            return {'name': 'custom_initial_value'}
+
 Other methods
 ~~~~~~~~~~~~~
 

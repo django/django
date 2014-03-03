@@ -765,6 +765,19 @@ class AdminViewFormUrlTest(TestCase):
         self.assertTrue('form_url' in response.context, msg='form_url not present in response.context')
         self.assertEqual(response.context['form_url'], 'pony')
 
+    def testInitialDataCanBeOverridden(self):
+        """
+        Tests that the behavior for setting initial
+        form data can be overridden in the ModelAdmin class.
+
+        Usually, the initial value is set via the GET params.
+        """
+        response = self.client.get('/test_admin/%s/admin_views/restaurant/add/' % self.urlbit, {'name': 'test_value'})
+        # this would be the usual behaviour
+        self.assertNotContains(response, 'value="test_value"')
+        # this is the overridden behaviour
+        self.assertContains(response, 'value="overridden_value"')
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminJavaScriptTest(TestCase):

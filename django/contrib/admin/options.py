@@ -1308,6 +1308,22 @@ class ModelAdmin(BaseModelAdmin):
             inline_admin_formsets.append(inline_admin_formset)
         return inline_admin_formsets
 
+    def get_changeform_initial_data(self, request):
+        """
+        Get the initial form data.
+        Unless overridden, this populates from the GET params.
+        """
+        initial = dict(request.GET.items())
+        for k in initial:
+            try:
+                f = self.model._meta.get_field(k)
+            except models.FieldDoesNotExist:
+                continue
+            # We have to special-case M2Ms as a list of comma-separated PKs.
+            if isinstance(f, models.ManyToManyField):
+                initial[k] = initial[k].split(",")
+        return initial
+
     @csrf_protect_m
     @transaction.atomic
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
@@ -1358,16 +1374,7 @@ class ModelAdmin(BaseModelAdmin):
                     return self.response_change(request, new_object)
         else:
             if add:
-                # Prepare the dict of initial data from the request.
-                # We have to special-case M2Ms as a list of comma-separated PKs.
-                initial = dict(request.GET.items())
-                for k in initial:
-                    try:
-                        f = opts.get_field(k)
-                    except models.FieldDoesNotExist:
-                        continue
-                    if isinstance(f, models.ManyToManyField):
-                        initial[k] = initial[k].split(",")
+                initial = self.get_changeform_initial_data(request)
                 form = ModelForm(initial=initial)
                 formsets, inline_instances = self._create_formsets(request, self.model())
             else:
