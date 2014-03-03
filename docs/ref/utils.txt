@@ -289,8 +289,7 @@ The functions defined in this module share the following properties:
 ==============================
 
 .. module:: django.utils.feedgenerator
-   :synopsis: Syndication feed generation library -- used for generating RSS,
-   etc.
+   :synopsis: Syndication feed generation library -- used for generating RSS, etc.
 
 Sample usage::
 
@@ -740,8 +739,7 @@ Functions for working with Python modules.
 ===========================
 
 .. module:: django.utils.safestring
-   :synopsis: Functions and classes for working with strings that can be
-   displayed safely without further escaping in HTML.
+   :synopsis: Functions and classes for working with strings that can be displayed safely without further escaping in HTML.
 
 Functions and classes for working with "safe strings": strings that can be
 displayed safely without further escaping in HTML. Marking something as a "safe
@@ -1067,8 +1065,7 @@ For a complete discussion on the usage of the following see the
     Use :mod:`~django.utils.timezone` instead.
 
 .. module:: django.utils.tzinfo
-   :synopsis: Implementation of ``tzinfo`` classes for use with
-   ``datetime.datetime``.
+   :synopsis: Implementation of ``tzinfo`` classes for use with ``datetime.datetime``.
 
 .. class:: FixedOffset
 
