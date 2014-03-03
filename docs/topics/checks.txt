@@ -78,12 +78,8 @@ Constructor arguments are:
 
 ``hint``
     A single-line string providing a hint for fixing the problem. If no hint
-    can be provided, or the hint is self-evident from the error message, a
-    value of ``None`` can be used::
-
-        Error('error message') # Will not work.
-        Error('error message', None) # Good
-        Error('error message', hint=None) # Better
+    can be provided, or the hint is self-evident from the error message, the
+    hint can be omitted, or a value of ``None`` can be used.
 
 ``obj``
     Optional. An object providing context for the message (for example, the
