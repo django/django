@@ -621,6 +621,12 @@ class BoundField(object):
             id_for_label = widget.id_for_label(id_)
             if id_for_label:
                 attrs = dict(attrs or {}, **{'for': id_for_label})
+            if self.field.required and hasattr(self.form, 'required_css_class'):
+                attrs = attrs or {}
+                if 'class' in attrs:
+                    attrs['class'] += ' ' + self.form.required_css_class
+                else:
+                    attrs['class'] = self.form.required_css_class
             attrs = flatatt(attrs) if attrs else ''
             contents = format_html('<label{0}>{1}</label>', attrs, contents)
         else:

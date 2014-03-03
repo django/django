@@ -511,10 +511,19 @@ classes, as needed. The HTML will look something like::
 
     >>> f = ContactForm(data)
     >>> print(f.as_table())
-    <tr class="required"><th><label for="id_subject">Subject:</label>    ...
-    <tr class="required"><th><label for="id_message">Message:</label>    ...
-    <tr class="required error"><th><label for="id_sender">Sender:</label>      ...
+    <tr class="required"><th><label class="required" for="id_subject">Subject:</label>    ...
+    <tr class="required"><th><label class="required" for="id_message">Message:</label>    ...
+    <tr class="required error"><th><label class="required" for="id_sender">Sender:</label>      ...
     <tr><th><label for="id_cc_myself">Cc myself:<label> ...
+    >>> f['subject'].label_tag()
+    <label class="required" for="id_subject">Subject:</label>
+    >>> f['subject'].label_tag(attrs={'class': 'foo'})
+    <label for="id_subject" class="foo required">Subject:</label>
+
+.. versionchanged:: 1.8
+
+    The ``required_css_class`` will also be added to the ``<label>`` tag as
+    seen above.
 
 .. _ref-forms-api-configuring-label:
 
@@ -798,6 +807,10 @@ additional attributes for the ``<label>`` tag.
     string to hide the label on selected fields. If you need to do this in a
     template, you could write a custom filter to allow passing parameters to
     ``label_tag``.
+
+.. versionchanged:: 1.8
+
+    The label includes :attr:`~Form.required_css_class` if applicable.
 
 .. method:: BoundField.css_classes()
 

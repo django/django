@@ -112,6 +112,10 @@ Forms
 * The new :meth:`~django.forms.Form.has_error()` method allows checking
   if a specific error has happened.
 
+* If :attr:`~django.forms.Form.required_css_class` is defined on a form, then
+  the ``<label>`` tags for required fields will have this class present in its
+  attributes.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
