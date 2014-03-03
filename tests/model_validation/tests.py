@@ -37,7 +37,7 @@ class ModelValidationTest(TestCase):
                 "sender, which has not been installed.",
                 hint=None,
                 obj='model_validation.tests',
-                id='E014',
+                id='signals.E001',
             ),
             Error(
                 "An instance of the `OnPostInit` class was connected to "
@@ -45,7 +45,7 @@ class ModelValidationTest(TestCase):
                 "'missing-app.Model' sender, which has not been installed.",
                 hint=None,
                 obj='model_validation.tests',
-                id='E014',
+                id='signals.E001',
             )
         ]
         self.assertEqual(errors, expected)

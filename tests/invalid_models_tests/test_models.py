@@ -214,16 +214,16 @@ class FieldNamesTests(IsolatedModelsTestCase):
         errors = Model.check()
         expected = [
             Error(
-                'Field names must not end with underscores.',
+                'Field names must not end with an underscore.',
                 hint=None,
                 obj=Model._meta.get_field('field_'),
-                id='E001',
+                id='fields.E001',
             ),
             Error(
-                'Field names must not end with underscores.',
+                'Field names must not end with an underscore.',
                 hint=None,
                 obj=Model._meta.get_field('m2m_'),
-                id='E001',
+                id='fields.E001',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -238,7 +238,7 @@ class FieldNamesTests(IsolatedModelsTestCase):
                 'Field names must not contain "__".',
                 hint=None,
                 obj=Model._meta.get_field('some__field'),
-                id='E052',
+                id='fields.E002',
             )
         ]
         self.assertEqual(errors, expected)
@@ -250,10 +250,10 @@ class FieldNamesTests(IsolatedModelsTestCase):
         errors = Model.check()
         expected = [
             Error(
-                'Cannot use "pk" as a field name since it is a reserved name.',
+                "'pk' is a reserved word that cannot be used as a field name.",
                 hint=None,
                 obj=Model._meta.get_field('pk'),
-                id='E051',
+                id='fields.E003',
             )
         ]
         self.assertEqual(errors, expected)

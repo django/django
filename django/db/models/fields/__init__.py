@@ -197,10 +197,10 @@ class Field(RegisterLookupMixin):
         if self.name.endswith('_'):
             return [
                 checks.Error(
-                    'Field names must not end with underscores.',
+                    'Field names must not end with an underscore.',
                     hint=None,
                     obj=self,
-                    id='E001',
+                    id='fields.E001',
                 )
             ]
         elif '__' in self.name:
@@ -209,16 +209,16 @@ class Field(RegisterLookupMixin):
                     'Field names must not contain "__".',
                     hint=None,
                     obj=self,
-                    id='E052',
+                    id='fields.E002',
                 )
             ]
         elif self.name == 'pk':
             return [
                 checks.Error(
-                    'Cannot use "pk" as a field name since it is a reserved name.',
+                    "'pk' is a reserved word that cannot be used as a field name.",
                     hint=None,
                     obj=self,
-                    id='E051',
+                    id='fields.E003',
                 )
             ]
         else:
@@ -230,10 +230,10 @@ class Field(RegisterLookupMixin):
                     not is_iterable(self.choices)):
                 return [
                     checks.Error(
-                        '"choices" must be an iterable (e.g., a list or tuple).',
+                        "'choices' must be an iterable (e.g., a list or tuple).",
                         hint=None,
                         obj=self,
-                        id='E033',
+                        id='fields.E004',
                     )
                 ]
             elif any(isinstance(choice, six.string_types) or
@@ -241,13 +241,11 @@ class Field(RegisterLookupMixin):
                      for choice in self.choices):
                 return [
                     checks.Error(
-                        ('All "choices" elements must be a tuple of two '
-                         'elements (the first one is the actual value '
-                         'to be stored and the second element is '
-                         'the human-readable name).'),
+                        ("'choices' must be an iterable containing "
+                         "(actual value, human readable name) tuples."),
                         hint=None,
                         obj=self,
-                        id='E034',
+                        id='fields.E005',
                     )
                 ]
             else:
@@ -259,10 +257,10 @@ class Field(RegisterLookupMixin):
         if self.db_index not in (None, True, False):
             return [
                 checks.Error(
-                    '"db_index" must be either None, True or False.',
+                    "'db_index' must be None, True or False.",
                     hint=None,
                     obj=self,
-                    id='E035',
+                    id='fields.E006',
                 )
             ]
         else:
@@ -277,10 +275,10 @@ class Field(RegisterLookupMixin):
             return [
                 checks.Error(
                     'Primary keys must not have null=True.',
-                    hint=('Set null=False on the field or '
+                    hint=('Set null=False on the field, or '
                           'remove primary_key=True argument.'),
                     obj=self,
-                    id='E036',
+                    id='fields.E007',
                 )
             ]
         else:
@@ -864,10 +862,10 @@ class AutoField(Field):
         if not self.primary_key:
             return [
                 checks.Error(
-                    'The field must have primary_key=True, because it is an AutoField.',
+                    'AutoFields must set primary_key=True.',
                     hint=None,
                     obj=self,
-                    id='E048',
+                    id='fields.E100',
                 ),
             ]
         else:
@@ -940,10 +938,10 @@ class BooleanField(Field):
         if getattr(self, 'null', False):
             return [
                 checks.Error(
-                    'BooleanFields do not acceps null values.',
+                    'BooleanFields do not accept null values.',
                     hint='Use a NullBooleanField instead.',
                     obj=self,
-                    id='E037',
+                    id='fields.E110',
                 )
             ]
         else:
@@ -1020,19 +1018,19 @@ class CharField(Field):
         except TypeError:
             return [
                 checks.Error(
-                    'The field must have "max_length" attribute.',
+                    "CharFields must define a 'max_length' attribute.",
                     hint=None,
                     obj=self,
-                    id='E038',
+                    id='fields.E120',
                 )
             ]
         except ValueError:
             return [
                 checks.Error(
-                    '"max_length" must be a positive integer.',
+                    "'max_length' must be a positive integer.",
                     hint=None,
                     obj=self,
-                    id='E039',
+                    id='fields.E121',
                 )
             ]
         else:
@@ -1305,24 +1303,16 @@ class DecimalField(Field):
 
     def check(self, **kwargs):
         errors = super(DecimalField, self).check(**kwargs)
-        errors.extend(self._check_decimal_places_and_max_digits(**kwargs))
+
+        digits_errors = self._check_decimal_places()
+        digits_errors.extend(self._check_max_digits())
+        if not digits_errors:
+            errors.extend(self._check_decimal_places_and_max_digits(**kwargs))
+        else:
+            errors.extend(digits_errors)
         return errors
 
-    def _check_decimal_places_and_max_digits(self, **kwargs):
-        errors = self.__check_decimal_places()
-        errors += self.__check_max_digits()
-        if not errors and int(self.decimal_places) > int(self.max_digits):
-            errors.append(
-                checks.Error(
-                    '"max_digits" must be greater or equal to "decimal_places".',
-                    hint=None,
-                    obj=self,
-                    id='E040',
-                )
-            )
-        return errors
-
-    def __check_decimal_places(self):
+    def _check_decimal_places(self):
         try:
             decimal_places = int(self.decimal_places)
             if decimal_places < 0:
@@ -1330,25 +1320,25 @@ class DecimalField(Field):
         except TypeError:
             return [
                 checks.Error(
-                    'The field requires a "decimal_places" attribute.',
+                    "DecimalFields must define a 'decimal_places' attribute.",
                     hint=None,
                     obj=self,
-                    id='E041',
+                    id='fields.E130',
                 )
             ]
         except ValueError:
             return [
                 checks.Error(
-                    '"decimal_places" attribute must be a non-negative integer.',
+                    "'decimal_places' must be a non-negative integer.",
                     hint=None,
                     obj=self,
-                    id='E042',
+                    id='fields.E131',
                 )
             ]
         else:
             return []
 
-    def __check_max_digits(self):
+    def _check_max_digits(self):
         try:
             max_digits = int(self.max_digits)
             if max_digits <= 0:
@@ -1356,23 +1346,35 @@ class DecimalField(Field):
         except TypeError:
             return [
                 checks.Error(
-                    'The field requires a "max_digits" attribute.',
+                    "DecimalFields must define a 'max_digits' attribute.",
                     hint=None,
                     obj=self,
-                    id='E043',
+                    id='fields.E132',
                 )
             ]
         except ValueError:
             return [
                 checks.Error(
-                    '"max_digits" attribute must be a positive integer.',
+                    "'max_digits' must be a positive integer.",
                     hint=None,
                     obj=self,
-                    id='E044',
+                    id='fields.E133',
                 )
             ]
         else:
             return []
+
+    def _check_decimal_places_and_max_digits(self, **kwargs):
+        if int(self.decimal_places) > int(self.max_digits):
+            return [
+                checks.Error(
+                    "'max_digits' must be greater or equal to 'decimal_places'.",
+                    hint=None,
+                    obj=self,
+                    id='fields.E134',
+                )
+            ]
+        return []
 
     def deconstruct(self):
         name, path, args, kwargs = super(DecimalField, self).deconstruct()
@@ -1481,10 +1483,10 @@ class FilePathField(Field):
         if not self.allow_files and not self.allow_folders:
             return [
                 checks.Error(
-                    'The field must have either "allow_files" or "allow_folders" set to True.',
+                    "FilePathFields must have either 'allow_files' or 'allow_folders' set to True.",
                     hint=None,
                     obj=self,
-                    id='E045',
+                    id='fields.E140',
                 )
             ]
         return []
@@ -1659,11 +1661,11 @@ class GenericIPAddressField(Field):
         if not getattr(self, 'null', False) and getattr(self, 'blank', False):
             return [
                 checks.Error(
-                    ('The field cannot accept blank values if null values '
-                     'are not allowed, as blank values are stored as null.'),
+                    ('GenericIPAddressFields cannot have blank=True if null=False, '
+                     'as blank values are stored as nulls.'),
                     hint=None,
                     obj=self,
-                    id='E046',
+                    id='fields.E150',
                 )
             ]
         return []

@@ -233,13 +233,11 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         errors = Model.rel.field.check()
         expected = [
             checks.Error(
-                ('The field has a relation with model MissingModel, '
-                 'which has either not been installed or is abstract.'),
-                hint=('Ensure that you did not misspell the model name and '
-                      'the model is not abstract. Does your INSTALLED_APPS '
-                      'setting contain the app where MissingModel is defined?'),
+                ("Field defines a relation with model 'MissingModel', "
+                 "which is either not installed, or is abstract."),
+                hint=None,
                 obj=Model.rel.field,
-                id='E030',
+                id='fields.E300',
             )
         ]
         self.assertEqual(errors, expected)
@@ -295,12 +293,12 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         errors = Model.rel.field.check()
         expected = [
             checks.Error(
-                ('The field defines a relation with the model '
-                 'contenttypes_tests.SwappedModel, '
-                 'which has been swapped out.'),
-                hint='Update the relation to point at settings.TEST_SWAPPED_MODEL',
+                ("Field defines a relation with the model "
+                 "'contenttypes_tests.SwappedModel', "
+                 "which has been swapped out."),
+                hint="Update the relation to point at 'settings.TEST_SWAPPED_MODEL'.",
                 obj=Model.rel.field,
-                id='E029',
+                id='fields.E301',
             )
         ]
         self.assertEqual(errors, expected)
@@ -317,10 +315,10 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         errors = InvalidBookmark.tags_.field.check()
         expected = [
             checks.Error(
-                'Field names must not end with underscores.',
+                'Field names must not end with an underscore.',
                 hint=None,
                 obj=InvalidBookmark.tags_.field,
-                id='E001',
+                id='fields.E001',
             )
         ]
         self.assertEqual(errors, expected)

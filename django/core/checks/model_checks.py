@@ -36,14 +36,14 @@ def check_model_signals(app_configs=None, **kwargs):
                         description = "An instance of the `%s` class" % receiver.__class__.__name__
                     errors.append(
                         Error(
-                            "%s was connected to the `%s` signal "
+                            "%s was connected to the '%s' signal "
                             "with a lazy reference to the '%s' sender, "
                             "which has not been installed." % (
                                 description, name, '.'.join(reference)
                             ),
                             obj=receiver.__module__,
                             hint=None,
-                            id='E014'
+                            id='signals.E001'
                         )
                     )
     return errors

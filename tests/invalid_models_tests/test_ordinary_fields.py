@@ -35,10 +35,10 @@ class AutoFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                'The field must have primary_key=True, because it is an AutoField.',
+                'AutoFields must set primary_key=True.',
                 hint=None,
                 obj=field,
-                id='E048',
+                id='fields.E100',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -54,10 +54,10 @@ class BooleanFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                'BooleanFields do not acceps null values.',
+                'BooleanFields do not accept null values.',
                 hint='Use a NullBooleanField instead.',
                 obj=field,
-                id='E037',
+                id='fields.E110',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -88,10 +88,10 @@ class CharFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                'The field must have "max_length" attribute.',
+                "CharFields must define a 'max_length' attribute.",
                 hint=None,
                 obj=field,
-                id='E038',
+                id='fields.E120',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -104,10 +104,10 @@ class CharFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                '"max_length" must be a positive integer.',
+                "'max_length' must be a positive integer.",
                 hint=None,
                 obj=field,
-                id='E039',
+                id='fields.E121',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -120,10 +120,10 @@ class CharFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                '"max_length" must be a positive integer.',
+                "'max_length' must be a positive integer.",
                 hint=None,
                 obj=field,
-                id='E039',
+                id='fields.E121',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -136,10 +136,10 @@ class CharFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                '"choices" must be an iterable (e.g., a list or tuple).',
+                "'choices' must be an iterable (e.g., a list or tuple).",
                 hint=None,
                 obj=field,
-                id='E033',
+                id='fields.E004',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -152,12 +152,10 @@ class CharFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                ('All "choices" elements must be a tuple of two elements '
-                 '(the first one is the actual value to be stored '
-                 'and the second element is the human-readable name).'),
+                "'choices' must be an iterable containing (actual value, human readable name) tuples.",
                 hint=None,
                 obj=field,
-                id='E034',
+                id='fields.E005',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -170,10 +168,10 @@ class CharFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                '"db_index" must be either None, True or False.',
+                "'db_index' must be None, True or False.",
                 hint=None,
                 obj=field,
-                id='E035',
+                id='fields.E006',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -210,16 +208,16 @@ class DecimalFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                'The field requires a "decimal_places" attribute.',
+                "DecimalFields must define a 'decimal_places' attribute.",
                 hint=None,
                 obj=field,
-                id='E041',
+                id='fields.E130',
             ),
             Error(
-                'The field requires a "max_digits" attribute.',
+                "DecimalFields must define a 'max_digits' attribute.",
                 hint=None,
                 obj=field,
-                id='E043',
+                id='fields.E132',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -232,16 +230,16 @@ class DecimalFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                '"decimal_places" attribute must be a non-negative integer.',
+                "'decimal_places' must be a non-negative integer.",
                 hint=None,
                 obj=field,
-                id='E042',
+                id='fields.E131',
             ),
             Error(
-                '"max_digits" attribute must be a positive integer.',
+                "'max_digits' must be a positive integer.",
                 hint=None,
                 obj=field,
-                id='E044',
+                id='fields.E133',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -254,16 +252,16 @@ class DecimalFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                '"decimal_places" attribute must be a non-negative integer.',
+                "'decimal_places' must be a non-negative integer.",
                 hint=None,
                 obj=field,
-                id='E042',
+                id='fields.E131',
             ),
             Error(
-                '"max_digits" attribute must be a positive integer.',
+                "'max_digits' must be a positive integer.",
                 hint=None,
                 obj=field,
-                id='E044',
+                id='fields.E133',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -276,10 +274,10 @@ class DecimalFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                '"max_digits" must be greater or equal to "decimal_places".',
+                "'max_digits' must be greater or equal to 'decimal_places'.",
                 hint=None,
                 obj=field,
-                id='E040',
+                id='fields.E134',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -313,10 +311,10 @@ class FileFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                '"unique" is not a valid argument for FileField.',
+                "'unique' is not a valid argument for a FileField.",
                 hint=None,
                 obj=field,
-                id='E049',
+                id='fields.E200',
             )
         ]
         self.assertEqual(errors, expected)
@@ -329,10 +327,10 @@ class FileFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                '"primary_key" is not a valid argument for FileField.',
+                "'primary_key' is not a valid argument for a FileField.",
                 hint=None,
                 obj=field,
-                id='E050',
+                id='fields.E201',
             )
         ]
         self.assertEqual(errors, expected)
@@ -348,10 +346,10 @@ class FilePathFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                'The field must have either "allow_files" or "allow_folders" set to True.',
+                "FilePathFields must have either 'allow_files' or 'allow_folders' set to True.",
                 hint=None,
                 obj=field,
-                id='E045',
+                id='fields.E140',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -367,11 +365,11 @@ class GenericIPAddressFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                ('The field cannot accept blank values if null values '
-                 'are not allowed, as blank values are stored as null.'),
+                ('GenericIPAddressFields cannot have blank=True if null=False, '
+                 'as blank values are stored as nulls.'),
                 hint=None,
                 obj=field,
-                id='E046',
+                id='fields.E150',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -394,11 +392,11 @@ class ImageFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [] if pillow_installed else [
             Error(
-                'To use ImageFields, Pillow must be installed.',
+                'Cannot use ImageField because Pillow is not installed.',
                 hint=('Get Pillow at https://pypi.python.org/pypi/Pillow '
                       'or run command "pip install pillow".'),
                 obj=field,
-                id='E032',
+                id='fields.E210',
             ),
         ]
         self.assertEqual(errors, expected)
