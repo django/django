@@ -488,6 +488,10 @@ Forms
   Each radio button or checkbox includes an ``id_for_label`` attribute to
   output the element's ID.
 
+* The ``<textarea>`` tags rendered by :class:`~django.forms.Textarea` now
+  include a ``maxlength`` attribute if the :class:`~django.db.models.TextField`
+  model field has a ``max_length``.
+
 * :attr:`Field.choices<django.db.models.Field.choices>` now allows you to
   customize the "empty choice" label by including a tuple with an empty string
   or ``None`` for the key and the custom label as the value. The default blank

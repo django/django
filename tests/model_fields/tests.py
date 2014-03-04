@@ -203,6 +203,21 @@ class BooleanFieldTests(unittest.TestCase):
     def test_nullbooleanfield_to_python(self):
         self._test_to_python(models.NullBooleanField())
 
+    def test_charfield_textfield_max_length_passed_to_formfield(self):
+        """
+        Test that CharField and TextField pass their max_length attributes to
+        form fields created using their .formfield() method (#22206).
+        """
+        cf1 = models.CharField()
+        cf2 = models.CharField(max_length=1234)
+        self.assertIsNone(cf1.formfield().max_length)
+        self.assertEqual(1234, cf2.formfield().max_length)
+
+        tf1 = models.TextField()
+        tf2 = models.TextField(max_length=2345)
+        self.assertIsNone(tf1.formfield().max_length)
+        self.assertEqual(2345, tf2.formfield().max_length)
+
     def test_booleanfield_choices_blank(self):
         """
         Test that BooleanField with choices and defaults doesn't generate a

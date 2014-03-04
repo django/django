@@ -968,6 +968,13 @@ databases supported by Django.
 A large text field. The default form widget for this field is a
 :class:`~django.forms.Textarea`.
 
+.. versionchanged:: 1.7
+
+    If you specify a ``max_length`` attribute, it will be reflected in the
+    :class:`~django.forms.Textarea` widget of the auto-generated form field.
+    However it is not enforced at the model or database level. Use a
+    :class:`CharField` for that.
+
 .. admonition:: MySQL users
 
     If you are using this field with MySQLdb 1.2.1p2 and the ``utf8_bin``
