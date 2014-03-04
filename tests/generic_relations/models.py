@@ -68,7 +68,7 @@ class Animal(models.Model):
     common_name = models.CharField(max_length=150)
     latin_name = models.CharField(max_length=150)
 
-    tags = GenericRelation(TaggedItem)
+    tags = GenericRelation(TaggedItem, related_query_name='animal')
     comparisons = GenericRelation(Comparison,
                                   object_id_field="object_id1",
                                   content_type_field="content_type1")
@@ -116,7 +116,7 @@ class Rock(Mineral):
 
 class ManualPK(models.Model):
     id = models.IntegerField(primary_key=True)
-    tags = GenericRelation(TaggedItem)
+    tags = GenericRelation(TaggedItem, related_query_name='manualpk')
 
 
 class ForProxyModelModel(models.Model):

@@ -6,7 +6,7 @@ from django.core import checks
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db import models, router, transaction, DEFAULT_DB_ALIAS
-from django.db.models import signals, FieldDoesNotExist
+from django.db.models import signals, FieldDoesNotExist, DO_NOTHING
 from django.db.models.base import ModelBase
 from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.related import PathInfo
@@ -243,8 +243,10 @@ class GenericRelation(ForeignObject):
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
         kwargs['rel'] = GenericRel(
-            self, to, related_name=kwargs.pop('related_name', None),
-            limit_choices_to=kwargs.pop('limit_choices_to', None),)
+            self, to,
+            related_query_name=kwargs.pop('related_query_name', None),
+            limit_choices_to=kwargs.pop('limit_choices_to', None),
+        )
         # Override content-type/object-id field names on the related class
         self.object_id_field_name = kwargs.pop("object_id_field", "object_id")
         self.content_type_field_name = kwargs.pop("content_type_field", "content_type")
@@ -300,10 +302,15 @@ class GenericRelation(ForeignObject):
         return [(self.rel.to._meta.get_field_by_name(self.object_id_field_name)[0],
                  self.model._meta.pk)]
 
-    def get_reverse_path_info(self):
+    def get_path_info(self):
         opts = self.rel.to._meta
         target = opts.get_field_by_name(self.object_id_field_name)[0]
         return [PathInfo(self.model._meta, opts, (target,), self.rel, True, False)]
+
+    def get_reverse_path_info(self):
+        opts = self.model._meta
+        from_opts = self.rel.to._meta
+        return [PathInfo(from_opts, opts, (opts.pk,), self, not self.unique, False)]
 
     def get_choices_default(self):
         return super(GenericRelation, self).get_choices(include_blank=False)
@@ -312,22 +319,12 @@ class GenericRelation(ForeignObject):
         qs = getattr(obj, self.name).all()
         return smart_text([instance._get_pk_val() for instance in qs])
 
-    def get_joining_columns(self, reverse_join=False):
-        if not reverse_join:
-            # This error message is meant for the user, and from user
-            # perspective this is a reverse join along the GenericRelation.
-            raise ValueError('Joining in reverse direction not allowed.')
-        return super(GenericRelation, self).get_joining_columns(reverse_join)
-
     def contribute_to_class(self, cls, name):
         super(GenericRelation, self).contribute_to_class(cls, name, virtual_only=True)
         # Save a reference to which model this class is on for future use
         self.model = cls
         # Add the descriptor for the relation
         setattr(cls, self.name, ReverseGenericRelatedObjectsDescriptor(self, self.for_concrete_model))
-
-    def contribute_to_related_class(self, cls, related):
-        pass
 
     def set_attributes_from_rel(self):
         pass
@@ -527,5 +524,7 @@ def create_generic_related_manager(superclass):
 
 
 class GenericRel(ForeignObjectRel):
-    def __init__(self, field, to, related_name=None, limit_choices_to=None):
-        super(GenericRel, self).__init__(field, to, related_name, limit_choices_to)
+    def __init__(self, field, to, related_name=None, limit_choices_to=None, related_query_name=None):
+        super(GenericRel, self).__init__(field=field, to=to, related_name=related_query_name or '+',
+                                         limit_choices_to=limit_choices_to, on_delete=DO_NOTHING,
+                                         related_query_name=related_query_name)

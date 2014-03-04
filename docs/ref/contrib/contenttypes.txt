@@ -373,6 +373,15 @@ Reverse generic relations
 
         This class used to be defined in ``django.contrib.contenttypes.generic``.
 
+    .. attribute:: related_query_name
+
+        .. versionadded:: 1.7
+
+        The relation on the related object back to this object doesn't exist by
+        default. Setting ``related_query_name`` creates a relation from the
+        related object back to this one. This allows querying and filtering
+        from the related object.
+
 If you know which models you'll be using most often, you can also add
 a "reverse" generic relationship to enable an additional API. For example::
 
@@ -390,6 +399,20 @@ be used to retrieve their associated ``TaggedItems``::
     >>> t2 = TaggedItem(content_object=b, tag='python')
     >>> t2.save()
     >>> b.tags.all()
+    [<TaggedItem: django>, <TaggedItem: python>]
+
+.. versionadded:: 1.7
+
+Defining :class:`~django.contrib.contenttypes.fields.GenericRelation` with
+``related_query_name`` set allows querying from the related object::
+
+    tags = GenericRelation(TaggedItem, related_query_name='bookmarks')
+
+This enables filtering, ordering, and other query operations on ``Bookmark``
+from ``TaggedItem``::
+
+    >>> # Get all tags belonging to books containing `django` in the url
+    >>> TaggedItem.objects.filter(bookmarks__url__contains='django')
     [<TaggedItem: django>, <TaggedItem: python>]
 
 Just as :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
