@@ -361,6 +361,9 @@ Minor features
   ``level_tag`` attribute that contains the string representation of the
   message level.
 
+* The new :class:`~django.contrib.messages.views.MessageMixin` provides easy
+  access to the messages API from class-based views.
+
 :mod:`django.contrib.redirects`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
