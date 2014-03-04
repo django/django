@@ -324,6 +324,28 @@ See :doc:`/topics/cache`.
 
 .. _settings-csrf:
 
+.. setting:: CSRF_COOKIE_AGE
+
+CSRF_COOKIE_AGE
+---------------
+
+.. versionadded:: 1.7
+
+Default: ``31449600`` (1 year, in seconds)
+
+The age of CSRF cookies, in seconds.
+
+The reason for setting a long-lived expiration time is to avoid problems in
+the case of a user closing a browser or bookmarking a page and then loading
+that page from a browser cache. Without persistent cookies, the form submission
+would fail in this case.
+
+Some browsers (specifically Internet Explorer) can disallow the use of
+persistent cookies or can have the indexes to the cookie jar corrupted on disk,
+thereby causing CSRF protection checks to fail (and sometimes intermittently).
+Change this setting to ``None`` to use session-based CSRF cookies, which
+keep the cookies in-memory instead of on persistent storage.
+
 .. setting:: CSRF_COOKIE_DOMAIN
 
 CSRF_COOKIE_DOMAIN

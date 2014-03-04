@@ -446,6 +446,12 @@ Cache
   "non-expiring" by default. Previously, it was only possible to pass
   ``timeout=None` to the cache backend's ``set()`` method.
 
+Cross Site Request Forgery
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The :setting:`CSRF_COOKIE_AGE` setting facilitates the use of session-based
+  CSRF cookies.
+
 Email
 ^^^^^
 
