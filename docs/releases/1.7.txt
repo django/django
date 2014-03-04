@@ -678,6 +678,11 @@ Models
   Previously this used to work if the field accepted integers as input as it
   took the primary key.
 
+* Integer fields are now validated against database backend specific min and
+  max values based on their :meth:`internal_type <django.db.models.Field.get_internal_type>`.
+  Previously model field validation didn't prevent values out of their associated
+  column data type range from being saved resulting in an integrity error.
+
 Signals
 ^^^^^^^
 

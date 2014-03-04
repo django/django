@@ -722,6 +722,16 @@ class BaseDatabaseOperations(object):
     """
     compiler_module = "django.db.models.sql.compiler"
 
+    # Integer field safe ranges by `internal_type` as documented
+    # in docs/ref/models/fields.txt.
+    integer_field_ranges = {
+        'SmallIntegerField': (-32768, 32767),
+        'IntegerField': (-2147483648, 2147483647),
+        'BigIntegerField': (-9223372036854775808, 9223372036854775807),
+        'PositiveSmallIntegerField': (0, 32767),
+        'PositiveIntegerField': (0, 2147483647),
+    }
+
     def __init__(self, connection):
         self.connection = connection
         self._cache = None
@@ -1205,6 +1215,14 @@ class BaseDatabaseOperations(object):
         backend due to #10888.
         """
         return params
+
+    def integer_field_range(self, internal_type):
+        """
+        Given an integer field internal type (e.g. 'PositiveIntegerField'),
+        returns a tuple of the (min_value, max_value) form representing the
+        range of the column type bound to the field.
+        """
+        return self.integer_field_ranges[internal_type]
 
 
 # Structure returned by the DB-API cursor.description interface (PEP 249)
