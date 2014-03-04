@@ -151,6 +151,23 @@ class ModelState(object):
                     options[name] = set(normalize_together(it))
                 else:
                     options[name] = model._meta.original_attrs[name]
+
+        def flatten_bases(model):
+            bases = []
+            for base in model.__bases__:
+                if hasattr(base, "_meta") and base._meta.abstract:
+                    bases.extend(flatten_bases(base))
+                else:
+                    bases.append(base)
+            return bases
+
+        # We can't rely on __mro__ directly because we only want to flatten
+        # abstract models and not the whole tree. However by recursing on
+        # __bases__ we may end up with duplicates and ordering issues, we
+        # therefore discard any duplicates and reorder the bases according
+        # to their index in the MRO.
+        flattened_bases = sorted(set(flatten_bases(model)), key=lambda x:model.__mro__.index(x))
+
         # Make our record
         bases = tuple(
             (
@@ -158,12 +175,11 @@ class ModelState(object):
                 if hasattr(base, "_meta") else
                 base
             )
-            for base in model.__bases__
-            if (not hasattr(base, "_meta") or not base._meta.abstract)
+            for base in flattened_bases
         )
         # Ensure at least one base inherits from models.Model
         if not any((isinstance(base, six.string_types) or issubclass(base, models.Model)) for base in bases):
-            bases = (models.Model, )
+            bases = (models.Model,)
         return cls(
             model._meta.app_label,
             model._meta.object_name,
