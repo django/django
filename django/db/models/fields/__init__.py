@@ -1007,10 +1007,10 @@ class CharField(Field):
 
     def check(self, **kwargs):
         errors = super(CharField, self).check(**kwargs)
-        errors.extend(self._check_max_length_attibute(**kwargs))
+        errors.extend(self._check_max_length_attribute(**kwargs))
         return errors
 
-    def _check_max_length_attibute(self, **kwargs):
+    def _check_max_length_attribute(self, **kwargs):
         try:
             max_length = int(self.max_length)
             if max_length <= 0:
