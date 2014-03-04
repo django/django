@@ -909,7 +909,7 @@ StreamingHttpResponse objects
 The :class:`StreamingHttpResponse` class is used to stream a response from
 Django to the browser. You might want to do this if generating the response
 takes too long or uses too much memory. For instance, it's useful for
-generating large CSV files.
+:ref:`generating large CSV files <streaming-csv-files>`.
 
 .. admonition:: Performance considerations
 
