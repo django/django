@@ -441,7 +441,7 @@ Cache
   will set the cache keys as "non-expiring" by default. Previously, it was
   still being set to 300 seconds, although explicitly passing ``None`` to the
   ``set()`` method of a subtype of
-  :class:`django.core.cache.backends.base.BaseCache` works as intended.
+  ``django.core.cache.backends.base.BaseCache`` works as intended.
 
 Email
 ^^^^^
