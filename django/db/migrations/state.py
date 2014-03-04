@@ -166,7 +166,7 @@ class ModelState(object):
         # __bases__ we may end up with duplicates and ordering issues, we
         # therefore discard any duplicates and reorder the bases according
         # to their index in the MRO.
-        flattened_bases = sorted(set(flatten_bases(model)), key=lambda x:model.__mro__.index(x))
+        flattened_bases = sorted(set(flatten_bases(model)), key=lambda x: model.__mro__.index(x))
 
         # Make our record
         bases = tuple(

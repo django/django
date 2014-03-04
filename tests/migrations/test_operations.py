@@ -582,6 +582,7 @@ class OperationTests(MigrationTestBase):
         self.assertEqual(project_state.render().get_model("test_runpython", "Pony").objects.count(), 6)
         self.assertEqual(project_state.render().get_model("test_runpython", "ShetlandPony").objects.count(), 2)
 
+
 class MigrateNothingRouter(object):
     """
     A router that sends all writes to the other database.
