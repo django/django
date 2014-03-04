@@ -1150,6 +1150,11 @@ Miscellaneous
 * The ``shortcut`` view in ``django.contrib.contenttypes.views`` now supports
   protocol-relative URLs (e.g. ``//example.com``).
 
+* :class:`~django.contrib.contenttypes.fields.GenericRelation` now supports an
+  optional ``related_name`` argument. Setting ``related_name`` adds a relation
+  from the related object back to the content type for filtering, ordering and
+  other query operations.
+
 .. _deprecated-features-1.7:
 
 Features deprecated in 1.7
