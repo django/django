@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django import forms
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import FieldError
 from django.test import TestCase
 from django.utils import six
 
@@ -162,6 +163,12 @@ class GenericRelationsTests(TestCase):
         self.assertQuerysetEqual(Animal.objects.filter(tags__content_type=ctype), [
             "<Animal: Platypus>"
         ])
+
+    def test_generic_relation_related_name_default(self):
+        # Test that GenericRelation by default isn't usable from
+        # the reverse side.
+        with self.assertRaises(FieldError):
+            TaggedItem.objects.filter(vegetable__isnull=True)
 
     def test_multiple_gfk(self):
         # Simple tests for multiple GenericForeignKeys

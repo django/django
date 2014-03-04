@@ -245,5 +245,5 @@ class GenericRelationTests(TestCase):
         form = GenericRelationForm({'links': None})
         self.assertTrue(form.is_valid())
         form.save()
-        links = HasLinkThing._meta.get_field_by_name('links')[0].field
+        links = HasLinkThing._meta.get_field_by_name('links')[0]
         self.assertEqual(links.save_form_data_calls, 1)
