@@ -314,6 +314,20 @@ class FormsTestCase(TestCase):
         self.assertHTMLEqual(f['message'].as_text(), '<input type="text" name="message" value="I love you." />')
         self.assertHTMLEqual(f['message'].as_hidden(), '<input type="hidden" name="message" value="I love you." />')
 
+        # CharField should set the maxlength attribute on the widget
+        self.assertHTMLEqual(CharField(max_length=None).widget.render('cats', None),
+            '<input type="text" name="cats" />')
+        self.assertHTMLEqual(CharField(max_length=1234).widget.render('cats', None),
+            '<input type="text" name="cats" maxlength=1234 />')
+
+        # Even if the widget is a Textarea rather than a TextInput
+        self.assertHTMLEqual(CharField(max_length=None,
+            widget=Textarea).widget.render('cats', None),
+            '<textarea rows="10" cols="40" name="cats" />')
+        self.assertHTMLEqual(CharField(max_length=1234,
+            widget=Textarea).widget.render('cats', None),
+            '<textarea rows="10" cols="40" name="cats" maxlength=1234 />')
+
     def test_forms_with_choices(self):
         # For a form with a <select>, use ChoiceField:
         class FrameworkForm(Form):
