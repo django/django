@@ -534,10 +534,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
     def _check_inlines_item(self, cls, model, inline, label):
         """ Check one inline model admin. """
-        # HACK: This is a nasty hack, but because inlines use the
-        # RenameBaseModelAdminMethod metaclass, it's almost impossible
-        # to get the *actual* class name for output purposes.
-        inline_label = repr(inline)[8:-2]
+        inline_label = '.'.join([inline.__module__, inline.__name__])
 
         from django.contrib.admin.options import BaseModelAdmin
 
