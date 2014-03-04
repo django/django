@@ -55,9 +55,25 @@ class BigS(models.Model):
     s = models.SlugField(max_length=255)
 
 
-class BigInt(models.Model):
+class SmallIntegerModel(models.Model):
+    value = models.SmallIntegerField()
+
+
+class IntegerModel(models.Model):
+    value = models.IntegerField()
+
+
+class BigIntegerModel(models.Model):
     value = models.BigIntegerField()
     null_value = models.BigIntegerField(null=True, blank=True)
+
+
+class PositiveSmallIntegerModel(models.Model):
+    value = models.PositiveSmallIntegerField()
+
+
+class PositiveIntegerModel(models.Model):
+    value = models.PositiveIntegerField()
 
 
 class Post(models.Model):

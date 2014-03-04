@@ -292,6 +292,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             return 'django_power(%s)' % ','.join(sub_expressions)
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
 
+    def integer_field_range(self, internal_type):
+        # SQLite doesn't enforce any integer constraints
+        return (None, None)
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'sqlite'
