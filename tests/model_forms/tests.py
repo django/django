@@ -498,7 +498,7 @@ class ModelFormBaseTest(TestCase):
                          ['slug', 'name'])
 
 
-class FieldOverridesTroughFormMetaForm(forms.ModelForm):
+class FieldOverridesByFormMetaForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ['name', 'url', 'slug']
@@ -528,9 +528,9 @@ class StumpJokeForm(forms.ModelForm):
         fields = '__all__'
 
 
-class TestFieldOverridesTroughFormMeta(TestCase):
+class TestFieldOverridesByFormMeta(TestCase):
     def test_widget_overrides(self):
-        form = FieldOverridesTroughFormMetaForm()
+        form = FieldOverridesByFormMetaForm()
         self.assertHTMLEqual(
             str(form['name']),
             '<textarea id="id_name" rows="10" cols="40" name="name"></textarea>',
@@ -545,7 +545,7 @@ class TestFieldOverridesTroughFormMeta(TestCase):
         )
 
     def test_label_overrides(self):
-        form = FieldOverridesTroughFormMetaForm()
+        form = FieldOverridesByFormMetaForm()
         self.assertHTMLEqual(
             str(form['name'].label_tag()),
             '<label for="id_name">Title:</label>',
@@ -560,14 +560,14 @@ class TestFieldOverridesTroughFormMeta(TestCase):
         )
 
     def test_help_text_overrides(self):
-        form = FieldOverridesTroughFormMetaForm()
+        form = FieldOverridesByFormMetaForm()
         self.assertEqual(
             form['slug'].help_text,
             'Watch out! Letters, numbers, underscores and hyphens only.',
         )
 
     def test_error_messages_overrides(self):
-        form = FieldOverridesTroughFormMetaForm(data={
+        form = FieldOverridesByFormMetaForm(data={
             'name': 'Category',
             'url': '/category/',
             'slug': '!%#*@',
