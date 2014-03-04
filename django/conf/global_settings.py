@@ -558,6 +558,7 @@ CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
 
 # Settings for CSRF cookie.
 CSRF_COOKIE_NAME = 'csrftoken'
+CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 CSRF_COOKIE_DOMAIN = None
 CSRF_COOKIE_PATH = '/'
 CSRF_COOKIE_SECURE = False
