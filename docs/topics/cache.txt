@@ -369,7 +369,7 @@ behavior. These arguments are provided as additional keys in the
 
   .. versionchanged:: 1.7
 
-  If the ``TIMEOUT`` is set to ``None``, the cache keys will never expire. 
+  If the ``TIMEOUT`` is set to ``None``, the cache keys will never expire.
 
 * :setting:`OPTIONS <CACHES-OPTIONS>`: Any options that should be
   passed to the cache backend. The list of valid options will vary
