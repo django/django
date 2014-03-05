@@ -154,11 +154,11 @@ class TestUtilsText(SimpleTestCase):
         input = "<script>alert('Hello \\xff.\n Welcome\there\r');</script>"
         output = r"<script>alert(\'Hello \\xff.\n Welcome\there\r\');<\/script>"
         with warnings.catch_warnings():
+            warnings.simplefilter("ignore", PendingDeprecationWarning)
             self.assertEqual(text.javascript_quote(input), output)
 
-        # Exercising quote_double_quotes keyword argument
-        input = '"Text"'
-        with warnings.catch_warnings():
+            # Exercising quote_double_quotes keyword argument
+            input = '"Text"'
             self.assertEqual(text.javascript_quote(input), '"Text"')
             self.assertEqual(text.javascript_quote(input, quote_double_quotes=True),
                              '&quot;Text&quot;')
@@ -168,6 +168,7 @@ class TestUtilsText(SimpleTestCase):
         input = "<script>alert('Hello \\xff.\n Wel𝕃come\there\r');</script>"
         output = r"<script>alert(\'Hello \\xff.\n Wel𝕃come\there\r\');<\/script>"
         with warnings.catch_warnings():
+            warnings.simplefilter("ignore", PendingDeprecationWarning)
             self.assertEqual(text.javascript_quote(input), output)
 
     def test_deprecation(self):
