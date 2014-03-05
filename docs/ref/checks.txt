@@ -90,10 +90,11 @@ Related Fields
 * **fields.E330**: ManyToManyFields cannot be unique.
 * **fields.E331**: Field specifies a many-to-many relation through model ``%s``, which has not been installed.
 * **fields.E332**: Many-to-many fields with intermediate tables must not be symmetrical.
-* **fields.E333**: The model is used as an intermediate model by ``<model>``, but it has more than two foreign keys to ``<model>``, which is ambiguous.
-* **fields.E334**: The model is used as an intermediate model by ``<model>``, but it has more than one foreign key from ``<model>``, which is ambiguous.
-* **fields.E335**: The model is used as an intermediate model by ``<model>``, but it has more than one foreign key to ``<model>``, which is ambiguous.
-* **fields.E336**: The model is used as an intermediary model by ``<model>``, but it does not have foreign key to ``<model>`` or ``<model>``."
+* **fields.E333**: The model is used as an intermediate model by ``<model>``, but it has more than two foreign keys to ``<model>``, which is ambiguous. You must specify which two foreign keys Django should use via the through_fields keyword argument.
+* **fields.E334**: The model is used as an intermediate model by ``<model>``, but it has more than one foreign key from ``<model>``, which is ambiguous. You must specify which foreign key Django should use via the through_fields keyword argument.
+* **fields.E335**: The model is used as an intermediate model by ``<model>``, but it has more than one foreign key to ``<model>``, which is ambiguous. You must specify which foreign key Django should use via the through_fields keyword argument.
+* **fields.E336**: The model is used as an intermediary model by ``<model>``, but it does not have foreign key to ``<model>`` or ``<model>``.
+* **fields.E337**: The field is given an iterable for through_fields, which does not provide the names for both link fields that Django should use for the relation through <model>.
 
 Signals
 ~~~~~~~
