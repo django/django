@@ -114,6 +114,18 @@ class Inner4Tabular(models.Model):
     dummy = models.IntegerField(help_text="Awesome tabular help text is awesome.")
     holder = models.ForeignKey(Holder4)
 
+
+# Models for min_num
+
+class Holder5(models.Model):
+    dummy = models.IntegerField()
+
+
+class Inner5(models.Model):
+    dummy = models.IntegerField()
+    holder = models.ForeignKey(Holder5)
+
+
 # Models for #12749
 
 
