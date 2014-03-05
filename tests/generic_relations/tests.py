@@ -55,7 +55,6 @@ class GenericRelationsTests(TestCase):
             qs, ["fatty", "hairy", "mpk", "yellow"], lambda x: x.tag)
         mpk.delete()
 
-
         # Recall that the Mineral class doesn't have an explicit GenericRelation
         # defined. That's OK, because you can create TaggedItems explicitly.
         tag1 = TaggedItem.objects.create(content_object=quartz, tag="shiny")

@@ -30,13 +30,11 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
     fields.
     """
 
-    def __init__(self, ct_field="content_type", fk_field="object_id", for_concrete_model=True,
-                 related_name=None):
+    def __init__(self, ct_field="content_type", fk_field="object_id", for_concrete_model=True):
         self.ct_field = ct_field
         self.fk_field = fk_field
         self.for_concrete_model = for_concrete_model
         self.editable = False
-        self.related_name = related_name
 
     def contribute_to_class(self, cls, name):
         self.name = name
@@ -242,11 +240,13 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
 class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
 
-    def __init__(self, to, related_name='+', **kwargs):
+    def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
         kwargs['rel'] = GenericRel(
-            self, to, related_name=related_name,
-            limit_choices_to=kwargs.pop('limit_choices_to', None))
+            self, to,
+            related_query_name=kwargs.pop('related_query_name', None),
+            limit_choices_to=kwargs.pop('limit_choices_to', None),
+        )
         # Override content-type/object-id field names on the related class
         self.object_id_field_name = kwargs.pop("object_id_field", "object_id")
         self.content_type_field_name = kwargs.pop("content_type_field", "content_type")
@@ -325,9 +325,6 @@ class GenericRelation(ForeignObject):
         self.model = cls
         # Add the descriptor for the relation
         setattr(cls, self.name, ReverseGenericRelatedObjectsDescriptor(self, self.for_concrete_model))
-
-    def contribute_to_related_class(self, cls, related):
-        pass
 
     def set_attributes_from_rel(self):
         pass
@@ -527,6 +524,7 @@ def create_generic_related_manager(superclass):
 
 
 class GenericRel(ForeignObjectRel):
-    def __init__(self, field, to, related_name=None, limit_choices_to=None):
-        super(GenericRel, self).__init__(field=field, to=to, related_name=related_name,
-                                         limit_choices_to=limit_choices_to, on_delete=DO_NOTHING)
+    def __init__(self, field, to, related_name=None, limit_choices_to=None, related_query_name=None):
+        super(GenericRel, self).__init__(field=field, to=to, related_name=related_query_name or '+',
+                                         limit_choices_to=limit_choices_to, on_delete=DO_NOTHING,
+                                         related_query_name=related_query_name)
