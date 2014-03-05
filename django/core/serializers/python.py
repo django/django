@@ -92,7 +92,7 @@ def Deserializer(object_list, **options):
         # Look up the model and starting build a dict of data for it.
         try:
             Model = _get_model(d["model"])
-        except base.DeserializationError, e:
+        except base.DeserializationError as e:
             if ignore:
                 continue
             else:
