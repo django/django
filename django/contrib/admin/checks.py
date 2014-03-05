@@ -850,6 +850,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
         errors.extend(self._check_exclude_of_parent_model(cls, parent_model))
         errors.extend(self._check_extra(cls))
         errors.extend(self._check_max_num(cls))
+        errors.extend(self._check_min_num(cls))
         errors.extend(self._check_formset(cls))
         return errors
 
@@ -909,12 +910,22 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
         else:
             return []
 
+    def _check_min_num(self, cls):
+        """ Check that min_num is an integer. """
+
+        if cls.min_num is None:
+            return []
+        elif not isinstance(cls.min_num, int):
+            return must_be('an integer', option='min_num', obj=cls, id='admin.E205')
+        else:
+            return []
+
     def _check_formset(self, cls):
         """ Check formset is a subclass of BaseModelFormSet. """
 
         if not issubclass(cls.formset, BaseModelFormSet):
             return must_inherit_from(parent='BaseModelFormSet', option='formset',
-                                     obj=cls, id='admin.E205')
+                                     obj=cls, id='admin.E206')
         else:
             return []
 

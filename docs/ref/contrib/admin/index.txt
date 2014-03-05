@@ -1966,6 +1966,16 @@ The ``InlineModelAdmin`` class adds:
     :meth:`InlineModelAdmin.get_max_num` also allows you to customize the
     maximum number of extra forms.
 
+.. attribute:: InlineModelAdmin.min_num
+
+    .. versionadded:: 1.7
+
+    This controls the minimum number of forms to show in the inline.
+    See :func:`~django.forms.models.modelformset_factory` for more information.
+
+    :meth:`InlineModelAdmin.get_min_num` also allows you to customize the
+    minimum number of displayed forms.
+
 .. attribute:: InlineModelAdmin.raw_id_fields
 
     By default, Django's admin uses a select-box interface (<select>) for
@@ -2042,6 +2052,16 @@ The ``InlineModelAdmin`` class adds:
                     return max_num - 5
                 return max_num
 
+.. method:: InlineModelAdmin.get_min_num(request, obj=None, **kwargs)
+
+    .. versionadded:: 1.7
+
+    Returns the minimum number of inline forms to use. By default,
+    returns the :attr:`InlineModelAdmin.min_num` attribute.
+
+    Override this method to programmatically determine the minimum number of
+    inline forms. For example, this may be based on the model instance
+    (passed as the keyword argument ``obj``).
 
 Working with a model with two or more foreign keys to the same parent model
 ---------------------------------------------------------------------------

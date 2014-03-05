@@ -4,17 +4,17 @@ import warnings
 
 from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.admin import GenericTabularInline
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.forms.formsets import DEFAULT_MAX_NUM
 from django.forms.models import ModelForm
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, RequestFactory
 from django.utils.deprecation import RemovedInDjango19Warning
 
 # local test models
-from .admin import MediaInline, MediaPermanentInline
-from .models import (Episode, EpisodeExtra, EpisodeMaxNum, Media,
-    EpisodePermanent, Category)
+from .admin import MediaInline, MediaPermanentInline, site as admin_site
+from .models import Episode, Media, EpisodePermanent, Category
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
@@ -137,6 +137,7 @@ class GenericInlineAdminParametersTest(TestCase):
 
     def setUp(self):
         self.client.login(username='super', password='secret')
+        self.factory = RequestFactory()
 
     def tearDown(self):
         self.client.logout()
@@ -166,9 +167,18 @@ class GenericInlineAdminParametersTest(TestCase):
         """
         With extra=0, there should be one form.
         """
-        e = self._create_object(EpisodeExtra)
-        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodeextra/%s/' % e.pk)
-        formset = response.context['inline_admin_formsets'][0].formset
+        class ExtraInline(GenericTabularInline):
+            model = Media
+            extra = 0
+
+        modeladmin = admin.ModelAdmin(Episode, admin_site)
+        modeladmin.inlines = [ExtraInline]
+
+        e = self._create_object(Episode)
+        request = self.factory.get('/generic_inline_admin/admin/generic_inline_admin/episode/%s/' % e.pk)
+        request.user = User(username='super', is_superuser=True)
+        response = modeladmin.changeform_view(request, object_id=str(e.pk))
+        formset = response.context_data['inline_admin_formsets'][0].formset
         self.assertEqual(formset.total_form_count(), 1)
         self.assertEqual(formset.initial_form_count(), 1)
 
@@ -176,10 +186,41 @@ class GenericInlineAdminParametersTest(TestCase):
         """
         With extra=5 and max_num=2, there should be only 2 forms.
         """
-        e = self._create_object(EpisodeMaxNum)
-        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodemaxnum/%s/' % e.pk)
-        formset = response.context['inline_admin_formsets'][0].formset
+        class MaxNumInline(GenericTabularInline):
+            model = Media
+            extra = 5
+            max_num = 2
+
+        modeladmin = admin.ModelAdmin(Episode, admin_site)
+        modeladmin.inlines = [MaxNumInline]
+
+        e = self._create_object(Episode)
+        request = self.factory.get('/generic_inline_admin/admin/generic_inline_admin/episode/%s/' % e.pk)
+        request.user = User(username='super', is_superuser=True)
+        response = modeladmin.changeform_view(request, object_id=str(e.pk))
+        formset = response.context_data['inline_admin_formsets'][0].formset
         self.assertEqual(formset.total_form_count(), 2)
+        self.assertEqual(formset.initial_form_count(), 1)
+
+    def testMinNumParam(self):
+        """
+        With extra=3 and min_num=2, there should be six forms.
+        See #22628 - this will change when that's fixed.
+        """
+        class MinNumInline(GenericTabularInline):
+            model = Media
+            extra = 3
+            min_num = 2
+
+        modeladmin = admin.ModelAdmin(Episode, admin_site)
+        modeladmin.inlines = [MinNumInline]
+
+        e = self._create_object(Episode)
+        request = self.factory.get('/generic_inline_admin/admin/generic_inline_admin/episode/%s/' % e.pk)
+        request.user = User(username='super', is_superuser=True)
+        response = modeladmin.changeform_view(request, object_id=str(e.pk))
+        formset = response.context_data['inline_admin_formsets'][0].formset
+        self.assertEqual(formset.total_form_count(), 6)
         self.assertEqual(formset.initial_form_count(), 1)
 
 
