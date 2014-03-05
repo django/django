@@ -181,6 +181,11 @@ class ConnectionHandler(object):
         for setting in ['NAME', 'USER', 'PASSWORD', 'HOST', 'PORT']:
             conn.setdefault(setting, '')
 
+    TEST_SETTING_RENAMES = {
+        'CREATE': 'CREATE_DB',
+        'USER_CREATE': 'CREATE_USER',
+    }
+
     def prepare_test_settings(self, alias):
         """
         Makes sure the test settings are available in the 'TEST' sub-dictionary.
@@ -194,13 +199,20 @@ class ConnectionHandler(object):
         for key, value in six.iteritems(conn):
             if key.startswith('TEST_'):
                 new_key = key[5:]
+                new_key = self.TEST_SETTING_RENAMES.get(new_key, new_key)
                 if new_key in test_settings:
                     raise ImproperlyConfigured("Connection %s has both %s and TEST[%s] specified." %
                                                (alias, key, new_key))
                 test_settings_warning = ("In Django 1.9 the %s connection setting will be moved "
                                          "to a %s entry in the TEST setting")
-                warnings.warn(PendingDeprecationWarning(test_settings_warning % (key, new_key)))
+                warnings.warn(PendingDeprecationWarning(test_settings_warning % (key, new_key)),
+                              stacklevel=2)
                 test_settings[new_key] = value
+        # Check that they didn't just use the old name with 'TEST_' removed
+        for key, new_key in six.iteritems(self.TEST_SETTING_RENAMES):
+            if key in test_settings:
+                warnings.warn("Test setting %s was renamed to %s; specified value (%s) ignored" %
+                              (key, new_key, test_settings[key]), stacklevel=2)
         for key in ['CHARSET', 'COLLATION', 'NAME', 'MIRROR']:
             test_settings.setdefault(key, None)
 

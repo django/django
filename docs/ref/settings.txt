@@ -674,8 +674,8 @@ See :ref:`the-test-database`.
 
 .. setting:: TEST_CREATE
 
-CREATE
-``````
+CREATE_DB
+`````````
 
 Default: ``True``
 
@@ -683,6 +683,18 @@ This is an Oracle-specific setting.
 
 If it is set to ``False``, the test tablespaces won't be automatically created
 at the beginning of the tests and dropped at the end.
+
+.. setting:: TEST_USER_CREATE
+
+CREATE_USER
+```````````
+
+Default: ``True``
+
+This is an Oracle-specific setting.
+
+If it is set to ``False``, the test user won't be automatically created at the
+beginning of the tests and dropped at the end.
 
 .. setting:: TEST_USER
 
@@ -695,18 +707,6 @@ This is an Oracle-specific setting.
 
 The username to use when connecting to the Oracle database that will be used
 when running tests. If not provided, Django will use ``'test_' + USER``.
-
-.. setting:: TEST_USER_CREATE
-
-USER_CREATE
-```````````
-
-Default: ``True``
-
-This is an Oracle-specific setting.
-
-If it is set to ``False``, the test user won't be automatically created at the
-beginning of the tests and dropped at the end.
 
 .. setting:: TEST_PASSWD
 
@@ -801,7 +801,7 @@ TEST_CREATE
 
 .. deprecated:: 1.7
 
-    Use the :setting:`CREATE <TEST_CREATE>` entry in the
+    Use the :setting:`CREATE_DB <TEST_CREATE>` entry in the
     :setting:`TEST <DATABASE-TEST>` dictionary.
 
 .. setting:: OLD_TEST_USER
@@ -821,7 +821,7 @@ TEST_USER_CREATE
 
 .. deprecated:: 1.7
 
-    Use the :setting:`USER_CREATE <TEST_USER_CREATE>` entry in the
+    Use the :setting:`CREATE_USER <TEST_USER_CREATE>` entry in the
     :setting:`TEST <DATABASE-TEST>` dictionary.
 
 .. setting:: OLD_TEST_PASSWD
