@@ -38,6 +38,12 @@ extensions = ["djangodocs", "sphinx.ext.intersphinx"]
 if 'spelling' in sys.argv:
     extensions.append("sphinxcontrib.spelling")
 
+# Spelling language.
+spelling_lang = 'en_US'
+
+# Location of word list.
+spelling_word_list_filename = 'spelling_wordlist'
+
 # Add any paths that contain templates here, relative to this directory.
 # templates_path = []
 

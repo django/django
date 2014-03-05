@@ -11,12 +11,10 @@ Ai
 Alchin
 amet
 Anssi
-api
 apnumber
 Apolloner
 app
 appname
-appropriate
 apps
 architected
 arg
@@ -53,14 +51,11 @@ bcrypt
 Bcrypt
 beatles
 Beaven
-behaviour
-benckmarking
 Berners
 Biggs
 Bjørn
 blocktrans
 blog
-blOG
 Boersma
 boilerplatish
 Bokmål
@@ -83,7 +78,6 @@ callables
 camelcase
 camelCase
 capfirst
-catalogue
 changelist
 Changelist
 changepassword
@@ -105,7 +99,6 @@ commenter
 commenters
 committer
 committers
-comparision
 compilemessages
 concat
 conf
@@ -142,8 +135,6 @@ de
 deconstruct
 deconstructing
 deepcopy
-defintion
-deinstall
 deserialization
 deserialize
 deserialized
@@ -193,7 +184,6 @@ Etag
 ETag
 ETags
 exe
-explictly
 extendible
 fabfile
 fabfiles
@@ -203,7 +193,6 @@ fallbacks
 faq
 fastcgi
 FastCGI
-favour
 fcgid
 fieldset
 fieldsets
@@ -275,7 +264,6 @@ https
 hyperlinks
 icontains
 Idan
-identifers
 ie
 iendswith
 ies
@@ -293,12 +281,8 @@ init
 inline
 inlines
 inspectdb
-instanciate
-instatiation
 intcomma
 internet
-interpeted
-intialization
 intranet
 intword
 ip
@@ -335,10 +319,9 @@ kwarg
 kwargs
 Kyngesburye
 latin
-lawrence
+Lawrence
 lexer
 lhs
-libary
 lifecycle
 lifecycles
 lighttpd
@@ -361,7 +344,6 @@ lte
 Magee
 makemessages
 makemigrations
-manys
 Mapnik
 MBR
 memcache
@@ -384,7 +366,6 @@ mixin
 mixins
 modelforms
 modelformset
-modelling
 modwsgi
 monkeypatched
 Montréal
@@ -478,7 +459,6 @@ proxied
 proxying
 pseudocode
 psycopg
-publicy
 Puthraya
 py
 pyformat
@@ -497,7 +477,6 @@ Quickstart
 quoteless
 Radziej
 rc
-realised
 rebase
 rebased
 rebasing
@@ -511,12 +490,10 @@ regex
 regexes
 reimplement
 reindex
-relabelling
 removetags
 repo
 reprojection
 reraise
-responsibilites
 reST
 reStructuredText
 reupload
@@ -546,13 +523,12 @@ serializable
 serializer
 serializers
 sessionid
+setuptools
 sha
 shapefile
 shapefiles
 sharding
-shortcutted
 sid
-signup
 simultaneously
 sitemap
 sitemaps
@@ -567,10 +543,6 @@ spaceless
 spam
 spammers
 spatialite
-specalist
-specfication
-specialised
-specialises
 Springmeyer
 sql
 sqlall
@@ -618,7 +590,6 @@ symlink
 symlinking
 symlinks
 syncdb
-synchronising
 sysadmin
 systemwide
 tablespace
@@ -705,7 +676,6 @@ usernames
 utc
 UTF
 util
-utilised
 utils
 uwsgi
 uWSGI
