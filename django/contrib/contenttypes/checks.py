@@ -16,3 +16,16 @@ def check_generic_foreign_keys(**kwargs):
     for field in fields:
         errors.extend(field.check())
     return errors
+
+
+def check_generic_relations(**kwargs):
+    from .fields import ReverseGenericRelatedObjectsDescriptor
+
+    errors = []
+    descriptors = (obj
+        for cls in apps.get_models()
+        for obj in six.itervalues(vars(cls))
+        if isinstance(obj, ReverseGenericRelatedObjectsDescriptor))
+    for descriptor in descriptors:
+        errors.extend(descriptor.field.check())
+    return errors

@@ -269,7 +269,16 @@ class GenericRelation(ForeignObject):
             from_fields=[self.object_id_field_name], **kwargs)
 
     def check(self, **kwargs):
-        errors = super(GenericRelation, self).check(**kwargs)
+        errors = []
+        errors.extend(self._check_field_name())
+        errors.extend(self._check_choices())
+        errors.extend(self._check_db_index())
+        errors.extend(self._check_null_allowed_for_primary_keys())
+        errors.extend(self._check_backend_specific_checks(**kwargs))
+        errors.extend(self._check_unique_target())
+        errors.extend(self._check_relation_model_exists())
+        errors.extend(self._check_referencing_to_swapped_model())
+        errors.extend(self._check_clashes(check_related_query_name=True))
         errors.extend(self._check_generic_foreign_key_existence())
         return errors
 
