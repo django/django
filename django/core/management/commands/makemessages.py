@@ -389,7 +389,7 @@ class Command(NoArgsCommand):
         pofile = os.path.join(basedir, '%s.po' % str(self.domain))
 
         if os.path.exists(pofile):
-            args = ['msgmerge', '-q']
+            args = ['msgmerge', '-q', '--previous']
             if self.wrap:
                 args.append(self.wrap)
             if self.location:
