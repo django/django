@@ -24,6 +24,7 @@ class AutodetectorTests(TestCase):
     author_proxy_notproxy = ModelState("testapp", "AuthorProxy", [], {}, ("testapp.author", ))
     publisher = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=100))])
     publisher_with_author = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("name", models.CharField(max_length=100))])
+    publisher_with_book = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("otherapp.Book")), ("name", models.CharField(max_length=100))])
     other_pony = ModelState("otherapp", "Pony", [("id", models.AutoField(primary_key=True))])
     other_stable = ModelState("otherapp", "Stable", [("id", models.AutoField(primary_key=True))])
     third_thing = ModelState("thirdapp", "Thing", [("id", models.AutoField(primary_key=True))])
@@ -243,7 +244,7 @@ class AutodetectorTests(TestCase):
         """
         # Make state
         before = self.make_project_state([])
-        after = self.make_project_state([self.author_with_book, self.book])
+        after = self.make_project_state([self.author_with_book, self.book, self.publisher_with_book])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Right number of migrations?
@@ -251,7 +252,7 @@ class AutodetectorTests(TestCase):
         self.assertEqual(len(changes['otherapp']), 2)
         # Right number of actions?
         migration1 = changes['testapp'][0]
-        self.assertEqual(len(migration1.operations), 1)
+        self.assertEqual(len(migration1.operations), 2)
         migration2 = changes['otherapp'][0]
         self.assertEqual(len(migration2.operations), 1)
         migration3 = changes['otherapp'][1]

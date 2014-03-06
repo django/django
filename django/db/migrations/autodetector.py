@@ -94,9 +94,14 @@ class MigrationAutodetector(object):
         # Phase 2 is progressively adding pending models, splitting up into two
         # migrations if required.
         pending_new_fks = []
+        added_phase_2 = set()
         while pending_add:
             # Is there one we can add that has all dependencies satisfied?
-            satisfied = [(m, rf) for m, rf in pending_add.items() if all((al, mn) not in pending_add for f, al, mn in rf)]
+            satisfied = [
+                (m, rf)
+                for m, rf in pending_add.items()
+                if all((al, mn) not in pending_add for f, al, mn in rf)
+            ]
             if satisfied:
                 (app_label, model_name), related_fields = sorted(satisfied)[0]
                 model_state = self.to_state.models[app_label, model_name]
@@ -107,7 +112,10 @@ class MigrationAutodetector(object):
                         fields=model_state.fields,
                         options=model_state.options,
                         bases=model_state.bases,
-                    )
+                    ),
+                    # If it's already been added in phase 2 put it in a new
+                    # migration for safety.
+                    new=any((al, mn) in added_phase_2 for f, al, mn in related_fields),
                 )
                 for field_name, other_app_label, other_model_name in related_fields:
                     # If it depends on a swappable something, add a dynamic depend'cy
@@ -117,6 +125,7 @@ class MigrationAutodetector(object):
                     elif app_label != other_app_label:
                             self.add_dependency(app_label, other_app_label)
                 del pending_add[app_label, model_name]
+                added_phase_2.add((app_label, model_name))
             # Ah well, we'll need to split one. Pick deterministically.
             else:
                 (app_label, model_name), related_fields = sorted(pending_add.items())[0]
@@ -342,6 +351,7 @@ class MigrationAutodetector(object):
                 else:
                     new_name = "%04i_%s" % (next_number, self.suggest_name(migration.operations))
                 name_map[(app_label, migration.name)] = (app_label, new_name)
+                next_number += 1
                 migration.name = new_name
         # Now fix dependencies
         for app_label, migrations in changes.items():
