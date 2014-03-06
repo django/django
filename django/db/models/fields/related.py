@@ -2032,6 +2032,8 @@ class ManyToManyField(RelatedField):
             kwargs['to'] = self.rel.to
         else:
             kwargs['to'] = "%s.%s" % (self.rel.to._meta.app_label, self.rel.to._meta.object_name)
+        if getattr(self.rel, 'through', None) is not None:
+            kwargs['through'] = self.rel.through
         # If swappable is True, then see if we're actually pointing to the target
         # of a swap.
         swappable_setting = self.swappable_setting
