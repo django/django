@@ -708,6 +708,20 @@ not provided, Django will use ``'test_' + NAME + '_temp'``.
 
 .. setting:: DATABASE_ROUTERS
 
+DATA_UPLOAD_MAX_MEMORY_SIZE
+---------------------------
+
+Default: ``2621440`` (i.e. 2.5 MB).
+
+The maximum size (in bytes) that a request body may contain before raising a
+``SuspiciousOperation`` error.  This value is applied when accessing
+``request.body`` or ``request.POST``, and is calculated against the total
+request size excluding any file upload data.
+
+See also :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`
+
+.. setting:: DATA_UPLOAD_MAX_MEMORY_SIZE
+
 DATABASE_ROUTERS
 ----------------
 
@@ -1083,6 +1097,8 @@ Default: ``2621440`` (i.e. 2.5 MB).
 
 The maximum size (in bytes) that an upload will be before it gets streamed to
 the file system. See :doc:`/topics/files` for details.
+
+See also :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE`
 
 .. setting:: FILE_UPLOAD_PERMISSIONS
 

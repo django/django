@@ -46,6 +46,7 @@ class HttpRequest(object):
         self.resolver_match = None
         self._post_parse_error = False
 
+
     def __repr__(self):
         return build_request_repr(self)
 
@@ -170,20 +171,36 @@ class HttpRequest(object):
             raise AttributeError("You cannot set the upload handlers after the upload has been processed.")
         self._upload_handlers = upload_handlers
 
-    def parse_file_upload(self, META, post_data):
+    def parse_file_upload(self):
         """Returns a tuple of (POST QueryDict, FILES MultiValueDict)."""
         self.upload_handlers = ImmutableList(
             self.upload_handlers,
             warning="You cannot alter upload handlers after the upload has been processed."
         )
-        parser = MultiPartParser(META, post_data, self.upload_handlers, self.encoding)
-        return parser.parse()
+        # Use already read data, if it exists, otherwise stream the request.
+        if hasattr(self, '_body'):
+            data = BytesIO(self._body)
+        else:
+            data = self
+        parser = MultiPartParser(self.META, data, self.upload_handlers, self.encoding)
+        return parser.parse()      
 
     @property
     def body(self):
         if not hasattr(self, '_body'):
             if self._read_started:
                 raise Exception("You cannot access body after reading from request's data stream")
+
+            # Hard-limit the maximum request data size that will be handled in-memory.
+            try:
+                content_length = int(self.META.get('HTTP_CONTENT_LENGTH', self.META.get('CONTENT_LENGTH', 0)))
+            except (ValueError, TypeError):
+                content_length = 0
+
+            if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None
+                and content_length > settings.DATA_UPLOAD_MAX_MEMORY_SIZE):
+                raise SuspiciousOperation('Request data too large')
+
             try:
                 self._body = self.read()
             except IOError as e:
@@ -205,28 +222,23 @@ class HttpRequest(object):
             self._mark_post_parse_error()
             return
 
-        if self.META.get('CONTENT_TYPE', '').startswith('multipart/form-data'):
-            if hasattr(self, '_body'):
-                # Use already read data
-                data = BytesIO(self._body)
+        try:
+            if self.META.get('CONTENT_TYPE', '').startswith('multipart/form-data'):
+                self._post, self._files = self.parse_file_upload()
+            elif self.META.get('CONTENT_TYPE', '').startswith('application/x-www-form-urlencoded'):
+                self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
             else:
-                data = self
-            try:
-                self._post, self._files = self.parse_file_upload(self.META, data)
-            except:
-                # An error occured while parsing POST data. Since when
-                # formatting the error the request handler might access
-                # self.POST, set self._post and self._file to prevent
-                # attempts to parse POST data again.
-                # Mark that an error occured. This allows self.__repr__ to
-                # be explicit about it instead of simply representing an
-                # empty POST
-                self._mark_post_parse_error()
-                raise
-        elif self.META.get('CONTENT_TYPE', '').startswith('application/x-www-form-urlencoded'):
-            self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
-        else:
-            self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
+                self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
+        except:
+            # An error occured while parsing POST data. Since when
+            # formatting the error the request handler might access
+            # self.POST, set self._post and self._file to prevent
+            # attempts to parse POST data again.
+            # Mark that an error occured. This allows self.__repr__ to
+            # be explicit about it instead of simply representing an
+            # empty POST
+            self._mark_post_parse_error()
+            raise
 
     ## File-like and iterator interface.
     ##

@@ -95,6 +95,12 @@ class MultiPartParser(object):
         self._content_length = content_length
         self._upload_handlers = upload_handlers
 
+        # Hard-limit the maximum request data size that will be parsed and
+        # stored in memory.
+        # File upload data is not included when counting against this limit.
+        self._max_data_size = settings.DATA_UPLOAD_MAX_MEMORY_SIZE
+        self._data_size = 0
+
     def parse(self):
         """
         Parse the POST data and break it into a FILES MultiValueDict and a POST
@@ -166,6 +172,11 @@ class MultiPartParser(object):
                             data = raw_data
                     else:
                         data = field_stream.read()
+
+                    self._data_size += len(data)
+                    if (self._max_data_size is not None and
+                        self._data_size > self._max_data_size):
+                        raise SuspiciousOperation('Request data too large')
 
                     self._post.appendlist(field_name,
                                           force_text(data, encoding, errors='replace'))
