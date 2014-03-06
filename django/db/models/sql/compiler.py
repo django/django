@@ -3,7 +3,6 @@ import datetime
 from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db.backends.utils import truncate_name
-from django.db.models import Model
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import ExpressionNode
 from django.db.models.query_utils import select_related_descend, QueryWrapper
