@@ -262,8 +262,7 @@ class BaseDatabaseSchemaEditor(object):
             })
         # Make M2M tables
         for field in model._meta.local_many_to_many:
-            if field.rel.through._meta.auto_created:
-                self.create_model(field.rel.through)
+            self.create_model(field.rel.through)
 
     def delete_model(self, model):
         """
