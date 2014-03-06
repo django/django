@@ -23,7 +23,7 @@ from django.utils.functional import lazy
 from .models import (
     Foo, Bar, Whiz, BigD, BigS, BigInt, Post, NullBooleanModel,
     BooleanModel, PrimaryKeyCharModel, DataModel, Document, RenamedField,
-    VerboseNameField, FksToBooleans, FkToChar)
+    VerboseNameField, FksToBooleans, FkToChar, FloatModel)
 
 
 class BasicFieldTests(test.TestCase):
@@ -77,6 +77,16 @@ class BasicFieldTests(test.TestCase):
                              'verbose field%d' % i)
 
         self.assertEqual(m._meta.get_field('id').verbose_name, 'verbose pk')
+
+    def test_float_validates_object(self):
+        instance = FloatModel(size=2.5)
+        instance.save()
+        self.assertTrue(instance.id)
+
+        obj = FloatModel.objects.get(pk=1)
+        obj.size = obj
+        with self.assertRaises(TypeError):
+            obj.save()
 
     def test_choices_form_class(self):
         """Can supply a custom choices form class. Regression for #20999."""

@@ -48,6 +48,9 @@ class Whiz(models.Model):
 class BigD(models.Model):
     d = models.DecimalField(max_digits=38, decimal_places=30)
 
+class FloatModel(models.Model):
+    size = models.FloatField()
+
 
 class BigS(models.Model):
     s = models.SlugField(max_length=255)
