@@ -569,6 +569,11 @@ Example usage::
 
     Added the ability to specify multiple locales.
 
+.. versionchanged:: 1.7
+
+    Added the ``--previous`` option to the ``msgmerge`` command when merging
+    with existing po files.
+
 .. django-admin-option:: --domain
 
 Use the ``--domain`` or ``-d`` option to change the domain of the messages files.
