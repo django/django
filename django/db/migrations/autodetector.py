@@ -349,7 +349,10 @@ class MigrationAutodetector(object):
                 if i == 0 and not app_leaf:
                     new_name = "0001_initial"
                 else:
-                    new_name = "%04i_%s" % (next_number, self.suggest_name(migration.operations))
+                    new_name = "%04i_%s" % (
+                        next_number,
+                        self.suggest_name(migration.operations)[:100],
+                    )
                 name_map[(app_label, migration.name)] = (app_label, new_name)
                 next_number += 1
                 migration.name = new_name
