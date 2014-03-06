@@ -3,6 +3,7 @@ import datetime
 from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db.backends.utils import truncate_name
+from django.db.models import Model
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import select_related_descend, QueryWrapper
 from django.db.models.sql.constants import (CURSOR, SINGLE, MULTI, NO_RESULTS,
@@ -950,7 +951,7 @@ class SQLUpdateCompiler(SQLCompiler):
         result.append('SET')
         values, update_params = [], []
         for field, model, val in self.query.values:
-            if hasattr(val, 'prepare_database_save'):
+            if hasattr(val, 'prepare_database_save') and not isinstance(val, Model):
                 val = val.prepare_database_save(field)
             else:
                 val = field.get_db_prep_save(val, connection=self.connection)
