@@ -186,6 +186,12 @@ class BaseDatabaseSchemaEditor(object):
         # Create column SQL, add FK deferreds if needed
         column_sqls = []
         params = []
+
+        # Adding an index to the first field in a unique-together is redundant
+        for name, _ in model._meta.unique_together:
+            field = model._meta.get_field_by_name(name)[0]
+            field.db_index = False
+
         for field in model._meta.local_fields:
             # SQL
             definition, extra_params = self.column_sql(model, field)
@@ -262,6 +268,7 @@ class BaseDatabaseSchemaEditor(object):
             })
         # Make M2M tables
         for field in model._meta.local_many_to_many:
+            import ipdb; ipdb.set_trace()
             self.create_model(field.rel.through)
 
     def delete_model(self, model):
