@@ -1904,21 +1904,7 @@ class ManyToManyField(RelatedField):
                 )
             )
 
-        elif self.rel.through_fields is not None:
-            if not len(self.rel.through_fields) >= 2 or not (self.rel.through_fields[0] and self.rel.through_fields[1]):
-                errors.append(
-                    checks.Error(
-                        ("The field is given an iterable for through_fields, "
-                         "which does not provide the names for both link fields "
-                         "that Django should use for the relation through model "
-                         "'%s'.") % qualified_model_name,
-                        hint=None,
-                        obj=self,
-                        id='fields.E337',
-                    )
-                )
-
-        elif not isinstance(self.rel.through, six.string_types):
+        else:
 
             assert from_model is not None, \
                 "ManyToManyField with intermediate " \
@@ -2018,6 +2004,78 @@ class ManyToManyField(RelatedField):
                             id='fields.E336',
                         )
                     )
+
+        # Validate `through_fields`
+        if self.rel.through_fields is not None:
+            # Validate that we're given an iterable of at least two items
+            # and that none of them is "falsy"
+            if not (len(self.rel.through_fields) >= 2 and
+                    self.rel.through_fields[0] and self.rel.through_fields[1]):
+                errors.append(
+                    checks.Error(
+                        ("Field specifies 'through_fields' but does not "
+                         "provide the names of the two link fields that should be "
+                         "used for the relation through model "
+                         "'%s'.") % qualified_model_name,
+                        hint=("Make sure you specify 'through_fields' as "
+                              "through_fields=('field1', 'field2')"),
+                        obj=self,
+                        id='fields.E337',
+                    )
+                )
+
+            # Validate the given through fields -- they should be actual
+            # fields on the through model, and also be foreign keys to the
+            # expected models
+            else:
+                assert from_model is not None, \
+                    "ManyToManyField with intermediate " \
+                    "tables cannot be checked if you don't pass the model " \
+                    "where the field is attached to."
+
+                source, through, target = from_model, self.rel.through, self.rel.to
+                source_field_name, target_field_name = self.rel.through_fields[:2]
+
+                for field_name, related_model in ((source_field_name, source),
+                                                  (target_field_name, target)):
+
+                    possible_field_names = []
+                    for f in through._meta.fields:
+                        if hasattr(f, 'rel') and getattr(f.rel, 'to', None) == related_model:
+                            possible_field_names.append(f.name)
+                    if possible_field_names:
+                        hint = ("Did you mean one of the following foreign "
+                                "keys to '%s': %s?") % (related_model._meta.object_name,
+                                                        ', '.join(possible_field_names))
+                    else:
+                        hint = None
+
+                    try:
+                        field = through._meta.get_field(field_name)
+                    except FieldDoesNotExist:
+                        errors.append(
+                            checks.Error(
+                                ("The intermediary model '%s' has no field '%s'.") % (
+                                    qualified_model_name, field_name),
+                                hint=hint,
+                                obj=self,
+                                id='fields.E338',
+                            )
+                        )
+                    else:
+                        if not (hasattr(field, 'rel') and
+                                getattr(field.rel, 'to', None) == related_model):
+                            errors.append(
+                                checks.Error(
+                                    "'%s.%s' is not a foreign key to '%s'." % (
+                                        through._meta.object_name, field_name,
+                                        related_model._meta.object_name),
+                                    hint=hint,
+                                    obj=self,
+                                    id='fields.E339',
+                                )
+                            )
+
         return errors
 
     def deconstruct(self):
@@ -2104,9 +2162,6 @@ class ManyToManyField(RelatedField):
                     (link_field_name is None or link_field_name == f.name):
                 setattr(self, cache_attr, getattr(f, attr))
                 return getattr(self, cache_attr)
-        # We only reach here if we're given an invalid field name via the
-        # `through_fields` argument
-        raise FieldDoesNotExist(link_field_name)
 
     def _get_m2m_reverse_attr(self, related, attr):
         "Function that can be curried to provide the related accessor or DB column name for the m2m table"
@@ -2133,12 +2188,7 @@ class ManyToManyField(RelatedField):
                 elif link_field_name is None or link_field_name == f.name:
                     setattr(self, cache_attr, getattr(f, attr))
                     break
-        try:
-            return getattr(self, cache_attr)
-        except AttributeError:
-            # We only reach here if we're given an invalid reverse field
-            # name via the `through_fields` argument
-            raise FieldDoesNotExist(link_field_name)
+        return getattr(self, cache_attr)
 
     def value_to_string(self, obj):
         data = ''
