@@ -1353,11 +1353,11 @@ that control how the relationship functions.
 
         class Group(models.Model):
             name = models.CharField(max_length=128)
-            members = models.ManyToManyField(Person, through='Membership', through_fields=('person', 'group'))
+            members = models.ManyToManyField(Person, through='Membership', through_fields=('group', 'person'))
 
         class Membership(models.Model):
-            person = models.ForeignKey(Person)
             group = models.ForeignKey(Group)
+            person = models.ForeignKey(Person)
             inviter = models.ForeignKey(Person, related_name="membership_invites")
             invite_reason = models.CharField(max_length=64)
 
@@ -1368,9 +1368,10 @@ that control how the relationship functions.
     above.
 
     ``through_fields`` accepts a 2-tuple ``('field1', 'field2')``, where
-    ``field1`` is the name of the foreign key to the target model (``person``
-    in this case), and ``field2`` the name of the foreign key to the model the
-    :class:`ManyToManyField` is defined on (``group`` in this case).
+    ``field1`` is the name of the foreign key to the model the
+    :class:`ManyToManyField` is defined on (``group`` in this case), and
+    ``field2`` the name of the foreign key to the target model (``person``
+    in this case).
 
     When you have more than one foreign key on an intermediary model to any
     (or even both) of the models participating in a many-to-many relationship,
