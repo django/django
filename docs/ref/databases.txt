@@ -603,7 +603,7 @@ Version 3.6.2
 --------------
 
 SQLite version 3.6.2 (released August 30, 2008) introduced a bug into ``SELECT
-DISTINCT`` handling that is triggered by, amongst other things, Django's
+DISTINCT`` handling that is triggered by, among other things, Django's
 ``DateQuerySet`` (returned by the ``dates()`` method on a queryset).
 
 You should avoid using this version of SQLite with Django. Either upgrade to

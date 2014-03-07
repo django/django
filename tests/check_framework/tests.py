@@ -134,7 +134,7 @@ class Django_1_6_0_CompatibilityChecks(TestCase):
                 errors = check_1_6_compatibility()
                 expected = [
                     checks.Warning(
-                        'BooleanField does not have a default value. ',
+                        'BooleanField does not have a default value.',
                         hint=('Django 1.6 changed the default value of BooleanField from False to None. '
                               'See https://docs.djangoproject.com/en/1.6/ref/models/fields/#booleanfield '
                               'for more information.'),

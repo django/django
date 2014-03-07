@@ -1710,7 +1710,7 @@ class FormsTestCase(TestCase):
     def test_empty_permitted(self):
         # Sometimes (pretty much in formsets) we want to allow a form to pass validation
         # if it is completely empty. We can accomplish this by using the empty_permitted
-        # agrument to a form constructor.
+        # argument to a form constructor.
         class SongForm(Form):
             artist = CharField()
             name = CharField()

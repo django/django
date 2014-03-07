@@ -108,7 +108,7 @@ def flatten_fieldsets(fieldsets):
 def get_deleted_objects(objs, opts, user, admin_site, using):
     """
     Find all objects related to ``objs`` that should also be deleted. ``objs``
-    must be a homogenous iterable of objects (e.g. a QuerySet).
+    must be a homogeneous iterable of objects (e.g. a QuerySet).
 
     Returns a nested list of strings suitable for display in the
     template with the ``unordered_list`` filter.
@@ -168,7 +168,7 @@ class NestedObjects(Collector):
 
     def collect(self, objs, source=None, source_attr=None, **kwargs):
         for obj in objs:
-            if source_attr:
+            if source_attr and not source_attr.endswith('+'):
                 related_name = source_attr % {
                     'class': source._meta.model_name,
                     'app_label': source._meta.app_label,

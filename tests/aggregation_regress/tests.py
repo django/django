@@ -70,7 +70,7 @@ class AggregationTests(TestCase):
         Regression test for #11916: Extra params + aggregation creates
         incorrect SQL.
         """
-        # oracle doesn't support subqueries in group by clause
+        # Oracle doesn't support subqueries in group by clause
         shortest_book_sql = """
         SELECT name
         FROM aggregation_regress_book b
@@ -1080,7 +1080,7 @@ class AggregationTests(TestCase):
         )
 
     def test_name_expressions(self):
-        # Test that aggregates are spotted corretly from F objects.
+        # Test that aggregates are spotted correctly from F objects.
         # Note that Adrian's age is 34 in the fixtures, and he has one book
         # so both conditions match one author.
         qs = Author.objects.annotate(Count('book')).filter(

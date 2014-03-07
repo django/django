@@ -153,7 +153,7 @@ class Number(models.Model):
     def __str__(self):
         return six.text_type(self.num)
 
-# Symmetrical m2m field with a normal field using the reverse accesor name
+# Symmetrical m2m field with a normal field using the reverse accessor name
 # ("valid").
 
 

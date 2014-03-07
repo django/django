@@ -162,7 +162,7 @@ class WSGIHandler(base.BaseHandler):
         if self._request_middleware is None:
             with self.initLock:
                 try:
-                    # Check that middleware is still uninitialised.
+                    # Check that middleware is still uninitialized.
                     if self._request_middleware is None:
                         self.load_middleware()
                 except:

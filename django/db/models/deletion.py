@@ -97,7 +97,7 @@ class Collector(object):
 
     def add_field_update(self, field, value, objs):
         """
-        Schedules a field update. 'objs' must be a homogenous iterable
+        Schedules a field update. 'objs' must be a homogeneous iterable
         collection of model instances (e.g. a QuerySet).
         """
         if not objs:
@@ -148,7 +148,7 @@ class Collector(object):
             source_attr=None, reverse_dependency=False):
         """
         Adds 'objs' to the collection of objects to be deleted as well as all
-        parent instances.  'objs' must be a homogenous iterable collection of
+        parent instances.  'objs' must be a homogeneous iterable collection of
         model instances (e.g. a QuerySet).  If 'collect_related' is True,
         related objects will be handled by their respective on_delete handler.
 

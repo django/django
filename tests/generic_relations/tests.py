@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django import forms
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import FieldError
 from django.test import TestCase
 from django.utils import six
 
@@ -42,6 +43,17 @@ class GenericRelationsTests(TestCase):
         # You can easily access the content object like a foreign key.
         t = TaggedItem.objects.get(tag="salty")
         self.assertEqual(t.content_object, bacon)
+        qs = TaggedItem.objects.filter(animal__isnull=False).order_by('animal__common_name', 'tag')
+        self.assertQuerysetEqual(
+            qs, ["<TaggedItem: hairy>", "<TaggedItem: yellow>", "<TaggedItem: fatty>"]
+        )
+        mpk = ManualPK.objects.create(id=1)
+        mpk.tags.create(tag='mpk')
+        from django.db.models import Q
+        qs = TaggedItem.objects.filter(Q(animal__isnull=False) | Q(manualpk__id=1)).order_by('tag')
+        self.assertQuerysetEqual(
+            qs, ["fatty", "hairy", "mpk", "yellow"], lambda x: x.tag)
+        mpk.delete()
 
         # Recall that the Mineral class doesn't have an explicit GenericRelation
         # defined. That's OK, because you can create TaggedItems explicitly.
@@ -150,6 +162,12 @@ class GenericRelationsTests(TestCase):
         self.assertQuerysetEqual(Animal.objects.filter(tags__content_type=ctype), [
             "<Animal: Platypus>"
         ])
+
+    def test_generic_relation_related_name_default(self):
+        # Test that GenericRelation by default isn't usable from
+        # the reverse side.
+        with self.assertRaises(FieldError):
+            TaggedItem.objects.filter(vegetable__isnull=True)
 
     def test_multiple_gfk(self):
         # Simple tests for multiple GenericForeignKeys

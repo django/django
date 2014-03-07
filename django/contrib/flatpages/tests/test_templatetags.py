@@ -88,7 +88,7 @@ class FlatpageTemplateTagTests(TestCase):
 
     @skipIfCustomUser
     def test_get_flatpages_with_prefix_for_user(self):
-        "The flatpage template tag retrive prefixed flatpages for an authenticated user"
+        "The flatpage template tag retrieve prefixed flatpages for an authenticated user"
         me = User.objects.create_user('testuser', 'test@example.com', 's3krit')
         out = Template(
             "{% load flatpages %}"

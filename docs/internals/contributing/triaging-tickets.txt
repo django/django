@@ -112,7 +112,7 @@ or ought to be closed for any of the various reasons.
 Accepted
 ~~~~~~~~
 
-The big grey area! The absolute meaning of "accepted" is that the issue
+The big gray area! The absolute meaning of "accepted" is that the issue
 described in the ticket is valid and is in some stage of being worked on.
 Beyond that there are several considerations:
 

@@ -449,9 +449,7 @@ class Options(object):
         for f, model in self.get_fields_with_model():
             cache[f.name] = cache[f.attname] = (f, model, True, False)
         for f in self.virtual_fields:
-            if hasattr(f, 'related'):
-                cache[f.name] = cache[f.attname] = (
-                    f.related, None if f.model == self.model else f.model, True, False)
+            cache[f.name] = (f, None if f.model == self.model else f.model, True, False)
         if apps.ready:
             self._name_map = cache
         return cache
@@ -530,8 +528,9 @@ class Options(object):
         proxy_cache = cache.copy()
         for klass in self.apps.get_models(include_auto_created=True):
             if not klass._meta.swapped:
-                for f in klass._meta.local_fields:
-                    if f.rel and not isinstance(f.rel.to, six.string_types) and f.generate_reverse_relation:
+                for f in klass._meta.local_fields + klass._meta.virtual_fields:
+                    if (hasattr(f, 'rel') and f.rel and not isinstance(f.rel.to, six.string_types)
+                            and f.generate_reverse_relation):
                         if self == f.rel.to._meta:
                             cache[f.related] = None
                             proxy_cache[f.related] = None

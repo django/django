@@ -69,7 +69,7 @@ libraries = {}
 builtins = []
 
 # True if TEMPLATE_STRING_IF_INVALID contains a format string (%s). None means
-# uninitialised.
+# uninitialized.
 invalid_var_format_string = None
 
 

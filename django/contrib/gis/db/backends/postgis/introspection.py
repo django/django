@@ -51,7 +51,7 @@ class PostGISIntrospection(DatabaseIntrospection):
         if not self.postgis_types_reverse:
             # If the PostGIS types reverse dictionary is not populated, do so
             # now.  In order to prevent unnecessary requests upon connection
-            # intialization, the `data_types_reverse` dictionary is not updated
+            # initialization, the `data_types_reverse` dictionary is not updated
             # with the PostGIS custom types until introspection is actually
             # performed -- in other words, when this function is called.
             self.postgis_types_reverse = self.get_postgis_types()

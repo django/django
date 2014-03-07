@@ -23,7 +23,7 @@ class MigrationLoader(object):
     an app. Their names are entirely unimportant from a code perspective,
     but will probably follow the 1234_name.py convention.
 
-    On initialisation, this class will scan those directories, and open and
+    On initialization, this class will scan those directories, and open and
     read the python files, looking for a class called Migration, which should
     inherit from django.db.migrations.Migration. See
     django.db.migrations.migration for what that looks like.

@@ -1182,7 +1182,7 @@ class LiveServerTestCase(TransactionTestCase):
             cls.server_thread.terminate()
             cls.server_thread.join()
 
-        # Restore sqlite connections' non-sharability
+        # Restore sqlite connections' non-shareability
         for conn in connections.all():
             if (conn.vendor == 'sqlite'
                     and conn.settings_dict['NAME'] == ':memory:'):

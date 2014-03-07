@@ -4,6 +4,11 @@ import json
 import sys
 import warnings
 
+try:
+    from collections import UserList
+except ImportError:  # Python 2
+    from UserList import UserList
+
 from django.conf import settings
 from django.utils.html import format_html, format_html_join, escape
 from django.utils.encoding import force_text, python_2_unicode_compatible
@@ -14,11 +19,6 @@ from django.utils import six
 # Import ValidationError so that it can be imported from this
 # module to maintain backwards compatibility.
 from django.core.exceptions import ValidationError
-
-try:
-    from collections import UserList
-except ImportError:  # Python 2
-    from UserList import UserList
 
 
 def flatatt(attrs):
@@ -56,8 +56,7 @@ class ErrorDict(dict):
         return {f: e.as_data() for f, e in self.items()}
 
     def as_json(self, escape_html=False):
-        errors = {f: json.loads(e.as_json(escape_html=escape_html)) for f, e in self.items()}
-        return json.dumps(errors)
+        return json.dumps({f: e.get_json_data(escape_html) for f, e in self.items()})
 
     def as_ul(self):
         if not self:
@@ -84,17 +83,20 @@ class ErrorList(UserList, list):
     A collection of errors that knows how to display itself in various formats.
     """
     def as_data(self):
-        return self.data
+        return ValidationError(self.data).error_list
 
-    def as_json(self, escape_html=False):
+    def get_json_data(self, escape_html=False):
         errors = []
-        for error in ValidationError(self.data).error_list:
+        for error in self.as_data():
             message = list(error)[0]
             errors.append({
                 'message': escape(message) if escape_html else message,
                 'code': error.code or '',
             })
-        return json.dumps(errors)
+        return errors
+
+    def as_json(self, escape_html=False):
+        return json.dumps(self.get_json_data(escape_html))
 
     def as_ul(self):
         if not self.data:

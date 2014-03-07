@@ -568,7 +568,7 @@ class Query(object):
         Converts the self.deferred_loading data structure to an alternate data
         structure, describing the field that *will* be loaded. This is used to
         compute the columns to select from the database and also by the
-        QuerySet class to work out which fields are being initialised on each
+        QuerySet class to work out which fields are being initialized on each
         model. Models that have all their fields included aren't mentioned in
         the result, only those that have field restrictions in place.
 
@@ -1088,24 +1088,21 @@ class Query(object):
         lookups = lookups[:]
         while lookups:
             lookup = lookups[0]
-            next = lhs.get_lookup(lookup)
+            if len(lookups) == 1:
+                final_lookup = lhs.get_lookup(lookup)
+                if final_lookup:
+                    return final_lookup(lhs, rhs)
+                # We didn't find a lookup, so we are going to try get_transform
+                # + get_lookup('exact').
+                lookups.append('exact')
+            next = lhs.get_transform(lookup)
             if next:
-                if len(lookups) == 1:
-                    # This was the last lookup, so return value lookup.
-                    if issubclass(next, Transform):
-                        lookups.append('exact')
-                        lhs = next(lhs, lookups)
-                    else:
-                        return next(lhs, rhs)
-                else:
-                    lhs = next(lhs, lookups)
-            # A field's get_lookup() can return None to opt for backwards
-            # compatibility path.
-            elif len(lookups) > 2:
-                raise FieldError(
-                    "Unsupported lookup for field '%s'" % lhs.output_type.name)
+                lhs = next(lhs, lookups)
             else:
-                return None
+                raise FieldError(
+                    "Unsupported lookup '%s' for %s or join on the field not "
+                    "permitted." %
+                    (lookup, lhs.output_type.__class__.__name__))
             lookups = lookups[1:]
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
@@ -1767,7 +1764,7 @@ class Query(object):
         """
         # Fields on related models are stored in the literal double-underscore
         # format, so that we can use a set datastructure. We do the foo__bar
-        # splitting and handling when computing the SQL colum names (as part of
+        # splitting and handling when computing the SQL column names (as part of
         # get_columns()).
         existing, defer = self.deferred_loading
         if defer:

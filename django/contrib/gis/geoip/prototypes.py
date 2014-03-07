@@ -56,7 +56,7 @@ GeoIPRecord_delete.restype = None
 def check_record(result, func, cargs):
     if result:
         # Checking the pointer to the C structure, if valid pull out elements
-        # into a dicionary.
+        # into a dictionary.
         rec = result.contents
         record = dict((fld, getattr(rec, fld)) for fld, ctype in rec._fields_)
 

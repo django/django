@@ -300,7 +300,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(4269, mpoly.srid)
             self.assertEqual('NAD83', mpoly.srs.name)
 
-            # Incrementing through the multipolyogn after the spatial reference
+            # Incrementing through the multipolygon after the spatial reference
             # has been re-assigned.
             for poly in mpoly:
                 self.assertEqual(mpoly.srs.wkt, poly.srs.wkt)

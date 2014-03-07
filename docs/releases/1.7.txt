@@ -308,6 +308,10 @@ Minor features
   <django.contrib.admin.ModelAdmin.list_display>` value by prefixing the
   ``admin_order_field`` value with a hyphen.
 
+* The :meth:`ModelAdmin.get_changeform_initial_data()
+  <django.contrib.admin.ModelAdmin.get_changeform_initial_data>` method may be
+  overridden to define custom behavior for setting initial change form data.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -437,6 +441,17 @@ Cache
   thread-safe any more, as :data:`django.core.cache.caches` now yields
   different instances per thread.
 
+* Defining the :setting:`TIMEOUT <CACHES-TIMEOUT>` argument of the
+  :setting:`CACHES` setting as ``None`` will set the cache keys as
+  "non-expiring" by default. Previously, it was only possible to pass
+  ``timeout=None` to the cache backend's ``set()`` method.
+
+Cross Site Request Forgery
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The :setting:`CSRF_COOKIE_AGE` setting facilitates the use of session-based
+  CSRF cookies.
+
 Email
 ^^^^^
 
@@ -478,6 +493,10 @@ Forms
   buttons or checkboxes now include ``for`` and ``id`` attributes, respectively.
   Each radio button or checkbox includes an ``id_for_label`` attribute to
   output the element's ID.
+
+* The ``<textarea>`` tags rendered by :class:`~django.forms.Textarea` now
+  include a ``maxlength`` attribute if the :class:`~django.db.models.TextField`
+  model field has a ``max_length``.
 
 * :attr:`Field.choices<django.db.models.Field.choices>` now allows you to
   customize the "empty choice" label by including a tuple with an empty string
@@ -558,6 +577,10 @@ Internationalization
   any extracted strings will now be automatically distributed to the proper
   app or project message file. See :ref:`how-to-create-language-files` for
   details.
+
+* The :djadmin:`makemessages` command now always adds the ``--previous``
+  command line flag to the ``msgmerge`` command, keeping previously translated
+  strings in po files for fuzzy strings.
 
 * The following settings to adjust the language cookie options were introduced:
   :setting:`LANGUAGE_COOKIE_AGE`, :setting:`LANGUAGE_COOKIE_DOMAIN`
@@ -644,6 +667,12 @@ Models
 
 * You can use a single list for :attr:`~django.db.models.Options.index_together`
   (rather than a list of lists) when specifying a single set of fields.
+
+* Custom intermediate models having more than one foreign key to any of the
+  models participating in a many-to-many relationship are now permitted,
+  provided you explicitly specify which foreign keys should be used by setting
+  the new :attr:`ManyToManyField.through_fields <django.db.models.ManyToManyField.through_fields>`
+  argument.
 
 Signals
 ^^^^^^^
@@ -1142,6 +1171,14 @@ Miscellaneous
 * ``django.utils.translation.get_language_from_path()`` and
   ``django.utils.translation.trans_real.get_supported_language_variant()``
   now no longer have a ``supported`` argument.
+
+* The ``shortcut`` view in ``django.contrib.contenttypes.views`` now supports
+  protocol-relative URLs (e.g. ``//example.com``).
+
+* :class:`~django.contrib.contenttypes.fields.GenericRelation` now supports an
+  optional ``related_query_name`` argument. Setting ``related_query_name`` adds
+  a relation from the related object back to the content type for filtering,
+  ordering and other query operations.
 
 .. _deprecated-features-1.7:
 

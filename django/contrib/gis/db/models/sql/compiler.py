@@ -21,7 +21,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
 
         If 'with_aliases' is true, any column names that are duplicated
         (without the table names) are given unique aliases. This is needed in
-        some cases to avoid ambiguitity with nested queries.
+        some cases to avoid ambiguity with nested queries.
 
         This routine is overridden from Query to handle customized selection of
         geometry columns.

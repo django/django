@@ -510,7 +510,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         self.assertFormErrors(['This is not a valid IPv6 address.'], f.clean, '1:2')
 
     def test_generic_ipaddress_normalization(self):
-        # Test the normalising code
+        # Test the normalizing code
         f = GenericIPAddressField()
         self.assertEqual(f.clean(' ::ffff:0a0a:0a0a  '), '::ffff:10.10.10.10')
         self.assertEqual(f.clean(' ::ffff:10.10.10.10  '), '::ffff:10.10.10.10')

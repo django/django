@@ -60,6 +60,14 @@ and use ``NotEqual`` to generate the SQL. By convention, these names are always
 lowercase strings containing only letters, but the only hard requirement is
 that it must not contain the string ``__``.
 
+We then need to define the ``as_sql`` method. This takes a ``SQLCompiler``
+object, called ``qn``,  and the active database connection. ``SQLCompiler``
+objects are not documented, but the only thing we need to know about them is
+that they have a ``compile()`` method which returns a tuple containing a SQL
+string, and the parameters to be interpolated into that string. In most cases,
+you don't need to use it directly and can pass it on to ``process_lhs()`` and
+``process_rhs()``.
+
 A ``Lookup`` works against two values, ``lhs`` and ``rhs``, standing for
 left-hand side and right-hand side. The left-hand side is usually a field
 reference, but it can be anything implementing the :ref:`query expression API
@@ -69,11 +77,13 @@ reference to the ``name`` field of the ``Author`` model, and ``'Jack'`` is the
 right-hand side.
 
 We call ``process_lhs`` and ``process_rhs`` to convert them into the values we
-need for SQL. In the above example, ``process_lhs`` returns
-``('"author"."name"', [])`` and ``process_rhs`` returns ``('"%s"', ['Jack'])``.
-In this example there were no parameters for the left hand side, but this would
-depend on the object we have, so we still need to include them in the
-parameters we return.
+need for SQL using the ``qn`` object described before. These methods return
+tuples containing some SQL and the parameters to be interpolated into that SQL,
+just as we need to return from our ``as_sql`` method. In the above example,
+``process_lhs`` returns ``('"author"."name"', [])`` and ``process_rhs`` returns
+``('"%s"', ['Jack'])``. In this example there were no parameters for the left
+hand side, but this would depend on the object we have, so we still need to
+include them in the parameters we return.
 
 Finally we combine the parts into a SQL expression with ``<>``, and supply all
 the parameters for the query. We then return a tuple containing the generated
@@ -216,6 +226,52 @@ When compiling a query, Django first looks for ``as_%s % connection.vendor``
 methods, and then falls back to ``as_sql``. The vendor names for the in-built
 backends are ``sqlite``, ``postgresql``, ``oracle`` and ``mysql``.
 
+How Django determines the lookups and transforms which are used
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In some cases you may which to dynamically change which ``Transform`` or
+``Lookup`` is returned based on the name passed in, rather than fixing it. As
+an example, you could have a field which stores coordinates or an arbitrary
+dimension, and wish to allow a syntax like ``.filter(coords__x7=4)`` to return
+the objects where the 7th coordinate has value 4. In order to do this, you
+would override ``get_lookup`` with something like::
+
+    class CoordinatesField(Field):
+        def get_lookup(self, lookup_name):
+            if lookup_name.startswith('x'):
+                try:
+                    dimension = int(lookup_name[1:])
+                except ValueError:
+                    pass
+                finally:
+                    return get_coordinate_lookup(dimension)
+            return super(CoordinatesField, self).get_lookup(lookup_name)
+
+You would then define ``get_coordinate_lookup`` appropriately to return a
+``Lookup`` subclass which handles the relevant value of ``dimension``.
+
+There is a similarly named method called ``get_transform()``. ``get_lookup()``
+should always return a ``Lookup`` subclass, and ``get_transform()`` a
+``Transform`` subclass. It is important to remember that ``Transform``
+objects can be further filtered on, and ``Lookup`` objects cannot.
+
+When filtering, if there is only one lookup name remaining to be resolved, we
+will look for a ``Lookup``. If there are multiple names, it will look for a
+``Transform``. In the situation where there is only one name and a ``Lookup``
+is not found, we look for a ``Transform`` and then the ``exact`` lookup on that
+``Transform``. All call sequences always end with a ``Lookup``. To clarify:
+
+- ``.filter(myfield__mylookup)`` will call ``myfield.get_lookup('mylookup')``.
+- ``.filter(myfield__mytransform__mylookup)`` will call
+  ``myfield.get_transform('mytransform')``, and then
+  ``mytransform.get_lookup('mylookup')``.
+- ``.filter(myfield__mytransform)`` will first call
+  ``myfield.get_lookup('mytransform')``, which will fail, so it will fall back
+  to calling ``myfield.get_transform('mytransform')`` and then
+  ``mytransform.get_lookup('exact')``.
+
+Lookups and transforms are registered using the same API - ``register_lookup``.
+
 .. _query-expression:
 
 The Query Expression API
@@ -228,20 +284,13 @@ to this API.
 .. method:: as_sql(qn, connection)
 
     Responsible for producing the query string and parameters for the
-    expression. The ``qn`` has a ``compile()`` method that can be used to
-    compile other expressions. The ``connection`` is the connection used to
-    execute the query.
+    expression. The ``qn`` is a ``SQLCompiler`` object, which has a
+    ``compile()`` method that can be used to compile other expressions. The
+    ``connection`` is the connection used to execute the query.
 
     Calling expression.as_sql() directly is usually incorrect - instead
     ``qn.compile(expression)`` should be used. The ``qn.compile()`` method will
     take care of calling vendor-specific methods of the expression.
-
-.. method:: get_lookup(lookup_name)
-
-    The ``get_lookup()`` method is used to fetch lookups. By default the
-    lookup is fetched from the expression's output type in the same way
-    described in registering and fetching lookup documentation below.
-    It is possible to override this method to alter that behavior.
 
 .. method:: as_vendorname(qn, connection)
 
@@ -250,6 +299,21 @@ to this API.
     vendorname is the vendor name of the backend used for executing the query.
     The vendorname is one of ``postgresql``, ``oracle``, ``sqlite`` or
     ``mysql`` for Django's built-in backends.
+
+.. method:: get_lookup(lookup_name)
+
+    The ``get_lookup()`` method is used to fetch lookups. By default the
+    lookup is fetched from the expression's output type in the same way
+    described in registering and fetching lookup documentation below.
+    It is possible to override this method to alter that behavior.
+
+.. method:: get_transform(lookup_name)
+
+    The ``get_transform()`` method is used when a transform is needed rather
+    than a lookup, or if a lookup is not found. This is a more complex
+    situation which is useful when there arbitrary possible lookups for a
+    field. Generally speaking, you will not need to override ``get_lookup()``
+    or ``get_transform()``, and can use ``register_lookup()`` instead.
 
 .. attribute:: output_type
 
@@ -325,12 +389,19 @@ The lookup registration API is explained below.
     Registers the Lookup or Transform for the class. For example
     ``DateField.register_lookup(YearExact)`` will register ``YearExact`` for
     all ``DateFields`` in the project, but also for fields that are instances
-    of a subclass of ``DateField`` (for example ``DateTimeField``).
+    of a subclass of ``DateField`` (for example ``DateTimeField``). You can
+    register a Lookup or a Transform using the same class method.
 
 .. method:: get_lookup(lookup_name)
 
-    Django uses ``get_lookup(lookup_name)`` to fetch lookups or transforms.
-    The implementation of ``get_lookup()`` fetches lookups or transforms
-    registered for the current class based on their lookup_name attribute.
+    Django uses ``get_lookup(lookup_name)`` to fetch lookups. The
+    implementation of ``get_lookup()`` looks for a subclass which is registered
+    for the current class with the correct ``lookup_name``.
+
+.. method:: get_transform(lookup_name)
+
+    Django uses ``get_transform(lookup_name)`` to fetch lookups. The
+    implementation of ``get_transform()`` looks for a subclass which is registered
+    for the current class with the correct ``transform_name``.
 
 The lookup registration API is available for ``Transform`` and ``Field`` classes.

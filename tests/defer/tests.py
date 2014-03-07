@@ -110,7 +110,7 @@ class DeferTests(TestCase):
         obj.name = "c2"
         obj.save()
 
-        # You can retrive a single column on a base class with no fields
+        # You can retrieve a single column on a base class with no fields
         obj = Child.objects.only("name").get(name="c2")
         self.assert_delayed(obj, 3)
         self.assertEqual(obj.name, "c2")

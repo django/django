@@ -117,7 +117,7 @@ class EggLoaderTest(TestCase):
 class CachedLoader(TestCase):
     def test_templatedir_caching(self):
         "Check that the template directories form part of the template cache key. Refs #13573"
-        # Retrive a template specifying a template directory to check
+        # Retrieve a template specifying a template directory to check
         t1, name = loader.find_template('test.html', (os.path.join(os.path.dirname(upath(__file__)), 'templates', 'first'),))
         # Now retrieve the same template name, but from a different directory
         t2, name = loader.find_template('test.html', (os.path.join(os.path.dirname(upath(__file__)), 'templates', 'second'),))

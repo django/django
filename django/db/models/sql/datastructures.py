@@ -24,6 +24,9 @@ class Col(object):
     def get_lookup(self, name):
         return self.output_type.get_lookup(name)
 
+    def get_transform(self, name):
+        return self.output_type.get_transform(name)
+
     def prepare(self):
         return self
 

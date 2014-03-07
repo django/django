@@ -266,7 +266,7 @@ class TemplateCommand(BaseCommand):
                 guessed_filename += ext
 
         # Move the temporary file to a filename that has better
-        # chances of being recognnized by the archive utils
+        # chances of being recognized by the archive utils
         if used_name != guessed_filename:
             guessed_path = path.join(tempdir, guessed_filename)
             shutil.move(the_path, guessed_path)

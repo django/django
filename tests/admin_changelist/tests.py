@@ -191,7 +191,7 @@ class ChangeListTests(TestCase):
     def test_distinct_for_m2m_in_list_filter(self):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
-        results shouldn't apper more than once. Basic ManyToMany.
+        results shouldn't appear more than once. Basic ManyToMany.
         """
         blues = Genre.objects.create(name='Blues')
         band = Band.objects.create(name='B.B. King Review', nr_of_members=11)
@@ -215,7 +215,7 @@ class ChangeListTests(TestCase):
     def test_distinct_for_through_m2m_in_list_filter(self):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
-        results shouldn't apper more than once. With an intermediate model.
+        results shouldn't appear more than once. With an intermediate model.
         """
         lead = Musician.objects.create(name='Vox')
         band = Group.objects.create(name='The Hype')
@@ -238,7 +238,7 @@ class ChangeListTests(TestCase):
     def test_distinct_for_inherited_m2m_in_list_filter(self):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
-        results shouldn't apper more than once. Model managed in the
+        results shouldn't appear more than once. Model managed in the
         admin inherits from the one that defins the relationship.
         """
         lead = Musician.objects.create(name='John')
@@ -262,7 +262,7 @@ class ChangeListTests(TestCase):
     def test_distinct_for_m2m_to_inherited_in_list_filter(self):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
-        results shouldn't apper more than once. Target of the relationship
+        results shouldn't appear more than once. Target of the relationship
         inherits from another.
         """
         lead = ChordsMusician.objects.create(name='Player A')
