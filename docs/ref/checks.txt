@@ -115,7 +115,7 @@ Admin
 
 Admin checks are all performed as part of the ``admin`` tag.
 
-The following checks are performend on any
+The following checks are performed on any
 :class:`~django.contrib.admin.ModelAdmin` (or subclass) that is registered
 with the admin site:
 
@@ -244,4 +244,3 @@ MySQL
 If you're using MySQL, the following checks will be performed:
 
 * **mysql.E001**: MySQL does not allow unique CharFields to have a max_length > 255.
-
