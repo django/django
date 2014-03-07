@@ -33,6 +33,17 @@ needs_sphinx = '1.0'
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ["djangodocs", "sphinx.ext.intersphinx"]
 
+# Spelling check needs additional module, that is not installed by default.
+# It is added dynamically, so you can always generate docs.
+if 'spelling' in sys.argv:
+    extensions.append("sphinxcontrib.spelling")
+
+# Spelling language.
+spelling_lang = 'en_US'
+
+# Location of word list.
+spelling_word_list_filename = 'spelling_wordlist'
+
 # Add any paths that contain templates here, relative to this directory.
 # templates_path = []
 

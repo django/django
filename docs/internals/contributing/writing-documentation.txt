@@ -348,3 +348,28 @@ look better:
   (that's a tilde) to get just the "last bit" of that path. So
   ``:class:`~django.contrib.contenttypes.models.ContentType``` will just
   display a link with the title "ContentType".
+
+Spelling check
+--------------
+
+Before you commit your docs there you may (and you should) check if in your work
+there are no typos. To do so you have to fulfill some requirements:
+
+* Install ``pyenchant`` package (you will need to have ``enchant`` installed on
+  your system). See: http://pythonhosted.org/pyenchant/ for more info.
+
+* Install ``sphinxcontrib-spelling`` package.
+
+* Change working directory to ``docs`` and run ``make spelling``.
+
+Wrong words (if any) with path and line numbers will be saved into
+``_build/spelling/output.txt``.
+
+If you encounter problem with words you can either:
+
+* Fix typo, surround brand/technology names with double ` or find
+  synonyms for problematic words (preferable).
+
+* If, and only if, you are sure word you are using is correct - add word
+  as correct to ``docs/spelling_wordlist`` (please keep alphabetical
+  order there and write one word per line).
