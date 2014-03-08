@@ -9,7 +9,7 @@ from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.transaction import atomic
 from .models import (Author, AuthorWithM2M, Book, BookWithLongName,
     BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
-    UniqueTest, Thing)
+    UniqueTest, Thing, TagThrough, BookWithM2MThrough)
 
 
 class SchemaTests(TransactionTestCase):
@@ -26,7 +26,7 @@ class SchemaTests(TransactionTestCase):
     models = [
         Author, AuthorWithM2M, Book, BookWithLongName, BookWithSlug,
         BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest,
-        Thing
+        Thing, TagThrough, BookWithM2MThrough
     ]
 
     # Utility functions
@@ -309,6 +309,20 @@ class SchemaTests(TransactionTestCase):
         # Ensure there is now an m2m table there
         columns = self.column_classes(BookWithM2M._meta.get_field_by_name("tags")[0].rel.through)
         self.assertEqual(columns['tagm2mtest_id'][0], "IntegerField")
+
+    def test_m2m_create_through(self):
+        """
+        Tests M2M fields on models during creation with through models
+        """
+        # Create the tables
+        with connection.schema_editor() as editor:
+            editor.create_model(TagThrough)
+            editor.create_model(TagM2MTest)
+            editor.create_model(BookWithM2MThrough)
+        # Ensure there is now an m2m table there
+        columns = self.column_classes(TagThrough)
+        self.assertEqual(columns['book_id'][0], "IntegerField")
+        self.assertEqual(columns['tag_id'][0], "IntegerField")
 
     def test_m2m(self):
         """

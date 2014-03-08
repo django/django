@@ -44,6 +44,21 @@ class BookWithM2M(models.Model):
         apps = new_apps
 
 
+class TagThrough(models.Model):
+    book = models.ForeignKey("schema.BookWithM2MThrough")
+    tag = models.ForeignKey("schema.TagM2MTest")
+
+    class Meta:
+        apps = new_apps
+
+
+class BookWithM2MThrough(models.Model):
+    tags = models.ManyToManyField("TagM2MTest", related_name="books", through=TagThrough)
+
+    class Meta:
+        apps = new_apps
+
+
 class BookWithSlug(models.Model):
     author = models.ForeignKey(Author)
     title = models.CharField(max_length=100, db_index=True)
