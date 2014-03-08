@@ -268,7 +268,6 @@ class BaseDatabaseSchemaEditor(object):
             })
         # Make M2M tables
         for field in model._meta.local_many_to_many:
-            import ipdb; ipdb.set_trace()
             self.create_model(field.rel.through)
 
     def delete_model(self, model):
