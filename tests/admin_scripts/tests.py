@@ -139,6 +139,7 @@ class AdminScriptTestCase(unittest.TestCase):
         python_path = [base_dir, django_dir, tests_dir]
         python_path.extend(ext_backend_base_dirs)
         test_environ[python_path_var_name] = os.pathsep.join(python_path)
+        test_environ['PYTHONWARNINGS'] = ''
 
         # Move to the test directory and run
         os.chdir(test_dir)
