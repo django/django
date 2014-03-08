@@ -67,6 +67,10 @@ class NullBooleanModel(models.Model):
     nbfield = models.NullBooleanField()
 
 
+class NotNullEmptyStringBasedModel(models.Model):
+    field = models.CharField(max_length=100, blank=True)
+
+
 class BooleanModel(models.Model):
     bfield = models.BooleanField(default=None)
     string = models.CharField(max_length=10, default='abc')

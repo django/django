@@ -19,7 +19,7 @@ from django import forms
 from django.core import exceptions, validators, checks
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
-from django.utils.functional import curry, total_ordering, Promise
+from django.utils.functional import cached_property, curry, total_ordering, Promise
 from django.utils.text import capfirst
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -91,7 +91,12 @@ class Field(RegisterLookupMixin):
     # Designates whether empty strings fundamentally are allowed at the
     # database level.
     empty_strings_allowed = True
-    empty_values = list(validators.EMPTY_VALUES)
+
+    def _empty_values(self):
+        if self.empty_strings_allowed and not self.null:
+            return ['']
+        return [None, '']
+    empty_values = cached_property(_empty_values)
 
     # These track each time a Field instance is created. Used to retain order.
     # The auto_creation_counter is used for fields that Django implicitly

@@ -23,7 +23,7 @@ from django.utils.functional import lazy
 from .models import (
     Foo, Bar, Whiz, BigD, BigS, BigInt, Post, NullBooleanModel,
     BooleanModel, PrimaryKeyCharModel, DataModel, Document, RenamedField,
-    VerboseNameField, FksToBooleans, FkToChar)
+    VerboseNameField, FksToBooleans, FkToChar, NotNullEmptyStringBasedModel)
 
 
 class BasicFieldTests(test.TestCase):
@@ -51,6 +51,11 @@ class BasicFieldTests(test.TestCase):
             nullboolean.full_clean()
         except ValidationError as e:
             self.fail("NullBooleanField failed validation with value of None: %s" % e.messages)
+
+    def test_not_null_blank_string_based_field(self):
+        stringbased = NotNullEmptyStringBasedModel(field=None)
+        with self.assertRaises(ValidationError):
+            stringbased.full_clean()
 
     def test_field_repr(self):
         """
