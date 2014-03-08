@@ -7,6 +7,7 @@ from django.core import mail
 from django.test import TestCase, RequestFactory, override_settings
 from django.test.utils import patch_logger
 from django.utils.encoding import force_text
+from django.utils.deprecation import RemovedInNextVersionWarning
 from django.utils.log import (CallbackFilter, RequireDebugFalse,
     RequireDebugTrue)
 from django.utils.six import StringIO
@@ -86,8 +87,8 @@ class DefaultLoggingTest(TestCase):
 
 class WarningLoggerTests(TestCase):
     """
-    Tests that warnings output for DeprecationWarnings is enabled
-    and captured to the logging system
+    Tests that warnings output for RemovedInDjangoXXWarning (XX being the next
+    Django version) is enabled and captured to the logging system
     """
     def setUp(self):
         # If tests are invoke with "-Wall" (or any -W flag actually) then
@@ -118,12 +119,12 @@ class WarningLoggerTests(TestCase):
 
     @override_settings(DEBUG=True)
     def test_warnings_capture(self):
-        warnings.warn('Foo Deprecated', DeprecationWarning)
+        warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
         output = force_text(self.outputs[0].getvalue())
         self.assertTrue('Foo Deprecated' in output)
 
     def test_warnings_capture_debug_false(self):
-        warnings.warn('Foo Deprecated', DeprecationWarning)
+        warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
         output = force_text(self.outputs[0].getvalue())
         self.assertFalse('Foo Deprecated' in output)
 
