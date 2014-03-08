@@ -270,9 +270,7 @@ class FileField(Field):
 
     def deconstruct(self):
         name, path, args, kwargs = super(FileField, self).deconstruct()
-        if kwargs.get("max_length", None) != 100:
-            kwargs["max_length"] = 100
-        else:
+        if kwargs.get("max_length", None) == 100:
             del kwargs["max_length"]
         kwargs['upload_to'] = self.upload_to
         if self.storage is not default_storage:
