@@ -846,7 +846,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
 
     def check(self, cls, parent_model, **kwargs):
         errors = super(InlineModelAdminChecks, self).check(cls, model=cls.model, **kwargs)
-        errors.extend(self._check_fk_name(cls, parent_model))
+        errors.extend(self._check_relation(cls, parent_model))
         errors.extend(self._check_exclude_of_parent_model(cls, parent_model))
         errors.extend(self._check_extra(cls))
         errors.extend(self._check_max_num(cls))
@@ -861,7 +861,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
             return []
 
         # Skip if `fk_name` is invalid.
-        if self._check_fk_name(cls, parent_model):
+        if self._check_relation(cls, parent_model):
             return []
 
         if cls.exclude is None:
@@ -883,7 +883,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
         else:
             return []
 
-    def _check_fk_name(self, cls, parent_model):
+    def _check_relation(self, cls, parent_model):
         try:
             _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name)
         except ValueError as e:
