@@ -201,7 +201,6 @@ class MigrationLoader(object):
                 if parent[1] == "__first__" and parent not in self.graph:
                     if parent[0] in self.unmigrated_apps:
                         if ignore_unmigrated:
-                            migration.dependencies.remove(parent)
                             parent = None
                         else:
                             # This app isn't migrated, but something depends on it.
