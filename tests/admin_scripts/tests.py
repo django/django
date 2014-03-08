@@ -24,7 +24,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError, call_command
 from django.db import connection
 from django.utils.encoding import force_text
-from django.utils._os import upath
+from django.utils._os import npath, upath
 from django.utils.six import StringIO
 from django.test import LiveServerTestCase, TestCase
 from django.test.runner import DiscoverRunner
@@ -138,8 +138,9 @@ class AdminScriptTestCase(unittest.TestCase):
             del test_environ['DJANGO_SETTINGS_MODULE']
         python_path = [base_dir, django_dir, tests_dir]
         python_path.extend(ext_backend_base_dirs)
-        test_environ[python_path_var_name] = os.pathsep.join(python_path)
-        test_environ['PYTHONWARNINGS'] = ''
+        # Use native strings for better compatibility
+        test_environ[str(python_path_var_name)] = npath(os.pathsep.join(python_path))
+        test_environ[str('PYTHONWARNINGS')] = str('')
 
         # Move to the test directory and run
         os.chdir(test_dir)
