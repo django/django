@@ -18,6 +18,7 @@ from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
                          SimpleCookie, BadHeaderError, JsonResponse,
                          parse_cookie)
 from django.test import TestCase
+from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import smart_str, force_text
 from django.utils.functional import lazy
 from django.utils._os import upath
@@ -561,7 +562,7 @@ class FileCloseTests(TestCase):
         r = HttpResponse(file1)
         self.assertFalse(file1.closed)
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
+            warnings.simplefilter("ignore", RemovedInDjango18Warning)
             list(r)
         self.assertFalse(file1.closed)
         r.close()

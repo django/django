@@ -13,6 +13,7 @@ from django import db
 from django.test import runner, TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.test.testcases import connections_support_transactions
 from django.test.utils import IgnoreAllDeprecationWarningsMixin, override_system_checks
+from django.utils import six
 
 from admin_scripts.tests import AdminScriptTestCase
 from .models import Person
@@ -368,14 +369,14 @@ class DeprecationDisplayTest(AdminScriptTestCase):
         args = ['test', '--settings=test_project.settings', 'test_runner_deprecation_app']
         out, err = self.run_django_admin(args)
         self.assertIn("Ran 1 test", err)
-        self.assertIn("DeprecationWarning: warning from test", err)
-        self.assertIn("DeprecationWarning: module-level warning from deprecation_app", err)
+        six.assertRegex(self, err, r"RemovedInDjango\d\dWarning: warning from test")
+        six.assertRegex(self, err, r"RemovedInDjango\d\dWarning: module-level warning from deprecation_app")
 
     def test_runner_deprecation_verbosity_zero(self):
         args = ['test', '--settings=test_project.settings', '--verbosity=0', 'test_runner_deprecation_app']
         out, err = self.run_django_admin(args)
         self.assertIn("Ran 1 test", err)
-        self.assertFalse("DeprecationWarning: warning from test" in err)
+        self.assertFalse("warning from test" in err)
 
 
 class AutoIncrementResetTest(TransactionTestCase):

@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+
 import warnings
 
 from django.test import SimpleTestCase, RequestFactory, override_settings

@@ -19,6 +19,7 @@ from django import forms
 from django.core import exceptions, validators, checks
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.functional import curry, total_ordering, Promise
 from django.utils.text import capfirst
 from django.utils import timezone
@@ -1618,7 +1619,7 @@ class IPAddressField(Field):
 
     def __init__(self, *args, **kwargs):
         warnings.warn("IPAddressField has been deprecated. Use GenericIPAddressField instead.",
-                      PendingDeprecationWarning)
+                      RemovedInDjango19Warning)
         kwargs['max_length'] = 15
         super(IPAddressField, self).__init__(*args, **kwargs)
 

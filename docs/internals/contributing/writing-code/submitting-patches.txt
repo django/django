@@ -173,11 +173,12 @@ There are a couple reasons that code in Django might be deprecated:
 
 As the :ref:`deprecation policy<internal-release-deprecation-policy>` describes,
 the first release of Django that deprecates a feature (``A.B``) should raise a
-``PendingDeprecationWarning`` when the deprecated feature is invoked. Assuming
+``RemovedInDjangoXXWarning`` (where XX is the Django version where the feature
+will be removed) when the deprecated feature is invoked. Assuming
 we have a good test coverage, these warnings will be shown by the test suite
 when :ref:`running it <running-unit-tests>` with warnings enabled:
 ``python -Wall runtests.py``. This is annoying and the output of the test suite
-should remain clean. Thus, when adding a ``PendingDeprecationWarning`` you need
+should remain clean. Thus, when adding a ``RemovedInDjangoXXWarning`` you need
 to eliminate or silence any warnings generated when running the tests.
 
 The first step is to remove any use of the deprecated behavior by Django itself.
@@ -218,9 +219,8 @@ Finally, there are a couple of updates to Django's documentation to make:
    under the ``A.B+2`` version describing what code will be removed.
 
 Once you have completed these steps, you are finished with the deprecation.
-In each minor release, all ``PendingDeprecationWarning``\s are promoted to
-``DeprecationWarning``\s and any features marked with ``DeprecationWarning``
-are removed.
+In each minor release, all ``RemovedInDjangoXXWarning``\s matching the new
+version are removed.
 
 Javascript patches
 ------------------

@@ -1,7 +1,9 @@
 import warnings
 
+from django.utils.deprecation import RemovedInDjango19Warning
+
 warnings.warn("django.utils.dictconfig will be removed in Django 1.9.",
-    PendingDeprecationWarning, stacklevel=2)
+    RemovedInDjango19Warning, stacklevel=2)
 
 # This is a copy of the Python logging.config.dictconfig module,
 # reproduced with permission. It is provided here for backwards

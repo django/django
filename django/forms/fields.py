@@ -25,6 +25,7 @@ from django.forms.widgets import (
 from django.utils import formats
 from django.utils.encoding import smart_text, force_str, force_text
 from django.utils.ipv6 import clean_ipv6_address
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils import six
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
@@ -502,7 +503,7 @@ class DateTimeField(BaseTemporalField):
             warnings.warn(
                 'Using SplitDateTimeWidget with DateTimeField is deprecated. '
                 'Use SplitDateTimeField instead.',
-                PendingDeprecationWarning, stacklevel=2)
+                RemovedInDjango19Warning, stacklevel=2)
             if len(value) != 2:
                 raise ValidationError(self.error_messages['invalid'], code='invalid')
             if value[0] in self.empty_values and value[1] in self.empty_values:
@@ -1169,7 +1170,7 @@ class IPAddressField(CharField):
 
     def __init__(self, *args, **kwargs):
         warnings.warn("IPAddressField has been deprecated. Use GenericIPAddressField instead.",
-                      PendingDeprecationWarning)
+                      RemovedInDjango19Warning)
         super(IPAddressField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):

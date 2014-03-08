@@ -1,8 +1,10 @@
 import warnings
 from optparse import make_option
+
 from django.db import DEFAULT_DB_ALIAS
 from django.core.management import call_command
 from django.core.management.base import NoArgsCommand
+from django.utils.deprecation import RemovedInDjango19Warning
 
 
 class Command(NoArgsCommand):
@@ -18,5 +20,5 @@ class Command(NoArgsCommand):
     help = "Deprecated - use 'migrate' instead."
 
     def handle_noargs(self, **options):
-        warnings.warn("The syncdb command will be removed in Django 1.9", PendingDeprecationWarning)
+        warnings.warn("The syncdb command will be removed in Django 1.9", RemovedInDjango19Warning)
         call_command("migrate", **options)

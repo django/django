@@ -21,6 +21,7 @@ from django.middleware.transaction import TransactionMiddleware
 from django.test import TransactionTestCase, TestCase, RequestFactory, override_settings
 from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import force_str
 from django.utils.six.moves import xrange
 
@@ -249,7 +250,7 @@ class CommonMiddlewareTest(TestCase):
         request = self._get_request('regular_url/that/does/not/exist')
         request.META['HTTP_REFERER'] = '/another/url/'
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
+            warnings.simplefilter("ignore", RemovedInDjango18Warning)
             response = self.client.get(request.path)
             CommonMiddleware().process_response(request, response)
         self.assertEqual(len(mail.outbox), 1)
@@ -261,7 +262,7 @@ class CommonMiddlewareTest(TestCase):
     def test_404_error_reporting_no_referer(self):
         request = self._get_request('regular_url/that/does/not/exist')
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
+            warnings.simplefilter("ignore", RemovedInDjango18Warning)
             response = self.client.get(request.path)
             CommonMiddleware().process_response(request, response)
         self.assertEqual(len(mail.outbox), 0)
@@ -273,7 +274,7 @@ class CommonMiddlewareTest(TestCase):
         request = self._get_request('foo_url/that/does/not/exist/either')
         request.META['HTTP_REFERER'] = '/another/url/'
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
+            warnings.simplefilter("ignore", RemovedInDjango18Warning)
             response = self.client.get(request.path)
             CommonMiddleware().process_response(request, response)
         self.assertEqual(len(mail.outbox), 0)

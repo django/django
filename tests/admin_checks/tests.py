@@ -4,11 +4,12 @@ import warnings
 
 from django import forms
 from django.contrib import admin
+from django.contrib.contenttypes.admin import GenericStackedInline
 from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from .models import Song, Book, Album, TwoAlbumFKAndAnE, City, State
+from .models import Song, Book, Album, TwoAlbumFKAndAnE, City, State, Influence
 
 
 class SongForm(forms.ModelForm):
@@ -179,6 +180,128 @@ class SystemChecksTestCase(TestCase):
                 hint=None,
                 obj=SongInline,
                 id='admin.E201',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_valid_generic_inline_model_admin(self):
+        """
+        Regression test for #22034 - check that generic inlines don't look for
+        normal ForeignKey relations.
+        """
+
+        class InfluenceInline(GenericStackedInline):
+            model = Influence
+
+        class SongAdmin(admin.ModelAdmin):
+            inlines = [InfluenceInline]
+
+        errors = SongAdmin.check(model=Song)
+        self.assertEqual(errors, [])
+
+    def test_generic_inline_model_admin_non_generic_model(self):
+        """
+        Ensure that a model without a GenericForeignKey raises problems if it's included
+        in an GenericInlineModelAdmin definition.
+        """
+
+        class BookInline(GenericStackedInline):
+            model = Book
+
+        class SongAdmin(admin.ModelAdmin):
+            inlines = [BookInline]
+
+        errors = SongAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                "'admin_checks.Book' has no GenericForeignKey.",
+                hint=None,
+                obj=BookInline,
+                id='admin.E301',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_generic_inline_model_admin_bad_ct_field(self):
+        "A GenericInlineModelAdmin raises problems if the ct_field points to a non-existent field."
+
+        class InfluenceInline(GenericStackedInline):
+            model = Influence
+            ct_field = 'nonexistent'
+
+        class SongAdmin(admin.ModelAdmin):
+            inlines = [InfluenceInline]
+
+        errors = SongAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                "'ct_field' references 'nonexistent', which is not a field on 'admin_checks.Influence'.",
+                hint=None,
+                obj=InfluenceInline,
+                id='admin.E302',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_generic_inline_model_admin_bad_fk_field(self):
+        "A GenericInlineModelAdmin raises problems if the ct_fk_field points to a non-existent field."
+
+        class InfluenceInline(GenericStackedInline):
+            model = Influence
+            ct_fk_field = 'nonexistent'
+
+        class SongAdmin(admin.ModelAdmin):
+            inlines = [InfluenceInline]
+
+        errors = SongAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                "'ct_fk_field' references 'nonexistent', which is not a field on 'admin_checks.Influence'.",
+                hint=None,
+                obj=InfluenceInline,
+                id='admin.E303',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_generic_inline_model_admin_non_gfk_ct_field(self):
+        "A GenericInlineModelAdmin raises problems if the ct_field points to a field that isn't part of a GenericForeignKey"
+
+        class InfluenceInline(GenericStackedInline):
+            model = Influence
+            ct_field = 'name'
+
+        class SongAdmin(admin.ModelAdmin):
+            inlines = [InfluenceInline]
+
+        errors = SongAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                "'admin_checks.Influence' has no GenericForeignKey using content type field 'name' and object ID field 'object_id'.",
+                hint=None,
+                obj=InfluenceInline,
+                id='admin.E304',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_generic_inline_model_admin_non_gfk_fk_field(self):
+        "A GenericInlineModelAdmin raises problems if the ct_fk_field points to a field that isn't part of a GenericForeignKey"
+
+        class InfluenceInline(GenericStackedInline):
+            model = Influence
+            ct_fk_field = 'name'
+
+        class SongAdmin(admin.ModelAdmin):
+            inlines = [InfluenceInline]
+
+        errors = SongAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                "'admin_checks.Influence' has no GenericForeignKey using content type field 'content_type' and object ID field 'name'.",
+                hint=None,
+                obj=InfluenceInline,
+                id='admin.E304',
             )
         ]
         self.assertEqual(errors, expected)

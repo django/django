@@ -8,6 +8,7 @@ import warnings
 
 from django.utils import html, safestring
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import force_text
 
 
@@ -132,7 +133,7 @@ class TestUtilsHtml(TestCase):
 
     def test_fix_ampersands(self):
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
+            warnings.simplefilter("ignore", RemovedInDjango18Warning)
             f = html.fix_ampersands
             # Strings without ampersands or with ampersands already encoded.
             values = ("a&#1;", "b", "&a;", "&amp; &x; ", "asdf")
@@ -177,7 +178,7 @@ class TestUtilsHtml(TestCase):
             ('<p>* foo</p><p>* bar</p>', '<ul>\n<li> foo</li><li> bar</li>\n</ul>'),
         )
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
+            warnings.simplefilter("ignore", RemovedInDjango18Warning)
             for value, output in items:
                 self.check_output(f, value, output)
 

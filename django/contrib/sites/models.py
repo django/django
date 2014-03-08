@@ -6,8 +6,9 @@ import warnings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.db.models.signals import pre_save, pre_delete
-from django.utils.translation import ugettext_lazy as _
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
 
 from .requests import RequestSite as RealRequestSite
 from .shortcuts import get_current_site as real_get_current_site
@@ -82,14 +83,14 @@ class RequestSite(RealRequestSite):
     def __init__(self, *args, **kwargs):
         warnings.warn(
             "Please import RequestSite from django.contrib.sites.requests.",
-            PendingDeprecationWarning, stacklevel=2)
+            RemovedInDjango19Warning, stacklevel=2)
         super(RequestSite, self).__init__(*args, **kwargs)
 
 
 def get_current_site(request):
     warnings.warn(
         "Please import get_current_site from django.contrib.sites.shortcuts.",
-        PendingDeprecationWarning, stacklevel=2)
+        RemovedInDjango19Warning, stacklevel=2)
     return real_get_current_site(request)
 
 

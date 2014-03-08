@@ -14,7 +14,7 @@ from django.db.models.query import QuerySet
 from django.db.models.sql.datastructures import Col
 from django.utils.encoding import smart_text
 from django.utils import six
-from django.utils.deprecation import RenameMethodsBase
+from django.utils.deprecation import RenameMethodsBase, RemovedInDjango18Warning
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry, cached_property
 from django.core import exceptions
@@ -346,8 +346,8 @@ class RelatedField(Field):
 
 class RenameRelatedObjectDescriptorMethods(RenameMethodsBase):
     renamed_methods = (
-        ('get_query_set', 'get_queryset', DeprecationWarning),
-        ('get_prefetch_query_set', 'get_prefetch_queryset', DeprecationWarning),
+        ('get_query_set', 'get_queryset', RemovedInDjango18Warning),
+        ('get_prefetch_query_set', 'get_prefetch_queryset', RemovedInDjango18Warning),
     )
 
 

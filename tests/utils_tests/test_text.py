@@ -6,6 +6,7 @@ import warnings
 
 from django.test import SimpleTestCase
 from django.utils import six, text
+from django.utils.deprecation import RemovedInDjango19Warning
 
 IS_WIDE_BUILD = (len('\U0001F4A9') == 1)
 
@@ -154,7 +155,7 @@ class TestUtilsText(SimpleTestCase):
         input = "<script>alert('Hello \\xff.\n Welcome\there\r');</script>"
         output = r"<script>alert(\'Hello \\xff.\n Welcome\there\r\');<\/script>"
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", PendingDeprecationWarning)
+            warnings.simplefilter("ignore", RemovedInDjango19Warning)
             self.assertEqual(text.javascript_quote(input), output)
 
             # Exercising quote_double_quotes keyword argument
@@ -168,7 +169,7 @@ class TestUtilsText(SimpleTestCase):
         input = "<script>alert('Hello \\xff.\n Wel𝕃come\there\r');</script>"
         output = r"<script>alert(\'Hello \\xff.\n Wel𝕃come\there\r\');<\/script>"
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", PendingDeprecationWarning)
+            warnings.simplefilter("ignore", RemovedInDjango19Warning)
             self.assertEqual(text.javascript_quote(input), output)
 
     def test_deprecation(self):

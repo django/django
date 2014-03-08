@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import warnings
 
 from django.core.management.commands.check import Command as CheckCommand
+from django.utils.deprecation import RemovedInDjango19Warning
 
 
 class Command(CheckCommand):
@@ -11,5 +12,5 @@ class Command(CheckCommand):
 
     def handle_noargs(self, **options):
         warnings.warn('"validate" has been deprecated in favor of "check".',
-            PendingDeprecationWarning)
+            RemovedInDjango19Warning)
         super(Command, self).handle_noargs(**options)
