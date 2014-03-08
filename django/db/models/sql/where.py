@@ -78,7 +78,7 @@ class WhereNode(tree.Node):
         else:
             value_annotation = bool(value)
 
-        if hasattr(obj, "prepare"):
+        if hasattr(obj, 'prepare') and not hasattr(obj, 'is_aggregate'):
             value = obj.prepare(lookup_type, value)
         return (obj, lookup_type, value_annotation, value)
 

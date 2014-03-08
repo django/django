@@ -14,17 +14,15 @@ import warnings
 from django.core.exceptions import FieldError
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.aggregates import refs_aggregate
 from django.db.models.expressions import ExpressionNode
 from django.db.models.fields import FieldDoesNotExist
 from django.db.models.lookups import Transform
-from django.db.models.query_utils import Q
+from django.db.models.query_utils import Q, refs_aggregate
 from django.db.models.related import PathInfo
-from django.db.models.sql import aggregates as base_aggregates_module
+from django.db.models.aggregates import Count
 from django.db.models.sql.constants import (QUERY_TERMS, ORDER_DIR, SINGLE,
         ORDER_PATTERN, JoinInfo, SelectInfo)
 from django.db.models.sql.datastructures import EmptyResultSet, Empty, MultiJoin, Col
-from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.where import (WhereNode, Constraint, EverythingNode,
     ExtraWhere, AND, OR, EmptyWhere)
 from django.utils import six
@@ -103,7 +101,6 @@ class Query(object):
     alias_prefix = 'T'
     subq_aliases = frozenset([alias_prefix])
     query_terms = QUERY_TERMS
-    aggregates_module = base_aggregates_module
 
     compiler = 'SQLCompiler'
 
@@ -361,6 +358,7 @@ class Query(object):
             obj.related_select_cols = []
 
             relabels = dict((t, 'subquery') for t in self.tables)
+            relabels[None] = 'subquery'
             # Remove any aggregates marked for reduction from the subquery
             # and move them to the outer AggregateQuery.
             for alias, aggregate in self.aggregate_select.items():
@@ -986,49 +984,10 @@ class Query(object):
         """
         Adds a single aggregate expression to the Query
         """
-        opts = model._meta
-        field_list = aggregate.lookup.split(LOOKUP_SEP)
-        if len(field_list) == 1 and self._aggregates and aggregate.lookup in self.aggregates:
-            # Aggregate is over an annotation
-            field_name = field_list[0]
-            col = field_name
-            source = self.aggregates[field_name]
-            if not is_summary:
-                raise FieldError("Cannot compute %s('%s'): '%s' is an aggregate" % (
-                    aggregate.name, field_name, field_name))
-        elif ((len(field_list) > 1) or
-                (field_list[0] not in [i.name for i in opts.fields]) or
-                self.group_by is None or
-                not is_summary):
-            # If:
-            #   - the field descriptor has more than one part (foo__bar), or
-            #   - the field descriptor is referencing an m2m/m2o field, or
-            #   - this is a reference to a model field (possibly inherited), or
-            #   - this is an annotation over a model field
-            # then we need to explore the joins that are required.
-
-            # Join promotion note - we must not remove any rows here, so use
-            # outer join if there isn't any existing join.
-            field, sources, opts, join_list, path = self.setup_joins(
-                field_list, opts, self.get_initial_alias())
-
-            # Process the join chain to see if it can be trimmed
-            targets, _, join_list = self.trim_joins(sources, join_list, path)
-
-            col = targets[0].column
-            source = sources[0]
-            col = (join_list[-1], col)
-        else:
-            # The simplest cases. No joins required -
-            # just reference the provided column alias.
-            field_name = field_list[0]
-            source = opts.get_field(field_name)
-            col = field_name
-        # We want to have the alias in SELECT clause even if mask is set.
+        aggregate.is_summary = is_summary
+        aggregate.prepare(self)
         self.append_aggregate_mask([alias])
-
-        # Add the aggregate to the query
-        aggregate.add_to_query(self, alias, col=col, source=source, is_summary=is_summary)
+        self.aggregates[alias] = aggregate
 
     def prepare_lookup_value(self, value, lookups, can_reuse):
         # Default lookup if none given is exact.
@@ -1047,8 +1006,8 @@ class Query(object):
                 RemovedInDjango19Warning, stacklevel=2)
             value = value()
         elif isinstance(value, ExpressionNode):
-            # If value is a query expression, evaluate it
-            value = SQLEvaluator(value, self, reuse=can_reuse)
+            # If value is a query expression, prepare it
+            value.prepare(self, reuse=can_reuse)
         if hasattr(value, 'query') and hasattr(value.query, 'bump_prefix'):
             value = value._clone()
             value.query.bump_prefix(self)
@@ -1665,6 +1624,11 @@ class Query(object):
         for col, _ in self.select:
             self.group_by.append(col)
 
+        if self._aggregates:
+            for alias, aggregate in six.iteritems(self.aggregates):
+                for col in aggregate.get_group_by_cols():
+                    self.group_by.append(col)
+
     def add_count_column(self):
         """
         Converts the query to do count(...) or count(distinct(pk)) in order to
@@ -1672,30 +1636,40 @@ class Query(object):
         """
         if not self.distinct:
             if not self.select:
-                count = self.aggregates_module.Count('*', is_summary=True)
+                count = Count('*')
+                count.is_summary = True
             else:
                 assert len(self.select) == 1, \
                     "Cannot add count col with multiple cols in 'select': %r" % self.select
-                count = self.aggregates_module.Count(self.select[0].col)
+                col = self.select[0].col
+                if isinstance(col, (tuple, list)):
+                    count = Count(col[1])
+                else:
+                    count = Count(col)
+
         else:
             opts = self.get_meta()
             if not self.select:
-                count = self.aggregates_module.Count(
-                    (self.join((None, opts.db_table, None)), opts.pk.column),
-                    is_summary=True, distinct=True)
+                lookup = self.join((None, opts.db_table, None)), opts.pk.column
+                count = Count(lookup[1], distinct=True)
+                count.is_summary = True
             else:
                 # Because of SQL portability issues, multi-column, distinct
                 # counts need a sub-query -- see get_count() for details.
                 assert len(self.select) == 1, \
                     "Cannot add count col with multiple cols in 'select'."
-
-                count = self.aggregates_module.Count(self.select[0].col, distinct=True)
+                col = self.select[0].col
+                if isinstance(col, (tuple, list)):
+                    count = Count(col[1], distinct=True)
+                else:
+                    count = Count(col, distinct=True)
             # Distinct handling is done in Count(), so don't do it at this
             # level.
             self.distinct = False
 
         # Set only aggregate to be the count column.
         # Clear out the select cache to reflect the new unmasked aggregates.
+        count.prepare(self)
         self._aggregates = {None: count}
         self.set_aggregate_mask(None)
         self.group_by = None

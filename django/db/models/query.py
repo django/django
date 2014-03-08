@@ -772,7 +772,7 @@ class QuerySet(object):
     def annotate(self, *args, **kwargs):
         """
         Return a query set in which the returned objects have been annotated
-        with data aggregated from related fields.
+        with extra data derived or aggregated from other fields.
         """
         for arg in args:
             if arg.default_alias in kwargs:
@@ -784,19 +784,27 @@ class QuerySet(object):
         names = getattr(self, '_fields', None)
         if names is None:
             names = set(self.model._meta.get_all_field_names())
-        for aggregate in kwargs:
-            if aggregate in names:
+        aggregate_annotations = {}
+        other_annotations = {}
+        for (field, annotation) in kwargs.items():
+            if field in names:
                 raise ValueError("The annotation '%s' conflicts with a field on "
-                    "the model." % aggregate)
+                    "the model." % field)
+            if kwargs[field].is_aggregate:
+                aggregate_annotations[field] = annotation
+            else:
+                other_annotations[field] = annotation
 
         obj = self._clone()
 
-        obj._setup_aggregate_query(list(kwargs))
-
         # Add the aggregates to the query
-        for (alias, aggregate_expr) in kwargs.items():
-            obj.query.add_aggregate(aggregate_expr, self.model, alias,
-                is_summary=False)
+        for (alias, aggregate_expr) in aggregate_annotations.items():
+            obj.query.add_aggregate(aggregate_expr, self.model, alias, is_summary=False)
+
+        # setup once the aggregates have been added so that group_by
+        # cols in the aggregate are added to the group by clause
+        if aggregate_annotations:
+            obj._setup_aggregate_query(list(aggregate_annotations))
 
         return obj
 

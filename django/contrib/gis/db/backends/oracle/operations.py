@@ -203,7 +203,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
 
         return [dist_param]
 
-    def get_geom_placeholder(self, f, value):
+    def get_geom_placeholder(self, f, value, qn):
         """
         Provides a proper substitution value for Geometries that are not in the
         SRID of the field.  Specifically, this routine will substitute in the
@@ -215,14 +215,15 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         def transform_value(val, srid):
             return val.srid != srid
 
-        if hasattr(value, 'expression'):
+        if hasattr(value, 'as_sql'):
             if transform_value(value, f.srid):
                 placeholder = '%s(%%s, %s)' % (self.transform, f.srid)
             else:
                 placeholder = '%s'
             # No geometry value used for F expression, substitute in
             # the column name instead.
-            return placeholder % self.get_expression_column(value)
+            sql, _ = qn.compile(value)
+            return placeholder % sql
         else:
             if transform_value(value, f.srid):
                 return '%s(SDO_GEOMETRY(%%s, %s), %s)' % (self.transform, value.srid, f.srid)
@@ -257,15 +258,15 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
                 if lookup_type == 'relate':
                     # The SDORelate class handles construction for these queries,
                     # and verifies the mask argument.
-                    return sdo_op(value[1]).as_sql(geo_col, self.get_geom_placeholder(field, geom))
+                    return sdo_op(value[1]).as_sql(geo_col, self.get_geom_placeholder(field, geom, qn))
                 else:
                     # Otherwise, just call the `as_sql` method on the SDOOperation instance.
-                    return sdo_op.as_sql(geo_col, self.get_geom_placeholder(field, geom))
+                    return sdo_op.as_sql(geo_col, self.get_geom_placeholder(field, geom, qn))
             else:
                 # Lookup info is a SDOOperation instance, whose `as_sql` method returns
                 # the SQL necessary for the geometry function call. For example:
                 #  SDO_CONTAINS("geoapp_country"."poly", SDO_GEOMTRY('POINT(5 23)', 4326)) = 'TRUE'
-                return lookup_info.as_sql(geo_col, self.get_geom_placeholder(field, value))
+                return lookup_info.as_sql(geo_col, self.get_geom_placeholder(field, value, qn))
         elif lookup_type == 'isnull':
             # Handling 'isnull' lookup type
             return "%s IS %sNULL" % (geo_col, ('' if value else 'NOT ')), []

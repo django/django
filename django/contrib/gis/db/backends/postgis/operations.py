@@ -376,7 +376,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         else:
             return [dist_param]
 
-    def get_geom_placeholder(self, f, value):
+    def get_geom_placeholder(self, f, value, qn):
         """
         Provides a proper substitution value for Geometries that are not in the
         SRID of the field.  Specifically, this routine will substitute in the
@@ -388,11 +388,12 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             # Adding Transform() to the SQL placeholder.
             placeholder = '%s(%%s, %s)' % (self.transform, f.srid)
 
-        if hasattr(value, 'expression'):
+        if hasattr(value, 'as_sql'):
             # If this is an F expression, then we don't really want
             # a placeholder and instead substitute in the column
             # of the expression.
-            placeholder = placeholder % self.get_expression_column(value)
+            sql, _ = qn.compile(value)
+            placeholder = placeholder % sql
 
         return placeholder
 
@@ -486,7 +487,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
                                  '"%s" lookup.' % lookup_type)
             # Handling a PostGIS operator.
             op = self.geometry_operators[lookup_type]
-            return op.as_sql(geo_col, self.get_geom_placeholder(field, value))
+            return op.as_sql(geo_col, self.get_geom_placeholder(field, value, qn))
         elif lookup_type in self.geometry_functions:
             if field.geography and not lookup_type in self.geography_functions:
                 raise ValueError('PostGIS geography type does not support the '
@@ -546,7 +547,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
                 geom = value
 
             # Calling the `as_sql` function on the operation instance.
-            return op.as_sql(geo_col, self.get_geom_placeholder(field, geom))
+            return op.as_sql(geo_col, self.get_geom_placeholder(field, geom, qn))
 
         elif lookup_type == 'isnull':
             # Handling 'isnull' lookup type

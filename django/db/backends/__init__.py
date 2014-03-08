@@ -1179,6 +1179,8 @@ class BaseDatabaseOperations(object):
         elif (internal_type and (internal_type.endswith('IntegerField')
                                  or internal_type == 'AutoField')):
             return int(value)
+        elif internal_type == 'DecimalField':
+            return utils.typecast_decimal(field.format_number(value))
         return value
 
     def check_aggregate_support(self, aggregate_func):
