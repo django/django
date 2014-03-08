@@ -128,6 +128,16 @@ class WarningLoggerTests(TestCase):
         output = force_text(self.outputs[0].getvalue())
         self.assertFalse('Foo Deprecated' in output)
 
+    @override_settings(DEBUG=True)
+    def test_error_filter_still_raises(self):
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                'error',
+                category=RemovedInNextVersionWarning
+            )
+            with self.assertRaises(RemovedInNextVersionWarning):
+                warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
+
 
 class CallbackFilterTest(TestCase):
     def test_sense(self):
