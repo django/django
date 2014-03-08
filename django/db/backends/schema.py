@@ -268,6 +268,11 @@ class BaseDatabaseSchemaEditor(object):
         """
         Deletes a model from the database.
         """
+        # Handle auto-created intermediary models
+        for field in model._meta.local_many_to_many:
+            if field.rel.through._meta.auto_created:
+                self.delete_model(field.rel.through)
+
         # Delete the table
         self.execute(self.sql_delete_table % {
             "table": self.quote_name(model._meta.db_table),
