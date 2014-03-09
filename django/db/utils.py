@@ -209,7 +209,7 @@ class ConnectionHandler(object):
                               "to a %s entry in the TEST setting" % (key, new_key),
                               RemovedInDjango19Warning, stacklevel=2)
                 test_settings[new_key] = value
-        for key in conn.keys():
+        for key in list(conn.keys()):
             if key.startswith('TEST_'):
                 del conn[key]
         # Check that they didn't just use the old name with 'TEST_' removed
