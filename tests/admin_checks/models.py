@@ -7,6 +7,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
+
 class Album(models.Model):
     title = models.CharField(max_length=150)
 

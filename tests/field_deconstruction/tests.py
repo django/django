@@ -318,4 +318,3 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(path, "django.db.models.URLField")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"max_length": 231})
-
