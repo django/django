@@ -1237,14 +1237,14 @@ class DefaultNonExpiringCacheKeyTests(TestCase):
         This value is defined inside the __init__() method of the
         :class:`django.core.cache.backends.base.BaseCache` type.
         """
-        self.assertEquals(300, self.DEFAULT_TIMEOUT)
+        self.assertEqual(300, self.DEFAULT_TIMEOUT)
 
     def test_caches_with_unset_timeout_has_correct_default_timeout(self):
         """Caches that have the TIMEOUT parameter undefined in the default
         settings will use the default 5 minute timeout.
         """
         cache = caches[DEFAULT_CACHE_ALIAS]
-        self.assertEquals(self.DEFAULT_TIMEOUT, cache.default_timeout)
+        self.assertEqual(self.DEFAULT_TIMEOUT, cache.default_timeout)
 
     @override_settings(CACHES=NEVER_EXPIRING_CACHES_SETTINGS)
     def test_caches_set_with_timeout_as_none_has_correct_default_timeout(self):
@@ -1255,7 +1255,7 @@ class DefaultNonExpiringCacheKeyTests(TestCase):
         """
         cache = caches[DEFAULT_CACHE_ALIAS]
         self.assertIs(None, cache.default_timeout)
-        self.assertEquals(None, cache.get_backend_timeout())
+        self.assertEqual(None, cache.get_backend_timeout())
 
     @override_settings(CACHES=DEFAULT_MEMORY_CACHES_SETTINGS)
     def test_caches_with_unset_timeout_set_expiring_key(self):
@@ -1267,7 +1267,7 @@ class DefaultNonExpiringCacheKeyTests(TestCase):
         cache = caches[DEFAULT_CACHE_ALIAS]
         cache.set(key, value)
         cache_key = cache.make_key(key)
-        self.assertNotEquals(None, cache._expire_info[cache_key])
+        self.assertNotEqual(None, cache._expire_info[cache_key])
 
     @override_settings(CACHES=NEVER_EXPIRING_CACHES_SETTINGS)
     def text_caches_set_with_timeout_as_none_set_non_expiring_key(self):
@@ -1279,7 +1279,7 @@ class DefaultNonExpiringCacheKeyTests(TestCase):
         cache = caches[DEFAULT_CACHE_ALIAS]
         cache.set(key, value)
         cache_key = cache.make_key(key)
-        self.assertEquals(None, cache._expire_info[cache_key])
+        self.assertEqual(None, cache._expire_info[cache_key])
 
 
 @override_settings(
