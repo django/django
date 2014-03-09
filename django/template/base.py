@@ -58,10 +58,8 @@ UNKNOWN_SOURCE = '<unknown source>'
 
 # match a variable or block tag and capture the entire tag, including start/end
 # delimiters
-tag_re = (re.compile('(%s.*?%s|%s.*?%s|%s.*?%s)' %
-          (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END),
-           re.escape(VARIABLE_TAG_START), re.escape(VARIABLE_TAG_END),
-           re.escape(COMMENT_TAG_START), re.escape(COMMENT_TAG_END))))
+tag_re = re.compile(r'{%\s*(?P<block>.+?)\s*%}|{{\s*(?P<var>.+?)\s*}}|{#\s*(?P<comment>.+?)\s*#}')
+
 
 # global dictionary of libraries that have been loaded using get_library
 libraries = {}
@@ -201,13 +199,37 @@ class Lexer(object):
         """
         Return a list of tokens from a given template_string.
         """
-        in_tag = False
         result = []
-        for bit in tag_re.split(self.template_string):
-            if bit:
-                result.append(self.create_token(bit, in_tag))
-            in_tag = not in_tag
+        for token in self._tokenize():
+            token.lineno = self.lineno
+            result.append(token)
         return result
+
+    def _tokenize(self):
+        """
+        A generator of template Tokens
+        """
+        upto = 0
+        for m in tag_re.finditer(self.template_string):
+            start, end = m.span()
+            if upto < start:
+                text = self.template_string[upto:start]
+                self.lineno += text.count('\n')
+                yield Token(TOKEN_TEXT, text)
+            block, var, comment = m.groups()
+
+            # XXX verbatim handling
+            if var is not None:
+                yield Token(TOKEN_VAR, var)
+            elif block is not None:
+                yield Token(TOKEN_BLOCK, block)
+            elif comment is not None:
+                yield Token(TOKEN_COMMENT, comment)
+            self.lineno += self.template_string[upto:end].count('\n')
+            upto = end
+        if upto < len(self.template_string):
+            yield Token(TOKEN_TEXT, self.template_string[upto:])
+
 
     def create_token(self, token_string, in_tag):
         """
