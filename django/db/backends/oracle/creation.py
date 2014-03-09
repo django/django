@@ -234,16 +234,16 @@ class DatabaseCreation(BaseDatabaseCreation):
         return self._test_settings_get('NAME', prefixed='NAME')
 
     def _test_database_create(self):
-        return self._test_settings_get('CREATE', default=True)
+        return self._test_settings_get('CREATE_DB', default=True)
 
     def _test_user_create(self):
-        return self._test_settings_get('USER_CREATE', default=True)
+        return self._test_settings_get('CREATE_USER', default=True)
 
     def _test_database_user(self):
         return self._test_settings_get('USER', prefixed='USER')
 
     def _test_database_passwd(self):
-        return self._test_settings_get('PASSWD', default=PASSWORD)
+        return self._test_settings_get('PASSWORD', default=PASSWORD)
 
     def _test_database_tblspace(self):
         return self._test_settings_get('TBLSPACE', prefixed='NAME')

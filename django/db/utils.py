@@ -184,6 +184,7 @@ class ConnectionHandler(object):
     TEST_SETTING_RENAMES = {
         'CREATE': 'CREATE_DB',
         'USER_CREATE': 'CREATE_USER',
+        'PASSWD': 'PASSWORD',
     }
 
     def prepare_test_settings(self, alias):
