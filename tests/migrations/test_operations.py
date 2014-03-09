@@ -132,7 +132,7 @@ class OperationTests(MigrationTestBase):
             operation.database_forwards("test_crmomm", editor, project_state, new_state)
         self.assertTableExists("test_crmomm_stable")
         self.assertTableExists("test_crmomm_stable_ponies")
-        self.assertColumnNotExists("test_crmomm", "ponies")
+        self.assertColumnNotExists("test_crmomm_stable", "ponies")
         # Make sure the M2M field actually works
         with atomic():
             new_apps = new_state.render()
@@ -479,22 +479,22 @@ class OperationTests(MigrationTestBase):
         self.assertEqual(len(new_state.models["test_alunto", "pony"].options.get("unique_together", set())), 1)
         # Make sure we can insert duplicate rows
         with connection.cursor() as cursor:
-            cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (1, 1, 1)")
-            cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (2, 1, 1)")
+            cursor.execute("INSERT INTO test_alunto_pony (pink, weight) VALUES (1, 1)")
+            cursor.execute("INSERT INTO test_alunto_pony (pink, weight) VALUES (1, 1)")
             cursor.execute("DELETE FROM test_alunto_pony")
             # Test the database alteration
             with connection.schema_editor() as editor:
                 operation.database_forwards("test_alunto", editor, project_state, new_state)
-            cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (1, 1, 1)")
+            cursor.execute("INSERT INTO test_alunto_pony (pink, weight) VALUES (1, 1)")
             with self.assertRaises(IntegrityError):
                 with atomic():
-                    cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (2, 1, 1)")
+                    cursor.execute("INSERT INTO test_alunto_pony (pink, weight) VALUES (1, 1)")
             cursor.execute("DELETE FROM test_alunto_pony")
             # And test reversal
             with connection.schema_editor() as editor:
                 operation.database_backwards("test_alunto", editor, new_state, project_state)
-            cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (1, 1, 1)")
-            cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (2, 1, 1)")
+            cursor.execute("INSERT INTO test_alunto_pony (pink, weight) VALUES (1, 1)")
+            cursor.execute("INSERT INTO test_alunto_pony (pink, weight) VALUES (1, 1)")
             cursor.execute("DELETE FROM test_alunto_pony")
         # Test flat unique_together
         operation = migrations.AlterUniqueTogether("Pony", ("pink", "weight"))
