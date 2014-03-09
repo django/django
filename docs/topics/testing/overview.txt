@@ -170,8 +170,8 @@ defined in :setting:`DATABASES`. When using the SQLite database engine
 the tests will by default use an in-memory database (i.e., the
 database will be created in memory, bypassing the filesystem
 entirely!). If you want to use a different database name, specify
-:setting:`TEST_NAME` in the dictionary for any given database in
-:setting:`DATABASES`.
+:setting:`NAME <TEST_NAME>` in the :setting:`TEST <DATABASE-TEST>`
+dictionary for any given database in :setting:`DATABASES`.
 
 Aside from using a separate database, the test runner will otherwise
 use all of the same database settings you have in your settings file:
@@ -181,11 +181,17 @@ need to make sure that the given user account has sufficient privileges to
 create a new database on the system.
 
 For fine-grained control over the character encoding of your test
-database, use the :setting:`TEST_CHARSET` option. If you're using
-MySQL, you can also use the :setting:`TEST_COLLATION` option to
+database, use the :setting:`CHARSET <TEST_CHARSET>` TEST option. If you're using
+MySQL, you can also use the :setting:`COLLATION <TEST_COLLATION>` option to
 control the particular collation used by the test database. See the
 :doc:`settings documentation </ref/settings>` for details of these
-advanced settings.
+and other advanced settings.
+
+.. versionchanged:: 1.7
+
+   The different options in the :setting:`TEST <DATABASE-TEST>` database
+   setting used to be separate options in the database settings dictionary,
+   prefixed with ``TEST_``.
 
 .. admonition:: Finding data from your production database when running tests?
 
