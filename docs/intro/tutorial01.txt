@@ -195,7 +195,7 @@ It worked!
 Database setup
 --------------
 
-Now, edit :file:`mysite/settings.py`. It's a normal Python module with
+Now, go ahead and edit :file:`mysite/settings.py`. It's a normal Python module with
 module-level variables representing Django settings.
 
 By default, the configuration uses SQLite. If you're new to databases, or
