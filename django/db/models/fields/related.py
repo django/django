@@ -2035,7 +2035,7 @@ class ManyToManyField(RelatedField):
         if getattr(self.rel, 'through', None) is not None:
             if isinstance(self.rel.through, six.string_types):
                 kwargs['through'] = self.rel.through
-            else:
+            elif not self.rel.through._meta.auto_created:
                 kwargs['through'] = "%s.%s" % (self.rel.through._meta.app_label, self.rel.through._meta.object_name)
         # If swappable is True, then see if we're actually pointing to the target
         # of a swap.
