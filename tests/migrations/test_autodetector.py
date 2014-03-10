@@ -18,6 +18,7 @@ class AutodetectorTests(TestCase):
     author_name_renamed = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("names", models.CharField(max_length=200))])
     author_name_default = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default='Ada Lovelace'))])
     author_with_book = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))])
+    author_renamed_with_book = ModelState("testapp", "Writer", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))])
     author_with_publisher = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("publisher", models.ForeignKey("testapp.Publisher"))])
     author_with_custom_user = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("user", models.ForeignKey("thirdapp.CustomUser"))])
     author_proxy = ModelState("testapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author", ))
@@ -29,6 +30,8 @@ class AutodetectorTests(TestCase):
     other_stable = ModelState("otherapp", "Stable", [("id", models.AutoField(primary_key=True))])
     third_thing = ModelState("thirdapp", "Thing", [("id", models.AutoField(primary_key=True))])
     book = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))])
+    book_with_author_renamed = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Writer")), ("title", models.CharField(max_length=200))])
+    book_with_field_and_author_renamed = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("writer", models.ForeignKey("testapp.Writer")), ("title", models.CharField(max_length=200))])
     book_unique = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("author", "title")]})
     book_unique_2 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("title", "author")]})
     book_unique_3 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("newfield", models.IntegerField()), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("title", "newfield")]})
@@ -183,6 +186,73 @@ class AutodetectorTests(TestCase):
         self.assertEqual(action.__class__.__name__, "RenameField")
         self.assertEqual(action.old_name, "name")
         self.assertEqual(action.new_name, "names")
+
+    def test_rename_model(self):
+        "Tests autodetection of renamed models"
+        # Make state
+        before = self.make_project_state([self.author_with_book, self.book])
+        after = self.make_project_state([self.author_renamed_with_book, self.book_with_author_renamed])
+        autodetector = MigrationAutodetector(before, after, MigrationQuestioner({"ask_rename_model": True}))
+        changes = autodetector._detect_changes()
+
+        # Right number of migrations for model rename?
+        self.assertEqual(len(changes['testapp']), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        # Right action?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "RenameModel")
+        self.assertEqual(action.old_name, "author")
+        self.assertEqual(action.new_name, "writer")
+
+        # Right number of migrations for related field rename?
+        self.assertEqual(len(changes['otherapp']), 1)
+        # Right number of actions?
+        migration = changes['otherapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        # Right action?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AlterField")
+        self.assertEqual(action.name, "author")
+        self.assertEqual(action.field.rel.to.__name__, "Writer")
+
+    def test_rename_model_with_renamed_rel_field(self):
+        """
+        Tests autodetection of renamed models while simultaneously renaming one
+        of the fields that relate to the renamed model.
+        """
+        # Make state
+        before = self.make_project_state([self.author_with_book, self.book])
+        after = self.make_project_state([self.author_renamed_with_book, self.book_with_field_and_author_renamed])
+        autodetector = MigrationAutodetector(before, after, MigrationQuestioner({"ask_rename_model": True, "ask_rename": True}))
+        changes = autodetector._detect_changes()
+
+        # Right number of migrations for model rename?
+        self.assertEqual(len(changes['testapp']), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        # Right actions?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "RenameModel")
+        self.assertEqual(action.old_name, "author")
+        self.assertEqual(action.new_name, "writer")
+
+        # Right number of migrations for related field rename?
+        self.assertEqual(len(changes['otherapp']), 1)
+        # Right number of actions?
+        migration = changes['otherapp'][0]
+        self.assertEqual(len(migration.operations), 2)
+        # Right actions?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "RenameField")
+        self.assertEqual(action.old_name, "author")
+        self.assertEqual(action.new_name, "writer")
+        action = migration.operations[1]
+        self.assertEqual(action.__class__.__name__, "AlterField")
+        self.assertEqual(action.name, "writer")
+        self.assertEqual(action.field.rel.to.__name__, "Writer")
 
     def test_fk_dependency(self):
         "Tests that having a ForeignKey automatically adds a dependency"
