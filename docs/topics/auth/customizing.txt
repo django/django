@@ -426,6 +426,10 @@ different User model.
 
             post_save.connect(post_save_receiver, sender=settings.AUTH_USER_MODEL)
 
+    Generally speaking, you should reference the User model with the
+    :setting:`AUTH_USER_MODEL` setting in code that is executed at import
+    time. ``get_user_model()`` only works once Django has imported all models.
+
 Specifying a custom User model
 ------------------------------
 

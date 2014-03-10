@@ -869,6 +869,10 @@ regressions cannot be ruled out. You may encounter the following exceptions:
   will also trigger this exception. The ORM cannot function properly until all
   models are available.
 
+  Another common culprit is :func:`django.contrib.auth.get_user_model()`. Use
+  the :setting:`AUTH_USER_MODEL` setting to reference the User model at import
+  time.
+
 * ``ImportError: cannot import name ...`` This happens if the import sequence
   ends up in a loop.
 
