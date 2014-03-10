@@ -237,44 +237,13 @@ class Lexer(object):
                     end = m.end()
                     yield Token(TOKEN_BLOCK, blk)
             elif comment is not None:
+                if not comment.find(TRANSLATOR_COMMENT_MARK):
+                    comment = ''
                 yield Token(TOKEN_COMMENT, comment)
             self.lineno += self.template_string[upto:end].count('\n')
             upto = end
         if upto < len(self.template_string):
             yield Token(TOKEN_TEXT, self.template_string[upto:])
-
-
-    def create_token(self, token_string, in_tag):
-        """
-        Convert the given token string into a new Token object and return it.
-        If in_tag is True, we are processing something that matched a tag,
-        otherwise it should be treated as a literal string.
-        """
-        if in_tag and token_string.startswith(BLOCK_TAG_START):
-            # The [2:-2] ranges below strip off *_TAG_START and *_TAG_END.
-            # We could do len(BLOCK_TAG_START) to be more "correct", but we've
-            # hard-coded the 2s here for performance. And it's not like
-            # the TAG_START values are going to change anytime, anyway.
-            block_content = token_string[2:-2].strip()
-            if self.verbatim and block_content == self.verbatim:
-                self.verbatim = False
-        if in_tag and not self.verbatim:
-            if token_string.startswith(VARIABLE_TAG_START):
-                token = Token(TOKEN_VAR, token_string[2:-2].strip())
-            elif token_string.startswith(BLOCK_TAG_START):
-                if block_content[:9] in ('verbatim', 'verbatim '):
-                    self.verbatim = 'end%s' % block_content
-                token = Token(TOKEN_BLOCK, block_content)
-            elif token_string.startswith(COMMENT_TAG_START):
-                content = ''
-                if token_string.find(TRANSLATOR_COMMENT_MARK):
-                    content = token_string[2:-2].strip()
-                token = Token(TOKEN_COMMENT, content)
-        else:
-            token = Token(TOKEN_TEXT, token_string)
-        token.lineno = self.lineno
-        self.lineno += token_string.count('\n')
-        return token
 
 
 class Parser(object):
