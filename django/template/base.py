@@ -210,7 +210,8 @@ class Lexer(object):
         A generator of template Tokens
         """
         upto = 0
-        for m in tag_re.finditer(self.template_string):
+        stream = tag_re.finditer(self.template_string)
+        for m in stream:
             start, end = m.span()
             if upto < start:
                 text = self.template_string[upto:start]
@@ -223,6 +224,18 @@ class Lexer(object):
                 yield Token(TOKEN_VAR, var)
             elif block is not None:
                 yield Token(TOKEN_BLOCK, block)
+                if block[:9] in ('verbatim', 'verbatim '):
+                    # Find matching end%s
+                    sentinel = 'end' + block
+                    while True:
+                        m = next(stream)
+                        blk = m.group('block')
+                        if blk and blk.startswith(sentinel):
+                            break
+                        # Should we track line count here?
+                    yield Token(TOKEN_TEXT, self.template_string[end:m.start()])
+                    end = m.end()
+                    yield Token(TOKEN_BLOCK, blk)
             elif comment is not None:
                 yield Token(TOKEN_COMMENT, comment)
             self.lineno += self.template_string[upto:end].count('\n')
