@@ -205,6 +205,9 @@ class Lexer(object):
             result.append(token)
         return result
 
+    def _source(self, match, token):
+        return token
+
     def _tokenize(self):
         """
         A generator of template Tokens
@@ -216,14 +219,14 @@ class Lexer(object):
             if upto < start:
                 text = self.template_string[upto:start]
                 self.lineno += text.count('\n')
-                yield Token(TOKEN_TEXT, text)
+                yield self._source(m, Token(TOKEN_TEXT, text))
             block, var, comment = m.groups()
 
             # XXX verbatim handling
             if var is not None:
-                yield Token(TOKEN_VAR, var)
+                yield self._source(m, Token(TOKEN_VAR, var))
             elif block is not None:
-                yield Token(TOKEN_BLOCK, block)
+                yield self._source(m, Token(TOKEN_BLOCK, block))
                 if block[:9] in ('verbatim', 'verbatim '):
                     # Find matching end%s
                     sentinel = 'end' + block
@@ -233,17 +236,17 @@ class Lexer(object):
                         if blk and blk.startswith(sentinel):
                             break
                         # Should we track line count here?
-                    yield Token(TOKEN_TEXT, self.template_string[end:m.start()])
+                    yield self._source(m, Token(TOKEN_TEXT, self.template_string[end:m.start()]))
                     end = m.end()
-                    yield Token(TOKEN_BLOCK, blk)
+                    yield self._source(m, Token(TOKEN_BLOCK, blk))
             elif comment is not None:
                 if not comment.find(TRANSLATOR_COMMENT_MARK):
                     comment = ''
-                yield Token(TOKEN_COMMENT, comment)
+                yield self._source(m, Token(TOKEN_COMMENT, comment))
             self.lineno += self.template_string[upto:end].count('\n')
             upto = end
         if upto < len(self.template_string):
-            yield Token(TOKEN_TEXT, self.template_string[upto:])
+            yield self._source(None, Token(TOKEN_TEXT, self.template_string[upto:]))
 
 
 class Parser(object):
