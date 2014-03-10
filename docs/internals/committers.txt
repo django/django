@@ -515,6 +515,18 @@ Marc Tamlyn
 
     .. _CCBV: http://ccbv.co.uk/
 
+Shai Berger
+    Shai started working with Python back in 1998, and with Django just
+    before 1.0. He is a Free Software enthusiast, but life happens, and
+    he was driven by consulting gigs to contribute to the Oracle and 
+    SQL Server backends of South, and then the Oracle backend of Django
+    itself. Finally, he joined core to help maintain the Oracle backend.
+
+    Shai works for `Platonix`_, a small consulting company he started
+    with a few friends in 1996, and lives near Tel Aviv, Israel.
+
+    .. _Platonix: http://tech.platonix.com
+
 Baptiste Mispelon
     Baptiste discovered Django around the 1.2 version and promptly switched away
     from his homegrown PHP framework. He started getting more involved in the
