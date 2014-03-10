@@ -674,6 +674,10 @@ Models
   the new :attr:`ManyToManyField.through_fields <django.db.models.ManyToManyField.through_fields>`
   argument.
 
+* Assigning a model instance to a non-relation field will now throw an error.
+  Previously this used to work if the field accepted integers as input as it
+  took the primary key.
+
 Signals
 ^^^^^^^
 

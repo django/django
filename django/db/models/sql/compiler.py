@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db.backends.utils import truncate_name
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.expressions import ExpressionNode
 from django.db.models.query_utils import select_related_descend, QueryWrapper
 from django.db.models.sql.constants import (CURSOR, SINGLE, MULTI, NO_RESULTS,
         ORDER_DIR, GET_ITERATOR_CHUNK_SIZE, SelectInfo)
@@ -951,7 +952,14 @@ class SQLUpdateCompiler(SQLCompiler):
         values, update_params = [], []
         for field, model, val in self.query.values:
             if hasattr(val, 'prepare_database_save'):
-                val = val.prepare_database_save(field)
+                if field.rel or isinstance(val, ExpressionNode):
+                    val = val.prepare_database_save(field)
+                else:
+                    raise TypeError("Database is trying to update a relational field "
+                                     "of type %s with a value of type %s. Make sure "
+                                     "you are setting the correct relations" %
+                                     (field.__class__.__name__,
+                                     val.__class__.__name__))
             else:
                 val = field.get_db_prep_save(val, connection=self.connection)
 
