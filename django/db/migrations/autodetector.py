@@ -93,8 +93,8 @@ class MigrationAutodetector(object):
                             self.add_to_migration(
                                 app_label,
                                 operations.RenameModel(
-                                    old_name=rem_model_name,
-                                    new_name=model_name,
+                                    old_name=rem_model_state.name,
+                                    new_name=model_state.name,
                                 )
                             )
                             renamed_models[app_label, model_name] = rem_model_name

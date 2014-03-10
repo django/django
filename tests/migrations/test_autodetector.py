@@ -203,8 +203,8 @@ class AutodetectorTests(TestCase):
         # Right action?
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "RenameModel")
-        self.assertEqual(action.old_name, "author")
-        self.assertEqual(action.new_name, "writer")
+        self.assertEqual(action.old_name, "Author")
+        self.assertEqual(action.new_name, "Writer")
 
         # Right number of migrations for related field rename?
         self.assertEqual(len(changes['otherapp']), 1)
@@ -236,8 +236,8 @@ class AutodetectorTests(TestCase):
         # Right actions?
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "RenameModel")
-        self.assertEqual(action.old_name, "author")
-        self.assertEqual(action.new_name, "writer")
+        self.assertEqual(action.old_name, "Author")
+        self.assertEqual(action.new_name, "Writer")
 
         # Right number of migrations for related field rename?
         self.assertEqual(len(changes['otherapp']), 1)
