@@ -540,6 +540,22 @@ Baptiste Mispelon
     .. _Arkestra: http://arkestra-project.org/
     .. _Don\'t be afraid to commit: https://dont-be-afraid-to-commit.readthedocs.org
 
+`Erik Romijn`_
+    Erik started using Django in the days of 1.2. His largest contribution to Django was
+    ``GenericIPAddressField``, and he has worked on all sorts of patches since.
+    While developing with Django, he always keeps a little list of even the slightest
+    Django frustrations, to tackle them at a later time and prevent other developers
+    from having to deal with the same issues.
+
+    Erik is an independent app maker, mostly developing web and mobile apps, as
+    `Solid Links`_. He also enjoys helping ordinary developers to build safer web apps,
+    for which Django is already a great start, and developed `Erik's Pony Checkup`_ with
+    that goal in mind. Erik lives in Amsterdam, The Netherlands.
+
+    .. _Erik Romijn: http://erik.io/
+    .. _Solid Links: http://solidlinks.nl/
+    .. _Erik's Pony Checkup: http://ponycheckup.com/
+
 Developers Emeritus
 ===================
 
