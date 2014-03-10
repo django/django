@@ -61,6 +61,48 @@ class MigrationAutodetector(object):
             for al, mn in self.to_state.models.keys()
             if not new_apps.get_model(al, mn)._meta.proxy
         ]
+
+        def _rel_agnostic_fields_def(fields):
+            """
+            Return a definition of the fields that ignores field names and
+            what related fields actually relate to.
+            """
+            fields_def = []
+            for name, field in fields:
+                deconstruction = field.deconstruct()[1:]
+                if field.rel and field.rel.to:
+                    del deconstruction[2]['to']
+                fields_def.append(deconstruction)
+            return fields_def
+
+        # Find any renamed models.
+        renamed_models = {}
+        renamed_models_rel = {}
+        added_models = set(new_model_keys) - set(old_model_keys)
+        for app_label, model_name in added_models:
+            model_state = self.to_state.models[app_label, model_name]
+            model_fields_def = _rel_agnostic_fields_def(model_state.fields)
+
+            removed_models = set(old_model_keys) - set(new_model_keys)
+            for rem_app_label, rem_model_name in removed_models:
+                if rem_app_label == app_label:
+                    rem_model_state = self.from_state.models[rem_app_label, rem_model_name]
+                    rem_model_fields_def = _rel_agnostic_fields_def(rem_model_state.fields)
+                    if model_fields_def == rem_model_fields_def:
+                        if self.questioner.ask_rename_model(rem_model_state, model_state):
+                            self.add_to_migration(
+                                app_label,
+                                operations.RenameModel(
+                                    old_name=rem_model_name,
+                                    new_name=model_name,
+                                )
+                            )
+                            renamed_models[app_label, model_name] = rem_model_name
+                            renamed_models_rel['%s.%s' % (rem_model_state.app_label, rem_model_state.name)] = '%s.%s' % (model_state.app_label, model_state.name)
+                            old_model_keys.remove((rem_app_label, rem_model_name))
+                            old_model_keys.append((app_label, model_name))
+                            break
+
         # Adding models. Phase 1 is adding models with no outward relationships.
         added_models = set(new_model_keys) - set(old_model_keys)
         pending_add = {}
@@ -180,7 +222,8 @@ class MigrationAutodetector(object):
         new_fields = set()
         unique_together_operations = []
         for app_label, model_name in kept_models:
-            old_model_state = self.from_state.models[app_label, model_name]
+            old_model_name = renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
             # Collect field changes for later global dealing with (so AddFields
             # always come before AlterFields even on separate models)
@@ -197,8 +240,10 @@ class MigrationAutodetector(object):
                     )
                 ))
         # New fields
+        renamed_fields = {}
         for app_label, model_name, field_name in new_fields - old_fields:
-            old_model_state = self.from_state.models[app_label, model_name]
+            old_model_name = renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
             field = new_model_state.get_field_by_name(field_name)
             # Scan to see if this is actually a rename!
@@ -206,7 +251,12 @@ class MigrationAutodetector(object):
             found_rename = False
             for rem_app_label, rem_model_name, rem_field_name in (old_fields - new_fields):
                 if rem_app_label == app_label and rem_model_name == model_name:
-                    if old_model_state.get_field_by_name(rem_field_name).deconstruct()[1:] == field_dec:
+                    old_field_dec = old_model_state.get_field_by_name(rem_field_name).deconstruct()[1:]
+                    if field.rel and field.rel.to:
+                        old_rel_to = old_field_dec[2]['to']
+                        if old_rel_to in renamed_models_rel:
+                            old_field_dec[2]['to'] = renamed_models_rel[old_rel_to]
+                    if old_field_dec == field_dec:
                         if self.questioner.ask_rename(model_name, rem_field_name, field_name, field):
                             self.add_to_migration(
                                 app_label,
@@ -217,7 +267,8 @@ class MigrationAutodetector(object):
                                 )
                             )
                             old_fields.remove((rem_app_label, rem_model_name, rem_field_name))
-                            new_fields.remove((app_label, model_name, field_name))
+                            old_fields.add((app_label, model_name, field_name))
+                            renamed_fields[app_label, model_name, field_name] = rem_field_name
                             found_rename = True
                             break
             if found_rename:
@@ -250,7 +301,8 @@ class MigrationAutodetector(object):
                     self.add_swappable_dependency(app_label, swappable_setting)
         # Old fields
         for app_label, model_name, field_name in old_fields - new_fields:
-            old_model_state = self.from_state.models[app_label, model_name]
+            old_model_name = renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
             self.add_to_migration(
                 app_label,
@@ -262,10 +314,12 @@ class MigrationAutodetector(object):
         # The same fields
         for app_label, model_name, field_name in old_fields.intersection(new_fields):
             # Did the field change?
-            old_model_state = self.from_state.models[app_label, model_name]
+            old_model_name = renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
-            old_field_dec = old_model_state.get_field_by_name(field_name).deconstruct()
-            new_field_dec = new_model_state.get_field_by_name(field_name).deconstruct()
+            old_field_name = renamed_fields.get((app_label, model_name, field_name), field_name)
+            old_field_dec = old_model_state.get_field_by_name(old_field_name).deconstruct()[1:]
+            new_field_dec = new_model_state.get_field_by_name(field_name).deconstruct()[1:]
             if old_field_dec != new_field_dec:
                 self.add_to_migration(
                     app_label,
