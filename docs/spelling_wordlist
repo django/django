@@ -200,6 +200,7 @@ filesystem
 filesystems
 findstatic
 firstof
+fk
 flatpage
 Flatpage
 flatpages
@@ -525,6 +526,7 @@ serializers
 sessionid
 setuptools
 sha
+Shai
 shapefile
 shapefiles
 sharding
@@ -555,8 +557,6 @@ sqlmigrate
 sqlsequencereset
 ssi
 stacktrace
-startapp
-startproject
 startswith
 stateful
 staticfile
