@@ -2014,7 +2014,7 @@ class ManyToManyField(RelatedField):
                 errors.append(
                     checks.Error(
                         ("Field specifies 'through_fields' but does not "
-                         "provide the names for both fields that should be "
+                         "provide the names of the two link fields that should be "
                          "used for the relation through model "
                          "'%s'.") % qualified_model_name,
                         hint=("Make sure you specify 'through_fields' as "

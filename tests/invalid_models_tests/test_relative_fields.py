@@ -1155,8 +1155,8 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Event)
         expected = [
             Error(
-                ("Field specifies 'through_fields' but does not provide the "
-                 "names for both fields that should be used for the relation "
+                ("Field specifies 'through_fields' but does not provide the names "
+                 "of the two link fields that should be used for the relation "
                  "through model 'invalid_models_tests.Invitation'."),
                 hint=("Make sure you specify 'through_fields' as "
                       "through_fields=('field1', 'field2')"),
