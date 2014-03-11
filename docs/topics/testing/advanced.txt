@@ -251,6 +251,15 @@ automatically as part of the setup of ``./manage.py test``. You only
 need to manually invoke this method if you're not using running your
 tests via Django's test runner.
 
+.. warning::
+
+    While not specific to testing, Django must be initialized when used
+    outside of ``manage.py``
+
+        >>> import django
+        >>> django.setup()
+
+
 .. _other-testing-frameworks:
 
 Using different testing frameworks
