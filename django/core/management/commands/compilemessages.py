@@ -1,32 +1,12 @@
 from __future__ import unicode_literals
 
-import codecs
 import os
 from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
-from django.core.management.utils import find_command, popen_wrapper
-from django.utils._os import npath, upath
-
-
-def has_bom(fn):
-    with open(fn, 'rb') as f:
-        sample = f.read(4)
-    return sample[:3] == b'\xef\xbb\xbf' or \
-        sample.startswith(codecs.BOM_UTF16_LE) or \
-        sample.startswith(codecs.BOM_UTF16_BE)
-
-
-def is_writable(path):
-    # Known side effect: updating file access/modified time to current time if
-    # it is writable.
-    try:
-        with open(path, 'a'):
-            os.utime(path, None)
-    except (IOError, OSError):
-        return False
-    return True
-
+from django.utils._os import upath
+from django.utils.translation.trans_real import (compile_message_file,
+                                                TranslationError, TranslationWritableError)
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
@@ -42,10 +22,6 @@ class Command(BaseCommand):
     def handle(self, **options):
         locale = options.get('locale')
         self.verbosity = int(options.get('verbosity'))
-
-        if find_command(self.program) is None:
-            raise CommandError("Can't find %s. Make sure you have GNU gettext "
-                               "tools 0.15 or newer installed." % self.program)
 
         basedirs = [os.path.join('conf', 'locale'), 'locale']
         if os.environ.get('DJANGO_SETTINGS_MODULE'):
@@ -80,24 +56,10 @@ class Command(BaseCommand):
             if self.verbosity > 0:
                 self.stdout.write('processing file %s in %s\n' % (f, dirpath))
             po_path = os.path.join(dirpath, f)
-            if has_bom(po_path):
-                raise CommandError("The %s file has a BOM (Byte Order Mark). "
-                                   "Django only supports .po files encoded in "
-                                   "UTF-8 and without any BOM." % po_path)
-            base_path = os.path.splitext(po_path)[0]
+            try:
+                compile_message_file(po_path)
+            except TranslationWritableError as writable_err:
+                self.stderr.write(writable_err.args[0])
+            except TranslationError as trans_err:
+                raise CommandError(trans_err.args[0])
 
-            # Check writability on first location
-            if i == 0 and not is_writable(npath(base_path + '.mo')):
-                self.stderr.write("The po files under %s are in a seemingly not "
-                                  "writable location. mo files will not be updated/created." % dirpath)
-                return
-
-            args = [self.program, '--check-format', '-o',
-                    npath(base_path + '.mo'), npath(base_path + '.po')]
-            output, errors, status = popen_wrapper(args)
-            if status:
-                if errors:
-                    msg = "Execution of %s failed: %s" % (self.program, errors)
-                else:
-                    msg = "Execution of %s failed" % self.program
-                raise CommandError(msg)
