@@ -240,6 +240,32 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_symmetric_self_reference_with_intermediate_table_and_through_fields(self):
+        """Using through_fields in a m2m with an intermediate model shouldn't mask its incompatibility with symmetry."""
+        class Person(models.Model):
+            # Explicit symmetrical=True.
+            friends = models.ManyToManyField('self',
+                symmetrical=True,
+                through="Relationship",
+                through_fields=('first', 'second'))
+
+        class Relationship(models.Model):
+            first = models.ForeignKey(Person, related_name="rel_from_set")
+            second = models.ForeignKey(Person, related_name="rel_to_set")
+            referee = models.ForeignKey(Person, related_name="referred")
+
+        field = Person._meta.get_field('friends')
+        errors = field.check(from_model=Person)
+        expected = [
+            Error(
+                'Many-to-many fields with intermediate tables must not be symmetrical.',
+                hint=None,
+                obj=field,
+                id='fields.E332',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
     def test_foreign_key_to_abstract_model(self):
         class Model(models.Model):
             foreign_key = models.ForeignKey('AbstractModel')
