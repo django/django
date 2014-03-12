@@ -8,7 +8,7 @@ import warnings
 from django import test
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db import connection, models, IntegrityError
+from django.db import connection, transaction, models, IntegrityError
 from django.db.models.fields import (
     AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
     CommaSeparatedIntegerField, DateField, DateTimeField, DecimalField,
@@ -80,10 +80,22 @@ class BasicFieldTests(test.TestCase):
 
     def test_float_validates_object(self):
         instance = FloatModel(size=2.5)
+        # Try setting float field to unsaved object
+        instance.size = instance
+        with transaction.atomic():
+            with self.assertRaises(TypeError):
+                instance.save()
+        # Set value to valid and save
+        instance.size = 2.5
         instance.save()
         self.assertTrue(instance.id)
-
-        obj = FloatModel.objects.get(pk=1)
+        # Set field to object on saved instance
+        instance.size = instance
+        with transaction.atomic():
+            with self.assertRaises(TypeError):
+                instance.save()
+        # Try setting field to object on retrieved object
+        obj = FloatModel.objects.get(pk=instance.id)
         obj.size = obj
         with self.assertRaises(TypeError):
             obj.save()
