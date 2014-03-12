@@ -956,10 +956,9 @@ class SQLUpdateCompiler(SQLCompiler):
                     val = val.prepare_database_save(field)
                 else:
                     raise TypeError("Database is trying to update a relational field "
-                                     "of type %s with a value of type %s. Make sure "
-                                     "you are setting the correct relations" %
-                                     (field.__class__.__name__,
-                                     val.__class__.__name__))
+                                    "of type %s with a value of type %s. Make sure "
+                                    "you are setting the correct relations" %
+                                    (field.__class__.__name__, val.__class__.__name__))
             else:
                 val = field.get_db_prep_save(val, connection=self.connection)
 

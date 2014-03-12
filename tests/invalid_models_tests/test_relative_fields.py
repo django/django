@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from django.core.checks import Error
 from django.db import models
-from django.db.models.fields import FieldDoesNotExist
 from django.test.utils import override_settings
 from django.test.testcases import skipIfDBFeature
 
