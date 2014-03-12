@@ -76,6 +76,12 @@ class BooleanModel(models.Model):
     string = models.CharField(max_length=10, default='abc')
 
 
+class DateTimeModel(models.Model):
+    d = models.DateField()
+    dt = models.DateTimeField()
+    t = models.TimeField()
+
+
 class PrimaryKeyCharModel(models.Model):
     string = models.CharField(max_length=10, primary_key=True)
 
