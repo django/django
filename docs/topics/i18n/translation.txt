@@ -7,8 +7,8 @@ Translation
 Overview
 ========
 
-In order to make a Django project translatable, you have to add a minimal amount
-of hooks to your Python code and templates. These hooks are called
+In order to make a Django project translatable, you have to add a minimal
+number of hooks to your Python code and templates. These hooks are called
 :term:`translation strings <translation string>`. They tell Django: "This text
 should be translated into the end user's language, if a translation for this
 text is available in that language." It's your responsibility to mark
