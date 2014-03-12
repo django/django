@@ -70,6 +70,19 @@ else:
     convert_unicode = force_bytes
 
 
+class Oracle_datetime(datetime.datetime):
+    """
+    A datetime object, with an additional class attribute
+    to tell cx_Oracle to save the microseconds too.
+    """
+    input_size = Database.TIMESTAMP
+
+    @classmethod
+    def from_datetime(cls, dt):
+        return Oracle_datetime(dt.year, dt.month, dt.day,
+                               dt.hour, dt.minute, dt.second, dt.microsecond)
+
+
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
     needs_datetime_string_cast = False
@@ -405,18 +418,36 @@ WHEN (new.%(col_name)s IS NULL)
         else:
             return "TABLESPACE %s" % self.quote_name(tablespace)
 
+    def value_to_db_date(self, value):
+        """
+        Transform a date value to an object compatible with what is expected
+        by the backend driver for date columns.
+        The default implementation transforms the date to text, but that is not
+        necessary for Oracle.
+        """
+        return value
+
     def value_to_db_datetime(self, value):
+        """
+        Transform a datetime value to an object compatible with what is expected
+        by the backend driver for datetime columns.
+
+        If naive datetime is passed assumes that is in UTC. Normally Django
+        models.DateTimeField makes sure that if USE_TZ is True passed datetime
+        is timezone aware.
+        """
+
         if value is None:
             return None
 
-        # Oracle doesn't support tz-aware datetimes
+        # cx_Oracle doesn't support tz-aware datetimes
         if timezone.is_aware(value):
             if settings.USE_TZ:
                 value = value.astimezone(timezone.utc).replace(tzinfo=None)
             else:
                 raise ValueError("Oracle backend does not support timezone-aware datetimes when USE_TZ is False.")
 
-        return six.text_type(value)
+        return Oracle_datetime.from_datetime(value)
 
     def value_to_db_time(self, value):
         if value is None:
@@ -429,24 +460,21 @@ WHEN (new.%(col_name)s IS NULL)
         if timezone.is_aware(value):
             raise ValueError("Oracle backend does not support timezone-aware times.")
 
-        return datetime.datetime(1900, 1, 1, value.hour, value.minute,
-                                 value.second, value.microsecond)
+        return Oracle_datetime(1900, 1, 1, value.hour, value.minute,
+                               value.second, value.microsecond)
 
     def year_lookup_bounds_for_date_field(self, value):
-        first = '%s-01-01'
-        second = '%s-12-31'
-        return [first % value, second % value]
+        # Create bounds as real date values
+        first = datetime.date(value, 1, 1)
+        last = datetime.date(value, 12, 31)
+        return [first, last]
 
     def year_lookup_bounds_for_datetime_field(self, value):
-        # The default implementation uses datetime objects for the bounds.
-        # This must be overridden here, to use a formatted date (string) as
-        # 'second' instead -- cx_Oracle chops the fraction-of-second part
-        # off of datetime objects, leaving almost an entire second out of
-        # the year under the default implementation.
+        # cx_Oracle doesn't support tz-aware datetimes
         bounds = super(DatabaseOperations, self).year_lookup_bounds_for_datetime_field(value)
         if settings.USE_TZ:
-            bounds = [b.astimezone(timezone.utc).replace(tzinfo=None) for b in bounds]
-        return [b.isoformat(str(' ')) for b in bounds]
+            bounds = [b.astimezone(timezone.utc) for b in bounds]
+        return [Oracle_datetime.from_datetime(b) for b in bounds]
 
     def combine_expression(self, connector, sub_expressions):
         "Oracle requires special cases for %% and & operators in query expressions"
@@ -671,14 +699,15 @@ class OracleParam(object):
     def __init__(self, param, cursor, strings_only=False):
         # With raw SQL queries, datetimes can reach this function
         # without being converted by DateTimeField.get_db_prep_value.
-        if settings.USE_TZ and isinstance(param, datetime.datetime):
+        if settings.USE_TZ and (isinstance(param, datetime.datetime) and
+                                not isinstance(param, Oracle_datetime)):
             if timezone.is_naive(param):
                 warnings.warn("Oracle received a naive datetime (%s)"
                               " while time zone support is active." % param,
                               RuntimeWarning)
                 default_timezone = timezone.get_default_timezone()
                 param = timezone.make_aware(param, default_timezone)
-            param = param.astimezone(timezone.utc).replace(tzinfo=None)
+            param = Oracle_datetime.from_datetime(param.astimezone(timezone.utc))
 
         # Oracle doesn't recognize True and False correctly in Python 3.
         # The conversion done below works both in 2 and 3.

@@ -20,7 +20,7 @@ from django.utils import unittest
 
 from .models import (Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post,
     NullBooleanModel, BooleanModel, DataModel, Document, RenamedField,
-    VerboseNameField, FksToBooleans)
+    DateTimeModel, VerboseNameField, FksToBooleans)
 
 
 class BasicFieldTests(test.TestCase):
@@ -153,6 +153,17 @@ class DateTimeFieldTests(unittest.TestCase):
                          datetime.time(1, 2, 3, 4))
         self.assertEqual(f.to_python('01:02:03.999999'),
                          datetime.time(1, 2, 3, 999999))
+
+    def test_datetimes_save_completely(self):
+        dat = datetime.date(2014, 3, 12)
+        datetim = datetime.datetime(2014, 3, 12, 21, 22, 23, 240000)
+        tim = datetime.time(21, 22, 23, 240000)
+        DateTimeModel.objects.create(d=dat, dt=datetim, t=tim)
+        obj = DateTimeModel.objects.first()
+        self.assertTrue(obj)
+        self.assertEqual(obj.d, dat)
+        self.assertEqual(obj.dt, datetim)
+        self.assertEqual(obj.t, tim)
 
 class BooleanFieldTests(unittest.TestCase):
     def _test_get_db_prep_lookup(self, f):
