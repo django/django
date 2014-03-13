@@ -776,7 +776,7 @@ or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-commen
         msgid "Go"
         msgstr ""
 
-        #. Translators:
+        #. Translators: This is a text of the base template
         # path/to/template/file.html:103
         msgid "Ambiguous translatable block of text"
         msgstr ""
