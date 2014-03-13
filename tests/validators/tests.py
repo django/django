@@ -198,6 +198,11 @@ TEST_DATA = (
     (RegexValidator(re.compile('x'), inverse_match=True), 'y', None),
     (RegexValidator('x', inverse_match=True), 'x', ValidationError),
     (RegexValidator(re.compile('x'), inverse_match=True), 'x', ValidationError),
+
+    (RegexValidator('x', flags=re.IGNORECASE), 'y', ValidationError),
+    (RegexValidator('a'), 'A', ValidationError),
+    (RegexValidator('a', flags=re.IGNORECASE), 'A', None),
+
 )
 
 

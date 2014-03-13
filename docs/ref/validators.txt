@@ -59,13 +59,14 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``RegexValidator``
 ------------------
-.. class:: RegexValidator([regex=None, message=None, code=None, inverse_match=None])
+.. class:: RegexValidator([regex=None, message=None, code=None, inverse_match=None, flags=0])
 
     :param regex: If not ``None``, overrides :attr:`regex`. Can be a regular
         expression string or a pre-compiled regular expression.
     :param message: If not ``None``, overrides :attr:`.message`.
     :param code: If not ``None``, overrides :attr:`code`.
     :param inverse_match: If not ``None``, overrides :attr:`inverse_match`.
+    :param flags: Overrides :attr:`flags`.
 
     .. attribute:: regex
 
@@ -92,6 +93,10 @@ to, or in lieu of custom ``field.clean()`` methods.
         .. versionadded:: 1.7
 
         The match mode for :attr:`regex`. Defaults to ``False``.
+
+    .. attribute:: flags
+
+        Flags passed to re.compile
 
 ``URLValidator``
 ----------------
