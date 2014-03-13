@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from unittest import TestCase
 import re
+from unittest import TestCase
 
 from django import forms
 from django.core import validators
