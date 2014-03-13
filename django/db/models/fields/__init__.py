@@ -537,6 +537,7 @@ class Field(RegisterLookupMixin):
         values (type, checks).
         This will look at db_type(), allowing custom model fields to override it.
         """
+        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
         type_string = self.db_type(connection)
         try:
             check_string = connection.creation.data_type_check_constraints[self.get_internal_type()] % data
