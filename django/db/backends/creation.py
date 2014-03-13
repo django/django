@@ -32,16 +32,6 @@ class BaseDatabaseCreation(object):
     def __init__(self, connection):
         self.connection = connection
 
-    def get_column_type(self, field_name, field_attrs):
-        """
-        Translates a Django field name into its SQL column type.
-        """
-        # e.g.
-        # field_name = 'CharField'
-        # field_attrs = {'max_length': 50}
-        # returns 'varchar(50)'
-        return self.data_types[field_name] % field_attrs
-
     @cached_property
     def _nodb_connection(self):
         """
