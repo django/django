@@ -795,11 +795,15 @@ Tests
 Validators
 ^^^^^^^^^^
 
-* :class:`~django.core.validators.RegexValidator` now accepts an optional
-  Boolean :attr:`~django.core.validators.RegexValidator.inverse_match` argument
-  which determines if the :exc:`~django.core.exceptions.ValidationError` should
+* :class:`~django.core.validators.RegexValidator` now accepts the optional
+  :attr:`~django.core.validators.RegexValidator.flags` and
+  Boolean :attr:`~django.core.validators.RegexValidator.inverse_match` arguments.
+  The :attr:`~django.core.validators.RegexValidator.inverse_match` attribute
+  determines if the :exc:`~django.core.exceptions.ValidationError` should
   be raised when the regular expression pattern matches (``True``) or does not
-  match (``False``, by default) the provided ``value``.
+  match (``False``, by default) the provided ``value``. The
+  :attr:`~django.core.validators.RegexValidator.flags` attribute sets the flags
+  used when compiling a regular expression string.
 
 * :class:`~django.core.validators.URLValidator` now accepts an optional
   ``schemes`` argument which allows customization of the accepted URI schemes
@@ -1190,6 +1194,13 @@ Miscellaneous
   optional ``related_query_name`` argument. Setting ``related_query_name`` adds
   a relation from the related object back to the content type for filtering,
   ordering and other query operations.
+
+* When a model field's :attr:`~django.db.models.Field.validators` contains
+  a :class:`~django.core.validators.RegexValidator`, the regular expression
+  must now be passed as a regular expression string. You can no longer use a
+  pre-compiled regular expression in this case, as it is not serializable.
+  The :attr:`~django.core.validators.RegexValidator.flags` attribute was added
+  to :class:`~django.core.validators.RegexValidator` to simplify this change.
 
 .. _deprecated-features-1.7:
 
