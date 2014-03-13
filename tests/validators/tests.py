@@ -198,6 +198,10 @@ TEST_DATA = (
     (RegexValidator(re.compile('x'), inverse_match=True), 'y', None),
     (RegexValidator('x', inverse_match=True), 'x', ValidationError),
     (RegexValidator(re.compile('x'), inverse_match=True), 'x', ValidationError),
+
+    (RegexValidator('x', flags=re.IGNORECASE), 'y', ValidationError),
+    (RegexValidator('a'), 'A', ValidationError),
+    (RegexValidator('a', flags=re.IGNORECASE), 'A', None),
 )
 
 
@@ -249,6 +253,14 @@ class TestSimpleValidators(TestCase):
         v = ValidationError({'first': ['First Problem']})
         self.assertEqual(str(v), str_prefix("{%(_)s'first': [%(_)s'First Problem']}"))
         self.assertEqual(repr(v), str_prefix("ValidationError({%(_)s'first': [%(_)s'First Problem']})"))
+
+    def test_regex_validator_flags(self):
+        try:
+            RegexValidator(re.compile('a'), flags=re.IGNORECASE)
+        except TypeError:
+            pass
+        else:
+            self.fail("TypeError not raised when flags and pre-compiled regex in RegexValidator")
 
 test_counter = 0
 for validator, value, expected in TEST_DATA:

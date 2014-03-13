@@ -21,8 +21,9 @@ class RegexValidator(object):
     message = _('Enter a valid value.')
     code = 'invalid'
     inverse_match = False
+    flags = 0
 
-    def __init__(self, regex=None, message=None, code=None, inverse_match=None):
+    def __init__(self, regex=None, message=None, code=None, inverse_match=None, flags=None):
         if regex is not None:
             self.regex = regex
         if message is not None:
@@ -31,10 +32,14 @@ class RegexValidator(object):
             self.code = code
         if inverse_match is not None:
             self.inverse_match = inverse_match
+        if flags is not None:
+            self.flags = flags
+        if self.flags and not isinstance(self.regex, six.string_types):
+            raise TypeError("If the flags are set, regex must be a regular expression string.")
 
         # Compile the regex if it was not passed pre-compiled.
         if isinstance(self.regex, six.string_types):
-            self.regex = re.compile(self.regex)
+            self.regex = re.compile(self.regex, self.flags)
 
     def __call__(self, value):
         """
