@@ -71,7 +71,11 @@ class MigrationAutodetector(object):
             for name, field in fields:
                 deconstruction = field.deconstruct()[1:]
                 if field.rel and field.rel.to:
-                    del deconstruction[2]['to']
+                    try:
+                        del deconstruction[2]['to']
+                    except KeyError:
+                        # `rel.to` does not have to come from kwargs.
+                        pass
                 fields_def.append(deconstruction)
             return fields_def
 
