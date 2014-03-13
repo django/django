@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+from datetime import datetime
 import unittest
 
 from django.core.checks import Error
@@ -399,3 +400,30 @@ class ImageFieldTests(IsolatedModelsTestCase):
             ),
         ]
         self.assertEqual(errors, expected)
+
+
+class DateFieldTests(IsolatedModelsTestCase):
+
+    def test_auto_now_and_auto_now_add_raise_error(self):
+            dn = datetime.now
+            mutually_exclusive_combinations = (
+                (True, True, dn),
+                (True, False, dn),
+                (False, True, dn),
+                (True, True, None)
+            )
+
+            for auto_now, auto_now_add, default in mutually_exclusive_combinations:
+                field = models.DateTimeField(name="field", auto_now=auto_now,
+                                             auto_now_add=auto_now_add,
+                                             default=default)
+                expected = [Error(
+                    "The options auto_now, auto_now_add, and default "
+                    "are mutually exclusive. Only one of these options "
+                    "may be present.",
+                    hint=None,
+                    obj=field,
+                    id='fields.E151',
+                )]
+                checks = field.check()
+                self.assertEqual(checks, expected)
