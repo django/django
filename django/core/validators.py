@@ -35,7 +35,7 @@ class RegexValidator(object):
         if flags is not None:
             self.flags = flags
         if flags and not isinstance(self.regex, six.string_types):
-            raise TypeError(_("If the flags are set, regex must be a string pattern."))
+            raise TypeError("If the flags are set, regex must be a regular expression string.")
 
         # Compile the regex if it was not passed pre-compiled.
         if isinstance(self.regex, six.string_types):
