@@ -234,6 +234,18 @@ class FieldsTests(SimpleTestCase):
         f1 = IntegerField(localize=True)
         self.assertWidgetRendersTo(f1, '<input id="id_f" name="f" type="text" />')
 
+    def test_integerfield_subclass(self):
+        """
+        Test that class-defined widget is not overwritten by __init__ (#22245).
+        """
+        class MyIntegerField(IntegerField):
+            widget = Textarea
+
+        f = MyIntegerField()
+        self.assertEqual(f.widget.__class__, Textarea)
+        f = MyIntegerField(localize=True)
+        self.assertEqual(f.widget.__class__, Textarea)
+
     # FloatField ##################################################################
 
     def test_floatfield_1(self):

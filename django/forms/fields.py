@@ -216,13 +216,16 @@ class CharField(Field):
 
 
 class IntegerField(Field):
+    widget = NumberInput
     default_error_messages = {
         'invalid': _('Enter a whole number.'),
     }
 
     def __init__(self, max_value=None, min_value=None, *args, **kwargs):
         self.max_value, self.min_value = max_value, min_value
-        kwargs.setdefault('widget', NumberInput if not kwargs.get('localize') else self.widget)
+        if kwargs.get('localize') and self.widget == NumberInput:
+            # Localized number input is not well supported on most browsers
+            kwargs.setdefault('widget', super(IntegerField, self).widget)
         super(IntegerField, self).__init__(*args, **kwargs)
 
         if max_value is not None:
