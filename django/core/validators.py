@@ -34,7 +34,7 @@ class RegexValidator(object):
             self.inverse_match = inverse_match
         if flags is not None:
             self.flags = flags
-        if flags and not isinstance(self.regex, six.string_types):
+        if self.flags and not isinstance(self.regex, six.string_types):
             raise TypeError("If the flags are set, regex must be a regular expression string.")
 
         # Compile the regex if it was not passed pre-compiled.
