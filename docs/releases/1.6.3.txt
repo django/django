@@ -18,3 +18,8 @@ several bugs in 1.6.2:
 * Fixed crash of ``QuerySet``\s that use ``F() + timedelta()`` when their query
   was compiled more once
   (`#21643 <http://code.djangoproject.com/ticket/21643>`_).
+
+* Prevented custom ``widget`` class attribute of
+  :class:`~django.forms.IntegerField` subclasses from being overwritten by the
+  code in their ``__init__`` method
+  (`#22245 <http://code.djangoproject.com/ticket/22245>`_).
