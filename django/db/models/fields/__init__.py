@@ -1074,7 +1074,37 @@ class CommaSeparatedIntegerField(CharField):
         return super(CommaSeparatedIntegerField, self).formfield(**defaults)
 
 
-class DateField(Field):
+class DateTimeCheckMixin(object):
+
+    def check(self, **kwargs):
+        errors = super(DateTimeCheckMixin, self).check(**kwargs)
+        errors.extend(self._check_mutually_exclusive_options())
+        return errors
+
+    def _check_mutually_exclusive_options(self):
+        # auto_now, auto_now_add, and default are mutually exclusive
+        # options. The use of more than one of these options together
+        # will trigger an Error
+        mutually_exclusive_options = [self.auto_now_add, self.auto_now,
+                                      self.has_default()]
+        enabled_options = [option not in (None, False)
+                          for option in mutually_exclusive_options].count(True)
+        if enabled_options > 1:
+            return [
+                checks.Error(
+                    "The options auto_now, auto_now_add, and default "
+                    "are mutually exclusive. Only one of these options "
+                    "may be present.",
+                    hint=None,
+                    obj=self,
+                    id='fields.E151',
+                )
+            ]
+        else:
+            return []
+
+
+class DateField(DateTimeCheckMixin, Field):
     empty_strings_allowed = False
     default_error_messages = {
         'invalid': _("'%(value)s' value has an invalid date format. It must be "
@@ -1887,7 +1917,7 @@ class TextField(Field):
         return super(TextField, self).formfield(**defaults)
 
 
-class TimeField(Field):
+class TimeField(DateTimeCheckMixin, Field):
     empty_strings_allowed = False
     default_error_messages = {
         'invalid': _("'%(value)s' value has an invalid format. It must be in "
