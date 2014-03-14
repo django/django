@@ -71,10 +71,10 @@ class Article(models.Model):
     categories = models.ManyToManyField(Category, blank=True)
     status = models.PositiveIntegerField(choices=ARTICLE_STATUS, blank=True, null=True)
 
-    def save(self):
+    def save(self, *args, **kwargs):
         if not self.id:
             self.created = datetime.date.today()
-        return super(Article, self).save()
+        return super(Article, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.headline
