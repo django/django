@@ -61,8 +61,8 @@ ArrayField
     When nesting ``ArrayField``, whether you use the `size` parameter or not,
     PostgreSQL requires that the arrays are rectangular::
 
-        from django.db import models
         from django.contrib.postgres.fields import ArrayField
+        from django.db import models
 
         class Board(models.Model):
             pieces = ArrayField(ArrayField(models.IntegerField()))
@@ -95,7 +95,7 @@ We will use the following example model::
         name = models.CharField(max_length=200)
         tags = ArrayField(models.CharField(max_length=200), blank=True)
 
-        def __str__(self):  # __unicode__ on python 2
+        def __str__(self):  # __unicode__ on Python 2
             return self.name
 
 .. fieldlookup:: arrayfield.contains
@@ -240,3 +240,165 @@ At present using :attr:`~django.db.models.Field.db_index` will create a
 ``btree`` index. This does not offer particularly significant help to querying.
 A more useful index is a ``GIN`` index, which you should create using a
 :class:`~django.db.migrations.operations.RunSQL` operation.
+
+HStoreField
+-----------
+
+.. class:: HStoreField(**options)
+
+    A field for storing mappings of strings to strings. The Python data type
+    used is a ``dict``.
+
+.. note::
+
+    On occasions it may be useful to require or restrict the keys which are
+    valid for a given field. This can be done using the
+    :class:`~django.contrib.postgres.validators.KeysValidator`.
+
+Querying HStoreField
+^^^^^^^^^^^^^^^^^^^^
+
+In addition to the ability to query by key, there are a number of custom
+lookups available for ``HStoreField``.
+
+We will use the following example model::
+
+    from django.contrib.postgres.fields import HStoreField
+    from django.db import models
+
+    class Dog(models.Model):
+        name = models.CharField(max_length=200)
+        data = HStoreField()
+
+        def __str__(self):  # __unicode__ on Python 2
+            return self.name
+
+.. fieldlookup:: hstorefield.key
+
+Key lookups
+~~~~~~~~~~~
+
+To query based on a given key, you simply use that key as the lookup name::
+
+    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
+    >>> Dog.objects.create(name='Meg', data={'breed': 'collie'})
+
+    >>> Dog.objects.filter(data__breed='collie')
+    [<Dog: Meg>]
+
+You can chain other lookups after key lookups::
+
+    >>> Dog.objects.filter(data__breed__contains='l')
+    [<Dog: Rufus>, Dog: Meg>]
+
+If the key you wish to query by clashes with the name of another lookup, you
+need to use the :lookup:`hstorefield.contains` lookup instead.
+
+.. warning::
+
+    Since any string could be a key in a hstore value, any lookup other than
+    those listed below will be interpreted as a key lookup. No errors are
+    raised. Be extra careful for typing mistakes, and always check your queries
+    work as you intend.
+
+.. fieldlookup:: hstorefield.contains
+
+contains
+~~~~~~~~
+
+The :lookup:`contains` lookup is overridden on
+:class:`~django.contrib.postgres.fields.HStoreField`. The returned objects are
+those where the given ``dict`` of key-value pairs are all contained in the
+field. It uses the SQL operator ``@>``. For example::
+
+    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador', 'owner': 'Bob'})
+    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+    >>> Dog.objects.create(name='Fred', data={})
+
+    >>> Dog.objects.filter(data__contains={'owner': 'Bob'})
+    [<Dog: Rufus>, <Dog: Meg>]
+
+    >>> Dog.objects.filter(data__contains={'breed': 'collie'})
+    [<Dog: Meg>]
+
+.. fieldlookup:: hstorefield.contained_by
+
+contained_by
+~~~~~~~~~~~~
+
+This is the inverse of the :lookup:`contains <hstorefield.contains>` lookup -
+the objects returned will be those where the key-value pairs on the object are
+a subset of those in the value passed. It uses the SQL operator ``<@``. For
+example::
+
+    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador', 'owner': 'Bob'})
+    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+    >>> Dog.objects.create(name='Fred', data={})
+
+    >>> Dog.objects.filter(data__contained_by={'breed': 'collie', 'owner': 'Bob'})
+    [<Dog: Meg>, <Dog: Fred>]
+
+    >>> Dog.objects.filter(data__contained_by={'breed': 'collie'})
+    [<Dog: Fred>]
+
+.. fieldlookup:: hstorefield.has_key
+
+has_key
+~~~~~~~
+
+Returns objects where the given key is in the data. Uses the SQL operator
+``?``. For example::
+
+    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
+    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+
+    >>> Dog.objects.filter(data__has_key='owner')
+    [<Dog: Meg>]
+
+.. fieldlookup:: hstorefield.has_keys
+
+has_keys
+~~~~~~~~
+
+Returns objects where all of the given keys are in the data. Uses the SQL operator
+``?&``. For example::
+
+    >>> Dog.objects.create(name='Rufus', data={})
+    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+
+    >>> Dog.objects.filter(data__has_keys=['breed', 'owner'])
+    [<Dog: Meg>]
+
+.. fieldlookup:: hstorefield.keys
+
+keys
+~~~~
+
+Returns objects where the array of keys is the given value. Note that the order
+is not guaranteed to be reliable, so this transform is mainly useful for using
+in conjunction with lookups on
+:class:`~django.contrib.postgres.fields.ArrayField`. Uses the SQL function
+``akeys()``. For example::
+
+    >>> Dog.objects.create(name='Rufus', data={'toy': 'bone'})
+    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+
+    >>> Dog.objects.filter(data__keys__overlap=['breed', 'toy'])
+    [<Dog: Rufus>, <Dog: Meg>]
+
+.. fieldlookup:: hstorefield.values
+
+values
+~~~~~~
+
+Returns objects where the array of values is the given value. Note that the
+order is not guaranteed to be reliable, so this transform is mainly useful for
+using in conjunction with lookups on
+:class:`~django.contrib.postgres.fields.ArrayField`. Uses the SQL function
+``avalues()``. For example::
+
+    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
+    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+
+    >>> Dog.objects.filter(data__values__contains=['collie'])
+    [<Dog: Meg>]
