@@ -18,6 +18,7 @@ from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils._os import upath
 
 
 temp_storage_dir = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
@@ -34,6 +35,10 @@ ARTICLE_STATUS_CHAR = (
     ('p', 'Pending'),
     ('l', 'Live'),
 )
+
+
+class Person(models.Model):
+    name = models.CharField(max_length=100)
 
 
 @python_2_unicode_compatible
@@ -93,12 +98,35 @@ class BetterWriter(Writer):
 
 
 @python_2_unicode_compatible
+class Publication(models.Model):
+    title = models.CharField(max_length=30)
+    date_published = models.DateField()
+
+    def __str__(self):
+        return self.title
+
+
+class Author(models.Model):
+    publication = models.OneToOneField(Publication, null=True, blank=True)
+    full_name = models.CharField(max_length=255)
+
+
+class Author1(models.Model):
+    publication = models.OneToOneField(Publication, null=False)
+    full_name = models.CharField(max_length=255)
+
+
+@python_2_unicode_compatible
 class WriterProfile(models.Model):
     writer = models.OneToOneField(Writer, primary_key=True)
     age = models.PositiveIntegerField()
 
     def __str__(self):
         return "%s is %s" % (self.writer, self.age)
+
+
+class Document(models.Model):
+    myfile = models.FileField(upload_to='unused', blank=True)
 
 
 @python_2_unicode_compatible
@@ -108,6 +136,22 @@ class TextFile(models.Model):
 
     def __str__(self):
         return self.description
+
+
+class CustomFileField(models.FileField):
+    def save_form_data(self, instance, data):
+        been_here = getattr(self, 'been_saved', False)
+        assert not been_here, "save_form_data called more than once"
+        setattr(self, 'been_saved', True)
+
+
+class CustomFF(models.Model):
+    f = CustomFileField(upload_to='unused', blank=True)
+
+
+class FilePathModel(models.Model):
+    path = models.FilePathField(path=os.path.dirname(upath(__file__)), match=".*\.py$", blank=True)
+
 
 try:
     from django.utils.image import Image  # NOQA: detect if Pillow is installed
@@ -161,6 +205,10 @@ class CommaSeparatedInteger(models.Model):
         return self.field
 
 
+class Homepage(models.Model):
+    url = models.URLField()
+
+
 @python_2_unicode_compatible
 class Product(models.Model):
     slug = models.SlugField(unique=True)
@@ -179,6 +227,15 @@ class Price(models.Model):
 
     class Meta:
         unique_together = (('price', 'quantity'),)
+
+
+class Triple(models.Model):
+    left = models.IntegerField()
+    middle = models.IntegerField()
+    right = models.IntegerField()
+
+    class Meta:
+        unique_together = (('left', 'middle'), ('middle', 'right'))
 
 
 class ArticleStatus(models.Model):
@@ -329,6 +386,8 @@ class CustomErrorMessage(models.Model):
     def clean(self):
         if self.name1 == 'FORBIDDEN_VALUE':
             raise ValidationError({'name1': [ValidationError('Model.clean() error messages.')]})
+        elif self.name1 == 'GLOBAL_ERROR':
+            raise ValidationError("Global error message.")
 
 
 def today_callable_dict():
