@@ -1,4 +1,4 @@
-from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields import ArrayField, HStoreField
 from django.db import models
 
 
@@ -20,3 +20,7 @@ class DateTimeArrayModel(models.Model):
 
 class NestedIntegerArrayModel(models.Model):
     field = ArrayField(ArrayField(models.IntegerField()))
+
+
+class HStoreModel(models.Model):
+    field = HStoreField(blank=True, null=True)
