@@ -89,28 +89,3 @@ to combine a Django application with a WSGI application of another framework.
     middleware up to version 2.0.7. In those cases the
     :data:`~django.core.signals.request_finished` signal isn't sent. This can
     result in idle connections to database and memcache servers.
-
-Upgrading from Django < 1.4
----------------------------
-
-If you're upgrading from Django 1.3.x or earlier, you don't have a
-:file:`wsgi.py` file in your project.
-
-You can simply add one to your project's top-level Python package (probably
-next to :file:`settings.py` and :file:`urls.py`) with the contents below::
-
-    import os
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
-
-    from django.core.wsgi import get_wsgi_application
-    application = get_wsgi_application()
-
-The ``os.environ.setdefault`` line just sets the default settings module to
-use, if you haven't explicitly set the :envvar:`DJANGO_SETTINGS_MODULE`
-environment variable. You'll need to edit this line to replace ``mysite`` with
-the name of your project package, so the path to your settings module is
-correct.
-
-Also add ``WSGI_APPLICATION = "mysite.wsgi.application"`` in your settings, so
-that :djadmin:`runserver` finds your ``application`` callable. Don't forget to
-replace ``mysite`` with the name of your project in this line.

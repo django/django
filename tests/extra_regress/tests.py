@@ -131,7 +131,7 @@ class ExtraRegressTests(TestCase):
         """
         Regression test for #8039: Ordering sometimes removed relevant tables
         from extra(). This test is the critical case: ordering uses a table,
-        but then removes the reference because of an optimisation. The table
+        but then removes the reference because of an optimization. The table
         should still be present because of the extra() call.
         """
         self.assertQuerysetEqual(

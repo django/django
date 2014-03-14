@@ -170,7 +170,7 @@ def is_discoverable(label):
 def dependency_ordered(test_databases, dependencies):
     """
     Reorder test_databases into an order that honors the dependencies
-    described in TEST_DEPENDENCIES.
+    described in TEST[DEPENDENCIES].
     """
     ordered_test_databases = []
     resolved_databases = set()
@@ -204,7 +204,7 @@ def dependency_ordered(test_databases, dependencies):
 
         if not changed:
             raise ImproperlyConfigured(
-                "Circular dependency in TEST_DEPENDENCIES")
+                "Circular dependency in TEST[DEPENDENCIES]")
         test_databases = deferred
     return ordered_test_databases
 
@@ -261,11 +261,11 @@ def setup_databases(verbosity, interactive, **kwargs):
     default_sig = connections[DEFAULT_DB_ALIAS].creation.test_db_signature()
     for alias in connections:
         connection = connections[alias]
-        if connection.settings_dict['TEST_MIRROR']:
+        test_settings = connection.settings_dict['TEST']
+        if test_settings['MIRROR']:
             # If the database is marked as a test mirror, save
             # the alias.
-            mirrored_aliases[alias] = (
-                connection.settings_dict['TEST_MIRROR'])
+            mirrored_aliases[alias] = test_settings['MIRROR']
         else:
             # Store a tuple with DB parameters that uniquely identify it.
             # If we have two aliases with the same values for that tuple,
@@ -276,13 +276,11 @@ def setup_databases(verbosity, interactive, **kwargs):
             )
             item[1].add(alias)
 
-            if 'TEST_DEPENDENCIES' in connection.settings_dict:
-                dependencies[alias] = (
-                    connection.settings_dict['TEST_DEPENDENCIES'])
+            if 'DEPENDENCIES' in test_settings:
+                dependencies[alias] = test_settings['DEPENDENCIES']
             else:
                 if alias != DEFAULT_DB_ALIAS and connection.creation.test_db_signature() != default_sig:
-                    dependencies[alias] = connection.settings_dict.get(
-                        'TEST_DEPENDENCIES', [DEFAULT_DB_ALIAS])
+                    dependencies[alias] = test_settings.get('DEPENDENCIES', [DEFAULT_DB_ALIAS])
 
     # Second pass -- actually create the databases.
     old_names = []

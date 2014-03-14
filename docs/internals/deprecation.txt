@@ -121,6 +121,9 @@ details on these changes.
 
 * ``django.utils.text.javascript_quote`` will be removed.
 
+* Database test settings as independent entries in the database settings,
+  prefixed by ``TEST_``, will no longer be supported.
+
 .. _deprecation-removed-in-1.8:
 
 1.8
@@ -208,6 +211,9 @@ details on these changes.
 * Geographic Sitemaps will be removed
   (``django.contrib.gis.sitemaps.views.index`` and
   ``django.contrib.gis.sitemaps.views.sitemap``).
+
+* ``django.utils.html.fix_ampersands``, the ``fix_ampersands`` template filter and
+  ``django.utils.html.clean_html`` will be removed following an accelerated deprecation.
 
 .. _deprecation-removed-in-1.7:
 

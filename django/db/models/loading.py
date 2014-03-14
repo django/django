@@ -1,14 +1,20 @@
 import warnings
 
 from django.apps import apps
+from django.utils.deprecation import RemovedInDjango19Warning
+
 
 warnings.warn(
     "The utilities in django.db.models.loading are deprecated "
     "in favor of the new application loading system.",
-    PendingDeprecationWarning, stacklevel=2)
+    RemovedInDjango19Warning, stacklevel=2)
 
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
         'load_app', 'app_cache_ready')
+
+# Backwards-compatibility for private APIs during the deprecation period.
+UnavailableApp = LookupError
+cache = apps
 
 # These methods were always module level, so are kept that way for backwards
 # compatibility.

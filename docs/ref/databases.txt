@@ -259,8 +259,8 @@ drivers that implement this API:
 Both drivers are thread-safe and both provide connection pooling. The major
 difference is that MySQL Connector/Python supports Python 3.
 
-In addition to a DB API driver, Django needs an adaptor to access the database
-drivers from its ORM. Django provides an adaptor for MySQLdb while MySQL
+In addition to a DB API driver, Django needs an adapter to access the database
+drivers from its ORM. Django provides an adapter for MySQLdb while MySQL
 Connector/Python includes `its own`_.
 
 .. _its own: http://dev.mysql.com/doc/refman/5.6/en/connector-python-django-backend.html
@@ -554,7 +554,7 @@ are passed into the query. So the :lookup:`iexact` filter will behave exactly
 the same as the :lookup:`exact` filter in these cases.
 
 Some possible workarounds for this are `documented at sqlite.org`_, but they
-aren't utilised by the default SQLite backend in Django, as incorporating them
+aren't utilized by the default SQLite backend in Django, as incorporating them
 would be fairly difficult to do robustly. Thus, Django exposes the default
 SQLite behavior and you should be aware of this when doing case-insensitive or
 substring filtering.
@@ -603,7 +603,7 @@ Version 3.6.2
 --------------
 
 SQLite version 3.6.2 (released August 30, 2008) introduced a bug into ``SELECT
-DISTINCT`` handling that is triggered by, amongst other things, Django's
+DISTINCT`` handling that is triggered by, among other things, Django's
 ``DateQuerySet`` (returned by the ``dates()`` method on a queryset).
 
 You should avoid using this version of SQLite with Django. Either upgrade to

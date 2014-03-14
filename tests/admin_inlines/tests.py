@@ -63,7 +63,7 @@ class TestInline(TestCase):
     def test_inline_primary(self):
         person = Person.objects.create(firstname='Imelda')
         item = OutfitItem.objects.create(name='Shoes')
-        # Imelda likes shoes, but can't cary her own bags.
+        # Imelda likes shoes, but can't carry her own bags.
         data = {
             'shoppingweakness_set-TOTAL_FORMS': 1,
             'shoppingweakness_set-INITIAL_FORMS': 0,
@@ -91,7 +91,7 @@ class TestInline(TestCase):
             'title_set-0-title2': 'a different title',
         }
         response = self.client.post('/admin/admin_inlines/titlecollection/add/', data)
-        # Here colspan is "4": two fields (title1 and title2), one hidden field and the delete checkbock.
+        # Here colspan is "4": two fields (title1 and title2), one hidden field and the delete checkbox.
         self.assertContains(response, '<tr><td colspan="4"><ul class="errorlist"><li>The two titles must be the same</li></ul></td></tr>')
 
     def test_no_parent_callable_lookup(self):
@@ -109,7 +109,7 @@ class TestInline(TestCase):
         self.assertEqual(response.status_code, 200)
         # Add parent object view should have the child inlines section
         self.assertContains(response, '<div class="inline-group" id="question_set-group">')
-        # The right callabe should be used for the inline readonly_fields
+        # The right callable should be used for the inline readonly_fields
         # column cells
         self.assertContains(response, '<p>Callable in QuestionInline</p>')
 

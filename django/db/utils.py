@@ -6,6 +6,7 @@ import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import RemovedInDjango18Warning, RemovedInDjango19Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils._os import upath
@@ -169,7 +170,7 @@ class ConnectionHandler(object):
         if settings.TRANSACTIONS_MANAGED:
             warnings.warn(
                 "TRANSACTIONS_MANAGED is deprecated. Use AUTOCOMMIT instead.",
-                DeprecationWarning, stacklevel=2)
+                RemovedInDjango18Warning, stacklevel=2)
             conn.setdefault('AUTOCOMMIT', False)
         conn.setdefault('AUTOCOMMIT', True)
         conn.setdefault('ENGINE', 'django.db.backends.dummy')
@@ -180,14 +181,51 @@ class ConnectionHandler(object):
         conn.setdefault('TIME_ZONE', 'UTC' if settings.USE_TZ else settings.TIME_ZONE)
         for setting in ['NAME', 'USER', 'PASSWORD', 'HOST', 'PORT']:
             conn.setdefault(setting, '')
-        for setting in ['TEST_CHARSET', 'TEST_COLLATION', 'TEST_NAME', 'TEST_MIRROR']:
-            conn.setdefault(setting, None)
+
+    TEST_SETTING_RENAMES = {
+        'CREATE': 'CREATE_DB',
+        'USER_CREATE': 'CREATE_USER',
+        'PASSWD': 'PASSWORD',
+    }
+
+    def prepare_test_settings(self, alias):
+        """
+        Makes sure the test settings are available in the 'TEST' sub-dictionary.
+        """
+        try:
+            conn = self.databases[alias]
+        except KeyError:
+            raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
+
+        test_settings = conn.setdefault('TEST', {})
+        for key, value in six.iteritems(conn):
+            if key.startswith('TEST_'):
+                new_key = key[5:]
+                new_key = self.TEST_SETTING_RENAMES.get(new_key, new_key)
+                if new_key in test_settings:
+                    raise ImproperlyConfigured("Connection %s has both %s and TEST[%s] specified." %
+                                               (alias, key, new_key))
+                warnings.warn("In Django 1.9 the %s connection setting will be moved "
+                              "to a %s entry in the TEST setting" % (key, new_key),
+                              RemovedInDjango19Warning, stacklevel=2)
+                test_settings[new_key] = value
+        for key in list(conn.keys()):
+            if key.startswith('TEST_'):
+                del conn[key]
+        # Check that they didn't just use the old name with 'TEST_' removed
+        for key, new_key in six.iteritems(self.TEST_SETTING_RENAMES):
+            if key in test_settings:
+                warnings.warn("Test setting %s was renamed to %s; specified value (%s) ignored" %
+                              (key, new_key, test_settings[key]), stacklevel=2)
+        for key in ['CHARSET', 'COLLATION', 'NAME', 'MIRROR']:
+            test_settings.setdefault(key, None)
 
     def __getitem__(self, alias):
         if hasattr(self._connections, alias):
             return getattr(self._connections, alias)
 
         self.ensure_defaults(alias)
+        self.prepare_test_settings(alias)
         db = self.databases[alias]
         backend = load_backend(db['ENGINE'])
         conn = backend.DatabaseWrapper(db, alias)
@@ -272,7 +310,7 @@ class ConnectionRouter(object):
                     warnings.warn(
                         'Router.allow_syncdb has been deprecated and will stop working in Django 1.9. '
                         'Rename the method to allow_migrate.',
-                        PendingDeprecationWarning, stacklevel=2)
+                        RemovedInDjango19Warning, stacklevel=2)
             except AttributeError:
                 # If the router doesn't have a method, skip to the next one.
                 pass

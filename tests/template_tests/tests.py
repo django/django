@@ -1,13 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.conf import settings
-
-if __name__ == '__main__':
-    # When running this file in isolation, we need to set up the configuration
-    # before importing 'template'.
-    settings.configure()
-
 from datetime import date, datetime
 import os
 import sys
@@ -16,6 +9,7 @@ import unittest
 import warnings
 
 from django import template
+from django.conf import settings
 from django.core import urlresolvers
 from django.template import (base as template_base, loader, Context,
     RequestContext, Template, TemplateSyntaxError)
@@ -23,6 +17,7 @@ from django.template.loaders import app_directories, filesystem, cached
 from django.test import RequestFactory, TestCase
 from django.test.utils import (setup_test_template_loader,
     restore_template_loaders, override_settings, extend_sys_path)
+from django.utils.deprecation import RemovedInDjango18Warning, RemovedInDjango19Warning
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
 from django.utils._os import upath
@@ -233,7 +228,7 @@ class TemplateLoaderTests(TestCase):
             self.assertTrue(template_name.endswith(load_name),
                 'Template loaded by filesystem loader has incorrect name for debug page: %s' % template_name)
 
-            # Aso test the cached loader, since it overrides load_template
+            # Also test the cached loader, since it overrides load_template
             cache_loader = cached.Loader(('',))
             cache_loader._cached_loaders = loader.template_source_loaders
             loader.template_source_loaders = (cache_loader,)
@@ -431,20 +426,6 @@ class TemplateRegressionTests(TestCase):
             self.assertTrue(depth > 5,
                 "The traceback context was lost when reraising the traceback. See #19827")
 
-    def test_url_explicit_exception_for_old_syntax_at_run_time(self):
-        # Regression test for #19280
-        t = Template('{% url path.to.view %}')      # not quoted = old syntax
-        c = Context()
-        with six.assertRaisesRegex(self, urlresolvers.NoReverseMatch,
-                "The syntax changed in Django 1.5, see the docs."):
-            t.render(c)
-
-    def test_url_explicit_exception_for_old_syntax_at_compile_time(self):
-        # Regression test for #19392
-        with six.assertRaisesRegex(self, template.TemplateSyntaxError,
-                "The syntax of 'url' changed in Django 1.5, see the docs."):
-            Template('{% url my-view %}')      # not a variable = old syntax
-
     @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
     def test_no_wrapped_exception(self):
         """
@@ -613,15 +594,18 @@ class TemplateTests(TestCase):
                                 try:
                                     with warnings.catch_warnings():
                                         # Ignore deprecations of the old syntax of the 'cycle' and 'firstof' tags.
-                                        warnings.filterwarnings("ignore", category=DeprecationWarning, module='django.template.base')
+                                        warnings.filterwarnings("ignore", category=RemovedInDjango18Warning, module='django.template.base')
                                         # Ignore pending deprecations of loading 'ssi' and 'url' tags from future.
-                                        warnings.filterwarnings("ignore", category=PendingDeprecationWarning, module='django.templatetags.future')
+                                        warnings.filterwarnings("ignore", category=RemovedInDjango19Warning, module='django.templatetags.future')
                                         test_template = loader.get_template(name)
                                 except ShouldNotExecuteException:
                                     failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template loading invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
 
                                 try:
-                                    output = self.render(test_template, vals)
+                                    with warnings.catch_warnings():
+                                        # Ignore deprecation of fix_ampersands
+                                        warnings.filterwarnings("ignore", category=DeprecationWarning, module='django.template.defaultfilters')
+                                        output = self.render(test_template, vals)
                                 except ShouldNotExecuteException:
                                     failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template rendering invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
                             except ContextStackException:

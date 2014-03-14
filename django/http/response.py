@@ -189,7 +189,7 @@ class HttpResponseBase(six.Iterator):
         return self._headers[header.lower()][1]
 
     def __getstate__(self):
-        # SimpleCookie is not pickeable with pickle.HIGHEST_PROTOCOL, so we
+        # SimpleCookie is not pickleable with pickle.HIGHEST_PROTOCOL, so we
         # serialize to a string instead
         state = self.__dict__.copy()
         state['cookies'] = str(state['cookies'])
@@ -274,7 +274,7 @@ class HttpResponseBase(six.Iterator):
             return bytes(value)
 
         # Handle string types -- we can't rely on force_bytes here because:
-        # - under Python 3 it attemps str conversion first
+        # - under Python 3 it attempts str conversion first
         # - when self._charset != 'utf-8' it re-encodes the content
         if isinstance(value, bytes):
             return bytes(value)

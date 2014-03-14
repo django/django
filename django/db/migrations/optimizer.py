@@ -7,8 +7,8 @@ class MigrationOptimizer(object):
     and you are returned a list of equal or shorter length - operations
     are merged into one if possible.
 
-    For example, a CreateModel and an AddField can be optimised into a
-    new CreateModel, and CreateModel and DeleteModel can be optimised into
+    For example, a CreateModel and an AddField can be optimized into a
+    new CreateModel, and CreateModel and DeleteModel can be optimized into
     nothing.
     """
 
@@ -17,9 +17,9 @@ class MigrationOptimizer(object):
         Main optimization entry point. Pass in a list of Operation instances,
         get out a new list of Operation instances.
 
-        Unfortunately, due to the scope of the optimisation (two combinable
+        Unfortunately, due to the scope of the optimization (two combinable
         operations might be separated by several hundred others), this can't be
-        done as a peephole optimisation with checks/output implemented on
+        done as a peephole optimization with checks/output implemented on
         the Operations themselves; instead, the optimizer looks at each
         individual operation and scans forwards in the list to see if there
         are any matches, stopping at boundaries - operations which can't

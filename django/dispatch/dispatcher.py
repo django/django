@@ -27,7 +27,7 @@ class Signal(object):
     Internal attributes:
 
         receivers
-            { receriverkey (id) : weakref(receiver) }
+            { receiverkey (id) : weakref(receiver) }
     """
     def __init__(self, providing_args=None, use_caching=False):
         """

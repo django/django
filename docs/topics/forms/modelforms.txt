@@ -662,7 +662,7 @@ There are a couple of things to note, however.
 
 .. versionchanged:: 1.7
 
-* It's possible to inherit from both ``Form`` and ``ModelForm`` simultaneuosly,
+* It's possible to inherit from both ``Form`` and ``ModelForm`` simultaneously,
   however, you must ensure that ``ModelForm`` appears first in the MRO. This is
   because these classes rely on different metaclasses and a class can only have
   one metaclass.

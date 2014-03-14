@@ -28,7 +28,7 @@ class GoogleMapsTest(TestCase):
     @override_settings(GOOGLE_MAPS_API_KEY=GOOGLE_MAPS_API_KEY)
     def test_unicode_in_google_maps(self):
         """
-        Test that GoogleMap doesn't crash with non-ascii content.
+        Test that GoogleMap doesn't crash with non-ASCII content.
         """
         from django.contrib.gis.geos import Point
         from django.contrib.gis.maps.google.gmap import GoogleMap, GMarker

@@ -186,7 +186,7 @@ class BasePasswordHasher(object):
 
     def salt(self):
         """
-        Generates a cryptographically secure nonce salt in ascii
+        Generates a cryptographically secure nonce salt in ASCII
         """
         return get_random_string()
 

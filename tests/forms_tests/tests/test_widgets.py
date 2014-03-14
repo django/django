@@ -16,6 +16,7 @@ from django.forms import (
     Textarea, TextInput, TimeInput,
 )
 from django.forms.widgets import RadioFieldRenderer
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.translation import activate, deactivate, override
@@ -1094,7 +1095,7 @@ class WidgetTests(TestCase):
             field = DateTimeField(widget=SplitDateTimeWidget, required=False)
 
         with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+            warnings.filterwarnings("ignore", category=RemovedInDjango19Warning)
             form = SplitDateForm({'field': ''})
             self.assertTrue(form.is_valid())
             form = SplitDateForm({'field': ['', '']})
@@ -1104,7 +1105,7 @@ class WidgetTests(TestCase):
             field = DateTimeField(widget=SplitDateTimeWidget, required=True)
 
         with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+            warnings.filterwarnings("ignore", category=RemovedInDjango19Warning)
             form = SplitDateRequiredForm({'field': ''})
             self.assertFalse(form.is_valid())
             form = SplitDateRequiredForm({'field': ['', '']})

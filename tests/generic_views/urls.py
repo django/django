@@ -164,7 +164,7 @@ urlpatterns = patterns('',
         views.AuthorListCustomPaginator.as_view()),
 
     # YearArchiveView
-    # Mixing keyword and possitional captures below is intentional; the views
+    # Mixing keyword and positional captures below is intentional; the views
     # ought to be able to accept either.
     (r'^dates/books/(?P<year>\d{4})/$',
         views.BookYearArchive.as_view()),

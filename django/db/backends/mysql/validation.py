@@ -22,11 +22,10 @@ class DatabaseValidation(BaseDatabaseValidation):
                     and (field.max_length is None or int(field.max_length) > 255)):
                 errors.append(
                     checks.Error(
-                        ('Under mysql backend, the field cannot have a "max_length" '
-                         'greated than 255 when it is unique.'),
+                        ('MySQL does not allow unique CharFields to have a max_length > 255.'),
                         hint=None,
                         obj=field,
-                        id='E047',
+                        id='mysql.E001',
                     )
                 )
         return errors

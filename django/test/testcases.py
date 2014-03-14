@@ -762,7 +762,7 @@ class TransactionTestCase(SimpleTestCase):
         # including mirrors or not. Otherwise, just on the default DB.
         if getattr(self, 'multi_db', False):
             return [alias for alias in connections
-                    if include_mirrors or not connections[alias].settings_dict['TEST_MIRROR']]
+                    if include_mirrors or not connections[alias].settings_dict['TEST']['MIRROR']]
         else:
             return [DEFAULT_DB_ALIAS]
 
@@ -1182,7 +1182,7 @@ class LiveServerTestCase(TransactionTestCase):
             cls.server_thread.terminate()
             cls.server_thread.join()
 
-        # Restore sqlite connections' non-sharability
+        # Restore sqlite connections' non-shareability
         for conn in connections.all():
             if (conn.vendor == 'sqlite'
                     and conn.settings_dict['NAME'] == ':memory:'):

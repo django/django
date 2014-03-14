@@ -140,7 +140,13 @@ LANGUAGES_BIDI = ("he", "ar", "fa", "ur")
 # to load the internationalization machinery.
 USE_I18N = True
 LOCALE_PATHS = ()
+
+# Settings for language cookie
 LANGUAGE_COOKIE_NAME = 'django_language'
+LANGUAGE_COOKIE_AGE = None
+LANGUAGE_COOKIE_DOMAIN = None
+LANGUAGE_COOKIE_PATH = '/'
+
 
 # If you set this to True, Django will format dates, numbers and calendars
 # according to user current locale.
@@ -552,6 +558,7 @@ CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
 
 # Settings for CSRF cookie.
 CSRF_COOKIE_NAME = 'csrftoken'
+CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 CSRF_COOKIE_DOMAIN = None
 CSRF_COOKIE_PATH = '/'
 CSRF_COOKIE_SECURE = False

@@ -610,7 +610,7 @@ in ``get_absolute_url()`` and have all your other code call that one place.
 
 .. note::
     The string you return from ``get_absolute_url()`` **must** contain only
-    ASCII characters (required by the URI specfication, :rfc:`2396`) and be
+    ASCII characters (required by the URI specification, :rfc:`2396`) and be
     URL-encoded, if necessary.
 
     Code and templates calling ``get_absolute_url()`` should be able to use the

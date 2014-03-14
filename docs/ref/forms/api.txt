@@ -142,7 +142,7 @@ and methods with an ``as_`` prefix could render them, but it had to be done
 the other way around in order not to break code that expects rendered error
 messages in ``Form.errors``.
 
-.. method:: Form.errors.as_json()
+.. method:: Form.errors.as_json(escape_html=False)
 
 .. versionadded:: 1.7
 
@@ -151,6 +151,17 @@ Returns the errors serialized as JSON.
     >>> f.errors.as_json()
     {"sender": [{"message": "Enter a valid email address.", "code": "invalid"}],
     "subject": [{"message": "This field is required.", "code": "required"}]}
+
+By default, ``as_json()`` does not escape its output. If you are using it for
+something like AJAX requests to a form view where the client interprets the
+response and inserts errors into the page, you'll want to be sure to escape the
+results on the client-side to avoid the possibility of a cross-site scripting
+attack. It's trivial to do so using a JavaScript library like jQuery - simply
+use ``$(el).text(errorText)`` rather than ``.html()``.
+
+If for some reason you don't want to use client-side escaping, you can also
+set ``escape_html=True`` and error messages will be escaped so you can use them
+directly in HTML.
 
 .. method:: Form.add_error(field, error)
 

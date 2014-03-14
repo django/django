@@ -770,7 +770,7 @@ out the `full reference`_ for more details.
     expected locations during the execution of these tests.
 
     In Django 1.7 this dependency of core functionality on a ``contrib``
-    appplication has been removed, because of which ``LiveServerTestCase``
+    application has been removed, because of which ``LiveServerTestCase``
     ability in this respect has been retrofitted to simply publish the contents
     of the file system under :setting:`STATIC_ROOT` at the :setting:`STATIC_URL`
     URL.

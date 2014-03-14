@@ -942,7 +942,7 @@ class Queries1Tests(BaseQuerysetTest):
 
     def test_ticket_10790_2(self):
         # Querying across several tables should strip only the last outer join,
-        # while preserving the preceeding inner joins.
+        # while preserving the preceding inner joins.
         q = Tag.objects.filter(parent__parent__isnull=False)
 
         self.assertQuerysetEqual(
@@ -2266,7 +2266,7 @@ class ConditionalTests(BaseQuerysetTest):
         # for the related field).
         self.assertEqual(len(Tag.objects.order_by('parent')), 5)
 
-        # ... but you can still order in a non-recursive fashion amongst linked
+        # ... but you can still order in a non-recursive fashion among linked
         # fields (the previous test failed because the default ordering was
         # recursive).
         self.assertQuerysetEqual(

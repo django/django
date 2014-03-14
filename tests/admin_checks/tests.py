@@ -4,11 +4,12 @@ import warnings
 
 from django import forms
 from django.contrib import admin
+from django.contrib.contenttypes.admin import GenericStackedInline
 from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from .models import Song, Book, Album, TwoAlbumFKAndAnE, City, State
+from .models import Song, Book, Album, TwoAlbumFKAndAnE, City, State, Influence
 
 
 class SongForm(forms.ModelForm):
@@ -63,11 +64,11 @@ class SystemChecksTestCase(TestCase):
         errors = SongAdmin.check(model=Song)
         expected = [
             checks.Error(
-                ('"list_editable[0]" refers to field "original_release", '
-                    'which is not editable through the admin.'),
+                ("The value of 'list_editable[0]' refers to 'original_release', "
+                 "which is not editable through the admin."),
                 hint=None,
                 obj=SongAdmin,
-                id='admin.E126',
+                id='admin.E125',
             )
         ]
         self.assertEqual(errors, expected)
@@ -114,7 +115,7 @@ class SystemChecksTestCase(TestCase):
         errors = ExcludedFields1.check(model=Book)
         expected = [
             checks.Error(
-                '"exclude" must be a list or tuple.',
+                "The value of 'exclude' must be a list or tuple.",
                 hint=None,
                 obj=ExcludedFields1,
                 id='admin.E014',
@@ -129,7 +130,7 @@ class SystemChecksTestCase(TestCase):
         errors = ExcludedFields2.check(model=Book)
         expected = [
             checks.Error(
-                '"exclude" contains duplicate field(s).',
+                "The value of 'exclude' contains duplicate field(s).",
                 hint=None,
                 obj=ExcludedFields2,
                 id='admin.E015',
@@ -149,7 +150,7 @@ class SystemChecksTestCase(TestCase):
         errors = ExcludedFieldsAlbumAdmin.check(model=Album)
         expected = [
             checks.Error(
-                '"exclude" must be a list or tuple.',
+                "The value of 'exclude' must be a list or tuple.",
                 hint=None,
                 obj=ExcludedFieldsInline,
                 id='admin.E014',
@@ -174,11 +175,133 @@ class SystemChecksTestCase(TestCase):
         errors = AlbumAdmin.check(model=Album)
         expected = [
             checks.Error(
-                ('Cannot exclude the field "album", because it is the foreign key '
-                 'to the parent model admin_checks.Album.'),
+                ("Cannot exclude the field 'album', because it is the foreign key "
+                 "to the parent model 'admin_checks.Album'."),
                 hint=None,
                 obj=SongInline,
                 id='admin.E201',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_valid_generic_inline_model_admin(self):
+        """
+        Regression test for #22034 - check that generic inlines don't look for
+        normal ForeignKey relations.
+        """
+
+        class InfluenceInline(GenericStackedInline):
+            model = Influence
+
+        class SongAdmin(admin.ModelAdmin):
+            inlines = [InfluenceInline]
+
+        errors = SongAdmin.check(model=Song)
+        self.assertEqual(errors, [])
+
+    def test_generic_inline_model_admin_non_generic_model(self):
+        """
+        Ensure that a model without a GenericForeignKey raises problems if it's included
+        in an GenericInlineModelAdmin definition.
+        """
+
+        class BookInline(GenericStackedInline):
+            model = Book
+
+        class SongAdmin(admin.ModelAdmin):
+            inlines = [BookInline]
+
+        errors = SongAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                "'admin_checks.Book' has no GenericForeignKey.",
+                hint=None,
+                obj=BookInline,
+                id='admin.E301',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_generic_inline_model_admin_bad_ct_field(self):
+        "A GenericInlineModelAdmin raises problems if the ct_field points to a non-existent field."
+
+        class InfluenceInline(GenericStackedInline):
+            model = Influence
+            ct_field = 'nonexistent'
+
+        class SongAdmin(admin.ModelAdmin):
+            inlines = [InfluenceInline]
+
+        errors = SongAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                "'ct_field' references 'nonexistent', which is not a field on 'admin_checks.Influence'.",
+                hint=None,
+                obj=InfluenceInline,
+                id='admin.E302',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_generic_inline_model_admin_bad_fk_field(self):
+        "A GenericInlineModelAdmin raises problems if the ct_fk_field points to a non-existent field."
+
+        class InfluenceInline(GenericStackedInline):
+            model = Influence
+            ct_fk_field = 'nonexistent'
+
+        class SongAdmin(admin.ModelAdmin):
+            inlines = [InfluenceInline]
+
+        errors = SongAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                "'ct_fk_field' references 'nonexistent', which is not a field on 'admin_checks.Influence'.",
+                hint=None,
+                obj=InfluenceInline,
+                id='admin.E303',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_generic_inline_model_admin_non_gfk_ct_field(self):
+        "A GenericInlineModelAdmin raises problems if the ct_field points to a field that isn't part of a GenericForeignKey"
+
+        class InfluenceInline(GenericStackedInline):
+            model = Influence
+            ct_field = 'name'
+
+        class SongAdmin(admin.ModelAdmin):
+            inlines = [InfluenceInline]
+
+        errors = SongAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                "'admin_checks.Influence' has no GenericForeignKey using content type field 'name' and object ID field 'object_id'.",
+                hint=None,
+                obj=InfluenceInline,
+                id='admin.E304',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_generic_inline_model_admin_non_gfk_fk_field(self):
+        "A GenericInlineModelAdmin raises problems if the ct_fk_field points to a field that isn't part of a GenericForeignKey"
+
+        class InfluenceInline(GenericStackedInline):
+            model = Influence
+            ct_fk_field = 'name'
+
+        class SongAdmin(admin.ModelAdmin):
+            inlines = [InfluenceInline]
+
+        errors = SongAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                "'admin_checks.Influence' has no GenericForeignKey using content type field 'content_type' and object ID field 'name'.",
+                hint=None,
+                obj=InfluenceInline,
+                id='admin.E304',
             )
         ]
         self.assertEqual(errors, expected)
@@ -194,8 +317,8 @@ class SystemChecksTestCase(TestCase):
         errors = RawIdNonexistingAdmin.check(model=Album)
         expected = [
             checks.Error(
-                ('"raw_id_fields[0]" refers to field "nonexisting", which is '
-                 'missing from model admin_checks.Album.'),
+                ("The value of 'raw_id_fields[0]' refers to 'nonexisting', which is "
+                 "not an attribute of 'admin_checks.Album'."),
                 hint=None,
                 obj=RawIdNonexistingAdmin,
                 id='admin.E002',
@@ -291,8 +414,8 @@ class SystemChecksTestCase(TestCase):
         errors = SongAdmin.check(model=Song)
         expected = [
             checks.Error(
-                ('"readonly_fields[1]" is neither a callable nor an attribute '
-                 'of "SongAdmin" nor found in the model admin_checks.Song.'),
+                ("The value of 'readonly_fields[1]' is not a callable, an attribute "
+                 "of 'SongAdmin', or an attribute of 'admin_checks.Song'."),
                 hint=None,
                 obj=SongAdmin,
                 id='admin.E035',
@@ -308,8 +431,8 @@ class SystemChecksTestCase(TestCase):
         errors = CityInline.check(State)
         expected = [
             checks.Error(
-                ('"readonly_fields[0]" is neither a callable nor an attribute '
-                 'of "CityInline" nor found in the model admin_checks.City.'),
+                ("The value of 'readonly_fields[0]' is not a callable, an attribute "
+                 "of 'CityInline', or an attribute of 'admin_checks.City'."),
                 hint=None,
                 obj=CityInline,
                 id='admin.E035',
@@ -347,8 +470,8 @@ class SystemChecksTestCase(TestCase):
         errors = BookAdmin.check(model=Book)
         expected = [
             checks.Error(
-                ('"fields" cannot include the ManyToManyField "authors", '
-                 'because "authors" manually specifies relationship model.'),
+                ("The value of 'fields' cannot include the ManyToManyField 'authors', "
+                 "because that field manually specifies a relationship model."),
                 hint=None,
                 obj=BookAdmin,
                 id='admin.E013',
@@ -366,8 +489,8 @@ class SystemChecksTestCase(TestCase):
         errors = FieldsetBookAdmin.check(model=Book)
         expected = [
             checks.Error(
-                ('"fieldsets[1][1][\'fields\']" cannot include the ManyToManyField '
-                 '"authors", because "authors" manually specifies relationship model.'),
+                ("The value of 'fieldsets[1][1][\"fields\"]' cannot include the ManyToManyField "
+                 "'authors', because that field manually specifies a relationship model."),
                 hint=None,
                 obj=FieldsetBookAdmin,
                 id='admin.E013',
@@ -471,7 +594,7 @@ class SystemChecksTestCase(TestCase):
         errors = MyModelAdmin.check(model=Song)
         expected = [
             checks.Error(
-                'There are duplicate field(s) in "fields".',
+                "The value of 'fields' contains duplicate field(s).",
                 hint=None,
                 obj=MyModelAdmin,
                 id='admin.E006'
@@ -490,7 +613,7 @@ class SystemChecksTestCase(TestCase):
         errors = MyModelAdmin.check(model=Song)
         expected = [
             checks.Error(
-                'There are duplicate field(s) in "fieldsets[0][1]".',
+                "There are duplicate field(s) in 'fieldsets[0][1]'.",
                 hint=None,
                 obj=MyModelAdmin,
                 id='admin.E012'

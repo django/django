@@ -1710,7 +1710,7 @@ class FormsTestCase(TestCase):
     def test_empty_permitted(self):
         # Sometimes (pretty much in formsets) we want to allow a form to pass validation
         # if it is completely empty. We can accomplish this by using the empty_permitted
-        # agrument to a form constructor.
+        # argument to a form constructor.
         class SongForm(Form):
             artist = CharField()
             name = CharField()
@@ -2069,6 +2069,33 @@ class FormsTestCase(TestCase):
             'bar': [{'code': 'required', 'message': 'This field is required.'}],
             '__all__': [{'code': 'secret', 'message': 'Non-field error.'}]
         }
+        self.assertEqual(errors, control)
+
+    def test_error_dict_as_json_escape_html(self):
+        """#21962 - adding html escape flag to ErrorDict"""
+        class MyForm(Form):
+            foo = CharField()
+            bar = CharField()
+
+            def clean(self):
+                raise ValidationError('<p>Non-field error.</p>',
+                                      code='secret',
+                                      params={'a': 1, 'b': 2})
+
+        control = {
+            'foo': [{'code': 'required', 'message': 'This field is required.'}],
+            'bar': [{'code': 'required', 'message': 'This field is required.'}],
+            '__all__': [{'code': 'secret', 'message': '<p>Non-field error.</p>'}]
+        }
+
+        form = MyForm({})
+        self.assertFalse(form.is_valid())
+
+        errors = json.loads(form.errors.as_json())
+        self.assertEqual(errors, control)
+
+        errors = json.loads(form.errors.as_json(escape_html=True))
+        control['__all__'][0]['message'] = '&lt;p&gt;Non-field error.&lt;/p&gt;'
         self.assertEqual(errors, control)
 
     def test_error_list(self):

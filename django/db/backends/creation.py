@@ -5,6 +5,7 @@ import warnings
 
 from django.conf import settings
 from django.db.utils import load_backend
+from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import force_bytes
 from django.utils.functional import cached_property
 from django.utils.six.moves import input
@@ -390,8 +391,8 @@ class BaseDatabaseCreation(object):
         _create_test_db() and when no external munging is done with the 'NAME'
         or 'TEST_NAME' settings.
         """
-        if self.connection.settings_dict['TEST_NAME']:
-            return self.connection.settings_dict['TEST_NAME']
+        if self.connection.settings_dict['TEST']['NAME']:
+            return self.connection.settings_dict['TEST']['NAME']
         return TEST_DATABASE_PREFIX + self.connection.settings_dict['NAME']
 
     def _create_test_db(self, verbosity, autoclobber):
@@ -474,7 +475,7 @@ class BaseDatabaseCreation(object):
         """
         warnings.warn(
             "set_autocommit was moved from BaseDatabaseCreation to "
-            "BaseDatabaseWrapper.", DeprecationWarning, stacklevel=2)
+            "BaseDatabaseWrapper.", RemovedInDjango18Warning, stacklevel=2)
         return self.connection.set_autocommit(True)
 
     def sql_table_creation_suffix(self):

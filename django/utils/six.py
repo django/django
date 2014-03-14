@@ -641,7 +641,7 @@ if PY3:
 else:
     _assertRaisesRegex = "assertRaisesRegexp"
     _assertRegex = "assertRegexpMatches"
-    # memoryview and buffer are not stricly equivalent, but should be fine for
+    # memoryview and buffer are not strictly equivalent, but should be fine for
     # django core usage (mainly BinaryField). However, Jython doesn't support
     # buffer (see http://bugs.jython.org/issue1521), so we have to be careful.
     if sys.platform.startswith('java'):

@@ -1,5 +1,5 @@
 from django.db import models, router
-from django.db.models.options import normalize_unique_together
+from django.db.models.options import normalize_together
 from django.db.migrations.state import ModelState
 from django.db.migrations.operations.base import Operation
 from django.utils import six
@@ -183,7 +183,7 @@ class AlterUniqueTogether(Operation):
 
     def __init__(self, name, unique_together):
         self.name = name
-        unique_together = normalize_unique_together(unique_together)
+        unique_together = normalize_together(unique_together)
         self.unique_together = set(tuple(cons) for cons in unique_together)
 
     def state_forwards(self, app_label, state):
@@ -220,6 +220,7 @@ class AlterIndexTogether(Operation):
 
     def __init__(self, name, index_together):
         self.name = name
+        index_together = normalize_together(index_together)
         self.index_together = set(tuple(cons) for cons in index_together)
 
     def state_forwards(self, app_label, state):

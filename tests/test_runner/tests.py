@@ -13,6 +13,7 @@ from django import db
 from django.test import runner, TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.test.testcases import connections_support_transactions
 from django.test.utils import IgnoreAllDeprecationWarningsMixin, override_system_checks
+from django.utils import six
 
 from admin_scripts.tests import AdminScriptTestCase
 from .models import Person
@@ -253,22 +254,23 @@ class Sqlite3InMemoryTestDbs(TestCase):
     def test_transaction_support(self):
         """Ticket #16329: sqlite3 in-memory test databases"""
         old_db_connections = db.connections
-        for option in ('NAME', 'TEST_NAME'):
+        for option_key, option_value in (
+                ('NAME', ':memory:'), ('TEST', {'NAME': ':memory:'})):
             try:
                 db.connections = db.ConnectionHandler({
                     'default': {
                         'ENGINE': 'django.db.backends.sqlite3',
-                        option: ':memory:',
+                        option_key: option_value,
                     },
                     'other': {
                         'ENGINE': 'django.db.backends.sqlite3',
-                        option: ':memory:',
+                        option_key: option_value,
                     },
                 })
                 other = db.connections['other']
                 runner.DiscoverRunner(verbosity=0).setup_databases()
-                msg = "DATABASES setting '%s' option set to sqlite3's ':memory:' value shouldn't interfere with transaction support detection." % option
-                # Transaction support should be properly initialised for the 'other' DB
+                msg = "DATABASES setting '%s' option set to sqlite3's ':memory:' value shouldn't interfere with transaction support detection." % option_key
+                # Transaction support should be properly initialized for the 'other' DB
                 self.assertTrue(other.features.supports_transactions, msg)
                 # And all the DBs should report that they support transactions
                 self.assertTrue(connections_support_transactions(), msg)
@@ -368,14 +370,14 @@ class DeprecationDisplayTest(AdminScriptTestCase):
         args = ['test', '--settings=test_project.settings', 'test_runner_deprecation_app']
         out, err = self.run_django_admin(args)
         self.assertIn("Ran 1 test", err)
-        self.assertIn("DeprecationWarning: warning from test", err)
-        self.assertIn("DeprecationWarning: module-level warning from deprecation_app", err)
+        six.assertRegex(self, err, r"RemovedInDjango\d\dWarning: warning from test")
+        six.assertRegex(self, err, r"RemovedInDjango\d\dWarning: module-level warning from deprecation_app")
 
     def test_runner_deprecation_verbosity_zero(self):
         args = ['test', '--settings=test_project.settings', '--verbosity=0', 'test_runner_deprecation_app']
         out, err = self.run_django_admin(args)
         self.assertIn("Ran 1 test", err)
-        self.assertFalse("DeprecationWarning: warning from test" in err)
+        self.assertFalse("warning from test" in err)
 
 
 class AutoIncrementResetTest(TransactionTestCase):

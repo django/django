@@ -128,6 +128,11 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(path, "django.db.models.FileField")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"upload_to": "foo/bar"})
+        field = models.FileField(upload_to="foo/bar", max_length=200)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.FileField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"upload_to": "foo/bar", "max_length": 200})
 
     def test_file_path_field(self):
         field = models.FilePathField(match=".*\.txt$")
@@ -135,11 +140,11 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(path, "django.db.models.FilePathField")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"match": ".*\.txt$"})
-        field = models.FilePathField(recursive=True, allow_folders=True)
+        field = models.FilePathField(recursive=True, allow_folders=True, max_length=123)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.FilePathField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"recursive": True, "allow_folders": True})
+        self.assertEqual(kwargs, {"recursive": True, "allow_folders": True, "max_length": 123})
 
     def test_float_field(self):
         field = models.FloatField()
@@ -237,6 +242,12 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"to": "auth.User"})
         self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
+        # Test through
+        field = models.ManyToManyField("auth.Permission", through="auth.Group")
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.ManyToManyField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"to": "auth.Permission", "through": "auth.Group"})
 
     @override_settings(AUTH_USER_MODEL="auth.Permission")
     def test_many_to_many_field_swapped(self):
@@ -276,11 +287,11 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(path, "django.db.models.SlugField")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {})
-        field = models.SlugField(db_index=False)
+        field = models.SlugField(db_index=False, max_length=231)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.SlugField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"db_index": False})
+        self.assertEqual(kwargs, {"db_index": False, "max_length": 231})
 
     def test_small_integer_field(self):
         field = models.SmallIntegerField()
@@ -302,3 +313,8 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(path, "django.db.models.URLField")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {})
+        field = models.URLField(max_length=231)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.URLField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"max_length": 231})

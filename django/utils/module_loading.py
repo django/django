@@ -9,6 +9,7 @@ import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango19Warning
 
 
 def import_string(dotted_path):
@@ -39,7 +40,7 @@ def import_by_path(dotted_path, error_prefix=''):
     """
     warnings.warn(
         'import_by_path() has been deprecated. Use import_string() instead.',
-        PendingDeprecationWarning, stacklevel=2)
+        RemovedInDjango19Warning, stacklevel=2)
     try:
         attr = import_string(dotted_path)
     except ImportError as e:

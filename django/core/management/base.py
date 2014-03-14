@@ -17,6 +17,7 @@ import django
 from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_str
 
 
@@ -208,7 +209,7 @@ class BaseCommand(object):
     def __init__(self):
         self.style = color_style()
 
-        # `requires_model_validation` is deprecated in favour of
+        # `requires_model_validation` is deprecated in favor of
         # `requires_system_checks`. If both options are present, an error is
         # raised. Otherwise the present option is used. If none of them is
         # defined, the default value (True) is used.
@@ -218,8 +219,8 @@ class BaseCommand(object):
         if has_old_option:
             warnings.warn(
                 '"requires_model_validation" is deprecated '
-                'in favour of "requires_system_checks".',
-                PendingDeprecationWarning)
+                'in favor of "requires_system_checks".',
+                RemovedInDjango19Warning)
         if has_old_option and has_new_option:
             raise ImproperlyConfigured(
                 'Command %s defines both "requires_model_validation" '
@@ -467,7 +468,7 @@ class AppCommand(BaseCommand):
             warnings.warn(
                 "AppCommand.handle_app() is superseded by "
                 "AppCommand.handle_app_config().",
-                PendingDeprecationWarning, stacklevel=2)
+                RemovedInDjango19Warning, stacklevel=2)
             if app_config.models_module is None:
                 raise CommandError(
                     "AppCommand cannot handle app '%s' in legacy mode "

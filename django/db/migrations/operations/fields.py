@@ -1,5 +1,6 @@
 from django.db import router
 from django.db.models.fields import NOT_PROVIDED
+from django.utils import six
 from .base import Operation
 
 
@@ -116,11 +117,17 @@ class AlterField(Operation):
         from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
         if router.allow_migrate(schema_editor.connection.alias, to_model):
-            schema_editor.alter_field(
-                from_model,
-                from_model._meta.get_field_by_name(self.name)[0],
-                to_model._meta.get_field_by_name(self.name)[0],
-            )
+            from_field = from_model._meta.get_field_by_name(self.name)[0]
+            to_field = to_model._meta.get_field_by_name(self.name)[0]
+            # If the field is a relatedfield with an unresolved rel.to, just
+            # set it equal to the other field side. Bandaid fix for AlterField
+            # migrations that are part of a RenameModel change.
+            if from_field.rel and from_field.rel.to:
+                if isinstance(from_field.rel.to, six.string_types):
+                    from_field.rel.to = to_field.rel.to
+                elif isinstance(to_field.rel.to, six.string_types):
+                    to_field.rel.to = from_field.rel.to
+            schema_editor.alter_field(from_model, from_field, to_field)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         self.database_forwards(app_label, schema_editor, from_state, to_state)

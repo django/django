@@ -195,11 +195,11 @@ class TestTransactionClosing(IgnoreDeprecationWarningsMixin, TransactionTestCase
 
 
 @skipIf(connection.vendor == 'sqlite'
-        and connection.settings_dict['TEST_NAME'] in (None, '', ':memory:'),
+        and connection.settings_dict['TEST']['NAME'] in (None, '', ':memory:'),
         "Cannot establish two connections to an in-memory SQLite database.")
 class TestNewConnection(IgnoreDeprecationWarningsMixin, TransactionTestCase):
     """
-    Check that new connections don't have special behaviour.
+    Check that new connections don't have special behavior.
     """
 
     available_apps = ['transactions_regress']

@@ -34,10 +34,11 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def sql_table_creation_suffix(self):
         suffix = []
-        if self.connection.settings_dict['TEST_CHARSET']:
-            suffix.append('CHARACTER SET %s' % self.connection.settings_dict['TEST_CHARSET'])
-        if self.connection.settings_dict['TEST_COLLATION']:
-            suffix.append('COLLATE %s' % self.connection.settings_dict['TEST_COLLATION'])
+        test_settings = self.connection.settings_dict['TEST']
+        if test_settings['CHARSET']:
+            suffix.append('CHARACTER SET %s' % test_settings['CHARSET'])
+        if test_settings['COLLATION']:
+            suffix.append('COLLATE %s' % test_settings['COLLATION'])
         return ' '.join(suffix)
 
     def sql_for_inline_foreign_key_references(self, model, field, known_models, style):

@@ -124,7 +124,7 @@ class MigrationExecutor(object):
 
     def detect_soft_applied(self, migration):
         """
-        Tests whether a migration has been implicity applied - that the
+        Tests whether a migration has been implicitly applied - that the
         tables it would create exist. This is intended only for use
         on initial migrations (as it only looks for CreateModel).
         """

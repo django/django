@@ -9,11 +9,11 @@ from django.utils.six.moves import xrange
 
 
 class RegisterLookupMixin(object):
-    def get_lookup(self, lookup_name):
+    def _get_lookup(self, lookup_name):
         try:
             return self.class_lookups[lookup_name]
         except KeyError:
-            # To allow for inheritance, check parent class class lookups.
+            # To allow for inheritance, check parent class' class_lookups.
             for parent in inspect.getmro(self.__class__):
                 if not 'class_lookups' in parent.__dict__:
                     continue
@@ -25,6 +25,18 @@ class RegisterLookupMixin(object):
         if hasattr(self, 'output_type'):
             return self.output_type.get_lookup(lookup_name)
         return None
+
+    def get_lookup(self, lookup_name):
+        found = self._get_lookup(lookup_name)
+        if found is not None and not issubclass(found, Lookup):
+            return None
+        return found
+
+    def get_transform(self, lookup_name):
+        found = self._get_lookup(lookup_name)
+        if found is not None and not issubclass(found, Transform):
+            return None
+        return found
 
     @classmethod
     def register_lookup(cls, lookup):

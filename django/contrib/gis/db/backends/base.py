@@ -148,7 +148,7 @@ class BaseSpatialOperations(object):
 class SpatialRefSysMixin(object):
     """
     The SpatialRefSysMixin is a class used by the database-dependent
-    SpatialRefSys objects to reduce redundnant code.
+    SpatialRefSys objects to reduce redundant code.
     """
     # For pulling out the spheroid from the spatial reference string. This
     # regular expression is used only if the user does not have GDAL installed.
@@ -304,7 +304,7 @@ class SpatialRefSysMixin(object):
     def get_units(cls, wkt):
         """
         Class method used by GeometryField on initialization to
-        retrive the units on the given WKT, without having to use
+        retrieve the units on the given WKT, without having to use
         any of the database fields.
         """
         if gdal.HAS_GDAL:

@@ -196,7 +196,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         else:
             dist_param = value
 
-        # dwithin lookups on oracle require a special string parameter
+        # dwithin lookups on Oracle require a special string parameter
         # that starts with "distance=".
         if lookup_type == 'dwithin':
             dist_param = 'distance=%s' % dist_param
@@ -220,7 +220,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
                 placeholder = '%s(%%s, %s)' % (self.transform, f.srid)
             else:
                 placeholder = '%s'
-            # No geometry value used for F expression, substitue in
+            # No geometry value used for F expression, substitute in
             # the column name instead.
             return placeholder % self.get_expression_column(value)
         else:

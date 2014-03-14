@@ -225,7 +225,7 @@ straight lookups. Here are some things to keep in mind:
     sensitive_function.alters_data = True
 
 * Occasionally you may want to turn off this feature for other reasons,
-  and tell the template system to leave a variable un-called no matter
+  and tell the template system to leave a variable uncalled no matter
   what.  To do so, set a ``do_not_call_in_templates`` attribute on the
   callable with the value ``True``.  The template system then will act as
   if your variable is not callable (allowing you to access attributes of

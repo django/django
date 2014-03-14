@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 """
-A series of tests to establish that the command-line managment tools work as
+A series of tests to establish that the command-line management tools work as
 advertised - especially with regards to the handling of the DJANGO_SETTINGS_MODULE
 and default settings.py files.
 """
@@ -24,7 +24,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError, call_command
 from django.db import connection
 from django.utils.encoding import force_text
-from django.utils._os import upath
+from django.utils._os import npath, upath
 from django.utils.six import StringIO
 from django.test import LiveServerTestCase, TestCase
 from django.test.runner import DiscoverRunner
@@ -122,35 +122,31 @@ class AdminScriptTestCase(unittest.TestCase):
         django_dir = os.path.dirname(tests_dir)
         ext_backend_base_dirs = self._ext_backend_paths()
 
-        # Remember the old environment
-        old_django_settings_module = os.environ.get('DJANGO_SETTINGS_MODULE', None)
+        # Define a temporary environment for the subprocess
+        test_environ = os.environ.copy()
         if sys.platform.startswith('java'):
             python_path_var_name = 'JYTHONPATH'
         else:
             python_path_var_name = 'PYTHONPATH'
 
-        old_python_path = os.environ.get(python_path_var_name, None)
         old_cwd = os.getcwd()
 
         # Set the test environment
         if settings_file:
-            os.environ['DJANGO_SETTINGS_MODULE'] = settings_file
-        elif 'DJANGO_SETTINGS_MODULE' in os.environ:
-            del os.environ['DJANGO_SETTINGS_MODULE']
+            test_environ['DJANGO_SETTINGS_MODULE'] = str(settings_file)
+        elif 'DJANGO_SETTINGS_MODULE' in test_environ:
+            del test_environ['DJANGO_SETTINGS_MODULE']
         python_path = [base_dir, django_dir, tests_dir]
         python_path.extend(ext_backend_base_dirs)
-        os.environ[python_path_var_name] = os.pathsep.join(python_path)
+        # Use native strings for better compatibility
+        test_environ[str(python_path_var_name)] = npath(os.pathsep.join(python_path))
+        test_environ[str('PYTHONWARNINGS')] = str('')
 
         # Move to the test directory and run
         os.chdir(test_dir)
         out, err = subprocess.Popen([sys.executable, script] + args,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                universal_newlines=True).communicate()
-        # Restore the old environment
-        if old_django_settings_module:
-            os.environ['DJANGO_SETTINGS_MODULE'] = old_django_settings_module
-        if old_python_path:
-            os.environ[python_path_var_name] = old_python_path
+                env=test_environ, universal_newlines=True).communicate()
         # Move back to the old working directory
         os.chdir(old_cwd)
 
@@ -1474,7 +1470,7 @@ class CommandTypes(AdminScriptTestCase):
 
     def test_run_from_argv_non_ascii_error(self):
         """
-        Test that non-ascii message of CommandError does not raise any
+        Test that non-ASCII message of CommandError does not raise any
         UnicodeDecodeError in run_from_argv.
         """
         def raise_command_error(*args, **kwargs):

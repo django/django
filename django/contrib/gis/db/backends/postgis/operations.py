@@ -290,7 +290,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
     def convert_extent3d(self, box3d):
         """
         Returns a 6-tuple extent for the `Extent3D` aggregate by converting
-        the 3d bounding-box text returnded by PostGIS (`box3d` argument), for
+        the 3d bounding-box text returned by PostGIS (`box3d` argument), for
         example: "BOX3D(-90.0 30.0 1, -85.0 40.0 2)".
         """
         ll, ur = box3d[6:-1].split(',')
@@ -342,7 +342,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         This is the most complex implementation of the spatial backends due to
         what is supported on geodetic geometry columns vs. what's available on
         projected geometry columns.  In addition, it has to take into account
-        the newly introduced geography column type introudced in PostGIS 1.5.
+        the geography column type newly introduced in PostGIS 1.5.
         """
         # Getting the distance parameter and any options.
         if len(dist_val) == 1:
@@ -561,7 +561,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         """
         agg_name = agg.__class__.__name__
         if not self.check_aggregate_support(agg):
-            raise NotImplementedError('%s spatial aggregate is not implmented for this backend.' % agg_name)
+            raise NotImplementedError('%s spatial aggregate is not implemented for this backend.' % agg_name)
         agg_name = agg_name.lower()
         if agg_name == 'union':
             agg_name += 'agg'

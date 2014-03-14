@@ -25,6 +25,7 @@ class StateTests(TestCase):
                 app_label = "migrations"
                 apps = new_apps
                 unique_together = ["name", "bio"]
+                index_together = ["bio", "age"]
 
         class AuthorProxy(Author):
             class Meta:
@@ -63,7 +64,7 @@ class StateTests(TestCase):
         self.assertEqual(author_state.fields[1][1].max_length, 255)
         self.assertEqual(author_state.fields[2][1].null, False)
         self.assertEqual(author_state.fields[3][1].null, True)
-        self.assertEqual(author_state.options, {"unique_together": set([("name", "bio")])})
+        self.assertEqual(author_state.options, {"unique_together": set([("name", "bio")]), "index_together": set([("bio", "age")])})
         self.assertEqual(author_state.bases, (models.Model, ))
 
         self.assertEqual(book_state.app_label, "migrations")
@@ -165,6 +166,16 @@ class StateTests(TestCase):
                 app_label = "migrations"
                 apps = Apps()
 
+        class AbstractSubFooBar(FooBar):
+            class Meta:
+                abstract = True
+                apps = Apps()
+
+        class SubFooBar(AbstractSubFooBar):
+            class Meta:
+                app_label = "migrations"
+                apps = Apps()
+
         apps = Apps(["migrations"])
 
         # We shouldn't be able to render yet
@@ -174,8 +185,13 @@ class StateTests(TestCase):
 
         # Once the parent models are in the app registry, it should be fine
         ModelState.from_model(Foo).render(apps)
+        self.assertSequenceEqual(ModelState.from_model(Foo).bases, [models.Model])
         ModelState.from_model(Bar).render(apps)
+        self.assertSequenceEqual(ModelState.from_model(Bar).bases, [models.Model])
         ModelState.from_model(FooBar).render(apps)
+        self.assertSequenceEqual(ModelState.from_model(FooBar).bases, ['migrations.foo', 'migrations.bar'])
+        ModelState.from_model(SubFooBar).render(apps)
+        self.assertSequenceEqual(ModelState.from_model(SubFooBar).bases, ['migrations.foobar'])
 
     def test_render_project_dependencies(self):
         """

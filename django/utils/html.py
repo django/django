@@ -3,10 +3,12 @@
 from __future__ import unicode_literals
 
 import re
+import warnings
 
-from django.utils.safestring import SafeData, mark_safe
+from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import force_text, force_str
 from django.utils.functional import allow_lazy
+from django.utils.safestring import SafeData, mark_safe
 from django.utils import six
 from django.utils.six.moves.urllib.parse import quote, unquote, urlsplit, urlunsplit
 from django.utils.text import normalize_newlines
@@ -174,6 +176,9 @@ strip_entities = allow_lazy(strip_entities, six.text_type)
 
 def fix_ampersands(value):
     """Returns the given HTML with all unencoded ampersands encoded correctly."""
+    # As fix_ampersands is wrapped in allow_lazy, stacklevel 3 is more useful than 2.
+    warnings.warn("The fix_ampersands function is deprecated and will be removed in Django 1.8.",
+                  RemovedInDjango18Warning, stacklevel=3)
     return unencoded_ampersands_re.sub('&amp;', force_text(value))
 fix_ampersands = allow_lazy(fix_ampersands, six.text_type)
 
@@ -209,13 +214,13 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     Links can have trailing punctuation (periods, commas, close-parens) and
     leading punctuation (opening parens) and it'll still do the right thing.
 
-    If trim_url_limit is not None, the URLs in link text longer than this limit
-    will truncated to trim_url_limit-3 characters and appended with an elipsis.
+    If trim_url_limit is not None, the URLs in the link text longer than this
+    limit will be truncated to trim_url_limit-3 characters and appended with
+    an ellipsis.
 
-    If nofollow is True, the URLs in link text will get a rel="nofollow"
-    attribute.
+    If nofollow is True, the links will get a rel="nofollow" attribute.
 
-    If autoescape is True, the link text and URLs will get autoescaped.
+    If autoescape is True, the link text and URLs will be autoescaped.
     """
     def trim_url(x, limit=trim_url_limit):
         if limit is None or len(x) <= limit:
@@ -290,6 +295,9 @@ def clean_html(text):
         * Remove stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the
           bottom of the text.
     """
+    # As clean_html is wrapped in allow_lazy, stacklevel 3 is more useful than 2.
+    warnings.warn("The clean_html function is deprecated and will be removed in Django 1.8.",
+                  RemovedInDjango18Warning, stacklevel=3)
     text = normalize_newlines(text)
     text = re.sub(r'<(/?)\s*b\s*>', '<\\1strong>', text)
     text = re.sub(r'<(/?)\s*i\s*>', '<\\1em>', text)

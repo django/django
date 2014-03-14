@@ -157,7 +157,7 @@ Configurable attributes
 
     Short name for the application, e.g. ``'admin'``
 
-    This attribute allows relabelling an application when two applications
+    This attribute allows relabeling an application when two applications
     have conflicting labels. It defaults to the last component of ``name``.
     It should be a valid Python identifier.
 
@@ -165,7 +165,7 @@ Configurable attributes
 
 .. attribute:: AppConfig.verbose_name
 
-    Human-readable name for the application, e.g. "Admin".
+    Human-readable name for the application, e.g. "Administration".
 
     This attribute defaults to ``label.title()``.
 
@@ -194,6 +194,10 @@ Read-only attributes
     from 'django/contrib/admin/models.pyc'>``.
 
     It may be ``None`` if the application doesn't contain a ``models`` module.
+    Note that the database related signals such as
+    :data:`~django.db.models.signals.pre_migrate` and
+    :data:`~django.db.models.signals.post_migrate`
+    are only emitted for applications that have a ``models`` module.
 
 Methods
 -------

@@ -28,7 +28,7 @@ Running Django in Gunicorn as a generic WSGI application
 
 When Gunicorn is installed, a ``gunicorn`` command is available which starts
 the Gunicorn server process. At its simplest, gunicorn just needs to be called
-with a the location of a WSGI application object.::
+with the location of a WSGI application object.::
 
     gunicorn [OPTIONS] APP_MODULE
 

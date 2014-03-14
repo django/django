@@ -224,7 +224,7 @@ class Command(BaseCommand):
                             cursor.execute(statement)
                         tables.append(connection.introspection.table_name_converter(model._meta.db_table))
 
-            # We force a commit here, as that was the previous behaviour.
+            # We force a commit here, as that was the previous behavior.
             # If you can prove we don't need this, remove it.
             transaction.set_dirty(using=connection.alias)
         finally:

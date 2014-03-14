@@ -140,7 +140,7 @@ class ModelTests(TestCase):
 
     def test_date_filter_null(self):
         # Date filtering was failing with NULL date values in SQLite
-        # (regression test for #3501, amongst other things).
+        # (regression test for #3501, among other things).
         Party.objects.create(when=datetime.datetime(1999, 1, 1))
         Party.objects.create()
         p = Party.objects.filter(when__month=1)[0]

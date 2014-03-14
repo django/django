@@ -12,6 +12,7 @@ from django.contrib.gis.db.models.fields import GeometryField
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.translation import ugettext as _
 
 from django.contrib.gis.shortcuts import render_to_kml, render_to_kmz
@@ -23,7 +24,7 @@ def index(request, sitemaps):
     for resolving geographic section sitemap URLs.
     """
     warnings.warn("Geo Sitemaps are deprecated. Use plain sitemaps from "
-        "django.contrib.sitemaps instead", DeprecationWarning, stacklevel=2)
+        "django.contrib.sitemaps instead", RemovedInDjango18Warning, stacklevel=2)
     current_site = get_current_site(request)
     sites = []
     protocol = request.scheme
@@ -48,7 +49,7 @@ def sitemap(request, sitemaps, section=None):
     elements defined by Google.
     """
     warnings.warn("Geo Sitemaps are deprecated. Use plain sitemaps from "
-        "django.contrib.sitemaps instead", DeprecationWarning, stacklevel=2)
+        "django.contrib.sitemaps instead", RemovedInDjango18Warning, stacklevel=2)
     maps, urls = [], []
     if section is not None:
         if section not in sitemaps:

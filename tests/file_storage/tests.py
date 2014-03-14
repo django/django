@@ -341,7 +341,7 @@ class FileStorageTests(unittest.TestCase):
 
     def test_file_chunks_error(self):
         """
-        Test behaviour when file.chunks() is raising an error
+        Test behavior when file.chunks() is raising an error
         """
         f1 = ContentFile('chunks fails')
 

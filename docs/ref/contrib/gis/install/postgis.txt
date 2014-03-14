@@ -11,7 +11,7 @@ might also need additional libraries, see `PostGIS requirements`_.
 
 .. note::
 
-    The `psycopg2`_ module is required for use as the database adaptor
+    The `psycopg2`_ module is required for use as the database adapter
     when using GeoDjango with PostGIS.
 
 .. _psycopg2: http://initd.org/psycopg/

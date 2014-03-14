@@ -80,14 +80,8 @@ class TranslatableFile(object):
                 '--keyword=ngettext_lazy:1,2',
                 '--keyword=pgettext:1c,2',
                 '--keyword=npgettext:1c,2,3',
-                '--from-code=UTF-8',
-                '--add-comments=Translators',
                 '--output=-'
-            ]
-            if command.wrap:
-                args.append(command.wrap)
-            if command.location:
-                args.append(command.location)
+            ] + command.xgettext_options
             args.append(work_file)
         elif domain == 'django' and (file_ext == '.py' or file_ext in command.extensions):
             thefile = self.file
@@ -115,14 +109,8 @@ class TranslatableFile(object):
                 '--keyword=npgettext:1c,2,3',
                 '--keyword=pgettext_lazy:1c,2',
                 '--keyword=npgettext_lazy:1c,2,3',
-                '--from-code=UTF-8',
-                '--add-comments=Translators',
                 '--output=-'
-            ]
-            if command.wrap:
-                args.append(command.wrap)
-            if command.location:
-                args.append(command.location)
+            ] + command.xgettext_options
             args.append(work_file)
         else:
             return
@@ -206,6 +194,11 @@ class Command(NoArgsCommand):
     requires_system_checks = False
     leave_locale_alone = True
 
+    msgmerge_options = ['-q', '--previous']
+    msguniq_options = ['--to-code=utf-8']
+    msgattrib_options = ['--no-obsolete']
+    xgettext_options = ['--from-code=UTF-8', '--add-comments=Translators']
+
     def handle_noargs(self, *args, **options):
         locale = options.get('locale')
         self.domain = options.get('domain')
@@ -217,8 +210,19 @@ class Command(NoArgsCommand):
         if options.get('use_default_ignore_patterns'):
             ignore_patterns += ['CVS', '.*', '*~', '*.pyc']
         self.ignore_patterns = list(set(ignore_patterns))
-        self.wrap = '--no-wrap' if options.get('no_wrap') else ''
-        self.location = '--no-location' if options.get('no_location') else ''
+
+        # Avoid messing with mutable class variables
+        if options.get('no_wrap'):
+            self.msgmerge_options = self.msgmerge_options[:] + ['--no-wrap']
+            self.msguniq_options = self.msguniq_options[:] + ['--no-wrap']
+            self.msgattrib_options = self.msgattrib_options[:] + ['--no-wrap']
+            self.xgettext_options = self.xgettext_options[:] + ['--no-wrap']
+        if options.get('no_location'):
+            self.msgmerge_options = self.msgmerge_options[:] + ['--no-location']
+            self.msguniq_options = self.msguniq_options[:] + ['--no-location']
+            self.msgattrib_options = self.msgattrib_options[:] + ['--no-location']
+            self.xgettext_options = self.xgettext_options[:] + ['--no-location']
+
         self.no_obsolete = options.get('no_obsolete')
         self.keep_pot = options.get('keep_pot')
 
@@ -307,12 +311,7 @@ class Command(NoArgsCommand):
             potfile = os.path.join(path, '%s.pot' % str(self.domain))
             if not os.path.exists(potfile):
                 continue
-            args = ['msguniq', '--to-code=utf-8']
-            if self.wrap:
-                args.append(self.wrap)
-            if self.location:
-                args.append(self.location)
-            args.append(potfile)
+            args = ['msguniq'] + self.msguniq_options + [potfile]
             msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
@@ -389,12 +388,7 @@ class Command(NoArgsCommand):
         pofile = os.path.join(basedir, '%s.po' % str(self.domain))
 
         if os.path.exists(pofile):
-            args = ['msgmerge', '-q']
-            if self.wrap:
-                args.append(self.wrap)
-            if self.location:
-                args.append(self.location)
-            args.extend([pofile, potfile])
+            args = ['msgmerge'] + self.msgmerge_options + [pofile, potfile]
             msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
@@ -413,12 +407,7 @@ class Command(NoArgsCommand):
             fp.write(msgs)
 
         if self.no_obsolete:
-            args = ['msgattrib', '-o', pofile, '--no-obsolete']
-            if self.wrap:
-                args.append(self.wrap)
-            if self.location:
-                args.append(self.location)
-            args.append(pofile)
+            args = ['msgattrib'] + self.msgattrib_options + ['-o', pofile, pofile]
             msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:

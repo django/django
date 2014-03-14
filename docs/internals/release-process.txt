@@ -58,18 +58,17 @@ security purposes, please see :doc:`our security policies <security>`.
     ``A.B+2``.
 
     So, for example, if we decided to start the deprecation of a function in
-    Django 1.5:
+    Django 1.7:
 
-    * Django 1.5 will contain a backwards-compatible replica of the function which
-      will raise a ``PendingDeprecationWarning``. This warning is silent by
+    * Django 1.7 will contain a backwards-compatible replica of the function which
+      will raise a ``RemovedInDjango19Warning``. This warning is silent by
       default; you can turn on display of these warnings with the ``-Wd`` option
       of Python.
 
-    * Django 1.6 will contain the backwards-compatible replica, but the warning
-      will be promoted to a full-fledged ``DeprecationWarning``. This warning is
-      *loud* by default, and will likely be quite annoying.
+    * Django 1.8 will still contain the backwards-compatible replica. This
+      warning becomes *loud* by default, and will likely be quite annoying.
 
-    * Django 1.7 will remove the feature outright.
+    * Django 1.9 will remove the feature outright.
 
   Micro release
     Micro releases (1.5.1, 1.6.2, 1.6.1, etc.) will be issued as needed, often to

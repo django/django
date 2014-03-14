@@ -38,6 +38,27 @@
     },
     {
         "pk": 1,
+        "model": "contenttypes_tests.schemeincludedurl",
+        "fields": {
+            "url": "http://test_scheme_included_http/"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "contenttypes_tests.schemeincludedurl",
+        "fields": {
+            "url": "https://test_scheme_included_https/"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "contenttypes_tests.schemeincludedurl",
+        "fields": {
+            "url": "//test_default_scheme_kept/"
+        }
+    },
+    {
+        "pk": 1,
         "model": "sites.site",
         "fields": {
             "domain": "testserver",

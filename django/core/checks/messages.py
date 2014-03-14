@@ -15,7 +15,7 @@ CRITICAL = 50
 @python_2_unicode_compatible
 class CheckMessage(object):
 
-    def __init__(self, level, msg, hint, obj=None, id=None):
+    def __init__(self, level, msg, hint=None, obj=None, id=None):
         assert isinstance(level, int), "The first argument should be level."
         self.level = level
         self.msg = msg

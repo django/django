@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+
 import warnings
 
 from django.test import SimpleTestCase, RequestFactory, override_settings
@@ -192,9 +193,8 @@ class DeprecatingRequestMergeDictTest(SimpleTestCase):
 @override_settings(USE_I18N=True)
 class DeprecatedChineseLanguageCodes(SimpleTestCase):
     def test_deprecation_warning(self):
-        warnings.simplefilter('always')
-
         with warnings.catch_warnings(record=True) as recorded:
+            warnings.simplefilter('always')
             with translation.override('zh-cn'):
                 pass
             with translation.override('zh-tw'):
@@ -213,9 +213,8 @@ class DeprecatingMemoizeTest(SimpleTestCase):
         """
         Ensure the correct warning is raised when memoize is used.
         """
-        warnings.simplefilter('always')
-
         with warnings.catch_warnings(record=True) as recorded:
+            warnings.simplefilter('always')
             memoize(lambda x: x, {}, 1)
             msg = str(recorded.pop().message)
             self.assertEqual(msg,

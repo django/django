@@ -1127,7 +1127,7 @@ names, like ``django.contrib.*``. The expansion was performed by a
 filesystem-based implementation of ``from <package> import *``. Unfortunately,
 `this can't be done reliably`_.
 
-This behavior was never documented. Since it is un-pythonic and not obviously
+This behavior was never documented. Since it is unpythonic and not obviously
 useful, it was removed in Django 1.4. If you relied on it, you must edit your
 settings file to list all your applications explicitly.
 

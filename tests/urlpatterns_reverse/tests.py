@@ -120,6 +120,7 @@ test_data = (
     ('inner-extra', '/outer/42/extra/inner/', [], {'extra': 'inner', 'outer': '42'}),
     ('inner-extra', '/outer/42/extra/inner/', ['42', 'inner'], {}),
     ('inner-extra', NoReverseMatch, ['fred', 'inner'], {}),
+    ('inner-no-kwargs', '/outer-no-kwargs/42/inner-no-kwargs/1/', ['42', '1'], {}),
     ('disjunction', NoReverseMatch, ['foo'], {}),
     ('inner-disjunction', NoReverseMatch, ['10', '11'], {}),
     ('extra-places', '/e-places/10/', ['10'], {}),

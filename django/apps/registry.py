@@ -6,6 +6,7 @@ import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import lru_cache
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils._os import upath
 
 from .config import AppConfig
@@ -156,7 +157,7 @@ class Apps(object):
         if app_mod:
             warnings.warn(
                 "The app_mod argument of get_models is deprecated.",
-                PendingDeprecationWarning, stacklevel=2)
+                RemovedInDjango19Warning, stacklevel=2)
             app_label = app_mod.__name__.split('.')[-2]
             try:
                 return list(self.get_app_config(app_label).get_models(
@@ -328,7 +329,7 @@ class Apps(object):
         """
         warnings.warn(
             "load_app(app_name) is deprecated.",
-            PendingDeprecationWarning, stacklevel=2)
+            RemovedInDjango19Warning, stacklevel=2)
         app_config = AppConfig.create(app_name)
         app_config.import_models(self.all_models[app_config.label])
         self.app_configs[app_config.label] = app_config
@@ -338,7 +339,7 @@ class Apps(object):
     def app_cache_ready(self):
         warnings.warn(
             "app_cache_ready() is deprecated in favor of the ready property.",
-            PendingDeprecationWarning, stacklevel=2)
+            RemovedInDjango19Warning, stacklevel=2)
         return self.ready
 
     def get_app(self, app_label):
@@ -347,7 +348,7 @@ class Apps(object):
         """
         warnings.warn(
             "get_app_config(app_label).models_module supersedes get_app(app_label).",
-            PendingDeprecationWarning, stacklevel=2)
+            RemovedInDjango19Warning, stacklevel=2)
         try:
             models_module = self.get_app_config(app_label).models_module
         except LookupError as exc:
@@ -364,7 +365,7 @@ class Apps(object):
         """
         warnings.warn(
             "[a.models_module for a in get_app_configs()] supersedes get_apps().",
-            PendingDeprecationWarning, stacklevel=2)
+            RemovedInDjango19Warning, stacklevel=2)
         app_configs = self.get_app_configs()
         return [app_config.models_module for app_config in app_configs
                 if app_config.models_module is not None]
@@ -375,7 +376,7 @@ class Apps(object):
     def get_app_package(self, app_label):
         warnings.warn(
             "get_app_config(label).name supersedes get_app_package(label).",
-            PendingDeprecationWarning, stacklevel=2)
+            RemovedInDjango19Warning, stacklevel=2)
         return self._get_app_package(self.get_app(app_label))
 
     def _get_app_path(self, app):
@@ -388,7 +389,7 @@ class Apps(object):
     def get_app_path(self, app_label):
         warnings.warn(
             "get_app_config(label).path supersedes get_app_path(label).",
-            PendingDeprecationWarning, stacklevel=2)
+            RemovedInDjango19Warning, stacklevel=2)
         return self._get_app_path(self.get_app(app_label))
 
     def get_app_paths(self):
@@ -400,7 +401,7 @@ class Apps(object):
         """
         warnings.warn(
             "[a.path for a in get_app_configs()] supersedes get_app_paths().",
-            PendingDeprecationWarning, stacklevel=2)
+            RemovedInDjango19Warning, stacklevel=2)
         self.check_ready()
         app_paths = []
         for app in self.get_apps():
@@ -413,7 +414,7 @@ class Apps(object):
         """
         warnings.warn(
             "register_models(app_label, *models) is deprecated.",
-            PendingDeprecationWarning, stacklevel=2)
+            RemovedInDjango19Warning, stacklevel=2)
         for model in models:
             self.register_model(app_label, model)
 

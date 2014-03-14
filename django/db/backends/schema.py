@@ -262,12 +262,18 @@ class BaseDatabaseSchemaEditor(object):
             })
         # Make M2M tables
         for field in model._meta.local_many_to_many:
-            self.create_model(field.rel.through)
+            if field.rel.through._meta.auto_created:
+                self.create_model(field.rel.through)
 
     def delete_model(self, model):
         """
         Deletes a model from the database.
         """
+        # Handle auto-created intermediary models
+        for field in model._meta.local_many_to_many:
+            if field.rel.through._meta.auto_created:
+                self.delete_model(field.rel.through)
+
         # Delete the table
         self.execute(self.sql_delete_table % {
             "table": self.quote_name(model._meta.db_table),
@@ -732,7 +738,7 @@ class BaseDatabaseSchemaEditor(object):
 
     def _alter_column_type_sql(self, table, column, type):
         """
-        Hook to specialise column type alteration for different backends,
+        Hook to specialize column type alteration for different backends,
         for cases when a creation type is different to an alteration type
         (e.g. SERIAL in PostgreSQL, PostGIS fields).
 

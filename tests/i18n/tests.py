@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+from contextlib import contextmanager
 import datetime
 import decimal
 from importlib import import_module
@@ -41,6 +42,19 @@ here = os.path.dirname(os.path.abspath(upath(__file__)))
 extended_locale_paths = settings.LOCALE_PATHS + (
     os.path.join(here, 'other', 'locale'),
 )
+
+
+@contextmanager
+def patch_formats(lang, **settings):
+    from django.utils.formats import _format_cache
+
+    # Populate _format_cache with temporary values
+    for key, value in settings.items():
+        _format_cache[(key, lang)] = value
+    try:
+        yield
+    finally:
+        reset_format_cache()
 
 
 class TranslationTests(TestCase):
@@ -482,31 +496,17 @@ class FormattingTests(TestCase):
         conditional test (e.g. 0 or empty string).
         Refs #16938.
         """
-        from django.conf.locale.fr import formats as fr_formats
+        with patch_formats('fr', THOUSAND_SEPARATOR='', FIRST_DAY_OF_WEEK=0):
+            with translation.override('fr'):
+                with self.settings(USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR='!'):
+                    self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
+                    # Even a second time (after the format has been cached)...
+                    self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
 
-        # Back up original formats
-        backup_THOUSAND_SEPARATOR = fr_formats.THOUSAND_SEPARATOR
-        backup_FIRST_DAY_OF_WEEK = fr_formats.FIRST_DAY_OF_WEEK
-
-        # Set formats that would get interpreted as False in a conditional test
-        fr_formats.THOUSAND_SEPARATOR = ''
-        fr_formats.FIRST_DAY_OF_WEEK = 0
-
-        reset_format_cache()
-        with translation.override('fr'):
-            with self.settings(USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR='!'):
-                self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
-                # Even a second time (after the format has been cached)...
-                self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
-
-            with self.settings(FIRST_DAY_OF_WEEK=1):
-                self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
-                # Even a second time (after the format has been cached)...
-                self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
-
-        # Restore original formats
-        fr_formats.THOUSAND_SEPARATOR = backup_THOUSAND_SEPARATOR
-        fr_formats.FIRST_DAY_OF_WEEK = backup_FIRST_DAY_OF_WEEK
+                with self.settings(FIRST_DAY_OF_WEEK=1):
+                    self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
+                    # Even a second time (after the format has been cached)...
+                    self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
 
     def test_l10n_enabled(self):
         self.maxDiff = 3000
@@ -821,10 +821,10 @@ class MiscTests(TestCase):
         p = trans_real.parse_accept_lang_header
         # Good headers.
         self.assertEqual([('de', 1.0)], p('de'))
-        self.assertEqual([('en-AU', 1.0)], p('en-AU'))
+        self.assertEqual([('en-au', 1.0)], p('en-AU'))
         self.assertEqual([('es-419', 1.0)], p('es-419'))
         self.assertEqual([('*', 1.0)], p('*;q=1.00'))
-        self.assertEqual([('en-AU', 0.123)], p('en-AU;q=0.123'))
+        self.assertEqual([('en-au', 0.123)], p('en-AU;q=0.123'))
         self.assertEqual([('en-au', 0.5)], p('en-au;q=0.5'))
         self.assertEqual([('en-au', 1.0)], p('en-au;q=1.0'))
         self.assertEqual([('da', 1.0), ('en', 0.5), ('en-gb', 0.25)], p('da, en-gb;q=0.25, en;q=0.5'))
@@ -883,6 +883,24 @@ class MiscTests(TestCase):
         # by Django without falling back nor ignoring it.
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-cn,de'}
         self.assertEqual(g(r), 'zh-cn')
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'NL'}
+        self.assertEqual('nl', g(r))
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'fy'}
+        self.assertEqual('fy', g(r))
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'ia'}
+        self.assertEqual('ia', g(r))
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'sr-latn'}
+        self.assertEqual('sr-latn', g(r))
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-hans'}
+        self.assertEqual('zh-hans', g(r))
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-hant'}
+        self.assertEqual('zh-hant', g(r))
 
     @override_settings(
         LANGUAGES=(
