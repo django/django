@@ -511,7 +511,7 @@ class Field(RegisterLookupMixin):
         connection.
         """
         # The default implementation of this method looks at the
-        # backend-specific DATA_TYPES dictionary, looking up the field by its
+        # backend-specific data_types dictionary, looking up the field by its
         # "internal type".
         #
         # A Field class can implement the get_internal_type() method to specify
@@ -525,24 +525,20 @@ class Field(RegisterLookupMixin):
         # mapped to one of the built-in Django field types. In this case, you
         # can implement db_type() instead of get_internal_type() to specify
         # exactly which wacky database column type you want to use.
-        params = self.db_parameters(connection)
-        if params['type']:
-            if params['check']:
-                return "%s CHECK (%s)" % (params['type'], params['check'])
-            else:
-                return params['type']
-        return None
+        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
+        try:
+            return connection.creation.data_types[self.get_internal_type()] % data
+        except KeyError:
+            return None
 
     def db_parameters(self, connection):
         """
-        Replacement for db_type, providing a range of different return
-        values (type, checks)
+        Extension of db_type(), providing a range of different return
+        values (type, checks).
+        This will look at db_type(), allowing custom model fields to override it.
         """
         data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
-        try:
-            type_string = connection.creation.data_types[self.get_internal_type()] % data
-        except KeyError:
-            type_string = None
+        type_string = self.db_type(connection)
         try:
             check_string = connection.creation.data_type_check_constraints[self.get_internal_type()] % data
         except KeyError:
