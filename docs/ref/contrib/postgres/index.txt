@@ -26,3 +26,5 @@ a number of PostgreSQL specific data types.
 
     fields
     forms
+    operations
+    validators
