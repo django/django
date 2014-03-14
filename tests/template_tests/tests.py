@@ -12,7 +12,7 @@ from django import template
 from django.conf import settings
 from django.core import urlresolvers
 from django.template import (base as template_base, loader, Context,
-    RequestContext, Template, TemplateSyntaxError)
+    RequestContext, Template, TemplateSyntaxError, TemplateRecursionError)
 from django.template.loaders import app_directories, filesystem, cached
 from django.test import RequestFactory, TestCase
 from django.test.utils import (setup_test_template_loader,
@@ -392,6 +392,18 @@ class TemplateLoaderTests(TestCase):
             "Recursion!  A1  Recursion!  B1   B2   B3  Recursion!  C1",
             t.render(Context({'comments': comments})).replace(' ', '').replace('\n', ' ').strip(),
         )
+
+    def test_extends_recursive(self):
+        """
+        Tests for #22232 preventing RuntimeError Maximum Recursion Depth Exceeded when a circular extension is detected.
+        """
+        with self.assertRaises(TemplateRecursionError):
+            t = loader.get_template('recursive_extends_self.html')
+            t.render(Context({}))
+        
+        with self.assertRaises(TemplateRecursionError):
+            t = loader.get_template('recursive_extends_child.html')
+            t.render(Context({}))
 
 
 class TemplateRegressionTests(TestCase):
