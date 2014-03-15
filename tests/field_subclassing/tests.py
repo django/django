@@ -3,9 +3,10 @@ from __future__ import unicode_literals
 import inspect
 
 from django.core import serializers
+from django.db import connection
 from django.test import TestCase
 
-from .fields import Small
+from .fields import Small, CustomTypedField
 from .models import DataModel, MyModel, OtherModel
 
 
@@ -104,3 +105,10 @@ class CustomField(TestCase):
         data = dict(inspect.getmembers(MyModel))
         self.assertIn('__module__', data)
         self.assertEqual(data['__module__'], 'field_subclassing.models')
+
+
+class TestDbType(TestCase):
+
+    def test_db_parameters_respects_db_type(self):
+        f = CustomTypedField()
+        self.assertEqual(f.db_parameters(connection)['type'], 'custom_field')

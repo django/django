@@ -165,7 +165,7 @@ Configurable attributes
 
 .. attribute:: AppConfig.verbose_name
 
-    Human-readable name for the application, e.g. "Admin".
+    Human-readable name for the application, e.g. "Administration".
 
     This attribute defaults to ``label.title()``.
 

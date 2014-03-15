@@ -74,3 +74,8 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.TextField)):
         if value is None:
             return None
         return json.dumps(value)
+
+
+class CustomTypedField(models.TextField):
+    def db_type(self, connection):
+        return 'custom_field'

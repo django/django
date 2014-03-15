@@ -440,12 +440,12 @@ explicit declaration defines how the two models are related.
 There are a few restrictions on the intermediate model:
 
 * Your intermediate model must contain one - and *only* one - foreign key
-  to the target model (this would be ``Person`` in our example), or you must
+  to the source model (this would be ``Group`` in our example), or you must
   explicitly specify the foreign keys Django should use for the relationship
   using :attr:`ManyToManyField.through_fields <ManyToManyField.through_fields>`.
   If you have more than one foreign key and ``through_fields`` is not
   specified, a validation error will be raised. A similar restriction applies
-  to the foreign key to the source model (this would be ``Group`` in our
+  to the foreign key to the target model (this would be ``Person`` in our
   example).
 
 * For a model which has a many-to-many relationship to itself through an

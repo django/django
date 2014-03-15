@@ -254,21 +254,22 @@ class Sqlite3InMemoryTestDbs(TestCase):
     def test_transaction_support(self):
         """Ticket #16329: sqlite3 in-memory test databases"""
         old_db_connections = db.connections
-        for option in ('NAME', 'TEST_NAME'):
+        for option_key, option_value in (
+                ('NAME', ':memory:'), ('TEST', {'NAME': ':memory:'})):
             try:
                 db.connections = db.ConnectionHandler({
                     'default': {
                         'ENGINE': 'django.db.backends.sqlite3',
-                        option: ':memory:',
+                        option_key: option_value,
                     },
                     'other': {
                         'ENGINE': 'django.db.backends.sqlite3',
-                        option: ':memory:',
+                        option_key: option_value,
                     },
                 })
                 other = db.connections['other']
                 runner.DiscoverRunner(verbosity=0).setup_databases()
-                msg = "DATABASES setting '%s' option set to sqlite3's ':memory:' value shouldn't interfere with transaction support detection." % option
+                msg = "DATABASES setting '%s' option set to sqlite3's ':memory:' value shouldn't interfere with transaction support detection." % option_key
                 # Transaction support should be properly initialized for the 'other' DB
                 self.assertTrue(other.features.supports_transactions, msg)
                 # And all the DBs should report that they support transactions

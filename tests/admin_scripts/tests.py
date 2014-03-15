@@ -133,7 +133,7 @@ class AdminScriptTestCase(unittest.TestCase):
 
         # Set the test environment
         if settings_file:
-            test_environ['DJANGO_SETTINGS_MODULE'] = settings_file
+            test_environ['DJANGO_SETTINGS_MODULE'] = str(settings_file)
         elif 'DJANGO_SETTINGS_MODULE' in test_environ:
             del test_environ['DJANGO_SETTINGS_MODULE']
         python_path = [base_dir, django_dir, tests_dir]

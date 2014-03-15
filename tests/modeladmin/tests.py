@@ -16,6 +16,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
 from django.test import TestCase
+from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
 
 from .models import Band, Concert, ValidationTestModel, ValidationTestInlineModel
@@ -565,7 +566,7 @@ class CheckTestCase(TestCase):
         self.assertEqual(error.hint, hint)
         self.assertEqual(error.obj, invalid_obj)
         self.assertEqual(error.id, id)
-        self.assertRegexpMatches(error.msg, msg)
+        six.assertRegex(self, error.msg, msg)
 
     def assertIsValid(self, model_admin, model):
         errors = model_admin.check(model=model)

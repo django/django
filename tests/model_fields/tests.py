@@ -8,7 +8,7 @@ import warnings
 from django import test
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db import connection, models, IntegrityError
+from django.db import connection, transaction, models, IntegrityError
 from django.db.models.fields import (
     AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
     CommaSeparatedIntegerField, DateField, DateTimeField, DecimalField,
@@ -23,7 +23,7 @@ from django.utils.functional import lazy
 from .models import (
     Foo, Bar, Whiz, BigD, BigS, BigInt, Post, NullBooleanModel,
     BooleanModel, PrimaryKeyCharModel, DataModel, Document, RenamedField,
-    VerboseNameField, FksToBooleans, FkToChar)
+    DateTimeModel, VerboseNameField, FksToBooleans, FkToChar, FloatModel)
 
 
 class BasicFieldTests(test.TestCase):
@@ -77,6 +77,28 @@ class BasicFieldTests(test.TestCase):
                              'verbose field%d' % i)
 
         self.assertEqual(m._meta.get_field('id').verbose_name, 'verbose pk')
+
+    def test_float_validates_object(self):
+        instance = FloatModel(size=2.5)
+        # Try setting float field to unsaved object
+        instance.size = instance
+        with transaction.atomic():
+            with self.assertRaises(TypeError):
+                instance.save()
+        # Set value to valid and save
+        instance.size = 2.5
+        instance.save()
+        self.assertTrue(instance.id)
+        # Set field to object on saved instance
+        instance.size = instance
+        with transaction.atomic():
+            with self.assertRaises(TypeError):
+                instance.save()
+        # Try setting field to object on retrieved object
+        obj = FloatModel.objects.get(pk=instance.id)
+        obj.size = obj
+        with self.assertRaises(TypeError):
+            obj.save()
 
     def test_choices_form_class(self):
         """Can supply a custom choices form class. Regression for #20999."""
@@ -174,6 +196,18 @@ class DateTimeFieldTests(unittest.TestCase):
                          datetime.time(1, 2, 3, 4))
         self.assertEqual(f.to_python('01:02:03.999999'),
                          datetime.time(1, 2, 3, 999999))
+
+    @test.skipUnlessDBFeature("supports_microsecond_precision")
+    def test_datetimes_save_completely(self):
+        dat = datetime.date(2014, 3, 12)
+        datetim = datetime.datetime(2014, 3, 12, 21, 22, 23, 240000)
+        tim = datetime.time(21, 22, 23, 240000)
+        DateTimeModel.objects.create(d=dat, dt=datetim, t=tim)
+        obj = DateTimeModel.objects.first()
+        self.assertTrue(obj)
+        self.assertEqual(obj.d, dat)
+        self.assertEqual(obj.dt, datetim)
+        self.assertEqual(obj.t, tim)
 
 
 class BooleanFieldTests(unittest.TestCase):

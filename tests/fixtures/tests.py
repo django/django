@@ -337,7 +337,10 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         """
         Verifies that the --app option works.
         """
-        management.call_command('loaddata', 'db_fixture_1', verbosity=0, app_label="someotherapp")
+        with warnings.catch_warnings():
+            # Ignore: No fixture named ...
+            warnings.filterwarnings("ignore", category=UserWarning)
+            management.call_command('loaddata', 'db_fixture_1', verbosity=0, app_label="someotherapp")
         self.assertQuerysetEqual(Article.objects.all(), [])
         management.call_command('loaddata', 'db_fixture_1', verbosity=0, app_label="fixtures")
         self.assertQuerysetEqual(Article.objects.all(), [
@@ -355,10 +358,9 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
     def test_unmatched_identifier_loading(self):
         # Try to load db fixture 3. This won't load because the database identifier doesn't match
-        with warnings.catch_warnings(record=True):
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=UserWarning)
             management.call_command('loaddata', 'db_fixture_3', verbosity=0)
-
-        with warnings.catch_warnings(record=True):
             management.call_command('loaddata', 'db_fixture_3', verbosity=0, using='default')
         self.assertQuerysetEqual(Article.objects.all(), [])
 

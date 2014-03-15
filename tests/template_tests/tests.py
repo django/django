@@ -1,13 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.conf import settings
-
-if __name__ == '__main__':
-    # When running this file in isolation, we need to set up the configuration
-    # before importing 'template'.
-    settings.configure()
-
 from datetime import date, datetime
 import os
 import sys
@@ -16,6 +9,7 @@ import unittest
 import warnings
 
 from django import template
+from django.conf import settings
 from django.core import urlresolvers
 from django.template import (base as template_base, loader, Context,
     RequestContext, Template, TemplateSyntaxError)
@@ -647,6 +641,8 @@ class TemplateTests(TestCase):
     def get_template_tests(self):
         # SYNTAX --
         # 'template_name': ('template contents', 'context dict', 'expected string output' or Exception class)
+        # This import is necessary when tests are run isolated:
+        from .templatetags import custom
         basedir = os.path.dirname(os.path.abspath(upath(__file__)))
         tests = {
             ### BASIC SYNTAX ################################################

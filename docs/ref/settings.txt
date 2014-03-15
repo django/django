@@ -605,10 +605,29 @@ Default: ``''`` (Empty string)
 
 The username to use when connecting to the database. Not used with SQLite.
 
+.. setting:: DATABASE-TEST
+
+TEST
+~~~~
+
+.. versionchanged:: 1.7
+
+    All :setting:`TEST <DATABASE-TEST>` sub-entries used to be independent
+    entries in the database settings dictionary, with a ``TEST_`` prefix.
+    Further, ``TEST_CREATE``, ``TEST_USER_CREATE`` and ``TEST_PASSWD``
+    were changed to ``CREATE_DB``, ``CREATE_USER`` and ``PASSWORD``
+    respectively.
+
+Default: ``{}``
+
+A dictionary of settings for test databases; for more details about the
+creation and use of test databases, see :ref:`the-test-database`. The
+following entries are available:
+
 .. setting:: TEST_CHARSET
 
-TEST_CHARSET
-~~~~~~~~~~~~
+CHARSET
+^^^^^^^
 
 Default: ``None``
 
@@ -624,8 +643,8 @@ backends.
 
 .. setting:: TEST_COLLATION
 
-TEST_COLLATION
-~~~~~~~~~~~~~~
+COLLATION
+^^^^^^^^^
 
 Default: ``None``
 
@@ -638,8 +657,8 @@ Only supported for the ``mysql`` backend (see the `MySQL manual`_ for details).
 
 .. setting:: TEST_DEPENDENCIES
 
-TEST_DEPENDENCIES
-~~~~~~~~~~~~~~~~~
+DEPENDENCIES
+^^^^^^^^^^^^
 
 Default: ``['default']``, for all databases other than ``default``,
 which has no dependencies.
@@ -650,8 +669,8 @@ on :ref:`controlling the creation order of test databases
 
 .. setting:: TEST_MIRROR
 
-TEST_MIRROR
-~~~~~~~~~~~
+MIRROR
+^^^^^^
 
 Default: ``None``
 
@@ -665,8 +684,8 @@ configurations of multiple databases. See the documentation on
 
 .. setting:: TEST_NAME
 
-TEST_NAME
-~~~~~~~~~
+NAME
+^^^^
 
 Default: ``None``
 
@@ -680,8 +699,8 @@ See :ref:`the-test-database`.
 
 .. setting:: TEST_CREATE
 
-TEST_CREATE
-~~~~~~~~~~~
+CREATE_DB
+^^^^^^^^^
 
 Default: ``True``
 
@@ -690,22 +709,10 @@ This is an Oracle-specific setting.
 If it is set to ``False``, the test tablespaces won't be automatically created
 at the beginning of the tests and dropped at the end.
 
-.. setting:: TEST_USER
-
-TEST_USER
-~~~~~~~~~
-
-Default: ``None``
-
-This is an Oracle-specific setting.
-
-The username to use when connecting to the Oracle database that will be used
-when running tests. If not provided, Django will use ``'test_' + USER``.
-
 .. setting:: TEST_USER_CREATE
 
-TEST_USER_CREATE
-~~~~~~~~~~~~~~~~
+CREATE_USER
+^^^^^^^^^^^
 
 Default: ``True``
 
@@ -714,10 +721,22 @@ This is an Oracle-specific setting.
 If it is set to ``False``, the test user won't be automatically created at the
 beginning of the tests and dropped at the end.
 
+.. setting:: TEST_USER
+
+USER
+^^^^
+
+Default: ``None``
+
+This is an Oracle-specific setting.
+
+The username to use when connecting to the Oracle database that will be used
+when running tests. If not provided, Django will use ``'test_' + USER``.
+
 .. setting:: TEST_PASSWD
 
-TEST_PASSWD
-~~~~~~~~~~~
+PASSWORD
+^^^^^^^^
 
 Default: ``None``
 
@@ -728,8 +747,8 @@ when running tests. If not provided, Django will use a hardcoded default value.
 
 .. setting:: TEST_TBLSPACE
 
-TEST_TBLSPACE
-~~~~~~~~~~~~~
+TBLSPACE
+^^^^^^^^
 
 Default: ``None``
 
@@ -740,8 +759,8 @@ provided, Django will use ``'test_' + NAME``.
 
 .. setting:: TEST_TBLSPACE_TMP
 
-TEST_TBLSPACE_TMP
-~~~~~~~~~~~~~~~~~
+TBLSPACE_TMP
+^^^^^^^^^^^^
 
 Default: ``None``
 
@@ -749,6 +768,116 @@ This is an Oracle-specific setting.
 
 The name of the temporary tablespace that will be used when running tests. If
 not provided, Django will use ``'test_' + NAME + '_temp'``.
+
+.. setting:: OLD_TEST_CHARSET
+
+TEST_CHARSET
+~~~~~~~~~~~~
+
+.. deprecated:: 1.7
+
+    Use the :setting:`CHARSET <TEST_CHARSET>` entry in the
+    :setting:`TEST <DATABASE-TEST>` dictionary.
+
+.. setting:: OLD_TEST_COLLATION
+
+TEST_COLLATION
+~~~~~~~~~~~~~~
+
+.. deprecated:: 1.7
+
+    Use the :setting:`COLLATION <TEST_COLLATION>` entry in the
+    :setting:`TEST <DATABASE-TEST>` dictionary.
+
+.. setting:: OLD_TEST_DEPENDENCIES
+
+TEST_DEPENDENCIES
+~~~~~~~~~~~~~~~~~
+
+.. deprecated:: 1.7
+
+    Use the :setting:`DEPENDENCIES <TEST_DEPENDENCIES>` entry in the
+    :setting:`TEST <DATABASE-TEST>` dictionary.
+
+.. setting:: OLD_TEST_MIRROR
+
+TEST_MIRROR
+~~~~~~~~~~~
+
+.. deprecated:: 1.7
+
+    Use the :setting:`MIRROR <TEST_MIRROR>` entry in the
+    :setting:`TEST <DATABASE-TEST>` dictionary.
+
+.. setting:: OLD_TEST_NAME
+
+TEST_NAME
+~~~~~~~~~
+
+.. deprecated:: 1.7
+
+    Use the :setting:`NAME <TEST_NAME>` entry in the
+    :setting:`TEST <DATABASE-TEST>` dictionary.
+
+.. setting:: OLD_TEST_CREATE
+
+TEST_CREATE
+~~~~~~~~~~~
+
+.. deprecated:: 1.7
+
+    Use the :setting:`CREATE_DB <TEST_CREATE>` entry in the
+    :setting:`TEST <DATABASE-TEST>` dictionary.
+
+.. setting:: OLD_TEST_USER
+
+TEST_USER
+~~~~~~~~~
+
+.. deprecated:: 1.7
+
+    Use the :setting:`USER <TEST_USER>` entry in the
+    :setting:`TEST <DATABASE-TEST>` dictionary.
+
+.. setting:: OLD_TEST_USER_CREATE
+
+TEST_USER_CREATE
+~~~~~~~~~~~~~~~~
+
+.. deprecated:: 1.7
+
+    Use the :setting:`CREATE_USER <TEST_USER_CREATE>` entry in the
+    :setting:`TEST <DATABASE-TEST>` dictionary.
+
+.. setting:: OLD_TEST_PASSWD
+
+TEST_PASSWD
+~~~~~~~~~~~
+
+.. deprecated:: 1.7
+
+    Use the :setting:`PASSWORD <TEST_PASSWD>` entry in the
+    :setting:`TEST <DATABASE-TEST>` dictionary.
+
+.. setting:: OLD_TEST_TBLSPACE
+
+TEST_TBLSPACE
+~~~~~~~~~~~~~
+
+.. deprecated:: 1.7
+
+    Use the :setting:`TBLSPACE <TEST_TBLSPACE>` entry in the
+    :setting:`TEST <DATABASE-TEST>` dictionary.
+
+.. setting:: OLD_TEST_TBLSPACE_TMP
+
+TEST_TBLSPACE_TMP
+~~~~~~~~~~~~~~~~~
+
+.. deprecated:: 1.7
+
+    Use the :setting:`TBLSPACE_TMP <TEST_TBLSPACE_TMP>` entry in the
+    :setting:`TEST <DATABASE-TEST>` dictionary.
 
 .. setting:: DATABASE_ROUTERS
 
@@ -2960,20 +3089,7 @@ Templates
 
 Testing
 -------
-* Database
-
-  * :setting:`TEST_CHARSET`
-  * :setting:`TEST_COLLATION`
-  * :setting:`TEST_DEPENDENCIES`
-  * :setting:`TEST_MIRROR`
-  * :setting:`TEST_NAME`
-  * :setting:`TEST_CREATE`
-  * :setting:`TEST_USER`
-  * :setting:`TEST_USER_CREATE`
-  * :setting:`TEST_PASSWD`
-  * :setting:`TEST_TBLSPACE`
-  * :setting:`TEST_TBLSPACE_TMP`
-
+* Database: :setting:`TEST <DATABASE-TEST>`
 * :setting:`TEST_RUNNER`
 
 URLs

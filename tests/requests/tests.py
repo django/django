@@ -699,7 +699,7 @@ class HostValidationTests(SimpleTestCase):
 
 
 @skipIf(connection.vendor == 'sqlite'
-        and connection.settings_dict['TEST_NAME'] in (None, '', ':memory:'),
+        and connection.settings_dict['TEST']['NAME'] in (None, '', ':memory:'),
         "Cannot establish two connections to an in-memory SQLite database.")
 class DatabaseConnectionHandlingTests(TransactionTestCase):
 
