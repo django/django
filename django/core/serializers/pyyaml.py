@@ -7,6 +7,7 @@ Requires PyYaml (http://pyyaml.org/), but that's checked for in __init__.
 import decimal
 import yaml
 import sys
+from collections import OrderedDict
 from io import StringIO
 
 from django.db import models
@@ -27,7 +28,32 @@ class DjangoSafeDumper(SafeDumper):
     def represent_decimal(self, data):
         return self.represent_scalar('tag:yaml.org,2002:str', str(data))
 
+    def represent_ordereddict(self, data):
+        return self.represent_mapping(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+                                      data.items())
+
+
 DjangoSafeDumper.add_representer(decimal.Decimal, DjangoSafeDumper.represent_decimal)
+DjangoSafeDumper.add_representer(OrderedDict, DjangoSafeDumper.represent_ordereddict)
+
+
+def make_ordered_dict(object, ordered_by):
+    ordered_object = OrderedDict()
+    for key in ordered_by:
+        ordered_object[key] = object[key]
+    for key, value in object.items():
+        if key not in ordered_by:
+            ordered_object[key] = value
+    return ordered_object
+
+
+def make_ordered(objects, ordered_by):
+    ordered_objects = []
+    for object in objects:
+        ordered_objects.append(
+            make_ordered_dict(object, ordered_by)
+        )
+    return ordered_objects
 
 
 class Serializer(PythonSerializer):
@@ -50,7 +76,9 @@ class Serializer(PythonSerializer):
             super(Serializer, self).handle_field(obj, field)
 
     def end_serialization(self):
-        yaml.dump(self.objects, self.stream, Dumper=DjangoSafeDumper, **self.options)
+        ordered_by = ['model', 'pk', 'fields']
+        objects = make_ordered(self.objects, ordered_by)
+        yaml.dump(objects, self.stream, Dumper=DjangoSafeDumper, **self.options)
 
     def getvalue(self):
         # Grand-parent super
