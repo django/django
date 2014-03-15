@@ -723,6 +723,10 @@ Methods
 
     .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
+    .. warning:: Both :rfc:`2109` and :rfc:`6265` state a minimum size allowance of 4096 bytes
+        for cookies. Django will not raise any exception if more than the allowed size is
+        stored, but many browsers will not set the cookie correctly.
+
 .. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
 
     Like :meth:`~HttpResponse.set_cookie()`, but
