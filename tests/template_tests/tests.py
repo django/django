@@ -641,6 +641,8 @@ class TemplateTests(TestCase):
     def get_template_tests(self):
         # SYNTAX --
         # 'template_name': ('template contents', 'context dict', 'expected string output' or Exception class)
+        # This import is necessary when tests are run isolated:
+        from .templatetags import custom
         basedir = os.path.dirname(os.path.abspath(upath(__file__)))
         tests = {
             ### BASIC SYNTAX ################################################
