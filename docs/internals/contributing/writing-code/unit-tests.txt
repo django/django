@@ -49,6 +49,8 @@ You can avoid typing the ``PYTHONPATH`` bit each time by adding your Django
 checkout to your ``PYTHONPATH`` or by installing the source checkout using pip.
 See :ref:`installing-development-version`.
 
+Having problems? See :ref:`troubleshooting-unit-tests` for some common issues.
+
 .. _running-unit-tests-settings:
 
 Using another ``settings`` module
@@ -238,3 +240,21 @@ method as above:
 .. code-block:: bash
 
    $ ./runtests.py --settings=settings django.contrib.auth
+
+.. _troubleshooting-unit-tests:
+
+Troubleshooting
+---------------
+
+Many test failures with ``UnicodeEncodeError``.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If the ``locales`` package is not installed, some tests will fail with a
+``UnicodeEncodeError``.
+
+You can resolve this on Debian-based systems, for example, by running:
+
+.. code-block:: bash
+
+    $ apt-get install locales
+    $ dpkg-reconfigure locales
