@@ -49,6 +49,18 @@ You can avoid typing the ``PYTHONPATH`` bit each time by adding your Django
 checkout to your ``PYTHONPATH`` or by installing the source checkout using pip.
 See :ref:`installing-development-version`.
 
+.. note::
+
+    If ``locales`` packages is not present, ``UTF-8`` related tests will fail
+    with a ``UnicodeEncodeError``.
+    
+    For example, on Debian-based systems, you can resolve this by running:
+
+    .. code-block:: bash
+
+        $ apt-get install locales
+        $ dpkg-reconfigure locales
+
 .. _running-unit-tests-settings:
 
 Using another ``settings`` module
