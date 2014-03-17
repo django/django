@@ -87,10 +87,13 @@ if os.name == 'nt':
         return bool(ret)
 
 elif os.name == 'posix':
-    import fcntl
-    LOCK_SH = fcntl.LOCK_SH  # shared lock
-    LOCK_NB = fcntl.LOCK_NB  # non-blocking
-    LOCK_EX = fcntl.LOCK_EX
+    try:
+        import fcntl
+        LOCK_SH = fcntl.LOCK_SH  # shared lock
+        LOCK_NB = fcntl.LOCK_NB  # non-blocking
+        LOCK_EX = fcntl.LOCK_EX
+    except (ImportError, AttributeError):
+        pass
 
     def lock(f, flags):
         ret = fcntl.flock(_fd(f), flags)
