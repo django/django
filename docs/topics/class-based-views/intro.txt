@@ -173,6 +173,29 @@ that inherits from ``View`` - for example, trying to use a form at the top of a
 list and combining :class:`~django.views.generic.edit.ProcessFormView` and
 :class:`~django.views.generic.list.ListView` - won't work as expected.
 
+.. _mixins_that_wrap_as_view:
+
+Mixins that wrap ``as_view()``
+------------------------------
+
+One way to apply common behavior to many classes is to write a mixin that wraps
+the :meth:`~django.views.generic.base.View.as_view()` method.
+
+For example, if you have many generic views that should be decorated with
+:func:`~django.contrib.auth.decorators.login_required` you could implement a
+mixin like this::
+
+    from django.contrib.auth.decorators import login_required
+
+    class LoginRequiredMixin(object):
+        @classmethod
+        def as_view(cls):
+            return login_required(super(LoginRequiredMixin, cls).as_view())
+
+    class MyView(LoginRequiredMixin, ...):
+        # this is a generic view
+        ...
+
 Handling forms with class-based views
 =====================================
 
