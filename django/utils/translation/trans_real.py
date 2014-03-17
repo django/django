@@ -21,7 +21,7 @@ from django.utils.six import StringIO
 from django.utils.translation import TranslatorCommentWarning, trim_whitespace, LANGUAGE_SESSION_KEY
 
 
-# Translations are cached in a dictionary for every language+app tuple.
+# Translations are cached in a dictionary for every language.
 # The active translations are stored by threadid to make them thread local.
 _translations = {}
 _active = local()
@@ -206,9 +206,8 @@ def translation(language):
 
 def activate(language):
     """
-    Fetches the translation object for a given tuple of application name and
-    language and installs it as the current translation object for the current
-    thread.
+    Fetches the translation object for a given language and installs it as the
+    current translation object for the current thread.
     """
     if language in _DJANGO_DEPRECATED_LOCALES:
         msg = ("The use of the language code '%s' is deprecated. "
