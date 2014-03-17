@@ -24,7 +24,7 @@ class Command(BaseCommand):
             help='An app_label or app_label.ModelName to exclude '
                  '(use multiple --exclude to exclude multiple apps/models).'),
         make_option('-n', '--natural', action='store_true', dest='use_natural_keys', default=False,
-            help='Use natural keys if they are available.'),
+            help='Use natural keys if they are available (deprecated: use --natural-foreign instead).'),
         make_option('--natural-foreign', action='store_true', dest='use_natural_foreign_keys', default=False,
             help='Use natural foreign keys if they are available.'),
         make_option('--natural-primary', action='store_true', dest='use_natural_primary_keys', default=False,
