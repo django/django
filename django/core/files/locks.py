@@ -25,7 +25,6 @@ def _fd(f):
     """Get a filedescriptor from something which could be a file or an fd."""
     return f.fileno() if hasattr(f, 'fileno') else f
     
-
 if os.name == 'nt':
     import msvcrt
     from ctypes import (sizeof, c_ulong, c_void_p, c_int64,
