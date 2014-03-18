@@ -73,6 +73,21 @@ The discussion about the development of Django itself takes place here.
 .. _django-developers subscription email address: mailto:django-developers+subscribe@googlegroups.com
 .. _django-developers posting email: mailto:django-developers@googlegroups.com
 
+.. _django-internationalization-mailing-list:
+
+``django-internationalization-and-localization``
+------------------------------------------------
+
+This is the place to discuss the internationalization of Django's components.
+
+* `django-internationalization-and-localization mailing archive`_
+* `django-internationalization-and-localization subscription email address`_
+* `django-internationalization-and-localization posting email`_
+
+.. _django-internationalization-and-localization mailing archive: https://groups.google.com/d/forum/django-i18n
+.. _django-internationalization-and-localization subscription email address: mailto:django-i18n+subscribe@googlegroups.com
+.. _django-internationalization-and-localization posting email: mailto:django-i18n@googlegroups.com
+
 .. _django-announce-mailing-list:
 
 ``django-announce``
