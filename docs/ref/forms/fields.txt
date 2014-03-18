@@ -1027,7 +1027,7 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
         field will be derived, and which will be used to validate the
         user's selection.
 
-    ``ModelChoiceField`` also takes one optional argument:
+    ``ModelChoiceField`` also takes two optional arguments:
 
     .. attribute:: empty_label
 
@@ -1046,6 +1046,40 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
         Note that if a ``ModelChoiceField`` is required and has a default
         initial value, no empty choice is created (regardless of the value
         of ``empty_label``).
+
+    .. attribute:: to_field_name
+
+        This optional argument is used to specify the field to use as the value
+        of the choices in the field's widget. By default it is set to ``None``,
+        in which case the primary key of each object will be used. For example::
+
+            # No custom to_field_name
+            field1 = forms.ModelChoiceField(queryset=...)
+
+        would yield:
+
+        .. code-block:: html
+
+            <select id="id_field1" name="field1">
+            <option value="obj1.pk">Object1</option>
+            <option value="obj2.pk">Object2</option>
+            ...
+            </select>
+
+        and::
+
+            # to_field_name provided
+            field2 = forms.ModelChoiceField(queryset=..., to_field_name="name")
+
+        would yield:
+
+        .. code-block:: html
+
+            <select id="id_field2" name="field2">
+            <option value="obj1.name">Object1</option>
+            <option value="obj2.name">Object2</option>
+            ...
+            </select>
 
     The ``__str__`` (``__unicode__`` on Python 2) method of the model will be
     called to generate string representations of the objects for use in the

@@ -564,14 +564,16 @@ The permission_required decorator
         The :func:`~django.contrib.auth.decorators.permission_required`
         decorator can take a list of permissions as well as a single permission.
 
+.. _applying-permissions-to-generic-views:
+
 Applying permissions to generic views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To apply a permission to a :doc:`class-based generic view
 </ref/class-based-views/index>`, decorate the :meth:`View.dispatch
 <django.views.generic.base.View.dispatch>` method on the class. See
-:ref:`decorating-class-based-views` for details.
-
+:ref:`decorating-class-based-views` for details. Another approach is to
+:ref:`write a mixin that wraps as_view() <mixins_that_wrap_as_view>`.
 
 .. _built-in-auth-views:
 
