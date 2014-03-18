@@ -18,7 +18,8 @@ If you find an incorrect translation or want to discuss specific translations,
 go to the `Django project page`_. If you would like to help out with
 translating or add a language that isn't yet translated, here's what to do:
 
-* Join the `Django i18n mailing list`_ and introduce yourself.
+* Join the :ref:`Django i18n mailing list <django-i18n-mailing-list>` and
+  introduce yourself.
 
 * Make sure you read the notes about :ref:`specialties-of-django-i18n`.
 
@@ -61,6 +62,5 @@ Django source tree, as for any code change:
   ``Translations``, and attach the patch to it.
 
 .. _Transifex: https://www.transifex.com/
-.. _Django i18n mailing list: /https://groups.google.com/d/forum/django-i18n
 .. _Django project page: https://www.transifex.com/projects/p/django-core/
 .. _Transifex User Guide: http://support.transifex.com/
