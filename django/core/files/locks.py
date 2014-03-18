@@ -24,8 +24,8 @@ __all__ = ('LOCK_EX', 'LOCK_SH', 'LOCK_NB', 'lock', 'unlock')
 def _fd(f):
     """Get a filedescriptor from something which could be a file or an fd."""
     return f.fileno() if hasattr(f, 'fileno') else f
-
-
+    
+    
 if os.name == 'nt':
     import msvcrt
     from ctypes import (sizeof, c_ulong, c_void_p, c_int64,
@@ -87,18 +87,30 @@ if os.name == 'nt':
         return bool(ret)
 
 elif os.name == 'posix':
-    import fcntl
-    LOCK_SH = fcntl.LOCK_SH  # shared lock
-    LOCK_NB = fcntl.LOCK_NB  # non-blocking
-    LOCK_EX = fcntl.LOCK_EX
-
-    def lock(f, flags):
-        ret = fcntl.flock(_fd(f), flags)
-        return (ret == 0)
-
-    def unlock(f):
-        ret = fcntl.flock(_fd(f), fcntl.LOCK_UN)
-        return (ret == 0)
+    try:
+        import fcntl
+        LOCK_SH = fcntl.LOCK_SH  # shared lock
+        LOCK_NB = fcntl.LOCK_NB  # non-blocking
+        LOCK_EX = fcntl.LOCK_EX
+    except (ImportError, AttributeError):
+        LOCK_EX = LOCK_SH = LOCK_NB = 0
+    
+        # Dummy functions that don't do anything.
+        def lock(f, flags):
+            # File is not locked
+            return False
+    
+        def unlock(f):
+            # File is unlocked
+            return True
+    else:
+        def lock(f, flags):
+            ret = fcntl.flock(_fd(f), flags)
+            return (ret == 0)
+    
+        def unlock(f):
+            ret = fcntl.flock(_fd(f), fcntl.LOCK_UN)
+            return (ret == 0)
 
 else:  # File locking is not supported.
     LOCK_EX = LOCK_SH = LOCK_NB = 0
