@@ -24,6 +24,18 @@ __all__ = ('LOCK_EX', 'LOCK_SH', 'LOCK_NB', 'lock', 'unlock')
 def _fd(f):
     """Get a filedescriptor from something which could be a file or an fd."""
     return f.fileno() if hasattr(f, 'fileno') else f
+    
+def _patch():
+    LOCK_EX = LOCK_SH = LOCK_NB = 0
+
+    # Dummy functions that don't do anything.
+    def lock(f, flags):
+        # File is not locked
+        return False
+
+    def unlock(f):
+        # File is unlocked
+        return True
 
 
 if os.name == 'nt':
@@ -93,24 +105,15 @@ elif os.name == 'posix':
         LOCK_NB = fcntl.LOCK_NB  # non-blocking
         LOCK_EX = fcntl.LOCK_EX
     except (ImportError, AttributeError):
-        pass
-
-    def lock(f, flags):
-        ret = fcntl.flock(_fd(f), flags)
-        return (ret == 0)
-
-    def unlock(f):
-        ret = fcntl.flock(_fd(f), fcntl.LOCK_UN)
-        return (ret == 0)
+        _patch()
+    else:
+        def lock(f, flags):
+            ret = fcntl.flock(_fd(f), flags)
+            return (ret == 0)
+    
+        def unlock(f):
+            ret = fcntl.flock(_fd(f), fcntl.LOCK_UN)
+            return (ret == 0)
 
 else:  # File locking is not supported.
-    LOCK_EX = LOCK_SH = LOCK_NB = 0
-
-    # Dummy functions that don't do anything.
-    def lock(f, flags):
-        # File is not locked
-        return False
-
-    def unlock(f):
-        # File is unlocked
-        return True
+    _patch()
