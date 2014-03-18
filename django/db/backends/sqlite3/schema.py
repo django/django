@@ -64,6 +64,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         for field in delete_fields:
             del body[field.name]
             del mapping[field.column]
+            # Remove any implicit M2M tables
+            if isinstance(field, ManyToManyField) and field.rel.through._meta.auto_created:
+                return self.delete_model(field.rel.through)
         # Work inside a new app registry
         apps = Apps()
         # Construct a new model for the new state
@@ -87,8 +90,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             ', '.join(self.quote_name(y) for x, y in field_maps),
             self.quote_name(model._meta.db_table),
         ))
-        # Delete the old table
-        self.delete_model(model)
+        # Delete the old table (not using self.delete_model to avoid deleting
+        # all implicit M2M tables)
+        self.execute(self.sql_delete_table % {
+            "table": self.quote_name(model._meta.db_table),
+        })
         # Rename the new to the old
         self.alter_db_table(model, temp_model._meta.db_table, model._meta.db_table)
         # Run deferred SQL on correct table
