@@ -28,7 +28,7 @@ class MigrateTests(TransactionTestCase):
 
     @skipUnless(HAS_SPATIAL_DB, "Spatial db is required.")
     @override_system_checks([])
-    @override_settings(MIGRATION_MODULES={"gis": "django.contrib.gis.tests.migrations.migrations"})
+    @override_settings(MIGRATION_MODULES={"gis": "django.contrib.gis.tests.gis_migrations.migrations"})
     def test_migrate_gis(self):
         """
         Tests basic usage of the migrate command when a model uses Geodjango
