@@ -206,27 +206,27 @@ class SQLCompiler(object):
             col_aliases = set()
         if self.query.select:
             only_load = self.deferred_to_columns()
-            for col, _ in self.query.select:
+            for col, _, column_alias in self.query.select:
                 if isinstance(col, (list, tuple)):
                     alias, column = col
                     table = self.query.alias_map[alias].table_name
                     if table in only_load and column not in only_load[table]:
                         continue
                     r = '%s.%s' % (qn(alias), qn(column))
-                    if with_aliases:
-                        if col[1] in col_aliases:
+                    a = r
+                    c = column
+                    if column_alias or with_aliases:
+                        if column_alias in col_aliases or (not column_alias and column in col_aliases):
                             c_alias = 'Col%d' % len(col_aliases)
-                            result.append('%s AS %s' % (r, c_alias))
-                            aliases.add(c_alias)
-                            col_aliases.add(c_alias)
+                            a = c_alias
                         else:
-                            result.append('%s AS %s' % (r, qn2(col[1])))
-                            aliases.add(r)
-                            col_aliases.add(col[1])
-                    else:
-                        result.append(r)
-                        aliases.add(r)
-                        col_aliases.add(col[1])
+                            c_alias = column_alias or column
+                            a = column_alias or a
+                        r = '%s AS %s' % (r, qn2(c_alias))
+                        c = c_alias
+                    result.append(r)
+                    aliases.add(a)
+                    col_aliases.add(c)
                 else:
                     col_sql, col_params = self.compile(col)
                     result.append(col_sql)
@@ -251,7 +251,7 @@ class SQLCompiler(object):
                 result.append('%s AS %s' % (agg_sql, qn(truncate_name(alias, max_name_length))))
             params.extend(agg_params)
 
-        for (table, col), _ in self.query.related_select_cols:
+        for (table, col), _, _ in self.query.related_select_cols:
             r = '%s.%s' % (qn(table), qn(col))
             if with_aliases and col in col_aliases:
                 c_alias = 'Col%d' % len(col_aliases)
@@ -404,7 +404,8 @@ class SQLCompiler(object):
                 group_by.append((str(field), []))
                 continue
             col, order = get_order_dir(field, asc)
-            if col in self.query.aggregate_select:
+            if (col in self.query.aggregate_select or
+                col in (a for _,_,a in self.query.select if a)):
                 result.append('%s %s' % (qn(col), order))
                 continue
             if '.' in field:
@@ -642,7 +643,7 @@ class SQLCompiler(object):
             columns, _ = self.get_default_columns(start_alias=alias,
                     opts=f.rel.to._meta, as_pairs=True)
             self.query.related_select_cols.extend(
-                SelectInfo((col[0], col[1].column), col[1]) for col in columns)
+                SelectInfo((col[0], col[1].column), col[1], None) for col in columns)
             if restricted:
                 next = requested.get(f.name, {})
             else:
@@ -669,7 +670,7 @@ class SQLCompiler(object):
                 columns, _ = self.get_default_columns(start_alias=alias,
                     opts=model._meta, as_pairs=True, from_parent=from_parent)
                 self.query.related_select_cols.extend(
-                    SelectInfo((col[0], col[1].column), col[1]) for col in columns)
+                    SelectInfo((col[0], col[1].column), col[1], None) for col in columns)
                 next = requested.get(f.related_query_name(), {})
                 self.fill_related_selections(model._meta, alias, cur_depth + 1,
                                              next, restricted)

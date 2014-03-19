@@ -617,8 +617,10 @@ class QuerySet(object):
                 params=params, translations=translations,
                 using=using)
 
-    def values(self, *fields):
-        return self._clone(klass=ValuesQuerySet, setup=True, _fields=fields)
+    def values(self, *fields, **aliased_fields):
+        cls = self._clone(klass=ValuesQuerySet, setup=True, _fields=fields,
+                           _aliased_fields=aliased_fields)
+        return cls
 
     def values_list(self, *fields, **kwargs):
         flat = kwargs.pop('flat', False)
@@ -1094,21 +1096,31 @@ class ValuesQuerySet(QuerySet):
         self.query.clear_deferred_loading()
         self.query.clear_select_fields()
 
-        if self._fields:
+        aliased_fields = getattr(self, '_aliased_fields', {})
+        all_fields = None
+
+        if self._fields or aliased_fields:
             self.extra_names = []
             self.aggregate_names = []
+            all_fields = list(self._fields) + aliased_fields.keys()
             if not self.query._extra and not self.query._aggregates:
                 # Short cut - if there are no extra or aggregates, then
                 # the values() clause must be just field names.
-                self.field_names = list(self._fields)
+                self.field_names = all_fields
             else:
                 self.query.default_cols = False
                 self.field_names = []
-                for f in self._fields:
+                for f in all_fields:
                     # we inspect the full extra_select list since we might
                     # be adding back an extra select item that we hadn't
                     # had selected previously.
-                    if self.query._extra and f in self.query._extra:
+                    real_f = f
+                    if f in aliased_fields:
+                        real_f = aliased_fields[f]
+                    if self.query._extra and real_f in self.query._extra:
+                        if f in aliased_fields:
+                            self.query._extra[f] = self.query._extra[real_f]
+                            del self.query._extra[real_f]
                         self.extra_names.append(f)
                     elif f in self.query.aggregate_select:
                         self.aggregate_names.append(f)
@@ -1121,6 +1133,8 @@ class ValuesQuerySet(QuerySet):
             self.aggregate_names = None
 
         self.query.select = []
+        if hasattr(self, '_aliased_fields'):
+            self.query.aliased_fields = self._aliased_fields
         if self.extra_names is not None:
             self.query.set_extra_mask(self.extra_names)
         self.query.add_fields(self.field_names, True)
@@ -1136,9 +1150,11 @@ class ValuesQuerySet(QuerySet):
             # Only clone self._fields if _fields wasn't passed into the cloning
             # call directly.
             c._fields = self._fields[:]
-        c.field_names = self.field_names
-        c.extra_names = self.extra_names
-        c.aggregate_names = self.aggregate_names
+        if not hasattr(c, '_aliased_fields') and hasattr(self, '_aliased_fields'):
+            c._aliased_fields = self._aliased_fields
+        c.field_names = None if self.field_names is None else self.field_names[:]
+        c.extra_names = None if self.extra_names is None else self.extra_names[:]
+        c.aggregate_names = None if self.aggregate_names is None else self.aggregate_names[:]
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()
         return c
@@ -1171,8 +1187,10 @@ class ValuesQuerySet(QuerySet):
         returned). This differs from QuerySet.as_sql(), where the column to
         select is set up by Django.
         """
-        if ((self._fields and len(self._fields) > 1) or
-                (not self._fields and len(self.model._meta.fields) > 1)):
+        aliased_fields = getattr(self, '_aliased_fields', {})
+        all_fields = list(self._fields) + aliased_fields.values()
+        if ((all_fields and len(all_fields) > 1) or
+                (not all_fields and len(self.model._meta.fields) > 1)):
             raise TypeError('Cannot use a multi-field %s as a filter value.'
                     % self.__class__.__name__)
 
@@ -1186,8 +1204,10 @@ class ValuesQuerySet(QuerySet):
         Validates that we aren't trying to do a query like
         value__in=qs.values('value1', 'value2'), which isn't valid.
         """
-        if ((self._fields and len(self._fields) > 1) or
-                (not self._fields and len(self.model._meta.fields) > 1)):
+        aliased_fields = getattr(self, '_aliased_fields', {})
+        all_fields = list(self._fields) + aliased_fields.values()
+        if ((all_fields and len(all_fields) > 1) or
+                (not all_fields and len(self.model._meta.fields) > 1)):
             raise TypeError('Cannot use a multi-field %s as a filter value.'
                     % self.__class__.__name__)
         return self

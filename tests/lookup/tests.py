@@ -251,6 +251,129 @@ class LookupTests(TestCase):
                 'pub_date': datetime(2005, 8, 1, 9, 0)
             }], transform=identity)
 
+    def test_values_aliases(self):
+        # values() returns a list of dictionaries instead of object instances --
+        # and you can specify which fields you want to retrieve.
+        identity = lambda x:x
+        self.assertQuerysetEqual(Article.objects.values(title='headline'),
+            [
+                {'title': u'Article 5'},
+                {'title': u'Article 6'},
+                {'title': u'Article 4'},
+                {'title': u'Article 2'},
+                {'title': u'Article 3'},
+                {'title': u'Article 7'},
+                {'title': u'Article 1'},
+            ],
+            transform=identity)
+        self.assertQuerysetEqual(
+            Article.objects.filter(pub_date__exact=datetime(2005, 7, 27)).values(primary_key='id'),
+            [{'primary_key': self.a2.id}, {'primary_key': self.a3.id}, {'primary_key': self.a7.id}],
+            transform=identity)
+        self.assertQuerysetEqual(Article.objects.values(primary_key='id', title='headline'),
+            [
+                {'primary_key': self.a5.id, 'title': 'Article 5'},
+                {'primary_key': self.a6.id, 'title': 'Article 6'},
+                {'primary_key': self.a4.id, 'title': 'Article 4'},
+                {'primary_key': self.a2.id, 'title': 'Article 2'},
+                {'primary_key': self.a3.id, 'title': 'Article 3'},
+                {'primary_key': self.a7.id, 'title': 'Article 7'},
+                {'primary_key': self.a1.id, 'title': 'Article 1'},
+            ],
+            transform=identity)
+        # You can use values() with iterator() for memory savings,
+        # because iterator() uses database-level iteration.
+        self.assertQuerysetEqual(Article.objects.values(primary_key='id', title='headline').iterator(),
+            [
+                {'primary_key': self.a5.id, 'title': 'Article 5'},
+                {'primary_key': self.a6.id, 'title': 'Article 6'},
+                {'primary_key': self.a4.id, 'title': 'Article 4'},
+                {'primary_key': self.a2.id, 'title': 'Article 2'},
+                {'primary_key': self.a3.id, 'title': 'Article 3'},
+                {'primary_key': self.a7.id, 'title': 'Article 7'},
+                {'primary_key': self.a1.id, 'title': 'Article 1'},
+            ],
+            transform=identity)
+        # The values() method works with "extra" fields specified in extra(select).
+        qs = Article.objects.extra(select={'id_plus_one': 'id + 1'}).values('id_plus_one', primary_key='id')
+        self.assertQuerysetEqual(
+            qs,
+            [
+                {'primary_key': self.a5.id, 'id_plus_one': self.a5.id + 1},
+                {'primary_key': self.a6.id, 'id_plus_one': self.a6.id + 1},
+                {'primary_key': self.a4.id, 'id_plus_one': self.a4.id + 1},
+                {'primary_key': self.a2.id, 'id_plus_one': self.a2.id + 1},
+                {'primary_key': self.a3.id, 'id_plus_one': self.a3.id + 1},
+                {'primary_key': self.a7.id, 'id_plus_one': self.a7.id + 1},
+                {'primary_key': self.a1.id, 'id_plus_one': self.a1.id + 1},
+            ],
+            transform=identity)
+        data = {
+            'id_plus_one': 'id+1',
+            'id_plus_two': 'id+2',
+            'id_plus_three': 'id+3',
+            'id_plus_four': 'id+4',
+            'id_plus_five': 'id+5',
+            'id_plus_six': 'id+6',
+            'id_plus_seven': 'id+7',
+            'id_plus_eight': 'id+8',
+        }
+        self.assertQuerysetEqual(
+            Article.objects.filter(id=self.a1.id).extra(select=data).values(**dict([(k+'_',k) for k in data.keys()])),
+            [{
+                'id_plus_one_': self.a1.id + 1,
+                'id_plus_two_': self.a1.id + 2,
+                'id_plus_three_': self.a1.id + 3,
+                'id_plus_four_': self.a1.id + 4,
+                'id_plus_five_': self.a1.id + 5,
+                'id_plus_six_': self.a1.id + 6,
+                'id_plus_seven_': self.a1.id + 7,
+                'id_plus_eight_': self.a1.id + 8,
+            }], transform=identity)
+        # You can specify fields from forward and reverse relations, just like filter().
+        self.assertQuerysetEqual(
+            Article.objects.values('headline', a_name='author__name'),
+            [
+                {'headline': self.a5.headline, 'a_name': self.au2.name},
+                {'headline': self.a6.headline, 'a_name': self.au2.name},
+                {'headline': self.a4.headline, 'a_name': self.au1.name},
+                {'headline': self.a2.headline, 'a_name': self.au1.name},
+                {'headline': self.a3.headline, 'a_name': self.au1.name},
+                {'headline': self.a7.headline, 'a_name': self.au2.name},
+                {'headline': self.a1.headline, 'a_name': self.au1.name},
+            ], transform=identity)
+        self.assertQuerysetEqual(
+            Author.objects.values('name', headline='article__headline').order_by('name', 'headline'),
+            [
+                {'name': self.au1.name, 'headline': self.a1.headline},
+                {'name': self.au1.name, 'headline': self.a2.headline},
+                {'name': self.au1.name, 'headline': self.a3.headline},
+                {'name': self.au1.name, 'headline': self.a4.headline},
+                {'name': self.au2.name, 'headline': self.a5.headline},
+                {'name': self.au2.name, 'headline': self.a6.headline},
+                {'name': self.au2.name, 'headline': self.a7.headline},
+            ], transform=identity)
+        self.assertQuerysetEqual(
+            Author.objects.values('name', headline='article__headline', tag_name='article__tag__name').order_by('name', 'headline', 'tag_name'),
+            [
+                {'name': self.au1.name, 'headline': self.a1.headline, 'tag_name': self.t1.name},
+                {'name': self.au1.name, 'headline': self.a2.headline, 'tag_name': self.t1.name},
+                {'name': self.au1.name, 'headline': self.a3.headline, 'tag_name': self.t1.name},
+                {'name': self.au1.name, 'headline': self.a3.headline, 'tag_name': self.t2.name},
+                {'name': self.au1.name, 'headline': self.a4.headline, 'tag_name': self.t2.name},
+                {'name': self.au2.name, 'headline': self.a5.headline, 'tag_name': self.t2.name},
+                {'name': self.au2.name, 'headline': self.a5.headline, 'tag_name': self.t3.name},
+                {'name': self.au2.name, 'headline': self.a6.headline, 'tag_name': self.t3.name},
+                {'name': self.au2.name, 'headline': self.a7.headline, 'tag_name': self.t3.name},
+            ], transform=identity)
+        # However, an exception FieldDoesNotExist will be thrown if you specify
+        # a non-existent field name in values() (a field that is neither in the
+        # model nor in extra(select)).
+        self.assertRaises(FieldError,
+            Article.objects.extra(select={'id_plus_one': 'id + 1'}).values,
+            'id', id_incremented='id_plus_two')
+
+
     def test_values_list(self):
         # values_list() is similar to values(), except that the results are
         # returned as a list of tuples, rather than a list of dictionaries.
