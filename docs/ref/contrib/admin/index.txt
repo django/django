@@ -2031,7 +2031,7 @@ The ``InlineModelAdmin`` class adds:
 
     Returns a :class:`~django.forms.models.BaseInlineFormSet` class for use in
     admin add/change views. See the example for
-    :class:`ModelAdmin.get_formsets`.
+    :class:`ModelAdmin.get_formsets_with_inlines`.
 
 .. method:: InlineModelAdmin.get_extra(request, obj=None, **kwargs)
 
