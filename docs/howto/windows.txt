@@ -1,0 +1,91 @@
+================================
+How to install Django on Windows
+================================
+
+This document will guide you through installing Python and Django for basic
+usage on Windows. This is meant as a beginner's guide for users working on
+Django projects and does not reflect how Django should be installed when
+developing patches for Django itself.
+
+The steps in this guide have been tested with Windows 7 and 8. In other
+versions, the steps would be similar.
+
+Install Python
+==============
+
+Django is a Python web framework, thus requiring Python to be installed on your
+machine.
+
+To install Python on your machine go to http://python.org/download/, and
+download a Windows MSI installer for Python. Once downloaded, run the MSI
+installer and follow the on-screen instructions.
+
+After installation, open the command prompt and check the Python version by
+executing ``python --version``. If you encounter a problem, make sure you
+have set the ``PATH`` variable correctly. You might need to adjust your
+``PATH`` environment variable to include paths to the Python executable and
+additional scripts. For example, if your Python is installed in
+``C:\Python34\``, the following paths need to be added to ``PATH``::
+
+    C:\Python34\;C:\Python34\Scripts;
+
+Install Setuptools
+==================
+
+To install Python packages on your computer, Setuptools is needed. Download the
+latest version of `Setuptools <http://pypi.python.org/pypi/setuptools>`_ for
+your Python version and follow the installation instructions given there.
+
+Install PIP
+===========
+
+`PIP <http://www.pip-installer.org/>`_ is a package manager for Python that
+uses the `Python Package Index <http://pypi.python.org>`_ to install Python
+packages. PIP will later be used to install Django from PyPI.
+
+Open a command prompt and execute ``easy_install pip``. This will install
+``pip`` on your system. This command will work if you have successfully
+installed Setuptools.
+
+Alternatively, go to `<http://www.pip-installer.org/en/latest/installing.html>`_
+for installing/upgrading instructions.
+
+Install Django
+==============
+
+Django can be installed easily using ``pip``.
+
+In the command prompt, execute the following command: ``pip install django``.
+This will download and install Django.
+
+After the installation has completed, you can verify your Django installation
+by executing ``django-admin.py --version`` in the command prompt.
+
+.. versionchanged:: 1.7
+
+ In Django 1.7, a ``.exe`` has been introduced, so just use
+ ``django-admin`` in place of ``django-admin.py`` in the command prompt.
+
+See :ref:`database-installation` for information on database installation
+with Django.
+
+Common pitfalls
+===============
+
+* If ``django-admin.py`` only displays the help text no matter what arguments
+  it is given, there is probably a problem with the file association in
+  Windows. Check if there is more than one environment variable set for
+  running Python scripts in ``PATH``. This usually occurs when there is more
+  than one Python version installed.
+
+* If you are connecting to the internet behind a proxy, there might be problem
+  in running the commands ``easy_install pip`` and ``pip install django``.
+  Set the environment variables for proxy configuration in the command prompt
+  as follows::
+
+    set http_proxy=http://username:password@proxyserver:proxyport
+    set https_proxy=https://username:password@proxyserver:proxyport
+
+* Executing ``django-admin.py`` opens up a text file. This is due to the text
+  editor being the default program for ``.py`` files. This must be changed
+  to the ``python.exe`` located in the folder where Python is installed.
