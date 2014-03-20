@@ -595,17 +595,23 @@ escaping HTML.
 
 .. function:: strip_tags(value)
 
-    Removes anything that looks like an html tag from the string, that is
-    anything contained within ``<>``.
+    Tries to remove anything that looks like an HTML tag from the string, that
+    is anything contained within ``<>``.
+    Absolutely NO guaranty is provided about the resulting string being entirely
+    HTML safe. So NEVER mark safe the result of a ``strip_tag`` call without
+    escaping it first, for example with :func:`~django.utils.html.escape`.
 
     For example::
 
         strip_tags(value)
 
     If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"``
-    the return value will be ``"Joel is a slug"``. Note that ``strip_tags``
-    result may still contain unsafe HTML content, so you might use
-    :func:`~django.utils.html.escape` to make it a safe string.
+    the return value will be ``"Joel is a slug"``.
+
+    If you are looking for a more robust solution, take a look at the `bleach`_
+    Python library.
+
+    .. _bleach: https://pypi.python.org/pypi/bleach
 
     .. versionchanged:: 1.6
 
