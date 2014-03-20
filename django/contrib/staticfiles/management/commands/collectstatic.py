@@ -7,7 +7,6 @@ from optparse import make_option
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError, NoArgsCommand
 from django.utils.encoding import smart_text
-from django.utils.functional import LazyObject
 from django.utils.six.moves import input
 
 from django.contrib.staticfiles import finders, storage
@@ -193,11 +192,7 @@ class Command(NoArgsCommand):
             self.stdout.write(msg)
 
     def is_local_storage(self):
-        if issubclass(self.storage.__class__, LazyObject):
-            storage = self.storage._wrapped
-        else:
-            storage = self.storage
-        return isinstance(storage, FileSystemStorage)
+        return isinstance(self.storage, FileSystemStorage)
 
     def clear_dir(self, path):
         """
