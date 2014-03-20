@@ -762,7 +762,8 @@ class BaseDatabaseSchemaEditor(object):
         Alters M2Ms to repoint their to= endpoints.
         """
         # Rename the through table
-        self.alter_db_table(old_field.rel.through, old_field.rel.through._meta.db_table, new_field.rel.through._meta.db_table)
+        if old_field.rel.through._meta.db_table != new_field.rel.through._meta.db_table:
+            self.alter_db_table(old_field.rel.through, old_field.rel.through._meta.db_table, new_field.rel.through._meta.db_table)
         # Repoint the FK to the other side
         self.alter_field(
             new_field.rel.through,
