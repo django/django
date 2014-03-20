@@ -347,6 +347,15 @@ class SchemaTests(TransactionTestCase):
             # Ensure there is now an m2m table there
             columns = self.column_classes(new_field.rel.through)
             self.assertEqual(columns['tagm2mtest_id'][0], "IntegerField")
+
+            # "Alter" the field. This should not rename the DB table to itself.
+            with connection.schema_editor() as editor:
+                editor.alter_field(
+                    Author,
+                    new_field,
+                    new_field,
+                )
+
             # Remove the M2M table again
             with connection.schema_editor() as editor:
                 editor.remove_field(
