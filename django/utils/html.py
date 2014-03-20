@@ -115,7 +115,10 @@ linebreaks = allow_lazy(linebreaks, six.text_type)
 
 class MLStripper(HTMLParser):
     def __init__(self):
-        HTMLParser.__init__(self)
+        if six.PY2:
+            HTMLParser.__init__(self)
+        else:
+            HTMLParser.__init__(self, strict=False)
         self.reset()
         self.fed = []
     def handle_data(self, d):
@@ -127,16 +130,37 @@ class MLStripper(HTMLParser):
     def get_data(self):
         return ''.join(self.fed)
 
-def strip_tags(value):
-    """Returns the given HTML with all tags stripped."""
+
+def _strip_once(value):
+    """
+    Internal tag stripping utility used by strip_tags.
+    """
     s = MLStripper()
     try:
         s.feed(value)
-        s.close()
     except HTMLParseError:
         return value
+    try:
+        s.close()
+    except (HTMLParseError, UnboundLocalError) as err:
+        # UnboundLocalError because of http://bugs.python.org/issue17802
+        # on Python 3.2, triggered by strict=False mode of HTMLParser
+        return s.get_data() + s.rawdata
     else:
         return s.get_data()
+
+
+def strip_tags(value):
+    """Returns the given HTML with all tags stripped."""
+    while True:
+        if not ('<' in value or '>' in value):
+            return value
+        new_value = _strip_once(value)
+        if new_value == value:
+            # _strip_once was not able to detect more tags
+            return value
+        else:
+            value = new_value
 strip_tags = allow_lazy(strip_tags)
 
 def remove_tags(html, tags):
