@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from django.contrib.comments.forms import CommentForm
 from django.contrib.comments.models import Comment
 from django.contrib.contenttypes.models import ContentType
@@ -32,7 +30,7 @@ class CommentTemplateTagTests(CommentTestCase):
         t = "{% load comments %}" + (tag or "{% get_comment_form for comment_tests.article a.id as form %}")
         ctx, out = self.render(t, a=Article.objects.get(pk=1))
         self.assertEqual(out, "")
-        self.assertTrue(isinstance(ctx["form"], CommentForm))
+        self.assertIsInstance(ctx["form"], CommentForm)
 
     def testGetCommentFormFromLiteral(self):
         self.testGetCommentForm("{% get_comment_form for comment_tests.article 1 as form %}")

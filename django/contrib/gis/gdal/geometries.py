@@ -67,7 +67,7 @@ from django.utils.six.moves import xrange
 #
 # The OGR_G_* routines are relevant here.
 
-#### OGRGeometry Class ####
+
 class OGRGeometry(GDALBase):
     "Generally encapsulates an OGR geometry."
 
@@ -101,7 +101,7 @@ class OGRGeometry(GDALBase):
             else:
                 # Seeing if the input is a valid short-hand string
                 # (e.g., 'Point', 'POLYGON').
-                ogr_t = OGRGeomType(geom_input)
+                OGRGeomType(geom_input)
                 g = capi.create_geom(OGRGeomType(geom_input).num)
         elif isinstance(geom_input, memoryview):
             # WKB was passed in
@@ -122,14 +122,16 @@ class OGRGeometry(GDALBase):
         self.ptr = g
 
         # Assigning the SpatialReference object to the geometry, if valid.
-        if bool(srs): self.srs = srs
+        if srs:
+            self.srs = srs
 
         # Setting the class depending upon the OGR Geometry Type
         self.__class__ = GEO_CLASSES[self.geom_type.num]
 
     def __del__(self):
         "Deletes this Geometry."
-        if self._ptr: capi.destroy_geom(self._ptr)
+        if self._ptr:
+            capi.destroy_geom(self._ptr)
 
     # Pickle routines
     def __getstate__(self):
@@ -143,7 +145,8 @@ class OGRGeometry(GDALBase):
     def __setstate__(self, state):
         wkb, srs = state
         ptr = capi.from_wkb(wkb, None, byref(c_void_p()), len(wkb))
-        if not ptr: raise OGRException('Invalid OGRGeometry loaded from pickled state.')
+        if not ptr:
+            raise OGRException('Invalid OGRGeometry loaded from pickled state.')
         self.ptr = ptr
         self.srs = srs
 
@@ -151,8 +154,8 @@ class OGRGeometry(GDALBase):
     def from_bbox(cls, bbox):
         "Constructs a Polygon from a bounding box (4-tuple)."
         x0, y0, x1, y1 = bbox
-        return OGRGeometry( 'POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' %  (
-                x0, y0, x0, y1, x1, y1, x1, y0, x0, y0) )
+        return OGRGeometry('POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' % (
+            x0, y0, x0, y1, x1, y1, x1, y0, x0, y0))
 
     ### Geometry set-like operations ###
     # g = g1 | g2
@@ -198,14 +201,6 @@ class OGRGeometry(GDALBase):
 
     def _get_coord_dim(self):
         "Returns the coordinate dimension of the Geometry."
-        if isinstance(self, GeometryCollection) and GDAL_VERSION < (1, 5, 2):
-            # On GDAL versions prior to 1.5.2, there exists a bug in which
-            # the coordinate dimension of geometry collections is always 2:
-            #   http://trac.osgeo.org/gdal/ticket/2334
-            # Here we workaround by returning the coordinate dimension of the
-            # first geometry in the collection instead.
-            if len(self):
-                return capi.get_coord_dim(capi.get_geom_ref(self.ptr, 0))
         return capi.get_coord_dim(self.ptr)
 
     def _set_coord_dim(self, dim):
@@ -293,7 +288,8 @@ class OGRGeometry(GDALBase):
     # The SRID property
     def _get_srid(self):
         srs = self.srs
-        if srs: return srs.srid
+        if srs:
+            return srs.srid
         return None
 
     def _set_srid(self, srid):
@@ -343,13 +339,13 @@ class OGRGeometry(GDALBase):
     def wkb(self):
         "Returns the WKB representation of the Geometry."
         if sys.byteorder == 'little':
-            byteorder = 1 # wkbNDR (from ogr_core.h)
+            byteorder = 1  # wkbNDR (from ogr_core.h)
         else:
-            byteorder = 0 # wkbXDR
+            byteorder = 0  # wkbXDR
         sz = self.wkb_size
         # Creating the unsigned character buffer, and passing it in by reference.
         buf = (c_ubyte * sz)()
-        wkb = capi.to_wkb(self.ptr, byteorder, byref(buf))
+        capi.to_wkb(self.ptr, byteorder, byref(buf))
         # Returning a buffer of the string at the pointer.
         return memoryview(string_at(buf, sz))
 
@@ -526,6 +522,7 @@ class OGRGeometry(GDALBase):
         """
         return self._geomgen(capi.geom_union, other)
 
+
 # The subclasses for OGR Geometry.
 class Point(OGRGeometry):
 
@@ -553,6 +550,7 @@ class Point(OGRGeometry):
         elif self.coord_dim == 3:
             return (self.x, self.y, self.z)
     coords = tuple
+
 
 class LineString(OGRGeometry):
 
@@ -583,7 +581,7 @@ class LineString(OGRGeometry):
     @property
     def tuple(self):
         "Returns the tuple representation of this LineString."
-        return tuple([self[i] for i in xrange(len(self))])
+        return tuple(self[i] for i in xrange(len(self)))
     coords = tuple
 
     def _listarr(self, func):
@@ -609,8 +607,11 @@ class LineString(OGRGeometry):
         if self.coord_dim == 3:
             return self._listarr(capi.getz)
 
+
 # LinearRings are used in Polygons.
-class LinearRing(LineString): pass
+class LinearRing(LineString):
+    pass
+
 
 class Polygon(OGRGeometry):
 
@@ -634,20 +635,20 @@ class Polygon(OGRGeometry):
     @property
     def shell(self):
         "Returns the shell of this Polygon."
-        return self[0] # First ring is the shell
+        return self[0]  # First ring is the shell
     exterior_ring = shell
 
     @property
     def tuple(self):
         "Returns a tuple of LinearRing coordinate tuples."
-        return tuple([self[i].tuple for i in xrange(self.geom_count)])
+        return tuple(self[i].tuple for i in xrange(self.geom_count))
     coords = tuple
 
     @property
     def point_count(self):
         "The number of Points in this Polygon."
         # Summing up the number of points in each ring of the Polygon.
-        return sum([self[i].point_count for i in xrange(self.geom_count)])
+        return sum(self[i].point_count for i in xrange(self.geom_count))
 
     @property
     def centroid(self):
@@ -656,6 +657,7 @@ class Polygon(OGRGeometry):
         p = OGRGeometry(OGRGeomType('Point'))
         capi.get_centroid(self.ptr, p.ptr)
         return p
+
 
 # Geometry Collection base class.
 class GeometryCollection(OGRGeometry):
@@ -681,7 +683,8 @@ class GeometryCollection(OGRGeometry):
         "Add the geometry to this Geometry Collection."
         if isinstance(geom, OGRGeometry):
             if isinstance(geom, self.__class__):
-                for g in geom: capi.add_geom(self.ptr, g.ptr)
+                for g in geom:
+                    capi.add_geom(self.ptr, g.ptr)
             else:
                 capi.add_geom(self.ptr, geom.ptr)
         elif isinstance(geom, six.string_types):
@@ -694,33 +697,41 @@ class GeometryCollection(OGRGeometry):
     def point_count(self):
         "The number of Points in this Geometry Collection."
         # Summing up the number of points in each geometry in this collection
-        return sum([self[i].point_count for i in xrange(self.geom_count)])
+        return sum(self[i].point_count for i in xrange(self.geom_count))
 
     @property
     def tuple(self):
         "Returns a tuple representation of this Geometry Collection."
-        return tuple([self[i].tuple for i in xrange(self.geom_count)])
+        return tuple(self[i].tuple for i in xrange(self.geom_count))
     coords = tuple
 
+
 # Multiple Geometry types.
-class MultiPoint(GeometryCollection): pass
-class MultiLineString(GeometryCollection): pass
-class MultiPolygon(GeometryCollection): pass
+class MultiPoint(GeometryCollection):
+    pass
+
+
+class MultiLineString(GeometryCollection):
+    pass
+
+
+class MultiPolygon(GeometryCollection):
+    pass
 
 # Class mapping dictionary (using the OGRwkbGeometryType as the key)
-GEO_CLASSES = {1 : Point,
-               2 : LineString,
-               3 : Polygon,
-               4 : MultiPoint,
-               5 : MultiLineString,
-               6 : MultiPolygon,
-               7 : GeometryCollection,
+GEO_CLASSES = {1: Point,
+               2: LineString,
+               3: Polygon,
+               4: MultiPoint,
+               5: MultiLineString,
+               6: MultiPolygon,
+               7: GeometryCollection,
                101: LinearRing,
-               1 + OGRGeomType.wkb25bit : Point,
-               2 + OGRGeomType.wkb25bit : LineString,
-               3 + OGRGeomType.wkb25bit : Polygon,
-               4 + OGRGeomType.wkb25bit : MultiPoint,
-               5 + OGRGeomType.wkb25bit : MultiLineString,
-               6 + OGRGeomType.wkb25bit : MultiPolygon,
-               7 + OGRGeomType.wkb25bit : GeometryCollection,
+               1 + OGRGeomType.wkb25bit: Point,
+               2 + OGRGeomType.wkb25bit: LineString,
+               3 + OGRGeomType.wkb25bit: Polygon,
+               4 + OGRGeomType.wkb25bit: MultiPoint,
+               5 + OGRGeomType.wkb25bit: MultiLineString,
+               6 + OGRGeomType.wkb25bit: MultiPolygon,
+               7 + OGRGeomType.wkb25bit: GeometryCollection,
                }

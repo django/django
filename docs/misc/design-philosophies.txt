@@ -67,7 +67,7 @@ as possible.
     The `discussion of DRY on the Portland Pattern Repository`__
 
     __ http://c2.com/cgi/wiki?DontRepeatYourself
-    
+
 .. _explicit-is-better-than-implicit:
 
 Explicit is better than implicit
@@ -307,3 +307,29 @@ Differentiate between GET and POST
 
 GET and POST are distinct; developers should explicitly use one or the other.
 The framework should make it easy to distinguish between GET and POST data.
+
+.. _cache-design-philosophy:
+
+Cache Framework
+===============
+
+The core goals of Django's :doc:`cache framework </topics/cache>` are:
+
+Less code
+---------
+
+A cache should be as fast as possible.  Hence, all framework code surrounding
+the cache backend should be kept to the absolute minimum, especially for
+``get()`` operations.
+
+Consistency
+-----------
+
+The cache API should provide a consistent interface across the different
+cache backends.
+
+Extensibility
+-------------
+
+The cache API should be extensible at the application level based on the
+developer's needs (for example, see :ref:`cache_key_transformation`).

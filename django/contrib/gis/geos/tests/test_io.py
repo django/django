@@ -2,12 +2,17 @@ from __future__ import unicode_literals
 
 import binascii
 import unittest
+from unittest import skipUnless
 
 from django.contrib.gis import memoryview
-from django.contrib.gis.geos import GEOSGeometry, WKTReader, WKTWriter, WKBReader, WKBWriter, geos_version_info
-from django.utils import six
+
+from ..import HAS_GEOS
+
+if HAS_GEOS:
+    from .. import GEOSGeometry, WKTReader, WKTWriter, WKBReader, WKBWriter, geos_version_info
 
 
+@skipUnless(HAS_GEOS, "Geos is required.")
 class GEOSIOTest(unittest.TestCase):
 
     def test01_wktreader(self):
@@ -109,11 +114,3 @@ class GEOSIOTest(unittest.TestCase):
             wkb_w.srid = True
             self.assertEqual(hex3d_srid, wkb_w.write_hex(g))
             self.assertEqual(wkb3d_srid, wkb_w.write(g))
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(GEOSIOTest))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())

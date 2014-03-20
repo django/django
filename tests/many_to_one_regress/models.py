@@ -10,20 +10,25 @@ from django.utils.encoding import python_2_unicode_compatible
 # created (the field names being lower-cased versions of their opposite
 # classes is important here).
 
+
 class First(models.Model):
     second = models.IntegerField()
 
+
 class Second(models.Model):
-    first = models.ForeignKey(First, related_name = 'the_first')
+    first = models.ForeignKey(First, related_name='the_first')
+
 
 # Protect against repetition of #1839, #2415 and #2536.
 class Third(models.Model):
     name = models.CharField(max_length=20)
     third = models.ForeignKey('self', null=True, related_name='child_set')
 
+
 class Parent(models.Model):
     name = models.CharField(max_length=20)
     bestchild = models.ForeignKey('Child', null=True, related_name='favored_by')
+
 
 class Child(models.Model):
     name = models.CharField(max_length=20)
@@ -38,8 +43,10 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
 class Record(models.Model):
     category = models.ForeignKey(Category)
+
 
 @python_2_unicode_compatible
 class Relation(models.Model):
@@ -49,8 +56,10 @@ class Relation(models.Model):
     def __str__(self):
         return "%s - %s" % (self.left.category.name, self.right.category.name)
 
+
 class Car(models.Model):
     make = models.CharField(max_length=100, null=True, unique=True)
+
 
 class Driver(models.Model):
     car = models.ForeignKey(Car, to_field='make', null=True, related_name='drivers')

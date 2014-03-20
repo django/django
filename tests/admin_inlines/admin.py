@@ -1,9 +1,15 @@
-from __future__ import absolute_import
-
 from django.contrib import admin
 from django import forms
 
-from .models import *
+from .models import (
+    Author, BinaryTree, CapoFamiglia, Chapter, ChildModel1, ChildModel2,
+    Consigliere, EditablePKBook, ExtraTerrestrial, Fashionista, Holder,
+    Holder2, Holder3, Holder4, Inner, Inner2, Inner3, Inner4Stacked,
+    Inner4Tabular, NonAutoPKBook, Novel, ParentModelWithCustomPk, Poll,
+    Profile, ProfileCollection, Question, ReadOnlyInline, ShoppingWeakness,
+    Sighting, SomeChildModel, SomeParentModel, SottoCapo, Title,
+    TitleCollection,
+)
 
 site = admin.AdminSite(name="admin")
 
@@ -12,14 +18,32 @@ class BookInline(admin.TabularInline):
     model = Author.books.through
 
 
+class NonAutoPKBookTabularInline(admin.TabularInline):
+    model = NonAutoPKBook
+
+
+class NonAutoPKBookStackedInline(admin.StackedInline):
+    model = NonAutoPKBook
+
+
+class EditablePKBookTabularInline(admin.TabularInline):
+    model = EditablePKBook
+
+
+class EditablePKBookStackedInline(admin.StackedInline):
+    model = EditablePKBook
+
+
 class AuthorAdmin(admin.ModelAdmin):
-    inlines = [BookInline]
+    inlines = [BookInline,
+        NonAutoPKBookTabularInline, NonAutoPKBookStackedInline,
+        EditablePKBookTabularInline, EditablePKBookStackedInline]
 
 
 class InnerInline(admin.StackedInline):
     model = Inner
     can_delete = False
-    readonly_fields = ('readonly',) # For bug #13174 tests.
+    readonly_fields = ('readonly',)  # For bug #13174 tests.
 
 
 class HolderAdmin(admin.ModelAdmin):
@@ -83,7 +107,7 @@ class InlineWeakness(admin.TabularInline):
 
 class QuestionInline(admin.TabularInline):
     model = Question
-    readonly_fields=['call_me']
+    readonly_fields = ['call_me']
 
     def call_me(self, obj):
         return 'Callable in QuestionInline'
@@ -98,7 +122,7 @@ class PollAdmin(admin.ModelAdmin):
 
 class ChapterInline(admin.TabularInline):
     model = Chapter
-    readonly_fields=['call_me']
+    readonly_fields = ['call_me']
 
     def call_me(self, obj):
         return 'Callable in ChapterInline'
@@ -129,9 +153,44 @@ class ChildModel1Inline(admin.TabularInline):
 class ChildModel2Inline(admin.StackedInline):
     model = ChildModel2
 
+
+# admin for #19425 and #18388
+class BinaryTreeAdmin(admin.TabularInline):
+    model = BinaryTree
+
+    def get_extra(self, request, obj=None, **kwargs):
+        extra = 2
+        if obj:
+            return extra - obj.binarytree_set.count()
+        return extra
+
+    def get_max_num(self, request, obj=None, **kwargs):
+        max_num = 3
+        if obj:
+            return max_num - obj.binarytree_set.count()
+        return max_num
+
+
 # admin for #19524
 class SightingInline(admin.TabularInline):
     model = Sighting
+
+
+# admin and form for #18263
+class SomeChildModelForm(forms.ModelForm):
+
+    class Meta:
+        fields = '__all__'
+        model = SomeChildModel
+        widgets = {
+            'position': forms.HiddenInput,
+        }
+
+
+class SomeChildModelInline(admin.TabularInline):
+    model = SomeChildModel
+    form = SomeChildModelForm
+
 
 site.register(TitleCollection, inlines=[TitleInline])
 # Test bug #12561 and #12778
@@ -150,4 +209,6 @@ site.register(Author, AuthorAdmin)
 site.register(CapoFamiglia, inlines=[ConsigliereInline, SottoCapoInline, ReadOnlyInlineInline])
 site.register(ProfileCollection, inlines=[ProfileInline])
 site.register(ParentModelWithCustomPk, inlines=[ChildModel1Inline, ChildModel2Inline])
+site.register(BinaryTree, inlines=[BinaryTreeAdmin])
 site.register(ExtraTerrestrial, inlines=[SightingInline])
+site.register(SomeParentModel, inlines=[SomeChildModelInline])

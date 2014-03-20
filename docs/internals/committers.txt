@@ -16,7 +16,7 @@ Journal-World`_ of Lawrence, Kansas, USA.
     He was lead developer at World Online for 2.5 years, during which time
     Django was developed and implemented on World Online's sites. He was the
     leader and founder of EveryBlock_, a "news feed for your block." He now
-    develops for Soundslice_.
+    develops Soundslice_.
 
     Adrian lives in Chicago, USA.
 
@@ -30,13 +30,10 @@ Journal-World`_ of Lawrence, Kansas, USA.
     Simon lives in Brighton, England.
 
 `Jacob Kaplan-Moss`_
-    Jacob is a partner at `Revolution Systems`_ which provides support services
-    around Django and related open source technologies. A good deal of Jacob's
-    work time is devoted to working on Django. Jacob previously worked at World
-    Online, where Django was invented, where he was the lead developer of
-    Ellington, a commercial Web publishing platform for media companies.
-
-    Jacob lives in Lawrence, Kansas, USA.
+    Jacob is Director of Platform Security at Heroku_. He worked at World
+    Online for four years, where he helped open source Django and found
+    the Django Software Foundation. Jacob lives on a hobby farm outside of
+    Lawrence where he spends his weekends playing with dirt and power tools.
 
 `Wilson Miner`_
     Wilson's design-fu is what makes Django look so nice. He designed the
@@ -55,22 +52,13 @@ Journal-World`_ of Lawrence, Kansas, USA.
 .. _jacob kaplan-moss: http://jacobian.org/
 .. _revolution systems: http://revsys.com/
 .. _wilson miner: http://wilsonminer.com/
+.. _heroku: http://heroku.com/
+.. _Rdio: http://rdio.com
 
 Current developers
 ==================
 
 Currently, Django is led by a team of volunteers from around the globe.
-
-.. _django-bdfls:
-
-BDFLs
------
-
-Adrian and Jacob are the Co-`Benevolent Dictators for Life`_ of Django. When
-"rough consensus and working code" fails, they're the ones who make the tough
-decisions.
-
-.. _Benevolent Dictators for Life: http://en.wikipedia.org/wiki/Benevolent_Dictator_For_Life
 
 Core developers
 ---------------
@@ -90,6 +78,23 @@ Malcolm Tredinnick
 
     *Malcolm passed away on March 17, 2013.*
 
+`Luke Plant`_
+    At University Luke studied physics and Materials Science and also
+    met `Michael Meeks`_ who introduced him to Linux and Open Source,
+    re-igniting an interest in programming.  Since then he has
+    contributed to a number of Open Source projects and worked
+    professionally as a developer.
+
+    Luke has contributed many excellent improvements to Django,
+    including database-level improvements, the CSRF middleware and
+    many unit tests.
+
+    Luke currently works for a church in Bradford, UK, and part-time
+    as a freelance developer.
+
+    .. _luke plant: http://lukeplant.me.uk/
+    .. _michael meeks: http://en.wikipedia.org/wiki/Michael_Meeks_(software)
+
 `Russell Keith-Magee`_
     Russell studied physics as an undergraduate, and studied neural networks for
     his PhD. His first job was with a startup in the defense industry developing
@@ -102,7 +107,43 @@ Malcolm Tredinnick
     Russell lives in the most isolated capital city in the world — Perth,
     Australia.
 
-.. _russell keith-magee: http://cecinestpasun.com/
+    .. _russell keith-magee: http://cecinestpasun.com/
+
+`James Bennett`_
+    James is Django's release manager, and also contributes to the
+    documentation and provide the occasional bugfix.
+
+    James came to Web development from philosophy when he discovered
+    that programmers get to argue just as much while collecting much
+    better pay. He lives in Lawrence, Kansas and previously worked at
+    World Online; currently, he's part of the Web development team at
+    Mozilla.
+
+    He `keeps a blog`_, and enjoys fine port and talking to his car.
+
+    .. _james bennett: http://b-list.org/
+    .. _keeps a blog: `james bennett`_
+
+`Gary Wilson`_
+    Gary starting contributing patches to Django in 2006 while developing Web
+    applications for `The University of Texas`_ (UT).  Since, he has made
+    contributions to the email and forms systems, as well as many other
+    improvements and code cleanups throughout the code base.
+
+    Gary is currently a developer and software engineering graduate student at
+    UT, where his dedication to spreading the ways of Python and Django never
+    ceases.
+
+    Gary lives in Austin, Texas, USA.
+
+    .. _Gary Wilson: http://thegarywilson.com/
+    .. _The University of Texas: http://www.utexas.edu/
+
+Matt Boersma
+    Matt is responsible for Django's Oracle support.
+
+Ian Kelly
+    Ian is also responsible for Django's support for Oracle.
 
 Joseph Kocherhans
     Joseph was the director of lead development at EveryBlock and previously
@@ -118,31 +159,14 @@ Joseph Kocherhans
 
     Joseph lives in Chicago, USA.
 
-.. _django software foundation: https://www.djangoproject.com/foundation/
-.. _charango: http://en.wikipedia.org/wiki/Charango
-
-`Luke Plant`_
-    At University Luke studied physics and Materials Science and also
-    met `Michael Meeks`_ who introduced him to Linux and Open Source,
-    re-igniting an interest in programming.  Since then he has
-    contributed to a number of Open Source projects and worked
-    professionally as a developer.
-
-    Luke has contributed many excellent improvements to Django,
-    including database-level improvements, the CSRF middleware and
-    many unit tests.
-
-    Luke currently works for a church in Bradford, UK, and part-time
-    as a freelance developer.
-
-.. _luke plant: http://lukeplant.me.uk/
-.. _michael meeks: http://en.wikipedia.org/wiki/Michael_Meeks_(software)
+    .. _django software foundation: https://www.djangoproject.com/foundation/
+    .. _charango: http://en.wikipedia.org/wiki/Charango
 
 `Brian Rosner`_
-    Brian is currently the tech lead at Eldarion_ managing and developing
+    Brian is the Chief Architect at Eldarion_ managing and developing
     Django / Pinax_ based Web sites. He enjoys learning more about programming
     languages and system architectures and contributing to open source
-    projects. Brian is the host of the `Django Dose`_ podcasts.
+    projects.
 
     Brian helped immensely in getting Django's "newforms-admin" branch finished
     in time for Django 1.0; he's now a full committer, continuing to improve on
@@ -150,25 +174,9 @@ Joseph Kocherhans
 
     Brian lives in Denver, Colorado, USA.
 
-.. _brian rosner: http://brosner.com/
-.. _eldarion: http://eldarion.com/
-.. _django dose: http://djangodose.com/
-.. _pinax: http://pinaxproject.com/
-
-`Gary Wilson`_
-    Gary starting contributing patches to Django in 2006 while developing Web
-    applications for `The University of Texas`_ (UT).  Since, he has made
-    contributions to the email and forms systems, as well as many other
-    improvements and code cleanups throughout the code base.
-
-    Gary is currently a developer and software engineering graduate student at
-    UT, where his dedication to spreading the ways of Python and Django never
-    ceases.
-
-    Gary lives in Austin, Texas, USA.
-
-.. _Gary Wilson: http://thegarywilson.com/
-.. _The University of Texas: http://www.utexas.edu/
+    .. _brian rosner: http://brosner.com/
+    .. _eldarion: http://eldarion.com/
+    .. _pinax: http://pinaxproject.com/
 
 Justin Bronn
     Justin Bronn is a computer scientist and attorney specializing
@@ -181,7 +189,7 @@ Justin Bronn
 
     Justin lives in San Francisco, CA.
 
-.. _GeoDjango: http://geodjango.org/
+    .. _GeoDjango: http://geodjango.org/
 
 Karen Tracey
     Karen has a background in distributed operating systems (graduate school),
@@ -200,15 +208,15 @@ Karen Tracey
 
     He has worked on Django's auth, admin and staticfiles apps as well as
     the form, core, internationalization and test systems. He currently works
-    as the lead engineer at Gidsy_.
+    at Mozilla_.
 
     Jannis lives in Berlin, Germany.
 
-.. _Jannis Leidel: http://jezdez.com/
-.. _Bauhaus-University Weimar: http://www.uni-weimar.de/
-.. _virtualenv: http://www.virtualenv.org/
-.. _pip: http://www.pip-installer.org/
-.. _Gidsy: http://gidsy.com/
+    .. _Jannis Leidel: https://jezdez.com/
+    .. _Bauhaus-University Weimar: http://www.uni-weimar.de/
+    .. _virtualenv: http://www.virtualenv.org/
+    .. _pip: http://www.pip-installer.org/
+    .. _Mozilla: http://www.mozilla.org/
 
 `James Tauber`_
     James is the lead developer of Pinax_ and the CEO and founder of
@@ -221,18 +229,27 @@ Karen Tracey
     Perth, Western Australia where he attended the same high school as
     Russell Keith-Magee.
 
-.. _James Tauber: http://jtauber.com/
+    .. _James Tauber: http://jtauber.com/
 
 `Alex Gaynor`_
-    Alex is a software engineer working at Rdio_. He found Django in 2007 and
+    Alex is a software engineer working at Rackspace_. He found Django in 2007 and
     has been addicted ever since he found out you don't need to write out your
     forms by hand. He has a small obsession with compilers.  He's contributed
     to the ORM, forms, admin, and other components of Django.
 
     Alex lives in San Francisco, CA, USA.
 
-.. _Alex Gaynor: http://alexgaynor.net
-.. _Rdio: http://rdio.com
+    .. _Alex Gaynor: http://alexgaynor.net
+    .. _Rackspace: http://www.rackspace.com
+
+`Simon Meers`_
+    Simon discovered Django 0.96 during his Computer Science PhD research and
+    has been developing with it full-time ever since. His core code
+    contributions are mostly in Django's admin application.
+
+    Simon works as a freelance developer based in Wollongong, Australia.
+
+    .. _Simon Meers: http://simonmeers.com/
 
 `Andrew Godwin`_
     Andrew is a freelance Python developer and tinkerer, and has been
@@ -243,7 +260,7 @@ Karen Tracey
 
     Andrew lives in London, UK.
 
-.. _Andrew Godwin: http://www.aeracode.org/
+    .. _Andrew Godwin: http://www.aeracode.org/
 
 `Carl Meyer`_
     Carl has been working with Django since 2007 (long enough to remember
@@ -253,8 +270,8 @@ Karen Tracey
 
     Carl lives in Rapid City, SD, USA.
 
-.. _Carl Meyer: http://www.oddbird.net/
-.. _OddBird: http://www.oddbird.net/
+    .. _Carl Meyer: http://www.oddbird.net/
+    .. _OddBird: http://www.oddbird.net/
 
 Ramiro Morales
     Ramiro has been reading Django source code and submitting patches since
@@ -267,6 +284,18 @@ Ramiro Morales
 
     Ramiro lives in Córdoba, Argentina.
 
+`Gabriel Hurley`_
+    Gabriel has been working with Django since 2008, shortly after the 1.0
+    release. Convinced by his business partner that Python and Django were the
+    right direction for the company, he couldn't have been more happy with the
+    decision. His contributions range across many areas in Django, but years of
+    copy-editing and an eye for detail lead him to be particularly at home
+    while working on Django's documentation.
+
+    Gabriel works as a web developer in Berkeley, CA, USA.
+
+    .. _gabriel hurley: http://strikeawe.com/
+
 `Chris Beaven`_
     Chris has been submitting patches and suggesting crazy ideas for Django
     since early 2006. An advocate for community involvement and a long-term
@@ -276,8 +305,8 @@ Ramiro Morales
     Chris lives in Napier, New Zealand (adding to the pool of Oceanic core
     developers). He works remotely as a developer for `Lincoln Loop`_.
 
-.. _Chris Beaven: http://smileychris.com/
-.. _Lincoln Loop: http://lincolnloop.com/
+    .. _Chris Beaven: http://smileychris.com/
+    .. _Lincoln Loop: http://lincolnloop.com/
 
 Honza Král
     Honza first discovered Django in 2006 and started using it right away,
@@ -290,7 +319,14 @@ Honza Král
     He is currently working for `Whiskey Media`_ in San Francisco developing
     awesome sites running on pure Django.
 
-.. _Whiskey Media: http://www.whiskeymedia.com/
+    .. _Whiskey Media: http://www.whiskeymedia.com/
+
+Tim Graham
+    When exploring Web frameworks for an independent study project in the fall
+    of 2008, Tim discovered Django and was lured to it by the documentation.
+    He enjoys contributing to the docs because they're awesome.
+
+    Tim works as a software engineer and lives in Philadelphia, PA, USA.
 
 `Idan Gazit`_
     As a self-professed design geek, Idan was initially attracted to Django
@@ -304,10 +340,10 @@ Honza Král
     now splits his days between his startup, Skills_, and beautifying all
     things Django and Python.
 
-.. _Idan Gazit: http://idan.gazit.me
-.. _photographer: http://flickr.com/photos/idangazit
-.. _Pixane: http://pixane.com
-.. _Skills: http://skillsapp.com
+    .. _Idan Gazit: http://idan.gazit.me
+    .. _photographer: http://flickr.com/photos/idangazit
+    .. _Pixane: http://pixane.com
+    .. _Skills: http://skillsapp.com
 
 `Paul McMillan`_
     Paul found Django in 2008 while looking for a more
@@ -320,9 +356,9 @@ Honza Král
     Paul works in Berkeley, California as a `web developer`_ and `security
     consultant`_.
 
-.. _Paul McMillan: http://subversivecode.com
-.. _web developer: http://zerocoordinate.com
-.. _security consultant: http://subversivecode.com/about
+    .. _Paul McMillan: http://subversivecode.com
+    .. _web developer: http://zerocoordinate.com
+    .. _security consultant: http://subversivecode.com/about
 
 `Julien Phalip`_
     Julien has a background in software engineering and human-computer
@@ -333,9 +369,9 @@ Honza Král
     the admin. Julien was a co-founder of the `Interaction Consortium`_. He
     now works at Odopod_, a digital agency based in San Francisco, CA, USA.
 
-.. _Julien Phalip: http://julienphalip.com
-.. _Interaction Consortium: http://interaction.net.au
-.. _Odopod: http://odopod.com
+    .. _Julien Phalip: http://julienphalip.com
+    .. _Interaction Consortium: http://interaction.net.au
+    .. _Odopod: http://odopod.com
 
 `Aymeric Augustin`_
     Aymeric is an engineer with a background in mathematics and computer
@@ -347,10 +383,10 @@ Honza Král
     a continuous integration server, and likes proving that Django is a good
     choice for enterprise software.
 
-    He works in a `management consulting company`_ in Paris, France.
+    He's the CTO of Oscaro_, an e-commerce company based in Paris, France.
 
-.. _Aymeric Augustin: http://myks.org/
-.. _management consulting company: http://www.polyconseil.fr/
+    .. _Aymeric Augustin: https://myks.org/
+    .. _Oscaro: http://www.oscaro.com/
 
 `Claude Paroz`_
     Claude is a former teacher who fell in love with free software at the
@@ -362,8 +398,8 @@ Honza Král
     He's also helping the GNOME Translation Project as maintainer of the
     Django-based `l10n.gnome.org`_.
 
-.. _Claude Paroz: http://www.2xlibre.net
-.. _l10n.gnome.org: http://l10n.gnome.org
+    .. _Claude Paroz: http://www.2xlibre.net
+    .. _l10n.gnome.org: https://l10n.gnome.org
 
 Anssi Kääriäinen
     Anssi works as a developer at Finnish National Institute for Health and
@@ -372,18 +408,18 @@ Anssi Kääriäinen
     Django as a great match for that use case.
 
     Anssi is interested in developing the object relational mapper (ORM) and
-    all related features. He's also a fan of benckmarking and he tries keep
+    all related features. He's also a fan of benchmarking and he tries keep
     Django as fast as possible.
 
 Florian Apolloner
     Florian is currently studying Physics at the `Graz University of Technology`_.
     Soon after he started using Django he joined the `Ubuntuusers webteam`_ to
-    work on *Inyoka*, the software powering the whole Ubuntusers site.
+    work on *Inyoka*, the software powering the whole Ubuntuusers site.
 
-    For the time beeing he lives in Graz, Austria (not Australia ;)).
+    For the time being he lives in Graz, Austria (not Australia ;)).
 
-.. _Graz University of Technology: http://tugraz.at/
-.. _Ubuntuusers webteam: http://wiki.ubuntuusers.de/ubuntuusers/Webteam
+    .. _Graz University of Technology: http://tugraz.at/
+    .. _Ubuntuusers webteam: http://wiki.ubuntuusers.de/ubuntuusers/Webteam
 
 Jeremy Dunck
     Jeremy was rescued from corporate IT drudgery by Free Software and, in part,
@@ -409,24 +445,25 @@ Jeremy Dunck
     Bryan works as a designer at GitHub by day, and masquerades as a `vlogger`_
     and `shoutcaster`_ in the after-hours. Bryan lives in Los Angeles, CA, USA.
 
-.. _bryan veloso: http://avalonstar.com/
-.. _vlogger: http://youtube.com/bryanveloso/
-.. _shoutcaster: http://twitch.tv/vlogalonstar/
+    .. _bryan veloso: http://avalonstar.com/
+    .. _vlogger: http://youtube.com/bryanveloso/
+    .. _shoutcaster: http://twitch.tv/vlogalonstar/
 
 `Preston Holmes`_
     Preston is a recovering neuroscientist who originally discovered Django as
     part of a sweeping move to Python from a grab bag of half a dozen
     languages. He was drawn to Django's balance of practical batteries included
     philosophy, care and thought in code design, and strong open source
-    community. In addition to his current job in private progressive education,
-    Preston contributes some developer time to local non-profits.
+    community. Currently working for Amazon Web Services, he is always looking
+    for opportunities to volunteer for community oriented education projects,
+    such as for kids and scientists (e.g. Software Carpentry).
 
     Preston lives with his family and animal menagerie in Santa Barbara, CA, USA.
 
-.. _Preston Holmes: http://www.ptone.com/
+    .. _Preston Holmes: http://www.ptone.com/
 
 `Simon Charette`_
-    Simon is a mathematic student who discovered Django while searching for a
+    Simon is a mathematics student who discovered Django while searching for a
     replacement framework to an in-house PHP entity. Since that faithful day
     Django has been a big part of his life. So far, he's been involved in some
     ORM and forms API fixes.
@@ -437,9 +474,21 @@ Jeremy Dunck
 
     Simon lives in Montréal, Québec, Canada.
 
-.. _Simon Charette: https://github.com/charettes
-.. _Ultimate Frisbee: http://www.montrealultimate.ca
-.. _Reptiletech: http://www.reptiletech.com
+    .. _Simon Charette: https://github.com/charettes
+    .. _Ultimate Frisbee: http://www.montrealultimate.ca
+    .. _Reptiletech: http://www.reptiletech.com
+
+Donald Stufft
+    Donald found Python and Django in 2007 while trying to find a language,
+    and web framework that he really enjoyed using after many years of PHP. He
+    fell in love with the beauty of Python and the way Django made tasks simple
+    and easy. His contributions to Django focus primarily on ensuring that it
+    is and remains a secure web framework.
+
+    Donald currently works at `Nebula Inc`_ as a Software Engineer for their
+    security team and lives in the Greater Philadelphia Area.
+
+    .. _Nebula Inc: https://www.nebula.com/
 
 `Daniel Lindsley`_
     Pythonista since 2003, Djangonaut since 2006. Daniel started with Django
@@ -452,61 +501,72 @@ Jeremy Dunck
 
     Daniel lives in Seattle, WA, USA.
 
-.. _`Daniel Lindsley`: http://toastdriven.com/
-.. _`Amazon Web Services`: https://aws.amazon.com/
+    .. _`Daniel Lindsley`: http://toastdriven.com/
+    .. _`Amazon Web Services`: https://aws.amazon.com/
 
-Specialists
------------
+Marc Tamlyn
+    Marc started life on the web using Django 1.2 back in 2010, and has never
+    looked back. He was involved with rewriting the class based view
+    documentation at DjangoCon EU 2012, and also helped to develop `CCBV`_, an
+    additional class based view reference tool.
 
-`James Bennett`_
-    James is Django's release manager, and also contributes to the
-    documentation and provide the occasional bugfix.
+    Marc is currently a full time parent, part time developer, and lives in
+    Oxford, UK.
 
-    James came to Web development from philosophy when he discovered
-    that programmers get to argue just as much while collecting much
-    better pay. He lives in Lawrence, Kansas and previously worked at
-    World Online; currently, he's part of the Web development team at
-    Mozilla.
+    .. _CCBV: http://ccbv.co.uk/
 
-    He `keeps a blog`_, and enjoys fine port and talking to his car.
+Shai Berger
+    Shai started working with Python back in 1998, and with Django just
+    before 1.0. He is a Free Software enthusiast, but life happens, and
+    he was driven by consulting gigs to contribute to the Oracle and 
+    SQL Server backends of South, and then the Oracle backend of Django
+    itself. Finally, he joined core to help maintain the Oracle backend.
 
-.. _james bennett: http://b-list.org/
-.. _keeps a blog: `james bennett`_
+    Shai works for `Platonix`_, a small consulting company he started
+    with a few friends in 1996, and lives near Tel Aviv, Israel.
 
-Ian Kelly
-    Ian is responsible for Django's support for Oracle.
+    .. _Platonix: http://tech.platonix.com
 
-Matt Boersma
-    Matt is also responsible for Django's Oracle support.
+Baptiste Mispelon
+    Baptiste discovered Django around the 1.2 version and promptly switched away
+    from his homegrown PHP framework. He started getting more involved in the
+    project after attending DjangoCon EU 2012, mostly by triaging tickets and
+    submitting small patches.
 
-`Simon Meers`_
-    Simon discovered Django 0.96 during his Computer Science PhD research and
-    has been developing with it full-time ever since. His core code
-    contributions are mostly in Django's admin application. He is also helping
-    to improve Django's documentation.
+    Baptiste currently lives in Budapest, Hungary and works for `M2BPO`_,
+    a small French company providing services to architects.
 
-    Simon works as a freelance developer based in Wollongong, Australia.
+    .. _M2BPO: http://www.m2bpo.fr
 
-.. _simon meers: http://simonmeers.com/
+`Daniele Procida`_
+    Daniele works at Cardiff University `School of Medicine`_. He unexpectedly
+    became a Django developer on 29th April 2009. Since then he has relied
+    daily on Django's documentation, which has been a constant companion to
+    him. More recently he has been able to contribute back to the project by
+    helping improve the documentation itself.
 
-`Gabriel Hurley`_
-    Gabriel has been working with Django since 2008, shortly after the 1.0
-    release. Convinced by his business partner that Python and Django were the
-    right direction for the company, he couldn't have been more happy with the
-    decision. His contributions range across many areas in Django, but years of
-    copy-editing and an eye for detail lead him to be particularly at home
-    while working on Django's documentation.
+    He is the author of `Arkestra`_ and `Don't be afraid to commit`_.
 
-    Gabriel works as a web developer in Berkeley, CA, USA.
+    .. _Daniele Procida: http://medicine.cf.ac.uk/person/mr-daniele-marco-procida/
+    .. _School of Medicine: http://medicine.cf.ac.uk/
+    .. _Arkestra: http://arkestra-project.org/
+    .. _Don\'t be afraid to commit: https://dont-be-afraid-to-commit.readthedocs.org
 
-.. _gabriel hurley: http://strikeawe.com/
+`Erik Romijn`_
+    Erik started using Django in the days of 1.2. His largest contribution to Django was
+    ``GenericIPAddressField``, and he has worked on all sorts of patches since.
+    While developing with Django, he always keeps a little list of even the slightest
+    Django frustrations, to tackle them at a later time and prevent other developers
+    from having to deal with the same issues.
 
-Tim Graham
-    When exploring Web frameworks for an independent study project in the fall
-    of 2008, Tim discovered Django and was lured to it by the documentation.
-    He enjoys contributing to the docs because they're awesome.
+    Erik is an independent app maker, mostly developing web and mobile apps, as
+    `Solid Links`_. He also enjoys helping ordinary developers to build safer web apps,
+    for which Django is already a great start, and developed `Erik's Pony Checkup`_ with
+    that goal in mind. Erik lives in Amsterdam, The Netherlands.
 
-    Tim works as a software engineer and lives in Philadelphia, PA, USA.
+    .. _Erik Romijn: http://erik.io/
+    .. _Solid Links: http://solidlinks.nl/
+    .. _Erik's Pony Checkup: http://ponycheckup.com/
 
 Developers Emeritus
 ===================

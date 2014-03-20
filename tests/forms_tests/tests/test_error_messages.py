@@ -1,8 +1,16 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
+
+import warnings
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import *
+from django.forms import (
+    BooleanField, CharField, ChoiceField, DateField, DateTimeField,
+    DecimalField, EmailField, FileField, FloatField, Form,
+    GenericIPAddressField, IntegerField, IPAddressField, ModelChoiceField,
+    ModelMultipleChoiceField, MultipleChoiceField, RegexField,
+    SplitDateTimeField, TimeField, URLField, utils, ValidationError,
+)
 from django.test import TestCase
 from django.utils.safestring import mark_safe
 from django.utils.encoding import python_2_unicode_compatible
@@ -15,6 +23,7 @@ class AssertFormErrorsMixin(object):
             self.fail("Testing the 'clean' method on %s failed to raise a ValidationError.")
         except ValidationError as e:
             self.assertEqual(e.messages, expected)
+
 
 class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
     def test_charfield(self):
@@ -192,7 +201,9 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'required': 'REQUIRED',
             'invalid': 'INVALID IP ADDRESS',
         }
-        f = IPAddressField(error_messages=e)
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            f = IPAddressField(error_messages=e)
         self.assertFormErrors(['REQUIRED'], f.clean, '')
         self.assertFormErrors(['INVALID IP ADDRESS'], f.clean, '127.0.0')
 
@@ -215,13 +226,14 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
                 raise ValidationError("I like to be awkward.")
 
         @python_2_unicode_compatible
-        class CustomErrorList(util.ErrorList):
+        class CustomErrorList(utils.ErrorList):
             def __str__(self):
                 return self.as_divs()
 
             def as_divs(self):
-                if not self: return ''
-                return mark_safe('<div class="error">%s</div>' % ''.join(['<p>%s</p>' % e for e in self]))
+                if not self:
+                    return ''
+                return mark_safe('<div class="error">%s</div>' % ''.join('<p>%s</p>' % e for e in self))
 
         # This form should print errors the default way.
         form1 = TestForm({'first_name': 'John'})
@@ -238,9 +250,9 @@ class ModelChoiceFieldErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
     def test_modelchoicefield(self):
         # Create choices for the model choice field tests below.
         from forms_tests.models import ChoiceModel
-        c1 = ChoiceModel.objects.create(pk=1, name='a')
-        c2 = ChoiceModel.objects.create(pk=2, name='b')
-        c3 = ChoiceModel.objects.create(pk=3, name='c')
+        ChoiceModel.objects.create(pk=1, name='a')
+        ChoiceModel.objects.create(pk=2, name='b')
+        ChoiceModel.objects.create(pk=3, name='c')
 
         # ModelChoiceField
         e = {

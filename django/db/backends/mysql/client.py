@@ -3,6 +3,7 @@ import sys
 
 from django.db.backends import BaseDatabaseClient
 
+
 class DatabaseClient(BaseDatabaseClient):
     executable_name = 'mysql'
 
@@ -37,4 +38,3 @@ class DatabaseClient(BaseDatabaseClient):
             sys.exit(os.system(" ".join(args)))
         else:
             os.execvp(self.executable_name, args)
-

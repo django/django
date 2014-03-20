@@ -1,11 +1,10 @@
-from __future__ import absolute_import
-import copy
+from __future__ import unicode_literals
 
-from django.conf import settings
+from django.apps import apps
 from django.db import models
-from django.db.models.loading import cache
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.template import Context, Template
+from django.test import TestCase, override_settings
+from django.utils.encoding import force_text
 
 from .models import (
     Child1,
@@ -18,6 +17,8 @@ from .models import (
     AbstractBase1,
     AbstractBase2,
     AbstractBase3,
+    RelatedModel,
+    RelationModel,
 )
 
 
@@ -52,24 +53,24 @@ class ManagersRegressionTests(TestCase):
         # Since Child6 inherits from Child4, the corresponding rows from f1 and
         # f2 also appear here. This is the expected result.
         self.assertQuerysetEqual(Child4._default_manager.order_by('data'), [
-                "<Child4: d1>",
-                "<Child4: d2>",
-                "<Child4: f1>",
-                "<Child4: f2>"
-            ]
+            "<Child4: d1>",
+            "<Child4: d2>",
+            "<Child4: f1>",
+            "<Child4: f2>"
+        ]
         )
         self.assertQuerysetEqual(Child4.manager1.all(), [
-                "<Child4: d1>",
-                "<Child4: f1>"
-            ],
+            "<Child4: d1>",
+            "<Child4: f1>"
+        ],
             ordered=False
         )
         self.assertQuerysetEqual(Child5._default_manager.all(), ["<Child5: fred>"])
         self.assertQuerysetEqual(Child6._default_manager.all(), ["<Child6: f1>"])
         self.assertQuerysetEqual(Child7._default_manager.order_by('name'), [
-                "<Child7: barney>",
-                "<Child7: fred>"
-            ]
+            "<Child7: barney>",
+            "<Child7: fred>"
+        ]
         )
 
     def test_abstract_manager(self):
@@ -105,16 +106,13 @@ class ManagersRegressionTests(TestCase):
         except AttributeError as e:
             self.assertEqual(str(e), "Manager isn't available; AbstractBase1 is abstract")
 
+    @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
     def test_swappable_manager(self):
+        # The models need to be removed after the test in order to prevent bad
+        # interactions with the flush operation in other tests.
+        _old_models = apps.app_configs['managers_regress'].models.copy()
+
         try:
-            # This test adds dummy models to the app cache. These
-            # need to be removed in order to prevent bad interactions
-            # with the flush operation in other tests.
-            old_app_models = copy.deepcopy(cache.app_models)
-            old_app_store = copy.deepcopy(cache.app_store)
-
-            settings.TEST_SWAPPABLE_MODEL = 'managers_regress.Parent'
-
             class SwappableModel(models.Model):
                 class Meta:
                     swappable = 'TEST_SWAPPABLE_MODEL'
@@ -128,20 +126,17 @@ class ManagersRegressionTests(TestCase):
                 self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
 
         finally:
-            del settings.TEST_SWAPPABLE_MODEL
-            cache.app_models = old_app_models
-            cache.app_store = old_app_store
+            apps.app_configs['managers_regress'].models = _old_models
+            apps.all_models['managers_regress'] = _old_models
+            apps.clear_cache()
 
+    @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
     def test_custom_swappable_manager(self):
+        # The models need to be removed after the test in order to prevent bad
+        # interactions with the flush operation in other tests.
+        _old_models = apps.app_configs['managers_regress'].models.copy()
+
         try:
-            # This test adds dummy models to the app cache. These
-            # need to be removed in order to prevent bad interactions
-            # with the flush operation in other tests.
-            old_app_models = copy.deepcopy(cache.app_models)
-            old_app_store = copy.deepcopy(cache.app_store)
-
-            settings.TEST_SWAPPABLE_MODEL = 'managers_regress.Parent'
-
             class SwappableModel(models.Model):
 
                 stuff = models.Manager()
@@ -159,20 +154,17 @@ class ManagersRegressionTests(TestCase):
                 self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
 
         finally:
-            del settings.TEST_SWAPPABLE_MODEL
-            cache.app_models = old_app_models
-            cache.app_store = old_app_store
+            apps.app_configs['managers_regress'].models = _old_models
+            apps.all_models['managers_regress'] = _old_models
+            apps.clear_cache()
 
+    @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
     def test_explicit_swappable_manager(self):
+        # The models need to be removed after the test in order to prevent bad
+        # interactions with the flush operation in other tests.
+        _old_models = apps.app_configs['managers_regress'].models.copy()
+
         try:
-            # This test adds dummy models to the app cache. These
-            # need to be removed in order to prevent bad interactions
-            # with the flush operation in other tests.
-            old_app_models = copy.deepcopy(cache.app_models)
-            old_app_store = copy.deepcopy(cache.app_store)
-
-            settings.TEST_SWAPPABLE_MODEL = 'managers_regress.Parent'
-
             class SwappableModel(models.Model):
 
                 objects = models.Manager()
@@ -190,6 +182,22 @@ class ManagersRegressionTests(TestCase):
                 self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
 
         finally:
-            del settings.TEST_SWAPPABLE_MODEL
-            cache.app_models = old_app_models
-            cache.app_store = old_app_store
+            apps.app_configs['managers_regress'].models = _old_models
+            apps.all_models['managers_regress'] = _old_models
+            apps.clear_cache()
+
+    def test_regress_3871(self):
+        related = RelatedModel.objects.create()
+
+        relation = RelationModel()
+        relation.fk = related
+        relation.gfk = related
+        relation.save()
+        relation.m2m.add(related)
+
+        t = Template('{{ related.test_fk.all.0 }}{{ related.test_gfk.all.0 }}{{ related.test_m2m.all.0 }}')
+
+        self.assertEqual(
+            t.render(Context({'related': related})),
+            ''.join([force_text(relation.pk)] * 3),
+        )

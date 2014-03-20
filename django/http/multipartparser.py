@@ -7,11 +7,12 @@ file upload handlers for processing.
 from __future__ import unicode_literals
 
 import base64
+import binascii
 import cgi
 import sys
 
 from django.conf import settings
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousMultipartForm
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
 from django.utils import six
@@ -20,8 +21,10 @@ from django.core.files.uploadhandler import StopUpload, SkipFile, StopFutureHand
 
 __all__ = ('MultiPartParser', 'MultiPartParserError', 'InputStreamExhausted')
 
+
 class MultiPartParserError(Exception):
     pass
+
 
 class InputStreamExhausted(Exception):
     """
@@ -32,6 +35,9 @@ class InputStreamExhausted(Exception):
 RAW = "raw"
 FILE = "file"
 FIELD = "field"
+
+_BASE64_DECODE_ERROR = TypeError if six.PY2 else binascii.Error
+
 
 class MultiPartParser(object):
     """
@@ -48,8 +54,8 @@ class MultiPartParser(object):
             The standard ``META`` dictionary in Django request objects.
         :input_data:
             The raw post data, as a file-like object.
-        :upload_handler:
-            An UploadHandler instance that performs operations on the uploaded
+        :upload_handlers:
+            A list of UploadHandler instances that perform operations on the uploaded
             data.
         :encoding:
             The encoding with which to treat the incoming data.
@@ -88,7 +94,7 @@ class MultiPartParser(object):
         # For compatibility with low-level network APIs (with 32-bit integers),
         # the chunk size should be < 2^31, but still divisible by 4.
         possible_sizes = [x.chunk_size for x in upload_handlers if x.chunk_size]
-        self._chunk_size = min([2**31-4] + possible_sizes)
+        self._chunk_size = min([2 ** 31 - 4] + possible_sizes)
 
         self._meta = META
         self._encoding = encoding or settings.DEFAULT_CHARSET
@@ -113,14 +119,15 @@ class MultiPartParser(object):
         if self._content_length == 0:
             return QueryDict('', encoding=self._encoding), MultiValueDict()
 
-        # See if the handler will want to take care of the parsing.
-        # This allows overriding everything if somebody wants it.
+        # See if any of the handlers take care of the parsing.
+        # This allows overriding everything if need be.
         for handler in handlers:
             result = handler.handle_raw_input(self._input_data,
                                               self._meta,
                                               self._content_length,
                                               self._boundary,
                                               encoding)
+            # Check to see if it was handled
             if result is not None:
                 return result[0], result[1]
 
@@ -160,8 +167,8 @@ class MultiPartParser(object):
                     if transfer_encoding == 'base64':
                         raw_data = field_stream.read()
                         try:
-                            data = str(raw_data).decode('base64')
-                        except:
+                            data = base64.b64decode(raw_data)
+                        except _BASE64_DECODE_ERROR:
                             data = raw_data
                     else:
                         data = field_stream.read()
@@ -176,11 +183,9 @@ class MultiPartParser(object):
                     file_name = force_text(file_name, encoding, errors='replace')
                     file_name = self.IE_sanitize(unescape_entities(file_name))
 
-                    content_type = meta_data.get('content-type', ('',))[0].strip()
-                    try:
-                        charset = meta_data.get('content-type', (0, {}))[1].get('charset', None)
-                    except:
-                        charset = None
+                    content_type, content_type_extra = meta_data.get('content-type', ('', {}))
+                    content_type = content_type.strip()
+                    charset = content_type_extra.get('charset')
 
                     try:
                         content_length = int(meta_data.get('content-length')[0])
@@ -193,7 +198,7 @@ class MultiPartParser(object):
                             try:
                                 handler.new_file(field_name, file_name,
                                                  content_type, content_length,
-                                                 charset)
+                                                 charset, content_type_extra)
                             except StopFutureHandlers:
                                 break
 
@@ -248,21 +253,21 @@ class MultiPartParser(object):
 
     def handle_file_complete(self, old_field_name, counters):
         """
-        Handle all the signalling that takes place when a file is complete.
+        Handle all the signaling that takes place when a file is complete.
         """
         for i, handler in enumerate(self._upload_handlers):
             file_obj = handler.file_complete(counters[i])
             if file_obj:
                 # If it returns a file object, then set the files dict.
-                self._files.appendlist(force_text(old_field_name,
-                                                     self._encoding,
-                                                     errors='replace'),
-                                       file_obj)
+                self._files.appendlist(
+                    force_text(old_field_name, self._encoding, errors='replace'),
+                    file_obj)
                 break
 
     def IE_sanitize(self, filename):
         """Cleanup filename from Internet Explorer full paths."""
-        return filename and filename[filename.rfind("\\")+1:].strip()
+        return filename and filename[filename.rfind("\\") + 1:].strip()
+
 
 class LazyStream(six.Iterator):
     """
@@ -292,7 +297,7 @@ class LazyStream(six.Iterator):
 
     def read(self, size=None):
         def parts():
-            remaining = (size is not None and [size] or [self._remaining])[0]
+            remaining = self._remaining if size is None else size
             # do the whole thing in one shot if no limit was provided.
             if remaining is None:
                 yield b''.join(self)
@@ -369,11 +374,12 @@ class LazyStream(six.Iterator):
                             if current_number == num_bytes])
 
         if number_equal > 40:
-            raise SuspiciousOperation(
+            raise SuspiciousMultipartForm(
                 "The multipart parser got stuck, which shouldn't happen with"
                 " normal uploaded files. Check for malicious upload activity;"
                 " if there is none, report this to the Django developers."
             )
+
 
 class ChunkIter(six.Iterator):
     """
@@ -398,6 +404,7 @@ class ChunkIter(six.Iterator):
     def __iter__(self):
         return self
 
+
 class InterBoundaryIter(six.Iterator):
     """
     A Producer that will iterate over boundaries.
@@ -414,6 +421,7 @@ class InterBoundaryIter(six.Iterator):
             return LazyStream(BoundaryIter(self._stream, self._boundary))
         except InputStreamExhausted:
             raise StopIteration()
+
 
 class BoundaryIter(six.Iterator):
     """
@@ -476,9 +484,9 @@ class BoundaryIter(six.Iterator):
             self._done = True
             return chunk[:end]
         else:
-            # make sure we dont treat a partial boundary (and
+            # make sure we don't treat a partial boundary (and
             # its separators) as data
-            if not chunk[:-rollback]:# and len(chunk) >= (len(self._boundary) + 6):
+            if not chunk[:-rollback]:  # and len(chunk) >= (len(self._boundary) + 6):
                 # There's nothing left, we should just return and mark as done.
                 self._done = True
                 return chunk
@@ -486,11 +494,11 @@ class BoundaryIter(six.Iterator):
                 stream.unget(chunk[-rollback:])
                 return chunk[:-rollback]
 
-    def _find_boundary(self, data, eof = False):
+    def _find_boundary(self, data, eof=False):
         """
         Finds a multipart boundary in data.
 
-        Should no boundry exist in the data None is returned instead. Otherwise
+        Should no boundary exist in the data None is returned instead. Otherwise
         a tuple containing the indices of the following are returned:
 
          * the end of current encapsulation
@@ -503,13 +511,14 @@ class BoundaryIter(six.Iterator):
             end = index
             next = index + len(self._boundary)
             # backup over CRLF
-            last = max(0, end-1)
-            if data[last:last+1] == b'\n':
+            last = max(0, end - 1)
+            if data[last:last + 1] == b'\n':
                 end -= 1
-            last = max(0, end-1)
-            if data[last:last+1] == b'\r':
+            last = max(0, end - 1)
+            if data[last:last + 1] == b'\r':
                 end -= 1
             return end, next
+
 
 def exhaust(stream_or_iterable):
     """
@@ -529,6 +538,7 @@ def exhaust(stream_or_iterable):
     for __ in iterator:
         pass
 
+
 def parse_boundary_stream(stream, max_header_size):
     """
     Parses one and exactly one stream that encapsulates a boundary.
@@ -547,7 +557,7 @@ def parse_boundary_stream(stream, max_header_size):
         main_value_pair, params = parse_header(line)
         try:
             name, value = main_value_pair.split(':', 1)
-        except:
+        except ValueError:
             raise ValueError("Invalid header: %r" % line)
         return name, (value, params)
 
@@ -572,7 +582,7 @@ def parse_boundary_stream(stream, max_header_size):
         # parameters") is from the Python docs.
         try:
             name, (value, params) = _parse_header(line)
-        except:
+        except ValueError:
             continue
 
         if name == 'content-disposition':
@@ -587,6 +597,7 @@ def parse_boundary_stream(stream, max_header_size):
 
     return (TYPE, outdict, stream)
 
+
 class Parser(object):
     def __init__(self, stream, boundary):
         self._stream = stream
@@ -597,6 +608,7 @@ class Parser(object):
         for sub_stream in boundarystream:
             # Iterate over each part
             yield parse_boundary_stream(sub_stream, 1024)
+
 
 def parse_header(line):
     """ Parse the header into a key-value.
@@ -610,12 +622,13 @@ def parse_header(line):
         i = p.find(b'=')
         if i >= 0:
             name = p[:i].strip().lower().decode('ascii')
-            value = p[i+1:].strip()
+            value = p[i + 1:].strip()
             if len(value) >= 2 and value[:1] == value[-1:] == b'"':
                 value = value[1:-1]
                 value = value.replace(b'\\\\', b'\\').replace(b'\\"', b'"')
             pdict[name] = value
     return key, pdict
+
 
 def _parse_header_params(s):
     plist = []

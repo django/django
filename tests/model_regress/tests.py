@@ -1,13 +1,15 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 from operator import attrgetter
+import sys
+import unittest
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
-from django.utils import tzinfo
-from django.db import router
+from django.utils.timezone import get_fixed_timezone
+from django.db import connection, router
 from django.db.models.sql import InsertQuery
 
 from .models import (Worker, Article, Party, Event, Department,
@@ -119,21 +121,26 @@ class ModelTests(TestCase):
 
         # Regression test for #18969
         self.assertQuerysetEqual(
-                Party.objects.filter(when__year=1), [
-                        datetime.date(1, 3, 3),
-                    ],
-                attrgetter("when")
+            Party.objects.filter(when__year=1), [
+                datetime.date(1, 3, 3),
+            ],
+            attrgetter("when")
         )
         self.assertQuerysetEqual(
-                Party.objects.filter(when__year='1'), [
-                        datetime.date(1, 3, 3),
-                    ],
-                attrgetter("when")
-       )
+            Party.objects.filter(when__year='1'), [
+                datetime.date(1, 3, 3),
+            ],
+            attrgetter("when")
+        )
+
+    if (3,) <= sys.version_info < (3, 3) and connection.vendor == 'mysql':
+        # In Python < 3.3, datetime.strftime raises an exception for years
+        # below 1000, and existing MySQL DB-API drivers hit this problem.
+        test_date_lookup = unittest.expectedFailure(test_date_lookup)
 
     def test_date_filter_null(self):
         # Date filtering was failing with NULL date values in SQLite
-        # (regression test for #3501, amongst other things).
+        # (regression test for #3501, among other things).
         Party.objects.create(when=datetime.datetime(1999, 1, 1))
         Party.objects.create()
         p = Party.objects.filter(when__month=1)[0]
@@ -182,8 +189,8 @@ class ModelTests(TestCase):
         # Regression test for #10443.
         # The idea is that all these creations and saving should work without
         # crashing. It's not rocket science.
-        dt1 = datetime.datetime(2008, 8, 31, 16, 20, tzinfo=tzinfo.FixedOffset(600))
-        dt2 = datetime.datetime(2008, 8, 31, 17, 20, tzinfo=tzinfo.FixedOffset(600))
+        dt1 = datetime.datetime(2008, 8, 31, 16, 20, tzinfo=get_fixed_timezone(600))
+        dt2 = datetime.datetime(2008, 8, 31, 17, 20, tzinfo=get_fixed_timezone(600))
         obj = Article.objects.create(
             headline="A headline", pub_date=dt1, article_text="foo"
         )
@@ -210,7 +217,7 @@ class ModelTests(TestCase):
 
 class ModelValidationTest(TestCase):
     def test_pk_validation(self):
-        one = NonAutoPK.objects.create(name="one")
+        NonAutoPK.objects.create(name="one")
         again = NonAutoPK(name="one")
         self.assertRaises(ValidationError, again.validate_unique)
 

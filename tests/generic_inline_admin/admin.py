@@ -1,7 +1,5 @@
-from __future__ import absolute_import
-
 from django.contrib import admin
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.admin import GenericTabularInline
 
 from .models import (Media, PhoneNumber, Episode, EpisodeExtra, Contact,
     Category, EpisodePermanent, EpisodeMaxNum)
@@ -9,7 +7,8 @@ from .models import (Media, PhoneNumber, Episode, EpisodeExtra, Contact,
 
 site = admin.AdminSite(name="admin")
 
-class MediaInline(generic.GenericTabularInline):
+
+class MediaInline(GenericTabularInline):
     model = Media
 
 
@@ -19,22 +18,22 @@ class EpisodeAdmin(admin.ModelAdmin):
     ]
 
 
-class MediaExtraInline(generic.GenericTabularInline):
+class MediaExtraInline(GenericTabularInline):
     model = Media
     extra = 0
 
 
-class MediaMaxNumInline(generic.GenericTabularInline):
+class MediaMaxNumInline(GenericTabularInline):
     model = Media
     extra = 5
     max_num = 2
 
 
-class PhoneNumberInline(generic.GenericTabularInline):
+class PhoneNumberInline(GenericTabularInline):
     model = PhoneNumber
 
 
-class MediaPermanentInline(generic.GenericTabularInline):
+class MediaPermanentInline(GenericTabularInline):
     model = Media
     can_delete = False
 

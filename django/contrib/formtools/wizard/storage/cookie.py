@@ -1,8 +1,8 @@
 import json
 
-from django.core.exceptions import SuspiciousOperation
 from django.core.signing import BadSignature
 
+from django.contrib.formtools.exceptions import WizardViewCookieModified
 from django.contrib.formtools.wizard import storage
 
 
@@ -21,7 +21,7 @@ class CookieStorage(storage.BaseStorage):
         except KeyError:
             data = None
         except BadSignature:
-            raise SuspiciousOperation('WizardView cookie manipulated')
+            raise WizardViewCookieModified('WizardView cookie manipulated')
         if data is None:
             return None
         return json.loads(data, cls=json.JSONDecoder)

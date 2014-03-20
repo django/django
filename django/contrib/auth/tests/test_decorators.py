@@ -1,7 +1,12 @@
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import models
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.tests.test_views import AuthViewsTestCase
 from django.contrib.auth.tests.utils import skipIfCustomUser
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
+from django.test import TestCase
+from django.test.client import RequestFactory
 
 
 @skipIfCustomUser
@@ -49,3 +54,54 @@ class LoginRequiredTestCase(AuthViewsTestCase):
         """
         self.testLoginRequired(view_url='/login_required_login_url/',
             login_url='/somewhere/')
+
+
+class PermissionsRequiredDecoratorTest(TestCase):
+    """
+    Tests for the permission_required decorator
+    """
+    def setUp(self):
+        self.user = models.User.objects.create(username='joe', password='qwerty')
+        self.factory = RequestFactory()
+        # Add permissions auth.add_customuser and auth.change_customuser
+        perms = models.Permission.objects.filter(codename__in=('add_customuser', 'change_customuser'))
+        self.user.user_permissions.add(*perms)
+
+    def test_many_permissions_pass(self):
+
+        @permission_required(['auth.add_customuser', 'auth.change_customuser'])
+        def a_view(request):
+            return HttpResponse()
+        request = self.factory.get('/rand')
+        request.user = self.user
+        resp = a_view(request)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_single_permission_pass(self):
+
+        @permission_required('auth.add_customuser')
+        def a_view(request):
+            return HttpResponse()
+        request = self.factory.get('/rand')
+        request.user = self.user
+        resp = a_view(request)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_permissioned_denied_redirect(self):
+
+        @permission_required(['auth.add_customuser', 'auth.change_customuser', 'non-existant-permission'])
+        def a_view(request):
+            return HttpResponse()
+        request = self.factory.get('/rand')
+        request.user = self.user
+        resp = a_view(request)
+        self.assertEqual(resp.status_code, 302)
+
+    def test_permissioned_denied_exception_raised(self):
+
+        @permission_required(['auth.add_customuser', 'auth.change_customuser', 'non-existant-permission'], raise_exception=True)
+        def a_view(request):
+            return HttpResponse()
+        request = self.factory.get('/rand')
+        request.user = self.user
+        self.assertRaises(PermissionDenied, a_view, request)

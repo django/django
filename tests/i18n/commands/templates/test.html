@@ -82,3 +82,16 @@ continued here.{% endcomment %}
 {% trans "Translatable literal with context wrapped in double quotes" context "Context wrapped in double quotes" as var %}
 {% blocktrans context 'Special blocktrans context wrapped in single quotes' %}Translatable literal with context wrapped in single quotes{% endblocktrans %}
 {% blocktrans context "Special blocktrans context wrapped in double quotes" %}Translatable literal with context wrapped in double quotes{% endblocktrans %}
+
+
+{# BasicExtractorTests.test_blocktrans_trimmed #}
+{% blocktrans %}
+  Text with a few
+  line breaks.
+{% endblocktrans %}
+{% blocktrans trimmed %}
+  Again some text with a few
+  line breaks, this time
+  should be trimmed.
+{% endblocktrans %}
+{% trans "I'm on line 97" %}

@@ -34,4 +34,3 @@ class RequestContextProcessorTests(TestCase):
         self.assertContains(response, url)
         response = self.client.post(url, {'path': '/blah/'})
         self.assertContains(response, url)
-

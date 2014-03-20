@@ -1,3 +1,5 @@
+.. _internals-security:
+
 ==========================
 Django's security policies
 ==========================
@@ -19,7 +21,7 @@ security@djangoproject.com**.
 
 Most normal bugs in Django are reported to `our public Trac
 instance`_, but due to the sensitive nature of security issues, we ask
-that they *not* be publicly reported in this fashion.
+that they **not** be publicly reported in this fashion.
 
 Instead, if you believe you've found something in Django which has
 security implications, please send a description of the issue via
@@ -28,14 +30,16 @@ reaches a subset of the core development team, who can forward
 security issues into the private committers' mailing list for broader
 discussion if needed.
 
-You can send encrypted email to this address; the public key ID for
-``security@djangoproject.com`` is ``0xfcb84b8d1d17f80b``, and this
-public key is available from most commonly-used keyservers.
-
 Once you've submitted an issue via email, you should receive an
 acknowledgment from a member of the Django development team within 48
 hours, and depending on the action to be taken, you may receive
 further followup emails.
+
+.. note::
+
+    If you want to send an encrypted email (*optional*), the public key ID for
+    ``security@djangoproject.com`` is ``0xfcb84b8d1d17f80b``, and this public
+    key is available from most commonly-used keyservers.
 
 .. _our public Trac instance: https://code.djangoproject.com/query
 
@@ -55,6 +59,9 @@ for several versions of Django:
   release of Django 1.5, support will be provided for Django 1.4 and
   Django 1.3. Upon the release of Django 1.5, Django 1.3's security
   support will end.
+
+* :ref:`Long-term support (LTS) releases <lts-releases>` will receive
+  security updates for a specified period.
 
 When new releases are issued for security reasons, the accompanying
 notice will include a list of affected versions. This list is
@@ -85,7 +92,7 @@ email message, signed with the Django release key, containing:
 * The patch(es), if any, that will be applied to Django.
 
 * The date on which the Django team will apply these patches, issue
-  new releases and publicy disclose the issue.
+  new releases and publicly disclose the issue.
 
 Simultaneously, the reporter of the issue will receive notification of
 the date on which we plan to take the issue public.
@@ -106,7 +113,10 @@ On the day of disclosure, we will take the following steps:
    relevant patches and new releases, and crediting the reporter of
    the issue (if the reporter wishes to be publicly identified).
 
-.. _the Python Package Index: http://pypi.python.org/pypi
+4. Post a notice to the |django-announce| mailing list that links to the blog
+   post.
+
+.. _the Python Package Index: https://pypi.python.org/pypi
 .. _the official Django development blog: https://www.djangoproject.com/weblog/
 
 If a reported issue is believed to be particularly time-sensitive --
@@ -119,6 +129,10 @@ us affects other frameworks or tools in the Python/web ecosystem, we
 may privately contact and discuss those issues with the appropriate
 maintainers, and coordinate our own disclosure and resolution with
 theirs.
+
+The Django team also maintains an :doc:`archive of security issues
+disclosed in Django</releases/security>`.
+
 
 .. _security-notifications:
 

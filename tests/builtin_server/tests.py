@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
 from io import BytesIO
+from unittest import TestCase
 
 from django.core.servers.basehttp import ServerHandler, MAX_SOCKET_CHUNK_SIZE
-from django.utils.unittest import TestCase
 
 
 class DummyHandler(object):

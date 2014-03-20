@@ -30,11 +30,11 @@ class Article(models.Model):
         database query for the sake of demonstration.
         """
         from django.db import connection
-        cursor = connection.cursor()
-        cursor.execute("""
-            SELECT id, headline, pub_date
-            FROM custom_methods_article
-            WHERE pub_date = %s
-                AND id != %s""", [connection.ops.value_to_db_date(self.pub_date),
-                                  self.id])
-        return [self.__class__(*row) for row in cursor.fetchall()]
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT id, headline, pub_date
+                FROM custom_methods_article
+                WHERE pub_date = %s
+                    AND id != %s""", [connection.ops.value_to_db_date(self.pub_date),
+                                      self.id])
+            return [self.__class__(*row) for row in cursor.fetchall()]

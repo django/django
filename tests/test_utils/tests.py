@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-import warnings
+from __future__ import unicode_literals
 
+import unittest
+
+from django.conf.urls import patterns, url
+from django.core.urlresolvers import reverse
 from django.db import connection
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.html import HTMLParseError, parse_html
-from django.test.simple import make_doctest
-from django.test.utils import CaptureQueriesContext
+from django.test.utils import (CaptureQueriesContext,
+    IgnoreAllDeprecationWarningsMixin, override_settings)
 from django.utils import six
-from django.utils import unittest
-from django.utils.unittest import skip
 
 from .models import Person
 
@@ -28,6 +29,29 @@ class SkippingTestCase(TestCase):
         self.assertRaises(ValueError, test_func)
 
 
+class SkippingClassTestCase(TestCase):
+    def test_skip_class_unless_db_feature(self):
+        @skipUnlessDBFeature("__class__")
+        class NotSkippedTests(unittest.TestCase):
+            def test_dummy(self):
+                return
+
+        @skipIfDBFeature("__class__")
+        class SkippedTests(unittest.TestCase):
+            def test_will_be_skipped(self):
+                self.fail("We should never arrive here.")
+
+        test_suite = unittest.TestSuite()
+        test_suite.addTest(NotSkippedTests('test_dummy'))
+        try:
+            test_suite.addTest(SkippedTests('test_will_be_skipped'))
+        except unittest.SkipTest:
+            self.fail("SkipTest should not be raised at this stage")
+        result = unittest.TextTestRunner(stream=six.StringIO()).run(test_suite)
+        self.assertEqual(result.testsRun, 2)
+        self.assertEqual(len(result.skipped), 1)
+
+
 class AssertNumQueriesTests(TestCase):
     urls = 'test_utils.urls'
 
@@ -35,9 +59,7 @@ class AssertNumQueriesTests(TestCase):
         def test_func():
             raise ValueError
 
-        self.assertRaises(ValueError,
-            self.assertNumQueries, 2, test_func
-        )
+        self.assertRaises(ValueError, self.assertNumQueries, 2, test_func)
 
     def test_assert_num_queries_with_client(self):
         person = Person.objects.create(name='test')
@@ -173,6 +195,7 @@ class AssertNumQueriesContextManagerTests(TestCase):
             with self.assertNumQueries(2):
                 Person.objects.count()
         self.assertIn("1 queries executed, 2 expected", str(exc_info.exception))
+        self.assertIn("Captured queries were", str(exc_info.exception))
 
         with self.assertRaises(TypeError):
             with self.assertNumQueries(4000):
@@ -193,6 +216,8 @@ class AssertNumQueriesContextManagerTests(TestCase):
 
 
 class AssertTemplateUsedContextManagerTests(TestCase):
+    urls = 'test_utils.urls'
+
     def test_usage(self):
         with self.assertTemplateUsed('template_used/base.html'):
             render_to_string('template_used/base.html')
@@ -249,6 +274,11 @@ class AssertTemplateUsedContextManagerTests(TestCase):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
 
+        with self.assertRaises(AssertionError) as cm:
+            response = self.client.get('/test_utils/no_template_used/')
+            self.assertTemplateUsed(response, 'template_used/base.html')
+        self.assertEqual(cm.exception.args[0], "No templates used to render the response")
+
     def test_failure(self):
         with self.assertRaises(TypeError):
             with self.assertTemplateUsed():
@@ -271,37 +301,6 @@ class AssertTemplateUsedContextManagerTests(TestCase):
                 render_to_string('template_used/alternative.html')
 
 
-class SaveRestoreWarningState(TestCase):
-    def test_save_restore_warnings_state(self):
-        """
-        Ensure save_warnings_state/restore_warnings_state work correctly.
-        """
-        # In reality this test could be satisfied by many broken implementations
-        # of save_warnings_state/restore_warnings_state (e.g. just
-        # warnings.resetwarnings()) , but it is difficult to test more.
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-
-            self.save_warnings_state()
-
-            class MyWarning(Warning):
-                pass
-
-            # Add a filter that causes an exception to be thrown, so we can catch it
-            warnings.simplefilter("error", MyWarning)
-            self.assertRaises(Warning, lambda: warnings.warn("warn", MyWarning))
-
-            # Now restore.
-            self.restore_warnings_state()
-            # After restoring, we shouldn't get an exception. But we don't want a
-            # warning printed either, so we have to silence the warning.
-            warnings.simplefilter("ignore", MyWarning)
-            warnings.warn("warn", MyWarning)
-
-            # Remove the filter we just added.
-            self.restore_warnings_state()
-
-
 class HTMLEqualTests(TestCase):
     def test_html_parser(self):
         element = parse_html('<div><p>Hello</p></div>')
@@ -317,7 +316,7 @@ class HTMLEqualTests(TestCase):
         self.assertEqual(dom[0], 'foo')
 
     def test_parse_html_in_script(self):
-        parse_html('<script>var a = "<p" + ">";</script>');
+        parse_html('<script>var a = "<p" + ">";</script>')
         parse_html('''
             <script>
             var js_sha_link='<p>***</p>';
@@ -332,7 +331,7 @@ class HTMLEqualTests(TestCase):
         self.assertEqual(dom.children[0], "<p>foo</p> '</scr'+'ipt>' <span>bar</span>")
 
     def test_self_closing_tags(self):
-        self_closing_tags = ('br' , 'hr', 'input', 'img', 'meta', 'spacer',
+        self_closing_tags = ('br', 'hr', 'input', 'img', 'meta', 'spacer',
             'link', 'frame', 'base', 'col')
         for tag in self_closing_tags:
             dom = parse_html('<p>Hello <%s> world</p>' % tag)
@@ -407,13 +406,13 @@ class HTMLEqualTests(TestCase):
 
     def test_complex_examples(self):
         self.assertHTMLEqual(
-        """<tr><th><label for="id_first_name">First name:</label></th>
+            """<tr><th><label for="id_first_name">First name:</label></th>
 <td><input type="text" name="first_name" value="John" id="id_first_name" /></td></tr>
 <tr><th><label for="id_last_name">Last name:</label></th>
 <td><input type="text" id="id_last_name" name="last_name" value="Lennon" /></td></tr>
 <tr><th><label for="id_birthday">Birthday:</label></th>
 <td><input type="text" value="1940-10-9" name="birthday" id="id_birthday" /></td></tr>""",
-        """
+            """
         <tr><th>
             <label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" value="John" id="id_first_name" />
         </td></tr>
@@ -426,7 +425,7 @@ class HTMLEqualTests(TestCase):
         """)
 
         self.assertHTMLEqual(
-        """<!DOCTYPE html>
+            """<!DOCTYPE html>
         <html>
         <head>
             <link rel="stylesheet">
@@ -593,7 +592,7 @@ class SkippingExtraTests(TestCase):
         with self.assertNumQueries(0):
             super(SkippingExtraTests, self).__call__(result)
 
-    @skip("Fixture loading should not be performed for skipped tests.")
+    @unittest.skip("Fixture loading should not be performed for skipped tests.")
     def test_fixtures_are_skipped(self):
         pass
 
@@ -624,9 +623,39 @@ class AssertFieldOutputTests(SimpleTestCase):
         self.assertFieldOutput(MyCustomField, {}, {}, empty_value=None)
 
 
-class DoctestNormalizerTest(SimpleTestCase):
+class DoctestNormalizerTest(IgnoreAllDeprecationWarningsMixin, SimpleTestCase):
 
     def test_normalizer(self):
+        from django.test.simple import make_doctest
         suite = make_doctest("test_utils.doctest_output")
         failures = unittest.TextTestRunner(stream=six.StringIO()).run(suite)
         self.assertEqual(failures.failures, [])
+
+
+# for OverrideSettingsTests
+def fake_view(request):
+    pass
+
+
+class FirstUrls:
+    urlpatterns = patterns('', url(r'first/$', fake_view, name='first'))
+
+
+class SecondUrls:
+    urlpatterns = patterns('', url(r'second/$', fake_view, name='second'))
+
+
+class OverrideSettingsTests(TestCase):
+    """
+    #21518 -- If neither override_settings nor a settings_changed receiver
+    clears the URL cache between tests, then one of these two test methods will
+    fail.
+    """
+
+    @override_settings(ROOT_URLCONF=FirstUrls)
+    def test_first(self):
+        reverse('first')
+
+    @override_settings(ROOT_URLCONF=SecondUrls)
+    def test_second(self):
+        reverse('second')

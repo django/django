@@ -1,8 +1,8 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from .models import A, B, C, D, DataPoint, RelatedPoint
+from .models import A, B, D, DataPoint, RelatedPoint
 
 
 class SimpleTest(TestCase):
@@ -50,6 +50,15 @@ class SimpleTest(TestCase):
         self.assertEqual(num_updated, 0)
         cnt = D.objects.filter(y=100).count()
         self.assertEqual(cnt, 0)
+
+    def test_foreign_key_update_with_id(self):
+        """
+        Test that update works using <field>_id for foreign keys
+        """
+        num_updated = self.a1.d_set.update(a_id=self.a2)
+        self.assertEqual(num_updated, 20)
+        self.assertEqual(self.a2.d_set.count(), 20)
+
 
 class AdvancedTests(TestCase):
 
@@ -115,4 +124,4 @@ class AdvancedTests(TestCase):
         """
         method = DataPoint.objects.all()[:2].update
         self.assertRaises(AssertionError, method,
-            another_value='another thing')
+                          another_value='another thing')

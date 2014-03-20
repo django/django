@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import re
 
 from django import forms
@@ -5,8 +6,8 @@ from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.forms import formsets, ValidationError
 from django.views.generic import TemplateView
-from django.utils.datastructures import SortedDict
 from django.utils.decorators import classonlymethod
+from django.utils.translation import ugettext as _
 from django.utils import six
 
 from django.contrib.formtools.wizard.storage import get_storage
@@ -16,7 +17,7 @@ from django.contrib.formtools.wizard.forms import ManagementForm
 
 def normalize_name(name):
     """
-    Converts camel-case style names into underscore seperated words. Example::
+    Converts camel-case style names into underscore separated words. Example::
 
         >>> normalize_name('oneTwoThree')
         'one_two_three'
@@ -26,6 +27,7 @@ def normalize_name(name):
     """
     new = re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', '_\\1', name)
     return new.lower().strip('_')
+
 
 class StepsHelper(object):
 
@@ -121,7 +123,7 @@ class WizardView(TemplateView):
 
     @classmethod
     def get_initkwargs(cls, form_list=None, initial_dict=None,
-        instance_dict=None, condition_dict=None, *args, **kwargs):
+            instance_dict=None, condition_dict=None, *args, **kwargs):
         """
         Creates a dict with all needed parameters for the form wizard instances.
 
@@ -157,7 +159,7 @@ class WizardView(TemplateView):
         form_list = form_list or kwargs.pop('form_list',
             getattr(cls, 'form_list', None)) or []
 
-        computed_form_list = SortedDict()
+        computed_form_list = OrderedDict()
 
         assert len(form_list) > 0, 'at least one form is needed'
 
@@ -183,8 +185,8 @@ class WizardView(TemplateView):
                 if (isinstance(field, forms.FileField) and
                         not hasattr(cls, 'file_storage')):
                     raise NoFileStorageConfigured(
-                            "You need to define 'file_storage' in your "
-                            "wizard view in order to handle file uploads.")
+                        "You need to define 'file_storage' in your "
+                        "wizard view in order to handle file uploads.")
 
         # build the kwargs for the wizardview instances
         kwargs['form_list'] = computed_form_list
@@ -205,7 +207,7 @@ class WizardView(TemplateView):
         The form_list is always generated on the fly because condition methods
         could use data from other (maybe previous forms).
         """
-        form_list = SortedDict()
+        form_list = OrderedDict()
         for form_key, form_class in six.iteritems(self.form_list):
             # try to fetch the value from condition list, by default, the form
             # gets passed to the new list.
@@ -271,7 +273,9 @@ class WizardView(TemplateView):
         management_form = ManagementForm(self.request.POST, prefix=self.prefix)
         if not management_form.is_valid():
             raise ValidationError(
-                'ManagementForm data is missing or has been tampered.')
+                _('ManagementForm data is missing or has been tampered.'),
+                code='missing_management_form',
+            )
 
         form_current_step = management_form.cleaned_data['current_step']
         if (form_current_step != self.steps.current and
@@ -327,11 +331,11 @@ class WizardView(TemplateView):
     def render_done(self, form, **kwargs):
         """
         This method gets called when all forms passed. The method should also
-        re-validate all steps to prevent manipulation. If any form don't
+        re-validate all steps to prevent manipulation. If any form fails to
         validate, `render_revalidation_failure` should get called.
         If everything is fine call `done`.
         """
-        final_form_list = []
+        final_forms = OrderedDict()
         # walk through the form list and try to validate the data again.
         for form_key in self.get_form_list():
             form_obj = self.get_form(step=form_key,
@@ -339,12 +343,12 @@ class WizardView(TemplateView):
                 files=self.storage.get_step_files(form_key))
             if not form_obj.is_valid():
                 return self.render_revalidation_failure(form_key, form_obj, **kwargs)
-            final_form_list.append(form_obj)
+            final_forms[form_key] = form_obj
 
         # render the done view and reset the wizard before returning the
         # response. This is needed to prevent from rendering done with the
         # same data twice.
-        done_response = self.done(final_form_list, **kwargs)
+        done_response = self.done(final_forms.values(), form_dict=final_forms, **kwargs)
         self.storage.reset()
         return done_response
 
@@ -364,7 +368,7 @@ class WizardView(TemplateView):
     def get_form_initial(self, step):
         """
         Returns a dictionary which will be passed to the form for `step`
-        as `initial`. If no initial data was provied while initializing the
+        as `initial`. If no initial data was provided while initializing the
         form wizard, a empty dictionary will be returned.
         """
         return self.initial_dict.get(step, {})
@@ -372,7 +376,7 @@ class WizardView(TemplateView):
     def get_form_instance(self, step):
         """
         Returns a object which will be passed to the form for `step`
-        as `instance`. If no instance object was provied while initializing
+        as `instance`. If no instance object was provided while initializing
         the form wizard, None will be returned.
         """
         return self.instance_dict.get(step, None)
@@ -395,23 +399,24 @@ class WizardView(TemplateView):
         """
         if step is None:
             step = self.steps.current
+        form_class = self.form_list[step]
         # prepare the kwargs for the form instance.
         kwargs = self.get_form_kwargs(step)
         kwargs.update({
             'data': data,
             'files': files,
-            'prefix': self.get_form_prefix(step, self.form_list[step]),
+            'prefix': self.get_form_prefix(step, form_class),
             'initial': self.get_form_initial(step),
         })
-        if issubclass(self.form_list[step], forms.ModelForm):
-            # If the form is based on ModelForm, add instance if available
-            # and not previously set.
+        if issubclass(form_class, (forms.ModelForm, forms.models.BaseInlineFormSet)):
+            # If the form is based on ModelForm or InlineFormSet,
+            # add instance if available and not previously set.
             kwargs.setdefault('instance', self.get_form_instance(step))
-        elif issubclass(self.form_list[step], forms.models.BaseModelFormSet):
+        elif issubclass(form_class, forms.models.BaseModelFormSet):
             # If the form is based on ModelFormSet, add queryset if available
             # and not previous set.
             kwargs.setdefault('queryset', self.get_form_instance(step))
-        return self.form_list[step](**kwargs)
+        return form_class(**kwargs)
 
     def process_step(self, form):
         """
@@ -495,9 +500,10 @@ class WizardView(TemplateView):
         if step is None:
             step = self.steps.current
         form_list = self.get_form_list()
-        key = form_list.keyOrder.index(step) + 1
-        if len(form_list.keyOrder) > key:
-            return form_list.keyOrder[key]
+        keys = list(form_list.keys())
+        key = keys.index(step) + 1
+        if len(keys) > key:
+            return keys[key]
         return None
 
     def get_prev_step(self, step=None):
@@ -509,9 +515,10 @@ class WizardView(TemplateView):
         if step is None:
             step = self.steps.current
         form_list = self.get_form_list()
-        key = form_list.keyOrder.index(step) - 1
+        keys = list(form_list.keys())
+        key = keys.index(step) - 1
         if key >= 0:
-            return form_list.keyOrder[key]
+            return keys[key]
         return None
 
     def get_step_index(self, step=None):
@@ -521,7 +528,7 @@ class WizardView(TemplateView):
         """
         if step is None:
             step = self.steps.current
-        return self.get_form_list().keyOrder.index(step)
+        return list(self.get_form_list().keys()).index(step)
 
     def get_context_data(self, form, **kwargs):
         """

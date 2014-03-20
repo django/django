@@ -1,6 +1,8 @@
 from unittest import TestCase
+
 from django.utils.baseconv import base2, base16, base36, base56, base62, base64, BaseConverter
 from django.utils.six.moves import xrange
+
 
 class TestBaseConv(TestCase):
 
@@ -39,4 +41,4 @@ class TestBaseConv(TestCase):
 
     def test_exception(self):
         self.assertRaises(ValueError, BaseConverter, 'abc', sign='a')
-        self.assertTrue(isinstance(BaseConverter('abc', sign='d'), BaseConverter))
+        self.assertIsInstance(BaseConverter('abc', sign='d'), BaseConverter)

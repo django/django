@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.core.exceptions import FieldError
 from django.test import TestCase
@@ -42,7 +42,8 @@ class CustomColumnsTests(TestCase):
         )
 
     def test_field_error(self):
-        self.assertRaises(FieldError,
+        self.assertRaises(
+            FieldError,
             lambda: Author.objects.filter(firstname__exact="John")
         )
 

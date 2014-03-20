@@ -7,6 +7,7 @@ from django.template.base import TemplateDoesNotExist
 from django.template.loader import BaseLoader
 from django.utils._os import safe_join
 
+
 class Loader(BaseLoader):
     is_usable = True
 

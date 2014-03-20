@@ -17,6 +17,7 @@ class DataPoint(models.Model):
     def __str__(self):
         return six.text_type(self.name)
 
+
 @python_2_unicode_compatible
 class RelatedPoint(models.Model):
     name = models.CharField(max_length=20)
@@ -29,12 +30,15 @@ class RelatedPoint(models.Model):
 class A(models.Model):
     x = models.IntegerField(default=10)
 
+
 class B(models.Model):
     a = models.ForeignKey(A)
     y = models.IntegerField(default=10)
 
+
 class C(models.Model):
     y = models.IntegerField(default=10)
+
 
 class D(C):
     a = models.ForeignKey(A)

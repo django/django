@@ -12,7 +12,7 @@ OpenLayers.Projection.addTransform("EPSG:4326", "EPSG:3857", OpenLayers.Layer.Sp
 {{ module }}.is_point = {{ is_point|yesno:"true,false" }};
 {% endblock %}
 {{ module }}.get_ewkt = function(feat){
-  return 'SRID={{ srid }};' + {{ module }}.wkt_f.write(feat);
+  return 'SRID={{ srid|unlocalize }};' + {{ module }}.wkt_f.write(feat);
 };
 {{ module }}.read_wkt = function(wkt){
   // OpenLayers cannot handle EWKT -- we make sure to strip it out.

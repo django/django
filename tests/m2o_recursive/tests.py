@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.test import TestCase
 
@@ -20,6 +20,7 @@ class ManyToOneRecursiveTests(TestCase):
         self.assertEqual(self.r.parent, None)
         self.assertQuerysetEqual(self.c.child_set.all(), [])
         self.assertEqual(self.c.parent.id, self.r.id)
+
 
 class MultipleManyToOneRecursiveTests(TestCase):
 

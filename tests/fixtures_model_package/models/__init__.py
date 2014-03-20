@@ -14,6 +14,7 @@ class Article(models.Model):
         app_label = 'fixtures_model_package'
         ordering = ('-pub_date', 'headline')
 
+
 class Book(models.Model):
     name = models.CharField(max_length=100)
 

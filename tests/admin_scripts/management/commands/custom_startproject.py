@@ -8,4 +8,4 @@ class Command(BaseCommand):
         make_option('--extra',
                     action='store', dest='extra',
                     help='An arbitrary extra value passed to the context'),
-        )
+    )

@@ -1,8 +1,3 @@
-"""
-
-"""
-from __future__ import absolute_import
-
 from django.contrib import admin
 
 from . import models
@@ -11,9 +6,11 @@ from . import models
 class WidgetAdmin(admin.AdminSite):
     pass
 
+
 class CarAdmin(admin.ModelAdmin):
     list_display = ['make', 'model', 'owner']
     list_editable = ['owner']
+
 
 class CarTireAdmin(admin.ModelAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -22,8 +19,9 @@ class CarTireAdmin(admin.ModelAdmin):
             return db_field.formfield(**kwargs)
         return super(CarTireAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
+
 class EventAdmin(admin.ModelAdmin):
-    raw_id_fields = ['band']
+    raw_id_fields = ['main_band', 'supporting_bands']
 
 
 class SchoolAdmin(admin.ModelAdmin):
@@ -48,3 +46,5 @@ site.register(models.Bee)
 site.register(models.Advisor)
 
 site.register(models.School, SchoolAdmin)
+
+site.register(models.Profile)

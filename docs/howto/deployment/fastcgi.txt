@@ -2,6 +2,9 @@
 How to use Django with FastCGI, SCGI, or AJP
 ============================================
 
+.. deprecated:: 1.7
+    FastCGI support is deprecated and will be removed in Django 1.9.
+
 .. highlight:: bash
 
 Although :doc:`WSGI</howto/deployment/wsgi/index>` is the preferred deployment

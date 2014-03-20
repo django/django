@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.core.exceptions import FieldError
 from django.test import TestCase
@@ -9,6 +9,7 @@ from .models import Author, Article
 def pks(objects):
     """ Return pks to be able to compare lists"""
     return [o.pk for o in objects]
+
 
 class CustomColumnRegression(TestCase):
 

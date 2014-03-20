@@ -1,6 +1,5 @@
-from __future__ import absolute_import
-
 from django import http
+from django.apps import apps
 from django.conf import settings
 from django.contrib import comments
 from django.contrib.comments import signals
@@ -50,12 +49,12 @@ def post_comment(request, next=None, using=None):
     if ctype is None or object_pk is None:
         return CommentPostBadRequest("Missing content_type or object_pk field.")
     try:
-        model = models.get_model(*ctype.split(".", 1))
+        model = apps.get_model(ctype)
         target = model._default_manager.using(using).get(pk=object_pk)
     except TypeError:
         return CommentPostBadRequest(
             "Invalid content_type value: %r" % escape(ctype))
-    except AttributeError:
+    except LookupError:
         return CommentPostBadRequest(
             "The given content-type %r does not resolve to a valid model." % \
                 escape(ctype))

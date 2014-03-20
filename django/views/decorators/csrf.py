@@ -1,5 +1,3 @@
-import warnings
-
 from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.utils.decorators import decorator_from_middleware, available_attrs
 from functools import wraps
@@ -15,7 +13,7 @@ using the decorator multiple times, is harmless and efficient.
 
 class _EnsureCsrfToken(CsrfViewMiddleware):
     # We need this to behave just like the CsrfViewMiddleware, but not reject
-    # requests.
+    # requests or log warnings.
     def _reject(self, request, reason):
         return None
 

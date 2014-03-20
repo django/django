@@ -3,37 +3,35 @@
 from __future__ import unicode_literals
 
 import re
-import string
-try:
-    from urllib.parse import quote, urlsplit, urlunsplit
-except ImportError:     # Python 2
-    from urllib import quote
-    from urlparse import urlsplit, urlunsplit
+import warnings
 
-from django.utils.safestring import SafeData, mark_safe
-from django.utils.encoding import force_bytes, force_text
+from django.utils.deprecation import RemovedInDjango18Warning
+from django.utils.encoding import force_text, force_str
 from django.utils.functional import allow_lazy
+from django.utils.safestring import SafeData, mark_safe
 from django.utils import six
+from django.utils.six.moves.urllib.parse import quote, unquote, urlsplit, urlunsplit
 from django.utils.text import normalize_newlines
 
+from .html_parser import HTMLParser, HTMLParseError
+
+
 # Configuration for urlize() function.
-TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)']
-WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;')]
+TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)', '"', '\'']
+WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;'), ('"', '"'), ('\'', '\'')]
 
 # List of possible strings used for bullets in bulleted lists.
 DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
 
 unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
-unquoted_percents_re = re.compile(r'%(?![0-9A-Fa-f]{2})')
 word_split_re = re.compile(r'(\s+)')
 simple_url_re = re.compile(r'^https?://\[?\w', re.IGNORECASE)
 simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)$', re.IGNORECASE)
 simple_email_re = re.compile(r'^\S+@\S+\.\S+$')
 link_target_attribute_re = re.compile(r'(<a [^>]*?)target=[^\s>]+')
 html_gunk_re = re.compile(r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
-hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join([re.escape(x) for x in DOTS]), re.DOTALL)
+hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join(re.escape(x) for x in DOTS), re.DOTALL)
 trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
-strip_tags_re = re.compile(r'</?\S([^=>]*=(\s*"[^"]*"|\s*\'[^\']*\'|\S*)|[^>])*?>', re.IGNORECASE)
 
 
 def escape(text):
@@ -60,19 +58,22 @@ _js_escapes = {
 # Escape every ASCII character with a value less than 32.
 _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 
+
 def escapejs(value):
     """Hex encodes characters for use in JavaScript strings."""
     return mark_safe(force_text(value).translate(_js_escapes))
 escapejs = allow_lazy(escapejs, six.text_type)
 
+
 def conditional_escape(text):
     """
     Similar to escape(), except that it doesn't operate on pre-escaped strings.
     """
-    if isinstance(text, SafeData):
-        return text
+    if hasattr(text, '__html__'):
+        return text.__html__()
     else:
         return escape(text)
+
 
 def format_html(format_string, *args, **kwargs):
     """
@@ -81,9 +82,9 @@ def format_html(format_string, *args, **kwargs):
     of str.format or % interpolation to build up small HTML fragments.
     """
     args_safe = map(conditional_escape, args)
-    kwargs_safe = dict([(k, conditional_escape(v)) for (k, v) in
-                        six.iteritems(kwargs)])
+    kwargs_safe = dict((k, conditional_escape(v)) for (k, v) in six.iteritems(kwargs))
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
+
 
 def format_html_join(sep, format_string, args_generator):
     """
@@ -101,8 +102,8 @@ def format_html_join(sep, format_string, args_generator):
 
     """
     return mark_safe(conditional_escape(sep).join(
-            format_html(format_string, *tuple(args))
-            for args in args_generator))
+        format_html(format_string, *tuple(args))
+        for args in args_generator))
 
 
 def linebreaks(value, autoescape=False):
@@ -116,10 +117,38 @@ def linebreaks(value, autoescape=False):
     return '\n\n'.join(paras)
 linebreaks = allow_lazy(linebreaks, six.text_type)
 
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.reset()
+        self.fed = []
+
+    def handle_data(self, d):
+        self.fed.append(d)
+
+    def handle_entityref(self, name):
+        self.fed.append('&%s;' % name)
+
+    def handle_charref(self, name):
+        self.fed.append('&#%s;' % name)
+
+    def get_data(self):
+        return ''.join(self.fed)
+
+
 def strip_tags(value):
     """Returns the given HTML with all tags stripped."""
-    return strip_tags_re.sub('', force_text(value))
+    s = MLStripper()
+    try:
+        s.feed(value)
+        s.close()
+    except HTMLParseError:
+        return value
+    else:
+        return s.get_data()
 strip_tags = allow_lazy(strip_tags)
+
 
 def remove_tags(html, tags):
     """Returns the given HTML with given tags removed."""
@@ -132,20 +161,27 @@ def remove_tags(html, tags):
     return html
 remove_tags = allow_lazy(remove_tags, six.text_type)
 
+
 def strip_spaces_between_tags(value):
     """Returns the given HTML with spaces between tags removed."""
     return re.sub(r'>\s+<', '><', force_text(value))
 strip_spaces_between_tags = allow_lazy(strip_spaces_between_tags, six.text_type)
+
 
 def strip_entities(value):
     """Returns the given HTML with all entities (&something;) stripped."""
     return re.sub(r'&(?:\w+|#\d+);', '', force_text(value))
 strip_entities = allow_lazy(strip_entities, six.text_type)
 
+
 def fix_ampersands(value):
     """Returns the given HTML with all unencoded ampersands encoded correctly."""
+    # As fix_ampersands is wrapped in allow_lazy, stacklevel 3 is more useful than 2.
+    warnings.warn("The fix_ampersands function is deprecated and will be removed in Django 1.8.",
+                  RemovedInDjango18Warning, stacklevel=3)
     return unencoded_ampersands_re.sub('&amp;', force_text(value))
 fix_ampersands = allow_lazy(fix_ampersands, six.text_type)
+
 
 def smart_urlquote(url):
     "Quotes a URL if it isn't already quoted."
@@ -153,8 +189,8 @@ def smart_urlquote(url):
     try:
         scheme, netloc, path, query, fragment = urlsplit(url)
         try:
-            netloc = netloc.encode('idna').decode('ascii') # IDN -> ACE
-        except UnicodeError: # invalid domain part
+            netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE
+        except UnicodeError:  # invalid domain part
             pass
         else:
             url = urlunsplit((scheme, netloc, path, query, fragment))
@@ -162,13 +198,12 @@ def smart_urlquote(url):
         # invalid IPv6 URL (normally square brackets in hostname part).
         pass
 
-    # An URL is considered unquoted if it contains no % characters or
-    # contains a % not followed by two hexadecimal digits. See #9655.
-    if '%' not in url or unquoted_percents_re.search(url):
-        # See http://bugs.python.org/issue2637
-        url = quote(force_bytes(url), safe=b'!*\'();:@&=+$,/?#[]~')
+    url = unquote(force_str(url))
+    # See http://bugs.python.org/issue2637
+    url = quote(url, safe=b'!*\'();:@&=+$,/?#[]~')
 
     return force_text(url)
+
 
 def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
@@ -179,19 +214,21 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     Links can have trailing punctuation (periods, commas, close-parens) and
     leading punctuation (opening parens) and it'll still do the right thing.
 
-    If trim_url_limit is not None, the URLs in link text longer than this limit
-    will truncated to trim_url_limit-3 characters and appended with an elipsis.
+    If trim_url_limit is not None, the URLs in the link text longer than this
+    limit will be truncated to trim_url_limit-3 characters and appended with
+    an ellipsis.
 
-    If nofollow is True, the URLs in link text will get a rel="nofollow"
-    attribute.
+    If nofollow is True, the links will get a rel="nofollow" attribute.
 
-    If autoescape is True, the link text and URLs will get autoescaped.
+    If autoescape is True, the link text and URLs will be autoescaped.
     """
-    trim_url = lambda x, limit=trim_url_limit: limit is not None and (len(x) > limit and ('%s...' % x[:max(0, limit - 3)])) or x
+    def trim_url(x, limit=trim_url_limit):
+        if limit is None or len(x) <= limit:
+            return x
+        return '%s...' % x[:max(0, limit - 3)]
     safe_input = isinstance(text, SafeData)
     words = word_split_re.split(force_text(text))
     for i, word in enumerate(words):
-        match = None
         if '.' in word or '@' in word or ':' in word:
             # Deal with punctuation.
             lead, middle, trail = '', word, ''
@@ -205,7 +242,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                     lead = lead + opening
                 # Keep parentheses at the end only if they're balanced.
                 if (middle.endswith(closing)
-                    and middle.count(closing) == middle.count(opening) + 1):
+                        and middle.count(closing) == middle.count(opening) + 1):
                     middle = middle[:-len(closing)]
                     trail = closing + trail
 
@@ -245,6 +282,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     return ''.join(words)
 urlize = allow_lazy(urlize, six.text_type)
 
+
 def clean_html(text):
     """
     Clean the given HTML.  Specifically, do the following:
@@ -257,8 +295,10 @@ def clean_html(text):
         * Remove stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the
           bottom of the text.
     """
-    from django.utils.text import normalize_newlines
-    text = normalize_newlines(force_text(text))
+    # As clean_html is wrapped in allow_lazy, stacklevel 3 is more useful than 2.
+    warnings.warn("The clean_html function is deprecated and will be removed in Django 1.8.",
+                  RemovedInDjango18Warning, stacklevel=3)
+    text = normalize_newlines(text)
     text = re.sub(r'<(/?)\s*b\s*>', '<\\1strong>', text)
     text = re.sub(r'<(/?)\s*i\s*>', '<\\1em>', text)
     text = fix_ampersands(text)
@@ -267,6 +307,7 @@ def clean_html(text):
     # Trim stupid HTML such as <br clear="all">.
     text = html_gunk_re.sub('', text)
     # Convert hard-coded bullets into HTML unordered lists.
+
     def replace_p_tags(match):
         s = match.group().replace('</p>', '</li>')
         for d in DOTS:
@@ -278,3 +319,11 @@ def clean_html(text):
     text = trailing_empty_content_re.sub('', text)
     return text
 clean_html = allow_lazy(clean_html, six.text_type)
+
+
+def avoid_wrapping(value):
+    """
+    Avoid text wrapping in the middle of a phrase by adding non-breaking
+    spaces where there previously were normal spaces.
+    """
+    return value.replace(" ", "\xa0")

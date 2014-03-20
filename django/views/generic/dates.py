@@ -13,6 +13,7 @@ from django.views.generic.base import View
 from django.views.generic.detail import BaseDetailView, SingleObjectTemplateResponseMixin
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
 
+
 class YearMixin(object):
     """
     Mixin for views manipulating year-based data.
@@ -366,7 +367,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
             is_empty = len(qs) == 0 if paginate_by is None else not qs.exists()
             if is_empty:
                 raise Http404(_("No %(verbose_name_plural)s available") % {
-                        'verbose_name_plural': force_text(qs.model._meta.verbose_name_plural)
+                    'verbose_name_plural': force_text(qs.model._meta.verbose_name_plural)
                 })
 
         return qs
@@ -481,7 +482,7 @@ class YearArchiveView(MultipleObjectTemplateResponseMixin, BaseYearArchiveView):
 
 class BaseMonthArchiveView(YearMixin, MonthMixin, BaseDateListView):
     """
-    List of objects published in a given year.
+    List of objects published in a given month.
     """
     date_list_period = 'day'
 
@@ -515,7 +516,7 @@ class BaseMonthArchiveView(YearMixin, MonthMixin, BaseDateListView):
 
 class MonthArchiveView(MultipleObjectTemplateResponseMixin, BaseMonthArchiveView):
     """
-    List of objects published in a given year.
+    List of objects published in a given month.
     """
     template_name_suffix = '_archive_month'
 

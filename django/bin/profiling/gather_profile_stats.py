@@ -12,6 +12,7 @@ import os
 import pstats
 import sys
 
+
 def gather_stats(p):
     profiles = {}
     for f in os.listdir(p):
@@ -32,6 +33,6 @@ def gather_stats(p):
         os.unlink(os.path.join(p, f))
     for (path, prof) in profiles.items():
         prof.dump_stats(os.path.join(p, "%s.agg.prof" % path))
-    
+
 if __name__ == '__main__':
     gather_stats(sys.argv[1])

@@ -1,8 +1,8 @@
-from __future__ import absolute_import
-
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -12,7 +12,7 @@ class Review(models.Model):
     source = models.CharField(max_length=100)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey()
+    content_object = GenericForeignKey()
 
     def __str__(self):
         return self.source
@@ -20,9 +20,11 @@ class Review(models.Model):
     class Meta:
         ordering = ('source',)
 
+
 class PersonManager(models.Manager):
     def get_by_natural_key(self, name):
         return self.get(name=name)
+
 
 @python_2_unicode_compatible
 class Person(models.Model):
@@ -34,6 +36,7 @@ class Person(models.Model):
 
     class Meta:
         ordering = ('name',)
+
 
 # This book manager doesn't do anything interesting; it just
 # exists to strip out the 'extra_arg' argument to certain
@@ -48,6 +51,7 @@ class BookManager(models.Manager):
         kwargs.pop('extra_arg', None)
         return super(BookManager, self).get_or_create(*args, **kwargs)
 
+
 @python_2_unicode_compatible
 class Book(models.Model):
     objects = BookManager()
@@ -55,7 +59,7 @@ class Book(models.Model):
     published = models.DateField()
     authors = models.ManyToManyField(Person)
     editor = models.ForeignKey(Person, null=True, related_name='edited')
-    reviews = generic.GenericRelation(Review)
+    reviews = GenericRelation(Review)
     pages = models.IntegerField(default=100)
 
     def __str__(self):
@@ -63,6 +67,7 @@ class Book(models.Model):
 
     class Meta:
         ordering = ('title',)
+
 
 @python_2_unicode_compatible
 class Pet(models.Model):
@@ -74,6 +79,7 @@ class Pet(models.Model):
 
     class Meta:
         ordering = ('name',)
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, null=True)

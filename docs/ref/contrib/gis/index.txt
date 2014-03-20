@@ -18,6 +18,7 @@ of spatially enabled data.
    install/index
    model-api
    db-api
+   forms-api
    geoquerysets
    measure
    geos

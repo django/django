@@ -1,5 +1,6 @@
+from unittest import skipIf
+
 from django.conf import settings
-from django.utils.unittest import skipIf
 
 
 def skipIfCustomUser(test_func):

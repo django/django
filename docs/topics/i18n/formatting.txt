@@ -7,8 +7,9 @@ Format localization
 Overview
 ========
 
-Django's formatting system is capable to display dates, times and numbers in templates using the format specified for the current :term:`locale <locale
-name>`. It also handles localized input in forms.
+Django's formatting system is capable of displaying dates, times and numbers in
+templates using the format specified for the current
+:term:`locale <locale name>`. It also handles localized input in forms.
 
 When it's enabled, two users accessing the same content may see dates, times and
 numbers formatted in different ways, depending on the formats for their current

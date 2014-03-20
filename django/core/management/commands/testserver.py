@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 
 from optparse import make_option
 
+
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--noinput', action='store_false', dest='interactive', default=True,
@@ -15,7 +16,7 @@ class Command(BaseCommand):
     help = 'Runs a development server with data from the given fixture(s).'
     args = '[fixture ...]'
 
-    requires_model_validation = False
+    requires_system_checks = False
 
     def handle(self, *fixture_labels, **options):
         from django.core.management import call_command
@@ -36,7 +37,8 @@ class Command(BaseCommand):
         # multiple times.
         shutdown_message = '\nServer stopped.\nNote that the test database, %r, has not been deleted. You can explore it on your own.' % db_name
         use_threading = connection.features.test_db_allows_multiple_connections
-        call_command('runserver',
+        call_command(
+            'runserver',
             addrport=addrport,
             shutdown_message=shutdown_message,
             use_reloader=False,

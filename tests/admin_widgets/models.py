@@ -8,14 +8,17 @@ from django.utils.encoding import python_2_unicode_compatible
 class MyFileField(models.FileField):
     pass
 
+
 @python_2_unicode_compatible
 class Member(models.Model):
     name = models.CharField(max_length=100)
     birthdate = models.DateTimeField(blank=True, null=True)
-    gender = models.CharField(max_length=1, blank=True, choices=[('M','Male'), ('F', 'Female')])
+    gender = models.CharField(max_length=1, blank=True, choices=[('M', 'Male'), ('F', 'Female')])
+    email = models.EmailField(blank=True)
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Band(models.Model):
@@ -25,6 +28,7 @@ class Band(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Album(models.Model):
@@ -36,31 +40,36 @@ class Album(models.Model):
     def __str__(self):
         return self.name
 
+
 class HiddenInventoryManager(models.Manager):
     def get_queryset(self):
         return super(HiddenInventoryManager, self).get_queryset().filter(hidden=False)
 
+
 @python_2_unicode_compatible
 class Inventory(models.Model):
-   barcode = models.PositiveIntegerField(unique=True)
-   parent = models.ForeignKey('self', to_field='barcode', blank=True, null=True)
-   name = models.CharField(blank=False, max_length=20)
-   hidden = models.BooleanField(default=False)
+    barcode = models.PositiveIntegerField(unique=True)
+    parent = models.ForeignKey('self', to_field='barcode', blank=True, null=True)
+    name = models.CharField(blank=False, max_length=20)
+    hidden = models.BooleanField(default=False)
 
-   # see #9258
-   default_manager = models.Manager()
-   objects = HiddenInventoryManager()
+    # see #9258
+    default_manager = models.Manager()
+    objects = HiddenInventoryManager()
 
-   def __str__(self):
-      return self.name
+    def __str__(self):
+        return self.name
+
 
 class Event(models.Model):
-    band = models.ForeignKey(Band, limit_choices_to=models.Q(pk__gt=0))
+    main_band = models.ForeignKey(Band, limit_choices_to=models.Q(pk__gt=0), related_name='events_main_band_at')
+    supporting_bands = models.ManyToManyField(Band, null=True, blank=True, related_name='events_supporting_band_at')
     start_date = models.DateField(blank=True, null=True)
     start_time = models.TimeField(blank=True, null=True)
     description = models.TextField(blank=True)
     link = models.URLField(blank=True)
     min_age = models.IntegerField(blank=True, null=True)
+
 
 @python_2_unicode_compatible
 class Car(models.Model):
@@ -71,14 +80,17 @@ class Car(models.Model):
     def __str__(self):
         return "%s %s" % (self.make, self.model)
 
+
 class CarTire(models.Model):
     """
     A single car tire. This to test that a user can only select their own cars.
     """
     car = models.ForeignKey(Car)
 
+
 class Honeycomb(models.Model):
     location = models.CharField(max_length=20)
+
 
 class Bee(models.Model):
     """
@@ -87,6 +99,7 @@ class Bee(models.Model):
     glass link to select related honeycomb instances.
     """
     honeycomb = models.ForeignKey(Honeycomb)
+
 
 class Individual(models.Model):
     """
@@ -97,8 +110,10 @@ class Individual(models.Model):
     name = models.CharField(max_length=20)
     parent = models.ForeignKey('self', null=True)
 
+
 class Company(models.Model):
     name = models.CharField(max_length=20)
+
 
 class Advisor(models.Model):
     """
@@ -120,6 +135,7 @@ class Student(models.Model):
     class Meta:
         ordering = ('name',)
 
+
 @python_2_unicode_compatible
 class School(models.Model):
     name = models.CharField(max_length=255)
@@ -128,3 +144,11 @@ class School(models.Model):
 
     def __str__(self):
         return self.name
+
+
+@python_2_unicode_compatible
+class Profile(models.Model):
+    user = models.ForeignKey('auth.User', 'username')
+
+    def __str__(self):
+        return self.user.username

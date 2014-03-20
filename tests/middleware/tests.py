@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import gzip
 from io import BytesIO
 import random
 import re
+from unittest import skipIf
 import warnings
 
 from django.conf import settings
@@ -17,19 +18,18 @@ from django.middleware.common import CommonMiddleware, BrokenLinkEmailsMiddlewar
 from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.gzip import GZipMiddleware
 from django.middleware.transaction import TransactionMiddleware
-from django.test import TransactionTestCase, TestCase, RequestFactory
-from django.test.utils import override_settings
+from django.test import TransactionTestCase, TestCase, RequestFactory, override_settings
+from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import force_str
 from django.utils.six.moves import xrange
-from django.utils.unittest import expectedFailure
-
-from transactions.tests import IgnorePendingDeprecationWarningsMixin
 
 from .models import Band
 
 
 class CommonMiddlewareTest(TestCase):
+    urls = 'middleware.urls'
 
     def _get_request(self, path):
         request = HttpRequest()
@@ -37,7 +37,7 @@ class CommonMiddlewareTest(TestCase):
             'SERVER_NAME': 'testserver',
             'SERVER_PORT': 80,
         }
-        request.path = request.path_info = "/middleware/%s" % path
+        request.path = request.path_info = "/%s" % path
         return request
 
     @override_settings(APPEND_SLASH=True)
@@ -72,7 +72,7 @@ class CommonMiddlewareTest(TestCase):
         request = self._get_request('slash')
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
-        self.assertEqual(r.url, 'http://testserver/middleware/slash/')
+        self.assertEqual(r.url, 'http://testserver/slash/')
 
     @override_settings(APPEND_SLASH=True, DEBUG=True)
     def test_append_slash_no_redirect_on_POST_in_DEBUG(self):
@@ -105,7 +105,7 @@ class CommonMiddlewareTest(TestCase):
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
             r.url,
-            'http://testserver/middleware/needsquoting%23/')
+            'http://testserver/needsquoting%23/')
 
     @override_settings(APPEND_SLASH=False, PREPEND_WWW=True)
     def test_prepend_www(self):
@@ -114,7 +114,7 @@ class CommonMiddlewareTest(TestCase):
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
             r.url,
-            'http://www.testserver/middleware/path/')
+            'http://www.testserver/path/')
 
     @override_settings(APPEND_SLASH=True, PREPEND_WWW=True)
     def test_prepend_www_append_slash_have_slash(self):
@@ -122,7 +122,7 @@ class CommonMiddlewareTest(TestCase):
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url,
-                          'http://www.testserver/middleware/slash/')
+            'http://www.testserver/slash/')
 
     @override_settings(APPEND_SLASH=True, PREPEND_WWW=True)
     def test_prepend_www_append_slash_slashless(self):
@@ -130,8 +130,7 @@ class CommonMiddlewareTest(TestCase):
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url,
-                          'http://www.testserver/middleware/slash/')
-
+            'http://www.testserver/slash/')
 
     # The following tests examine expected behavior given a custom urlconf that
     # overrides the default one through the request object.
@@ -174,7 +173,7 @@ class CommonMiddlewareTest(TestCase):
         self.assertFalse(r is None,
             "CommonMiddlware failed to return APPEND_SLASH redirect using request.urlconf")
         self.assertEqual(r.status_code, 301)
-        self.assertEqual(r.url, 'http://testserver/middleware/customurlconf/slash/')
+        self.assertEqual(r.url, 'http://testserver/customurlconf/slash/')
 
     @override_settings(APPEND_SLASH=True, DEBUG=True)
     def test_append_slash_no_redirect_on_POST_in_DEBUG_custom_urlconf(self):
@@ -212,7 +211,7 @@ class CommonMiddlewareTest(TestCase):
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
             r.url,
-            'http://testserver/middleware/customurlconf/needsquoting%23/')
+            'http://testserver/customurlconf/needsquoting%23/')
 
     @override_settings(APPEND_SLASH=False, PREPEND_WWW=True)
     def test_prepend_www_custom_urlconf(self):
@@ -222,7 +221,7 @@ class CommonMiddlewareTest(TestCase):
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
             r.url,
-            'http://www.testserver/middleware/customurlconf/path/')
+            'http://www.testserver/customurlconf/path/')
 
     @override_settings(APPEND_SLASH=True, PREPEND_WWW=True)
     def test_prepend_www_append_slash_have_slash_custom_urlconf(self):
@@ -231,7 +230,7 @@ class CommonMiddlewareTest(TestCase):
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url,
-                          'http://www.testserver/middleware/customurlconf/slash/')
+            'http://www.testserver/customurlconf/slash/')
 
     @override_settings(APPEND_SLASH=True, PREPEND_WWW=True)
     def test_prepend_www_append_slash_slashless_custom_urlconf(self):
@@ -240,7 +239,7 @@ class CommonMiddlewareTest(TestCase):
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url,
-                          'http://www.testserver/middleware/customurlconf/slash/')
+            'http://www.testserver/customurlconf/slash/')
 
     # Legacy tests for the 404 error reporting via email (to be removed in 1.8)
 
@@ -251,7 +250,7 @@ class CommonMiddlewareTest(TestCase):
         request = self._get_request('regular_url/that/does/not/exist')
         request.META['HTTP_REFERER'] = '/another/url/'
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", PendingDeprecationWarning)
+            warnings.simplefilter("ignore", RemovedInDjango18Warning)
             response = self.client.get(request.path)
             CommonMiddleware().process_response(request, response)
         self.assertEqual(len(mail.outbox), 1)
@@ -263,7 +262,7 @@ class CommonMiddlewareTest(TestCase):
     def test_404_error_reporting_no_referer(self):
         request = self._get_request('regular_url/that/does/not/exist')
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", PendingDeprecationWarning)
+            warnings.simplefilter("ignore", RemovedInDjango18Warning)
             response = self.client.get(request.path)
             CommonMiddleware().process_response(request, response)
         self.assertEqual(len(mail.outbox), 0)
@@ -275,7 +274,7 @@ class CommonMiddlewareTest(TestCase):
         request = self._get_request('foo_url/that/does/not/exist/either')
         request.META['HTTP_REFERER'] = '/another/url/'
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", PendingDeprecationWarning)
+            warnings.simplefilter("ignore", RemovedInDjango18Warning)
             response = self.client.get(request.path)
             CommonMiddleware().process_response(request, response)
         self.assertEqual(len(mail.outbox), 0)
@@ -320,9 +319,39 @@ class BrokenLinkEmailsMiddlewareTest(TestCase):
         BrokenLinkEmailsMiddleware().process_response(self.req, self.resp)
         self.assertEqual(len(mail.outbox), 0)
 
+    @skipIf(six.PY3, "HTTP_REFERER is str type on Python 3")
+    def test_404_error_nonascii_referrer(self):
+        # Such referer strings should not happen, but anyway, if it happens,
+        # let's not crash
+        self.req.META['HTTP_REFERER'] = b'http://testserver/c/\xd0\xbb\xd0\xb8/'
+        BrokenLinkEmailsMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_custom_request_checker(self):
+        class SubclassedMiddleware(BrokenLinkEmailsMiddleware):
+            ignored_user_agent_patterns = (re.compile(r'Spider.*'),
+                                           re.compile(r'Robot.*'))
+
+            def is_ignorable_request(self, request, uri, domain, referer):
+                '''Check user-agent in addition to normal checks.'''
+                if super(SubclassedMiddleware, self).is_ignorable_request(request, uri, domain, referer):
+                    return True
+                user_agent = request.META['HTTP_USER_AGENT']
+                return any(pattern.search(user_agent) for pattern in
+                    self.ignored_user_agent_patterns)
+
+        self.req.META['HTTP_REFERER'] = '/another/url/'
+        self.req.META['HTTP_USER_AGENT'] = 'Spider machine 3.4'
+        SubclassedMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(len(mail.outbox), 0)
+        self.req.META['HTTP_USER_AGENT'] = 'My user agent'
+        SubclassedMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(len(mail.outbox), 1)
+
 
 class ConditionalGetMiddlewareTest(TestCase):
     urls = 'middleware.cond_get_urls'
+
     def setUp(self):
         self.req = HttpRequest()
         self.req.META = {
@@ -678,10 +707,14 @@ class ETagGZipMiddlewareTest(TestCase):
 
         self.assertNotEqual(gzip_etag, nogzip_etag)
 
-class TransactionMiddlewareTest(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+
+class TransactionMiddlewareTest(IgnoreDeprecationWarningsMixin, TransactionTestCase):
     """
     Test the transaction middleware.
     """
+
+    available_apps = ['middleware']
+
     def setUp(self):
         super(TransactionMiddlewareTest, self).setUp()
         self.request = HttpRequest()

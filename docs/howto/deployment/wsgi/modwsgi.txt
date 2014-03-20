@@ -25,7 +25,8 @@ Basic configuration
 ===================
 
 Once you've got mod_wsgi installed and activated, edit your Apache server's
-``httpd.conf`` file and add
+``httpd.conf`` file and add the following. If you are using a version of Apache
+older than 2.4, replace ``Require all granted`` with ``Allow from all``.
 
 .. code-block:: apache
 
@@ -35,7 +36,7 @@ Once you've got mod_wsgi installed and activated, edit your Apache server's
     <Directory /path/to/mysite.com/mysite>
     <Files wsgi.py>
     Order deny,allow
-    Allow from all
+    Require all granted
     </Files>
     </Directory>
 
@@ -73,7 +74,10 @@ Using a virtualenv
 If you install your project's Python dependencies inside a `virtualenv`_,
 you'll need to add the path to this virtualenv's ``site-packages`` directory to
 your Python path as well. To do this, add an additional path to your
-`WSGIPythonPath` directive, with multiple paths separated by a colon::
+``WSGIPythonPath`` directive, with multiple paths separated by a colon (``:``)
+if using a UNIX-like system, or a semicolon (``;``) if using Windows. If any
+part of a directory path contains a space character, the complete argument
+string to ``WSGIPythonPath`` must be quoted::
 
     WSGIPythonPath /path/to/mysite.com:/path/to/your/venv/lib/python2.X/site-packages
 
@@ -139,12 +143,12 @@ will be served using mod_wsgi::
 
     <Directory /path/to/mysite.com/static>
     Order deny,allow
-    Allow from all
+    Require all granted
     </Directory>
 
     <Directory /path/to/mysite.com/media>
     Order deny,allow
-    Allow from all
+    Require all granted
     </Directory>
 
     WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
@@ -152,9 +156,12 @@ will be served using mod_wsgi::
     <Directory /path/to/mysite.com/mysite>
     <Files wsgi.py>
     Order allow,deny
-    Allow from all
+    Require all granted
     </Files>
     </Directory>
+
+If you are using a version of Apache older than 2.4, replace
+``Require all granted`` with ``Allow from all``.
 
 .. _lighttpd: http://www.lighttpd.net/
 .. _Nginx: http://wiki.nginx.org/Main
@@ -172,10 +179,11 @@ will be served using mod_wsgi::
 Serving the admin files
 =======================
 
-Note that the Django development server automatically serves the static files
-of the admin app (and any other installed apps), but this is not the case when
-you use any other server arrangement. You're responsible for setting up Apache,
-or whichever media server you're using, to serve the admin files.
+When :mod:`django.contrib.staticfiles` is in :setting:`INSTALLED_APPS`, the
+Django development server automatically serves the static files of the
+admin app (and any other installed apps). This is however not the case when you
+use any other server arrangement. You're responsible for setting up Apache, or
+whichever Web server you're using, to serve the admin files.
 
 The admin files live in (:file:`django/contrib/admin/static/admin`) of the
 Django distribution.
@@ -192,7 +200,7 @@ other approaches:
    configuration).
 
 2. Use an ``Alias`` directive, as demonstrated above, to alias the appropriate
-   URL (probably :setting:`STATIC_URL` + `admin/`) to the actual location of
+   URL (probably :setting:`STATIC_URL` + ``admin/``) to the actual location of
    the admin files.
 
 3. Copy the admin static files so that they live within your Apache

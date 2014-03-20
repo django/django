@@ -1,9 +1,8 @@
 import os
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TestCase, Client
-from django.test.utils import override_settings
+from django.test import override_settings
 
 
 @override_settings(
@@ -16,6 +15,7 @@ from django.test.utils import override_settings
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     ),
+    CSRF_FAILURE_VIEW='django.views.csrf.csrf_failure',
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(__file__), 'templates'),
     ),
@@ -45,19 +45,19 @@ class FlatpageCSRFTests(TestCase):
         response = self.client.get('/flatpage_root/sekrit/')
         self.assertRedirects(response, '/accounts/login/?next=/flatpage_root/sekrit/')
         User.objects.create_user('testuser', 'test@example.com', 's3krit')
-        self.client.login(username='testuser',password='s3krit')
+        self.client.login(username='testuser', password='s3krit')
         response = self.client.get('/flatpage_root/sekrit/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<p>Isn't it sekrit!</p>")
 
     def test_fallback_flatpage(self):
-        "A flatpage can be served by the fallback middlware"
+        "A flatpage can be served by the fallback middleware"
         response = self.client.get('/flatpage/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<p>Isn't it flat!</p>")
 
     def test_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage raises a 404 when served by the fallback middlware"
+        "A non-existent flatpage raises a 404 when served by the fallback middleware"
         response = self.client.get('/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 

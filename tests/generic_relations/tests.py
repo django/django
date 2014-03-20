@@ -1,12 +1,16 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django import forms
-from django.contrib.contenttypes.generic import generic_inlineformset_factory
+from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import FieldError
 from django.test import TestCase
+from django.utils import six
 
 from .models import (TaggedItem, ValuableTaggedItem, Comparison, Animal,
-    Vegetable, Mineral, Gecko, Rock)
+                     Vegetable, Mineral, Gecko, Rock, ManualPK,
+                     ForProxyModelModel, ForConcreteModelModel,
+                     ProxyRelatedModel, ConcreteRelatedModel, AllowsNullGFK)
 
 
 class GenericRelationsTests(TestCase):
@@ -16,7 +20,7 @@ class GenericRelationsTests(TestCase):
         platypus = Animal.objects.create(
             common_name="Platypus", latin_name="Ornithorhynchus anatinus"
         )
-        eggplant = Vegetable.objects.create(name="Eggplant", is_yucky=True)
+        Vegetable.objects.create(name="Eggplant", is_yucky=True)
         bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
         quartz = Mineral.objects.create(name="Quartz", hardness=7)
 
@@ -39,11 +43,22 @@ class GenericRelationsTests(TestCase):
         # You can easily access the content object like a foreign key.
         t = TaggedItem.objects.get(tag="salty")
         self.assertEqual(t.content_object, bacon)
+        qs = TaggedItem.objects.filter(animal__isnull=False).order_by('animal__common_name', 'tag')
+        self.assertQuerysetEqual(
+            qs, ["<TaggedItem: hairy>", "<TaggedItem: yellow>", "<TaggedItem: fatty>"]
+        )
+        mpk = ManualPK.objects.create(id=1)
+        mpk.tags.create(tag='mpk')
+        from django.db.models import Q
+        qs = TaggedItem.objects.filter(Q(animal__isnull=False) | Q(manualpk__id=1)).order_by('tag')
+        self.assertQuerysetEqual(
+            qs, ["fatty", "hairy", "mpk", "yellow"], lambda x: x.tag)
+        mpk.delete()
 
         # Recall that the Mineral class doesn't have an explicit GenericRelation
         # defined. That's OK, because you can create TaggedItems explicitly.
         tag1 = TaggedItem.objects.create(content_object=quartz, tag="shiny")
-        tag2 = TaggedItem.objects.create(content_object=quartz, tag="clearish")
+        TaggedItem.objects.create(content_object=quartz, tag="clearish")
 
         # However, excluding GenericRelations means your lookups have to be a
         # bit more explicit.
@@ -75,12 +90,17 @@ class GenericRelationsTests(TestCase):
             "<Animal: Lion>",
             "<Animal: Platypus>"
         ])
+        # Create another fatty tagged instance with different PK to ensure
+        # there is a content type restriction in the generated queries below.
+        mpk = ManualPK.objects.create(id=lion.pk)
+        mpk.tags.create(tag="fatty")
         self.assertQuerysetEqual(Animal.objects.filter(tags__tag='fatty'), [
             "<Animal: Platypus>"
         ])
         self.assertQuerysetEqual(Animal.objects.exclude(tags__tag='fatty'), [
             "<Animal: Lion>"
         ])
+        mpk.delete()
 
         # If you delete an object with an explicit Generic relation, the related
         # objects are deleted when the source object is deleted.
@@ -90,24 +110,24 @@ class GenericRelationsTests(TestCase):
         )
 
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-                ('clearish', Mineral, quartz.pk),
-                ('fatty', Animal, platypus.pk),
-                ('fatty', Vegetable, bacon.pk),
-                ('hairy', Animal, lion.pk),
-                ('salty', Vegetable, bacon.pk),
-                ('shiny', Animal, platypus.pk),
-                ('yellow', Animal, lion.pk)
-            ],
+            ('clearish', Mineral, quartz.pk),
+            ('fatty', Animal, platypus.pk),
+            ('fatty', Vegetable, bacon.pk),
+            ('hairy', Animal, lion.pk),
+            ('salty', Vegetable, bacon.pk),
+            ('shiny', Animal, platypus.pk),
+            ('yellow', Animal, lion.pk)
+        ],
             comp_func
         )
         lion.delete()
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-                ('clearish', Mineral, quartz.pk),
-                ('fatty', Animal, platypus.pk),
-                ('fatty', Vegetable, bacon.pk),
-                ('salty', Vegetable, bacon.pk),
-                ('shiny', Animal, platypus.pk)
-            ],
+            ('clearish', Mineral, quartz.pk),
+            ('fatty', Animal, platypus.pk),
+            ('fatty', Vegetable, bacon.pk),
+            ('salty', Vegetable, bacon.pk),
+            ('shiny', Animal, platypus.pk)
+        ],
             comp_func
         )
 
@@ -116,12 +136,12 @@ class GenericRelationsTests(TestCase):
         quartz_pk = quartz.pk
         quartz.delete()
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-                ('clearish', Mineral, quartz_pk),
-                ('fatty', Animal, platypus.pk),
-                ('fatty', Vegetable, bacon.pk),
-                ('salty', Vegetable, bacon.pk),
-                ('shiny', Animal, platypus.pk)
-            ],
+            ('clearish', Mineral, quartz_pk),
+            ('fatty', Animal, platypus.pk),
+            ('fatty', Vegetable, bacon.pk),
+            ('salty', Vegetable, bacon.pk),
+            ('shiny', Animal, platypus.pk)
+        ],
             comp_func
         )
         # If you delete a tag, the objects using the tag are unaffected
@@ -130,11 +150,11 @@ class GenericRelationsTests(TestCase):
         tag.delete()
         self.assertQuerysetEqual(bacon.tags.all(), ["<TaggedItem: salty>"])
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-                ('clearish', Mineral, quartz_pk),
-                ('fatty', Animal, platypus.pk),
-                ('salty', Vegetable, bacon.pk),
-                ('shiny', Animal, platypus.pk)
-            ],
+            ('clearish', Mineral, quartz_pk),
+            ('fatty', Animal, platypus.pk),
+            ('salty', Vegetable, bacon.pk),
+            ('shiny', Animal, platypus.pk)
+        ],
             comp_func
         )
         TaggedItem.objects.filter(tag='fatty').delete()
@@ -143,6 +163,11 @@ class GenericRelationsTests(TestCase):
             "<Animal: Platypus>"
         ])
 
+    def test_generic_relation_related_name_default(self):
+        # Test that GenericRelation by default isn't usable from
+        # the reverse side.
+        with self.assertRaises(FieldError):
+            TaggedItem.objects.filter(vegetable__isnull=True)
 
     def test_multiple_gfk(self):
         # Simple tests for multiple GenericForeignKeys
@@ -240,22 +265,212 @@ class GenericRelationsTests(TestCase):
         TaggedItem.objects.create(content_object=granite, tag="countertop")
         self.assertEqual(Rock.objects.filter(tags__tag="countertop").count(), 1)
 
+    def test_generic_inline_formsets_initial(self):
+        """
+        Test for #17927 Initial values support for BaseGenericInlineFormSet.
+        """
+        quartz = Mineral.objects.create(name="Quartz", hardness=7)
+
+        GenericFormSet = generic_inlineformset_factory(TaggedItem, extra=1)
+        ctype = ContentType.objects.get_for_model(quartz)
+        initial_data = [{
+            'tag': 'lizard',
+            'content_type': ctype.pk,
+            'object_id': quartz.pk,
+        }]
+        formset = GenericFormSet(initial=initial_data)
+        self.assertEqual(formset.forms[0].initial, initial_data[0])
+
+    def test_get_or_create(self):
+        # get_or_create should work with virtual fields (content_object)
+        quartz = Mineral.objects.create(name="Quartz", hardness=7)
+        tag, created = TaggedItem.objects.get_or_create(tag="shiny",
+            defaults={'content_object': quartz})
+        self.assertTrue(created)
+        self.assertEqual(tag.tag, "shiny")
+        self.assertEqual(tag.content_object.id, quartz.id)
+
+    def test_update_or_create_defaults(self):
+        # update_or_create should work with virtual fields (content_object)
+        quartz = Mineral.objects.create(name="Quartz", hardness=7)
+        diamond = Mineral.objects.create(name="Diamond", hardness=7)
+        tag, created = TaggedItem.objects.update_or_create(tag="shiny",
+            defaults={'content_object': quartz})
+        self.assertTrue(created)
+        self.assertEqual(tag.content_object.id, quartz.id)
+
+        tag, created = TaggedItem.objects.update_or_create(tag="shiny",
+            defaults={'content_object': diamond})
+        self.assertFalse(created)
+        self.assertEqual(tag.content_object.id, diamond.id)
+
 
 class CustomWidget(forms.TextInput):
     pass
 
+
 class TaggedItemForm(forms.ModelForm):
     class Meta:
         model = TaggedItem
+        fields = '__all__'
         widgets = {'tag': CustomWidget}
 
-class GenericInlineFormsetTest(TestCase):
-    """
-    Regression for #14572: Using base forms with widgets
-    defined in Meta should not raise errors.
-    """
 
+class GenericInlineFormsetTest(TestCase):
     def test_generic_inlineformset_factory(self):
+        """
+        Regression for #14572: Using base forms with widgets
+        defined in Meta should not raise errors.
+        """
         Formset = generic_inlineformset_factory(TaggedItem, TaggedItemForm)
         form = Formset().forms[0]
-        self.assertTrue(isinstance(form['tag'].field.widget, CustomWidget))
+        self.assertIsInstance(form['tag'].field.widget, CustomWidget)
+
+    def test_save_new_uses_form_save(self):
+        """
+        Regression for #16260: save_new should call form.save()
+        """
+        class SaveTestForm(forms.ModelForm):
+            def save(self, *args, **kwargs):
+                self.instance.saved_by = "custom method"
+                return super(SaveTestForm, self).save(*args, **kwargs)
+
+        Formset = generic_inlineformset_factory(
+            ForProxyModelModel, fields='__all__', form=SaveTestForm)
+
+        instance = ProxyRelatedModel.objects.create()
+
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '',
+            'form-0-title': 'foo',
+        }
+
+        formset = Formset(data, instance=instance, prefix='form')
+        self.assertTrue(formset.is_valid())
+        new_obj = formset.save()[0]
+        self.assertEqual(new_obj.saved_by, "custom method")
+
+    def test_save_new_for_proxy(self):
+        Formset = generic_inlineformset_factory(ForProxyModelModel,
+            fields='__all__', for_concrete_model=False)
+
+        instance = ProxyRelatedModel.objects.create()
+
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '',
+            'form-0-title': 'foo',
+        }
+
+        formset = Formset(data, instance=instance, prefix='form')
+        self.assertTrue(formset.is_valid())
+
+        new_obj, = formset.save()
+        self.assertEqual(new_obj.obj, instance)
+
+    def test_save_new_for_concrete(self):
+        Formset = generic_inlineformset_factory(ForProxyModelModel,
+            fields='__all__', for_concrete_model=True)
+
+        instance = ProxyRelatedModel.objects.create()
+
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '',
+            'form-0-title': 'foo',
+        }
+
+        formset = Formset(data, instance=instance, prefix='form')
+        self.assertTrue(formset.is_valid())
+
+        new_obj, = formset.save()
+        self.assertNotIsInstance(new_obj.obj, ProxyRelatedModel)
+
+
+class ProxyRelatedModelTest(TestCase):
+    def test_default_behavior(self):
+        """
+        The default for for_concrete_model should be True
+        """
+        base = ForConcreteModelModel()
+        base.obj = rel = ProxyRelatedModel.objects.create()
+        base.save()
+
+        base = ForConcreteModelModel.objects.get(pk=base.pk)
+        rel = ConcreteRelatedModel.objects.get(pk=rel.pk)
+        self.assertEqual(base.obj, rel)
+
+    def test_works_normally(self):
+        """
+        When for_concrete_model is False, we should still be able to get
+        an instance of the concrete class.
+        """
+        base = ForProxyModelModel()
+        base.obj = rel = ConcreteRelatedModel.objects.create()
+        base.save()
+
+        base = ForProxyModelModel.objects.get(pk=base.pk)
+        self.assertEqual(base.obj, rel)
+
+    def test_proxy_is_returned(self):
+        """
+        Instances of the proxy should be returned when
+        for_concrete_model is False.
+        """
+        base = ForProxyModelModel()
+        base.obj = ProxyRelatedModel.objects.create()
+        base.save()
+
+        base = ForProxyModelModel.objects.get(pk=base.pk)
+        self.assertIsInstance(base.obj, ProxyRelatedModel)
+
+    def test_query(self):
+        base = ForProxyModelModel()
+        base.obj = rel = ConcreteRelatedModel.objects.create()
+        base.save()
+
+        self.assertEqual(rel, ConcreteRelatedModel.objects.get(bases__id=base.id))
+
+    def test_query_proxy(self):
+        base = ForProxyModelModel()
+        base.obj = rel = ProxyRelatedModel.objects.create()
+        base.save()
+
+        self.assertEqual(rel, ProxyRelatedModel.objects.get(bases__id=base.id))
+
+    def test_generic_relation(self):
+        base = ForProxyModelModel()
+        base.obj = ProxyRelatedModel.objects.create()
+        base.save()
+
+        base = ForProxyModelModel.objects.get(pk=base.pk)
+        rel = ProxyRelatedModel.objects.get(pk=base.obj.pk)
+        self.assertEqual(base, rel.bases.get())
+
+    def test_generic_relation_set(self):
+        base = ForProxyModelModel()
+        base.obj = ConcreteRelatedModel.objects.create()
+        base.save()
+        newrel = ConcreteRelatedModel.objects.create()
+
+        newrel.bases = [base]
+        newrel = ConcreteRelatedModel.objects.get(pk=newrel.pk)
+        self.assertEqual(base, newrel.bases.get())
+
+
+class TestInitWithNoneArgument(TestCase):
+    def test_none_not_allowed(self):
+        # TaggedItem requires a content_type, initializing with None should
+        # raise a ValueError.
+        with six.assertRaisesRegex(self, ValueError,
+          'Cannot assign None: "TaggedItem.content_type" does not allow null values'):
+            TaggedItem(content_object=None)
+
+    def test_none_allowed(self):
+        # AllowsNullGFK doesn't require a content_type, so None argument should
+        # also be allowed.
+        AllowsNullGFK(content_object=None)

@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from django.conf.urls import patterns, url, include
 
 from .views import view_class_instance

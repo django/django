@@ -19,6 +19,7 @@ __all__ = ('SelectDateWidget',)
 
 RE_DATE = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
 
+
 def _parse_date_fmt():
     fmt = get_format('DATE_FORMAT')
     escaped = False
@@ -39,6 +40,7 @@ def _parse_date_fmt():
             #if not self.first_select: self.first_select = 'day'
     return output
 
+
 class SelectDateWidget(Widget):
     """
     A Widget that splits date input into three <select> boxes.
@@ -51,15 +53,21 @@ class SelectDateWidget(Widget):
     day_field = '%s_day'
     year_field = '%s_year'
 
-    def __init__(self, attrs=None, years=None, required=True):
-        # years is an optional list/tuple of years to use in the "year" select box.
+    def __init__(self, attrs=None, years=None, months=None):
         self.attrs = attrs or {}
-        self.required = required
+
+        # Optional list or tuple of years to use in the "year" select box.
         if years:
             self.years = years
         else:
             this_year = datetime.date.today().year
-            self.years = range(this_year, this_year+10)
+            self.years = range(this_year, this_year + 10)
+
+        # Optional dict of months to use in the "month" select box.
+        if months:
+            self.months = months
+        else:
+            self.months = MONTHS
 
     def render(self, name, value, attrs=None):
         try:
@@ -80,10 +88,10 @@ class SelectDateWidget(Widget):
                         year_val, month_val, day_val = [int(v) for v in match.groups()]
         choices = [(i, i) for i in self.years]
         year_html = self.create_select(name, self.year_field, value, year_val, choices)
-        choices = list(six.iteritems(MONTHS))
+        choices = list(six.iteritems(self.months))
         month_html = self.create_select(name, self.month_field, value, month_val, choices)
         choices = [(i, i) for i in range(1, 32)]
-        day_html = self.create_select(name, self.day_field, value, day_val,  choices)
+        day_html = self.create_select(name, self.day_field, value, day_val, choices)
 
         output = []
         for field in _parse_date_fmt():
@@ -130,7 +138,7 @@ class SelectDateWidget(Widget):
             id_ = self.attrs['id']
         else:
             id_ = 'id_%s' % name
-        if not (self.required and val):
+        if not self.is_required:
             choices.insert(0, self.none_value)
         local_attrs = self.build_attrs(id=field % id_)
         s = Select(choices=choices)

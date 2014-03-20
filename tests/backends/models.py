@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
 from django.contrib.contenttypes.models import ContentType
 from django.db import models, connection
 from django.utils.encoding import python_2_unicode_compatible
@@ -46,13 +48,13 @@ class Tag(models.Model):
     name = models.CharField(max_length=30)
     content_type = models.ForeignKey(ContentType, related_name='backend_tags')
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
 
 
 class Post(models.Model):
     name = models.CharField(max_length=30)
     text = models.TextField()
-    tags = generic.GenericRelation('Tag')
+    tags = GenericRelation('Tag')
 
     class Meta:
         db_table = 'CaseSensitive_Post'
@@ -68,11 +70,18 @@ class Reporter(models.Model):
         return "%s %s" % (self.first_name, self.last_name)
 
 
+class ReporterProxy(Reporter):
+    class Meta:
+        proxy = True
+
+
 @python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateField()
     reporter = models.ForeignKey(Reporter)
+    reporter_proxy = models.ForeignKey(ReporterProxy, null=True,
+                                       related_name='reporter_proxy')
 
     def __str__(self):
         return self.headline

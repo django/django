@@ -1,12 +1,9 @@
-from __future__ import absolute_import
-
 from django.contrib.auth.models import User
 from django.contrib.comments.forms import CommentForm
 from django.contrib.comments.models import Comment
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 
 from ..models import Article, Author
 
@@ -84,12 +81,3 @@ class CommentTestCase(TestCase):
         d = self.getData()
         d.update(f.initial)
         return d
-
-from comment_tests.tests.test_app_api import *
-from comment_tests.tests.test_feeds import *
-from comment_tests.tests.test_models import *
-from comment_tests.tests.test_comment_form import *
-from comment_tests.tests.test_templatetags import *
-from comment_tests.tests.test_comment_view import *
-from comment_tests.tests.test_comment_utils_moderators import *
-from comment_tests.tests.test_moderation_views import *

@@ -3,6 +3,7 @@ syntax:glob
 *.egg-info
 *.pot
 *.py[co]
+__pycache__
 docs/_build/
 tests/coverage_html/
 tests/.coverage

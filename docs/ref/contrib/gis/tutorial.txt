@@ -244,7 +244,7 @@ model to represent this data::
         objects = models.GeoManager()
 
         # Returns the string representation of the model.
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.name
 
 Please note two important things:
@@ -261,8 +261,8 @@ argument. Use an integer representing the coordinate system's EPSG code.
 
 __ http://en.wikipedia.org/wiki/SRID
 
-Run ``syncdb``
---------------
+Run ``migrate``
+---------------
 
 After defining your model, you need to sync it with the database. First,
 let's look at the SQL that will generate the table for the
@@ -288,21 +288,26 @@ This command should produce the following output:
         "subregion" integer NOT NULL,
         "lon" double precision NOT NULL,
         "lat" double precision NOT NULL
+        "mpoly" geometry(MULTIPOLYGON,4326) NOT NULL
     )
     ;
-    SELECT AddGeometryColumn('world_worldborder', 'mpoly', 4326, 'MULTIPOLYGON', 2);
-    ALTER TABLE "world_worldborder" ALTER "mpoly" SET NOT NULL;
-    CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ( "mpoly" GIST_GEOMETRY_OPS );
+    CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ( "mpoly" );
     COMMIT;
 
-If this looks correct, run ``syncdb`` to create this table in the database::
+.. note::
 
-    $ python manage.py syncdb
+    With PostGIS < 2.0, the output is slightly different. The ``mpoly`` geometry
+    column is added through a separate ``SELECT AddGeometryColumn(...)``
+    statement.
+
+If this looks correct, run :djadmin:`migrate` to create this table in the database::
+
+    $ python manage.py migrate
     Creating table world_worldborder
     Installing custom SQL for world.WorldBorder model
 
-The ``syncdb`` command may also prompt you to create an admin user. Either
-do so now, or later by running ``django-admin.py createsuperuser``.
+The :djadmin:`migrate` command may also prompt you to create an admin user.
+Either do so now, or later by running ``django-admin.py createsuperuser``.
 
 Importing Spatial Data
 ======================
@@ -498,14 +503,13 @@ Afterwards, invoke the Django shell from the ``geodjango`` project directory:
 
 .. code-block:: bash
 
-   $ python manage.py shell
+    $ python manage.py shell
 
 Next, import the ``load`` module, call the ``run`` routine, and watch
 ``LayerMapping`` do the work::
 
-   >>> from world import load
-   >>> load.run()
-
+    >>> from world import load
+    >>> load.run()
 
 .. _ogrinspect-intro:
 
@@ -729,8 +733,6 @@ Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
     from django.conf.urls import patterns, url, include
     from django.contrib.gis import admin
 
-    admin.autodiscover()
-
     urlpatterns = patterns('',
         url(r'^admin/', include(admin.site.urls)),
     )
@@ -742,12 +744,12 @@ Start up the Django development server:
     $ python manage.py runserver
 
 Finally, browse to ``http://localhost:8000/admin/``, and log in with the admin
-user created after running ``syncdb``.  Browse to any of the ``WorldBorder``
+user created after running :djadmin:`migrate`. Browse to any of the ``WorldBorder``
 entries -- the borders may be edited by clicking on a polygon and dragging
 the vertexes to the desired position.
 
 .. _OpenLayers: http://openlayers.org/
-.. _Open Street Map: http://openstreetmap.org/
+.. _Open Street Map: http://www.openstreetmap.org/
 .. _Vector Map Level 0: http://earth-info.nga.mil/publications/vmap0.html
 .. _OSGeo: http://www.osgeo.org
 

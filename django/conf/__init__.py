@@ -6,17 +6,13 @@ variable, and then from django.conf.global_settings; see the global settings fil
 a list of all possible variables.
 """
 
-import logging
+import importlib
 import os
-import sys
 import time     # Needed for Windows
-import warnings
 
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import LazyObject, empty
-from django.utils import importlib
-from django.utils.module_loading import import_by_path
 from django.utils import six
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -34,11 +30,8 @@ class LazySettings(LazyObject):
         is used the first time we need any settings at all, if the user has not
         previously configured the settings manually.
         """
-        try:
-            settings_module = os.environ[ENVIRONMENT_VARIABLE]
-            if not settings_module: # If it's set but is an empty string.
-                raise KeyError
-        except KeyError:
+        settings_module = os.environ.get(ENVIRONMENT_VARIABLE)
+        if not settings_module:
             desc = ("setting %s" % name) if name else "settings"
             raise ImproperlyConfigured(
                 "Requested %s, but settings are not configured. "
@@ -47,37 +40,11 @@ class LazySettings(LazyObject):
                 % (desc, ENVIRONMENT_VARIABLE))
 
         self._wrapped = Settings(settings_module)
-        self._configure_logging()
 
     def __getattr__(self, name):
         if self._wrapped is empty:
             self._setup(name)
         return getattr(self._wrapped, name)
-
-    def _configure_logging(self):
-        """
-        Setup logging from LOGGING_CONFIG and LOGGING settings.
-        """
-        if not sys.warnoptions:
-            try:
-                # Route warnings through python logging
-                logging.captureWarnings(True)
-                # Allow DeprecationWarnings through the warnings filters
-                warnings.simplefilter("default", DeprecationWarning)
-            except AttributeError:
-                # No captureWarnings on Python 2.6, DeprecationWarnings are on anyway
-                pass
-
-        if self.LOGGING_CONFIG:
-            from django.utils.log import DEFAULT_LOGGING
-            # First find the logging configuration function ...
-            logging_config_func = import_by_path(self.LOGGING_CONFIG)
-
-            logging_config_func(DEFAULT_LOGGING)
-
-            # ... then invoke it with the logging settings
-            if self.LOGGING:
-                logging_config_func(self.LOGGING)
 
     def configure(self, default_settings=global_settings, **options):
         """
@@ -91,7 +58,6 @@ class LazySettings(LazyObject):
         for name, value in options.items():
             setattr(holder, name, value)
         self._wrapped = holder
-        self._configure_logging()
 
     @property
     def configured(self):
@@ -118,7 +84,7 @@ class Settings(BaseSettings):
     def __init__(self, settings_module):
         # update this dict from global settings (but only for ALL_CAPS settings)
         for setting in dir(global_settings):
-            if setting == setting.upper():
+            if setting.isupper():
                 setattr(self, setting, getattr(global_settings, setting))
 
         # store the settings module in case someone later cares
@@ -127,22 +93,23 @@ class Settings(BaseSettings):
         try:
             mod = importlib.import_module(self.SETTINGS_MODULE)
         except ImportError as e:
-            raise ImportError("Could not import settings '%s' (Is it on sys.path?): %s" % (self.SETTINGS_MODULE, e))
+            raise ImportError(
+                "Could not import settings '%s' (Is it on sys.path? Is there an import error in the settings file?): %s"
+                % (self.SETTINGS_MODULE, e)
+            )
 
-        # Settings that should be converted into tuples if they're mistakenly entered
-        # as strings.
         tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS")
-
+        self._explicit_settings = set()
         for setting in dir(mod):
-            if setting == setting.upper():
+            if setting.isupper():
                 setting_value = getattr(mod, setting)
-                if setting in tuple_settings and \
-                        isinstance(setting_value, six.string_types):
-                    warnings.warn("The %s setting must be a tuple. Please fix your "
-                                  "settings, as auto-correction is now deprecated." % setting,
-                                  DeprecationWarning, stacklevel=2)
-                    setting_value = (setting_value,) # In case the user forgot the comma.
+
+                if (setting in tuple_settings and
+                        isinstance(setting_value, six.string_types)):
+                    raise ImproperlyConfigured("The %s setting must be a tuple. "
+                            "Please fix your settings." % setting)
                 setattr(self, setting, setting_value)
+                self._explicit_settings.add(setting)
 
         if not self.SECRET_KEY:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
@@ -158,6 +125,9 @@ class Settings(BaseSettings):
             # we don't do this unconditionally (breaks Windows).
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
+
+    def is_overridden(self, setting):
+        return setting in self._explicit_settings
 
 
 class UserSettingsHolder(BaseSettings):
@@ -191,5 +161,11 @@ class UserSettingsHolder(BaseSettings):
 
     def __dir__(self):
         return list(self.__dict__) + dir(self.default_settings)
+
+    def is_overridden(self, setting):
+        deleted = (setting in self._deleted)
+        set_locally = (setting in self.__dict__)
+        set_on_default = getattr(self.default_settings, 'is_overridden', lambda s: False)(setting)
+        return (deleted or set_locally or set_on_default)
 
 settings = LazySettings()

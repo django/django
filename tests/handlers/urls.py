@@ -9,4 +9,5 @@ urlpatterns = patterns('',
     url(r'^streaming/$', views.streaming),
     url(r'^in_transaction/$', views.in_transaction),
     url(r'^not_in_transaction/$', views.not_in_transaction),
+    url(r'^suspicious/$', views.suspicious),
 )

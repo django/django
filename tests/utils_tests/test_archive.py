@@ -1,7 +1,7 @@
 import os
 import shutil
 import tempfile
-from django.utils import unittest
+import unittest
 
 from django.utils.archive import Archive, extract
 from django.utils._os import upath

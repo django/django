@@ -1,10 +1,36 @@
+from __future__ import absolute_import  # Avoid importing `importlib` from this package.
+
+import copy
 import imp
+from importlib import import_module
 import os
 import sys
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
-from django.utils.importlib import import_module
+from django.utils.deprecation import RemovedInDjango19Warning
+
+
+def import_string(dotted_path):
+    """
+    Import a dotted module path and return the attribute/class designated by the
+    last name in the path. Raise ImportError if the import failed.
+    """
+    try:
+        module_path, class_name = dotted_path.rsplit('.', 1)
+    except ValueError:
+        msg = "%s doesn't look like a module path" % dotted_path
+        six.reraise(ImportError, ImportError(msg), sys.exc_info()[2])
+
+    module = import_module(module_path)
+
+    try:
+        return getattr(module, class_name)
+    except AttributeError:
+        msg = 'Module "%s" does not define a "%s" attribute/class' % (
+            dotted_path, class_name)
+        six.reraise(ImportError, ImportError(msg), sys.exc_info()[2])
 
 
 def import_by_path(dotted_path, error_prefix=''):
@@ -12,24 +38,53 @@ def import_by_path(dotted_path, error_prefix=''):
     Import a dotted module path and return the attribute/class designated by the
     last name in the path. Raise ImproperlyConfigured if something goes wrong.
     """
+    warnings.warn(
+        'import_by_path() has been deprecated. Use import_string() instead.',
+        RemovedInDjango19Warning, stacklevel=2)
     try:
-        module_path, class_name = dotted_path.rsplit('.', 1)
-    except ValueError:
-        raise ImproperlyConfigured("%s%s doesn't look like a module path" % (
-            error_prefix, dotted_path))
-    try:
-        module = import_module(module_path)
+        attr = import_string(dotted_path)
     except ImportError as e:
         msg = '%sError importing module %s: "%s"' % (
-            error_prefix, module_path, e)
+            error_prefix, dotted_path, e)
         six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg),
                     sys.exc_info()[2])
-    try:
-        attr = getattr(module, class_name)
-    except AttributeError:
-        raise ImproperlyConfigured('%sModule "%s" does not define a "%s" attribute/class' % (
-            error_prefix, module_path, class_name))
     return attr
+
+
+def autodiscover_modules(*args, **kwargs):
+    """
+    Auto-discover INSTALLED_APPS modules and fail silently when
+    not present. This forces an import on them to register any admin bits they
+    may want.
+
+    You may provide a register_to keyword parameter as a way to access a
+    registry. This register_to object must have a _registry instance variable
+    to access it.
+    """
+    from django.apps import apps
+
+    register_to = kwargs.get('register_to')
+    for app_config in apps.get_app_configs():
+        # Attempt to import the app's module.
+        try:
+            if register_to:
+                before_import_registry = copy.copy(register_to._registry)
+
+            for module_to_search in args:
+                import_module('%s.%s' % (app_config.name, module_to_search))
+        except:
+            # Reset the model registry to the state before the last import as
+            # this import will have to reoccur on the next request and this
+            # could raise NotRegistered and AlreadyRegistered exceptions
+            # (see #8245).
+            if register_to:
+                register_to._registry = before_import_registry
+
+            # Decide whether to bubble up this error. If the app just
+            # doesn't have an admin module, we can ignore the error
+            # attempting to import it, otherwise we want it to bubble up.
+            if module_has_submodule(app_config.module, module_to_search):
+                raise
 
 
 def module_has_submodule(package, module_name):

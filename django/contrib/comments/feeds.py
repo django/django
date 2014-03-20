@@ -1,5 +1,5 @@
 from django.contrib.syndication.views import Feed
-from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 from django.contrib import comments
 from django.utils.translation import ugettext as _
 
@@ -21,9 +21,9 @@ class LatestCommentFeed(Feed):
 
     def items(self):
         qs = comments.get_model().objects.filter(
-            site__pk = self.site.pk,
-            is_public = True,
-            is_removed = False,
+            site__pk=self.site.pk,
+            is_public=True,
+            is_removed=False,
         )
         return qs.order_by('-submit_date')[:40]
 

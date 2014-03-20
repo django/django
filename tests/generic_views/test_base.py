@@ -1,14 +1,15 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import time
+import unittest
 
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
-from django.utils import unittest
 from django.views.generic import View, TemplateView, RedirectView
 
 from . import views
+
 
 class SimpleView(View):
     """
@@ -76,7 +77,7 @@ class ViewTest(unittest.TestCase):
         Test that a view can't be accidentally instantiated before deployment
         """
         try:
-            view = SimpleView(key='value').as_view()
+            SimpleView(key='value').as_view()
             self.fail('Should not be able to instantiate a view')
         except AttributeError:
             pass
@@ -86,7 +87,7 @@ class ViewTest(unittest.TestCase):
         Test that a view can't be accidentally instantiated before deployment
         """
         try:
-            view = SimpleView.as_view('value')
+            SimpleView.as_view('value')
             self.fail('Should not be able to use non-keyword arguments instantiating a view')
         except TypeError:
             pass
@@ -227,6 +228,15 @@ class ViewTest(unittest.TestCase):
             self.assertNotIn(attribute, dir(bare_view))
             self.assertIn(attribute, dir(view))
 
+    def test_direct_instantiation(self):
+        """
+        It should be possible to use the view by directly instantiating it
+        without going through .as_view() (#21564).
+        """
+        view = PostOnlyView()
+        response = view.dispatch(self.rf.head('/'))
+        self.assertEqual(response.status_code, 405)
+
 
 class TemplateViewTest(TestCase):
     urls = 'generic_views.urls'
@@ -278,7 +288,7 @@ class TemplateViewTest(TestCase):
         response = self.client.get('/template/simple/bar/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['foo'], 'bar')
-        self.assertTrue(isinstance(response.context['view'], View))
+        self.assertIsInstance(response.context['view'], View)
 
     def test_extra_template_params(self):
         """
@@ -288,7 +298,7 @@ class TemplateViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['foo'], 'bar')
         self.assertEqual(response.context['key'], 'value')
-        self.assertTrue(isinstance(response.context['view'], View))
+        self.assertIsInstance(response.context['view'], View)
 
     def test_cached_views(self):
         """
@@ -317,7 +327,9 @@ class TemplateViewTest(TestCase):
         self.assertEqual(response['Content-Type'], 'text/plain')
 
 
-class RedirectViewTest(unittest.TestCase):
+class RedirectViewTest(TestCase):
+    urls = 'generic_views.urls'
+
     rf = RequestFactory()
 
     def test_no_url(self):
@@ -360,6 +372,22 @@ class RedirectViewTest(unittest.TestCase):
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response.url, '/bar/42/')
 
+    def test_named_url_pattern(self):
+        "Named pattern parameter should reverse to the matching pattern"
+        response = RedirectView.as_view(pattern_name='artist_detail')(self.rf.get('/foo/'), pk=1)
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response['Location'], '/detail/artist/1/')
+
+    def test_named_url_pattern_using_args(self):
+        response = RedirectView.as_view(pattern_name='artist_detail')(self.rf.get('/foo/'), 1)
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response['Location'], '/detail/artist/1/')
+
+    def test_wrong_named_url_pattern(self):
+        "A wrong pattern name returns 410 GONE"
+        response = RedirectView.as_view(pattern_name='wrong.pattern_name')(self.rf.get('/foo/'))
+        self.assertEqual(response.status_code, 410)
+
     def test_redirect_POST(self):
         "Default is a permanent redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.post('/foo/'))
@@ -384,6 +412,12 @@ class RedirectViewTest(unittest.TestCase):
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response.url, '/bar/')
 
+    def test_redirect_PATCH(self):
+        "Default is a permanent redirect"
+        response = RedirectView.as_view(url='/bar/')(self.rf.patch('/foo/'))
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.url, '/bar/')
+
     def test_redirect_DELETE(self):
         "Default is a permanent redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.delete('/foo/'))
@@ -395,6 +429,15 @@ class RedirectViewTest(unittest.TestCase):
         # we can't use self.rf.get because it always sets QUERY_STRING
         response = RedirectView.as_view(url='/bar/')(self.rf.request(PATH_INFO='/foo/'))
         self.assertEqual(response.status_code, 301)
+
+    def test_direct_instantiation(self):
+        """
+        It should be possible to use the view without going through .as_view()
+        (#21564).
+        """
+        view = RedirectView()
+        response = view.dispatch(self.rf.head('/foo/'))
+        self.assertEqual(response.status_code, 410)
 
 
 class GetContextDataTest(unittest.TestCase):
@@ -411,3 +454,48 @@ class GetContextDataTest(unittest.TestCase):
         # test that kwarg overrides values assigned higher up
         context = test_view.get_context_data(test_name='test_value')
         self.assertEqual(context['test_name'], 'test_value')
+
+    def test_object_at_custom_name_in_context_data(self):
+        # Checks 'pony' key presence in dict returned by get_context_date
+        test_view = views.CustomSingleObjectView()
+        test_view.context_object_name = 'pony'
+        context = test_view.get_context_data()
+        self.assertEqual(context['pony'], test_view.object)
+
+    def test_object_in_get_context_data(self):
+        # Checks 'object' key presence in dict returned by get_context_date #20234
+        test_view = views.CustomSingleObjectView()
+        context = test_view.get_context_data()
+        self.assertEqual(context['object'], test_view.object)
+
+
+class UseMultipleObjectMixinTest(unittest.TestCase):
+    rf = RequestFactory()
+
+    def test_use_queryset_from_view(self):
+        test_view = views.CustomMultipleObjectMixinView()
+        test_view.get(self.rf.get('/'))
+        # Don't pass queryset as argument
+        context = test_view.get_context_data()
+        self.assertEqual(context['object_list'], test_view.queryset)
+
+    def test_overwrite_queryset(self):
+        test_view = views.CustomMultipleObjectMixinView()
+        test_view.get(self.rf.get('/'))
+        queryset = [{'name': 'Lennon'}, {'name': 'Ono'}]
+        self.assertNotEqual(test_view.queryset, queryset)
+        # Overwrite the view's queryset with queryset from kwarg
+        context = test_view.get_context_data(object_list=queryset)
+        self.assertEqual(context['object_list'], queryset)
+
+
+class SingleObjectTemplateResponseMixinTest(unittest.TestCase):
+
+    def test_template_mixin_without_template(self):
+        """
+        We want to makes sure that if you use a template mixin, but forget the
+        template, it still tells you it's ImproperlyConfigured instead of
+        TemplateDoesNotExist.
+        """
+        view = views.TemplateResponseWithoutTemplate()
+        self.assertRaises(ImproperlyConfigured, view.get_template_names)

@@ -1,24 +1,22 @@
 import os
 import errno
-try:
-    from urllib.parse import urljoin
-except ImportError:     # Python 2
-    from urlparse import urljoin
 import itertools
 from datetime import datetime
 
 from django.conf import settings
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import locks, File
 from django.core.files.move import file_move_safe
 from django.utils.encoding import force_text, filepath_to_uri
 from django.utils.functional import LazyObject
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
+from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.text import get_valid_filename
 from django.utils._os import safe_join, abspathu
 
 
 __all__ = ('Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage')
+
 
 class Storage(object):
     """
@@ -95,62 +93,64 @@ class Storage(object):
         """
         Deletes the specified file from the storage system.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a delete() method')
 
     def exists(self, name):
         """
-        Returns True if a file referened by the given name already exists in the
+        Returns True if a file referenced by the given name already exists in the
         storage system, or False if the name is available for a new file.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a exists() method')
 
     def listdir(self, path):
         """
         Lists the contents of the specified path, returning a 2-tuple of lists;
         the first item being directories, the second item being files.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a listdir() method')
 
     def size(self, name):
         """
         Returns the total size, in bytes, of the file specified by name.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a size() method')
 
     def url(self, name):
         """
         Returns an absolute URL where the file's contents can be accessed
         directly by a Web browser.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a url() method')
 
     def accessed_time(self, name):
         """
         Returns the last accessed time (as datetime object) of the file
         specified by name.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide an accessed_time() method')
 
     def created_time(self, name):
         """
         Returns the creation time (as datetime object) of the file
         specified by name.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a created_time() method')
 
     def modified_time(self, name):
         """
         Returns the last modified time (as datetime object) of the file
         specified by name.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a modified_time() method')
+
 
 class FileSystemStorage(Storage):
     """
     Standard filesystem storage
     """
 
-    def __init__(self, location=None, base_url=None):
+    def __init__(self, location=None, base_url=None, file_permissions_mode=None,
+            directory_permissions_mode=None):
         if location is None:
             location = settings.MEDIA_ROOT
         self.base_location = location
@@ -158,6 +158,14 @@ class FileSystemStorage(Storage):
         if base_url is None:
             base_url = settings.MEDIA_URL
         self.base_url = base_url
+        self.file_permissions_mode = (
+            file_permissions_mode if file_permissions_mode is not None
+            else settings.FILE_UPLOAD_PERMISSIONS
+        )
+        self.directory_permissions_mode = (
+            directory_permissions_mode if directory_permissions_mode is not None
+            else settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS
+        )
 
     def _open(self, name, mode='rb'):
         return File(open(self.path(name), mode))
@@ -172,7 +180,16 @@ class FileSystemStorage(Storage):
         directory = os.path.dirname(full_path)
         if not os.path.exists(directory):
             try:
-                os.makedirs(directory)
+                if self.directory_permissions_mode is not None:
+                    # os.makedirs applies the global umask, so we reset it,
+                    # for consistency with file_permissions_mode behavior.
+                    old_umask = os.umask(0)
+                    try:
+                        os.makedirs(directory, self.directory_permissions_mode)
+                    finally:
+                        os.umask(old_umask)
+                else:
+                    os.makedirs(directory)
             except OSError as e:
                 if e.errno != errno.EEXIST:
                     raise
@@ -200,15 +217,16 @@ class FileSystemStorage(Storage):
                              getattr(os, 'O_BINARY', 0))
                     # The current umask value is masked out by os.open!
                     fd = os.open(full_path, flags, 0o666)
+                    _file = None
                     try:
                         locks.lock(fd, locks.LOCK_EX)
-                        _file = None
                         for chunk in content.chunks():
                             if _file is None:
                                 mode = 'wb' if isinstance(chunk, bytes) else 'wt'
                                 _file = os.fdopen(fd, mode)
                             _file.write(chunk)
                     finally:
+                        content.close()
                         locks.unlock(fd)
                         if _file is not None:
                             _file.close()
@@ -225,12 +243,13 @@ class FileSystemStorage(Storage):
                 # OK, the file save worked. Break out of the loop.
                 break
 
-        if settings.FILE_UPLOAD_PERMISSIONS is not None:
-            os.chmod(full_path, settings.FILE_UPLOAD_PERMISSIONS)
+        if self.file_permissions_mode is not None:
+            os.chmod(full_path, self.file_permissions_mode)
 
         return name
 
     def delete(self, name):
+        assert name, "The name argument is not allowed to be empty."
         name = self.path(name)
         # If the file exists, delete it from the filesystem.
         # Note that there is a race between os.path.exists and os.remove:
@@ -260,7 +279,7 @@ class FileSystemStorage(Storage):
         try:
             path = safe_join(self.location, name)
         except ValueError:
-            raise SuspiciousOperation("Attempted access to '%s' denied." % name)
+            raise SuspiciousFileOperation("Attempted access to '%s' denied." % name)
         return os.path.normpath(path)
 
     def size(self, name):
@@ -280,8 +299,10 @@ class FileSystemStorage(Storage):
     def modified_time(self, name):
         return datetime.fromtimestamp(os.path.getmtime(self.path(name)))
 
+
 def get_storage_class(import_path=None):
-    return import_by_path(import_path or settings.DEFAULT_FILE_STORAGE)
+    return import_string(import_path or settings.DEFAULT_FILE_STORAGE)
+
 
 class DefaultStorage(LazyObject):
     def _setup(self):

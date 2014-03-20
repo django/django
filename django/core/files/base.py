@@ -8,9 +8,10 @@ from django.core.files.utils import FileProxyMixin
 from django.utils import six
 from django.utils.encoding import force_bytes, python_2_unicode_compatible
 
+
 @python_2_unicode_compatible
 class File(FileProxyMixin):
-    DEFAULT_CHUNK_SIZE = 64 * 2**10
+    DEFAULT_CHUNK_SIZE = 64 * 2 ** 10
 
     def __init__(self, file, name=None):
         self.file = file
@@ -103,7 +104,7 @@ class File(FileProxyMixin):
 
                 # If this is the end of a line, yield
                 # otherwise, wait for the next round
-                if line[-1] in ('\n', '\r'):
+                if line[-1:] in (b'\n', b'\r'):
                     yield line
                 else:
                     buffer_ = line
@@ -127,6 +128,7 @@ class File(FileProxyMixin):
 
     def close(self):
         self.file.close()
+
 
 @python_2_unicode_compatible
 class ContentFile(File):

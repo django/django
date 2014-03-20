@@ -7,6 +7,7 @@ from django.utils.encoding import force_text
 
 from django.contrib.staticfiles import finders
 
+
 class Command(LabelCommand):
     help = "Finds the absolute paths for the given static file(s)."
     args = "[file ...]"
@@ -20,15 +21,25 @@ class Command(LabelCommand):
         verbosity = int(options.get('verbosity', 1))
         result = finders.find(path, all=options['all'])
         path = force_text(path)
+        if verbosity >= 2:
+            searched_locations = ("Looking in the following locations:\n  %s" %
+                                  "\n  ".join(force_text(location)
+                                  for location in finders.searched_locations))
+        else:
+            searched_locations = ''
         if result:
             if not isinstance(result, (list, tuple)):
                 result = [result]
             result = (force_text(os.path.realpath(path)) for path in result)
             if verbosity >= 1:
-                output = '\n  '.join(result)
-                return "Found '%s' here:\n  %s" % (path, output)
+                file_list = '\n  '.join(result)
+                return ("Found '%s' here:\n  %s\n%s" %
+                        (path, file_list, searched_locations))
             else:
                 return '\n'.join(result)
         else:
+            message = ["No matching file found for '%s'." % path]
+            if verbosity >= 2:
+                message.append(searched_locations)
             if verbosity >= 1:
-                self.stderr.write("No matching file found for '%s'." % path)
+                self.stderr.write('\n'.join(message))

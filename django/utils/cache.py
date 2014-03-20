@@ -23,13 +23,14 @@ import re
 import time
 
 from django.conf import settings
-from django.core.cache import get_cache
+from django.core.cache import caches
 from django.utils.encoding import iri_to_uri, force_bytes, force_text
 from django.utils.http import http_date
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import get_language
 
 cc_delim_re = re.compile(r'\s*,\s*')
+
 
 def patch_cache_control(response, **kwargs):
     """
@@ -58,7 +59,7 @@ def patch_cache_control(response, **kwargs):
 
     if response.has_header('Cache-Control'):
         cc = cc_delim_re.split(response['Cache-Control'])
-        cc = dict([dictitem(el) for el in cc])
+        cc = dict(dictitem(el) for el in cc)
     else:
         cc = {}
 
@@ -76,8 +77,9 @@ def patch_cache_control(response, **kwargs):
 
     for (k, v) in kwargs.items():
         cc[k.replace('_', '-')] = v
-    cc = ', '.join([dictvalue(el) for el in cc.items()])
+    cc = ', '.join(dictvalue(el) for el in cc.items())
     response['Cache-Control'] = cc
+
 
 def get_max_age(response):
     """
@@ -86,18 +88,20 @@ def get_max_age(response):
     """
     if not response.has_header('Cache-Control'):
         return
-    cc = dict([_to_tuple(el) for el in
-        cc_delim_re.split(response['Cache-Control'])])
+    cc = dict(_to_tuple(el) for el in
+        cc_delim_re.split(response['Cache-Control']))
     if 'max-age' in cc:
         try:
             return int(cc['max-age'])
         except (ValueError, TypeError):
             pass
 
+
 def _set_response_etag(response):
     if not response.streaming:
         response['ETag'] = '"%s"' % hashlib.md5(response.content).hexdigest()
     return response
+
 
 def patch_response_headers(response, cache_timeout=None):
     """
@@ -112,7 +116,7 @@ def patch_response_headers(response, cache_timeout=None):
     if cache_timeout is None:
         cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
     if cache_timeout < 0:
-        cache_timeout = 0 # Can't have max-age negative
+        cache_timeout = 0  # Can't have max-age negative
     if settings.USE_ETAGS and not response.has_header('ETag'):
         if hasattr(response, 'render') and callable(response.render):
             response.add_post_render_callback(_set_response_etag)
@@ -124,11 +128,13 @@ def patch_response_headers(response, cache_timeout=None):
         response['Expires'] = http_date(time.time() + cache_timeout)
     patch_cache_control(response, max_age=cache_timeout)
 
+
 def add_never_cache_headers(response):
     """
     Adds headers to a response to indicate that a page should never be cached.
     """
     patch_response_headers(response, cache_timeout=-1)
+
 
 def patch_vary_headers(response, newheaders):
     """
@@ -144,10 +150,11 @@ def patch_vary_headers(response, newheaders):
     else:
         vary_headers = []
     # Use .lower() here so we treat headers as case-insensitive.
-    existing_headers = set([header.lower() for header in vary_headers])
+    existing_headers = set(header.lower() for header in vary_headers)
     additional_headers = [newheader for newheader in newheaders
                           if newheader.lower() not in existing_headers]
     response['Vary'] = ', '.join(vary_headers + additional_headers)
+
 
 def has_vary_header(response, header_query):
     """
@@ -156,8 +163,9 @@ def has_vary_header(response, header_query):
     if not response.has_header('Vary'):
         return False
     vary_headers = cc_delim_re.split(response['Vary'])
-    existing_headers = set([header.lower() for header in vary_headers])
+    existing_headers = set(header.lower() for header in vary_headers)
     return header_query.lower() in existing_headers
+
 
 def _i18n_cache_key_suffix(request, cache_key):
     """If necessary, adds the current locale or time zone to the cache key."""
@@ -168,12 +176,13 @@ def _i18n_cache_key_suffix(request, cache_key):
         cache_key += '.%s' % getattr(request, 'LANGUAGE_CODE', get_language())
     if settings.USE_TZ:
         # The datetime module doesn't restrict the output of tzname().
-        # Windows is known to use non-standard, locale-dependant names.
+        # Windows is known to use non-standard, locale-dependent names.
         # User-defined tzinfo classes may return absolutely anything.
         # Hence this paranoid conversion to create a valid cache key.
         tz_name = force_text(get_current_timezone_name(), errors='ignore')
         cache_key += '.%s' % tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
     return cache_key
+
 
 def _generate_cache_key(request, method, headerlist, key_prefix):
     """Returns a cache key from the headers given in the header list."""
@@ -182,23 +191,25 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
         value = request.META.get(header, None)
         if value is not None:
             ctx.update(force_bytes(value))
-    path = hashlib.md5(force_bytes(iri_to_uri(request.get_full_path())))
+    url = hashlib.md5(force_bytes(iri_to_uri(request.build_absolute_uri())))
     cache_key = 'views.decorators.cache.cache_page.%s.%s.%s.%s' % (
-        key_prefix, method, path.hexdigest(), ctx.hexdigest())
+        key_prefix, method, url.hexdigest(), ctx.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
+
 
 def _generate_cache_header_key(key_prefix, request):
     """Returns a cache key for the header cache."""
-    path = hashlib.md5(force_bytes(iri_to_uri(request.get_full_path())))
+    url = hashlib.md5(force_bytes(iri_to_uri(request.build_absolute_uri())))
     cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
-        key_prefix, path.hexdigest())
+        key_prefix, url.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
+
 
 def get_cache_key(request, key_prefix=None, method='GET', cache=None):
     """
-    Returns a cache key based on the request path and query. It can be used
+    Returns a cache key based on the request URL and query. It can be used
     in the request phase because it pulls the list of headers to take into
-    account from the global path registry and uses those to build a cache key
+    account from the global URL registry and uses those to build a cache key
     to check against.
 
     If there is no headerlist stored, the page needs to be rebuilt, so this
@@ -208,18 +219,19 @@ def get_cache_key(request, key_prefix=None, method='GET', cache=None):
         key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
     cache_key = _generate_cache_header_key(key_prefix, request)
     if cache is None:
-        cache = get_cache(settings.CACHE_MIDDLEWARE_ALIAS)
+        cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
     headerlist = cache.get(cache_key, None)
     if headerlist is not None:
         return _generate_cache_key(request, method, headerlist, key_prefix)
     else:
         return None
 
+
 def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cache=None):
     """
-    Learns what headers to take into account for some request path from the
-    response object. It stores those headers in a global path registry so that
-    later access to that path will know what headers to take into account
+    Learns what headers to take into account for some request URL from the
+    response object. It stores those headers in a global URL registry so that
+    later access to that URL will know what headers to take into account
     without building the response object itself. The headers are named in the
     Vary header of the response, but we want to prevent response generation.
 
@@ -234,7 +246,7 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
         cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
     cache_key = _generate_cache_header_key(key_prefix, request)
     if cache is None:
-        cache = get_cache(settings.CACHE_MIDDLEWARE_ALIAS)
+        cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
     if response.has_header('Vary'):
         is_accept_language_redundant = settings.USE_I18N or settings.USE_L10N
         # If i18n or l10n are used, the generated cache key will be suffixed
@@ -252,13 +264,13 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
         return _generate_cache_key(request, request.method, headerlist, key_prefix)
     else:
         # if there is no Vary header, we still need a cache key
-        # for the request.get_full_path()
+        # for the request.build_absolute_uri()
         cache.set(cache_key, [], cache_timeout)
         return _generate_cache_key(request, request.method, [], key_prefix)
 
 
 def _to_tuple(s):
-    t = s.split('=',1)
+    t = s.split('=', 1)
     if len(t) == 2:
         return t[0].lower(), t[1]
     return t[0].lower(), True

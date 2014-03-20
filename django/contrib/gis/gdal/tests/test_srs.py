@@ -1,5 +1,10 @@
-from django.contrib.gis.gdal import SpatialReference, CoordTransform, OGRException, SRSException
-from django.utils import unittest
+import unittest
+from unittest import skipUnless
+
+from django.contrib.gis.gdal import HAS_GDAL
+
+if HAS_GDAL:
+    from django.contrib.gis.gdal import SpatialReference, CoordTransform, OGRException, SRSException
 
 
 class TestSRS:
@@ -13,20 +18,20 @@ srlist = (TestSRS('GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,29
                   proj='+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ',
                   epsg=4326, projected=False, geographic=True, local=False,
                   lin_name='unknown', ang_name='degree', lin_units=1.0, ang_units=0.0174532925199,
-                  auth={'GEOGCS' : ('EPSG', '4326'), 'spheroid' : ('EPSG', '7030')},
-                  attr=(('DATUM', 'WGS_1984'), (('SPHEROID', 1), '6378137'),('primem|authority', 'EPSG'),),
+                  auth={'GEOGCS': ('EPSG', '4326'), 'spheroid': ('EPSG', '7030')},
+                  attr=(('DATUM', 'WGS_1984'), (('SPHEROID', 1), '6378137'), ('primem|authority', 'EPSG'),),
                   ),
           TestSRS('PROJCS["NAD83 / Texas South Central",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["standard_parallel_1",30.28333333333333],PARAMETER["standard_parallel_2",28.38333333333333],PARAMETER["latitude_of_origin",27.83333333333333],PARAMETER["central_meridian",-99],PARAMETER["false_easting",600000],PARAMETER["false_northing",4000000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","32140"]]',
                   proj=None, epsg=32140, projected=True, geographic=False, local=False,
                   lin_name='metre', ang_name='degree', lin_units=1.0, ang_units=0.0174532925199,
-                  auth={'PROJCS' : ('EPSG', '32140'), 'spheroid' : ('EPSG', '7019'), 'unit' : ('EPSG', '9001'),},
-                  attr=(('DATUM', 'North_American_Datum_1983'),(('SPHEROID', 2), '298.257222101'),('PROJECTION','Lambert_Conformal_Conic_2SP'),),
+                  auth={'PROJCS': ('EPSG', '32140'), 'spheroid': ('EPSG', '7019'), 'unit': ('EPSG', '9001')},
+                  attr=(('DATUM', 'North_American_Datum_1983'), (('SPHEROID', 2), '298.257222101'), ('PROJECTION', 'Lambert_Conformal_Conic_2SP'),),
                   ),
           TestSRS('PROJCS["NAD_1983_StatePlane_Texas_South_Central_FIPS_4204_Feet",GEOGCS["GCS_North_American_1983",DATUM["North_American_Datum_1983",SPHEROID["GRS_1980",6378137.0,298.257222101]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["False_Easting",1968500.0],PARAMETER["False_Northing",13123333.33333333],PARAMETER["Central_Meridian",-99.0],PARAMETER["Standard_Parallel_1",28.38333333333333],PARAMETER["Standard_Parallel_2",30.28333333333334],PARAMETER["Latitude_Of_Origin",27.83333333333333],UNIT["Foot_US",0.3048006096012192]]',
                   proj=None, epsg=None, projected=True, geographic=False, local=False,
                   lin_name='Foot_US', ang_name='Degree', lin_units=0.3048006096012192, ang_units=0.0174532925199,
-                  auth={'PROJCS' : (None, None),},
-                  attr=(('PROJCS|GeOgCs|spheroid', 'GRS_1980'),(('projcs', 9), 'UNIT'), (('projcs', 11), None),),
+                  auth={'PROJCS': (None, None)},
+                  attr=(('PROJCS|GeOgCs|spheroid', 'GRS_1980'), (('projcs', 9), 'UNIT'), (('projcs', 11), None),),
                   ),
           # This is really ESRI format, not WKT -- but the import should work the same
           TestSRS('LOCAL_CS["Non-Earth (Meter)",LOCAL_DATUM["Local Datum",0],UNIT["Meter",1.0],AXIS["X",EAST],AXIS["Y",NORTH]]',
@@ -41,17 +46,19 @@ well_known = (TestSRS('GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",637813
               TestSRS('GEOGCS["WGS 72",DATUM["WGS_1972",SPHEROID["WGS 72",6378135,298.26,AUTHORITY["EPSG","7043"]],AUTHORITY["EPSG","6322"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4322"]]', wk='WGS72', name='WGS 72', attrs=(('GEOGCS|AUTHORITY', 1, '4322'), ('SPHEROID', 'WGS 72'))),
               TestSRS('GEOGCS["NAD27",DATUM["North_American_Datum_1927",SPHEROID["Clarke 1866",6378206.4,294.9786982138982,AUTHORITY["EPSG","7008"]],AUTHORITY["EPSG","6267"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4267"]]', wk='NAD27', name='NAD27', attrs=(('GEOGCS|AUTHORITY', 1, '4267'), ('SPHEROID', 'Clarke 1866'))),
               TestSRS('GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]]', wk='NAD83', name='NAD83', attrs=(('GEOGCS|AUTHORITY', 1, '4269'), ('SPHEROID', 'GRS 1980'))),
-              TestSRS('PROJCS["NZGD49 / Karamea Circuit",GEOGCS["NZGD49",DATUM["New_Zealand_Geodetic_Datum_1949",SPHEROID["International 1924",6378388,297,AUTHORITY["EPSG","7022"]],TOWGS84[59.47,-5.04,187.44,0.47,-0.1,1.024,-4.5993],AUTHORITY["EPSG","6272"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4272"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",-41.28991152777778],PARAMETER["central_meridian",172.1090281944444],PARAMETER["scale_factor",1],PARAMETER["false_easting",300000],PARAMETER["false_northing",700000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","27216"]]', wk='EPSG:27216', name='NZGD49 / Karamea Circuit', attrs=(('PROJECTION','Transverse_Mercator'), ('SPHEROID', 'International 1924'))),
+              TestSRS('PROJCS["NZGD49 / Karamea Circuit",GEOGCS["NZGD49",DATUM["New_Zealand_Geodetic_Datum_1949",SPHEROID["International 1924",6378388,297,AUTHORITY["EPSG","7022"]],TOWGS84[59.47,-5.04,187.44,0.47,-0.1,1.024,-4.5993],AUTHORITY["EPSG","6272"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4272"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",-41.28991152777778],PARAMETER["central_meridian",172.1090281944444],PARAMETER["scale_factor",1],PARAMETER["false_easting",300000],PARAMETER["false_northing",700000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","27216"]]', wk='EPSG:27216', name='NZGD49 / Karamea Circuit', attrs=(('PROJECTION', 'Transverse_Mercator'), ('SPHEROID', 'International 1924'))),
               )
 
 bad_srlist = ('Foobar', 'OOJCS["NAD83 / Texas South Central",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["standard_parallel_1",30.28333333333333],PARAMETER["standard_parallel_2",28.38333333333333],PARAMETER["latitude_of_origin",27.83333333333333],PARAMETER["central_meridian",-99],PARAMETER["false_easting",600000],PARAMETER["false_northing",4000000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","32140"]]',)
 
+
+@skipUnless(HAS_GDAL, "GDAL is required")
 class SpatialRefTest(unittest.TestCase):
 
     def test01_wkt(self):
         "Testing initialization on valid OGC WKT."
         for s in srlist:
-            srs = SpatialReference(s.wkt)
+            SpatialReference(s.wkt)
 
     def test02_bad_wkt(self):
         "Testing initialization on invalid WKT."
@@ -120,8 +127,8 @@ class SpatialRefTest(unittest.TestCase):
         for s in srlist:
             srs = SpatialReference(s.wkt)
             for tup in s.attr:
-                att = tup[0] # Attribute to test
-                exp = tup[1] # Expected result
+                att = tup[0]  # Attribute to test
+                exp = tup[1]  # Expected result
                 self.assertEqual(exp, srs[att])
 
     def test11_wellknown(self):
@@ -143,7 +150,7 @@ class SpatialRefTest(unittest.TestCase):
         target = SpatialReference('WGS84')
         for s in srlist:
             if s.proj:
-                ct = CoordTransform(SpatialReference(s.wkt), target)
+                CoordTransform(SpatialReference(s.wkt), target)
 
     def test13_attr_value(self):
         "Testing the attr_value() method."
@@ -155,11 +162,3 @@ class SpatialRefTest(unittest.TestCase):
         self.assertEqual('EPSG', s1['AUTHORITY'])
         self.assertEqual(4326, int(s1['AUTHORITY', 1]))
         self.assertEqual(None, s1['FOOBAR'])
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(SpatialRefTest))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())

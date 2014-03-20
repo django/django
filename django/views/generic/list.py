@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.core.paginator import Paginator, InvalidPage
 from django.core.exceptions import ImproperlyConfigured
+from django.db.models.query import QuerySet
 from django.http import Http404
 from django.utils.translation import ugettext as _
 from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
@@ -22,18 +23,25 @@ class MultipleObjectMixin(ContextMixin):
 
     def get_queryset(self):
         """
-        Get the list of items for this view. This must be an iterable, and may
-        be a queryset (in which qs-specific behavior will be enabled).
+        Return the list of items for this view.
+
+        The return value must be an iterable and may be an instance of
+        `QuerySet` in which case `QuerySet` specific behavior will be enabled.
         """
         if self.queryset is not None:
             queryset = self.queryset
-            if hasattr(queryset, '_clone'):
-                queryset = queryset._clone()
+            if isinstance(queryset, QuerySet):
+                queryset = queryset.all()
         elif self.model is not None:
             queryset = self.model._default_manager.all()
         else:
-            raise ImproperlyConfigured("'%s' must define 'queryset' or 'model'"
-                                       % self.__class__.__name__)
+            raise ImproperlyConfigured(
+                "%(cls)s is missing a QuerySet. Define "
+                "%(cls)s.model, %(cls)s.queryset, or override "
+                "%(cls)s.get_queryset()." % {
+                    'cls': self.__class__.__name__
+                }
+            )
         return queryset
 
     def paginate_queryset(self, queryset, page_size):
@@ -57,8 +65,8 @@ class MultipleObjectMixin(ContextMixin):
             return (paginator, page, page.object_list, page.has_other_pages())
         except InvalidPage as e:
             raise Http404(_('Invalid page (%(page_number)s): %(message)s') % {
-                                'page_number': page_number,
-                                'message': str(e)
+                'page_number': page_number,
+                'message': str(e)
             })
 
     def get_paginate_by(self, queryset):
@@ -105,7 +113,7 @@ class MultipleObjectMixin(ContextMixin):
         """
         Get the context for this view.
         """
-        queryset = kwargs.pop('object_list')
+        queryset = kwargs.pop('object_list', self.object_list)
         page_size = self.get_paginate_by(queryset)
         context_object_name = self.get_context_object_name(queryset)
         if page_size:
@@ -142,14 +150,14 @@ class BaseListView(MultipleObjectMixin, View):
             # it's better to do a cheap query than to load the unpaginated
             # queryset in memory.
             if (self.get_paginate_by(self.object_list) is not None
-                and hasattr(self.object_list, 'exists')):
+                    and hasattr(self.object_list, 'exists')):
                 is_empty = not self.object_list.exists()
             else:
                 is_empty = len(self.object_list) == 0
             if is_empty:
                 raise Http404(_("Empty list and '%(class_name)s.allow_empty' is False.")
                         % {'class_name': self.__class__.__name__})
-        context = self.get_context_data(object_list=self.object_list)
+        context = self.get_context_data()
         return self.render_to_response(context)
 
 

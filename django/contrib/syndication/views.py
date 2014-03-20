@@ -3,16 +3,16 @@ from __future__ import unicode_literals
 from calendar import timegm
 
 from django.conf import settings
-from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import HttpResponse, Http404
 from django.template import loader, TemplateDoesNotExist, RequestContext
-from django.utils import feedgenerator, tzinfo
+from django.utils import feedgenerator
 from django.utils.encoding import force_text, iri_to_uri, smart_text
 from django.utils.html import escape
 from django.utils.http import http_date
 from django.utils import six
-from django.utils.timezone import is_naive
+from django.utils.timezone import get_default_timezone, is_naive, make_aware
 
 
 def add_domain(domain, url, secure=False):
@@ -43,9 +43,9 @@ class Feed(object):
             raise Http404('Feed object does not exist.')
         feedgen = self.get_feed(obj, request)
         response = HttpResponse(content_type=feedgen.mime_type)
-        if hasattr(self, 'item_pubdate'):
-            # if item_pubdate is defined for the feed, set header so as
-            # ConditionalGetMiddleware is able to send 304 NOT MODIFIED
+        if hasattr(self, 'item_pubdate') or hasattr(self, 'item_updateddate'):
+            # if item_pubdate or item_updateddate is defined for the feed, set
+            # header so as ConditionalGetMiddleware is able to send 304 NOT MODIFIED
             response['Last-Modified'] = http_date(
                 timegm(feedgen.latest_post_date().utctimetuple()))
         feedgen.write(response, 'utf-8')
@@ -121,23 +121,23 @@ class Feed(object):
         link = add_domain(current_site.domain, link, request.is_secure())
 
         feed = self.feed_type(
-            title = self.__get_dynamic_attr('title', obj),
-            subtitle = self.__get_dynamic_attr('subtitle', obj),
-            link = link,
-            description = self.__get_dynamic_attr('description', obj),
-            language = settings.LANGUAGE_CODE,
-            feed_url = add_domain(
+            title=self.__get_dynamic_attr('title', obj),
+            subtitle=self.__get_dynamic_attr('subtitle', obj),
+            link=link,
+            description=self.__get_dynamic_attr('description', obj),
+            language=settings.LANGUAGE_CODE,
+            feed_url=add_domain(
                 current_site.domain,
                 self.__get_dynamic_attr('feed_url', obj) or request.path,
                 request.is_secure(),
             ),
-            author_name = self.__get_dynamic_attr('author_name', obj),
-            author_link = self.__get_dynamic_attr('author_link', obj),
-            author_email = self.__get_dynamic_attr('author_email', obj),
-            categories = self.__get_dynamic_attr('categories', obj),
-            feed_copyright = self.__get_dynamic_attr('feed_copyright', obj),
-            feed_guid = self.__get_dynamic_attr('feed_guid', obj),
-            ttl = self.__get_dynamic_attr('ttl', obj),
+            author_name=self.__get_dynamic_attr('author_name', obj),
+            author_link=self.__get_dynamic_attr('author_link', obj),
+            author_email=self.__get_dynamic_attr('author_email', obj),
+            categories=self.__get_dynamic_attr('categories', obj),
+            feed_copyright=self.__get_dynamic_attr('feed_copyright', obj),
+            feed_guid=self.__get_dynamic_attr('feed_guid', obj),
+            ttl=self.__get_dynamic_attr('ttl', obj),
             **self.feed_extra_kwargs(obj)
         )
 
@@ -175,9 +175,9 @@ class Feed(object):
             enc_url = self.__get_dynamic_attr('item_enclosure_url', item)
             if enc_url:
                 enc = feedgenerator.Enclosure(
-                    url = smart_text(enc_url),
-                    length = smart_text(self.__get_dynamic_attr('item_enclosure_length', item)),
-                    mime_type = smart_text(self.__get_dynamic_attr('item_enclosure_mime_type', item))
+                    url=smart_text(enc_url),
+                    length=smart_text(self.__get_dynamic_attr('item_enclosure_length', item)),
+                    mime_type=smart_text(self.__get_dynamic_attr('item_enclosure_mime_type', item))
                 )
             author_name = self.__get_dynamic_attr('item_author_name', item)
             if author_name is not None:
@@ -186,25 +186,31 @@ class Feed(object):
             else:
                 author_email = author_link = None
 
+            tz = get_default_timezone()
+
             pubdate = self.__get_dynamic_attr('item_pubdate', item)
             if pubdate and is_naive(pubdate):
-                ltz = tzinfo.LocalTimezone(pubdate)
-                pubdate = pubdate.replace(tzinfo=ltz)
+                pubdate = make_aware(pubdate, tz)
+
+            updateddate = self.__get_dynamic_attr('item_updateddate', item)
+            if updateddate and is_naive(updateddate):
+                updateddate = make_aware(updateddate, tz)
 
             feed.add_item(
-                title = title,
-                link = link,
-                description = description,
-                unique_id = self.__get_dynamic_attr('item_guid', item, link),
-                unique_id_is_permalink = self.__get_dynamic_attr(
+                title=title,
+                link=link,
+                description=description,
+                unique_id=self.__get_dynamic_attr('item_guid', item, link),
+                unique_id_is_permalink=self.__get_dynamic_attr(
                     'item_guid_is_permalink', item),
-                enclosure = enc,
-                pubdate = pubdate,
-                author_name = author_name,
-                author_email = author_email,
-                author_link = author_link,
-                categories = self.__get_dynamic_attr('item_categories', item),
-                item_copyright = self.__get_dynamic_attr('item_copyright', item),
+                enclosure=enc,
+                pubdate=pubdate,
+                updateddate=updateddate,
+                author_name=author_name,
+                author_email=author_email,
+                author_link=author_link,
+                categories=self.__get_dynamic_attr('item_categories', item),
+                item_copyright=self.__get_dynamic_attr('item_copyright', item),
                 **self.item_extra_kwargs(item)
             )
         return feed

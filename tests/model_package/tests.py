@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.contrib.sites.models import Site
 from django.db import models
@@ -13,9 +13,6 @@ class Advertisment(models.Model):
     publications = models.ManyToManyField(
         "model_package.Publication", null=True, blank=True
     )
-
-    class Meta:
-        app_label = 'model_package'
 
 
 class ModelPackageTests(TestCase):

@@ -7,7 +7,7 @@ be driving a release, you should follow these instructions to get the
 package out.
 
 **Please, keep these instructions up-to-date if you make changes!** The point
-here is to be descriptive, not proscriptive, so feel free to streamline or
+here is to be descriptive, not prescriptive, so feel free to streamline or
 otherwise make changes, but **update this document accordingly!**
 
 Overview
@@ -83,16 +83,24 @@ A few items need to be taken care of before even beginning the release process.
 This stuff starts about a week before the release; most of it can be done
 any time leading up to the actual release:
 
-#. If this is a security release, send out pre-notification **one week**
-   before the release. We maintain a list of who gets these pre-notification
-   emails at *FIXME WHERE?*. This email should be signed by the key you'll use
-   for the release, and should include patches for each issue being fixed.
+#. If this is a security release, send out pre-notification **one week** before
+   the release. We maintain a list of who gets these pre-notification emails in
+   the private ``django-core`` repository. This email should be signed by the
+   key you'll use for the release, and should include patches for each issue
+   being fixed.
+
+#. If this is a major release, make sure the tests pass, then increase
+   the default PBKDF2 iterations in
+   ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` by about 10%
+   (pick a round number). Run the tests, and update the 3 failing
+   hasher tests with the new values. Make sure this gets noted in the
+   release notes (see release notes on 1.6 for an example).
 
 #. As the release approaches, watch Trac to make sure no release blockers
    are left for the upcoming release.
 
 #. Check with the other committers to make sure they don't have any
-   un-committed changes for the release.
+   uncommitted changes for the release.
 
 #. Proofread the release notes, including looking at the online
    version to catch any broken links or reST errors, and make sure the
@@ -161,6 +169,9 @@ OK, this is the fun part, where we actually push out a release!
 
    __ https://github.com/django/django/commit/18d920ea4839fb54f9d2a5dcb555b6a5666ee469
 
+#. For a version release, remove the ``UNDER DEVELOPMENT`` header at the top of
+   the release notes.
+
 #. If this is a pre-release package, update the "Development Status" trove
    classifier in ``setup.py`` to reflect this. Otherwise, make sure the
    classifier is set to ``Development Status :: 5 - Production/Stable``.
@@ -183,13 +194,46 @@ OK, this is the fun part, where we actually push out a release!
         $ md5sum dist/Django-*
         $ sha1sum dist/Django-*
 
-   *FIXME: perhaps we should switch to sha256?*
-
 #. Create a "checksums" file containing the hashes and release information.
-   You can start with `a previous checksums file`__ and replace the
-   dates, keys, links, and checksums. *FIXME: make a template file.*
+   Start with this template and insert the correct version, date, release URL
+   and checksums::
 
-   __ https://www.djangoproject.com/m/pgp/Django-1.5b1.checksum.txt
+    This file contains MD5 and SHA1 checksums for the source-code tarball
+    of Django <<VERSION>>, released <<DATE>>.
+
+    To use this file, you will need a working install of PGP or other
+    compatible public-key encryption software. You will also need to have
+    the Django release manager's public key in your keyring; this key has
+    the ID ``0x3684C0C08C8B2AE1`` and can be imported from the MIT
+    keyserver. For example, if using the open-source GNU Privacy Guard
+    implementation of PGP::
+
+        gpg --keyserver pgp.mit.edu --recv-key 0x3684C0C08C8B2AE1
+
+    Once the key is imported, verify this file::
+
+        gpg --verify <<THIS FILENAME>>
+
+    Once you have verified this file, you can use normal MD5 and SHA1
+    checksumming applications to generate the checksums of the Django
+    package and compare them to the checksums listed below.
+
+
+    Release package:
+    ================
+
+    Django <<VERSION>>: https://www.djangoproject.com/m/releases/<<URL>>
+
+
+    MD5 checksum:
+    =============
+
+    MD5(<<RELEASE TAR.GZ FILENAME>>)= <<MD5SUM>>
+
+    SHA1 checksum:
+    ==============
+
+    SHA1(<<RELEASE TAR.GZ FILENAME>>)= <<SHA1SUM>>
 
 #. Sign the checksum file (``gpg --clearsign
    Django-<version>.checksum.txt``). This generates a signed document,
@@ -258,7 +302,8 @@ Now you're ready to actually put the release out there. To do this:
 
 #. Go to the `Add release page in the admin`__, enter the new release number
    exactly as it appears in the name of the tarball (Django-<version>.tar.gz).
-   So for example enter "1.5.1" or "1.4-rc-2", etc.
+   So for example enter "1.5.1" or "1.4-rc-2", etc. If the release is part of
+   an LTS branch, mark it so.
 
    __ https://www.djangoproject.com/admin/releases/release/add/
 
@@ -268,11 +313,10 @@ Now you're ready to actually put the release out there. To do this:
    of the docs by flipping the ``is_default`` flag to ``True`` on the
    appropriate ``DocumentRelease`` object in the ``docs.djangoproject.com``
    database (this will automatically flip it to ``False`` for all
-   others). *FIXME: I had to do this via fab managepy:shell,docs but we should
-   probably make it possible to do via the admin.*
+   others); you can do this using the site's admin.
 
-#. Post the release announcement to the django-announce,
-   django-developers and django-users mailing lists. This should
+#. Post the release announcement to the |django-announce|,
+   |django-developers| and |django-users| mailing lists. This should
    include links to the announcement blog post and the release notes.
 
 Post-release
@@ -285,14 +329,19 @@ You're almost done! All that's left to do now is:
    example, after releasing 1.5.1, update ``VERSION`` to
    ``VERSION = (1, 5, 2, 'alpha', 0)``.
 
-#. For the first alpha release of a new version (when we create the
+#. For the first beta release of a new version (when we create the
    ``stable/1.?.x`` git branch), you'll want to create a new
    ``DocumentRelease`` object in the ``docs.djangoproject.com`` database for
    the new version's docs, and update the ``docs/fixtures/doc_releases.json``
-   JSON fixture. *FIXME: what is the purpose of maintaining this fixture?*
+   JSON fixture, so people without access to the production DB can still
+   run an up-to-date copy of the docs site.
 
-#. Add the release in `Trac's versions list`_ if necessary. Not all versions
-   are declared; take example on previous releases.
+#. Add the release in `Trac's versions list`_ if necessary (and make it the
+   default if it's a final release). Not all versions are declared;
+   take example on previous releases.
+
+#. On the master branch, remove the ``UNDER DEVELOPMENT`` header in the notes
+   of the release that's just been pushed out.
 
 .. _Trac's versions list: https://code.djangoproject.com/admin/ticket/versions
 

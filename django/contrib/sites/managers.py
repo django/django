@@ -1,41 +1,64 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.conf import settings
+from django.core import checks
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
 
+
 class CurrentSiteManager(models.Manager):
     "Use this to limit objects to those associated with the current site."
+
     def __init__(self, field_name=None):
         super(CurrentSiteManager, self).__init__()
         self.__field_name = field_name
-        self.__is_validated = False
-        
-    def _validate_field_name(self):
-        field_names = self.model._meta.get_all_field_names()
-        
-        # If a custom name is provided, make sure the field exists on the model
-        if self.__field_name is not None and self.__field_name not in field_names:
-            raise ValueError("%s couldn't find a field named %s in %s." % \
-                (self.__class__.__name__, self.__field_name, self.model._meta.object_name))
-        
-        # Otherwise, see if there is a field called either 'site' or 'sites'
-        else:
-            for potential_name in ['site', 'sites']:
-                if potential_name in field_names:
-                    self.__field_name = potential_name
-                    self.__is_validated = True
-                    break
-        
-        # Now do a type check on the field (FK or M2M only)
+
+    def check(self, **kwargs):
+        errors = super(CurrentSiteManager, self).check(**kwargs)
+        errors.extend(self._check_field_name())
+        return errors
+
+    def _check_field_name(self):
+        field_name = self._get_field_name()
         try:
-            field = self.model._meta.get_field(self.__field_name)
-            if not isinstance(field, (models.ForeignKey, models.ManyToManyField)):
-                raise TypeError("%s must be a ForeignKey or ManyToManyField." %self.__field_name)
+            field = self.model._meta.get_field(field_name)
         except FieldDoesNotExist:
-            raise ValueError("%s couldn't find a field named %s in %s." % \
-                    (self.__class__.__name__, self.__field_name, self.model._meta.object_name))
-        self.__is_validated = True
-    
+            return [
+                checks.Error(
+                    "CurrentSiteManager could not find a field named '%s'." % field_name,
+                    hint=None,
+                    obj=self,
+                    id='sites.E001',
+                )
+            ]
+
+        if not isinstance(field, (models.ForeignKey, models.ManyToManyField)):
+            return [
+                checks.Error(
+                    "CurrentSiteManager cannot use '%s.%s' as it is not a ForeignKey or ManyToManyField." % (
+                        self.model._meta.object_name, field_name
+                    ),
+                    hint=None,
+                    obj=self,
+                    id='sites.E002',
+                )
+            ]
+
+        return []
+
+    def _get_field_name(self):
+        """ Return self.__field_name or 'site' or 'sites'. """
+
+        if not self.__field_name:
+            try:
+                self.model._meta.get_field('site')
+            except FieldDoesNotExist:
+                self.__field_name = 'sites'
+            else:
+                self.__field_name = 'site'
+        return self.__field_name
+
     def get_queryset(self):
-        if not self.__is_validated:
-            self._validate_field_name()
-        return super(CurrentSiteManager, self).get_queryset().filter(**{self.__field_name + '__id__exact': settings.SITE_ID})
+        return super(CurrentSiteManager, self).get_queryset().filter(
+            **{self._get_field_name() + '__id': settings.SITE_ID})

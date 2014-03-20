@@ -12,9 +12,9 @@ Run with the extra option "help" for a list of additional options you can
 pass to this server.
 """
 
+import importlib
 import os
 import sys
-from django.utils import importlib
 
 __version__ = "0.1"
 __all__ = ["runfastcgi"]
@@ -81,11 +81,13 @@ Examples:
 
 """ % FASTCGI_OPTIONS
 
+
 def fastcgi_help(message=None):
     print(FASTCGI_HELP)
     if message:
         print(message)
     return False
+
 
 def runfastcgi(argset=[], **kwargs):
     options = FASTCGI_OPTIONS.copy()
@@ -101,7 +103,7 @@ def runfastcgi(argset=[], **kwargs):
         return fastcgi_help()
 
     try:
-        import flup
+        import flup  # NOQA
     except ImportError as e:
         sys.stderr.write("ERROR: %s\n" % e)
         sys.stderr.write("  Unable to load the flup package.  In order to run django\n")

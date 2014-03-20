@@ -1,11 +1,12 @@
 from __future__ import unicode_literals
 
+from importlib import import_module
+
 from django import forms, http
 from django.conf import settings
 from django.db import models
 from django.test import TestCase
 from django.template.response import TemplateResponse
-from django.utils.importlib import import_module
 
 from django.contrib.auth.models import User
 
@@ -17,7 +18,7 @@ from django.contrib.formtools.wizard.views import (WizardView,
 class DummyRequest(http.HttpRequest):
     def __init__(self, POST=None):
         super(DummyRequest, self).__init__()
-        self.method = POST and "POST" or "GET"
+        self.method = "POST" if POST else "GET"
         if POST is not None:
             self.POST.update(POST)
         self.session = {}
@@ -47,7 +48,7 @@ class CustomKwargsStep1(Step1):
 
     def __init__(self, test=None, *args, **kwargs):
         self.test = test
-        return super(CustomKwargsStep1, self).__init__(*args, **kwargs)
+        super(CustomKwargsStep1, self).__init__(*args, **kwargs)
 
 
 class TestModel(models.Model):
@@ -60,9 +61,11 @@ class TestModel(models.Model):
 class TestModelForm(forms.ModelForm):
     class Meta:
         model = TestModel
+        fields = '__all__'
 
 
-TestModelFormSet = forms.models.modelformset_factory(TestModel, form=TestModelForm, extra=2)
+TestModelFormSet = forms.models.modelformset_factory(TestModel, form=TestModelForm, extra=2,
+                                                     fields='__all__')
 
 
 class TestWizard(WizardView):
@@ -78,11 +81,13 @@ class TestWizard(WizardView):
             kwargs['test'] = True
         return kwargs
 
+
 class TestWizardWithInitAttrs(TestWizard):
     form_list = [Step1, Step2]
     condition_dict = {'step2': True}
     initial_dict = {'start': {'name': 'value1'}}
     instance_dict = {'start': User()}
+
 
 class FormTests(TestCase):
     def test_form_init(self):

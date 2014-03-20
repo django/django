@@ -2,6 +2,8 @@ import warnings
 
 from django.core.exceptions import MiddlewareNotUsed
 from django.db import connection, transaction
+from django.utils.deprecation import RemovedInDjango18Warning
+
 
 class TransactionMiddleware(object):
     """
@@ -14,7 +16,7 @@ class TransactionMiddleware(object):
     def __init__(self):
         warnings.warn(
             "TransactionMiddleware is deprecated in favor of ATOMIC_REQUESTS.",
-            PendingDeprecationWarning, stacklevel=2)
+            RemovedInDjango18Warning, stacklevel=2)
         if connection.settings_dict['ATOMIC_REQUESTS']:
             raise MiddlewareNotUsed
 

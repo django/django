@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import comments
 from django.utils import six
-from django.utils.deprecation import RenameMethodsBase
+from django.utils.deprecation import RenameMethodsBase, RemovedInDjango18Warning
 from django.utils.encoding import smart_text
 
 register = template.Library()
@@ -12,7 +12,7 @@ register = template.Library()
 
 class RenameBaseCommentNodeMethods(RenameMethodsBase):
     renamed_methods = (
-        ('get_query_set', 'get_queryset', PendingDeprecationWarning),
+        ('get_query_set', 'get_queryset', RemovedInDjango18Warning),
     )
 
 
@@ -35,8 +35,8 @@ class BaseCommentNode(six.with_metaclass(RenameBaseCommentNodeMethods, template.
             if tokens[3] != 'as':
                 raise template.TemplateSyntaxError("Third argument in %r must be 'as'" % tokens[0])
             return cls(
-                object_expr = parser.compile_filter(tokens[2]),
-                as_varname = tokens[4],
+                object_expr=parser.compile_filter(tokens[2]),
+                as_varname=tokens[4],
             )
 
         # {% get_whatever for app.model pk as varname %}
@@ -44,9 +44,9 @@ class BaseCommentNode(six.with_metaclass(RenameBaseCommentNodeMethods, template.
             if tokens[4] != 'as':
                 raise template.TemplateSyntaxError("Fourth argument in %r must be 'as'" % tokens[0])
             return cls(
-                ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
-                object_pk_expr = parser.compile_filter(tokens[3]),
-                as_varname = tokens[5]
+                ctype=BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
+                object_pk_expr=parser.compile_filter(tokens[3]),
+                as_varname=tokens[5]
             )
 
         else:
@@ -83,9 +83,9 @@ class BaseCommentNode(six.with_metaclass(RenameBaseCommentNodeMethods, template.
             return self.comment_model.objects.none()
 
         qs = self.comment_model.objects.filter(
-            content_type = ctype,
-            object_pk    = smart_text(object_pk),
-            site__pk     = settings.SITE_ID,
+            content_type=ctype,
+            object_pk=smart_text(object_pk),
+            site__pk=settings.SITE_ID,
         )
 
         # The is_public and is_removed fields are implementation details of the
@@ -112,7 +112,7 @@ class BaseCommentNode(six.with_metaclass(RenameBaseCommentNodeMethods, template.
 
     def get_context_value_from_queryset(self, context, qs):
         """Subclasses should override this."""
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseCommentNode must provide a get_context_value_from_queryset() method')
 
 class CommentListNode(BaseCommentNode):
     """Insert a list of comments into the context."""
@@ -166,8 +166,8 @@ class RenderCommentFormNode(CommentFormNode):
         # {% render_comment_form for app.models pk %}
         elif len(tokens) == 4:
             return cls(
-                ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
-                object_pk_expr = parser.compile_filter(tokens[3])
+                ctype=BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
+                object_pk_expr=parser.compile_filter(tokens[3])
             )
 
     def render(self, context):
@@ -202,8 +202,8 @@ class RenderCommentListNode(CommentListNode):
         # {% render_comment_list for app.models pk %}
         elif len(tokens) == 4:
             return cls(
-                ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
-                object_pk_expr = parser.compile_filter(tokens[3])
+                ctype=BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
+                object_pk_expr=parser.compile_filter(tokens[3])
             )
 
     def render(self, context):
@@ -338,4 +338,3 @@ def get_comment_permalink(comment, anchor_pattern=None):
     if anchor_pattern:
         return comment.get_absolute_url(anchor_pattern)
     return comment.get_absolute_url()
-

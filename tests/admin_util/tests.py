@@ -1,29 +1,27 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from datetime import datetime
 
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
-from django.contrib.admin.util import (display_for_field, flatten_fieldsets,
-    label_for_field, lookup_field, NestedObjects)
+from django.contrib.admin.utils import (display_for_field, flatten,
+    flatten_fieldsets, label_for_field, lookup_field, NestedObjects)
 from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 from django.contrib.sites.models import Site
 from django.db import models, DEFAULT_DB_ALIAS
 from django import forms
-from django.test import TestCase
-from django.utils import unittest
+from django.test import SimpleTestCase, TestCase
 from django.utils.formats import localize
 from django.utils.safestring import mark_safe
 from django.utils import six
 
-from .models import Article, Count, Event, Location, EventGuide
+from .models import Article, Count, Event, Location, EventGuide, Vehicle, Car
 
 
 class NestedObjectsTests(TestCase):
     """
     Tests for ``NestedObject`` utility collection.
-
     """
     def setUp(self):
         self.n = NestedObjects(using=DEFAULT_DB_ALIAS)
@@ -82,7 +80,18 @@ class NestedObjectsTests(TestCase):
             # One for Location, one for Guest, and no query for EventGuide
             n.collect(objs)
 
-class UtilTests(unittest.TestCase):
+    def test_relation_on_abstract(self):
+        """
+        #21846 -- Check that `NestedObjects.collect()` doesn't trip
+        (AttributeError) on the special notation for relations on abstract
+        models (related_name that contains %(app_label)s and/or %(class)s).
+        """
+        n = NestedObjects(using=DEFAULT_DB_ALIAS)
+        Car.objects.create()
+        n.collect([Vehicle.objects.first()])
+
+
+class UtilTests(SimpleTestCase):
     def test_values_from_lookup_field(self):
         """
         Regression test for #12654: lookup_field
@@ -151,7 +160,7 @@ class UtilTests(unittest.TestCase):
         # handling.
         display_value = display_for_field(None, models.NullBooleanField())
         expected = '<img src="%sadmin/img/icon-unknown.gif" alt="None" />' % settings.STATIC_URL
-        self.assertEqual(display_value, expected)
+        self.assertHTMLEqual(display_value, expected)
 
         display_value = display_for_field(None, models.DecimalField())
         self.assertEqual(display_value, EMPTY_CHANGELIST_VALUE)
@@ -230,10 +239,23 @@ class UtilTests(unittest.TestCase):
         )
         self.assertEqual(
             label_for_field("test_from_model", Article,
-                model_admin = MockModelAdmin,
-                return_attr = True
-            ),
+                model_admin=MockModelAdmin,
+                return_attr=True),
             ("not Really the Model", MockModelAdmin.test_from_model)
+        )
+
+    def test_label_for_property(self):
+        # NOTE: cannot use @property decorator, because of
+        # AttributeError: 'property' object has no attribute 'short_description'
+        class MockModelAdmin(object):
+            def my_property(self):
+                return "this if from property"
+            my_property.short_description = 'property short description'
+            test_from_property = property(my_property)
+
+        self.assertEqual(
+            label_for_field("test_from_property", Article, model_admin=MockModelAdmin),
+            'property short description'
         )
 
     def test_related_name(self):
@@ -282,24 +304,35 @@ class UtilTests(unittest.TestCase):
         # safestring should not be escaped
         class MyForm(forms.Form):
             text = forms.CharField(label=mark_safe('<i>text</i>'))
-            cb   = forms.BooleanField(label=mark_safe('<i>cb</i>'))
+            cb = forms.BooleanField(label=mark_safe('<i>cb</i>'))
 
         form = MyForm()
-        self.assertEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
-                         '<label for="id_text" class="required inline"><i>text</i>:</label>')
-        self.assertEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
-                         '<label for="id_cb" class="vCheckboxLabel required inline"><i>cb</i></label>')
+        self.assertHTMLEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
+                             '<label for="id_text" class="required inline"><i>text</i>:</label>')
+        self.assertHTMLEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
+                             '<label for="id_cb" class="vCheckboxLabel required inline"><i>cb</i></label>')
 
         # normal strings needs to be escaped
         class MyForm(forms.Form):
             text = forms.CharField(label='&text')
-            cb   = forms.BooleanField(label='&cb')
+            cb = forms.BooleanField(label='&cb')
 
         form = MyForm()
-        self.assertEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
-                         '<label for="id_text" class="required inline">&amp;text:</label>')
-        self.assertEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
-                         '<label for="id_cb" class="vCheckboxLabel required inline">&amp;cb</label>')
+        self.assertHTMLEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
+                             '<label for="id_text" class="required inline">&amp;text:</label>')
+        self.assertHTMLEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
+                             '<label for="id_cb" class="vCheckboxLabel required inline">&amp;cb</label>')
+
+    def test_flatten(self):
+        flat_all = ['url', 'title', 'content', 'sites']
+        inputs = (
+            ((), []),
+            (('url', 'title', ('content', 'sites')), flat_all),
+            (('url', 'title', 'content', 'sites'), flat_all),
+            ((('url', 'title'), ('content', 'sites')), flat_all)
+        )
+        for orig, expected in inputs:
+            self.assertEqual(flatten(orig), expected)
 
     def test_flatten_fieldsets(self):
         """

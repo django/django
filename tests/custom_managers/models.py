@@ -11,47 +11,140 @@ returns.
 
 from __future__ import unicode_literals
 
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
 # An example of a custom manager called "objects".
 
+
 class PersonManager(models.Manager):
     def get_fun_people(self):
         return self.filter(fun=True)
 
-@python_2_unicode_compatible
-class Person(models.Model):
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
-    fun = models.BooleanField()
-    objects = PersonManager()
-
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
-
 # An example of a custom manager that sets get_queryset().
+
 
 class PublishedBookManager(models.Manager):
     def get_queryset(self):
         return super(PublishedBookManager, self).get_queryset().filter(is_published=True)
 
+# An example of a custom queryset that copies its methods onto the manager.
+
+
+class CustomQuerySet(models.QuerySet):
+    def filter(self, *args, **kwargs):
+        queryset = super(CustomQuerySet, self).filter(fun=True)
+        queryset._filter_CustomQuerySet = True
+        return queryset
+
+    def public_method(self, *args, **kwargs):
+        return self.all()
+
+    def _private_method(self, *args, **kwargs):
+        return self.all()
+
+    def optout_public_method(self, *args, **kwargs):
+        return self.all()
+    optout_public_method.queryset_only = True
+
+    def _optin_private_method(self, *args, **kwargs):
+        return self.all()
+    _optin_private_method.queryset_only = False
+
+
+class BaseCustomManager(models.Manager):
+    def __init__(self, arg):
+        super(BaseCustomManager, self).__init__()
+        self.init_arg = arg
+
+    def filter(self, *args, **kwargs):
+        queryset = super(BaseCustomManager, self).filter(fun=True)
+        queryset._filter_CustomManager = True
+        return queryset
+
+    def manager_only(self):
+        return self.all()
+
+CustomManager = BaseCustomManager.from_queryset(CustomQuerySet)
+
+
+class FunPeopleManager(models.Manager):
+    def get_queryset(self):
+        return super(FunPeopleManager, self).get_queryset().filter(fun=True)
+
+
+class BoringPeopleManager(models.Manager):
+    def get_queryset(self):
+        return super(BoringPeopleManager, self).get_queryset().filter(fun=False)
+
+
+@python_2_unicode_compatible
+class Person(models.Model):
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    fun = models.BooleanField(default=False)
+
+    favorite_book = models.ForeignKey('Book', null=True, related_name='favorite_books')
+    favorite_thing_type = models.ForeignKey('contenttypes.ContentType', null=True)
+    favorite_thing_id = models.IntegerField(null=True)
+    favorite_thing = GenericForeignKey('favorite_thing_type', 'favorite_thing_id')
+
+    objects = PersonManager()
+    fun_people = FunPeopleManager()
+    boring_people = BoringPeopleManager()
+
+    custom_queryset_default_manager = CustomQuerySet.as_manager()
+    custom_queryset_custom_manager = CustomManager('hello')
+
+    def __str__(self):
+        return "%s %s" % (self.first_name, self.last_name)
+
+
+@python_2_unicode_compatible
+class FunPerson(models.Model):
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    fun = models.BooleanField(default=True)
+
+    favorite_book = models.ForeignKey('Book', null=True, related_name='fun_people_favorite_books')
+    favorite_thing_type = models.ForeignKey('contenttypes.ContentType', null=True)
+    favorite_thing_id = models.IntegerField(null=True)
+    favorite_thing = GenericForeignKey('favorite_thing_type', 'favorite_thing_id')
+
+    objects = FunPeopleManager()
+
+    def __str__(self):
+        return "%s %s" % (self.first_name, self.last_name)
+
+
 @python_2_unicode_compatible
 class Book(models.Model):
     title = models.CharField(max_length=50)
     author = models.CharField(max_length=30)
-    is_published = models.BooleanField()
+    is_published = models.BooleanField(default=False)
     published_objects = PublishedBookManager()
     authors = models.ManyToManyField(Person, related_name='books')
+    fun_authors = models.ManyToManyField(FunPerson, related_name='books')
+
+    favorite_things = GenericRelation(Person,
+        content_type_field='favorite_thing_type', object_id_field='favorite_thing_id')
+
+    fun_people_favorite_things = GenericRelation(FunPerson,
+        content_type_field='favorite_thing_type', object_id_field='favorite_thing_id')
 
     def __str__(self):
         return self.title
 
 # An example of providing multiple custom managers.
 
+
 class FastCarManager(models.Manager):
     def get_queryset(self):
         return super(FastCarManager, self).get_queryset().filter(top_speed__gt=150)
+
 
 @python_2_unicode_compatible
 class Car(models.Model):

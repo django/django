@@ -92,7 +92,7 @@ interested in helping out with Django's development, feel free to join the
 discussions there.
 
 Django's online documentation also includes pointers on how to contribute to
-Django: 
+Django:
 
 * :doc:`How to contribute to Django </internals/contributing/index>`
 

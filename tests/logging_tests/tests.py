@@ -1,24 +1,21 @@
 from __future__ import unicode_literals
 
-import copy
 import logging
-import sys
 import warnings
 
-from django.conf import LazySettings
 from django.core import mail
-from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings
+from django.test import TestCase, RequestFactory, override_settings
+from django.test.utils import patch_logger
 from django.utils.encoding import force_text
-from django.utils.log import CallbackFilter, RequireDebugFalse, RequireDebugTrue
+from django.utils.deprecation import RemovedInNextVersionWarning
+from django.utils.log import (CallbackFilter, RequireDebugFalse,
+    RequireDebugTrue)
 from django.utils.six import StringIO
-from django.utils.unittest import skipUnless
 
 from admin_scripts.tests import AdminScriptTestCase
 
 from .logconfig import MyEmailBackend
 
-PYVERS = sys.version_info[:2]
 
 # logging config prior to using filter with mail_admins
 OLD_LOGGING = {
@@ -65,6 +62,7 @@ class LoggingFiltersTest(TestCase):
         with self.settings(DEBUG=False):
             self.assertEqual(filter_.filter("record is not used"), False)
 
+
 class DefaultLoggingTest(TestCase):
     def setUp(self):
         self.logger = logging.getLogger('django')
@@ -86,16 +84,16 @@ class DefaultLoggingTest(TestCase):
             self.logger.error("Hey, this is an error.")
             self.assertEqual(output.getvalue(), 'Hey, this is an error.\n')
 
-@skipUnless(PYVERS > (2,6), "warnings captured only in Python >= 2.7")
+
 class WarningLoggerTests(TestCase):
     """
-    Tests that warnings output for DeprecationWarnings is enabled
-    and captured to the logging system
+    Tests that warnings output for RemovedInDjangoXXWarning (XX being the next
+    Django version) is enabled and captured to the logging system
     """
     def setUp(self):
         # If tests are invoke with "-Wall" (or any -W flag actually) then
-        # warning logging gets disabled (see django/conf/__init__.py). However,
-        # these tests expect warnings to be logged, so manually force warnings
+        # warning logging gets disabled (see configure_logging in django/utils/log.py).
+        # However, these tests expect warnings to be logged, so manually force warnings
         # to the logs. Use getattr() here because the logging capture state is
         # undocumented and (I assume) brittle.
         self._old_capture_state = bool(getattr(logging, '_warnings_showwarning', False))
@@ -121,14 +119,24 @@ class WarningLoggerTests(TestCase):
 
     @override_settings(DEBUG=True)
     def test_warnings_capture(self):
-        warnings.warn('Foo Deprecated', DeprecationWarning)
+        warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
         output = force_text(self.outputs[0].getvalue())
         self.assertTrue('Foo Deprecated' in output)
 
     def test_warnings_capture_debug_false(self):
-        warnings.warn('Foo Deprecated', DeprecationWarning)
+        warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
         output = force_text(self.outputs[0].getvalue())
         self.assertFalse('Foo Deprecated' in output)
+
+    @override_settings(DEBUG=True)
+    def test_error_filter_still_raises(self):
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                'error',
+                category=RemovedInNextVersionWarning
+            )
+            with self.assertRaises(RemovedInNextVersionWarning):
+                warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
 
 
 class CallbackFilterTest(TestCase):
@@ -162,7 +170,7 @@ class AdminEmailHandlerTest(TestCase):
         admin_email_handler = [
             h for h in logger.handlers
             if h.__class__.__name__ == "AdminEmailHandler"
-            ][0]
+        ][0]
         return admin_email_handler
 
     def test_fail_silently(self):
@@ -170,9 +178,9 @@ class AdminEmailHandlerTest(TestCase):
         self.assertTrue(admin_email_handler.connection().fail_silently)
 
     @override_settings(
-            ADMINS=(('whatever admin', 'admin@example.com'),),
-            EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-'
-        )
+        ADMINS=(('whatever admin', 'admin@example.com'),),
+        EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-'
+    )
     def test_accepts_args(self):
         """
         Ensure that user-supplied arguments and the EMAIL_SUBJECT_PREFIX
@@ -200,10 +208,10 @@ class AdminEmailHandlerTest(TestCase):
             admin_email_handler.filters = orig_filters
 
     @override_settings(
-            ADMINS=(('whatever admin', 'admin@example.com'),),
-            EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-',
-            INTERNAL_IPS=('127.0.0.1',),
-        )
+        ADMINS=(('whatever admin', 'admin@example.com'),),
+        EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-',
+        INTERNAL_IPS=('127.0.0.1',),
+    )
     def test_accepts_args_and_request(self):
         """
         Ensure that the subject is also handled if being
@@ -235,10 +243,10 @@ class AdminEmailHandlerTest(TestCase):
             admin_email_handler.filters = orig_filters
 
     @override_settings(
-            ADMINS=(('admin', 'admin@example.com'),),
-            EMAIL_SUBJECT_PREFIX='',
-            DEBUG=False,
-        )
+        ADMINS=(('admin', 'admin@example.com'),),
+        EMAIL_SUBJECT_PREFIX='',
+        DEBUG=False,
+    )
     def test_subject_accepts_newlines(self):
         """
         Ensure that newlines in email reports' subjects are escaped to avoid
@@ -258,10 +266,10 @@ class AdminEmailHandlerTest(TestCase):
         self.assertEqual(mail.outbox[0].subject, expected_subject)
 
     @override_settings(
-            ADMINS=(('admin', 'admin@example.com'),),
-            EMAIL_SUBJECT_PREFIX='',
-            DEBUG=False,
-        )
+        ADMINS=(('admin', 'admin@example.com'),),
+        EMAIL_SUBJECT_PREFIX='',
+        DEBUG=False,
+    )
     def test_truncate_subject(self):
         """
         RFC 2822's hard limit is 998 characters per line.
@@ -280,9 +288,9 @@ class AdminEmailHandlerTest(TestCase):
         self.assertEqual(mail.outbox[0].subject, expected_subject)
 
     @override_settings(
-            ADMINS=(('admin', 'admin@example.com'),),
-            DEBUG=False,
-        )
+        ADMINS=(('admin', 'admin@example.com'),),
+        DEBUG=False,
+    )
     def test_uses_custom_email_backend(self):
         """
         Refs #19325
@@ -293,7 +301,7 @@ class AdminEmailHandlerTest(TestCase):
 
         def my_mail_admins(*args, **kwargs):
             connection = kwargs['connection']
-            self.assertTrue(isinstance(connection, MyEmailBackend))
+            self.assertIsInstance(connection, MyEmailBackend)
             mail_admins_called['called'] = True
 
         # Monkeypatches
@@ -336,7 +344,7 @@ class SettingsConfigTest(AdminScriptTestCase):
         # validate is just an example command to trigger settings configuration
         out, err = self.run_manage(['validate'])
         self.assertNoOutput(err)
-        self.assertOutput(out, "0 errors found")
+        self.assertOutput(out, "System check identified no issues (0 silenced).")
 
 
 def dictConfig(config):
@@ -344,13 +352,39 @@ def dictConfig(config):
 dictConfig.called = False
 
 
-class SettingsConfigureLogging(TestCase):
+class SetupConfigureLogging(TestCase):
     """
-    Test that calling settings.configure() initializes the logging
-    configuration.
+    Test that calling django.setup() initializes the logging configuration.
     """
+    @override_settings(LOGGING_CONFIG='logging_tests.tests.dictConfig')
     def test_configure_initializes_logging(self):
-        settings = LazySettings()
-        settings.configure(
-            LOGGING_CONFIG='logging_tests.tests.dictConfig')
+        from django import setup
+        setup()
         self.assertTrue(dictConfig.called)
+
+
+@override_settings(DEBUG=True)
+class SecurityLoggerTest(TestCase):
+
+    urls = 'logging_tests.urls'
+
+    def test_suspicious_operation_creates_log_message(self):
+        with patch_logger('django.security.SuspiciousOperation', 'error') as calls:
+            self.client.get('/suspicious/')
+            self.assertEqual(len(calls), 1)
+            self.assertEqual(calls[0], 'dubious')
+
+    def test_suspicious_operation_uses_sublogger(self):
+        with patch_logger('django.security.DisallowedHost', 'error') as calls:
+            self.client.get('/suspicious_spec/')
+            self.assertEqual(len(calls), 1)
+            self.assertEqual(calls[0], 'dubious')
+
+    @override_settings(
+        ADMINS=(('admin', 'admin@example.com'),),
+        DEBUG=False,
+    )
+    def test_suspicious_email_admins(self):
+        self.client.get('/suspicious/')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('path:/suspicious/,', mail.outbox[0].body)

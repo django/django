@@ -10,7 +10,7 @@ There are two components here, separated by a ':'. The first component is a
 URLsafe base64 encoded JSON of the object passed to dumps(). The second
 component is a base64 encoded hmac/SHA1 hash of "$first_component:$secret"
 
-signing.loads(s) checks the signature and returns the deserialised object.
+signing.loads(s) checks the signature and returns the deserialized object.
 If the signature fails, a BadSignature exception is raised.
 
 >>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk")
@@ -44,7 +44,7 @@ from django.conf import settings
 from django.utils import baseconv
 from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.encoding import force_bytes, force_str, force_text
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 
 
 class BadSignature(Exception):
@@ -75,8 +75,9 @@ def base64_hmac(salt, value, key):
 
 
 def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
-    Signer = import_by_path(settings.SIGNING_BACKEND)
-    return Signer('django.http.cookies' + settings.SECRET_KEY, salt=salt)
+    Signer = import_string(settings.SIGNING_BACKEND)
+    key = force_bytes(settings.SECRET_KEY)
+    return Signer(b'django.http.cookies' + key, salt=salt)
 
 
 class JSONSerializer(object):
@@ -148,9 +149,9 @@ class Signer(object):
 
     def __init__(self, key=None, sep=':', salt=None):
         # Use of native strings in all versions of Python
-        self.sep = str(sep)
-        self.key = str(key or settings.SECRET_KEY)
-        self.salt = str(salt or
+        self.sep = force_str(sep)
+        self.key = key or settings.SECRET_KEY
+        self.salt = force_str(salt or
             '%s.%s' % (self.__class__.__module__, self.__class__.__name__))
 
     def signature(self, value):
@@ -183,7 +184,11 @@ class TimestampSigner(Signer):
         return super(TimestampSigner, self).sign(value)
 
     def unsign(self, value, max_age=None):
-        result =  super(TimestampSigner, self).unsign(value)
+        """
+        Retrieve original value and check it wasn't signed more
+        than max_age seconds ago.
+        """
+        result = super(TimestampSigner, self).unsign(value)
         value, timestamp = result.rsplit(self.sep, 1)
         timestamp = baseconv.base62.decode(timestamp)
         if max_age is not None:

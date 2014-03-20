@@ -1,33 +1,45 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
+
+from unittest import skipUnless
 
 from django.db import connection
 from django.db.models import Q
-from django.contrib.gis.geos import GEOSGeometry, LineString
-from django.contrib.gis.measure import D # alias for Distance
-from django.contrib.gis.tests.utils import oracle, postgis, spatialite, no_oracle, no_spatialite
+from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.measure import D  # alias for Distance
+from django.contrib.gis.tests.utils import (
+    HAS_SPATIAL_DB, mysql, oracle, postgis, spatialite, no_oracle, no_spatialite
+)
 from django.test import TestCase
 
-from .models import (AustraliaCity, Interstate, SouthTexasInterstate,
-    SouthTexasCity, SouthTexasCityFt, CensusZipcode, SouthTexasZipcode)
+if HAS_GEOS and HAS_SPATIAL_DB:
+    from django.contrib.gis.geos import GEOSGeometry, LineString
+
+    from .models import (AustraliaCity, Interstate, SouthTexasInterstate,
+        SouthTexasCity, SouthTexasCityFt, CensusZipcode, SouthTexasZipcode)
 
 
+@skipUnless(HAS_GEOS and HAS_SPATIAL_DB and not mysql,
+    "Geos and spatial db (not mysql) are required.")
 class DistanceTest(TestCase):
 
-    # A point we are testing distances with -- using a WGS84
-    # coordinate that'll be implicitly transormed to that to
-    # the coordinate system of the field, EPSG:32140 (Texas South Central
-    # w/units in meters)
-    stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
-    # Another one for Australia
-    au_pnt = GEOSGeometry('POINT (150.791 -34.4919)', 4326)
+    if HAS_GEOS and HAS_SPATIAL_DB:
+        # A point we are testing distances with -- using a WGS84
+        # coordinate that'll be implicitly transformed to that to
+        # the coordinate system of the field, EPSG:32140 (Texas South Central
+        # w/units in meters)
+        stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
+        # Another one for Australia
+        au_pnt = GEOSGeometry('POINT (150.791 -34.4919)', 4326)
 
     def get_names(self, qs):
         cities = [c.name for c in qs]
         cities.sort()
         return cities
 
-    def test01_init(self):
-        "Test initialization of distance models."
+    def test_init(self):
+        """
+        Test initialization of distance models.
+        """
         self.assertEqual(9, SouthTexasCity.objects.count())
         self.assertEqual(9, SouthTexasCityFt.objects.count())
         self.assertEqual(11, AustraliaCity.objects.count())
@@ -37,8 +49,10 @@ class DistanceTest(TestCase):
         self.assertEqual(1, SouthTexasInterstate.objects.count())
 
     @no_spatialite
-    def test02_dwithin(self):
-        "Testing the `dwithin` lookup type."
+    def test_dwithin(self):
+        """
+        Test the `dwithin` lookup type.
+        """
         # Distances -- all should be equal (except for the
         # degree/meter pair in au_cities, that's somewhat
         # approximate).
@@ -52,8 +66,10 @@ class DistanceTest(TestCase):
         # Performing distance queries on two projected coordinate systems one
         # with units in meters and the other in units of U.S. survey feet.
         for dist in tx_dists:
-            if isinstance(dist, tuple): dist1, dist2 = dist
-            else: dist1 = dist2 = dist
+            if isinstance(dist, tuple):
+                dist1, dist2 = dist
+            else:
+                dist1 = dist2 = dist
             qs1 = SouthTexasCity.objects.filter(point__dwithin=(self.stx_pnt, dist1))
             qs2 = SouthTexasCityFt.objects.filter(point__dwithin=(self.stx_pnt, dist2))
             for qs in qs1, qs2:
@@ -61,12 +77,16 @@ class DistanceTest(TestCase):
 
         # Now performing the `dwithin` queries on a geodetic coordinate system.
         for dist in au_dists:
-            if isinstance(dist, D) and not oracle: type_error = True
-            else: type_error = False
+            if isinstance(dist, D) and not oracle:
+                type_error = True
+            else:
+                type_error = False
 
             if isinstance(dist, tuple):
-                if oracle: dist = dist[1]
-                else: dist = dist[0]
+                if oracle:
+                    dist = dist[1]
+                else:
+                    dist = dist[0]
 
             # Creating the query set.
             qs = AustraliaCity.objects.order_by('name')
@@ -75,10 +95,12 @@ class DistanceTest(TestCase):
                 # Distance objects into a DWithin query using a geodetic field.
                 self.assertRaises(ValueError, AustraliaCity.objects.filter(point__dwithin=(self.au_pnt, dist)).count)
             else:
-                self.assertEqual(au_cities, self.get_names(qs.filter(point__dwithin=(self.au_pnt, dist))))
+                self.assertListEqual(au_cities, self.get_names(qs.filter(point__dwithin=(self.au_pnt, dist))))
 
-    def test03a_distance_method(self):
-        "Testing the `distance` GeoQuerySet method on projected coordinate systems."
+    def test_distance_projected(self):
+        """
+        Test the `distance` GeoQuerySet method on projected coordinate systems.
+        """
         # The point for La Grange, TX
         lagrange = GEOSGeometry('POINT(-96.876369 29.905320)', 4326)
         # Reference distances in feet and in meters. Got these values from
@@ -88,7 +110,7 @@ class DistanceTest(TestCase):
                        138809.684197, 158309.246259, 212183.594374,
                        70870.188967, 165337.758878, 139196.085105]
         #  SELECT ST_Distance(point, ST_Transform(ST_GeomFromText('POINT(-96.876369 29.905320)', 4326), 2278)) FROM distapp_southtexascityft;
-        # Oracle 11 thinks this is not a projected coordinate system, so it's s
+        # Oracle 11 thinks this is not a projected coordinate system, so it's
         # not tested.
         ft_distances = [482528.79154625, 458103.408123001, 462231.860397575,
                         455411.438904354, 519386.252102563, 696139.009211594,
@@ -101,14 +123,13 @@ class DistanceTest(TestCase):
         if spatialite or oracle:
             dist_qs = [dist1, dist2]
         else:
-            dist3 = SouthTexasCityFt.objects.distance(lagrange.ewkt) # Using EWKT string parameter.
+            dist3 = SouthTexasCityFt.objects.distance(lagrange.ewkt)  # Using EWKT string parameter.
             dist4 = SouthTexasCityFt.objects.distance(lagrange)
             dist_qs = [dist1, dist2, dist3, dist4]
 
         # Original query done on PostGIS, have to adjust AlmostEqual tolerance
         # for Oracle.
-        if oracle: tol = 2
-        else: tol = 5
+        tol = 2 if oracle else 5
 
         # Ensuring expected distances are returned for each distance queryset.
         for qs in dist_qs:
@@ -117,14 +138,15 @@ class DistanceTest(TestCase):
                 self.assertAlmostEqual(ft_distances[i], c.distance.survey_ft, tol)
 
     @no_spatialite
-    def test03b_distance_method(self):
-        "Testing the `distance` GeoQuerySet method on geodetic coordnate systems."
-        if oracle: tol = 2
-        else: tol = 5
+    def test_distance_geodetic(self):
+        """
+        Test the `distance` GeoQuerySet method on geodetic coordinate systems.
+        """
+        tol = 2 if oracle else 5
 
         # Testing geodetic distance calculation with a non-point geometry
         # (a LineString of Wollongong and Shellharbour coords).
-        ls = LineString( ( (150.902, -34.4245), (150.87, -34.5789) ) )
+        ls = LineString(((150.902, -34.4245), (150.87, -34.5789)))
         if oracle or connection.ops.geography:
             # Reference query:
             #  SELECT ST_distance_sphere(point, ST_GeomFromText('LINESTRING(150.9020 -34.4245,150.8700 -34.5789)', 4326)) FROM distapp_australiacity ORDER BY name;
@@ -173,13 +195,15 @@ class DistanceTest(TestCase):
             self.assertAlmostEqual(spheroid_distances[i], c.distance.m, tol)
         if postgis:
             # PostGIS uses sphere-only distances by default, testing these as well.
-            qs =  AustraliaCity.objects.exclude(id=hillsdale.id).distance(hillsdale.point)
+            qs = AustraliaCity.objects.exclude(id=hillsdale.id).distance(hillsdale.point)
             for i, c in enumerate(qs):
                 self.assertAlmostEqual(sphere_distances[i], c.distance.m, tol)
 
-    @no_oracle # Oracle already handles geographic distance calculation.
-    def test03c_distance_method(self):
-        "Testing the `distance` GeoQuerySet method used with `transform` on a geographic field."
+    @no_oracle  # Oracle already handles geographic distance calculation.
+    def test_distance_transform(self):
+        """
+        Test the `distance` GeoQuerySet method used with `transform` on a geographic field.
+        """
         # Normally you can't compute distances from a geometry field
         # that is not a PointField (on PostGIS 1.4 and below).
         if not connection.ops.geography:
@@ -206,12 +230,14 @@ class DistanceTest(TestCase):
 
         for buf in [buf1, buf2]:
             qs = CensusZipcode.objects.exclude(name='77005').transform(32140).distance(buf)
-            self.assertEqual(ref_zips, self.get_names(qs))
+            self.assertListEqual(ref_zips, self.get_names(qs))
             for i, z in enumerate(qs):
                 self.assertAlmostEqual(z.distance.m, dists_m[i], 5)
 
-    def test04_distance_lookups(self):
-        "Testing the `distance_lt`, `distance_gt`, `distance_lte`, and `distance_gte` lookup types."
+    def test_distance_lookups(self):
+        """
+        Test the `distance_lt`, `distance_gt`, `distance_lte`, and `distance_gte` lookup types.
+        """
         # Retrieving the cities within a 20km 'donut' w/a 7km radius 'hole'
         # (thus, Houston and Southside place will be excluded as tested in
         # the `test02_dwithin` above).
@@ -237,8 +263,10 @@ class DistanceTest(TestCase):
         qs = SouthTexasZipcode.objects.exclude(name='77005').filter(poly__distance_lte=(z.poly, D(m=300)))
         self.assertEqual(['77002', '77025', '77401'], self.get_names(qs))
 
-    def test05_geodetic_distance_lookups(self):
-        "Testing distance lookups on geodetic coordinate systems."
+    def test_geodetic_distance_lookups(self):
+        """
+        Test distance lookups on geodetic coordinate systems.
+        """
         # Line is from Canberra to Sydney.  Query is for all other cities within
         # a 100km of that line (which should exclude only Hobart & Adelaide).
         line = GEOSGeometry('LINESTRING(144.9630 -37.8143,151.2607 -33.8870)', 4326)
@@ -259,7 +287,8 @@ class DistanceTest(TestCase):
 
             # Ensured that a ValueError was raised, none of the rest of the test is
             # support on this backend, so bail now.
-            if spatialite: return
+            if spatialite:
+                return
 
         # Too many params (4 in this case) should raise a ValueError.
         self.assertRaises(ValueError, len,
@@ -278,7 +307,7 @@ class DistanceTest(TestCase):
         # Cities that are either really close or really far from Wollongong --
         # and using different units of distance.
         wollongong = AustraliaCity.objects.get(name='Wollongong')
-        d1, d2 = D(yd=19500), D(nm=400) # Yards (~17km) & Nautical miles.
+        d1, d2 = D(yd=19500), D(nm=400)  # Yards (~17km) & Nautical miles.
 
         # Normal geodetic distance lookup (uses `distance_sphere` on PostGIS.
         gq1 = Q(point__distance_lte=(wollongong.point, d1))
@@ -300,8 +329,10 @@ class DistanceTest(TestCase):
             cities = self.get_names(qs)
             self.assertEqual(cities, ['Adelaide', 'Hobart', 'Shellharbour', 'Thirroul'])
 
-    def test06_area(self):
-        "Testing the `area` GeoQuerySet method."
+    def test_area(self):
+        """
+        Test the `area` GeoQuerySet method.
+        """
         # Reference queries:
         # SELECT ST_Area(poly) FROM distapp_southtexaszipcode;
         area_sq_m = [5437908.90234375, 10183031.4389648, 11254471.0073242, 9881708.91772461]
@@ -311,8 +342,10 @@ class DistanceTest(TestCase):
         for i, z in enumerate(SouthTexasZipcode.objects.area()):
             self.assertAlmostEqual(area_sq_m[i], z.area.sq_m, tol)
 
-    def test07_length(self):
-        "Testing the `length` GeoQuerySet method."
+    def test_length(self):
+        """
+        Test the `length` GeoQuerySet method.
+        """
         # Reference query (should use `length_spheroid`).
         # SELECT ST_length_spheroid(ST_GeomFromText('<wkt>', 4326) 'SPHEROID["WGS 84",6378137,298.257223563, AUTHORITY["EPSG","7030"]]');
         len_m1 = 473504.769553813
@@ -323,8 +356,7 @@ class DistanceTest(TestCase):
             self.assertRaises(ValueError, Interstate.objects.length)
         else:
             qs = Interstate.objects.length()
-            if oracle: tol = 2
-            else: tol = 3
+            tol = 2 if oracle else 3
             self.assertAlmostEqual(len_m1, qs[0].length.m, tol)
 
         # Now doing length on a projected coordinate system.
@@ -332,13 +364,14 @@ class DistanceTest(TestCase):
         self.assertAlmostEqual(len_m2, i10.length.m, 2)
 
     @no_spatialite
-    def test08_perimeter(self):
-        "Testing the `perimeter` GeoQuerySet method."
+    def test_perimeter(self):
+        """
+        Test the `perimeter` GeoQuerySet method.
+        """
         # Reference query:
         # SELECT ST_Perimeter(distapp_southtexaszipcode.poly) FROM distapp_southtexaszipcode;
         perim_m = [18404.3550889361, 15627.2108551001, 20632.5588368978, 17094.5996143697]
-        if oracle: tol = 2
-        else: tol = 7
+        tol = 2 if oracle else 7
         for i, z in enumerate(SouthTexasZipcode.objects.perimeter()):
             self.assertAlmostEqual(perim_m[i], z.perimeter.m, tol)
 
@@ -346,13 +379,15 @@ class DistanceTest(TestCase):
         for i, c in enumerate(SouthTexasCity.objects.perimeter(model_att='perim')):
             self.assertEqual(0, c.perim.m)
 
-    def test09_measurement_null_fields(self):
-        "Testing the measurement GeoQuerySet methods on fields with NULL values."
+    def test_measurement_null_fields(self):
+        """
+        Test the measurement GeoQuerySet methods on fields with NULL values.
+        """
         # Creating SouthTexasZipcode w/NULL value.
         SouthTexasZipcode.objects.create(name='78212')
         # Performing distance/area queries against the NULL PolygonField,
         # and ensuring the result of the operations is None.
         htown = SouthTexasCity.objects.get(name='Downtown Houston')
         z = SouthTexasZipcode.objects.distance(htown.point).area().get(name='78212')
-        self.assertEqual(None, z.distance)
-        self.assertEqual(None, z.area)
+        self.assertIsNone(z.distance)
+        self.assertIsNone(z.area)

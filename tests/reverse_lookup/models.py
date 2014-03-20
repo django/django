@@ -15,6 +15,7 @@ class User(models.Model):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class Poll(models.Model):
     question = models.CharField(max_length=200)
@@ -22,6 +23,7 @@ class Poll(models.Model):
 
     def __str__(self):
         return self.question
+
 
 @python_2_unicode_compatible
 class Choice(models.Model):

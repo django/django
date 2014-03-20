@@ -31,9 +31,9 @@ class TestSigner(TestCase):
         signer = signing.Signer('predictable-secret', salt='extra-salt')
         self.assertEqual(
             signer.signature('hello'),
-                signing.base64_hmac('extra-salt' + 'signer',
-                'hello', 'predictable-secret').decode()
-            )
+            signing.base64_hmac('extra-salt' + 'signer',
+                                'hello', 'predictable-secret').decode()
+        )
         self.assertNotEqual(
             signing.Signer('predictable-secret', salt='one').signature('hello'),
             signing.Signer('predictable-secret', salt='two').signature('hello'))
@@ -48,7 +48,7 @@ class TestSigner(TestCase):
             'jkw osanteuh ,rcuh nthu aou oauh ,ud du',
             '\u2019',
         ]
-        if not six.PY3:
+        if six.PY2:
             examples.append(b'a byte string')
         for example in examples:
             signed = signer.sign(example)
@@ -79,7 +79,7 @@ class TestSigner(TestCase):
             'a unicode string \u2019',
             {'a': 'dictionary'},
         ]
-        if not six.PY3:
+        if six.PY2:
             objects.append(b'a byte string')
         for o in objects:
             self.assertNotEqual(o, signing.dumps(o))
@@ -104,6 +104,13 @@ class TestSigner(TestCase):
         for transform in transforms:
             self.assertRaises(
                 signing.BadSignature, signing.loads, transform(encoded))
+
+    def test_works_with_non_ascii_keys(self):
+        binary_key = b'\xe7'  # Set some binary (non-ASCII key)
+
+        s = signing.Signer(binary_key)
+        self.assertEqual('foo:6NB0fssLW5RQvZ3Y-MTerq2rX7w', s.sign('foo'))
+
 
 class TestTimestampSigner(TestCase):
 

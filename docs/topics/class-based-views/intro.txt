@@ -71,7 +71,7 @@ something like::
 In a class-based view, this would become::
 
     from django.http import HttpResponse
-    from django.views.generic.base import View
+    from django.views.generic import View
 
     class MyView(View):
         def get(self, request):
@@ -113,7 +113,7 @@ and methods in the subclass. So that if your parent class had an attribute
 ``greeting`` like this::
 
     from django.http import HttpResponse
-    from django.views.generic.base import View
+    from django.views.generic import View
 
     class GreetingView(View):
         greeting = "Good Day"
@@ -173,6 +173,30 @@ that inherits from ``View`` - for example, trying to use a form at the top of a
 list and combining :class:`~django.views.generic.edit.ProcessFormView` and
 :class:`~django.views.generic.list.ListView` - won't work as expected.
 
+.. _mixins_that_wrap_as_view:
+
+Mixins that wrap ``as_view()``
+------------------------------
+
+One way to apply common behavior to many classes is to write a mixin that wraps
+the :meth:`~django.views.generic.base.View.as_view()` method.
+
+For example, if you have many generic views that should be decorated with
+:func:`~django.contrib.auth.decorators.login_required` you could implement a
+mixin like this::
+
+    from django.contrib.auth.decorators import login_required
+
+    class LoginRequiredMixin(object):
+        @classmethod
+        def as_view(cls, **initkwargs):
+            view = super(LoginRequiredMixin, cls).as_view(**initkwargs)
+            return login_required(view)
+
+    class MyView(LoginRequiredMixin, ...):
+        # this is a generic view
+        ...
+
 Handling forms with class-based views
 =====================================
 
@@ -198,6 +222,7 @@ A similar class-based view might look like::
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render
+    from django.views.generic import View
 
     from .forms import MyForm
 
@@ -208,7 +233,7 @@ A similar class-based view might look like::
 
         def get(self, request, *args, **kwargs):
             form = self.form_class(initial=self.initial)
-            return render(request,  self.template_name, {'form': form})
+            return render(request, self.template_name, {'form': form})
 
         def post(self, request, *args, **kwargs):
             form = self.form_class(request.POST)

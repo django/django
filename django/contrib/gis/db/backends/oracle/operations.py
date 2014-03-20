@@ -13,10 +13,11 @@ from decimal import Decimal
 from django.db.backends.oracle.base import DatabaseOperations
 from django.contrib.gis.db.backends.base import BaseSpatialOperations
 from django.contrib.gis.db.backends.oracle.adapter import OracleSpatialAdapter
-from django.contrib.gis.db.backends.util import SpatialFunction
+from django.contrib.gis.db.backends.utils import SpatialFunction
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.utils import six
+
 
 class SDOOperation(SpatialFunction):
     "Base class for SDO* Oracle operations."
@@ -27,32 +28,39 @@ class SDOOperation(SpatialFunction):
         kwargs.setdefault('result', 'TRUE')
         super(SDOOperation, self).__init__(func, **kwargs)
 
+
 class SDODistance(SpatialFunction):
     "Class for Distance queries."
     sql_template = ('%(function)s(%(geo_col)s, %(geometry)s, %(tolerance)s) '
                     '%(operator)s %(result)s')
     dist_func = 'SDO_GEOM.SDO_DISTANCE'
+
     def __init__(self, op, tolerance=0.05):
         super(SDODistance, self).__init__(self.dist_func,
                                           tolerance=tolerance,
                                           operator=op, result='%s')
 
+
 class SDODWithin(SpatialFunction):
     dwithin_func = 'SDO_WITHIN_DISTANCE'
     sql_template = "%(function)s(%(geo_col)s, %(geometry)s, %%s) = 'TRUE'"
+
     def __init__(self):
         super(SDODWithin, self).__init__(self.dwithin_func)
+
 
 class SDOGeomRelate(SpatialFunction):
     "Class for using SDO_GEOM.RELATE."
     relate_func = 'SDO_GEOM.RELATE'
     sql_template = ("%(function)s(%(geo_col)s, '%(mask)s', %(geometry)s, "
                     "%(tolerance)s) %(operator)s '%(mask)s'")
+
     def __init__(self, mask, tolerance=0.05):
         # SDO_GEOM.RELATE(...) has a peculiar argument order: column, mask, geom, tolerance.
         # Moreover, the runction result is the mask (e.g., 'DISJOINT' instead of 'TRUE').
         super(SDOGeomRelate, self).__init__(self.relate_func, operator='=',
                                             mask=mask, tolerance=tolerance)
+
 
 class SDORelate(SpatialFunction):
     "Class for using SDO_RELATE."
@@ -60,6 +68,7 @@ class SDORelate(SpatialFunction):
     mask_regex = re.compile(r'^(%s)(\+(%s))*$' % (masks, masks), re.I)
     sql_template = "%(function)s(%(geo_col)s, %(geometry)s, 'mask=%(mask)s') = 'TRUE'"
     relate_func = 'SDO_RELATE'
+
     def __init__(self, mask):
         if not self.mask_regex.match(mask):
             raise ValueError('Invalid %s mask: "%s"' % (self.relate_func, mask))
@@ -68,23 +77,24 @@ class SDORelate(SpatialFunction):
 # Valid distance types and substitutions
 dtypes = (Decimal, Distance, float) + six.integer_types
 
+
 class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     compiler_module = "django.contrib.gis.db.backends.oracle.compiler"
 
     name = 'oracle'
     oracle = True
-    valid_aggregates = dict([(a, None) for a in ('Union', 'Extent')])
+    valid_aggregates = {'Union', 'Extent'}
 
     Adapter = OracleSpatialAdapter
-    Adaptor = Adapter # Backwards-compatibility alias.
+    Adaptor = Adapter  # Backwards-compatibility alias.
 
     area = 'SDO_GEOM.SDO_AREA'
-    gml= 'SDO_UTIL.TO_GMLGEOMETRY'
+    gml = 'SDO_UTIL.TO_GMLGEOMETRY'
     centroid = 'SDO_GEOM.SDO_CENTROID'
     difference = 'SDO_GEOM.SDO_DIFFERENCE'
     distance = 'SDO_GEOM.SDO_DISTANCE'
-    extent= 'SDO_AGGR_MBR'
-    intersection= 'SDO_GEOM.SDO_INTERSECTION'
+    extent = 'SDO_AGGR_MBR'
+    intersection = 'SDO_GEOM.SDO_INTERSECTION'
     length = 'SDO_GEOM.SDO_LENGTH'
     num_geom = 'SDO_UTIL.GETNUMELEM'
     num_points = 'SDO_UTIL.GETNUMVERTICES'
@@ -104,34 +114,33 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     select = 'SDO_UTIL.TO_WKTGEOMETRY(%s)'
 
     distance_functions = {
-        'distance_gt' : (SDODistance('>'), dtypes),
-        'distance_gte' : (SDODistance('>='), dtypes),
-        'distance_lt' : (SDODistance('<'), dtypes),
-        'distance_lte' : (SDODistance('<='), dtypes),
-        'dwithin' : (SDODWithin(), dtypes),
-        }
+        'distance_gt': (SDODistance('>'), dtypes),
+        'distance_gte': (SDODistance('>='), dtypes),
+        'distance_lt': (SDODistance('<'), dtypes),
+        'distance_lte': (SDODistance('<='), dtypes),
+        'dwithin': (SDODWithin(), dtypes),
+    }
 
     geometry_functions = {
-        'contains' : SDOOperation('SDO_CONTAINS'),
-        'coveredby' : SDOOperation('SDO_COVEREDBY'),
-        'covers' : SDOOperation('SDO_COVERS'),
-        'disjoint' : SDOGeomRelate('DISJOINT'),
-        'intersects' : SDOOperation('SDO_OVERLAPBDYINTERSECT'), # TODO: Is this really the same as ST_Intersects()?
-        'equals' : SDOOperation('SDO_EQUAL'),
-        'exact' : SDOOperation('SDO_EQUAL'),
-        'overlaps' : SDOOperation('SDO_OVERLAPS'),
-        'same_as' : SDOOperation('SDO_EQUAL'),
-        'relate' : (SDORelate, six.string_types), # Oracle uses a different syntax, e.g., 'mask=inside+touch'
-        'touches' : SDOOperation('SDO_TOUCH'),
-        'within' : SDOOperation('SDO_INSIDE'),
-        }
+        'contains': SDOOperation('SDO_CONTAINS'),
+        'coveredby': SDOOperation('SDO_COVEREDBY'),
+        'covers': SDOOperation('SDO_COVERS'),
+        'disjoint': SDOGeomRelate('DISJOINT'),
+        'intersects': SDOOperation('SDO_OVERLAPBDYINTERSECT'),  # TODO: Is this really the same as ST_Intersects()?
+        'equals': SDOOperation('SDO_EQUAL'),
+        'exact': SDOOperation('SDO_EQUAL'),
+        'overlaps': SDOOperation('SDO_OVERLAPS'),
+        'same_as': SDOOperation('SDO_EQUAL'),
+        'relate': (SDORelate, six.string_types),  # Oracle uses a different syntax, e.g., 'mask=inside+touch'
+        'touches': SDOOperation('SDO_TOUCH'),
+        'within': SDOOperation('SDO_INSIDE'),
+    }
     geometry_functions.update(distance_functions)
 
-    gis_terms = ['isnull']
-    gis_terms += list(geometry_functions)
-    gis_terms = dict([(term, None) for term in gis_terms])
+    gis_terms = set(['isnull'])
+    gis_terms.update(geometry_functions)
 
-    truncate_params = {'relate' : None}
+    truncate_params = {'relate': None}
 
     def convert_extent(self, clob):
         if clob:
@@ -187,7 +196,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         else:
             dist_param = value
 
-        # dwithin lookups on oracle require a special string parameter
+        # dwithin lookups on Oracle require a special string parameter
         # that starts with "distance=".
         if lookup_type == 'dwithin':
             dist_param = 'distance=%s' % dist_param
@@ -211,7 +220,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
                 placeholder = '%s(%%s, %s)' % (self.transform, f.srid)
             else:
                 placeholder = '%s'
-            # No geometry value used for F expression, substitue in
+            # No geometry value used for F expression, substitute in
             # the column name instead.
             return placeholder % self.get_expression_column(value)
         else:
@@ -222,10 +231,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
 
     def spatial_lookup_sql(self, lvalue, lookup_type, value, field, qn):
         "Returns the SQL WHERE clause for use in Oracle spatial SQL construction."
-        alias, col, db_type = lvalue
-
-        # Getting the quoted table name as `geo_col`.
-        geo_col = '%s.%s' % (qn(alias), qn(col))
+        geo_col, db_type = lvalue
 
         # See if a Oracle Geometry function matches the lookup type next
         lookup_info = self.geometry_functions.get(lookup_type, False)
@@ -272,7 +278,8 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         given Aggregate instance.
         """
         agg_name = agg.__class__.__name__.lower()
-        if agg_name == 'union' : agg_name += 'agg'
+        if agg_name == 'union':
+            agg_name += 'agg'
         if agg.is_extent:
             sql_template = '%(function)s(%(field)s)'
         else:
@@ -295,5 +302,5 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         """
         # This code doesn't work for bulk insert cases.
         assert len(placeholders) == 1
-        return [[param for pholder,param
+        return [[param for pholder, param
                  in six.moves.zip(placeholders[0], params[0]) if pholder != 'NULL'], ]

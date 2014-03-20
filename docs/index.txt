@@ -17,7 +17,7 @@ Having trouble? We'd like to help!
 * Looking for specific information? Try the :ref:`genindex`, :ref:`modindex` or
   the :doc:`detailed table of contents <contents>`.
 
-* Search for information in the `archives of the django-users mailing list`_, or
+* Search for information in the archives of the |django-users| mailing list, or
   `post a question`_.
 
 * Ask a question in the `#django IRC channel`_, or search the `IRC logs`_ to see
@@ -25,8 +25,8 @@ Having trouble? We'd like to help!
 
 * Report bugs with Django in our `ticket tracker`_.
 
-.. _archives of the django-users mailing list: http://groups.google.com/group/django-users/
-.. _post a question: http://groups.google.com/group/django-users/
+.. _archives: http://groups.google.com/group/django-users/
+.. _post a question: https://groups.google.com/d/forum/django-users
 .. _#django IRC channel: irc://irc.freenode.net/django
 .. _IRC logs: http://django-irc-logs.com/
 .. _ticket tracker: https://code.djangoproject.com/
@@ -65,11 +65,17 @@ manipulating the data of your Web application. Learn more about it below:
 
 * **QuerySets:**
   :doc:`Executing queries <topics/db/queries>` |
-  :doc:`QuerySet method reference <ref/models/querysets>`
+  :doc:`QuerySet method reference <ref/models/querysets>` |
+  :doc:`Query-related classes <ref/models/queries>`
 
 * **Model instances:**
   :doc:`Instance methods <ref/models/instances>` |
   :doc:`Accessing related objects <ref/models/relations>`
+
+* **Migrations:**
+  :doc:`Introduction to Migrations<topics/migrations>` |
+  :doc:`Operations reference <ref/migration-operations>` |
+  :doc:`SchemaEditor <ref/schema-editor>`
 
 * **Advanced:**
   :doc:`Managers <topics/db/managers>` |
@@ -77,7 +83,8 @@ manipulating the data of your Web application. Learn more about it below:
   :doc:`Transactions <topics/db/transactions>` |
   :doc:`Aggregation <topics/db/aggregation>` |
   :doc:`Custom fields <howto/custom-model-fields>` |
-  :doc:`Multiple databases <topics/db/multi-db>`
+  :doc:`Multiple databases <topics/db/multi-db>` |
+  :doc:`Custom lookups <ref/models/custom-lookups>`
 
 * **Other:**
   :doc:`Supported databases <ref/databases>` |
@@ -175,6 +182,9 @@ testing of Django applications:
   :doc:`Overview <topics/settings>` |
   :doc:`Full list of settings <ref/settings>`
 
+* **Applications:**
+  :doc:`Overview <ref/applications>`
+
 * **Exceptions:**
   :doc:`Overview <ref/exceptions>`
 
@@ -185,13 +195,12 @@ testing of Django applications:
 * **Testing:**
   :doc:`Introduction <topics/testing/index>` |
   :doc:`Writing and running tests <topics/testing/overview>` |
-  :doc:`Advanced topics <topics/testing/advanced>` |
-  :doc:`Doctests <topics/testing/doctests>`
+  :doc:`Advanced topics <topics/testing/advanced>`
 
 * **Deployment:**
   :doc:`Overview <howto/deployment/index>` |
   :doc:`WSGI servers <howto/deployment/wsgi/index>` |
-  :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` |
+  :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` (deprecated) |
   :doc:`Deploying static files <howto/static-files/deployment>` |
   :doc:`Tracking code errors by email <howto/error-reporting>`
 
@@ -212,6 +221,7 @@ Security is a topic of paramount importance in the development of Web
 applications and Django provides multiple protection tools and mechanisms:
 
 * :doc:`Security overview <topics/security>`
+* :doc:`Disclosed security issues in Django <releases/security>`
 * :doc:`Clickjacking protection <ref/clickjacking>`
 * :doc:`Cross Site Request Forgery protection <ref/contrib/csrf>`
 * :doc:`Cryptographic signing <topics/signing>`
@@ -225,9 +235,18 @@ regions:
 
 * :doc:`Overview <topics/i18n/index>` |
   :doc:`Internationalization <topics/i18n/translation>` |
-  :ref:`Localization <how-to-create-language-files>`
+  :ref:`Localization <how-to-create-language-files>` |
+  :doc:`Localized Web UI formatting and form input <topics/i18n/formatting>`
 * :doc:`"Local flavor" <topics/localflavor>`
 * :doc:`Time zones </topics/i18n/timezones>`
+
+Performance and optimization
+============================
+
+There are a variety of techniques and tools that can help get your code running
+more efficiently - faster, and using fewer system resources.
+
+* :doc:`Performance and optimization overview <topics/performance>`
 
 Python compatibility
 ====================
@@ -274,6 +293,7 @@ Learn about some other core functionalities of the Django framework:
 * :doc:`Flatpages <ref/contrib/flatpages>`
 * :doc:`Redirects <ref/contrib/redirects>`
 * :doc:`Signals <topics/signals>`
+* :doc:`System check framework <topics/checks>`
 * :doc:`The sites framework <ref/contrib/sites>`
 * :doc:`Unicode in Django <ref/unicode>`
 
@@ -288,7 +308,8 @@ you can contribute:
   :doc:`The release process <internals/release-process>` |
   :doc:`Team of committers <internals/committers>` |
   :doc:`The Django source code repository <internals/git>` |
-  :doc:`Security policies <internals/security>`
+  :doc:`Security policies <internals/security>` |
+  :doc:`Mailing lists <internals/mailing-lists>`
 
 * **Design philosophies:**
   :doc:`Overview <misc/design-philosophies>`

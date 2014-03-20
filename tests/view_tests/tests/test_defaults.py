@@ -1,17 +1,18 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
-from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
-from django.test.utils import setup_test_template_loader, restore_template_loaders
+from django.test.utils import (setup_test_template_loader,
+    restore_template_loaders, override_settings)
 
-from ..models import Author, Article, UrlArticle
+from ..models import UrlArticle
 
 
 class DefaultsTests(TestCase):
     """Test django views in django/views/defaults.py"""
+    urls = 'view_tests.urls'
     fixtures = ['testdata.json']
-    non_existing_urls = ['/views/non_existing_url/', # this is in urls.py
-                         '/views/other_non_existing_url/'] # this NOT in urls.py
+    non_existing_urls = ['/non_existing_url/',  # this is in urls.py
+                         '/other_non_existing_url/']  # this NOT in urls.py
 
     def test_page_not_found(self):
         "A 404 status is returned by the page_not_found view"
@@ -32,7 +33,7 @@ class DefaultsTests(TestCase):
 
     def test_server_error(self):
         "The server_error view raises a 500 status"
-        response = self.client.get('/views/server_error/')
+        response = self.client.get('/server_error/')
         self.assertEqual(response.status_code, 500)
 
     def test_custom_templates(self):
@@ -45,7 +46,7 @@ class DefaultsTests(TestCase):
              '500.html': 'This is a test template for a 500 error.'}
         )
         try:
-            for code, url in ((404, '/views/non_existing_url/'), (500, '/views/server_error/')):
+            for code, url in ((404, '/non_existing_url/'), (500, '/server_error/')):
                 response = self.client.get(url)
                 self.assertContains(response, "test template for a %d error" % code,
                     status_code=code)
@@ -59,3 +60,20 @@ class DefaultsTests(TestCase):
         article = UrlArticle.objects.get(pk=1)
         self.assertTrue(getattr(article.get_absolute_url, 'purge', False),
                         'The attributes of the original get_absolute_url must be added.')
+
+    @override_settings(DEFAULT_CONTENT_TYPE="text/xml")
+    def test_default_content_type_is_text_html(self):
+        """
+        Content-Type of the default error responses is text/html. Refs #20822.
+        """
+        response = self.client.get('/raises400/')
+        self.assertEqual(response['Content-Type'], 'text/html')
+
+        response = self.client.get('/raises403/')
+        self.assertEqual(response['Content-Type'], 'text/html')
+
+        response = self.client.get('/non_existing_url/')
+        self.assertEqual(response['Content-Type'], 'text/html')
+
+        response = self.client.get('/server_error/')
+        self.assertEqual(response['Content-Type'], 'text/html')

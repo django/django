@@ -1,29 +1,30 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
+from unittest import skipUnless
 from xml.dom import minidom
 
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.test import TestCase
+from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
+from django.test import TestCase, modify_settings
 
-from .models import City
+if HAS_GEOS:
+    from .models import City
 
 
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'})
+@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoFeedTest(TestCase):
 
     urls = 'django.contrib.gis.tests.geoapp.urls'
 
     def setUp(self):
         Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
-        self.old_Site_meta_installed = Site._meta.installed
-        Site._meta.installed = True
-
-    def tearDown(self):
-        Site._meta.installed = self.old_Site_meta_installed
 
     def assertChildNodes(self, elem, expected):
         "Taken from syndication/tests.py."
-        actual = set([n.nodeName for n in elem.childNodes])
+        actual = set(n.nodeName for n in elem.childNodes)
         expected = set(expected)
         self.assertEqual(actual, expected)
 
@@ -44,7 +45,7 @@ class GeoFeedTest(TestCase):
         # Incrementing through the feeds.
         for feed in [feed1, feed2]:
             # Ensuring the georss namespace was added to the <rss> element.
-            self.assertEqual(feed.getAttribute('xmlns:georss'),  'http://www.georss.org/georss')
+            self.assertEqual(feed.getAttribute('xmlns:georss'), 'http://www.georss.org/georss')
             chan = feed.getElementsByTagName('channel')[0]
             items = chan.getElementsByTagName('item')
             self.assertEqual(len(items), City.objects.count())
@@ -64,7 +65,7 @@ class GeoFeedTest(TestCase):
 
         for feed in [feed1, feed2]:
             # Ensuring the georsss namespace was added to the <feed> element.
-            self.assertEqual(feed.getAttribute('xmlns:georss'),  'http://www.georss.org/georss')
+            self.assertEqual(feed.getAttribute('xmlns:georss'), 'http://www.georss.org/georss')
             entries = feed.getElementsByTagName('entry')
             self.assertEqual(len(entries), City.objects.count())
 
@@ -87,5 +88,5 @@ class GeoFeedTest(TestCase):
             self.assertChildNodes(item, ['title', 'link', 'description', 'guid', 'geo:lat', 'geo:lon'])
 
         # Boxes and Polygons aren't allowed in W3C Geo feeds.
-        self.assertRaises(ValueError, self.client.get, '/feeds/w3cgeo2/') # Box in <channel>
-        self.assertRaises(ValueError, self.client.get, '/feeds/w3cgeo3/') # Polygons in <entry>
+        self.assertRaises(ValueError, self.client.get, '/feeds/w3cgeo2/')  # Box in <channel>
+        self.assertRaises(ValueError, self.client.get, '/feeds/w3cgeo3/')  # Polygons in <entry>

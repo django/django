@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.test import TestCase
 
@@ -47,4 +47,3 @@ class CustomManagersRegressTestCase(TestCase):
         obj = RelatedModel.objects.get(name="xyzzy")
         obj.delete()
         self.assertEqual(len(OneToOneRestrictedModel.plain_manager.all()), 0)
-

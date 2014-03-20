@@ -72,4 +72,4 @@ Glossary
         See :doc:`/topics/templates`.
 
     view
-        A function responsible for rending a page.
+        A function responsible for rendering a page.

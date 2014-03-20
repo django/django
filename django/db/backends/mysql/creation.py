@@ -1,42 +1,44 @@
 from django.db.backends.creation import BaseDatabaseCreation
 
+
 class DatabaseCreation(BaseDatabaseCreation):
     # This dictionary maps Field objects to their associated MySQL column
     # types, as strings. Column-type strings can contain format strings; they'll
     # be interpolated against the values of Field.__dict__ before being output.
     # If a column type is set to None, it won't be included in the output.
     data_types = {
-        'AutoField':         'integer AUTO_INCREMENT',
-        'BinaryField':       'longblob',
-        'BooleanField':      'bool',
-        'CharField':         'varchar(%(max_length)s)',
+        'AutoField': 'integer AUTO_INCREMENT',
+        'BinaryField': 'longblob',
+        'BooleanField': 'bool',
+        'CharField': 'varchar(%(max_length)s)',
         'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
-        'DateField':         'date',
-        'DateTimeField':     'datetime',
-        'DecimalField':      'numeric(%(max_digits)s, %(decimal_places)s)',
-        'FileField':         'varchar(%(max_length)s)',
-        'FilePathField':     'varchar(%(max_length)s)',
-        'FloatField':        'double precision',
-        'IntegerField':      'integer',
-        'BigIntegerField':   'bigint',
-        'IPAddressField':    'char(15)',
+        'DateField': 'date',
+        'DateTimeField': 'datetime',
+        'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
+        'FileField': 'varchar(%(max_length)s)',
+        'FilePathField': 'varchar(%(max_length)s)',
+        'FloatField': 'double precision',
+        'IntegerField': 'integer',
+        'BigIntegerField': 'bigint',
+        'IPAddressField': 'char(15)',
         'GenericIPAddressField': 'char(39)',
-        'NullBooleanField':  'bool',
-        'OneToOneField':     'integer',
+        'NullBooleanField': 'bool',
+        'OneToOneField': 'integer',
         'PositiveIntegerField': 'integer UNSIGNED',
         'PositiveSmallIntegerField': 'smallint UNSIGNED',
-        'SlugField':         'varchar(%(max_length)s)',
+        'SlugField': 'varchar(%(max_length)s)',
         'SmallIntegerField': 'smallint',
-        'TextField':         'longtext',
-        'TimeField':         'time',
+        'TextField': 'longtext',
+        'TimeField': 'time',
     }
 
     def sql_table_creation_suffix(self):
         suffix = []
-        if self.connection.settings_dict['TEST_CHARSET']:
-            suffix.append('CHARACTER SET %s' % self.connection.settings_dict['TEST_CHARSET'])
-        if self.connection.settings_dict['TEST_COLLATION']:
-            suffix.append('COLLATE %s' % self.connection.settings_dict['TEST_COLLATION'])
+        test_settings = self.connection.settings_dict['TEST']
+        if test_settings['CHARSET']:
+            suffix.append('CHARACTER SET %s' % test_settings['CHARSET'])
+        if test_settings['COLLATION']:
+            suffix.append('COLLATE %s' % test_settings['COLLATION'])
         return ' '.join(suffix)
 
     def sql_for_inline_foreign_key_references(self, model, field, known_models, style):
@@ -60,7 +62,7 @@ class DatabaseCreation(BaseDatabaseCreation):
 
         index_name = "%s_%s" % (model._meta.db_table, self._digest([f.name for f in fields]))
 
-        from ..util import truncate_name
+        from ..utils import truncate_name
 
         return [
             style.SQL_KEYWORD("DROP INDEX") + " " +

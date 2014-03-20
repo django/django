@@ -20,7 +20,8 @@ create a new app to hold them.
 The app should contain a ``templatetags`` directory, at the same level as
 ``models.py``, ``views.py``, etc. If this doesn't already exist, create it -
 don't forget the ``__init__.py`` file to ensure the directory is treated as a
-Python package.
+Python package. After adding this module, you will need to restart your server
+before you can use the tags or filters in templates.
 
 Your custom tags and filters will live in a module inside the ``templatetags``
 directory. The name of the module file is the name you'll use to load the tags
@@ -31,6 +32,7 @@ For example, if your custom tags/filters are in a file called
 ``poll_extras.py``, your app layout might look like this::
 
     polls/
+        __init__.py
         models.py
         templatetags/
             __init__.py
@@ -71,6 +73,8 @@ following:
     ``django/template/defaulttags.py``, respectively.
 
     For more information on the :ttag:`load` tag, read its documentation.
+
+.. _howto-writing-custom-template-filters:
 
 Writing custom template filters
 -------------------------------
@@ -114,7 +118,7 @@ your function. Example:
 Registering custom filters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: django.template.Library.filter
+.. method:: django.template.Library.filter()
 
 Once you've written your filter definition, you need to register it with
 your ``Library`` instance, to make it available to Django's template language:
@@ -153,7 +157,7 @@ are described in :ref:`filters and auto-escaping <filters-auto-escaping>` and
 Template filters that expect strings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: django.template.defaultfilters.stringfilter
+.. method:: django.template.defaultfilters.stringfilter()
 
 If you're writing a template filter that only expects a string as the first
 argument, you should use the decorator ``stringfilter``. This will
@@ -300,18 +304,21 @@ Template filter code falls into one of two situations:
 
    .. code-block:: python
 
-       from django.utils.html import conditional_escape
-       from django.utils.safestring import mark_safe
+      from django import template
+      from django.utils.html import conditional_escape
+      from django.utils.safestring import mark_safe
 
-       @register.filter(needs_autoescape=True)
-       def initial_letter_filter(text, autoescape=None):
-           first, other = text[0], text[1:]
-           if autoescape:
-               esc = conditional_escape
-           else:
-               esc = lambda x: x
-           result = '<strong>%s</strong>%s' % (esc(first), esc(other))
-           return mark_safe(result)
+      register = template.Library()
+
+      @register.filter(needs_autoescape=True)
+      def initial_letter_filter(text, autoescape=None):
+          first, other = text[0], text[1:]
+          if autoescape:
+              esc = conditional_escape
+          else:
+              esc = lambda x: x
+          result = '<strong>%s</strong>%s' % (esc(first), esc(other))
+          return mark_safe(result)
 
    The ``needs_autoescape`` flag and the ``autoescape`` keyword argument mean
    that our function will know whether automatic escaping is in effect when the
@@ -331,6 +338,34 @@ Template filter code falls into one of two situations:
    (although including it wouldn't hurt anything). Whenever you manually
    handle the auto-escaping issues and return a safe string, the
    ``is_safe`` flag won't change anything either way.
+
+.. warning:: Avoiding XSS vulnerabilities when reusing built-in filters
+
+    Be careful when reusing Django's built-in filters. You'll need to pass
+    ``autoescape=True`` to the filter in order to get the proper autoescaping
+    behavior and avoid a cross-site script vulnerability.
+
+    For example, if you wanted to write a custom filter called
+    ``urlize_and_linebreaks`` that combined the :tfilter:`urlize` and
+    :tfilter:`linebreaksbr` filters, the filter would look like::
+
+        from django.template.defaultfilters import linebreaksbr, urlize
+
+        @register.filter
+        def urlize_and_linebreaks(text):
+            return linebreaksbr(urlize(text, autoescape=True), autoescape=True)
+
+    Then:
+
+    .. code-block:: html+django
+
+        {{ comment|urlize_and_linebreaks }}
+
+    would be equivalent to:
+
+    .. code-block:: html+django
+
+        {{ comment|urlize|linebreaksbr }}
 
 .. _filters-timezones:
 
@@ -454,8 +489,9 @@ Continuing the above example, we need to define ``CurrentTimeNode``:
 
 .. code-block:: python
 
-    from django import template
     import datetime
+    from django import template
+
     class CurrentTimeNode(template.Node):
         def __init__(self, format_string):
             self.format_string = format_string
@@ -470,8 +506,12 @@ Notes:
 
 * The ``render()`` method is where the work actually happens.
 
-* ``render()`` should never raise ``TemplateSyntaxError`` or any other
-  exception. It should fail silently, just as template filters should.
+* ``render()`` should generally fail silently, particularly in a production
+  environment where :setting:`DEBUG` and :setting:`TEMPLATE_DEBUG` are
+  ``False``. In some cases however, particularly if :setting:`TEMPLATE_DEBUG` is
+  ``True``, this method may raise an exception to make debugging easier. For
+  example, several core tags raise ``django.template.TemplateSyntaxError``
+  if they receive the wrong number or type of arguments.
 
 Ultimately, this decoupling of compilation and rendering results in an
 efficient template system, because a template can render multiple contexts
@@ -497,6 +537,8 @@ The ``__init__`` method for the ``Context`` class takes a parameter called
 ``autoescape`` that you can use for this purpose. For example:
 
 .. code-block:: python
+
+    from django.template import Context
 
     def render(self, context):
         # ...
@@ -545,7 +587,10 @@ A naive implementation of ``CycleNode`` might look something like this:
 
 .. code-block:: python
 
-    class CycleNode(Node):
+    import itertools
+    from django import template
+
+    class CycleNode(template.Node):
         def __init__(self, cyclevars):
             self.cycle_iter = itertools.cycle(cyclevars)
         def render(self, context):
@@ -576,7 +621,7 @@ Let's refactor our ``CycleNode`` implementation to use the ``render_context``:
 
 .. code-block:: python
 
-    class CycleNode(Node):
+    class CycleNode(template.Node):
         def __init__(self, cyclevars):
             self.cyclevars = cyclevars
         def render(self, context):
@@ -664,6 +709,7 @@ Now your tag should begin to look like this:
 .. code-block:: python
 
     from django import template
+
     def do_format_time(parser, token):
         try:
             # split_contents() knows not to split quoted strings.
@@ -704,7 +750,7 @@ cannot resolve the string passed to it in the current context of the page.
 Simple tags
 ~~~~~~~~~~~
 
-.. method:: django.template.Library.simple_tag
+.. method:: django.template.Library.simple_tag()
 
 Many template tags take a number of arguments -- strings or template variables
 -- and return a string after doing some processing based solely on
@@ -721,6 +767,11 @@ mentioned above and registers it with the template system.
 Our earlier ``current_time`` function could thus be written like this:
 
 .. code-block:: python
+
+    import datetime
+    from django import template
+
+    register = template.Library()
 
     def current_time(format_string):
         return datetime.datetime.now().strftime(format_string)
@@ -964,6 +1015,9 @@ object in the ``render()`` method. Here's an updated version of
 outputting it:
 
 .. code-block:: python
+
+    import datetime
+    from django import template
 
     class CurrentTimeNode2(template.Node):
         def __init__(self, format_string):

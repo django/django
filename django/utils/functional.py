@@ -2,8 +2,11 @@ import copy
 import operator
 from functools import wraps
 import sys
+import warnings
 
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils.six.moves import copyreg
 
 
 # You can't trivially replace this with `functools.partial` because this binds
@@ -23,6 +26,10 @@ def memoize(func, cache, num_args):
 
     Only the first num_args are considered when creating the key.
     """
+    warnings.warn("memoize wrapper is deprecated and will be removed in "
+                  "Django 1.9. Use django.utils.lru_cache instead.",
+                  RemovedInDjango19Warning, stacklevel=2)
+
     @wraps(func)
     def wrapper(*args):
         mem_args = args[:num_args]
@@ -87,6 +94,7 @@ def lazy(func, *resultclasses):
                 (func, self.__args, self.__kw) + resultclasses
             )
 
+        @classmethod
         def __prepare_class__(cls):
             cls.__dispatch = {}
             for resultclass in resultclasses:
@@ -113,8 +121,8 @@ def lazy(func, *resultclasses):
                     cls.__bytes__ = cls.__bytes_cast
                 else:
                     cls.__str__ = cls.__bytes_cast
-        __prepare_class__ = classmethod(__prepare_class__)
 
+        @classmethod
         def __promise__(cls, klass, funcname, method):
             # Builds a wrapper around some magic method and registers that
             # magic method for the given type and method name.
@@ -131,7 +139,6 @@ def lazy(func, *resultclasses):
                 cls.__dispatch[klass] = {}
             cls.__dispatch[klass][funcname] = method
             return __wrapper__
-        __promise__ = classmethod(__promise__)
 
         def __text_cast(self):
             return func(*self.__args, **self.__kw)
@@ -147,6 +154,11 @@ def lazy(func, *resultclasses):
             else:
                 return func(*self.__args, **self.__kw)
 
+        def __ne__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() != other
+
         def __eq__(self, other):
             if isinstance(other, Promise):
                 other = other.__cast()
@@ -161,7 +173,7 @@ def lazy(func, *resultclasses):
             return hash(self.__cast())
 
         def __mod__(self, rhs):
-            if self._delegate_bytes and not six.PY3:
+            if self._delegate_bytes and six.PY2:
                 return bytes(self) % rhs
             elif self._delegate_text:
                 return six.text_type(self) % rhs
@@ -249,25 +261,73 @@ class LazyObject(object):
 
     def _setup(self):
         """
-        Must be implemented by subclasses to initialise the wrapped object.
+        Must be implemented by subclasses to initialize the wrapped object.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of LazyObject must provide a _setup() method')
+
+    # Because we have messed with __class__ below, we confuse pickle as to what
+    # class we are pickling. It also appears to stop __reduce__ from being
+    # called. So, we define __getstate__ in a way that cooperates with the way
+    # that pickle interprets this class.  This fails when the wrapped class is
+    # a builtin, but it is better than nothing.
+    def __getstate__(self):
+        if self._wrapped is empty:
+            self._setup()
+        return self._wrapped.__dict__
+
+    # Python 3.3 will call __reduce__ when pickling; this method is needed
+    # to serialize and deserialize correctly.
+    @classmethod
+    def __newobj__(cls, *args):
+        return cls.__new__(cls, *args)
+
+    def __reduce_ex__(self, proto):
+        if proto >= 2:
+            # On Py3, since the default protocol is 3, pickle uses the
+            # ``__newobj__`` method (& more efficient opcodes) for writing.
+            return (self.__newobj__, (self.__class__,), self.__getstate__())
+        else:
+            # On Py2, the default protocol is 0 (for back-compat) & the above
+            # code fails miserably (see regression test). Instead, we return
+            # exactly what's returned if there's no ``__reduce__`` method at
+            # all.
+            return (copyreg._reconstructor, (self.__class__, object, None), self.__getstate__())
+
+    def __deepcopy__(self, memo):
+        if self._wrapped is empty:
+            # We have to use type(self), not self.__class__, because the
+            # latter is proxied.
+            result = type(self)()
+            memo[id(self)] = result
+            return result
+        return copy.deepcopy(self._wrapped, memo)
+
+    if six.PY3:
+        __bytes__ = new_method_proxy(bytes)
+        __str__ = new_method_proxy(str)
+        __bool__ = new_method_proxy(bool)
+    else:
+        __str__ = new_method_proxy(str)
+        __unicode__ = new_method_proxy(unicode)
+        __nonzero__ = new_method_proxy(bool)
 
     # Introspection support
     __dir__ = new_method_proxy(dir)
 
+    # Need to pretend to be the wrapped class, for the sake of objects that
+    # care about this (especially in equality tests)
+    __class__ = property(new_method_proxy(operator.attrgetter("__class__")))
+    __eq__ = new_method_proxy(operator.eq)
+    __ne__ = new_method_proxy(operator.ne)
+    __hash__ = new_method_proxy(hash)
+
     # Dictionary methods support
-    @new_method_proxy
-    def __getitem__(self, key):
-        return self[key]
+    __getitem__ = new_method_proxy(operator.getitem)
+    __setitem__ = new_method_proxy(operator.setitem)
+    __delitem__ = new_method_proxy(operator.delitem)
 
-    @new_method_proxy
-    def __setitem__(self, key, value):
-        self[key] = value
-
-    @new_method_proxy
-    def __delitem__(self, key):
-        del self[key]
+    __len__ = new_method_proxy(len)
+    __contains__ = new_method_proxy(operator.contains)
 
 
 # Workaround for http://bugs.python.org/issue12370
@@ -276,7 +336,7 @@ _super = super
 
 class SimpleLazyObject(LazyObject):
     """
-    A lazy object initialised from any function.
+    A lazy object initialized from any function.
 
     Designed for compound objects of unknown type. For builtins or objects of
     known type, use django.utils.functional.lazy.
@@ -296,12 +356,14 @@ class SimpleLazyObject(LazyObject):
     def _setup(self):
         self._wrapped = self._setupfunc()
 
-    if six.PY3:
-        __bytes__ = new_method_proxy(bytes)
-        __str__ = new_method_proxy(str)
-    else:
-        __str__ = new_method_proxy(str)
-        __unicode__ = new_method_proxy(unicode)
+    # Return a meaningful representation of the lazy object for debugging
+    # without evaluating the wrapped object.
+    def __repr__(self):
+        if self._wrapped is empty:
+            repr_attr = self._setupfunc
+        else:
+            repr_attr = self._wrapped
+        return '<%s: %r>' % (type(self).__name__, repr_attr)
 
     def __deepcopy__(self, memo):
         if self._wrapped is empty:
@@ -310,46 +372,7 @@ class SimpleLazyObject(LazyObject):
             result = SimpleLazyObject(self._setupfunc)
             memo[id(self)] = result
             return result
-        else:
-            return copy.deepcopy(self._wrapped, memo)
-
-    # Because we have messed with __class__ below, we confuse pickle as to what
-    # class we are pickling. It also appears to stop __reduce__ from being
-    # called. So, we define __getstate__ in a way that cooperates with the way
-    # that pickle interprets this class.  This fails when the wrapped class is
-    # a builtin, but it is better than nothing.
-    def __getstate__(self):
-        if self._wrapped is empty:
-            self._setup()
-        return self._wrapped.__dict__
-
-    # Python 3.3 will call __reduce__ when pickling; these methods are needed
-    # to serialize and deserialize correctly. They are not called in earlier
-    # versions of Python.
-    @classmethod
-    def __newobj__(cls, *args):
-        return cls.__new__(cls, *args)
-
-    def __reduce__(self):
-        return (self.__newobj__, (self.__class__,), self.__getstate__())
-
-    # Return a meaningful representation of the lazy object for debugging
-    # without evaluating the wrapped object.
-    def __repr__(self):
-        if self._wrapped is empty:
-            repr_attr = self._setupfunc
-        else:
-            repr_attr = self._wrapped
-        return '<SimpleLazyObject: %r>' % repr_attr
-
-    # Need to pretend to be the wrapped class, for the sake of objects that
-    # care about this (especially in equality tests)
-    __class__ = property(new_method_proxy(operator.attrgetter("__class__")))
-    __eq__ = new_method_proxy(operator.eq)
-    __ne__ = new_method_proxy(operator.ne)
-    __hash__ = new_method_proxy(hash)
-    __bool__ = new_method_proxy(bool)       # Python 3
-    __nonzero__ = __bool__                  # Python 2
+        return copy.deepcopy(self._wrapped, memo)
 
 
 class lazy_property(property):
@@ -389,9 +412,8 @@ def partition(predicate, values):
 if sys.version_info >= (2, 7, 2):
     from functools import total_ordering
 else:
-    # For Python < 2.7.2. Python 2.6 does not have total_ordering, and
-    # total_ordering in 2.7 versions prior to 2.7.2 is buggy. See
-    # http://bugs.python.org/issue10042 for details. For these versions use
+    # For Python < 2.7.2. total_ordering in versions prior to 2.7.2 is buggy.
+    # See http://bugs.python.org/issue10042 for details. For these versions use
     # code borrowed from Python 2.7.3.
     def total_ordering(cls):
         """Class decorator that fills in missing ordering methods"""

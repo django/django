@@ -1,32 +1,38 @@
 import os
 import unittest
-from django.contrib.gis.gdal import DataSource, Envelope, OGRGeometry, OGRException, OGRIndexError, GDAL_VERSION
-from django.contrib.gis.gdal.field import OFTReal, OFTInteger, OFTString
+from unittest import skipUnless
+
+from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geometry.test_data import get_ds_file, TestDS, TEST_DATA
 
+if HAS_GDAL:
+    from django.contrib.gis.gdal import DataSource, Envelope, OGRGeometry, OGRException, OGRIndexError, GDAL_VERSION
+    from django.contrib.gis.gdal.field import OFTReal, OFTInteger, OFTString
 
-# List of acceptable data sources.
-ds_list = (TestDS('test_point', nfeat=5, nfld=3, geom='POINT', gtype=1, driver='ESRI Shapefile',
-                  fields={'dbl' : OFTReal, 'int' : OFTInteger, 'str' : OFTString,},
-                  extent=(-1.35011,0.166623,-0.524093,0.824508), # Got extent from QGIS
-                  srs_wkt='GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]',
-                  field_values={'dbl' : [float(i) for i in range(1, 6)], 'int' : list(range(1, 6)), 'str' : [str(i) for i in range(1, 6)]},
-                  fids=range(5)),
-           TestDS('test_vrt', ext='vrt', nfeat=3, nfld=3, geom='POINT', gtype='Point25D', driver='VRT',
-                  fields={'POINT_X' : OFTString, 'POINT_Y' : OFTString, 'NUM' : OFTString}, # VRT uses CSV, which all types are OFTString.
-                  extent=(1.0, 2.0, 100.0, 523.5), # Min/Max from CSV
-                  field_values={'POINT_X' : ['1.0', '5.0', '100.0'], 'POINT_Y' : ['2.0', '23.0', '523.5'], 'NUM' : ['5', '17', '23']},
-                  fids=range(1,4)),
-           TestDS('test_poly', nfeat=3, nfld=3, geom='POLYGON', gtype=3,
-                  driver='ESRI Shapefile',
-                  fields={'float' : OFTReal, 'int' : OFTInteger, 'str' : OFTString,},
-                  extent=(-1.01513,-0.558245,0.161876,0.839637), # Got extent from QGIS
-                  srs_wkt='GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]'),
-           )
+    # List of acceptable data sources.
+    ds_list = (
+        TestDS('test_point', nfeat=5, nfld=3, geom='POINT', gtype=1, driver='ESRI Shapefile',
+            fields={'dbl': OFTReal, 'int': OFTInteger, 'str': OFTString},
+            extent=(-1.35011, 0.166623, -0.524093, 0.824508),  # Got extent from QGIS
+            srs_wkt='GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]',
+            field_values={'dbl': [float(i) for i in range(1, 6)], 'int': list(range(1, 6)), 'str': [str(i) for i in range(1, 6)]},
+            fids=range(5)),
+        TestDS('test_vrt', ext='vrt', nfeat=3, nfld=3, geom='POINT', gtype='Point25D', driver='VRT',
+            fields={'POINT_X': OFTString, 'POINT_Y': OFTString, 'NUM': OFTString},  # VRT uses CSV, which all types are OFTString.
+            extent=(1.0, 2.0, 100.0, 523.5),  # Min/Max from CSV
+            field_values={'POINT_X': ['1.0', '5.0', '100.0'], 'POINT_Y': ['2.0', '23.0', '523.5'], 'NUM': ['5', '17', '23']},
+            fids=range(1, 4)),
+        TestDS('test_poly', nfeat=3, nfld=3, geom='POLYGON', gtype=3,
+            driver='ESRI Shapefile',
+            fields={'float': OFTReal, 'int': OFTInteger, 'str': OFTString},
+            extent=(-1.01513, -0.558245, 0.161876, 0.839637),  # Got extent from QGIS
+            srs_wkt='GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]'),
+    )
 
-bad_ds = (TestDS('foo'),
-          )
+bad_ds = (TestDS('foo'),)
 
+
+@skipUnless(HAS_GDAL, "GDAL is required")
 class DataSourceTest(unittest.TestCase):
 
     def test01_valid_shp(self):
@@ -72,7 +78,7 @@ class DataSourceTest(unittest.TestCase):
                 self.assertEqual(source.nfld, layer.num_fields)
                 self.assertEqual(source.nfld, len(layer.fields))
 
-                # Testing the layer's extent (an Envelope), and it's properties
+                # Testing the layer's extent (an Envelope), and its properties
                 if source.driver == 'VRT' and (GDAL_VERSION >= (1, 7, 0) and GDAL_VERSION < (1, 7, 3)):
                     # There's a known GDAL regression with retrieving the extent
                     # of a VRT layer in versions 1.7.0-1.7.2:
@@ -87,7 +93,8 @@ class DataSourceTest(unittest.TestCase):
 
                 # Now checking the field names.
                 flds = layer.fields
-                for f in flds: self.assertEqual(True, f in source.fields)
+                for f in flds:
+                    self.assertEqual(True, f in source.fields)
 
                 # Negative FIDs are not allowed.
                 self.assertRaises(OGRIndexError, layer.__getitem__, -1)
@@ -236,11 +243,3 @@ class DataSourceTest(unittest.TestCase):
         feat = ds[0][0]
         # Reference value obtained using `ogrinfo`.
         self.assertEqual(676586997978, feat.get('ALAND10'))
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(DataSourceTest))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())

@@ -28,8 +28,17 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os, sys, time, signal, traceback
+from __future__ import absolute_import  # Avoid importing `importlib` from this package.
 
+import os
+import signal
+import sys
+import time
+import traceback
+
+from django.apps import apps
+from django.conf import settings
+from django.core.signals import request_finished
 try:
     from django.utils.six.moves import _thread as thread
 except ImportError:
@@ -38,7 +47,7 @@ except ImportError:
 # This import does nothing, but it's necessary to avoid some race conditions
 # in the threading module. See http://code.djangoproject.com/ticket/2330 .
 try:
-    import threading
+    import threading  # NOQA
 except ImportError:
     pass
 
@@ -47,6 +56,18 @@ try:
 except ImportError:
     termios = None
 
+USE_INOTIFY = False
+try:
+    # Test whether inotify is enabled and likely to work
+    import pyinotify
+
+    fd = pyinotify.INotifyWrapper.create().inotify_init()
+    if fd >= 0:
+        USE_INOTIFY = True
+        os.close(fd)
+except ImportError:
+    pass
+
 RUN_RELOADER = True
 
 _mtimes = {}
@@ -54,14 +75,32 @@ _win = (sys.platform == "win32")
 
 _error_files = []
 
-def code_changed():
-    global _mtimes, _win
-    filenames = []
-    for m in sys.modules.values():
-        try:
-            filenames.append(m.__file__)
-        except AttributeError:
-            pass
+
+def gen_filenames():
+    """
+    Yields a generator over filenames referenced in sys.modules and translation
+    files.
+    """
+    filenames = [filename.__file__ for filename in list(sys.modules.values())
+                if hasattr(filename, '__file__')]
+
+    if settings.USE_I18N:
+        # Add the names of the .mo files that can be generated
+        # by compilemessages management command to the list of files watched.
+        basedirs = [os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                                 'conf', 'locale'),
+                    'locale']
+        for app_config in reversed(list(apps.get_app_configs())):
+            basedirs.append(os.path.join(app_config.path, 'locale'))
+        basedirs.extend(settings.LOCALE_PATHS)
+        basedirs = [os.path.abspath(basedir) for basedir in basedirs
+                    if os.path.isdir(basedir)]
+        for basedir in basedirs:
+            for dirpath, dirnames, locale_filenames in os.walk(basedir):
+                for filename in locale_filenames:
+                    if filename.endswith('.mo'):
+                        filenames.append(os.path.join(dirpath, filename))
+
     for filename in filenames + _error_files:
         if not filename:
             continue
@@ -69,8 +108,45 @@ def code_changed():
             filename = filename[:-1]
         if filename.endswith("$py.class"):
             filename = filename[:-9] + ".py"
-        if not os.path.exists(filename):
-            continue # File might be in an egg, so it can't be reloaded.
+        if os.path.exists(filename):
+            yield filename
+
+
+def inotify_code_changed():
+    """
+    Checks for changed code using inotify. After being called
+    it blocks until a change event has been fired.
+    """
+    wm = pyinotify.WatchManager()
+    notifier = pyinotify.Notifier(wm)
+
+    def update_watch(sender=None, **kwargs):
+        mask = (
+            pyinotify.IN_MODIFY |
+            pyinotify.IN_DELETE |
+            pyinotify.IN_ATTRIB |
+            pyinotify.IN_MOVED_FROM |
+            pyinotify.IN_MOVED_TO |
+            pyinotify.IN_CREATE
+        )
+        for path in gen_filenames():
+            wm.add_watch(path, mask)
+
+    # New modules may get imported when a request is processed.
+    request_finished.connect(update_watch)
+
+    # Block until an event happens.
+    update_watch()
+    notifier.check_events(timeout=None)
+    notifier.stop()
+
+    # If we are here the code must have changed.
+    return True
+
+
+def code_changed():
+    global _mtimes, _win
+    for filename in gen_filenames():
         stat = os.stat(filename)
         mtime = stat.st_mtime
         if _win:
@@ -86,6 +162,7 @@ def code_changed():
                 pass
             return True
     return False
+
 
 def check_errors(fn):
     def wrapper(*args, **kwargs):
@@ -108,6 +185,7 @@ def check_errors(fn):
 
     return wrapper
 
+
 def ensure_echo_on():
     if termios:
         fd = sys.stdin
@@ -123,12 +201,18 @@ def ensure_echo_on():
                 if old_handler is not None:
                     signal.signal(signal.SIGTTOU, old_handler)
 
+
 def reloader_thread():
     ensure_echo_on()
+    if USE_INOTIFY:
+        fn = inotify_code_changed
+    else:
+        fn = code_changed
     while RUN_RELOADER:
-        if code_changed():
-            sys.exit(3) # force reload
+        if fn():
+            sys.exit(3)  # force reload
         time.sleep(1)
+
 
 def restart_with_reloader():
     while True:
@@ -140,6 +224,7 @@ def restart_with_reloader():
         exit_code = os.spawnve(os.P_WAIT, sys.executable, args, new_environ)
         if exit_code != 3:
             return exit_code
+
 
 def python_reloader(main_func, args, kwargs):
     if os.environ.get("RUN_MAIN") == "true":
@@ -157,6 +242,7 @@ def python_reloader(main_func, args, kwargs):
                 sys.exit(exit_code)
         except KeyboardInterrupt:
             pass
+
 
 def jython_reloader(main_func, args, kwargs):
     from _systemrestart import SystemRestart
@@ -179,4 +265,3 @@ def main(main_func, args=None, kwargs=None):
 
     wrapped_main_func = check_errors(main_func)
     reloader(wrapped_main_func, args, kwargs)
-

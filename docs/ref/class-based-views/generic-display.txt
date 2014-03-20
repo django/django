@@ -36,7 +36,7 @@ DetailView
     9. ``get()``
     10. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
 
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from django.views.generic.detail import DetailView
         from django.utils import timezone
@@ -52,7 +52,7 @@ DetailView
                 context['now'] = timezone.now()
                 return context
 
-    **Example urls.py**::
+    **Example myapp/urls.py**::
 
         from django.conf.urls import patterns, url
 
@@ -61,6 +61,16 @@ DetailView
         urlpatterns = patterns('',
             url(r'^(?P<slug>[-_\w]+)/$', ArticleDetailView.as_view(), name='article-detail'),
         )
+
+    **Example myapp/article_detail.html**:
+
+    .. code-block:: html+django
+
+        <h1>{{ object.headline }}</h1>
+        <p>{{ object.content }}</p>
+        <p>Reporter: {{ object.reporter }}</p>
+        <p>Published: {{ object.pub_date|date }}</p>
+        <p>Date: {{ now|date }}</p>
 
 ListView
 --------
@@ -77,7 +87,6 @@ ListView
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.list.ListView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.list.BaseListView`
@@ -112,7 +121,7 @@ ListView
                 context['now'] = timezone.now()
                 return context
 
-    **Example urls.py**::
+    **Example myapp/urls.py**::
 
         from django.conf.urls import patterns, url
 
@@ -121,6 +130,19 @@ ListView
         urlpatterns = patterns('',
             url(r'^$', ArticleListView.as_view(), name='article-list'),
         )
+
+    **Example myapp/article_list.html**:
+
+    .. code-block:: html+django
+
+        <h1>Articles</h1>
+        <ul>
+        {% for article in object_list %}
+            <li>{{ article.pub_date|date }} - {{ article.headline }}</li>
+        {% empty %}
+            <li>No articles yet.</li>
+        {% endfor %}
+        </ul>
 
 .. class:: django.views.generic.list.BaseListView
 

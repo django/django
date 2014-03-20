@@ -1,9 +1,10 @@
 import gc
 import sys
 import time
+import unittest
+import weakref
 
 from django.dispatch import Signal, receiver
-from django.utils import unittest
 
 
 if sys.platform.startswith('java'):
@@ -22,8 +23,10 @@ else:
     def garbage_collect():
         gc.collect()
 
+
 def receiver_1_arg(val, **kwargs):
     return val
+
 
 class Callable(object):
     def __call__(self, val, **kwargs):
@@ -35,20 +38,23 @@ class Callable(object):
 a_signal = Signal(providing_args=["val"])
 b_signal = Signal(providing_args=["val"])
 c_signal = Signal(providing_args=["val"])
+d_signal = Signal(providing_args=["val"], use_caching=True)
+
 
 class DispatcherTests(unittest.TestCase):
     """Test suite for dispatcher (barely started)"""
 
     def _testIsClean(self, signal):
         """Assert that everything has been cleaned up automatically"""
+        # Note that dead weakref cleanup happens as side effect of using
+        # the signal's receivers through the signals API. So, first do a
+        # call to an API method to force cleanup.
+        self.assertFalse(signal.has_listeners())
         self.assertEqual(signal.receivers, [])
-
-        # force cleanup just in case
-        signal.receivers = []
 
     def testExact(self):
         a_signal.connect(receiver_1_arg, sender=self)
-        expected = [(receiver_1_arg,"test")]
+        expected = [(receiver_1_arg, "test")]
         result = a_signal.send(sender=self, val="test")
         self.assertEqual(result, expected)
         a_signal.disconnect(receiver_1_arg, sender=self)
@@ -56,7 +62,7 @@ class DispatcherTests(unittest.TestCase):
 
     def testIgnoredSender(self):
         a_signal.connect(receiver_1_arg)
-        expected = [(receiver_1_arg,"test")]
+        expected = [(receiver_1_arg, "test")]
         result = a_signal.send(sender=self, val="test")
         self.assertEqual(result, expected)
         a_signal.disconnect(receiver_1_arg)
@@ -71,6 +77,24 @@ class DispatcherTests(unittest.TestCase):
         result = a_signal.send(sender=self, val="test")
         self.assertEqual(result, expected)
         self._testIsClean(a_signal)
+
+    def testCachedGarbagedCollected(self):
+        """
+        Make sure signal caching sender receivers don't prevent garbage
+        collection of senders.
+        """
+        class sender:
+            pass
+        wref = weakref.ref(sender)
+        d_signal.connect(receiver_1_arg)
+        d_signal.send(sender, val='garbage')
+        del sender
+        garbage_collect()
+        try:
+            self.assertIsNone(wref())
+        finally:
+            # Disconnect after reference check since it flushes the tested cache.
+            d_signal.disconnect(receiver_1_arg)
 
     def testMultipleRegistration(self):
         a = Callable()
@@ -95,10 +119,10 @@ class DispatcherTests(unittest.TestCase):
         def uid_based_receiver_2(**kwargs):
             pass
 
-        a_signal.connect(uid_based_receiver_1, dispatch_uid = "uid")
-        a_signal.connect(uid_based_receiver_2, dispatch_uid = "uid")
+        a_signal.connect(uid_based_receiver_1, dispatch_uid="uid")
+        a_signal.connect(uid_based_receiver_2, dispatch_uid="uid")
         self.assertEqual(len(a_signal.receivers), 1)
-        a_signal.disconnect(dispatch_uid = "uid")
+        a_signal.disconnect(dispatch_uid="uid")
         self._testIsClean(a_signal)
 
     def testRobust(self):
@@ -108,7 +132,7 @@ class DispatcherTests(unittest.TestCase):
         a_signal.connect(fails)
         result = a_signal.send_robust(sender=self, val="test")
         err = result[0][1]
-        self.assertTrue(isinstance(err, ValueError))
+        self.assertIsInstance(err, ValueError)
         self.assertEqual(err.args, ('this',))
         a_signal.disconnect(fails)
         self._testIsClean(a_signal)

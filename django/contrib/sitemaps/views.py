@@ -1,12 +1,14 @@
-import warnings
+from calendar import timegm
 from functools import wraps
 
-from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 from django.core import urlresolvers
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404
 from django.template.response import TemplateResponse
 from django.utils import six
+from django.utils.http import http_date
+
 
 def x_robots_tag(func):
     @wraps(func)
@@ -16,18 +18,13 @@ def x_robots_tag(func):
         return response
     return inner
 
+
 @x_robots_tag
 def index(request, sitemaps,
           template_name='sitemap_index.xml', content_type='application/xml',
-          sitemap_url_name='django.contrib.sitemaps.views.sitemap',
-          mimetype=None):
+          sitemap_url_name='django.contrib.sitemaps.views.sitemap'):
 
-    if mimetype:
-        warnings.warn("The mimetype keyword argument is deprecated, use "
-            "content_type instead", DeprecationWarning, stacklevel=2)
-        content_type = mimetype
-
-    req_protocol = 'https' if request.is_secure() else 'http'
+    req_protocol = request.scheme
     req_site = get_current_site(request)
 
     sites = []
@@ -36,7 +33,7 @@ def index(request, sitemaps,
             site = site()
         protocol = req_protocol if site.protocol is None else site.protocol
         sitemap_url = urlresolvers.reverse(
-                sitemap_url_name, kwargs={'section': section})
+            sitemap_url_name, kwargs={'section': section})
         absolute_url = '%s://%s%s' % (protocol, req_site.domain, sitemap_url)
         sites.append(absolute_url)
         for page in range(2, site.paginator.num_pages + 1):
@@ -45,17 +42,12 @@ def index(request, sitemaps,
     return TemplateResponse(request, template_name, {'sitemaps': sites},
                             content_type=content_type)
 
+
 @x_robots_tag
 def sitemap(request, sitemaps, section=None,
-            template_name='sitemap.xml', content_type='application/xml',
-            mimetype=None):
+            template_name='sitemap.xml', content_type='application/xml'):
 
-    if mimetype:
-        warnings.warn("The mimetype keyword argument is deprecated, use "
-            "content_type instead", DeprecationWarning, stacklevel=2)
-        content_type = mimetype
-
-    req_protocol = 'https' if request.is_secure() else 'http'
+    req_protocol = request.scheme
     req_site = get_current_site(request)
 
     if section is not None:
@@ -77,5 +69,11 @@ def sitemap(request, sitemaps, section=None,
             raise Http404("Page %s empty" % page)
         except PageNotAnInteger:
             raise Http404("No page '%s'" % page)
-    return TemplateResponse(request, template_name, {'urlset': urls},
-                            content_type=content_type)
+    response = TemplateResponse(request, template_name, {'urlset': urls},
+                                content_type=content_type)
+    if hasattr(site, 'latest_lastmod'):
+        # if latest_lastmod is defined for site, set header so as
+        # ConditionalGetMiddleware is able to send 304 NOT MODIFIED
+        response['Last-Modified'] = http_date(
+            timegm(site.latest_lastmod.utctimetuple()))
+    return response

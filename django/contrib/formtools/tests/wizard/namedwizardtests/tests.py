@@ -219,6 +219,11 @@ class NamedWizardTests(object):
                  {'random_crap': 'blah blah'}
              ]})
 
+        form_dict = response.context['form_dict']
+        self.assertIn('form1', form_dict.keys())
+        self.assertIn('form2', form_dict.keys())
+        self.assertEqual(form_dict['form1'].cleaned_data, response.context['form_list'][0])
+
     def test_manipulated_data(self):
         response = self.client.get(
             reverse(self.wizard_urlname, kwargs={'step': 'form1'}))

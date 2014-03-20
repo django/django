@@ -13,18 +13,15 @@ from io import BytesIO
 import socket
 import sys
 import traceback
-try:
-    from urllib.parse import urljoin
-except ImportError:     # Python 2
-    from urlparse import urljoin
-from django.utils.six.moves import socketserver
 from wsgiref import simple_server
-from wsgiref.util import FileWrapper   # for backwards compatibility
+from wsgiref.util import FileWrapper   # NOQA: for backwards compatibility
 
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
 from django.core.wsgi import get_wsgi_application
-from django.utils.module_loading import import_by_path
 from django.utils import six
+from django.utils.module_loading import import_string
+from django.utils.six.moves import socketserver
 
 __all__ = ('WSGIServer', 'WSGIRequestHandler', 'MAX_SOCKET_CHUNK_SIZE')
 
@@ -55,14 +52,18 @@ def get_internal_wsgi_application():
     if app_path is None:
         return get_wsgi_application()
 
-    return import_by_path(
-        app_path,
-        error_prefix="WSGI application '%s' could not be loaded; " % app_path
-    )
-
-
-class WSGIServerException(Exception):
-    pass
+    try:
+        return import_string(app_path)
+    except ImportError as e:
+        msg = (
+            "WSGI application '%(app_path)s' could not be loaded; "
+            "Error importing module: '%(exception)s'" % ({
+                'app_path': app_path,
+                'exception': e,
+            })
+        )
+        six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg),
+                    sys.exc_info()[2])
 
 
 class ServerHandler(simple_server.ServerHandler, object):
@@ -117,21 +118,13 @@ class WSGIServer(simple_server.WSGIServer, object):
 
     def server_bind(self):
         """Override server_bind to store the server name."""
-        try:
-            super(WSGIServer, self).server_bind()
-        except Exception as e:
-            six.reraise(WSGIServerException, WSGIServerException(e), sys.exc_info()[2])
+        super(WSGIServer, self).server_bind()
         self.setup_environ()
 
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
 
     def __init__(self, *args, **kwargs):
-        from django.conf import settings
-        self.admin_static_prefix = urljoin(settings.STATIC_URL, 'admin/')
-        # We set self.path to avoid crashes in log_message() on unsupported
-        # requests (like "OPTIONS").
-        self.path = ''
         self.style = color_style()
         super(WSGIRequestHandler, self).__init__(*args, **kwargs)
 
@@ -140,11 +133,6 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         return self.client_address[0]
 
     def log_message(self, format, *args):
-        # Don't bother logging requests for admin images or the favicon.
-        if (self.path.startswith(self.admin_static_prefix)
-                or self.path == '/favicon.ico'):
-            return
-
         msg = "[%s] %s\n" % (self.log_date_time_string(), format % args)
 
         # Utilize terminal colors, if available

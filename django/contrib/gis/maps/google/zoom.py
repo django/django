@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.gis.geos import GEOSGeometry, LinearRing, Polygon, Point
 from django.contrib.gis.maps.google.gmap import GoogleMapException
 from django.utils.six.moves import xrange
@@ -6,6 +8,7 @@ from math import pi, sin, log, exp, atan
 # Constants used for degree to radian conversion, and vice-versa.
 DTOR = pi / 180.
 RTOD = 180. / pi
+
 
 class GoogleZoom(object):
     """
@@ -32,18 +35,18 @@ class GoogleZoom(object):
 
         # Initializing arrays to hold the parameters for each one of the
         # zoom levels.
-        self._degpp = [] # Degrees per pixel
-        self._radpp = [] # Radians per pixel
-        self._npix  = [] # 1/2 the number of pixels for a tile at the given zoom level
+        self._degpp = []  # Degrees per pixel
+        self._radpp = []  # Radians per pixel
+        self._npix = []  # 1/2 the number of pixels for a tile at the given zoom level
 
         # Incrementing through the zoom levels and populating the parameter arrays.
-        z = tilesize # The number of pixels per zoom level.
+        z = tilesize  # The number of pixels per zoom level.
         for i in xrange(num_zoom):
             # Getting the degrees and radians per pixel, and the 1/2 the number of
             # for every zoom level.
-            self._degpp.append(z / 360.) # degrees per pixel
-            self._radpp.append(z / (2 * pi)) # radians per pixel
-            self._npix.append(z / 2) # number of pixels to center of tile
+            self._degpp.append(z / 360.)  # degrees per pixel
+            self._radpp.append(z / (2 * pi))  # radians per pixel
+            self._npix.append(z / 2)  # number of pixels to center of tile
 
             # Multiplying `z` by 2 for the next iteration.
             z *= 2
@@ -78,7 +81,7 @@ class GoogleZoom(object):
         fac = min(max(sin(DTOR * lat), -0.9999), 0.9999)
 
         # Calculating the pixel y coordinate.
-        px_y = round(npix + (0.5 * log((1 + fac)/(1 - fac)) * (-1.0 * self._radpp[zoom])))
+        px_y = round(npix + (0.5 * log((1 + fac) / (1 - fac)) * (-1.0 * self._radpp[zoom])))
 
         # Returning the pixel x, y to the caller of the function.
         return (px_x, px_y)
@@ -95,7 +98,7 @@ class GoogleZoom(object):
         lon = (px[0] - npix) / self._degpp[zoom]
 
         # Calculating the latitude value.
-        lat = RTOD * ( 2 * atan(exp((px[1] - npix)/ (-1.0 * self._radpp[zoom]))) - 0.5 * pi)
+        lat = RTOD * (2 * atan(exp((px[1] - npix) / (-1.0 * self._radpp[zoom]))) - 0.5 * pi)
 
         # Returning the longitude, latitude coordinate pair.
         return (lon, lat)
@@ -115,8 +118,8 @@ class GoogleZoom(object):
 
         # Getting the lower-left and upper-right lat/lon coordinates
         # for the bounding box of the tile.
-        ll = self.pixel_to_lonlat((px[0]-delta, px[1]-delta), zoom)
-        ur = self.pixel_to_lonlat((px[0]+delta, px[1]+delta), zoom)
+        ll = self.pixel_to_lonlat((px[0] - delta, px[1] - delta), zoom)
+        ur = self.pixel_to_lonlat((px[0] + delta, px[1] + delta), zoom)
 
         # Constructing the Polygon, representing the tile and returning.
         return Polygon(LinearRing(ll, (ll[0], ur[1]), ur, (ur[0], ll[1]), ll), srid=4326)
@@ -142,10 +145,10 @@ class GoogleZoom(object):
             if (env_w > tile_w) or (env_h > tile_h):
                 if z == 0:
                     raise GoogleMapException('Geometry width and height should not exceed that of the Earth.')
-                return z-1
+                return z - 1
 
         # Otherwise, we've zoomed in to the max.
-        return self._nzoom-1
+        return self._nzoom - 1
 
     def get_width_height(self, extent):
         """
@@ -158,5 +161,5 @@ class GoogleZoom(object):
         ur = Point(extent[2:])
         # Calculating the width and height.
         height = ll.distance(ul)
-        width  = ul.distance(ur)
+        width = ul.distance(ur)
         return width, height

@@ -14,6 +14,8 @@ var DateTimeShortcuts = {
     clockDivName: 'clockbox',        // name of clock <div> that gets toggled
     clockLinkName: 'clocklink',      // name of the link that is used to toggle
     shortCutsClass: 'datetimeshortcuts', // class of the clock and cal shortcuts
+    timezoneWarningClass: 'timezonewarning', // class of the warning for timezone mismatch
+    timezoneOffset: 0,
     admin_media_prefix: '',
     init: function() {
         // Get admin_media_prefix by grabbing it off the window object. It's
@@ -26,16 +28,76 @@ var DateTimeShortcuts = {
             DateTimeShortcuts.admin_media_prefix = '/missing-admin-media-prefix/';
         }
 
+        if (window.__admin_utc_offset__ != undefined) {
+            var serverOffset = window.__admin_utc_offset__;
+            var localOffset = new Date().getTimezoneOffset() * -60;
+            DateTimeShortcuts.timezoneOffset = localOffset - serverOffset;
+        }
+
         var inputs = document.getElementsByTagName('input');
         for (i=0; i<inputs.length; i++) {
             var inp = inputs[i];
             if (inp.getAttribute('type') == 'text' && inp.className.match(/vTimeField/)) {
                 DateTimeShortcuts.addClock(inp);
+                DateTimeShortcuts.addTimezoneWarning(inp);
             }
             else if (inp.getAttribute('type') == 'text' && inp.className.match(/vDateField/)) {
                 DateTimeShortcuts.addCalendar(inp);
+                DateTimeShortcuts.addTimezoneWarning(inp);
             }
         }
+    },
+    // Return the current time while accounting for the server timezone.
+    now: function() {
+        if (window.__admin_utc_offset__ != undefined) {
+            var serverOffset = window.__admin_utc_offset__;
+            var localNow = new Date();
+            var localOffset = localNow.getTimezoneOffset() * -60;
+            localNow.setTime(localNow.getTime() + 1000 * (serverOffset - localOffset));
+            return localNow;
+        } else {
+            return new Date();
+        }
+    },
+    // Add a warning when the time zone in the browser and backend do not match.
+    addTimezoneWarning: function(inp) {
+        var $ = django.jQuery;
+        var warningClass = DateTimeShortcuts.timezoneWarningClass;
+        var timezoneOffset = DateTimeShortcuts.timezoneOffset / 3600;
+
+        // Only warn if there is a time zone mismatch.
+        if (!timezoneOffset)
+            return;
+
+        // Check if warning is already there.
+        if ($(inp).siblings('.' + warningClass).length)
+            return;
+
+        var message;
+        if (timezoneOffset > 0) {
+            message = ngettext(
+                'Note: You are %s hour ahead of server time.',
+                'Note: You are %s hours ahead of server time.',
+                timezoneOffset
+            );
+        }
+        else {
+            timezoneOffset *= -1
+            message = ngettext(
+                'Note: You are %s hour behind server time.',
+                'Note: You are %s hours behind server time.',
+                timezoneOffset
+            );
+        }
+        message = interpolate(message, [timezoneOffset]);
+
+        var $warning = $('<span>');
+        $warning.attr('class', warningClass);
+        $warning.text(message);
+
+        $(inp).parent()
+            .append($('<br>'))
+            .append($warning)
     },
     // Add clock widget to a given field
     addClock: function(inp) {
@@ -48,7 +110,7 @@ var DateTimeShortcuts = {
         shortcuts_span.className = DateTimeShortcuts.shortCutsClass;
         inp.parentNode.insertBefore(shortcuts_span, inp.nextSibling);
         var now_link = document.createElement('a');
-        now_link.setAttribute('href', "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date().strftime('" + get_format('TIME_INPUT_FORMATS')[0] + "'));");
+        now_link.setAttribute('href', "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", -1);");
         now_link.appendChild(document.createTextNode(gettext('Now')));
         var clock_link = document.createElement('a');
         clock_link.setAttribute('href', 'javascript:DateTimeShortcuts.openClock(' + num + ');');
@@ -82,15 +144,14 @@ var DateTimeShortcuts = {
         addEvent(clock_box, 'click', cancelEventPropagation);
 
         quickElement('h2', clock_box, gettext('Choose a time'));
-        var time_list = quickElement('ul', clock_box, '');
+        var time_list = quickElement('ul', clock_box);
         time_list.className = 'timelist';
-        var time_format = get_format('TIME_INPUT_FORMATS')[0];
-        quickElement("a", quickElement("li", time_list, ""), gettext("Now"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date().strftime('" + time_format + "'));");
-        quickElement("a", quickElement("li", time_list, ""), gettext("Midnight"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,0,0,0,0).strftime('" + time_format + "'));");
-        quickElement("a", quickElement("li", time_list, ""), gettext("6 a.m."), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,6,0,0,0).strftime('" + time_format + "'));");
-        quickElement("a", quickElement("li", time_list, ""), gettext("Noon"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,12,0,0,0).strftime('" + time_format + "'));");
+        quickElement("a", quickElement("li", time_list), gettext("Now"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", -1);");
+        quickElement("a", quickElement("li", time_list), gettext("Midnight"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", 0);");
+        quickElement("a", quickElement("li", time_list), gettext("6 a.m."), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", 6);");
+        quickElement("a", quickElement("li", time_list), gettext("Noon"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", 12);");
 
-        var cancel_p = quickElement('p', clock_box, '');
+        var cancel_p = quickElement('p', clock_box);
         cancel_p.className = 'calendar-cancel';
         quickElement('a', cancel_p, gettext('Cancel'), 'href', 'javascript:DateTimeShortcuts.dismissClock(' + num + ');');
         django.jQuery(document).bind('keyup', function(event) {
@@ -128,7 +189,14 @@ var DateTimeShortcuts = {
        removeEvent(document, 'click', DateTimeShortcuts.dismissClockFunc[num]);
     },
     handleClockQuicklink: function(num, val) {
-       DateTimeShortcuts.clockInputs[num].value = val;
+       var d;
+       if (val == -1) {
+           d = DateTimeShortcuts.now();
+       }
+       else {
+           d = new Date(1970, 1, 1, val, 0, 0, 0)
+       }
+       DateTimeShortcuts.clockInputs[num].value = d.strftime(get_format('TIME_INPUT_FORMATS')[0]);
        DateTimeShortcuts.clockInputs[num].focus();
        DateTimeShortcuts.dismissClock(num);
     },
@@ -181,7 +249,7 @@ var DateTimeShortcuts = {
         addEvent(cal_box, 'click', cancelEventPropagation);
 
         // next-prev links
-        var cal_nav = quickElement('div', cal_box, '');
+        var cal_nav = quickElement('div', cal_box);
         var cal_nav_prev = quickElement('a', cal_nav, '<', 'href', 'javascript:DateTimeShortcuts.drawPrev('+num+');');
         cal_nav_prev.className = 'calendarnav-previous';
         var cal_nav_next = quickElement('a', cal_nav, '>', 'href', 'javascript:DateTimeShortcuts.drawNext('+num+');');
@@ -194,7 +262,7 @@ var DateTimeShortcuts = {
         DateTimeShortcuts.calendars[num].drawCurrent();
 
         // calendar shortcuts
-        var shortcuts = quickElement('div', cal_box, '');
+        var shortcuts = quickElement('div', cal_box);
         shortcuts.className = 'calendar-shortcuts';
         quickElement('a', shortcuts, gettext('Yesterday'), 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', -1);');
         shortcuts.appendChild(document.createTextNode('\240|\240'));
@@ -203,7 +271,7 @@ var DateTimeShortcuts = {
         quickElement('a', shortcuts, gettext('Tomorrow'), 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', +1);');
 
         // cancel bar
-        var cancel_p = quickElement('p', cal_box, '');
+        var cancel_p = quickElement('p', cal_box);
         cancel_p.className = 'calendar-cancel';
         quickElement('a', cancel_p, gettext('Cancel'), 'href', 'javascript:DateTimeShortcuts.dismissCalendar(' + num + ');');
         django.jQuery(document).bind('keyup', function(event) {
@@ -225,8 +293,9 @@ var DateTimeShortcuts = {
             var date_parts = inp.value.split('-');
             var year = date_parts[0];
             var month = parseFloat(date_parts[1]);
+            var selected = new Date(inp.value);
             if (year.match(/\d\d\d\d/) && month >= 1 && month <= 12) {
-                DateTimeShortcuts.calendars[num].drawDate(month, year);
+                DateTimeShortcuts.calendars[num].drawDate(month, year, selected);
             }
         }
 
@@ -258,7 +327,7 @@ var DateTimeShortcuts = {
         DateTimeShortcuts.calendars[num].drawNextMonth();
     },
     handleCalendarCallback: function(num) {
-        format = get_format('DATE_INPUT_FORMATS')[0];
+        var format = get_format('DATE_INPUT_FORMATS')[0];
         // the format needs to be escaped a little
         format = format.replace('\\', '\\\\');
         format = format.replace('\r', '\\r');
@@ -276,7 +345,7 @@ var DateTimeShortcuts = {
                ").style.display='none';}"].join('');
     },
     handleCalendarQuickLink: function(num, offset) {
-       var d = new Date();
+       var d = DateTimeShortcuts.now();
        d.setDate(d.getDate() + offset)
        DateTimeShortcuts.calendarInputs[num].value = d.strftime(get_format('DATE_INPUT_FORMATS')[0]);
        DateTimeShortcuts.calendarInputs[num].focus();

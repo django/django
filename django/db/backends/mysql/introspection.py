@@ -1,11 +1,12 @@
 import re
 from .base import FIELD_TYPE
-
+from django.utils.datastructures import OrderedSet
 from django.db.backends import BaseDatabaseIntrospection, FieldInfo
 from django.utils.encoding import force_text
 
 
 foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")
+
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     data_types_reverse = {
@@ -53,7 +54,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT column_name, numeric_precision, numeric_scale FROM information_schema.columns
             WHERE table_name = %s AND table_schema = DATABASE()
                 AND data_type='decimal'""", [table_name])
-        numeric_map = dict([(line[0], tuple([int(n) for n in line[1:]])) for line in cursor.fetchall()])
+        numeric_map = dict((line[0], tuple(int(n) for n in line[1:])) for line in cursor.fetchall())
 
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
         return [FieldInfo(*((force_text(line[0]),)
@@ -68,7 +69,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Returns a dictionary of {field_name: field_index} for the given table.
         Indexes are 0-based.
         """
-        return dict([(d[0], i) for i, d in enumerate(self.get_table_description(cursor, table_name))])
+        return dict((d[0], i) for i, d in enumerate(self.get_table_description(cursor, table_name)))
 
     def get_relations(self, cursor, table_name):
         """
@@ -114,6 +115,71 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         for row in rows:
             if row[2] in multicol_indexes:
                 continue
-            indexes[row[4]] = {'primary_key': (row[2] == 'PRIMARY'), 'unique': not bool(row[1])}
+            if row[4] not in indexes:
+                indexes[row[4]] = {'primary_key': False, 'unique': False}
+            # It's possible to have the unique and PK constraints in separate indexes.
+            if row[2] == 'PRIMARY':
+                indexes[row[4]]['primary_key'] = True
+            if not row[1]:
+                indexes[row[4]]['unique'] = True
         return indexes
 
+    def get_constraints(self, cursor, table_name):
+        """
+        Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
+        """
+        constraints = {}
+        # Get the actual constraint names and columns
+        name_query = """
+            SELECT kc.`constraint_name`, kc.`column_name`,
+                kc.`referenced_table_name`, kc.`referenced_column_name`
+            FROM information_schema.key_column_usage AS kc
+            WHERE
+                kc.table_schema = %s AND
+                kc.table_name = %s
+        """
+        cursor.execute(name_query, [self.connection.settings_dict['NAME'], table_name])
+        for constraint, column, ref_table, ref_column in cursor.fetchall():
+            if constraint not in constraints:
+                constraints[constraint] = {
+                    'columns': OrderedSet(),
+                    'primary_key': False,
+                    'unique': False,
+                    'index': False,
+                    'check': False,
+                    'foreign_key': (ref_table, ref_column) if ref_column else None,
+                }
+            constraints[constraint]['columns'].add(column)
+        # Now get the constraint types
+        type_query = """
+            SELECT c.constraint_name, c.constraint_type
+            FROM information_schema.table_constraints AS c
+            WHERE
+                c.table_schema = %s AND
+                c.table_name = %s
+        """
+        cursor.execute(type_query, [self.connection.settings_dict['NAME'], table_name])
+        for constraint, kind in cursor.fetchall():
+            if kind.lower() == "primary key":
+                constraints[constraint]['primary_key'] = True
+                constraints[constraint]['unique'] = True
+            elif kind.lower() == "unique":
+                constraints[constraint]['unique'] = True
+        # Now add in the indexes
+        cursor.execute("SHOW INDEX FROM %s" % self.connection.ops.quote_name(table_name))
+        for table, non_unique, index, colseq, column in [x[:5] for x in cursor.fetchall()]:
+            if index not in constraints:
+                constraints[index] = {
+                    'columns': OrderedSet(),
+                    'primary_key': False,
+                    'unique': False,
+                    'index': True,
+                    'check': False,
+                    'foreign_key': None,
+                }
+            constraints[index]['index'] = True
+            constraints[index]['columns'].add(column)
+        # Convert the sorted sets to lists
+        for constraint in constraints.values():
+            constraint['columns'] = list(constraint['columns'])
+        return constraints

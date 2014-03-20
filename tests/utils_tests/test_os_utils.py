@@ -1,6 +1,6 @@
 import os
+import unittest
 
-from django.utils import unittest
 from django.utils._os import safe_join
 
 

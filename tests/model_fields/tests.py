@@ -1,24 +1,29 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 from decimal import Decimal
+import unittest
+import warnings
 
 from django import test
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db import models, IntegrityError
-from django.db.models.fields.files import FieldFile
+from django.db import connection, transaction, models, IntegrityError
+from django.db.models.fields import (
+    AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
+    CommaSeparatedIntegerField, DateField, DateTimeField, DecimalField,
+    EmailField, FilePathField, FloatField, IntegerField, IPAddressField,
+    GenericIPAddressField, NOT_PROVIDED, NullBooleanField, PositiveIntegerField,
+    PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
+    TimeField, URLField)
+from django.db.models.fields.files import FileField, ImageField
 from django.utils import six
-from django.utils import unittest
+from django.utils.functional import lazy
 
-from .models import (Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post,
-    NullBooleanModel, BooleanModel, DataModel, Document, RenamedField,
-    VerboseNameField, FksToBooleans)
-
-from .test_imagefield import (ImageFieldTests, ImageFieldTwoDimensionsTests,
-    TwoImageFieldTests, ImageFieldNoDimensionsTests,
-    ImageFieldOneDimensionTests, ImageFieldDimensionsFirstTests,
-    ImageFieldUsingFileTests)
+from .models import (
+    Foo, Bar, Whiz, BigD, BigS, BigInt, Post, NullBooleanModel,
+    BooleanModel, PrimaryKeyCharModel, DataModel, Document, RenamedField,
+    DateTimeModel, VerboseNameField, FksToBooleans, FkToChar, FloatModel)
 
 
 class BasicFieldTests(test.TestCase):
@@ -69,18 +74,43 @@ class BasicFieldTests(test.TestCase):
         m = VerboseNameField
         for i in range(1, 23):
             self.assertEqual(m._meta.get_field('field%d' % i).verbose_name,
-                    'verbose field%d' % i)
+                             'verbose field%d' % i)
 
         self.assertEqual(m._meta.get_field('id').verbose_name, 'verbose pk')
 
-    def test_formclass_with_choices(self):
-        # regression for 18162
-        class CustomChoiceField(forms.TypedChoiceField):
-            pass
-        choices = [('a@b.cc', 'a@b.cc'), ('b@b.cc', 'b@b.cc')]
+    def test_float_validates_object(self):
+        instance = FloatModel(size=2.5)
+        # Try setting float field to unsaved object
+        instance.size = instance
+        with transaction.atomic():
+            with self.assertRaises(TypeError):
+                instance.save()
+        # Set value to valid and save
+        instance.size = 2.5
+        instance.save()
+        self.assertTrue(instance.id)
+        # Set field to object on saved instance
+        instance.size = instance
+        with transaction.atomic():
+            with self.assertRaises(TypeError):
+                instance.save()
+        # Try setting field to object on retrieved object
+        obj = FloatModel.objects.get(pk=instance.id)
+        obj.size = obj
+        with self.assertRaises(TypeError):
+            obj.save()
+
+    def test_choices_form_class(self):
+        """Can supply a custom choices form class. Regression for #20999."""
+        choices = [('a', 'a')]
         field = models.CharField(choices=choices)
-        klass = CustomChoiceField
-        self.assertIsInstance(field.formfield(form_class=klass), klass)
+        klass = forms.TypedMultipleChoiceField
+        self.assertIsInstance(field.formfield(choices_form_class=klass), klass)
+
+    def test_field_str(self):
+        from django.utils.encoding import force_str
+        f = Foo._meta.get_field('a')
+        self.assertEqual(force_str(f), "model_fields.Foo.a")
 
 
 class DecimalFieldTests(test.TestCase):
@@ -130,12 +160,25 @@ class DecimalFieldTests(test.TestCase):
         # This should not crash. That counts as a win for our purposes.
         Foo.objects.filter(d__gte=100000000000)
 
+
 class ForeignKeyTests(test.TestCase):
     def test_callable_default(self):
         """Test the use of a lazy callable for ForeignKey.default"""
         a = Foo.objects.create(id=1, a='abc', d=Decimal("12.34"))
         b = Bar.objects.create(b="bcd")
         self.assertEqual(b.a, a)
+
+    @test.skipIfDBFeature('interprets_empty_strings_as_nulls')
+    def test_empty_string_fk(self):
+        """
+        Test that foreign key values to empty strings don't get converted
+        to None (#19299)
+        """
+        char_model_empty = PrimaryKeyCharModel.objects.create(string='')
+        fk_model_empty = FkToChar.objects.create(out=char_model_empty)
+        fk_model_empty = FkToChar.objects.select_related('out').get(id=fk_model_empty.pk)
+        self.assertEqual(fk_model_empty.out, char_model_empty)
+
 
 class DateTimeFieldTests(unittest.TestCase):
     def test_datetimefield_to_python_usecs(self):
@@ -153,6 +196,19 @@ class DateTimeFieldTests(unittest.TestCase):
                          datetime.time(1, 2, 3, 4))
         self.assertEqual(f.to_python('01:02:03.999999'),
                          datetime.time(1, 2, 3, 999999))
+
+    @test.skipUnlessDBFeature("supports_microsecond_precision")
+    def test_datetimes_save_completely(self):
+        dat = datetime.date(2014, 3, 12)
+        datetim = datetime.datetime(2014, 3, 12, 21, 22, 23, 240000)
+        tim = datetime.time(21, 22, 23, 240000)
+        DateTimeModel.objects.create(d=dat, dt=datetim, t=tim)
+        obj = DateTimeModel.objects.first()
+        self.assertTrue(obj)
+        self.assertEqual(obj.d, dat)
+        self.assertEqual(obj.dt, datetim)
+        self.assertEqual(obj.t, tim)
+
 
 class BooleanFieldTests(unittest.TestCase):
     def _test_get_db_prep_lookup(self, f):
@@ -181,6 +237,21 @@ class BooleanFieldTests(unittest.TestCase):
     def test_nullbooleanfield_to_python(self):
         self._test_to_python(models.NullBooleanField())
 
+    def test_charfield_textfield_max_length_passed_to_formfield(self):
+        """
+        Test that CharField and TextField pass their max_length attributes to
+        form fields created using their .formfield() method (#22206).
+        """
+        cf1 = models.CharField()
+        cf2 = models.CharField(max_length=1234)
+        self.assertIsNone(cf1.formfield().max_length)
+        self.assertEqual(1234, cf2.formfield().max_length)
+
+        tf1 = models.TextField()
+        tf2 = models.TextField(max_length=2345)
+        self.assertIsNone(tf1.formfield().max_length)
+        self.assertEqual(2345, tf2.formfield().max_length)
+
     def test_booleanfield_choices_blank(self):
         """
         Test that BooleanField with choices and defaults doesn't generate a
@@ -198,28 +269,28 @@ class BooleanFieldTests(unittest.TestCase):
         b.bfield = True
         b.save()
         b2 = BooleanModel.objects.get(pk=b.pk)
-        self.assertTrue(isinstance(b2.bfield, bool))
+        self.assertIsInstance(b2.bfield, bool)
         self.assertEqual(b2.bfield, True)
 
         b3 = BooleanModel()
         b3.bfield = False
         b3.save()
         b4 = BooleanModel.objects.get(pk=b3.pk)
-        self.assertTrue(isinstance(b4.bfield, bool))
+        self.assertIsInstance(b4.bfield, bool)
         self.assertEqual(b4.bfield, False)
 
         b = NullBooleanModel()
         b.nbfield = True
         b.save()
         b2 = NullBooleanModel.objects.get(pk=b.pk)
-        self.assertTrue(isinstance(b2.nbfield, bool))
+        self.assertIsInstance(b2.nbfield, bool)
         self.assertEqual(b2.nbfield, True)
 
         b3 = NullBooleanModel()
         b3.nbfield = False
         b3.save()
         b4 = NullBooleanModel.objects.get(pk=b3.pk)
-        self.assertTrue(isinstance(b4.nbfield, bool))
+        self.assertIsInstance(b4.nbfield, bool)
         self.assertEqual(b4.nbfield, False)
 
         # http://code.djangoproject.com/ticket/13293
@@ -270,13 +341,27 @@ class BooleanFieldTests(unittest.TestCase):
         Check that a BooleanField defaults to None -- which isn't
         a valid value (#15124).
         """
-        b = BooleanModel()
-        self.assertIsNone(b.bfield)
-        with self.assertRaises(IntegrityError):
-            b.save()
+        # Patch the boolean field's default value. We give it a default
+        # value when defining the model to satisfy the check tests
+        # #20895.
+        boolean_field = BooleanModel._meta.get_field('bfield')
+        self.assertTrue(boolean_field.has_default())
+        old_default = boolean_field.default
+        try:
+            boolean_field.default = NOT_PROVIDED
+            # check patch was successful
+            self.assertFalse(boolean_field.has_default())
+            b = BooleanModel()
+            self.assertIsNone(b.bfield)
+            with self.assertRaises(IntegrityError):
+                b.save()
+        finally:
+            boolean_field.default = old_default
+
         nb = NullBooleanModel()
         self.assertIsNone(nb.nbfield)
         nb.save()           # no error
+
 
 class ChoicesTests(test.TestCase):
     def test_choices_and_field_display(self):
@@ -290,14 +375,15 @@ class ChoicesTests(test.TestCase):
         self.assertEqual(Whiz(c=None).get_c_display(), None)    # Blank value
         self.assertEqual(Whiz(c='').get_c_display(), '')        # Empty value
 
+
 class SlugFieldTests(test.TestCase):
     def test_slugfield_max_length(self):
         """
         Make sure SlugField honors max_length (#9706)
         """
-        bs = BigS.objects.create(s = 'slug'*50)
+        bs = BigS.objects.create(s='slug' * 50)
         bs = BigS.objects.get(pk=bs.pk)
-        self.assertEqual(bs.s, 'slug'*50)
+        self.assertEqual(bs.s, 'slug' * 50)
 
 
 class ValidationTest(test.TestCase):
@@ -318,15 +404,21 @@ class ValidationTest(test.TestCase):
         self.assertRaises(ValidationError, f.clean, "a", None)
 
     def test_charfield_with_choices_cleans_valid_choice(self):
-        f = models.CharField(max_length=1, choices=[('a','A'), ('b','B')])
+        f = models.CharField(max_length=1,
+                             choices=[('a', 'A'), ('b', 'B')])
         self.assertEqual('a', f.clean('a', None))
 
     def test_charfield_with_choices_raises_error_on_invalid_choice(self):
-        f = models.CharField(choices=[('a','A'), ('b','B')])
+        f = models.CharField(choices=[('a', 'A'), ('b', 'B')])
         self.assertRaises(ValidationError, f.clean, "not a", None)
 
+    def test_charfield_get_choices_with_blank_defined(self):
+        f = models.CharField(choices=[('', '<><>'), ('a', 'A')])
+        self.assertEqual(f.get_choices(True), [('', '<><>'), ('a', 'A')])
+
     def test_choices_validation_supports_named_groups(self):
-        f = models.IntegerField(choices=(('group',((10,'A'),(20,'B'))),(30,'C')))
+        f = models.IntegerField(
+            choices=(('group', ((10, 'A'), (20, 'B'))), (30, 'C')))
         self.assertEqual(10, f.clean(10, None))
 
     def test_nullable_integerfield_raises_error_with_blank_false(self):
@@ -375,17 +467,18 @@ class BigIntegerFieldTests(test.TestCase):
         self.assertEqual(qs[0].value, minval)
 
     def test_types(self):
-        b = BigInt(value = 0)
-        self.assertTrue(isinstance(b.value, six.integer_types))
+        b = BigInt(value=0)
+        self.assertIsInstance(b.value, six.integer_types)
         b.save()
-        self.assertTrue(isinstance(b.value, six.integer_types))
+        self.assertIsInstance(b.value, six.integer_types)
         b = BigInt.objects.all()[0]
-        self.assertTrue(isinstance(b.value, six.integer_types))
+        self.assertIsInstance(b.value, six.integer_types)
 
     def test_coercing(self):
-        BigInt.objects.create(value ='10')
-        b = BigInt.objects.get(value = '10')
+        BigInt.objects.create(value='10')
+        b = BigInt.objects.get(value='10')
         self.assertEqual(b.value, 10)
+
 
 class TypeCoercionTests(test.TestCase):
     """
@@ -399,6 +492,7 @@ class TypeCoercionTests(test.TestCase):
 
     def test_lookup_integer_in_textfield(self):
         self.assertEqual(Post.objects.filter(body=24).count(), 0)
+
 
 class FileFieldTests(unittest.TestCase):
     def test_clearable(self):
@@ -437,6 +531,17 @@ class FileFieldTests(unittest.TestCase):
         field.save_form_data(d, 'else.txt')
         self.assertEqual(d.myfile, 'else.txt')
 
+    def test_delete_when_file_unset(self):
+        """
+        Calling delete on an unset FileField should not call the file deletion
+        process, but fail silently (#20660).
+        """
+        d = Document()
+        try:
+            d.myfile.delete()
+        except OSError:
+            self.fail("Deleting an unset FileField should not raise OSError.")
+
 
 class BinaryFieldTests(test.TestCase):
     binary_data = b'\x00\x46\xFE'
@@ -455,6 +560,202 @@ class BinaryFieldTests(test.TestCase):
             # Test default value
             self.assertEqual(bytes(dm.short_data), b'\x08')
 
+    if connection.vendor == 'mysql' and six.PY3:
+        # Existing MySQL DB-API drivers fail on binary data.
+        test_set_and_retrieve = unittest.expectedFailure(test_set_and_retrieve)
+
     def test_max_length(self):
-        dm = DataModel(short_data=self.binary_data*4)
+        dm = DataModel(short_data=self.binary_data * 4)
         self.assertRaises(ValidationError, dm.full_clean)
+
+
+class GenericIPAddressFieldTests(test.TestCase):
+    def test_genericipaddressfield_formfield_protocol(self):
+        """
+        Test that GenericIPAddressField with a specified protocol does not
+        generate a formfield with no specified protocol. See #20740.
+        """
+        model_field = models.GenericIPAddressField(protocol='IPv4')
+        form_field = model_field.formfield()
+        self.assertRaises(ValidationError, form_field.clean, '::1')
+        model_field = models.GenericIPAddressField(protocol='IPv6')
+        form_field = model_field.formfield()
+        self.assertRaises(ValidationError, form_field.clean, '127.0.0.1')
+
+
+class PromiseTest(test.TestCase):
+    def test_AutoField(self):
+        lazy_func = lazy(lambda: 1, int)
+        self.assertIsInstance(
+            AutoField(primary_key=True).get_prep_value(lazy_func()),
+            int)
+
+    @unittest.skipIf(six.PY3, "Python 3 has no `long` type.")
+    def test_BigIntegerField(self):
+        lazy_func = lazy(lambda: long(9999999999999999999), long)
+        self.assertIsInstance(
+            BigIntegerField().get_prep_value(lazy_func()),
+            long)
+
+    def test_BinaryField(self):
+        lazy_func = lazy(lambda: b'', bytes)
+        self.assertIsInstance(
+            BinaryField().get_prep_value(lazy_func()),
+            bytes)
+
+    def test_BooleanField(self):
+        lazy_func = lazy(lambda: True, bool)
+        self.assertIsInstance(
+            BooleanField().get_prep_value(lazy_func()),
+            bool)
+
+    def test_CharField(self):
+        lazy_func = lazy(lambda: '', six.text_type)
+        self.assertIsInstance(
+            CharField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_CommaSeparatedIntegerField(self):
+        lazy_func = lazy(lambda: '1,2', six.text_type)
+        self.assertIsInstance(
+            CommaSeparatedIntegerField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_DateField(self):
+        lazy_func = lazy(lambda: datetime.date.today(), datetime.date)
+        self.assertIsInstance(
+            DateField().get_prep_value(lazy_func()),
+            datetime.date)
+
+    def test_DateTimeField(self):
+        lazy_func = lazy(lambda: datetime.datetime.now(), datetime.datetime)
+        self.assertIsInstance(
+            DateTimeField().get_prep_value(lazy_func()),
+            datetime.datetime)
+
+    def test_DecimalField(self):
+        lazy_func = lazy(lambda: Decimal('1.2'), Decimal)
+        self.assertIsInstance(
+            DecimalField().get_prep_value(lazy_func()),
+            Decimal)
+
+    def test_EmailField(self):
+        lazy_func = lazy(lambda: 'mailbox@domain.com', six.text_type)
+        self.assertIsInstance(
+            EmailField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_FileField(self):
+        lazy_func = lazy(lambda: 'filename.ext', six.text_type)
+        self.assertIsInstance(
+            FileField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_FilePathField(self):
+        lazy_func = lazy(lambda: 'tests.py', six.text_type)
+        self.assertIsInstance(
+            FilePathField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_FloatField(self):
+        lazy_func = lazy(lambda: 1.2, float)
+        self.assertIsInstance(
+            FloatField().get_prep_value(lazy_func()),
+            float)
+
+    def test_ImageField(self):
+        lazy_func = lazy(lambda: 'filename.ext', six.text_type)
+        self.assertIsInstance(
+            ImageField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_IntegerField(self):
+        lazy_func = lazy(lambda: 1, int)
+        self.assertIsInstance(
+            IntegerField().get_prep_value(lazy_func()),
+            int)
+
+    def test_IPAddressField(self):
+        lazy_func = lazy(lambda: '127.0.0.1', six.text_type)
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            self.assertIsInstance(
+                IPAddressField().get_prep_value(lazy_func()),
+                six.text_type)
+
+    def test_GenericIPAddressField(self):
+        lazy_func = lazy(lambda: '127.0.0.1', six.text_type)
+        self.assertIsInstance(
+            GenericIPAddressField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_NullBooleanField(self):
+        lazy_func = lazy(lambda: True, bool)
+        self.assertIsInstance(
+            NullBooleanField().get_prep_value(lazy_func()),
+            bool)
+
+    def test_PositiveIntegerField(self):
+        lazy_func = lazy(lambda: 1, int)
+        self.assertIsInstance(
+            PositiveIntegerField().get_prep_value(lazy_func()),
+            int)
+
+    def test_PositiveSmallIntegerField(self):
+        lazy_func = lazy(lambda: 1, int)
+        self.assertIsInstance(
+            PositiveSmallIntegerField().get_prep_value(lazy_func()),
+            int)
+
+    def test_SlugField(self):
+        lazy_func = lazy(lambda: 'slug', six.text_type)
+        self.assertIsInstance(
+            SlugField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_SmallIntegerField(self):
+        lazy_func = lazy(lambda: 1, int)
+        self.assertIsInstance(
+            SmallIntegerField().get_prep_value(lazy_func()),
+            int)
+
+    def test_TextField(self):
+        lazy_func = lazy(lambda: 'Abc', six.text_type)
+        self.assertIsInstance(
+            TextField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_TimeField(self):
+        lazy_func = lazy(lambda: datetime.datetime.now().time(), datetime.time)
+        self.assertIsInstance(
+            TimeField().get_prep_value(lazy_func()),
+            datetime.time)
+
+    def test_URLField(self):
+        lazy_func = lazy(lambda: 'http://domain.com', six.text_type)
+        self.assertIsInstance(
+            URLField().get_prep_value(lazy_func()),
+            six.text_type)
+
+
+class CustomFieldTests(unittest.TestCase):
+
+    def test_14786(self):
+        """
+        Regression test for #14786 -- Test that field values are not prepared
+        twice in get_db_prep_lookup().
+        """
+        class NoopField(models.TextField):
+            def __init__(self, *args, **kwargs):
+                self.prep_value_count = 0
+                super(NoopField, self).__init__(*args, **kwargs)
+
+            def get_prep_value(self, value):
+                self.prep_value_count += 1
+                return super(NoopField, self).get_prep_value(value)
+
+        field = NoopField()
+        field.get_db_prep_lookup(
+            'exact', 'TEST', connection=connection, prepared=False
+        )
+        self.assertEqual(field.prep_value_count, 1)

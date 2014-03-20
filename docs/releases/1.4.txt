@@ -9,9 +9,9 @@ Welcome to Django 1.4!
 These release notes cover the `new features`_, as well
 as some `backwards incompatible changes`_ you'll want to be aware of
 when upgrading from Django 1.3 or older versions. We've also dropped some
-features, which are detailed in :doc:`our deprecation plan
-</internals/deprecation>`, and we've `begun the deprecation process for some
-features`_.
+features, which are detailed in :ref:`our deprecation plan
+<deprecation-removed-in-1.4>`, and we've `begun the deprecation process for
+some features`_.
 
 .. _`new features`: `What's new in Django 1.4`_
 .. _`backwards incompatible changes`: `Backwards incompatible changes in 1.4`_
@@ -257,8 +257,7 @@ different strategy and broader scope,
 ``QuerySet`` that will prefetch each of the specified related lookups in a
 single batch as soon as the query begins to be evaluated. Unlike
 ``select_related``, it does the joins in Python, not in the database, and
-supports many-to-many relationships,
-:class:`~django.contrib.contenttypes.generic.GenericForeignKey` and more. This
+supports many-to-many relationships, ``GenericForeignKey`` and more. This
 allows you to fix a very common performance problem in which your code ends up
 doing O(n) database queries (or worse) if objects on your primary ``QuerySet``
 each have many related objects that you also need to fetch.
@@ -507,10 +506,11 @@ docs </ref/contrib/csrf>` for more information.
 Error report filtering
 ~~~~~~~~~~~~~~~~~~~~~~
 
-We added two function decorators, :func:`sensitive_variables` and
-:func:`sensitive_post_parameters`, to allow designating the local variables
-and POST parameters that may contain sensitive information and should be
-filtered out of error reports.
+We added two function decorators,
+:func:`~django.views.decorators.debug.sensitive_variables` and
+:func:`~django.views.decorators.debug.sensitive_post_parameters`, to allow
+designating the local variables and POST parameters that may contain sensitive
+information and should be filtered out of error reports.
 
 All POST parameters are now systematically filtered out of error reports for
 certain views (``login``, ``password_reset_confirm``, ``password_change`` and
@@ -541,8 +541,8 @@ compare HTML directly with the new
 :meth:`~django.test.SimpleTestCase.assertHTMLEqual` and
 :meth:`~django.test.SimpleTestCase.assertHTMLNotEqual` assertions, or use
 the ``html=True`` flag with
-:meth:`~django.test.TestCase.assertContains` and
-:meth:`~django.test.TestCase.assertNotContains` to test whether the
+:meth:`~django.test.SimpleTestCase.assertContains` and
+:meth:`~django.test.SimpleTestCase.assertNotContains` to test whether the
 client's response contains a given HTML fragment. See the :ref:`assertions
 documentation <assertions>` for more.
 
@@ -810,7 +810,7 @@ instance:
 
   * Consequences: The user will see an error about the form having expired
     and will be sent back to the first page of the wizard, losing the data
-    he has entered so far.
+    entered so far.
 
   * Time period: The amount of time you expect users to take filling out the
     affected forms.
@@ -1093,8 +1093,8 @@ wild, because they would confuse browsers too.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It's now possible to check whether a template was used within a block of
-code with :meth:`~django.test.TestCase.assertTemplateUsed` and
-:meth:`~django.test.TestCase.assertTemplateNotUsed`. And they
+code with :meth:`~django.test.SimpleTestCase.assertTemplateUsed` and
+:meth:`~django.test.SimpleTestCase.assertTemplateNotUsed`. And they
 can be used as a context manager::
 
     with self.assertTemplateUsed('index.html'):
@@ -1174,6 +1174,8 @@ In Django 1.3, the ``get_initial`` method of the
 class ``initial`` dictionary. This has been fixed to return a copy of this
 dictionary, so form instances can modify their initial data without messing
 with the class variable.
+
+.. _deprecated-features-1.4:
 
 Features deprecated in 1.4
 ==========================
@@ -1316,7 +1318,7 @@ names, like ``django.contrib.*``. The expansion was performed by a
 filesystem-based implementation of ``from <package> import *``. Unfortunately,
 `this can't be done reliably`_.
 
-This behavior was never documented. Since it is un-pythonic and not obviously
+This behavior was never documented. Since it is unpythonic and not obviously
 useful, it was removed in Django 1.4. If you relied on it, you must edit your
 settings file to list all your applications explicitly.
 

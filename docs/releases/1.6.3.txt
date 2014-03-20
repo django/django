@@ -1,0 +1,25 @@
+==========================
+Django 1.6.3 release notes
+==========================
+
+*Under development*
+
+This is Django 1.6.3, a bugfix release for Django 1.6. Django 1.6.3 fixes
+several bugs in 1.6.2:
+
+* Content retrieved from the GeoIP library is now properly decoded from its
+  default ``iso-8859-1`` encoding
+  (`#21996 <http://code.djangoproject.com/ticket/21996>`_).
+
+* Fixed ``AttributeError`` when using
+  :meth:`~django.db.models.query.QuerySet.bulk_create` with ``ForeignObject``
+  (`#21566 <http://code.djangoproject.com/ticket/21566>`_).
+
+* Fixed crash of ``QuerySet``\s that use ``F() + timedelta()`` when their query
+  was compiled more once
+  (`#21643 <http://code.djangoproject.com/ticket/21643>`_).
+
+* Prevented custom ``widget`` class attribute of
+  :class:`~django.forms.IntegerField` subclasses from being overwritten by the
+  code in their ``__init__`` method
+  (`#22245 <http://code.djangoproject.com/ticket/22245>`_).

@@ -12,13 +12,11 @@ validation (accessing the ``errors`` attribute or calling ``full_clean()``
 directly), but normally they won't be needed.
 
 In general, any cleaning method can raise ``ValidationError`` if there is a
-problem with the data it is processing, passing the relevant error message to
-the ``ValidationError`` constructor. If no ``ValidationError`` is raised, the
-method should return the cleaned (normalized) data as a Python object.
-
-If you detect multiple errors during a cleaning method and wish to signal all
-of them to the form submitter, it is possible to pass a list of errors to the
-``ValidationError`` constructor.
+problem with the data it is processing, passing the relevant information to
+the ``ValidationError`` constructor. :ref:`See below <raising-validation-error>`
+for the best practice in raising ``ValidationError``. If no ``ValidationError``
+is raised, the method should return the cleaned (normalized) data as a Python
+object.
 
 Most validation can be done using `validators`_ - simple helpers that can be
 reused easily. Validators are simple functions (or callables) that take a single
@@ -77,17 +75,19 @@ overridden:
   any validation that requires access to multiple fields from the form at
   once. This is where you might put in things to check that if field ``A``
   is supplied, field ``B`` must contain a valid email address and the
-  like. The data that this method returns is the final ``cleaned_data``
-  attribute for the form, so don't forget to return the full list of
-  cleaned data if you override this method (by default, ``Form.clean()``
-  just returns ``self.cleaned_data``).
+  like. This method can return a completely different dictionary if it wishes,
+  which will be used as the ``cleaned_data``.
+
+  Since the field validation methods have been run by the time ``clean()`` is
+  called, you also have access to the form's errors attribute which
+  contains all the errors raised by cleaning of individual fields.
 
   Note that any errors raised by your ``Form.clean()`` override will not
   be associated with any field in particular. They go into a special
   "field" (called ``__all__``), which you can access via the
   ``non_field_errors()`` method if you need to. If you want to attach
-  errors to a specific field in the form, you will need to access the
-  ``_errors`` attribute on the form, which is `described later`_.
+  errors to a specific field in the form, you need to call
+  :meth:`~django.forms.Form.add_error()`.
 
   Also note that there are special considerations when overriding
   the ``clean()`` method of a ``ModelForm`` subclass. (see the
@@ -98,7 +98,8 @@ These methods are run in the order given above, one field at a time.  That is,
 for each field in the form (in the order they are declared in the form
 definition), the ``Field.clean()`` method (or its override) is run, then
 ``clean_<fieldname>()``. Finally, once those two methods are run for every
-field, the ``Form.clean()`` method, or its override, is executed.
+field, the ``Form.clean()`` method, or its override, is executed whether or not
+the previous methods have raised errors.
 
 Examples of each of these methods are provided below.
 
@@ -107,60 +108,105 @@ field, if the ``Field.clean()`` method raises a ``ValidationError``, any
 field-specific cleaning method is not called. However, the cleaning methods
 for all remaining fields are still executed.
 
-The ``clean()`` method for the ``Form`` class or subclass is always run. If
-that method raises a ``ValidationError``, ``cleaned_data`` will be an empty
-dictionary.
+.. _raising-validation-error:
 
-The previous paragraph means that if you are overriding ``Form.clean()``, you
-should iterate through ``self.cleaned_data.items()``, possibly considering the
-``_errors`` dictionary attribute on the form as well. In this way, you will
-already know which fields have passed their individual validation requirements.
+Raising ``ValidationError``
+---------------------------
 
-.. _described later:
+.. versionchanged:: 1.6
 
-Form subclasses and modifying field errors
-------------------------------------------
+In order to make error messages flexible and easy to override, consider the
+following guidelines:
 
-Sometimes, in a form's ``clean()`` method, you will want to add an error
-message to a particular field in the form. This won't always be appropriate
-and the more typical situation is to raise a ``ValidationError`` from
-``Form.clean()``, which is turned into a form-wide error that is available
-through the ``Form.non_field_errors()`` method.
+* Provide a descriptive error ``code`` to the constructor::
 
-When you really do need to attach the error to a particular field, you should
-store (or amend) a key in the ``Form._errors`` attribute. This attribute is an
-instance of a ``django.forms.util.ErrorDict`` class. Essentially, though, it's
-just a dictionary. There is a key in the dictionary for each field in the form
-that has an error. Each value in the dictionary is a
-``django.forms.util.ErrorList`` instance, which is a list that knows how to
-display itself in different ways. So you can treat ``_errors`` as a dictionary
-mapping field names to lists.
+      # Good
+      ValidationError(_('Invalid value'), code='invalid')
 
-If you want to add a new error to a particular field, you should check whether
-the key already exists in ``self._errors`` or not. If not, create a new entry
-for the given key, holding an empty ``ErrorList`` instance. In either case,
-you can then append your error message to the list for the field name in
-question and it will be displayed when the form is displayed.
+      # Bad
+      ValidationError(_('Invalid value'))
 
-There is an example of modifying ``self._errors`` in the following section.
+* Don't coerce variables into the message; use placeholders and the ``params``
+  argument of the constructor::
 
-.. admonition:: What's in a name?
+      # Good
+      ValidationError(
+          _('Invalid value: %(value)s'),
+          params={'value': '42'},
+      )
 
-    You may be wondering why is this attribute called ``_errors`` and not
-    ``errors``. Normal Python practice is to prefix a name with an underscore
-    if it's not for external usage. In this case, you are subclassing the
-    ``Form`` class, so you are essentially writing new internals. In effect,
-    you are given permission to access some of the internals of ``Form``.
+      # Bad
+      ValidationError(_('Invalid value: %s') % value)
 
-    Of course, any code outside your form should never access ``_errors``
-    directly. The data is available to external code through the ``errors``
-    property, which populates ``_errors`` before returning it).
+* Use mapping keys instead of positional formatting. This enables putting
+  the variables in any order or omitting them altogether when rewriting the
+  message::
 
-    Another reason is purely historical: the attribute has been called
-    ``_errors`` since the early days of the forms module and changing it now
-    (particularly since ``errors`` is used for the read-only property name)
-    would be inconvenient for a number of reasons. You can use whichever
-    explanation makes you feel more comfortable. The result is the same.
+      # Good
+      ValidationError(
+          _('Invalid value: %(value)s'),
+          params={'value': '42'},
+      )
+
+      # Bad
+      ValidationError(
+          _('Invalid value: %s'),
+          params=('42',),
+      )
+
+* Wrap the message with ``gettext`` to enable translation::
+
+      # Good
+      ValidationError(_('Invalid value'))
+
+      # Bad
+      ValidationError('Invalid value')
+
+Putting it all together::
+
+    raise ValidationError(
+        _('Invalid value: %(value)s'),
+        code='invalid',
+        params={'value': '42'},
+    )
+
+Following these guidelines is particularly necessary if you write reusable
+forms, form fields, and model fields.
+
+While not recommended, if you are at the end of the validation chain
+(i.e. your form ``clean()`` method) and you know you will *never* need
+to override your error message you can still opt for the less verbose::
+
+    ValidationError(_('Invalid value: %s') % value)
+
+.. versionadded:: 1.7
+
+The :meth:`Form.errors.as_data() <django.forms.Form.errors.as_data()>` and
+:meth:`Form.errors.as_json() <django.forms.Form.errors.as_json()>` methods
+greatly benefit from fully featured ``ValidationError``\s (with a ``code`` name
+and a ``params`` dictionary).
+
+Raising multiple errors
+~~~~~~~~~~~~~~~~~~~~~~~
+
+If you detect multiple errors during a cleaning method and wish to signal all
+of them to the form submitter, it is possible to pass a list of errors to the
+``ValidationError`` constructor.
+
+As above, it is recommended to pass a list of ``ValidationError`` instances
+with ``code``\s and ``params`` but a list of strings will also work::
+
+    # Good
+    raise ValidationError([
+        ValidationError(_('Error 1'), code='error1'),
+        ValidationError(_('Error 2'), code='error2'),
+    ])
+
+    # Bad
+    raise ValidationError([
+        _('Error 1'),
+        _('Error 2'),
+    ])
 
 Using validation in practice
 ----------------------------
@@ -176,12 +222,18 @@ Using validators
 ~~~~~~~~~~~~~~~~
 
 Django's form (and model) fields support use of simple utility functions and
-classes known as validators. These can be passed to a field's constructor, via
-the field's ``validators`` argument, or defined on the Field class itself with
-the ``default_validators`` attribute.
+classes known as validators. A validator is merely a callable object or
+function that takes a value and simply returns nothing if the value is valid or
+raises a :exc:`~django.core.exceptions.ValidationError` if not. These can be
+passed to a field's constructor, via the field's ``validators`` argument, or
+defined on the :class:`~django.forms.Field` class itself with the
+``default_validators`` attribute.
 
 Simple validators can be used to validate values inside the field, let's have
 a look at Django's ``SlugField``::
+
+    from django.forms import CharField
+    from django.core import validators
 
     class SlugField(CharField):
         default_validators = [validators.validate_slug]
@@ -196,6 +248,13 @@ is equivalent to::
 
     slug = forms.CharField(validators=[validators.validate_slug])
 
+Common cases such as validating against an email or a regular expression can be
+handled using existing validator classes available in Django. For example,
+``validators.validate_slug`` is an instance of
+a :class:`~django.core.validators.RegexValidator` constructed with the first
+argument being the pattern: ``^[-a-zA-Z0-9_]+$``. See the section on
+:doc:`writing validators </ref/validators>` to see a list of what is already
+available and for an example of how to write a validator.
 
 Form field default cleaning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -252,6 +311,8 @@ we want to make sure that the ``recipients`` field always contains the address
 don't want to put it into the general ``MultiEmailField`` class. Instead, we
 write a cleaning method that operates on the ``recipients`` field, like so::
 
+    from django import forms
+
     class ContactForm(forms.Form):
         # Everything as before.
         ...
@@ -265,8 +326,17 @@ write a cleaning method that operates on the ``recipients`` field, like so::
             # not.
             return data
 
+Sometimes you may want to add an error message to a particular field from the
+form's ``clean()`` method, in which case you can use
+:meth:`~django.forms.Form.add_error()`. Note that this won't always be
+appropriate and the more typical situation is to raise a ``ValidationError``
+from , which is turned into a form-wide error that is available through the
+``Form.non_field_errors()`` method.
+
 Cleaning and validating fields that depend on each other
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: django.forms.Form.clean()
 
 Suppose we add another requirement to our contact form: if the ``cc_myself``
 field is ``True``, the ``subject`` must contain the word ``"help"``. We are
@@ -289,6 +359,8 @@ common method is to display the error at the top of the form. To create such
 an error, you can raise a ``ValidationError`` from the ``clean()`` method. For
 example::
 
+    from django import forms
+
     class ContactForm(forms.Form):
         # Everything as before.
         ...
@@ -304,8 +376,11 @@ example::
                     raise forms.ValidationError("Did not send for 'help' in "
                             "the subject despite CC'ing yourself.")
 
-            # Always return the full collection of cleaned data.
-            return cleaned_data
+.. versionchanged:: 1.7
+
+    In previous versions of Django, ``form.clean()`` was required to return
+    a dictionary of ``cleaned_data``. This method may still return a dictionary
+    of data to be used, but it's no longer required.
 
 In this code, if the validation error is raised, the form will display an
 error message at the top of the form (normally) describing the problem.
@@ -321,6 +396,8 @@ here and leaving it up to you and your designers to work out what works
 effectively in your particular situation. Our new code (replacing the previous
 sample) looks like this::
 
+    from django import forms
+
     class ContactForm(forms.Form):
         # Everything as before.
         ...
@@ -331,35 +408,11 @@ sample) looks like this::
             subject = cleaned_data.get("subject")
 
             if cc_myself and subject and "help" not in subject:
-                # We know these are not in self._errors now (see discussion
-                # below).
                 msg = u"Must put 'help' in subject when cc'ing yourself."
-                self._errors["cc_myself"] = self.error_class([msg])
-                self._errors["subject"] = self.error_class([msg])
+                self.add_error('cc_myself', msg)
+                self.add_error('subject', msg)
 
-                # These fields are no longer valid. Remove them from the
-                # cleaned data.
-                del cleaned_data["cc_myself"]
-                del cleaned_data["subject"]
-
-            # Always return the full collection of cleaned data.
-            return cleaned_data
-
-As you can see, this approach requires a bit more effort, not withstanding the
-extra design effort to create a sensible form display. The details are worth
-noting, however. Firstly, earlier we mentioned that you might need to check if
-the field name keys already exist in the ``_errors`` dictionary. In this case,
-since we know the fields exist in ``self.cleaned_data``, they must have been
-valid when cleaned as individual fields, so there will be no corresponding
-entries in ``_errors``.
-
-Secondly, once we have decided that the combined data in the two fields we are
-considering aren't valid, we must remember to remove them from the
-``cleaned_data``.
-
-.. versionchanged:: 1.5
-
-    Django used to remove the ``cleaned_data`` attribute entirely if there were
-    any errors in the form. Since version 1.5, ``cleaned_data`` is present even if
-    the form doesn't validate, but it contains only field values that did
-    validate.
+The second argument of ``add_error()`` can be a simple string, or preferably
+an instance of ``ValidationError``. See :ref:`raising-validation-error` for
+more details. Note that ``add_error()` automatically removes the field
+from ``cleaned_data``.

@@ -1,28 +1,43 @@
 #!/usr/bin/env python
+from __future__ import division
+
 import logging
 import os
 import shutil
 import subprocess
 import sys
 import tempfile
+import warnings
 
+import django
 from django import contrib
+from django.utils.deprecation import RemovedInDjango18Warning, RemovedInDjango19Warning
 from django.utils._os import upath
 from django.utils import six
 
-CONTRIB_DIR_NAME = 'django.contrib'
+
+warnings.simplefilter("default", RemovedInDjango19Warning)
+warnings.simplefilter("default", RemovedInDjango18Warning)
+
+CONTRIB_MODULE_PATH = 'django.contrib'
 
 TEST_TEMPLATE_DIR = 'templates'
 
-RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
 CONTRIB_DIR = os.path.dirname(upath(contrib.__file__))
+RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
+
 TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
-SUBDIRS_TO_SKIP = ['templates']
+SUBDIRS_TO_SKIP = [
+    'data',
+    'test_discovery_sample',
+    'test_discovery_sample2',
+    'test_runner_deprecation_app',
+    'test_runner_invalid_app',
+]
 
 ALWAYS_INSTALLED_APPS = [
-    'shared_models',
     'django.contrib.contenttypes',
     'django.contrib.auth',
     'django.contrib.sites',
@@ -31,40 +46,60 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.comments',
-    'django.contrib.admin',
+    'django.contrib.admin.apps.SimpleAdminConfig',
     'django.contrib.admindocs',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'staticfiles_tests',
     'staticfiles_tests.apps.test',
     'staticfiles_tests.apps.no_label',
+    'servers.another_app',
 ]
 
-def geodjango(settings):
-    # All databases must have spatial backends to run GeoDjango tests.
-    spatial_dbs = [name for name, db_dict in settings.DATABASES.items()
-                   if db_dict['ENGINE'].startswith('django.contrib.gis')]
-    return len(spatial_dbs) == len(settings.DATABASES)
 
 def get_test_modules():
+    from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
     modules = []
-    for loc, dirpath in (
+    discovery_paths = [
         (None, RUNTESTS_DIR),
-        (CONTRIB_DIR_NAME, CONTRIB_DIR)):
+        (CONTRIB_MODULE_PATH, CONTRIB_DIR)
+    ]
+    if HAS_SPATIAL_DB:
+        discovery_paths.append(
+            ('django.contrib.gis.tests', os.path.join(CONTRIB_DIR, 'gis', 'tests'))
+        )
+
+    for modpath, dirpath in discovery_paths:
         for f in os.listdir(dirpath):
             if ('.' in f or
-                # Python 3 byte code dirs (PEP 3147)
-                f == '__pycache__' or
-                f.startswith('sql') or
-                os.path.basename(f) in SUBDIRS_TO_SKIP or
-                os.path.isfile(f)):
+                    f.startswith('sql') or
+                    os.path.basename(f) in SUBDIRS_TO_SKIP or
+                    os.path.isfile(f) or
+                    not os.path.exists(os.path.join(dirpath, f, '__init__.py'))):
                 continue
-            modules.append((loc, f))
+            modules.append((modpath, f))
     return modules
 
+
+def get_installed():
+    from django.apps import apps
+    return [app_config.name for app_config in apps.get_app_configs()]
+
+
 def setup(verbosity, test_labels):
+    from django.apps import apps, AppConfig
     from django.conf import settings
-    from django.db.models.loading import get_apps, load_app
+    from django.test import TransactionTestCase, TestCase
+
+    print("Testing against Django installed in '%s'" % os.path.dirname(django.__file__))
+
+    # Force declaring available_apps in TransactionTestCase for faster tests.
+    def no_available_apps(self):
+        raise Exception("Please define available_apps in TransactionTestCase "
+                        "and its subclasses.")
+    TransactionTestCase.available_apps = property(no_available_apps)
+    TestCase.available_apps = None
+
     state = {
         'INSTALLED_APPS': settings.INSTALLED_APPS,
         'ROOT_URLCONF': getattr(settings, "ROOT_URLCONF", ""),
@@ -91,69 +126,105 @@ def setup(verbosity, test_labels):
         handler = logging.StreamHandler()
         logger.addHandler(handler)
 
+    warnings.filterwarnings(
+        'ignore',
+        'django.contrib.comments is deprecated and will be removed before Django 1.8.',
+        RemovedInDjango18Warning
+    )
+    warnings.filterwarnings(
+        'ignore',
+        'Model class django.contrib.comments.models.* Django 1.9.',
+        RemovedInDjango19Warning
+    )
     # Load all the ALWAYS_INSTALLED_APPS.
-    get_apps()
+    django.setup()
 
     # Load all the test model apps.
-    test_labels_set = set([label.split('.')[0] for label in test_labels])
     test_modules = get_test_modules()
 
-    # If GeoDjango, then we'll want to add in the test applications
-    # that are a part of its test suite.
-    if geodjango(settings):
-        from django.contrib.gis.tests import geo_apps
-        test_modules.extend(geo_apps(runtests=True))
-        settings.INSTALLED_APPS.extend(['django.contrib.gis', 'django.contrib.sitemaps'])
+    # Reduce given test labels to just the app module path
+    test_labels_set = set()
+    for label in test_labels:
+        bits = label.split('.')
+        if bits[:2] == ['django', 'contrib']:
+            bits = bits[:3]
+        else:
+            bits = bits[:1]
+        test_labels_set.add('.'.join(bits))
 
-    for module_dir, module_name in test_modules:
-        if module_dir:
-            module_label = '.'.join([module_dir, module_name])
+    for modpath, module_name in test_modules:
+        if modpath:
+            module_label = '.'.join([modpath, module_name])
         else:
             module_label = module_name
-        # if the module was named on the command line, or
+        # if the module (or an ancestor) was named on the command line, or
         # no modules were named (i.e., run all), import
-        # this module and add it to the list to test.
-        if not test_labels or module_name in test_labels_set:
+        # this module and add it to INSTALLED_APPS.
+        if not test_labels:
+            module_found_in_labels = True
+        else:
+            module_found_in_labels = any(
+                # exact match or ancestor match
+                module_label == label or module_label.startswith(label + '.')
+                for label in test_labels_set)
+
+        installed_app_names = set(get_installed())
+        if module_found_in_labels and module_label not in installed_app_names:
             if verbosity >= 2:
                 print("Importing application %s" % module_name)
-            mod = load_app(module_label)
-            if mod:
-                if module_label not in settings.INSTALLED_APPS:
-                    settings.INSTALLED_APPS.append(module_label)
+            # HACK.
+            settings.INSTALLED_APPS.append(module_label)
+            app_config = AppConfig.create(module_label)
+            apps.app_configs[app_config.label] = app_config
+            app_config.import_models(apps.all_models[app_config.label])
+            apps.clear_cache()
 
     return state
 
+
 def teardown(state):
     from django.conf import settings
-    # Removing the temporary TEMP_DIR. Ensure we pass in unicode
-    # so that it will successfully remove temp trees containing
-    # non-ASCII filenames on Windows. (We're assuming the temp dir
-    # name itself does not contain non-ASCII characters.)
-    shutil.rmtree(six.text_type(TEMP_DIR))
+
+    try:
+        # Removing the temporary TEMP_DIR. Ensure we pass in unicode
+        # so that it will successfully remove temp trees containing
+        # non-ASCII filenames on Windows. (We're assuming the temp dir
+        # name itself does not contain non-ASCII characters.)
+        shutil.rmtree(six.text_type(TEMP_DIR))
+    except OSError:
+        print('Failed to remove temp directory: %s' % TEMP_DIR)
+
     # Restore the old settings.
     for key, value in state.items():
         setattr(settings, key, value)
+
 
 def django_tests(verbosity, interactive, failfast, test_labels):
     from django.conf import settings
     state = setup(verbosity, test_labels)
     extra_tests = []
 
-    # If GeoDjango is used, add it's tests that aren't a part of
-    # an application (e.g., GEOS, GDAL, Distance objects).
-    if geodjango(settings) and (not test_labels or 'gis' in test_labels):
-        from django.contrib.gis.tests import geodjango_suite
-        extra_tests.append(geodjango_suite(apps=False))
-
     # Run the test suite, including the extra validation tests.
     from django.test.utils import get_runner
     if not hasattr(settings, 'TEST_RUNNER'):
-        settings.TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
+        settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
     TestRunner = get_runner(settings)
 
-    test_runner = TestRunner(verbosity=verbosity, interactive=interactive,
-        failfast=failfast)
-    failures = test_runner.run_tests(test_labels, extra_tests=extra_tests)
+    test_runner = TestRunner(
+        verbosity=verbosity,
+        interactive=interactive,
+        failfast=failfast,
+    )
+    # Catch warnings thrown in test DB setup -- remove in Django 1.9
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            'ignore',
+            "Custom SQL location '<app_label>/models/sql' is deprecated, "
+            "use '<app_label>/sql' instead.",
+            RemovedInDjango19Warning
+        )
+        failures = test_runner.run_tests(
+            test_labels or get_installed(), extra_tests=extra_tests)
 
     teardown(state)
     return failures
@@ -162,10 +233,7 @@ def django_tests(verbosity, interactive, failfast, test_labels):
 def bisect_tests(bisection_label, options, test_labels):
     state = setup(int(options.verbosity), test_labels)
 
-    if not test_labels:
-        # Get the full list of test labels to use for bisection
-        from django.db.models.loading import get_apps
-        test_labels = [app.__name__.split('.')[-2] for app in get_apps()]
+    test_labels = test_labels or get_installed()
 
     print('***** Bisecting test suite: %s' % ' '.join(test_labels))
 
@@ -188,7 +256,7 @@ def bisect_tests(bisection_label, options, test_labels):
 
     iteration = 1
     while len(test_labels) > 1:
-        midpoint = len(test_labels)/2
+        midpoint = len(test_labels) // 2
         test_labels_a = test_labels[:midpoint] + [bisection_label]
         test_labels_b = test_labels[midpoint:] + [bisection_label]
         print('***** Pass %da: Running the first half of the test suite' % iteration)
@@ -219,14 +287,11 @@ def bisect_tests(bisection_label, options, test_labels):
         print("***** Source of error: %s" % test_labels[0])
     teardown(state)
 
+
 def paired_tests(paired_test, options, test_labels):
     state = setup(int(options.verbosity), test_labels)
 
-    if not test_labels:
-        print("")
-        # Get the full list of test labels to use for bisection
-        from django.db.models.loading import get_apps
-        test_labels = [app.__name__.split('.')[-2] for app in get_apps()]
+    test_labels = test_labels or get_installed()
 
     print('***** Trying paired execution')
 
@@ -257,6 +322,7 @@ def paired_tests(paired_test, options, test_labels):
 
     print('***** No problem pair found')
     teardown(state)
+
 
 if __name__ == "__main__":
     from optparse import OptionParser
@@ -299,10 +365,9 @@ if __name__ == "__main__":
     options, args = parser.parse_args()
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
-    elif "DJANGO_SETTINGS_MODULE" not in os.environ:
-        parser.error("DJANGO_SETTINGS_MODULE is not set in the environment. "
-                      "Set it or use --settings.")
     else:
+        if "DJANGO_SETTINGS_MODULE" not in os.environ:
+            os.environ['DJANGO_SETTINGS_MODULE'] = 'test_sqlite'
         options.settings = os.environ['DJANGO_SETTINGS_MODULE']
 
     if options.liveserver is not None:

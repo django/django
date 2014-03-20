@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django import forms
 
@@ -11,6 +11,7 @@ class AuthorForm(forms.ModelForm):
 
     class Meta:
         model = Author
+        fields = ['name', 'slug']
 
 
 class ContactForm(forms.Form):

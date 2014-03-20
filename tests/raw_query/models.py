@@ -15,17 +15,21 @@ class Author(models.Model):
             assert k in [f.attname for f in self._meta.fields], \
                 "Author.__init__ got an unexpected parameter: %s" % k
 
+
 class Book(models.Model):
     title = models.CharField(max_length=255)
     author = models.ForeignKey(Author)
-    paperback = models.BooleanField()
+    paperback = models.BooleanField(default=False)
     opening_line = models.TextField()
+
 
 class Coffee(models.Model):
     brand = models.CharField(max_length=255, db_column="name")
 
+
 class Reviewer(models.Model):
     reviewed = models.ManyToManyField(Book)
+
 
 class FriendlyAuthor(Author):
     pass

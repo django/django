@@ -3,9 +3,14 @@ from __future__ import unicode_literals
 
 import warnings
 
-from django.forms import *
+from django.forms import (
+    CharField, ChoiceField, Form, HiddenInput, IntegerField, ModelForm,
+    ModelMultipleChoiceField, MultipleChoiceField, RadioSelect, Select,
+    TextInput,
+)
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy, override
+from django.utils import translation
+from django.utils.translation import gettext_lazy, ugettext_lazy
 
 from forms_tests.models import Cheese
 
@@ -32,9 +37,9 @@ class FormsRegressionsTestCase(TestCase):
         self.assertHTMLEqual(f.as_p(), '<p><label for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>')
 
         # Translations are done at rendering time, so multi-lingual apps can define forms)
-        with override('de'):
+        with translation.override('de'):
             self.assertHTMLEqual(f.as_p(), '<p><label for="id_username">Benutzername:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>')
-        with override('pl', deactivate=True):
+        with translation.override('pl'):
             self.assertHTMLEqual(f.as_p(), '<p><label for="id_username">Nazwa u\u017cytkownika:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>')
 
     def test_regression_5216(self):
@@ -44,8 +49,8 @@ class FormsRegressionsTestCase(TestCase):
             field_2 = CharField(max_length=10, label=ugettext_lazy('field_2'), widget=TextInput(attrs={'id': 'field_2_id'}))
 
         f = SomeForm()
-        self.assertHTMLEqual(f['field_1'].label_tag(), '<label for="id_field_1">field_1</label>')
-        self.assertHTMLEqual(f['field_2'].label_tag(), '<label for="field_2_id">field_2</label>')
+        self.assertHTMLEqual(f['field_1'].label_tag(), '<label for="id_field_1">field_1:</label>')
+        self.assertHTMLEqual(f['field_2'].label_tag(), '<label for="field_2_id">field_2:</label>')
 
         # Unicode decoding problems...
         GENDERS = (('\xc5', 'En tied\xe4'), ('\xf8', 'Mies'), ('\xdf', 'Nainen'))
@@ -68,13 +73,11 @@ class FormsRegressionsTestCase(TestCase):
             self.assertEqual(f.clean(b'\xd1\x88\xd1\x82.'), '\u0448\u0442.')
 
         # Translated error messages used to be buggy.
-        with override('ru'):
+        with translation.override('ru'):
             f = SomeForm({})
             self.assertHTMLEqual(f.as_p(), '<ul class="errorlist"><li>\u041e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e\u0435 \u043f\u043e\u043b\u0435.</li></ul>\n<p><label for="id_somechoice_0">\xc5\xf8\xdf:</label> <ul id="id_somechoice">\n<li><label for="id_somechoice_0"><input type="radio" id="id_somechoice_0" value="\xc5" name="somechoice" /> En tied\xe4</label></li>\n<li><label for="id_somechoice_1"><input type="radio" id="id_somechoice_1" value="\xf8" name="somechoice" /> Mies</label></li>\n<li><label for="id_somechoice_2"><input type="radio" id="id_somechoice_2" value="\xdf" name="somechoice" /> Nainen</label></li>\n</ul></p>')
 
         # Deep copying translated text shouldn't raise an error)
-        from django.utils.translation import gettext_lazy
-
         class CopyForm(Form):
             degree = IntegerField(widget=Select(choices=((1, gettext_lazy('test')),)))
 
@@ -139,6 +142,7 @@ class FormsRegressionsTestCase(TestCase):
         class CheeseForm(ModelForm):
             class Meta:
                 model = Cheese
+                fields = '__all__'
 
         form = CheeseForm({
             'name': 'Brie',

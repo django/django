@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from django.db.models import Q
 from django.test import TestCase
 
@@ -52,7 +50,7 @@ class RelatedObjectTests(TestCase):
         # These queries combine results from the m2m and the m2o relationships.
         # They're three ways of saying the same thing.
         self.assertQuerysetEqual(
-            Issue.objects.filter(Q(cc__id__exact = r.id) | Q(client=r.id)), [
+            Issue.objects.filter(Q(cc__id__exact=r.id) | Q(client=r.id)), [
                 1,
                 2,
                 3,
@@ -76,15 +74,15 @@ class RelatedObjectTests(TestCase):
             lambda i: i.num
         )
 
-class RelatedObjectTests(TestCase):
+
+class RelatedObjectUnicodeTests(TestCase):
     def test_m2m_with_unicode_reference(self):
         """
         Regression test for #6045: references to other models can be unicode
         strings, providing they are directly convertible to ASCII.
         """
-        m1=UnicodeReferenceModel.objects.create()
-        m2=UnicodeReferenceModel.objects.create()
-        m2.others.add(m1) # used to cause an error (see ticket #6045)
+        m1 = UnicodeReferenceModel.objects.create()
+        m2 = UnicodeReferenceModel.objects.create()
+        m2.others.add(m1)  # used to cause an error (see ticket #6045)
         m2.save()
-        list(m2.others.all()) # Force retrieval.
-
+        list(m2.others.all())  # Force retrieval.

@@ -1,16 +1,16 @@
-from django.contrib.sites.models import Site
+from django.apps import apps as django_apps
 from django.core import urlresolvers, paginator
 from django.core.exceptions import ImproperlyConfigured
-try:
-    from urllib.parse import urlencode
-    from urllib.request import urlopen
-except ImportError:     # Python 2
-    from urllib import urlencode, urlopen
+from django.utils.six.moves.urllib.parse import urlencode
+from django.utils.six.moves.urllib.request import urlopen
+
 
 PING_URL = "http://www.google.com/webmasters/tools/ping"
 
+
 class SitemapNotFound(Exception):
     pass
+
 
 def ping_google(sitemap_url=None, ping_url=PING_URL):
     """
@@ -33,11 +33,14 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
     if sitemap_url is None:
         raise SitemapNotFound("You didn't provide a sitemap_url, and the sitemap URL couldn't be auto-detected.")
 
-    from django.contrib.sites.models import Site
+    if not django_apps.is_installed('django.contrib.sites'):
+        raise ImproperlyConfigured("ping_google requires django.contrib.sites, which isn't installed.")
+    Site = django_apps.get_model('sites.Site')
     current_site = Site.objects.get_current()
     url = "http://%s%s" % (current_site.domain, sitemap_url)
-    params = urlencode({'sitemap':url})
+    params = urlencode({'sitemap': url})
     urlopen("%s?%s" % (ping_url, params))
+
 
 class Sitemap(object):
     # This limit is defined by Google. See the index documentation at
@@ -76,7 +79,8 @@ class Sitemap(object):
 
         # Determine domain
         if site is None:
-            if Site._meta.installed:
+            if django_apps.is_installed('django.contrib.sites'):
+                Site = django_apps.get_model('sites.Site')
                 try:
                     site = Site.objects.get_current()
                 except Site.DoesNotExist:
@@ -86,23 +90,38 @@ class Sitemap(object):
         domain = site.domain
 
         urls = []
+        latest_lastmod = None
+        all_items_lastmod = True  # track if all items have a lastmod
         for item in self.paginator.page(page).object_list:
             loc = "%s://%s%s" % (protocol, domain, self.__get('location', item))
             priority = self.__get('priority', item, None)
+            lastmod = self.__get('lastmod', item, None)
+            if all_items_lastmod:
+                all_items_lastmod = lastmod is not None
+                if (all_items_lastmod and
+                        (latest_lastmod is None or lastmod > latest_lastmod)):
+                    latest_lastmod = lastmod
             url_info = {
-                'item':       item,
-                'location':   loc,
-                'lastmod':    self.__get('lastmod', item, None),
+                'item': item,
+                'location': loc,
+                'lastmod': lastmod,
                 'changefreq': self.__get('changefreq', item, None),
-                'priority':   str(priority is not None and priority or ''),
+                'priority': str(priority if priority is not None else ''),
             }
             urls.append(url_info)
+        if all_items_lastmod and latest_lastmod:
+            self.latest_lastmod = latest_lastmod
         return urls
+
 
 class FlatPageSitemap(Sitemap):
     def items(self):
+        if not django_apps.is_installed('django.contrib.sites'):
+            raise ImproperlyConfigured("ping_google requires django.contrib.sites, which isn't installed.")
+        Site = django_apps.get_model('sites.Site')
         current_site = Site.objects.get_current()
         return current_site.flatpage_set.filter(registration_required=False)
+
 
 class GenericSitemap(Sitemap):
     priority = None
@@ -122,3 +141,6 @@ class GenericSitemap(Sitemap):
         if self.date_field is not None:
             return getattr(item, self.date_field)
         return None
+
+
+default_app_config = 'django.contrib.sitemaps.apps.SiteMapsConfig'

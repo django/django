@@ -1,8 +1,10 @@
+import base64
 from datetime import timedelta
 import os
 import shutil
 import string
 import tempfile
+import unittest
 import warnings
 
 from django.conf import settings
@@ -13,15 +15,17 @@ from django.contrib.sessions.backends.file import SessionStore as FileSession
 from django.contrib.sessions.backends.signed_cookies import SessionStore as CookieSession
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.middleware import SessionMiddleware
-from django.core.cache import get_cache
+from django.core.cache import caches
+from django.core.cache.backends.base import InvalidCacheBackendError
 from django.core import management
-from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
+from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
-from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings
+from django.test import TestCase, RequestFactory, override_settings
+from django.test.utils import patch_logger
 from django.utils import six
 from django.utils import timezone
-from django.utils import unittest
+
+from django.contrib.sessions.exceptions import InvalidSessionKey
 
 
 class SessionTestsMixin(object):
@@ -136,8 +140,8 @@ class SessionTestsMixin(object):
         self.assertTrue(self.session.modified)
 
     def test_save(self):
-        if (hasattr(self.session, '_cache') and'DummyCache' in
-            settings.CACHES[settings.SESSION_CACHE_ALIAS]['BACKEND']):
+        if (hasattr(self.session, '_cache') and 'DummyCache' in
+                settings.CACHES[settings.SESSION_CACHE_ALIAS]['BACKEND']):
             raise unittest.SkipTest("Session saving tests require a real cache backend")
         self.session.save()
         self.assertTrue(self.session.exists(self.session.session_key))
@@ -272,22 +276,34 @@ class SessionTestsMixin(object):
         encoded = self.session.encode(data)
         self.assertEqual(self.session.decode(encoded), data)
 
+    def test_decode_failure_logged_to_security(self):
+        bad_encode = base64.b64encode(b'flaskdj:alkdjf')
+        with patch_logger('django.security.SuspiciousSession', 'warning') as calls:
+            self.assertEqual({}, self.session.decode(bad_encode))
+            # check that the failed decode is logged
+            self.assertEqual(len(calls), 1)
+            self.assertTrue('corrupted' in calls[0])
+
     def test_actual_expiry(self):
-        # Regression test for #19200
-        old_session_key = None
-        new_session_key = None
-        try:
-            self.session['foo'] = 'bar'
-            self.session.set_expiry(-timedelta(seconds=10))
-            self.session.save()
-            old_session_key = self.session.session_key
-            # With an expiry date in the past, the session expires instantly.
-            new_session = self.backend(self.session.session_key)
-            new_session_key = new_session.session_key
-            self.assertNotIn('foo', new_session)
-        finally:
-            self.session.delete(old_session_key)
-            self.session.delete(new_session_key)
+        # this doesn't work with JSONSerializer (serializing timedelta)
+        with override_settings(SESSION_SERIALIZER='django.contrib.sessions.serializers.PickleSerializer'):
+            self.session = self.backend()  # reinitialize after overriding settings
+
+            # Regression test for #19200
+            old_session_key = None
+            new_session_key = None
+            try:
+                self.session['foo'] = 'bar'
+                self.session.set_expiry(-timedelta(seconds=10))
+                self.session.save()
+                old_session_key = self.session.session_key
+                # With an expiry date in the past, the session expires instantly.
+                new_session = self.backend(self.session.session_key)
+                new_session_key = new_session.session_key
+                self.assertNotIn('foo', new_session)
+            finally:
+                self.session.delete(old_session_key)
+                self.session.delete(new_session_key)
 
 
 class DatabaseSessionTests(SessionTestsMixin, TestCase):
@@ -370,6 +386,11 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
             self.session._session_key = (string.ascii_letters + string.digits) * 20
             self.assertEqual(self.session.load(), {})
 
+    @override_settings(SESSION_CACHE_ALIAS='sessions')
+    def test_non_default_cache(self):
+        # 21000 - CacheDB backend should respect SESSION_CACHE_ALIAS.
+        self.assertRaises(InvalidCacheBackendError, self.backend)
+
 
 @override_settings(USE_TZ=True)
 class CacheDBSessionWithTimeZoneTests(CacheDBSessionTests):
@@ -403,14 +424,17 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         self.assertRaises(ImproperlyConfigured, self.backend)
 
     def test_invalid_key_backslash(self):
-        # Ensure we don't allow directory-traversal
-        self.assertRaises(SuspiciousOperation,
-                          self.backend("a\\b\\c").load)
+        # Ensure we don't allow directory-traversal.
+        # This is tested directly on _key_to_file, as load() will swallow
+        # a SuspiciousOperation in the same way as an IOError - by creating
+        # a new session, making it unclear whether the slashes were detected.
+        self.assertRaises(InvalidSessionKey,
+                          self.backend()._key_to_file, "a\\b\\c")
 
     def test_invalid_key_forwardslash(self):
         # Ensure we don't allow directory-traversal
-        self.assertRaises(SuspiciousOperation,
-                          self.backend("a/b/c").load)
+        self.assertRaises(InvalidSessionKey,
+                          self.backend()._key_to_file, "a/b/c")
 
     @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.file")
     def test_clearsessions_command(self):
@@ -422,7 +446,7 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
 
         def count_sessions():
             return len([session_file for session_file in os.listdir(storage_path)
-                                     if session_file.startswith(file_prefix)])
+                if session_file.startswith(file_prefix)])
 
         self.assertEqual(0, count_sessions())
 
@@ -457,7 +481,7 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
 
     def test_default_cache(self):
         self.session.save()
-        self.assertNotEqual(get_cache('default').get(self.session.cache_key), None)
+        self.assertNotEqual(caches['default'].get(self.session.cache_key), None)
 
     @override_settings(CACHES={
         'default': {
@@ -465,6 +489,7 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
         },
         'sessions': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'session',
         },
     }, SESSION_CACHE_ALIAS='sessions')
     def test_non_default_cache(self):
@@ -472,8 +497,8 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
         self.session = self.backend()
 
         self.session.save()
-        self.assertEqual(get_cache('default').get(self.session.cache_key), None)
-        self.assertNotEqual(get_cache('sessions').get(self.session.cache_key), None)
+        self.assertEqual(caches['default'].get(self.session.cache_key), None)
+        self.assertNotEqual(caches['sessions'].get(self.session.cache_key), None)
 
 
 class SessionMiddlewareTests(unittest.TestCase):

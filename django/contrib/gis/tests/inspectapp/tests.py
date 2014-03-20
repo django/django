@@ -1,16 +1,40 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
+from unittest import skipUnless
 
+from django.core.management import call_command
 from django.db import connections
 from django.test import TestCase
-from django.contrib.gis.gdal import Driver
+from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geometry.test_data import TEST_DATA
-from django.contrib.gis.utils.ogrinspect import ogrinspect
+from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
+from django.utils.six import StringIO
 
-from .models import AllOGRFields
+if HAS_GDAL:
+    from django.contrib.gis.gdal import Driver
+    from django.contrib.gis.utils.ogrinspect import ogrinspect
+
+    from .models import AllOGRFields
 
 
+@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GDAL and spatial db are required.")
+class InspectDbTests(TestCase):
+    def test_geom_columns(self):
+        """
+        Test the geo-enabled inspectdb command.
+        """
+        out = StringIO()
+        call_command('inspectdb',
+                 table_name_filter=lambda tn: tn.startswith('inspectapp_'),
+                 stdout=out)
+        output = out.getvalue()
+        self.assertIn('geom = models.PolygonField()', output)
+        self.assertIn('point = models.PointField()', output)
+        self.assertIn('objects = models.GeoManager()', output)
+
+
+@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GDAL and spatial db are required.")
 class OGRInspectTest(TestCase):
     maxDiff = 1024
 
@@ -52,7 +76,7 @@ class OGRInspectTest(TestCase):
         self.assertEqual(model_def, '\n'.join(expected))
 
     def test_time_field(self):
-        # Only possible to test this on PostGIS at the momemnt.  MySQL
+        # Only possible to test this on PostGIS at the moment.  MySQL
         # complains about permissions, and SpatiaLite/Oracle are
         # insanely difficult to get support compiled in for in GDAL.
         if not connections['default'].ops.postgis:
@@ -91,6 +115,13 @@ class OGRInspectTest(TestCase):
             '    objects = models.GeoManager()'
         ))
 
+    def test_management_command(self):
+        shp_file = os.path.join(TEST_DATA, 'cities', 'cities.shp')
+        out = StringIO()
+        call_command('ogrinspect', shp_file, 'City', stdout=out)
+        output = out.getvalue()
+        self.assertIn('class City(models.Model):', output)
+
 
 def get_ogr_db_string():
     """
@@ -124,6 +155,7 @@ def get_ogr_db_string():
 
     # Build the params of the OGR database connection string
     params = [db_str % {'db_name': db['NAME']}]
+
     def add(key, template):
         value = db.get(key, None)
         # Don't add the parameter if it is not in django's settings

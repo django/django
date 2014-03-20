@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+from unittest import TestCase
+
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils import six
-from django.utils.unittest import TestCase
 
 
 class ValidationMessagesTest(TestCase):
@@ -18,10 +18,6 @@ class ValidationMessagesTest(TestCase):
         f = models.AutoField(primary_key=True)
         self._test_validation_messages(f, 'fõo',
             ["'fõo' value must be an integer."])
-        # primary_key must be True. Refs #12467.
-        with six.assertRaisesRegex(self, AssertionError,
-                "AutoFields must have primary_key=True."):
-            models.AutoField(primary_key=False)
 
     def test_integer_field_raises_error_message(self):
         f = models.IntegerField()

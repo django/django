@@ -1,5 +1,3 @@
-import json
-
 from django.test import TestCase
 from django.core import signing
 from django.core.exceptions import SuspiciousOperation

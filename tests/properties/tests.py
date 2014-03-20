@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.test import TestCase
 
@@ -18,7 +18,7 @@ class PropertyTests(TestCase):
         # The "full_name" property hasn't provided a "set" method.
         self.assertRaises(AttributeError, setattr, self.a, 'full_name', 'Paul McCartney')
 
-        # But "full_name_2" has, and it can be used to initialise the class.
-        a2 = Person(full_name_2 = 'Paul McCartney')
+        # But "full_name_2" has, and it can be used to initialize the class.
+        a2 = Person(full_name_2='Paul McCartney')
         a2.save()
         self.assertEqual(a2.first_name, 'Paul')

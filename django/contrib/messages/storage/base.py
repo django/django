@@ -34,23 +34,25 @@ class Message(object):
 
     def __eq__(self, other):
         return isinstance(other, Message) and self.level == other.level and \
-                                              self.message == other.message
+            self.message == other.message
 
     def __str__(self):
         return force_text(self.message)
 
     def _get_tags(self):
-        label_tag = force_text(LEVEL_TAGS.get(self.level, ''),
-                                  strings_only=True)
         extra_tags = force_text(self.extra_tags, strings_only=True)
-        if extra_tags and label_tag:
-            return ' '.join([extra_tags, label_tag])
+        if extra_tags and self.level_tag:
+            return ' '.join([extra_tags, self.level_tag])
         elif extra_tags:
             return extra_tags
-        elif label_tag:
-            return label_tag
+        elif self.level_tag:
+            return self.level_tag
         return ''
     tags = property(_get_tags)
+
+    @property
+    def level_tag(self):
+        return force_text(LEVEL_TAGS.get(self.level, ''), strings_only=True)
 
 
 class BaseStorage(object):
@@ -105,7 +107,7 @@ class BaseStorage(object):
         just containing no messages) then ``None`` should be returned in
         place of ``messages``.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseStorage must provide a _get() method')
 
     def _store(self, messages, response, *args, **kwargs):
         """
@@ -116,7 +118,7 @@ class BaseStorage(object):
 
         **This method must be implemented by a subclass.**
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseStorage must provide a _store() method')
 
     def _prepare_messages(self, messages):
         """

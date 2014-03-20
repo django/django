@@ -114,11 +114,11 @@ anywhere in your codebase, but convention is to put it in :file:`views.py`.
 The only requirement on this subclass is that it implement a
 :meth:`~WizardView.done()` method.
 
-.. method:: WizardView.done(form_list)
+.. method:: WizardView.done(form_list, form_dict, **kwargs)
 
     This method specifies what should happen when the data for *every* form is
-    submitted and validated. This method is passed a list of validated
-    :class:`~django.forms.Form` instances.
+    submitted and validated. This method is passed a list and dictionary of
+    validated :class:`~django.forms.Form` instances.
 
     In this simplistic example, rather than performing any database operation,
     the method simply renders a template of the validated data::
@@ -144,6 +144,21 @@ The only requirement on this subclass is that it implement a
                 do_something_with_the_form_data(form_list)
                 return HttpResponseRedirect('/page-to-redirect-to-when-done/')
 
+    In addition to ``form_list``, the :meth:`~WizardView.done` method
+    is passed a ``form_dict``, which allows you to access the wizard's
+    forms based on their step names. This is especially useful when using
+    :class:`NamedUrlWizardView`, for example::
+
+        def done(self, form_list, form_dict, **kwargs):
+            user = form_dict['user'].save()
+            credit_card = form_dict['credit_card'].save()
+            # ...
+
+    .. versionchanged:: 1.7
+
+        Previously, the ``form_dict`` argument wasn't passed to the
+        ``done`` method.
+
 See the section :ref:`Advanced WizardView methods <wizardview-advanced-methods>`
 below to learn about more :class:`WizardView` hooks.
 
@@ -166,7 +181,7 @@ This template expects a ``wizard`` object that has various items attached to
 it:
 
 * ``form`` -- The :class:`~django.forms.Form` or
-  :class:`~django.forms.formset.BaseFormSet` instance for the current step
+  :class:`~django.forms.formsets.BaseFormSet` instance for the current step
   (either empty or with errors).
 
 * ``steps`` -- A helper object to access the various steps related data:
@@ -229,7 +244,7 @@ Here's a full example template:
 Hooking the wizard into a URLconf
 ---------------------------------
 
-.. method:: WizardView.as_view
+.. method:: WizardView.as_view()
 
 Finally, we need to specify which forms to use in the wizard, and then
 deploy the new :class:`WizardView` object at a URL in the ``urls.py``. The
@@ -304,7 +319,7 @@ The ``urls.py`` file would contain something like::
 
 .. versionchanged:: 1.6
 
-The ``condiction_dict`` can be passed as attribute for the ``as_view()`
+The ``condition_dict`` can be passed as attribute for the ``as_view()`
 method or as a class attribute named ``condition_dict``::
 
     class OrderWizard(WizardView):
@@ -420,8 +435,10 @@ Advanced ``WizardView`` methods
 .. method:: WizardView.get_form(step=None, data=None, files=None)
 
     This method constructs the form for a given ``step``. If no ``step`` is
-    defined, the current step will be determined automatically.
-    The method gets three arguments:
+    defined, the current step will be determined automatically. If you override
+    ``get_form``, however, you will need to set ``step`` yourself using
+    ``self.steps.current`` as in the example below. The method gets three
+    arguments:
 
     * ``step`` -- The step for which the form instance should be generated.
     * ``data`` -- Gets passed to the form's data argument
@@ -433,6 +450,11 @@ Advanced ``WizardView`` methods
 
         def get_form(self, step=None, data=None, files=None):
             form = super(MyWizard, self).get_form(step, data, files)
+
+            # determine the step if not given
+            if step is None:
+                step = self.steps.current
+
             if step == '1':
                 form.user = self.request.user
             return form
@@ -704,7 +726,7 @@ sessions and browser cookies respectively).
 To use the named urls, you have to change the ``urls.py``.
 
 Below you will see an example of a contact wizard with two steps, step 1 with
-"contactdata" as its name and step 2 with "leavemessage" as its name.
+``"contactdata"`` as its name and step 2 with ``"leavemessage"`` as its name.
 
 Additionally you have to pass two more arguments to the
 :meth:`~WizardView.as_view` method:

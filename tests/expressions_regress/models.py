@@ -8,11 +8,12 @@ from django.db import models
 
 @python_2_unicode_compatible
 class Number(models.Model):
-    integer = models.IntegerField(db_column='the_integer')
+    integer = models.BigIntegerField(db_column='the_integer')
     float = models.FloatField(null=True, db_column='the_float')
 
     def __str__(self):
         return '%i, %.3f' % (self.integer, self.float)
+
 
 class Experiment(models.Model):
     name = models.CharField(max_length=24)
@@ -26,4 +27,3 @@ class Experiment(models.Model):
 
     def duration(self):
         return self.end - self.start
-

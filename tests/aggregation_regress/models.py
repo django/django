@@ -1,5 +1,7 @@
 # coding: utf-8
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -28,7 +30,7 @@ class ItemTag(models.Model):
     tag = models.CharField(max_length=100)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
 
 
 @python_2_unicode_compatible
@@ -42,7 +44,7 @@ class Book(models.Model):
     contact = models.ForeignKey(Author, related_name='book_contact_set')
     publisher = models.ForeignKey(Publisher)
     pubdate = models.DateField()
-    tags = generic.GenericRelation(ItemTag)
+    tags = GenericRelation(ItemTag)
 
     class Meta:
         ordering = ('name',)
@@ -61,15 +63,16 @@ class Store(models.Model):
     def __str__(self):
         return self.name
 
+
 class Entries(models.Model):
     EntryID = models.AutoField(primary_key=True, db_column='Entry ID')
     Entry = models.CharField(unique=True, max_length=50)
-    Exclude = models.BooleanField()
+    Exclude = models.BooleanField(default=False)
 
 
 class Clues(models.Model):
     ID = models.AutoField(primary_key=True)
-    EntryID = models.ForeignKey(Entries, verbose_name='Entry', db_column = 'Entry ID')
+    EntryID = models.ForeignKey(Entries, verbose_name='Entry', db_column='Entry ID')
     Clue = models.CharField(max_length=150)
 
 
@@ -87,3 +90,17 @@ class HardbackBook(Book):
 
     def __str__(self):
         return "%s (hardback): %s" % (self.name, self.weight)
+
+
+# Models for ticket #21150
+class Alfa(models.Model):
+    name = models.CharField(max_length=10, null=True)
+
+
+class Bravo(models.Model):
+    pass
+
+
+class Charlie(models.Model):
+    alfa = models.ForeignKey(Alfa, null=True)
+    bravo = models.ForeignKey(Bravo, null=True)

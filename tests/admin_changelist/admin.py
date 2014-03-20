@@ -1,13 +1,15 @@
-from __future__ import absolute_import
-
 from django.contrib import admin
 from django.core.paginator import Paginator
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
 
-from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
-    Quartet, Membership, ChordsMusician, ChordsBand, Invitation, Swallow)
+from .models import Event, Child, Parent, Swallow
 
 
 site = admin.AdminSite(name="admin")
+
+site.register(User, UserAdmin)
+
 
 class CustomPaginator(Paginator):
     def __init__(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
@@ -67,6 +69,11 @@ class ChordsBandAdmin(admin.ModelAdmin):
     list_filter = ['members']
 
 
+class InvitationAdmin(admin.ModelAdmin):
+    list_display = ('band', 'player')
+    list_select_related = ('player',)
+
+
 class DynamicListDisplayChildAdmin(admin.ModelAdmin):
     list_display = ('parent', 'name', 'age')
 
@@ -77,6 +84,7 @@ class DynamicListDisplayChildAdmin(admin.ModelAdmin):
             my_list_display.remove('parent')
         return my_list_display
 
+
 class DynamicListDisplayLinksChildAdmin(admin.ModelAdmin):
     list_display = ('parent', 'name', 'age')
     list_display_links = ['parent', 'name']
@@ -86,11 +94,19 @@ class DynamicListDisplayLinksChildAdmin(admin.ModelAdmin):
 
 site.register(Child, DynamicListDisplayChildAdmin)
 
+
+class NoListDisplayLinksParentAdmin(admin.ModelAdmin):
+    list_display_links = None
+
+site.register(Parent, NoListDisplayLinksParentAdmin)
+
+
 class SwallowAdmin(admin.ModelAdmin):
-    actions = None # prevent ['action_checkbox'] + list(list_display)
+    actions = None  # prevent ['action_checkbox'] + list(list_display)
     list_display = ('origin', 'load', 'speed')
 
 site.register(Swallow, SwallowAdmin)
+
 
 class DynamicListFilterChildAdmin(admin.ModelAdmin):
     list_filter = ('parent', 'name', 'age')
@@ -102,3 +118,11 @@ class DynamicListFilterChildAdmin(admin.ModelAdmin):
             my_list_filter.remove('parent')
         return my_list_filter
 
+
+class DynamicSearchFieldsChildAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+
+    def get_search_fields(self, request):
+        search_fields = super(DynamicSearchFieldsChildAdmin, self).get_search_fields(request)
+        search_fields += ('age',)
+        return search_fields

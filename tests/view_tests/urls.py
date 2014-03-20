@@ -1,6 +1,4 @@
 # coding: utf-8
-from __future__ import absolute_import
-
 from os import path
 
 from django.conf.urls import patterns, url, include
@@ -38,6 +36,11 @@ js_info_dict_admin = {
     'packages': ('django.contrib.admin', 'view_tests'),
 }
 
+js_info_dict_app5 = {
+    'domain': 'djangojs',
+    'packages': ('view_tests.app5',),
+}
+
 urlpatterns = patterns('',
     (r'^$', views.index_page),
 
@@ -47,12 +50,16 @@ urlpatterns = patterns('',
 
     # a view that raises an exception for the debug view
     (r'raises/$', views.raises),
-    (r'raises404/$', views.raises404),
+
+    (r'raises400/$', views.raises400),
     (r'raises403/$', views.raises403),
+    (r'raises404/$', views.raises404),
+    (r'raises500/$', views.raises500),
 
     # i18n views
     (r'^i18n/', include('django.conf.urls.i18n')),
     (r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
+    (r'^jsi18n/app5/$', 'django.views.i18n.javascript_catalog', js_info_dict_app5),
     (r'^jsi18n_english_translation/$', 'django.views.i18n.javascript_catalog', js_info_dict_english_translation),
     (r'^jsi18n_multi_packages1/$', 'django.views.i18n.javascript_catalog', js_info_dict_multi_packages1),
     (r'^jsi18n_multi_packages2/$', 'django.views.i18n.javascript_catalog', js_info_dict_multi_packages2),
@@ -66,5 +73,6 @@ urlpatterns = patterns('',
 urlpatterns += patterns('view_tests.views',
     url(r'view_exception/(?P<n>\d+)/$', 'view_exception', name='view_exception'),
     url(r'template_exception/(?P<n>\d+)/$', 'template_exception', name='template_exception'),
-    url(r'^raises_template_does_not_exist/$', 'raises_template_does_not_exist', name='raises_template_does_not_exist'),
+    url(r'^raises_template_does_not_exist/(?P<path>.+)$', 'raises_template_does_not_exist', name='raises_template_does_not_exist'),
+    url(r'^render_no_template/$', 'render_no_template', name='render_no_template'),
 )

@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from unittest import skipUnless
 import warnings
 
 from django.test import SimpleTestCase
-from django.utils import text
+from django.utils import six, text
+from django.utils.deprecation import RemovedInDjango19Warning
+
+IS_WIDE_BUILD = (len('\U0001F4A9') == 1)
+
 
 class TestUtilsText(SimpleTestCase):
 
@@ -76,11 +81,20 @@ class TestUtilsText(SimpleTestCase):
         truncator = text.Truncator('<br/>The <hr />quick brown fox jumped over'
             ' the lazy dog.')
         self.assertEqual('<br/>The <hr />quick brown...',
-            truncator.words(3, '...', html=True ))
+            truncator.words(3, '...', html=True))
         truncator = text.Truncator('<br>The <hr/>quick <em>brown fox</em> '
             'jumped over the lazy dog.')
         self.assertEqual('<br>The <hr/>quick <em>brown...</em>',
-            truncator.words(3, '...', html=True ))
+            truncator.words(3, '...', html=True))
+
+        # Test html entities
+        truncator = text.Truncator('<i>Buenos d&iacute;as!'
+            ' &#x00bf;C&oacute;mo est&aacute;?</i>')
+        self.assertEqual('<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo...</i>',
+            truncator.words(3, '...', html=True))
+        truncator = text.Truncator('<p>I &lt;3 python, what about you?</p>')
+        self.assertEqual('<p>I &lt;3 python...</p>',
+            truncator.words(3, '...', html=True))
 
     def test_wrap(self):
         digits = '1234 67 9'
@@ -99,6 +113,19 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(text.wrap('a %s word' % long_word, 10),
                          'a\n%s\nword' % long_word)
 
+    def test_normalize_newlines(self):
+        self.assertEqual(text.normalize_newlines("abc\ndef\rghi\r\n"),
+                         "abc\ndef\nghi\n")
+        self.assertEqual(text.normalize_newlines("\n\r\r\n\r"), "\n\n\n\n")
+        self.assertEqual(text.normalize_newlines("abcdefghi"), "abcdefghi")
+        self.assertEqual(text.normalize_newlines(""), "")
+
+    def test_normalize_newlines_bytes(self):
+        """normalize_newlines should be able to handle bytes too"""
+        normalized = text.normalize_newlines(b"abc\ndef\rghi\r\n")
+        self.assertEqual(normalized, "abc\ndef\nghi\n")
+        self.assertIsInstance(normalized, six.text_type)
+
     def test_slugify(self):
         items = (
             ('Hello, World!', 'hello-world'),
@@ -106,3 +133,48 @@ class TestUtilsText(SimpleTestCase):
         )
         for value, output in items:
             self.assertEqual(text.slugify(value), output)
+
+    def test_unescape_entities(self):
+        items = [
+            ('', ''),
+            ('foo', 'foo'),
+            ('&amp;', '&'),
+            ('&#x26;', '&'),
+            ('&#38;', '&'),
+            ('foo &amp; bar', 'foo & bar'),
+            ('foo & bar', 'foo & bar'),
+        ]
+        for value, output in items:
+            self.assertEqual(text.unescape_entities(value), output)
+
+    def test_get_valid_filename(self):
+        filename = "^&'@{}[],$=!-#()%+~_123.txt"
+        self.assertEqual(text.get_valid_filename(filename), "-_123.txt")
+
+    def test_javascript_quote(self):
+        input = "<script>alert('Hello \\xff.\n Welcome\there\r');</script>"
+        output = r"<script>alert(\'Hello \\xff.\n Welcome\there\r\');<\/script>"
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RemovedInDjango19Warning)
+            self.assertEqual(text.javascript_quote(input), output)
+
+            # Exercising quote_double_quotes keyword argument
+            input = '"Text"'
+            self.assertEqual(text.javascript_quote(input), '"Text"')
+            self.assertEqual(text.javascript_quote(input, quote_double_quotes=True),
+                             '&quot;Text&quot;')
+
+    @skipUnless(IS_WIDE_BUILD, 'Not running in a wide build of Python')
+    def test_javascript_quote_unicode(self):
+        input = "<script>alert('Hello \\xff.\n Wel𝕃come\there\r');</script>"
+        output = r"<script>alert(\'Hello \\xff.\n Wel𝕃come\there\r\');<\/script>"
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RemovedInDjango19Warning)
+            self.assertEqual(text.javascript_quote(input), output)
+
+    def test_deprecation(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            text.javascript_quote('thingy')
+            self.assertEqual(len(w), 1)
+            self.assertIn('escapejs()', repr(w[0].message))

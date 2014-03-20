@@ -33,7 +33,14 @@ import os
 from decimal import Decimal
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import *
+from django.forms import (
+    BooleanField, CharField, ChoiceField, ComboField, DateField, DateTimeField,
+    DecimalField, EmailField, Field, FileField, FilePathField, FloatField,
+    Form, forms, HiddenInput, IntegerField, MultipleChoiceField,
+    NullBooleanField, NumberInput, PasswordInput, RadioSelect, RegexField,
+    SplitDateTimeField, TextInput, Textarea, TimeField, TypedChoiceField,
+    TypedMultipleChoiceField, URLField, ValidationError, Widget,
+)
 from django.test import SimpleTestCase
 from django.utils import formats
 from django.utils import six
@@ -68,7 +75,6 @@ class FieldsTests(SimpleTestCase):
             def __init__(self):
                 self.class_a_var = True
                 super(A, self).__init__()
-
 
         class ComplexField(Field, A):
             def __init__(self):
@@ -125,6 +131,15 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.max_length, None)
         self.assertEqual(f.min_length, 10)
 
+    def test_charfield_length_not_int(self):
+        """
+        Ensure that setting min_length or max_length to something that is not a
+        number returns an exception.
+        """
+        self.assertRaises(ValueError, CharField, min_length='a')
+        self.assertRaises(ValueError, CharField, max_length='a')
+        self.assertRaises(ValueError, CharField, 'a')
+
     def test_charfield_widget_attrs(self):
         """
         Ensure that CharField.widget_attrs() always returns a dictionary.
@@ -133,14 +148,13 @@ class FieldsTests(SimpleTestCase):
         # Return an empty dictionary if max_length is None
         f = CharField()
         self.assertEqual(f.widget_attrs(TextInput()), {})
-
-        # Or if the widget is not TextInput or PasswordInput
-        f = CharField(max_length=10)
-        self.assertEqual(f.widget_attrs(HiddenInput()), {})
+        self.assertEqual(f.widget_attrs(Textarea()), {})
 
         # Otherwise, return a maxlength attribute equal to max_length
+        f = CharField(max_length=10)
         self.assertEqual(f.widget_attrs(TextInput()), {'maxlength': '10'})
         self.assertEqual(f.widget_attrs(PasswordInput()), {'maxlength': '10'})
+        self.assertEqual(f.widget_attrs(Textarea()), {'maxlength': '10'})
 
     # IntegerField ################################################################
 
@@ -225,6 +239,18 @@ class FieldsTests(SimpleTestCase):
         f1 = IntegerField(localize=True)
         self.assertWidgetRendersTo(f1, '<input id="id_f" name="f" type="text" />')
 
+    def test_integerfield_subclass(self):
+        """
+        Test that class-defined widget is not overwritten by __init__ (#22245).
+        """
+        class MyIntegerField(IntegerField):
+            widget = Textarea
+
+        f = MyIntegerField()
+        self.assertEqual(f.widget.__class__, Textarea)
+        f = MyIntegerField(localize=True)
+        self.assertEqual(f.widget.__class__, Textarea)
+
     # FloatField ##################################################################
 
     def test_floatfield_1(self):
@@ -245,6 +271,9 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a number.'", f.clean, '1.0a')
         self.assertEqual(f.max_value, None)
         self.assertEqual(f.min_value, None)
+        self.assertRaisesMessage(ValidationError, "'Enter a number.'", f.clean, 'Infinity')
+        self.assertRaisesMessage(ValidationError, "'Enter a number.'", f.clean, 'NaN')
+        self.assertRaisesMessage(ValidationError, "'Enter a number.'", f.clean, '-Inf')
 
     def test_floatfield_2(self):
         f = FloatField(required=False)
@@ -264,6 +293,10 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.max_value, 1.5)
         self.assertEqual(f.min_value, 0.5)
 
+    def test_floatfield_widget_attrs(self):
+        f = FloatField(widget=NumberInput(attrs={'step': 0.01, 'max': 1.0, 'min': 0.0}))
+        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" min="0.0" max="1.0" type="number" id="id_f" />')
+
     def test_floatfield_localized(self):
         """
         Make sure localized FloatField's widget renders to a text input with
@@ -277,17 +310,16 @@ class FieldsTests(SimpleTestCase):
         n = 4.35
         self.assertFalse(f._has_changed(n, '4.3500'))
 
-        with translation.override('fr'):
-            with self.settings(USE_L10N=True):
-                f = FloatField(localize=True)
-                localized_n = formats.localize_input(n)  # -> '4,35' in French
-                self.assertFalse(f._has_changed(n, localized_n))
+        with translation.override('fr'), self.settings(USE_L10N=True):
+            f = FloatField(localize=True)
+            localized_n = formats.localize_input(n)  # -> '4,35' in French
+            self.assertFalse(f._has_changed(n, localized_n))
 
     # DecimalField ################################################################
 
     def test_decimalfield_1(self):
         f = DecimalField(max_digits=4, decimal_places=2)
-        self.assertWidgetRendersTo(f, '<input id="id_f" step="0.01" type="number" name="f" maxlength="6" />')
+        self.assertWidgetRendersTo(f, '<input id="id_f" step="0.01" type="number" name="f" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertEqual(f.clean('1'), Decimal("1"))
@@ -333,7 +365,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_decimalfield_3(self):
         f = DecimalField(max_digits=4, decimal_places=2, max_value=Decimal('1.5'), min_value=Decimal('0.5'))
-        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" min="0.5" max="1.5" maxlength="6" type="number" id="id_f" />')
+        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" min="0.5" max="1.5" type="number" id="id_f" />')
         self.assertRaisesMessage(ValidationError, "'Ensure this value is less than or equal to 1.5.'", f.clean, '1.6')
         self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 0.5.'", f.clean, '0.4')
         self.assertEqual(f.clean('1.5'), Decimal("1.5"))
@@ -365,6 +397,19 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.clean('.01'), Decimal(".01"))
         self.assertRaisesMessage(ValidationError, "'Ensure that there are no more than 0 digits before the decimal point.'", f.clean, '1.1')
 
+    def test_decimalfield_widget_attrs(self):
+        f = DecimalField(max_digits=6, decimal_places=2)
+        self.assertEqual(f.widget_attrs(Widget()), {})
+        self.assertEqual(f.widget_attrs(NumberInput()), {'step': '0.01'})
+        f = DecimalField(max_digits=10, decimal_places=0)
+        self.assertEqual(f.widget_attrs(NumberInput()), {'step': '1'})
+        f = DecimalField(max_digits=19, decimal_places=19)
+        self.assertEqual(f.widget_attrs(NumberInput()), {'step': '1e-19'})
+        f = DecimalField(max_digits=20)
+        self.assertEqual(f.widget_attrs(NumberInput()), {'step': 'any'})
+        f = DecimalField(max_digits=6, widget=NumberInput(attrs={'step': '0.01'}))
+        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" type="number" id="id_f" />')
+
     def test_decimalfield_localized(self):
         """
         Make sure localized DecimalField's widget renders to a text input with
@@ -379,11 +424,10 @@ class FieldsTests(SimpleTestCase):
         self.assertFalse(f._has_changed(d, '0.10'))
         self.assertTrue(f._has_changed(d, '0.101'))
 
-        with translation.override('fr'):
-            with self.settings(USE_L10N=True):
-                f = DecimalField(max_digits=2, decimal_places=2, localize=True)
-                localized_d = formats.localize_input(d)  # -> '0,1' in French
-                self.assertFalse(f._has_changed(d, localized_d))
+        with translation.override('fr'), self.settings(USE_L10N=True):
+            f = DecimalField(max_digits=2, decimal_places=2, localize=True)
+            localized_d = formats.localize_input(d)  # -> '0,1' in French
+            self.assertFalse(f._has_changed(d, localized_d))
 
     # DateField ###################################################################
 
@@ -664,7 +708,7 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', b'Some File Content'), 'files/test4.pdf')))
 
     def test_filefield_2(self):
-        f = FileField(max_length = 5)
+        f = FileField(max_length=5)
         self.assertRaisesMessage(ValidationError, "'Ensure this filename has at most 5 characters (it has 18).'", f.clean, SimpleUploadedFile('test_maxlength.txt', b'hello world'))
         self.assertEqual('files/test1.pdf', f.clean('', 'files/test1.pdf'))
         self.assertEqual('files/test2.pdf', f.clean(None, 'files/test2.pdf'))
@@ -696,7 +740,6 @@ class FieldsTests(SimpleTestCase):
         # A file was uploaded and there is initial data (file identity is not dealt
         # with here)
         self.assertTrue(f._has_changed('resume.txt', {'filename': 'resume.txt', 'content': 'My resume'}))
-
 
     # URLField ##################################################################
 
@@ -734,11 +777,11 @@ class FieldsTests(SimpleTestCase):
     def test_url_regex_ticket11198(self):
         f = URLField()
         # hangs "forever" if catastrophic backtracking in ticket:#11198 not fixed
-        self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://%s' % ("X"*200,))
+        self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://%s' % ("X" * 200,))
 
         # a second test, to make sure the problem is really addressed, even on
         # domains that don't fail the domain label length check in the regex
-        self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://%s' % ("X"*60,))
+        self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://%s' % ("X" * 60,))
 
     def test_urlfield_2(self):
         f = URLField(required=False)
@@ -879,7 +922,7 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. John is not one of the available choices.'", f.clean, 'John')
 
     def test_choicefield_4(self):
-        f = ChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3','A'),('4','B'))), ('5','Other')])
+        f = ChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3', 'A'), ('4', 'B'))), ('5', 'Other')])
         self.assertEqual('1', f.clean(1))
         self.assertEqual('1', f.clean('1'))
         self.assertEqual('3', f.clean(3))
@@ -929,6 +972,23 @@ class FieldsTests(SimpleTestCase):
         # has_changed should not trigger required validation
         f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=True)
         self.assertFalse(f._has_changed(None, ''))
+        self.assertFalse(f._has_changed(1, '1'))
+
+    def test_typedchoicefield_special_coerce(self):
+        """
+        Test a coerce function which results in a value not present in choices.
+        Refs #21397.
+        """
+        def coerce_func(val):
+            return Decimal('1.%s' % val)
+
+        f = TypedChoiceField(choices=[(1, "1"), (2, "2")], coerce=coerce_func, required=True)
+        self.assertEqual(Decimal('1.2'), f.clean('2'))
+        self.assertRaisesMessage(ValidationError,
+            "'This field is required.'", f.clean, '')
+        self.assertRaisesMessage(ValidationError,
+            "'Select a valid choice. 3 is not one of the available choices.'",
+            f.clean, '3')
 
     # NullBooleanField ############################################################
 
@@ -944,7 +1004,6 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(None, f.clean('3'))
         self.assertEqual(None, f.clean('hello'))
 
-
     def test_nullbooleanfield_2(self):
         # Make sure that the internal value is preserved if using HiddenInput (#7753)
         class HiddenNullBooleanForm(Form):
@@ -957,7 +1016,7 @@ class FieldsTests(SimpleTestCase):
         class HiddenNullBooleanForm(Form):
             hidden_nullbool1 = NullBooleanField(widget=HiddenInput, initial=True)
             hidden_nullbool2 = NullBooleanField(widget=HiddenInput, initial=False)
-        f = HiddenNullBooleanForm({ 'hidden_nullbool1': 'True', 'hidden_nullbool2': 'False' })
+        f = HiddenNullBooleanForm({'hidden_nullbool1': 'True', 'hidden_nullbool2': 'False'})
         self.assertEqual(None, f.full_clean())
         self.assertEqual(True, f.cleaned_data['hidden_nullbool1'])
         self.assertEqual(False, f.cleaned_data['hidden_nullbool2'])
@@ -966,11 +1025,12 @@ class FieldsTests(SimpleTestCase):
         # Make sure we're compatible with MySQL, which uses 0 and 1 for its boolean
         # values. (#9609)
         NULLBOOL_CHOICES = (('1', 'Yes'), ('0', 'No'), ('', 'Unknown'))
+
         class MySQLNullBooleanForm(Form):
             nullbool0 = NullBooleanField(widget=RadioSelect(choices=NULLBOOL_CHOICES))
             nullbool1 = NullBooleanField(widget=RadioSelect(choices=NULLBOOL_CHOICES))
             nullbool2 = NullBooleanField(widget=RadioSelect(choices=NULLBOOL_CHOICES))
-        f = MySQLNullBooleanForm({ 'nullbool0': '1', 'nullbool1': '0', 'nullbool2': '' })
+        f = MySQLNullBooleanForm({'nullbool0': '1', 'nullbool1': '0', 'nullbool2': ''})
         self.assertEqual(None, f.full_clean())
         self.assertEqual(True, f.cleaned_data['nullbool0'])
         self.assertEqual(False, f.cleaned_data['nullbool1'])
@@ -1017,7 +1077,7 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. 3 is not one of the available choices.'", f.clean, ['3'])
 
     def test_multiplechoicefield_3(self):
-        f = MultipleChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3','A'),('4','B'))), ('5','Other')])
+        f = MultipleChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3', 'A'), ('4', 'B'))), ('5', 'Other')])
         self.assertEqual(['1'], f.clean([1]))
         self.assertEqual(['1'], f.clean(['1']))
         self.assertEqual(['1', '5'], f.clean([1, 5]))
@@ -1025,7 +1085,7 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(['1', '5'], f.clean(['1', 5]))
         self.assertEqual(['1', '5'], f.clean(['1', '5']))
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. 6 is not one of the available choices.'", f.clean, ['6'])
-        self.assertRaisesMessage(ValidationError, "'Select a valid choice. 6 is not one of the available choices.'", f.clean, ['1','6'])
+        self.assertRaisesMessage(ValidationError, "'Select a valid choice. 6 is not one of the available choices.'", f.clean, ['1', '6'])
 
     def test_multiplechoicefield_changed(self):
         f = MultipleChoiceField(choices=[('1', 'One'), ('2', 'Two'), ('3', 'Three')])
@@ -1058,8 +1118,8 @@ class FieldsTests(SimpleTestCase):
 
     def test_typedmultiplechoicefield_4(self):
         f = TypedMultipleChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int)
-        self.assertEqual([1, -1], f.clean(['1','-1']))
-        self.assertRaisesMessage(ValidationError, "'Select a valid choice. 2 is not one of the available choices.'", f.clean, ['1','2'])
+        self.assertEqual([1, -1], f.clean(['1', '-1']))
+        self.assertRaisesMessage(ValidationError, "'Select a valid choice. 2 is not one of the available choices.'", f.clean, ['1', '2'])
 
     def test_typedmultiplechoicefield_5(self):
         # Even more weirdness: if you have a valid choice but your coercion function
@@ -1083,6 +1143,23 @@ class FieldsTests(SimpleTestCase):
         # has_changed should not trigger required validation
         f = TypedMultipleChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=True)
         self.assertFalse(f._has_changed(None, ''))
+
+    def test_typedmultiplechoicefield_special_coerce(self):
+        """
+        Test a coerce function which results in a value not present in choices.
+        Refs #21397.
+        """
+        def coerce_func(val):
+            return Decimal('1.%s' % val)
+
+        f = TypedMultipleChoiceField(
+            choices=[(1, "1"), (2, "2")], coerce=coerce_func, required=True)
+        self.assertEqual([Decimal('1.2')], f.clean(['2']))
+        self.assertRaisesMessage(ValidationError,
+            "'This field is required.'", f.clean, [])
+        self.assertRaisesMessage(ValidationError,
+            "'Select a valid choice. 3 is not one of the available choices.'",
+            f.clean, ['3'])
 
    # ComboField ##################################################################
 
@@ -1116,14 +1193,15 @@ class FieldsTests(SimpleTestCase):
         f.choices = [p for p in f.choices if p[0].endswith('.py')]
         f.choices.sort()
         expected = [
-                ('/django/forms/__init__.py', '__init__.py'),
-                ('/django/forms/fields.py', 'fields.py'),
-                ('/django/forms/forms.py', 'forms.py'),
-                ('/django/forms/formsets.py', 'formsets.py'),
-                ('/django/forms/models.py', 'models.py'),
-                ('/django/forms/util.py', 'util.py'),
-                ('/django/forms/widgets.py', 'widgets.py')
-            ]
+            ('/django/forms/__init__.py', '__init__.py'),
+            ('/django/forms/fields.py', 'fields.py'),
+            ('/django/forms/forms.py', 'forms.py'),
+            ('/django/forms/formsets.py', 'formsets.py'),
+            ('/django/forms/models.py', 'models.py'),
+            ('/django/forms/util.py', 'util.py'),
+            ('/django/forms/utils.py', 'utils.py'),
+            ('/django/forms/widgets.py', 'widgets.py')
+        ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
             self.assertTrue(got[0].endswith(exp[0]))
@@ -1136,14 +1214,15 @@ class FieldsTests(SimpleTestCase):
         f = FilePathField(path=path, match='^.*?\.py$')
         f.choices.sort()
         expected = [
-                ('/django/forms/__init__.py', '__init__.py'),
-                ('/django/forms/fields.py', 'fields.py'),
-                ('/django/forms/forms.py', 'forms.py'),
-                ('/django/forms/formsets.py', 'formsets.py'),
-                ('/django/forms/models.py', 'models.py'),
-                ('/django/forms/util.py', 'util.py'),
-                ('/django/forms/widgets.py', 'widgets.py')
-            ]
+            ('/django/forms/__init__.py', '__init__.py'),
+            ('/django/forms/fields.py', 'fields.py'),
+            ('/django/forms/forms.py', 'forms.py'),
+            ('/django/forms/formsets.py', 'formsets.py'),
+            ('/django/forms/models.py', 'models.py'),
+            ('/django/forms/util.py', 'util.py'),
+            ('/django/forms/utils.py', 'utils.py'),
+            ('/django/forms/widgets.py', 'widgets.py')
+        ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
             self.assertTrue(got[0].endswith(exp[0]))
@@ -1154,16 +1233,17 @@ class FieldsTests(SimpleTestCase):
         f = FilePathField(path=path, recursive=True, match='^.*?\.py$')
         f.choices.sort()
         expected = [
-                ('/django/forms/__init__.py', '__init__.py'),
-                ('/django/forms/extras/__init__.py', 'extras/__init__.py'),
-                ('/django/forms/extras/widgets.py', 'extras/widgets.py'),
-                ('/django/forms/fields.py', 'fields.py'),
-                ('/django/forms/forms.py', 'forms.py'),
-                ('/django/forms/formsets.py', 'formsets.py'),
-                ('/django/forms/models.py', 'models.py'),
-                ('/django/forms/util.py', 'util.py'),
-                ('/django/forms/widgets.py', 'widgets.py')
-            ]
+            ('/django/forms/__init__.py', '__init__.py'),
+            ('/django/forms/extras/__init__.py', 'extras/__init__.py'),
+            ('/django/forms/extras/widgets.py', 'extras/widgets.py'),
+            ('/django/forms/fields.py', 'fields.py'),
+            ('/django/forms/forms.py', 'forms.py'),
+            ('/django/forms/formsets.py', 'formsets.py'),
+            ('/django/forms/models.py', 'models.py'),
+            ('/django/forms/util.py', 'util.py'),
+            ('/django/forms/utils.py', 'utils.py'),
+            ('/django/forms/widgets.py', 'widgets.py')
+        ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
             self.assertTrue(got[0].endswith(exp[0]))
@@ -1193,7 +1273,6 @@ class FieldsTests(SimpleTestCase):
         for exp, got in zip(expected, actual):
             self.assertEqual(exp[1], got[1])
             self.assertTrue(got[0].endswith(exp[0]))
-
 
     # SplitDateTimeField ##########################################################
 
@@ -1227,6 +1306,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_splitdatetimefield_changed(self):
         f = SplitDateTimeField(input_date_formats=['%d/%m/%Y'])
+        self.assertFalse(f._has_changed(['11/01/2012', '09:18:15'], ['11/01/2012', '09:18:15']))
         self.assertTrue(f._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['2008-05-06', '12:40:00']))
         self.assertFalse(f._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:40']))
         self.assertTrue(f._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:41']))

@@ -8,10 +8,6 @@ import shutil
 import stat
 import sys
 import tempfile
-try:
-    from urllib.request import urlretrieve
-except ImportError:     # Python 2
-    from urllib import urlretrieve
 
 from optparse import make_option
 from os import path
@@ -19,6 +15,7 @@ from os import path
 import django
 from django.template import Template, Context
 from django.utils import archive
+from django.utils.six.moves.urllib.request import urlretrieve
 from django.utils._os import rmtree_errorhandler
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import handle_extensions
@@ -43,7 +40,7 @@ class TemplateCommand(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--template',
                     action='store', dest='template',
-                    help='The dotted import path to load the template from.'),
+                    help='The path or URL to load the template from.'),
         make_option('--extension', '-e', dest='extensions',
                     action='append', default=['py'],
                     help='The file extension(s) to render (default: "py"). '
@@ -54,8 +51,8 @@ class TemplateCommand(BaseCommand):
                     help='The file name(s) to render. '
                          'Separate multiple extensions with commas, or use '
                          '-n multiple times.')
-        )
-    requires_model_validation = False
+    )
+    requires_system_checks = False
     # Can't import settings during this command, because they haven't
     # necessarily been created.
     can_import_settings = False
@@ -105,7 +102,7 @@ class TemplateCommand(BaseCommand):
         base_name = '%s_name' % app_or_project
         base_subdir = '%s_template' % app_or_project
         base_directory = '%s_directory' % app_or_project
-        if django.VERSION[-1] == 0:
+        if django.VERSION[-2] != 'final':
             docs_version = 'dev'
         else:
             docs_version = '%d.%d' % django.VERSION[:2]
@@ -232,7 +229,7 @@ class TemplateCommand(BaseCommand):
             tmp = url.rstrip('/')
             filename = tmp.split('/')[-1]
             if url.endswith('/'):
-                display_url  = tmp + '/'
+                display_url = tmp + '/'
             else:
                 display_url = url
             return filename, display_url
@@ -269,7 +266,7 @@ class TemplateCommand(BaseCommand):
                 guessed_filename += ext
 
         # Move the temporary file to a filename that has better
-        # chances of being recognnized by the archive utils
+        # chances of being recognized by the archive utils
         if used_name != guessed_filename:
             guessed_path = path.join(tempdir, guessed_filename)
             shutil.move(the_path, guessed_path)

@@ -36,9 +36,19 @@ Use standard DB optimization techniques
 
 ...including:
 
-* Indexes. This is a number one priority, *after* you have determined from
+* Indexes_. This is a number one priority, *after* you have determined from
   profiling what indexes should be added. Use
-  :attr:`django.db.models.Field.db_index` to add these from Django.
+  :attr:`Field.db_index <django.db.models.Field.db_index>` or
+  :attr:`Meta.index_together <django.db.models.Options.index_together>` to add
+  these from Django. Consider adding indexes to fields that you frequently
+  query using :meth:`~django.db.models.query.QuerySet.filter()`,
+  :meth:`~django.db.models.query.QuerySet.exclude()`,
+  :meth:`~django.db.models.query.QuerySet.order_by()`, etc. as indexes may help
+  to speed up lookups. Note that determining the best indexes is a complex
+  database-dependent topic that will depend on your particular application.
+  The overhead of maintaining an index may outweigh any gains in query speed.
+
+.. _Indexes: http://en.wikipedia.org/wiki/Database_index
 
 * Appropriate use of field types.
 
@@ -88,7 +98,8 @@ of parentheses, but will call callables automatically, hiding the above
 distinction.
 
 Be careful with your own custom properties - it is up to you to implement
-caching.
+caching when required, for example using the
+:class:`~django.utils.functional.cached_property` decorator.
 
 Use the ``with`` template tag
 -----------------------------
@@ -111,10 +122,11 @@ For instance:
 * At the most basic level, use :ref:`filter and exclude <queryset-api>` to do
   filtering in the database.
 
-* Use :ref:`F() object query expressions <query-expressions>` to do filtering
-  against other fields within the same model.
+* Use :class:`F expressions <django.db.models.F>` to filter
+  based on other fields within the same model.
 
-* Use :doc:`annotate to do aggregation in the database </topics/db/aggregation>`.
+* Use :doc:`annotate to do aggregation in the database
+  </topics/db/aggregation>`.
 
 If these aren't enough to generate the SQL you need:
 
@@ -233,6 +245,8 @@ queryset``.
 
 But:
 
+.. _overuse_of_count_and_exists:
+
 Don't overuse ``count()`` and ``exists()``
 ------------------------------------------
 
@@ -305,6 +319,17 @@ its primary key. i.e. do::
 instead of::
 
    entry.blog.id
+
+Don't order results if you don't care
+-------------------------------------
+
+Ordering is not free; each field to order by is an operation the database must
+perform. If a model has a default ordering (:attr:`Meta.ordering
+<django.db.models.Options.ordering>`) and you don't need it, remove
+it on a ``QuerySet`` by calling
+:meth:`~django.db.models.query.QuerySet.order_by()` with no parameters.
+
+Adding an index to your database may help to improve ordering performance.
 
 Insert in bulk
 ==============

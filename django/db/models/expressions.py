@@ -4,6 +4,7 @@ from django.db.models.aggregates import refs_aggregate
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
 
+
 class ExpressionNode(tree.Node):
     """
     Base class for all query expressions.
@@ -13,6 +14,7 @@ class ExpressionNode(tree.Node):
     SUB = '-'
     MUL = '*'
     DIV = '/'
+    POW = '^'
     MOD = '%%'  # This is a quoted % operator - it is quoted
                 # because it can be used in strings that also
                 # have parameter substitution.
@@ -84,6 +86,9 @@ class ExpressionNode(tree.Node):
     def __mod__(self, other):
         return self._combine(other, self.MOD, False)
 
+    def __pow__(self, other):
+        return self._combine(other, self.POW, False)
+
     def __and__(self, other):
         raise NotImplementedError(
             "Use .bitand() and .bitor() for bitwise logical operations."
@@ -118,6 +123,9 @@ class ExpressionNode(tree.Node):
     def __rmod__(self, other):
         return self._combine(other, self.MOD, True)
 
+    def __rpow__(self, other):
+        return self._combine(other, self.POW, True)
+
     def __rand__(self, other):
         raise NotImplementedError(
             "Use .bitand() and .bitor() for bitwise logical operations."
@@ -128,6 +136,7 @@ class ExpressionNode(tree.Node):
             "Use .bitand() and .bitor() for bitwise logical operations."
         )
 
+
 class F(ExpressionNode):
     """
     An expression representing the value of the given field.
@@ -136,16 +145,12 @@ class F(ExpressionNode):
         super(F, self).__init__(None, None, False)
         self.name = name
 
-    def __deepcopy__(self, memodict):
-        obj = super(F, self).__deepcopy__(memodict)
-        obj.name = self.name
-        return obj
-
     def prepare(self, evaluator, query, allow_joins):
         return evaluator.prepare_leaf(self, query, allow_joins)
 
     def evaluate(self, evaluator, qn, connection):
         return evaluator.evaluate_leaf(self, qn, connection)
+
 
 class DateModifierNode(ExpressionNode):
     """

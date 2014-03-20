@@ -132,7 +132,7 @@ Troubleshooting
 If you can't find the solution to your problem here then participate in the
 community!  You can:
 
-* Join the ``#geodjango`` IRC channel on FreeNode. Please be patient and polite
+* Join the ``#geodjango`` IRC channel on Freenode. Please be patient and polite
   -- while you may not get an immediate response, someone will attempt to answer
   your question as soon as they see it.
 * Ask your question on the `GeoDjango`__ mailing list.
@@ -140,7 +140,7 @@ community!  You can:
   sure to provide a complete description of the problem, versions used,
   and specify the component as "GIS".
 
-__ http://groups.google.com/group/geodjango
+__ https://groups.google.com/d/forum/geodjango
 __ https://code.djangoproject.com/newticket
 
 .. _libsettings:
@@ -239,13 +239,14 @@ Python
 ^^^^^^
 
 Although OS X comes with Python installed, users can use framework
-installers (`2.6`__ and `2.7`__ are available) provided by
+installers (`2.7`__, `3.2`__ and `3.3`__ are available) provided by
 the Python Software Foundation.  An advantage to using the installer is
 that OS X's Python will remain "pristine" for internal operating system
 use.
 
-__ http://python.org/ftp/python/2.6.6/python-2.6.6-macosx10.3.dmg
-__ http://python.org/ftp/python/2.7.3/
+__ http://python.org/ftp/python/2.7.5/
+__ http://python.org/ftp/python/3.2.5/
+__ http://python.org/ftp/python/3.3.2/
 
 .. note::
 
@@ -272,7 +273,7 @@ Summary::
     $ brew install gdal
     $ brew install libgeoip
 
-__ http://mxcl.github.com/homebrew/
+__ http://brew.sh/
 .. _Apple Developer Tools: https://developer.apple.com/technologies/tools/
 
 .. _kyngchaos:

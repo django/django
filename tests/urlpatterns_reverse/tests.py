@@ -1,20 +1,24 @@
 """
 Unit tests for reverse URL lookups.
 """
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
-from django.conf import settings
+import unittest
+
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.core.urlresolvers import (reverse, resolve, get_callable,
+from django.core.urlresolvers import (reverse, reverse_lazy, resolve, get_callable,
     get_resolver, NoReverseMatch, Resolver404, ResolverMatch, RegexURLResolver,
     RegexURLPattern)
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
-from django.test import TestCase
-from django.utils import unittest, six
+from django.test import TestCase, override_settings
+from django.utils import six
+
+from admin_scripts.tests import AdminScriptTestCase
 
 from . import urlconf_outer, middleware, views
+from .views import empty_view
 
 
 resolve_test_data = (
@@ -34,8 +38,8 @@ resolve_test_data = (
     ('/unnamed/view_class/42/37/', 'urlpatterns_reverse.views.ViewClass', None, '', views.view_class_instance, tuple(), {'arg1': '42', 'arg2': '37'}),
 
     # If you have no kwargs, you get an args list.
-    ('/no_kwargs/42/37/', 'no-kwargs', None, '', views.empty_view, ('42','37'), {}),
-    ('/included/no_kwargs/42/37/', 'inc-no-kwargs', None, '', views.empty_view, ('42','37'), {}),
+    ('/no_kwargs/42/37/', 'no-kwargs', None, '', views.empty_view, ('42', '37'), {}),
+    ('/included/no_kwargs/42/37/', 'inc-no-kwargs', None, '', views.empty_view, ('42', '37'), {}),
 
     # Namespaces
     ('/test1/inner/42/37/', 'urlobject-view', 'testapp', 'test-ns1', 'empty_view', tuple(), {'arg1': '42', 'arg2': '37'}),
@@ -52,7 +56,7 @@ resolve_test_data = (
 
     # Namespaces capturing variables
     ('/inc70/', 'inner-nothing', None, 'inc-ns5', views.empty_view, tuple(), {'outer': '70'}),
-    ('/inc78/extra/foobar/', 'inner-extra', None, 'inc-ns5', views.empty_view, tuple(), {'outer':'78', 'extra':'foobar'}),
+    ('/inc78/extra/foobar/', 'inner-extra', None, 'inc-ns5', views.empty_view, tuple(), {'outer': '78', 'extra': 'foobar'}),
 )
 
 test_data = (
@@ -116,6 +120,7 @@ test_data = (
     ('inner-extra', '/outer/42/extra/inner/', [], {'extra': 'inner', 'outer': '42'}),
     ('inner-extra', '/outer/42/extra/inner/', ['42', 'inner'], {}),
     ('inner-extra', NoReverseMatch, ['fred', 'inner'], {}),
+    ('inner-no-kwargs', '/outer-no-kwargs/42/inner-no-kwargs/1/', ['42', '1'], {}),
     ('disjunction', NoReverseMatch, ['foo'], {}),
     ('inner-disjunction', NoReverseMatch, ['10', '11'], {}),
     ('extra-places', '/e-places/10/', ['10'], {}),
@@ -134,9 +139,9 @@ test_data = (
     # the method. This is potentially ambiguous, as you have to pick the
     # correct view for the arguments provided.
     ('kwargs_view', '/arg_view/', [], {}),
-    ('kwargs_view', '/arg_view/10/', [], {'arg1':10}),
+    ('kwargs_view', '/arg_view/10/', [], {'arg1': 10}),
     ('urlpatterns_reverse.views.absolute_kwargs_view', '/absolute_arg_view/', [], {}),
-    ('urlpatterns_reverse.views.absolute_kwargs_view', '/absolute_arg_view/10/', [], {'arg1':10}),
+    ('urlpatterns_reverse.views.absolute_kwargs_view', '/absolute_arg_view/10/', [], {'arg1': 10}),
     ('non_path_include', '/includes/non_path_include/', [], {}),
 
     # Tests for #13154
@@ -145,6 +150,7 @@ test_data = (
     ('defaults', NoReverseMatch, [], {'arg1': 3, 'arg2': 3}),
     ('defaults', NoReverseMatch, [], {'arg2': 1}),
 )
+
 
 class NoURLPatternsTests(TestCase):
     urls = 'urlpatterns_reverse.no_urls'
@@ -156,8 +162,11 @@ class NoURLPatternsTests(TestCase):
         resolver = RegexURLResolver(r'^$', self.urls)
 
         self.assertRaisesMessage(ImproperlyConfigured,
-            "The included urlconf urlpatterns_reverse.no_urls "\
-            "doesn't have any patterns in it", getattr, resolver, 'url_patterns')
+            "The included urlconf 'urlpatterns_reverse.no_urls' does not "
+            "appear to have any patterns in it. If you see valid patterns in "
+            "the file then the issue is probably caused by a circular import.",
+            getattr, resolver, 'url_patterns')
+
 
 class URLPatternReverse(TestCase):
     urls = 'urlpatterns_reverse.urls'
@@ -192,6 +201,20 @@ class URLPatternReverse(TestCase):
         self.assertEqual('/%7Eme/places/1/',
                 reverse('places', args=[1], prefix='/~me/'))
 
+    def test_patterns_reported(self):
+        # Regression for #17076
+        try:
+            # this url exists, but requires an argument
+            reverse("people", args=[])
+        except NoReverseMatch as e:
+            pattern_description = r"1 pattern(s) tried: ['people/(?P<name>\\w+)/$']"
+            self.assertIn(pattern_description, str(e))
+        else:
+            # we can't use .assertRaises, since we want to inspect the
+            # exception
+            self.fail("Expected a NoReverseMatch, but none occurred.")
+
+
 class ResolverTests(unittest.TestCase):
     def test_resolver_repr(self):
         """
@@ -202,6 +225,19 @@ class ResolverTests(unittest.TestCase):
         resolver = get_resolver('urlpatterns_reverse.namespace_urls')
         sub_resolver = resolver.namespace_dict['test-ns1'][1]
         self.assertIn('<RegexURLPattern list>', repr(sub_resolver))
+
+    def test_reverse_lazy_object_coercion_by_resolve(self):
+        """
+        Verifies lazy object returned by reverse_lazy is coerced to
+        text by resolve(). Previous to #21043, this would raise a TypeError.
+        """
+        urls = 'urlpatterns_reverse.named_urls'
+        proxy_url = reverse_lazy('named-url1', urlconf=urls)
+        resolver = get_resolver(urls)
+        try:
+            resolver.resolve(proxy_url)
+        except TypeError:
+            self.fail('Failed to coerce lazy object to text')
 
     def test_non_regex(self):
         """
@@ -246,12 +282,13 @@ class ResolverTests(unittest.TestCase):
             self.assertEqual(len(e.args[0]['tried']), len(url_types_names), 'Wrong number of tried URLs returned.  Expected %s, got %s.' % (len(url_types_names), len(e.args[0]['tried'])))
             for tried, expected in zip(e.args[0]['tried'], url_types_names):
                 for t, e in zip(tried, expected):
-                    self.assertTrue(isinstance(t, e['type']), str('%s is not an instance of %s') % (t, e['type']))
+                    self.assertIsInstance(t, e['type']), str('%s is not an instance of %s') % (t, e['type'])
                     if 'name' in e:
                         if not e['name']:
                             self.assertTrue(t.name is None, 'Expected no URL name but found %s.' % t.name)
                         else:
                             self.assertEqual(t.name, e['name'], 'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], t.name))
+
 
 class ReverseLazyTest(TestCase):
     urls = 'urlpatterns_reverse.reverse_lazy_urls'
@@ -261,12 +298,31 @@ class ReverseLazyTest(TestCase):
         self.assertRedirects(response, "/redirected_to/", status_code=301)
 
     def test_user_permission_with_lazy_reverse(self):
-        user = User.objects.create_user('alfred', 'alfred@example.com', password='testpw')
+        User.objects.create_user('alfred', 'alfred@example.com', password='testpw')
         response = self.client.get('/login_required_view/')
         self.assertRedirects(response, "/login/?next=/login_required_view/", status_code=302)
         self.client.login(username='alfred', password='testpw')
         response = self.client.get('/login_required_view/')
         self.assertEqual(response.status_code, 200)
+
+
+class ReverseLazySettingsTest(AdminScriptTestCase):
+    """
+    Test that reverse_lazy can be used in settings without causing a circular
+    import error.
+    """
+    def setUp(self):
+        self.write_settings('settings.py', extra="""
+from django.core.urlresolvers import reverse_lazy
+LOGIN_URL = reverse_lazy('login')""")
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_lazy_in_settings(self):
+        out, err = self.run_manage(['sqlall', 'auth'])
+        self.assertNoOutput(err)
+
 
 class ReverseShortcutTests(TestCase):
     urls = 'urlpatterns_reverse.urls'
@@ -278,11 +334,11 @@ class ReverseShortcutTests(TestCase):
                 return "/hi-there/"
 
         res = redirect(FakeObj())
-        self.assertTrue(isinstance(res, HttpResponseRedirect))
+        self.assertIsInstance(res, HttpResponseRedirect)
         self.assertEqual(res.url, '/hi-there/')
 
         res = redirect(FakeObj(), permanent=True)
-        self.assertTrue(isinstance(res, HttpResponsePermanentRedirect))
+        self.assertIsInstance(res, HttpResponsePermanentRedirect)
         self.assertEqual(res.url, '/hi-there/')
 
     def test_redirect_to_view_name(self):
@@ -313,14 +369,14 @@ class NamespaceTests(TestCase):
     def test_ambiguous_object(self):
         "Names deployed via dynamic URL objects that require namespaces can't be resolved"
         self.assertRaises(NoReverseMatch, reverse, 'urlobject-view')
-        self.assertRaises(NoReverseMatch, reverse, 'urlobject-view', args=[37,42])
-        self.assertRaises(NoReverseMatch, reverse, 'urlobject-view', kwargs={'arg1':42, 'arg2':37})
+        self.assertRaises(NoReverseMatch, reverse, 'urlobject-view', args=[37, 42])
+        self.assertRaises(NoReverseMatch, reverse, 'urlobject-view', kwargs={'arg1': 42, 'arg2': 37})
 
     def test_ambiguous_urlpattern(self):
         "Names deployed via dynamic URL objects that require namespaces can't be resolved"
         self.assertRaises(NoReverseMatch, reverse, 'inner-nothing')
-        self.assertRaises(NoReverseMatch, reverse, 'inner-nothing', args=[37,42])
-        self.assertRaises(NoReverseMatch, reverse, 'inner-nothing', kwargs={'arg1':42, 'arg2':37})
+        self.assertRaises(NoReverseMatch, reverse, 'inner-nothing', args=[37, 42])
+        self.assertRaises(NoReverseMatch, reverse, 'inner-nothing', kwargs={'arg1': 42, 'arg2': 37})
 
     def test_non_existent_namespace(self):
         "Non-existent namespaces raise errors"
@@ -330,110 +386,103 @@ class NamespaceTests(TestCase):
     def test_normal_name(self):
         "Normal lookups work as expected"
         self.assertEqual('/normal/', reverse('normal-view'))
-        self.assertEqual('/normal/37/42/', reverse('normal-view', args=[37,42]))
-        self.assertEqual('/normal/42/37/', reverse('normal-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/normal/37/42/', reverse('normal-view', args=[37, 42]))
+        self.assertEqual('/normal/42/37/', reverse('normal-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/+%5C$*/', reverse('special-view'))
 
     def test_simple_included_name(self):
         "Normal lookups work on names included from other patterns"
         self.assertEqual('/included/normal/', reverse('inc-normal-view'))
-        self.assertEqual('/included/normal/37/42/', reverse('inc-normal-view', args=[37,42]))
-        self.assertEqual('/included/normal/42/37/', reverse('inc-normal-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/included/normal/37/42/', reverse('inc-normal-view', args=[37, 42]))
+        self.assertEqual('/included/normal/42/37/', reverse('inc-normal-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/included/+%5C$*/', reverse('inc-special-view'))
 
     def test_namespace_object(self):
         "Dynamic URL objects can be found using a namespace"
         self.assertEqual('/test1/inner/', reverse('test-ns1:urlobject-view'))
-        self.assertEqual('/test1/inner/37/42/', reverse('test-ns1:urlobject-view', args=[37,42]))
-        self.assertEqual('/test1/inner/42/37/', reverse('test-ns1:urlobject-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/test1/inner/37/42/', reverse('test-ns1:urlobject-view', args=[37, 42]))
+        self.assertEqual('/test1/inner/42/37/', reverse('test-ns1:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/test1/inner/+%5C$*/', reverse('test-ns1:urlobject-special-view'))
 
     def test_embedded_namespace_object(self):
         "Namespaces can be installed anywhere in the URL pattern tree"
         self.assertEqual('/included/test3/inner/', reverse('test-ns3:urlobject-view'))
-        self.assertEqual('/included/test3/inner/37/42/', reverse('test-ns3:urlobject-view', args=[37,42]))
-        self.assertEqual('/included/test3/inner/42/37/', reverse('test-ns3:urlobject-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/included/test3/inner/37/42/', reverse('test-ns3:urlobject-view', args=[37, 42]))
+        self.assertEqual('/included/test3/inner/42/37/', reverse('test-ns3:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/included/test3/inner/+%5C$*/', reverse('test-ns3:urlobject-special-view'))
 
     def test_namespace_pattern(self):
         "Namespaces can be applied to include()'d urlpatterns"
         self.assertEqual('/ns-included1/normal/', reverse('inc-ns1:inc-normal-view'))
-        self.assertEqual('/ns-included1/normal/37/42/', reverse('inc-ns1:inc-normal-view', args=[37,42]))
-        self.assertEqual('/ns-included1/normal/42/37/', reverse('inc-ns1:inc-normal-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/ns-included1/normal/37/42/', reverse('inc-ns1:inc-normal-view', args=[37, 42]))
+        self.assertEqual('/ns-included1/normal/42/37/', reverse('inc-ns1:inc-normal-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/ns-included1/+%5C$*/', reverse('inc-ns1:inc-special-view'))
 
     def test_namespace_pattern_with_variable_prefix(self):
         "When using a include with namespaces when there is a regex variable in front of it"
-        self.assertEqual('/ns-outer/42/normal/', reverse('inc-outer:inc-normal-view', kwargs={'outer':42}))
+        self.assertEqual('/ns-outer/42/normal/', reverse('inc-outer:inc-normal-view', kwargs={'outer': 42}))
         self.assertEqual('/ns-outer/42/normal/', reverse('inc-outer:inc-normal-view', args=[42]))
-        self.assertEqual('/ns-outer/42/normal/37/4/', reverse('inc-outer:inc-normal-view', kwargs={'outer':42, 'arg1': 37, 'arg2': 4}))
+        self.assertEqual('/ns-outer/42/normal/37/4/', reverse('inc-outer:inc-normal-view', kwargs={'outer': 42, 'arg1': 37, 'arg2': 4}))
         self.assertEqual('/ns-outer/42/normal/37/4/', reverse('inc-outer:inc-normal-view', args=[42, 37, 4]))
-        self.assertEqual('/ns-outer/42/+%5C$*/', reverse('inc-outer:inc-special-view',  kwargs={'outer':42}))
-        self.assertEqual('/ns-outer/42/+%5C$*/', reverse('inc-outer:inc-special-view',  args=[42]))
+        self.assertEqual('/ns-outer/42/+%5C$*/', reverse('inc-outer:inc-special-view', kwargs={'outer': 42}))
+        self.assertEqual('/ns-outer/42/+%5C$*/', reverse('inc-outer:inc-special-view', args=[42]))
 
     def test_multiple_namespace_pattern(self):
         "Namespaces can be embedded"
         self.assertEqual('/ns-included1/test3/inner/', reverse('inc-ns1:test-ns3:urlobject-view'))
-        self.assertEqual('/ns-included1/test3/inner/37/42/', reverse('inc-ns1:test-ns3:urlobject-view', args=[37,42]))
-        self.assertEqual('/ns-included1/test3/inner/42/37/', reverse('inc-ns1:test-ns3:urlobject-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/ns-included1/test3/inner/37/42/', reverse('inc-ns1:test-ns3:urlobject-view', args=[37, 42]))
+        self.assertEqual('/ns-included1/test3/inner/42/37/', reverse('inc-ns1:test-ns3:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/ns-included1/test3/inner/+%5C$*/', reverse('inc-ns1:test-ns3:urlobject-special-view'))
 
     def test_nested_namespace_pattern(self):
         "Namespaces can be nested"
         self.assertEqual('/ns-included1/ns-included4/ns-included1/test3/inner/', reverse('inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-view'))
-        self.assertEqual('/ns-included1/ns-included4/ns-included1/test3/inner/37/42/', reverse('inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-view', args=[37,42]))
-        self.assertEqual('/ns-included1/ns-included4/ns-included1/test3/inner/42/37/', reverse('inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/ns-included1/ns-included4/ns-included1/test3/inner/37/42/', reverse('inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-view', args=[37, 42]))
+        self.assertEqual('/ns-included1/ns-included4/ns-included1/test3/inner/42/37/', reverse('inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/ns-included1/ns-included4/ns-included1/test3/inner/+%5C$*/', reverse('inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-special-view'))
 
     def test_app_lookup_object(self):
         "A default application namespace can be used for lookup"
         self.assertEqual('/default/inner/', reverse('testapp:urlobject-view'))
-        self.assertEqual('/default/inner/37/42/', reverse('testapp:urlobject-view', args=[37,42]))
-        self.assertEqual('/default/inner/42/37/', reverse('testapp:urlobject-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/default/inner/37/42/', reverse('testapp:urlobject-view', args=[37, 42]))
+        self.assertEqual('/default/inner/42/37/', reverse('testapp:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/default/inner/+%5C$*/', reverse('testapp:urlobject-special-view'))
 
     def test_app_lookup_object_with_default(self):
         "A default application namespace is sensitive to the 'current' app can be used for lookup"
         self.assertEqual('/included/test3/inner/', reverse('testapp:urlobject-view', current_app='test-ns3'))
-        self.assertEqual('/included/test3/inner/37/42/', reverse('testapp:urlobject-view', args=[37,42], current_app='test-ns3'))
-        self.assertEqual('/included/test3/inner/42/37/', reverse('testapp:urlobject-view', kwargs={'arg1':42, 'arg2':37}, current_app='test-ns3'))
+        self.assertEqual('/included/test3/inner/37/42/', reverse('testapp:urlobject-view', args=[37, 42], current_app='test-ns3'))
+        self.assertEqual('/included/test3/inner/42/37/', reverse('testapp:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}, current_app='test-ns3'))
         self.assertEqual('/included/test3/inner/+%5C$*/', reverse('testapp:urlobject-special-view', current_app='test-ns3'))
 
     def test_app_lookup_object_without_default(self):
         "An application namespace without a default is sensitive to the 'current' app can be used for lookup"
         self.assertEqual('/other2/inner/', reverse('nodefault:urlobject-view'))
-        self.assertEqual('/other2/inner/37/42/', reverse('nodefault:urlobject-view', args=[37,42]))
-        self.assertEqual('/other2/inner/42/37/', reverse('nodefault:urlobject-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/other2/inner/37/42/', reverse('nodefault:urlobject-view', args=[37, 42]))
+        self.assertEqual('/other2/inner/42/37/', reverse('nodefault:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/other2/inner/+%5C$*/', reverse('nodefault:urlobject-special-view'))
 
         self.assertEqual('/other1/inner/', reverse('nodefault:urlobject-view', current_app='other-ns1'))
-        self.assertEqual('/other1/inner/37/42/', reverse('nodefault:urlobject-view', args=[37,42], current_app='other-ns1'))
-        self.assertEqual('/other1/inner/42/37/', reverse('nodefault:urlobject-view', kwargs={'arg1':42, 'arg2':37}, current_app='other-ns1'))
+        self.assertEqual('/other1/inner/37/42/', reverse('nodefault:urlobject-view', args=[37, 42], current_app='other-ns1'))
+        self.assertEqual('/other1/inner/42/37/', reverse('nodefault:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}, current_app='other-ns1'))
         self.assertEqual('/other1/inner/+%5C$*/', reverse('nodefault:urlobject-special-view', current_app='other-ns1'))
 
     def test_special_chars_namespace(self):
         self.assertEqual('/+%5C$*/included/normal/', reverse('special:inc-normal-view'))
-        self.assertEqual('/+%5C$*/included/normal/37/42/', reverse('special:inc-normal-view', args=[37,42]))
-        self.assertEqual('/+%5C$*/included/normal/42/37/', reverse('special:inc-normal-view', kwargs={'arg1':42, 'arg2':37}))
+        self.assertEqual('/+%5C$*/included/normal/37/42/', reverse('special:inc-normal-view', args=[37, 42]))
+        self.assertEqual('/+%5C$*/included/normal/42/37/', reverse('special:inc-normal-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/+%5C$*/included/+%5C$*/', reverse('special:inc-special-view'))
 
     def test_namespaces_with_variables(self):
         "Namespace prefixes can capture variables: see #15900"
         self.assertEqual('/inc70/', reverse('inc-ns5:inner-nothing', kwargs={'outer': '70'}))
-        self.assertEqual('/inc78/extra/foobar/', reverse('inc-ns5:inner-extra', kwargs={'outer':'78', 'extra':'foobar'}))
+        self.assertEqual('/inc78/extra/foobar/', reverse('inc-ns5:inner-extra', kwargs={'outer': '78', 'extra': 'foobar'}))
         self.assertEqual('/inc70/', reverse('inc-ns5:inner-nothing', args=['70']))
-        self.assertEqual('/inc78/extra/foobar/', reverse('inc-ns5:inner-extra', args=['78','foobar']))
+        self.assertEqual('/inc78/extra/foobar/', reverse('inc-ns5:inner-extra', args=['78', 'foobar']))
 
+
+@override_settings(ROOT_URLCONF=urlconf_outer.__name__)
 class RequestURLconfTests(TestCase):
-    def setUp(self):
-        self.root_urlconf = settings.ROOT_URLCONF
-        self.middleware_classes = settings.MIDDLEWARE_CLASSES
-        settings.ROOT_URLCONF = urlconf_outer.__name__
-
-    def tearDown(self):
-        settings.ROOT_URLCONF = self.root_urlconf
-        settings.MIDDLEWARE_CLASSES = self.middleware_classes
-
     def test_urlconf(self):
         response = self.client.get('/test/me/')
         self.assertEqual(response.status_code, 200)
@@ -444,10 +493,12 @@ class RequestURLconfTests(TestCase):
         response = self.client.get('/second_test/')
         self.assertEqual(response.status_code, 404)
 
-    def test_urlconf_overridden(self):
-        settings.MIDDLEWARE_CLASSES += (
+    @override_settings(
+        MIDDLEWARE_CLASSES=(
             '%s.ChangeURLconfMiddleware' % middleware.__name__,
         )
+    )
+    def test_urlconf_overridden(self):
         response = self.client.get('/test/me/')
         self.assertEqual(response.status_code, 404)
         response = self.client.get('/inner_urlconf/second_test/')
@@ -456,67 +507,78 @@ class RequestURLconfTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'outer:,inner:/second_test/')
 
-    def test_urlconf_overridden_with_null(self):
-        settings.MIDDLEWARE_CLASSES += (
+    @override_settings(
+        MIDDLEWARE_CLASSES=(
             '%s.NullChangeURLconfMiddleware' % middleware.__name__,
         )
+    )
+    def test_urlconf_overridden_with_null(self):
         self.assertRaises(ImproperlyConfigured, self.client.get, '/test/me/')
 
+    @override_settings(
+        MIDDLEWARE_CLASSES=(
+            '%s.ChangeURLconfMiddleware' % middleware.__name__,
+            '%s.ReverseInnerInResponseMiddleware' % middleware.__name__,
+        )
+    )
     def test_reverse_inner_in_response_middleware(self):
         """
         Test reversing an URL from the *overridden* URLconf from inside
         a response middleware.
         """
-        settings.MIDDLEWARE_CLASSES += (
-            '%s.ChangeURLconfMiddleware' % middleware.__name__,
-            '%s.ReverseInnerInResponseMiddleware' % middleware.__name__,
-        )
         response = self.client.get('/second_test/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'/second_test/')
 
+    @override_settings(
+        MIDDLEWARE_CLASSES=(
+            '%s.ChangeURLconfMiddleware' % middleware.__name__,
+            '%s.ReverseOuterInResponseMiddleware' % middleware.__name__,
+        )
+    )
     def test_reverse_outer_in_response_middleware(self):
         """
         Test reversing an URL from the *default* URLconf from inside
         a response middleware.
         """
-        settings.MIDDLEWARE_CLASSES += (
-            '%s.ChangeURLconfMiddleware' % middleware.__name__,
-            '%s.ReverseOuterInResponseMiddleware' % middleware.__name__,
-        )
         message = "Reverse for 'outer' with arguments '()' and keyword arguments '{}' not found."
         with self.assertRaisesMessage(NoReverseMatch, message):
             self.client.get('/second_test/')
 
+    @override_settings(
+        MIDDLEWARE_CLASSES=(
+            '%s.ChangeURLconfMiddleware' % middleware.__name__,
+            '%s.ReverseInnerInStreaming' % middleware.__name__,
+        )
+    )
     def test_reverse_inner_in_streaming(self):
         """
         Test reversing an URL from the *overridden* URLconf from inside
         a streaming response.
         """
-        settings.MIDDLEWARE_CLASSES += (
-            '%s.ChangeURLconfMiddleware' % middleware.__name__,
-            '%s.ReverseInnerInStreaming' % middleware.__name__,
-        )
         response = self.client.get('/second_test/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(b''.join(response), b'/second_test/')
 
+    @override_settings(
+        MIDDLEWARE_CLASSES=(
+            '%s.ChangeURLconfMiddleware' % middleware.__name__,
+            '%s.ReverseOuterInStreaming' % middleware.__name__,
+        )
+    )
     def test_reverse_outer_in_streaming(self):
         """
         Test reversing an URL from the *default* URLconf from inside
         a streaming response.
         """
-        settings.MIDDLEWARE_CLASSES += (
-            '%s.ChangeURLconfMiddleware' % middleware.__name__,
-            '%s.ReverseOuterInStreaming' % middleware.__name__,
-        )
         message = "Reverse for 'outer' with arguments '()' and keyword arguments '{}' not found."
         with self.assertRaisesMessage(NoReverseMatch, message):
             self.client.get('/second_test/')
             b''.join(self.client.get('/second_test/'))
 
+
 class ErrorHandlerResolutionTests(TestCase):
-    """Tests for handler404 and handler500"""
+    """Tests for handler400, handler404 and handler500"""
 
     def setUp(self):
         from django.core.urlresolvers import RegexURLResolver
@@ -526,16 +588,17 @@ class ErrorHandlerResolutionTests(TestCase):
         self.callable_resolver = RegexURLResolver(r'^$', urlconf_callables)
 
     def test_named_handlers(self):
-        from .views import empty_view
         handler = (empty_view, {})
+        self.assertEqual(self.resolver.resolve400(), handler)
         self.assertEqual(self.resolver.resolve404(), handler)
         self.assertEqual(self.resolver.resolve500(), handler)
 
     def test_callable_handers(self):
-        from .views import empty_view
         handler = (empty_view, {})
+        self.assertEqual(self.callable_resolver.resolve400(), handler)
         self.assertEqual(self.callable_resolver.resolve404(), handler)
         self.assertEqual(self.callable_resolver.resolve500(), handler)
+
 
 class DefaultErrorHandlerTests(TestCase):
     urls = 'urlpatterns_reverse.urls_without_full_import'
@@ -553,12 +616,14 @@ class DefaultErrorHandlerTests(TestCase):
         except AttributeError:
             self.fail("Shouldn't get an AttributeError due to undefined 500 handler")
 
+
 class NoRootUrlConfTests(TestCase):
     """Tests for handler404 and handler500 if urlconf is None"""
     urls = None
 
     def test_no_handler_exception(self):
         self.assertRaises(ImproperlyConfigured, self.client.get, '/test/me/')
+
 
 class ResolverMatchTests(TestCase):
     urls = 'urlpatterns_reverse.namespace_urls'
@@ -595,6 +660,7 @@ class ResolverMatchTests(TestCase):
         request = HttpRequest()
         self.assertIsNone(request.resolver_match)
 
+
 class ErroneousViewTests(TestCase):
     urls = 'urlpatterns_reverse.erroneous_urls'
 
@@ -614,15 +680,23 @@ class ErroneousViewTests(TestCase):
         # The regex error will be hit before NoReverseMatch can be raised
         self.assertRaises(ImproperlyConfigured, reverse, 'whatever blah blah')
 
+
 class ViewLoadingTests(TestCase):
     def test_view_loading(self):
+        self.assertEqual(get_callable('urlpatterns_reverse.views.empty_view'),
+                         empty_view)
+
+        # passing a callable should return the callable
+        self.assertEqual(get_callable(empty_view), empty_view)
+
+    def test_exceptions(self):
         # A missing view (identified by an AttributeError) should raise
         # ViewDoesNotExist, ...
-        six.assertRaisesRegex(self, ViewDoesNotExist, ".*View does not exist in.*",
-            get_callable,
-            'urlpatterns_reverse.views.i_should_not_exist')
+        six.assertRaisesRegex(self, ViewDoesNotExist,
+                              ".*View does not exist in.*",
+                              get_callable,
+                              'urlpatterns_reverse.views.i_should_not_exist')
         # ... but if the AttributeError is caused by something else don't
         # swallow it.
         self.assertRaises(AttributeError, get_callable,
-            'urlpatterns_reverse.views_broken.i_am_broken')
-
+                          'urlpatterns_reverse.views_broken.i_am_broken')

@@ -16,8 +16,8 @@ wanting to work on production-level applications that use Django.
 
 However, it's not the 1.0 release, and we'll be introducing further changes
 before 1.0. For a clear look at which areas of the framework will change (and
-which ones will *not* change) before 1.0, see the api-stability.txt file, which
-lives in the docs/ directory of the distribution.
+which ones will *not* change) before 1.0, see the ``api-stability.txt`` file,
+which lives in the docs/ directory of the distribution.
 
 You may have a need to use some of the features that are marked as
 "subject to API change" in that document, but that's OK with us as long as it's
@@ -120,4 +120,3 @@ Thanks for using Django!
 
 The Django Team
 July 2006
-

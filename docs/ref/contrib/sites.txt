@@ -6,8 +6,6 @@ The "sites" framework
    :synopsis: Lets you operate multiple Web sites from the same database and
               Django project
 
-.. currentmodule:: django.contrib.sites.models
-
 Django comes with an optional "sites" framework. It's a hook for associating
 objects and functionality to particular Web sites, and it's a holding place for
 the domain names and "verbose" names of your Django-powered sites.
@@ -15,9 +13,9 @@ the domain names and "verbose" names of your Django-powered sites.
 Use it if your single Django installation powers more than one site and you
 need to differentiate between those sites in some way.
 
-The whole sites framework is based on a simple model:
+The sites framework is mainly based on a simple model:
 
-.. class:: Site
+.. class:: models.Site
 
     A model for storing the ``domain`` and ``name`` attributes of a Web site.
     The :setting:`SITE_ID` setting specifies the database ID of the
@@ -31,7 +29,6 @@ The whole sites framework is based on a simple model:
     .. attribute:: name
 
         A human-readable "verbose" name for the Web site.
-
 
 How you use this is up to you, but Django uses it in a couple of ways
 automatically via simple conventions.
@@ -80,11 +77,11 @@ This accomplishes several things quite nicely:
   The view code that displays a given story just checks to make sure the
   requested story is on the current site. It looks something like this::
 
-      from django.contrib.sites.models import get_current_site
+      from django.contrib.sites.shortcuts import get_current_site
 
       def article_detail(request, article_id):
           try:
-              a = Article.objects.get(id=article_id, sites__id__exact=get_current_site(request).id)
+              a = Article.objects.get(id=article_id, sites__id=get_current_site(request).id)
           except Article.DoesNotExist:
               raise Http404
           # ...
@@ -137,7 +134,7 @@ hard-coding is best for hackish fixes that you need done quickly. The
 cleaner way of accomplishing the same thing is to check the current site's
 domain::
 
-    from django.contrib.sites.models import get_current_site
+    from django.contrib.sites.shortcuts import get_current_site
 
     def my_view(request):
         current_site = get_current_site(request)
@@ -149,7 +146,8 @@ domain::
             pass
 
 This has also the advantage of checking if the sites framework is installed,
-and return a :class:`RequestSite` instance if it is not.
+and return a :class:`~django.contrib.sites.requests.RequestSite` instance if
+it is not.
 
 If you don't have access to the request object, you can use the
 ``get_current()`` method of the :class:`~django.contrib.sites.models.Site`
@@ -172,10 +170,10 @@ Getting the current domain for display
 
 LJWorld.com and Lawrence.com both have email alert functionality, which lets
 readers sign up to get notifications when news happens. It's pretty basic: A
-reader signs up on a Web form, and he immediately gets an email saying,
+reader signs up on a Web form and immediately gets an email saying,
 "Thanks for your subscription."
 
-It'd be inefficient and redundant to implement this signup-processing code
+It'd be inefficient and redundant to implement this sign up processing code
 twice, so the sites use the same code behind the scenes. But the "thank you for
 signing up" notice needs to be different for each site. By using
 :class:`~django.contrib.sites.models.Site`
@@ -185,7 +183,7 @@ current site's :attr:`~django.contrib.sites.models.Site.name` and
 
 Here's an example of what the form-handling view looks like::
 
-    from django.contrib.sites.models import get_current_site
+    from django.contrib.sites.shortcuts import get_current_site
     from django.core.mail import send_mail
 
     def register_for_newsletter(request):
@@ -264,10 +262,10 @@ To enable the sites framework, follow these steps:
 
     SITE_ID = 1
 
-3. Run :djadmin:`syncdb`.
+3. Run :djadmin:`migrate`.
 
 ``django.contrib.sites`` registers a
-:data:`~django.db.models.signals.post_syncdb` signal handler which creates a
+:data:`~django.db.models.signals.post_migrate` signal handler which creates a
 default site named ``example.com`` with the domain ``example.com``. This site
 will also be created after Django creates the test database. To set the
 correct name and domain for your project, you can use an :doc:`initial data
@@ -296,12 +294,10 @@ clear the cache using ``Site.objects.clear_cache()``::
     Site.objects.clear_cache()
     current_site = Site.objects.get_current()
 
-.. currentmodule:: django.contrib.sites.managers
-
 The ``CurrentSiteManager``
 ==========================
 
-.. class:: CurrentSiteManager
+.. class:: managers.CurrentSiteManager
 
 If :class:`~django.contrib.sites.models.Site` plays a key role in your
 application, consider using the helpful
@@ -377,6 +373,26 @@ your admin site to have access to all objects (not just site-specific
 ones), put ``objects = models.Manager()`` in your model, before you
 define :class:`~django.contrib.sites.managers.CurrentSiteManager`.
 
+.. _site-middleware:
+
+Site middleware
+===============
+
+.. versionadded:: 1.7
+
+If you often use this pattern::
+
+    from django.contrib.sites.models import Site
+
+    def my_view(request):
+        site = Site.objects.get_current()
+        ...
+
+there is simple way to avoid repetitions. Add
+:class:`django.contrib.site.middleware.CurrentSiteMiddleware` to
+:setting:`MIDDLEWARE_CLASSES`. The middleware sets the ``site`` attribute on
+every request object, so you can use ``request.site`` to get the current site.
+
 How Django uses the sites framework
 ===================================
 
@@ -417,15 +433,14 @@ Here's how Django uses the sites framework:
   :class:`~django.contrib.sites.models.Site` name to the template as
   ``{{ site_name }}``.
 
-* The shortcut view (``django.views.defaults.shortcut``) uses the domain
-  of the current :class:`~django.contrib.sites.models.Site` object when
-  calculating an object's URL.
+* The shortcut view (``django.contrib.contenttypes.views.shortcut``)
+  uses the domain of the current
+  :class:`~django.contrib.sites.models.Site` object when calculating
+  an object's URL.
 
 * In the admin framework, the "view on site" link uses the current
   :class:`~django.contrib.sites.models.Site` to work out the domain for the
   site that it will redirect to.
-
-.. currentmodule:: django.contrib.sites.models
 
 ``RequestSite`` objects
 =======================
@@ -434,32 +449,50 @@ Here's how Django uses the sites framework:
 
 Some :doc:`django.contrib </ref/contrib/index>` applications take advantage of
 the sites framework but are architected in a way that doesn't *require* the
-sites framework to be installed in your database. (Some people don't want to, or
-just aren't *able* to install the extra database table that the sites framework
-requires.) For those cases, the framework provides a
-:class:`~django.contrib.sites.models.RequestSite` class, which can be used as a
-fallback when the database-backed sites framework is not available.
+sites framework to be installed in your database. (Some people don't want to,
+or just aren't *able* to install the extra database table that the sites
+framework requires.) For those cases, the framework provides a
+:class:`django.contrib.sites.requests.RequestSite` class, which can be used as
+a fallback when the database-backed sites framework is not available.
 
-.. class:: RequestSite
+.. class:: requests.RequestSite
 
     A class that shares the primary interface of
     :class:`~django.contrib.sites.models.Site` (i.e., it has
     ``domain`` and ``name`` attributes) but gets its data from a Django
     :class:`~django.http.HttpRequest` object rather than from a database.
 
-    The ``save()`` and ``delete()`` methods raise ``NotImplementedError``.
-
     .. method:: __init__(request)
 
         Sets the ``name`` and ``domain`` attributes to the value of
         :meth:`~django.http.HttpRequest.get_host`.
 
+    .. versionchanged:: 1.7
 
-A :class:`~django.contrib.sites.models.RequestSite` object has a similar
-interface to a normal :class:`~django.contrib.sites.models.Site` object, except
-its :meth:`~django.contrib.sites.models.RequestSite.__init__()` method takes an
-:class:`~django.http.HttpRequest` object. It's able to deduce the
-``domain`` and ``name`` by looking at the request's domain. It has ``save()``
-and ``delete()`` methods to match the interface of
+      This class used to be defined in ``django.contrib.sites.models``.
+
+A :class:`~django.contrib.sites.requests.RequestSite` object has a similar
+interface to a normal :class:`~django.contrib.sites.models.Site` object,
+except its :meth:`~django.contrib.sites.requests.RequestSite.__init__()`
+method takes an :class:`~django.http.HttpRequest` object. It's able to deduce
+the ``domain`` and ``name`` by looking at the request's domain. It has
+``save()`` and ``delete()`` methods to match the interface of
 :class:`~django.contrib.sites.models.Site`, but the methods raise
-``NotImplementedError``.
+:exc:`~exceptions.NotImplementedError`..
+
+``get_current_site`` shortcut
+=============================
+
+Finally, to avoid repetitive fallback code, the framework provides a
+:func:`django.contrib.sites.shortcuts.get_current_site` function.
+
+.. function:: shortcuts.get_current_site
+
+    A function that checks if ``django.contrib.sites`` is installed and
+    returns either the current :class:`~django.contrib.sites.models.Site`
+    object or a :class:`~django.contrib.sites.requests.RequestSite` object
+    based on the request.
+
+    .. versionchanged:: 1.7
+
+      This function used to be defined in ``django.contrib.sites.models``.

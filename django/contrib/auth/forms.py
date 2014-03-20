@@ -1,27 +1,31 @@
 from __future__ import unicode_literals
 
-import warnings
+from collections import OrderedDict
 
 from django import forms
-from django.forms.util import flatatt
+from django.forms.utils import flatatt
 from django.template import loader
-from django.utils.datastructures import SortedDict
+from django.utils.encoding import force_bytes
 from django.utils.html import format_html, format_html_join
-from django.utils.http import int_to_base36
+from django.utils.http import urlsafe_base64_encode
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import User
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD, identify_hasher
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, identify_hasher
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 
 
 UNMASKED_DIGITS_TO_SHOW = 6
 
-mask_password = lambda p: "%s%s" % (p[:UNMASKED_DIGITS_TO_SHOW], "*" * max(len(p) - UNMASKED_DIGITS_TO_SHOW, 0))
+
+def mask_password(password):
+    shown = password[:UNMASKED_DIGITS_TO_SHOW]
+    masked = "*" * max(len(password) - UNMASKED_DIGITS_TO_SHOW, 0)
+    return shown + masked
 
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
@@ -29,7 +33,7 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
         encoded = value
         final_attrs = self.build_attrs(attrs)
 
-        if not encoded or encoded == UNUSABLE_PASSWORD:
+        if not encoded or encoded.startswith(UNUSABLE_PASSWORD_PREFIX):
             summary = mark_safe("<strong>%s</strong>" % ugettext("No password set."))
         else:
             try:
@@ -75,7 +79,7 @@ class UserCreationForm(forms.ModelForm):
     username = forms.RegexField(label=_("Username"), max_length=30,
         regex=r'^[\w.@+-]+$',
         help_text=_("Required. 30 characters or fewer. Letters, digits and "
-                      "@/./+/-/_ only."),
+                    "@/./+/-/_ only."),
         error_messages={
             'invalid': _("This value may contain only letters, numbers and "
                          "@/./+/-/_ characters.")})
@@ -97,14 +101,19 @@ class UserCreationForm(forms.ModelForm):
             User._default_manager.get(username=username)
         except User.DoesNotExist:
             return username
-        raise forms.ValidationError(self.error_messages['duplicate_username'])
+        raise forms.ValidationError(
+            self.error_messages['duplicate_username'],
+            code='duplicate_username',
+        )
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError(
-                self.error_messages['password_mismatch'])
+                self.error_messages['password_mismatch'],
+                code='password_mismatch',
+            )
         return password2
 
     def save(self, commit=True):
@@ -119,7 +128,7 @@ class UserChangeForm(forms.ModelForm):
     username = forms.RegexField(
         label=_("Username"), max_length=30, regex=r"^[\w.@+-]+$",
         help_text=_("Required. 30 characters or fewer. Letters, digits and "
-                      "@/./+/-/_ only."),
+                    "@/./+/-/_ only."),
         error_messages={
             'invalid': _("This value may contain only letters, numbers and "
                          "@/./+/-/_ characters.")})
@@ -130,6 +139,7 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = User
+        fields = '__all__'
 
     def __init__(self, *args, **kwargs):
         super(UserChangeForm, self).__init__(*args, **kwargs)
@@ -170,7 +180,7 @@ class AuthenticationForm(forms.Form):
         # Set the label for the "username" field.
         UserModel = get_user_model()
         self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
-        if not self.fields['username'].label:
+        if self.fields['username'].label is None:
             self.fields['username'].label = capfirst(self.username_field.verbose_name)
 
     def clean(self):
@@ -182,16 +192,31 @@ class AuthenticationForm(forms.Form):
                                            password=password)
             if self.user_cache is None:
                 raise forms.ValidationError(
-                    self.error_messages['invalid_login'] % {
-                        'username': self.username_field.verbose_name
-                    })
-            elif not self.user_cache.is_active:
-                raise forms.ValidationError(self.error_messages['inactive'])
+                    self.error_messages['invalid_login'],
+                    code='invalid_login',
+                    params={'username': self.username_field.verbose_name},
+                )
+            else:
+                self.confirm_login_allowed(self.user_cache)
+
         return self.cleaned_data
 
-    def check_for_test_cookie(self):
-        warnings.warn("check_for_test_cookie is deprecated; ensure your login "
-                "view is CSRF-protected.", DeprecationWarning)
+    def confirm_login_allowed(self, user):
+        """
+        Controls whether the given User may log in. This is a policy setting,
+        independent of end-user authentication. This default behavior is to
+        allow login by active users, and reject login by inactive users.
+
+        If the given user cannot log in, this method should raise a
+        ``forms.ValidationError``.
+
+        If the given user may log in, this method should return None.
+        """
+        if not user.is_active:
+            raise forms.ValidationError(
+                self.error_messages['inactive'],
+                code='inactive',
+            )
 
     def get_user_id(self):
         if self.user_cache:
@@ -209,7 +234,7 @@ class PasswordResetForm(forms.Form):
              subject_template_name='registration/password_reset_subject.txt',
              email_template_name='registration/password_reset_email.html',
              use_https=False, token_generator=default_token_generator,
-             from_email=None, request=None):
+             from_email=None, request=None, html_email_template_name=None):
         """
         Generates a one-use only link for resetting password and sends to the
         user.
@@ -217,11 +242,12 @@ class PasswordResetForm(forms.Form):
         from django.core.mail import send_mail
         UserModel = get_user_model()
         email = self.cleaned_data["email"]
-        users = UserModel._default_manager.filter(email__iexact=email)
-        for user in users:
+        active_users = UserModel._default_manager.filter(
+            email__iexact=email, is_active=True)
+        for user in active_users:
             # Make sure that no email is sent to a user that actually has
             # a password marked as unusable
-            if user.password == UNUSABLE_PASSWORD:
+            if not user.has_usable_password():
                 continue
             if not domain_override:
                 current_site = get_current_site(request)
@@ -233,16 +259,21 @@ class PasswordResetForm(forms.Form):
                 'email': user.email,
                 'domain': domain,
                 'site_name': site_name,
-                'uid': int_to_base36(user.pk),
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                 'user': user,
                 'token': token_generator.make_token(user),
-                'protocol': use_https and 'https' or 'http',
+                'protocol': 'https' if use_https else 'http',
             }
             subject = loader.render_to_string(subject_template_name, c)
             # Email subject *must not* contain newlines
             subject = ''.join(subject.splitlines())
             email = loader.render_to_string(email_template_name, c)
-            send_mail(subject, email, from_email, [user.email])
+
+            if html_email_template_name:
+                html_email = loader.render_to_string(html_email_template_name, c)
+            else:
+                html_email = None
+            send_mail(subject, email, from_email, [user.email], html_message=html_email)
 
 
 class SetPasswordForm(forms.Form):
@@ -268,7 +299,9 @@ class SetPasswordForm(forms.Form):
         if password1 and password2:
             if password1 != password2:
                 raise forms.ValidationError(
-                    self.error_messages['password_mismatch'])
+                    self.error_messages['password_mismatch'],
+                    code='password_mismatch',
+                )
         return password2
 
     def save(self, commit=True):
@@ -297,13 +330,15 @@ class PasswordChangeForm(SetPasswordForm):
         old_password = self.cleaned_data["old_password"]
         if not self.user.check_password(old_password):
             raise forms.ValidationError(
-                self.error_messages['password_incorrect'])
+                self.error_messages['password_incorrect'],
+                code='password_incorrect',
+            )
         return old_password
 
-PasswordChangeForm.base_fields = SortedDict([
+PasswordChangeForm.base_fields = OrderedDict(
     (k, PasswordChangeForm.base_fields[k])
     for k in ['old_password', 'new_password1', 'new_password2']
-])
+)
 
 
 class AdminPasswordChangeForm(forms.Form):
@@ -328,7 +363,9 @@ class AdminPasswordChangeForm(forms.Form):
         if password1 and password2:
             if password1 != password2:
                 raise forms.ValidationError(
-                    self.error_messages['password_mismatch'])
+                    self.error_messages['password_mismatch'],
+                    code='password_mismatch',
+                )
         return password2
 
     def save(self, commit=True):
@@ -339,3 +376,11 @@ class AdminPasswordChangeForm(forms.Form):
         if commit:
             self.user.save()
         return self.user
+
+    def _get_changed_data(self):
+        data = super(AdminPasswordChangeForm, self).changed_data
+        for name in self.fields.keys():
+            if name not in data:
+                return []
+        return ['password']
+    changed_data = property(_get_changed_data)

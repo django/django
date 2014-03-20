@@ -1,0 +1,55 @@
+[
+  {
+    "model": "syndication_tests.entry",
+    "pk": 1,
+    "fields": {
+      "title": "My first entry",
+      "updated": "1850-01-01 12:30:00",
+      "published": "1066-09-25 20:15:00"
+    }
+  },
+  {
+    "model": "syndication_tests.entry",
+    "pk": 2,
+    "fields": {
+      "title": "My second entry",
+      "updated": "2008-01-02 12:30:00",
+      "published": "2006-03-17 18:00:00"
+    }
+  },
+  {
+    "model": "syndication_tests.entry",
+    "pk": 3,
+    "fields": {
+      "title": "My third entry",
+      "updated": "2008-01-02 13:30:00",
+      "published": "2005-06-14 10:45:00"
+    }
+  },
+  {
+    "model": "syndication_tests.entry",
+    "pk": 4,
+    "fields": {
+      "title": "A & B < C > D",
+      "updated": "2008-01-03 13:30:00",
+      "published": "2005-11-25 12:11:23"
+    }
+  },
+  {
+    "model": "syndication_tests.entry",
+    "pk": 5,
+    "fields": {
+      "title": "My last entry",
+      "updated": "2013-01-20 00:00:00",
+      "published": "2013-03-25 20:00:00"
+    }
+  },
+  {
+    "model": "syndication_tests.article",
+    "pk": 1,
+    "fields": {
+      "title": "My first article",
+      "entry": "1"
+    }
+  }
+]

@@ -3,6 +3,7 @@ import fnmatch
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
+
 def matches_patterns(path, patterns=None):
     """
     Return True or False depending on whether the ``path`` should be
@@ -14,6 +15,7 @@ def matches_patterns(path, patterns=None):
         if fnmatch.fnmatchcase(path, pattern):
             return True
     return False
+
 
 def get_files(storage, ignore_patterns=None, location=''):
     """
@@ -36,6 +38,7 @@ def get_files(storage, ignore_patterns=None, location=''):
             dir = os.path.join(location, dir)
         for fn in get_files(storage, ignore_patterns, dir):
             yield fn
+
 
 def check_settings(base_url=None):
     """

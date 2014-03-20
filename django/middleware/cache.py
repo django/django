@@ -29,11 +29,6 @@ More details about how the caching works:
   of the response's "Cache-Control" header, falling back to the
   CACHE_MIDDLEWARE_SECONDS setting if the section was not found.
 
-* If CACHE_MIDDLEWARE_ANONYMOUS_ONLY is set to True, only anonymous requests
-  (i.e., those not made by a logged-in user) will be cached. This is a simple
-  and effective way of avoiding the caching of the Django admin (and any other
-  user-specific content).
-
 * This middleware expects that a HEAD request is answered with the same response
   headers exactly like the corresponding GET request.
 
@@ -48,9 +43,12 @@ More details about how the caching works:
 
 """
 
+import warnings
+
 from django.conf import settings
-from django.core.cache import get_cache, DEFAULT_CACHE_ALIAS
+from django.core.cache import caches, DEFAULT_CACHE_ALIAS
 from django.utils.cache import get_cache_key, learn_cache_key, patch_response_headers, get_max_age
+from django.utils.deprecation import RemovedInDjango18Warning
 
 
 class UpdateCacheMiddleware(object):
@@ -67,7 +65,7 @@ class UpdateCacheMiddleware(object):
         self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
         self.cache_anonymous_only = getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
-        self.cache = get_cache(self.cache_alias)
+        self.cache = caches[self.cache_alias]
 
     def _session_accessed(self, request):
         try:
@@ -99,7 +97,7 @@ class UpdateCacheMiddleware(object):
         # Control" header before reverting to using the default cache_timeout
         # length.
         timeout = get_max_age(response)
-        if timeout == None:
+        if timeout is None:
             timeout = self.cache_timeout
         elif timeout == 0:
             # max-age was set to 0, don't bother caching.
@@ -115,6 +113,7 @@ class UpdateCacheMiddleware(object):
                 self.cache.set(cache_key, response, timeout)
         return response
 
+
 class FetchFromCacheMiddleware(object):
     """
     Request-phase cache middleware that fetches a page from the cache.
@@ -124,10 +123,9 @@ class FetchFromCacheMiddleware(object):
     MIDDLEWARE_CLASSES so that it'll get called last during the request phase.
     """
     def __init__(self):
-        self.cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
         self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
-        self.cache = get_cache(self.cache_alias)
+        self.cache = caches[self.cache_alias]
 
     def process_request(self, request):
         """
@@ -136,13 +134,13 @@ class FetchFromCacheMiddleware(object):
         """
         if not request.method in ('GET', 'HEAD'):
             request._cache_update_cache = False
-            return None # Don't bother checking the cache.
+            return None  # Don't bother checking the cache.
 
         # try and get the cached GET response
         cache_key = get_cache_key(request, self.key_prefix, 'GET', cache=self.cache)
         if cache_key is None:
             request._cache_update_cache = True
-            return None # No cache information available, need to rebuild.
+            return None  # No cache information available, need to rebuild.
         response = self.cache.get(cache_key, None)
         # if it wasn't found and we are looking for a HEAD, try looking just for that
         if response is None and request.method == 'HEAD':
@@ -151,11 +149,12 @@ class FetchFromCacheMiddleware(object):
 
         if response is None:
             request._cache_update_cache = True
-            return None # No cache information available, need to rebuild.
+            return None  # No cache information available, need to rebuild.
 
         # hit, return cached response
         request._cache_update_cache = False
         return response
+
 
 class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
     """
@@ -170,35 +169,32 @@ class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
         # we fall back to system defaults. If it is not provided at all,
         # we need to use middleware defaults.
 
-        cache_kwargs = {}
+        try:
+            key_prefix = kwargs['key_prefix']
+            if key_prefix is None:
+                key_prefix = ''
+        except KeyError:
+            key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
+        self.key_prefix = key_prefix
 
         try:
-            self.key_prefix = kwargs['key_prefix']
-            if self.key_prefix is not None:
-                cache_kwargs['KEY_PREFIX'] = self.key_prefix
-            else:
-                self.key_prefix = ''
+            cache_alias = kwargs['cache_alias']
+            if cache_alias is None:
+                cache_alias = DEFAULT_CACHE_ALIAS
         except KeyError:
-            self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
-            cache_kwargs['KEY_PREFIX'] = self.key_prefix
+            cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
+        self.cache_alias = cache_alias
 
-        try:
-            self.cache_alias = kwargs['cache_alias']
-            if self.cache_alias is None:
-                self.cache_alias = DEFAULT_CACHE_ALIAS
-            if cache_timeout is not None:
-                cache_kwargs['TIMEOUT'] = cache_timeout
-        except KeyError:
-            self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
-            if cache_timeout is None:
-                cache_kwargs['TIMEOUT'] = settings.CACHE_MIDDLEWARE_SECONDS
-            else:
-                cache_kwargs['TIMEOUT'] = cache_timeout
+        if cache_timeout is None:
+            cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
+        self.cache_timeout = cache_timeout
 
         if cache_anonymous_only is None:
-            self.cache_anonymous_only = getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
-        else:
-            self.cache_anonymous_only = cache_anonymous_only
+            cache_anonymous_only = getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
+        self.cache_anonymous_only = cache_anonymous_only
 
-        self.cache = get_cache(self.cache_alias, **cache_kwargs)
-        self.cache_timeout = self.cache.default_timeout
+        if self.cache_anonymous_only:
+            msg = "CACHE_MIDDLEWARE_ANONYMOUS_ONLY has been deprecated and will be removed in Django 1.8."
+            warnings.warn(msg, RemovedInDjango18Warning, stacklevel=1)
+
+        self.cache = caches[self.cache_alias]

@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.conf.urls import patterns
 
@@ -11,8 +11,8 @@ urlpatterns = patterns('',
 )
 
 urlpatterns += patterns('django.contrib.gis.sitemaps.views',
-    (r'^sitemap.xml$', 'index', {'sitemaps' : sitemaps}),
-    (r'^sitemaps/(?P<section>\w+)\.xml$', 'sitemap', {'sitemaps' : sitemaps}),
+    (r'^sitemap.xml$', 'index', {'sitemaps': sitemaps}),
+    (r'^sitemaps/(?P<section>\w+)\.xml$', 'sitemap', {'sitemaps': sitemaps}),
     (r'^sitemaps/kml/(?P<label>\w+)/(?P<model>\w+)/(?P<field_name>\w+)\.kml$', 'kml'),
     (r'^sitemaps/kml/(?P<label>\w+)/(?P<model>\w+)/(?P<field_name>\w+)\.kmz$', 'kmz'),
 )

@@ -1,5 +1,10 @@
-from django.db.models.sql.aggregates import *
+from django.db.models.sql import aggregates
+from django.db.models.sql.aggregates import *  # NOQA
 from django.contrib.gis.db.models.fields import GeometryField
+
+
+__all__ = ['Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union'] + aggregates.__all__
+
 
 class GeoAggregate(Aggregate):
     # Default SQL template for spatial aggregates.
@@ -32,7 +37,7 @@ class GeoAggregate(Aggregate):
         if hasattr(self.col, 'as_sql'):
             field_name, params = self.col.as_sql(qn, connection)
         elif isinstance(self.col, (list, tuple)):
-            field_name = '.'.join([qn(c) for c in self.col])
+            field_name = '.'.join(qn(c) for c in self.col)
         else:
             field_name = self.col
 
@@ -46,17 +51,22 @@ class GeoAggregate(Aggregate):
 
         return sql_template % substitutions, params
 
+
 class Collect(GeoAggregate):
     pass
+
 
 class Extent(GeoAggregate):
     is_extent = '2D'
 
+
 class Extent3D(GeoAggregate):
     is_extent = '3D'
 
+
 class MakeLine(GeoAggregate):
     pass
+
 
 class Union(GeoAggregate):
     pass

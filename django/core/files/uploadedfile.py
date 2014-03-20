@@ -2,6 +2,7 @@
 Classes representing uploaded files.
 """
 
+import errno
 import os
 from io import BytesIO
 
@@ -13,6 +14,7 @@ from django.utils.encoding import force_str
 __all__ = ('UploadedFile', 'TemporaryUploadedFile', 'InMemoryUploadedFile',
            'SimpleUploadedFile')
 
+
 class UploadedFile(File):
     """
     A abstract uploaded file (``TemporaryUploadedFile`` and
@@ -21,13 +23,14 @@ class UploadedFile(File):
     An ``UploadedFile`` object behaves somewhat like a file object and
     represents some file data that the user submitted with a form.
     """
-    DEFAULT_CHUNK_SIZE = 64 * 2**10
+    DEFAULT_CHUNK_SIZE = 64 * 2 ** 10
 
-    def __init__(self, file=None, name=None, content_type=None, size=None, charset=None):
+    def __init__(self, file=None, name=None, content_type=None, size=None, charset=None, content_type_extra=None):
         super(UploadedFile, self).__init__(file, name)
         self.size = size
         self.content_type = content_type
         self.charset = charset
+        self.content_type_extra = content_type_extra
 
     def __repr__(self):
         return force_str("<%s: %s (%s)>" % (
@@ -45,23 +48,25 @@ class UploadedFile(File):
             # File names longer than 255 characters can cause problems on older OSes.
             if len(name) > 255:
                 name, ext = os.path.splitext(name)
+                ext = ext[:255]
                 name = name[:255 - len(ext)] + ext
 
         self._name = name
 
     name = property(_get_name, _set_name)
 
+
 class TemporaryUploadedFile(UploadedFile):
     """
     A file uploaded to a temporary location (i.e. stream-to-disk).
     """
-    def __init__(self, name, content_type, size, charset):
+    def __init__(self, name, content_type, size, charset, content_type_extra=None):
         if settings.FILE_UPLOAD_TEMP_DIR:
             file = tempfile.NamedTemporaryFile(suffix='.upload',
                 dir=settings.FILE_UPLOAD_TEMP_DIR)
         else:
             file = tempfile.NamedTemporaryFile(suffix='.upload')
-        super(TemporaryUploadedFile, self).__init__(file, name, content_type, size, charset)
+        super(TemporaryUploadedFile, self).__init__(file, name, content_type, size, charset, content_type_extra)
 
     def temporary_file_path(self):
         """
@@ -73,18 +78,19 @@ class TemporaryUploadedFile(UploadedFile):
         try:
             return self.file.close()
         except OSError as e:
-            if e.errno != 2:
+            if e.errno != errno.ENOENT:
                 # Means the file was moved or deleted before the tempfile
                 # could unlink it.  Still sets self.file.close_called and
                 # calls self.file.file.close() before the exception
                 raise
 
+
 class InMemoryUploadedFile(UploadedFile):
     """
     A file uploaded into memory (i.e. stream-to-memory).
     """
-    def __init__(self, file, field_name, name, content_type, size, charset):
-        super(InMemoryUploadedFile, self).__init__(file, name, content_type, size, charset)
+    def __init__(self, file, field_name, name, content_type, size, charset, content_type_extra=None):
+        super(InMemoryUploadedFile, self).__init__(file, name, content_type, size, charset, content_type_extra)
         self.field_name = field_name
 
     def open(self, mode=None):
@@ -109,8 +115,9 @@ class SimpleUploadedFile(InMemoryUploadedFile):
     def __init__(self, name, content, content_type='text/plain'):
         content = content or b''
         super(SimpleUploadedFile, self).__init__(BytesIO(content), None, name,
-                                                 content_type, len(content), None)
+                                                 content_type, len(content), None, None)
 
+    @classmethod
     def from_dict(cls, file_dict):
         """
         Creates a SimpleUploadedFile object from
@@ -122,4 +129,3 @@ class SimpleUploadedFile(InMemoryUploadedFile):
         return cls(file_dict['filename'],
                    file_dict['content'],
                    file_dict.get('content-type', 'text/plain'))
-    from_dict = classmethod(from_dict)

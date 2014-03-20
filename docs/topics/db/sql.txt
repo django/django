@@ -23,11 +23,11 @@ return model instances:
 
 .. method:: Manager.raw(raw_query, params=None, translations=None)
 
-This method method takes a raw SQL query, executes it, and returns a
+This method takes a raw SQL query, executes it, and returns a
 ``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
-can be iterated over just like an normal QuerySet to provide object instances.
+can be iterated over just like a normal QuerySet to provide object instances.
 
-This is best illustrated with an example. Suppose you've got the following model::
+This is best illustrated with an example. Suppose you have the following model::
 
     class Person(models.Model):
         first_name = models.CharField(...)
@@ -86,7 +86,7 @@ had ``Person`` data in it, you could easily map it into ``Person`` instances::
     >>> Person.objects.raw('''SELECT first AS first_name,
     ...                              last AS last_name,
     ...                              bd AS birth_date,
-    ...                              pk as id,
+    ...                              pk AS id,
     ...                       FROM some_other_table''')
 
 As long as the names match, the model instances will be created correctly.
@@ -105,13 +105,13 @@ Index lookups
 ``raw()`` supports indexing, so if you need only the first result you can
 write::
 
-    >>> first_person = Person.objects.raw('SELECT * from myapp_person')[0]
+    >>> first_person = Person.objects.raw('SELECT * FROM myapp_person')[0]
 
 However, the indexing and slicing are not performed at the database level. If
-you have a big amount of ``Person`` objects in your database, it is more
+you have a large number of ``Person`` objects in your database, it is more
 efficient to limit the query at the SQL level::
 
-    >>> first_person = Person.objects.raw('SELECT * from myapp_person LIMIT 1')[0]
+    >>> first_person = Person.objects.raw('SELECT * FROM myapp_person LIMIT 1')[0]
 
 Deferring model fields
 ----------------------
@@ -166,9 +166,17 @@ argument to ``raw()``::
     >>> lname = 'Doe'
     >>> Person.objects.raw('SELECT * FROM myapp_person WHERE last_name = %s', [lname])
 
-``params`` is a list of parameters. You'll use ``%s`` placeholders in the
-query string (regardless of your database engine); they'll be replaced with
-parameters from the ``params`` list.
+``params`` is a list or dictionary of parameters. You'll use ``%s``
+placeholders in the query string for a list, or ``%(key)s``
+placeholders for a dictionary (where ``key`` is replaced by a
+dictionary key, of course), regardless of your database engine.  Such
+placeholders will be replaced with parameters from the ``params``
+argument.
+
+.. note:: Dictionary params not supported with SQLite
+
+   Dictionary params are not supported with the SQLite backend; with
+   this backend, you must pass parameters as a list.
 
 .. warning::
 
@@ -181,13 +189,20 @@ parameters from the ``params`` list.
 
     **Don't.**
 
-    Using the ``params`` list completely protects you from `SQL injection
+    Using the ``params`` argument completely protects you from `SQL injection
     attacks`__, a common exploit where attackers inject arbitrary SQL into
     your database. If you use string interpolation, sooner or later you'll
     fall victim to SQL injection. As long as you remember to always use the
-    ``params`` list you'll be protected.
+    ``params`` argument you'll be protected.
 
 __ http://en.wikipedia.org/wiki/SQL_injection
+
+.. versionchanged:: 1.6
+
+    In Django 1.5 and earlier, you could pass parameters as dictionaries
+    when using PostgreSQL or MySQL, although this wasn't documented. Now
+    you can also do this when using Oracle, and it is officially supported.
+
 
 .. _executing-custom-sql:
 
@@ -232,7 +247,7 @@ Note that if you want to include literal percent signs in the query, you have to
 double them in the case you are passing parameters::
 
      cursor.execute("SELECT foo FROM bar WHERE baz = '30%'")
-     cursor.execute("SELECT foo FROM bar WHERE baz = '30%%' and id = %s", [self.id])
+     cursor.execute("SELECT foo FROM bar WHERE baz = '30%%' AND id = %s", [self.id])
 
 If you are using :doc:`more than one database </topics/db/multi-db>`, you can
 use ``django.db.connections`` to obtain the connection (and cursor) for a
@@ -259,11 +274,11 @@ names, which means you end up with a ``list`` of values, rather than a
 
 Here is an example of the difference between the two::
 
-    >>> cursor.execute("SELECT id, parent_id from test LIMIT 2");
+    >>> cursor.execute("SELECT id, parent_id FROM test LIMIT 2");
     >>> cursor.fetchall()
     ((54360982L, None), (54360880L, None))
 
-    >>> cursor.execute("SELECT id, parent_id from test LIMIT 2");
+    >>> cursor.execute("SELECT id, parent_id FROM test LIMIT 2");
     >>> dictfetchall(cursor)
     [{'parent_id': None, 'id': 54360982L}, {'parent_id': None, 'id': 54360880L}]
 
@@ -282,3 +297,30 @@ database library will automatically escape your parameters as necessary.
 Also note that Django expects the ``"%s"`` placeholder, *not* the ``"?"``
 placeholder, which is used by the SQLite Python bindings. This is for the sake
 of consistency and sanity.
+
+.. versionchanged:: 1.7
+
+:pep:`249` does not state whether a cursor should be usable as a context
+manager. Prior to Python 2.7, a cursor was usable as a context manager due
+an unexpected behavior in magic method lookups (`Python ticket #9220`_).
+Django 1.7 explicitly added support to allow using a cursor as context
+manager.
+
+.. _`Python ticket #9220`: http://bugs.python.org/issue9220
+
+Using a cursor as a context manager:
+
+.. code-block:: python
+
+    with connection.cursor() as c:
+        c.execute(...)
+
+is equivalent to:
+
+.. code-block:: python
+
+    c = connection.cursor()
+    try:
+        c.execute(...)
+    finally:
+        c.close()

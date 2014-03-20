@@ -1,14 +1,16 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
-import sys
 import time
+import unittest
 
 from django.conf import settings
-from django.db import transaction, connection
+from django.db import transaction, connection, router
 from django.db.utils import ConnectionHandler, DEFAULT_DB_ALIAS, DatabaseError
 from django.test import (TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
-from django.utils import unittest
+from django.test import override_settings
+
+from multiple_database.routers import TestRouter
 
 from .models import Person
 
@@ -21,7 +23,12 @@ except ImportError:
 requires_threading = unittest.skipUnless(threading, 'requires threading')
 
 
+# We need to set settings.DEBUG to True so we can capture the output SQL
+# to examine.
+@override_settings(DEBUG=True)
 class SelectForUpdateTests(TransactionTestCase):
+
+    available_apps = ['select_for_update']
 
     def setUp(self):
         transaction.enter_transaction_management()
@@ -37,11 +44,6 @@ class SelectForUpdateTests(TransactionTestCase):
         self.new_connection = new_connections[DEFAULT_DB_ALIAS]
         self.new_connection.enter_transaction_management()
 
-        # We need to set settings.DEBUG to True so we can capture
-        # the output SQL to examine.
-        self._old_debug = settings.DEBUG
-        settings.DEBUG = True
-
     def tearDown(self):
         try:
             # We don't really care if this fails - some of the tests will set
@@ -51,7 +53,6 @@ class SelectForUpdateTests(TransactionTestCase):
         except transaction.TransactionManagementError:
             pass
         self.new_connection.close()
-        settings.DEBUG = self._old_debug
         try:
             self.end_blocking_transaction()
         except (DatabaseError, AttributeError):
@@ -64,7 +65,7 @@ class SelectForUpdateTests(TransactionTestCase):
         sql = 'SELECT * FROM %(db_table)s %(for_update)s;' % {
             'db_table': Person._meta.db_table,
             'for_update': self.new_connection.ops.for_update_sql(),
-            }
+        }
         self.cursor.execute(sql, ())
         self.cursor.fetchone()
 
@@ -97,15 +98,8 @@ class SelectForUpdateTests(TransactionTestCase):
         list(Person.objects.all().select_for_update(nowait=True))
         self.assertTrue(self.has_for_update_sql(connection, nowait=True))
 
-    # In Python 2.6 beta and some final releases, exceptions raised in __len__
-    # are swallowed (Python issue 1242657), so these cases return an empty
-    # list, rather than raising an exception. Not a lot we can do about that,
-    # unfortunately, due to the way Python handles list() calls internally.
-    # Python 2.6.1 is the "in the wild" version affected by this, so we skip
-    # the test for that version.
     @requires_threading
     @skipUnlessDBFeature('has_select_for_update_nowait')
-    @unittest.skipIf(sys.version_info[:3] == (2, 6, 1), "Python version is 2.6.1")
     def test_nowait_raises_error_on_block(self):
         """
         If nowait is specified, we expect an error to be raised rather
@@ -126,15 +120,8 @@ class SelectForUpdateTests(TransactionTestCase):
         self.end_blocking_transaction()
         self.assertIsInstance(status[-1], DatabaseError)
 
-    # In Python 2.6 beta and some final releases, exceptions raised in __len__
-    # are swallowed (Python issue 1242657), so these cases return an empty
-    # list, rather than raising an exception. Not a lot we can do about that,
-    # unfortunately, due to the way Python handles list() calls internally.
-    # Python 2.6.1 is the "in the wild" version affected by this, so we skip
-    # the test for that version.
     @skipIfDBFeature('has_select_for_update_nowait')
     @skipUnlessDBFeature('has_select_for_update')
-    @unittest.skipIf(sys.version_info[:3] == (2, 6, 1), "Python version is 2.6.1")
     def test_unsupported_nowait_raises_error(self):
         """
         If a SELECT...FOR UPDATE NOWAIT is run on a database backend
@@ -232,6 +219,7 @@ class SelectForUpdateTests(TransactionTestCase):
         raises the correct exception
         """
         self.start_blocking_transaction()
+
         def raw(status):
             try:
                 list(
@@ -264,5 +252,15 @@ class SelectForUpdateTests(TransactionTestCase):
         means that it will be either committed or rolled back by Django,
         which will release any locks held by the SELECT FOR UPDATE.
         """
-        people = list(Person.objects.select_for_update())
+        list(Person.objects.select_for_update())
         self.assertTrue(transaction.is_dirty())
+
+    @skipUnlessDBFeature('has_select_for_update')
+    def test_select_for_update_on_multidb(self):
+        old_routers = router.routers
+        try:
+            router.routers = [TestRouter()]
+            query = Person.objects.select_for_update()
+            self.assertEqual(router.db_for_write(Person), query.db)
+        finally:
+            router.routers = old_routers

@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.core.exceptions import FieldError
 from django.test import TestCase
@@ -19,7 +19,7 @@ class ReverseLookupTests(TestCase):
             question="What's the second question?",
             creator=jim
         )
-        new_choice = Choice.objects.create(
+        Choice.objects.create(
             poll=first_poll,
             related_poll=second_poll,
             name="This is the answer."

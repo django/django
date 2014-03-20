@@ -54,7 +54,7 @@ following model, which would represent entries in a Weblog::
 Now, suppose that we want the following steps to be applied whenever a
 new comment is posted on an ``Entry``:
 
-1. If the ``Entry``'s ``enable_comments`` field is ``False``, the
+1. If the ``Entry``’s ``enable_comments`` field is ``False``, the
    comment will simply be disallowed (i.e., immediately deleted).
 
 2. If the ``enable_comments`` field is ``True``, the comment will be
@@ -222,7 +222,7 @@ models with an instance of the subclass.
     :func:`moderator.unregister` methods detailed above, the following methods
     on :class:`Moderator` can be overridden to achieve customized behavior:
 
-    .. method:: connect
+    .. method:: connect()
 
         Determines how moderation is set up globally. The base
         implementation in

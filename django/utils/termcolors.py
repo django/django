@@ -5,11 +5,12 @@ termcolors.py
 from django.utils import six
 
 color_names = ('black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white')
-foreground = dict([(color_names[x], '3%s' % x) for x in range(8)])
-background = dict([(color_names[x], '4%s' % x) for x in range(8)])
+foreground = dict((color_names[x], '3%s' % x) for x in range(8))
+background = dict((color_names[x], '4%s' % x) for x in range(8))
 
 RESET = '0'
 opt_dict = {'bold': '1', 'underscore': '4', 'blink': '5', 'reverse': '7', 'conceal': '8'}
+
 
 def colorize(text='', opts=(), **kwargs):
     """
@@ -55,6 +56,7 @@ def colorize(text='', opts=(), **kwargs):
         text = '%s\x1b[%sm' % (text or '', RESET)
     return '%s%s' % (('\x1b[%sm' % ';'.join(code_list)), text or '')
 
+
 def make_style(opts=(), **kwargs):
     """
     Returns a function with default parameters for colorize()
@@ -73,52 +75,68 @@ LIGHT_PALETTE = 'light'
 
 PALETTES = {
     NOCOLOR_PALETTE: {
-        'ERROR':        {},
-        'NOTICE':       {},
-        'SQL_FIELD':    {},
-        'SQL_COLTYPE':  {},
-        'SQL_KEYWORD':  {},
-        'SQL_TABLE':    {},
-        'HTTP_INFO':         {},
-        'HTTP_SUCCESS':      {},
-        'HTTP_REDIRECT':     {},
+        'ERROR': {},
+        'WARNING': {},
+        'NOTICE': {},
+        'SQL_FIELD': {},
+        'SQL_COLTYPE': {},
+        'SQL_KEYWORD': {},
+        'SQL_TABLE': {},
+        'HTTP_INFO': {},
+        'HTTP_SUCCESS': {},
+        'HTTP_REDIRECT': {},
         'HTTP_NOT_MODIFIED': {},
-        'HTTP_BAD_REQUEST':  {},
-        'HTTP_NOT_FOUND':    {},
+        'HTTP_BAD_REQUEST': {},
+        'HTTP_NOT_FOUND': {},
         'HTTP_SERVER_ERROR': {},
+        'MIGRATE_HEADING': {},
+        'MIGRATE_LABEL': {},
+        'MIGRATE_SUCCESS': {},
+        'MIGRATE_FAILURE': {},
     },
     DARK_PALETTE: {
-        'ERROR':        { 'fg': 'red', 'opts': ('bold',) },
-        'NOTICE':       { 'fg': 'red' },
-        'SQL_FIELD':    { 'fg': 'green', 'opts': ('bold',) },
-        'SQL_COLTYPE':  { 'fg': 'green' },
-        'SQL_KEYWORD':  { 'fg': 'yellow' },
-        'SQL_TABLE':    { 'opts': ('bold',) },
-        'HTTP_INFO':         { 'opts': ('bold',) },
-        'HTTP_SUCCESS':      { },
-        'HTTP_REDIRECT':     { 'fg': 'green' },
-        'HTTP_NOT_MODIFIED': { 'fg': 'cyan' },
-        'HTTP_BAD_REQUEST':  { 'fg': 'red', 'opts': ('bold',) },
-        'HTTP_NOT_FOUND':    { 'fg': 'yellow' },
-        'HTTP_SERVER_ERROR': { 'fg': 'magenta', 'opts': ('bold',) },
+        'ERROR': {'fg': 'red', 'opts': ('bold',)},
+        'WARNING': {'fg': 'yellow', 'opts': ('bold',)},
+        'NOTICE': {'fg': 'red'},
+        'SQL_FIELD': {'fg': 'green', 'opts': ('bold',)},
+        'SQL_COLTYPE': {'fg': 'green'},
+        'SQL_KEYWORD': {'fg': 'yellow'},
+        'SQL_TABLE': {'opts': ('bold',)},
+        'HTTP_INFO': {'opts': ('bold',)},
+        'HTTP_SUCCESS': {},
+        'HTTP_REDIRECT': {'fg': 'green'},
+        'HTTP_NOT_MODIFIED': {'fg': 'cyan'},
+        'HTTP_BAD_REQUEST': {'fg': 'red', 'opts': ('bold',)},
+        'HTTP_NOT_FOUND': {'fg': 'yellow'},
+        'HTTP_SERVER_ERROR': {'fg': 'magenta', 'opts': ('bold',)},
+        'MIGRATE_HEADING': {'fg': 'cyan', 'opts': ('bold',)},
+        'MIGRATE_LABEL': {'opts': ('bold',)},
+        'MIGRATE_SUCCESS': {'fg': 'green', 'opts': ('bold',)},
+        'MIGRATE_FAILURE': {'fg': 'red', 'opts': ('bold',)},
     },
     LIGHT_PALETTE: {
-        'ERROR':        { 'fg': 'red', 'opts': ('bold',) },
-        'NOTICE':       { 'fg': 'red' },
-        'SQL_FIELD':    { 'fg': 'green', 'opts': ('bold',) },
-        'SQL_COLTYPE':  { 'fg': 'green' },
-        'SQL_KEYWORD':  { 'fg': 'blue' },
-        'SQL_TABLE':    { 'opts': ('bold',) },
-        'HTTP_INFO':         { 'opts': ('bold',) },
-        'HTTP_SUCCESS':      { },
-        'HTTP_REDIRECT':     { 'fg': 'green', 'opts': ('bold',) },
-        'HTTP_NOT_MODIFIED': { 'fg': 'green' },
-        'HTTP_BAD_REQUEST':  { 'fg': 'red', 'opts': ('bold',) },
-        'HTTP_NOT_FOUND':    { 'fg': 'red' },
-        'HTTP_SERVER_ERROR': { 'fg': 'magenta', 'opts': ('bold',) },
+        'ERROR': {'fg': 'red', 'opts': ('bold',)},
+        'WARNING': {'fg': 'yellow', 'opts': ('bold',)},
+        'NOTICE': {'fg': 'red'},
+        'SQL_FIELD': {'fg': 'green', 'opts': ('bold',)},
+        'SQL_COLTYPE': {'fg': 'green'},
+        'SQL_KEYWORD': {'fg': 'blue'},
+        'SQL_TABLE': {'opts': ('bold',)},
+        'HTTP_INFO': {'opts': ('bold',)},
+        'HTTP_SUCCESS': {},
+        'HTTP_REDIRECT': {'fg': 'green', 'opts': ('bold',)},
+        'HTTP_NOT_MODIFIED': {'fg': 'green'},
+        'HTTP_BAD_REQUEST': {'fg': 'red', 'opts': ('bold',)},
+        'HTTP_NOT_FOUND': {'fg': 'red'},
+        'HTTP_SERVER_ERROR': {'fg': 'magenta', 'opts': ('bold',)},
+        'MIGRATE_HEADING': {'fg': 'cyan', 'opts': ('bold',)},
+        'MIGRATE_LABEL': {'opts': ('bold',)},
+        'MIGRATE_SUCCESS': {'fg': 'green', 'opts': ('bold',)},
+        'MIGRATE_FAILURE': {'fg': 'red', 'opts': ('bold',)},
     }
 }
 DEFAULT_PALETTE = DARK_PALETTE
+
 
 def parse_color_setting(config_string):
     """Parse a DJANGO_COLORS environment variable to produce the system palette

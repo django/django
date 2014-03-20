@@ -1,5 +1,7 @@
+import unittest
+
 from django.template.smartif import IfParser
-from django.utils import unittest
+
 
 class SmartIfTests(unittest.TestCase):
 
@@ -22,13 +24,13 @@ class SmartIfTests(unittest.TestCase):
         self.assertTrue(var.eval({}))
 
     def test_in(self):
-        list_ = [1,2,3]
+        list_ = [1, 2, 3]
         self.assertCalcEqual(True, [1, 'in', list_])
         self.assertCalcEqual(False, [1, 'in', None])
         self.assertCalcEqual(False, [None, 'in', list_])
 
     def test_not_in(self):
-        list_ = [1,2,3]
+        list_ = [1, 2, 3]
         self.assertCalcEqual(False, [1, 'not', 'in', list_])
         self.assertCalcEqual(True, [4, 'not', 'in', list_])
         self.assertCalcEqual(False, [1, 'not', 'in', None])

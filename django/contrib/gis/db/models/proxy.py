@@ -8,6 +8,7 @@ Thanks to Robert Coup for providing this functionality (see #4322).
 from django.contrib.gis import memoryview
 from django.utils import six
 
+
 class GeometryProxy(object):
     def __init__(self, klass, field):
         """
@@ -32,7 +33,7 @@ class GeometryProxy(object):
 
         if isinstance(geom_value, self._klass):
             geom = geom_value
-        elif (geom_value is None) or (geom_value==''):
+        elif (geom_value is None) or (geom_value == ''):
             geom = None
         else:
             # Otherwise, a Geometry object is built using the field's contents,
@@ -54,12 +55,14 @@ class GeometryProxy(object):
         # general GeometryField is used.
         if isinstance(value, self._klass) and (str(value.geom_type).upper() == gtype or gtype == 'GEOMETRY'):
             # Assigning the SRID to the geometry.
-            if value.srid is None: value.srid = self._field.srid
+            if value.srid is None:
+                value.srid = self._field.srid
         elif value is None or isinstance(value, six.string_types + (memoryview,)):
             # Set with None, WKT, HEX, or WKB
             pass
         else:
-            raise TypeError('cannot set %s GeometryProxy with value of type: %s' % (obj.__class__.__name__, type(value)))
+            raise TypeError('Cannot set %s GeometryProxy (%s) with value of type: %s' % (
+                obj.__class__.__name__, gtype, type(value)))
 
         # Setting the objects dictionary with the value, and returning.
         obj.__dict__[self._field.attname] = value

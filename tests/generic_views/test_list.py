@@ -1,8 +1,7 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.views.generic.base import View
 from django.utils.encoding import force_str
 
@@ -24,7 +23,7 @@ class ListViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertTemplateUsed(res, 'generic_views/author_list.html')
         self.assertEqual(list(res.context['object_list']), list(Author.objects.all()))
-        self.assertTrue(isinstance(res.context['view'], View))
+        self.assertIsInstance(res.context['view'], View)
         self.assertIs(res.context['author_list'], res.context['object_list'])
         self.assertIsNone(res.context['paginator'])
         self.assertIsNone(res.context['page_obj'])

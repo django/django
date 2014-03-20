@@ -3,8 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.flatpages.models import FlatPage
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 
 
 @override_settings(
@@ -43,7 +42,7 @@ class FlatpageViewTests(TestCase):
         response = self.client.get('/flatpage_root/sekrit/')
         self.assertRedirects(response, '/accounts/login/?next=/flatpage_root/sekrit/')
         User.objects.create_user('testuser', 'test@example.com', 's3krit')
-        self.client.login(username='testuser',password='s3krit')
+        self.client.login(username='testuser', password='s3krit')
         response = self.client.get('/flatpage_root/sekrit/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<p>Isn't it sekrit!</p>")
@@ -54,7 +53,7 @@ class FlatpageViewTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage won't be served if the fallback middlware is disabled"
+        "A non-existent flatpage won't be served if the fallback middleware is disabled"
         response = self.client.get('/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 
@@ -75,7 +74,7 @@ class FlatpageViewTests(TestCase):
 
 
 @override_settings(
-    APPEND_SLASH = True,
+    APPEND_SLASH=True,
     LOGIN_URL='/accounts/login/',
     MIDDLEWARE_CLASSES=(
         'django.middleware.common.CommonMiddleware',
@@ -110,7 +109,7 @@ class FlatpageViewAppendSlashTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_redirect_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage won't be served if the fallback middlware is disabled and should not add a slash"
+        "A non-existent flatpage won't be served if the fallback middleware is disabled and should not add a slash"
         response = self.client.get('/no_such_flatpage')
         self.assertEqual(response.status_code, 404)
 
