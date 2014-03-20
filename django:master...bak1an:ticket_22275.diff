@@ -1,0 +1,96 @@
+diff --git a/django/db/migrations/autodetector.py b/django/db/migrations/autodetector.py
+index cbc4604..152fde9 100644
+--- a/django/db/migrations/autodetector.py
++++ b/django/db/migrations/autodetector.py
+@@ -136,6 +136,7 @@ def _rel_agnostic_fields_def(fields):
+         # Phase 2 is progressively adding pending models, splitting up into two
+         # migrations if required.
+         pending_new_fks = []
++        pending_unique_together = []
+         added_phase_2 = set()
+         while pending_add:
+             # Is there one we can add that has all dependencies satisfied?
+@@ -172,6 +173,11 @@ def _rel_agnostic_fields_def(fields):
+             else:
+                 (app_label, model_name), related_fields = sorted(pending_add.items())[0]
+                 model_state = self.to_state.models[app_label, model_name]
++                # Defer unique together constraints creation, see ticket #22275
++                unique_together_constraints = model_state.options.pop('unique_together', None)
++                if unique_together_constraints:
++                    pending_unique_together.append((app_label, model_name,
++                                                   unique_together_constraints))
+                 # Work out the fields that need splitting out
+                 bad_fields = dict((f, (al, mn)) for f, al, mn in related_fields if (al, mn) in pending_add)
+                 # Create the model, without those
+@@ -206,6 +212,15 @@ def _rel_agnostic_fields_def(fields):
+                 self.add_swappable_dependency(app_label, swappable_setting)
+             elif app_label != other_app_label:
+                 self.add_dependency(app_label, other_app_label)
++        # Phase 3.1 - unique together constraints
++        for app_label, model_name, unique_together in pending_unique_together:
++            self.add_to_migration(
++                app_label,
++                operations.AlterUniqueTogether(
++                    name=model_name,
++                    unique_together=unique_together
++                )
++            )
+         # Removing models
+         removed_models = set(old_model_keys) - set(new_model_keys)
+         for app_label, model_name in removed_models:
+diff --git a/tests/migrations/test_autodetector.py b/tests/migrations/test_autodetector.py
+index c3ada83..40e540d 100644
+--- a/tests/migrations/test_autodetector.py
++++ b/tests/migrations/test_autodetector.py
+@@ -37,6 +37,8 @@ class AutodetectorTests(TestCase):
+     book_unique_3 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("newfield", models.IntegerField()), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("title", "newfield")]})
+     edition = ModelState("thirdapp", "Edition", [("id", models.AutoField(primary_key=True)), ("book", models.ForeignKey("otherapp.Book"))])
+     custom_user = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))])
++    knight = ModelState("eggs", "Knight", [("id", models.AutoField(primary_key=True))])
++    rabbit = ModelState("eggs", "Rabbit", [("id", models.AutoField(primary_key=True)), ("knight", models.ForeignKey("eggs.Knight")), ("parent", models.ForeignKey("eggs.Rabbit"))], {"unique_together": [("parent", "knight")]})
+ 
+     def make_project_state(self, model_states):
+         "Shortcut to make ProjectStates from lists of predefined models"
+@@ -370,6 +372,42 @@ def test_same_app_circular_fk_dependency(self):
+         self.assertEqual(migration1.dependencies, [])
+         self.assertEqual(migration2.dependencies, [("testapp", "auto_1")])
+ 
++    def test_same_app_circular_fk_dependency_and_unique_together(self):
++        """
++        Tests that a migration with circular FK dependency does not try to
++        create unique together constraint before creating all required fields first.
++        See ticket #22275.
++        """
++        # Make state
++        before = self.make_project_state([])
++        after = self.make_project_state([self.knight, self.rabbit])
++        autodetector = MigrationAutodetector(before, after)
++        changes = autodetector._detect_changes()
++        # Right number of migrations?
++        self.assertEqual(len(changes['eggs']), 2)
++        # Right number of actions?
++        migration1 = changes['eggs'][0]
++        self.assertEqual(len(migration1.operations), 2)
++        migration2 = changes['eggs'][1]
++        self.assertEqual(len(migration2.operations), 2)
++        # Right actions?
++        action = migration1.operations[0]
++        self.assertEqual(action.__class__.__name__, "CreateModel")
++        action = migration1.operations[1]
++        self.assertEqual(action.__class__.__name__, "CreateModel")
++        # CreateModel action for Rabbit should not have unique_together now
++        self.assertEqual(action.name, "Rabbit")
++        self.assertFalse("unique_together" in action.options)
++        action = migration2.operations[0]
++        self.assertEqual(action.__class__.__name__, "AddField")
++        self.assertEqual(action.name, "parent")
++        action = migration2.operations[1]
++        self.assertEqual(action.__class__.__name__, "AlterUniqueTogether")
++        self.assertEqual(action.name, "rabbit")
++        # Right dependencies?
++        self.assertEqual(migration1.dependencies, [])
++        self.assertEqual(migration2.dependencies, [("eggs", "auto_1")])
++
+     def test_unique_together(self):
+         "Tests unique_together detection"
+         # Make state

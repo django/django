@@ -136,6 +136,7 @@ class MigrationAutodetector(object):
         # Phase 2 is progressively adding pending models, splitting up into two
         # migrations if required.
         pending_new_fks = []
+        pending_unique_together = []
         added_phase_2 = set()
         while pending_add:
             # Is there one we can add that has all dependencies satisfied?
@@ -172,6 +173,11 @@ class MigrationAutodetector(object):
             else:
                 (app_label, model_name), related_fields = sorted(pending_add.items())[0]
                 model_state = self.to_state.models[app_label, model_name]
+                # Defer unique together constraints creation, see ticket #22275
+                unique_together_constraints = model_state.options.pop('unique_together', None)
+                if unique_together_constraints:
+                    pending_unique_together.append((app_label, model_name,
+                                                   unique_together_constraints))
                 # Work out the fields that need splitting out
                 bad_fields = dict((f, (al, mn)) for f, al, mn in related_fields if (al, mn) in pending_add)
                 # Create the model, without those
@@ -206,6 +212,15 @@ class MigrationAutodetector(object):
                 self.add_swappable_dependency(app_label, swappable_setting)
             elif app_label != other_app_label:
                 self.add_dependency(app_label, other_app_label)
+        # Phase 3.1 - unique together constraints
+        for app_label, model_name, unique_together in pending_unique_together:
+            self.add_to_migration(
+                app_label,
+                operations.AlterUniqueTogether(
+                    name=model_name,
+                    unique_together=unique_together
+                )
+            )
         # Removing models
         removed_models = set(old_model_keys) - set(new_model_keys)
         for app_label, model_name in removed_models:

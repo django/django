@@ -37,6 +37,8 @@ class AutodetectorTests(TestCase):
     book_unique_3 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("newfield", models.IntegerField()), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("title", "newfield")]})
     edition = ModelState("thirdapp", "Edition", [("id", models.AutoField(primary_key=True)), ("book", models.ForeignKey("otherapp.Book"))])
     custom_user = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))])
+    knight = ModelState("eggs", "Knight", [("id", models.AutoField(primary_key=True))])
+    rabbit = ModelState("eggs", "Rabbit", [("id", models.AutoField(primary_key=True)), ("knight", models.ForeignKey("eggs.Knight")), ("parent", models.ForeignKey("eggs.Rabbit"))], {"unique_together": [("parent", "knight")]})
 
     def make_project_state(self, model_states):
         "Shortcut to make ProjectStates from lists of predefined models"
@@ -369,6 +371,42 @@ class AutodetectorTests(TestCase):
         # Right dependencies?
         self.assertEqual(migration1.dependencies, [])
         self.assertEqual(migration2.dependencies, [("testapp", "auto_1")])
+
+    def test_same_app_circular_fk_dependency_and_unique_together(self):
+        """
+        Tests that a migration with circular FK dependency does not try to
+        create unique together constraint before creating all required fields first.
+        See ticket #22275.
+        """
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([self.knight, self.rabbit])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['eggs']), 2)
+        # Right number of actions?
+        migration1 = changes['eggs'][0]
+        self.assertEqual(len(migration1.operations), 2)
+        migration2 = changes['eggs'][1]
+        self.assertEqual(len(migration2.operations), 2)
+        # Right actions?
+        action = migration1.operations[0]
+        self.assertEqual(action.__class__.__name__, "CreateModel")
+        action = migration1.operations[1]
+        self.assertEqual(action.__class__.__name__, "CreateModel")
+        # CreateModel action for Rabbit should not have unique_together now
+        self.assertEqual(action.name, "Rabbit")
+        self.assertFalse("unique_together" in action.options)
+        action = migration2.operations[0]
+        self.assertEqual(action.__class__.__name__, "AddField")
+        self.assertEqual(action.name, "parent")
+        action = migration2.operations[1]
+        self.assertEqual(action.__class__.__name__, "AlterUniqueTogether")
+        self.assertEqual(action.name, "rabbit")
+        # Right dependencies?
+        self.assertEqual(migration1.dependencies, [])
+        self.assertEqual(migration2.dependencies, [("eggs", "auto_1")])
 
     def test_unique_together(self):
         "Tests unique_together detection"
