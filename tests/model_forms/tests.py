@@ -1297,7 +1297,7 @@ class ModelFormBasicTests(TestCase):
         self.assertEqual(Category.objects.get(id=cat.id).name, 'Third')
 
     def test_runtime_choicefield_populated(self):
-        self.maxDiff=None
+        self.maxDiff = None
         # Here, we demonstrate that choices for a ForeignKey ChoiceField are determined
         # at runtime, based on the data in the database when the form is displayed, not
         # the data in the database when the form is instantiated.
@@ -1395,10 +1395,10 @@ class ModelChoiceFieldTests(TestCase):
         self.assertEqual(f.clean(str(self.c1.id)).name, "Entertainment")
         with self.assertRaises(ValidationError):
             f.clean('100')
-        
+
         # len can be called on choices
         self.assertEqual(len(f.choices), 2)
-        
+
         # queryset can be changed after the field is created.
         f.queryset = Category.objects.exclude(name='Third')
         self.assertEqual(list(f.choices), [
@@ -1987,6 +1987,7 @@ class FileAndImageFieldTests(TestCase):
         instance = f.save()
         self.assertEqual(instance.image.name, 'foo/test4.png')
         instance.delete()
+
 
 class ModelOtherFieldTests(TestCase):
     def test_big_integer_field(self):
