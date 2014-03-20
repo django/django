@@ -721,13 +721,11 @@ class QuerySet(object):
         else:
             return self._filter_or_exclude(None, **filter_obj)
 
-    def select_for_update(self, **kwargs):
+    def select_for_update(self, nowait=False):
         """
         Returns a new QuerySet instance that will select objects with a
         FOR UPDATE lock.
         """
-        # Default to false for nowait
-        nowait = kwargs.pop('nowait', False)
         obj = self._clone()
         obj._for_write = True
         obj.query.select_for_update = True
