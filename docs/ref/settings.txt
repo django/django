@@ -1002,14 +1002,12 @@ environment, such as all the currently defined Django settings (from
 ``settings.py``).
 
 As a security measure, Django will *not* include settings that might be
-sensitive (or offensive), such as :setting:`SECRET_KEY` or
-:setting:`PROFANITIES_LIST`. Specifically, it will exclude any setting whose
-name includes any of the following:
+sensitive (or offensive), such as :setting:`SECRET_KEY`. Specifically, it will
+exclude any setting whose name includes any of the following:
 
 * ``'API'``
 * ``'KEY'``
 * ``'PASS'``
-* ``'PROFANITIES_LIST'``
 * ``'SECRET'``
 * ``'SIGNATURE'``
 * ``'TOKEN'``
@@ -2468,53 +2466,6 @@ Default::
      'django.contrib.auth.hashers.MD5PasswordHasher',
      'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
      'django.contrib.auth.hashers.CryptPasswordHasher',)
-
-
-.. _settings-comments:
-
-Comments
-========
-
-Settings for :mod:`django.contrib.comments`.
-
-.. setting:: COMMENTS_HIDE_REMOVED
-
-COMMENTS_HIDE_REMOVED
----------------------
-
-If ``True`` (default), removed comments will be excluded from comment
-lists/counts (as taken from template tags). Otherwise, the template author is
-responsible for some sort of a "this comment has been removed by the site staff"
-message.
-
-.. setting:: COMMENT_MAX_LENGTH
-
-COMMENT_MAX_LENGTH
-------------------
-
-The maximum length of the comment field, in characters. Comments longer than
-this will be rejected. Defaults to 3000.
-
-.. setting:: COMMENTS_APP
-
-COMMENTS_APP
-------------
-
-An app which provides :doc:`customization of the comments framework
-</ref/contrib/comments/custom>`.  Use the same dotted-string notation
-as in :setting:`INSTALLED_APPS`.  Your custom :setting:`COMMENTS_APP`
-must also be listed in :setting:`INSTALLED_APPS`.
-
-.. setting:: PROFANITIES_LIST
-
-PROFANITIES_LIST
-----------------
-
-Default: ``()`` (Empty tuple)
-
-A tuple of profanities, as strings, that will be forbidden in comments when
-``COMMENTS_ALLOW_PROFANITIES`` is ``False``.
-
 
 .. _settings-messages:
 

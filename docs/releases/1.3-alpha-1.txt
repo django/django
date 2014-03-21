@@ -234,9 +234,8 @@ No more naughty words
 ~~~~~~~~~~~~~~~~~~~~~
 
 Django has historically provided (and enforced) a list of profanities.
-The :doc:`comments app </ref/contrib/comments/index>` has enforced this
-list of profanities, preventing people from submitting comments that
-contained one of those profanities.
+The comments app has enforced this list of profanities, preventing people from
+submitting comments that contained one of those profanities.
 
 Unfortunately, the technique used to implement this profanities list
 was woefully naive, and prone to the `Scunthorpe problem`_. Fixing the
@@ -246,7 +245,7 @@ framework, we have "fixed" the problem by making the list of
 prohibited words an empty list.
 
 If you want to restore the old behavior, simply put a
-:setting:`PROFANITIES_LIST` setting in your settings file that includes the
+``PROFANITIES_LIST`` setting in your settings file that includes the
 words that you want to prohibit (see the `commit that implemented this
 change`_ if you want to see the list of words that was historically
 prohibited). However, if avoiding profanities is important to you, you

@@ -336,7 +336,6 @@ itself. It includes a number of other URLconfs::
 
     urlpatterns = patterns('',
         # ... snip ...
-        url(r'^comments/', include('django.contrib.comments.urls')),
         url(r'^community/', include('django_website.aggregator.urls')),
         url(r'^contact/', include('django_website.contact.urls')),
         # ... snip ...

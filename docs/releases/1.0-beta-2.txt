@@ -30,11 +30,7 @@ This beta release includes two major features:
 Refactored ``django.contrib.comments``
     As part of a Google Summer of Code project, Thejaswi Puthraya
     carried out a major rewrite and refactoring of Django's bundled
-    comment system, greatly increasing its flexibility and
-    customizability. :doc:`Full documentation
-    </ref/contrib/comments/index>` is available, as well as an
-    upgrade guide if you were using
-    the previous incarnation of the comments application..
+    comment system, greatly increasing its flexibility and customizability.
 
 Refactored documentation
     Django's bundled and online documentation has also been

@@ -589,7 +589,7 @@ your code.
 Storage of IP addresses in the comments app
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :doc:`comments </ref/contrib/comments/index>` app now uses a
+The comments app now uses a
 ``GenericIPAddressField`` for storing commenters' IP addresses, to support
 comments submitted from IPv6 addresses. Until now, it stored them in an
 ``IPAddressField``, which is only meant to support IPv4. When saving a comment

@@ -9,9 +9,6 @@ A list of all the signals that Django sends.
     See the documentation on the :doc:`signal dispatcher </topics/signals>` for
     information regarding how to register for and receive signals.
 
-    The :doc:`comment framework </ref/contrib/comments/index>` sends a :doc:`set
-    of comment-related signals </ref/contrib/comments/signals>`.
-
     The :doc:`authentication framework </topics/auth/index>` sends :ref:`signals when
     a user is logged in / out <topics-auth-signals>`.
 

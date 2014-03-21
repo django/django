@@ -51,9 +51,6 @@ installed; several of Django's other bundled applications require it:
 * Django's :mod:`authentication framework <django.contrib.auth>` uses it
   to tie user permissions to specific models.
 
-* Django's comments system (:mod:`django.contrib.comments`) uses it to
-  "attach" comments to any installed model.
-
 .. currentmodule:: django.contrib.contenttypes.models
 
 The ``ContentType`` model
@@ -442,8 +439,8 @@ same types of lookups manually::
 Note that if the model in a
 :class:`~django.contrib.contenttypes.fields.GenericRelation` uses a
 non-default value for ``ct_field`` or ``fk_field`` in its
-:class:`~django.contrib.contenttypes.fields.GenericForeignKey` (e.g. the
-:mod:`django.contrib.comments` app uses ``ct_field="object_pk"``),
+:class:`~django.contrib.contenttypes.fields.GenericForeignKey` (for example, if
+you had a ``Comment`` model that uses ``ct_field="object_pk"``),
 you'll need to set ``content_type_field`` and/or ``object_id_field`` in
 the :class:`~django.contrib.contenttypes.fields.GenericRelation` to
 match the ``ct_field`` and ``fk_field``, respectively, in the

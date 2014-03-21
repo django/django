@@ -17,7 +17,7 @@ from django.utils.encoding import force_bytes, smart_text
 from django.utils.module_loading import import_string
 from django.utils import six
 
-HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|PROFANITIES_LIST|SIGNATURE')
+HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE')
 
 CLEANSED_SUBSTITUTE = '********************'
 
