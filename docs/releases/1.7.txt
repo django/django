@@ -391,7 +391,7 @@ Minor features
 :mod:`django.contrib.sites`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* The new :class:`django.contrib.site.middleware.CurrentSiteMiddleware` allows
+* The new :class:`django.contrib.sites.middleware.CurrentSiteMiddleware` allows
   setting the current site on each request.
 
 :mod:`django.contrib.staticfiles`
