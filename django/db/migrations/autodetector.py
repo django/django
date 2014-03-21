@@ -267,7 +267,7 @@ class MigrationAutodetector(object):
             for rem_app_label, rem_model_name, rem_field_name in (old_fields - new_fields):
                 if rem_app_label == app_label and rem_model_name == model_name:
                     old_field_dec = old_model_state.get_field_by_name(rem_field_name).deconstruct()[1:]
-                    if field.rel and field.rel.to:
+                    if field.rel and field.rel.to and 'to' in old_field_dec[2]:
                         old_rel_to = old_field_dec[2]['to']
                         if old_rel_to in renamed_models_rel:
                             old_field_dec[2]['to'] = renamed_models_rel[old_rel_to]
