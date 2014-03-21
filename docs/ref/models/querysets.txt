@@ -981,7 +981,7 @@ less ambiguous than storing a filtered result in the related manager's cache:
     >>>
     >>> # Recommended:
     >>> restaurants = Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas', to_attr='vegetarian_pizzas' queryset=queryset))
+    ...     Prefetch('pizzas', queryset=queryset, to_attr='vegetarian_pizzas'))
     >>> vegetarian_pizzas = restaurants[0].vegetarian_pizzas
     >>>
     >>> # Not recommended:
