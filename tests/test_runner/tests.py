@@ -4,7 +4,6 @@ Tests for django test runner
 from __future__ import unicode_literals
 
 from optparse import make_option
-import types
 import unittest
 
 from django.core.exceptions import ImproperlyConfigured
@@ -12,7 +11,7 @@ from django.core.management import call_command
 from django import db
 from django.test import runner, TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.test.testcases import connections_support_transactions
-from django.test.utils import IgnoreAllDeprecationWarningsMixin, override_system_checks
+from django.test.utils import override_system_checks
 from django.utils import six
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -219,27 +218,6 @@ class Ticket17477RegressionTests(AdminScriptTestCase):
         args = ['help', 'test']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-
-
-class ModulesTestsPackages(IgnoreAllDeprecationWarningsMixin, unittest.TestCase):
-
-    def test_get_tests(self):
-        "Check that the get_tests helper function can find tests in a directory"
-        from django.apps import AppConfig
-        from django.test.simple import get_tests
-        app_config = AppConfig.create('test_runner.valid_app')
-        app_config.import_models({})
-        tests = get_tests(app_config)
-        self.assertIsInstance(tests, types.ModuleType)
-
-    def test_import_error(self):
-        "Test for #12658 - Tests with ImportError's shouldn't fail silently"
-        from django.apps import AppConfig
-        from django.test.simple import get_tests
-        app_config = AppConfig.create('test_runner_invalid_app')
-        app_config.import_models({})
-        with self.assertRaises(ImportError):
-            get_tests(app_config)
 
 
 class Sqlite3InMemoryTestDbs(TestCase):

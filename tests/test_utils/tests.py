@@ -11,8 +11,7 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.html import HTMLParseError, parse_html
-from django.test.utils import (CaptureQueriesContext,
-    IgnoreAllDeprecationWarningsMixin, override_settings)
+from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils import six
 
 from .models import Person
@@ -621,15 +620,6 @@ class AssertFieldOutputTests(SimpleTestCase):
                 'required': 'This is really required.',
             }
         self.assertFieldOutput(MyCustomField, {}, {}, empty_value=None)
-
-
-class DoctestNormalizerTest(IgnoreAllDeprecationWarningsMixin, SimpleTestCase):
-
-    def test_normalizer(self):
-        from django.test.simple import make_doctest
-        suite = make_doctest("test_utils.doctest_output")
-        failures = unittest.TextTestRunner(stream=six.StringIO()).run(suite)
-        self.assertEqual(failures.failures, [])
 
 
 # for OverrideSettingsTests

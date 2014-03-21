@@ -2067,11 +2067,6 @@ Default: ``'django.test.runner.DiscoverRunner'``
 The name of the class to use for starting the test suite. See
 :ref:`other-testing-frameworks`.
 
-.. versionchanged:: 1.6
-
-    Previously the default ``TEST_RUNNER`` was
-    ``django.test.simple.DjangoTestSuiteRunner``.
-
 .. setting:: THOUSAND_SEPARATOR
 
 THOUSAND_SEPARATOR
