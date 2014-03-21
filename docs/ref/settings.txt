@@ -1468,7 +1468,7 @@ A tuple of IP addresses, as strings, that:
 
 * See debug comments, when :setting:`DEBUG` is ``True``
 * Receive X headers in admindocs if the ``XViewMiddleware`` is installed (see
-  :doc:`/topics/http/middleware`)
+  :doc:`/ref/contrib/admin/admindocs`)
 
 .. setting:: LANGUAGE_CODE
 
