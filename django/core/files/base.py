@@ -40,7 +40,7 @@ class File(FileProxyMixin):
         if not hasattr(self, '_size'):
             if hasattr(self.file, 'size'):
                 self._size = self.file.size
-            elif hasattr(self.file, 'name') and os.path.exists(self.file.name):
+            elif hasattr(self.file, 'name') and self.file.name is not None and os.path.exists(self.file.name):
                 self._size = os.path.getsize(self.file.name)
             elif hasattr(self.file, 'tell') and hasattr(self.file, 'seek'):
                 pos = self.file.tell()
