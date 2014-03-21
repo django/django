@@ -1,9 +1,6 @@
-import warnings
-
 from django import http
 from django.template import (Context, RequestContext,
                              loader, Template, TemplateDoesNotExist)
-from django.utils.deprecation import RemovedInDjango18Warning
 from django.views.decorators.csrf import requires_csrf_token
 
 
@@ -81,12 +78,3 @@ def permission_denied(request, template_name='403.html'):
     except TemplateDoesNotExist:
         return http.HttpResponseForbidden('<h1>403 Forbidden</h1>', content_type='text/html')
     return http.HttpResponseForbidden(template.render(RequestContext(request)))
-
-
-def shortcut(request, content_type_id, object_id):
-    warnings.warn(
-        "django.views.defaults.shortcut will be removed in Django 1.8. "
-        "Import it from django.contrib.contenttypes.views instead.",
-        RemovedInDjango18Warning, stacklevel=2)
-    from django.contrib.contenttypes.views import shortcut as real_shortcut
-    return real_shortcut(request, content_type_id, object_id)
