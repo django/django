@@ -20,7 +20,7 @@ from django.core.cache import get_cache
 from django.core.cache.backends.base import (CacheKeyWarning,
     InvalidCacheBackendError)
 from django.core.context_processors import csrf
-from django.db import router, transaction
+from django.db import connections, router, transaction
 from django.core.cache.utils import make_template_fragment_key
 from django.http import (HttpResponse, HttpRequest, StreamingHttpResponse,
     QueryDict)
@@ -912,9 +912,16 @@ class CreateCacheTableForDBCacheTests(TestCase):
                                         database='default',
                                         verbosity=0, interactive=False)
             # cache table should be created on 'other'
-            # one query is used to create the table and another one the index
-            with self.assertNumQueries(2, using='other'):
-                management.call_command('createcachetable', 'cache_table',
+            # Queries:
+            #   1: create savepoint (if transactional DDL is supported)
+            #   2: create the table
+            #   3: create the index
+            #   4: release savepoint (if transactional DDL is supported)
+            from django.db import connections
+            num = 4 if connections['other'].features.can_rollback_ddl else 2
+            with self.assertNumQueries(num, using='other'):
+                management.call_command('createcachetable',
+                                        'cache_table',
                                         database='other',
                                         verbosity=0, interactive=False)
         finally:
@@ -1958,4 +1965,3 @@ class TestMakeTemplateFragmentKey(TestCase):
         key = make_template_fragment_key('spam', ['abc:def%'])
         self.assertEqual(key,
             'template.cache.spam.f27688177baec990cdf3fbd9d9c3f469')
-

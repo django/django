@@ -102,6 +102,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_combine_inserts_with_and_without_auto_increment_pk = False
     autocommits_when_autocommit_is_off = True
     atomic_transactions = False
+    can_rollback_ddl = True
     supports_paramstyle_pyformat = False
 
     @cached_property

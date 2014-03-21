@@ -53,7 +53,7 @@ class Command(LabelCommand):
         for i, line in enumerate(table_output):
             full_statement.append('    %s%s' % (line, ',' if i < len(table_output)-1 else ''))
         full_statement.append(');')
-        with transaction.commit_on_success_unless_managed():
+        with transaction.atomic(using=db, savepoint=connection.features.can_rollback_ddl):
             curs = connection.cursor()
             try:
                 curs.execute("\n".join(full_statement))

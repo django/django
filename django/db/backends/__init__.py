@@ -652,6 +652,9 @@ class BaseDatabaseFeatures(object):
     # supported by the Python driver
     supports_paramstyle_pyformat = True
 
+    # Can we roll back DDL in a transaction?
+    can_rollback_ddl = False
+
     def __init__(self, connection):
         self.connection = connection
 
