@@ -113,7 +113,7 @@ class LegacyDatabaseTests(TestCase):
         Event.objects.create(dt=dt)
         event = Event.objects.get()
         self.assertIsNone(event.dt.tzinfo)
-        # django.db.backend.utils.typecast_dt will just drop the
+        # django.db.backends.utils.typecast_dt will just drop the
         # timezone, so a round-trip in the database alters the data (!)
         # interpret the naive datetime in local time and you get a wrong value
         self.assertNotEqual(event.dt.replace(tzinfo=EAT), dt)
@@ -139,7 +139,7 @@ class LegacyDatabaseTests(TestCase):
         Event.objects.create(dt=dt)
         event = Event.objects.get()
         self.assertIsNone(event.dt.tzinfo)
-        # django.db.backend.utils.typecast_dt will just drop the
+        # django.db.backends.utils.typecast_dt will just drop the
         # timezone, so a round-trip in the database alters the data (!)
         # interpret the naive datetime in local time and you get a wrong value
         self.assertNotEqual(event.dt.replace(tzinfo=EAT), dt)

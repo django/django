@@ -442,7 +442,7 @@ class BaseDatabaseWrapper(object):
 
 class BaseDatabaseFeatures(object):
     allows_group_by_pk = False
-    # True if django.db.backend.utils.typecast_timestamp is used on values
+    # True if django.db.backends.utils.typecast_timestamp is used on values
     # returned from dates() calls.
     needs_datetime_string_cast = True
     empty_fetchmany_value = []
