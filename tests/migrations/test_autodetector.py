@@ -19,6 +19,7 @@ class AutodetectorTests(TestCase):
     author_name_default = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default='Ada Lovelace'))])
     author_with_book = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))])
     author_renamed_with_book = ModelState("testapp", "Writer", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))])
+    author_with_publisher_string = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("publisher_name", models.CharField(max_length=200))])
     author_with_publisher = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("publisher", models.ForeignKey("testapp.Publisher"))])
     author_with_custom_user = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("user", models.ForeignKey("thirdapp.CustomUser"))])
     author_proxy = ModelState("testapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author", ))
@@ -517,3 +518,25 @@ class AutodetectorTests(TestCase):
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "AddField")
         self.assertEqual(action.name, "name")
+
+    def test_replace_string_with_foreignkey(self):
+        """
+        Adding an FK in the same "spot" as a deleted CharField should work. (#22300).
+        """
+        # Make state
+        before = self.make_project_state([self.author_with_publisher_string])
+        after = self.make_project_state([self.author_with_publisher])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['testapp']), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 2)
+        # Right actions?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AddField")
+        self.assertEqual(action.name, "publisher")
+        action = migration.operations[1]
+        self.assertEqual(action.__class__.__name__, "RemoveField")
+        self.assertEqual(action.name, "publisher_name")
