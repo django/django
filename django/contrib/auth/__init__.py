@@ -108,8 +108,7 @@ def logout(request):
     user_logged_out.send(sender=user.__class__, request=request, user=user)
 
     # remember language choice saved to session
-    # for backwards compatibility django_language is also checked (remove in 1.8)
-    language = request.session.get(LANGUAGE_SESSION_KEY, request.session.get('django_language'))
+    language = request.session.get(LANGUAGE_SESSION_KEY)
 
     request.session.flush()
 
