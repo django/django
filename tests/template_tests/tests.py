@@ -602,10 +602,7 @@ class TemplateTests(TestCase):
                                     failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template loading invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
 
                                 try:
-                                    with warnings.catch_warnings():
-                                        # Ignore deprecation of fix_ampersands
-                                        warnings.filterwarnings("ignore", category=DeprecationWarning, module='django.template.defaultfilters')
-                                        output = self.render(test_template, vals)
+                                    output = self.render(test_template, vals)
                                 except ShouldNotExecuteException:
                                     failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template rendering invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
                             except ContextStackException:

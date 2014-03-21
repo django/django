@@ -12,7 +12,7 @@ from django.conf import settings
 from django.utils import formats
 from django.utils.dateformat import format, time_format
 from django.utils.encoding import force_text, iri_to_uri
-from django.utils.html import (conditional_escape, escapejs, fix_ampersands,
+from django.utils.html import (conditional_escape, escapejs,
     escape, urlize as _urlize, linebreaks, strip_tags, avoid_wrapping,
     remove_tags)
 from django.utils.http import urlquote
@@ -81,12 +81,6 @@ def escapejs_filter(value):
     """Hex encodes characters for use in JavaScript strings."""
     return escapejs(value)
 
-
-@register.filter("fix_ampersands", is_safe=True)
-@stringfilter
-def fix_ampersands_filter(value):
-    """Replaces ampersands with ``&amp;`` entities."""
-    return fix_ampersands(value)
 
 # Values for testing floatformat input against infinity and NaN representations,
 # which differ across platforms and Python versions.  Some (i.e. old Windows

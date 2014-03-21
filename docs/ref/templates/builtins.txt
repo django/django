@@ -1572,35 +1572,6 @@ For example::
 
 If ``value`` is the list ``['a', 'b', 'c']``, the output will be ``'a'``.
 
-.. templatefilter:: fix_ampersands
-
-fix_ampersands
-^^^^^^^^^^^^^^
-
-.. note::
-
-    This is rarely useful as ampersands are automatically escaped. See
-    :tfilter:`escape` for more information.
-
-.. deprecated:: 1.7
-    This filter has been deprecated and will be removed in Django 1.8.
-
-Replaces ampersands with ``&amp;`` entities.
-
-For example::
-
-    {{ value|fix_ampersands }}
-
-If ``value`` is ``Tom & Jerry``, the output will be ``Tom &amp; Jerry``.
-
-However, ampersands used in named entities and numeric character references
-will not be replaced. For example, if ``value`` is ``Caf&eacute;``, the output
-will *not* be ``Caf&amp;eacute;`` but remain ``Caf&eacute;``. This means that
-in some edge cases, such as acronyms followed by semicolons, this filter will
-not replace ampersands that need replacing. For example, if ``value`` is
-``Contact the R&D;``, the output will remain unchanged because ``&D;``
-resembles a named entity.
-
 .. templatefilter:: floatformat
 
 floatformat

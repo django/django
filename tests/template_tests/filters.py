@@ -104,11 +104,6 @@ def get_filter_tests():
         'filter-capfirst01': ("{% autoescape off %}{{ a|capfirst }} {{ b|capfirst }}{% endautoescape %}", {"a": "fred>", "b": mark_safe("fred&gt;")}, "Fred> Fred&gt;"),
         'filter-capfirst02': ("{{ a|capfirst }} {{ b|capfirst }}", {"a": "fred>", "b": mark_safe("fred&gt;")}, "Fred&gt; Fred&gt;"),
 
-        # Note that applying fix_ampsersands in autoescape mode leads to
-        # double escaping.
-        'filter-fix_ampersands01': ("{% autoescape off %}{{ a|fix_ampersands }} {{ b|fix_ampersands }}{% endautoescape %}", {"a": "a&b", "b": mark_safe("a&b")}, "a&amp;b a&amp;b"),
-        'filter-fix_ampersands02': ("{{ a|fix_ampersands }} {{ b|fix_ampersands }}", {"a": "a&b", "b": mark_safe("a&b")}, "a&amp;amp;b a&amp;b"),
-
         'filter-floatformat01': ("{% autoescape off %}{{ a|floatformat }} {{ b|floatformat }}{% endautoescape %}", {"a": "1.42", "b": mark_safe("1.42")}, "1.4 1.4"),
         'filter-floatformat02': ("{{ a|floatformat }} {{ b|floatformat }}", {"a": "1.42", "b": mark_safe("1.42")}, "1.4 1.4"),
 
