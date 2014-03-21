@@ -784,8 +784,7 @@ class ModelAdmin(BaseModelAdmin):
         """
         # If self.actions is explicitly set to None that means that we don't
         # want *any* actions enabled on this page.
-        from django.contrib.admin.views.main import _is_changelist_popup
-        if self.actions is None or _is_changelist_popup(request):
+        if self.actions is None or IS_POPUP_VAR in request.GET:
             return OrderedDict()
 
         actions = []
