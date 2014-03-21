@@ -1852,7 +1852,7 @@ class FileAndImageFieldTests(TestCase):
         names.sort()
         self.assertEqual(names, ['---------', '__init__.py', 'models.py', 'tests.py'])
 
-    @skipUnless(test_images, "Pillow/PIL not installed")
+    @skipUnless(test_images, "Pillow not installed")
     def test_image_field(self):
         # ImageField and FileField are nearly identical, but they differ slighty when
         # it comes to validation. This specifically tests that #6302 is fixed for

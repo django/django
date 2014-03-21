@@ -2,11 +2,9 @@ import os
 import tempfile
 import warnings
 
-from django.core.exceptions import ImproperlyConfigured
-
 try:
-    from django.utils.image import Image
-except ImproperlyConfigured:
+    from PIL import Image
+except ImportError:
     Image = None
 
 from django.core.files.storage import FileSystemStorage
@@ -114,7 +112,7 @@ class VerboseNameField(models.Model):
     field9 = models.FileField("verbose field9", upload_to="unused")
     field10 = models.FilePathField("verbose field10")
     field11 = models.FloatField("verbose field11")
-    # Don't want to depend on Pillow/PIL in this test
+    # Don't want to depend on Pillow in this test
     #field_image = models.ImageField("verbose field")
     field12 = models.IntegerField("verbose field12")
     with warnings.catch_warnings(record=True) as w:
@@ -151,7 +149,7 @@ class Document(models.Model):
 ###############################################################################
 # ImageField
 
-# If Pillow/PIL available, do these tests.
+# If Pillow available, do these tests.
 if Image:
     class TestImageFieldFile(ImageFieldFile):
         """

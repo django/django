@@ -619,22 +619,20 @@ For each field, we describe the default widget used if you don't specify
     * Normalizes to: An ``UploadedFile`` object that wraps the file content
       and file name into a single object.
     * Validates that file data has been bound to the form, and that the
-      file is of an image format understood by Pillow/PIL.
+      file is of an image format understood by Pillow.
     * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
       ``invalid_image``
 
-    Using an ``ImageField`` requires that either `Pillow`_ (recommended) or the
-    `Python Imaging Library`_ (PIL) are installed and supports the image
-    formats you use. If you encounter a ``corrupt image`` error when you
-    upload an image, it usually means either Pillow or PIL
-    doesn't understand its format. To fix this, install the appropriate
-    library and reinstall Pillow or PIL.
+    Using an ``ImageField`` requires that `Pillow`_ is installed with support
+    for the image formats you use. If you encounter a ``corrupt image`` error
+    when you upload an image, it usually means that Pillow doesn't understand
+    its format. To fix this, install the appropriate library and reinstall
+    Pillow.
 
     When you use an ``ImageField`` on a form, you must also remember to
     :ref:`bind the file data to the form <binding-uploaded-files>`.
 
 .. _Pillow: http://python-imaging.github.io/Pillow/
-.. _Python Imaging Library: http://www.pythonware.com/products/pil/
 
 ``IntegerField``
 ~~~~~~~~~~~~~~~~

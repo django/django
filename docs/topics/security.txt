@@ -226,8 +226,8 @@ User-uploaded content
   served in ways that do not follow security best practices. Specifically, an
   HTML file can be uploaded as an image if that file contains a valid PNG
   header followed by malicious HTML. This file will pass verification of the
-  libraries that Django uses for :class:`~django.db.models.ImageField` image
-  processing (PIL or Pillow). When this file is subsequently displayed to a
+  library that Django uses for :class:`~django.db.models.ImageField` image
+  processing (Pillow). When this file is subsequently displayed to a
   user, it may be displayed as HTML depending on the type and configuration of
   your web server.
 

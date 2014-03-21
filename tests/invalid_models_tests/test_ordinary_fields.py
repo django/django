@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 import unittest
 
 from django.core.checks import Error
-from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, models
 
 from .base import IsolatedModelsTestCase
@@ -379,8 +378,8 @@ class ImageFieldTests(IsolatedModelsTestCase):
 
     def test_pillow_installed(self):
         try:
-            import django.utils.image  # NOQA
-        except ImproperlyConfigured:
+            from PIL import Image  # NOQA
+        except ImportError:
             pillow_installed = False
         else:
             pillow_installed = True

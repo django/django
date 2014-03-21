@@ -13,7 +13,7 @@ import os
 import tempfile
 
 from django.core import validators
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils import six
@@ -154,7 +154,7 @@ class FilePathModel(models.Model):
 
 
 try:
-    from django.utils.image import Image  # NOQA: detect if Pillow is installed
+    from PIL import Image  # NOQA: detect if Pillow is installed
 
     test_images = True
 
@@ -193,7 +193,7 @@ try:
 
         def __str__(self):
             return self.description
-except ImproperlyConfigured:
+except ImportError:
     test_images = False
 
 

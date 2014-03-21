@@ -8,7 +8,6 @@ import tempfile
 import unittest
 import zlib
 
-from django.core.exceptions import ImproperlyConfigured
 from django.core.files import File
 from django.core.files.move import file_move_safe
 from django.core.files.base import ContentFile
@@ -18,10 +17,11 @@ from django.utils._os import upath
 from django.utils import six
 
 try:
-    from django.utils.image import Image
-    from django.core.files import images
-except ImproperlyConfigured:
+    from PIL import Image
+except ImportError:
     Image = None
+else:
+    from django.core.files import images
 
 
 class FileTests(unittest.TestCase):
@@ -112,7 +112,7 @@ class DimensionClosingBug(unittest.TestCase):
     """
     Test that get_image_dimensions() properly closes files (#8817)
     """
-    @unittest.skipUnless(Image, "Pillow/PIL not installed")
+    @unittest.skipUnless(Image, "Pillow not installed")
     def test_not_closing_of_files(self):
         """
         Open files passed into get_image_dimensions() should stay opened.
@@ -123,7 +123,7 @@ class DimensionClosingBug(unittest.TestCase):
         finally:
             self.assertTrue(not empty_io.closed)
 
-    @unittest.skipUnless(Image, "Pillow/PIL not installed")
+    @unittest.skipUnless(Image, "Pillow not installed")
     def test_closing_of_filenames(self):
         """
         get_image_dimensions() called with a filename should closed the file.
@@ -163,7 +163,7 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
     Test that get_image_dimensions() works properly after various calls
     using a file handler (#11158)
     """
-    @unittest.skipUnless(Image, "Pillow/PIL not installed")
+    @unittest.skipUnless(Image, "Pillow not installed")
     def test_multiple_calls(self):
         """
         Multiple calls of get_image_dimensions() should return the same size.
@@ -177,7 +177,7 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
         self.assertEqual(image_pil.size, size_1)
         self.assertEqual(size_1, size_2)
 
-    @unittest.skipUnless(Image, "Pillow/PIL not installed")
+    @unittest.skipUnless(Image, "Pillow not installed")
     def test_bug_19457(self):
         """
         Regression test for #19457
