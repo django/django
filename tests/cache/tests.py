@@ -981,9 +981,11 @@ class CreateCacheTableForDBCacheTests(TestCase):
             # cache table should be created on 'other'
             # Queries:
             #   1: check table doesn't already exist
-            #   2: create the table
-            #   3: create the index
-            with self.assertNumQueries(3, using='other'):
+            #   2: create savepoint
+            #   3: create the table
+            #   4: create the index
+            #   5: release savepoint
+            with self.assertNumQueries(5, using='other'):
                 management.call_command('createcachetable',
                                         database='other',
                                         verbosity=0, interactive=False)
