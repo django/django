@@ -1,10 +1,17 @@
 from datetime import datetime
 from importlib import import_module
+import os
+import tempfile
 
 from django.http import HttpRequest
 from django.conf import settings
-
 from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
+from django.core.files.uploadedfile import SimpleUploadedFile
+
+
+temp_storage_location = tempfile.mkdtemp(dir=os.environ.get('DJANGO_TEST_TEMP_DIR'))
+temp_storage = FileSystemStorage(location=temp_storage_location)
 
 
 def get_request():
