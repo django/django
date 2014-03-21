@@ -642,7 +642,7 @@ class TemplateTests(TestCase):
         # SYNTAX --
         # 'template_name': ('template contents', 'context dict', 'expected string output' or Exception class)
         # This import is necessary when tests are run isolated:
-        from .templatetags import custom
+        from .templatetags import custom  # noqa
         basedir = os.path.dirname(os.path.abspath(upath(__file__)))
         tests = {
             ### BASIC SYNTAX ################################################

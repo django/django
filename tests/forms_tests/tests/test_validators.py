@@ -29,10 +29,10 @@ class UserForm(forms.Form):
         max_length=50,
         validators=[
             validators.RegexValidator(
-                    regex='^[a-z]*$',
-                    message="Letters only.",
-                    flags=re.IGNORECASE,
-                )
+                regex='^[a-z]*$',
+                message="Letters only.",
+                flags=re.IGNORECASE,
+            )
         ]
 
     )
