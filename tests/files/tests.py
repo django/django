@@ -205,3 +205,17 @@ class FileMoveSafeTests(unittest.TestCase):
 
         os.close(handle_a)
         os.close(handle_b)
+
+
+class SpooledTempTests(unittest.TestCase):
+    def test_in_memory_spooled_temp(self):
+        with tempfile.SpooledTemporaryFile() as temp:
+            temp.write(b"foo bar baz quux\n")
+            django_file = File(temp, name="something.txt")
+            self.assertEqual(django_file.size, 17)
+
+    def test_written_spooled_temp(self):
+        with tempfile.SpooledTemporaryFile(max_size=4) as temp:
+            temp.write(b"foo bar baz quux\n")
+            django_file = File(temp, name="something.txt")
+            self.assertEqual(django_file.size, 17)
