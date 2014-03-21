@@ -223,10 +223,6 @@ class Command(BaseCommand):
                         for statement in sql:
                             cursor.execute(statement)
                         tables.append(connection.introspection.table_name_converter(model._meta.db_table))
-
-            # We force a commit here, as that was the previous behavior.
-            # If you can prove we don't need this, remove it.
-            transaction.set_dirty(using=connection.alias)
         finally:
             cursor.close()
 
@@ -245,7 +241,7 @@ class Command(BaseCommand):
                             if self.verbosity >= 2:
                                 self.stdout.write("    Installing custom SQL for %s.%s model\n" % (app_name, model._meta.object_name))
                             try:
-                                with transaction.commit_on_success_unless_managed(using=connection.alias):
+                                with transaction.atomic(using=connection.alias):
                                     for sql in custom_sql:
                                         cursor.execute(sql)
                             except Exception as e:
@@ -268,7 +264,7 @@ class Command(BaseCommand):
                             if self.verbosity >= 2:
                                 self.stdout.write("    Installing index for %s.%s model\n" % (app_name, model._meta.object_name))
                             try:
-                                with transaction.commit_on_success_unless_managed(using=connection.alias):
+                                with transaction.atomic(using=connection.alias):
                                     for sql in index_sql:
                                         cursor.execute(sql)
                             except Exception as e:

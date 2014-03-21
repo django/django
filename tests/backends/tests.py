@@ -371,7 +371,7 @@ class PostgresNewConnectionTests(TestCase):
             # Fetch a new connection with the new_tz as default
             # time zone, run a query and rollback.
             new_connection.settings_dict['TIME_ZONE'] = new_tz
-            new_connection.enter_transaction_management()
+            new_connection.set_autocommit(False)
             cursor = new_connection.cursor()
             new_connection.rollback()
 

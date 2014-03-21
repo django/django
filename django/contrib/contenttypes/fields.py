@@ -500,7 +500,7 @@ def create_generic_related_manager(superclass):
             if bulk:
                 queryset.delete()
             else:
-                with transaction.commit_on_success_unless_managed(using=db, savepoint=False):
+                with transaction.atomic(using=db, savepoint=False):
                     for obj in queryset:
                         obj.delete()
         _clear.alters_data = True

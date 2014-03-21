@@ -56,7 +56,7 @@ class Command(BaseCommand):
 
         self.verbosity = int(options.get('verbosity'))
 
-        with transaction.commit_on_success_unless_managed(using=self.using):
+        with transaction.atomic(using=self.using):
             self.loaddata(fixture_labels)
 
         # Close the DB connection -- unless we're still in a transaction. This

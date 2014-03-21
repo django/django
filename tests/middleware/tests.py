@@ -9,21 +9,15 @@ from unittest import skipIf
 
 from django.conf import settings
 from django.core import mail
-from django.db import (transaction, connections, DEFAULT_DB_ALIAS,
-                       IntegrityError)
 from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
 from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.middleware.common import CommonMiddleware, BrokenLinkEmailsMiddleware
 from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.gzip import GZipMiddleware
-from django.middleware.transaction import TransactionMiddleware
-from django.test import TransactionTestCase, TestCase, RequestFactory, override_settings
-from django.test.utils import IgnoreDeprecationWarningsMixin
+from django.test import TestCase, RequestFactory, override_settings
 from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.six.moves import xrange
-
-from .models import Band
 
 
 class CommonMiddlewareTest(TestCase):
@@ -666,64 +660,3 @@ class ETagGZipMiddlewareTest(TestCase):
         nogzip_etag = response.get('ETag')
 
         self.assertNotEqual(gzip_etag, nogzip_etag)
-
-
-class TransactionMiddlewareTest(IgnoreDeprecationWarningsMixin, TransactionTestCase):
-    """
-    Test the transaction middleware.
-    """
-
-    available_apps = ['middleware']
-
-    def setUp(self):
-        super(TransactionMiddlewareTest, self).setUp()
-        self.request = HttpRequest()
-        self.request.META = {
-            'SERVER_NAME': 'testserver',
-            'SERVER_PORT': 80,
-        }
-        self.request.path = self.request.path_info = "/"
-        self.response = HttpResponse()
-        self.response.status_code = 200
-
-    def tearDown(self):
-        transaction.abort()
-        super(TransactionMiddlewareTest, self).tearDown()
-
-    def test_request(self):
-        TransactionMiddleware().process_request(self.request)
-        self.assertFalse(transaction.get_autocommit())
-
-    def test_managed_response(self):
-        transaction.enter_transaction_management()
-        Band.objects.create(name='The Beatles')
-        self.assertTrue(transaction.is_dirty())
-        TransactionMiddleware().process_response(self.request, self.response)
-        self.assertFalse(transaction.is_dirty())
-        self.assertEqual(Band.objects.count(), 1)
-
-    def test_exception(self):
-        transaction.enter_transaction_management()
-        Band.objects.create(name='The Beatles')
-        self.assertTrue(transaction.is_dirty())
-        TransactionMiddleware().process_exception(self.request, None)
-        self.assertFalse(transaction.is_dirty())
-        self.assertEqual(Band.objects.count(), 0)
-
-    def test_failing_commit(self):
-        # It is possible that connection.commit() fails. Check that
-        # TransactionMiddleware handles such cases correctly.
-        try:
-            def raise_exception():
-                raise IntegrityError()
-            connections[DEFAULT_DB_ALIAS].commit = raise_exception
-            transaction.enter_transaction_management()
-            Band.objects.create(name='The Beatles')
-            self.assertTrue(transaction.is_dirty())
-            with self.assertRaises(IntegrityError):
-                TransactionMiddleware().process_response(self.request, None)
-            self.assertFalse(transaction.is_dirty())
-            self.assertEqual(Band.objects.count(), 0)
-            self.assertFalse(transaction.is_managed())
-        finally:
-            del connections[DEFAULT_DB_ALIAS].commit

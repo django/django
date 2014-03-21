@@ -44,7 +44,6 @@ class CursorWrapper(object):
 
     def callproc(self, procname, params=None):
         self.db.validate_no_broken_transaction()
-        self.db.set_dirty()
         with self.db.wrap_database_errors:
             if params is None:
                 return self.cursor.callproc(procname)
@@ -53,7 +52,6 @@ class CursorWrapper(object):
 
     def execute(self, sql, params=None):
         self.db.validate_no_broken_transaction()
-        self.db.set_dirty()
         with self.db.wrap_database_errors:
             if params is None:
                 return self.cursor.execute(sql)
@@ -62,7 +60,6 @@ class CursorWrapper(object):
 
     def executemany(self, sql, param_list):
         self.db.validate_no_broken_transaction()
-        self.db.set_dirty()
         with self.db.wrap_database_errors:
             return self.cursor.executemany(sql, param_list)
 

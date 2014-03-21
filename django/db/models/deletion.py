@@ -249,7 +249,7 @@ class Collector(object):
         # end of a transaction.
         self.sort()
 
-        with transaction.commit_on_success_unless_managed(using=self.using):
+        with transaction.atomic(using=self.using, savepoint=False):
             # send pre_delete signals
             for model, obj in self.instances_with_model():
                 if not model._meta.auto_created:

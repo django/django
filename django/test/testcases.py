@@ -57,9 +57,6 @@ def to_list(value):
 
 real_commit = transaction.commit
 real_rollback = transaction.rollback
-real_enter_transaction_management = transaction.enter_transaction_management
-real_leave_transaction_management = transaction.leave_transaction_management
-real_abort = transaction.abort
 
 
 def nop(*args, **kwargs):
@@ -69,17 +66,11 @@ def nop(*args, **kwargs):
 def disable_transaction_methods():
     transaction.commit = nop
     transaction.rollback = nop
-    transaction.enter_transaction_management = nop
-    transaction.leave_transaction_management = nop
-    transaction.abort = nop
 
 
 def restore_transaction_methods():
     transaction.commit = real_commit
     transaction.rollback = real_rollback
-    transaction.enter_transaction_management = real_enter_transaction_management
-    transaction.leave_transaction_management = real_leave_transaction_management
-    transaction.abort = real_abort
 
 
 def assert_and_parse_html(self, html, user_msg, msg):
@@ -772,7 +763,7 @@ class TransactionTestCase(SimpleTestCase):
             sql_list = conn.ops.sequence_reset_by_name_sql(
                 no_style(), conn.introspection.sequence_list())
             if sql_list:
-                with transaction.commit_on_success_unless_managed(using=db_name):
+                with transaction.atomic(using=db_name):
                     cursor = conn.cursor()
                     for sql in sql_list:
                         cursor.execute(sql)

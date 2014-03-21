@@ -686,8 +686,7 @@ def create_foreign_related_manager(superclass, rel_field, rel_model):
         def add(self, *objs):
             objs = list(objs)
             db = router.db_for_write(self.model, instance=self.instance)
-            with transaction.commit_on_success_unless_managed(
-                    using=db, savepoint=False):
+            with transaction.atomic(using=db, savepoint=False):
                 for obj in objs:
                     if not isinstance(obj, self.model):
                         raise TypeError("'%s' instance expected, got %r" %
@@ -738,7 +737,7 @@ def create_foreign_related_manager(superclass, rel_field, rel_model):
                 if bulk:
                     queryset.update(**{rel_field.name: None})
                 else:
-                    with transaction.commit_on_success_unless_managed(using=db, savepoint=False):
+                    with transaction.atomic(using=db, savepoint=False):
                         for obj in queryset:
                             setattr(obj, rel_field.name, None)
                             obj.save(update_fields=[rel_field.name])

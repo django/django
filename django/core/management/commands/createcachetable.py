@@ -71,7 +71,7 @@ class Command(BaseCommand):
         for i, line in enumerate(table_output):
             full_statement.append('    %s%s' % (line, ',' if i < len(table_output) - 1 else ''))
         full_statement.append(');')
-        with transaction.commit_on_success_unless_managed():
+        with transaction.atomic():
             with connection.cursor() as curs:
                 try:
                     curs.execute("\n".join(full_statement))

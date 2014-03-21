@@ -20,17 +20,17 @@ class DeleteLockingTest(TransactionTestCase):
     available_apps = ['delete_regress']
 
     def setUp(self):
+        transaction.set_autocommit(False)
         # Create a second connection to the default database
         new_connections = ConnectionHandler(settings.DATABASES)
         self.conn2 = new_connections[DEFAULT_DB_ALIAS]
-        # Put both DB connections into managed transaction mode
-        transaction.enter_transaction_management()
-        self.conn2.enter_transaction_management()
+        self.conn2.set_autocommit(False)
 
     def tearDown(self):
+        transaction.rollback()
+        transaction.set_autocommit(True)
         # Close down the second connection.
-        transaction.leave_transaction_management()
-        self.conn2.abort()
+        self.conn2.rollback()
         self.conn2.close()
 
     @skipUnlessDBFeature('test_db_allows_multiple_connections')
@@ -38,15 +38,10 @@ class DeleteLockingTest(TransactionTestCase):
         "Deletes on concurrent transactions don't collide and lock the database. Regression for #9479"
 
         # Create some dummy data
-        b1 = Book(id=1, pagecount=100)
-        b2 = Book(id=2, pagecount=200)
-        b3 = Book(id=3, pagecount=300)
-        b1.save()
-        b2.save()
-        b3.save()
-
-        transaction.commit()
-
+        with transaction.atomic():
+            Book.objects.create(id=1, pagecount=100)
+            Book.objects.create(id=2, pagecount=200)
+            Book.objects.create(id=3, pagecount=300)
         self.assertEqual(3, Book.objects.count())
 
         # Delete something using connection 2.
@@ -58,10 +53,9 @@ class DeleteLockingTest(TransactionTestCase):
         # deleted in connection 2. This causes an infinite loop
         # under MySQL InnoDB unless we keep track of already
         # deleted objects.
-        Book.objects.filter(pagecount__lt=250).delete()
-        transaction.commit()
+        with transaction.atomic():
+            Book.objects.filter(pagecount__lt=250).delete()
         self.assertEqual(1, Book.objects.count())
-        transaction.commit()
 
 
 class DeleteCascadeTests(TestCase):

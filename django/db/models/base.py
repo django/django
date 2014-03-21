@@ -625,7 +625,7 @@ class Model(six.with_metaclass(ModelBase)):
         if not meta.auto_created:
             signals.pre_save.send(sender=origin, instance=self, raw=raw, using=using,
                                   update_fields=update_fields)
-        with transaction.commit_on_success_unless_managed(using=using, savepoint=False):
+        with transaction.atomic(using=using, savepoint=False):
             if not raw:
                 self._save_parents(cls, using, update_fields)
             updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
@@ -1417,7 +1417,7 @@ def method_set_order(ordered_obj, self, id_list, using=None):
     order_name = ordered_obj._meta.order_with_respect_to.name
     # FIXME: It would be nice if there was an "update many" version of update
     # for situations like this.
-    with transaction.commit_on_success_unless_managed(using=using):
+    with transaction.atomic(using=using, savepoint=False):
         for i, j in enumerate(id_list):
             ordered_obj.objects.filter(**{'pk': j, order_name: rel_val}).update(_order=i)
 
