@@ -62,7 +62,7 @@ Are you sure you want to do this?
 
         if confirm == 'yes':
             try:
-                with transaction.commit_on_success_unless_managed():
+                with transaction.atomic(using=db):
                     with connection.cursor() as cursor:
                         for sql in sql_list:
                             cursor.execute(sql)
