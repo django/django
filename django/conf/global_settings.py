@@ -420,10 +420,6 @@ NUMBER_GROUPING = 0
 # Thousand separator symbol
 THOUSAND_SEPARATOR = ','
 
-# Do you want to manage transactions manually?
-# Hint: you really don't!
-TRANSACTIONS_MANAGED = False
-
 # The tablespaces to use for each model when not specified otherwise.
 DEFAULT_TABLESPACE = ''
 DEFAULT_INDEX_TABLESPACE = ''

@@ -2178,22 +2178,6 @@ to ensure your processes are running in the correct environment.
 
 .. _pytz: http://pytz.sourceforge.net/
 
-.. setting:: TRANSACTIONS_MANAGED
-
-TRANSACTIONS_MANAGED
---------------------
-
-.. deprecated:: 1.6
-
-    This setting was deprecated because its name is very misleading. Use the
-    :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>` key in :setting:`DATABASES`
-    entries instead.
-
-Default: ``False``
-
-Set this to ``True`` if you want to :ref:`disable Django's transaction
-management <deactivate-transaction-management>` and implement your own.
-
 .. setting:: USE_ETAGS
 
 USE_ETAGS
@@ -2869,7 +2853,6 @@ Database
 * :setting:`DATABASE_ROUTERS`
 * :setting:`DEFAULT_INDEX_TABLESPACE`
 * :setting:`DEFAULT_TABLESPACE`
-* :setting:`TRANSACTIONS_MANAGED`
 
 Debugging
 ---------
