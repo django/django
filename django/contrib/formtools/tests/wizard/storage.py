@@ -1,10 +1,17 @@
 from datetime import datetime
 from importlib import import_module
+import os
+import tempfile
 
 from django.http import HttpRequest
 from django.conf import settings
-
 from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
+from django.core.files.uploadedfile import SimpleUploadedFile
+
+
+temp_storage_location = tempfile.mkdtemp(dir=os.environ.get('DJANGO_TEST_TEMP_DIR'))
+temp_storage = FileSystemStorage(location=temp_storage_location)
 
 
 def get_request():
@@ -85,3 +92,17 @@ class TestStorage(object):
         storage.extra_data['test'] = True
 
         self.assertTrue('test' in storage.extra_data)
+
+    def test_reset_deletes_tmp_files(self):
+        request = get_request()
+        storage = self.get_storage()('wizard1', request, temp_storage)
+
+        step = 'start'
+        file_ = SimpleUploadedFile('file.txt', b'content')
+        storage.set_step_files(step, {'file': file_})
+
+        tmp_name = storage.get_step_files(step)['file'].name
+        self.assertTrue(storage.file_storage.exists(tmp_name))
+
+        storage.reset()
+        self.assertFalse(storage.file_storage.exists(tmp_name))

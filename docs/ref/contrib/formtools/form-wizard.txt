@@ -629,9 +629,9 @@ storage class <builtin-fs-storage>`)::
 
 .. warning::
 
-    Please remember to take care of removing old files as the
-    :class:`WizardView` won't remove any files, whether the wizard gets
-    finished correctly or not.
+    Please remember to take care of removing old temporary files, as the
+    :class:`WizardView` will only remove these files if the wizard finishes
+    correctly.
 
 Conditionally view/skip specific steps
 ======================================
