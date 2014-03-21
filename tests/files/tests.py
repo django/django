@@ -210,12 +210,12 @@ class FileMoveSafeTests(unittest.TestCase):
 class SpooledTempTests(unittest.TestCase):
     def test_in_memory_spooled_temp(self):
         with tempfile.SpooledTemporaryFile() as temp:
-            temp.write("foo bar baz quux\n")
+            temp.write(b"foo bar baz quux\n")
             django_file = File(temp, name="something.txt")
-            self.assertTrue(django_file.size, 17) 
+            self.assertEqual(django_file.size, 17)
 
     def test_written_spooled_temp(self):
         with tempfile.SpooledTemporaryFile(max_size=4) as temp:
-            temp.write("foo bar baz quux\n")
+            temp.write(b"foo bar baz quux\n")
             django_file = File(temp, name="something.txt")
-            self.assertTrue(django_file.size, 17) 
+            self.assertEqual(django_file.size, 17)
