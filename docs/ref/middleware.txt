@@ -182,7 +182,7 @@ Enables session support. See the :doc:`session documentation
 Site middleware
 ---------------
 
-.. module:: django.contrib.site.middleware
+.. module:: django.contrib.sites.middleware
   :synopsis: Site middleware.
 
 .. class:: CurrentSiteMiddleware
