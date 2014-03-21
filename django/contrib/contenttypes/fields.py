@@ -12,19 +12,11 @@ from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.related import PathInfo
 from django.db.models.sql.datastructures import Col
 from django.contrib.contenttypes.models import ContentType
-from django.utils import six
-from django.utils.deprecation import RenameMethodsBase, RemovedInDjango18Warning
 from django.utils.encoding import smart_text, python_2_unicode_compatible
 
 
-class RenameGenericForeignKeyMethods(RenameMethodsBase):
-    renamed_methods = (
-        ('get_prefetch_query_set', 'get_prefetch_queryset', RemovedInDjango18Warning),
-    )
-
-
 @python_2_unicode_compatible
-class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
+class GenericForeignKey(object):
     """
     Provides a generic relation to any object through content-type/object-id
     fields.

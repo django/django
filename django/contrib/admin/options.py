@@ -36,8 +36,7 @@ from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.utils import six
 from django.utils.decorators import method_decorator
-from django.utils.deprecation import (RenameMethodsBase,
-    RemovedInDjango18Warning, RemovedInDjango19Warning)
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html import escape, escapejs
 from django.utils.http import urlencode
@@ -92,13 +91,7 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
 csrf_protect_m = method_decorator(csrf_protect)
 
 
-class RenameBaseModelAdminMethods(forms.MediaDefiningClass, RenameMethodsBase):
-    renamed_methods = (
-        ('queryset', 'get_queryset', RemovedInDjango18Warning),
-    )
-
-
-class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
+class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
     """Functionality common to both ModelAdmin and InlineAdmin."""
 
     raw_id_fields = ()

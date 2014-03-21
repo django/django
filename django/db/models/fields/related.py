@@ -14,7 +14,6 @@ from django.db.models.query import QuerySet
 from django.db.models.sql.datastructures import Col
 from django.utils.encoding import smart_text
 from django.utils import six
-from django.utils.deprecation import RenameMethodsBase, RemovedInDjango18Warning
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry, cached_property
 from django.core import exceptions
@@ -344,14 +343,7 @@ class RelatedField(Field):
         return self.rel.related_query_name or self.rel.related_name or self.opts.model_name
 
 
-class RenameRelatedObjectDescriptorMethods(RenameMethodsBase):
-    renamed_methods = (
-        ('get_query_set', 'get_queryset', RemovedInDjango18Warning),
-        ('get_prefetch_query_set', 'get_prefetch_queryset', RemovedInDjango18Warning),
-    )
-
-
-class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescriptorMethods)):
+class SingleRelatedObjectDescriptor(object):
     # This class provides the functionality that makes the related-object
     # managers available as attributes on a model class, for fields that have
     # a single "remote" value, on the class pointed to by a related field.
@@ -479,7 +471,7 @@ class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescri
         setattr(value, self.related.field.get_cache_name(), instance)
 
 
-class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescriptorMethods)):
+class ReverseSingleRelatedObjectDescriptor(object):
     # This class provides the functionality that makes the related-object
     # managers available as attributes on a model class, for fields that have
     # a single "remote" value, on the class that defines the related field.

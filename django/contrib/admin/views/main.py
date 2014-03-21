@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
-from django.utils.deprecation import RenameMethodsBase, RemovedInDjango18Warning
+from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.http import urlencode
@@ -57,13 +57,7 @@ def _is_changelist_popup(request):
     return False
 
 
-class RenameChangeListMethods(RenameMethodsBase):
-    renamed_methods = (
-        ('get_query_set', 'get_queryset', RemovedInDjango18Warning),
-    )
-
-
-class ChangeList(six.with_metaclass(RenameChangeListMethods)):
+class ChangeList(object):
     def __init__(self, request, model, list_display, list_display_links,
             list_filter, date_hierarchy, search_fields, list_select_related,
             list_per_page, list_max_show_all, list_editable, model_admin):
@@ -109,20 +103,6 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
             title = ugettext('Select %s to change')
         self.title = title % force_text(self.opts.verbose_name)
         self.pk_attname = self.lookup_opts.pk.attname
-
-    @property
-    def root_query_set(self):
-        warnings.warn("`ChangeList.root_query_set` is deprecated, "
-                      "use `root_queryset` instead.",
-                      RemovedInDjango18Warning, 2)
-        return self.root_queryset
-
-    @property
-    def query_set(self):
-        warnings.warn("`ChangeList.query_set` is deprecated, "
-                      "use `queryset` instead.",
-                      RemovedInDjango18Warning, 2)
-        return self.queryset
 
     def get_filters_params(self, params=None):
         """

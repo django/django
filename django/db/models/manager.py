@@ -6,7 +6,6 @@ from django.db.models.query import QuerySet
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
-from django.utils.deprecation import RenameMethodsBase, RemovedInDjango18Warning
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -52,15 +51,8 @@ def ensure_default_manager(sender, **kwargs):
 signals.class_prepared.connect(ensure_default_manager)
 
 
-class RenameManagerMethods(RenameMethodsBase):
-    renamed_methods = (
-        ('get_query_set', 'get_queryset', RemovedInDjango18Warning),
-        ('get_prefetch_query_set', 'get_prefetch_queryset', RemovedInDjango18Warning),
-    )
-
-
 @python_2_unicode_compatible
-class BaseManager(six.with_metaclass(RenameManagerMethods)):
+class BaseManager(object):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
 
