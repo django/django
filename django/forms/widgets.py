@@ -634,13 +634,6 @@ class RadioChoiceInput(ChoiceInput):
         self.value = force_text(self.value)
 
 
-class RadioInput(RadioChoiceInput):
-    def __init__(self, *args, **kwargs):
-        msg = "RadioInput has been deprecated. Use RadioChoiceInput instead."
-        warnings.warn(msg, RemovedInDjango18Warning, stacklevel=2)
-        super(RadioInput, self).__init__(*args, **kwargs)
-
-
 class CheckboxChoiceInput(ChoiceInput):
     input_type = 'checkbox'
 
