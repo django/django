@@ -5,7 +5,6 @@ from django.db.utils import (DEFAULT_DB_ALIAS, DataError, OperationalError,
     IntegrityError, InternalError, ProgrammingError, NotSupportedError,
     DatabaseError, InterfaceError, Error, load_backend,
     ConnectionHandler, ConnectionRouter)
-from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.functional import cached_property
 
 
@@ -52,29 +51,6 @@ class DefaultConnectionProxy(object):
         return connections[DEFAULT_DB_ALIAS] != other
 
 connection = DefaultConnectionProxy()
-
-
-class DefaultBackendProxy(object):
-    """
-    Temporary proxy class used during deprecation period of the `backend` module
-    variable.
-    """
-    @cached_property
-    def _backend(self):
-        warnings.warn("Accessing django.db.backend is deprecated.",
-            RemovedInDjango18Warning, stacklevel=2)
-        return load_backend(connections[DEFAULT_DB_ALIAS].settings_dict['ENGINE'])
-
-    def __getattr__(self, item):
-        return getattr(self._backend, item)
-
-    def __setattr__(self, name, value):
-        return setattr(self._backend, name, value)
-
-    def __delattr__(self, name):
-        return delattr(self._backend, name)
-
-backend = DefaultBackendProxy()
 
 
 # Register an event to reset saved queries when a Django request is started.
