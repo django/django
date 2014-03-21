@@ -1917,24 +1917,6 @@ available in ``request.META``.)
     If any of those are not true, you should keep this setting set to ``None``
     and find another way of determining HTTPS, perhaps via custom middleware.
 
-.. setting:: SEND_BROKEN_LINK_EMAILS
-
-SEND_BROKEN_LINK_EMAILS
------------------------
-
-.. deprecated:: 1.6
-    Since :class:`~django.middleware.common.BrokenLinkEmailsMiddleware`
-    was split from :class:`~django.middleware.common.CommonMiddleware`,
-    this setting no longer serves a purpose.
-
-Default: ``False``
-
-Whether to send an email to the :setting:`MANAGERS` each time somebody visits
-a Django-powered page that is 404ed with a non-empty referer (i.e., a broken
-link). This is only used if ``CommonMiddleware`` is installed (see
-:doc:`/topics/http/middleware`). See also :setting:`IGNORABLE_404_URLS` and
-:doc:`/howto/error-reporting`.
-
 .. setting:: SERIALIZATION_MODULES
 
 SERIALIZATION_MODULES
@@ -2934,7 +2916,6 @@ Email
 * :setting:`EMAIL_SUBJECT_PREFIX`
 * :setting:`EMAIL_USE_TLS`
 * :setting:`MANAGERS`
-* :setting:`SEND_BROKEN_LINK_EMAILS`
 * :setting:`SERVER_EMAIL`
 
 Error reporting
@@ -2942,7 +2923,6 @@ Error reporting
 * :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER`
 * :setting:`IGNORABLE_404_URLS`
 * :setting:`MANAGERS`
-* :setting:`SEND_BROKEN_LINK_EMAILS`
 * :setting:`SILENCED_SYSTEM_CHECKS`
 
 File uploads

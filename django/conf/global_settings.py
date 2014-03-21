@@ -168,9 +168,6 @@ FILE_CHARSET = 'utf-8'
 # Email address that error messages come from.
 SERVER_EMAIL = 'root@localhost'
 
-# Whether to send broken-link emails. Deprecated, must be removed in 1.8.
-SEND_BROKEN_LINK_EMAILS = False
-
 # Database connection info. If left empty, will default to the dummy backend.
 DATABASES = {}
 
