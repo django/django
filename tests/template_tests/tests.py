@@ -17,7 +17,7 @@ from django.template.loaders import app_directories, filesystem, cached
 from django.test import RequestFactory, TestCase
 from django.test.utils import (setup_test_template_loader,
     restore_template_loaders, override_settings, extend_sys_path)
-from django.utils.deprecation import RemovedInDjango18Warning, RemovedInDjango19Warning
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
 from django.utils._os import upath
@@ -593,8 +593,6 @@ class TemplateTests(TestCase):
                             try:
                                 try:
                                     with warnings.catch_warnings():
-                                        # Ignore deprecations of the old syntax of the 'cycle' and 'firstof' tags.
-                                        warnings.filterwarnings("ignore", category=RemovedInDjango18Warning, module='django.template.base')
                                         # Ignore pending deprecations of loading 'ssi' and 'url' tags from future.
                                         warnings.filterwarnings("ignore", category=RemovedInDjango19Warning, module='django.templatetags.future')
                                         test_template = loader.get_template(name)
