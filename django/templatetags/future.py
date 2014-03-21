@@ -29,6 +29,8 @@ def url(parser, token):
 def cycle(parser, token):
     """
     This is the future version of `cycle` with auto-escaping.
+    The deprecation is now complete and this version is no different
+    from the non-future version so this can be deprecated (#22306)
 
     By default all strings are escaped.
 
@@ -42,13 +44,15 @@ def cycle(parser, token):
 
         {% cycle var1 var2|safe var3|safe  as somecycle %}
     """
-    return defaulttags.cycle(parser, token, escape=True)
+    return defaulttags.cycle(parser, token)
 
 
 @register.tag
 def firstof(parser, token):
     """
     This is the future version of `firstof` with auto-escaping.
+    The deprecation is now complete and this version is no different
+    from the non-future version so this can be deprecated (#22306)
 
     This is equivalent to::
 
@@ -71,4 +75,4 @@ def firstof(parser, token):
         {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
 
     """
-    return defaulttags.firstof(parser, token, escape=True)
+    return defaulttags.firstof(parser, token)

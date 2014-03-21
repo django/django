@@ -17,7 +17,6 @@ from django.template.base import (Node, NodeList, Template, Context, Library,
     render_value_in_context)
 from django.template.smartif import IfParser, Literal
 from django.template.defaultfilters import date
-from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import force_text, smart_text
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
@@ -65,11 +64,10 @@ class CsrfTokenNode(Node):
 
 
 class CycleNode(Node):
-    def __init__(self, cyclevars, variable_name=None, silent=False, escape=False):
+    def __init__(self, cyclevars, variable_name=None, silent=False):
         self.cyclevars = cyclevars
         self.variable_name = variable_name
         self.silent = silent
-        self.escape = escape        # only while the "future" version exists
 
     def render(self, context):
         if self not in context.render_context:
@@ -81,8 +79,6 @@ class CycleNode(Node):
             context[self.variable_name] = value
         if self.silent:
             return ''
-        if not self.escape:
-            value = mark_safe(value)
         return render_value_in_context(value, context)
 
 
@@ -107,16 +103,13 @@ class FilterNode(Node):
 
 
 class FirstOfNode(Node):
-    def __init__(self, variables, escape=False):
+    def __init__(self, variables):
         self.vars = variables
-        self.escape = escape        # only while the "future" version exists
 
     def render(self, context):
         for var in self.vars:
             value = var.resolve(context, True)
             if value:
-                if not self.escape:
-                    value = mark_safe(value)
                 return render_value_in_context(value, context)
         return ''
 
@@ -554,7 +547,7 @@ def comment(parser, token):
 
 
 @register.tag
-def cycle(parser, token, escape=False):
+def cycle(parser, token):
     """
     Cycles among the given strings each time this tag is encountered.
 
@@ -587,13 +580,6 @@ def cycle(parser, token, escape=False):
         {% endfor %}
 
     """
-    if not escape:
-        warnings.warn(
-            "'The `cycle` template tag is changing to escape its arguments; "
-            "the non-autoescaping version is deprecated. Load it "
-            "from the `future` tag library to start using the new behavior.",
-            RemovedInDjango18Warning, stacklevel=2)
-
     # Note: This returns the exact same node on each {% cycle name %} call;
     # that is, the node object returned from {% cycle a b c as name %} and the
     # one returned from {% cycle name %} are the exact same object. This
@@ -640,13 +626,13 @@ def cycle(parser, token, escape=False):
     if as_form:
         name = args[-1]
         values = [parser.compile_filter(arg) for arg in args[1:-2]]
-        node = CycleNode(values, name, silent=silent, escape=escape)
+        node = CycleNode(values, name, silent=silent)
         if not hasattr(parser, '_namedCycleNodes'):
             parser._namedCycleNodes = {}
         parser._namedCycleNodes[name] = node
     else:
         values = [parser.compile_filter(arg) for arg in args[1:]]
-        node = CycleNode(values, escape=escape)
+        node = CycleNode(values)
     return node
 
 
@@ -701,7 +687,7 @@ def do_filter(parser, token):
 
 
 @register.tag
-def firstof(parser, token, escape=False):
+def firstof(parser, token):
     """
     Outputs the first variable passed that is not False, without escaping.
 
@@ -735,17 +721,10 @@ def firstof(parser, token, escape=False):
         {% endfilter %}
 
     """
-    if not escape:
-        warnings.warn(
-            "'The `firstof` template tag is changing to escape its arguments; "
-            "the non-autoescaping version is deprecated. Load it "
-            "from the `future` tag library to start using the new behavior.",
-            RemovedInDjango18Warning, stacklevel=2)
-
     bits = token.split_contents()[1:]
     if len(bits) < 1:
         raise TemplateSyntaxError("'firstof' statement requires at least one argument")
-    return FirstOfNode([parser.compile_filter(bit) for bit in bits], escape=escape)
+    return FirstOfNode([parser.compile_filter(bit) for bit in bits])
 
 
 @register.tag('for')

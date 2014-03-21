@@ -102,13 +102,11 @@ this::
         </tr>
     {% endfor %}
 
-Note that the variables included in the cycle will not be escaped. Any HTML or
-Javascript code contained in the printed variable will be rendered as-is, which
-could potentially lead to security issues. So either make sure that you trust
-their values or use explicit escaping like this::
+Variables included in the cycle will be escaped.  You can disable auto-escaping
+with::
 
     {% for o in some_list %}
-        <tr class="{% filter force_escape %}{% cycle rowvalue1 rowvalue2 %}{% endfilter %}">
+        <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape
             ...
         </tr>
     {% endfor %}
@@ -196,21 +194,6 @@ In this syntax, each value gets interpreted as a literal string, and there's no
 way to specify variable values. Or literal commas. Or spaces. Did we mention
 you shouldn't use this syntax in any new projects?
 
-.. versionchanged:: 1.6
-
-To improve safety, future versions of ``cycle`` will automatically escape
-their output. You're encouraged to activate this behavior by loading
-``cycle`` from the ``future`` template library::
-
-    {% load cycle from future %}
-
-When using the ``future`` version, you can disable auto-escaping with::
-
-    {% for o in some_list %}
-        <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape %}">
-            ...
-        </tr>
-    {% endfor %}
 
 .. templatetag:: debug
 
@@ -268,10 +251,8 @@ Sample usage::
 firstof
 ^^^^^^^
 
-Outputs the first argument variable that is not False. This tag does *not*
-auto-escape variable values.
-
-Outputs nothing if all the passed variables are False.
+Outputs the first argument variable that is not ``False``. Outputs nothing if
+all the passed variables are ``False``.
 
 Sample usage::
 
@@ -292,32 +273,15 @@ passed variables are False::
 
     {% firstof var1 var2 var3 "fallback value" %}
 
-Note that currently the variables included in the firstof tag will not be
-escaped. Any HTML or Javascript code contained in the printed variable will be
-rendered as-is, which could potentially lead to security issues. If you need
-to escape the variables in the firstof tag, you must do so explicitly::
+This tag auto-escapes variable values. You can disable auto-escaping with::
 
-    {% filter force_escape %}
-        {% firstof var1 var2 var3 "fallback value" %}
-    {% endfilter %}
+    {% autoescape off %}
+        {% firstof var1 var2 var3 "<strong>fallback value</strong>" %}
+    {% endautoescape %}
 
-.. versionchanged:: 1.6
+Or if only some variables should be escaped, you can use::
 
-    To improve safety, future versions of ``firstof`` will automatically escape
-    their output. You're encouraged to activate this behavior by loading
-    ``firstof`` from the ``future`` template library::
-
-        {% load firstof from future %}
-
-    When using the ``future`` version, you can disable auto-escaping with::
-
-        {% autoescape off %}
-            {% firstof var1 var2 var3 "<strong>fallback value</strong>" %}
-        {% endautoescape %}
-
-    Or if only some variables should be escaped, you can use::
-
-        {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
+    {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
 
 .. templatetag:: for
 
