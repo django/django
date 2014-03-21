@@ -6,12 +6,10 @@ from __future__ import unicode_literals
 
 import copy
 from itertools import chain
-import warnings
 
 from django.conf import settings
 from django.forms.utils import flatatt, to_current_timezone
 from django.utils.datastructures import MultiValueDict, MergeDict
-from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html import conditional_escape, format_html
 from django.utils.translation import ugettext_lazy
@@ -186,14 +184,6 @@ class Widget(six.with_metaclass(MediaDefiningClass)):
     @property
     def is_hidden(self):
         return self.input_type == 'hidden' if hasattr(self, 'input_type') else False
-
-    @is_hidden.setter
-    def is_hidden(self, *args):
-        warnings.warn(
-            "`is_hidden` property is now read-only (and checks `input_type`). "
-            "Please update your code.",
-            RemovedInDjango18Warning, stacklevel=2
-        )
 
     def subwidgets(self, name, value, attrs=None, choices=()):
         """
