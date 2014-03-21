@@ -43,12 +43,9 @@ More details about how the caching works:
 
 """
 
-import warnings
-
 from django.conf import settings
 from django.core.cache import caches, DEFAULT_CACHE_ALIAS
 from django.utils.cache import get_cache_key, learn_cache_key, patch_response_headers, get_max_age
-from django.utils.deprecation import RemovedInDjango18Warning
 
 
 class UpdateCacheMiddleware(object):
@@ -63,7 +60,6 @@ class UpdateCacheMiddleware(object):
     def __init__(self):
         self.cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
         self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
-        self.cache_anonymous_only = getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
         self.cache = caches[self.cache_alias]
 
@@ -74,17 +70,7 @@ class UpdateCacheMiddleware(object):
             return False
 
     def _should_update_cache(self, request, response):
-        if not hasattr(request, '_cache_update_cache') or not request._cache_update_cache:
-            return False
-        # If the session has not been accessed otherwise, we don't want to
-        # cause it to be accessed here. If it hasn't been accessed, then the
-        # user's logged-in status has not affected the response anyway.
-        if self.cache_anonymous_only and self._session_accessed(request):
-            assert hasattr(request, 'user'), "The Django cache middleware with CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True requires authentication middleware to be installed. Edit your MIDDLEWARE_CLASSES setting to insert 'django.contrib.auth.middleware.AuthenticationMiddleware' before the CacheMiddleware."
-            if request.user.is_authenticated():
-                # Don't cache user-variable requests from authenticated users.
-                return False
-        return True
+        return hasattr(request, '_cache_update_cache') and request._cache_update_cache
 
     def process_response(self, request, response):
         """Sets the cache, if needed."""
@@ -163,7 +149,7 @@ class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
     Also used as the hook point for the cache decorator, which is generated
     using the decorator-from-middleware utility.
     """
-    def __init__(self, cache_timeout=None, cache_anonymous_only=None, **kwargs):
+    def __init__(self, cache_timeout=None, **kwargs):
         # We need to differentiate between "provided, but using default value",
         # and "not provided". If the value is provided using a default, then
         # we fall back to system defaults. If it is not provided at all,
@@ -188,13 +174,4 @@ class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
         if cache_timeout is None:
             cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
         self.cache_timeout = cache_timeout
-
-        if cache_anonymous_only is None:
-            cache_anonymous_only = getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
-        self.cache_anonymous_only = cache_anonymous_only
-
-        if self.cache_anonymous_only:
-            msg = "CACHE_MIDDLEWARE_ANONYMOUS_ONLY has been deprecated and will be removed in Django 1.8."
-            warnings.warn(msg, RemovedInDjango18Warning, stacklevel=1)
-
         self.cache = caches[self.cache_alias]

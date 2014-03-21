@@ -26,8 +26,7 @@ from django.middleware.cache import (FetchFromCacheMiddleware,
 from django.template import Template
 from django.template.response import TemplateResponse
 from django.test import TestCase, TransactionTestCase, RequestFactory, override_settings
-from django.test.utils import (IgnoreDeprecationWarningsMixin,
-    IgnorePendingDeprecationWarningsMixin)
+from django.test.utils import IgnorePendingDeprecationWarningsMixin
 from django.utils import six
 from django.utils import timezone
 from django.utils import translation
@@ -1743,7 +1742,6 @@ def hello_world_view(request, value):
     CACHE_MIDDLEWARE_ALIAS='other',
     CACHE_MIDDLEWARE_KEY_PREFIX='middlewareprefix',
     CACHE_MIDDLEWARE_SECONDS=30,
-    CACHE_MIDDLEWARE_ANONYMOUS_ONLY=False,
     CACHES={
         'default': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -1755,7 +1753,7 @@ def hello_world_view(request, value):
         },
     },
 )
-class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
+class CacheMiddlewareTest(TestCase):
 
     def setUp(self):
         super(CacheMiddlewareTest, self).setUp()
@@ -1781,7 +1779,6 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
         self.assertEqual(middleware.cache_timeout, 30)
         self.assertEqual(middleware.key_prefix, 'middlewareprefix')
         self.assertEqual(middleware.cache_alias, 'other')
-        self.assertEqual(middleware.cache_anonymous_only, False)
 
         # If arguments are being passed in construction, it's being used as a decorator.
         # First, test with "defaults":
@@ -1790,15 +1787,13 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
         self.assertEqual(as_view_decorator.cache_timeout, 30)  # Timeout value for 'default' cache, i.e. 30
         self.assertEqual(as_view_decorator.key_prefix, '')
         self.assertEqual(as_view_decorator.cache_alias, 'default')  # Value of DEFAULT_CACHE_ALIAS from django.core.cache
-        self.assertEqual(as_view_decorator.cache_anonymous_only, False)
 
         # Next, test with custom values:
-        as_view_decorator_with_custom = CacheMiddleware(cache_anonymous_only=True, cache_timeout=60, cache_alias='other', key_prefix='foo')
+        as_view_decorator_with_custom = CacheMiddleware(cache_timeout=60, cache_alias='other', key_prefix='foo')
 
         self.assertEqual(as_view_decorator_with_custom.cache_timeout, 60)
         self.assertEqual(as_view_decorator_with_custom.key_prefix, 'foo')
         self.assertEqual(as_view_decorator_with_custom.cache_alias, 'other')
-        self.assertEqual(as_view_decorator_with_custom.cache_anonymous_only, True)
 
     def test_middleware(self):
         middleware = CacheMiddleware()
@@ -1829,57 +1824,6 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
         result = timeout_middleware.process_request(request)
         self.assertNotEqual(result, None)
         self.assertEqual(result.content, b'Hello World 1')
-
-    @override_settings(CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True)
-    def test_cache_middleware_anonymous_only_wont_cause_session_access(self):
-        """ The cache middleware shouldn't cause a session access due to
-        CACHE_MIDDLEWARE_ANONYMOUS_ONLY if nothing else has accessed the
-        session. Refs 13283 """
-
-        from django.contrib.sessions.middleware import SessionMiddleware
-        from django.contrib.auth.middleware import AuthenticationMiddleware
-
-        middleware = CacheMiddleware()
-        session_middleware = SessionMiddleware()
-        auth_middleware = AuthenticationMiddleware()
-
-        request = self.factory.get('/view_anon/')
-
-        # Put the request through the request middleware
-        session_middleware.process_request(request)
-        auth_middleware.process_request(request)
-        result = middleware.process_request(request)
-        self.assertEqual(result, None)
-
-        response = hello_world_view(request, '1')
-
-        # Now put the response through the response middleware
-        session_middleware.process_response(request, response)
-        response = middleware.process_response(request, response)
-
-        self.assertEqual(request.session.accessed, False)
-
-    @override_settings(CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True)
-    def test_cache_middleware_anonymous_only_with_cache_page(self):
-        """CACHE_MIDDLEWARE_ANONYMOUS_ONLY should still be effective when used
-        with the cache_page decorator: the response to a request from an
-        authenticated user should not be cached."""
-
-        request = self.factory.get('/view_anon/')
-
-        class MockAuthenticatedUser(object):
-            def is_authenticated(self):
-                return True
-
-        class MockAccessedSession(object):
-            accessed = True
-
-        request.user = MockAuthenticatedUser()
-        request.session = MockAccessedSession()
-
-        response = cache_page(60)(hello_world_view)(request, '1')
-
-        self.assertFalse("Cache-Control" in response)
 
     def test_view_decorator(self):
         # decorate the same view with different cache decorators
