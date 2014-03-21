@@ -24,7 +24,7 @@ from .models import (Article, ArticleStatus, Author, Author1, BetterWriter, BigI
     DerivedBook, DerivedPost, Document, ExplicitPK, FilePathModel, FlexibleDatePost, Homepage,
     ImprovedArticle, ImprovedArticleWithParentLink, Inventory, Person, Post, Price,
     Product, Publication, TextFile, Triple, Writer, WriterProfile,
-    Colour, ColourfulItem, ArticleStatusNote, DateTimePost, CustomErrorMessage,
+    Colour, ColourfulItem, DateTimePost, CustomErrorMessage,
     test_images, StumpJoke, Character)
 
 if test_images:
@@ -1004,7 +1004,7 @@ class ModelFormBasicTests(TestCase):
 <option value="%s" selected="selected">Entertainment</option>
 <option value="%s" selected="selected">It&#39;s a test</option>
 <option value="%s">Third test</option>
-</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
+</select></li>
 <li>Status: <select name="status">
 <option value="" selected="selected">---------</option>
 <option value="1">Draft</option>
@@ -1040,7 +1040,7 @@ class ModelFormBasicTests(TestCase):
 <option value="%s">Entertainment</option>
 <option value="%s">It&#39;s a test</option>
 <option value="%s">Third test</option>
-</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
+</select></li>
 <li>Status: <select name="status">
 <option value="" selected="selected">---------</option>
 <option value="1">Draft</option>
@@ -1084,7 +1084,7 @@ class ModelFormBasicTests(TestCase):
 <option value="%d" selected="selected">Entertainment</option>
 <option value="%d" selected="selected">It&39;s a test</option>
 <option value="%d">Third test</option>
-</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>"""
+</select></li>"""
             % (self.c1.pk, self.c2.pk, self.c3.pk))
 
     def test_basic_creation(self):
@@ -1147,7 +1147,7 @@ class ModelFormBasicTests(TestCase):
 <option value="%s">Entertainment</option>
 <option value="%s">It&#39;s a test</option>
 <option value="%s">Third test</option>
-</select><br /><span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></td></tr>
+</select></td></tr>
 <tr><th>Status:</th><td><select name="status">
 <option value="" selected="selected">---------</option>
 <option value="1">Draft</option>
@@ -1175,7 +1175,7 @@ class ModelFormBasicTests(TestCase):
 <option value="%s" selected="selected">Entertainment</option>
 <option value="%s">It&#39;s a test</option>
 <option value="%s">Third test</option>
-</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
+</select></li>
 <li>Status: <select name="status">
 <option value="" selected="selected">---------</option>
 <option value="1">Draft</option>
@@ -1316,7 +1316,7 @@ class ModelFormBasicTests(TestCase):
 <option value="%s">Entertainment</option>
 <option value="%s">It&#39;s a test</option>
 <option value="%s">Third test</option>
-</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
+</select> </li>
 <li>Status: <select name="status">
 <option value="" selected="selected">---------</option>
 <option value="1">Draft</option>
@@ -1341,7 +1341,7 @@ class ModelFormBasicTests(TestCase):
 <option value="%s">It&#39;s a test</option>
 <option value="%s">Third test</option>
 <option value="%s">Fourth</option>
-</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
+</select></li>
 <li>Status: <select name="status">
 <option value="" selected="selected">---------</option>
 <option value="1">Draft</option>
@@ -2152,7 +2152,7 @@ class OtherModelFormTests(TestCase):
             """<p><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" maxlength="50" /></p>
         <p><label for="id_colours">Colours:</label> <select multiple="multiple" name="colours" id="id_colours">
         <option value="%(blue_pk)s">Blue</option>
-        </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>"""
+        </select></p>"""
             % {'blue_pk': colour.pk})
 
 
@@ -2223,36 +2223,6 @@ class CustomCleanTests(TestCase):
         form = CategoryForm(data)
         category = form.save()
         self.assertEqual(category.name, 'TEST')
-
-
-class M2mHelpTextTest(TestCase):
-    """Tests for ticket #9321."""
-    def test_multiple_widgets(self):
-        """Help text of different widgets for ManyToManyFields model fields"""
-        class StatusNoteForm(forms.ModelForm):
-            class Meta:
-                model = ArticleStatusNote
-                fields = '__all__'
-
-        class StatusNoteCBM2mForm(forms.ModelForm):
-            class Meta:
-                model = ArticleStatusNote
-                fields = '__all__'
-                widgets = {'status': forms.CheckboxSelectMultiple}
-
-        dreaded_help_text = '<span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span>'
-
-        # Default widget (SelectMultiple):
-        std_form = StatusNoteForm()
-        self.assertInHTML(dreaded_help_text, std_form.as_p())
-
-        # Overridden widget (CheckboxSelectMultiple, a subclass of
-        # SelectMultiple but with a UI that doesn't involve Control/Command
-        # keystrokes to extend selection):
-        form = StatusNoteCBM2mForm()
-        html = form.as_p()
-        self.assertInHTML('<ul id="id_status">', html)
-        self.assertInHTML(dreaded_help_text, html, count=0)
 
 
 class ModelFormInheritanceTests(TestCase):

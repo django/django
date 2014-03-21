@@ -15,12 +15,12 @@ from django.forms.forms import DeclarativeFieldsMetaclass, BaseForm
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.utils import ErrorList
 from django.forms.widgets import (SelectMultiple, HiddenInput,
-    MultipleHiddenInput, CheckboxSelectMultiple)
+    MultipleHiddenInput)
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import smart_text, force_text
 from django.utils.text import get_text_list, capfirst
-from django.utils.translation import ugettext_lazy as _, ugettext, string_concat
+from django.utils.translation import ugettext_lazy as _, ugettext
 
 
 __all__ = (
@@ -1196,10 +1196,6 @@ class ModelMultipleChoiceField(ModelChoiceField):
         super(ModelMultipleChoiceField, self).__init__(queryset, None,
             cache_choices, required, widget, label, initial, help_text,
             *args, **kwargs)
-        # Remove this in Django 1.8
-        if isinstance(self.widget, SelectMultiple) and not isinstance(self.widget, CheckboxSelectMultiple):
-            msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
-            self.help_text = string_concat(self.help_text, ' ', msg)
 
     def to_python(self, value):
         if not value:

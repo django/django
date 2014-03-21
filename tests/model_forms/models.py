@@ -369,11 +369,6 @@ class ColourfulItem(models.Model):
     colours = models.ManyToManyField(Colour)
 
 
-class ArticleStatusNote(models.Model):
-    name = models.CharField(max_length=20)
-    status = models.ManyToManyField(ArticleStatus)
-
-
 class CustomErrorMessage(models.Model):
     name1 = models.CharField(max_length=50,
         validators=[validators.validate_slug],
