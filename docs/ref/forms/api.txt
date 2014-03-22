@@ -103,7 +103,7 @@ Access the :attr:`~Form.errors` attribute to get a dictionary of error
 messages::
 
     >>> f.errors
-    {'sender': [u'Enter a valid email address.'], 'subject': [u'This field is required.']}
+    {'sender': ['Enter a valid email address.'], 'subject': ['This field is required.']}
 
 In this dictionary, the keys are the field names, and the values are lists of
 Unicode strings representing the error messages. The error messages are stored
@@ -291,7 +291,7 @@ it, you can access the clean data via its ``cleaned_data`` attribute::
     >>> f.is_valid()
     True
     >>> f.cleaned_data
-    {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
+    {'cc_myself': True, 'message': 'Hi there', 'sender': 'foo@example.com', 'subject': 'hello'}
 
 Note that any text-based field -- such as ``CharField`` or ``EmailField`` --
 always cleans the input into a Unicode string. We'll cover the encoding
@@ -308,7 +308,7 @@ only the valid fields::
     >>> f.is_valid()
     False
     >>> f.cleaned_data
-    {'cc_myself': True, 'message': u'Hi there'}
+    {'cc_myself': True, 'message': 'Hi there'}
 
 ``cleaned_data`` will always *only* contain a key for fields defined in the
 ``Form``, even if you pass extra data when you define the ``Form``. In this
@@ -326,7 +326,7 @@ but ``cleaned_data`` contains only the form's fields::
     >>> f.is_valid()
     True
     >>> f.cleaned_data # Doesn't contain extra_field_1, etc.
-    {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
+    {'cc_myself': True, 'message': 'Hi there', 'sender': 'foo@example.com', 'subject': 'hello'}
 
 When the ``Form`` is valid, ``cleaned_data`` will include a key and value for
 *all* its fields, even if the data didn't include a value for some optional
@@ -338,12 +338,12 @@ fields. In this example, the data dictionary doesn't include a value for the
     ...     first_name = CharField()
     ...     last_name = CharField()
     ...     nick_name = CharField(required=False)
-    >>> data = {'first_name': u'John', 'last_name': u'Lennon'}
+    >>> data = {'first_name': 'John', 'last_name': 'Lennon'}
     >>> f = OptionalPersonForm(data)
     >>> f.is_valid()
     True
     >>> f.cleaned_data
-    {'nick_name': u'', 'first_name': u'John', 'last_name': u'Lennon'}
+    {'nick_name': '', 'first_name': 'John', 'last_name': 'Lennon'}
 
 In this above example, the ``cleaned_data`` value for ``nick_name`` is set to an
 empty string, because ``nick_name`` is ``CharField``, and ``CharField``\s treat
@@ -428,7 +428,7 @@ containing one field::
 
     >>> f = ContactForm()
     >>> f.as_p()
-    u'<p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></p>\n<p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></p>\n<p><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></p>\n<p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>'
+    '<p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></p>\n<p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></p>\n<p><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></p>\n<p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>'
     >>> print(f.as_p())
     <p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></p>
     <p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></p>
@@ -447,7 +447,7 @@ flexibility::
 
     >>> f = ContactForm()
     >>> f.as_ul()
-    u'<li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></li>\n<li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></li>\n<li><label for="id_sender">Sender:</label> <input type="email" name="sender" id="id_sender" /></li>\n<li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></li>'
+    '<li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></li>\n<li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></li>\n<li><label for="id_sender">Sender:</label> <input type="email" name="sender" id="id_sender" /></li>\n<li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></li>'
     >>> print(f.as_ul())
     <li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></li>
     <li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></li>
@@ -465,7 +465,7 @@ it calls its ``as_table()`` method behind the scenes::
 
     >>> f = ContactForm()
     >>> f.as_table()
-    u'<tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>\n<tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>\n<tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" /></td></tr>\n<tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>'
+    '<tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>\n<tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>\n<tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" /></td></tr>\n<tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>'
     >>> print(f.as_table())
     <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>
     <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>
@@ -752,7 +752,7 @@ when printed::
     >>> print(f['message'])
     <input type="text" name="message" />
     >>> f['message'].errors
-    [u'This field is required.']
+    ['This field is required.']
     >>> print(f['message'].errors)
     <ul class="errorlist"><li>This field is required.</li></ul>
     >>> f['subject'].errors

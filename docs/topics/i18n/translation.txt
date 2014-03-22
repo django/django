@@ -402,11 +402,11 @@ itself to a bytestring. You can't use a unicode string inside a bytestring,
 either, so this is consistent with normal Python behavior. For example::
 
     # This is fine: putting a unicode proxy into a unicode string.
-    u"Hello %s" % ugettext_lazy("people")
+    "Hello %s" % ugettext_lazy("people")
 
     # This will not work, since you cannot insert a unicode object
     # into a bytestring (nor can you insert our unicode proxy there)
-    "Hello %s" % ugettext_lazy("people")
+    b"Hello %s" % ugettext_lazy("people")
 
 If you ever see output that looks like ``"hello
 <django.utils.functional...>"``, you have tried to insert the result of

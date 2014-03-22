@@ -449,7 +449,7 @@ For example::
         last_name = models.CharField(max_length=50)
 
         def __unicode__(self):
-            return u'%s %s' % (self.first_name, self.last_name)
+            return '%s %s' % (self.first_name, self.last_name)
 
 If you define a ``__unicode__()`` method on your model and not a
 :meth:`~Model.__str__()` method, Django will automatically provide you with a
@@ -724,9 +724,9 @@ For example::
 
     class Person(models.Model):
         SHIRT_SIZES = (
-            (u'S', u'Small'),
-            (u'M', u'Medium'),
-            (u'L', u'Large'),
+            ('S', 'Small'),
+            ('M', 'Medium'),
+            ('L', 'Large'),
         )
         name = models.CharField(max_length=60)
         shirt_size = models.CharField(max_length=2, choices=SHIRT_SIZES)
@@ -736,9 +736,9 @@ For example::
     >>> p = Person(name="Fred Flintstone", shirt_size="L")
     >>> p.save()
     >>> p.shirt_size
-    u'L'
+    'L'
     >>> p.get_shirt_size_display()
-    u'Large'
+    'Large'
 
 .. method:: Model.get_next_by_FOO(\**kwargs)
 .. method:: Model.get_previous_by_FOO(\**kwargs)

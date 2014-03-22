@@ -64,7 +64,7 @@ You can use ``kwargs`` instead of ``args``. For example::
     The string returned by ``reverse()`` is already
     :ref:`urlquoted <uri-and-iri-handling>`. For example::
 
-        >>> reverse('cities', args=[u'Orléans'])
+        >>> reverse('cities', args=['Orléans'])
         '.../Orl%C3%A9ans/'
 
     Applying further encoding (such as :meth:`~django.utils.http.urlquote` or

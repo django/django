@@ -1794,8 +1794,8 @@ For example::
     {{ value|make_list }}
 
 If ``value`` is the string ``"Joel"``, the output would be the list
-``[u'J', u'o', u'e', u'l']``. If ``value`` is ``123``, the output will be the
-list ``[u'1', u'2', u'3']``.
+``['J', 'o', 'e', 'l']``. If ``value`` is ``123``, the output will be the
+list ``['1', '2', '3']``.
 
 .. templatefilter:: phone2numeric
 

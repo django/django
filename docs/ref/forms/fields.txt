@@ -24,11 +24,11 @@ exception or returns the clean value::
     >>> from django import forms
     >>> f = forms.EmailField()
     >>> f.clean('foo@example.com')
-    u'foo@example.com'
+    'foo@example.com'
     >>> f.clean('invalid email address')
     Traceback (most recent call last):
     ...
-    ValidationError: [u'Enter a valid email address.']
+    ValidationError: ['Enter a valid email address.']
 
 .. _core-field-arguments:
 
@@ -51,40 +51,40 @@ an empty value -- either ``None`` or the empty string (``""``) -- then
     >>> from django import forms
     >>> f = forms.CharField()
     >>> f.clean('foo')
-    u'foo'
+    'foo'
     >>> f.clean('')
     Traceback (most recent call last):
     ...
-    ValidationError: [u'This field is required.']
+    ValidationError: ['This field is required.']
     >>> f.clean(None)
     Traceback (most recent call last):
     ...
-    ValidationError: [u'This field is required.']
+    ValidationError: ['This field is required.']
     >>> f.clean(' ')
-    u' '
+    ' '
     >>> f.clean(0)
-    u'0'
+    '0'
     >>> f.clean(True)
-    u'True'
+    'True'
     >>> f.clean(False)
-    u'False'
+    'False'
 
 To specify that a field is *not* required, pass ``required=False`` to the
 ``Field`` constructor::
 
     >>> f = forms.CharField(required=False)
     >>> f.clean('foo')
-    u'foo'
+    'foo'
     >>> f.clean('')
-    u''
+    ''
     >>> f.clean(None)
-    u''
+    ''
     >>> f.clean(0)
-    u'0'
+    '0'
     >>> f.clean(True)
-    u'True'
+    'True'
     >>> f.clean(False)
-    u'False'
+    'False'
 
 If a ``Field`` has ``required=False`` and you pass ``clean()`` an empty value,
 then ``clean()`` will return a *normalized* empty value rather than raising
@@ -175,7 +175,7 @@ validation if a particular field's value is not given. ``initial`` values are
     False
     # The form does *not* fall back to using the initial values.
     >>> f.errors
-    {'url': [u'This field is required.'], 'name': [u'This field is required.']}
+    {'url': ['This field is required.'], 'name': ['This field is required.']}
 
 Instead of a constant, you can also pass any callable::
 
@@ -245,7 +245,7 @@ want to override. For example, here is the default error message::
     >>> generic.clean('')
     Traceback (most recent call last):
       ...
-    ValidationError: [u'This field is required.']
+    ValidationError: ['This field is required.']
 
 And here is a custom error message::
 
@@ -253,7 +253,7 @@ And here is a custom error message::
     >>> name.clean('')
     Traceback (most recent call last):
       ...
-    ValidationError: [u'Please enter your name']
+    ValidationError: ['Please enter your name']
 
 In the `built-in Field classes`_ section below, each ``Field`` defines the
 error message keys it uses.
@@ -867,11 +867,11 @@ Slightly complex built-in ``Field`` classes
             >>> from django.forms import ComboField
             >>> f = ComboField(fields=[CharField(max_length=20), EmailField()])
             >>> f.clean('test@example.com')
-            u'test@example.com'
+            'test@example.com'
             >>> f.clean('longemailaddress@example.com')
             Traceback (most recent call last):
             ...
-            ValidationError: [u'Ensure this value has at most 20 characters (it has 28).']
+            ValidationError: ['Ensure this value has at most 20 characters (it has 28).']
 
 ``MultiValueField``
 ~~~~~~~~~~~~~~~~~~~

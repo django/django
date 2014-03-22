@@ -425,9 +425,9 @@ a subclass of dictionary. Exceptions are outlined here:
           >>> q = q.copy() # to make it mutable
           >>> q.update({'a': '2'})
           >>> q.getlist('a')
-          [u'1', u'2']
+          ['1', '2']
           >>> q['a'] # returns the last
-          [u'2']
+          ['2']
 
 .. method:: QueryDict.items()
 
@@ -436,7 +436,7 @@ a subclass of dictionary. Exceptions are outlined here:
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.items()
-           [(u'a', u'3')]
+           [('a', '3')]
 
 .. method:: QueryDict.iteritems()
 
@@ -456,7 +456,7 @@ a subclass of dictionary. Exceptions are outlined here:
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.values()
-           [u'3']
+           ['3']
 
 .. method:: QueryDict.itervalues()
 
@@ -497,7 +497,7 @@ In addition, ``QueryDict`` has the following methods:
 
         >>> q = QueryDict('a=1&a=2&a=3')
         >>> q.lists()
-        [(u'a', [u'1', u'2', u'3'])]
+        [('a', ['1', '2', '3'])]
 
 .. method:: QueryDict.pop(key)
 
@@ -506,7 +506,7 @@ In addition, ``QueryDict`` has the following methods:
 
         >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
         >>> q.pop('a')
-        [u'1', u'2', u'3']
+        ['1', '2', '3']
 
 .. method:: QueryDict.popitem()
 
@@ -517,7 +517,7 @@ In addition, ``QueryDict`` has the following methods:
 
         >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
         >>> q.popitem()
-        (u'a', [u'1', u'2', u'3'])
+        ('a', ['1', '2', '3'])
 
 .. method:: QueryDict.dict()
 
@@ -527,7 +527,7 @@ In addition, ``QueryDict`` has the following methods:
 
         >>> q = QueryDict('a=1&a=3&a=5')
         >>> q.dict()
-        {u'a': u'5'}
+        {'a': '5'}
 
 .. method:: QueryDict.urlencode([safe])
 

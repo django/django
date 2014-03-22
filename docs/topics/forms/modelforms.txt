@@ -913,7 +913,7 @@ extra forms displayed.
     >>> AuthorFormSet = modelformset_factory(Author, max_num=1)
     >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
     >>> [x.name for x in formset.get_queryset()]
-    [u'Charles Baudelaire', u'Paul Verlaine', u'Walt Whitman']
+    ['Charles Baudelaire', 'Paul Verlaine', 'Walt Whitman']
 
 If the value of ``max_num`` is greater than the number of existing related
 objects, up to ``extra`` additional blank forms will be added to the formset,
@@ -1111,7 +1111,7 @@ a particular author, you could do this::
 
     >>> from django.forms.models import inlineformset_factory
     >>> BookFormSet = inlineformset_factory(Author, Book)
-    >>> author = Author.objects.get(name=u'Mike Royko')
+    >>> author = Author.objects.get(name='Mike Royko')
     >>> formset = BookFormSet(instance=author)
 
 .. note::
@@ -1150,7 +1150,7 @@ Then when you create your inline formset, pass in the optional argument
 
     >>> from django.forms.models import inlineformset_factory
     >>> BookFormSet = inlineformset_factory(Author, Book, formset=CustomInlineFormSet)
-    >>> author = Author.objects.get(name=u'Mike Royko')
+    >>> author = Author.objects.get(name='Mike Royko')
     >>> formset = BookFormSet(instance=author)
 
 More than one foreign key to the same model

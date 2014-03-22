@@ -51,7 +51,7 @@ You can retrieve the original value using the ``unsign`` method::
 
     >>> original = signer.unsign(value)
     >>> original
-    u'My string'
+    'My string'
 
 If the signature or value have been altered in any way, a
 ``django.core.signing.BadSignature`` exception will be raised::
@@ -94,7 +94,7 @@ your :setting:`SECRET_KEY`::
     >>> signer.sign('My string')
     'My string:Ee7vGi-ING6n02gkcJ-QLHg6vFw'
     >>> signer.unsign('My string:Ee7vGi-ING6n02gkcJ-QLHg6vFw')
-    u'My string'
+    'My string'
 
 Using salt in this way puts the different signatures into different
 namespaces.  A signature that comes from one namespace (a particular salt
@@ -120,12 +120,12 @@ created within a specified period of time::
     >>> value
     'hello:1NMg5H:oPVuCqlJWmChm1rA2lyTUtelC-c'
     >>> signer.unsign(value)
-    u'hello'
+    'hello'
     >>> signer.unsign(value, max_age=10)
     ...
     SignatureExpired: Signature age 15.5289158821 > 10 seconds
     >>> signer.unsign(value, max_age=20)
-    u'hello'
+    'hello'
 
 .. class:: TimestampSigner(key=None, sep=':', salt=None)
 

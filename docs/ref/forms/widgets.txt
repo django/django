@@ -203,7 +203,7 @@ foundation for custom widgets.
             >>> from django import forms
             >>> name = forms.TextInput(attrs={'size': 10, 'title': 'Your name',})
             >>> name.render('name', 'A name')
-            u'<input title="Your name" type="text" name="name" value="A name" size="10" />'
+            '<input title="Your name" type="text" name="name" value="A name" size="10" />'
 
         .. versionchanged:: 1.8
 
@@ -342,7 +342,7 @@ foundation for custom widgets.
                 return [None, None, None]
 
             def format_output(self, rendered_widgets):
-                return u''.join(rendered_widgets)
+                return ''.join(rendered_widgets)
 
             def value_from_datadict(self, data, files, name):
                 datelist = [

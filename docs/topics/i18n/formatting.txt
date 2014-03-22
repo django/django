@@ -174,7 +174,9 @@ To customize the English formats, a structure like this would be needed::
 
 where :file:`formats.py` contains custom format definitions. For example::
 
-    THOUSAND_SEPARATOR = u'\xa0'
+    from __future__ import unicode_literals
+
+    THOUSAND_SEPARATOR = '\xa0'
 
 to use a non-breaking space (Unicode ``00A0``) as a thousand separator,
 instead of the default for English, a comma.

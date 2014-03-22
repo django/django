@@ -187,7 +187,7 @@ Use the ``django.test.Client`` class to make requests.
 
             >>> response = c.get('/redirect_me/', follow=True)
             >>> response.redirect_chain
-            [(u'http://testserver/next/', 302), (u'http://testserver/final/', 302)]
+            [('http://testserver/next/', 302), ('http://testserver/final/', 302)]
 
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
@@ -1245,7 +1245,7 @@ your test suite.
     failure. Similar to unittest's :meth:`~unittest.TestCase.assertRaisesRegexp`
     with the difference that ``expected_message`` isn't a regular expression.
 
-.. method:: SimpleTestCase.assertFieldOutput(fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value=u'')
+.. method:: SimpleTestCase.assertFieldOutput(fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value='')
 
     Asserts that a form field behaves correctly with various inputs.
 
@@ -1262,7 +1262,7 @@ your test suite.
     ``a@a.com`` as a valid email address, but rejects ``aaa`` with a reasonable
     error message::
 
-        self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': [u'Enter a valid email address.']})
+        self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': ['Enter a valid email address.']})
 
 .. method:: SimpleTestCase.assertFormError(response, form, field, errors, msg_prefix='')
 

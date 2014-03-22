@@ -41,11 +41,11 @@ the details of the attached photo::
     >>> car.photo
     <ImageFieldFile: chevy.jpg>
     >>> car.photo.name
-    u'cars/chevy.jpg'
+    'cars/chevy.jpg'
     >>> car.photo.path
-    u'/media/cars/chevy.jpg'
+    '/media/cars/chevy.jpg'
     >>> car.photo.url
-    u'http://media.example.com/cars/chevy.jpg'
+    'http://media.example.com/cars/chevy.jpg'
 
 This object -- ``car.photo`` in the example -- is a ``File`` object, which means
 it has all the methods and attributes described below.
@@ -131,7 +131,7 @@ useful -- you can use the global default storage system::
 
     >>> path = default_storage.save('/path/to/file', ContentFile('new content'))
     >>> path
-    u'/path/to/file'
+    '/path/to/file'
 
     >>> default_storage.size(path)
     11

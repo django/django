@@ -19,7 +19,7 @@ For example, here's a validator that only allows even numbers::
 
     def validate_even(value):
         if value % 2 != 0:
-            raise ValidationError(u'%s is not an even number' % value)
+            raise ValidationError('%s is not an even number' % value)
 
 You can add this to a model field via the field's :attr:`~django.db.models.Field.validators`
 argument::

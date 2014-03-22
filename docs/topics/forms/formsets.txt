@@ -64,7 +64,7 @@ example::
     >>> from myapp.forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
     >>> formset = ArticleFormSet(initial=[
-    ...     {'title': u'Django is now open source',
+    ...     {'title': 'Django is now open source',
     ...      'pub_date': datetime.date.today(),}
     ... ])
 
@@ -136,9 +136,9 @@ all forms in the formset::
     >>> from myapp.forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm)
     >>> data = {
-    ...     'form-TOTAL_FORMS': u'1',
-    ...     'form-INITIAL_FORMS': u'0',
-    ...     'form-MAX_NUM_FORMS': u'',
+    ...     'form-TOTAL_FORMS': '1',
+    ...     'form-INITIAL_FORMS': '0',
+    ...     'form-MAX_NUM_FORMS': '',
     ... }
     >>> formset = ArticleFormSet(data)
     >>> formset.is_valid()
@@ -149,19 +149,19 @@ formset is smart enough to ignore extra forms that were not changed. If we
 provide an invalid article::
 
     >>> data = {
-    ...     'form-TOTAL_FORMS': u'2',
-    ...     'form-INITIAL_FORMS': u'0',
-    ...     'form-MAX_NUM_FORMS': u'',
-    ...     'form-0-title': u'Test',
-    ...     'form-0-pub_date': u'1904-06-16',
-    ...     'form-1-title': u'Test',
-    ...     'form-1-pub_date': u'', # <-- this date is missing but required
+    ...     'form-TOTAL_FORMS': '2',
+    ...     'form-INITIAL_FORMS': '0',
+    ...     'form-MAX_NUM_FORMS': '',
+    ...     'form-0-title': 'Test',
+    ...     'form-0-pub_date': '1904-06-16',
+    ...     'form-1-title': 'Test',
+    ...     'form-1-pub_date': '', # <-- this date is missing but required
     ... }
     >>> formset = ArticleFormSet(data)
     >>> formset.is_valid()
     False
     >>> formset.errors
-    [{}, {'pub_date': [u'This field is required.']}]
+    [{}, {'pub_date': ['This field is required.']}]
 
 As we can see, ``formset.errors`` is a list whose entries correspond to the
 forms in the formset. Validation was performed for each of the two forms, and
@@ -176,7 +176,7 @@ To check how many errors there are in the formset, we can use the
 
     >>> # Using the previous example
     >>> formset.errors
-    [{}, {'pub_date': [u'This field is required.']}]
+    [{}, {'pub_date': ['This field is required.']}]
     >>> len(formset.errors)
     2
     >>> formset.total_error_count()
@@ -186,11 +186,11 @@ We can also check if form data differs from the initial data (i.e. the form was
 sent without any data)::
 
     >>> data = {
-    ...     'form-TOTAL_FORMS': u'1',
-    ...     'form-INITIAL_FORMS': u'0',
-    ...     'form-MAX_NUM_FORMS': u'',
-    ...     'form-0-title': u'',
-    ...     'form-0-pub_date': u'',
+    ...     'form-TOTAL_FORMS': '1',
+    ...     'form-INITIAL_FORMS': '0',
+    ...     'form-MAX_NUM_FORMS': '',
+    ...     'form-0-title': '',
+    ...     'form-0-pub_date': '',
     ... }
     >>> formset = ArticleFormSet(data)
     >>> formset.has_changed()
@@ -209,13 +209,13 @@ collection of forms contained in the formset. If you don't provide
 this management data, an exception will be raised::
 
     >>> data = {
-    ...     'form-0-title': u'Test',
-    ...     'form-0-pub_date': u'',
+    ...     'form-0-title': 'Test',
+    ...     'form-0-pub_date': '',
     ... }
     >>> formset = ArticleFormSet(data)
     Traceback (most recent call last):
     ...
-    django.forms.utils.ValidationError: [u'ManagementForm data is missing or has been tampered with']
+    django.forms.utils.ValidationError: ['ManagementForm data is missing or has been tampered with']
 
 It is used to keep track of how many form instances are being displayed. If
 you are adding new forms via JavaScript, you should increment the count fields
@@ -273,13 +273,13 @@ is where you define your own validation that works at the formset level::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)
     >>> data = {
-    ...     'form-TOTAL_FORMS': u'2',
-    ...     'form-INITIAL_FORMS': u'0',
-    ...     'form-MAX_NUM_FORMS': u'',
-    ...     'form-0-title': u'Test',
-    ...     'form-0-pub_date': u'1904-06-16',
-    ...     'form-1-title': u'Test',
-    ...     'form-1-pub_date': u'1912-06-23',
+    ...     'form-TOTAL_FORMS': '2',
+    ...     'form-INITIAL_FORMS': '0',
+    ...     'form-MAX_NUM_FORMS': '',
+    ...     'form-0-title': 'Test',
+    ...     'form-0-pub_date': '1904-06-16',
+    ...     'form-1-title': 'Test',
+    ...     'form-1-pub_date': '1912-06-23',
     ... }
     >>> formset = ArticleFormSet(data)
     >>> formset.is_valid()
@@ -287,7 +287,7 @@ is where you define your own validation that works at the formset level::
     >>> formset.errors
     [{}, {}]
     >>> formset.non_form_errors()
-    [u'Articles in a set must have distinct titles.']
+    ['Articles in a set must have distinct titles.']
 
 The formset ``clean`` method is called after all the ``Form.clean`` methods
 have been called. The errors will be found using the ``non_form_errors()``
@@ -314,14 +314,14 @@ deletion, is less than or equal to ``max_num``.
     >>> from myapp.forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, max_num=1, validate_max=True)
     >>> data = {
-    ...     'form-TOTAL_FORMS': u'2',
-    ...     'form-INITIAL_FORMS': u'0',
-    ...     'form-MIN_NUM_FORMS': u'',
-    ...     'form-MAX_NUM_FORMS': u'',
-    ...     'form-0-title': u'Test',
-    ...     'form-0-pub_date': u'1904-06-16',
-    ...     'form-1-title': u'Test 2',
-    ...     'form-1-pub_date': u'1912-06-23',
+    ...     'form-TOTAL_FORMS': '2',
+    ...     'form-INITIAL_FORMS': '0',
+    ...     'form-MIN_NUM_FORMS': '',
+    ...     'form-MAX_NUM_FORMS': '',
+    ...     'form-0-title': 'Test',
+    ...     'form-0-pub_date': '1904-06-16',
+    ...     'form-1-title': 'Test 2',
+    ...     'form-1-pub_date': '1912-06-23',
     ... }
     >>> formset = ArticleFormSet(data)
     >>> formset.is_valid()
@@ -329,7 +329,7 @@ deletion, is less than or equal to ``max_num``.
     >>> formset.errors
     [{}, {}]
     >>> formset.non_form_errors()
-    [u'Please submit 1 or fewer forms.']
+    ['Please submit 1 or fewer forms.']
 
 ``validate_max=True`` validates against ``max_num`` strictly even if
 ``max_num`` was exceeded because the amount of initial data supplied was
@@ -363,14 +363,14 @@ deletion, is greater than or equal to ``min_num``.
     >>> from myapp.forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, min_num=3, validate_min=True)
     >>> data = {
-    ...     'form-TOTAL_FORMS': u'2',
-    ...     'form-INITIAL_FORMS': u'0',
-    ...     'form-MIN_NUM_FORMS': u'',
-    ...     'form-MAX_NUM_FORMS': u'',
-    ...     'form-0-title': u'Test',
-    ...     'form-0-pub_date': u'1904-06-16',
-    ...     'form-1-title': u'Test 2',
-    ...     'form-1-pub_date': u'1912-06-23',
+    ...     'form-TOTAL_FORMS': '2',
+    ...     'form-INITIAL_FORMS': '0',
+    ...     'form-MIN_NUM_FORMS': '',
+    ...     'form-MAX_NUM_FORMS': '',
+    ...     'form-0-title': 'Test',
+    ...     'form-0-pub_date': '1904-06-16',
+    ...     'form-1-title': 'Test 2',
+    ...     'form-1-pub_date': '1912-06-23',
     ... }
     >>> formset = ArticleFormSet(data)
     >>> formset.is_valid()
@@ -378,7 +378,7 @@ deletion, is greater than or equal to ``min_num``.
     >>> formset.errors
     [{}, {}]
     >>> formset.non_form_errors()
-    [u'Please submit 3 or more forms.']
+    ['Please submit 3 or more forms.']
 
 .. versionchanged:: 1.7
 
@@ -405,8 +405,8 @@ Lets you create a formset with the ability to order::
     >>> from myapp.forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, can_order=True)
     >>> formset = ArticleFormSet(initial=[
-    ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
-    ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
+    ...     {'title': 'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
+    ...     {'title': 'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
     ... ])
     >>> for form in formset:
     ...     print(form.as_table())
@@ -426,31 +426,31 @@ data it automatically assigned them a numeric value. Let's look at what will
 happen when the user changes these values::
 
     >>> data = {
-    ...     'form-TOTAL_FORMS': u'3',
-    ...     'form-INITIAL_FORMS': u'2',
-    ...     'form-MAX_NUM_FORMS': u'',
-    ...     'form-0-title': u'Article #1',
-    ...     'form-0-pub_date': u'2008-05-10',
-    ...     'form-0-ORDER': u'2',
-    ...     'form-1-title': u'Article #2',
-    ...     'form-1-pub_date': u'2008-05-11',
-    ...     'form-1-ORDER': u'1',
-    ...     'form-2-title': u'Article #3',
-    ...     'form-2-pub_date': u'2008-05-01',
-    ...     'form-2-ORDER': u'0',
+    ...     'form-TOTAL_FORMS': '3',
+    ...     'form-INITIAL_FORMS': '2',
+    ...     'form-MAX_NUM_FORMS': '',
+    ...     'form-0-title': 'Article #1',
+    ...     'form-0-pub_date': '2008-05-10',
+    ...     'form-0-ORDER': '2',
+    ...     'form-1-title': 'Article #2',
+    ...     'form-1-pub_date': '2008-05-11',
+    ...     'form-1-ORDER': '1',
+    ...     'form-2-title': 'Article #3',
+    ...     'form-2-pub_date': '2008-05-01',
+    ...     'form-2-ORDER': '0',
     ... }
 
     >>> formset = ArticleFormSet(data, initial=[
-    ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
-    ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
+    ...     {'title': 'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
+    ...     {'title': 'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
     ... ])
     >>> formset.is_valid()
     True
     >>> for form in formset.ordered_forms:
     ...     print(form.cleaned_data)
-    {'pub_date': datetime.date(2008, 5, 1), 'ORDER': 0, 'title': u'Article #3'}
-    {'pub_date': datetime.date(2008, 5, 11), 'ORDER': 1, 'title': u'Article #2'}
-    {'pub_date': datetime.date(2008, 5, 10), 'ORDER': 2, 'title': u'Article #1'}
+    {'pub_date': datetime.date(2008, 5, 1), 'ORDER': 0, 'title': 'Article #3'}
+    {'pub_date': datetime.date(2008, 5, 11), 'ORDER': 1, 'title': 'Article #2'}
+    {'pub_date': datetime.date(2008, 5, 10), 'ORDER': 2, 'title': 'Article #1'}
 
 ``can_delete``
 ~~~~~~~~~~~~~~
@@ -465,8 +465,8 @@ Lets you create a formset with the ability to select forms for deletion::
     >>> from myapp.forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, can_delete=True)
     >>> formset = ArticleFormSet(initial=[
-    ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
-    ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
+    ...     {'title': 'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
+    ...     {'title': 'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
     ... ])
     >>> for form in formset:
     ....    print(form.as_table())
@@ -486,26 +486,26 @@ and is a ``forms.BooleanField``. When data comes through marking any of the
 delete fields you can access them with ``deleted_forms``::
 
     >>> data = {
-    ...     'form-TOTAL_FORMS': u'3',
-    ...     'form-INITIAL_FORMS': u'2',
-    ...     'form-MAX_NUM_FORMS': u'',
-    ...     'form-0-title': u'Article #1',
-    ...     'form-0-pub_date': u'2008-05-10',
-    ...     'form-0-DELETE': u'on',
-    ...     'form-1-title': u'Article #2',
-    ...     'form-1-pub_date': u'2008-05-11',
-    ...     'form-1-DELETE': u'',
-    ...     'form-2-title': u'',
-    ...     'form-2-pub_date': u'',
-    ...     'form-2-DELETE': u'',
+    ...     'form-TOTAL_FORMS': '3',
+    ...     'form-INITIAL_FORMS': '2',
+    ...     'form-MAX_NUM_FORMS': '',
+    ...     'form-0-title': 'Article #1',
+    ...     'form-0-pub_date': '2008-05-10',
+    ...     'form-0-DELETE': 'on',
+    ...     'form-1-title': 'Article #2',
+    ...     'form-1-pub_date': '2008-05-11',
+    ...     'form-1-DELETE': '',
+    ...     'form-2-title': '',
+    ...     'form-2-pub_date': '',
+    ...     'form-2-DELETE': '',
     ... }
 
     >>> formset = ArticleFormSet(data, initial=[
-    ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
-    ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
+    ...     {'title': 'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
+    ...     {'title': 'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
     ... ])
     >>> [form.cleaned_data for form in formset.deleted_forms]
-    [{'DELETE': True, 'pub_date': datetime.date(2008, 5, 10), 'title': u'Article #1'}]
+    [{'DELETE': True, 'pub_date': datetime.date(2008, 5, 10), 'title': 'Article #1'}]
 
 If you are using a :class:`ModelFormSet<django.forms.models.BaseModelFormSet>`,
 model instances for deleted forms will be deleted when you call

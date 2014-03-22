@@ -408,7 +408,7 @@ sample) looks like this::
             subject = cleaned_data.get("subject")
 
             if cc_myself and subject and "help" not in subject:
-                msg = u"Must put 'help' in subject when cc'ing yourself."
+                msg = "Must put 'help' in subject when cc'ing yourself."
                 self.add_error('cc_myself', msg)
                 self.add_error('subject', msg)
 
