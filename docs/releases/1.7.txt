@@ -792,6 +792,12 @@ Tests
 * The database settings for testing have been collected into a dictionary
   named :setting:`TEST <DATABASE-TEST>`.
 
+Utilities
+^^^^^^^^^
+
+* Improved :func:`~django.utils.html.strip_tags` accuracy (but it still cannot
+  guarantee an HTML-safe result, as stated in the documentation).
+
 Validators
 ^^^^^^^^^^
 
