@@ -23,3 +23,6 @@ several bugs in 1.6.2:
   :class:`~django.forms.IntegerField` subclasses from being overwritten by the
   code in their ``__init__`` method
   (`#22245 <http://code.djangoproject.com/ticket/22245>`_).
+
+* Improved :func:`~django.utils.html.strip_tags` accuracy (but it still cannot
+  guarantee an HTML-safe result, as stated in the documentation).
