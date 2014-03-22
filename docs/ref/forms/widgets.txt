@@ -205,6 +205,19 @@ foundation for custom widgets.
             >>> name.render('name', 'A name')
             u'<input title="Your name" type="text" name="name" value="A name" size="10" />'
 
+        .. versionchanged:: 1.8
+
+            If you assign a value of ``True`` or ``False`` to an attribute,
+            it will be rendered as an HTML5 boolean attribute::
+
+                >>> name = forms.TextInput(attrs={'required': True})
+                >>> name.render('name', 'A name')
+                '<input name="name" type="text" value="A name" required />'
+                >>>
+                >>> name = forms.TextInput(attrs={'required': False})
+                >>> name.render('name', 'A name')
+                '<input name="name" type="text" value="A name" />'
+
     .. method:: render(name, value, attrs=None)
 
         Returns HTML for the widget, as a Unicode string. This method must be
