@@ -15,6 +15,7 @@ from django.conf.urls import patterns, url
 from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, StreamingHttpResponse
 from django.contrib.admin import BooleanFieldListFilter
+from django.utils.safestring import mark_safe
 from django.utils.six import StringIO
 
 from .models import (Article, Chapter, Child, Parent, Picture, Widget,
@@ -407,8 +408,8 @@ class PrePopulatedPostAdmin(admin.ModelAdmin):
 class PostAdmin(admin.ModelAdmin):
     list_display = ['title', 'public']
     readonly_fields = (
-        'posted', 'awesomeness_level', 'coolness', 'value', 'multiline',
-        lambda obj: "foo"
+        'posted', 'awesomeness_level', 'coolness', 'value',
+        'multiline', 'multiline_html', lambda obj: "foo"
     )
 
     inlines = [
@@ -426,6 +427,10 @@ class PostAdmin(admin.ModelAdmin):
 
     def multiline(self, instance):
         return "Multiline\ntest\nstring"
+
+    def multiline_html(self, instance):
+        return mark_safe("Multiline<br>\nhtml<br>\ncontent")
+    multiline_html.allow_tags = True
 
     value.short_description = 'Value in $US'
 

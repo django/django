@@ -47,7 +47,7 @@
               {% if not field.field.is_hidden %}
               <td{% if field.field.name %} class="field-{{ field.field.name }}"{% endif %}>
               {% if field.is_readonly %}
-                  <p>{{ field.contents|linebreaksbr }}</p>
+                  <p>{{ field.contents }}</p>
               {% else %}
                   {{ field.field.errors.as_ul }}
                   {{ field.field }}
