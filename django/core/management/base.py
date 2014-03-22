@@ -349,6 +349,7 @@ class BaseCommand(object):
         finally:
             if saved_locale is not None:
                 translation.activate(saved_locale)
+            django.db.close_old_connections()
 
     def validate(self, app_config=None, display_num_errors=False):
         """ Deprecated. Delegates to ``check``."""
