@@ -6,10 +6,9 @@ and database field objects.
 from __future__ import unicode_literals
 
 from collections import OrderedDict
-import warnings
 
 from django.core.exceptions import (
-    ValidationError, NON_FIELD_ERRORS, FieldError)
+    ImproperlyConfigured, ValidationError, NON_FIELD_ERRORS, FieldError)
 from django.forms.fields import Field, ChoiceField
 from django.forms.forms import DeclarativeFieldsMetaclass, BaseForm
 from django.forms.formsets import BaseFormSet, formset_factory
@@ -17,7 +16,6 @@ from django.forms.utils import ErrorList
 from django.forms.widgets import (SelectMultiple, HiddenInput,
     MultipleHiddenInput)
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import smart_text, force_text
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext
@@ -266,12 +264,11 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
         if opts.model:
             # If a model is defined, extract form fields from it.
             if opts.fields is None and opts.exclude is None:
-                # This should be some kind of assertion error once deprecation
-                # cycle is complete.
-                warnings.warn("Creating a ModelForm without either the 'fields' attribute "
-                              "or the 'exclude' attribute is deprecated - form %s "
-                              "needs updating" % name,
-                              RemovedInDjango18Warning, stacklevel=2)
+                raise ImproperlyConfigured(
+                    "Creating a ModelForm without either the 'fields' attribute "
+                    "or the 'exclude' attribute is prohibited; form %s "
+                    "needs updating." % name
+                )
 
             if opts.fields == ALL_FIELDS:
                 # Sentinel for fields_for_model to indicate "get the list of
@@ -528,14 +525,12 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
         'formfield_callback': formfield_callback
     }
 
-    # The ModelFormMetaclass will trigger a similar warning/error, but this will
-    # be difficult to debug for code that needs updating, so we produce the
-    # warning here too.
     if (getattr(Meta, 'fields', None) is None and
             getattr(Meta, 'exclude', None) is None):
-        warnings.warn("Calling modelform_factory without defining 'fields' or "
-                      "'exclude' explicitly is deprecated",
-                      RemovedInDjango18Warning, stacklevel=2)
+        raise ImproperlyConfigured(
+            "Calling modelform_factory without defining 'fields' or "
+            "'exclude' explicitly is prohibited."
+        )
 
     # Instatiate type(form) in order to use the same metaclass as form.
     return type(form)(class_name, (form,), form_class_attrs)
@@ -814,20 +809,15 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
     """
     Returns a FormSet class for the given Django model class.
     """
-    # modelform_factory will produce the same warning/error, but that will be
-    # difficult to debug for code that needs upgrading, so we produce the
-    # warning here too. This logic is reproducing logic inside
-    # modelform_factory, but it can be removed once the deprecation cycle is
-    # complete, since the validation exception will produce a helpful
-    # stacktrace.
     meta = getattr(form, 'Meta', None)
     if meta is None:
         meta = type(str('Meta'), (object,), {})
     if (getattr(meta, 'fields', fields) is None and
             getattr(meta, 'exclude', exclude) is None):
-        warnings.warn("Calling modelformset_factory without defining 'fields' or "
-                      "'exclude' explicitly is deprecated",
-                      RemovedInDjango18Warning, stacklevel=2)
+        raise ImproperlyConfigured(
+            "Calling modelformset_factory without defining 'fields' or "
+            "'exclude' explicitly is prohibited."
+        )
 
     form = modelform_factory(model, form=form, fields=fields, exclude=exclude,
                              formfield_callback=formfield_callback,

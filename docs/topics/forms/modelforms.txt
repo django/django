@@ -430,13 +430,11 @@ In addition, Django applies the following rule: if you set ``editable=False`` on
 the model field, *any* form created from the model via ``ModelForm`` will not
 include that field.
 
-.. versionchanged:: 1.6
+.. versionchanged:: 1.8
 
-    Before version 1.6, the ``'__all__'`` shortcut did not exist, but omitting
-    the ``fields`` attribute had the same effect. Omitting both ``fields`` and
-    ``exclude`` is now deprecated, but will continue to work as before until
-    version 1.8
-
+    In older versions, omitting both ``fields`` and ``exclude`` resulted in
+    a form with all the model's fields. Doing this now raises an
+    :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
 .. note::
 

@@ -128,16 +128,15 @@ here; we don't have to write any logic ourselves::
     We have to use :func:`~django.core.urlresolvers.reverse_lazy` here, not
     just ``reverse`` as the urls are not loaded when the file is imported.
 
-.. versionchanged:: 1.6
+The ``fields`` attribute works the same way as the ``fields`` attribute on the
+inner ``Meta`` class on :class:`~django.forms.ModelForm`. Unless you define the
+form class in another way, the attribute is required and the view will raise
+an :exc:`~django.core.exceptions.ImproperlyConfigured` exception if it's not.
 
-In Django 1.6, the ``fields`` attribute was added, which works the same way as
-the ``fields`` attribute on the inner ``Meta`` class on
-:class:`~django.forms.ModelForm`.
+.. versionchanged:: 1.8
 
-Omitting the fields attribute will work as previously, but is deprecated and
-this attribute will be required from 1.8 (unless you define the form class in
-another way).
-
+    Omitting the ``fields`` attribute was previously allowed and resulted in a
+    form with all of the model's fields.
 
 Finally, we hook these new views into the URLconf::
 

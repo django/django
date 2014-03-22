@@ -1,9 +1,6 @@
-import warnings
-
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import models as model_forms
 from django.http import HttpResponseRedirect
-from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import force_text
 from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
 from django.views.generic.detail import (SingleObjectMixin,
@@ -112,9 +109,10 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
                 model = self.get_queryset().model
 
             if self.fields is None:
-                warnings.warn("Using ModelFormMixin (base class of %s) without "
-                              "the 'fields' attribute is deprecated." % self.__class__.__name__,
-                              RemovedInDjango18Warning)
+                raise ImproperlyConfigured(
+                    "Using ModelFormMixin (base class of %s) without "
+                    "the 'fields' attribute is prohibited." % self.__class__.__name__
+                )
 
             return model_forms.modelform_factory(model, fields=self.fields)
 

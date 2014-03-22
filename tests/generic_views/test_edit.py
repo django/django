@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import warnings
 from unittest import expectedFailure
 
 from django.core.exceptions import ImproperlyConfigured
@@ -8,7 +7,6 @@ from django.core.urlresolvers import reverse
 from django import forms
 from django.test import TestCase
 from django.test.client import RequestFactory
-from django.utils.deprecation import RemovedInDjango18Warning
 from django.views.generic.base import View
 from django.views.generic.edit import FormMixin, ModelFormMixin, CreateView
 
@@ -151,33 +149,23 @@ class CreateViewTests(TestCase):
                          ['name'])
 
     def test_create_view_all_fields(self):
+        class MyCreateView(CreateView):
+            model = Author
+            fields = '__all__'
 
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", RemovedInDjango18Warning)
-
-            class MyCreateView(CreateView):
-                model = Author
-                fields = '__all__'
-
-            self.assertEqual(list(MyCreateView().get_form_class().base_fields),
-                             ['name', 'slug'])
-        self.assertEqual(len(w), 0)
+        self.assertEqual(list(MyCreateView().get_form_class().base_fields),
+                         ['name', 'slug'])
 
     def test_create_view_without_explicit_fields(self):
+        class MyCreateView(CreateView):
+            model = Author
 
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", RemovedInDjango18Warning)
-
-            class MyCreateView(CreateView):
-                model = Author
-
-            # Until end of the deprecation cycle, should still create the form
-            # as before:
-            self.assertEqual(list(MyCreateView().get_form_class().base_fields),
-                             ['name', 'slug'])
-
-        # but with a warning:
-        self.assertEqual(w[0].category, RemovedInDjango18Warning)
+        message = (
+            "Using ModelFormMixin (base class of MyCreateView) without the "
+            "'fields' attribute is prohibited."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, message):
+            MyCreateView().get_form_class()
 
 
 class UpdateViewTests(TestCase):
