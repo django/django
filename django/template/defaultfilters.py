@@ -572,7 +572,7 @@ def last(value):
         return ''
 
 
-@register.filter(is_safe=True)
+@register.filter(is_safe=False)
 def length(value):
     """Returns the length of the value - useful for lists."""
     try:

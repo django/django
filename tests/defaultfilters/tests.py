@@ -20,7 +20,7 @@ from django.test import TestCase
 from django.utils import six
 from django.utils import translation
 from django.utils.encoding import python_2_unicode_compatible
-from django.utils.safestring import SafeData
+from django.utils.safestring import mark_safe, SafeData
 
 
 class DefaultFiltersTests(TestCase):
@@ -495,6 +495,7 @@ class DefaultFiltersTests(TestCase):
 
     def test_length(self):
         self.assertEqual(length('1234'), 4)
+        self.assertEqual(length(mark_safe('1234')), 4)
         self.assertEqual(length([1, 2, 3, 4]), 4)
         self.assertEqual(length_is([], 0), True)
         self.assertEqual(length_is([], 1), False)

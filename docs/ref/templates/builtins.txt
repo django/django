@@ -1680,7 +1680,8 @@ For example::
 
     {{ value|length }}
 
-If ``value`` is ``['a', 'b', 'c', 'd']``, the output will be ``4``.
+If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
+``4``.
 
 .. templatefilter:: length_is
 
@@ -1693,7 +1694,8 @@ For example::
 
     {{ value|length_is:"4" }}
 
-If ``value`` is ``['a', 'b', 'c', 'd']``, the output will be ``True``.
+If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
+``True``.
 
 .. templatefilter:: linebreaks
 
