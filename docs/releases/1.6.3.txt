@@ -34,5 +34,9 @@ several bugs in 1.6.2:
   <django.contrib.admin.ModelAdmin.preserve_filters>` when running a site with
   a URL prefix (`#21795 <http://code.djangoproject.com/ticket/21795>`_).
 
+* Fixed a crash in the ``find_command`` management utility when the ``PATH``
+  environment variable wasn't set
+  (`#22256 <http://code.djangoproject.com/ticket/22256>`_).
+
 Additionally, Django's vendored version of six, :mod:`django.utils.six` has been
 upgraded to the latest release (1.6.1).
