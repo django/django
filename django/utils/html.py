@@ -149,7 +149,7 @@ def _strip_once(value):
         return value
     try:
         s.close()
-    except (HTMLParseError, UnboundLocalError) as err:
+    except (HTMLParseError, UnboundLocalError):
         # UnboundLocalError because of http://bugs.python.org/issue17802
         # on Python 3.2, triggered by strict=False mode of HTMLParser
         return s.get_data() + s.rawdata
