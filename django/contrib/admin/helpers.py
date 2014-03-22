@@ -7,7 +7,7 @@ from django.contrib.admin.templatetags.admin_static import static
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.related import ManyToManyRel
 from django.forms.utils import flatatt
-from django.template.defaultfilters import capfirst
+from django.template.defaultfilters import capfirst, linebreaksbr
 from django.utils.encoding import force_text, smart_text
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
@@ -182,6 +182,8 @@ class AdminReadonlyField(object):
                     result_repr = smart_text(value)
                     if getattr(attr, "allow_tags", False):
                         result_repr = mark_safe(result_repr)
+                    else:
+                        result_repr = linebreaksbr(result_repr)
             else:
                 if isinstance(f.rel, ManyToManyRel) and value is not None:
                     result_repr = ", ".join(map(six.text_type, value.all()))

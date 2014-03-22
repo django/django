@@ -3622,6 +3622,7 @@ class ReadonlyTest(TestCase):
 
         # Checks that multiline text in a readonly field gets <br /> tags
         self.assertContains(response, "Multiline<br />test<br />string")
+        self.assertContains(response, "<p>Multiline<br />html<br />content</p>", html=True)
         self.assertContains(response, "InlineMultiline<br />test<br />string")
 
         self.assertContains(response,
