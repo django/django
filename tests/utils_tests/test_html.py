@@ -63,7 +63,6 @@ class TestUtilsHtml(TestCase):
             self.check_output(f, value, output)
 
     def test_strip_tags(self):
-        from django.utils.html_parser import use_workaround
         f = html.strip_tags
         items = (
             ('<p>See: &#39;&eacute; is an apostrophe followed by e acute</p>',
@@ -81,12 +80,17 @@ class TestUtilsHtml(TestCase):
             ('a<p a >b</p>c', 'abc'),
             ('d<a:b c:d>e</p>f', 'def'),
             ('<strong>foo</strong><a href="http://example.com">bar</a>', 'foobar'),
-            ('<script>alert()</script>&h', 'alert()&h'),
         )
-        if not use_workaround:
-            items += (('<sc<!-- -->ript>test<<!-- -->/script>', 'test'),)
         for value, output in items:
             self.check_output(f, value, output)
+
+        # Some convoluted syntax for which parsing may differ between python versions
+        output = html.strip_tags('<sc<!-- -->ript>test<<!-- -->/script>')
+        self.assertNotIn('<script>', output)
+        self.assertIn('test', output)
+        output = html.strip_tags('<script>alert()</script>&h')
+        self.assertNotIn('<script>', output)
+        self.assertIn('alert()', output)
 
         # Test with more lengthy content (also catching performance regressions)
         for filename in ('strip_tags1.html', 'strip_tags2.txt'):
