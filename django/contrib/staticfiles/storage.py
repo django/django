@@ -292,7 +292,7 @@ class ManifestFilesMixin(HashedFilesMixin):
     def read_manifest(self):
         try:
             with self.open(self.manifest_name) as manifest:
-                return manifest.read()
+                return manifest.read().decode('utf-8')
         except IOError:
             return None
 
@@ -319,7 +319,8 @@ class ManifestFilesMixin(HashedFilesMixin):
         payload = {'paths': self.hashed_files, 'version': self.manifest_version}
         if self.exists(self.manifest_name):
             self.delete(self.manifest_name)
-        self._save(self.manifest_name, ContentFile(json.dumps(payload)))
+        contents = json.dumps(payload).encode('utf-8')
+        self._save(self.manifest_name, ContentFile(contents))
 
 
 class _MappingCache(object):

@@ -662,6 +662,11 @@ class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
                       storage.staticfiles_storage.manifest_version,
                       force_text(manifest_content))
 
+    def test_parse_cache(self):
+        hashed_files = storage.staticfiles_storage.hashed_files
+        manifest = storage.staticfiles_storage.load_manifest()
+        self.assertEqual(hashed_files, manifest)
+
 
 # we set DEBUG to False here since the template tag wouldn't work otherwise
 @override_settings(**dict(
