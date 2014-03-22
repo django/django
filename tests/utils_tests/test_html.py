@@ -80,11 +80,17 @@ class TestUtilsHtml(TestCase):
             ('a<p a >b</p>c', 'abc'),
             ('d<a:b c:d>e</p>f', 'def'),
             ('<strong>foo</strong><a href="http://example.com">bar</a>', 'foobar'),
-            ('<sc<!-- -->ript>test<<!-- -->/script>', 'test'),
-            ('<script>alert()</script>&h', 'alert()&h'),
         )
         for value, output in items:
             self.check_output(f, value, output)
+
+        # Some convoluted syntax for which parsing may differ between python versions
+        output = html.strip_tags('<sc<!-- -->ript>test<<!-- -->/script>')
+        self.assertNotIn('<script>', output)
+        self.assertIn('test', output)
+        output = html.strip_tags('<script>alert()</script>&h')
+        self.assertNotIn('<script>', output)
+        self.assertIn('alert()', output)
 
         # Test with more lengthy content (also catching performance regressions)
         for filename in ('strip_tags1.html', 'strip_tags2.txt'):
