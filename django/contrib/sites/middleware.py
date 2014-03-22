@@ -7,4 +7,4 @@ class CurrentSiteMiddleware(object):
     """
 
     def process_request(self, request):
-        request.site = Site.objects.get_current()
+        request.site = Site.objects.get_current(request)
