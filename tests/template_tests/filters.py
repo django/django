@@ -321,8 +321,8 @@ def get_filter_tests():
         'length03': ('{{ string|length }}', {'string': ''}, '0'),
         'length04': ('{{ string|length }}', {'string': 'django'}, '6'),
         # Invalid uses that should fail silently.
-        'length05': ('{{ int|length }}', {'int': 7}, ''),
-        'length06': ('{{ None|length }}', {'None': None}, ''),
+        'length05': ('{{ int|length }}', {'int': 7}, mark_safe(0)),
+        'length06': ('{{ None|length }}', {'None': None}, mark_safe(0)),
 
         # length_is filter.
         'length_is01': ('{% if some_list|length_is:"4" %}Four{% endif %}', {'some_list': ['4', None, True, {}]}, 'Four'),
