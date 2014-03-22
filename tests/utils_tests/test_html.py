@@ -63,6 +63,7 @@ class TestUtilsHtml(TestCase):
             self.check_output(f, value, output)
 
     def test_strip_tags(self):
+        from django.utils.html_parser import use_workaround
         f = html.strip_tags
         items = (
             ('<p>See: &#39;&eacute; is an apostrophe followed by e acute</p>',
@@ -80,9 +81,10 @@ class TestUtilsHtml(TestCase):
             ('a<p a >b</p>c', 'abc'),
             ('d<a:b c:d>e</p>f', 'def'),
             ('<strong>foo</strong><a href="http://example.com">bar</a>', 'foobar'),
-            ('<sc<!-- -->ript>test<<!-- -->/script>', 'test'),
             ('<script>alert()</script>&h', 'alert()&h'),
         )
+        if not use_workaround:
+            items += (('<sc<!-- -->ript>test<<!-- -->/script>', 'test'),)
         for value, output in items:
             self.check_output(f, value, output)
 
