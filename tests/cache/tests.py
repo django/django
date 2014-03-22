@@ -18,7 +18,7 @@ from django.conf import settings
 from django.core import management
 from django.core.cache import (cache, caches, CacheKeyWarning,
     InvalidCacheBackendError, DEFAULT_CACHE_ALIAS)
-from django.db import connection, router, transaction
+from django.db import connection, connections, router, transaction
 from django.core.cache.utils import make_template_fragment_key
 from django.http import HttpResponse, StreamingHttpResponse
 from django.middleware.cache import (FetchFromCacheMiddleware,
@@ -981,11 +981,12 @@ class CreateCacheTableForDBCacheTests(TestCase):
             # cache table should be created on 'other'
             # Queries:
             #   1: check table doesn't already exist
-            #   2: create savepoint
+            #   2: create savepoint (if transactional DDL is supported)
             #   3: create the table
             #   4: create the index
-            #   5: release savepoint
-            with self.assertNumQueries(5, using='other'):
+            #   5: release savepoint (if transactional DDL is supported)
+            num = 5 if connections['other'].features.can_rollback_ddl else 3
+            with self.assertNumQueries(num, using='other'):
                 management.call_command('createcachetable',
                                         database='other',
                                         verbosity=0, interactive=False)
