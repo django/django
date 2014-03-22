@@ -4,10 +4,9 @@ import datetime
 import os
 from decimal import Decimal
 from unittest import skipUnless
-import warnings
 
 from django import forms
-from django.core.exceptions import FieldError, NON_FIELD_ERRORS
+from django.core.exceptions import FieldError, ImproperlyConfigured, NON_FIELD_ERRORS
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import ValidationError
 from django.db import connection
@@ -15,7 +14,6 @@ from django.db.models.query import EmptyQuerySet
 from django.forms.models import (construct_instance, fields_for_model,
     model_to_dict, modelform_factory, ModelFormMetaclass)
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils._os import upath
 from django.utils import six
 
@@ -202,23 +200,15 @@ class ModelFormBaseTest(TestCase):
         self.assertEqual(instance.name, '')
 
     def test_missing_fields_attribute(self):
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always", RemovedInDjango18Warning)
-
+        message = (
+            "Creating a ModelForm without either the 'fields' attribute "
+            "or the 'exclude' attribute is prohibited; form "
+            "MissingFieldsForm needs updating."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, message):
             class MissingFieldsForm(forms.ModelForm):
                 class Meta:
                     model = Category
-
-        # There is some internal state in warnings module which means that
-        # if a warning has been seen already, the catch_warnings won't
-        # have recorded it. The following line therefore will not work reliably:
-
-        # self.assertEqual(w[0].category, RemovedInDjango18Warning)
-
-        # Until end of the deprecation cycle, should still create the
-        # form as before:
-        self.assertEqual(list(MissingFieldsForm.base_fields),
-                         ['name', 'slug', 'url'])
 
     def test_extra_fields(self):
         class ExtraFields(BaseCategoryForm):
@@ -2329,11 +2319,12 @@ class FormFieldCallbackTests(TestCase):
 
     def test_modelform_factory_without_fields(self):
         """ Regression for #19733 """
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", RemovedInDjango18Warning)
-            # This should become an error once deprecation cycle is complete.
+        message = (
+            "Calling modelform_factory without defining 'fields' or 'exclude' "
+            "explicitly is prohibited."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, message):
             modelform_factory(Person)
-        self.assertEqual(w[0].category, RemovedInDjango18Warning)
 
     def test_modelform_factory_with_all_fields(self):
         """ Regression for #19733 """

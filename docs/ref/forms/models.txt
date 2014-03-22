@@ -34,16 +34,16 @@ Model Form Functions
 
     See :ref:`modelforms-factory` for example usage.
 
-    .. versionchanged:: 1.6
-
     You must provide the list of fields explicitly, either via keyword arguments
     ``fields`` or ``exclude``, or the corresponding attributes on the form's
     inner ``Meta`` class. See :ref:`modelforms-selecting-fields` for more
-    information. Omitting any definition of the fields to use will result in all
-    fields being used, but this behavior is deprecated.
+    information. Omitting any definition of the fields to use will result in
+    an :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
-    The ``localized_fields``, ``labels``, ``help_texts``, and
-    ``error_messages`` parameters were added.
+    .. versionchanged:: 1.8
+
+        Previously, omitting the list of fields was allowed and resulted in
+        a form with all fields of the model.
 
 .. function:: modelformset_factory(model, form=ModelForm, formfield_callback=None, formset=BaseModelFormSet, extra=1, can_delete=False, can_order=False, max_num=None, fields=None, exclude=None, widgets=None, validate_max=False, localized_fields=None, labels=None, help_texts=None, error_messages=None)
 
