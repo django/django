@@ -1,7 +1,6 @@
 import hashlib
 import sys
 import time
-import warnings
 
 from django.conf import settings
 from django.db.utils import load_backend

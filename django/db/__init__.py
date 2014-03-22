@@ -1,11 +1,7 @@
-import warnings
-
 from django.core import signals
 from django.db.utils import (DEFAULT_DB_ALIAS, DataError, OperationalError,
     IntegrityError, InternalError, ProgrammingError, NotSupportedError,
-    DatabaseError, InterfaceError, Error, load_backend,
-    ConnectionHandler, ConnectionRouter)
-from django.utils.functional import cached_property
+    DatabaseError, InterfaceError, Error, ConnectionHandler, ConnectionRouter)
 
 
 __all__ = [
