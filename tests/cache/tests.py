@@ -26,7 +26,7 @@ from django.middleware.cache import (FetchFromCacheMiddleware,
 from django.template import Template
 from django.template.response import TemplateResponse
 from django.test import TestCase, TransactionTestCase, RequestFactory, override_settings
-from django.test.utils import IgnorePendingDeprecationWarningsMixin
+from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils import six
 from django.utils import timezone
 from django.utils import translation
@@ -1176,7 +1176,7 @@ class CustomCacheKeyValidationTests(TestCase):
         }
     }
 )
-class GetCacheTests(IgnorePendingDeprecationWarningsMixin, TestCase):
+class GetCacheTests(IgnoreDeprecationWarningsMixin, TestCase):
 
     def test_simple(self):
         from django.core.cache import caches, get_cache

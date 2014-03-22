@@ -11,13 +11,13 @@ import warnings
 
 import django
 from django import contrib
-from django.utils.deprecation import RemovedInDjango18Warning, RemovedInDjango19Warning
+from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils._os import upath
 from django.utils import six
 
 
 warnings.simplefilter("default", RemovedInDjango19Warning)
-warnings.simplefilter("default", RemovedInDjango18Warning)
+warnings.simplefilter("default", RemovedInDjango20Warning)
 
 CONTRIB_MODULE_PATH = 'django.contrib'
 

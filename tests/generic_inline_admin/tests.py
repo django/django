@@ -9,6 +9,7 @@ from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.forms.formsets import DEFAULT_MAX_NUM
 from django.forms.models import ModelForm
 from django.test import TestCase, override_settings
+from django.utils.deprecation import RemovedInDjango19Warning
 
 # local test models
 from .admin import MediaInline, MediaPermanentInline
@@ -376,7 +377,7 @@ class GenericInlineModelAdminTest(TestCase):
             # Verify that the deprecation warning was triggered when get_formsets was called
             # This verifies that we called that method.
             self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, PendingDeprecationWarning))
+            self.assertTrue(issubclass(w[0].category, RemovedInDjango19Warning))
 
         class EpisodeAdmin(admin.ModelAdmin):
             inlines = [

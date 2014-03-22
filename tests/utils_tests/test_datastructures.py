@@ -6,13 +6,13 @@ import copy
 import pickle
 
 from django.test import SimpleTestCase
-from django.test.utils import IgnorePendingDeprecationWarningsMixin
+from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils.datastructures import (DictWrapper, ImmutableList,
     MultiValueDict, MultiValueDictKeyError, MergeDict, SortedDict)
 from django.utils import six
 
 
-class SortedDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
+class SortedDictTests(IgnoreDeprecationWarningsMixin, SimpleTestCase):
     def setUp(self):
         super(SortedDictTests, self).setUp()
         self.d1 = SortedDict()
@@ -136,7 +136,7 @@ class SortedDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
         self.assertEqual(list(reversed(self.d2)), [7, 0, 9, 1])
 
 
-class MergeDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
+class MergeDictTests(IgnoreDeprecationWarningsMixin, SimpleTestCase):
 
     def test_simple_mergedict(self):
         d1 = {'chris': 'cool', 'camri': 'cute', 'cotton': 'adorable',
