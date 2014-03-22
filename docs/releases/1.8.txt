@@ -106,7 +106,8 @@ File Uploads
 Forms
 ^^^^^
 
-* ...
+* Form widgets now render attributes with a value of ``True`` or ``False``
+  as HTML5 boolean attributes.
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
