@@ -182,6 +182,17 @@ when defining form errors.
 Note that ``Form.add_error()`` automatically removes the relevant field from
 ``cleaned_data``.
 
+.. method:: Form.has_error(field, code=None)
+
+.. versionadded:: 1.8
+
+This method returns a boolean designating whether a field has an error with
+a specific error ``code``. If ``code`` is ``None``, it will return ``True``
+if the field contains any errors at all.
+
+To check for non-field errors use
+:data:`~django.core.exceptions.NON_FIELD_ERRORS` as the ``field`` parameter.
+
 Behavior of unbound forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
