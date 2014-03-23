@@ -231,7 +231,13 @@ class Atomic(object):
                     if sid is None:
                         connection.needs_rollback = True
                     else:
-                        connection.savepoint_rollback(sid)
+                        try:
+                            connection.savepoint_rollback(sid)
+                        except DatabaseError:
+                            # If rolling back to a savepoint fails, mark for
+                            # rollback at a higher level and avoid shadowing
+                            # the original exception.
+                            connection.needs_rollback = True
                 else:
                     # Roll back transaction
                     connection.rollback()
