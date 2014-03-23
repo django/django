@@ -8,7 +8,7 @@ except ImportError:
 import time
 
 from django.db import (connection, transaction,
-    DatabaseError, IntegrityError, OperationalError)
+    DatabaseError, Error, IntegrityError, OperationalError)
 from django.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import IgnorePendingDeprecationWarningsMixin
 from django.utils import six
@@ -358,6 +358,20 @@ class AtomicErrorsTests(TransactionTestCase):
             transaction.set_rollback(False)
             r2.save(force_update=True)
         self.assertEqual(Reporter.objects.get(pk=r1.pk).last_name, "Calculus")
+
+    @skipUnlessDBFeature('test_db_allows_multiple_connections')
+    def test_atomic_prevents_queries_in_broken_transaction_after_client_close(self):
+        with transaction.atomic():
+            Reporter.objects.create(first_name="Archibald", last_name="Haddock")
+            connection.close()
+            # The connection is closed and the transaction is marked as
+            # needing rollback. This will raise an InterfaceError on databases
+            # that refuse to create cursors on closed connections (PostgreSQL)
+            # and a TransactionManagementError on other databases.
+            with self.assertRaises(Error):
+                Reporter.objects.create(first_name="Cuthbert", last_name="Calculus")
+        # The connection is usable again .
+        self.assertEqual(Reporter.objects.count(), 0)
 
 
 @skipUnless(connection.vendor == 'mysql', "MySQL-specific behaviors")
