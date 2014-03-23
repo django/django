@@ -4,6 +4,7 @@ import datetime
 import decimal
 import hashlib
 import logging
+import traceback
 from time import time
 
 from django.conf import settings
@@ -76,9 +77,11 @@ class CursorDebugWrapper(CursorWrapper):
             stop = time()
             duration = stop - start
             sql = self.db.ops.last_executed_query(self.cursor, sql, params)
+            callstack = traceback.format_stack()
             self.db.queries.append({
                 'sql': sql,
                 'time': "%.3f" % duration,
+                'traceback': callstack,
             })
             logger.debug('(%.3f) %s; args=%s' % (duration, sql, params),
                 extra={'duration': duration, 'sql': sql, 'params': params}
