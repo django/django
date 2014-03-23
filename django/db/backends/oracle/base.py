@@ -625,7 +625,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         pass
 
     def _set_autocommit(self, autocommit):
-        self.connection.autocommit = autocommit
+        with self.wrap_database_errors:
+            self.connection.autocommit = autocommit
 
     def check_constraints(self, table_names=None):
         """

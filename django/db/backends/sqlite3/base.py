@@ -387,7 +387,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             level = ''
         # 'isolation_level' is a misleading API.
         # SQLite always runs at the SERIALIZABLE isolation level.
-        self.connection.isolation_level = level
+        with self.wrap_database_errors:
+            self.connection.isolation_level = level
 
     def check_constraints(self, table_names=None):
         """
