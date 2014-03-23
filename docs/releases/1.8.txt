@@ -91,7 +91,8 @@ Cache
 Email
 ^^^^^
 
-* ...
+* Email backends now support the context manager protocol for opening and
+  closing connections.
 
 File Storage
 ^^^^^^^^^^^^
