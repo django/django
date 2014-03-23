@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import os
 import warnings
 
 from django.contrib.sites.models import Site
@@ -37,19 +38,24 @@ class SubclassTestCaseFixtureLoadingTests(TestCaseFixtureLoadingTests):
 
 class DumpDataAssertMixin(object):
 
-    def _dumpdata_assert(self, args, output, format='json',
+    def _dumpdata_assert(self, args, output, format='json', filename=None,
                          natural_foreign_keys=False, natural_primary_keys=False,
                          use_base_manager=False, exclude_list=[], primary_keys=''):
         new_io = six.StringIO()
         management.call_command('dumpdata', *args, **{'format': format,
                                                       'stdout': new_io,
                                                       'stderr': new_io,
+                                                      'output': filename,
                                                       'use_natural_foreign_keys': natural_foreign_keys,
                                                       'use_natural_primary_keys': natural_primary_keys,
                                                       'use_base_manager': use_base_manager,
                                                       'exclude': exclude_list,
                                                       'primary_keys': primary_keys})
-        command_output = new_io.getvalue().strip()
+        if filename:
+            command_output = open(filename, "r").read()
+            os.remove(filename)
+        else:
+            command_output = new_io.getvalue().strip()
         if format == "json":
             self.assertJSONEqual(command_output, output)
         elif format == "xml":
@@ -281,6 +287,11 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Copyright is fine the way it is", "pub_date": "2006-06-16T14:00:00"}}]',
                 primary_keys='2,3'
             )
+
+    def test_dumpdata_with_file_output(self):
+        management.call_command('loaddata', 'fixture1.json', verbosity=0)
+        self._dumpdata_assert(['fixtures'], '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}, {"pk": 10, "model": "fixtures.book", "fields": {"name": "Achieving self-awareness of Python programs", "authors": []}}]',
+                filename='dumpdata.json')
 
     def test_compress_format_loading(self):
         # Load fixture 4 (compressed), using format specification
