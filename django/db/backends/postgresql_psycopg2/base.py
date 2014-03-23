@@ -189,14 +189,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             self.connection.set_isolation_level(isolation_level)
 
     def _set_autocommit(self, autocommit):
-        if self.psycopg2_version >= (2, 4, 2):
-            self.connection.autocommit = autocommit
-        else:
-            if autocommit:
-                level = psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
+        with self.wrap_database_errors:
+            if self.psycopg2_version >= (2, 4, 2):
+                self.connection.autocommit = autocommit
             else:
-                level = self.isolation_level
-            self.connection.set_isolation_level(level)
+                if autocommit:
+                    level = psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
+                else:
+                    level = self.isolation_level
+                self.connection.set_isolation_level(level)
 
     def check_constraints(self, table_names=None):
         """
