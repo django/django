@@ -393,6 +393,21 @@ The email backend class has the following methods:
   connection afterwards. If the connection is already open, it will be
   left open after mail has been sent.
 
+It can also be used as a context manager, which will automatically call
+``open()`` and ``close()`` as needed::
+
+    from django.core import mail
+
+    with mail.get_connection() as connection:
+        mail.EmailMessage(subject1, body1, from1, [to1],
+                          connection=connection).send()
+        mail.EmailMessage(subject2, body2, from2, [to2],
+                          connection=connection).send()
+
+.. versionadded:: 1.8
+
+    The context manager protocol was added.
+
 Obtaining an instance of an email backend
 -----------------------------------------
 

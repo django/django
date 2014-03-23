@@ -91,7 +91,8 @@ Cache
 Email
 ^^^^^
 
-* ...
+* :ref:`Email backends <topic-email-backends>` now support the context manager
+  protocol for opening and closing connections.
 
 File Storage
 ^^^^^^^^^^^^
