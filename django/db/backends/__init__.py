@@ -59,6 +59,7 @@ class BaseDatabaseWrapper(object):
 
         # Connection termination related attributes.
         self.close_at = None
+        self.closed_in_transaction = False
         self.errors_occurred = False
 
         # Thread-safety related attributes.
@@ -101,9 +102,11 @@ class BaseDatabaseWrapper(object):
         # In case the previous connection was closed while in an atomic block
         self.in_atomic_block = False
         self.savepoint_ids = []
+        self.needs_rollback = False
         # Reset parameters defining when to close the connection
         max_age = self.settings_dict['CONN_MAX_AGE']
         self.close_at = None if max_age is None else time.time() + max_age
+        self.closed_in_transaction = False
         self.errors_occurred = False
         # Establish the connection
         conn_params = self.get_connection_params()
@@ -183,7 +186,11 @@ class BaseDatabaseWrapper(object):
         try:
             self._close()
         finally:
-            self.connection = None
+            if self.in_atomic_block:
+                self.closed_in_transaction = True
+                self.needs_rollback = True
+            else:
+                self.connection = None
 
     ##### Backend-specific savepoint management methods #####
 
