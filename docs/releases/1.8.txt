@@ -109,6 +109,9 @@ Forms
 * Form widgets now render attributes with a value of ``True`` or ``False``
   as HTML5 boolean attributes.
 
+* The new :meth:`~django.forms.Form.has_error()` method allows checking
+  if a specific error has happened.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 

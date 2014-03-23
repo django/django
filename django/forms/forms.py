@@ -334,6 +334,15 @@ class BaseForm(object):
             if field in self.cleaned_data:
                 del self.cleaned_data[field]
 
+    def has_error(self, field, code=None):
+        if code is None:
+            return field in self.errors
+        if field in self.errors:
+            for error in self.errors.as_data()[field]:
+                if error.code == code:
+                    return True
+        return False
+
     def full_clean(self):
         """
         Cleans all of self.data and populates self._errors and
