@@ -18,7 +18,7 @@ from functools import wraps
 
 from django.db import (
         connections, DEFAULT_DB_ALIAS,
-        DatabaseError, ProgrammingError)
+        DatabaseError, Error, ProgrammingError)
 from django.utils.decorators import available_attrs
 
 
@@ -309,7 +309,12 @@ class Atomic(object):
                     try:
                         connection.commit()
                     except DatabaseError:
-                        connection.rollback()
+                        try:
+                            connection.rollback()
+                        except Error:
+                            # Error during rollback means the connection was
+                            # closed. Clean up in case the server dropped it.
+                            connection.close()
                         raise
             else:
                 # This flag will be set to True again if there isn't a savepoint
@@ -330,7 +335,12 @@ class Atomic(object):
                             connection.needs_rollback = True
                 else:
                     # Roll back transaction
-                    connection.rollback()
+                    try:
+                        connection.rollback()
+                    except Error:
+                        # Error during rollback means the connection was
+                        # closed. Clean up in case the server dropped it.
+                        connection.close()
 
         finally:
             # Outermost block exit when autocommit was enabled.
