@@ -161,6 +161,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         """
         Alters M2Ms to repoint their to= endpoints.
         """
+        if old_field.rel.through == new_field.rel.through:
+            return
+
         # Make a new through table
         self.create_model(new_field.rel.through)
         # Copy the data across
