@@ -25,7 +25,7 @@ import sys
 import types
 
 __author__ = "Benjamin Peterson <benjamin@python.org>"
-__version__ = "1.5.2"
+__version__ = "1.6.1"
 
 
 # Useful for very coarse version differentiation.
@@ -83,7 +83,11 @@ class _LazyDescr(object):
         self.name = name
 
     def __get__(self, obj, tp):
-        result = self._resolve()
+        try:
+            result = self._resolve()
+        except ImportError:
+            # See the nice big comment in MovedModule.__getattr__.
+            raise AttributeError("%s could not be imported " % self.name)
         setattr(obj, self.name, result) # Invokes __set__.
         # This is a bit ugly, but it avoids running this again.
         delattr(obj.__class__, self.name)
@@ -105,15 +109,22 @@ class MovedModule(_LazyDescr):
         return _import_module(self.mod)
 
     def __getattr__(self, attr):
-        # Hack around the Django autoreloader. The reloader tries to get
-        # __file__ or __name__ of every module in sys.modules. This doesn't work
-        # well if this MovedModule is for an module that is unavailable on this
-        # machine (like winreg on Unix systems). Thus, we pretend __file__ and
-        # __name__ don't exist if the module hasn't been loaded yet. See issues
-        # #51 and #53.
-        if attr in ("__file__", "__name__") and self.mod not in sys.modules:
-            raise AttributeError
-        _module = self._resolve()
+        # It turns out many Python frameworks like to traverse sys.modules and
+        # try to load various attributes. This causes problems if this is a
+        # platform-specific module on the wrong platform, like _winreg on
+        # Unixes. Therefore, we silently pretend unimportable modules do not
+        # have any attributes. See issues #51, #53, #56, and #63 for the full
+        # tales of woe.
+        #
+        # First, if possible, avoid loading the module just to look at __file__,
+        # __name__, or __path__.
+        if (attr in ("__file__", "__name__", "__path__") and
+            self.mod not in sys.modules):
+            raise AttributeError(attr)
+        try:
+            _module = self._resolve()
+        except ImportError:
+            raise AttributeError(attr)
         value = getattr(_module, attr)
         setattr(self, attr, value)
         return value
@@ -222,6 +233,7 @@ _moved_attributes = [
     MovedModule("urllib", __name__ + ".moves.urllib", __name__ + ".moves.urllib"),
     MovedModule("urllib_robotparser", "robotparser", "urllib.robotparser"),
     MovedModule("xmlrpc_client", "xmlrpclib", "xmlrpc.client"),
+    MovedModule("xmlrpc_server", "xmlrpclib", "xmlrpc.server"),
     MovedModule("winreg", "_winreg"),
 ]
 for attr in _moved_attributes:
@@ -241,6 +253,7 @@ class Module_six_moves_urllib_parse(_LazyModule):
 
 _urllib_parse_moved_attributes = [
     MovedAttribute("ParseResult", "urlparse", "urllib.parse"),
+    MovedAttribute("SplitResult", "urlparse", "urllib.parse"),
     MovedAttribute("parse_qs", "urlparse", "urllib.parse"),
     MovedAttribute("parse_qsl", "urlparse", "urllib.parse"),
     MovedAttribute("urldefrag", "urlparse", "urllib.parse"),
@@ -254,6 +267,7 @@ _urllib_parse_moved_attributes = [
     MovedAttribute("unquote", "urllib", "urllib.parse"),
     MovedAttribute("unquote_plus", "urllib", "urllib.parse"),
     MovedAttribute("urlencode", "urllib", "urllib.parse"),
+    MovedAttribute("splitquery", "urllib", "urllib.parse"),
 ]
 for attr in _urllib_parse_moved_attributes:
     setattr(Module_six_moves_urllib_parse, attr.name, attr)
