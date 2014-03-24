@@ -5,6 +5,7 @@ import io
 import os
 import re
 import shutil
+import time
 from unittest import SkipTest, skipUnless
 import warnings
 
@@ -27,12 +28,12 @@ has_xgettext = find_command('xgettext')
 @skipUnless(has_xgettext, 'xgettext is mandatory for extraction tests')
 class ExtractorTests(SimpleTestCase):
 
+    test_dir = os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), 'commands'))
+
     PO_FILE = 'locale/%s/LC_MESSAGES/django.po' % LOCALE
 
     def setUp(self):
         self._cwd = os.getcwd()
-        self.test_dir = os.path.abspath(
-            os.path.join(os.path.dirname(upath(__file__)), 'commands'))
 
     def _rmrf(self, dname):
         if os.path.commonprefix([self.test_dir, os.path.abspath(dname)]) != self.test_dir:
@@ -102,6 +103,20 @@ class ExtractorTests(SimpleTestCase):
     def assertLocationCommentNotPresent(self, po_filename, line_number, *comment_parts):
         """Check the opposite of assertLocationComment()"""
         return self._assertPoLocComment(False, po_filename, line_number, *comment_parts)
+
+    def assertRecentlyModified(self, path):
+        """
+        Assert that file was recently modified (modification time was less than 10 seconds ago).
+        """
+        delta = time.time() - os.stat(path).st_mtime
+        self.assertLess(delta, 10, "%s was recently modified" % path)
+
+    def assertNotRecentlyModified(self, path):
+        """
+        Assert that file was not recently modified (modification time was more than 10 seconds ago).
+        """
+        delta = time.time() - os.stat(path).st_mtime
+        self.assertGreater(delta, 10, "%s wasn't recently modified" % path)
 
 
 class BasicExtractorTests(ExtractorTests):
@@ -402,6 +417,7 @@ class SymlinkExtractorTests(ExtractorTests):
 
 
 class CopyPluralFormsExtractorTests(ExtractorTests):
+
     PO_FILE_ES = 'locale/es/LC_MESSAGES/django.po'
 
     def tearDown(self):
@@ -527,7 +543,56 @@ class MultipleLocaleExtractionTests(ExtractorTests):
         self.assertTrue(os.path.exists(self.PO_FILE_DE))
 
 
+class ExcludedLocaleExtractionTests(ExtractorTests):
+
+    LOCALES = ['en', 'fr', 'it']
+    PO_FILE = 'locale/%s/LC_MESSAGES/django.po'
+
+    test_dir = os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), 'exclude'))
+
+    def _set_times_for_all_po_files(self):
+        """
+        Set access and modification times to the Unix epoch time for all the .po files.
+        """
+        for locale in self.LOCALES:
+            os.utime(self.PO_FILE % locale, (0, 0))
+
+    def setUp(self):
+        super(ExcludedLocaleExtractionTests, self).setUp()
+
+        os.chdir(self.test_dir)  # ExtractorTests.tearDown() takes care of restoring.
+        shutil.copytree('canned_locale', 'locale')
+        self._set_times_for_all_po_files()
+        self.addCleanup(self._rmrf, os.path.join(self.test_dir, 'locale'))
+
+    def test_one_locale_excluded(self):
+        management.call_command('makemessages', exclude=['it'], stdout=StringIO())
+        self.assertRecentlyModified(self.PO_FILE % 'en')
+        self.assertRecentlyModified(self.PO_FILE % 'fr')
+        self.assertNotRecentlyModified(self.PO_FILE % 'it')
+
+    def test_multiple_locales_excluded(self):
+        management.call_command('makemessages', exclude=['it', 'fr'], stdout=StringIO())
+        self.assertRecentlyModified(self.PO_FILE % 'en')
+        self.assertNotRecentlyModified(self.PO_FILE % 'fr')
+        self.assertNotRecentlyModified(self.PO_FILE % 'it')
+
+    def test_one_locale_excluded_with_locale(self):
+        management.call_command('makemessages', locale=['en', 'fr'], exclude=['fr'], stdout=StringIO())
+        self.assertRecentlyModified(self.PO_FILE % 'en')
+        self.assertNotRecentlyModified(self.PO_FILE % 'fr')
+        self.assertNotRecentlyModified(self.PO_FILE % 'it')
+
+    def test_multiple_locales_excluded_with_locale(self):
+        management.call_command('makemessages', locale=['en', 'fr', 'it'], exclude=['fr', 'it'],
+                                stdout=StringIO())
+        self.assertRecentlyModified(self.PO_FILE % 'en')
+        self.assertNotRecentlyModified(self.PO_FILE % 'fr')
+        self.assertNotRecentlyModified(self.PO_FILE % 'it')
+
+
 class CustomLayoutExtractionTests(ExtractorTests):
+
     def setUp(self):
         self._cwd = os.getcwd()
         self.test_dir = os.path.join(os.path.dirname(upath(__file__)), 'project_dir')

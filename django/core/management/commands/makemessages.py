@@ -160,9 +160,11 @@ def write_pot_file(potfile, msgs):
 
 class Command(NoArgsCommand):
     option_list = NoArgsCommand.option_list + (
-        make_option('--locale', '-l', default=None, dest='locale', action='append',
+        make_option('--locale', '-l', default=[], dest='locale', action='append',
             help='Creates or updates the message files for the given locale(s) (e.g. pt_BR). '
                  'Can be used multiple times.'),
+        make_option('--exclude', '-e', default=[], dest='exclude', action='append',
+                    help='Locales to exclude. Default is none. Can be used multiple times.'),
         make_option('--domain', '-d', default='django', dest='domain',
             help='The domain of the message files (default: "django").'),
         make_option('--all', '-a', action='store_true', dest='all',
@@ -189,7 +191,7 @@ class Command(NoArgsCommand):
 "pulls out all strings marked for translation. It creates (or updates) a message "
 "file in the conf/locale (in the django tree) or locale (for projects and "
 "applications) directory.\n\nYou must run this command with one of either the "
-"--locale or --all options.")
+"--locale, --exclude or --all options.")
 
     requires_system_checks = False
     leave_locale_alone = True
@@ -201,6 +203,7 @@ class Command(NoArgsCommand):
 
     def handle_noargs(self, *args, **options):
         locale = options.get('locale')
+        exclude = options.get('exclude')
         self.domain = options.get('domain')
         self.verbosity = int(options.get('verbosity'))
         process_all = options.get('all')
@@ -235,7 +238,7 @@ class Command(NoArgsCommand):
             exts = extensions if extensions else ['html', 'txt']
         self.extensions = handle_extensions(exts)
 
-        if (locale is None and not process_all) or self.domain is None:
+        if (locale is None and not exclude and not process_all) or self.domain is None:
             raise CommandError("Type '%s help %s' for usage information." % (
                 os.path.basename(sys.argv[0]), sys.argv[1]))
 
@@ -270,12 +273,16 @@ class Command(NoArgsCommand):
                     os.makedirs(self.default_locale_path)
 
         # Build locale list
-        locales = []
-        if locale is not None:
-            locales = locale
-        elif process_all:
-            locale_dirs = filter(os.path.isdir, glob.glob('%s/*' % self.default_locale_path))
-            locales = [os.path.basename(l) for l in locale_dirs]
+        locale_dirs = filter(os.path.isdir, glob.glob('%s/*' % self.default_locale_path))
+        all_locales = map(os.path.basename, locale_dirs)
+
+        # Account for excluded locales
+        if process_all:
+            locales = all_locales
+        else:
+            locales = locale or all_locales
+            locales = set(locales) - set(exclude)
+
         if locales:
             check_programs('msguniq', 'msgmerge', 'msgattrib')
 
