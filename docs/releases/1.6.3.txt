@@ -26,3 +26,6 @@ several bugs in 1.6.2:
 
 * Improved :func:`~django.utils.html.strip_tags` accuracy (but it still cannot
   guarantee an HTML-safe result, as stated in the documentation).
+
+Additionally, Django's vendored version of six, :mod:`django.utils.six` has been
+upgraded to the latest release (1.6.1).
