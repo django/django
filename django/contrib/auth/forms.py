@@ -348,6 +348,7 @@ class AdminPasswordChangeForm(forms.Form):
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
     }
+    required_css_class = 'required'
     password1 = forms.CharField(label=_("Password"),
                                 widget=forms.PasswordInput)
     password2 = forms.CharField(label=_("Password (again)"),
