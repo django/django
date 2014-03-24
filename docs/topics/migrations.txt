@@ -55,9 +55,9 @@ staging machines, and eventually your production machines.
     It is possible to override the name of the package which contains the
     migrations on a per-app basis by modifying the :setting:`MIGRATION_MODULES` setting.
 
-Migrations will run the same way every time and produce consistent results,
-meaning that what you see in development and staging is exactly what will
-happen in production - no unexpected surprises.
+Migrations will run the same way on the same dataset and produce consistent
+results, meaning that what you see in development and staging is, under the
+same circumstances, exactly what will happen in production.
 
 Backend Support
 ---------------
