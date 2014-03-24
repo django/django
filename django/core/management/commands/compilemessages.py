@@ -31,7 +31,8 @@ def is_writable(path):
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--locale', '-l', dest='locale', action='append',
-                    help='locale(s) to process (e.g. de_AT). Default is to process all. Can be used multiple times.'),
+                    help='Locale(s) to process (e.g. de_AT). Default is to process all. Can be '
+                         'used multiple times.'),
     )
     help = 'Compiles .po files to .mo files for use with builtin gettext support.'
 
@@ -90,8 +91,8 @@ class Command(BaseCommand):
 
             # Check writability on first location
             if i == 0 and not is_writable(npath(base_path + '.mo')):
-                self.stderr.write("The po files under %s are in a seemingly not "
-                                  "writable location. mo files will not be updated/created." % dirpath)
+                self.stderr.write("The po files under %s are in a seemingly not writable location. "
+                                  "mo files will not be updated/created." % dirpath)
                 return
 
             args = [self.program] + self.program_options + ['-o',
