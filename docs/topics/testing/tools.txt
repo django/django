@@ -573,11 +573,6 @@ functionality like:
 * Using the :attr:`~SimpleTestCase.client` :class:`~django.test.Client`.
 * Custom test-time :attr:`URL maps <SimpleTestCase.urls>`.
 
-.. versionchanged:: 1.6
-
-    The latter two features were moved from ``TransactionTestCase`` to
-    ``SimpleTestCase`` in Django 1.6.
-
 If you need any of the other more complex and heavyweight Django-specific
 features like:
 
@@ -1281,8 +1276,6 @@ your test suite.
 
 .. method:: SimpleTestCase.assertFormsetError(response, formset, form_index, field, errors, msg_prefix='')
 
-    .. versionadded:: 1.6
-
     Asserts that the ``formset`` raises the provided list of errors when
     rendered.
 
@@ -1459,15 +1452,11 @@ your test suite.
     By default, the comparison is also ordering dependent. If ``qs`` doesn't
     provide an implicit ordering, you can set the ``ordered`` parameter to
     ``False``, which turns the comparison into a Python set comparison.
+    If the order is undefined (if the given ``qs`` isn't ordered and the
+    comparison is against more than one ordered values), a ``ValueError`` is
+    raised.
 
     Output in case of error can be customized with the ``msg`` argument.
-
-    .. versionchanged:: 1.6
-
-        The method now checks for undefined order and raises ``ValueError``
-        if undefined order is spotted. The ordering is seen as undefined if
-        the given ``qs`` isn't ordered and the comparison is against more
-        than one ordered values.
 
     .. versionchanged:: 1.7
 

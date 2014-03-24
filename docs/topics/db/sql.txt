@@ -197,13 +197,6 @@ argument.
 
 __ http://en.wikipedia.org/wiki/SQL_injection
 
-.. versionchanged:: 1.6
-
-    In Django 1.5 and earlier, you could pass parameters as dictionaries
-    when using PostgreSQL or MySQL, although this wasn't documented. Now
-    you can also do this when using Oracle, and it is officially supported.
-
-
 .. _executing-custom-sql:
 
 Executing custom SQL directly
@@ -235,13 +228,6 @@ For example::
         row = cursor.fetchone()
 
         return row
-
-.. versionchanged:: 1.6
-
-    In Django 1.5 and earlier, after performing a data changing operation, you
-    had to call ``transaction.commit_unless_managed()`` to ensure your changes
-    were committed to the database. Since Django now defaults to database-level
-    autocommit, this isn't necessary any longer.
 
 Note that if you want to include literal percent signs in the query, you have to
 double them in the case you are passing parameters::

@@ -86,14 +86,8 @@ validation errors yourself, or if you have excluded fields from the
 
 .. method:: Model.full_clean(exclude=None, validate_unique=True)
 
-.. versionchanged:: 1.6
-
-  The ``validate_unique`` parameter was added to allow skipping
-  :meth:`Model.validate_unique()`. Previously, :meth:`Model.validate_unique()`
-  was always called by ``full_clean``.
-
 This method calls :meth:`Model.clean_fields()`, :meth:`Model.clean()`, and
-:meth:`Model.validate_unique()` (if ``validate_unique`` is ``True``, in that
+:meth:`Model.validate_unique()` (if ``validate_unique`` is ``True``), in that
 order and raises a :exc:`~django.core.exceptions.ValidationError` that has a
 ``message_dict`` attribute containing errors from all three stages.
 
@@ -310,17 +304,15 @@ value explicitly when saving new objects, if you cannot guarantee the
 primary-key value is unused. For more on this nuance, see `Explicitly specifying
 auto-primary-key values`_ above and `Forcing an INSERT or UPDATE`_ below.
 
-.. versionchanged:: 1.6
-
-    Previously Django did a ``SELECT`` when the primary key attribute was set.
-    If the ``SELECT`` found a row, then Django did an ``UPDATE``, otherwise it
-    did an ``INSERT``. The old algorithm results in one more query in the
-    ``UPDATE`` case. There are some rare cases where the database doesn't
-    report that a row was updated even if the database contains a row for the
-    object's primary key value. An example is the PostgreSQL ``ON UPDATE``
-    trigger which returns ``NULL``. In such cases it is possible to revert to the
-    old algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
-    option to ``True``.
+In Django 1.5 and earlier, Django did a ``SELECT`` when the primary key
+attribute was set. If the ``SELECT`` found a row, then Django did an ``UPDATE``,
+otherwise it did an ``INSERT``. The old algorithm results in one more query in
+the ``UPDATE`` case. There are some rare cases where the database doesn't
+report that a row was updated even if the database contains a row for the
+object's primary key value. An example is the PostgreSQL ``ON UPDATE`` trigger
+which returns ``NULL``. In such cases it is possible to revert to the old
+algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
+option to ``True``.
 
 .. _ref-models-force-insert:
 

@@ -501,10 +501,6 @@ widget::
 The ``widgets`` dictionary accepts either widget instances (e.g.,
 ``Textarea(...)``) or classes (e.g., ``Textarea``).
 
-.. versionadded:: 1.6
-
-    The ``labels``, ``help_texts`` and ``error_messages`` options were added.
-
 Similarly, you can specify the ``labels``, ``help_texts`` and ``error_messages``
 attributes of the inner ``Meta`` class if you want to further customize a field.
 
@@ -609,8 +605,6 @@ the field declaratively and setting its ``validators`` parameter::
 
 Enabling localization of fields
 -------------------------------
-
-.. versionadded:: 1.6
 
 By default, the fields in a ``ModelForm`` will not localize their data. To
 enable localization for fields, you can use the ``localized_fields``
@@ -818,8 +812,6 @@ exclude::
 Specifying widgets to use in the form with ``widgets``
 ------------------------------------------------------
 
-.. versionadded:: 1.6
-
 Using the ``widgets`` parameter, you can specify a dictionary of values to
 customize the ``ModelForm``’s widget class for a particular field. This
 works the same way as the ``widgets`` dictionary on the inner ``Meta``
@@ -830,8 +822,6 @@ class of a ``ModelForm`` works::
 
 Enabling localization for fields with ``localized_fields``
 ----------------------------------------------------------
-
-.. versionadded:: 1.6
 
 Using the ``localized_fields`` parameter, you can enable localization for
 fields in the form.
@@ -1196,9 +1186,9 @@ Notice how we pass ``instance`` in both the ``POST`` and ``GET`` cases.
 Specifying widgets to use in the inline form
 --------------------------------------------
 
-.. versionadded:: 1.6
 
 ``inlineformset_factory`` uses ``modelformset_factory`` and passes most
 of its arguments to ``modelformset_factory``. This means you can use
 the ``widgets`` parameter in much the same way as passing it to
-``modelformset_factory``. See `Specifying widgets to use in the form with widgets`_ above.
+``modelformset_factory``. See `Specifying widgets to use in the form with
+widgets`_ above.

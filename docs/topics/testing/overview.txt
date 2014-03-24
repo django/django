@@ -58,12 +58,6 @@ test utility is to find all the test cases (that is, subclasses of
 :class:`unittest.TestCase`) in any file whose name begins with ``test``,
 automatically build a test suite out of those test cases, and run that suite.
 
-.. versionchanged:: 1.6
-
-   Previously, Django's default test runner only discovered tests in
-   ``tests.py`` and ``models.py`` files within a Python package listed in
-   :setting:`INSTALLED_APPS`.
-
 For more details about :mod:`unittest`, see the Python documentation.
 
 .. warning::
@@ -119,15 +113,6 @@ You can specify a custom filename pattern match using the ``-p`` (or
 ``test*.py`` pattern::
 
     $ ./manage.py test --pattern="tests_*.py"
-
-.. versionchanged:: 1.6
-
-   Previously, test labels were in the form ``applabel``,
-   ``applabel.TestCase``, or ``applabel.TestCase.test_method``, rather than
-   being true Python dotted paths, and tests could only be found within
-   ``tests.py`` or ``models.py`` files within a Python package listed in
-   :setting:`INSTALLED_APPS`. The ``--pattern`` option and file paths as test
-   labels are new in 1.6.
 
 If you press ``Ctrl-C`` while the tests are running, the test runner will
 wait for the currently running test to complete and then exit gracefully.

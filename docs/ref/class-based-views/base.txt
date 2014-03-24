@@ -213,8 +213,6 @@ RedirectView
 
     .. attribute:: pattern_name
 
-        .. versionadded:: 1.6
-
         The name of the URL pattern to redirect to. Reversing will be done
         using the same args and kwargs as are passed in for this view.
 
@@ -237,10 +235,6 @@ RedirectView
     .. method:: get_redirect_url(*args, **kwargs)
 
         Constructs the target URL for redirection.
-
-        .. versionchanged:: 1.6
-
-            The signature of this method was changed to include ``*args``.
 
         The default implementation uses :attr:`url` as a starting
         string and performs expansion of ``%`` named parameters in that string

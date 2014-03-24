@@ -143,22 +143,11 @@ Methods
         :meth:`~django.contrib.auth.models.User.set_unusable_password()`
         were used.
 
-        .. versionchanged:: 1.6
-
-            In Django 1.4 and 1.5, a blank string was unintentionally stored
-            as an unusable password.
-
     .. method:: check_password(raw_password)
 
         Returns ``True`` if the given raw string is the correct password for
         the user. (This takes care of the password hashing in making the
         comparison.)
-
-        .. versionchanged:: 1.6
-
-            In Django 1.4 and 1.5, a blank string was unintentionally
-            considered to be an unusable password, resulting in this method
-            returning ``False`` for such a password.
 
     .. method:: set_unusable_password()
 

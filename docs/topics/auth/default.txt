@@ -851,11 +851,6 @@ patterns.
     error message since this would expose their account's existence but no
     mail will be sent either.
 
-    .. versionchanged:: 1.6
-
-        Previously, error messages indicated whether a given email was
-        registered.
-
     **URL name:** ``password_reset``
 
     **Optional arguments:**
@@ -936,14 +931,8 @@ patterns.
         Someone asked for password reset for email {{ email }}. Follow the link below:
         {{ protocol}}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
 
-    .. versionchanged:: 1.6
-
-      Reversing ``password_reset_confirm`` takes a ``uidb64`` argument instead
-      of ``uidb36``.
-
     The same template context is used for subject template. Subject must be
     single line plain text string.
-
 
 .. function:: password_reset_done(request[, template_name, current_app, extra_context])
 
@@ -975,11 +964,6 @@ patterns.
     **Optional arguments:**
 
     * ``uidb64``: The user's id encoded in base 64. Defaults to ``None``.
-
-      .. versionchanged:: 1.6
-
-          The ``uidb64`` parameter was previously base 36 encoded and named
-          ``uidb36``.
 
     * ``token``: Token to check that the password is valid. Defaults to
       ``None``.

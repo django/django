@@ -613,10 +613,6 @@ escaping HTML.
 
     .. _bleach: https://pypi.python.org/pypi/bleach
 
-    .. versionchanged:: 1.6
-
-        For improved safety, ``strip_tags`` is now parser-based.
-
 .. function:: remove_tags(value, tags)
 
     Removes a space-separated list of [X]HTML tag names from the output.
@@ -696,14 +692,10 @@ escaping HTML.
 
 .. function:: urlsafe_base64_encode(s)
 
-    .. versionadded:: 1.6
-
     Encodes a bytestring in base64 for use in URLs, stripping any trailing
     equal signs.
 
 .. function::  urlsafe_base64_decode(s)
-
-    .. versionadded:: 1.6
 
     Decodes a base64 encoded string, adding back any trailing equal signs that
     might have been stripped.
@@ -733,7 +725,6 @@ Functions for working with Python modules.
 
 .. function:: import_by_path(dotted_path, error_prefix='')
 
-    .. versionadded:: 1.6
     .. deprecated:: 1.7
        Use :meth:`~django.utils.module_loading.import_string` instead.
 

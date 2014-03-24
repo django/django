@@ -260,8 +260,6 @@ wizard's ``as_view()`` method takes a list of your
         (r'^contact/$', ContactWizard.as_view([ContactForm1, ContactForm2])),
     )
 
-.. versionchanged:: 1.6
-
 You can also pass the form list as a class attribute named ``form_list``::
 
     class ContactWizard(WizardView):
@@ -316,8 +314,6 @@ The ``urls.py`` file would contain something like::
     urlpatterns = patterns('',
         (r'^checkout/$', OrderWizard.as_view(FORMS, condition_dict={'cc': pay_by_credit_card})),
     )
-
-.. versionchanged:: 1.6
 
 The ``condition_dict`` can be passed as attribute for the ``as_view()`
 method or as a class attribute named ``condition_dict``::
@@ -493,8 +489,6 @@ Advanced ``WizardView`` methods
 
 .. method:: WizardView.render_goto_step(step, goto_step, **kwargs)
 
-    .. versionadded:: 1.6
-
     This method is called when the step should be changed to something else
     than the next step. By default, this method just stores the requested
     step ``goto_step`` in the storage and then renders the new step.
@@ -597,8 +591,6 @@ Providing initial data for the forms
 
     The ``initial_dict`` can also take a list of dictionaries for a specific
     step if the step is a ``FormSet``.
-
-    .. versionchanged:: 1.6
 
     The ``initial_dict`` can also be added as a class attribute named
     ``initial_dict`` to avoid having the initial data in the ``urls.py``.

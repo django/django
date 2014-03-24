@@ -269,10 +269,6 @@ All attributes can be set in your derived class and can be used in
   because attempting to set the locale needs access to settings. This condition
   will generate a :class:`CommandError`.
 
-.. versionadded:: 1.6
-
-    The ``leave_locale_alone`` option was added in Django 1.6.
-
 Methods
 -------
 

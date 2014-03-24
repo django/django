@@ -348,8 +348,6 @@ protection is safe from cross-subdomain attacks by default - please see the
 CSRF_COOKIE_HTTPONLY
 --------------------
 
-.. versionadded:: 1.6
-
 Default: ``False``
 
 Whether to use ``HttpOnly`` flag on the CSRF cookie. If this is set to
@@ -455,8 +453,6 @@ configurations are available:
 ATOMIC_REQUESTS
 ~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.6
-
 Default: ``False``
 
 Set this to ``True`` to wrap each HTTP request in a transaction on this
@@ -466,8 +462,6 @@ database. See :ref:`tying-transactions-to-http-requests`.
 
 AUTOCOMMIT
 ~~~~~~~~~~
-
-.. versionadded:: 1.6
 
 Default: ``True``
 
@@ -534,8 +528,6 @@ file. When specifying the path, always use forward slashes, even on Windows
 
 CONN_MAX_AGE
 ~~~~~~~~~~~~
-
-.. versionadded:: 1.6
 
 Default: ``0``
 
@@ -2121,10 +2113,6 @@ precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
 
-.. versionchanged:: 1.6
-
-    Input format with microseconds has been added.
-
 .. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: TIME_ZONE
@@ -2653,12 +2641,6 @@ SESSION_SERIALIZER
 ------------------
 
 Default: ``'django.contrib.sessions.serializers.JSONSerializer'``
-
-.. versionchanged:: 1.6
-
-    The default switched from
-    :class:`~django.contrib.sessions.serializers.PickleSerializer` to
-    :class:`~django.contrib.sessions.serializers.JSONSerializer` in Django 1.6.
 
 Full import path of a serializer class to use for serializing session data.
 Included serializers are:

@@ -636,8 +636,6 @@ Attributes
 
 .. attribute:: HttpResponse.reason_phrase
 
-    .. versionadded:: 1.6
-
     The HTTP reason phrase for the response.
 
 .. attribute:: HttpResponse.streaming
@@ -669,8 +667,6 @@ Methods
     Historically, this parameter was called ``mimetype`` (now deprecated).
 
     ``status`` is the `HTTP status code`_ for the response.
-
-    .. versionadded:: 1.6
 
     ``reason`` is the HTTP response phrase. If not provided, a default phrase
     will be used.
@@ -781,8 +777,6 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     constructor arguments. Note that this returns an HTTP status code 302.
 
     .. attribute:: HttpResponseRedirect.url
-
-        .. versionadded:: 1.6
 
         This read-only attribute represents the URL the response will redirect
         to (equivalent to the ``Location`` response header).
@@ -953,8 +947,6 @@ Attributes
     The `HTTP status code`_ for the response.
 
 .. attribute:: HttpResponse.reason_phrase
-
-    .. versionadded:: 1.6
 
     The HTTP reason phrase for the response.
 

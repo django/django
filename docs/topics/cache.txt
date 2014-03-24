@@ -771,11 +771,6 @@ of the appropriate backend in the :setting:`CACHES` setting (explained above).
 It's the number of seconds the value should be stored in the cache. Passing in
 ``None`` for ``timeout`` will cache the value forever.
 
-.. versionchanged:: 1.6
-
-    Previously, passing ``None`` explicitly would use the default timeout
-    value.
-
 If the object doesn't exist in the cache, ``cache.get()`` returns ``None``::
 
     # Wait 30 seconds for 'my_key' to expire...

@@ -585,16 +585,7 @@ Returns a ``DateQuerySet`` — a ``QuerySet`` that evaluates to a list of
 :class:`datetime.date` objects representing all available dates of a
 particular kind within the contents of the ``QuerySet``.
 
-.. versionchanged:: 1.6
-
-    ``dates`` used to return a list of :class:`datetime.datetime` objects.
-
 ``field`` should be the name of a ``DateField`` of your model.
-
-.. versionchanged:: 1.6
-
-    ``dates`` used to accept operating on a ``DateTimeField``.
-
 ``kind`` should be either ``"year"``, ``"month"`` or ``"day"``. Each
 ``datetime.date`` object in the result list is "truncated" to the given
 ``type``.
@@ -623,8 +614,6 @@ Examples::
 
 datetimes
 ~~~~~~~~~
-
-.. versionadded:: 1.6
 
 .. method:: datetimes(field, kind, order='ASC', tzinfo=None)
 
@@ -768,8 +757,6 @@ cases it is possible to call ``select_related()`` with no arguments. This will
 follow all non-null foreign keys it can find - nullable foreign keys must be
 specified. This is not recommended in most cases as it is likely to make the
 underlying query more complex, and return more data, than is actually needed.
-
-.. versionadded:: 1.6
 
 If you need to clear the list of related fields added by past calls of
 ``select_related`` on a ``QuerySet``, you can pass ``None`` as a parameter::
@@ -1474,10 +1461,6 @@ get_or_create
 A convenience method for looking up an object with the given ``kwargs`` (may be
 empty if your model has defaults for all fields), creating one if necessary.
 
-.. versionchanged:: 1.6
-
-    Older versions of Django required ``kwargs``.
-
 Returns a tuple of ``(object, created)``, where ``object`` is the retrieved or
 created object and ``created`` is a boolean specifying whether a new object was
 created.
@@ -1762,16 +1745,13 @@ earliest
 
 .. method:: earliest(field_name=None)
 
-.. versionadded:: 1.6
-
 Works otherwise like :meth:`~django.db.models.query.QuerySet.latest` except
 the direction is changed.
 
 first
 ~~~~~
-.. method:: first()
 
-.. versionadded:: 1.6
+.. method:: first()
 
 Returns the first object matched by the queryset, or ``None`` if there
 is no matching object. If the ``QuerySet`` has no ordering defined, then the
@@ -1792,8 +1772,6 @@ equivalent to the above example::
 last
 ~~~~
 .. method:: last()
-
-.. versionadded:: 1.6
 
 Works like  :meth:`first()`, but returns the last object in the queryset.
 
@@ -2435,8 +2413,6 @@ in the database <database-time-zone-definitions>`.
 hour
 ~~~~
 
-.. versionadded:: 1.6
-
 For datetime fields, an exact hour match. Takes an integer between 0 and 23.
 
 Example::
@@ -2457,8 +2433,6 @@ zone before filtering.
 minute
 ~~~~~~
 
-.. versionadded:: 1.6
-
 For datetime fields, an exact minute match. Takes an integer between 0 and 59.
 
 Example::
@@ -2478,8 +2452,6 @@ zone before filtering.
 
 second
 ~~~~~~
-
-.. versionadded:: 1.6
 
 For datetime fields, an exact second match. Takes an integer between 0 and 59.
 

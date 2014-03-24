@@ -433,8 +433,6 @@ helper function described next.
 Lazy translations and plural
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.6
-
 When using lazy translation for a plural string (``[u]n[p]gettext_lazy``), you
 generally don't know the ``number`` argument at the time of the string
 definition. Therefore, you are authorized to pass a key name instead of an

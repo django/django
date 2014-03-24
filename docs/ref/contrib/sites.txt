@@ -249,10 +249,6 @@ To do this, you can use the sites framework. A simple example::
 Enabling the sites framework
 ============================
 
-.. versionchanged:: 1.6
-
-    In previous versions, the sites framework was enabled by default.
-
 To enable the sites framework, follow these steps:
 
 1. Add ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS`

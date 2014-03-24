@@ -144,10 +144,6 @@ Example usage::
     django-admin.py compilemessages -l pt_BR
     django-admin.py compilemessages -l pt_BR -l fr
 
-.. versionchanged:: 1.6
-
-    Added the ability to specify multiple locales.
-
 createcachetable
 ----------------
 
@@ -202,10 +198,6 @@ example, the default settings don't define :setting:`ROOT_URLCONF`, so
 
 The :djadminopt:`--all` option may be provided to display all settings, even
 if they have Django's default value. Such settings are prefixed by ``"###"``.
-
-.. versionadded:: 1.6
-
-    The :djadminopt:`--all` option was added.
 
 dumpdata <app_label app_label app_label.Model ...>
 --------------------------------------------------
@@ -277,8 +269,6 @@ deserialization.
 Use :ref:`natural keys <topics-serialization-natural-keys>` to represent
 any foreign key and many-to-many relationship with a model that provides
 a natural key definition.
-
-.. versionadded:: 1.6
 
 .. django-admin-option:: --pks
 
@@ -362,11 +352,6 @@ access to your precious data on a model by model basis.
 
 The :djadminopt:`--database` option may be used to specify the
 database to introspect.
-
-.. versionchanged:: 1.6
-
-    The behavior by which introspected models are created as unmanaged ones is new
-    in Django 1.6.
 
 loaddata <fixture fixture ...>
 ------------------------------
@@ -565,10 +550,6 @@ Example usage::
     django-admin.py makemessages -l pt_BR
     django-admin.py makemessages -l pt_BR -l fr
 
-.. versionchanged:: 1.6
-
-    Added the ability to specify multiple locales.
-
 .. versionchanged:: 1.7
 
     Added the ``--previous`` option to the ``msgmerge`` command when merging
@@ -619,8 +600,6 @@ comment lines in language files. Note that using this option makes it harder
 for technically skilled translators to understand each message's context.
 
 .. django-admin-option:: --keep-pot
-
-.. versionadded:: 1.6
 
 Use the ``--keep-pot`` option to prevent Django from deleting the temporary
 .pot files it generates before creating the .po file. This is useful for
@@ -977,10 +956,6 @@ behavior you can use the ``--no-startup`` option. e.g.::
 
     django-admin.py shell --plain --no-startup
 
-.. versionadded:: 1.6
-
-    The ``--no-startup`` option was added in Django 1.6.
-
 sql <app_label app_label ...>
 -----------------------------
 
@@ -1042,8 +1017,6 @@ sqldropindexes <app_label app_label ...>
 ----------------------------------------
 
 .. django-admin:: sqldropindexes
-
-.. versionadded:: 1.6
 
 Prints the DROP INDEX SQL statements for the given app name(s).
 
@@ -1509,11 +1482,6 @@ By default, ``django-admin.py`` will show a simple error message whenever an
 :class:`~django.core.management.CommandError` occurs, but a full stack trace
 for any other exception. If you specify ``--traceback``, ``django-admin.py``
 will also output a full stack trace when a ``CommandError`` is raised.
-
-.. versionchanged:: 1.6
-
-    Previously, Django didn't show a full stack trace by default for exceptions
-    other than ``CommandError``.
 
 .. django-admin-option:: --verbosity
 

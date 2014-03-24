@@ -17,10 +17,6 @@ Overview
 The admin is enabled in the default project template used by
 :djadmin:`startproject`.
 
-.. versionchanged:: 1.6
-
-    In previous versions, the admin wasn't enabled by default.
-
 For reference, here are the requirements:
 
 1. Add ``'django.contrib.admin'`` to your :setting:`INSTALLED_APPS` setting.
@@ -419,8 +415,6 @@ subclass::
 
     .. admonition:: Note
 
-        .. versionchanged:: 1.6
-
         If you define the ``Meta.model`` attribute on a
         :class:`~django.forms.ModelForm`, you must also define the
         ``Meta.fields`` attribute (or the ``Meta.exclude`` attribute). However,
@@ -693,9 +687,7 @@ subclass::
               list_display = ('full_name',)
 
 
-    * .. versionadded:: 1.6
-
-      The field names in ``list_display`` will also appear as CSS classes in
+    * The field names in ``list_display`` will also appear as CSS classes in
       the HTML output, in the form of ``column-<field_name>`` on each ``<th>``
       element. This can be used to set column widths in a CSS file for example.
 
@@ -918,8 +910,6 @@ subclass::
     the list of objects on the admin change list page. This can save you a
     bunch of database queries.
 
-    .. versionchanged:: 1.6
-
     The value should be either a boolean, a list or a tuple. Default is
     ``False``.
 
@@ -977,8 +967,6 @@ subclass::
     nor ``ManyToManyField`` fields.
 
 .. attribute:: ModelAdmin.preserve_filters
-
-    .. versionadded:: 1.6
 
     The admin now preserves filters on the list view after creating, editing
     or deleting an object. You can restore the previous behavior of clearing
@@ -1285,8 +1273,6 @@ templates used by the :class:`ModelAdmin` views:
                     return ['name']
 
 .. method:: ModelAdmin.get_search_results(request, queryset, search_term)
-
-    .. versionadded:: 1.6
 
     The ``get_search_results`` method modifies the list of objects displayed in
     to those that match the provided search term. It accepts the request, a
@@ -1598,8 +1584,6 @@ templates used by the :class:`ModelAdmin` views:
 
     .. admonition:: Note
 
-        .. versionchanged:: 1.6
-
         If you define the ``Meta.model`` attribute on a
         :class:`~django.forms.ModelForm`, you must also define the
         ``Meta.fields`` attribute (or the ``Meta.exclude`` attribute). However,
@@ -1658,10 +1642,6 @@ templates used by the :class:`ModelAdmin` views:
                 if request.user.is_superuser:
                     return qs
                 return qs.filter(author=request.user)
-
-    .. versionchanged:: 1.6
-
-        The ``get_queryset`` method was previously named ``queryset``.
 
 .. method:: ModelAdmin.message_user(request, message, level=messages.INFO, extra_tags='', fail_silently=False)
 
@@ -1817,10 +1797,6 @@ To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
 
-.. versionchanged:: 1.6
-
-    The embedded jQuery has been upgraded from 1.4.2 to 1.9.1.
-
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
 a specific need. For example, if you require the jQuery library to be in the
@@ -1975,8 +1951,6 @@ The ``InlineModelAdmin`` class adds:
     The dynamic link will not appear if the number of currently displayed forms
     exceeds ``max_num``, or if the user does not have JavaScript enabled.
 
-    .. versionadded:: 1.6
-
     :meth:`InlineModelAdmin.get_extra` also allows you to customize the number
     of extra forms.
 
@@ -1987,8 +1961,6 @@ The ``InlineModelAdmin`` class adds:
     This controls the maximum number of forms to show in the inline. This
     doesn't directly correlate to the number of objects, but can if the value
     is small enough. See :ref:`model-formsets-max-num` for more information.
-
-    .. versionadded:: 1.6
 
     :meth:`InlineModelAdmin.get_max_num` also allows you to customize the
     maximum number of extra forms.
@@ -2035,8 +2007,6 @@ The ``InlineModelAdmin`` class adds:
 
 .. method:: InlineModelAdmin.get_extra(request, obj=None, **kwargs)
 
-    .. versionadded:: 1.6
-
     Returns the number of extra inline forms to use. By default, returns the
     :attr:`InlineModelAdmin.extra` attribute.
 
@@ -2054,8 +2024,6 @@ The ``InlineModelAdmin`` class adds:
                 return extra
 
 .. method:: InlineModelAdmin.get_max_num(request, obj=None, **kwargs)
-
-    .. versionadded:: 1.6
 
     Returns the maximum number of extra inline forms to use. By default,
     returns the :attr:`InlineModelAdmin.max_num` attribute.
@@ -2550,11 +2518,6 @@ your URLconf. Specifically, add these four patterns:
     url(r'^admin/password_reset/done/$', 'django.contrib.auth.views.password_reset_done', name='password_reset_done'),
     url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm', name='password_reset_confirm'),
     url(r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete', name='password_reset_complete'),
-
-.. versionchanged:: 1.6
-
-    The pattern for :func:`~django.contrib.auth.views.password_reset_confirm`
-    changed as the ``uid`` is now base 64 encoded.
 
 (This assumes you've added the admin at ``admin/`` and requires that you put
 the URLs starting with ``^admin/`` before the line that includes the admin app

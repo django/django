@@ -974,12 +974,8 @@ url
 ^^^
 
 Returns an absolute path reference (a URL without the domain name) matching a
-given view function and optional parameters.
-
-.. versionchanged:: 1.6
-
-    Any special characters in the resulting path will be encoded using
-    :func:`~django.utils.encoding.iri_to_uri`.
+given view function and optional parameters. Any special characters in the
+resulting path will be encoded using :func:`~django.utils.encoding.iri_to_uri`.
 
 This is a way to output links without violating the DRY principle by having to
 hard-code URLs in your templates::

@@ -139,8 +139,6 @@ into those elements.
 
   .. method:: Feed.get_context_data(**kwargs)
 
-    .. versionadded:: 1.6
-
       There is also a way to pass additional information to title and description
       templates, if you need to supply more than the two variables mentioned
       before. You can provide your implementation of ``get_context_data`` method

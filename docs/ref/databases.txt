@@ -19,8 +19,6 @@ General notes
 Persistent connections
 ----------------------
 
-.. versionadded:: 1.6
-
 Persistent connections avoid the overhead of re-establishing a connection to
 the database in each request. They're controlled by the
 :setting:`CONN_MAX_AGE` parameter which defines the maximum lifetime of a
@@ -114,33 +112,10 @@ will do some additional queries to set these parameters.
 
 .. _ALTER ROLE: http://www.postgresql.org/docs/current/interactive/sql-alterrole.html
 
-.. _postgresql-autocommit-mode:
-
-Autocommit mode
----------------
-
-.. versionchanged:: 1.6
-
-In previous versions of Django, database-level autocommit could be enabled by
-setting the ``autocommit`` key in the :setting:`OPTIONS` part of your database
-configuration in :setting:`DATABASES`::
-
-    DATABASES = {
-        # ...
-        'OPTIONS': {
-            'autocommit': True,
-        },
-    }
-
-Since Django 1.6, autocommit is turned on by default. This configuration is
-ignored and can be safely removed.
-
 .. _database-isolation-level:
 
 Isolation level
 ---------------
-
-.. versionadded:: 1.6
 
 Like PostgreSQL itself, Django defaults to the ``READ COMMITTED`` `isolation
 level`_. If you need a higher isolation level such as ``REPEATABLE READ`` or

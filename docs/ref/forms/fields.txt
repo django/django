@@ -481,11 +481,8 @@ For each field, we describe the default widget used if you don't specify
 
     The ``max_value`` and ``min_value`` error messages may contain
     ``%(limit_value)s``, which will be substituted by the appropriate limit.
-
-    .. versionchanged:: 1.6
-
-        Similarly, the ``max_digits``, ``max_decimal_places`` and
-        ``max_whole_digits`` error messages may contain ``%(max)s``.
+    Similarly, the ``max_digits``, ``max_decimal_places`` and
+    ``max_whole_digits`` error messages may contain ``%(max)s``.
 
     Takes four optional arguments:
 
@@ -1105,11 +1102,9 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
     * Error message keys: ``required``, ``list``, ``invalid_choice``,
       ``invalid_pk_value``
 
-    .. versionchanged:: 1.6
-
-        The ``invalid_choice`` message may contain ``%(value)s`` and the
-        ``invalid_pk_value`` message may contain ``%(pk)s``, which will be
-        substituted by the appropriate values.
+    The ``invalid_choice`` message may contain ``%(value)s`` and the
+    ``invalid_pk_value`` message may contain ``%(pk)s``, which will be
+    substituted by the appropriate values.
 
     Allows the selection of one or more model objects, suitable for
     representing a many-to-many relation. As with :class:`ModelChoiceField`,

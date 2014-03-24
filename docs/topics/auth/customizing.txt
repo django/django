@@ -70,6 +70,10 @@ The order of :setting:`AUTHENTICATION_BACKENDS` matters, so if the same
 username and password is valid in multiple backends, Django will stop
 processing at the first positive match.
 
+If a backend raises a :class:`~django.core.exceptions.PermissionDenied`
+exception, authentication will immediately fail. Django won't check the
+backends that follow.
+
 .. note::
 
     Once a user has authenticated, Django stores which backend was used to
@@ -80,12 +84,6 @@ processing at the first positive match.
     :setting:`AUTHENTICATION_BACKENDS`, you'll need to clear out session data if
     you need to force users to re-authenticate using different methods. A simple
     way to do that is simply to execute ``Session.objects.all().delete()``.
-
-.. versionadded:: 1.6
-
-    If a backend raises a :class:`~django.core.exceptions.PermissionDenied`
-    exception, authentication will immediately fail. Django won't check the
-    backends that follow.
 
 Writing an authentication backend
 ---------------------------------
@@ -570,22 +568,11 @@ The following methods are available on any subclass of
         :meth:`~django.contrib.auth.models.AbstractBaseUser.set_unusable_password()`
         were used.
 
-        .. versionchanged:: 1.6
-
-            In Django 1.4 and 1.5, a blank string was unintentionally stored
-            as an unusable password as well.
-
     .. method:: models.AbstractBaseUser.check_password(raw_password)
 
         Returns ``True`` if the given raw string is the correct password for
         the user. (This takes care of the password hashing in making the
         comparison.)
-
-        .. versionchanged:: 1.6
-
-            In Django 1.4 and 1.5, a blank string was unintentionally
-            considered to be an unusable password, resulting in this method
-            returning ``False`` for such a password.
 
     .. method:: models.AbstractBaseUser.set_unusable_password()
 
@@ -908,10 +895,6 @@ models provided by ``auth`` app::
         def test_extension_user(self):
             "Run tests for a simple extension of the built-in User."
             self.assertSomething()
-
-.. versionchanged:: 1.6
-
-    In Django 1.5, it wasn't necessary to explicitly import the test User models.
 
 A full example
 --------------

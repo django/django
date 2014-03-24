@@ -113,8 +113,6 @@ for all remaining fields are still executed.
 Raising ``ValidationError``
 ---------------------------
 
-.. versionchanged:: 1.6
-
 In order to make error messages flexible and easy to override, consider the
 following guidelines:
 

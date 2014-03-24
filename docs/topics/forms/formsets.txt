@@ -118,13 +118,6 @@ affect validation.  If ``validate_max=True`` is passed to the
 :func:`~django.forms.formsets.formset_factory`, then ``max_num`` will affect
 validation.  See :ref:`validate_max`.
 
-.. versionchanged:: 1.6
-
-   The ``validate_max`` parameter was added to
-   :func:`~django.forms.formsets.formset_factory`.  Also, the behavior of
-   ``FormSet`` was brought in line with that of ``ModelFormSet`` so that it
-   displays initial data regardless of ``max_num``.
-
 Formset validation
 ------------------
 
@@ -168,8 +161,6 @@ forms in the formset. Validation was performed for each of the two forms, and
 the expected error message appears for the second item.
 
 .. method:: BaseFormSet.total_error_count()
-
-.. versionadded:: 1.6
 
 To check how many errors there are in the formset, we can use the
 ``total_error_count`` method::
@@ -343,11 +334,6 @@ excessive.
     forms above ``max_num`` will be validated.  The remainder will be
     truncated entirely.  This is to protect against memory exhaustion attacks
     using forged POST requests.
-
-.. versionchanged:: 1.6
-
-   The ``validate_max`` parameter was added to
-   :func:`~django.forms.formsets.formset_factory`.
 
 ``validate_min``
 ~~~~~~~~~~~~~~~~

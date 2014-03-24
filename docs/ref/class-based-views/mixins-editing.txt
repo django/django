@@ -37,8 +37,6 @@ FormMixin
 
     .. attribute:: prefix
 
-        .. versionadded:: 1.6
-
         The :attr:`~django.forms.Form.prefix` for the generated form.
 
     .. method:: get_initial()
@@ -65,8 +63,6 @@ FormMixin
         and ``request.FILES``) will also be provided.
 
     .. method:: get_prefix()
-
-        .. versionadded:: 1.6
 
         Determine the :attr:`~django.forms.Form.prefix` for the generated form.
         Returns :attr:`~django.views.generic.edit.FormMixin.prefix` by default.
@@ -234,12 +230,10 @@ DeletionMixin
         The url to redirect to when the nominated object has been
         successfully deleted.
 
-        .. versionadded:: 1.6
-
-            ``success_url`` may contain dictionary string formatting, which
-            will be interpolated against the object's field attributes. For
-            example, you could use ``success_url="/parent/%(parent_id)s/"`` to
-            redirect to a URL composed out of the ``parent_id`` field on a model.
+        ``success_url`` may contain dictionary string formatting, which will be
+        interpolated against the object's field attributes. For example, you
+        could use ``success_url="/parent/%(parent_id)s/"`` to redirect to a URL
+        composed out of the ``parent_id`` field on a model.
 
     .. method:: get_success_url()
 

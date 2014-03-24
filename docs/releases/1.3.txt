@@ -610,13 +610,11 @@ Transaction management
 
 When using managed transactions -- that is, anything but the default
 autocommit mode -- it is important when a transaction is marked as
-"dirty". Dirty transactions are committed by the
-:func:`~django.db.transaction.commit_on_success` decorator or the
-:class:`~django.middleware.transaction.TransactionMiddleware`, and
-:func:`~django.db.transaction.commit_manually` forces them to be
-closed explicitly; clean transactions "get a pass", which means they
-are usually rolled back at the end of a request when the connection is
-closed.
+"dirty". Dirty transactions are committed by the ``commit_on_success``
+decorator or the ``django.middleware.transaction.TransactionMiddleware``, and
+``commit_manually`` forces them to be closed explicitly; clean transactions
+"get a pass", which means they are usually rolled back at the end of a request
+when the connection is closed.
 
 Until Django 1.3, transactions were only marked dirty when Django was
 aware of a modifying operation performed in them; that is, either some

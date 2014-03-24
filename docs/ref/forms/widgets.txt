@@ -409,8 +409,6 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
 .. class:: NumberInput
 
-    .. versionadded:: 1.6
-
     Text input: ``<input type="number" ...>``
 
     Beware that not all browsers support entering localized numbers in
@@ -422,16 +420,12 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
 .. class:: EmailInput
 
-    .. versionadded:: 1.6
-
     Text input: ``<input type="email" ...>``
 
 ``URLInput``
 ~~~~~~~~~~~~
 
 .. class:: URLInput
-
-    .. versionadded:: 1.6
 
     Text input: ``<input type="url" ...>``
 
@@ -649,10 +643,8 @@ Selector and checkbox widgets
     simply includes ``{{ myform.beatles }}`` -- they'll be output in a ``<ul>``
     with ``<li>`` tags, as above.
 
-.. versionchanged:: 1.6
-
-The outer ``<ul>`` container will now receive the ``id`` attribute defined on
-the widget.
+    The outer ``<ul>`` container will receive the ``id`` attribute defined on
+    the widget.
 
 .. versionchanged:: 1.7
 
@@ -675,10 +667,8 @@ the widget.
           ...
         </ul>
 
-.. versionchanged:: 1.6
-
-The outer ``<ul>`` container will now receive the ``id`` attribute defined on
-the widget.
+    The outer ``<ul>`` container will receive the ``id`` attribute defined on
+    the widget.
 
 Like :class:`RadioSelect`, you can now loop over the individual checkboxes making
 up the lists. See the documentation of :class:`RadioSelect` for more details.

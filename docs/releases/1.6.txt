@@ -411,8 +411,8 @@ Autocommit option for PostgreSQL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In previous versions, database-level autocommit was only an option for
-PostgreSQL, and it was disabled by default. This option is now :ref:`ignored
-<postgresql-autocommit-mode>` and can be removed.
+PostgreSQL, and it was disabled by default. This option is now ignored and can
+be removed.
 
 .. _new-test-runner:
 

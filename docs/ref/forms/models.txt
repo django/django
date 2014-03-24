@@ -61,11 +61,6 @@ Model Form Functions
 
     See :ref:`model-formsets` for example usage.
 
-    .. versionchanged:: 1.6
-
-        The ``widgets``, ``validate_max``, ``localized_fields``, ``labels``,
-        ``help_texts``, and ``error_messages`` parameters were added.
-
 .. function:: inlineformset_factory(parent_model, model, form=ModelForm, formset=BaseInlineFormSet, fk_name=None, fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, widgets=None, validate_max=False, localized_fields=None, labels=None, help_texts=None, error_messages=None)
 
     Returns an ``InlineFormSet`` using :func:`modelformset_factory` with
@@ -76,8 +71,3 @@ Model Form Functions
     the ``parent_model``, you must specify a ``fk_name``.
 
     See :ref:`inline-formsets` for example usage.
-
-    .. versionchanged:: 1.6
-
-        The ``widgets``, ``validate_max`` and ``localized_fields``, ``labels``,
-        ``help_texts``, and ``error_messages`` parameters were added.

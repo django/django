@@ -24,11 +24,6 @@ integrity of ORM operations that require multiple queries, especially
 Django's :class:`~django.test.TestCase` class also wraps each test in a
 transaction for performance reasons.
 
-.. versionchanged:: 1.6
-
-    Previous version of Django featured :ref:`a more complicated default
-    behavior <transactions-upgrading-from-1.5>`.
-
 .. _tying-transactions-to-http-requests:
 
 Tying transactions to HTTP requests
@@ -93,15 +88,8 @@ still possible to prevent views from running in a transaction.
 
     It only works if it's applied to the view itself.
 
-.. versionchanged:: 1.6
-
-    Django used to provide this feature via ``TransactionMiddleware``, which is
-    now deprecated.
-
 Controlling transactions explicitly
 -----------------------------------
-
-.. versionadded:: 1.6
 
 Django provides a single API to control database transactions.
 
@@ -251,11 +239,6 @@ on.
 To avoid this, you can :ref:`deactivate the transaction management
 <deactivate-transaction-management>`, but it isn't recommended.
 
-.. versionchanged:: 1.6
-
-    Before Django 1.6, autocommit was turned off, and it was emulated by
-    forcing a commit after write operations in the ORM.
-
 .. _deactivate-transaction-management:
 
 Deactivating transaction management
@@ -272,10 +255,6 @@ by Django or by third-party libraries. Thus, this is best used in situations
 where you want to run your own transaction-controlling middleware or do
 something really strange.
 
-.. versionchanged:: 1.6
-
-    This used to be controlled by the ``TRANSACTIONS_MANAGED`` setting.
-
 Low-level APIs
 ==============
 
@@ -291,8 +270,6 @@ Low-level APIs
 
 Autocommit
 ----------
-
-.. versionadded:: 1.6
 
 Django provides a straightforward API in the :mod:`django.db.transaction`
 module to manage the autocommit state of each database connection.
@@ -360,12 +337,10 @@ you issue a rollback, the entire transaction is rolled back. Savepoints
 provide the ability to perform a fine-grained rollback, rather than the full
 rollback that would be performed by ``transaction.rollback()``.
 
-.. versionchanged:: 1.6
-
-    When the :func:`atomic` decorator is nested, it creates a savepoint to allow
-    partial commit or rollback. You're strongly encouraged to use :func:`atomic`
-    rather than the functions described below, but they're still part of the
-    public API, and there's no plan to deprecate them.
+When the :func:`atomic` decorator is nested, it creates a savepoint to allow
+partial commit or rollback. You're strongly encouraged to use :func:`atomic`
+rather than the functions described below, but they're still part of the
+public API, and there's no plan to deprecate them.
 
 Each of these functions takes a ``using`` argument which should be the name of
 a database for which the behavior applies.  If no ``using`` argument is
@@ -418,8 +393,6 @@ The following example demonstrates the use of savepoints::
         else:
             transaction.savepoint_rollback(sid)
             # open transaction now contains only a.save()
-
-.. versionadded:: 1.6
 
 Savepoints may be used to recover from a database error by performing a partial
 rollback. If you're doing this inside an :func:`atomic` block, the entire block

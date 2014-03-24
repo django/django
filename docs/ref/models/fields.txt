@@ -384,8 +384,6 @@ guaranteed to fit numbers from ``-9223372036854775808`` to
 
 .. class:: BinaryField([**options])
 
-.. versionadded:: 1.6
-
 A field to store raw binary data. It only supports ``bytes`` assignment. Be
 aware that this field has limited functionality. For example, it is not possible
 to filter a queryset on a ``BinaryField`` value.
@@ -409,10 +407,8 @@ The default form widget for this field is a
 If you need to accept :attr:`~Field.null` values then use
 :class:`NullBooleanField` instead.
 
-.. versionchanged:: 1.6
-
-    The default value of ``BooleanField`` was changed from ``False`` to
-    ``None`` when :attr:`Field.default` isn't defined.
+The default value of ``BooleanField`` is ``None`` when :attr:`Field.default`
+isn't defined.
 
 ``CharField``
 -------------
@@ -1142,8 +1138,6 @@ define the details of how the relation works.
 
 .. attribute:: ForeignKey.related_query_name
 
-    .. versionadded:: 1.6
-
     The name to use for the reverse filter name from the target model.
     Defaults to the value of :attr:`related_name` if it is set, otherwise it
     defaults to the name of the model::
@@ -1162,8 +1156,6 @@ define the details of how the relation works.
     uses the primary key of the related object.
 
 .. attribute:: ForeignKey.db_constraint
-
-    .. versionadded:: 1.6
 
     Controls whether or not a constraint should be created in the database for
     this foreign key. The default is ``True``, and that's almost certainly what
@@ -1292,8 +1284,6 @@ that control how the relationship functions.
 
 .. attribute:: ManyToManyField.related_query_name
 
-    .. versionadded:: 1.6
-
     Same as :attr:`ForeignKey.related_query_name`.
 
 .. attribute:: ManyToManyField.limit_choices_to
@@ -1395,8 +1385,6 @@ that control how the relationship functions.
     itself.
 
 .. attribute:: ManyToManyField.db_constraint
-
-    .. versionadded:: 1.6
 
     Controls whether or not constraints should be created in the database for
     the foreign keys in the intermediary table. The default is ``True``, and
