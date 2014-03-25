@@ -42,7 +42,7 @@ class Command(NoArgsCommand):
         yield "# You'll have to do the following manually to clean this up:"
         yield "#   * Rearrange models' order"
         yield "#   * Make sure each model has one field with primary_key=True"
-        yield "#   * Remove `managed = False` lines for those models you wish to give write DB access"
+        yield "#   * Remove `managed = False` lines if you wish to allow Django to create and delete the table"
         yield "# Feel free to rename the models, but don't rename db_table values or field names."
         yield "#"
         yield "# Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'"

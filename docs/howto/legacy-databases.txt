@@ -49,29 +49,20 @@ Once you've cleaned up your models, name the file ``models.py`` and put it in
 the Python package that holds your app. Then add the app to your
 :setting:`INSTALLED_APPS` setting.
 
-If your plan is that your Django application(s) modify data (i.e. edit, remove
-records and create new ones) in the existing database tables corresponding to
-any of the introspected models then one of the manual review and edit steps
-you need to perform on the resulting ``models.py`` file is to change the
-Python declaration of each one of these models to specify it is a
-:attr:`managed <django.db.models.Options.managed>` one. For example, consider
-this generated model definition:
-
-.. parsed-literal::
+By default, :djadmin:`inspectdb` creates unmanaged models. That is,
+``managed = False`` in the model's ``Meta`` class tells Django not to manage
+each table's creation and deletion::
 
     class Person(models.Model):
         id = models.IntegerField(primary_key=True)
         first_name = models.CharField(max_length=70)
         class Meta:
-            **managed = False**
+           managed = False
            db_table = 'CENSUS_PERSONS'
 
-If you wanted to modify existing data on your ``CENSUS_PERSONS`` SQL table
-with Django you'd need to change the ``managed`` option highlighted above to
-``True`` (or simply remove it to let it because ``True`` is its default value).
-
-This serves as an explicit opt-in to give your nascent Django project write
-access to your precious data on a model by model basis.
+If you do want to allow Django to manage the table's lifecycle, you'll need to
+change the :attr:`~django.db.models.Options.managed` option above to ``True``
+(or simply remove it because ``True`` is its default value).
 
 .. versionchanged:: 1.6
 
