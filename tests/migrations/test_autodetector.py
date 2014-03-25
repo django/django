@@ -343,7 +343,7 @@ class AutodetectorTests(TestCase):
         self.assertEqual(action.name, "author")
         # Right dependencies?
         self.assertEqual(migration1.dependencies, [("otherapp", "auto_1")])
-        self.assertEqual(migration2.dependencies, [])
+        self.assertEqual(migration2.dependencies, [('testapp', '__first__')])
         self.assertEqual(set(migration3.dependencies), set([("otherapp", "auto_1"), ("testapp", "auto_1")]))
 
     def test_same_app_circular_fk_dependency(self):

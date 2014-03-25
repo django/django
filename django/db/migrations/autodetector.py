@@ -134,6 +134,7 @@ class MigrationAutodetector(object):
                         bases=model_state.bases,
                     )
                 )
+
         # Phase 2 is progressively adding pending models, splitting up into two
         # migrations if required.
         pending_new_fks = []
@@ -161,14 +162,6 @@ class MigrationAutodetector(object):
                     # migration for safety.
                     new=any((al, mn) in added_phase_2 for f, al, mn in related_fields),
                 )
-                for field_name, other_app_label, other_model_name in related_fields:
-                    # If it depends on a swappable something, add a dynamic depend'cy
-                    swappable_setting = new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0].swappable_setting
-                    if swappable_setting is not None:
-                        self.add_swappable_dependency(app_label, swappable_setting)
-                    elif app_label != other_app_label:
-                            self.add_dependency(app_label, other_app_label)
-                del pending_add[app_label, model_name]
                 added_phase_2.add((app_label, model_name))
             # Ah well, we'll need to split one. Pick deterministically.
             else:
@@ -194,8 +187,16 @@ class MigrationAutodetector(object):
                 # Add the bad fields to be made in a phase 3
                 for field_name, (other_app_label, other_model_name) in bad_fields.items():
                     pending_new_fks.append((app_label, model_name, field_name, other_app_label))
-                del pending_add[app_label, model_name]
-        # Phase 3 is adding the final set of FKs as separate new migrations
+            for field_name, other_app_label, other_model_name in related_fields:
+                # If it depends on a swappable something, add a dynamic depend'cy
+                swappable_setting = new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0].swappable_setting
+                if swappable_setting is not None:
+                    self.add_swappable_dependency(app_label, swappable_setting)
+                elif app_label != other_app_label:
+                    self.add_dependency(app_label, other_app_label)
+            del pending_add[app_label, model_name]
+
+        # Phase 3 is adding the final set of FKs as separate new migrations.
         for app_label, model_name, field_name, other_app_label in pending_new_fks:
             model_state = self.to_state.models[app_label, model_name]
             self.add_to_migration(
@@ -370,7 +371,7 @@ class MigrationAutodetector(object):
         Adds a dependency to app_label's newest migration on
         other_app_label's latest migration.
         """
-        if self.migrations.get(other_app_label, []):
+        if self.migrations.get(other_app_label):
             dependency = (other_app_label, self.migrations[other_app_label][-1].name)
         else:
             dependency = (other_app_label, "__first__")
