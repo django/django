@@ -24,6 +24,8 @@ class AutodetectorTests(TestCase):
     author_with_custom_user = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("user", models.ForeignKey("thirdapp.CustomUser"))])
     author_proxy = ModelState("testapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author", ))
     author_proxy_notproxy = ModelState("testapp", "AuthorProxy", [], {}, ("testapp.author", ))
+    author_unmanaged = ModelState("testapp", "AuthorUnmanaged", [], {"managed": False}, ("testapp.author", ))
+    author_unmanaged_managed = ModelState("testapp", "AuthorUnmanaged", [], {}, ("testapp.author", ))
     publisher = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=100))])
     publisher_with_author = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("name", models.CharField(max_length=100))])
     publisher_with_book = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("otherapp.Book")), ("name", models.CharField(max_length=100))])
@@ -487,6 +489,31 @@ class AutodetectorTests(TestCase):
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "CreateModel")
         self.assertEqual(action.name, "AuthorProxy")
+
+    def test_unmanaged_ignorance(self):
+        "Tests that the autodetector correctly ignores managed models"
+        # First, we test adding an unmanaged model
+        before = self.make_project_state([self.author_empty])
+        after = self.make_project_state([self.author_empty, self.author_unmanaged])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes), 0)
+
+        # Now, we test turning an unmanaged model into a managed model
+        before = self.make_project_state([self.author_empty, self.author_unmanaged])
+        after = self.make_project_state([self.author_empty, self.author_unmanaged_managed])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['testapp']), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        # Right action?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "CreateModel")
+        self.assertEqual(action.name, "AuthorUnmanaged")
 
     @override_settings(AUTH_USER_MODEL="thirdapp.CustomUser")
     def test_swappable(self):
