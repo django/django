@@ -36,6 +36,12 @@ details on these changes.
 * ``allow_syncdb`` on database routers will no longer automatically become
   ``allow_migrate``.
 
+* The ``DatabaseCreation`` class on each database backend will be removed,
+  and all table/schema editing will be moved to be via ``SchemaEditor`` instead.
+
+* The legacy method of syncing apps without migrations will be removed,
+  and migrations will become compulsory for all apps.
+
 * All models will need to be defined inside an installed application or
   declare an explicit :attr:`~django.db.models.Options.app_label`.
   Furthermore, it won't be possible to import them before their application
