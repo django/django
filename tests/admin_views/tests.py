@@ -52,7 +52,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
     Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage,
     Telegram, Pizza, Topping, FilteredManager, City, Restaurant, Worker,
-    ParentWithDependentChildren, Character)
+    ParentWithDependentChildren, Character, FieldOverridePost)
 from .admin import site, site2, CityAdmin
 
 
@@ -3692,6 +3692,18 @@ class ReadonlyTest(TestCase):
         pizza.toppings.add(topping)
         response = self.client.get('/test_admin/admin/admin_views/topping/add/')
         self.assertEqual(response.status_code, 200)
+
+    def test_readonly_field_overrides(self):
+        """
+        Regression test for #22087 - ModelForm Meta overrides are ignored by
+        AdminReadonlyField
+        """
+        p = FieldOverridePost.objects.create(title="Test Post", content="Test Content")
+        response = self.client.get('/test_admin/admin/admin_views/fieldoverridepost/%d/' % p.pk)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<p class="help">Overridden help text for the date</p>')
+        self.assertContains(response, '<label for="id_public">Overridden public label:</label>', html=True)
+        self.assertNotContains(response, "Some help text for the date (with unicode ŠĐĆŽćžšđ)")
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
