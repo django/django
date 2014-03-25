@@ -58,9 +58,8 @@ class ProjectState(object):
         "Takes in an Apps and returns a ProjectState matching it"
         app_models = {}
         for model in apps.get_models():
-            if model._meta.managed:
-                model_state = ModelState.from_model(model)
-                app_models[(model_state.app_label, model_state.name.lower())] = model_state
+            model_state = ModelState.from_model(model)
+            app_models[(model_state.app_label, model_state.name.lower())] = model_state
         return cls(app_models)
 
     def __eq__(self, other):
