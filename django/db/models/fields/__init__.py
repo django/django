@@ -1562,13 +1562,14 @@ class IntegerField(Field):
     description = _("Integer")
 
     def __init__(self, *args, **kwargs):
-        field_validators = kwargs.setdefault('validators', [])
+        default_validators = self.default_validators[:]
         internal_type = self.get_internal_type()
         min_value, max_value = connection.ops.integer_field_range(internal_type)
         if min_value is not None:
-            field_validators.append(validators.MinValueValidator(min_value))
+            default_validators.append(validators.MinValueValidator(min_value))
         if max_value is not None:
-            field_validators.append(validators.MaxValueValidator(max_value))
+            default_validators.append(validators.MaxValueValidator(max_value))
+        self.default_validators = default_validators
         super(IntegerField, self).__init__(*args, **kwargs)
 
     def get_prep_value(self, value):
