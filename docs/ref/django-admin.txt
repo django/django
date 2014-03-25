@@ -277,6 +277,13 @@ you can use the ``--pks`` option to specify a comma separated list of
 primary keys on which to filter.  This is only available when dumping
 one model.
 
+.. versionadded:: 1.8
+
+.. django-admin-option:: --output
+
+By default ``dumpdata`` will output all the serialized data to standard output.
+This options allows to specify the file to which the data is to be written.
+
 flush
 -----
 

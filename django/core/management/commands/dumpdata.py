@@ -36,6 +36,8 @@ class Command(BaseCommand):
             help="Only dump objects with given primary keys. "
                  "Accepts a comma separated list of keys. "
                  "This option will only work when you specify one model."),
+        make_option('-o' ,'--output', default=None, dest='output',
+            help='Specifies file to which the output is written.'),
     )
     help = ("Output the contents of the database as a fixture of the given "
             "format (using each model's default manager unless --all is "
@@ -47,6 +49,7 @@ class Command(BaseCommand):
         indent = options.get('indent')
         using = options.get('database')
         excludes = options.get('exclude')
+        output = options.get('output')
         show_traceback = options.get('traceback')
         use_natural_keys = options.get('use_natural_keys')
         if use_natural_keys:
@@ -155,7 +158,7 @@ class Command(BaseCommand):
             serializers.serialize(format, get_objects(), indent=indent,
                     use_natural_foreign_keys=use_natural_foreign_keys,
                     use_natural_primary_keys=use_natural_primary_keys,
-                    stream=self.stdout)
+                    stream=open(output, 'w') if output else self.stdout)
         except Exception as e:
             if show_traceback:
                 raise
