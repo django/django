@@ -51,11 +51,17 @@ algorithm the system follows to determine which Python code to execute:
 3. Django runs through each URL pattern, in order, and stops at the first
    one that matches the requested URL.
 
-4. Once one of the regexes matches, Django imports and calls the given
-   view, which is a simple Python function (or a :doc:`class based view
-   </topics/class-based-views/index>`). The view gets passed an
-   :class:`~django.http.HttpRequest` as its first argument and any values
-   captured in the regex as remaining arguments.
+4. Once one of the regexes matches, Django imports and calls the given view,
+   which is a simple Python function (or a :doc:`class based view
+   </topics/class-based-views/index>`). The view gets passed the following
+   arguments:
+
+   * An instance of :class:`~django.http.HttpRequest`.
+   * If the matched regular expression returned no named groups, then the
+     matches from the regular expression are provided as positional arguments.
+   * The keyword arguments are made up of any named groups matched by the
+     regular expression, overridden by any arguments specified in the optional
+     ``kwargs`` argument to :func:`django.conf.urls.url`.
 
 5. If no regex matches, or if an exception is raised during any
    point in this process, Django invokes an appropriate
