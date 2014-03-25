@@ -347,15 +347,12 @@ needed.
 ``inspectdb`` works with PostgreSQL, MySQL and SQLite. Foreign-key detection
 only works in PostgreSQL and with certain types of MySQL tables.
 
-If your plan is that your Django application(s) modify data (i.e. edit, remove
-records and create new ones) in the existing database tables corresponding to
-any of the introspected models then one of the manual review and edit steps
-you need to perform on the resulting ``models.py`` file is to change the
-Python declaration of each one of these models to specify it is a
-:attr:`managed <django.db.models.Options.managed>` one.
-
-This serves as an explicit opt-in to give your nascent Django project write
-access to your precious data on a model by model basis.
+By default, ``inspectdb`` creates unmanaged models. That is, ``managed = False``
+in the model's ``Meta`` class tells Django not to manage each table's creation,
+modification, and deletion. If you do want to allow Django to manage the
+table's lifecycle, you'll need to change the
+:attr:`~django.db.models.Options.managed` option to ``True`` (or simply remove
+it because ``True`` is its default value).
 
 The :djadminopt:`--database` option may be used to specify the
 database to introspect.
