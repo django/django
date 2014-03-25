@@ -36,7 +36,7 @@ class Command(BaseCommand):
             help="Only dump objects with given primary keys. "
                  "Accepts a comma separated list of keys. "
                  "This option will only work when you specify one model."),
-        make_option('-o' ,'--output', default=None, dest='output',
+        make_option('-o', '--output', default=None, dest='output',
             help='Specifies file to which the output is written.'),
     )
     help = ("Output the contents of the database as a fixture of the given "

@@ -124,8 +124,8 @@ Internationalization
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
-* :djadmin:`dumpdata` now has the option ``--output`` which allows to specify the
-file to which the serialized data is to be written.
+* :djadmin:`dumpdata` now has the option :djadminopt:`--output` which allows
+  specifying the file to which the serialized data is written.
 
 Models
 ^^^^^^
