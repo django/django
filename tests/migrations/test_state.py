@@ -52,11 +52,22 @@ class StateTests(TestCase):
                 verbose_name = "tome"
                 db_table = "test_tome"
 
+        class Unmanaged(models.Model):
+            title = models.CharField(max_length=1000)
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+                managed = False
+
         project_state = ProjectState.from_apps(new_apps)
         author_state = project_state.models['migrations', 'author']
         author_proxy_state = project_state.models['migrations', 'authorproxy']
         sub_author_state = project_state.models['migrations', 'subauthor']
         book_state = project_state.models['migrations', 'book']
+        # unmanaged models should not appear in migrations
+        with self.assertRaises(KeyError):
+            project_state.models['migrations', 'unmanaged']
 
         self.assertEqual(author_state.app_label, "migrations")
         self.assertEqual(author_state.name, "Author")
