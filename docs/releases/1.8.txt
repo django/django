@@ -173,7 +173,7 @@ Backwards incompatible changes in 1.8
 Miscellaneous
 ~~~~~~~~~~~~~
 
-* ...
+* ``URLField.to_python`` no longer adds a trailing slash to pathless URLs.
 
 .. _deprecated-features-1.8:
 

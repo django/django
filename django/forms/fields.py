@@ -704,9 +704,6 @@ class URLField(CharField):
                 # Rebuild the url_fields list, since the domain segment may now
                 # contain the path too.
                 url_fields = split_url(urlunsplit(url_fields))
-            if not url_fields[2]:
-                # the path portion may need to be added before query params
-                url_fields[2] = '/'
             value = urlunsplit(url_fields)
         return value
 
