@@ -91,7 +91,8 @@ manipulating the data of your Web application. Learn more about it below:
   :doc:`Supported databases <ref/databases>` |
   :doc:`Legacy databases <howto/legacy-databases>` |
   :doc:`Providing initial data <howto/initial-data>` |
-  :doc:`Optimize database access <topics/db/optimization>`
+  :doc:`Optimize database access <topics/db/optimization>` |
+  :doc:`PostgreSQL specific features <ref/contrib/postgres/index>`
 
 The view layer
 ==============
