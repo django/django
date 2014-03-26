@@ -3,7 +3,6 @@ import re
 
 from django.core import checks
 from django.db.models import Field, Lookup, Transform, IntegerField
-from django.utils.module_loading import import_string
 from django.utils import six
 from django.utils.functional import cached_property
 
@@ -14,15 +13,9 @@ __all__ = ['ArrayField']
 class ArrayField(Field):
     empty_strings_allowed = False
 
-    def __init__(self, base_field=None, _base_field_deconstructed=None, **kwargs):
+    def __init__(self, base_field, **kwargs):
         super(ArrayField, self).__init__(**kwargs)
-        if base_field is not None:
-            self.base_field = base_field
-        else:
-            if _base_field_deconstructed is None:
-                raise TypeError('base_field is required.')
-            name, path, args, kwargs = _base_field_deconstructed
-            self.base_field = import_string(path)(*args, **kwargs)
+        self.base_field = base_field
 
     def check(self, **kwargs):
         errors = super(ArrayField, self).check(**kwargs)
@@ -74,7 +67,8 @@ class ArrayField(Field):
 
     def deconstruct(self):
         name, path, args, kwargs = super(ArrayField, self).deconstruct()
-        kwargs['_base_field_deconstructed'] = self.base_field.deconstruct()
+        path = 'django.contrib.postgres.fields.ArrayField'
+        args.insert(0, self.base_field)
         return name, path, args, kwargs
 
     def to_python(self, value):

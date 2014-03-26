@@ -3,6 +3,7 @@ import unittest
 from django.contrib.postgres.fields import ArrayField
 from django.core import serializers
 from django.db import models, IntegrityError, connection
+from django.db.migrations.writer import MigrationWriter
 from django.test import TestCase
 from django.utils import timezone
 
@@ -157,6 +158,11 @@ class TestMigrations(TestCase):
         name, path, args, kwargs = field.deconstruct()
         new = ArrayField(*args, **kwargs)
         self.assertEqual(new.base_field.max_length, field.base_field.max_length)
+
+    def test_makemigrations(self):
+        field = ArrayField(models.CharField(max_length=20))
+        statement, imports = MigrationWriter.serialize(field)
+        self.assertEqual(statement, 'django.contrib.postgres.fields.ArrayField(models.CharField(max_length=20))')
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
