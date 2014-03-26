@@ -2049,7 +2049,7 @@ class ModelOtherFieldTests(TestCase):
 
         form = HomepageForm({'url': 'example.com'})
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data['url'], 'http://example.com/')
+        self.assertEqual(form.cleaned_data['url'], 'http://example.com')
 
         form = HomepageForm({'url': 'example.com/test'})
         self.assertTrue(form.is_valid())
