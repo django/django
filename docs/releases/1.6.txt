@@ -44,6 +44,8 @@ supported Python series (2.6.X, 2.7.X, 3.2.X, and 3.3.X).
 Django 1.6 will be the final release series to support Python 2.6; beginning
 with Django 1.7, the minimum supported Python version will be 2.7.
 
+Python 3.4 is not supported, but support will be added in Django 1.7.
+
 What's new in Django 1.6
 ========================
 
