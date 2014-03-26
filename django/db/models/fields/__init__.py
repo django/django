@@ -1562,13 +1562,8 @@ class IntegerField(Field):
     description = _("Integer")
 
     def __init__(self, *args, **kwargs):
-        field_validators = kwargs.setdefault('validators', [])
-        internal_type = self.get_internal_type()
-        min_value, max_value = connection.ops.integer_field_range(internal_type)
-        if min_value is not None:
-            field_validators.append(validators.MinValueValidator(min_value))
-        if max_value is not None:
-            field_validators.append(validators.MaxValueValidator(max_value))
+        self.range_validators_added = False
+        kwargs.setdefault('validators', [])
         super(IntegerField, self).__init__(*args, **kwargs)
 
     def get_prep_value(self, value):
@@ -1587,6 +1582,16 @@ class IntegerField(Field):
         return "IntegerField"
 
     def to_python(self, value):
+        # these specific validators are added here to avoid import errors
+        # when accessing the ``connection`` module during import time
+        if not self.range_validators_added:
+            internal_type = self.get_internal_type()
+            min_value, max_value = connection.ops.integer_field_range(internal_type)
+            if min_value is not None:
+                self.field_validators.append(validators.MinValueValidator(min_value))
+            if max_value is not None:
+                self.field_validators.append(validators.MaxValueValidator(max_value))
+            self.range_validators_added = True
         if value is None:
             return value
         try:
