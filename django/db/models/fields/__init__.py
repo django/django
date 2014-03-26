@@ -1588,9 +1588,9 @@ class IntegerField(Field):
             internal_type = self.get_internal_type()
             min_value, max_value = connection.ops.integer_field_range(internal_type)
             if min_value is not None:
-                self.field_validators.append(validators.MinValueValidator(min_value))
+                self.validators.append(validators.MinValueValidator(min_value))
             if max_value is not None:
-                self.field_validators.append(validators.MaxValueValidator(max_value))
+                self.validators.append(validators.MaxValueValidator(max_value))
             self.range_validators_added = True
         if value is None:
             return value
