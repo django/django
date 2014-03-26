@@ -132,7 +132,7 @@ All attributes should be considered read-only, unless stated otherwise below.
 
     A dictionary-like object containing all uploaded files. Each key in
     ``FILES`` is the ``name`` from the ``<input type="file" name="" />``. Each
-    value in ``FILES`` is an :class:`UploadedFile` as described below.
+    value in ``FILES`` is an :class:`~django.core.files.uploadedfile.UploadedFile`.
 
     See :doc:`/topics/files` for more information.
 
@@ -332,36 +332,6 @@ Methods
         import xml.etree.ElementTree as ET
         for element in ET.iterparse(request):
             process(element)
-
-
-UploadedFile objects
-====================
-
-.. class:: UploadedFile
-
-
-Attributes
-----------
-
-.. attribute::  UploadedFile.name
-
-    The name of the uploaded file.
-
-.. attribute:: UploadedFile.size
-
-    The size, in bytes, of the uploaded file.
-
-Methods
-----------
-
-.. method:: UploadedFile.chunks(chunk_size=None)
-
-    Returns a generator that yields sequential chunks of data.
-
-.. method:: UploadedFile.read(num_bytes=None)
-
-    Read a number of bytes from the file.
-
 
 
 QueryDict objects
