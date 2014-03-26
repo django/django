@@ -231,7 +231,7 @@ class BaseValidator(object):
 
     def __call__(self, value):
         cleaned = self.clean(value)
-        params = {'limit_value': self.limit_value, 'show_value': cleaned}
+        params = {'limit_value': self.limit_value, 'show_value': cleaned, 'value': value}
         if self.compare(cleaned, self.limit_value):
             raise ValidationError(self.message, code=self.code, params=params)
 
@@ -258,8 +258,8 @@ class MinLengthValidator(BaseValidator):
     compare = lambda self, a, b: a < b
     clean = lambda self, x: len(x)
     message = ungettext_lazy(
-        'Ensure this value has at least %(limit_value)d character (it has %(show_value)d).',
-        'Ensure this value has at least %(limit_value)d characters (it has %(show_value)d).',
+        'Ensure this value has at least %(limit_value)d character ("%(value)s" has %(show_value)d).',
+        'Ensure this value has at least %(limit_value)d characters ("%(value)s" has %(show_value)d).',
         'limit_value')
     code = 'min_length'
 
@@ -269,7 +269,7 @@ class MaxLengthValidator(BaseValidator):
     compare = lambda self, a, b: a > b
     clean = lambda self, x: len(x)
     message = ungettext_lazy(
-        'Ensure this value has at most %(limit_value)d character (it has %(show_value)d).',
-        'Ensure this value has at most %(limit_value)d characters (it has %(show_value)d).',
+        'Ensure this value has at most %(limit_value)d character ("%(value)s" has %(show_value)d).',
+        'Ensure this value has at most %(limit_value)d characters ("%(value)s" has %(show_value)d).',
         'limit_value')
     code = 'max_length'
