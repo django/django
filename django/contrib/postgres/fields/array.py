@@ -103,12 +103,12 @@ class ArrayField(Field):
             pass
         else:
             index = index + 1  # postgres uses 1-indexing
-            return index_transform_factory(index, self.base_field)
+            return IndexTransformFactory(index, self.base_field)
         if re.match('\d+_\d+', name):
             start, end = name.split('_')
             start = int(start) + 1
             end = int(end) + 1
-            return slice_transform_factory(start, end)
+            return SliceTransformFactory(start, end)
 
 
 class ArrayContainsLookup(Lookup):
@@ -152,27 +152,49 @@ class ArrayLenTransform(Transform):
 ArrayField.register_lookup(ArrayLenTransform)
 
 
-def index_transform_factory(index, base_field):
+class IndexTransform(Transform):
 
-    class IndexTransform(Transform):
+    def __init__(self, index, base_field, *args, **kwargs):
+        super(IndexTransform, self).__init__(*args, **kwargs)
+        self.index = index
+        self.base_field = base_field
 
-        def as_sql(self, qn, connection):
-            lhs, params = qn.compile(self.lhs)
-            return '%s[%s]' % (lhs, index), params
+    def as_sql(self, qn, connection):
+        lhs, params = qn.compile(self.lhs)
+        return '%s[%s]' % (lhs, self.index), params
 
-        @cached_property
-        def output_type(self):
-            return base_field
-
-    return IndexTransform
+    @cached_property
+    def output_type(self):
+        return self.base_field
 
 
-def slice_transform_factory(start, end):
+class IndexTransformFactory(object):
 
-    class SliceTransform(Transform):
+    def __init__(self, index, base_field):
+        self.index = index
+        self.base_field = base_field
 
-        def as_sql(self, qn, connection):
-            lhs, params = qn.compile(self.lhs)
-            return '%s[%s:%s]' % (lhs, start, end), params
+    def __call__(self, *args, **kwargs):
+        return IndexTransform(self.index, self.base_field, *args, **kwargs)
 
-    return SliceTransform
+
+class SliceTransform(Transform):
+
+    def __init__(self, start, end, *args, **kwargs):
+        super(SliceTransform, self).__init__(*args, **kwargs)
+        self.start = start
+        self.end = end
+
+    def as_sql(self, qn, connection):
+        lhs, params = qn.compile(self.lhs)
+        return '%s[%s:%s]' % (lhs, self.start, self.end), params
+
+
+class SliceTransformFactory(object):
+
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
+
+    def __call__(self, *args, **kwargs):
+        return SliceTransform(self.start, self.end, *args, **kwargs)
