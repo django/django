@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
-from unittest import expectedFailure, skipUnless
+from unittest import skip, skipUnless
 import warnings
 
 try:
@@ -482,8 +482,7 @@ def serializerTest(format, self):
         self.assertEqual(count, klass.objects.count())
 
 if connection.vendor == 'mysql' and six.PY3:
-    # Existing MySQL DB-API drivers fail on binary data.
-    serializerTest = expectedFailure(serializerTest)
+    serializerTest = skip("Existing MySQL DB-API drivers fail on binary data.")(serializerTest)
 
 
 def naturalKeySerializerTest(format, self):
