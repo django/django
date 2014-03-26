@@ -20,8 +20,8 @@ if not use_workaround:
             it at call time because Python 2.7 does not have the keyword
             argument.
             """
-            def __init__(self, convert_charrefs=False):
-                _html_parser.HTMLParser.__init__(self, convert_charrefs=convert_charrefs)
+            def __init__(self, convert_charrefs=False, **kwargs):
+                _html_parser.HTMLParser.__init__(self, convert_charrefs=convert_charrefs, **kwargs)
     else:
         HTMLParser = _html_parser.HTMLParser
 else:
