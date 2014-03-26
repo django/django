@@ -57,6 +57,7 @@ ALWAYS_INSTALLED_APPS = [
 
 def get_test_modules():
     from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
+    from django.db import connection
     modules = []
     discovery_paths = [
         (None, RUNTESTS_DIR),
@@ -74,6 +75,8 @@ def get_test_modules():
                     os.path.basename(f) in SUBDIRS_TO_SKIP or
                     os.path.isfile(f) or
                     not os.path.exists(os.path.join(dirpath, f, '__init__.py'))):
+                continue
+            if not connection.vendor == 'postgresql' and f == 'postgres_tests':
                 continue
             modules.append((modpath, f))
     return modules
