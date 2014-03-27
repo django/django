@@ -17,7 +17,7 @@ from django.template.loaders import app_directories, filesystem, cached
 from django.test import RequestFactory, TestCase
 from django.test.utils import (setup_test_template_loader,
     restore_template_loaders, override_settings, extend_sys_path)
-from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
 from django.utils._os import upath
@@ -511,7 +511,7 @@ class TemplateRegressionTests(TestCase):
     def test_ifchanged_render_once(self):
         """ Test for ticket #19890. The content of ifchanged template tag was
         rendered twice."""
-        template = Template('{% load cycle from future %}{% ifchanged %}{% cycle "1st time" "2nd time" %}{% endifchanged %}')
+        template = Template('{% ifchanged %}{% cycle "1st time" "2nd time" %}{% endifchanged %}')
         output = template.render(Context({}))
         self.assertEqual(output, '1st time')
 
@@ -595,6 +595,8 @@ class TemplateTests(TestCase):
                                     with warnings.catch_warnings():
                                         # Ignore pending deprecations of loading 'ssi' and 'url' tags from future.
                                         warnings.filterwarnings("ignore", category=RemovedInDjango19Warning, module='django.templatetags.future')
+                                        # Ignore deprecations of loading 'cycle' and 'firstof' tags from future.
+                                        warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.templatetags.future")
                                         test_template = loader.get_template(name)
                                 except ShouldNotExecuteException:
                                     failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template loading invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
