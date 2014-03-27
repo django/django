@@ -691,7 +691,7 @@ msgid ""
 "corrupted image."
 msgstr ""
 "Seleccione una imagen válida. El archivo que ha seleccionado no es una "
-"imagen o es un un archivo de imagen corrupto."
+"imagen o es un archivo de imagen corrupto."
 
 #: forms/fields.py:580
 msgid "Enter a valid URL."
