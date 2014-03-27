@@ -96,26 +96,23 @@ class RelatedGeoModelTest(TestCase):
         p4 = Point(-96.801611, 32.782057)
         p5 = Point(-95.363151, 29.763374)
 
-        # Creating the reference union geometry depending on the spatial backend,
-        # as Oracle will have a different internal ordering of the component
-        # geometries than PostGIS.  The second union aggregate is for a union
+        # The second union aggregate is for a union
         # query that includes limiting information in the WHERE clause (in other
         # words a `.filter()` precedes the call to `.unionagg()`).
-        if oracle:
-            ref_u1 = MultiPoint(p4, p5, p3, p1, p2, srid=4326)
-            ref_u2 = MultiPoint(p3, p2, srid=4326)
-        else:
-            # Looks like PostGIS points by longitude value.
-            ref_u1 = MultiPoint(p1, p2, p4, p5, p3, srid=4326)
-            ref_u2 = MultiPoint(p2, p3, srid=4326)
+        ref_u1 = MultiPoint(p1, p2, p4, p5, p3, srid=4326)
+        ref_u2 = MultiPoint(p2, p3, srid=4326)
 
         u1 = City.objects.unionagg(field_name='location__point')
         u2 = City.objects.exclude(name__in=('Roswell', 'Houston', 'Dallas', 'Fort Worth')).unionagg(field_name='location__point')
         u3 = aggs['location__point__union']
+        self.assertEqual(type(u1), MultiPoint)
+        self.assertEqual(type(u3), MultiPoint)
 
-        self.assertEqual(ref_u1, u1)
-        self.assertEqual(ref_u2, u2)
-        self.assertEqual(ref_u1, u3)
+        # Ordering of points in the result of the union is not defined and
+        # implementation-dependent (DB backend, GEOS version)
+        self.assertSetEqual(set([p.ewkt for p in ref_u1]), set([p.ewkt for p in u1]))
+        self.assertSetEqual(set([p.ewkt for p in ref_u2]), set([p.ewkt for p in u2]))
+        self.assertSetEqual(set([p.ewkt for p in ref_u1]), set([p.ewkt for p in u3]))
 
     def test05_select_related_fk_to_subclass(self):
         "Testing that calling select_related on a query over a model with an FK to a model subclass works"

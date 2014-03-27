@@ -10,7 +10,7 @@ geospatial libraries:
 ========================  ====================================  ================================  ==========================
 Program                   Description                           Required                          Supported Versions
 ========================  ====================================  ================================  ==========================
-:ref:`GEOS <ref-geos>`    Geometry Engine Open Source           Yes                               3.3, 3.2, 3.1
+:ref:`GEOS <ref-geos>`    Geometry Engine Open Source           Yes                               3.4, 3.3, 3.2, 3.1
 `PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.8, 4.7, 4.6, 4.5, 4.4
 :ref:`GDAL <ref-gdal>`    Geospatial Data Abstraction Library   No (but, required for SQLite)     1.9, 1.8, 1.7, 1.6
 :ref:`GeoIP <ref-geoip>`  IP-based geolocation library          No                                1.4
@@ -23,6 +23,7 @@ Program                   Description                           Required        
     GEOS 3.1.0 2009-03-11
     GEOS 3.2.0 2009-12-14
     GEOS 3.3.0 2011-05-30
+    GEOS 3.4.0 2013-08-11
     GDAL 1.6.0 2008-12-04
     GDAL 1.7.1 2010-02-08
     GDAL 1.8.0 2011-01-13
