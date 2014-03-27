@@ -763,8 +763,11 @@ class ForeignRelatedObjectsDescriptor(object):
         return self.related_manager_cls(instance)
 
     def __set__(self, instance, value):
-        manager = self.__get__(instance)
+        # Force evaluation of `value` in case it's a queryset whose
+        # value could be affected by `manager.clear()`. Refs #19816.
+        value = tuple(value)
 
+        manager = self.__get__(instance)
         db = router.db_for_write(manager.model, instance=manager.instance)
         with transaction.atomic(using=db, savepoint=False):
             # If the foreign key can support nulls, then completely clear the related set.
@@ -1113,8 +1116,11 @@ class ManyRelatedObjectsDescriptor(object):
             opts = self.related.field.rel.through._meta
             raise AttributeError("Cannot set values on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." % (opts.app_label, opts.object_name))
 
-        manager = self.__get__(instance)
+        # Force evaluation of `value` in case it's a queryset whose
+        # value could be affected by `manager.clear()`. Refs #19816.
+        value = tuple(value)
 
+        manager = self.__get__(instance)
         db = router.db_for_write(manager.through, instance=manager.instance)
         with transaction.atomic(using=db, savepoint=False):
             manager.clear()
@@ -1170,12 +1176,11 @@ class ReverseManyRelatedObjectsDescriptor(object):
             opts = self.field.rel.through._meta
             raise AttributeError("Cannot set values on a ManyToManyField which specifies an intermediary model.  Use %s.%s's Manager instead." % (opts.app_label, opts.object_name))
 
-        manager = self.__get__(instance)
-
-        # clear() can change expected output of 'value' queryset, we force evaluation
-        # of queryset before clear; ticket #19816
+        # Force evaluation of `value` in case it's a queryset whose
+        # value could be affected by `manager.clear()`. Refs #19816.
         value = tuple(value)
 
+        manager = self.__get__(instance)
         db = router.db_for_write(manager.through, instance=manager.instance)
         with transaction.atomic(using=db, savepoint=False):
             manager.clear()

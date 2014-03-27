@@ -163,6 +163,21 @@ class GenericRelationsTests(TestCase):
             "<Animal: Platypus>"
         ])
 
+    def test_assign_with_queryset(self):
+        # Ensure that querysets used in reverse GFK assignments are pre-evaluated
+        # so their value isn't affected by the clearing operation in
+        # ManyRelatedObjectsDescriptor.__set__. Refs #19816.
+        bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
+        bacon.tags.create(tag="fatty")
+        bacon.tags.create(tag="salty")
+        self.assertEqual(2, bacon.tags.count())
+
+        qs = bacon.tags.filter(tag="fatty")
+        bacon.tags = qs
+
+        self.assertEqual(1, bacon.tags.count())
+        self.assertEqual(1, qs.count())
+
     def test_generic_relation_related_name_default(self):
         # Test that GenericRelation by default isn't usable from
         # the reverse side.
