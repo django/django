@@ -2,11 +2,11 @@ import inspect
 import warnings
 
 
-class RemovedInDjango20Warning(DeprecationWarning):
+class RemovedInDjango20Warning(PendingDeprecationWarning):
     pass
 
 
-class RemovedInDjango19Warning(PendingDeprecationWarning):
+class RemovedInDjango19Warning(DeprecationWarning):
     pass
 
 
