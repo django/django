@@ -10,6 +10,10 @@ class RemovedInDjango19Warning(PendingDeprecationWarning):
     pass
 
 
+class RemovedInDjango18Warning(DeprecationWarning):
+    pass
+
+
 RemovedInNextVersionWarning = RemovedInDjango19Warning
 
 

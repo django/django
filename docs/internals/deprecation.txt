@@ -152,9 +152,8 @@ details on these changes.
   Upgrade paths are described in the :ref:`transaction management docs
   <transactions-upgrading-from-1.5>`.
 
-* The :ttag:`cycle` and :ttag:`firstof` template tags will auto-escape their
-  arguments. In 1.6 and 1.7, this behavior is provided by the version of these
-  tags in the ``future`` template tag library.
+* ``cycle`` and ``firstof`` template tags will be removed from the ``future``
+  template tag library (used during the 1.6/1.7 deprecation period).
 
 * The ``SEND_BROKEN_LINK_EMAILS`` setting will be removed. Add the
   :class:`django.middleware.common.BrokenLinkEmailsMiddleware` middleware to
