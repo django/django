@@ -391,14 +391,6 @@ class OGRGeometry(GDALBase):
             klone.transform(coord_trans)
             return klone
 
-        # Have to get the coordinate dimension of the original geometry
-        # so it can be used to reset the transformed geometry's dimension
-        # afterwards.  This is done because of GDAL bug (in versions prior
-        # to 1.7) that turns geometries 3D after transformation, see:
-        #  http://trac.osgeo.org/gdal/changeset/17792
-        if GDAL_VERSION < (1, 7):
-            orig_dim = self.coord_dim
-
         # Depending on the input type, use the appropriate OGR routine
         # to perform the transformation.
         if isinstance(coord_trans, CoordTransform):
@@ -411,20 +403,6 @@ class OGRGeometry(GDALBase):
         else:
             raise TypeError('Transform only accepts CoordTransform, '
                             'SpatialReference, string, and integer objects.')
-
-        # Setting with original dimension, see comment above.
-        if GDAL_VERSION < (1, 7):
-            if isinstance(self, GeometryCollection):
-                # With geometry collections have to set dimension on
-                # each internal geometry reference, as the collection
-                # dimension isn't affected.
-                for i in xrange(len(self)):
-                    internal_ptr = capi.get_geom_ref(self.ptr, i)
-                    if orig_dim != capi.get_coord_dim(internal_ptr):
-                        capi.set_coord_dim(internal_ptr, orig_dim)
-            else:
-                if self.coord_dim != orig_dim:
-                    self.coord_dim = orig_dim
 
     def transform_to(self, srs):
         "For backwards-compatibility."

@@ -175,7 +175,7 @@ Miscellaneous
 
 * ``URLField.to_python`` no longer adds a trailing slash to pathless URLs.
 
-* ``django.contrib.gis`` dropped support for GEOS 3.1.
+* ``django.contrib.gis`` dropped support for GEOS 3.1 and GDAL 1.6.
 
 .. _deprecated-features-1.8:
 
