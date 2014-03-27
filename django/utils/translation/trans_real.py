@@ -1,6 +1,5 @@
 """Translation helper functions."""
 from __future__ import unicode_literals
-
 from collections import OrderedDict
 import os
 import re
@@ -8,13 +7,15 @@ import sys
 import gettext as gettext_module
 from threading import local
 import warnings
+import codecs
 
 from django.apps import apps
+from django.core.management.utils import find_command, popen_wrapper
 from django.dispatch import receiver
 from django.test.signals import setting_changed
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_str, force_text
-from django.utils._os import upath
+from django.utils._os import npath, upath
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six, lru_cache
 from django.utils.six import StringIO
@@ -97,6 +98,117 @@ def to_language(locale):
         return locale.lower()
 
 
+def has_reload_i18n_setting():
+    """If DEBUG or I18N_RELOAD_ON_CHANGE is True, return True."""
+    from django.conf import settings
+
+    if settings.DEBUG:
+        return True
+
+    if getattr(settings, "I18N_RELOAD_ON_CHANGE", False):
+        return True
+
+    return False
+
+
+def purge_i18n_caches():
+    """Removes the local cache, and the gettext cache."""
+    global _translations
+    _translations = {}
+
+    # gettext chose to do caching at the lowest level possible, and not provide
+    # an API for clearing translations.  I don't like this, but without a
+    # change to gettext, or a local fixed copy, this is the option for keeping
+    # files from being cached by path
+    gettext_module._translations = {}
+
+
+def needs_compilation(domain, path, lang):
+    """
+    Check to see if a .mo file needs to be compiled.  Files need to be compiled
+    when DEBUG is true and one of the following conditions is met: the .po file
+    is missing, or the .po file is older than the .mo file.
+    """
+    # Turn off checking for production
+    if not has_reload_i18n_setting():
+        return False
+
+    mo_file = ".".join([domain, "mo"])
+    po_file = ".".join([domain, "po"])
+    mo_path = os.path.join(path, lang, "LC_MESSAGES", mo_file)
+    po_path = os.path.join(path, lang, "LC_MESSAGES", po_file)
+
+    # If there's no plain text, there's nothing to compile
+    if not os.path.exists(po_path):
+        return False
+
+    # If there's no compiled version, we do need to compile
+    if not os.path.exists(mo_path):
+        return True
+
+    # If the plain text is newer than the compiled, we need to compile
+    mo_mod = os.path.getmtime(mo_path)
+    po_mod = os.path.getmtime(po_path)
+
+    if po_mod > mo_mod:
+        return True
+
+    return False
+
+
+def compile_messages(domain, path, lang):
+    """Compiles a .po file into a .mo file by domain, path, and lang."""
+    po_file = ".".join([domain, "po"])
+    file_path = os.path.join(path, lang, "LC_MESSAGES", po_file)
+    compile_message_file(file_path)
+
+
+def compile_message_file(path):
+    """Compiles a .po file into a .mo file by path."""
+    program = 'msgfmt'
+    if find_command(program) is None:
+        raise TranslationError("Can't find %s. Make sure you have GNU gettext "
+                               "tools 0.15 or newer installed." % self.program)
+
+    def _has_bom(fn):
+        with open(fn, 'rb') as f:
+            sample = f.read(4)
+        return sample[:3] == b'\xef\xbb\xbf' or \
+            sample.startswith(codecs.BOM_UTF16_LE) or \
+            sample.startswith(codecs.BOM_UTF16_BE)
+
+    def is_writable(path):
+        # Known side effect: updating file access/modified time to current time if
+        # it is writable.
+        try:
+            with open(path, 'a'):
+                os.utime(path, None)
+        except (IOError, OSError):
+            return False
+        return True
+
+    if _has_bom(path):
+        raise TranslationError("The %s file has a BOM (Byte Order Mark). Django only supports .po files encoded in UTF-8 and without any BOM." % path)
+
+    base_path = os.path.splitext(path)[0]
+
+    # Check writability
+    if not is_writable(npath(base_path + '.mo')):
+        raise TranslationWritableError("The po files under %s are in a seemingly not "
+                          "writable location.")
+
+    args = [program, '--check-format', '-o',
+            npath(base_path + '.mo'), npath(base_path + '.po')]
+
+    output, errors, status = popen_wrapper(args)
+    if status:
+        if errors:
+            msg = "Execution of %s failed: %s" % (program, errors)
+        else:
+            msg = "Execution of %s failed" % program
+        raise TranslationError(msg)
+
+
 class DjangoTranslation(gettext_module.GNUTranslations):
     """
     This class sets up the GNUTranslations context with regard to output
@@ -135,11 +247,16 @@ def translation(language):
     """
     global _translations
 
+    from django.conf import settings
+
+    # If DEBUG is True, disable all caching.  needs_compilation needs more
+    # info than we have here, but at least it will just be reads
+    if has_reload_i18n_setting():
+        purge_i18n_caches()
+
     t = _translations.get(language, None)
     if t is not None:
         return t
-
-    from django.conf import settings
 
     globalpath = os.path.join(os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
 
@@ -155,6 +272,8 @@ def translation(language):
 
         def _translation(path):
             try:
+                if needs_compilation('django', path, lang):
+                    compile_messages('django', path, lang)
                 t = gettext_module.translation('django', path, [loc], DjangoTranslation)
                 t.set_language(lang)
                 return t
@@ -737,3 +856,9 @@ def parse_accept_lang_header(lang_string):
         result.append((lang, priority))
     result.sort(key=lambda k: k[1], reverse=True)
     return result
+
+class TranslationWritableError(Exception):
+    pass
+
+class TranslationError(Exception):
+    pass
