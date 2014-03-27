@@ -15,7 +15,7 @@ Program                   Description                           Required        
 :ref:`GDAL <ref-gdal>`    Geospatial Data Abstraction Library   No (but, required for SQLite)     1.10, 1.9, 1.8, 1.7, 1.6
 :ref:`GeoIP <ref-geoip>`  IP-based geolocation library          No                                1.4
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             2.1, 2.0, 1.5, 1.4, 1.3
-`SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 3.0, 2.4, 2.3
+`SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 4.1, 4.0, 3.0, 2.4, 2.3
 ========================  ====================================  ================================  ==========================
 
 ..
@@ -37,6 +37,8 @@ Program                   Description                           Required        
     SpatiaLite 2.3.0 2009-04-06
     Spatialite 2.4.0 2010-11-14
     Spatialite 3.0.0 2011-12-30
+    Spatialite 4.0.0 2012-11-25
+    Spatialite 4.1.0 2013-06-04
 
 .. admonition::  Install GDAL
 
@@ -299,4 +301,3 @@ file:
 .. [#] Specifically, GeoDjango provides support for the `OGR
        <http://gdal.org/ogr>`_ library, a component of GDAL.
 .. [#] See `GDAL ticket #2382 <http://trac.osgeo.org/gdal/ticket/2382>`_.
-

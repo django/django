@@ -437,8 +437,11 @@ class GeoQuerySetTest(TestCase):
                 self.assertEqual(c.mpoly.difference(geom), c.difference)
                 if not spatialite:
                     self.assertEqual(c.mpoly.intersection(geom), c.intersection)
-                self.assertEqual(c.mpoly.sym_difference(geom), c.sym_difference)
-                self.assertEqual(c.mpoly.union(geom), c.union)
+                # Ordering might differ in collections
+                self.assertSetEqual(set(g.wkt for g in c.mpoly.sym_difference(geom)),
+                                    set(g.wkt for g in c.sym_difference))
+                self.assertSetEqual(set(g.wkt for g in c.mpoly.union(geom)),
+                                    set(g.wkt for g in c.union))
 
     @skipUnless(getattr(connection.ops, 'envelope', False), 'Database does not support envelope operation')
     def test_envelope(self):
@@ -781,9 +784,9 @@ class GeoQuerySetTest(TestCase):
     def test_unionagg(self):
         "Testing the `unionagg` (aggregate union) GeoQuerySet method."
         tx = Country.objects.get(name='Texas').mpoly
-        # Houston, Dallas -- Oracle has different order.
+        # Houston, Dallas -- Ordering may differ depending on backend or GEOS version.
         union1 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)')
-        union2 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)')
+        union2 = fromstr('MULTIPOINT(-95.363151 29.763374,-96.801611 32.782057)')
         qs = City.objects.filter(point__within=tx)
         self.assertRaises(TypeError, qs.unionagg, 'name')
         # Using `field_name` keyword argument in one query and specifying an
@@ -792,12 +795,8 @@ class GeoQuerySetTest(TestCase):
         u1 = qs.unionagg(field_name='point')
         u2 = qs.order_by('name').unionagg()
         tol = 0.00001
-        if oracle:
-            union = union2
-        else:
-            union = union1
-        self.assertEqual(True, union.equals_exact(u1, tol))
-        self.assertEqual(True, union.equals_exact(u2, tol))
+        self.assertEqual(True, union1.equals_exact(u1, tol) or union2.equals_exact(u1, tol))
+        self.assertEqual(True, union1.equals_exact(u2, tol) or union2.equals_exact(u2, tol))
         qs = City.objects.filter(name='NotACity')
         self.assertEqual(None, qs.unionagg(field_name='point'))
 
