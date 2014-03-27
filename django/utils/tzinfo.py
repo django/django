@@ -12,7 +12,7 @@ from django.utils.encoding import force_str, force_text, DEFAULT_LOCALE_ENCODING
 warnings.warn(
     "django.utils.tzinfo will be removed in Django 1.9. "
     "Use django.utils.timezone instead.",
-    RemovedInDjango19Warning)
+    RemovedInDjango19Warning, stacklevel=2)
 
 
 # Python's doc say: "A tzinfo subclass must have an __init__() method that can
