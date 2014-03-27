@@ -101,16 +101,13 @@ class GEOSIOTest(unittest.TestCase):
             # Equivalent of `wkb_w.outdim = bad_outdim`
             self.assertRaises(ValueError, wkb_w._set_outdim, bad_outdim)
 
-        # These tests will fail on 3.0.0 because of a bug that was fixed in 3.1:
-        # http://trac.osgeo.org/geos/ticket/216
-        if not geos_version_info()['version'].startswith('3.0.'):
-            # Now setting the output dimensions to be 3
-            wkb_w.outdim = 3
+        # Now setting the output dimensions to be 3
+        wkb_w.outdim = 3
 
-            self.assertEqual(hex3d, wkb_w.write_hex(g))
-            self.assertEqual(wkb3d, wkb_w.write(g))
+        self.assertEqual(hex3d, wkb_w.write_hex(g))
+        self.assertEqual(wkb3d, wkb_w.write(g))
 
-            # Telling the WKBWriter to include the srid in the representation.
-            wkb_w.srid = True
-            self.assertEqual(hex3d_srid, wkb_w.write_hex(g))
-            self.assertEqual(wkb3d_srid, wkb_w.write(g))
+        # Telling the WKBWriter to include the srid in the representation.
+        wkb_w.srid = True
+        self.assertEqual(hex3d_srid, wkb_w.write_hex(g))
+        self.assertEqual(wkb3d_srid, wkb_w.write(g))

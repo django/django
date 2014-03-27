@@ -29,18 +29,6 @@ if HAS_GEOS:
 @skipUnless(HAS_GEOS, "Geos is required.")
 class GEOSTest(unittest.TestCase, TestDataMixin):
 
-    @property
-    def null_srid(self):
-        """
-        Returns the proper null SRID depending on the GEOS version.
-        See the comments in `test_srid` for more details.
-        """
-        info = geos_version_info()
-        if info['version'] == '3.0.0' and info['release_candidate']:
-            return -1
-        else:
-            return None
-
     def test_base(self):
         "Tests out the GEOSBase class."
         # Testing out GEOSBase class, which provides a `ptr` property
@@ -116,9 +104,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
         # HEXEWKB should be appropriate for its dimension -- have to use an
         # a WKBWriter w/dimension set accordingly, else GEOS will insert
-        # garbage into 3D coordinate if there is none.  Also, GEOS has a
-        # a bug in versions prior to 3.1 that puts the X coordinate in
-        # place of Z; an exception should be raised on those versions.
+        # garbage into 3D coordinate if there is none.
         self.assertEqual(hexewkb_2d, pnt_2d.hexewkb)
         self.assertEqual(hexewkb_3d, pnt_3d.hexewkb)
         self.assertEqual(True, GEOSGeometry(hexewkb_3d).hasz)
@@ -651,13 +637,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         p1 = fromstr(hex)
         self.assertEqual(4326, p1.srid)
 
-        # In GEOS 3.0.0rc1-4  when the EWKB and/or HEXEWKB is exported,
-        # the SRID information is lost and set to -1 -- this is not a
-        # problem on the 3.0.0 version (another reason to upgrade).
-        exp_srid = self.null_srid
-
         p2 = fromstr(p1.hex)
-        self.assertEqual(exp_srid, p2.srid)
+        self.assertIsNone(p2.srid)
         p3 = fromstr(p1.hex, srid=-1)  # -1 is intended.
         self.assertEqual(-1, p3.srid)
 
@@ -1007,15 +988,12 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         tgeoms.extend(get_geoms(self.geometries.polygons, 3084))
         tgeoms.extend(get_geoms(self.geometries.multipolygons, 900913))
 
-        # The SRID won't be exported in GEOS 3.0 release candidates.
-        no_srid = self.null_srid == -1
         for geom in tgeoms:
             s1, s2 = cPickle.dumps(geom), pickle.dumps(geom)
             g1, g2 = cPickle.loads(s1), pickle.loads(s2)
             for tmpg in (g1, g2):
                 self.assertEqual(geom, tmpg)
-                if not no_srid:
-                    self.assertEqual(geom.srid, tmpg.srid)
+                self.assertEqual(geom.srid, tmpg.srid)
 
     def test_prepared(self):
         "Testing PreparedGeometry support."
@@ -1071,7 +1049,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertIsInstance(g.valid_reason, six.string_types)
         self.assertTrue(g.valid_reason.startswith("Too few points in geometry component"))
 
-    @skipUnless(HAS_GEOS and geos_version_info()['version'] >= '3.2.0', "geos >= 3.2.0 is required")
+    @skipUnless(HAS_GEOS, "Geos is required.")
     def test_linearref(self):
         "Testing linear referencing"
 
