@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import re
+import sys
 
 from django.utils.encoding import force_text, force_str
 from django.utils.functional import allow_lazy
@@ -118,10 +119,12 @@ linebreaks = allow_lazy(linebreaks, six.text_type)
 
 class MLStripper(HTMLParser):
     def __init__(self):
-        if six.PY2:
-            HTMLParser.__init__(self)
-        else:
+        # The strict parameter was added in Python 3.2 with a default of True.
+        # The default changed to False in Python 3.3 and was deprecated.
+        if sys.version_info[:2] == (3, 2):
             HTMLParser.__init__(self, strict=False)
+        else:
+            HTMLParser.__init__(self)
         self.reset()
         self.fed = []
 
