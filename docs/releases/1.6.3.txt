@@ -30,5 +30,9 @@ several bugs in 1.6.2:
 * Fixed a regression in the :mod:`django.contrib.gis` SQL compiler for
   non-concrete fields (`#22250 <http://code.djangoproject.com/ticket/22250>`_).
 
+* Fixed :attr:`ModelAdmin.preserve_filters
+  <django.contrib.admin.ModelAdmin.preserve_filters>` when running a site with
+  a URL prefix (`#21795 <http://code.djangoproject.com/ticket/21795>`_).
+
 Additionally, Django's vendored version of six, :mod:`django.utils.six` has been
 upgraded to the latest release (1.6.1).
