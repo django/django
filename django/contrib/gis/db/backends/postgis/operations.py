@@ -75,7 +75,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
     name = 'postgis'
     postgis = True
     geom_func_prefix = 'ST_'
-    version_regex = re.compile(r'^(?P<major>\d)\.(?P<minor1>\d)\.(?P<minor2>\d+)(dev)?')
+    version_regex = re.compile(r'^(?P<major>\d)\.(?P<minor1>\d)\.(?P<minor2>\d+)')
     valid_aggregates = {'Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union'}
 
     Adapter = PostGISAdapter
