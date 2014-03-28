@@ -984,7 +984,7 @@ Exception Value: {{ exception_value|force_escape }}
 </html>
 """
 
-TECHNICAL_500_TEXT_TEMPLATE = """{% load firstof from future %}{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
+TECHNICAL_500_TEXT_TEMPLATE = """{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
 {% firstof exception_value 'No exception message supplied' %}
 {% if request %}
 Request Method: {{ request.META.REQUEST_METHOD }}
