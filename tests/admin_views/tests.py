@@ -11,16 +11,18 @@ from django.core import mail
 from django.core.checks import Error
 from django.core.files import temp as tempfile
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.urlresolvers import (NoReverseMatch,
+    get_script_prefix, reverse, set_script_prefix)
 # Register auth models with the admin.
 from django.contrib.auth import get_permission_codename
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import LogEntry, DELETION
+from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
+from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.admin.utils import quote
 from django.contrib.admin.validation import ModelAdminValidator
 from django.contrib.admin.views.main import IS_POPUP_VAR
-from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Group, User, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -4440,11 +4442,14 @@ class AdminKeepChangeListFiltersTests(TestCase):
     def tearDown(self):
         self.client.logout()
 
-    def get_changelist_filters_querystring(self):
-        return urlencode({
+    def get_changelist_filters(self):
+        return {
             'is_superuser__exact': 0,
             'is_staff__exact': 0,
-        })
+        }
+
+    def get_changelist_filters_querystring(self):
+        return urlencode(self.get_changelist_filters())
 
     def get_preserved_filters_querystring(self):
         return urlencode({
@@ -4585,6 +4590,29 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Test redirect on "Delete".
         response = self.client.post(self.get_delete_url(), {'post': 'yes'})
         self.assertRedirects(response, self.get_changelist_url())
+
+    def test_url_prefix(self):
+        context = {
+            'preserved_filters': self.get_preserved_filters_querystring(),
+            'opts': User._meta,
+        }
+
+        url = reverse('admin:auth_user_changelist', current_app=self.admin_site.name)
+        self.assertEqual(
+            self.get_changelist_url(),
+            add_preserved_filters(context, url),
+        )
+
+        original_prefix = get_script_prefix()
+        try:
+            set_script_prefix('/prefix/')
+            url = reverse('admin:auth_user_changelist', current_app=self.admin_site.name)
+            self.assertEqual(
+                self.get_changelist_url(),
+                add_preserved_filters(context, url),
+            )
+        finally:
+            set_script_prefix(original_prefix)
 
 
 class NamespacedAdminKeepChangeListFiltersTests(AdminKeepChangeListFiltersTests):

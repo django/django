@@ -5,7 +5,7 @@ except ImportError:
 
 from django import template
 from django.contrib.admin.utils import quote
-from django.core.urlresolvers import resolve, Resolver404
+from django.core.urlresolvers import Resolver404, get_script_prefix, resolve
 from django.utils.http import urlencode
 
 register = template.Library()
@@ -33,8 +33,9 @@ def add_preserved_filters(context, url, popup=False, to_field=None):
     if opts and preserved_filters:
         preserved_filters = dict(parse_qsl(preserved_filters))
 
+        match_url = '/%s' % url.partition(get_script_prefix())[2]
         try:
-            match = resolve(url)
+            match = resolve(match_url)
         except Resolver404:
             pass
         else:
