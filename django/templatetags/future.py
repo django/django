@@ -3,7 +3,7 @@ import warnings
 from django.template import Library
 from django.template import defaulttags
 from django.utils.deprecation import (RemovedInDjango19Warning,
-    RemovedInDjango18Warning)
+    RemovedInDjango20Warning)
 
 register = Library()
 
@@ -28,17 +28,60 @@ def url(parser, token):
 
 @register.tag
 def cycle(parser, token):
+    """
+    This is the future version of `cycle` with auto-escaping.
+    The deprecation is now complete and this version is no different
+    from the non-future version so this can be deprecated (#22306)
+
+    By default all strings are escaped.
+
+    If you want to disable auto-escaping of variables you can use::
+
+        {% autoescape off %}
+            {% cycle var1 var2 var3 as somecycle %}
+        {% autoescape %}
+
+    Or if only some variables should be escaped, you can use::
+
+        {% cycle var1 var2|safe var3|safe  as somecycle %}
+    """
     warnings.warn(
         "Loading the `cycle` tag from the `future` library is deprecated and "
-        "will be removed in Django 1.8. Use the default `cycle` tag instead.",
-        RemovedInDjango18Warning)
+        "will be removed in Django 2.0. Use the default `cycle` tag instead.",
+        RemovedInDjango20Warning)
     return defaulttags.cycle(parser, token)
 
 
 @register.tag
 def firstof(parser, token):
+    """
+    This is the future version of `firstof` with auto-escaping.
+    The deprecation is now complete and this version is no different
+    from the non-future version so this can be deprecated (#22306)
+
+    This is equivalent to::
+
+        {% if var1 %}
+            {{ var1 }}
+        {% elif var2 %}
+            {{ var2 }}
+        {% elif var3 %}
+            {{ var3 }}
+        {% endif %}
+
+    If you want to disable auto-escaping of variables you can use::
+
+        {% autoescape off %}
+            {% firstof var1 var2 var3 "<strong>fallback value</strong>" %}
+        {% autoescape %}
+
+    Or if only some variables should be escaped, you can use::
+
+        {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
+
+    """
     warnings.warn(
         "Loading the `firstof` tag from the `future` library is deprecated and "
-        "will be removed in Django 1.8. Use the default `firstof` tag instead.",
-        RemovedInDjango18Warning)
+        "will be removed in Django 2.0. Use the default `firstof` tag instead.",
+        RemovedInDjango20Warning)
     return defaulttags.firstof(parser, token)
