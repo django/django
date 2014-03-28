@@ -1,9 +1,56 @@
 from __future__ import unicode_literals
 
 from io import BytesIO
+import sys
+import traceback
 from unittest import TestCase
+from wsgiref import simple_server
 
-from django.core.servers.basehttp import ServerHandler, MAX_SOCKET_CHUNK_SIZE
+
+# If data is too large, socket will choke, so write chunks no larger than 32MB
+# at a time. The rationale behind the 32MB can be found on Django's Trac:
+# https://code.djangoproject.com/ticket/5596#comment:4
+MAX_SOCKET_CHUNK_SIZE = 32 * 1024 * 1024  # 32 MB
+
+
+class ServerHandler(simple_server.ServerHandler, object):
+    error_status = str("500 INTERNAL SERVER ERROR")
+
+    def write(self, data):
+        """'write()' callable as specified by PEP 3333"""
+
+        assert isinstance(data, bytes), "write() argument must be bytestring"
+
+        if not self.status:
+            raise AssertionError("write() before start_response()")
+
+        elif not self.headers_sent:
+            # Before the first output, send the stored headers
+            self.bytes_sent = len(data)    # make sure we know content-length
+            self.send_headers()
+        else:
+            self.bytes_sent += len(data)
+
+        # XXX check Content-Length and truncate if too many bytes written?
+        data = BytesIO(data)
+        for chunk in iter(lambda: data.read(MAX_SOCKET_CHUNK_SIZE), b''):
+            self._write(chunk)
+            self._flush()
+
+    def error_output(self, environ, start_response):
+        super(ServerHandler, self).error_output(environ, start_response)
+        return ['\n'.join(traceback.format_exception(*sys.exc_info()))]
+
+    # Backport of http://hg.python.org/cpython/rev/d5af1b235dab. See #16241.
+    # This can be removed when support for Python <= 2.7.3 is deprecated.
+    def finish_response(self):
+        try:
+            if not self.result_is_file() or not self.sendfile():
+                for data in self.result:
+                    self.write(data)
+                self.finish_content()
+        finally:
+            self.close()
 
 
 class DummyHandler(object):
