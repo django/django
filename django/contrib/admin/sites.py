@@ -273,10 +273,12 @@ class AdminSite(object):
         """
         Handles the "change password" task -- both form display and validation.
         """
+        from django.contrib.admin.forms import AdminPasswordChangeForm
         from django.contrib.auth.views import password_change
         url = reverse('admin:password_change_done', current_app=self.name)
         defaults = {
             'current_app': self.name,
+            'password_change_form': AdminPasswordChangeForm,
             'post_change_redirect': url,
             'extra_context': self.each_context(),
         }
