@@ -1,32 +1,39 @@
 import unittest
 
-from django.contrib.gis.db.backends.postgis.operations import PostGISOperations
 from django.core.exceptions import ImproperlyConfigured
 from django.db import ProgrammingError
 
+try:
+    from django.contrib.gis.db.backends.postgis.operations import PostGISOperations
+    HAS_POSTGRES = True
+except ImportError:
+    HAS_POSTGRES = False
 
-class FakeConnection(object):
-    def __init__(self):
-        self.settings_dict = {
-            'NAME': 'test',
-        }
+
+if HAS_POSTGRES:
+    class FakeConnection(object):
+        def __init__(self):
+            self.settings_dict = {
+                'NAME': 'test',
+            }
 
 
-class FakePostGISOperations(PostGISOperations):
-    def __init__(self, version=None):
-        self.version = version
-        self.connection = FakeConnection()
+    class FakePostGISOperations(PostGISOperations):
+        def __init__(self, version=None):
+            self.version = version
+            self.connection = FakeConnection()
 
-    def _get_postgis_func(self, func):
-        if func == 'postgis_lib_version':
-            if self.version is None:
-                raise ProgrammingError
+        def _get_postgis_func(self, func):
+            if func == 'postgis_lib_version':
+                if self.version is None:
+                    raise ProgrammingError
+                else:
+                    return self.version
             else:
-                return self.version
-        else:
-            raise NotImplementedError('This function was not expected to be called')
+                raise NotImplementedError('This function was not expected to be called')
 
 
+@unittest.skipUnless(HAS_POSTGRES, "The psycopg2 driver is needed for these tests")
 class TestPostgisVersionCheck(unittest.TestCase):
     """
     Tests that the postgis version check parses correctly the version numbers
