@@ -640,21 +640,24 @@ Help text of model form fields for ManyToManyField fields
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 HTML rendering of model form fields corresponding to
-:class:`~django.db.models.ManyToManyField` ORM model fields used to get the
-hard-coded sentence
+:class:`~django.db.models.ManyToManyField` model fields used to get the
+hard-coded sentence:
 
   *Hold down "Control", or "Command" on a Mac, to select more than one.*
 
 (or its translation to the active locale) imposed as the help legend shown along
 them if neither :attr:`model <django.db.models.Field.help_text>` nor :attr:`form
-<django.forms.Field.help_text>` ``help_text`` attribute was specified by the
-user (or appended to, if ``help_text`` was provided.)
+<django.forms.Field.help_text>` ``help_text`` attributes were specified by the
+user (or this string was appended to any ``help_text`` that was provided).
 
-This happened always, possibly even with form fields implementing user
-interactions that don't involve a keyboard and/or a mouse and was handled at the
-model field layer.
+Since this happened at the model layer, there was no way to prevent the text
+from appearing in cases where it wasn't applicable such as form fields that
+implement user interactions that don't involve a keyboard and/or a mouse.
 
-Starting with Django 1.6 this doesn't happen anymore.
+Starting with Django 1.6, as an ad-hoc temporary backward-compatibility
+provision, the logic to add the "Hold down..." sentence has been moved to the
+model form field layer and modified to add the text only when the associated
+widget is :class:`~django.forms.SelectMultiple` or selected subclasses.
 
 The change can affect you in a backward incompatible way if you employ custom
 model form fields and/or widgets for ``ManyToManyField`` model fields whose UIs
@@ -666,11 +669,6 @@ Applications that use Django :doc:`model form </topics/forms/modelforms>`
 facilities together with Django built-in form :doc:`fields </ref/forms/fields>`
 and :doc:`widgets </ref/forms/widgets>` aren't affected but need to be aware of
 what's described in :ref:`m2m-help_text-deprecation` below.
-
-This is because, as an ad-hoc temporary backward-compatibility provision, the
-described non-standard behavior has been preserved but moved to the model form
-field layer and occurs only when the associated widget is
-:class:`~django.forms.SelectMultiple` or selected subclasses.
 
 QuerySet iteration
 ~~~~~~~~~~~~~~~~~~
