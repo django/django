@@ -295,19 +295,23 @@ class QueryTestCase(TestCase):
 
         # Add to an m2m with an object from a different database
         with self.assertRaises(ValueError):
-            marty.book_set.add(dive)
+            with transaction.atomic(using='default'):
+                marty.book_set.add(dive)
 
         # Set a m2m with an object from a different database
         with self.assertRaises(ValueError):
-            marty.book_set = [pro, dive]
+            with transaction.atomic(using='default'):
+                marty.book_set = [pro, dive]
 
         # Add to a reverse m2m with an object from a different database
         with self.assertRaises(ValueError):
-            dive.authors.add(marty)
+            with transaction.atomic(using='other'):
+                dive.authors.add(marty)
 
         # Set a reverse m2m with an object from a different database
         with self.assertRaises(ValueError):
-            dive.authors = [mark, marty]
+            with transaction.atomic(using='other'):
+                dive.authors = [mark, marty]
 
     def test_m2m_deletion(self):
         "Cascaded deletions of m2m relations issue queries on the right database"
@@ -762,7 +766,8 @@ class QueryTestCase(TestCase):
 
         # Add to a foreign key set with an object from a different database
         with self.assertRaises(ValueError):
-            dive.reviews.add(review1)
+            with transaction.atomic(using='other'):
+                dive.reviews.add(review1)
 
         # BUT! if you assign a FK object when the base object hasn't
         # been saved yet, you implicitly assign the database for the

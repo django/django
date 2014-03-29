@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.db import transaction
 from django.test import TestCase
 from django.utils import six
 
@@ -54,7 +55,9 @@ class ManyToManyTests(TestCase):
 
         # Adding an object of the wrong type raises TypeError
         with six.assertRaisesRegex(self, TypeError, "'Publication' instance expected, got <Article.*"):
-            a6.publications.add(a5)
+            with transaction.atomic():
+                a6.publications.add(a5)
+
         # Add a Publication directly via publications.add by using keyword arguments.
         a6.publications.create(title='Highlights for Adults')
         self.assertQuerysetEqual(a6.publications.all(),
