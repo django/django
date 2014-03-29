@@ -777,3 +777,12 @@ class GeoQuerySetTest(TestCase):
         self.assertEqual(True, union.equals_exact(u2, tol))
         qs = City.objects.filter(name='NotACity')
         self.assertEqual(None, qs.unionagg(field_name='point'))
+
+    def test_non_concrete_field(self):
+        pkfield = City._meta.get_field_by_name('id')[0]
+        orig_pkfield_col = pkfield.column
+        pkfield.column = None
+        try:
+            list(City.objects.all())
+        finally:
+            pkfield.column = orig_pkfield_col
