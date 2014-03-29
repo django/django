@@ -9,7 +9,7 @@ from django.contrib.gis import memoryview
 from ..import HAS_GEOS
 
 if HAS_GEOS:
-    from .. import GEOSGeometry, WKTReader, WKTWriter, WKBReader, WKBWriter, geos_version_info
+    from .. import GEOSGeometry, WKTReader, WKTWriter, WKBReader, WKBWriter
 
 
 @skipUnless(HAS_GEOS, "Geos is required.")

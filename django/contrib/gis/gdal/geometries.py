@@ -50,7 +50,6 @@ from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
 from django.contrib.gis.gdal.error import OGRException, OGRIndexError, SRSException
 from django.contrib.gis.gdal.geomtype import OGRGeomType
-from django.contrib.gis.gdal.libgdal import GDAL_VERSION
 from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
 
 # Getting the ctypes prototype functions that interface w/the GDAL C library.

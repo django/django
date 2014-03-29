@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from unittest import skipUnless
 
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql, oracle, no_mysql, no_oracle, no_spatialite
+from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql, no_mysql, no_oracle, no_spatialite
 from django.test import TestCase
 
 if HAS_GEOS:
