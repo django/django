@@ -52,7 +52,8 @@ class DumpDataAssertMixin(object):
                                                       'exclude': exclude_list,
                                                       'primary_keys': primary_keys})
         if filename:
-            command_output = open(filename, "r").read()
+            with open(filename, "r") as f:
+                command_output = f.read()
             os.remove(filename)
         else:
             command_output = new_io.getvalue().strip()
