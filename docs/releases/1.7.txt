@@ -1086,6 +1086,31 @@ Note also that the admin login form has been updated to not contain the
 ``this_is_the_login_form`` field (now unused) and the ``ValidationError`` code
 has been set to the more regular ``invalid_login`` key.
 
+``select_for_update()`` requires a transaction
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Historically, queries that use
+:meth:`~django.db.models.query.QuerySet.select_for_update()` could be
+executed in autocommit mode, outside of a transaction. Before Django
+1.6, Django's automatic transactions mode allowed this to be used to
+lock records until the next write operation. Django 1.6 introduced
+database-level autocommit; since then, execution in such a context
+voids the effect of ``select_for_update()``. It is, therefore, assumed
+now to be an error, and raises an exception.
+
+This change may cause test failures if you use ``select_for_update()``
+in a test class which is a subclass of
+:class:`~django.test.TransactionTestCase` rather than
+:class:`~django.test.TestCase`.  
+
+This change was made because such errors can be caused by including an
+app which expects global transactions (e.g. :setting:`ATOMIC_REQUESTS
+<DATABASE-ATOMIC_REQUESTS>` set to True), or Django's old autocommit
+behavior, in a project which runs without them; and further, such
+errors may manifest as data-corruption bugs.
+
+This was also fixed in Django 1.6.3.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 

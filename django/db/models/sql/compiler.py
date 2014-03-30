@@ -11,6 +11,7 @@ from django.db.models.sql.constants import (CURSOR, SINGLE, MULTI, NO_RESULTS,
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.query import get_order_dir, Query
+from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError
 from django.utils import six
 from django.utils.six.moves import zip
@@ -157,6 +158,9 @@ class SQLCompiler(object):
                 result.append('OFFSET %d' % self.query.low_mark)
 
         if self.query.select_for_update and self.connection.features.has_select_for_update:
+            if self.connection.get_autocommit():
+                raise TransactionManagementError("select_for_update cannot be used outside of a transaction.")
+
             # If we've been asked for a NOWAIT query but the backend does not support it,
             # raise a DatabaseError otherwise we could get an unexpected deadlock.
             nowait = self.query.select_for_update_nowait
