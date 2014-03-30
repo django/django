@@ -376,7 +376,7 @@ class ManyToManyTests(TestCase):
         # ManyRelatedObjectsDescriptor.__set__. Refs #19816.
         self.a1.publications = [self.p1, self.p2]
 
-        qs = self.a1.publications.filter(id=self.a1.id)
+        qs = self.a1.publications.filter(title='The Python Journal')
         self.a1.publications = qs
 
         self.assertEqual(1, self.a1.publications.count())
@@ -388,7 +388,7 @@ class ManyToManyTests(TestCase):
         # ReverseManyRelatedObjectsDescriptor.__set__. Refs #19816.
         self.p1.article_set = [self.a1, self.a2]
 
-        qs = self.p1.article_set.filter(id=self.p1.id)
+        qs = self.p1.article_set.filter(headline='Django lets you build Web apps easily')
         self.p1.article_set = qs
 
         self.assertEqual(1, self.p1.article_set.count())

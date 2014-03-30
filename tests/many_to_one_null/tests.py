@@ -92,7 +92,7 @@ class ManyToOneNullTests(TestCase):
         # ForeignRelatedObjectsDescriptor.__set__. Refs #19816.
         self.r2.article_set = [self.a2, self.a3]
 
-        qs = self.r2.article_set.filter(id=self.a2.id)
+        qs = self.r2.article_set.filter(headline="Second")
         self.r2.article_set = qs
 
         self.assertEqual(1, self.r2.article_set.count())
