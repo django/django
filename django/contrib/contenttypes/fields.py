@@ -393,8 +393,11 @@ class ReverseGenericRelatedObjectsDescriptor(object):
         return manager
 
     def __set__(self, instance, value):
-        manager = self.__get__(instance)
+        # Force evaluation of `value` in case it's a queryset whose
+        # value could be affected by `manager.clear()`. Refs #19816.
+        value = tuple(value)
 
+        manager = self.__get__(instance)
         db = router.db_for_write(manager.model, instance=manager.instance)
         with transaction.atomic(using=db, savepoint=False):
             manager.clear()

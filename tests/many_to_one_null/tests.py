@@ -86,6 +86,18 @@ class ManyToOneNullTests(TestCase):
         self.assertQuerysetEqual(Article.objects.filter(reporter__isnull=True),
                                  ['<Article: First>', '<Article: Fourth>'])
 
+    def test_assign_with_queryset(self):
+        # Ensure that querysets used in reverse FK assignments are pre-evaluated
+        # so their value isn't affected by the clearing operation in
+        # ForeignRelatedObjectsDescriptor.__set__. Refs #19816.
+        self.r2.article_set = [self.a2, self.a3]
+
+        qs = self.r2.article_set.filter(id=self.a2.id)
+        self.r2.article_set = qs
+
+        self.assertEqual(1, self.r2.article_set.count())
+        self.assertEqual(1, qs.count())
+
     def test_clear_efficiency(self):
         r = Reporter.objects.create()
         for _ in range(3):

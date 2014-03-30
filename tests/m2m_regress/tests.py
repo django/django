@@ -97,15 +97,3 @@ class M2MRegressionTests(TestCase):
         # causes a TypeError in add_lazy_relation
         m1 = RegressionModelSplit(name='1')
         m1.save()
-
-    def test_m2m_filter(self):
-        worksheet = Worksheet.objects.create(id=1)
-        line_hi = Line.objects.create(name="hi")
-        line_bye = Line.objects.create(name="bye")
-
-        worksheet.lines = [line_hi, line_bye]
-        hi = worksheet.lines.filter(name="hi")
-
-        worksheet.lines = hi
-        self.assertEqual(1, worksheet.lines.count())
-        self.assertEqual(1, hi.count())

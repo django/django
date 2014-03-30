@@ -370,6 +370,30 @@ class ManyToManyTests(TestCase):
         self.assertQuerysetEqual(self.a4.publications.all(),
                                  ['<Publication: Science Weekly>'])
 
+    def test_forward_assign_with_queryset(self):
+        # Ensure that querysets used in m2m assignments are pre-evaluated
+        # so their value isn't affected by the clearing operation in
+        # ManyRelatedObjectsDescriptor.__set__. Refs #19816.
+        self.a1.publications = [self.p1, self.p2]
+
+        qs = self.a1.publications.filter(id=self.a1.id)
+        self.a1.publications = qs
+
+        self.assertEqual(1, self.a1.publications.count())
+        self.assertEqual(1, qs.count())
+
+    def test_reverse_assign_with_queryset(self):
+        # Ensure that querysets used in M2M assignments are pre-evaluated
+        # so their value isn't affected by the clearing operation in
+        # ReverseManyRelatedObjectsDescriptor.__set__. Refs #19816.
+        self.p1.article_set = [self.a1, self.a2]
+
+        qs = self.p1.article_set.filter(id=self.p1.id)
+        self.p1.article_set = qs
+
+        self.assertEqual(1, self.p1.article_set.count())
+        self.assertEqual(1, qs.count())
+
     def test_clear(self):
         # Relation sets can be cleared:
         self.p2.article_set.clear()
