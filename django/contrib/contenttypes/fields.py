@@ -394,9 +394,12 @@ class ReverseGenericRelatedObjectsDescriptor(object):
 
     def __set__(self, instance, value):
         manager = self.__get__(instance)
-        manager.clear()
-        for obj in value:
-            manager.add(obj)
+
+        db = router.db_for_write(manager.model, instance=manager.instance)
+        with transaction.atomic(using=db, savepoint=False):
+            manager.clear()
+            for obj in value:
+                manager.add(obj)
 
 
 def create_generic_related_manager(superclass):
@@ -474,12 +477,14 @@ def create_generic_related_manager(superclass):
                     self.prefetch_cache_name)
 
         def add(self, *objs):
-            for obj in objs:
-                if not isinstance(obj, self.model):
-                    raise TypeError("'%s' instance expected" % self.model._meta.object_name)
-                setattr(obj, self.content_type_field_name, self.content_type)
-                setattr(obj, self.object_id_field_name, self.pk_val)
-                obj.save()
+            db = router.db_for_write(self.model, instance=self.instance)
+            with transaction.atomic(using=db, savepoint=False):
+                for obj in objs:
+                    if not isinstance(obj, self.model):
+                        raise TypeError("'%s' instance expected" % self.model._meta.object_name)
+                    setattr(obj, self.content_type_field_name, self.content_type)
+                    setattr(obj, self.object_id_field_name, self.pk_val)
+                    obj.save()
         add.alters_data = True
 
         def remove(self, *objs, **kwargs):
@@ -498,6 +503,8 @@ def create_generic_related_manager(superclass):
             db = router.db_for_write(self.model, instance=self.instance)
             queryset = queryset.using(db)
             if bulk:
+                # `QuerySet.delete()` creates its own atomic block which
+                # contains the `pre_delete` and `post_delete` signal handlers.
                 queryset.delete()
             else:
                 with transaction.atomic(using=db, savepoint=False):
