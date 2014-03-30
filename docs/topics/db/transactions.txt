@@ -695,7 +695,10 @@ Select for update
 If you were relying on "automatic transactions" to provide locking between
 :meth:`~django.db.models.query.QuerySet.select_for_update` and a subsequent
 write operation — an extremely fragile design, but nonetheless possible — you
-must wrap the relevant code in :func:`atomic`.
+must wrap the relevant code in :func:`atomic`. Since Django 1.6.3, executing
+a query with :meth:`~django.db.models.query.QuerySet.select_for_update` in
+autocommit mode will raise a
+:exc:`~django.db.transaction.TransactionManagementError`.
 
 Using a high isolation level
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
