@@ -534,7 +534,7 @@ field, you could do the following::
 If you want to specify a field's validators, you can do so by defining
 the field declaratively and setting its ``validators`` parameter::
 
-    from django.forms import ModelForm, DateField
+    from django.forms import ModelForm, CharField
     from myapp.models import Article
 
     class ArticleForm(ModelForm):
