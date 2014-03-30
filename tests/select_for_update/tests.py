@@ -151,6 +151,34 @@ class SelectForUpdateTests(TransactionTestCase):
             Person.objects.all().select_for_update(nowait=True)
         )
 
+    @skipUnlessDBFeature('has_select_for_update')
+    def test_for_update_requires_transaction(self):
+        """
+        Test that a TransactionManagementError is raised
+        when a select_for_update query is executed outside of a transaction.
+        """
+        transaction.set_autocommit(True)
+        try:
+            with self.assertRaises(transaction.TransactionManagementError):
+                list(Person.objects.all().select_for_update())
+        finally:
+            transaction.set_autocommit(True)
+
+    @skipUnlessDBFeature('has_select_for_update')
+    def test_for_update_requires_transaction_only_in_execution(self):
+        """
+        Test that no TransactionManagementError is raised
+        when select_for_update is invoked outside of a transaction -
+        only when the query is executed.
+        """
+        transaction.set_autocommit(True)
+        try:
+            people = Person.objects.all().select_for_update()
+            with self.assertRaises(transaction.TransactionManagementError):
+                list(people)
+        finally:
+            transaction.set_autocommit(True)
+
     def run_select_for_update(self, status, nowait=False):
         """
         Utility method that runs a SELECT FOR UPDATE against all
