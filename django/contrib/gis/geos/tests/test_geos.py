@@ -489,7 +489,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         del poly
 
         # Access to these rings is OK since they are clones.
-        s1, s2 = str(ring1), str(ring2)
+        str(ring1)
+        str(ring2)
 
     def test_coord_seq(self):
         "Testing Coordinate Sequence objects."

@@ -128,7 +128,7 @@ def typecast_timestamp(s):  # does NOT store time zone information
     # "2005-07-29 09:56:00-05"
     if not s:
         return None
-    if not ' ' in s:
+    if ' ' not in s:
         return typecast_date(s)
     d, t = s.split()
     # Extract timezone information, if it exists. Currently we just throw

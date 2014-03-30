@@ -17,7 +17,6 @@ if HAS_POSTGRES:
                 'NAME': 'test',
             }
 
-
     class FakePostGISOperations(PostGISOperations):
         def __init__(self, version=None):
             self.version = version

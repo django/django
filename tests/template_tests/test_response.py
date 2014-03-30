@@ -259,7 +259,8 @@ class TemplateResponseTest(TestCase):
             'first/test.html', {
                 'value': 123,
                 'fn': datetime.now,
-            })
+            }
+        )
         self.assertRaises(ContentNotRenderedError,
                           pickle.dumps, response)
 

@@ -118,7 +118,7 @@ class FetchFromCacheMiddleware(object):
         Checks whether the page is already cached and returns the cached
         version if available.
         """
-        if not request.method in ('GET', 'HEAD'):
+        if request.method not in ('GET', 'HEAD'):
             request._cache_update_cache = False
             return None  # Don't bother checking the cache.
 

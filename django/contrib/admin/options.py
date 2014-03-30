@@ -253,7 +253,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             })
             kwargs['empty_label'] = _('None') if db_field.blank else None
 
-        if not 'queryset' in kwargs:
+        if 'queryset' not in kwargs:
             queryset = self.get_field_queryset(db, db_field, request)
             if queryset is not None:
                 kwargs['queryset'] = queryset
@@ -277,7 +277,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):
             kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
 
-        if not 'queryset' in kwargs:
+        if 'queryset' not in kwargs:
             queryset = self.get_field_queryset(db, db_field, request)
             if queryset is not None:
                 kwargs['queryset'] = queryset

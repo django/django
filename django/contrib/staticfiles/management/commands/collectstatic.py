@@ -312,5 +312,5 @@ class Command(NoArgsCommand):
             self.log("Copying '%s'" % source_path, level=1)
             with source_storage.open(path) as source_file:
                 self.storage.save(prefixed_path, source_file)
-        if not prefixed_path in self.copied_files:
+        if prefixed_path not in self.copied_files:
             self.copied_files.append(prefixed_path)

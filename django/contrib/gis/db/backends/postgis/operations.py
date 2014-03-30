@@ -481,14 +481,14 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         geo_col, db_type = lvalue
 
         if lookup_type in self.geometry_operators:
-            if field.geography and not lookup_type in self.geography_operators:
+            if field.geography and lookup_type not in self.geography_operators:
                 raise ValueError('PostGIS geography does not support the '
                                  '"%s" lookup.' % lookup_type)
             # Handling a PostGIS operator.
             op = self.geometry_operators[lookup_type]
             return op.as_sql(geo_col, self.get_geom_placeholder(field, value))
         elif lookup_type in self.geometry_functions:
-            if field.geography and not lookup_type in self.geography_functions:
+            if field.geography and lookup_type not in self.geography_functions:
                 raise ValueError('PostGIS geography type does not support the '
                                  '"%s" lookup.' % lookup_type)
 

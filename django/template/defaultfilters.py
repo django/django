@@ -926,7 +926,7 @@ def pluralize(value, arg='s'):
     * If value is 1, cand{{ value|pluralize:"y,ies" }} displays "1 candy".
     * If value is 2, cand{{ value|pluralize:"y,ies" }} displays "2 candies".
     """
-    if not ',' in arg:
+    if ',' not in arg:
         arg = ',' + arg
     bits = arg.split(',')
     if len(bits) > 2:

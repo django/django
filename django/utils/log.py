@@ -74,7 +74,7 @@ def configure_logging(logging_config, logging_settings):
         warnings.simplefilter("default", RemovedInNextVersionWarning)
 
     if logging_config:
-         # First find the logging configuration function ...
+        # First find the logging configuration function ...
         logging_config_func = import_string(logging_config)
 
         logging_config_func(DEFAULT_LOGGING)

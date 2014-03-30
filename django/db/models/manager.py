@@ -120,7 +120,7 @@ class BaseManager(object):
         elif model._meta.swapped:
             setattr(model, name, SwappedManagerDescriptor(model))
         else:
-        # if not model._meta.abstract and not model._meta.swapped:
+            # if not model._meta.abstract and not model._meta.swapped:
             setattr(model, name, ManagerDescriptor(self))
         if not getattr(model, '_default_manager', None) or self.creation_counter < model._default_manager.creation_counter:
             model._default_manager = self

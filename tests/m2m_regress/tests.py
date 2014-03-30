@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.utils import six
 
 from .models import (SelfRefer, Tag, TagCollection, Entry, SelfReferChild,
-    SelfReferChildSibling, Worksheet, RegressionModelSplit, Line)
+    SelfReferChildSibling, Worksheet, RegressionModelSplit)
 
 
 class M2MRegressionTests(TestCase):
