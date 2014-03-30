@@ -37,7 +37,7 @@ class GeoFeedMixin(object):
         """
         # Getting the Geometry object.
         geom = item.get('geometry', None)
-        if not geom is None:
+        if geom is not None:
             if isinstance(geom, (list, tuple)):
                 # Special case if a tuple/list was passed in.  The tuple may be
                 # a point or a box
@@ -58,7 +58,7 @@ class GeoFeedMixin(object):
                     else:
                         raise ValueError('Only should be 2 or 4 numeric elements.')
                 # If a GeoRSS box was given via tuple.
-                if not box_coords is None:
+                if box_coords is not None:
                     if w3c_geo:
                         raise ValueError('Cannot use simple GeoRSS box in W3C Geo feeds.')
                     handler.addQuickElement('georss:box', self.georss_coords(box_coords))

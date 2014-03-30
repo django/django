@@ -43,7 +43,7 @@ else:
 if lib_names:
     for lib_name in lib_names:
         lib_path = find_library(lib_name)
-        if not lib_path is None:
+        if lib_path is not None:
             break
 
 # No GEOS library could be found.

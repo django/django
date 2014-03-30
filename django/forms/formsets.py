@@ -153,7 +153,7 @@ class BaseFormSet(object):
         if self.is_bound:
             defaults['data'] = self.data
             defaults['files'] = self.files
-        if self.initial and not 'initial' in kwargs:
+        if self.initial and 'initial' not in kwargs:
             try:
                 defaults['initial'] = self.initial[i]
             except IndexError:

@@ -619,7 +619,7 @@ def cycle(parser, token, escape=False):
         name = args[1]
         if not hasattr(parser, '_namedCycleNodes'):
             raise TemplateSyntaxError("No named cycles in template. '%s' is not defined" % name)
-        if not name in parser._namedCycleNodes:
+        if name not in parser._namedCycleNodes:
             raise TemplateSyntaxError("Named cycle '%s' does not exist" % name)
         return parser._namedCycleNodes[name]
 

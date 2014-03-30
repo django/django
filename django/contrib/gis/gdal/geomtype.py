@@ -42,7 +42,7 @@ class OGRGeomType(object):
             if num is None:
                 raise OGRException('Invalid OGR String Type "%s"' % type_input)
         elif isinstance(type_input, int):
-            if not type_input in self._types:
+            if type_input not in self._types:
                 raise OGRException('Invalid OGR Integer Type: %d' % type_input)
             num = type_input
         else:

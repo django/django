@@ -15,7 +15,7 @@ class RegisterLookupMixin(object):
         except KeyError:
             # To allow for inheritance, check parent class' class_lookups.
             for parent in inspect.getmro(self.__class__):
-                if not 'class_lookups' in parent.__dict__:
+                if 'class_lookups' not in parent.__dict__:
                     continue
                 if lookup_name in parent.class_lookups:
                     return parent.class_lookups[lookup_name]
@@ -40,7 +40,7 @@ class RegisterLookupMixin(object):
 
     @classmethod
     def register_lookup(cls, lookup):
-        if not 'class_lookups' in cls.__dict__:
+        if 'class_lookups' not in cls.__dict__:
             cls.class_lookups = {}
         cls.class_lookups[lookup.lookup_name] = lookup
 

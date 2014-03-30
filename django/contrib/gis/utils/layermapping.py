@@ -239,7 +239,7 @@ class LayerMapping(object):
                     raise TypeError('ForeignKey mapping must be of dictionary type.')
             else:
                 # Is the model field type supported by LayerMapping?
-                if not model_field.__class__ in self.FIELD_TYPES:
+                if model_field.__class__ not in self.FIELD_TYPES:
                     raise LayerMapError('Django field type "%s" has no OGR mapping (yet).' % fld_name)
 
                 # Is the OGR field in the Layer?
@@ -277,7 +277,7 @@ class LayerMapping(object):
         if isinstance(unique, (list, tuple)):
             # List of fields to determine uniqueness with
             for attr in unique:
-                if not attr in self.mapping:
+                if attr not in self.mapping:
                     raise ValueError
         elif isinstance(unique, six.string_types):
             # Only a single field passed in.

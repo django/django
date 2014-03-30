@@ -165,7 +165,7 @@ class Signer(object):
 
     def unsign(self, signed_value):
         signed_value = force_str(signed_value)
-        if not self.sep in signed_value:
+        if self.sep not in signed_value:
             raise BadSignature('No "%s" found in value' % self.sep)
         value, sig = signed_value.rsplit(self.sep, 1)
         if constant_time_compare(sig, self.signature(value)):

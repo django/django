@@ -192,7 +192,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         SafeMIMEMultipart as well
         """
         headers = {"Date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
-        subject, from_email, to = 'hello', 'from@example.com', '"Sürname, Firstname" <to@example.com>'
+        from_email, to = 'from@example.com', '"Sürname, Firstname" <to@example.com>'
         text_content = 'This is an important message.'
         html_content = '<p>This is an <strong>important</strong> message.</p>'
         msg = EmailMultiAlternatives('Message from Firstname Sürname', text_content, from_email, [to], headers=headers)
