@@ -35,10 +35,10 @@ from django.test import override_settings
 from django.utils import formats
 from django.utils import translation
 from django.utils.cache import get_max_age
-from django.utils.encoding import iri_to_uri, force_bytes
+from django.utils.encoding import iri_to_uri, force_bytes, force_text
 from django.utils.html import escape
 from django.utils.http import urlencode, urlquote
-from django.utils.six.moves.urllib.parse import urljoin
+from django.utils.six.moves.urllib.parse import parse_qsl, urljoin, urlparse
 from django.utils._os import upath
 from django.utils import six
 
@@ -4442,6 +4442,60 @@ class AdminKeepChangeListFiltersTests(TestCase):
     def tearDown(self):
         self.client.logout()
 
+    def assertURLEqual(self, url1, url2):
+        """
+        Assert that two URLs are equal despite the ordering
+        of their querystring. Refs #22360.
+        """
+        parsed_url1 = urlparse(url1)
+        path1 = parsed_url1.path
+        parsed_qs1 = dict(parse_qsl(parsed_url1.query))
+
+        parsed_url2 = urlparse(url2)
+        path2 = parsed_url2.path
+        parsed_qs2 = dict(parse_qsl(parsed_url2.query))
+
+        for parsed_qs in [parsed_qs1, parsed_qs2]:
+            if '_changelist_filters' in parsed_qs:
+                changelist_filters = parsed_qs['_changelist_filters']
+                parsed_filters = dict(parse_qsl(changelist_filters))
+                parsed_qs['_changelist_filters'] = parsed_filters
+
+        self.assertEqual(path1, path2)
+        self.assertEqual(parsed_qs1, parsed_qs2)
+
+    def test_assert_url_equal(self):
+        # Test equality.
+        self.assertURLEqual(
+            'http://testserver/test_admin/admin/auth/user/105/?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0',
+            'http://testserver/test_admin/admin/auth/user/105/?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'
+        )
+
+        # Test inequality.
+        with self.assertRaises(AssertionError):
+            self.assertURLEqual(
+                'http://testserver/test_admin/admin/auth/user/105/?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0',
+                'http://testserver/test_admin/admin/auth/user/105/?_changelist_filters=is_staff__exact%3D1%26is_superuser__exact%3D1'
+            )
+
+        # Ignore scheme and host.
+        self.assertURLEqual(
+            'http://testserver/test_admin/admin/auth/user/105/?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0',
+            '/test_admin/admin/auth/user/105/?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'
+        )
+
+        # Ignore ordering of querystring.
+        self.assertURLEqual(
+            '/test_admin/admin/auth/user/?is_staff__exact=0&is_superuser__exact=0',
+            '/test_admin/admin/auth/user/?is_superuser__exact=0&is_staff__exact=0'
+        )
+
+        # Ignore ordering of _changelist_filters.
+        self.assertURLEqual(
+            '/test_admin/admin/auth/user/105/?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0',
+            '/test_admin/admin/auth/user/105/?_changelist_filters=is_superuser__exact%3D0%26is_staff__exact%3D0'
+        )
+
     def get_changelist_filters(self):
         return {
             'is_superuser__exact': 0,
@@ -4505,8 +4559,11 @@ class AdminKeepChangeListFiltersTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Check the `change_view` link has the correct querystring.
-        detail_link = """<a href="%s">joepublic</a>""" % self.get_change_url()
-        self.assertContains(response, detail_link, count=1)
+        detail_link = re.search(
+            '<a href="(.*?)">joepublic</a>',
+            force_text(response.content)
+        )
+        self.assertURLEqual(detail_link.group(1), self.get_change_url())
 
     def test_change_view(self):
         # Get the `change_view`.
@@ -4514,16 +4571,25 @@ class AdminKeepChangeListFiltersTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Check the form action.
-        form_action = """<form enctype="multipart/form-data" action="?%s" method="post" id="user_form">""" % self.get_preserved_filters_querystring()
-        self.assertContains(response, form_action, count=1)
+        form_action = re.search(
+            '<form enctype="multipart/form-data" action="(.*?)" method="post" id="user_form".*?>',
+            force_text(response.content)
+        )
+        self.assertURLEqual(form_action.group(1), '?%s' % self.get_preserved_filters_querystring())
 
         # Check the history link.
-        history_link = """<a href="%s" class="historylink">History</a>""" % self.get_history_url()
-        self.assertContains(response, history_link, count=1)
+        history_link = re.search(
+            '<a href="(.*?)" class="historylink">History</a>',
+            force_text(response.content)
+        )
+        self.assertURLEqual(history_link.group(1), self.get_history_url())
 
         # Check the delete link.
-        delete_link = """<a href="%s" class="deletelink">Delete</a>""" % (self.get_delete_url())
-        self.assertContains(response, delete_link, count=1)
+        delete_link = re.search(
+            '<a href="(.*?)" class="deletelink">Delete</a>',
+            force_text(response.content)
+        )
+        self.assertURLEqual(delete_link.group(1), self.get_delete_url())
 
         # Test redirect on "Save".
         post_data = {
@@ -4536,19 +4602,31 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         post_data['_save'] = 1
         response = self.client.post(self.get_change_url(), data=post_data)
-        self.assertRedirects(response, self.get_changelist_url())
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(
+            response.url,
+            self.get_changelist_url()
+        )
         post_data.pop('_save')
 
         # Test redirect on "Save and continue".
         post_data['_continue'] = 1
         response = self.client.post(self.get_change_url(), data=post_data)
-        self.assertRedirects(response, self.get_change_url())
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(
+            response.url,
+            self.get_change_url()
+        )
         post_data.pop('_continue')
 
         # Test redirect on "Save and add new".
         post_data['_addanother'] = 1
         response = self.client.post(self.get_change_url(), data=post_data)
-        self.assertRedirects(response, self.get_add_url())
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(
+            response.url,
+            self.get_add_url()
+        )
         post_data.pop('_addanother')
 
     def test_add_view(self):
@@ -4557,39 +4635,58 @@ class AdminKeepChangeListFiltersTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Check the form action.
-        form_action = """<form enctype="multipart/form-data" action="?%s" method="post" id="user_form">""" % self.get_preserved_filters_querystring()
-        self.assertContains(response, form_action, count=1)
+        form_action = re.search(
+            '<form enctype="multipart/form-data" action="(.*?)" method="post" id="user_form".*?>',
+            force_text(response.content)
+        )
+        self.assertURLEqual(form_action.group(1), '?%s' % self.get_preserved_filters_querystring())
 
-        # Test redirect on "Save".
         post_data = {
             'username': 'dummy',
             'password1': 'test',
             'password2': 'test',
         }
 
+        # Test redirect on "Save".
         post_data['_save'] = 1
         response = self.client.post(self.get_add_url(), data=post_data)
-        self.assertRedirects(response, self.get_change_url(User.objects.latest('pk').pk))
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(
+            response.url,
+            self.get_change_url(User.objects.latest('pk').pk)
+        )
         post_data.pop('_save')
 
         # Test redirect on "Save and continue".
         post_data['username'] = 'dummy2'
         post_data['_continue'] = 1
         response = self.client.post(self.get_add_url(), data=post_data)
-        self.assertRedirects(response, self.get_change_url(User.objects.latest('pk').pk))
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(
+            response.url,
+            self.get_change_url(User.objects.latest('pk').pk)
+        )
         post_data.pop('_continue')
 
         # Test redirect on "Save and add new".
         post_data['username'] = 'dummy3'
         post_data['_addanother'] = 1
         response = self.client.post(self.get_add_url(), data=post_data)
-        self.assertRedirects(response, self.get_add_url())
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(
+            response.url,
+            self.get_add_url()
+        )
         post_data.pop('_addanother')
 
     def test_delete_view(self):
         # Test redirect on "Delete".
         response = self.client.post(self.get_delete_url(), {'post': 'yes'})
-        self.assertRedirects(response, self.get_changelist_url())
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(
+            response.url,
+            self.get_changelist_url()
+        )
 
     def test_url_prefix(self):
         context = {
@@ -4598,7 +4695,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         }
 
         url = reverse('admin:auth_user_changelist', current_app=self.admin_site.name)
-        self.assertEqual(
+        self.assertURLEqual(
             self.get_changelist_url(),
             add_preserved_filters(context, url),
         )
@@ -4607,7 +4704,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         try:
             set_script_prefix('/prefix/')
             url = reverse('admin:auth_user_changelist', current_app=self.admin_site.name)
-            self.assertEqual(
+            self.assertURLEqual(
                 self.get_changelist_url(),
                 add_preserved_filters(context, url),
             )
