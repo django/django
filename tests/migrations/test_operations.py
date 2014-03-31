@@ -14,6 +14,17 @@ class OperationTests(MigrationTestBase):
     both forwards and backwards.
     """
 
+    def apply_operations(self, app_label, project_state, operations):
+        new_state = project_state.clone()
+        for operation in operations:
+            operation.state_forwards(app_label, new_state)
+
+        # Set up the database
+        with connection.schema_editor() as editor:
+            for operation in operations:
+                operation.database_forwards(app_label, editor, project_state, new_state)
+        return new_state
+
     def set_up_test_model(self, app_label, second_model=False, related_model=False, mti_model=False):
         """
         Creates a test model state and database table.
@@ -67,14 +78,8 @@ class OperationTests(MigrationTestBase):
                 ],
                 bases=['%s.Pony' % app_label],
             ))
-        project_state = ProjectState()
-        for operation in operations:
-            operation.state_forwards(app_label, project_state)
-        # Set up the database
-        with connection.schema_editor() as editor:
-            for operation in operations:
-                operation.database_forwards(app_label, editor, ProjectState(), project_state)
-        return project_state
+
+        return self.apply_operations(app_label, ProjectState(), operations)
 
     def test_create_model(self):
         """
@@ -373,6 +378,23 @@ class OperationTests(MigrationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_adflmm", editor, new_state, project_state)
         self.assertTableNotExists("test_adflmm_pony_stables")
+
+    def test_alter_field_m2m(self):
+        project_state = self.set_up_test_model("test_alflmm", second_model=True)
+
+        project_state = self.apply_operations("test_alflmm", project_state, operations=[
+            migrations.AddField("Pony", "stables", models.ManyToManyField("Stable", related_name="ponies"))
+        ])
+        new_apps = project_state.render()
+        Pony = new_apps.get_model("test_alflmm", "Pony")
+        self.assertFalse(Pony._meta.get_field('stables').blank)
+
+        project_state = self.apply_operations("test_alflmm", project_state, operations=[
+            migrations.AlterField("Pony", "stables", models.ManyToManyField(to="Stable", related_name="ponies", blank=True))
+        ])
+        new_apps = project_state.render()
+        Pony = new_apps.get_model("test_alflmm", "Pony")
+        self.assertTrue(Pony._meta.get_field('stables').blank)
 
     def test_remove_field(self):
         """

@@ -161,7 +161,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         """
         Alters M2Ms to repoint their to= endpoints.
         """
-        if old_field.rel.through == new_field.rel.through:
+        if old_field.rel.through._meta.db_table == new_field.rel.through._meta.db_table:
             return
 
         # Make a new through table
