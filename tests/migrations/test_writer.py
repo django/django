@@ -1,9 +1,9 @@
 # encoding: utf8
-
 from __future__ import unicode_literals
 
 import datetime
 import os
+import tokenize
 
 from django.core.validators import RegexValidator, EmailValidator
 from django.db import models, migrations
@@ -59,7 +59,11 @@ class WriterTests(TestCase):
         self.assertSerializedEqual(1)
         self.assertSerializedEqual(None)
         self.assertSerializedEqual(b"foobar")
+        string, imports = MigrationWriter.serialize(b"foobar")
+        self.assertEqual(string, "b'foobar'")
         self.assertSerializedEqual("föobár")
+        string, imports = MigrationWriter.serialize("foobar")
+        self.assertEqual(string, "'foobar'")
         self.assertSerializedEqual({1: 2})
         self.assertSerializedEqual(["a", 2, True, None])
         self.assertSerializedEqual(set([2, 3, "eighty"]))
@@ -92,15 +96,15 @@ class WriterTests(TestCase):
         # Classes
         validator = RegexValidator(message="hello")
         string, imports = MigrationWriter.serialize(validator)
-        self.assertEqual(string, "django.core.validators.RegexValidator(message=%s)" % repr("hello"))
+        self.assertEqual(string, "django.core.validators.RegexValidator(message='hello')")
         self.serialize_round_trip(validator)
         validator = EmailValidator(message="hello")  # Test with a subclass.
         string, imports = MigrationWriter.serialize(validator)
-        self.assertEqual(string, "django.core.validators.EmailValidator(message=%s)" % repr("hello"))
+        self.assertEqual(string, "django.core.validators.EmailValidator(message='hello')")
         self.serialize_round_trip(validator)
         validator = deconstructible(path="custom.EmailValidator")(EmailValidator)(message="hello")
         string, imports = MigrationWriter.serialize(validator)
-        self.assertEqual(string, "custom.EmailValidator(message=%s)" % repr("hello"))
+        self.assertEqual(string, "custom.EmailValidator(message='hello')")
         # Django fields
         self.assertSerializedFieldEqual(models.CharField(max_length=255))
         self.assertSerializedFieldEqual(models.TextField(null=True, blank=True))
@@ -153,6 +157,17 @@ class WriterTests(TestCase):
         # Just make sure it runs for now, and that things look alright.
         result = self.safe_exec(output)
         self.assertIn("Migration", result)
+        # In order to preserve compatibility with Python 3.2 unicode literals
+        # prefix shouldn't be added to strings.
+        tokens = tokenize.generate_tokens(six.StringIO(str(output)).readline)
+        for token_type, token_source, (srow, scol), _, line in tokens:
+            if token_type == tokenize.STRING:
+                self.assertFalse(
+                    token_source.startswith('u'),
+                    "Unicode literal prefix found at %d:%d: %r" % (
+                        srow, scol, line.strip()
+                    )
+                )
 
     def test_migration_path(self):
         test_apps = [
