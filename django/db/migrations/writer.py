@@ -53,8 +53,10 @@ class OperationWriter(object):
                     self.feed('%s={' % arg_name)
                     self.indent()
                     for key, value in arg_value.items():
+                        key_string, key_imports = MigrationWriter.serialize(key)
                         arg_string, arg_imports = MigrationWriter.serialize(value)
-                        self.feed('%s: %s,' % (repr(key), arg_string))
+                        self.feed('%s: %s,' % (key_string, arg_string))
+                        imports.update(key_imports)
                         imports.update(arg_imports)
                     self.unindent()
                     self.feed('},')
@@ -122,7 +124,7 @@ class MigrationWriter(object):
                 dependencies.append("        migrations.swappable_dependency(settings.%s)," % dependency[1])
                 imports.add("from django.conf import settings")
             else:
-                dependencies.append("        %s," % repr(dependency))
+                dependencies.append("        %s," % self.serialize(dependency)[0])
         items["dependencies"] = "\n".join(dependencies) + "\n" if dependencies else ""
 
         # Format imports nicely
@@ -131,7 +133,7 @@ class MigrationWriter(object):
 
         # If there's a replaces, make a string for it
         if self.migration.replaces:
-            items['replaces_str'] = "\n    replaces = %s\n" % repr(self.migration.replaces)
+            items['replaces_str'] = "\n    replaces = %s\n" % self.serialize(self.migration.replaces)[0]
 
         return (MIGRATION_TEMPLATE % items).encode("utf8")
 
@@ -185,6 +187,12 @@ class MigrationWriter(object):
         More advanced than repr() as it can encode things
         like datetime.datetime.now.
         """
+        # FIXME: Ideally Promise would be reconstructible, but for now we
+        # use force_text on them and defer to the normal string serialization
+        # process.
+        if isinstance(value, Promise):
+            value = force_text(value)
+
         # Sequences
         if isinstance(value, (list, set, tuple)):
             imports = set()
@@ -229,11 +237,20 @@ class MigrationWriter(object):
         elif isinstance(value, SettingsReference):
             return "settings.%s" % value.setting_name, set(["from django.conf import settings"])
         # Simple types
-        elif isinstance(value, six.integer_types + (float, six.binary_type, six.text_type, bool, type(None))):
+        elif isinstance(value, six.integer_types + (float, bool, type(None))):
             return repr(value), set()
-        # Promise
-        elif isinstance(value, Promise):
-            return repr(force_text(value)), set()
+        elif isinstance(value, six.binary_type):
+            value_repr = repr(value)
+            if six.PY2:
+                # Prepend the `b` prefix since we're importing unicode_literals
+                value_repr = 'b' + value_repr
+            return value_repr, set()
+        elif isinstance(value, six.text_type):
+            value_repr = repr(value)
+            if six.PY2:
+                # Strip the `u` prefix since we're importing unicode_literals
+                value_repr = value_repr[1:]
+            return value_repr, set()
         # Decimal
         elif isinstance(value, decimal.Decimal):
             return repr(value), set(["from decimal import Decimal"])
@@ -286,6 +303,8 @@ class MigrationWriter(object):
 
 MIGRATION_TEMPLATE = """\
 # encoding: utf8
+from __future__ import unicode_literals
+
 from django.db import models, migrations
 %(imports)s
 
