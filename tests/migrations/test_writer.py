@@ -10,7 +10,7 @@ from django.db import models, migrations
 from django.db.migrations.writer import MigrationWriter, SettingsReference
 from django.test import TestCase
 from django.conf import settings
-from django.utils import six
+from django.utils import datetime_safe, six
 from django.utils.deconstruct import deconstructible
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import get_default_timezone
@@ -81,6 +81,14 @@ class WriterTests(TestCase):
         self.assertSerializedEqual(datetime.date.today)
         with self.assertRaises(ValueError):
             self.assertSerializedEqual(datetime.datetime(2012, 1, 1, 1, 1, tzinfo=get_default_timezone()))
+        safe_date = datetime_safe.date(2014, 3, 31)
+        string, imports = MigrationWriter.serialize(safe_date)
+        self.assertEqual(string, repr(datetime.date(2014, 3, 31)))
+        self.assertEqual(imports, {'import datetime'})
+        safe_datetime = datetime_safe.datetime(2014, 3, 31, 16, 4, 31)
+        string, imports = MigrationWriter.serialize(safe_datetime)
+        self.assertEqual(string, repr(datetime.datetime(2014, 3, 31, 16, 4, 31)))
+        self.assertEqual(imports, {'import datetime'})
         # Classes
         validator = RegexValidator(message="hello")
         string, imports = MigrationWriter.serialize(validator)
