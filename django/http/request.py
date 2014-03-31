@@ -6,11 +6,6 @@ import re
 import sys
 from io import BytesIO
 from pprint import pformat
-try:
-    from urllib.parse import parse_qsl, urlencode, quote, urljoin
-except ImportError:
-    from urllib import urlencode, quote
-    from urlparse import parse_qsl, urljoin
 
 from django.conf import settings
 from django.core import signing
@@ -20,6 +15,7 @@ from django.http.multipartparser import MultiPartParser
 from django.utils import six
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import force_bytes, force_text, force_str, iri_to_uri
+from django.utils.six.moves.urllib.parse import parse_qsl, urlencode, quote, urljoin
 
 
 RAISE_ERROR = object()
