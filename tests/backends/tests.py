@@ -14,7 +14,6 @@ from django.core.management.color import no_style
 from django.db import (connection, connections, DEFAULT_DB_ALIAS,
     DatabaseError, IntegrityError, transaction)
 from django.db.backends.signals import connection_created
-from django.db.backends.sqlite3.base import DatabaseOperations
 from django.db.backends.postgresql_psycopg2 import version as pg_version
 from django.db.backends.utils import format_number, CursorWrapper
 from django.db.models import Sum, Avg, Variance, StdDev
@@ -485,6 +484,8 @@ class SqliteChecks(TestCase):
     @unittest.skipUnless(connection.vendor == 'sqlite',
                          "No need to do SQLite checks")
     def test_convert_values_to_handle_null_value(self):
+        from django.db.backends.sqlite3.base import DatabaseOperations
+
         database_operations = DatabaseOperations(connection)
         self.assertEqual(
             None,
@@ -1033,3 +1034,16 @@ class UnicodeArrayTestCase(TestCase):
         a = ["ᄲawef"]
         b = self.select(a)
         self.assertEqual(a[0], b[0])
+
+
+@unittest.skipUnless(
+    connection.vendor == 'postgresql',
+    "This test applies only to PostgreSQL")
+class PostgresLookupCastTests(TestCase):
+    def test_lookup_cast(self):
+        from django.db.backends.postgresql_psycopg2.operations import DatabaseOperations
+
+        do = DatabaseOperations(connection=None)
+        for lookup in ('iexact', 'contains', 'icontains', 'startswith',
+                       'istartswith', 'endswith', 'iendswith', 'regex', 'iregex'):
+            self.assertIn('::text', do.lookup_cast(lookup))
