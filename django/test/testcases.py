@@ -245,7 +245,7 @@ class SimpleTestCase(unittest.TestCase):
 
         Note that assertRedirects won't work for external links since it uses
         TestClient to do a request (use fetch_redirect_response=False to check
-        such links without fetching thtem).
+        such links without fetching them).
         """
         if msg_prefix:
             msg_prefix += ": "
