@@ -227,7 +227,7 @@ class ModelState(object):
         body['__module__'] = "__fake__"
         # Then, make a Model object
         return type(
-            self.name,
+            str(self.name),
             bases,
             body,
         )
