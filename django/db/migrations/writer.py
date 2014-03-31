@@ -11,9 +11,9 @@ import types
 from django.apps import apps
 from django.db import models
 from django.db.migrations.loader import MigrationLoader
+from django.utils import datetime_safe, six
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
-from django.utils import six
 
 
 class SettingsReference(str):
@@ -215,10 +215,16 @@ class MigrationWriter(object):
         elif isinstance(value, datetime.datetime):
             if value.tzinfo is not None:
                 raise ValueError("Cannot serialize datetime values with timezones. Either use a callable value for default or remove the timezone.")
-            return repr(value), set(["import datetime"])
+            value_repr = repr(value)
+            if isinstance(value, datetime_safe.datetime):
+                value_repr = "datetime.%s" % value_repr
+            return value_repr, set(["import datetime"])
         # Dates
         elif isinstance(value, datetime.date):
-            return repr(value), set(["import datetime"])
+            value_repr = repr(value)
+            if isinstance(value, datetime_safe.date):
+                value_repr = "datetime.%s" % value_repr
+            return value_repr, set(["import datetime"])
         # Settings references
         elif isinstance(value, SettingsReference):
             return "settings.%s" % value.setting_name, set(["from django.conf import settings"])
