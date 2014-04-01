@@ -591,6 +591,13 @@ The following methods are available on any subclass of
         :meth:`~django.contrib.auth.models.AbstractBaseUser.set_unusable_password()` has
         been called for this user.
 
+    .. method:: models.AbstractBaseUser.get_session_auth_hash()
+
+        .. versionadded:: 1.7
+
+        Returns an HMAC of the password field. Used for
+        :ref:`session-invalidation-on-password-change`.
+
 You should also define a custom manager for your ``User`` model. If your
 ``User`` model defines ``username``, ``email``, ``is_staff``, ``is_active``,
 ``is_superuser``, ``last_login``, and ``date_joined`` fields the same as

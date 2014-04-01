@@ -3,6 +3,7 @@ from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin.options import IS_POPUP_VAR
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import (UserCreationForm, UserChangeForm,
     AdminPasswordChangeForm)
 from django.contrib.auth.models import User, Group
@@ -131,6 +132,7 @@ class UserAdmin(admin.ModelAdmin):
                 self.log_change(request, request.user, change_message)
                 msg = ugettext('Password changed successfully.')
                 messages.success(request, msg)
+                update_session_auth_hash(request, form.user)
                 return HttpResponseRedirect('..')
         else:
             form = self.change_password_form(user)

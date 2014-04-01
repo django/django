@@ -49,9 +49,9 @@ class AuthViewsTestCase(TestCase):
     fixtures = ['authtestdata.json']
     urls = 'django.contrib.auth.tests.urls'
 
-    def login(self, password='password'):
+    def login(self, username='testclient', password='password'):
         response = self.client.post('/login/', {
-            'username': 'testclient',
+            'username': username,
             'password': password,
         })
         self.assertTrue(SESSION_KEY in self.client.session)
@@ -443,6 +443,25 @@ class ChangePasswordTest(AuthViewsTestCase):
         self.assertURLEqual(response.url, '/password_reset/')
 
 
+@override_settings(MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware'
+])
+class SessionAuthenticationTests(AuthViewsTestCase):
+    def test_user_password_change_updates_session(self):
+        """
+        #21649 - Ensure contrib.auth.views.password_change updates the user's
+        session auth hash after a password change so the session isn't logged out.
+        """
+        self.login()
+        response = self.client.post('/password_change/', {
+            'old_password': 'password',
+            'new_password1': 'password1',
+            'new_password2': 'password1',
+        })
+        # if the hash isn't updated, retrieving the redirection page will fail.
+        self.assertRedirects(response, '/password_change/done/')
+
+
 @skipIfCustomUser
 class LoginTest(AuthViewsTestCase):
 
@@ -545,6 +564,36 @@ class LoginTest(AuthViewsTestCase):
 
         # Check the CSRF token switched
         self.assertNotEqual(token1, token2)
+
+    def test_session_key_flushed_on_login(self):
+        """
+        To avoid reusing another user's session, ensure a new, empty session is
+        created if the existing session corresponds to a different authenticated
+        user.
+        """
+        self.login()
+        original_session_key = self.client.session.session_key
+
+        self.login(username='staff')
+        self.assertNotEqual(original_session_key, self.client.session.session_key)
+
+    def test_session_key_flushed_on_login_after_password_change(self):
+        """
+        As above, but same user logging in after a password change.
+        """
+        self.login()
+        original_session_key = self.client.session.session_key
+
+        # If no password change, session key should not be flushed.
+        self.login()
+        self.assertEqual(original_session_key, self.client.session.session_key)
+
+        user = User.objects.get(username='testclient')
+        user.set_password('foobar')
+        user.save()
+
+        self.login(password='foobar')
+        self.assertNotEqual(original_session_key, self.client.session.session_key)
 
 
 @skipIfCustomUser
@@ -731,6 +780,11 @@ class LogoutTest(AuthViewsTestCase):
 
 @skipIfCustomUser
 @override_settings(
+    # Redirect in test_user_change_password will fail if session auth hash
+    # isn't updated after password change (#21649)
+    MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
+        'django.contrib.auth.middleware.SessionAuthenticationMiddleware'
+    ],
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
 )
 class ChangelistTests(AuthViewsTestCase):
