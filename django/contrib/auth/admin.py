@@ -3,6 +3,7 @@ from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin.options import IS_POPUP_VAR
+from django.contrib.auth import SESSION_HASH_KEY
 from django.contrib.auth.forms import (UserCreationForm, UserChangeForm,
     AdminPasswordChangeForm)
 from django.contrib.auth.models import User, Group
@@ -131,6 +132,12 @@ class UserAdmin(admin.ModelAdmin):
                 self.log_change(request, request.user, change_message)
                 msg = ugettext('Password changed successfully.')
                 messages.success(request, msg)
+                # When a user changes their own password, update their
+                # session to prevent a passsword change from logging them out
+                # if django.contrib.auth.middleware.SessionVerificationMiddleware
+                # is enabled.
+                if hasattr(form.user, 'get_session_auth_hash') and request.user == form.user:
+                    request.session[SESSION_HASH_KEY] = form.user.get_session_auth_hash()
                 return HttpResponseRedirect('..')
         else:
             form = self.change_password_form(user)

@@ -443,6 +443,25 @@ class ChangePasswordTest(AuthViewsTestCase):
         self.assertURLEqual(response.url, '/password_reset/')
 
 
+@override_settings(MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
+    'django.contrib.auth.middleware.SessionVerificationMiddleware'
+])
+class SessionVerificationTests(AuthViewsTestCase):
+    def test_user_password_change_updates_session(self):
+        """
+        #21649 - Ensure contrib.auth.views.password_change updates the user's
+        session auth token after a password change so the session isn't logged out.
+        """
+        self.login()
+        response = self.client.post('/password_change/', {
+            'old_password': 'password',
+            'new_password1': 'password1',
+            'new_password2': 'password1',
+        })
+        # if the token isn't updated, retrieving the redirection page will fail.
+        self.assertRedirects(response, '/password_change/done/')
+
+
 @skipIfCustomUser
 class LoginTest(AuthViewsTestCase):
 
@@ -731,6 +750,11 @@ class LogoutTest(AuthViewsTestCase):
 
 @skipIfCustomUser
 @override_settings(
+    # Redirect in test_user_change_password will fail if session auth token
+    # isn't updated after password change (#21649)
+    MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
+        'django.contrib.auth.middleware.SessionVerificationMiddleware'
+    ],
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
 )
 class ChangelistTests(AuthViewsTestCase):

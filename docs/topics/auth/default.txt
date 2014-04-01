@@ -111,6 +111,12 @@ Django also provides :ref:`views <built-in-auth-views>` and :ref:`forms
 <built-in-auth-forms>` that may be used to allow users to change their own
 passwords.
 
+.. versionadded:: 1.7
+
+Changing a user's password will log out all their sessions if the
+:class:`~django.contrib.auth.middleware.SessionVerificationMiddleware` is
+enabled. See :ref:`session-invalidation-on-password-change` for details.
+
 Authenticating Users
 --------------------
 
@@ -574,6 +580,57 @@ To apply a permission to a :doc:`class-based generic view
 <django.views.generic.base.View.dispatch>` method on the class. See
 :ref:`decorating-class-based-views` for details. Another approach is to
 :ref:`write a mixin that wraps as_view() <mixins_that_wrap_as_view>`.
+
+.. _session-invalidation-on-password-change:
+
+Session invalidation on password change
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.7
+
+.. warning::
+
+    This protection only applies if
+    :class:`~django.contrib.auth.middleware.SessionVerificationMiddleware`
+    is enabled in :setting:`MIDDLEWARE_CLASSES`.
+
+If your :setting:`AUTH_USER_MODEL` inherits from
+:class:`~django.contrib.auth.models.AbstractBaseUser` or implements its own
+:meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`
+method, the session will include the token returned by this function. In the
+:class:`~django.contrib.auth.models.AbstractBaseUser` case, this is an HMAC of
+the password field. If the
+:class:`~django.contrib.auth.middleware.SessionVerificationMiddleware` is
+enabled, Django verifies that the token sent along with each request matches
+the one that's computed server-side. This allows a user to "log out" all of
+their other sessions by changing their password.
+
+The default password change views included with Django,
+:func:`django.contrib.auth.views.password_change` and and the
+``user_change_password`` view in the ``auth`` admin, update the session with
+the new password hash so that a user changing their own password won't log
+themselves out. If you have a custom view and wish to implement similar logic,
+do something like this::
+
+    from django.contrib.auth import SESSION_HASH_KEY
+
+    if hasattr(form.user, 'get_session_auth_hash') and request.user == form.user:
+        request.session[SESSION_HASH_KEY] = form.user.get_session_auth_hash()
+
+If you are upgrading an existing site and wish to enable this middleware without
+requiring all your users to re-login afterward, you should first upgrade to
+Django 1.7 and run it for a while so that as sessions are naturally recreated
+as users login, they include the session auth hash as described above. Once you
+start running your site with ``SessionVerificationMiddleware``, any users who
+have not logged in and had their session updated with the auth hash will their
+existing session invalidated and be required to login.
+
+.. note::
+
+    Since
+    :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`
+    is based on :setting:`SECRET_KEY`, updating your site to use a new secret
+    will invalidate all existing sessions.
 
 .. _built-in-auth-views:
 
@@ -1250,3 +1307,9 @@ User passwords are not displayed in the admin (nor stored in the database), but
 the :doc:`password storage details </topics/auth/passwords>` are displayed.
 Included in the display of this information is a link to
 a password change form that allows admins to change user passwords.
+
+.. versionadded:: 1.7
+
+Changing a user's password will log out all their sessions if the
+:class:`~django.contrib.auth.middleware.SessionVerificationMiddleware` is
+enabled. See :ref:`session-invalidation-on-password-change` for details.
