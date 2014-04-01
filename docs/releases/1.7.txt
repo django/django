@@ -331,6 +331,15 @@ Minor features
   ``html_email_template_name`` parameter used to send a multipart HTML email
   for password resets.
 
+* The :meth:`AbstractBaseUser.get_session_auth_hash()
+  <django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash>`
+  method was added and if your :setting:`AUTH_USER_MODEL` inherits from
+  :class:`~django.contrib.auth.models.AbstractBaseUser`, changing a user's
+  password now invalidates old sessions if the
+  :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware` is
+  enabled. See :ref:`session-invalidation-on-password-change` for more details
+  including upgrade considerations when enabling this new middleware.
+
 :mod:`django.contrib.formtools`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
