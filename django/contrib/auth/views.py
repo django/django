@@ -267,7 +267,7 @@ def password_change(request,
             form.save()
             # Updating the password logs out all other sessions for the user
             # except the current one if
-            # django.contrib.auth.middleware.SessionVerificationMiddleware
+            # django.contrib.auth.middleware.SessionAuthenticationMiddleware
             # is enabled.
             if hasattr(form.user, 'get_session_auth_hash') and request.user == form.user:
                 request.session[SESSION_HASH_KEY] = form.user.get_session_auth_hash()

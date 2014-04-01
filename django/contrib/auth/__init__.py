@@ -84,10 +84,9 @@ def login(request, user):
         session_auth_hash = user.get_session_auth_hash()
 
     if SESSION_KEY in request.session:
-        if request.session[SESSION_KEY] != user.pk or (
-                # TODO: add a test for this
-                session_auth_hash and
-                request.session[SESSION_HASH_KEY] != session_auth_hash):
+        session_key = request.session[SESSION_KEY]
+        if session_key != user.pk or (
+                session_auth_hash and session_key != session_auth_hash):
             # To avoid reusing another user's session, create a new, empty
             # session if the existing session corresponds to a different
             # authenticated user.

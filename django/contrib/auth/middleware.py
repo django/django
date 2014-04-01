@@ -23,7 +23,7 @@ class AuthenticationMiddleware(object):
         request.user = SimpleLazyObject(lambda: get_user(request))
 
 
-class SessionVerificationMiddleware(object):
+class SessionAuthenticationMiddleware(object):
     """
     Middleware for invalidating a user's sessions that don't correspond to the
     user's current session authentication hash (generated based on the user's

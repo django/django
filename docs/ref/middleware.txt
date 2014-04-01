@@ -204,7 +204,7 @@ Adds the ``user`` attribute, representing the currently-logged-in user, to
 every incoming ``HttpRequest`` object. See :ref:`Authentication in Web requests
 <auth-web-requests>`.
 
-.. class:: SessionVerificationMiddleware
+.. class:: SessionAuthenticationMiddleware
 
 .. versionadded:: 1.7
 

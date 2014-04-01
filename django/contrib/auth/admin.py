@@ -134,7 +134,7 @@ class UserAdmin(admin.ModelAdmin):
                 messages.success(request, msg)
                 # When a user changes their own password, update their
                 # session to prevent a passsword change from logging them out
-                # if django.contrib.auth.middleware.SessionVerificationMiddleware
+                # if django.contrib.auth.middleware.SessionAuthenticationMiddleware
                 # is enabled.
                 if hasattr(form.user, 'get_session_auth_hash') and request.user == form.user:
                     request.session[SESSION_HASH_KEY] = form.user.get_session_auth_hash()

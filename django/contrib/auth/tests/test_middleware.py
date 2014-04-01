@@ -1,10 +1,10 @@
-from django.contrib.auth.middleware import SessionVerificationMiddleware
+from django.contrib.auth.middleware import SessionAuthenticationMiddleware
 from django.contrib.auth.models import User
 from django.http import HttpRequest
 from django.test import TestCase
 
 
-class TestSessionVerificationMiddleware(TestCase):
+class TestSessionAuthenticationMiddleware(TestCase):
     def setUp(self):
         self.user_password = 'test_password'
         self.user = User.objects.create_user('test_user',
@@ -15,7 +15,7 @@ class TestSessionVerificationMiddleware(TestCase):
         """
         Tests that changing a user's password invalidates the session.
         """
-        verification_middleware = SessionVerificationMiddleware()
+        verification_middleware = SessionAuthenticationMiddleware()
         self.assertTrue(self.client.login(
             username=self.user.username,
             password=self.user_password,
