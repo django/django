@@ -1,7 +1,7 @@
 import unittest
 
 from django.contrib.postgres.fields import ArrayField
-from django.core import serializers
+from django.core import exceptions, serializers
 from django.db import models, IntegrityError, connection
 from django.db.migrations.writer import MigrationWriter
 from django.test import TestCase
@@ -153,6 +153,12 @@ class TestMigrations(TestCase):
         new = ArrayField(*args, **kwargs)
         self.assertEqual(type(new.base_field), type(field.base_field))
 
+    def test_deconstruct_with_size(self):
+        field = ArrayField(models.IntegerField(), size=3)
+        name, path, args, kwargs = field.deconstruct()
+        new = ArrayField(*args, **kwargs)
+        self.assertEqual(new.size, field.size)
+
     def test_deconstruct_args(self):
         field = ArrayField(models.CharField(max_length=20))
         name, path, args, kwargs = field.deconstruct()
@@ -162,7 +168,7 @@ class TestMigrations(TestCase):
     def test_makemigrations(self):
         field = ArrayField(models.CharField(max_length=20))
         statement, imports = MigrationWriter.serialize(field)
-        self.assertEqual(statement, 'django.contrib.postgres.fields.ArrayField(models.CharField(max_length=20))')
+        self.assertEqual(statement, 'django.contrib.postgres.fields.ArrayField(models.CharField(max_length=20), size=None)')
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
@@ -177,3 +183,33 @@ class TestSerialization(TestCase):
     def test_loading(self):
         instance = list(serializers.deserialize('json', self.test_data))[0].object
         self.assertEqual(instance.field, [1, 2])
+
+
+class TestValidation(TestCase):
+
+    def test_unbounded(self):
+        field = ArrayField(models.IntegerField())
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean([1, None], None)
+        self.assertEqual(cm.exception.code, 'item_invalid')
+        self.assertEqual(cm.exception.message % cm.exception.params, 'Item 1 in the array did not validate: This field cannot be null.')
+
+    def test_blank_true(self):
+        field = ArrayField(models.IntegerField(blank=True, null=True))
+        # This should not raise a validation error
+        field.clean([1, None], None)
+
+    def test_with_size(self):
+        field = ArrayField(models.IntegerField(), size=3)
+        field.clean([1, 2, 3], None)
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean([1, 2, 3, 4], None)
+        self.assertEqual(cm.exception.messages[0], 'Array contains 4 items, it should contain no more than 3.')
+
+    def test_nested_array_mismatch(self):
+        field = ArrayField(ArrayField(models.IntegerField()))
+        field.clean([[1, 2], [3, 4]], None)
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean([[1, 2], [3, 4, 5]], None)
+        self.assertEqual(cm.exception.code, 'nested_array_mismatch')
+        self.assertEqual(cm.exception.messages[0], 'Nested arrays must have the same length.')

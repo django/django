@@ -1,10 +1,12 @@
 import json
 import re
 
-from django.core import checks
+from django.contrib.postgres.validators import ArrayMaxLengthValidator
+from django.core import checks, exceptions
 from django.db.models import Field, Lookup, Transform, IntegerField
 from django.utils import six
 from django.utils.functional import cached_property
+from django.utils.translation import string_concat, ugettext_lazy as _
 
 
 __all__ = ['ArrayField']
@@ -12,10 +14,18 @@ __all__ = ['ArrayField']
 
 class ArrayField(Field):
     empty_strings_allowed = False
+    default_error_messages = {
+        'item_invalid': _('Item %(nth)s in the array did not validate: '),
+        'nested_array_mismatch': _('Nested arrays must have the same length.'),
+    }
 
-    def __init__(self, base_field, **kwargs):
-        super(ArrayField, self).__init__(**kwargs)
+    def __init__(self, base_field, size=None, **kwargs):
         self.base_field = base_field
+        self.size = size
+        if self.size:
+            self.default_validators = self.default_validators[:]
+            self.default_validators.append(ArrayMaxLengthValidator(self.size))
+        super(ArrayField, self).__init__(**kwargs)
 
     def check(self, **kwargs):
         errors = super(ArrayField, self).check(**kwargs)
@@ -52,7 +62,8 @@ class ArrayField(Field):
         return 'Array of %s' % self.base_field.definition
 
     def db_type(self, connection):
-        return self.base_field.db_type(connection) + '[]'
+        size = self.size or ''
+        return '%s[%s]' % (self.base_field.db_type(connection), size)
 
     def get_prep_value(self, value):
         if isinstance(value, list):
@@ -69,6 +80,7 @@ class ArrayField(Field):
         name, path, args, kwargs = super(ArrayField, self).deconstruct()
         path = 'django.contrib.postgres.fields.ArrayField'
         args.insert(0, self.base_field)
+        kwargs['size'] = self.size
         return name, path, args, kwargs
 
     def to_python(self, value):
@@ -109,6 +121,24 @@ class ArrayField(Field):
             start = int(start) + 1
             end = int(end) + 1
             return SliceTransformFactory(start, end)
+
+    def validate(self, value, model_instance):
+        super(ArrayField, self).validate(value, model_instance)
+        for i, part in enumerate(value):
+            try:
+                self.base_field.validate(part, model_instance)
+            except exceptions.ValidationError as e:
+                raise exceptions.ValidationError(
+                    string_concat(self.error_messages['item_invalid'], e.message),
+                    code='item_invalid',
+                    params={'nth': i},
+                )
+        if type(self.base_field) == ArrayField:
+            if len(set(len(i) for i in value)) > 1:
+                raise exceptions.ValidationError(
+                    self.error_messages['nested_array_mismatch'],
+                    code='nested_array_mismatch',
+                )
 
 
 class ArrayContainsLookup(Lookup):
