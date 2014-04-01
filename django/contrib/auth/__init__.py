@@ -165,4 +165,18 @@ def get_permission_codename(action, opts):
     return '%s_%s' % (action, opts.model_name)
 
 
+def update_session_auth_token(request, user):
+    """
+    Updating a user's password logs out all other sessions for the user
+    except the current one if
+    django.contrib.auth.middleware.SessionAuthenticationMiddleware is enabled.
+
+    This function takes the current request and the updated user object from
+    which the new session token will be derived and updates the session token
+    appropriately to prevent a password change from logging out the session
+    from which the password was changed.
+    """
+    if hasattr(user, 'get_session_auth_hash') and request.user == user:
+        request.session[SESSION_HASH_KEY] = user.get_session_auth_hash()
+
 default_app_config = 'django.contrib.auth.apps.AuthConfig'
