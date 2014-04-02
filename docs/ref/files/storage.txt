@@ -36,6 +36,16 @@ The FileSystemStorage Class
     :class:`~django.core.files.storage.Storage` and provides implementations
     for all the public methods thereof.
 
+    .. attribute:: location
+
+	Absolute path to the directory that will hold the files.
+        Defaults to the value of your :setting:`MEDIA_ROOT` setting.
+
+    .. attribute:: base_url
+
+	URL that serves the files stored at this location.
+	Defaults to the value of your :setting:`MEDIA_URL` setting.
+
     .. attribute:: file_permissions_mode
 
         The file system permissions that the file will receive when it is
