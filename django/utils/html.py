@@ -163,8 +163,6 @@ def _strip_once(value):
 def strip_tags(value):
     """Returns the given HTML with all tags stripped."""
     while True:
-        if not ('<' in value or '>' in value):
-            return value
         new_value = _strip_once(value)
         if new_value == value:
             # _strip_once was not able to detect more tags
