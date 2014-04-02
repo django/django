@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from unittest import skipUnless
 
+from django.core.exceptions import FieldError
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql, no_mysql, no_oracle, no_spatialite
 from django.test import TestCase
@@ -187,12 +188,25 @@ class RelatedGeoModelTest(TestCase):
     def test_values_with_aliases(self):
         "Testing values() with aliases specifiers."
 
+        # Alias combined with standard fields spec
+        for d in Location.objects.values('point', pkey='id'):
+            self.assertTrue('pkey' in d)
+            pk = d['pkey']
+            self.assertTrue('point' in d)
+            self.assertTrue(isinstance(d['point'], Geometry))
+            self.assertEqual(d['point'], Location.objects.get(pk=pk).point)
+
+        # Multiple aliases
         for d in Location.objects.values(spot='point', primary_key='id'):
             self.assertTrue('primary_key' in d)
             pk = d['primary_key']
             self.assertTrue('spot' in d)
             self.assertTrue(isinstance(d['spot'], Geometry))
             self.assertEqual(d['spot'], Location.objects.get(pk=pk).point)
+
+        # FieldDoesNotExist is thrown if you specify a non-existent field name
+        # in values() (a field that isn't part of the model)
+        self.assertRaises(FieldError, Location.objects.values, 'bogus')
 
     def test08_defer_only(self):
         "Testing defer() and only() on Geographic models."

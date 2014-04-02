@@ -254,7 +254,7 @@ class LookupTests(TestCase):
     def test_values_aliases(self):
         # values() returns a list of dictionaries instead of object instances --
         # and you can specify which fields you want to retrieve.
-        identity = lambda x:x
+        identity = lambda x: x
         self.assertQuerysetEqual(Article.objects.values(title='headline'),
             [
                 {'title': 'Article 5'},
@@ -319,7 +319,7 @@ class LookupTests(TestCase):
             'id_plus_eight': 'id+8',
         }
         self.assertQuerysetEqual(
-            Article.objects.filter(id=self.a1.id).extra(select=data).values(**dict([(k+'_',k) for k in data.keys()])),
+            Article.objects.filter(id=self.a1.id).extra(select=data).values(**dict([(k + '_', k) for k in data.keys()])),
             [{
                 'id_plus_one_': self.a1.id + 1,
                 'id_plus_two_': self.a1.id + 2,
@@ -366,7 +366,7 @@ class LookupTests(TestCase):
                 {'name': self.au2.name, 'headline': self.a6.headline, 'tag_name': self.t3.name},
                 {'name': self.au2.name, 'headline': self.a7.headline, 'tag_name': self.t3.name},
             ], transform=identity)
-        # However, an exception FieldDoesNotExist will be thrown if you specify
+        # However, a FieldDoesNotExist exception will be thrown if you specify
         # a non-existent field name in values() (a field that is neither in the
         # model nor in extra(select)).
         self.assertRaises(FieldError,
