@@ -534,8 +534,7 @@ class WizardView(TemplateView):
         context variables are:
 
          * all extra data stored in the storage backend
-         * `form` - form instance of the current step
-         * `wizard` - the wizard instance itself
+         * `wizard` - a dictionary representation of the wizard instance
 
         Example:
 
