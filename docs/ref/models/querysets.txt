@@ -480,6 +480,12 @@ Example::
     >>> Blog.objects.values('id', blog_name='name')
     [{'id': 1, 'blog_name': 'Beatles Blog'}]
 
+.. versionchanged:: 1.8
+
+    The ability to create aliases through keyword arguments arguments
+    represented by the ``**aliased_fields`` parameter above was added in Django
+    1.8.
+
 A few subtleties that are worth mentioning:
 
 * If you have a field called ``foo`` that is a
