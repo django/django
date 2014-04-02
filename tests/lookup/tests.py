@@ -257,13 +257,13 @@ class LookupTests(TestCase):
         identity = lambda x:x
         self.assertQuerysetEqual(Article.objects.values(title='headline'),
             [
-                {'title': u'Article 5'},
-                {'title': u'Article 6'},
-                {'title': u'Article 4'},
-                {'title': u'Article 2'},
-                {'title': u'Article 3'},
-                {'title': u'Article 7'},
-                {'title': u'Article 1'},
+                {'title': 'Article 5'},
+                {'title': 'Article 6'},
+                {'title': 'Article 4'},
+                {'title': 'Article 2'},
+                {'title': 'Article 3'},
+                {'title': 'Article 7'},
+                {'title': 'Article 1'},
             ],
             transform=identity)
         self.assertQuerysetEqual(

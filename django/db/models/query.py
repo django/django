@@ -1100,7 +1100,7 @@ class ValuesQuerySet(QuerySet):
         if self._fields or aliased_fields:
             self.extra_names = []
             self.aggregate_names = []
-            all_fields = list(self._fields) + aliased_fields.keys()
+            all_fields = list(self._fields) + list(six.iterkeys(aliased_fields))
             if not self.query._extra and not self.query._aggregates:
                 # Short cut - if there are no extra or aggregates, then
                 # the values() clause must be just field names.
@@ -1186,7 +1186,7 @@ class ValuesQuerySet(QuerySet):
         select is set up by Django.
         """
         aliased_fields = getattr(self, '_aliased_fields', {})
-        all_fields = list(self._fields) + aliased_fields.values()
+        all_fields = list(self._fields) + list(six.itervalues(aliased_fields))
         if ((all_fields and len(all_fields) > 1) or
                 (not all_fields and len(self.model._meta.fields) > 1)):
             raise TypeError('Cannot use a multi-field %s as a filter value.'
@@ -1203,7 +1203,7 @@ class ValuesQuerySet(QuerySet):
         value__in=qs.values('value1', 'value2'), which isn't valid.
         """
         aliased_fields = getattr(self, '_aliased_fields', {})
-        all_fields = list(self._fields) + aliased_fields.values()
+        all_fields = list(self._fields) + list(six.itervalues(aliased_fields))
         if ((all_fields and len(all_fields) > 1) or
                 (not all_fields and len(self.model._meta.fields) > 1)):
             raise TypeError('Cannot use a multi-field %s as a filter value.'
