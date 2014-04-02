@@ -149,20 +149,8 @@ See :doc:`/ref/files/storage` for the file storage API.
 The built-in filesystem storage class
 -------------------------------------
 
-Django ships with a built-in ``FileSystemStorage`` class (defined in
-``django.core.files.storage``) which implements basic local filesystem file
-storage. Its initializer takes two arguments:
-
-======================  ===================================================
-Argument                Description
-======================  ===================================================
-``location``            Optional. Absolute path to the directory that will
-                        hold the files. If omitted, it will be set to the
-                        value of your :setting:`MEDIA_ROOT` setting.
-``base_url``            Optional. URL that serves the files stored at this
-                        location. If omitted, it will default to the value
-                        of your :setting:`MEDIA_URL` setting.
-======================  ===================================================
+Django ships with a :class:`django.core.files.storage.FileSystemStorage` class
+which implements basic local filesystem file storage.
 
 For example, the following code will store uploaded files under
 ``/media/photos`` regardless of what your :setting:`MEDIA_ROOT` setting is::
