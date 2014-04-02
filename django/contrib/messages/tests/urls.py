@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django import forms
@@ -68,10 +68,10 @@ class ContactFormViewWithMsg(SuccessMessageMixin, FormView):
     success_message = "%(name)s was created successfully"
 
 
-urlpatterns = patterns('',
-    ('^add/(debug|info|success|warning|error)/$', add),
+urlpatterns = [
+    url('^add/(debug|info|success|warning|error)/$', add),
     url('^add/msg/$', ContactFormViewWithMsg.as_view(), name='add_success_msg'),
-    ('^show/$', show),
-    ('^template_response/add/(debug|info|success|warning|error)/$', add_template_response),
-    ('^template_response/show/$', show_template_response),
-)
+    url('^show/$', show),
+    url('^template_response/add/(debug|info|success|warning|error)/$', add_template_response),
+    url('^template_response/show/$', show_template_response),
+]

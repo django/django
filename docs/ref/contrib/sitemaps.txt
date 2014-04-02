@@ -265,7 +265,7 @@ Example
 
 Here's an example of a :doc:`URLconf </topics/http/urls>` using both::
 
-    from django.conf.urls import patterns
+    from django.conf.urls import url
     from django.contrib.sitemaps import FlatPageSitemap, GenericSitemap
     from blog.models import Entry
 
@@ -279,13 +279,13 @@ Here's an example of a :doc:`URLconf </topics/http/urls>` using both::
         'blog': GenericSitemap(info_dict, priority=0.6),
     }
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         # some generic view using info_dict
         # ...
 
         # the sitemap
-        (r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
-    )
+        url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps}),
+    ]
 
 .. _URLconf: ../url_dispatch/
 
@@ -313,20 +313,20 @@ the sitemap. For example::
             return reverse(item)
 
     # urls.py
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
     from .sitemaps import StaticViewSitemap
 
     sitemaps = {
         'static': StaticViewSitemap,
     }
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^$', 'views.main', name='main'),
         url(r'^about/$', 'views.about', name='about'),
         url(r'^license/$', 'views.license', name='license'),
         # ...
         url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
-    )
+    ]
 
 
 Creating a sitemap index
@@ -345,10 +345,12 @@ references individual sitemap files, one per each section defined in your
 
 Here's what the relevant URLconf lines would look like for the example above::
 
-    urlpatterns = patterns('django.contrib.sitemaps.views',
-        (r'^sitemap\.xml$', 'index', {'sitemaps': sitemaps}),
-        (r'^sitemap-(?P<section>.+)\.xml$', 'sitemap', {'sitemaps': sitemaps}),
-    )
+    from django.contrib.sitemaps import views
+
+    urlpatterns = [
+        url(r'^sitemap\.xml$', views.index, {'sitemaps': sitemaps}),
+        url(r'^sitemap-(?P<section>.+)\.xml$', views.sitemap, {'sitemaps': sitemaps}),
+    ]
 
 This will automatically generate a :file:`sitemap.xml` file that references
 both :file:`sitemap-flatpages.xml` and :file:`sitemap-blog.xml`. The
@@ -366,14 +368,14 @@ with a caching decorator -- you must name your sitemap view and pass
     from django.contrib.sitemaps import views as sitemaps_views
     from django.views.decorators.cache import cache_page
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^sitemap\.xml$',
             cache_page(86400)(sitemaps_views.index),
             {'sitemaps': sitemaps, 'sitemap_url_name': 'sitemaps'}),
         url(r'^sitemap-(?P<section>.+)\.xml$',
             cache_page(86400)(sitemaps_views.sitemap),
             {'sitemaps': sitemaps}, name='sitemaps'),
-    )
+    ]
 
 
 Template customization
@@ -383,16 +385,18 @@ If you wish to use a different template for each sitemap or sitemap index
 available on your site, you may specify it by passing a ``template_name``
 parameter to the ``sitemap`` and ``index`` views via the URLconf::
 
-    urlpatterns = patterns('django.contrib.sitemaps.views',
-        (r'^custom-sitemap\.xml$', 'index', {
+    from django.contrib.sitemaps import views
+
+    urlpatterns = [
+        url(r'^custom-sitemap\.xml$', views.index, {
             'sitemaps': sitemaps,
             'template_name': 'custom_sitemap.html'
         }),
-        (r'^custom-sitemap-(?P<section>.+)\.xml$', 'sitemap', {
+        url(r'^custom-sitemap-(?P<section>.+)\.xml$', views.sitemap, {
             'sitemaps': sitemaps,
             'template_name': 'custom_sitemap.html'
         }),
-    )
+    ]
 
 
 These views return :class:`~django.template.response.TemplateResponse`

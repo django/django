@@ -141,15 +141,15 @@ an :exc:`~django.core.exceptions.ImproperlyConfigured` exception if it's not.
 Finally, we hook these new views into the URLconf::
 
     # urls.py
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
     from myapp.views import AuthorCreate, AuthorUpdate, AuthorDelete
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         # ...
         url(r'author/add/$', AuthorCreate.as_view(), name='author_add'),
         url(r'author/(?P<pk>\d+)/$', AuthorUpdate.as_view(), name='author_update'),
         url(r'author/(?P<pk>\d+)/delete/$', AuthorDelete.as_view(), name='author_delete'),
-    )
+    ]
 
 .. note::
 

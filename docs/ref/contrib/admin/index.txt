@@ -1395,9 +1395,9 @@ templates used by the :class:`ModelAdmin` views:
         class MyModelAdmin(admin.ModelAdmin):
             def get_urls(self):
                 urls = super(MyModelAdmin, self).get_urls()
-                my_urls = patterns('',
-                    (r'^my_view/$', self.my_view)
-                )
+                my_urls = [
+                    url(r'^my_view/$', self.my_view),
+                ]
                 return my_urls + urls
 
             def my_view(self, request):
@@ -1432,9 +1432,9 @@ templates used by the :class:`ModelAdmin` views:
         class MyModelAdmin(admin.ModelAdmin):
             def get_urls(self):
                 urls = super(MyModelAdmin, self).get_urls()
-                my_urls = patterns('',
-                    (r'^my_view/$', self.admin_site.admin_view(self.my_view))
-                )
+                my_urls = [
+                    url(r'^my_view/$', self.admin_site.admin_view(self.my_view))
+                ]
                 return my_urls + urls
 
     Notice the wrapped view in the fifth line above::
@@ -2434,23 +2434,23 @@ In this example, we register the default ``AdminSite`` instance
 ``django.contrib.admin.site`` at the URL ``/admin/`` ::
 
     # urls.py
-    from django.conf.urls import patterns, include
+    from django.conf.urls import include, url
     from django.contrib import admin
 
-    urlpatterns = patterns('',
-        (r'^admin/', include(admin.site.urls)),
-    )
+    urlpatterns = [
+        url(r'^admin/', include(admin.site.urls)),
+    ]
 
 In this example, we register the ``AdminSite`` instance
 ``myproject.admin.admin_site`` at the URL ``/myadmin/`` ::
 
     # urls.py
-    from django.conf.urls import patterns, include
+    from django.conf.urls import include, url
     from myproject.admin import admin_site
 
-    urlpatterns = patterns('',
-        (r'^myadmin/', include(admin_site.urls)),
-    )
+    urlpatterns = [
+        url(r'^myadmin/', include(admin_site.urls)),
+    ]
 
 Note that you may not want autodiscovery of ``admin`` modules when using your
 own ``AdminSite`` instance since you will likely be importing all the per-app
@@ -2472,13 +2472,13 @@ separate versions of the admin site -- using the ``AdminSite`` instances
 respectively::
 
     # urls.py
-    from django.conf.urls import patterns, include
+    from django.conf.urls import include, url
     from myproject.admin import basic_site, advanced_site
 
-    urlpatterns = patterns('',
-        (r'^basic-admin/', include(basic_site.urls)),
-        (r'^advanced-admin/', include(advanced_site.urls)),
-    )
+    urlpatterns = [
+        url(r'^basic-admin/', include(basic_site.urls)),
+        url(r'^advanced-admin/', include(advanced_site.urls)),
+    ]
 
 ``AdminSite`` instances take a single argument to their constructor, their
 name, which can be anything you like. This argument becomes the prefix to the

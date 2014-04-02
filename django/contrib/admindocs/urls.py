@@ -1,7 +1,7 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.contrib.admindocs import views
 
-urlpatterns = patterns('',
+urlpatterns = [
     url('^$',
         views.BaseAdminDocsView.as_view(template_name='admin_doc/index.html'),
         name='django-admindocs-docroot'),
@@ -29,4 +29,4 @@ urlpatterns = patterns('',
     url('^templates/(?P<template>.*)/$',
         views.TemplateDetailView.as_view(),
         name='django-admindocs-templates'),
-)
+]

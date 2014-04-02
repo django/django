@@ -54,13 +54,13 @@ DetailView
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         from article.views import ArticleDetailView
 
-        urlpatterns = patterns('',
+        urlpatterns = [
             url(r'^(?P<slug>[-_\w]+)/$', ArticleDetailView.as_view(), name='article-detail'),
-        )
+        ]
 
     **Example myapp/article_detail.html**:
 
@@ -123,13 +123,13 @@ ListView
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         from article.views import ArticleListView
 
-        urlpatterns = patterns('',
+        urlpatterns = [
             url(r'^$', ArticleListView.as_view(), name='article-list'),
-        )
+        ]
 
     **Example myapp/article_list.html**:
 

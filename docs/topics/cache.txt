@@ -532,9 +532,9 @@ The per-view cache, like the per-site cache, is keyed off of the URL. If
 multiple URLs point at the same view, each URL will be cached separately.
 Continuing the ``my_view`` example, if your URLconf looks like this::
 
-    urlpatterns = ('',
-        (r'^foo/(\d{1,2})/$', my_view),
-    )
+    urlpatterns = [
+        url(r'^foo/(\d{1,2})/$', my_view),
+    ]
 
 then requests to ``/foo/1/`` and ``/foo/23/`` will be cached separately, as
 you may expect. But once a particular URL (e.g., ``/foo/23/``) has been
@@ -578,17 +578,17 @@ themselves.
 Doing so is easy: simply wrap the view function with ``cache_page`` when you
 refer to it in the URLconf. Here's the old URLconf from earlier::
 
-    urlpatterns = ('',
-        (r'^foo/(\d{1,2})/$', my_view),
-    )
+    urlpatterns = [
+        url(r'^foo/(\d{1,2})/$', my_view),
+    ]
 
 Here's the same thing, with ``my_view`` wrapped in ``cache_page``::
 
     from django.views.decorators.cache import cache_page
 
-    urlpatterns = ('',
-        (r'^foo/(\d{1,2})/$', cache_page(60 * 15)(my_view)),
-    )
+    urlpatterns = [
+        url(r'^foo/(\d{1,2})/$', cache_page(60 * 15)(my_view)),
+    ]
 
 .. templatetag:: cache
 

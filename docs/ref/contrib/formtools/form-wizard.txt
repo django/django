@@ -251,14 +251,14 @@ deploy the new :class:`WizardView` object at a URL in the ``urls.py``. The
 wizard's ``as_view()`` method takes a list of your
 :class:`~django.forms.Form` classes as an argument during instantiation::
 
-    from django.conf.urls import patterns
+    from django.conf.urls import url
 
     from myapp.forms import ContactForm1, ContactForm2
     from myapp.views import ContactWizard
 
-    urlpatterns = patterns('',
-        (r'^contact/$', ContactWizard.as_view([ContactForm1, ContactForm2])),
-    )
+    urlpatterns = [
+        url(r'^contact/$', ContactWizard.as_view([ContactForm1, ContactForm2])),
+    ]
 
 You can also pass the form list as a class attribute named ``form_list``::
 
@@ -311,9 +311,9 @@ Here's what the view code might look like::
 
 The ``urls.py`` file would contain something like::
 
-    urlpatterns = patterns('',
-        (r'^checkout/$', OrderWizard.as_view(FORMS, condition_dict={'cc': pay_by_credit_card})),
-    )
+    urlpatterns = [
+        url(r'^checkout/$', OrderWizard.as_view(FORMS, condition_dict={'cc': pay_by_credit_card})),
+    ]
 
 The ``condition_dict`` can be passed as attribute for the ``as_view()`
 method or as a class attribute named ``condition_dict``::
@@ -673,18 +673,18 @@ We define our wizard in a ``views.py``::
 
 We need to add the ``ContactWizard`` to our ``urls.py`` file::
 
-    from django.conf.urls import patterns
+    from django.conf.urls import url
 
     from myapp.forms import ContactForm1, ContactForm2
     from myapp.views import ContactWizard, show_message_form_condition
 
     contact_forms = [ContactForm1, ContactForm2]
 
-    urlpatterns = patterns('',
-        (r'^contact/$', ContactWizard.as_view(contact_forms,
+    urlpatterns = [
+        url(r'^contact/$', ContactWizard.as_view(contact_forms,
             condition_dict={'1': show_message_form_condition}
         )),
-    )
+    ]
 
 As you can see, we defined a ``show_message_form_condition`` next to our
 :class:`WizardView` subclass and added a ``condition_dict`` argument to the
@@ -728,7 +728,7 @@ Additionally you have to pass two more arguments to the
 
 Example code for the changed ``urls.py`` file::
 
-    from django.conf.urls import url, patterns
+    from django.conf.urls import url
 
     from myapp.forms import ContactForm1, ContactForm2
     from myapp.views import ContactWizard
@@ -741,10 +741,10 @@ Example code for the changed ``urls.py`` file::
     contact_wizard = ContactWizard.as_view(named_contact_forms,
         url_name='contact_step', done_step_name='finished')
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^contact/(?P<step>.+)/$', contact_wizard, name='contact_step'),
         url(r'^contact/$', contact_wizard, name='contact'),
-    )
+    ]
 
 Advanced ``NamedUrlWizardView`` methods
 =======================================

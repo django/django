@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 import unittest
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.core.urlresolvers import reverse
 from django.db import connection
 from django.forms import EmailField, IntegerField
@@ -628,11 +628,11 @@ def fake_view(request):
 
 
 class FirstUrls:
-    urlpatterns = patterns('', url(r'first/$', fake_view, name='first'))
+    urlpatterns = [url(r'first/$', fake_view, name='first')]
 
 
 class SecondUrls:
-    urlpatterns = patterns('', url(r'second/$', fake_view, name='second'))
+    urlpatterns = [url(r'second/$', fake_view, name='second')]
 
 
 class OverrideSettingsTests(TestCase):
