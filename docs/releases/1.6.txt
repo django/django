@@ -444,6 +444,17 @@ but will not be removed from Django until version 1.8.
 
 .. _recommendations in the Python documentation: http://docs.python.org/2/library/doctest.html#unittest-api
 
+Removal of ``django.contrib.gis.tests.GeoDjangoTestSuiteRunner`` Geodjango custom test runner
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is for developers working on the GeoDjango application itself and related
+to the item above about changes in the test runners:
+
+The ``django.contrib.gis.tests.GeoDjangoTestSuiteRunner`` test runner has been
+removed and the standalone GeoDjango tests execution setup it implemented isn't
+supported anymore. To run the GeoDjango tests simply use the new
+``DicoverRunner`` and specify the ``django.contrib.gis`` app.
+
 Custom User models in tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
