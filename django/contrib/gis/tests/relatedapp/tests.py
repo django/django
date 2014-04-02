@@ -184,6 +184,16 @@ class RelatedGeoModelTest(TestCase):
             self.assertEqual(m.point, d['point'])
             self.assertEqual(m.point, t[1])
 
+    def test_values_with_aliases(self):
+        "Testing values() with aliases specifiers."
+
+        for d in Location.objects.values(spot='point', primary_key='id'):
+            self.assertTrue('primary_key' in d)
+            pk = d['primary_key']
+            self.assertTrue('spot' in d)
+            self.assertTrue(isinstance(d['spot'], Geometry))
+            self.assertEqual(d['spot'], Location.objects.get(pk=pk).point)
+
     def test08_defer_only(self):
         "Testing defer() and only() on Geographic models."
         qs = Location.objects.all()
