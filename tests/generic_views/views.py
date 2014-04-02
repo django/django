@@ -225,9 +225,6 @@ class CustomMultipleObjectMixinView(generic.list.MultipleObjectMixin, generic.Vi
         {'name': 'Yoko'},
     ]
 
-    def get(self, request):
-        self.object_list = self.get_queryset()
-
 
 class CustomContextView(generic.detail.SingleObjectMixin, generic.View):
     model = Book

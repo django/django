@@ -61,11 +61,7 @@ class View(object):
 
         def view(request, *args, **kwargs):
             self = cls(**initkwargs)
-            if hasattr(self, 'get') and not hasattr(self, 'head'):
-                self.head = self.get
-            self.request = request
-            self.args = args
-            self.kwargs = kwargs
+            self.setup(request, *args, **kwargs)
             return self.dispatch(request, *args, **kwargs)
 
         # take name and docstring from class
@@ -75,6 +71,20 @@ class View(object):
         # like csrf_exempt from dispatch
         update_wrapper(view, cls.dispatch, assigned=())
         return view
+
+    def setup(self, request=None, *args, **kwargs):
+        """
+        Sets attributes on self, useful for isolated testing without having
+        to configure URLs.
+        You can create a request through RequestFactory and pass args/kwargs as
+        you would do for a reverse() call.
+        """
+        if hasattr(self, 'get') and not hasattr(self, 'head'):
+            self.head = self.get
+        self.request = request
+        self.args = args
+        self.kwargs = kwargs
+        return self
 
     def dispatch(self, request, *args, **kwargs):
         # Try to dispatch to the right method; if a method doesn't exist,

@@ -294,11 +294,14 @@ class TemplateViewTest(TestCase):
         """
         A template view can be customized to return extra context.
         """
-        response = self.client.get('/template/custom/bar/')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['foo'], 'bar')
-        self.assertEqual(response.context['key'], 'value')
-        self.assertIsInstance(response.context['view'], View)
+        request = RequestFactory().get('/dummy')
+        kwargs = {
+            'foo': 'bar'
+        }
+        view = views.CustomTemplateView().setup(request, **kwargs)
+        context = view.get_context_data()
+        self.assertEqual(context['key'], 'value')
+        self.assertIsInstance(context['view'], View)
 
     def test_cached_views(self):
         """
@@ -473,15 +476,15 @@ class UseMultipleObjectMixinTest(unittest.TestCase):
     rf = RequestFactory()
 
     def test_use_queryset_from_view(self):
-        test_view = views.CustomMultipleObjectMixinView()
-        test_view.get(self.rf.get('/'))
+        test_view = views.CustomMultipleObjectMixinView().setup()
+        test_view.object_list = test_view.get_queryset()
         # Don't pass queryset as argument
         context = test_view.get_context_data()
         self.assertEqual(context['object_list'], test_view.queryset)
 
     def test_overwrite_queryset(self):
-        test_view = views.CustomMultipleObjectMixinView()
-        test_view.get(self.rf.get('/'))
+        test_view = views.CustomMultipleObjectMixinView().setup()
+        test_view.object_list = test_view.get_queryset()
         queryset = [{'name': 'Lennon'}, {'name': 'Ono'}]
         self.assertNotEqual(test_view.queryset, queryset)
         # Overwrite the view's queryset with queryset from kwarg

@@ -312,3 +312,22 @@ login protection.
     as parameters to the decorated method on the class. If your method
     does not accept a compatible set of parameters it will raise a
     ``TypeError`` exception.
+
+Unit-testing class-based views
+==============================
+
+Every class-based views possess a method called setup where you can pass
+optional parameters: request, args and kwargs and get the view as an instance
+back.
+For example::
+
+
+    class MyView(View):
+        def calculate(self):
+            return 42
+
+    # And in your tests
+
+    def test_calculate(self):
+        test_view = MyView().setup()
+        self.assertEqual(test_view.calculate(), 42)
