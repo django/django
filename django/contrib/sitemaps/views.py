@@ -30,7 +30,7 @@ def index(request, sitemaps,
     sites = []
     for section, site in sitemaps.items():
         if callable(site):
-            site = site()
+            site = site(request=request)
         protocol = req_protocol if site.protocol is None else site.protocol
         sitemap_url = urlresolvers.reverse(
             sitemap_url_name, kwargs={'section': section})
@@ -62,7 +62,7 @@ def sitemap(request, sitemaps, section=None,
     for site in maps:
         try:
             if callable(site):
-                site = site()
+                site = site(request=request)
             urls.extend(site.get_urls(page=page, site=req_site,
                                       protocol=req_protocol))
         except EmptyPage:

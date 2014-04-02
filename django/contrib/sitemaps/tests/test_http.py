@@ -171,3 +171,7 @@ class HTTPSitemapTests(SitemapTestsBase):
     def test_empty_sitemap(self):
         response = self.client.get('/empty/sitemap.xml')
         self.assertEqual(response.status_code, 200)
+
+    def test_request_sitemap(self):
+        response = self.client.get('/request/sitemap.xml')
+        self.assertEqual(response.status_code, 200)
