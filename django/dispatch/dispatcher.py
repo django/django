@@ -2,6 +2,7 @@ import sys
 import threading
 import weakref
 
+from django.utils import six
 from django.utils.six.moves import xrange
 
 if sys.version_info < (3, 4):
@@ -87,7 +88,7 @@ class Signal(object):
 
         # If DEBUG is on, check that we got a good receiver
         if settings.configured and settings.DEBUG:
-            import inspect
+            from django.utils import inspect
             assert callable(receiver), "Signal receivers must be callable."
 
             # Check for **kwargs
@@ -100,7 +101,7 @@ class Signal(object):
             except TypeError:
                 try:
                     argspec = inspect.getargspec(receiver.__call__)
-                except (TypeError, AttributeError):
+                except (TypeError, AttributeError, ValueError):
                     argspec = None
             if argspec:
                 assert argspec[2] is not None, \
