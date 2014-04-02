@@ -81,7 +81,7 @@ def gen_filenames():
     Yields a generator over filenames referenced in sys.modules and translation
     files.
     """
-    filenames = [filename.__file__ for filename in sys.modules.values()
+    filenames = [filename.__file__ for filename in list(sys.modules.values())
                 if hasattr(filename, '__file__')]
 
     if settings.USE_I18N:
