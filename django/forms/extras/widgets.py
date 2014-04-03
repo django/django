@@ -23,19 +23,17 @@ RE_DATE = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
 def _parse_date_fmt():
     fmt = get_format('DATE_FORMAT')
     escaped = False
-    output = []
     for char in fmt:
         if escaped:
             escaped = False
         elif char == '\\':
             escaped = True
         elif char in 'Yy':
-            output.append('year')
+            yield 'year'
         elif char in 'bEFMmNn':
-            output.append('month')
+            yield 'month'
         elif char in 'dj':
-            output.append('day')
-    return output
+            yield 'day'
 
 
 class SelectDateWidget(Widget):
@@ -97,9 +95,7 @@ class SelectDateWidget(Widget):
         return mark_safe('\n'.join(output))
 
     def id_for_label(self, id_):
-        field_list = _parse_date_fmt()
-        if field_list:
-            first_select = field_list[0]
+        for first_select in _parse_date_fmt():
             return '%s_%s' % (id_, first_select)
         else:
             return '%s_month' % id_
