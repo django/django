@@ -245,7 +245,7 @@ written (and is better written) as::
 Thus ``patterns()`` serves little purpose and is a burden when teaching new users
 (answering the newbie's question "why do I need this empty string as the first
 argument to ``patterns()``?"). For these reasons, we are deprecating it.
-Updating your code is as simple as ensuring that ``urlpatterns`` is a string of
+Updating your code is as simple as ensuring that ``urlpatterns`` is a list of
 :func:`django.conf.urls.url` instances. For example::
 
     from django.conf.urls import url
