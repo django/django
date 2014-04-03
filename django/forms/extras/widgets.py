@@ -86,21 +86,17 @@ class SelectDateWidget(Widget):
                     match = RE_DATE.match(value)
                     if match:
                         year_val, month_val, day_val = [int(v) for v in match.groups()]
+        html = {}
         choices = [(i, i) for i in self.years]
-        year_html = self.create_select(name, self.year_field, value, year_val, choices)
+        html['year'] = self.create_select(name, self.year_field, value, year_val, choices)
         choices = list(six.iteritems(self.months))
-        month_html = self.create_select(name, self.month_field, value, month_val, choices)
+        html['month'] = self.create_select(name, self.month_field, value, month_val, choices)
         choices = [(i, i) for i in range(1, 32)]
-        day_html = self.create_select(name, self.day_field, value, day_val, choices)
+        html['day'] = self.create_select(name, self.day_field, value, day_val, choices)
 
         output = []
         for field in _parse_date_fmt():
-            if field == 'year':
-                output.append(year_html)
-            elif field == 'month':
-                output.append(month_html)
-            elif field == 'day':
-                output.append(day_html)
+            output.append(html[field])
         return mark_safe('\n'.join(output))
 
     def id_for_label(self, id_):
