@@ -167,8 +167,7 @@ def get_permission_codename(action, opts):
 
 def update_session_auth_token(request, user):
     """
-    Updating a user's password logs out all other sessions for the user
-    except the current one if
+    Updating a user's password logs out all sessions for the user if
     django.contrib.auth.middleware.SessionAuthenticationMiddleware is enabled.
 
     This function takes the current request and the updated user object from

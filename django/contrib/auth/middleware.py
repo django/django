@@ -38,7 +38,7 @@ class SessionAuthenticationMiddleware(object):
                 user.get_session_auth_hash()
             )
             if not session_hash_verified:
-                request.user = auth.models.AnonymousUser()
+                auth.logout(request)
 
 
 class RemoteUserMiddleware(object):
