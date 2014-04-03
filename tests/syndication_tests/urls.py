@@ -1,24 +1,24 @@
-from django.conf.urls import patterns
+from django.conf.urls import url
 
 from . import feeds
 
 
-urlpatterns = patterns('django.contrib.syndication.views',
-    (r'^syndication/complex/(?P<foo>.*)/$', feeds.ComplexFeed()),
-    (r'^syndication/rss2/$', feeds.TestRss2Feed()),
-    (r'^syndication/rss2/guid_ispermalink_true/$',
+urlpatterns = [
+    url(r'^syndication/complex/(?P<foo>.*)/$', feeds.ComplexFeed()),
+    url(r'^syndication/rss2/$', feeds.TestRss2Feed()),
+    url(r'^syndication/rss2/guid_ispermalink_true/$',
         feeds.TestRss2FeedWithGuidIsPermaLinkTrue()),
-    (r'^syndication/rss2/guid_ispermalink_false/$',
+    url(r'^syndication/rss2/guid_ispermalink_false/$',
         feeds.TestRss2FeedWithGuidIsPermaLinkFalse()),
-    (r'^syndication/rss091/$', feeds.TestRss091Feed()),
-    (r'^syndication/no_pubdate/$', feeds.TestNoPubdateFeed()),
-    (r'^syndication/atom/$', feeds.TestAtomFeed()),
-    (r'^syndication/latest/$', feeds.TestLatestFeed()),
-    (r'^syndication/custom/$', feeds.TestCustomFeed()),
-    (r'^syndication/naive-dates/$', feeds.NaiveDatesFeed()),
-    (r'^syndication/aware-dates/$', feeds.TZAwareDatesFeed()),
-    (r'^syndication/feedurl/$', feeds.TestFeedUrlFeed()),
-    (r'^syndication/articles/$', feeds.ArticlesFeed()),
-    (r'^syndication/template/$', feeds.TemplateFeed()),
-    (r'^syndication/template_context/$', feeds.TemplateContextFeed()),
-)
+    url(r'^syndication/rss091/$', feeds.TestRss091Feed()),
+    url(r'^syndication/no_pubdate/$', feeds.TestNoPubdateFeed()),
+    url(r'^syndication/atom/$', feeds.TestAtomFeed()),
+    url(r'^syndication/latest/$', feeds.TestLatestFeed()),
+    url(r'^syndication/custom/$', feeds.TestCustomFeed()),
+    url(r'^syndication/naive-dates/$', feeds.NaiveDatesFeed()),
+    url(r'^syndication/aware-dates/$', feeds.TZAwareDatesFeed()),
+    url(r'^syndication/feedurl/$', feeds.TestFeedUrlFeed()),
+    url(r'^syndication/articles/$', feeds.ArticlesFeed()),
+    url(r'^syndication/template/$', feeds.TemplateFeed()),
+    url(r'^syndication/template_context/$', feeds.TemplateContextFeed()),
+]

@@ -1,20 +1,23 @@
 from __future__ import unicode_literals
 
-from django.conf.urls import patterns
+from django.conf.urls import url
+from django.contrib.gis import views as gis_views
+from django.contrib.sitemaps import views as sitemap_views
+from django.contrib.gis.sitemaps import views as gis_sitemap_views
 
 from .feeds import feed_dict
 from .sitemaps import sitemaps
 
 
-urlpatterns = patterns('',
-    (r'^feeds/(?P<url>.*)/$', 'django.contrib.gis.views.feed', {'feed_dict': feed_dict}),
-)
+urlpatterns = [
+    url(r'^feeds/(?P<url>.*)/$', gis_views.feed, {'feed_dict': feed_dict}),
+]
 
-urlpatterns += patterns('django.contrib.sitemaps.views',
-    (r'^sitemaps/(?P<section>\w+)\.xml$', 'sitemap', {'sitemaps': sitemaps}),
-)
+urlpatterns += [
+    url(r'^sitemaps/(?P<section>\w+)\.xml$', sitemap_views.sitemap, {'sitemaps': sitemaps}),
+]
 
-urlpatterns += patterns('django.contrib.gis.sitemaps.views',
-    (r'^sitemaps/kml/(?P<label>\w+)/(?P<model>\w+)/(?P<field_name>\w+)\.kml$', 'kml'),
-    (r'^sitemaps/kml/(?P<label>\w+)/(?P<model>\w+)/(?P<field_name>\w+)\.kmz$', 'kmz'),
-)
+urlpatterns += [
+    url(r'^sitemaps/kml/(?P<label>\w+)/(?P<model>\w+)/(?P<field_name>\w+)\.kml$', gis_sitemap_views.kml),
+    url(r'^sitemaps/kml/(?P<label>\w+)/(?P<model>\w+)/(?P<field_name>\w+)\.kmz$', gis_sitemap_views.kmz),
+]

@@ -23,6 +23,7 @@ attr
 auth
 autoclobber
 autocommit
+autocompletion
 autoconf
 autodetect
 autodetectable

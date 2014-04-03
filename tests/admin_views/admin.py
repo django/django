@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMessage
 from django.core.servers.basehttp import FileWrapper
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, StreamingHttpResponse
 from django.contrib.admin import BooleanFieldListFilter
@@ -617,11 +617,11 @@ class ReportAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         # Corner case: Don't call parent implementation
-        return patterns('',
+        return [
             url(r'^extra/$',
                 self.extra,
                 name='cable_extra'),
-        )
+        ]
 
 
 class CustomTemplateBooleanFieldListFilter(BooleanFieldListFilter):

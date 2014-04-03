@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.conf import settings
+from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.auth.forms import (UserCreationForm, UserChangeForm,
@@ -76,11 +77,9 @@ class UserAdmin(admin.ModelAdmin):
         return super(UserAdmin, self).get_form(request, obj, **defaults)
 
     def get_urls(self):
-        from django.conf.urls import patterns
-        return patterns('',
-            (r'^(\d+)/password/$',
-             self.admin_site.admin_view(self.user_change_password))
-        ) + super(UserAdmin, self).get_urls()
+        return [
+            url(r'^(\d+)/password/$', self.admin_site.admin_view(self.user_change_password)),
+        ] + super(UserAdmin, self).get_urls()
 
     def lookup_allowed(self, lookup, value):
         # See #20078: we don't want to allow any lookups involving passwords.

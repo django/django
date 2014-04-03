@@ -177,12 +177,12 @@ class AdminSite(object):
             class MyAdminSite(AdminSite):
 
                 def get_urls(self):
-                    from django.conf.urls import patterns, url
+                    from django.conf.urls import url
 
                     urls = super(MyAdminSite, self).get_urls()
-                    urls += patterns('',
+                    urls += [
                         url(r'^my_view/$', self.admin_view(some_view))
-                    )
+                    ]
                     return urls
 
         By default, admin_views are marked non-cacheable using the
@@ -211,7 +211,7 @@ class AdminSite(object):
         return update_wrapper(inner, view)
 
     def get_urls(self):
-        from django.conf.urls import patterns, url, include
+        from django.conf.urls import url, include
         # Since this module gets imported in the application's root package,
         # it cannot import models from other applications at the module level,
         # and django.contrib.contenttypes.views imports ContentType.
@@ -226,7 +226,7 @@ class AdminSite(object):
             return update_wrapper(wrapper, view)
 
         # Admin-site-wide views.
-        urlpatterns = patterns('',
+        urlpatterns = [
             url(r'^$', wrap(self.index), name='index'),
             url(r'^login/$', self.login, name='login'),
             url(r'^logout/$', wrap(self.logout), name='logout'),
@@ -234,15 +234,15 @@ class AdminSite(object):
             url(r'^password_change/done/$', wrap(self.password_change_done, cacheable=True), name='password_change_done'),
             url(r'^jsi18n/$', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
             url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$', wrap(contenttype_views.shortcut), name='view_on_site'),
-        )
+        ]
 
         # Add in each model's views, and create a list of valid URLS for the
         # app_index
         valid_app_labels = []
         for model, model_admin in six.iteritems(self._registry):
-            urlpatterns += patterns('',
-                url(r'^%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls))
-            )
+            urlpatterns += [
+                url(r'^%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls)),
+            ]
             if model._meta.app_label not in valid_app_labels:
                 valid_app_labels.append(model._meta.app_label)
 
@@ -250,9 +250,9 @@ class AdminSite(object):
         # labels for which we need to allow access to the app_index view,
         if valid_app_labels:
             regex = r'^(?P<app_label>' + '|'.join(valid_app_labels) + ')/$'
-            urlpatterns += patterns('',
+            urlpatterns += [
                 url(regex, wrap(self.app_index), name='app_list'),
-            )
+            ]
         return urlpatterns
 
     @property

@@ -184,13 +184,13 @@ to decouple URLs from Python code.
 Here's what a URLconf might look like for the ``Reporter``/``Article``
 example above::
 
-    from django.conf.urls import patterns
+    from django.conf.urls import url
 
-    urlpatterns = patterns('',
-        (r'^articles/(\d{4})/$', 'news.views.year_archive'),
-        (r'^articles/(\d{4})/(\d{2})/$', 'news.views.month_archive'),
-        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'news.views.article_detail'),
-    )
+    urlpatterns = [
+        url(r'^articles/(\d{4})/$', 'news.views.year_archive'),
+        url(r'^articles/(\d{4})/(\d{2})/$', 'news.views.month_archive'),
+        url(r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'news.views.article_detail'),
+    ]
 
 The code above maps URLs, as simple `regular expressions`_, to the location of
 Python callback functions ("views"). The regular expressions use parenthesis to

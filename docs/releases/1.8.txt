@@ -203,3 +203,62 @@ Django 1.6 introduced ``{% load cycle from future %}`` and
 :ttag:`cycle` and :ttag:`firstof` template tags. This syntax is now deprecated
 and will be removed in Django 2.0. You can simply remove the
 ``{% load ... from future %}`` tags.
+
+``django.conf.urls.patterns()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In the olden days of Django, it was encouraged to reference views as strings
+in ``urlpatterns``::
+
+    urlpatterns = patterns('',
+        url('^$', 'myapp.views.myview'),
+    )
+
+and Django would magically import ``myapp.views.myview`` internally and turn
+the string into a real function reference. In order to reduce repetition when
+referencing many views from the same module, the ``patterns()`` function takes
+a required initial ``prefix`` argument which is prepended to all
+views-as-strings in that set of ``urlpatterns``::
+
+    urlpatterns = patterns('myapp.views',
+        url('^$', 'myview'),
+        url('^other/$', 'otherview'),
+    )
+
+In the modern era, we have updated the tutorial to instead recommend importing
+your views module and referencing your view functions (or classes) directly.
+This has a number of advantages, all deriving from the fact that we are using
+normal Python in place of "Django String Magic": the errors when you mistype a
+view name are less obscure, IDEs can help with autocompletion of view names,
+etc.
+
+So these days, the above use of the ``prefix`` arg is much more likely to be
+written (and is better written) as::
+
+    from myapp import views
+
+    urlpatterns = patterns('',
+        url('^$', views.myview),
+        url('^other/$', views.otherview),
+    )
+
+Thus ``patterns()`` serves little purpose and is a burden when teaching new users
+(answering the newbie's question "why do I need this empty string as the first
+argument to ``patterns()``?"). For these reasons, we are deprecating it.
+Updating your code is as simple as ensuring that ``urlpatterns`` is a string of
+:func:`django.conf.urls.url` instances. For example::
+
+    from django.conf.urls import url
+    from myapp import views
+
+    urlpatterns = [
+        url('^$', views.myview),
+        url('^other/$', views.otherview),
+    ]
+
+``prefix`` argument to :func:`~django.conf.urls.i18n.i18n_patterns`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Related to the previous item, the ``prefix`` argument to
+:func:`django.conf.urls.i18n.i18n_patterns` has been deprecated. Simply pass a
+list of :func:`django.conf.urls.url` instances instead.

@@ -45,8 +45,8 @@ algorithm the system follows to determine which Python code to execute:
    will be used in place of the :setting:`ROOT_URLCONF` setting.
 
 2. Django loads that Python module and looks for the variable
-   ``urlpatterns``. This should be a Python list, in the format returned by
-   the function :func:`django.conf.urls.patterns`.
+   ``urlpatterns``. This should be a Python list of :func:`django.conf.urls.url`
+   instances.
 
 3. Django runs through each URL pattern, in order, and stops at the first
    one that matches the requested URL.
@@ -72,14 +72,14 @@ Example
 
 Here's a sample URLconf::
 
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^articles/2003/$', 'news.views.special_case_2003'),
         url(r'^articles/(\d{4})/$', 'news.views.year_archive'),
         url(r'^articles/(\d{4})/(\d{2})/$', 'news.views.month_archive'),
         url(r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'news.views.article_detail'),
-    )
+    ]
 
 Notes:
 
@@ -129,14 +129,14 @@ is ``(?P<name>pattern)``, where ``name`` is the name of the group and
 
 Here's the above example URLconf, rewritten to use named groups::
 
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^articles/2003/$', 'news.views.special_case_2003'),
         url(r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
         url(r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'news.views.month_archive'),
         url(r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/$', 'news.views.article_detail'),
-    )
+    ]
 
 This accomplishes exactly the same thing as the previous example, with one
 subtle difference: The captured values are passed to view functions as keyword
@@ -203,12 +203,12 @@ A convenient trick is to specify default parameters for your views' arguments.
 Here's an example URLconf and view::
 
     # URLconf
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^blog/$', 'blog.views.page'),
         url(r'^blog/page(?P<num>\d+)/$', 'blog.views.page'),
-    )
+    ]
 
     # View (in blog/views.py)
     def page(request, num="1"):
@@ -230,9 +230,8 @@ accessed. This makes the system blazingly fast.
 Syntax of the urlpatterns variable
 ==================================
 
-``urlpatterns`` should be a Python list, in the format returned by the function
-:func:`django.conf.urls.patterns`. Always use ``patterns()`` to create
-the ``urlpatterns`` variable.
+``urlpatterns`` should be a Python list of :func:`~django.conf.urls.url`
+instances.
 
 Error handling
 ==============
@@ -260,73 +259,6 @@ The variables are:
 * ``handler403`` -- See :data:`django.conf.urls.handler403`.
 * ``handler400`` -- See :data:`django.conf.urls.handler400`.
 
-.. _urlpatterns-view-prefix:
-
-The view prefix
-===============
-
-You can specify a common prefix in your ``patterns()`` call, to cut down on
-code duplication.
-
-Here's the example URLconf from the :doc:`Django overview </intro/overview>`::
-
-    from django.conf.urls import patterns, url
-
-    urlpatterns = patterns('',
-        url(r'^articles/(\d{4})/$', 'news.views.year_archive'),
-        url(r'^articles/(\d{4})/(\d{2})/$', 'news.views.month_archive'),
-        url(r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'news.views.article_detail'),
-    )
-
-In this example, each view has a common prefix -- ``'news.views'``.
-Instead of typing that out for each entry in ``urlpatterns``, you can use the
-first argument to the ``patterns()`` function to specify a prefix to apply to
-each view function.
-
-With this in mind, the above example can be written more concisely as::
-
-    from django.conf.urls import patterns, url
-
-    urlpatterns = patterns('news.views',
-        url(r'^articles/(\d{4})/$', 'year_archive'),
-        url(r'^articles/(\d{4})/(\d{2})/$', 'month_archive'),
-        url(r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'article_detail'),
-    )
-
-Note that you don't put a trailing dot (``"."``) in the prefix. Django puts
-that in automatically.
-
-Multiple view prefixes
-----------------------
-
-In practice, you'll probably end up mixing and matching views to the point
-where the views in your ``urlpatterns`` won't have a common prefix. However,
-you can still take advantage of the view prefix shortcut to remove duplication.
-Just add multiple ``patterns()`` objects together, like this:
-
-Old::
-
-    from django.conf.urls import patterns, url
-
-    urlpatterns = patterns('',
-        url(r'^$', 'myapp.views.app_index'),
-        url(r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$', 'myapp.views.month_display'),
-        url(r'^tag/(?P<tag>\w+)/$', 'weblog.views.tag'),
-    )
-
-New::
-
-    from django.conf.urls import patterns, url
-
-    urlpatterns = patterns('myapp.views',
-        url(r'^$', 'app_index'),
-        url(r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$','month_display'),
-    )
-
-    urlpatterns += patterns('weblog.views',
-        url(r'^tag/(?P<tag>\w+)/$', 'tag'),
-    )
-
 .. _including-other-urlconfs:
 
 Including other URLconfs
@@ -338,14 +270,14 @@ essentially "roots" a set of URLs below other ones.
 For example, here's an excerpt of the URLconf for the `Django Web site`_
 itself. It includes a number of other URLconfs::
 
-    from django.conf.urls import include, patterns, url
+    from django.conf.urls import include, url
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         # ... snip ...
         url(r'^community/', include('django_website.aggregator.urls')),
         url(r'^contact/', include('django_website.contact.urls')),
         # ... snip ...
-    )
+    ]
 
 Note that the regular expressions in this example don't have a ``$``
 (end-of-string match character) but do include a trailing slash. Whenever
@@ -353,23 +285,21 @@ Django encounters ``include()`` (:func:`django.conf.urls.include()`), it chops
 off whatever part of the URL matched up to that point and sends the remaining
 string to the included URLconf for further processing.
 
-Another possibility is to include additional URL patterns not by specifying the
-URLconf Python module defining them as the ``include()`` argument but by using
-directly the pattern list as returned by :func:`~django.conf.urls.patterns`
-instead. For example, consider this URLconf::
+Another possibility is to include additional URL patterns by using a list of
+:func:`~django.conf.urls.url` instances. For example, consider this URLconf::
 
-    from django.conf.urls import include, patterns, url
+    from django.conf.urls import include, url
 
-    extra_patterns = patterns('',
+    extra_patterns = [
         url(r'^reports/(?P<id>\d+)/$', 'credit.views.report'),
         url(r'^charge/$', 'credit.views.charge'),
-    )
+    ]
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^$', 'apps.main.views.homepage'),
         url(r'^help/', include('apps.help.urls')),
         url(r'^credit/', include(extra_patterns)),
-    )
+    ]
 
 In this example, the ``/credit/reports/`` URL will be handled by the
 ``credit.views.report()`` Django view.
@@ -377,28 +307,30 @@ In this example, the ``/credit/reports/`` URL will be handled by the
 This can be used to remove redundancy from URLconfs where a single pattern
 prefix is used repeatedly. For example, consider this URLconf::
 
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
+    from . import views
 
-    urlpatterns = patterns('wiki.views',
-        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/history/$', 'history'),
-        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/edit/$', 'edit'),
-        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/discuss/$', 'discuss'),
-        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/permissions/$', 'permissions'),
-    )
+    urlpatterns = [
+        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/history/$', views.history),
+        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/edit/$', views.edit),
+        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/discuss/$', views.discuss),
+        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/permissions/$', views.permissions),
+    ]
 
 We can improve this by stating the common path prefix only once and grouping
 the suffixes that differ::
 
-    from django.conf.urls import include, patterns, url
+    from django.conf.urls import include, url
+    from . import views
 
-    urlpatterns = patterns('',
-        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/', include(patterns('wiki.views',
-            url(r'^history/$', 'history'),
-            url(r'^edit/$', 'edit'),
-            url(r'^discuss/$', 'discuss'),
-            url(r'^permissions/$', 'permissions'),
-        ))),
-    )
+    urlpatterns = [
+        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/', include([
+            url(r'^history/$', views.history),
+            url(r'^edit/$', views.edit),
+            url(r'^discuss/$', views.discuss),
+            url(r'^permissions/$', views.permissions),
+        ])),
+    ]
 
 .. _`Django Web site`: https://www.djangoproject.com/
 
@@ -409,19 +341,20 @@ An included URLconf receives any captured parameters from parent URLconfs, so
 the following example is valid::
 
     # In settings/urls/main.py
-    from django.conf.urls import include, patterns, url
+    from django.conf.urls import include, url
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^(?P<username>\w+)/blog/', include('foo.urls.blog')),
-    )
+    ]
 
     # In foo/urls/blog.py
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
+    from . import views
 
-    urlpatterns = patterns('foo.views',
-        url(r'^$', 'blog.index'),
-        url(r'^archive/$', 'blog.archive'),
-    )
+    urlpatterns = [
+        url(r'^$', views.blog.index),
+        url(r'^archive/$', views.blog.archive),
+    ]
 
 In the above example, the captured ``"username"`` variable is passed to the
 included URLconf, as expected.
@@ -440,11 +373,12 @@ function.
 
 For example::
 
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
+    from . import views
 
-    urlpatterns = patterns('blog.views',
-        url(r'^blog/(?P<year>\d{4})/$', 'year_archive', {'foo': 'bar'}),
-    )
+    urlpatterns = [
+        url(r'^blog/(?P<year>\d{4})/$', views.year_archive, {'foo': 'bar'}),
+    ]
 
 In this example, for a request to ``/blog/2005/``, Django will call
 ``blog.views.year_archive(request, year='2005', foo='bar')``.
@@ -472,36 +406,38 @@ For example, these two URLconf sets are functionally identical:
 Set one::
 
     # main.py
-    from django.conf.urls import include, patterns, url
+    from django.conf.urls import include, url
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^blog/', include('inner'), {'blogid': 3}),
-    )
+    ]
 
     # inner.py
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
+    from mysite import views
 
-    urlpatterns = patterns('',
-        url(r'^archive/$', 'mysite.views.archive'),
-        url(r'^about/$', 'mysite.views.about'),
-    )
+    urlpatterns = [
+        url(r'^archive/$', views.archive),
+        url(r'^about/$', views.about),
+    ]
 
 Set two::
 
     # main.py
-    from django.conf.urls import include, patterns, url
+    from django.conf.urls import include, url
+    from mysite import views
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^blog/', include('inner')),
-    )
+    ]
 
     # inner.py
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
 
-    urlpatterns = patterns('',
-        url(r'^archive/$', 'mysite.views.archive', {'blogid': 3}),
-        url(r'^about/$', 'mysite.views.about', {'blogid': 3}),
-    )
+    urlpatterns = [
+        url(r'^archive/$', views.archive, {'blogid': 3}),
+        url(r'^about/$', views.about, {'blogid': 3}),
+    ]
 
 Note that extra options will *always* be passed to *every* line in the included
 URLconf, regardless of whether the line's view actually accepts those options
@@ -517,38 +453,38 @@ supported -- you can pass any callable object as the view.
 
 For example, given this URLconf in "string" notation::
 
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^archive/$', 'mysite.views.archive'),
         url(r'^about/$', 'mysite.views.about'),
         url(r'^contact/$', 'mysite.views.contact'),
-    )
+    ]
 
 You can accomplish the same thing by passing objects rather than strings. Just
 be sure to import the objects::
 
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
     from mysite.views import archive, about, contact
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^archive/$', archive),
         url(r'^about/$', about),
         url(r'^contact/$', contact),
-    )
+    ]
 
 The following example is functionally identical. It's just a bit more compact
 because it imports the module that contains the views, rather than importing
 each view individually::
 
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
     from mysite import views
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^archive/$', views.archive),
         url(r'^about/$', views.about),
         url(r'^contact/$', views.contact),
-    )
+    ]
 
 The style you use is up to you.
 
@@ -558,12 +494,12 @@ the view prefix (as explained in "The view prefix" above) will have no effect.
 Note that :doc:`class based views</topics/class-based-views/index>` must be
 imported::
 
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
     from mysite.views import ClassBasedView
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^myview/$', ClassBasedView.as_view()),
-    )
+    ]
 
 Reverse resolution of URLs
 ==========================
@@ -618,13 +554,13 @@ Examples
 
 Consider again this URLconf entry::
 
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         #...
         url(r'^articles/(\d{4})/$', 'news.views.year_archive'),
         #...
-    )
+    ]
 
 According to this design, the URL for the archive corresponding to year *nnnn*
 is ``/articles/nnnn/``.
@@ -670,13 +606,13 @@ It's fairly common to use the same view function in multiple URL patterns in
 your URLconf. For example, these two URL patterns both point to the ``archive``
 view::
 
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
     from mysite.views import archive
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^archive/(\d{4})/$', archive),
         url(r'^archive-summary/(\d{4})/$', archive, {'summary': True}),
-    )
+    ]
 
 This is completely valid, but it leads to problems when you try to do reverse
 URL matching (through the :func:`~django.core.urlresolvers.reverse` function
@@ -691,13 +627,13 @@ matching.
 
 Here's the above example, rewritten to use named URL patterns::
 
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
     from mysite.views import archive
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^archive/(\d{4})/$', archive, name="full-archive"),
         url(r'^archive-summary/(\d{4})/$', archive, {'summary': True}, name="arch-summary"),
-    )
+    ]
 
 With these names in place (``full-archive`` and ``arch-summary``), you can
 target each pattern individually by using its name:
@@ -859,20 +795,20 @@ This will include the URLs defined in ``apps.help.urls`` into the
 ``'foo'``.
 
 Secondly, you can include an object that contains embedded namespace data. If
-you ``include()`` an object as returned by :func:`~django.conf.urls.patterns`,
+you ``include()`` a list of :func:`django.conf.urls.url` instances,
 the URLs contained in that object will be added to the global namespace.
 However, you can also ``include()`` a 3-tuple containing::
 
-    (<patterns object>, <application namespace>, <instance namespace>)
+    (<list of url() instances>, <application namespace>, <instance namespace>)
 
 For example::
 
-    from django.conf.urls import include, patterns, url
+    from django.conf.urls import include, url
 
-    help_patterns = patterns('',
+    help_patterns = [
         url(r'^basic/$', 'apps.help.views.views.basic'),
         url(r'^advanced/$', 'apps.help.views.views.advanced'),
-    )
+    ]
 
     url(r'^help/', include((help_patterns, 'bar', 'foo'))),
 

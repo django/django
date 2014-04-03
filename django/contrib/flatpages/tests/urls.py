@@ -1,7 +1,7 @@
-from django.conf.urls import patterns, include
+from django.conf.urls import include, url
 
 # special urls for flatpage test cases
-urlpatterns = patterns('',
-    (r'^flatpage_root', include('django.contrib.flatpages.urls')),
-    (r'^accounts/', include('django.contrib.auth.urls')),
-)
+urlpatterns = [
+    url(r'^flatpage_root', include('django.contrib.flatpages.urls')),
+    url(r'^accounts/', include('django.contrib.auth.urls')),
+]
