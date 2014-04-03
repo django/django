@@ -1127,7 +1127,7 @@ msgstr "یا"
 #. Translators: This string is used as a separator between list elements
 #: utils/text.py:256
 msgid ", "
-msgstr "،"
+msgstr "و"
 
 #: utils/timesince.py:22
 msgid "year"
