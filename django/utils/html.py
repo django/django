@@ -162,15 +162,15 @@ def _strip_once(value):
 
 def strip_tags(value):
     """Returns the given HTML with all tags stripped."""
-    while True:
-        if not ('<' in value or '>' in value):
-            return value
+    # Note: in typical case this loop executes _strip_once once. Loop condition
+    # is redundant, but helps to reduce number of executions of _strip_once.
+    while '<' in value and '>' in value:
         new_value = _strip_once(value)
         if new_value == value:
             # _strip_once was not able to detect more tags
-            return value
-        else:
-            value = new_value
+            break
+        value = new_value
+    return value
 strip_tags = allow_lazy(strip_tags)
 
 
