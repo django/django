@@ -104,11 +104,9 @@ class SelectDateWidget(Widget):
         return mark_safe('\n'.join(output))
 
     def id_for_label(self, id_):
-        first_select = None
         field_list = _parse_date_fmt()
         if field_list:
             first_select = field_list[0]
-        if first_select is not None:
             return '%s_%s' % (id_, first_select)
         else:
             return '%s_month' % id_
