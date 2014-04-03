@@ -1186,11 +1186,10 @@ class ValuesQuerySet(QuerySet):
         select is set up by Django.
         """
         aliased_fields = getattr(self, '_aliased_fields', {})
-        all_fields = list(self._fields) + list(six.itervalues(aliased_fields))
-        if ((all_fields and len(all_fields) > 1) or
-                (not all_fields and len(self.model._meta.fields) > 1)):
-            raise TypeError('Cannot use a multi-field %s as a filter value.'
-                    % self.__class__.__name__)
+        field_count = len(self._fields) + len(aliased_fields)
+        if field_count > 1 or (not field_count and len(self.model._meta.fields) > 1):
+            raise TypeError('Cannot use a multi-field %s as a filter value.' %
+                            self.__class__.__name__)
 
         obj = self._clone()
         if obj._db is None or connection == connections[obj._db]:
@@ -1203,11 +1202,10 @@ class ValuesQuerySet(QuerySet):
         value__in=qs.values('value1', 'value2'), which isn't valid.
         """
         aliased_fields = getattr(self, '_aliased_fields', {})
-        all_fields = list(self._fields) + list(six.itervalues(aliased_fields))
-        if ((all_fields and len(all_fields) > 1) or
-                (not all_fields and len(self.model._meta.fields) > 1)):
-            raise TypeError('Cannot use a multi-field %s as a filter value.'
-                    % self.__class__.__name__)
+        field_count = len(self._fields) + len(aliased_fields)
+        if field_count > 1 or (not field_count and len(self.model._meta.fields) > 1):
+            raise TypeError('Cannot use a multi-field %s as a filter value.' %
+                            self.__class__.__name__)
         return self
 
 
