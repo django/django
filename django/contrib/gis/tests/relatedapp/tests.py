@@ -204,7 +204,7 @@ class RelatedGeoModelTest(TestCase):
             self.assertTrue(isinstance(d['spot'], Geometry))
             self.assertEqual(d['spot'], Location.objects.get(pk=pk).point)
 
-        # FieldDoesNotExist is thrown if you specify a non-existent field name
+        # FieldError is thrown if you specify a non-existent field name
         # in values() (a field that isn't part of the model)
         self.assertRaises(FieldError, Location.objects.values, 'bogus')
 

@@ -281,7 +281,7 @@ class LookupTests(TestCase):
                 {'primary_key': self.a1.id, 'title': 'Article 1'},
             ],
             transform=identity)
-        # You can use values() with iterator() for memory savings,
+        # You can use values() with iterator() to reduce memory usage,
         # because iterator() uses database-level iteration.
         self.assertQuerysetEqual(Article.objects.values(primary_key='id', title='headline').iterator(),
             [
@@ -366,13 +366,12 @@ class LookupTests(TestCase):
                 {'name': self.au2.name, 'headline': self.a6.headline, 'tag_name': self.t3.name},
                 {'name': self.au2.name, 'headline': self.a7.headline, 'tag_name': self.t3.name},
             ], transform=identity)
-        # However, a FieldDoesNotExist exception will be thrown if you specify
+        # However, a FieldError exception will be thrown if you specify
         # a non-existent field name in values() (a field that is neither in the
         # model nor in extra(select)).
         self.assertRaises(FieldError,
             Article.objects.extra(select={'id_plus_one': 'id + 1'}).values,
             'id', id_incremented='id_plus_two')
-
 
     def test_values_list(self):
         # values_list() is similar to values(), except that the results are
