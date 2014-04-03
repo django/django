@@ -13,7 +13,7 @@ def i18n_patterns(prefix, *args):
     function. This may only be used in the root URLconf, not in an included
     URLconf.
     """
-    if isinstance(prefix, (six.text_type, str)):
+    if isinstance(prefix, six.string_types):
         warnings.warn(
             "Calling i18n_patterns() with the `prefix` argument and with tuples "
             "instead of django.conf.urls.url() instances is deprecated and "
