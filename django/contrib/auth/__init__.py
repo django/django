@@ -171,7 +171,7 @@ def update_session_auth_hash(request, user):
     django.contrib.auth.middleware.SessionAuthenticationMiddleware is enabled.
 
     This function takes the current request and the updated user object from
-    which the new session token will be derived and updates the session token
+    which the new session hash will be derived and updates the session hash
     appropriately to prevent a password change from logging out the session
     from which the password was changed.
     """
