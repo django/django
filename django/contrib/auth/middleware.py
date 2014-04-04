@@ -32,7 +32,7 @@ class SessionAuthenticationMiddleware(object):
     def process_request(self, request):
         user = request.user
         if user and hasattr(user, 'get_session_auth_hash'):
-            session_hash = request.session.get(auth.SESSION_HASH_KEY)
+            session_hash = request.session.get(auth.HASH_SESSION_KEY)
             session_hash_verified = session_hash and constant_time_compare(
                 session_hash,
                 user.get_session_auth_hash()
