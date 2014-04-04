@@ -169,6 +169,8 @@ in :mod:`django.contrib.gis`::
        }
     }
 
+    SECRET_KEY = 'django_tests_secret_key'
+
 Assuming the settings above were in a ``postgis.py`` file in the same
 directory as ``runtests.py``, then all Django and GeoDjango tests would
 be performed when executing the command::
