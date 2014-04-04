@@ -584,6 +584,10 @@ class LoginTest(AuthViewsTestCase):
         self.login()
         original_session_key = self.client.session.session_key
 
+        # If no password change, session key should not be flushed.
+        self.login()
+        self.assertEqual(original_session_key, self.client.session.session_key)
+
         user = User.objects.get(username='testclient')
         user.set_password('foobar')
         user.save()
