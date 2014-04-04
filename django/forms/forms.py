@@ -157,7 +157,7 @@ class BaseForm(object):
         Returns True if the form has no errors. Otherwise, False. If errors are
         being ignored, returns False.
         """
-        return self.is_bound and not bool(self.errors)
+        return self.is_bound and not self.errors
 
     def add_prefix(self, field_name):
         """
