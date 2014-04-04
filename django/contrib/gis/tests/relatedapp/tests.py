@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from unittest import skipUnless
 
 from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql, no_mysql, no_oracle, no_spatialite
 from django.test import TestCase
 
@@ -119,6 +120,7 @@ class RelatedGeoModelTest(TestCase):
         # Regression test for #9752.
         list(DirectoryEntry.objects.all().select_related())
 
+    @skipUnless(HAS_GDAL, "GDAL is required")
     def test06_f_expressions(self):
         "Testing F() expressions on GeometryFields."
         # Constructing a dummy parcel border and getting the City instance for

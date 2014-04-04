@@ -4,16 +4,17 @@ from unittest import skipUnless
 
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
+from django.contrib.gis.gdal import HAS_GDAL
 from django.test import TestCase
 
-if HAS_GEOS and HAS_SPATIAL_DB:
+if HAS_GEOS and HAS_SPATIAL_DB and HAS_GDAL:
     from django.contrib.gis import admin
     from django.contrib.gis.geos import Point
 
     from .models import City
 
 
-@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
+@skipUnless(HAS_GEOS and HAS_SPATIAL_DB and HAS_GDAL, "Geos, GDAL, and spatial db are required.")
 class GeoAdminTest(TestCase):
     urls = 'django.contrib.gis.tests.geoadmin.urls'
 
