@@ -165,7 +165,7 @@ def get_permission_codename(action, opts):
     return '%s_%s' % (action, opts.model_name)
 
 
-def update_session_auth_token(request, user):
+def update_session_auth_hash(request, user):
     """
     Updating a user's password logs out all sessions for the user if
     django.contrib.auth.middleware.SessionAuthenticationMiddleware is enabled.

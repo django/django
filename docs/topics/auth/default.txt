@@ -613,20 +613,20 @@ the session with the new password hash so that a user changing their own
 password won't log themselves out. If you have a custom password change view
 and wish to have similar behavior, use this function:
 
-.. function:: update_session_auth_token(request, user)
+.. function:: update_session_auth_hash(request, user)
 
     This function takes the current request and the updated user object from
     which the new session token will be derived and updates the session token
     appropriately. Example usage::
 
-        from django.contrib.auth import update_session_auth_token
+        from django.contrib.auth import update_session_auth_hash
 
         def password_change(request):
             if request.method == 'POST':
                 form = PasswordChangeForm(user=request.user, data=request.POST)
                 if form.is_valid():
                     form.save()
-                    update_session_auth_token(request, form.user)
+                    update_session_auth_hash(request, form.user)
             else:
                 ...
 

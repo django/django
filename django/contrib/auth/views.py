@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_protect
 
 # Avoid shadowing the login() and logout() views below.
 from django.contrib.auth import (REDIRECT_FIELD_NAME, login as auth_login,
-    logout as auth_logout, get_user_model, update_session_auth_token)
+    logout as auth_logout, get_user_model, update_session_auth_hash)
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm, PasswordChangeForm
 from django.contrib.auth.tokens import default_token_generator
@@ -269,7 +269,7 @@ def password_change(request,
             # except the current one if
             # django.contrib.auth.middleware.SessionAuthenticationMiddleware
             # is enabled.
-            update_session_auth_token(request, form.user)
+            update_session_auth_hash(request, form.user)
             return HttpResponseRedirect(post_change_redirect)
     else:
         form = password_change_form(user=request.user)
