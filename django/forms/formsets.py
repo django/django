@@ -308,7 +308,7 @@ class BaseFormSet(object):
                     # should not cause the entire formset to be invalid.
                     continue
             forms_valid &= form.is_valid()
-        return forms_valid and not bool(self.non_form_errors())
+        return forms_valid and not self.non_form_errors()
 
     def full_clean(self):
         """
