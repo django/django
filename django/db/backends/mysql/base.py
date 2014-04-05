@@ -13,8 +13,11 @@ import warnings
 try:
     import MySQLdb as Database
 except ImportError as e:
-    from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured("Error loading MySQLdb module: %s" % e)
+    try:
+        import pymysql as Database
+    except ImportError:
+        from django.core.exceptions import ImproperlyConfigured
+        raise ImproperlyConfigured("Error loading MySQLdb module: %s" % e)
 
 # We want version (1, 2, 1, 'final', 2) or later. We can't just use
 # lexicographic ordering in this check because then (1, 2, 1, 'gamma')
@@ -25,8 +28,12 @@ if (version < (1, 2, 1) or (version[:3] == (1, 2, 1) and
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
 
-from MySQLdb.converters import conversions, Thing2Literal
-from MySQLdb.constants import FIELD_TYPE, CLIENT
+try:
+    from MySQLdb.converters import conversions, Thing2Literal
+    from MySQLdb.constants import FIELD_TYPE, CLIENT
+except ImportError:
+    from pymysql.converters import conversions, Thing2Literal
+    from pymysql.constants import FIELD_TYPE, CLIENT
 
 try:
     import pytz

@@ -27,5 +27,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def quote_value(self, value):
         # Inner import to allow module to fail to load gracefully
-        import MySQLdb.converters
-        return MySQLdb.escape(value, MySQLdb.converters.conversions)
+        try:
+            from MySQLdb import escape
+            from MySQLdb.converters import conversions
+        except ImportError:
+            from pymysql import escape
+            from pymysql.converters import conversions
+        return escape(value, conversions)

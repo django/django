@@ -1,4 +1,7 @@
-from MySQLdb.constants import FIELD_TYPE
+try:
+    from MySQLdb.constants import FIELD_TYPE
+except ImportError:
+    from pymysql.constants import FIELD_TYPE
 
 from django.contrib.gis.gdal import OGRGeomType
 from django.db.backends.mysql.introspection import DatabaseIntrospection
