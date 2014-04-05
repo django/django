@@ -8,9 +8,9 @@ from django.utils.encoding import force_str
 from .models import Author, Artist
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class ListViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'generic_views.urls'
 
     def test_items(self):
         res = self.client.get('/list/dict/')

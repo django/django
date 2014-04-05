@@ -12,6 +12,7 @@ import socket
 import sys
 import threading
 import unittest
+import warnings
 from unittest import skipIf         # NOQA: Imported here for backward compatibility
 from unittest.util import safe_repr
 
@@ -33,6 +34,7 @@ from django.test.html import HTMLParseError, parse_html
 from django.test.signals import setting_changed, template_rendered
 from django.test.utils import (CaptureQueriesContext, ContextList,
     override_settings, modify_settings, compare_xml)
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils import six
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit, urlparse, unquote
@@ -202,6 +204,11 @@ class SimpleTestCase(unittest.TestCase):
     def _urlconf_setup(self):
         set_urlconf(None)
         if hasattr(self, 'urls'):
+            warnings.warn(
+                "SimpleTestCase.urls is deprecated and will be removed in "
+                "Django 2.0. Use @override_settings(ROOT_URLCONF=...) "
+                "in %s instead." % self.__class__.__name__,
+                RemovedInDjango20Warning, stacklevel=2)
             self._old_root_urlconf = settings.ROOT_URLCONF
             settings.ROOT_URLCONF = self.urls
             clear_url_caches()

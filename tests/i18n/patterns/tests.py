@@ -34,12 +34,12 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
     ),
+    ROOT_URLCONF='i18n.patterns.urls.default',
 )
 class URLTestCaseBase(TestCase):
     """
     TestCase base-class for the URL tests.
     """
-    urls = 'i18n.patterns.urls.default'
 
     def setUp(self):
         # Make sure the cache is empty before we are doing our tests.
@@ -73,8 +73,8 @@ class URLPrefixTests(URLTestCaseBase):
         self.assertRaises(ImproperlyConfigured, lambda: reverse('account:register'))
 
 
+@override_settings(ROOT_URLCONF='i18n.patterns.urls.disabled')
 class URLDisabledTests(URLTestCaseBase):
-    urls = 'i18n.patterns.urls.disabled'
 
     @override_settings(USE_I18N=False)
     def test_prefixed_i18n_disabled(self):
@@ -84,12 +84,12 @@ class URLDisabledTests(URLTestCaseBase):
             self.assertEqual(reverse('prefixed'), '/prefixed/')
 
 
+@override_settings(ROOT_URLCONF='i18n.patterns.urls.path_unused')
 class PathUnusedTests(URLTestCaseBase):
     """
     Check that if no i18n_patterns is used in root urlconfs, then no
     language activation happens based on url prefix.
     """
-    urls = 'i18n.patterns.urls.path_unused'
 
     def test_no_lang_activate(self):
         response = self.client.get('/nl/foo/')

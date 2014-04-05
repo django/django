@@ -529,9 +529,9 @@ class TemplateRegressionTests(TestCase):
 @override_settings(MEDIA_URL="/media/", STATIC_URL="/static/",
                    TEMPLATE_DEBUG=False, ALLOWED_INCLUDE_ROOTS=(
                        os.path.dirname(os.path.abspath(upath(__file__))),),
+                   ROOT_URLCONF='template_tests.urls',
                    )
 class TemplateTests(TestCase):
-    urls = 'template_tests.urls'
 
     def test_templates(self):
         template_tests = self.get_template_tests()

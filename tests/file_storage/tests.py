@@ -641,13 +641,13 @@ class ContentFileStorageTestCase(unittest.TestCase):
         self.storage.save('unicode.txt', ContentFile("español"))
 
 
+@override_settings(ROOT_URLCONF='file_storage.urls')
 class FileLikeObjectTestCase(LiveServerTestCase):
     """
     Test file-like objects (#15644).
     """
 
     available_apps = []
-    urls = 'file_storage.urls'
 
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()

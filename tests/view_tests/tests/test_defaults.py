@@ -7,9 +7,9 @@ from django.test.utils import (setup_test_template_loader,
 from ..models import UrlArticle
 
 
+@override_settings(ROOT_URLCONF='view_tests.urls')
 class DefaultsTests(TestCase):
     """Test django views in django/views/defaults.py"""
-    urls = 'view_tests.urls'
     fixtures = ['testdata.json']
     non_existing_urls = ['/non_existing_url/',  # this is in urls.py
                          '/other_non_existing_url/']  # this NOT in urls.py

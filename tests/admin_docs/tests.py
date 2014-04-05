@@ -11,8 +11,8 @@ from django.test import TestCase, modify_settings, override_settings
 from .models import Person, Company
 
 
+@override_settings(ROOT_URLCONF='admin_docs.urls')
 class MiscTests(TestCase):
-    urls = 'admin_docs.urls'
 
     def setUp(self):
         User.objects.create_superuser('super', None, 'secret')
@@ -30,11 +30,11 @@ class MiscTests(TestCase):
         self.client.get('/admindocs/views/')  # should not raise
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF='admin_docs.urls')
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
 class AdminDocViewTests(TestCase):
     fixtures = ['data.xml']
-    urls = 'admin_docs.urls'
 
     def setUp(self):
         self.client.login(username='super', password='secret')
@@ -104,10 +104,10 @@ class AdminDocViewTests(TestCase):
             utils.docutils_is_available = True
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='admin_docs.urls')
 class XViewMiddlewareTest(TestCase):
     fixtures = ['data.xml']
-    urls = 'admin_docs.urls'
 
     def test_xview_func(self):
         user = User.objects.get(username='super')
@@ -147,8 +147,8 @@ class XViewMiddlewareTest(TestCase):
 
 
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
+@override_settings(ROOT_URLCONF='admin_docs.urls')
 class DefaultRoleTest(TestCase):
-    urls = 'admin_docs.urls'
 
     def test_parse_rst(self):
         """
@@ -183,7 +183,8 @@ class DefaultRoleTest(TestCase):
         self.assertEqual(parts['fragment'], markup)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='admin_docs.urls')
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
 class TestModelDetailView(TestCase):
     """
@@ -191,7 +192,6 @@ class TestModelDetailView(TestCase):
     """
 
     fixtures = ['data.xml']
-    urls = 'admin_docs.urls'
 
     def setUp(self):
         self.client.login(username='super', password='secret')

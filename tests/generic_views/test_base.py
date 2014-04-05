@@ -5,7 +5,7 @@ import unittest
 
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
-from django.test import TestCase, RequestFactory
+from django.test import TestCase, RequestFactory, override_settings
 from django.views.generic import View, TemplateView, RedirectView
 
 from . import views
@@ -238,8 +238,8 @@ class ViewTest(unittest.TestCase):
         self.assertEqual(response.status_code, 405)
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class TemplateViewTest(TestCase):
-    urls = 'generic_views.urls'
 
     rf = RequestFactory()
 
@@ -327,8 +327,8 @@ class TemplateViewTest(TestCase):
         self.assertEqual(response['Content-Type'], 'text/plain')
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class RedirectViewTest(TestCase):
-    urls = 'generic_views.urls'
 
     rf = RequestFactory()
 

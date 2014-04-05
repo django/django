@@ -363,10 +363,8 @@ class SetupConfigureLogging(TestCase):
         self.assertTrue(dictConfig.called)
 
 
-@override_settings(DEBUG=True)
+@override_settings(DEBUG=True, ROOT_URLCONF='logging_tests.urls')
 class SecurityLoggerTest(TestCase):
-
-    urls = 'logging_tests.urls'
 
     def test_suspicious_operation_creates_log_message(self):
         with patch_logger('django.security.SuspiciousOperation', 'error') as calls:

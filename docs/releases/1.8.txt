@@ -256,6 +256,14 @@ Updating your code is as simple as ensuring that ``urlpatterns`` is a list of
         url('^other/$', views.otherview),
     ]
 
+``django.test.SimpleTestCase.urls``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The attribute :attr:`SimpleTestCase.urls <django.test.SimpleTestCase.urls>`
+for specifying URLconf configuration in tests has been deprecated and will be
+removed in Django 2.0. Use :func:`@override_settings(ROOT_URLCONF=...)
+<django.test.override_settings>` instead.
+
 ``prefix`` argument to :func:`~django.conf.urls.i18n.i18n_patterns`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

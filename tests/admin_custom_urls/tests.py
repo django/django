@@ -8,7 +8,8 @@ from django.test import TestCase, override_settings
 from .models import Action, Person, Car
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF='admin_custom_urls.urls',)
 class AdminCustomUrlsTest(TestCase):
     """
     Remember that:
@@ -16,7 +17,6 @@ class AdminCustomUrlsTest(TestCase):
     * The ModelAdmin for Action customizes the add_view URL, it's
       '<app name>/<model name>/!add/'
     """
-    urls = 'admin_custom_urls.urls'
     fixtures = ['users.json', 'actions.json']
 
     def setUp(self):
@@ -83,9 +83,9 @@ class AdminCustomUrlsTest(TestCase):
         self.assertContains(response, 'value="path/to/html/document.html"')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF='admin_custom_urls.urls',)
 class CustomRedirects(TestCase):
-    urls = 'admin_custom_urls.urls'
     fixtures = ['users.json', 'actions.json']
 
     def setUp(self):

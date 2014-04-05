@@ -4,7 +4,7 @@ from unittest import skipUnless
 
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 if HAS_GEOS and HAS_SPATIAL_DB:
     from django.contrib.gis import admin
@@ -14,8 +14,8 @@ if HAS_GEOS and HAS_SPATIAL_DB:
 
 
 @skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
+@override_settings(ROOT_URLCONF='django.contrib.gis.tests.geoadmin.urls')
 class GeoAdminTest(TestCase):
-    urls = 'django.contrib.gis.tests.geoadmin.urls'
 
     def test_ensure_geographic_media(self):
         geoadmin = admin.site._registry[City]
