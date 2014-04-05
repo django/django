@@ -1269,7 +1269,8 @@ your test suite.
 
     ``field`` is the name of the field on the form to check. If ``field``
     has a value of ``None``, non-field errors (errors you can access via
-    ``form.non_field_errors()``) will be checked.
+    :meth:`form.non_field_errors() <django.forms.Form.non_field_errors>`) will
+    be checked.
 
     ``errors`` is an error string, or a list of error strings, that are
     expected as a result of form validation.
@@ -1288,7 +1289,8 @@ your test suite.
 
     ``field`` is the name of the field on the form to check. If ``field``
     has a value of ``None``, non-field errors (errors you can access via
-    ``form.non_field_errors()``) will be checked.
+    :meth:`form.non_field_errors() <django.forms.Form.non_field_errors>`) will
+    be checked.
 
     ``errors`` is an error string, or a list of error strings, that are
     expected as a result of form validation.

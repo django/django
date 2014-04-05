@@ -173,7 +173,8 @@ from a view.
 
 The ``field`` argument is the name of the field to which the errors
 should be added. If its value is ``None`` the error will be treated as
-a non-field error as returned by ``Form.non_field_errors()``.
+a non-field error as returned by :meth:`Form.non_field_errors()
+<django.forms.Form.non_field_errors>`.
 
 The ``error`` argument can be a simple string, or preferably an instance of
 ``ValidationError``. See :ref:`raising-validation-error` for best practices
@@ -192,6 +193,14 @@ if the field contains any errors at all.
 
 To check for non-field errors use
 :data:`~django.core.exceptions.NON_FIELD_ERRORS` as the ``field`` parameter.
+
+.. method:: Form.non_field_errors()
+
+This method returns the list of errors from :attr:`Form.errors
+<django.forms.Form.errors>`  that aren't associated with a particular field.
+This includes ``ValidationError``\s that are raised in :meth:`Form.clean()
+<django.forms.Form.clean>` and errors added using :meth:`Form.add_error(None,
+"...") <django.forms.Form.add_error>`.
 
 Behavior of unbound forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~

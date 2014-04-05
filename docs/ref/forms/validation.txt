@@ -85,8 +85,8 @@ overridden:
   Note that any errors raised by your ``Form.clean()`` override will not
   be associated with any field in particular. They go into a special
   "field" (called ``__all__``), which you can access via the
-  ``non_field_errors()`` method if you need to. If you want to attach
-  errors to a specific field in the form, you need to call
+  :meth:`~django.forms.Form.non_field_errors` method if you need to. If you
+  want to attach errors to a specific field in the form, you need to call
   :meth:`~django.forms.Form.add_error()`.
 
   Also note that there are special considerations when overriding
@@ -329,7 +329,7 @@ form's ``clean()`` method, in which case you can use
 :meth:`~django.forms.Form.add_error()`. Note that this won't always be
 appropriate and the more typical situation is to raise a ``ValidationError``
 from , which is turned into a form-wide error that is available through the
-``Form.non_field_errors()`` method.
+:meth:`Form.non_field_errors() <django.forms.Form.non_field_errors>` method.
 
 Cleaning and validating fields that depend on each other
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
