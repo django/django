@@ -24,6 +24,11 @@ class EventAdmin(admin.ModelAdmin):
     raw_id_fields = ['main_band', 'supporting_bands']
 
 
+class AlbumAdmin(admin.ModelAdmin):
+    fields = ('name', 'cover_art',)
+    readonly_fields = ('cover_art',)
+
+
 class SchoolAdmin(admin.ModelAdmin):
     filter_vertical = ('students',)
     filter_horizontal = ('alumni',)
@@ -37,7 +42,7 @@ site.register(models.CarTire, CarTireAdmin)
 site.register(models.Member)
 site.register(models.Band)
 site.register(models.Event, EventAdmin)
-site.register(models.Album)
+site.register(models.Album, AlbumAdmin)
 
 site.register(models.Inventory)
 
