@@ -1,23 +1,22 @@
 from __future__ import unicode_literals
 
-from collections import defaultdict
 import datetime
 import decimal
+from collections import defaultdict
 
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import FieldDoesNotExist
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
 from django.forms.forms import pretty_name
-from django.utils import formats
-from django.utils.html import format_html
-from django.utils.text import capfirst
-from django.utils import timezone
+from django.utils import formats, six, timezone
 from django.utils.encoding import force_str, force_text, smart_text
-from django.utils import six
+from django.utils.html import conditional_escape, format_html
+from django.utils.safestring import mark_safe
+from django.utils.text import capfirst
 from django.utils.translation import ungettext
-from django.core.urlresolvers import reverse, NoReverseMatch
 
 
 def lookup_needs_distinct(opts, lookup_path):
@@ -389,6 +388,11 @@ def display_for_field(value, field):
         return formats.number_format(value, field.decimal_places)
     elif isinstance(field, models.FloatField):
         return formats.number_format(value)
+    elif isinstance(field, models.FileField):
+        return mark_safe('<a href="%s">%s</a>' % (
+            conditional_escape(value.url),
+            conditional_escape(value),
+        ))
     else:
         return smart_text(value)
 

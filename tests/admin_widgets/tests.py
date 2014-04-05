@@ -350,24 +350,53 @@ class AdminURLWidgetTest(DjangoTestCase):
         )
 
 
-class AdminFileWidgetTest(DjangoTestCase):
-    def test_render(self):
+@override_settings(
+    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
+    ROOT_URLCONF='admin_widgets.urls',
+)
+class AdminFileWidgetTests(DjangoTestCase):
+    fixtures = ['admin-widgets-users.xml']
+
+    def setUp(self):
         band = models.Band.objects.create(name='Linkin Park')
-        album = band.album_set.create(
+        self.album = band.album_set.create(
             name='Hybrid Theory', cover_art=r'albums\hybrid_theory.jpg'
         )
 
+    def test_render(self):
         w = widgets.AdminFileWidget()
         self.assertHTMLEqual(
-            w.render('test', album.cover_art),
-            '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/hybrid_theory.jpg">albums\hybrid_theory.jpg</a> <span class="clearable-file-input"><input type="checkbox" name="test-clear" id="test-clear_id" /> <label for="test-clear_id">Clear</label></span><br />Change: <input type="file" name="test" /></p>' % {
-                'STORAGE_URL': default_storage.url('')
+            w.render('test', self.album.cover_art),
+            '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/'
+            'hybrid_theory.jpg">albums\hybrid_theory.jpg</a> '
+            '<span class="clearable-file-input">'
+            '<input type="checkbox" name="test-clear" id="test-clear_id" /> '
+            '<label for="test-clear_id">Clear</label></span><br />'
+            'Change: <input type="file" name="test" /></p>' % {
+                'STORAGE_URL': default_storage.url(''),
             },
         )
-
         self.assertHTMLEqual(
             w.render('test', SimpleUploadedFile('test', b'content')),
             '<input type="file" name="test" />',
+        )
+
+    def test_readonly_fields(self):
+        """
+        File widgets should render as a link when they're marked "read only."
+        """
+        self.client.login(username="super", password="secret")
+        response = self.client.get('/admin_widgets/album/%s/' % self.album.id)
+        self.assertContains(
+            response,
+            '<p><a href="%(STORAGE_URL)salbums/hybrid_theory.jpg">'
+            'albums\hybrid_theory.jpg</a></p>' % {'STORAGE_URL': default_storage.url('')},
+            html=True,
+        )
+        self.assertNotContains(
+            response,
+            '<input type="file" name="cover_art" id="id_cover_art" />',
+            html=True,
         )
 
 
