@@ -54,7 +54,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
     Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage,
     Telegram, Pizza, Topping, FilteredManager, City, Restaurant, Worker,
-    ParentWithDependentChildren, Character, FieldOverridePost)
+    ParentWithDependentChildren, Character, FieldOverridePost, Color2)
 from .admin import site, site2, CityAdmin
 
 
@@ -667,6 +667,38 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             reverse('admin:app_list', kwargs={'app_label': 'this_should_fail'})
         with self.assertRaises(NoReverseMatch):
             reverse('admin:app_list', args=('admin_views2',))
+
+    def test_proxy_model_content_type_is_used_for_log_entries(self):
+        """
+        Log entries for proxy models should have the proxy model's content
+        type.
+
+        Regression test for #21084.
+        """
+        color2_content_type = ContentType.objects.get_for_model(Color2, for_concrete_model=False)
+
+        # add
+        color2_add_url = reverse('admin:admin_views_color2_add')
+        self.client.post(color2_add_url, {'value': 'orange'})
+
+        color2_addition_log = LogEntry.objects.all()[0]
+        self.assertEqual(color2_content_type, color2_addition_log.content_type)
+
+        # change
+        color_id = color2_addition_log.object_id
+        color2_change_url = reverse('admin:admin_views_color2_change', args=(color_id))
+
+        self.client.post(color2_change_url, {'value': 'blue'})
+
+        color2_change_log = LogEntry.objects.all()[0]
+        self.assertEqual(color2_content_type, color2_change_log.content_type)
+
+        # delete
+        color2_delete_url = reverse('admin:admin_views_color2_delete', args=(color_id))
+        self.client.post(color2_delete_url)
+
+        color2_delete_log = LogEntry.objects.all()[0]
+        self.assertEqual(color2_content_type, color2_delete_log.content_type)
 
 
 @override_settings(TEMPLATE_DIRS=ADMIN_VIEW_TEMPLATES_DIR)
