@@ -491,7 +491,7 @@ Selector and checkbox widgets
 
     .. attribute:: CheckboxInput.check_test
 
-        A callable that takes the value of the CheckBoxInput and returns
+        A callable that takes the value of the ``CheckboxInput`` and returns
         ``True`` if the checkbox should be checked for that value.
 
         .. versionchanged:: 1.5
