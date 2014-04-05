@@ -51,8 +51,8 @@ class SkippingClassTestCase(TestCase):
         self.assertEqual(len(result.skipped), 1)
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class AssertNumQueriesTests(TestCase):
-    urls = 'test_utils.urls'
 
     def test_assert_num_queries(self):
         def test_func():
@@ -121,8 +121,8 @@ class AssertQuerysetEqualTests(TestCase):
         )
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class CaptureQueriesContextManagerTests(TestCase):
-    urls = 'test_utils.urls'
 
     def setUp(self):
         self.person_pk = six.text_type(Person.objects.create(name='test').pk)
@@ -175,8 +175,8 @@ class CaptureQueriesContextManagerTests(TestCase):
         self.assertIn(self.person_pk, captured_queries[1]['sql'])
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class AssertNumQueriesContextManagerTests(TestCase):
-    urls = 'test_utils.urls'
 
     def test_simple(self):
         with self.assertNumQueries(0):
@@ -214,8 +214,8 @@ class AssertNumQueriesContextManagerTests(TestCase):
             self.client.get("/test_utils/get_person/%s/" % person.pk)
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class AssertTemplateUsedContextManagerTests(TestCase):
-    urls = 'test_utils.urls'
 
     def test_usage(self):
         with self.assertTemplateUsed('template_used/base.html'):

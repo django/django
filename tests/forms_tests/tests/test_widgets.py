@@ -1112,10 +1112,10 @@ class WidgetTests(TestCase):
             self.assertFalse(form.is_valid())
 
 
+@override_settings(ROOT_URLCONF='forms_tests.urls')
 class LiveWidgetTests(AdminSeleniumWebDriverTestCase):
 
     available_apps = ['forms_tests'] + AdminSeleniumWebDriverTestCase.available_apps
-    urls = 'forms_tests.urls'
 
     def test_textarea_trailing_newlines(self):
         """

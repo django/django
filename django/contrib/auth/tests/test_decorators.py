@@ -5,16 +5,16 @@ from django.contrib.auth.tests.test_views import AuthViewsTestCase
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 
 
 @skipIfCustomUser
+@override_settings(ROOT_URLCONF='django.contrib.auth.tests.urls')
 class LoginRequiredTestCase(AuthViewsTestCase):
     """
     Tests the login_required decorators
     """
-    urls = 'django.contrib.auth.tests.urls'
 
     def testCallable(self):
         """

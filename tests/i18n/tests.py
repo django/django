@@ -1261,10 +1261,9 @@ class MultipleLocaleActivationTests(TestCase):
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
     ),
+    ROOT_URLCONF='i18n.urls',
 )
 class LocaleMiddlewareTests(TestCase):
-
-    urls = 'i18n.urls'
 
     def test_streaming_response(self):
         # Regression test for #5241
@@ -1299,10 +1298,9 @@ class LocaleMiddlewareTests(TestCase):
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
     ),
+    ROOT_URLCONF='i18n.urls'
 )
 class CountrySpecificLanguageTests(TestCase):
-
-    urls = 'i18n.urls'
 
     def setUp(self):
         super(CountrySpecificLanguageTests, self).setUp()

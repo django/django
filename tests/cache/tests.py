@@ -2007,9 +2007,9 @@ class TestWithTemplateResponse(TestCase):
         self.assertTrue(response.has_header('ETag'))
 
 
+@override_settings(ROOT_URLCONF="admin_views.urls")
 class TestEtagWithAdmin(TestCase):
     # See https://code.djangoproject.com/ticket/16003
-    urls = "admin_views.urls"
 
     def test_admin(self):
         with self.settings(USE_ETAGS=False):

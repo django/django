@@ -48,7 +48,6 @@ class override_settings_tags(override_settings):
 
 class BaseTests(object):
     storage_class = default_storage
-    urls = 'django.contrib.messages.tests.urls'
     levels = {
         'debug': constants.DEBUG,
         'info': constants.INFO,
@@ -61,6 +60,7 @@ class BaseTests(object):
         self.settings_override = override_settings_tags(
             TEMPLATE_DIRS=(),
             TEMPLATE_CONTEXT_PROCESSORS=global_settings.TEMPLATE_CONTEXT_PROCESSORS,
+            ROOT_URLCONF='django.contrib.messages.tests.urls',
             MESSAGE_TAGS='',
             MESSAGE_STORAGE='%s.%s' % (self.storage_class.__module__,
                                        self.storage_class.__name__),

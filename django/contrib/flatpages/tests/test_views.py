@@ -16,6 +16,7 @@ from django.test import TestCase, override_settings
         'django.contrib.messages.middleware.MessageMiddleware',
         # no 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
     ),
+    ROOT_URLCONF='django.contrib.flatpages.tests.urls',
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(__file__), 'templates'),
     ),
@@ -23,7 +24,6 @@ from django.test import TestCase, override_settings
 )
 class FlatpageViewTests(TestCase):
     fixtures = ['sample_flatpages', 'example_site']
-    urls = 'django.contrib.flatpages.tests.urls'
 
     def test_view_flatpage(self):
         "A flatpage can be served through a view"
@@ -84,6 +84,7 @@ class FlatpageViewTests(TestCase):
         'django.contrib.messages.middleware.MessageMiddleware',
         # no 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
     ),
+    ROOT_URLCONF='django.contrib.flatpages.tests.urls',
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(__file__), 'templates'),
     ),
@@ -91,7 +92,6 @@ class FlatpageViewTests(TestCase):
 )
 class FlatpageViewAppendSlashTests(TestCase):
     fixtures = ['sample_flatpages', 'example_site']
-    urls = 'django.contrib.flatpages.tests.urls'
 
     def test_redirect_view_flatpage(self):
         "A flatpage can be served through a view and should add a slash"

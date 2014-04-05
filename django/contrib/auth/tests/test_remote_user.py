@@ -6,14 +6,14 @@ from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.utils import skipIfCustomUser
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
 
 @skipIfCustomUser
+@override_settings(ROOT_URLCONF='django.contrib.auth.tests.urls')
 class RemoteUserTest(TestCase):
 
-    urls = 'django.contrib.auth.tests.urls'
     middleware = 'django.contrib.auth.middleware.RemoteUserMiddleware'
     backend = 'django.contrib.auth.backends.RemoteUserBackend'
     header = 'REMOTE_USER'

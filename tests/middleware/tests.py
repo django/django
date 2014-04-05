@@ -20,8 +20,8 @@ from django.utils.encoding import force_str
 from django.utils.six.moves import xrange
 
 
+@override_settings(ROOT_URLCONF='middleware.urls')
 class CommonMiddlewareTest(TestCase):
-    urls = 'middleware.urls'
 
     def _get_request(self, path):
         request = HttpRequest()
@@ -303,8 +303,8 @@ class BrokenLinkEmailsMiddlewareTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
 
+@override_settings(ROOT_URLCONF='middleware.cond_get_urls')
 class ConditionalGetMiddlewareTest(TestCase):
-    urls = 'middleware.cond_get_urls'
 
     def setUp(self):
         self.req = HttpRequest()

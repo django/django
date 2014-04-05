@@ -14,11 +14,10 @@ from .. import urls
 from ..urls import media_dir
 
 
-@override_settings(DEBUG=True)
+@override_settings(DEBUG=True, ROOT_URLCONF='view_tests.urls')
 class StaticTests(SimpleTestCase):
     """Tests django views in django/views/static.py"""
 
-    urls = 'view_tests.urls'
     prefix = 'site_media'
 
     def test_serve(self):

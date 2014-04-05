@@ -101,8 +101,8 @@ class BadExceptionMiddleware(TestMiddleware):
         raise TestException('Test Exception Exception')
 
 
+@override_settings(ROOT_URLCONF='middleware_exceptions.urls')
 class BaseMiddlewareExceptionTest(TestCase):
-    urls = 'middleware_exceptions.urls'
 
     def setUp(self):
         self.exceptions = []
@@ -779,8 +779,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
 _missing = object()
 
 
+@override_settings(ROOT_URLCONF='middleware_exceptions.urls')
 class RootUrlconfTests(TestCase):
-    urls = 'middleware_exceptions.urls'
 
     @override_settings(ROOT_URLCONF=None)
     def test_missing_root_urlconf(self):

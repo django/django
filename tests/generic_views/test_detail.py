@@ -1,15 +1,15 @@
 from __future__ import unicode_literals
 
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.views.generic.base import View
 
 from .models import Artist, Author, Page
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class DetailViewTest(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'generic_views.urls'
 
     def test_simple_object(self):
         res = self.client.get('/detail/obj/')

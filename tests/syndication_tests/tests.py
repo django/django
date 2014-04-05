@@ -10,7 +10,7 @@ except ImportError:
 
 from django.contrib.syndication import views
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.utils.feedgenerator import rfc2822_date, rfc3339_date
 from django.utils import timezone
@@ -50,11 +50,11 @@ class FeedTestCase(TestCase):
 ######################################
 
 
+@override_settings(ROOT_URLCONF='syndication_tests.urls')
 class SyndicationFeedTest(FeedTestCase):
     """
     Tests for the high-level syndication feed framework.
     """
-    urls = 'syndication_tests.urls'
 
     def test_rss2_feed(self):
         """

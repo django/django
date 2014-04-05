@@ -26,7 +26,7 @@ from django.db import connection
 from django.utils.encoding import force_text
 from django.utils._os import npath, upath
 from django.utils.six import StringIO
-from django.test import LiveServerTestCase, TestCase
+from django.test import LiveServerTestCase, TestCase, override_settings
 from django.test.runner import DiscoverRunner
 from django.test.utils import str_prefix
 
@@ -1631,9 +1631,9 @@ class ArgumentOrder(AdminScriptTestCase):
         self.assertOutput(out, str_prefix("EXECUTE:BaseCommand labels=('testlabel',), options=[('no_color', False), ('option_a', 'x'), ('option_b', %%s), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', %(_)s'1')]") % option_b)
 
 
+@override_settings(ROOT_URLCONF='admin_scripts.urls')
 class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
-    urls = 'admin_scripts.urls'
     available_apps = [
         'admin_scripts',
         'django.contrib.auth',

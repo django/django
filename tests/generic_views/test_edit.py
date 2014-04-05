@@ -5,7 +5,7 @@ from unittest import expectedFailure
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django import forms
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 from django.views.generic.base import View
 from django.views.generic.edit import FormMixin, ModelFormMixin, CreateView
@@ -41,8 +41,8 @@ class FormMixinTests(TestCase):
         self.assertEqual(test_string, set_kwargs.get('prefix'))
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class BasicFormTests(TestCase):
-    urls = 'generic_views.urls'
 
     def test_post_data(self):
         res = self.client.post('/contact/', {'name': "Me", 'message': "Hello"})
@@ -61,8 +61,8 @@ class ModelFormMixinTests(TestCase):
                          mixin.get_form_kwargs())
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class CreateViewTests(TestCase):
-    urls = 'generic_views.urls'
 
     def test_create(self):
         res = self.client.get('/edit/authors/create/')
@@ -168,8 +168,8 @@ class CreateViewTests(TestCase):
             MyCreateView().get_form_class()
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class UpdateViewTests(TestCase):
-    urls = 'generic_views.urls'
 
     def test_update_post(self):
         a = Author.objects.create(
@@ -305,8 +305,8 @@ class UpdateViewTests(TestCase):
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (xkcd)>'])
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class DeleteViewTests(TestCase):
-    urls = 'generic_views.urls'
 
     def test_delete_by_post(self):
         a = Author.objects.create(**{'name': 'Randall Munroe', 'slug': 'randall-munroe'})

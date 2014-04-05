@@ -66,6 +66,7 @@ class PermWrapperTests(TestCase):
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(upath(__file__)), 'templates'),
     ),
+    ROOT_URLCONF='django.contrib.auth.tests.urls',
     USE_TZ=False,                           # required for loading the fixture
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
 )
@@ -73,7 +74,6 @@ class AuthContextProcessorTests(TestCase):
     """
     Tests for the ``django.contrib.auth.context_processors.auth`` processor
     """
-    urls = 'django.contrib.auth.tests.urls'
     fixtures = ['context-processors-users.xml']
 
     @override_settings(
