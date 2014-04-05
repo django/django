@@ -7,20 +7,20 @@ import warnings
 
 from django.apps import apps
 from django.apps.config import MODELS_MODULE_NAME
-import django.db.models.manager  # NOQA: Imported to register signal handler.
 from django.conf import settings
 from django.core import checks
 from django.core.exceptions import (ObjectDoesNotExist,
     MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
+from django.db import (router, transaction, DatabaseError,
+    DEFAULT_DB_ALIAS)
+from django.db.models.deletion import Collector
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
     OneToOneField, add_lazy_relation)
-from django.db import (router, transaction, DatabaseError,
-    DEFAULT_DB_ALIAS)
+from django.db.models.manager import ensure_default_manager
+from django.db.models.options import Options
 from django.db.models.query import Q
 from django.db.models.query_utils import DeferredAttribute, deferred_class_factory
-from django.db.models.deletion import Collector
-from django.db.models.options import Options
 from django.db.models import signals
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
@@ -353,6 +353,7 @@ class ModelBase(type):
             cls.get_absolute_url = update_wrapper(curry(get_absolute_url, opts, cls.get_absolute_url),
                                                   cls.get_absolute_url)
 
+        ensure_default_manager(cls)
         signals.class_prepared.send(sender=cls)
 
 

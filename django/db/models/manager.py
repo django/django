@@ -3,20 +3,18 @@ import inspect
 
 from django.db import router
 from django.db.models.query import QuerySet
-from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 
 
-def ensure_default_manager(sender, **kwargs):
+def ensure_default_manager(cls):
     """
     Ensures that a Model subclass contains a default manager  and sets the
     _default_manager attribute on the class. Also sets up the _base_manager
     points to a plain Manager instance (which could be the same as
     _default_manager if it's not a subclass of Manager).
     """
-    cls = sender
     if cls._meta.abstract:
         setattr(cls, 'objects', AbstractManagerDescriptor(cls))
         return
@@ -47,8 +45,6 @@ def ensure_default_manager(sender, **kwargs):
                     cls.add_to_class('_base_manager', base_class())
                     return
             raise AssertionError("Should never get here. Please report a bug, including your model and model manager setup.")
-
-signals.class_prepared.connect(ensure_default_manager)
 
 
 @python_2_unicode_compatible
