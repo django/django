@@ -42,7 +42,7 @@ class SiteManager(models.Manager):
         from the database.
         """
         from django.conf import settings
-        if getattr(settings, 'SITE_ID'):
+        if hasattr(settings, 'SITE_ID'):
             sid = settings.SITE_ID
             try:
                 current_site = SITE_CACHE[sid]
