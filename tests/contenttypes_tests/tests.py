@@ -15,9 +15,9 @@ from django.utils.encoding import force_str
 from .models import Author, Article, SchemeIncludedURL
 
 
+@override_settings(ROOT_URLCONF='contenttypes_tests.urls')
 class ContentTypesViewsTests(TestCase):
     fixtures = ['testdata.json']
-    urls = 'contenttypes_tests.urls'
 
     def test_shortcut_with_absolute_url(self):
         "Can view a shortcut for an Author object that has a get_absolute_url method"

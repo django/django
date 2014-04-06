@@ -41,13 +41,13 @@ from django.contrib.auth.views import login as login_view
     ),
     USE_TZ=False,
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='django.contrib.auth.tests.urls',
 )
 class AuthViewsTestCase(TestCase):
     """
     Helper base class for all the follow test cases.
     """
     fixtures = ['authtestdata.json']
-    urls = 'django.contrib.auth.tests.urls'
 
     def login(self, username='testclient', password='password'):
         response = self.client.post('/login/', {
@@ -86,8 +86,8 @@ class AuthViewsTestCase(TestCase):
 
 
 @skipIfCustomUser
+@override_settings(ROOT_URLCONF='django.contrib.auth.urls')
 class AuthViewNamedURLTests(AuthViewsTestCase):
-    urls = 'django.contrib.auth.urls'
 
     def test_named_urls(self):
         "Named URLs should be reversible"
@@ -786,9 +786,9 @@ class LogoutTest(AuthViewsTestCase):
         'django.contrib.auth.middleware.SessionAuthenticationMiddleware'
     ],
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='django.contrib.auth.tests.urls_admin',
 )
 class ChangelistTests(AuthViewsTestCase):
-    urls = 'django.contrib.auth.tests.urls_admin'
 
     def setUp(self):
         # Make me a superuser before logging in.

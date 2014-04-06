@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 
 FULL_RESPONSE = 'Test conditional get response'
@@ -16,8 +16,8 @@ ETAG = 'b4246ffc4f62314ca13147c9d4f76974'
 EXPIRED_ETAG = '7fae4cd4b0f81e7d2914700043aa8ed6'
 
 
+@override_settings(ROOT_URLCONF='conditional_processing.urls')
 class ConditionalGet(TestCase):
-    urls = 'conditional_processing.urls'
 
     def assertFullResponse(self, response, check_last_modified=True, check_etag=True):
         self.assertEqual(response.status_code, 200)

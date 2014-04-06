@@ -15,9 +15,9 @@ from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
     SomeChildModel)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF="admin_inlines.urls")
 class TestInline(TestCase):
-    urls = "admin_inlines.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -255,9 +255,9 @@ class TestInline(TestCase):
         )
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF="admin_inlines.urls")
 class TestInlineMedia(TestCase):
-    urls = "admin_inlines.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -294,8 +294,8 @@ class TestInlineMedia(TestCase):
         self.assertContains(response, 'my_awesome_inline_scripts.js')
 
 
+@override_settings(ROOT_URLCONF="admin_inlines.urls")
 class TestInlineAdminForm(TestCase):
-    urls = "admin_inlines.urls"
 
     def test_immutable_content_type(self):
         """Regression for #9362
@@ -313,9 +313,9 @@ class TestInlineAdminForm(TestCase):
         self.assertEqual(iaf.original.content_type, parent_ct)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF="admin_inlines.urls")
 class TestInlineProtectedOnDelete(TestCase):
-    urls = "admin_inlines.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -350,13 +350,13 @@ class TestInlineProtectedOnDelete(TestCase):
                             % (chapter, foot_note))
 
 
+@override_settings(ROOT_URLCONF="admin_inlines.urls")
 class TestInlinePermissions(TestCase):
     """
     Make sure the admin respects permissions for objects that are edited
     inline. Refs #8060.
 
     """
-    urls = "admin_inlines.urls"
 
     def setUp(self):
         self.user = User(username='admin')
@@ -546,12 +546,12 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF="admin_inlines.urls")
 class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
     available_apps = ['admin_inlines'] + AdminSeleniumWebDriverTestCase.available_apps
     fixtures = ['admin-views-users.xml']
-    urls = "admin_inlines.urls"
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def test_add_stackeds(self):

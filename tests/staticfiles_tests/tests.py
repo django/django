@@ -735,11 +735,11 @@ class TestCollectionLinks(CollectionTestCase, TestDefaults):
         self.assertTrue(os.path.islink(path))
 
 
+@override_settings(ROOT_URLCONF='staticfiles_tests.urls.default')
 class TestServeStatic(StaticFilesTestCase):
     """
     Test static asset serving view.
     """
-    urls = 'staticfiles_tests.urls.default'
 
     def _response(self, filepath):
         return self.client.get(
@@ -771,11 +771,11 @@ class TestServeStaticWithDefaultURL(TestServeStatic, TestDefaults):
     pass
 
 
+@override_settings(ROOT_URLCONF='staticfiles_tests.urls.helper')
 class TestServeStaticWithURLHelper(TestServeStatic, TestDefaults):
     """
     Test static asset serving view with staticfiles_urlpatterns helper.
     """
-    urls = 'staticfiles_tests.urls.helper'
 
 
 class TestServeAdminMedia(TestServeStatic):

@@ -3,11 +3,11 @@ from __future__ import unicode_literals
 
 import json
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 
+@override_settings(ROOT_URLCONF='view_tests.generic_urls')
 class JsonResponseTests(TestCase):
-    urls = 'view_tests.generic_urls'
 
     def test_json_response(self):
         response = self.client.get('/json/response/')

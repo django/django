@@ -7,9 +7,10 @@ from django.test import override_settings
 
 
 @skipIfCustomUser
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(USE_TZ=False,
+    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='django.contrib.auth.tests.urls')
 class SignalTestCase(TestCase):
-    urls = 'django.contrib.auth.tests.urls'
     fixtures = ['authtestdata.json']
 
     def listener_login(self, user, **kwargs):

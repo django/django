@@ -27,6 +27,7 @@ TEST_SETTINGS = {
 }
 
 
+@override_settings(ROOT_URLCONF='servers.urls')
 class LiveServerBase(LiveServerTestCase):
 
     available_apps = [
@@ -36,7 +37,6 @@ class LiveServerBase(LiveServerTestCase):
         'django.contrib.sessions',
     ]
     fixtures = ['testdata.json']
-    urls = 'servers.urls'
 
     @classmethod
     def setUpClass(cls):

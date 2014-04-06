@@ -961,6 +961,11 @@ URLconf configuration
 
 .. attribute:: SimpleTestCase.urls
 
+.. deprecated:: 1.8
+
+    Use ``@override_settings(ROOT_URLCONF=...)`` instead for URLconf
+    configuration.
+
 If your application provides views, you may want to include tests that use the
 test client to exercise those views. However, an end user is free to deploy the
 views in your application at any URL of their choosing. This means that your

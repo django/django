@@ -3,16 +3,16 @@ from __future__ import unicode_literals
 from django.core.urlresolvers import NoReverseMatch
 from django.contrib.auth.views import logout
 from django.shortcuts import resolve_url
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from .models import UnimportantThing
 
 
+@override_settings(ROOT_URLCONF='resolve_url.urls')
 class ResolveUrlTests(TestCase):
     """
     Tests for the ``resolve_url`` function.
     """
-    urls = 'resolve_url.urls'
 
     def test_url_path(self):
         """

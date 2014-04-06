@@ -36,9 +36,9 @@ class TestFormPreview(preview.FormPreview):
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(upath(__file__)), 'templates'),
     ),
+    ROOT_URLCONF='django.contrib.formtools.tests.urls',
 )
 class PreviewTests(TestCase):
-    urls = 'django.contrib.formtools.tests.urls'
 
     def setUp(self):
         super(PreviewTests, self).setUp()

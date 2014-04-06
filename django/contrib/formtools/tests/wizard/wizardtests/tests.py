@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import os
 
 from django import forms
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -24,7 +24,6 @@ PoemFormSet = forms.models.inlineformset_factory(Poet, Poem, fields="__all__")
 
 
 class WizardTests(object):
-    urls = 'django.contrib.formtools.tests.wizard.wizardtests.urls'
 
     def setUp(self):
         self.testuser, created = User.objects.get_or_create(username='testuser1')
@@ -208,6 +207,7 @@ class WizardTests(object):
 
 
 @skipIfCustomUser
+@override_settings(ROOT_URLCONF='django.contrib.formtools.tests.wizard.wizardtests.urls')
 class SessionWizardTests(WizardTests, TestCase):
     wizard_url = '/wiz_session/'
     wizard_step_1_data = {
@@ -240,6 +240,7 @@ class SessionWizardTests(WizardTests, TestCase):
 
 
 @skipIfCustomUser
+@override_settings(ROOT_URLCONF='django.contrib.formtools.tests.wizard.wizardtests.urls')
 class CookieWizardTests(WizardTests, TestCase):
     wizard_url = '/wiz_cookie/'
     wizard_step_1_data = {
@@ -272,6 +273,7 @@ class CookieWizardTests(WizardTests, TestCase):
 
 
 @skipIfCustomUser
+@override_settings(ROOT_URLCONF='django.contrib.formtools.tests.wizard.wizardtests.urls')
 class WizardTestKwargs(TestCase):
     wizard_url = '/wiz_other_template/'
     wizard_step_1_data = {
@@ -301,7 +303,6 @@ class WizardTestKwargs(TestCase):
             'cookie_contact_wizard-current_step': 'form4',
         }
     )
-    urls = 'django.contrib.formtools.tests.wizard.wizardtests.urls'
 
     def setUp(self):
         self.testuser, created = User.objects.get_or_create(username='testuser1')
