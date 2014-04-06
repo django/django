@@ -4,7 +4,6 @@ import os
 import re
 
 from django import forms
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
     PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm,
@@ -34,9 +33,8 @@ class UserCreationFormTest(TestCase):
         }
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
-        UserModel = get_user_model()
         self.assertEqual(form["username"].errors,
-                         [force_text(UserModel._meta.get_field('username').error_messages['unique'])])
+                         [force_text(User._meta.get_field('username').error_messages['unique'])])
 
     def test_invalid_data(self):
         data = {
@@ -190,8 +188,7 @@ class AuthenticationFormTest(TestCase):
             username = CharField()
 
         form = CustomAuthenticationForm()
-        UserModel = get_user_model()
-        username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
+        username_field = User._meta.get_field(User.USERNAME_FIELD)
         self.assertEqual(form.fields['username'].label, capfirst(username_field.verbose_name))
 
     def test_username_field_label_empty_string(self):
