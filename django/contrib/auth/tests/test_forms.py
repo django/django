@@ -34,8 +34,9 @@ class UserCreationFormTest(TestCase):
         }
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
+        UserModel = get_user_model()
         self.assertEqual(form["username"].errors,
-                         [force_text(form.error_messages['duplicate_username'])])
+                         [force_text(UserModel._meta.get_field('username').error_messages['unique'])])
 
     def test_invalid_data(self):
         data = {
