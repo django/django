@@ -414,6 +414,10 @@ Miscellaneous
   parameters. Internally, Django will continue to provide the
   ``pk`` parameter in ``params`` for backwards compatibility.
 
+* ``UserCreationForm.errors_messages['duplicate_username']`` is no longer used.
+  If you wish to customize that error message, use
+  ``User.error_messages['unique']`` instead.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
