@@ -5,6 +5,7 @@ from unittest import skipUnless
 from django.db import connection
 from django.db.models import Q
 from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.measure import D  # alias for Distance
 from django.contrib.gis.tests.utils import (
     HAS_SPATIAL_DB, mysql, oracle, postgis, spatialite, no_oracle, no_spatialite
@@ -48,6 +49,7 @@ class DistanceTest(TestCase):
         self.assertEqual(1, Interstate.objects.count())
         self.assertEqual(1, SouthTexasInterstate.objects.count())
 
+    @skipUnless(HAS_GDAL, "GDAL is required")
     @no_spatialite
     def test_dwithin(self):
         """
@@ -97,6 +99,7 @@ class DistanceTest(TestCase):
             else:
                 self.assertListEqual(au_cities, self.get_names(qs.filter(point__dwithin=(self.au_pnt, dist))))
 
+    @skipUnless(HAS_GDAL, "GDAL is required")
     def test_distance_projected(self):
         """
         Test the `distance` GeoQuerySet method on projected coordinate systems.
@@ -199,6 +202,7 @@ class DistanceTest(TestCase):
             for i, c in enumerate(qs):
                 self.assertAlmostEqual(sphere_distances[i], c.distance.m, tol)
 
+    @skipUnless(HAS_GDAL, "GDAL is required")
     @no_oracle  # Oracle already handles geographic distance calculation.
     def test_distance_transform(self):
         """
@@ -234,6 +238,7 @@ class DistanceTest(TestCase):
             for i, z in enumerate(qs):
                 self.assertAlmostEqual(z.distance.m, dists_m[i], 5)
 
+    @skipUnless(HAS_GDAL, "GDAL is required")
     def test_distance_lookups(self):
         """
         Test the `distance_lt`, `distance_gt`, `distance_lte`, and `distance_gte` lookup types.
@@ -263,6 +268,7 @@ class DistanceTest(TestCase):
         qs = SouthTexasZipcode.objects.exclude(name='77005').filter(poly__distance_lte=(z.poly, D(m=300)))
         self.assertEqual(['77002', '77025', '77401'], self.get_names(qs))
 
+    @skipUnless(HAS_GDAL, "GDAL is required")
     def test_geodetic_distance_lookups(self):
         """
         Test distance lookups on geodetic coordinate systems.
@@ -341,6 +347,7 @@ class DistanceTest(TestCase):
         for i, z in enumerate(SouthTexasZipcode.objects.area()):
             self.assertAlmostEqual(area_sq_m[i], z.area.sq_m, tol)
 
+    @skipUnless(HAS_GDAL, "GDAL is required")
     def test_length(self):
         """
         Test the `length` GeoQuerySet method.
@@ -362,6 +369,7 @@ class DistanceTest(TestCase):
         i10 = SouthTexasInterstate.objects.length().get(name='I-10')
         self.assertAlmostEqual(len_m2, i10.length.m, 2)
 
+    @skipUnless(HAS_GDAL, "GDAL is required")
     @no_spatialite
     def test_perimeter(self):
         """
@@ -378,6 +386,7 @@ class DistanceTest(TestCase):
         for i, c in enumerate(SouthTexasCity.objects.perimeter(model_att='perim')):
             self.assertEqual(0, c.perim.m)
 
+    @skipUnless(HAS_GDAL, "GDAL is required")
     def test_measurement_null_fields(self):
         """
         Test the measurement GeoQuerySet methods on fields with NULL values.
