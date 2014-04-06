@@ -44,8 +44,9 @@ class UserCreationFormTest(TestCase):
         }
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form["username"].errors,
-                         [force_text(form.fields['username'].error_messages['invalid'])])
+        for validator in User._meta.get_field('username').validators:
+            if validator.code == "invalid":
+                self.assertEqual(form["username"].errors, [force_text(validator.message)])
 
     def test_password_verification(self):
         # The verification password is incorrect.
@@ -288,8 +289,9 @@ class UserChangeFormTest(TestCase):
         data = {'username': 'not valid'}
         form = UserChangeForm(data, instance=user)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form['username'].errors,
-                         [force_text(form.fields['username'].error_messages['invalid'])])
+        for validator in User._meta.get_field('username').validators:
+            if validator.code == "invalid":
+                self.assertEqual(form["username"].errors, [force_text(validator.message)])
 
     def test_bug_14242(self):
         # A regression test, introduce by adding an optimization for the
