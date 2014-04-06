@@ -393,6 +393,11 @@ can be used for notification when a user logs in or out.
         authentication backend. Credentials matching a set of 'sensitive' patterns,
         (including password) will not be sent in the clear as part of the signal.
 
+     .. versionadded:: 1.7
+     
+     It should be noted that the failure is also logged as a warning to ``django.
+     security.FailedLogin``
+
 .. _authentication-backends-reference:
 
 Authentication backends

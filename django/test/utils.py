@@ -481,15 +481,17 @@ class IgnoreAllDeprecationWarningsMixin(IgnoreDeprecationWarningsMixin):
 
 
 @contextmanager
-def patch_logger(logger_name, log_level):
+def patch_logger(logger_name, log_level, formatstr=''):
     """
-    Context manager that takes a named logger and the logging level
-    and provides a simple mock-like list of messages received
+    Context manager that takes a named logger, the logging level, and
+    a format string for the logger, and provides a simple mock-like list 
+    of messages received
     """
     calls = []
 
     def replacement(msg, *args, **kwargs):
-        calls.append(msg % args)
+        extra = kwargs.get('extra',{})
+        calls.append((formatstr % extra) + (msg % args))
     logger = logging.getLogger(logger_name)
     orig = getattr(logger, log_level)
     setattr(logger, log_level, replacement)

@@ -365,7 +365,9 @@ class SetupConfigureLogging(TestCase):
 
 @override_settings(DEBUG=True)
 class SecurityLoggerTest(TestCase):
-
+    """
+    Test that security messages are being logged
+    """
     urls = 'logging_tests.urls'
 
     def test_suspicious_operation_creates_log_message(self):
@@ -388,3 +390,17 @@ class SecurityLoggerTest(TestCase):
         self.client.get('/suspicious/')
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn('path:/suspicious/,', mail.outbox[0].body)
+
+    def test_user_login_failed_creates_log_message(self):
+        with self.settings(DEBUG=True):
+            with patch_logger('django.security.FailedLogin', 'warning', "%(username)s : ") as calls:
+                self.client.login(username='testclient', password='bad') 
+                self.assertEqual(len(calls), 1)
+                self.assertEqual(calls[0], "testclient : user login failed")
+
+    def test_no_user_login_failed_creates_log_message(self):
+        with self.settings(DEBUG=True):
+            with patch_logger('django.security.FailedLogin', 'warning', "%(username)s : ") as calls:
+                self.client.login() 
+                self.assertEqual(len(calls), 1)
+                self.assertEqual(calls[0], "None : user login failed")
