@@ -360,7 +360,7 @@ class AllValuesFieldListFilter(FieldListFilter):
         self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull,
                                                  None)
         parent_model, reverse_path = reverse_field_path(model, field_path)
-        queryset = parent_model._default_manager.all()
+        queryset = model_admin.get_queryset(request)
         # optional feature: limit choices base on existing relationships
         # queryset = queryset.complex_filter(
         #    {'%s__isnull' % reverse_path: False})
