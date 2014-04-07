@@ -121,15 +121,14 @@ class BaseCollectionTestCase(BaseStaticFilesTestCase):
     """
     def setUp(self):
         super(BaseCollectionTestCase, self).setUp()
-        self.old_root = settings.STATIC_ROOT
-        settings.STATIC_ROOT = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
+        if not os.path.exists(settings.STATIC_ROOT):
+            os.mkdir(settings.STATIC_ROOT)
         self.run_collectstatic()
         # Use our own error handler that can handle .svn dirs on Windows
         self.addCleanup(shutil.rmtree, settings.STATIC_ROOT,
                         ignore_errors=True, onerror=rmtree_errorhandler)
 
     def tearDown(self):
-        settings.STATIC_ROOT = self.old_root
         super(BaseCollectionTestCase, self).tearDown()
 
     def run_collectstatic(self, **kwargs):
@@ -752,13 +751,13 @@ class TestServeStatic(StaticFilesTestCase):
         self.assertEqual(self._response(filepath).status_code, 404)
 
 
+@override_settings(DEBUG=False)
 class TestServeDisabled(TestServeStatic):
     """
     Test serving static files disabled when DEBUG is False.
     """
     def setUp(self):
         super(TestServeDisabled, self).setUp()
-        settings.DEBUG = False
 
     def test_disabled_serving(self):
         self.assertFileNotFound('test.txt')
