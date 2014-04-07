@@ -160,6 +160,13 @@ js_catalog_template = r"""
     }
   };
 
+  /* Register django as an AMD module if it is available */
+  if (typeof define === 'function' && define.amd) {
+    define('django', [], function() {
+      return django;
+    });
+  }
+
   /* add to global namespace */
   globals.pluralidx = django.pluralidx;
   globals.gettext = django.gettext;
