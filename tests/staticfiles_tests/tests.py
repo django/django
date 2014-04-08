@@ -128,9 +128,6 @@ class BaseCollectionTestCase(BaseStaticFilesTestCase):
         self.addCleanup(shutil.rmtree, settings.STATIC_ROOT,
                         ignore_errors=True, onerror=rmtree_errorhandler)
 
-    def tearDown(self):
-        super(BaseCollectionTestCase, self).tearDown()
-
     def run_collectstatic(self, **kwargs):
         call_command('collectstatic', interactive=False, verbosity='0',
                      ignore_patterns=['*.ignoreme'], **kwargs)
@@ -756,9 +753,6 @@ class TestServeDisabled(TestServeStatic):
     """
     Test serving static files disabled when DEBUG is False.
     """
-    def setUp(self):
-        super(TestServeDisabled, self).setUp()
-
     def test_disabled_serving(self):
         self.assertFileNotFound('test.txt')
 
