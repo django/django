@@ -105,7 +105,7 @@ Providing initial SQL data
 
 .. warning::
 
-    Attention, this functionnality requires .. _sqlparse:https://github.com/andialbrecht/sqlparse
+    Attention, this functionality requires .. _sqlparse:https://github.com/andialbrecht/sqlparse
     Simply install it by using pip install sqlparse
 
 Django provides a hook for passing the database arbitrary SQL that's executed
