@@ -291,3 +291,44 @@ class StateTests(TestCase):
         ))
         self.assertNotEqual(project_state, other_state)
         self.assertEqual(project_state == other_state, False)
+
+    def test_dangling_references_throw_error(self):
+        new_apps = Apps()
+
+        class Author(models.Model):
+            name = models.TextField()
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
+        class Book(models.Model):
+            author = models.ForeignKey(Author)
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
+        class Magazine(models.Model):
+            authors = models.ManyToManyField(Author)
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
+        # Make a valid ProjectState and render it
+        project_state = ProjectState()
+        project_state.add_model_state(ModelState.from_model(Author))
+        project_state.add_model_state(ModelState.from_model(Book))
+        project_state.add_model_state(ModelState.from_model(Magazine))
+        rendered_state = project_state.render()
+        self.assertEqual(len(rendered_state.get_models()), 3)
+
+        # now make an invalid one with a ForeignKey
+        project_state = ProjectState()
+        project_state.add_model_state(ModelState.from_model(Book))
+        with self.assertRaises(ValueError):
+            rendered_state = project_state.render()
+
+        # and another with ManyToManyField
+        project_state = ProjectState()
+        project_state.add_model_state(ModelState.from_model(Magazine))
+        with self.assertRaises(ValueError):
+            rendered_state = project_state.render()
