@@ -155,8 +155,25 @@ def sql_all(app_config, style, connection):
 
 
 def _split_statements(content):
-    import sqlparse
-    return sqlparse.split(content.strip())
+    try :
+        import sqlparse
+        return sqlparse.split(content.strip())
+    except ImportError:
+        warnings.warn("You should consider installing sqlparse, please check "
+                      "https://docs.djangoproject.com/en/1.6/howto/initial-data/#providing-initial-sql-data"
+        comment_re = re.compile(r"^((?:'[^']*'|[^'])*?)--.*$")
+        statements = []
+        statement = []
+        for line in content.split("\n"):
+            cleaned_line = comment_re.sub(r"\1", line).strip()
+            if not cleaned_line:
+                continue
+            statement.append(cleaned_line)
+            if cleaned_line.endswith(";"):
+                statements.append(" ".join(statement))
+                statement = []
+        return statements
+
 
 def custom_sql_for_model(model, style, connection):
     opts = model._meta
