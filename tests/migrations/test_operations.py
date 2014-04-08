@@ -413,6 +413,45 @@ class OperationTests(MigrationTestBase):
         # And test reversal
         self.unapply_operations("test_rmflmm", project_state, operations=operations)
         self.assertTableExists("test_rmflmm_pony_stables")
+
+    def test_remove_field_m2m_with_through1(self):
+        # FIXME: This test fails with a KeyError when we delete the M2M.
+        project_state = self.set_up_test_model("test_rmflmmwt", second_model=True)
+
+        self.assertTableNotExists("test_rmflmmwt_ponystables")
+        project_state = self.apply_operations("test_rmflmmwt", project_state, operations=[
+            migrations.CreateModel("PonyStables", fields=[
+                ("pony", models.ForeignKey('test_rmflmmwt.Pony')),
+                ("stable", models.ForeignKey('test_rmflmmwt.Stable')),
+            ]),
+            migrations.AddField("Pony", "stables", models.ManyToManyField("Stable", related_name="ponies", through='test_rmflmmwt.PonyStables'))
+        ])
+        self.assertTableExists("test_rmflmmwt_ponystables")
+
+        operations = [migrations.RemoveField("Pony", "stables")]
+        self.apply_operations("test_rmflmmwt", project_state, operations=operations)
+
+    def test_remove_field_m2m_with_through2(self):
+        # FIXME: This test fails with an AttributeError when we delete the M2M.
+        project_state = self.set_up_test_model("test_rmflmmwt2", second_model=True)
+
+        self.assertTableNotExists("test_rmflmmwt2_ponystables")
+        project_state = self.apply_operations("test_rmflmmwt2", project_state, operations=[
+            migrations.CreateModel("PonyStables", fields=[
+                ("pony", models.ForeignKey('test_rmflmmwt2.Pony')),
+                ("stable", models.ForeignKey('test_rmflmmwt2.Stable')),
+            ]),
+            migrations.AddField("Pony", "stables", models.ManyToManyField("Stable", related_name="ponies", through='test_rmflmmwt2.PonyStables'))
+        ])
+        self.assertTableExists("test_rmflmmwt2_ponystables")
+
+        operations = [
+            migrations.DeleteModel("PonyStables"),
+            migrations.RemoveField("Pony", "stables"),
+        ]
+        self.apply_operations("test_rmflmmwt2", project_state, operations=operations)
+        self.assertTableNotExists("test_rmflmmwt2_ponystables")
+
     def test_remove_field(self):
         """
         Tests the RemoveField operation.
