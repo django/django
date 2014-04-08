@@ -91,6 +91,12 @@ class TestQuerying(TestCase):
             self.objs[:2]
         )
 
+    def test_contained_by(self):
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__contained_by=[1, 2]),
+            self.objs[:2]
+        )
+
     def test_contains(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__contains=[2]),
