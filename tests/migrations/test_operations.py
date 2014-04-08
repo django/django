@@ -4,6 +4,7 @@ from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
 from django.db.utils import IntegrityError
 from django.db.migrations.state import ProjectState
+from django.db.migrations.migration import Migration
 from .test_base import MigrationTestBase
 
 
@@ -15,15 +16,16 @@ class OperationTests(MigrationTestBase):
     """
 
     def apply_operations(self, app_label, project_state, operations):
-        new_state = project_state.clone()
-        for operation in operations:
-            operation.state_forwards(app_label, new_state)
-
-        # Set up the database
+        migration = Migration('name', app_label)
+        migration.operations = operations
         with connection.schema_editor() as editor:
-            for operation in operations:
-                operation.database_forwards(app_label, editor, project_state, new_state)
-        return new_state
+            return migration.apply(project_state, editor)
+
+    def unapply_operations(self, app_label, project_state, operations):
+        migration = Migration('name', app_label)
+        migration.operations = operations
+        with connection.schema_editor() as editor:
+            return migration.unapply(project_state, editor)
 
     def set_up_test_model(self, app_label, second_model=False, related_model=False, mti_model=False):
         """
@@ -396,6 +398,21 @@ class OperationTests(MigrationTestBase):
         Pony = new_apps.get_model("test_alflmm", "Pony")
         self.assertTrue(Pony._meta.get_field('stables').blank)
 
+    def test_remove_field_m2m(self):
+        project_state = self.set_up_test_model("test_rmflmm", second_model=True)
+
+        project_state = self.apply_operations("test_rmflmm", project_state, operations=[
+            migrations.AddField("Pony", "stables", models.ManyToManyField("Stable", related_name="ponies"))
+        ])
+        self.assertTableExists("test_rmflmm_pony_stables")
+
+        operations = [migrations.RemoveField("Pony", "stables")]
+        self.apply_operations("test_rmflmm", project_state, operations=operations)
+        self.assertTableNotExists("test_rmflmm_pony_stables")
+
+        # And test reversal
+        self.unapply_operations("test_rmflmm", project_state, operations=operations)
+        self.assertTableExists("test_rmflmm_pony_stables")
     def test_remove_field(self):
         """
         Tests the RemoveField operation.
