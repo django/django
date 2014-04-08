@@ -22,12 +22,8 @@ your operating system's package manager.
 
 .. admonition:: Python on Windows
 
-    On Windows, you might need to adjust your ``PATH`` environment variable
-    to include paths to Python executable and additional scripts. For example,
-    if your Python is installed in ``C:\Python27\``, the following paths need
-    to be added to ``PATH``::
-
-        C:\Python27\;C:\Python27\Scripts;
+    If you are just starting with Django and using Windows, you may find
+    :doc:`/howto/windows` useful.
 
 Install Apache and mod_wsgi
 =============================

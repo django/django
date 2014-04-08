@@ -24,6 +24,7 @@ you quickly accomplish common tasks.
    outputting-pdf
    static-files/index
    static-files/deployment
+   windows
 
 .. seealso::
 
