@@ -25,6 +25,9 @@ about each item can often be found in the release notes of two versions prior.
 * Using an incorrect count of unpacked values in the ``for`` template tag
   will raise an exception rather than fail silently.
 
+* The regular expression parsing of SQL initial data will be removed and
+  ``sqlparse`` will be required for the feature.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
