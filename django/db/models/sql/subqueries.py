@@ -77,7 +77,7 @@ class DeleteQuery(Query):
             else:
                 innerq.clear_select_clause()
                 innerq.select = [
-                    SelectInfo((self.get_initial_alias(), pk.column), None)
+                    SelectInfo((self.get_initial_alias(), pk.column), None, None)
                 ]
                 values = innerq
             self.where = self.where_class()
@@ -229,7 +229,7 @@ class DateQuery(Query):
         alias = result[3][-1]
         select = self._get_select((alias, field.column), lookup_type)
         self.clear_select_clause()
-        self.select = [SelectInfo(select, None)]
+        self.select = [SelectInfo(select, None, None)]
         self.distinct = True
         self.order_by = [1] if order == 'ASC' else [-1]
 
