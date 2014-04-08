@@ -160,7 +160,7 @@ def _split_statements(content):
         return sqlparse.split(content.strip())
     except ImportError:
         warnings.warn("You should consider installing sqlparse, please check "
-                      "https://docs.djangoproject.com/en/1.6/howto/initial-data/#providing-initial-sql-data"
+                      "https://docs.djangoproject.com/en/1.6/howto/initial-data/#providing-initial-sql-data")
         comment_re = re.compile(r"^((?:'[^']*'|[^'])*?)--.*$")
         statements = []
         statement = []
