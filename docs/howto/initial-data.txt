@@ -105,8 +105,9 @@ Providing initial SQL data
 
 .. warning::
 
-    Attention, this functionality requires .. _sqlparse:https://github.com/andialbrecht/sqlparse
-    Simply install it by using pip install sqlparse
+    This functionality works better with .. _sqlparse:https://github.com/andialbrecht/sqlparse on complex statements
+    such as SQL functions.
+    Simply install it by using ``pip install sqlparse``.
 
 Django provides a hook for passing the database arbitrary SQL that's executed
 just after the CREATE TABLE statements when you run :djadmin:`migrate`. You can
