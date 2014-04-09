@@ -475,8 +475,7 @@ class LoginTest(AuthViewsTestCase):
             self.assertEqual(response.context['site_name'], site.name)
         else:
             self.assertIsInstance(response.context['site'], RequestSite)
-        self.assertTrue(isinstance(response.context['form'], AuthenticationForm),
-                     'Login form is not an AuthenticationForm')
+        self.assertIsInstance(response.context['form'], AuthenticationForm)
 
     def test_security_check(self, password='password'):
         login_url = reverse('login')

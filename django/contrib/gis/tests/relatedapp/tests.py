@@ -179,8 +179,8 @@ class RelatedGeoModelTest(TestCase):
         for m, d, t in zip(gqs, gvqs, gvlqs):
             # The values should be Geometry objects and not raw strings returned
             # by the spatial database.
-            self.assertTrue(isinstance(d['point'], Geometry))
-            self.assertTrue(isinstance(t[1], Geometry))
+            self.assertIsInstance(d['point'], Geometry)
+            self.assertIsInstance(t[1], Geometry)
             self.assertEqual(m.point, d['point'])
             self.assertEqual(m.point, t[1])
 
@@ -255,7 +255,7 @@ class RelatedGeoModelTest(TestCase):
         qs = Location.objects.filter(id=5).annotate(num_cities=Count('city')).values('id', 'point', 'num_cities')
         self.assertEqual(1, len(qs))
         self.assertEqual(2, qs[0]['num_cities'])
-        self.assertTrue(isinstance(qs[0]['point'], GEOSGeometry))
+        self.assertIsInstance(qs[0]['point'], GEOSGeometry)
 
     # TODO: The phantom model does appear on Oracle.
     @no_oracle

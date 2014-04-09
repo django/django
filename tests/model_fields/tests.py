@@ -298,7 +298,7 @@ class BooleanFieldTests(unittest.TestCase):
         # conversions are applied with an offset
         b5 = BooleanModel.objects.all().extra(
             select={'string_col': 'string'})[0]
-        self.assertFalse(isinstance(b5.pk, bool))
+        self.assertNotIsInstance(b5.pk, bool)
 
     def test_select_related(self):
         """

@@ -201,7 +201,7 @@ class GeoModelTest(TestCase):
         as_text = 'ST_AsText' if postgis else 'asText'
         cities2 = City.objects.raw('select id, name, %s(point) from geoapp_city' % as_text)
         self.assertEqual(len(cities1), len(list(cities2)))
-        self.assertTrue(isinstance(cities2[0].point, Point))
+        self.assertIsInstance(cities2[0].point, Point)
 
 
 @skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")

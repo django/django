@@ -646,7 +646,7 @@ class BackendTestCase(TestCase):
         Test that cursors can be used as a context manager
         """
         with connection.cursor() as cursor:
-            self.assertTrue(isinstance(cursor, CursorWrapper))
+            self.assertIsInstance(cursor, CursorWrapper)
         # Both InterfaceError and ProgrammingError seem to be used when
         # accessing closed cursor (psycopg2 has InterfaceError, rest seem
         # to use ProgrammingError).
@@ -661,7 +661,7 @@ class BackendTestCase(TestCase):
         # psycopg2 offers us a way to check that by closed attribute.
         # So, run only on psycopg2 for that reason.
         with connection.cursor() as cursor:
-            self.assertTrue(isinstance(cursor, CursorWrapper))
+            self.assertIsInstance(cursor, CursorWrapper)
         self.assertTrue(cursor.closed)
 
 

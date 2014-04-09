@@ -1908,7 +1908,7 @@ class FormsTestCase(TestCase):
 
         field = ChoicesField()
         field2 = copy.deepcopy(field)
-        self.assertTrue(isinstance(field2, ChoicesField))
+        self.assertIsInstance(field2, ChoicesField)
         self.assertFalse(id(field2.fields) == id(field.fields))
         self.assertFalse(id(field2.fields[0].choices) ==
                          id(field.fields[0].choices))
@@ -2152,7 +2152,7 @@ class FormsTestCase(TestCase):
         e.append('Foo')
         e.append(ValidationError('Foo%(bar)s', code='foobar', params={'bar': 'bar'}))
 
-        self.assertTrue(isinstance(e, list))
+        self.assertIsInstance(e, list)
         self.assertIn('Foo', e)
         self.assertIn('Foo', forms.ValidationError(e))
 

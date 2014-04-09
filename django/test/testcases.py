@@ -620,8 +620,8 @@ class SimpleTestCase(unittest.TestCase):
         # test that max_length and min_length are always accepted
         if issubclass(fieldclass, CharField):
             field_kwargs.update({'min_length': 2, 'max_length': 20})
-            self.assertTrue(isinstance(fieldclass(*field_args, **field_kwargs),
-                                       fieldclass))
+            self.assertIsInstance(fieldclass(*field_args, **field_kwargs),
+                                  fieldclass)
 
     def assertHTMLEqual(self, html1, html2, msg=None):
         """
