@@ -333,19 +333,23 @@ If you have an authenticated user you want to attach to the current session
     :func:`~django.contrib.auth.login()`::
 
         from django.contrib.auth import authenticate, login
+        from yourapp.forms import LoginForm
 
         def my_view(request):
-            username = request.POST['username']
-            password = request.POST['password']
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    # Redirect to a success page.
+            if request.POST:
+                form = LoginForm(request.POST)
+                if form.is_valid():
+                    username = form.cleaned_data['username']
+                    password = form.cleaned_data['password']
+                    user = authenticate(username=username, password=password)
+                if user is not None:
+                    if user.is_active:
+                        login(request, user)
+                        # Redirect to a success page.
+                    else:
+                        # Return a 'disabled account' error message
                 else:
-                    # Return a 'disabled account' error message
-            else:
-                # Return an 'invalid login' error message.
+                    # Return an 'invalid login' error message.
 
 .. admonition:: Calling ``authenticate()`` first
 
