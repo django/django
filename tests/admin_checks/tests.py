@@ -415,7 +415,8 @@ class SystemChecksTestCase(TestCase):
         expected = [
             checks.Error(
                 ("The value of 'readonly_fields[1]' is not a callable, an attribute "
-                 "of 'SongAdmin', or an attribute of 'admin_checks.Song'."),
+                 "of 'SongAdmin', an attribute of 'admin_checks.Song', or in "
+                 "model_instance_fields."),
                 hint=None,
                 obj=SongAdmin,
                 id='admin.E035',
@@ -432,7 +433,8 @@ class SystemChecksTestCase(TestCase):
         expected = [
             checks.Error(
                 ("The value of 'readonly_fields[0]' is not a callable, an attribute "
-                 "of 'CityInline', or an attribute of 'admin_checks.City'."),
+                 "of 'CityInline', an attribute of 'admin_checks.City', or in "
+                 "model_instance_fields."),
                 hint=None,
                 obj=CityInline,
                 id='admin.E035',

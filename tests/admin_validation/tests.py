@@ -218,7 +218,8 @@ class ValidationTestCase(TestCase):
 
         self.assertRaisesMessage(ImproperlyConfigured,
             str_prefix("SongAdmin.readonly_fields[1], %(_)s'nonexistant' is not a callable "
-                       "or an attribute of 'SongAdmin' or found in the model 'Song'."),
+                       "or an attribute of 'SongAdmin' or found in the model 'Song' or in "
+                       "model_instance_fields."),
             SongAdmin.validate,
             Song)
 
@@ -229,7 +230,8 @@ class ValidationTestCase(TestCase):
 
         self.assertRaisesMessage(ImproperlyConfigured,
             str_prefix("CityInline.readonly_fields[0], %(_)s'i_dont_exist' is not a callable "
-                       "or an attribute of 'CityInline' or found in the model 'City'."),
+                       "or an attribute of 'CityInline' or found in the model 'City' or in "
+                       "model_instance_fields."),
             CityInline.validate,
             City)
 

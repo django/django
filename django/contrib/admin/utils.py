@@ -315,6 +315,8 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
                 attr = name
             elif model_admin is not None and hasattr(model_admin, name):
                 attr = getattr(model_admin, name)
+            elif model_admin is not None and name in getattr(model_admin, 'model_instance_fields', []):
+                attr = None
             elif hasattr(model, name):
                 attr = getattr(model, name)
             else:

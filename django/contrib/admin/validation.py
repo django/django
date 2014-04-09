@@ -190,15 +190,18 @@ class BaseValidator(object):
         " Validate that readonly_fields refers to proper attribute or field. "
         if hasattr(cls, "readonly_fields"):
             check_isseq(cls, "readonly_fields", cls.readonly_fields)
+            if hasattr(cls, "model_instance_fields"):
+                check_isseq(cls, "model_instance_fields", cls.model_instance_fields)
             for idx, field in enumerate(cls.readonly_fields):
-                if not callable(field):
-                    if not hasattr(cls, field):
-                        if not hasattr(model, field):
-                            try:
-                                model._meta.get_field(field)
-                            except models.FieldDoesNotExist:
-                                raise ImproperlyConfigured("%s.readonly_fields[%d], %r is not a callable or an attribute of %r or found in the model %r."
-                                    % (cls.__name__, idx, field, cls.__name__, model._meta.object_name))
+                if not (callable(field) or
+                        hasattr(cls, field) or
+                        hasattr(model, field) or
+                        field in getattr(cls, "model_instance_fields", [])):
+                    try:
+                        model._meta.get_field(field)
+                    except models.FieldDoesNotExist:
+                        raise ImproperlyConfigured("%s.readonly_fields[%d], %r is not a callable or an attribute of %r or found in the model %r or in model_instance_fields."
+                            % (cls.__name__, idx, field, cls.__name__, model._meta.object_name))
 
 
 class ModelAdminValidator(BaseValidator):
@@ -245,11 +248,14 @@ class ModelAdminValidator(BaseValidator):
                 if not callable(field):
                     if not hasattr(cls, field):
                         if not hasattr(model, field):
-                            try:
-                                model._meta.get_field(field)
-                            except models.FieldDoesNotExist:
-                                raise ImproperlyConfigured("%s.list_display[%d], %r is not a callable or an attribute of %r or found in the model %r."
-                                    % (cls.__name__, idx, field, cls.__name__, model._meta.object_name))
+                            if hasattr(cls, "model_instance_fields"):
+                                check_isseq(cls, "model_instance_fields", cls.model_instance_fields)
+                                if field not in cls.model_instance_fields:
+                                    try:
+                                        model._meta.get_field(field)
+                                    except models.FieldDoesNotExist:
+                                        raise ImproperlyConfigured("%s.list_display[%d], %r is not a callable or an attribute of %r or found in the model %r."
+                                            % (cls.__name__, idx, field, cls.__name__, model._meta.object_name))
                         else:
                             # getattr(model, field) could be an X_RelatedObjectsDescriptor
                             f = fetch_attr(cls, model, "list_display[%d]" % idx, field)
