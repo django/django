@@ -41,7 +41,8 @@ Install PIP
 
 `PIP <http://www.pip-installer.org/>`_ is a package manager for Python that
 uses the `Python Package Index <http://pypi.python.org>`_ to install Python
-packages. PIP will later be used to install Django from PyPI.
+packages. PIP will later be used to install Django from PyPI. If you've
+installed Python 3.4, ``pip`` is included so you may skip this section.
 
 Open a command prompt and execute ``easy_install pip``. This will install
 ``pip`` on your system. This command will work if you have successfully
