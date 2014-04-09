@@ -351,9 +351,14 @@ class BaseDatabaseWrapper(object):
     def is_usable(self):
         """
         Tests if the database connection is usable.
+
         This function may assume that self.connection is not None.
+
+        Actual implementations should take care not to raise exceptions
+        as that may prevent Django from recycling unusable connections.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require an is_usable() method')
+        raise NotImplementedError(
+            "subclasses of BaseDatabaseWrapper may require an is_usable() method")
 
     def close_if_unusable_or_obsolete(self):
         """

@@ -665,6 +665,37 @@ class BackendTestCase(TestCase):
         self.assertTrue(cursor.closed)
 
 
+class IsUsableTests(TransactionTestCase):
+    # Avoid using a regular TestCase because Django really dislikes closing
+    # the database connection inside a transaction at this point (#21202).
+
+    available_apps = []
+
+    # Unfortunately with sqlite3 the in-memory test database cannot be closed.
+    @skipUnlessDBFeature('test_db_allows_multiple_connections')
+    def test_is_usable_after_database_disconnects(self):
+        """
+        Test that is_usable() doesn't crash when the database disconnects.
+
+        Regression for #21553.
+        """
+        # Open a connection to the database.
+        with connection.cursor():
+            pass
+        # Emulate a connection close by the database.
+        connection._close()
+        # Even then is_usable() should not raise an exception.
+        try:
+            self.assertFalse(connection.is_usable())
+        finally:
+            # Clean up the mess created by connection._close(). Since the
+            # connection is already closed, this crashes on some backends.
+            try:
+                connection.close()
+            except Exception:
+                pass
+
+
 # We don't make these tests conditional because that means we would need to
 # check and differentiate between:
 # * MySQL+InnoDB, MySQL+MYISAM (something we currently can't do).
