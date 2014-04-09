@@ -467,13 +467,15 @@ class BaseModelAdminChecks(object):
             return []
         elif hasattr(model, field_name):
             return []
+        elif field_name in getattr(cls, 'model_instance_fields', []):
+            return []
         else:
             try:
                 model._meta.get_field(field_name)
             except models.FieldDoesNotExist:
                 return [
                     checks.Error(
-                        "The value of '%s' is not a callable, an attribute of '%s', or an attribute of '%s.%s'." % (
+                        "The value of '%s' is not a callable, an attribute of '%s', an attribute of '%s.%s', or in model_instance_fields." % (
                             label, cls.__name__, model._meta.app_label, model._meta.object_name
                         ),
                         hint=None,
