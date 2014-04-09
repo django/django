@@ -128,9 +128,8 @@ Management Commands
 * :djadmin:`dumpdata` now has the option :djadminopt:`--output` which allows
   specifying the file to which the serialized data is written.
 
-* Fixed #22401 `<https://code.djangoproject.com/ticket/22401>`_ 
-  now needs the sqlparse python library as a dependency.
-  Be sure to check `the doc <https://docs.djangoproject.com/en/1.6/howto/initial-data/#providing-initial-sql-data>`_.
+* :ref:`initial-sql` now works better with the sqlparse python library as a dependency.
+  
 
 Models
 ^^^^^^
