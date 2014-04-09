@@ -131,7 +131,7 @@ compilemessages
 
 .. django-admin:: compilemessages
 
-Compiles .po files created :djadmin:`makemessages` to .mo files for use with
+Compiles .po files created by :djadmin:`makemessages` to .mo files for use with
 the builtin gettext support. See :doc:`/topics/i18n/index`.
 
 Use the :djadminopt:`--locale` option (or its shorter version ``-l``) to
