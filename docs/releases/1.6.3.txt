@@ -5,12 +5,12 @@ Django 1.6.3 release notes
 *Under development*
 
 This is Django 1.6.3, a bugfix release for Django 1.6. Django 1.6.3 fixes
-several bugs in 1.6.2, and makes one backwards-incompatible change:
+several bugs in 1.6.2 and makes one backwards-incompatible change:
 
 ``select_for_update()`` requires a transaction
 ==============================================
 
-Historically, Queries that use
+Historically, queries that use
 :meth:`~django.db.models.query.QuerySet.select_for_update()` could be
 executed in autocommit mode, outside of a transaction. Before Django
 1.6, Django's automatic transactions mode allowed this to be used to
@@ -19,10 +19,16 @@ database-level autocommit; since then, execution in such a context
 voids the effect of ``select_for_update()``. It is, therefore, assumed
 now to be an error, and raises an exception.
 
-This change was made because such errors can be caused by including an app which
-expects global transactions, or Django's old autocommit behavior, in a project
-which runs without them; and further, such errors may manifest as
-data-corruption bugs.
+This change may cause test failures if you use ``select_for_update()``
+in a test class which is a subclass of
+:class:`~django.test.TransactionTestCase` rather than
+:class:`~django.test.TestCase`.  
+
+This change was made because such errors can be caused by including an
+app which expects global transactions (e.g. :setting:`ATOMIC_REQUESTS
+<DATABASE-ATOMIC_REQUESTS>` set to True), or Django's old autocommit
+behavior, in a project which runs without them; and further, such
+errors may manifest as data-corruption bugs.
 
 Other bugfixes and changes
 ==========================
