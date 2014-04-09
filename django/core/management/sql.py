@@ -155,12 +155,10 @@ def sql_all(app_config, style, connection):
 
 
 def _split_statements(content):
-    try :
+    try:
         import sqlparse
-        return sqlparse.split(content.strip())
     except ImportError:
-        warnings.warn("You should consider installing sqlparse, please check "
-                      "https://docs.djangoproject.com/en/1.6/howto/initial-data/#providing-initial-sql-data")
+        warnings.warn("Providing intial SQL data works better with sqlparse installed.")
         comment_re = re.compile(r"^((?:'[^']*'|[^'])*?)--.*$")
         statements = []
         statement = []
@@ -173,6 +171,8 @@ def _split_statements(content):
                 statements.append(" ".join(statement))
                 statement = []
         return statements
+    else:
+        return sqlparse.split(content.strip())
 
 
 def custom_sql_for_model(model, style, connection):
