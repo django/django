@@ -377,7 +377,9 @@ subclass::
 
     * ``description``
         A string of optional extra text to be displayed at the top of each
-        fieldset, under the heading of the fieldset.
+        fieldset, under the heading of the fieldset. This string is not
+        rendered for :class:`~django.contrib.admin.TabularInline` due to its
+        layout.
 
         Note that this value is *not* HTML-escaped when it's displayed in
         the admin interface. This lets you include HTML if you so desire.
