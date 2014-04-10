@@ -6,6 +6,16 @@ from itertools import chain
 from django.utils.itercompat import is_iterable
 
 
+class Tags(object):
+    """
+    Built-in tags for internal checks.
+    """
+    admin = 'admin'
+    compatibility = 'compatibility'
+    models = 'models'
+    signals = 'signals'
+
+
 class CheckRegistry(object):
 
     def __init__(self):
