@@ -64,8 +64,10 @@ class CheckRegistry(object):
         return errors
 
     def tag_exists(self, tag):
-        tags = chain(*[check.tags for check in self.registered_checks if hasattr(check, 'tags')])
-        return tag in tags
+        return tag in self.tags_available()
+
+    def tags_available(self):
+        return set(chain(*[check.tags for check in self.registered_checks if hasattr(check, 'tags')]))
 
 
 registry = CheckRegistry()
