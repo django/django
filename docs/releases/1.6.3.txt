@@ -17,18 +17,18 @@ executed in autocommit mode, outside of a transaction. Before Django
 lock records until the next write operation. Django 1.6 introduced
 database-level autocommit; since then, execution in such a context
 voids the effect of ``select_for_update()``. It is, therefore, assumed
-now to be an error, and raises an exception.
+now to be an error and raises an exception.
+
+This change was made because such errors can be caused by including an
+app which expects global transactions (e.g. :setting:`ATOMIC_REQUESTS
+<DATABASE-ATOMIC_REQUESTS>` set to ``True``), or Django's old autocommit
+behavior, in a project which runs without them; and further, such
+errors may manifest as data-corruption bugs.
 
 This change may cause test failures if you use ``select_for_update()``
 in a test class which is a subclass of
 :class:`~django.test.TransactionTestCase` rather than
-:class:`~django.test.TestCase`.  
-
-This change was made because such errors can be caused by including an
-app which expects global transactions (e.g. :setting:`ATOMIC_REQUESTS
-<DATABASE-ATOMIC_REQUESTS>` set to True), or Django's old autocommit
-behavior, in a project which runs without them; and further, such
-errors may manifest as data-corruption bugs.
+:class:`~django.test.TestCase`.
 
 Other bugfixes and changes
 ==========================
