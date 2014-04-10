@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 
 from django.apps import apps
 
-from .. import Warning, register
+from .. import Warning, register, Tags
 
 
-@register('compatibility')
+@register(Tags.compatibility)
 def check_1_6_compatibility(**kwargs):
     errors = []
     errors.extend(_check_test_runner(**kwargs))

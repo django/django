@@ -6,10 +6,10 @@ import types
 
 from django.apps import apps
 
-from . import Error, register
+from . import Error, Tags, register
 
 
-@register('models')
+@register(Tags.models)
 def check_all_models(app_configs=None, **kwargs):
     errors = [model.check(**kwargs)
         for model in apps.get_models()
@@ -17,7 +17,7 @@ def check_all_models(app_configs=None, **kwargs):
     return list(chain(*errors))
 
 
-@register('models', 'signals')
+@register(Tags.models, Tags.signals)
 def check_model_signals(app_configs=None, **kwargs):
     """Ensure lazily referenced model signals senders are installed."""
     from django.db import models
