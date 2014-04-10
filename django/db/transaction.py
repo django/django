@@ -2,7 +2,7 @@ from functools import wraps
 
 from django.db import (
     connections, DEFAULT_DB_ALIAS,
-    DatabaseError, ProgrammingError)
+    DatabaseError, Error, ProgrammingError)
 from django.utils.decorators import available_attrs
 
 
@@ -205,21 +205,37 @@ class Atomic(object):
             connection.in_atomic_block = False
 
         try:
-            if exc_type is None and not connection.needs_rollback:
+            if connection.closed_in_transaction:
+                # The database will perform a rollback by itself.
+                # Wait until we exit the outermost block.
+                pass
+
+            elif exc_type is None and not connection.needs_rollback:
                 if connection.in_atomic_block:
                     # Release savepoint if there is one
                     if sid is not None:
                         try:
                             connection.savepoint_commit(sid)
                         except DatabaseError:
-                            connection.savepoint_rollback(sid)
+                            try:
+                                connection.savepoint_rollback(sid)
+                            except Error:
+                                # If rolling back to a savepoint fails, mark for
+                                # rollback at a higher level and avoid shadowing
+                                # the original exception.
+                                connection.needs_rollback = True
                             raise
                 else:
                     # Commit transaction
                     try:
                         connection.commit()
                     except DatabaseError:
-                        connection.rollback()
+                        try:
+                            connection.rollback()
+                        except Error:
+                            # Error during rollback means the connection was
+                            # closed. Clean up in case the server dropped it.
+                            connection.close()
                         raise
             else:
                 # This flag will be set to True again if there isn't a savepoint
@@ -233,25 +249,35 @@ class Atomic(object):
                     else:
                         try:
                             connection.savepoint_rollback(sid)
-                        except DatabaseError:
+                        except Error:
                             # If rolling back to a savepoint fails, mark for
                             # rollback at a higher level and avoid shadowing
                             # the original exception.
                             connection.needs_rollback = True
                 else:
                     # Roll back transaction
-                    connection.rollback()
+                    try:
+                        connection.rollback()
+                    except Error:
+                        # Error during rollback means the connection was
+                        # closed. Clean up in case the server dropped it.
+                        connection.close()
 
         finally:
             # Outermost block exit when autocommit was enabled.
             if not connection.in_atomic_block:
-                if connection.features.autocommits_when_autocommit_is_off:
+                if connection.closed_in_transaction:
+                    connection.connection = None
+                elif connection.features.autocommits_when_autocommit_is_off:
                     connection.autocommit = True
                 else:
                     connection.set_autocommit(True)
             # Outermost block exit when autocommit was disabled.
             elif not connection.savepoint_ids and not connection.commit_on_exit:
-                connection.in_atomic_block = False
+                if connection.closed_in_transaction:
+                    connection.connection = None
+                else:
+                    connection.in_atomic_block = False
 
     def __call__(self, func):
         @wraps(func, assigned=available_attrs(func))

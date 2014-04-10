@@ -664,13 +664,6 @@ class BackendTestCase(TestCase):
             self.assertIsInstance(cursor, CursorWrapper)
         self.assertTrue(cursor.closed)
 
-
-class IsUsableTests(TransactionTestCase):
-    # Avoid using a regular TestCase because Django really dislikes closing
-    # the database connection inside a transaction at this point (#21202).
-
-    available_apps = []
-
     # Unfortunately with sqlite3 the in-memory test database cannot be closed.
     @skipUnlessDBFeature('test_db_allows_multiple_connections')
     def test_is_usable_after_database_disconnects(self):
