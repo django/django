@@ -488,7 +488,7 @@ class BackendTestCase(TestCase):
     def create_squares_with_executemany(self, args):
         self.create_squares(args, 'format', True)
 
-    def create_squares(self, args, paramstyle, multiple):    
+    def create_squares(self, args, paramstyle, multiple):
         cursor = connection.cursor()
         opts = models.Square._meta
         tbl = connection.introspection.table_name_converter(opts.db_table)
@@ -560,7 +560,7 @@ class BackendTestCase(TestCase):
             # same test for DebugCursorWrapper
             self.create_squares(args, 'pyformat', multiple=True)
         self.assertEqual(models.Square.objects.count(), 9)
-        
+
     def test_unicode_fetches(self):
         #6254: fetchone, fetchmany, fetchall return strings as unicode objects
         qn = connection.ops.quote_name
@@ -627,8 +627,7 @@ class IsUsableTests(TransactionTestCase):
         Regression for #21553.
         """
         # Open a connection to the database.
-        with connection.cursor():
-            pass
+        connection.cursor().close()
         # Emulate a connection close by the database.
         connection._close()
         # Even then is_usable() should not raise an exception.
