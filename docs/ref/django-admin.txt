@@ -126,6 +126,10 @@ to perform only security and compatibility checks, you would run::
 
     python manage.py check --tag security --tag compatibility
 
+.. django-admin-option:: --list-tags
+
+List all available tags.
+
 compilemessages
 ---------------
 
