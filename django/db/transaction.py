@@ -217,7 +217,13 @@ class Atomic(object):
                         try:
                             connection.savepoint_commit(sid)
                         except DatabaseError:
-                            connection.savepoint_rollback(sid)
+                            try:
+                                connection.savepoint_rollback(sid)
+                            except Error:
+                                # If rolling back to a savepoint fails, mark for
+                                # rollback at a higher level and avoid shadowing
+                                # the original exception.
+                                connection.needs_rollback = True
                             raise
                 else:
                     # Commit transaction
@@ -243,7 +249,7 @@ class Atomic(object):
                     else:
                         try:
                             connection.savepoint_rollback(sid)
-                        except DatabaseError:
+                        except Error:
                             # If rolling back to a savepoint fails, mark for
                             # rollback at a higher level and avoid shadowing
                             # the original exception.
