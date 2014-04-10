@@ -694,6 +694,6 @@ connecting to external databases. Therefore, it's recommended:
 
 .. warning::
 
-    If you're synchronizing content types to more that one database, be aware
+    If you're synchronizing content types to more than one database, be aware
     that their primary keys may not match across databases. This may result in
     data corruption or data loss.
