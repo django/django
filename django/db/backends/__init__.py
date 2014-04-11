@@ -166,6 +166,8 @@ class BaseDatabaseWrapper(object):
         self.validate_thread_sharing()
         self.validate_no_atomic_block()
         self._commit()
+        # A successful commit means that the database connection works.
+        self.errors_occurred = False
 
     def rollback(self):
         """
@@ -174,6 +176,8 @@ class BaseDatabaseWrapper(object):
         self.validate_thread_sharing()
         self.validate_no_atomic_block()
         self._rollback()
+        # A successful rollback means that the database connection works.
+        self.errors_occurred = False
 
     def close(self):
         """
@@ -381,6 +385,8 @@ class BaseDatabaseWrapper(object):
                 self.close()
                 return
 
+            # If an exception other than DataError or IntegrityError occurred
+            # since the last commit / rollback, check if the connection works.
             if self.errors_occurred:
                 if self.is_usable():
                     self.errors_occurred = False
