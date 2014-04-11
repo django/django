@@ -233,8 +233,8 @@ class Atomic(object):
                         try:
                             connection.rollback()
                         except Error:
-                            # Error during rollback means the connection was
-                            # closed. Clean up in case the server dropped it.
+                            # An error during rollback means that something
+                            # went wrong with the connection. Drop it.
                             connection.close()
                         raise
             else:
@@ -259,8 +259,8 @@ class Atomic(object):
                     try:
                         connection.rollback()
                     except Error:
-                        # Error during rollback means the connection was
-                        # closed. Clean up in case the server dropped it.
+                        # An error during rollback means that something
+                        # went wrong with the connection. Drop it.
                         connection.close()
 
         finally:
