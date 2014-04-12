@@ -25,7 +25,7 @@ class DiscoverRunnerTest(TestCase):
             ["test_discovery_sample.tests_sample"],
         ).countTestCases()
 
-        self.assertEqual(count, 2)
+        self.assertEqual(count, 4)
 
     def test_dotted_test_class_vanilla_unittest(self):
         count = DiscoverRunner().build_suite(
@@ -61,7 +61,7 @@ class DiscoverRunnerTest(TestCase):
                 ["test_discovery_sample/"],
             ).countTestCases()
 
-        self.assertEqual(count, 3)
+        self.assertEqual(count, 5)
 
     def test_empty_label(self):
         """
@@ -102,6 +102,20 @@ class DiscoverRunnerTest(TestCase):
         ).countTestCases()
 
         self.assertEqual(count, 0)
+
+    def test_testcase_ordering(self):
+        suite = DiscoverRunner().build_suite(["test_discovery_sample/"])
+        tc_names = [case.__class__.__name__ for case in suite._tests]
+        self.assertEqual(
+            suite._tests[0].__class__.__name__,
+            'TestDjangoTestCase',
+            msg="TestDjangoTestCase should be the first test case")
+        self.assertEqual(
+            suite._tests[1].__class__.__name__,
+            'TestZimpleTestCase',
+            msg="TestZimpleTestCase should be the second test case")
+        # All others can follow in unspecified order, including doctests
+        self.assertIn('DocTestCase', [t.__class__.__name__ for t in suite._tests[2:]])
 
     def test_overrideable_test_suite(self):
         self.assertEqual(DiscoverRunner().test_suite, TestSuite)

@@ -6,7 +6,7 @@ from unittest import TestSuite, defaultTestLoader
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
 
 
@@ -18,7 +18,7 @@ class DiscoverRunner(object):
     test_suite = TestSuite
     test_runner = unittest.TextTestRunner
     test_loader = defaultTestLoader
-    reorder_by = (TestCase, )
+    reorder_by = (TestCase, SimpleTestCase)
     option_list = (
         make_option('-t', '--top-level-directory',
             action='store', dest='top_level', default=None,
