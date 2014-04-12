@@ -279,7 +279,9 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
         # composite fields. In the meantime we take this practical approach to
         # solve a regression on 1.6 when the reverse manager in hidden
         # (related_name ends with a '+'). Refs #21410.
-        if self.field.rel.is_hidden():
+        # The check for len(...) == 1 is a special case that allows the query
+        # to be join-less and smaller. Refs #21760.
+        if self.field.rel.is_hidden() or len(self.field.foreign_related_fields) == 1:
             query = {'%s__in' % related_field.name: set(instance_attr(inst)[0] for inst in instances)}
         else:
             query = {'%s__in' % self.field.related_query_name(): instances}

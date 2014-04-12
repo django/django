@@ -2,9 +2,11 @@ from __future__ import absolute_import, unicode_literals
 
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection
+from django.db.models.query import get_prefetcher
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import six
+from django.utils.encoding import force_text
 
 from .models import (Author, Book, Reader, Qualification, Teacher, Department,
     TaggedItem, Bookmark, AuthorAddress, FavoriteAuthors, AuthorWithAge,
@@ -677,3 +679,18 @@ class Ticket21410Tests(TestCase):
 
     def test_bug(self):
         list(Author2.objects.prefetch_related('first_book', 'favorite_books'))
+
+
+class Ticket21760Tests(TestCase):
+
+    def setUp(self):
+        self.rooms = []
+        for _ in range(3):
+            house = House.objects.create()
+            for _ in range(3):
+                self.rooms.append(Room.objects.create(house = house))
+
+    def test_bug(self):
+        prefetcher = get_prefetcher(self.rooms[0], 'house')[0]
+        queryset = prefetcher.get_prefetch_queryset(list(Room.objects.all()))[0]
+        self.assertNotIn(' JOIN ', force_text(queryset.query))
