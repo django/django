@@ -20,6 +20,11 @@ class Small(object):
     def __str__(self):
         return '%s%s' % (force_text(self.first), force_text(self.second))
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.first == other.first and self.second == other.second
+        return False
+
 
 class SmallField(six.with_metaclass(models.SubfieldBase, models.Field)):
     """
