@@ -189,7 +189,7 @@ backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 KEY_FUNCTION
 ~~~~~~~~~~~~
 
-A string containing a dotted path to a function that defines how to
+A string containing a dotted path to a function (or any callable) that defines how to
 compose a prefix, version and key into a final cache key. The default
 implementation is equivalent to the function::
 
