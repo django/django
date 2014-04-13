@@ -877,41 +877,8 @@ Start-up sequence
 
 Django 1.7 loads application configurations and models as soon as it starts.
 While this behavior is more straightforward and is believed to be more robust,
-regressions cannot be ruled out. You may encounter the following exceptions:
-
-* ``RuntimeError: App registry isn't ready yet.`` This happens when importing
-  an application configuration or a models module triggers code that depends
-  on the app registry.
-
-  For example, :func:`~django.utils.translation.ugettext()` uses the app
-  registry to look up translation catalogs in applications. To translate at
-  import time, you need :func:`~django.utils.translation.ugettext_lazy()`
-  instead. (Using :func:`~django.utils.translation.ugettext()` would be a bug,
-  because the translation would happen at import time, rather than at each
-  request depending on the active language.)
-
-  Executing database queries with the ORM at import time in models modules
-  will also trigger this exception. The ORM cannot function properly until all
-  models are available.
-
-  Another common culprit is :func:`django.contrib.auth.get_user_model()`. Use
-  the :setting:`AUTH_USER_MODEL` setting to reference the User model at import
-  time.
-
-* ``ImportError: cannot import name ...`` This happens if the import sequence
-  ends up in a loop.
-
-  To eliminate such problems, you should minimize dependencies between your
-  models modules and do as little work as possible at import time. To avoid
-  executing code at import time, you can move it into a function and cache its
-  results. The code will be executed when you first need its results. This
-  concept is known as "lazy evaluation".
-
-* ``django.contrib.admin`` will now automatically perform autodiscovery of
-  ``admin`` modules in installed applications. To prevent it, change your
-  :setting:`INSTALLED_APPS` to contain
-  ``'django.contrib.admin.apps.SimpleAdminConfig'`` instead of
-  ``'django.contrib.admin'``.
+regressions cannot be ruled out. See :ref:`application-loading-process` for
+solutions to some problems you may encounter.
 
 Standalone scripts
 ^^^^^^^^^^^^^^^^^^
