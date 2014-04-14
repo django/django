@@ -213,6 +213,12 @@ class AssertTemplateUsedTests(TestCase):
         except AssertionError as e:
             self.assertIn("abc: No templates used to render the response", str(e))
 
+        with self.assertRaises(AssertionError) as context:
+            self.assertTemplateUsed(response, 'GET Template', count=2)
+        self.assertIn(
+            "No templates used to render the response",
+            str(context.exception))
+
     def test_single_context(self):
         "Template assertions work when there is a single context"
         response = self.client.get('/post_view/', {})
@@ -236,6 +242,21 @@ class AssertTemplateUsedTests(TestCase):
             self.assertTemplateUsed(response, 'Empty POST Template', msg_prefix='abc')
         except AssertionError as e:
             self.assertIn("abc: Template 'Empty POST Template' was not a template used to render the response. Actual template(s) used: Empty GET Template", str(e))
+
+        with self.assertRaises(AssertionError) as context:
+            self.assertTemplateUsed(response, 'Empty GET Template', count=2)
+        self.assertIn(
+            "Template 'Empty GET Template' was expected to be rendered 2 "
+            "time(s) but was actually rendered 1 time(s).",
+            str(context.exception))
+
+        with self.assertRaises(AssertionError) as context:
+            self.assertTemplateUsed(
+                response, 'Empty GET Template', msg_prefix='abc', count=2)
+        self.assertIn(
+            "abc: Template 'Empty GET Template' was expected to be rendered 2 "
+            "time(s) but was actually rendered 1 time(s).",
+            str(context.exception))
 
     def test_multiple_context(self):
         "Template assertions work when there are multiple contexts"
@@ -262,6 +283,19 @@ class AssertTemplateUsedTests(TestCase):
             self.assertTemplateUsed(response, "Valid POST Template")
         except AssertionError as e:
             self.assertIn("Template 'Valid POST Template' was not a template used to render the response. Actual template(s) used: form_view.html, base.html", str(e))
+
+        with self.assertRaises(AssertionError) as context:
+            self.assertTemplateUsed(response, 'base.html', count=2)
+        self.assertIn(
+            "Template 'base.html' was expected to be rendered 2 "
+            "time(s) but was actually rendered 1 time(s).",
+            str(context.exception))
+
+    def test_template_rendered_multiple_times(self):
+        """Template assertions work when a template is rendered multiple times."""
+        response = self.client.get('/render_template_multiple_times/')
+
+        self.assertTemplateUsed(response, 'base.html', count=2)
 
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')

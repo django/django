@@ -37,4 +37,5 @@ urlpatterns = [
     url(r'^read_all/$', views.read_all),
     url(r'^read_buffer/$', views.read_buffer),
     url(r'^request_context_view/$', views.request_context_view),
+    url(r'^render_template_multiple_times/$', views.render_template_multiple_times),
 ]

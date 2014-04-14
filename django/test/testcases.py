@@ -521,7 +521,7 @@ class SimpleTestCase(unittest.TestCase):
                           None]
         return None, template_names, msg_prefix
 
-    def assertTemplateUsed(self, response=None, template_name=None, msg_prefix=''):
+    def assertTemplateUsed(self, response=None, template_name=None, msg_prefix='', count=None):
         """
         Asserts that the template with the provided name was used in rendering
         the response. Also usable as context manager.
@@ -539,6 +539,12 @@ class SimpleTestCase(unittest.TestCase):
             msg_prefix + "Template '%s' was not a template used to render"
             " the response. Actual template(s) used: %s" %
                 (template_name, ', '.join(template_names)))
+
+        if count is not None:
+            self.assertEqual(template_names.count(template_name), count,
+                msg_prefix + "Template '%s' was expected to be rendered %d "
+                "time(s) but was actually rendered %d time(s)." %
+                    (template_name, count, template_names.count(template_name)))
 
     def assertTemplateNotUsed(self, response=None, template_name=None, msg_prefix=''):
         """
