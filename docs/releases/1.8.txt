@@ -385,6 +385,10 @@ Requests and Responses
   <django.http.HttpRequest.get_full_path>` method now escapes unsafe characters
   from the path portion of a Uniform Resource Identifier (URI) properly.
 
+* :class:`~django.http.HttpResponse` now implements a few additional methods
+  like :meth:`~django.http.HttpResponse.getvalue` so that instances can be used
+  as stream objects.
+
 Tests
 ^^^^^
 

@@ -651,6 +651,12 @@ Attributes
     This attribute exists so middleware can treat streaming responses
     differently from regular responses.
 
+.. attribute:: HttpResponse.closed
+
+    .. versionadded:: 1.8
+
+    ``True`` if the response has been closed.
+
 Methods
 -------
 
@@ -768,6 +774,27 @@ Methods
 .. method:: HttpResponse.tell()
 
     This method makes an :class:`HttpResponse` instance a file-like object.
+
+.. method:: HttpResponse.getvalue()
+
+    .. versionadded:: 1.8
+
+    Returns the value of :attr:`HttpResponse.content`. This method makes
+    an :class:`HttpResponse` instance a stream-like object.
+
+.. method:: HttpResponse.writable()
+
+    .. versionadded:: 1.8
+
+    Always ``True``. This method makes an :class:`HttpResponse` instance a
+    stream-like object.
+
+.. method:: HttpResponse.writelines(lines)
+
+    .. versionadded:: 1.8
+
+    Writes a list of lines to the response. Line seperators are not added. This
+    method makes an :class:`HttpResponse` instance a stream-like object.
 
 .. _HTTP status code: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
 
