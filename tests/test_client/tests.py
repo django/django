@@ -371,10 +371,12 @@ class ClientTest(TestCase):
         user = User.objects.filter(is_active=True)[0]
         self.assertIsNotNone(user, 'Test precondition failed. Could not find an active User instance.')
 
+        # Log in
         login = self.client.simple_login(user)
         self.assertTrue(login)
 
-        response = self.client.get('/test_client/login_protected_view/')
+        # Request a page that requires a logged in user
+        response = self.client.get('/login_protected_method_view/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, user.username)
 
@@ -382,11 +384,13 @@ class ClientTest(TestCase):
         user = User.objects.filter(is_active=False)[0]
         self.assertIsNotNone(user, 'Test precondition failed. Could not find an inactive User instance.')
 
+        # Log in with inactive user
         login = self.client.simple_login(user)
         self.assertFalse(login)
 
-        response = self.client.get('/test_client/login_protected_view/')
-        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/login_protected_view/')
+        # Request a page that requires a logged in user
+        response = self.client.get('/login_protected_method_view/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/login_protected_method_view/')
 
     def test_logout(self):
         "Request a logout after logging in"
