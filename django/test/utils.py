@@ -33,6 +33,7 @@ __all__ = (
 
 RESTORE_LOADERS_ATTR = '_original_template_source_loaders'
 TZ_SUPPORT = hasattr(time, 'tzset')
+TEST_ENVIRON_AUTHENTICATION_BACKENDS = settings.AUTHENTICATION_BACKENDS + ('django.contrib.auth.backends.SimpleLoginBackend',)
 
 
 class Approximate(object):
@@ -109,7 +110,7 @@ def setup_test_environment():
     settings.ALLOWED_HOSTS = ['*']
 
     auth._original_authentication_backends = settings.AUTHENTICATION_BACKENDS
-    settings.AUTHENTICATION_BACKENDS = settings.AUTHENTICATION_BACKENDS + ('django.contrib.auth.backends.SimpleLoginBackend',)
+    settings.AUTHENTICATION_BACKENDS = TEST_ENVIRON_AUTHENTICATION_BACKENDS
 
     mail.outbox = []
 
