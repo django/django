@@ -12,16 +12,37 @@ your code, Django provides the following function:
 
 .. function:: reverse(viewname, [urlconf=None, args=None, kwargs=None, current_app=None])
 
-``viewname`` is either the function name (either a function reference, or the
-string version of the name, if you used that form in ``urlpatterns``) or the
-:ref:`URL pattern name <naming-url-patterns>`.  Normally, you won't need to
-worry about the ``urlconf`` parameter and will only pass in the positional and
-keyword arguments to use in the URL matching. For example::
+``viewname`` can be a string containing the Python path to the view object, a
+:ref:`URL pattern name <naming-url-patterns>`, or the callable view object.
+For example, given the following ``url``::
+
+    url(r'^archive/$', 'news.views.archive', name='news_archive')
+
+you can use any of the following to reverse the URL::
+
+    # using the Python path
+    reverse('news.views.archive')
+
+    # using the named URL
+    reverse('news_archive')
+
+    # passing a callable object
+    from news import views
+    reverse(views.archive)
+
+If the URL accepts arguments, you may pass them in ``args``. For example::
 
     from django.core.urlresolvers import reverse
 
     def myview(request):
         return HttpResponseRedirect(reverse('arch-summary', args=[1945]))
+
+You can also pass ``kwargs`` instead of ``args``. For example::
+
+    >>> reverse('admin:app_list', kwargs={'app_label': 'auth'})
+    '/admin/auth/'
+
+``args`` and ``kwargs`` cannot be passed to ``reverse()`` at the same time.
 
 If no match can be made, ``reverse()`` raises a
 :class:`~django.core.urlresolvers.NoReverseMatch` exception.
@@ -39,12 +60,9 @@ This ``current_app`` argument is used as a hint to resolve application
 namespaces into URLs on specific application instances, according to the
 :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`.
 
-You can use ``kwargs`` instead of ``args``. For example::
+The ``urlconf`` argument is the URLconf module containing the url patterns to
+use for reversing. By default, the root URLconf for the current thread is used.
 
-    >>> reverse('admin:app_list', kwargs={'app_label': 'auth'})
-    '/admin/auth/'
-
-``args`` and ``kwargs`` cannot be passed to ``reverse()`` at the same time.
 
 .. admonition:: Make sure your views are all correct.
 
