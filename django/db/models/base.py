@@ -1346,6 +1346,19 @@ class Model(six.with_metaclass(ModelBase)):
                             id='models.E013',
                         )
                     )
+                elif field not in cls._meta.local_fields:
+                    errors.append(
+                        checks.Error(
+                            ("'%s' refers to field '%s' which is not local "
+                             "to model '%s'.") % (
+                                option, field_name, cls._meta.object_name
+                            ),
+                            hint=("This issue may be caused by multi-table "
+                                  "inheritance."),
+                            obj=cls,
+                            id='models.E016',
+                        )
+                    )
         return errors
 
     @classmethod
