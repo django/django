@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from os.path import splitext
 import re
 
 from django.core.exceptions import ValidationError
@@ -273,3 +274,23 @@ class MaxLengthValidator(BaseValidator):
         'Ensure this value has at most %(limit_value)d characters (it has %(show_value)d).',
         'limit_value')
     code = 'max_length'
+
+
+@deconstructible
+class FileExtensionValidator(object):
+    message = _("File extension '%(extension)s' is not allowed. Allowed extensions are: '%(allowed_extensions)s'.")
+
+    def __init__(self, allowed_extensions=None):
+        self.allowed_extensions = allowed_extensions
+
+    def __call__(self, value):
+        extension = self._extract_extension_from_filename(value.name)
+        if self.allowed_extensions is not None and not extension in self.allowed_extensions:
+            message = self.message % {
+                'extension': extension,
+                'allowed_extensions': ', '.join(self.allowed_extensions)
+            }
+            raise ValidationError(message)
+
+    def _extract_extension_from_filename(self, filename):
+        return splitext(filename)[1][1:].lower()
