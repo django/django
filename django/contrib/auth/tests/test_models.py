@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractUser, Group, User, UserManager
+from django.contrib.auth.models import (AbstractUser, ContentType, Group,
+                                        Permission, User, UserManager)
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core import mail
 from django.db.models.signals import post_save
@@ -45,6 +46,11 @@ class LoadDataWithNaturalKeysTestCase(TestCase):
 
 @skipIfCustomUser
 class UserManagerTestCase(TestCase):
+    def setUp(self):
+        self.content_type = ContentType.objects.get_for_model(Group)
+        self.permission = Permission.objects.create(name='test',
+                                                    content_type=self.content_type,
+                                                    codename='test')
 
     def test_create_user(self):
         email_lowercase = 'normal@normal.com'
@@ -73,6 +79,74 @@ class UserManagerTestCase(TestCase):
             'The given username must be set',
             User.objects.create_user, username=''
         )
+
+    def test_with_perm_invalid_permission_name(self):
+        self.assertRaises(ValueError, User.objects.with_perm, 'nodots')
+        self.assertRaises(ValueError, User.objects.with_perm, 'too.many.dots')
+        self.assertRaises(ValueError, User.objects.with_perm, '...........')
+        self.assertRaises(ValueError, User.objects.with_perm, '')
+
+    def test_with_perm_user_permissions(self):
+        user1 = User.objects.create_user('user1', 'foo@example.com')
+        user1.user_permissions.add(self.permission)
+        user1.save()
+
+        # Shouldn't be in results.
+        User.objects.create_user('user2', 'bar@example.com')
+
+        self.assertQuerysetEqual(User.objects.with_perm('auth.test'),
+                                 [user1], lambda x: x)
+
+    def test_with_perm_group_permissions(self):
+        group1 = Group.objects.create(name='test')
+        group1.permissions.add(self.permission)
+        group1.save()
+        user1 = User.objects.create_user('user1', 'foo@example.com')
+        user1.groups.add(group1)
+        user1.save()
+
+        # Shouldn't be in results.
+        User.objects.create_user('user2', 'bar@example.com')
+
+        self.assertQuerysetEqual(User.objects.with_perm('auth.test'),
+                                 [user1], lambda x: x)
+
+    def test_with_perm_superuser(self):
+        superuser = User.objects.create_superuser('user1', 'foo@example.com', '')
+
+        # Shouldn't be in results.
+        User.objects.create_user('user2', 'bar@example.com')
+
+        self.assertQuerysetEqual(User.objects.with_perm('auth.test'),
+                                 [superuser], lambda x: x)
+
+    def test_with_perm_inactive(self):
+        # Shouldn't be in results.
+        user = User.objects.create_superuser('user1', 'foo@example.com', '')
+        user.is_active = False
+        user.save()
+        self.assertQuerysetEqual(User.objects.with_perm('auth.test'), [],
+                                 lambda x: x)
+
+    def test_with_perm_distinct(self):
+        group1 = Group.objects.create(name='test')
+        group1.permissions.add(self.permission)
+        group1.save()
+        group2 = Group.objects.create(name='test2')
+        group2.permissions.add(self.permission)
+        group2.save()
+
+
+        user1 = User.objects.create_user('user1', 'foo@example.com')
+        user1.groups.add(group1)
+        user1.groups.add(group2)
+        user1.user_permissions.add(self.permission)
+        user1.save()
+
+        self.assertQuerysetEqual(User.objects.with_perm('auth.test'),
+                                 [user1], lambda x: x)
+
+
 
 
 class AbstractUserTestCase(TestCase):
