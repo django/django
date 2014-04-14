@@ -127,6 +127,7 @@ class Context(BaseContext):
         self.current_app = current_app
         self.use_l10n = use_l10n
         self.use_tz = use_tz
+        self.template_name = "Unknown"
         self.render_context = RenderContext()
         super(Context, self).__init__(dict_)
 
