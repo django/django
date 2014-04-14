@@ -23,9 +23,9 @@ URLconf from the :doc:`Django overview </intro/overview>`::
     from django.conf.urls import patterns, url
 
     urlpatterns = patterns('',
-        url(r'^articles/(\d{4})/$', 'news.views.year_archive'),
-        url(r'^articles/(\d{4})/(\d{2})/$', 'news.views.month_archive'),
-        url(r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'news.views.article_detail'),
+        url(r'^articles/([0-9]{4})/$', 'news.views.year_archive'),
+        url(r'^articles/([0-9]{4})/([0-9]{2})/$', 'news.views.month_archive'),
+        url(r'^articles/([0-9]{4})/([0-9]{2})/([0-9]+)/$', 'news.views.article_detail'),
     )
 
 In this example, each view has a common prefix -- ``'news.views'``.
@@ -38,9 +38,9 @@ With this in mind, the above example can be written more concisely as::
     from django.conf.urls import patterns, url
 
     urlpatterns = patterns('news.views',
-        url(r'^articles/(\d{4})/$', 'year_archive'),
-        url(r'^articles/(\d{4})/(\d{2})/$', 'month_archive'),
-        url(r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'article_detail'),
+        url(r'^articles/([0-9]{4})/$', 'year_archive'),
+        url(r'^articles/([0-9]{4})/([0-9]{2})/$', 'month_archive'),
+        url(r'^articles/([0-9]{4})/([0-9]{2})/([0-9]+)/$', 'article_detail'),
     )
 
 Note that you don't put a trailing dot (``"."``) in the prefix. Django puts

@@ -171,7 +171,7 @@ YearArchiveView
         from myapp.views import ArticleYearArchiveView
 
         urlpatterns = [
-            url(r'^(?P<year>\d{4})/$',
+            url(r'^(?P<year>[0-9]{4})/$',
                 ArticleYearArchiveView.as_view(),
                 name="article_year_archive"),
         ]
@@ -267,11 +267,11 @@ MonthArchiveView
 
         urlpatterns = [
             # Example: /2012/aug/
-            url(r'^(?P<year>\d{4})/(?P<month>[-\w]+)/$',
+            url(r'^(?P<year>[0-9]{4})/(?P<month>[-\w]+)/$',
                 ArticleMonthArchiveView.as_view(),
                 name="archive_month"),
             # Example: /2012/08/
-            url(r'^(?P<year>\d{4})/(?P<month>\d+)/$',
+            url(r'^(?P<year>[0-9]{4})/(?P<month>[0-9]+)/$',
                 ArticleMonthArchiveView.as_view(month_format='%m'),
                 name="archive_month_numeric"),
         ]
@@ -361,7 +361,7 @@ WeekArchiveView
 
         urlpatterns = [
             # Example: /2012/week/23/
-            url(r'^(?P<year>\d{4})/week/(?P<week>\d+)/$',
+            url(r'^(?P<year>[0-9]{4})/week/(?P<week>[0-9]+)/$',
                 ArticleWeekArchiveView.as_view(),
                 name="archive_week"),
         ]
@@ -475,7 +475,7 @@ DayArchiveView
 
         urlpatterns = [
             # Example: /2012/nov/10/
-            url(r'^(?P<year>\d{4})/(?P<month>[-\w]+)/(?P<day>\d+)/$',
+            url(r'^(?P<year>[0-9]{4})/(?P<month>[-\w]+)/(?P<day>[0-9]+)/$',
                 ArticleDayArchiveView.as_view(),
                 name="archive_day"),
         ]
@@ -597,7 +597,7 @@ DateDetailView
         from django.views.generic.dates import DateDetailView
 
         urlpatterns = [
-            url(r'^(?P<year>\d+)/(?P<month>[-\w]+)/(?P<day>\d+)/(?P<pk>\d+)/$',
+            url(r'^(?P<year>[0-9]+)/(?P<month>[-\w]+)/(?P<day>[0-9]+)/(?P<pk>[0-9]+)/$',
                 DateDetailView.as_view(model=Article, date_field="pub_date"),
                 name="archive_date_detail"),
         ]

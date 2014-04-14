@@ -1078,7 +1078,7 @@ class ModelFormsetTest(TestCase):
         form = formset.forms[0]
         now = form.fields['date_joined'].initial()
         result = form.as_p()
-        result = re.sub(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d+)?', '__DATETIME__', result)
+        result = re.sub(r'[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+)?', '__DATETIME__', result)
         self.assertHTMLEqual(result,
             '<p><label for="id_membership_set-0-date_joined">Date joined:</label> <input type="text" name="membership_set-0-date_joined" value="__DATETIME__" id="id_membership_set-0-date_joined" /><input type="hidden" name="initial-membership_set-0-date_joined" value="__DATETIME__" id="initial-membership_set-0-id_membership_set-0-date_joined" /></p>\n'
             '<p><label for="id_membership_set-0-karma">Karma:</label> <input type="number" name="membership_set-0-karma" id="id_membership_set-0-karma" /><input type="hidden" name="membership_set-0-person" value="%d" id="id_membership_set-0-person" /><input type="hidden" name="membership_set-0-id" id="id_membership_set-0-id" /></p>'

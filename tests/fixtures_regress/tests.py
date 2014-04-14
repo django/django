@@ -372,7 +372,7 @@ class TestFixtures(TestCase):
 
         # Get rid of artifacts like '000000002' to eliminate the differences
         # between different Python versions.
-        data = re.sub('0{6,}\d', '', data)
+        data = re.sub('0{6,}[0-9]', '', data)
 
         animals_data = sorted([
             {"pk": 1, "model": "fixtures_regress.animal", "fields": {"count": 3, "weight": 1.2, "name": "Lion", "latin_name": "Panthera leo"}},

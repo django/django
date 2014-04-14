@@ -61,7 +61,7 @@ created a URLconf for the polls application that includes this line:
 .. snippet::
     :filename: polls/urls.py
 
-    url(r'^(?P<question_id>\d+)/vote/$', views.vote, name='vote'),
+    url(r'^(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
 
 We also created a dummy implementation of the ``vote()`` function. Let's
 create a real version. Add the following to ``polls/views.py``:
@@ -228,9 +228,9 @@ First, open the ``polls/urls.py`` URLconf and change it like so:
 
     urlpatterns = [
         url(r'^$', views.IndexView.as_view(), name='index'),
-        url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
-        url(r'^(?P<pk>\d+)/results/$', views.ResultsView.as_view(), name='results'),
-        url(r'^(?P<question_id>\d+)/vote/$', views.vote, name='vote'),
+        url(r'^(?P<pk>[0-9]+)/$', views.DetailView.as_view(), name='detail'),
+        url(r'^(?P<pk>[0-9]+)/results/$', views.ResultsView.as_view(), name='results'),
+        url(r'^(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
     ]
 
 Amend views
