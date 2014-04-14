@@ -183,7 +183,7 @@ class SQLCompiler(object):
         Used when nesting this query inside another.
         """
         obj = self.query.clone()
-        if obj.low_mark == 0 and obj.high_mark is None and not self.query.distinct_fields:
+        if obj.can_filter() and not self.query.distinct_fields:
             # If there is no slicing in use, then we can safely drop all ordering
             obj.clear_ordering(True)
         return obj.get_compiler(connection=self.connection).as_sql()
