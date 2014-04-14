@@ -22,6 +22,7 @@ rather than the HTML rendered to the end-user.
 """
 from __future__ import unicode_literals
 
+from django.contrib.auth.models import User
 from django.core import mail
 from django.test import Client, TestCase, RequestFactory
 from django.test import override_settings
@@ -365,6 +366,27 @@ class ClientTest(TestCase):
 
         login = self.client.login(username='inactive', password='password')
         self.assertFalse(login)
+
+    def test_simple_login_with_active_user_logs_in_successfully(self):
+        user = User.objects.filter(is_active=True)[0]
+        self.assertIsNotNone(user, 'Test precondition failed. Could not find an active User instance.')
+
+        login = self.client.simple_login(user)
+        self.assertTrue(login)
+
+        response = self.client.get('/test_client/login_protected_view/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['user'].username, user.username)
+
+    def test_simple_login_with_inactive_user_gets_redirected_to_login_page(self):
+        user = User.objects.filter(is_active=False)[0]
+        self.assertIsNotNone(user, 'Test precondition failed. Could not find an inactive User instance.')
+
+        login = self.client.simple_login(user)
+        self.assertFalse(login)
+
+        response = self.client.get('/test_client/login_protected_view/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/login_protected_view/')
 
     def test_logout(self):
         "Request a logout after logging in"

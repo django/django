@@ -10,6 +10,7 @@ from xml.dom.minidom import parseString, Node
 
 from django.apps import apps
 from django.conf import settings, UserSettingsHolder
+from django.contrib import auth
 from django.core import mail
 from django.core.signals import request_started
 from django.db import reset_queries
@@ -107,6 +108,9 @@ def setup_test_environment():
     request._original_allowed_hosts = settings.ALLOWED_HOSTS
     settings.ALLOWED_HOSTS = ['*']
 
+    auth._original_authentication_backends = settings.AUTHENTICATION_BACKENDS
+    settings.AUTHENTICATION_BACKENDS = settings.AUTHENTICATION_BACKENDS + ('django.contrib.auth.backends.SimpleLoginBackend',)
+
     mail.outbox = []
 
     deactivate()
@@ -127,6 +131,9 @@ def teardown_test_environment():
 
     settings.ALLOWED_HOSTS = request._original_allowed_hosts
     del request._original_allowed_hosts
+
+    settings.AUTHENTICATION_BACKENDS = auth._original_authentication_backends
+    del auth._original_authentication_backends
 
     del mail.outbox
 
