@@ -7,12 +7,13 @@ import types
 from unittest import TestCase
 
 from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.core.validators import (
     BaseValidator, EmailValidator, MaxLengthValidator, MaxValueValidator,
     MinLengthValidator, MinValueValidator, RegexValidator, URLValidator,
     validate_comma_separated_integer_list, validate_email, validate_integer,
     validate_ipv46_address, validate_ipv4_address, validate_ipv6_address,
-    validate_slug,
+    validate_slug, FileExtensionValidator
 )
 from django.test.utils import str_prefix
 
@@ -202,6 +203,12 @@ TEST_DATA = (
     (RegexValidator('x', flags=re.IGNORECASE), 'y', ValidationError),
     (RegexValidator('a'), 'A', ValidationError),
     (RegexValidator('a', flags=re.IGNORECASE), 'A', None),
+
+    (FileExtensionValidator(['txt']), ContentFile('contents', name='fileWithUnsupportedExtension.jpg'), ValidationError),
+    (FileExtensionValidator(['txt']), ContentFile('contents', name='fileWithNoExtenstion'), ValidationError),
+    (FileExtensionValidator([]), ContentFile('contents', name='file.txt'), ValidationError),
+    (FileExtensionValidator(['txt']), ContentFile('contents', name='file.txt'), None),
+    (FileExtensionValidator(), ContentFile('contents', name='file.jpg'), None),
 )
 
 
@@ -323,3 +330,32 @@ class TestValidatorEquality(TestCase):
             MinValueValidator(45),
             MinValueValidator(11),
         )
+
+
+class FileExtensionValidatorTests(TestCase):
+    def _file_with_name(self, filename):
+        return ContentFile('contents', name=filename)
+
+    def test_empty_list_for_allowed_extensions_raises_validation_error(self):
+        validator = FileExtensionValidator([])
+        with self.assertRaises(ValidationError) as exc:
+            validator(self._file_with_name('file.jpg'))
+
+        self.assertEqual(exc.exception.message, "File extension 'jpg' is not allowed. Allowed extensions are: ''.")
+
+    def test_unspecified_allowed_extension_supports_any_extension(self):
+        validator = FileExtensionValidator()
+        result = validator(self._file_with_name('file.jpg'))
+        self.assertIsNone(result)
+
+    def test_file_with_no_extension_raises_exception(self):
+        validator = FileExtensionValidator(['jpg', 'gif'])
+        with self.assertRaises(ValidationError) as exc:
+            validator(self._file_with_name('noFileExtension'))
+        self.assertEqual(exc.exception.message, "File extension '' is not allowed. Allowed extensions are: 'jpg, gif'.")
+
+    def test_file_with_many_extensions_that_is_unsupported_raises_exception(self):
+        validator = FileExtensionValidator(['jpg', 'gif'])
+        with self.assertRaises(ValidationError) as exc:
+            validator(self._file_with_name('file.with.many.extensions.txt'))
+        self.assertEqual(exc.exception.message, "File extension 'txt' is not allowed. Allowed extensions are: 'jpg, gif'.")
