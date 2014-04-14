@@ -112,6 +112,7 @@ class HttpResponseBase(six.Iterator):
         # historical behavior of request_finished.
         self._handler_class = None
         self.cookies = SimpleCookie()
+        self.closed = False
         if status is not None:
             self.status_code = status
         if reason is not None:
@@ -313,16 +314,26 @@ class HttpResponseBase(six.Iterator):
                 closable.close()
             except Exception:
                 pass
+        self.closed = True
         signals.request_finished.send(sender=self._handler_class)
 
     def write(self, content):
-        raise Exception("This %s instance is not writable" % self.__class__.__name__)
+        raise IOError("This %s instance is not writable" % self.__class__.__name__)
 
     def flush(self):
         pass
 
     def tell(self):
-        raise Exception("This %s instance cannot tell its position" % self.__class__.__name__)
+        raise IOError("This %s instance cannot tell its position" % self.__class__.__name__)
+
+    # These methods partially implement a stream-like object interface.
+    # See https://docs.python.org/library/io.html#io.IOBase
+
+    def writable(self):
+        return False
+
+    def writelines(self, lines):
+        raise IOError("This %s instance is not writable" % self.__class__.__name__)
 
 
 class HttpResponse(HttpResponseBase):
@@ -373,6 +384,16 @@ class HttpResponse(HttpResponseBase):
     def tell(self):
         return len(self.content)
 
+    def getvalue(self):
+        return self.content
+
+    def writable(self):
+        return True
+
+    def writelines(self, lines):
+        for line in lines:
+            self.write(line)
+
 
 class StreamingHttpResponse(HttpResponseBase):
     """
@@ -409,6 +430,9 @@ class StreamingHttpResponse(HttpResponseBase):
 
     def __iter__(self):
         return self.streaming_content
+
+    def getvalue(self):
+        return b''.join(self.streaming_content)
 
 
 class HttpResponseRedirectBase(HttpResponse):

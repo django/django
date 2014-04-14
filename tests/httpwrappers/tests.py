@@ -407,6 +407,15 @@ class HttpResponseTests(unittest.TestCase):
         r.write(b'def')
         self.assertEqual(r.content, b'abcdef')
 
+    def test_stream_interface(self):
+        r = HttpResponse('asdf')
+        self.assertEqual(r.getvalue(), b'asdf')
+
+        r = HttpResponse()
+        self.assertEqual(r.writable(), True)
+        r.writelines(['foo\n', 'bar\n', 'baz\n'])
+        self.assertEqual(r.content, b'foo\nbar\nbaz\n')
+
     def test_unsafe_redirect(self):
         bad_urls = [
             'data:text/html,<script>window.alert("xss")</script>',
@@ -536,6 +545,9 @@ class StreamingHttpResponseTests(TestCase):
         # and we can't tell the current position.
         with self.assertRaises(Exception):
             r.tell()
+
+        r = StreamingHttpResponse(iter(['hello', 'world']))
+        self.assertEqual(r.getvalue(), b'helloworld')
 
 
 class FileCloseTests(TestCase):

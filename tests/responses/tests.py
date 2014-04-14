@@ -4,14 +4,37 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.http import HttpResponse
+from django.http.response import HttpResponseBase
 from django.test import SimpleTestCase
 
 UTF8 = 'utf-8'
 ISO88591 = 'iso-8859-1'
 
 
-class HttpResponseTests(SimpleTestCase):
+class HttpResponseBaseTests(SimpleTestCase):
+    def test_closed(self):
+        r = HttpResponseBase()
+        self.assertIs(r.closed, False)
 
+        r.close()
+        self.assertIs(r.closed, True)
+
+    def test_write(self):
+        r = HttpResponseBase()
+        self.assertIs(r.writable(), False)
+
+        with self.assertRaisesMessage(IOError, 'This HttpResponseBase instance is not writable'):
+            r.write('asdf')
+        with self.assertRaisesMessage(IOError, 'This HttpResponseBase instance is not writable'):
+            r.writelines(['asdf\n', 'qwer\n'])
+
+    def test_tell(self):
+        r = HttpResponseBase()
+        with self.assertRaisesMessage(IOError, 'This HttpResponseBase instance cannot tell its position'):
+            r.tell()
+
+
+class HttpResponseTests(SimpleTestCase):
     def test_status_code(self):
         resp = HttpResponse(status=418)
         self.assertEqual(resp.status_code, 418)
