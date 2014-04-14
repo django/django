@@ -51,6 +51,7 @@ u'<html></html>'
 
 from __future__ import unicode_literals
 
+import logging
 import re
 import warnings
 from functools import partial
@@ -124,6 +125,8 @@ tag_re = (re.compile('(%s.*?%s|%s.*?%s|%s.*?%s)' %
 libraries = {}
 # global list of libraries to load by default for a new parser
 builtins = []
+
+logger = logging.getLogger('django.template')
 
 
 class TemplateSyntaxError(Exception):
@@ -209,6 +212,7 @@ class Template(object):
         try:
             if context.template is None:
                 with context.bind_template(self):
+                    context.template_name = self.name
                     return self._render(context)
             else:
                 return self._render(context)
@@ -893,6 +897,9 @@ class Variable(object):
                             else:
                                 raise
         except Exception as e:
+            template_name = getattr(context, 'template_name', 'unknown')
+            logger.debug('{} - {}'.format(template_name, e))
+
             if getattr(e, 'silent_variable_failure', False):
                 current = context.template.engine.string_if_invalid
             else:
